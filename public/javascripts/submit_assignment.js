@@ -24,6 +24,7 @@ define([
   'jst/assignments/homework_submission_tool',
   'compiled/external_tools/HomeworkSubmissionLtiContainer',
   'compiled/views/editor/KeyboardShortcuts' /* TinyMCE Keyboard Shortcuts for a11y */,
+  'jsx/shared/rce/RichContentEditor',
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -36,9 +37,13 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts) {
+], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool,
+     HomeworkSubmissionLtiContainer, RCEKeyboardShortcuts, RichContentEditor) {
 
   window.submissionAttachmentIndex = -1;
+
+  var richContentEditor = new RichContentEditor({riskLevel: "highrisk"});
+  richContentEditor.preloadRemoteModule();
 
   $(document).ready(function() {
     var submitting = false,
@@ -206,7 +211,7 @@ define([
 
     $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
-      $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
+      richContentEditor.callOnRCE($("#submit_online_text_entry_form textarea:first"), 'toggle')
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
@@ -228,7 +233,9 @@ define([
         activate: function(event, ui) {
           if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+            if (!richContentEditor.callOnRCE($el, 'exists?')) {
+              richContentEditor.loadNewEditor($el);
+            }
           }
 
           if (ui.newTab.attr("aria-controls") === "submit_google_doc_form") {
@@ -238,7 +245,9 @@ define([
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+            if (!richContentEditor.callOnRCE($el, 'exists?')) {
+              richContentEditor.loadNewEditor($el);
+            }
           }
 
           //list Google Docs if Google Docs tab is active

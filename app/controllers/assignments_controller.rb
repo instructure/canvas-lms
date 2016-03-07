@@ -55,6 +55,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
     @assignment ||= @context.assignments.find(params[:id])
     if @assignment.deleted?
       respond_to do |format|
