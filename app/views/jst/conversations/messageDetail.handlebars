@@ -41,10 +41,11 @@
             <li>
               <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
             </li>
-            <li>
-              <a href="#" class="archive-btn">{{archiveToggleMessage}}</a>
-            </li>
-
+            {{#if canArchive}}
+              <li>
+                <a href="#" class="archive-btn">{{archiveToggleMessage}}</a>
+              </li>
+            {{/if}}
             <li><a href="#" class="star-toggle-btn">{{starToggleMessage}}</a></li>
 
             <li>

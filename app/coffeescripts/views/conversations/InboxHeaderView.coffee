@@ -139,6 +139,10 @@ define [
       @$archiveBtn.attr('title', if archived then @messages['unarchive'] else @messages['archive'])
       @$archiveBtn.find('.screenreader-only')
         .text(if archived then @messages['unarchive_conversation'] else @messages['archive_conversation'])
+      if msg.get('canArchive')
+        @$archiveBtn.removeAttr('disabled')
+      else
+        @$archiveBtn.attr('disabled', true)
       @refreshMenu()
 
     refreshMenu: ->

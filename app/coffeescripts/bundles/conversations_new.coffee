@@ -80,6 +80,8 @@ require [
         return @detail.render()
       else if messages.length > 1
         delete @detail.model
+
+        messages[0].set('canArchive', @filters.type != 'sent')
         @detail.onModelChange(messages[0], null)
         @detail.render(batch: true)
         @header.onModelChange(messages[0], null)
@@ -96,6 +98,8 @@ require [
           @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
+      if model
+        model.set('canArchive', @filters.type != 'sent')
       @header.onModelChange(model, null)
       @detail.onModelChange(model, null)
       @detail.render()
