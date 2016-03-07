@@ -457,6 +457,18 @@ describe Course do
         expect(c.grants_right?(@designer, :read_prior_roster)).to be_truthy
       end
 
+      it "should grant be able to disable read_roster to date-completed designer" do
+        Account.default.role_overrides.create!(:permission => :read_roster, :role => designer_role, :enabled => false)
+        @enrollment.start_at = 4.days.ago
+        @enrollment.end_at = 2.days.ago
+        @enrollment.save!
+        expect(@enrollment.reload.state_based_on_date).to eq :completed
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read_roster)).to be_falsey
+        expect(c.grants_right?(@designer, :read_prior_roster)).to be_falsey
+      end
+
       it "should grant read_as_admin and read to date-completed designer of unpublished course" do
         c.update_attribute(:workflow_state, 'claimed')
         make_date_completed

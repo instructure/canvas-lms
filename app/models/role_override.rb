@@ -285,7 +285,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
       },
       :view_all_grades => {
         :label => lambda { t('permissions.view_all_grades', "View all grades") },
@@ -788,7 +789,7 @@ class RoleOverride < ActiveRecord::Base
 
   # permissions that apply to concluded courses/enrollments
   def self.concluded_permission_types
-    self.permissions.select{|k, p| p[:applies_to_concluded]}.keys
+    self.permissions.select{|k, p| !!p[:applies_to_concluded]}
   end
 
   def self.manageable_permissions(context, base_role_type=nil)

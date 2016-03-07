@@ -1153,15 +1153,17 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :use_student_view, :read_outcomes, :view_unpublished_items]
+    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items]
 
     # overrideable permissions for concluded users
-    RoleOverride.concluded_permission_types.each do |permission|
+    RoleOverride.concluded_permission_types.each do |permission, details|
+      applicable_roles = details[:applies_to_concluded].is_a?(Array) && details[:applies_to_concluded]
+
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission)} ||
+          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
             user.cached_not_ended_enrollments.any? do |e|
-              e.course_id == self.id && e.completed? && e.has_permission_to?(permission)
+              e.course_id == self.id && e.completed? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))
             end
           )
       end
@@ -1208,7 +1210,7 @@ class Course < ActiveRecord::Base
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)
-    given { |user| self.account_membership_allows(user, :read_roster) }
+    given { |user| self.grants_all_rights?(user, :read_roster, :read_as_admin) }
     can :read_prior_roster
   end
 

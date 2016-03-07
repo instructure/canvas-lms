@@ -838,15 +838,23 @@ describe "security" do
         add_permission :manage_students
 
         get "/courses/#{@course.id}/users"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/groups"
+        assert_status(401)
+
+        add_permission :read_roster
+
+        get "/courses/#{@course.id}/users"
         expect(response).to be_success
-        expect(response.body).not_to match /View User Groups/
+        expect(response.body).to match /View User Groups/
         expect(response.body).to match /View Prior Enrollments/
 
         get "/courses/#{@course.id}/users/prior"
         expect(response).to be_success
 
         get "/courses/#{@course.id}/groups"
-        assert_status(401)
+        expect(response).to be_success
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
