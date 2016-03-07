@@ -7,9 +7,11 @@ define [
   'jst/tinymce/EquationEditorView'
   'str/htmlEscape'
   'compiled/fn/preventDefault'
+  'jsx/shared/rce/RceCommandShim'
   'jqueryui/dialog'
   'mathquill'
-], (I18n, $, _, Backbone, EquationToolbarView, template, htmlEscape, preventDefault) ->
+], (I18n, $, _, Backbone, EquationToolbarView, template, htmlEscape,
+      preventDefault, RceCommandShim) ->
 
   class EquationEditorView extends Backbone.View
 
@@ -180,5 +182,5 @@ define [
       $div = $(document.createElement('div')).append($img)
 
       @restoreCaret()
-      @$editor.editorBox 'insert_code', $div.html()
+      new RceCommandShim().send(@$editor, 'insert_code', $div.html())
       @$el.dialog('close')

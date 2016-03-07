@@ -24,9 +24,10 @@ define([
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
+  'jsx/shared/rce/RceCommandShim',
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers'
-], function(tinymce, I18n, $, htmlEscape) {
+], function(tinymce, I18n, $, htmlEscape, RceCommandShim) {
 
   var $box, $editor, $userURL, $altText, $actions, $flickrLink;
 
@@ -43,6 +44,8 @@ define([
     embed_image: I18n.t('embed_image', 'Embed Image'),
     image_not_found: I18n.t('image_not_found', 'Image not found, please try a new URL')
   };
+
+  var rceShim = new RceCommandShim();
 
   function initShared () {
     $box = $('<div/>', {html: htmlEscape(TRANSLATIONS.instructions) + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ htmlEscape(TRANSLATIONS.url) +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+htmlEscape(TRANSLATIONS.alt_text)+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' class='btn' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
@@ -78,7 +81,7 @@ define([
       var title = data.title,
           html = '<a href="' + htmlEscape(data.link_url) + '"><img src="' + htmlEscape(data.image_url) + '" title="' + htmlEscape(title) + '"alt="' + htmlEscape(title) + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
-      $editor.editorBox('insert_code', html);
+      rceShim.send($editor, 'insert_code', html);
     });
   }
 
@@ -87,7 +90,8 @@ define([
         text = $userURL.val();
 
     event.preventDefault();
-    $editor.editorBox('insert_code', "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>");
+    var html = "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>";
+    rceShim.send($editor, 'insert_code', html);
     $box.dialog('close');
   }
 
@@ -149,7 +153,7 @@ define([
 
         if (search === 'flickr') $flickrLink.click();
       });
-        
+
       /* replaced by instructure_image button
          but this plugin is still used by the wiki sidebar (for now)
       editor.addButton('instructure_embed', {
@@ -173,4 +177,3 @@ define([
 
   tinymce.PluginManager.add('instructure_embed', tinymce.plugins.InstructureEmbed);
 });
-

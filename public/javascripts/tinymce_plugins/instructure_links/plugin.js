@@ -21,13 +21,14 @@ define([
   'jquery',
   'str/htmlEscape',
   'tinymce_plugins/instructure_links/linkable_editor',
+  'jsx/shared/rce/RceCommandShim',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
-], function(tinymce, $, htmlEscape, LinkableEditor) {
+], function(tinymce, $, htmlEscape, LinkableEditor, RceCommandShim) {
 
   var lastLookup = null;
-
+  var rceShim = new RceCommandShim();
 
   /**
    * A module for holding helper functions pulled out of the mess below.
@@ -190,7 +191,7 @@ define([
                     $("#instructure_link_prompt").dialog('close');
                     $.findLinkForService($(this).data('service').service, function(data) {
                       $("#instructure_link_prompt").dialog('close');
-                      $editor.editorBox('create_link', {
+                      rceShim.send($editor, 'create_link', {
                         title: data.title,
                         url: data.url,
                         classes: priorClasses
@@ -218,14 +219,14 @@ define([
               var $editor = $box.data('editor');
               var $target = $(event.target);
               event.preventDefault();
-              $editor.editorBox('insert_code', Links.buttonToImg($target));
+              rceShim.send($editor, 'insert_code', Links.buttonToImg($target));
               $box.dialog('close');
             });
             // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
             $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
               var $editor = $box.data('editor');
               event.preventDefault();
-              $editor.editorBox('create_link', $(event.target).closest('img').attr('alt'));
+              rceShim.send($editor, 'create_link', $(event.target).closest('img').attr('alt'));
               $box.dialog('close');
             });
             $box.find("#instructure_link_prompt_form .prompt").bind('change keyup', function() {
