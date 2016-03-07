@@ -36,6 +36,9 @@ class Wiki < ActiveRecord::Base
   before_save :set_has_no_front_page_default
   after_save :update_contexts
 
+  has_one :course
+  has_one :group
+
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
   def set_has_no_front_page_default
