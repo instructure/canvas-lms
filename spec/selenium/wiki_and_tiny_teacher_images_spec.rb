@@ -109,7 +109,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
 
       wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
       f('.upload_new_file_link').click
-      fj('a.switch_views:visible').click
       wiki_page_body = clear_wiki_rce
 
       expect(@image_list.find_elements(:css, '.img').length).to eq 2

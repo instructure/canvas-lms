@@ -150,15 +150,87 @@ module CustomSeleniumActions
     driver.execute_script("return $('<div />').append('#{string_of_html}').find('#{css_selector}')")
   end
 
+  def select_all_in_tiny(tiny_controlling_element)
+    # This used to be a direct usage of "editorBox", which is sorta crummy because
+    # we don't want acceptance tests to have special implementation knowledge of
+    # the system under test.
+    #
+    # This script is a bit bigger, but interacts more like a user would by
+    # selecting the contents we want to manipulate directly. the reason it looks so
+    # cumbersome is because tinymce has it's actual interaction point down in
+    # an iframe.
+    src = %Q{
+      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('.mce-tinymce').find('iframe');
+      var iframeDoc = $iframe[0].contentDocument;
+      var domElement = iframeDoc.getElementsByTagName("body")[0];
+      var selection = iframeDoc.getSelection();
+      var range = iframeDoc.createRange();
+      range.selectNodeContents(domElement);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    driver.execute_script(src)
+  end
+
+  def switch_views_available?
+    fj('a.switch_views:visible').present?
+  end
+
+  def switch_editor_views(tiny_controlling_element)
+    if !tiny_controlling_element.is_a?(String)
+      tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+    end
+    selector = tiny_controlling_element.to_s.to_json
+    keep_trying_until { switch_views_available? }
+    driver.execute_script(%Q{
+      $(#{selector}).parent().parent().find("a.switch_views:visible").click();
+    })
+  end
+
+  def clear_tiny(tiny_controlling_element, iframe_id=nil)
+    if switch_views_available?
+      switch_editor_views(tiny_controlling_element)
+      tiny_controlling_element.clear
+      expect(tiny_controlling_element[:value]).to be_empty
+      switch_editor_views(tiny_controlling_element)
+    else
+      raise "Must provide iframe Id if we can't switch views" unless iframe_id
+      in_frame iframe_id do
+        tinymce_element = f("body")
+        puts "contents: #{tinymce_element.text}"
+        while tinymce_element.text.length > 0 do
+          puts "contents: #{tinymce_element.text}"
+          tinymce_element.click
+          tinymce_element.send_keys(Array.new(100, :backspace))
+          tinymce_element = f("body")
+        end
+      end
+    end
+  end
+
   def type_in_tiny(tiny_controlling_element, text, clear: false)
     selector = tiny_controlling_element.to_s.to_json
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until do
-      driver.execute_script("return $(#{selector}).editorBox('exists?');")
+    keep_trying_until do
+      driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').length > 0;")
     end
-    tiny_action = clear ? "mceSetContent" : "mceInsertContent"
-    scr = "$(#{selector}).editorBox('execute', '#{tiny_action}', false, #{text.to_s.to_json})"
-    driver.execute_script(scr)
+
+    iframe_id = driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').find('iframe')[0];")['id']
+    text_lines = text.split("\n")
+
+    clear_tiny(tiny_controlling_element, iframe_id) if clear
+
+    in_frame iframe_id do
+      tinymce_element = f("body")
+      tinymce_element.click
+      if text_lines.size > 1
+        text_lines.each_with_index do |line, index|
+          tinymce_element.send_keys(line)
+          tinymce_element.send_keys(:return) unless index >= text_lines.size - 1
+        end
+      else
+        tinymce_element.send_keys(text)
+      end
+    end
   end
 
   def hover_and_click(element_jquery_finder)

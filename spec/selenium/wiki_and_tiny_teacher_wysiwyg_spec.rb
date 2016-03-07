@@ -12,7 +12,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       course_with_teacher_logged_in
     end
 
-    def wysiwyg_state_setup(text = "<p>1</p><p>2</p><p>3</p>", val = false)
+    def wysiwyg_state_setup(text = "1\n2\n3", val: false, html: false)
       get "/courses/#{@course.id}/pages/front-page/edit"
       wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
 
@@ -20,7 +20,11 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         add_text_to_tiny(text)
         validate_link(text)
       else
-        add_text_to_tiny_no_val(text)
+        if html
+          add_html_to_tiny(text)
+        else
+          add_text_to_tiny_no_val(text)
+        end
         select_all_wiki
       end
     end
@@ -28,14 +32,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should type a web address link, save it, "\
     "and validate auto link plugin worked correctly", priority: "1", test_id: 312410 do
       text = "http://www.google.com/"
-      wysiwyg_state_setup(text, val = true)
+      wysiwyg_state_setup(text, val: true)
       save_wiki
       validate_link(text)
     end
 
     it "should remove web address link previously embedded, save it and persist", priority: "1", test_id: 312637 do
       text = "http://www.google.com/"
-      wysiwyg_state_setup(text, val = true)
+      wysiwyg_state_setup(text, val: true)
 
       select_all_wiki
       f('.mce-i-unlink').click
@@ -65,7 +69,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove bullet lists", priority: "1", test_id: 535894 do
       text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
@@ -84,7 +88,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove numbered lists", priority: "1", test_id: 537619 do
       text = "<ol><li>1</li><li>2</li><li>3</li></ol>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
@@ -103,7 +107,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove font color for all selected text", priority: "1", test_id: 469876 do
       text = "<p><span style=\"color: rgb(255, 0, 0);\">1</span></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       # order-dependent ID of the forecolor button
       f("#mceu_3 .mce-caret").click
@@ -124,7 +128,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove background font color", priority: "1", test_id: 474035 do
       text = "<p><span style=\"background-color: rgb(255, 0, 0);\">1</span></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       # order-dependent ID of the backcolor button
       f("#mceu_4 .mce-caret").click
@@ -205,7 +209,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove left align from text", priority: "1", test_id: 526906 do
       text = "<p style=\"text-align: left;\">1</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       f(".mce-i-alignleft").click
       validate_wiki_style_attrib_empty("p")
@@ -219,7 +223,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove center align from text", priority: "1", test_id: 529217 do
       text = "<p style=\"text-align: center;\">1</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       f(".mce-i-aligncenter").click
       validate_wiki_style_attrib_empty("p")
@@ -233,7 +237,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove right align from text", priority: "1", test_id: 530886 do
       text = "<p style=\"text-align: right;\">1</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       f(".mce-i-alignright").click
       validate_wiki_style_attrib_empty("p")
@@ -267,7 +271,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove superscript from text in rce", priority: "1", test_id: 532084 do
       text = "<p><sup>This is my text</sup></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       shift_click_button('.mce-i-superscript')
       in_frame wiki_page_body_ifr_id do
@@ -286,7 +290,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove subscript from text in rce", priority: "1", test_id: 532799 do
       text = "<p><sub>This is my text</sub></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
 
       shift_click_button('.mce-i-subscript')
       in_frame wiki_page_body_ifr_id do
@@ -322,7 +326,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should change paragraph type to preformatted" do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'Preformatted')]]").click
       in_frame wiki_page_body_ifr_id do
@@ -332,7 +336,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should change paragraph type to Header 2", priority: "1", test_id: 417581 do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'Header 2')]]").click
       in_frame wiki_page_body_ifr_id do
@@ -375,7 +379,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should delete a table", priority: "1", test_id: 588945 do
       table = "<table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>"
-      wysiwyg_state_setup(table)
+      wysiwyg_state_setup(table, html: true)
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
       in_frame wiki_page_body_ifr_id do
@@ -393,7 +397,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove bold from text in rce", priority: "1", test_id: 417603 do
       text = "<p><strong>This is my text</strong></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-bold')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce strong')).to be_nil
@@ -410,7 +414,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove italic from text in rce", priority: "1", test_id: 417607 do
       text = "<p><em>This is my text</em></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-italic')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce em')).to be_nil
@@ -425,7 +429,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove underline from text in the rce", priority: "1", test_id: 460408 do
       text = "<p><u>This is my text</u></p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-underline')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce u')).to be_nil
@@ -442,7 +446,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove right-to-left from text in the rce", priority: "1", test_id: 547797 do
       text = "<p dir=\"rtl\">This is my text</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-rtl')
       validate_wiki_style_attrib_empty("p")
     end
@@ -457,35 +461,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should remove left-to-right from text in the rce", priority: "1", test_id: 550312 do
       text = "<p dir=\"ltr\">This is my text</p>"
-      wysiwyg_state_setup(text)
+      wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-ltr')
       validate_wiki_style_attrib_empty("p")
-    end
-
-    it "should add an equation to the rce by using equation buttons" do
-      skip "check_image broken"
-      get "/courses/#{@course.id}/pages/front-page/edit"
-
-      f("##{wiki_page_editor_id}_instructure_equation").click
-      wait_for_ajaximations
-      expect(f('.mathquill-editor')).to be_displayed
-      misc_tab = f('.mathquill-tab-bar > li:last-child a')
-      misc_tab.click
-      f('#Misc_tab li:nth-child(35) a').click
-      basic_tab = f('.mathquill-tab-bar > li:first-child a')
-      basic_tab.click
-      f('#Basic_tab li:nth-child(27) a').click
-      f('.ui-dialog-buttonset .btn-primary').click
-      keep_trying_until do
-        in_frame wiki_page_body_ifr_id do
-          expect(f('#tinymce img.equation_image')).to be_displayed
-        end
-      end
-
-      f('form.edit-form button.submit').click
-      wait_for_ajax_requests
-
-      check_image(f('#wiki_page_show img'))
     end
 
     it "should not scroll to the top of the page after using an equation button" do
@@ -552,35 +530,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         expect(response.code).to eq "302"
         expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
       end
-    end
-
-    it "should add an equation to the rce by using equation buttons in advanced view" do
-      skip('broken')
-      get "/courses/#{@course.id}/pages/front-page/edit"
-
-      f("##{wiki_page_editor_id}_instructure_equation").click
-      wait_for_ajaximations
-      expect(f('.mathquill-editor')).to be_displayed
-      f('a.math-toggle-link').click
-      wait_for_ajaximations
-      expect(f('#mathjax-editor')).to be_displayed
-      misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
-      misc_tab.click
-      f('#misc_tab li:nth-child(35) a').click
-      basic_tab = f('#mathjax-view .mathquill-tab-bar > li:first-child a')
-      basic_tab.click
-      f('#basic_tab li:nth-child(27) a').click
-      f('.ui-dialog-buttonset .btn-primary').click
-      keep_trying_until do
-        in_frame wiki_page_body_ifr_id do
-          expect(f('#tinymce img.equation_image')).to be_displayed
-        end
-      end
-
-      f('form.edit-form button.submit').click
-      wait_for_ajax_requests
-
-      check_image(f('#wiki_page_show img'))
     end
 
     it "should add an equation to the rce by using the equation editor in advanced view" do
@@ -660,7 +609,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should display record video dialog" do
       stub_kaltura
-      #pending("failing because it is dependant on an external kaltura system")
 
       get "/courses/#{@course.id}/pages/front-page/edit"
 

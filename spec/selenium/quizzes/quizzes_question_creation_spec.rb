@@ -274,13 +274,15 @@ describe 'quizzes question creation' do
       type_in_tiny '.question_form:visible textarea.question_content',
         'If [x] + [y] is a whole number, then this is a formula question.'
 
-      fj('button.recompute_variables').click
-      val = fj('.variables.value').to_i
+      # get focus out of tinymce to allow change event to propogate
+      f(".question_header").click
+      f('button.recompute_variables').click
+      val = f('.variables.value').to_i
       expect(val <= 10 && val >= 0)
-      fj('button.recompute_variables').click
-      keep_trying_until { expect(fj('.variables.value').to_i != val) }
+      f('button.recompute_variables').click
+      keep_trying_until { expect(f('.variables.value').to_i != val) }
       fj('.supercalc:visible').send_keys('x + y')
-      fj('button.save_formula_button').click
+      f('button.save_formula_button').click
       # normally it's capped at 200 (to keep the yaml from getting crazy big)...
       # since selenium tests take forever, let's make the limit much lower
       driver.execute_script('ENV.quiz_max_combination_count = 10')
@@ -453,4 +455,3 @@ describe 'quizzes question creation' do
     end
   end
 end
-

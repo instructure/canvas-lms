@@ -7,14 +7,7 @@ describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
-
-  def toggle_html_mode
-    keep_trying_until do
-      fj('a.switch_views:visible').present?
-    end
-    fj('a.switch_views:visible').click
-  end
-
+  
   context "Navigation" do
     def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
@@ -99,7 +92,7 @@ describe "Wiki Pages" do
       driver.execute_script("window.close()")
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      toggle_html_mode
+      switch_editor_views(wiki_page_body)
       expect(f('textarea').text).to include_text('test')
     end
   end
@@ -412,16 +405,16 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
-        toggle_html_mode
-        f('textarea').send_keys("derp")
+        switch_editor_views(wiki_page_body)
+        wiki_page_body.send_keys("derp")
         fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
 
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
-        toggle_html_mode
-        f('textarea').send_keys('derp')
+        switch_editor_views(wiki_page_body)
+        wiki_page_body.send_keys('derp')
         fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
@@ -430,7 +423,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
-        toggle_html_mode
+        switch_editor_views(wiki_page_body)
         f('.title').clear()
         f('.title').send_keys("derpy-title")
         fln('Home').click
@@ -575,7 +568,8 @@ describe "Wiki Pages" do
 
     it "should embed vimeo video in the page", priority: "1", test_id: 126835 do
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fln("HTML Editor").click
+      element = f("#wiki_page_body")
+      switch_editor_views(element)
       html_contents = %q(
         <p>
           <iframe style="width: 640px; height: 480px;"
@@ -589,7 +583,7 @@ describe "Wiki Pages" do
           </iframe>
         </p>
       )
-      f("#wiki_page_body").send_keys(html_contents)
+      element.send_keys(html_contents)
       f(".btn-primary").click
       wait_for_ajaximations
       expect(f("iframe")).to be_present
