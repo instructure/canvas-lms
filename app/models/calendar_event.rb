@@ -64,6 +64,28 @@ class CalendarEvent < ActiveRecord::Base
   before_update :sync_google_calendar
   before_save :sync_google_calendar
 
+  after_destroy :kill_google_calendar
+
+  def kill_google_calendar
+    return if !google_calendar_id
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.delete,
+      :parameters => params)
+  end
+
   def sync_google_calendar
     obj = {}
 
