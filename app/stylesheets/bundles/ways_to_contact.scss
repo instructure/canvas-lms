@@ -17,6 +17,12 @@
 .channel_list .channel.unconfirmed .default_link {
   display: none;
 }
+.channel_list .channel.unconfirmed .unconfirmed_text {
+    display: block;
+}
+.channel_list .unconfirmed_text {
+    display: none;
+}
 .channel_list .channel.default .default_link,
 .channel_list .channel.default:hover .default_link {
   display: block;
@@ -25,6 +31,12 @@
 }
 .channel_list .channel.default .delete_channel_link {
   display: none;
+}
+.channel_list .channel.default .cant_delete_default_text {
+    display: block;
+}
+.channel_list .cant_delete_default_text {
+    display: none;
 }
 #right-side table.channel_list tr.channel.unconfirmed > td a {
   color: $ic-color-dark;

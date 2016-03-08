@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
@@ -122,7 +122,7 @@ describe "profile" do
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")
-      link = f("#channel_#{channel.id} td:first-child a")
+      link = f("#channel_#{channel.id} td:first-of-type a")
       link.click
       wait_for_ajaximations
       expect(row).to have_class("default")

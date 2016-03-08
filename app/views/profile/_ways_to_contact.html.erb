@@ -2,30 +2,40 @@
   css_bundle :ways_to_contact
 %>
 
+<%# this needs to be reactified. badly. %>
 <h2><%= t('headers.ways_to_contact', "Ways to Contact") %></h2>
 <div class="rs-margin-lr">
-<table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
-  <caption><%= t('headers.email_addresses', "Email Addresses") %></caption>
+  <table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
+    <thead>
+      <tr>
+        <th><%= t("Email Addresses") %></th>
+        <th><span class="screenreader-only"><%= t("Set Email as Default") %></span></th>
+        <th><span class="screenreader-only"><%= t("Email Actions") %></span></th>
+      </tr>
+    </thead>
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c == @default_email_channel %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
+      <th scope="row">
+        <% if c.state == :unconfirmed %>
+          <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
+        <% else %>
+          <p class="path email_channel"><%= c.path %></>
+        <% end %>
+      </th>
       <td class="email_meta">
         <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t("Set default email address") %>" >
-          <i class="icon-star standalone-icon" alt="<%= t('titles.default_email_address_alt', "Default email address") %>" aria-hidden="true" title="<%= t('titles.default_email_address', "Default email address") %>"></i>
+          <i class="icon-star standalone-icon" alt="<%= t("Set email address as default") %>" aria-hidden="true" title="<%= t("Set email address as default") %>"></i>
           <% if c == @default_email_channel %>
             <span class="screenreader-only default_label"><%= t("This is the default email address") %></span>
+          <% else %>
+            <span class="screenreader-only"><%= t("Set as default email address") %></span>
           <% end %>
           <% if c.state == :unconfirmed %>
             <span class="screenreader-only"><%= t("This email address is unconfirmed") %></span>
             <i class="icon-warning standalone-icon" alt="" aria-hidden="true"></i>
           <% end %>
         </a>
-      </td>
-      <td>
-        <% if c.state == :unconfirmed %>
-          <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
-        <% else %>
-          <p class="path email_channel"><%= c.path %></>
-        <% end %>
+        <span class="screenreader-only unconfirmed_text"><%= t("This email address is unconfirmed") %></span>
       </td>
       <td class="email_actions">
         <span class="hidden_for_single">
@@ -33,8 +43,9 @@
               <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
           <% end %>
           <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
-            <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label= "<%= t('titles.remove_email_address_aria_label', "Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t('titles.remove_email_address_alt', "Remove email address") %>" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+            <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label="<%= t("Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t("Remove email address") %>"></i></a>
           <% end %>
+          <span class="screenreader-only cant_delete_default_text"><%= t("You cannot remove your default email address") %></span>
           <% if c.active? && c.has_merge_candidates? %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover" aria-label="<%= t('titles.merge_users_aria_label', "Another user has the same email address.  Click here to combine user accounts.") %>"><i class="icon-group-new standalone-icon" alt="<%= t('titles.merge_users_alt', "Another user has the same email address.  Click here to combine user accounts.") %>" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
           <% end %>
@@ -54,14 +65,15 @@
     </tr>
   <% end %>
   <tr class="channel blank unconfirmed" style="display: none;">
+    <th scope="row">
+      <a href="#" class="path email_channel" title="">&nbsp;</a>
+    </th>
     <td class="email_meta">
       <a href="<%= user_profile_url(@current_user) %>" class="default_link no-hover"><i class="icon-star standalone-icon" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
-    </td>
-    <td>
-      <a href="#" class="path email_channel" title="">&nbsp;</a>
+      <span class="screenreader-only unconfirmed_text"><%= t("This email address is unconfirmed") %></span>
     </td>
     <td class="email_actions hidden_for_single">
-      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
+      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover" aria-label="<%= t('Remove email address') %>"><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t('Remove email address') %>"></i></a>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
       <span class="channel_id" style="display: none;">&nbsp;</span>
       <span class="user_id" style="display: none;">&nbsp;</span>
@@ -201,7 +213,7 @@
     <div class="control-group sms_email_group">
       <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
       <div class="controls">
-        <input type="email" name="communication_channel_sms_email" class="sms_email" id="communication_channel_sms_email" />
+        <input type="email" name="communication_channel_sms_email" class="sms_email" id="communication_channel_sms_email" aria-describedby="communication_channel_sms_number communication_channel_carrier" />
       </div>
     </div>
 
@@ -210,7 +222,7 @@
     </div>
 <% end %>
 </div>
-<div id="confirm_email_channel" style="display: none;" class="dialog">
+<div id="confirm_email_channel" style="display: none;" class="dialog" role="dialog">
   <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We emailed a confirmation link to %{email_address}. Click the link in that
     email to finish registering. Make sure to check your spam box in case it
