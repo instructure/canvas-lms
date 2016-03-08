@@ -135,6 +135,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
+    self.deleted_at = Time.now.utc
     self.save
   end
 
