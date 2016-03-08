@@ -634,3 +634,13 @@ define [
     @gradebookColumnOrderSettings = undefined
     @getVisibleGradeGridColumns()
     notOk @makeColumnSortFn.called
+
+  module 'Gradebook#fieldsToExcludeFromAssignments',
+    setup: ->
+      @excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments
+
+  test "includes 'description' in the response", ->
+    ok _.contains(@excludedFields(), 'description')
+
+  test "includes 'needs_grading_count' in the response", ->
+    ok _.contains(@excludedFields(), 'needs_grading_count')

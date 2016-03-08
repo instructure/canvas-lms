@@ -30,7 +30,7 @@ module Api::V1::AssignmentGroup
 
   def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
-    opts.reverse_merge! override_assignment_dates: true
+    opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
     hash = api_json(group, user, session,:only => %w(id name position group_weight))
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
@@ -39,7 +39,7 @@ module Api::V1::AssignmentGroup
       assignments = opts[:assignments] || group.visible_assignments(user)
 
       user_content_attachments = opts[:preloaded_user_content_attachments]
-      unless opts[:exclude_descriptions]
+      unless opts[:exclude_response_fields].include?('description')
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
 
@@ -61,8 +61,7 @@ module Api::V1::AssignmentGroup
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
-          exclude_description: opts[:exclude_descriptions],
-          exclude_rubric: opts[:exclude_rubrics],
+          exclude_response_fields: opts[:exclude_response_fields],
           overrides: overrides,
           needs_grading_course_proxy: needs_grading_course_proxy,
           submission: includes.include?('submission') ? opts[:submissions][a.id] : nil

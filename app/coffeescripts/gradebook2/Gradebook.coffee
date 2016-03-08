@@ -112,7 +112,7 @@ define [
         @gotAllStudents()
         gotAllStudentsAndAssignmentsPromise.resolve()
 
-      @assignmentGroupsParams = {exclude_descriptions: true}
+      @assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(@assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
@@ -1699,3 +1699,6 @@ define [
       return false if @options.all_grading_periods_totals
       selectedPeriodId = @getGradingPeriodToShow()
       @isAllGradingPeriods(selectedPeriodId)
+
+    fieldsToExcludeFromAssignments: ->
+      ['description', 'needs_grading_count']

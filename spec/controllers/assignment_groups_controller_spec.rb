@@ -79,8 +79,12 @@ describe AssignmentGroupsController do
         end
 
         let(:index_params) do
-          { course_id: course.id, exclude_descriptions: true, format: :json,
-            include: ['assignments', 'assignment_visibility', 'overrides'] }
+          {
+            course_id: course.id,
+            exclude_response_fields: ['description'],
+            format: :json,
+            include: ['assignments', 'assignment_visibility', 'overrides']
+          }
         end
 
         let(:assignments_ids) do

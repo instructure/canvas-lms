@@ -66,7 +66,7 @@ module Api::V1::Assignment
       include_all_dates: false,
       override_dates: true,
       needs_grading_count_by_section: false,
-      exclude_description: false
+      exclude_response_fields: []
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -74,7 +74,7 @@ module Api::V1::Assignment
     end
 
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
-    if opts[:exclude_description]
+    if opts[:exclude_response_fields].include?('description')
       fields_copy = fields[:only].dup
       fields_copy.delete("description")
       fields = {only: fields_copy}
@@ -109,7 +109,7 @@ module Api::V1::Assignment
 
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
-    unless opts[:exclude_description]
+    unless opts[:exclude_response_fields].include?('description')
       hash['description'] = api_user_content(hash['description'],
                                              @context || assignment.context,
                                              user,
@@ -140,7 +140,8 @@ module Api::V1::Assignment
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
     end
 
-    if assignment.context.grants_right?(user, :manage_grades)
+    include_needs_grading_count = opts[:exclude_response_fields].exclude?('needs_grading_count')
+    if include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
       query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
       if opts[:needs_grading_count_by_section]
         hash['needs_grading_count_by_section'] = query.count_by_section
@@ -162,7 +163,7 @@ module Api::V1::Assignment
       hash['allowed_extensions'] = assignment.allowed_extensions
     end
 
-    unless opts[:exclude_rubric]
+    unless opts[:exclude_response_fields].include?('rubric')
       if assignment.rubric_association
         hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
         if assignment.rubric_association.rubric
@@ -199,7 +200,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false, exclude_messages: opts[:exclude_description])
+        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?('description'))
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
