@@ -70,6 +70,7 @@ module.exports = {
         test: /\.jsx$/,
         include: [
           path.resolve(__dirname, "../app/jsx"),
+          path.resolve(__dirname, "../spec/javascripts/jsx"),
           /gems\/plugins\/.*\/app\/jsx\//
         ],
         exclude: [

@@ -43,6 +43,11 @@ testWebpackConfig.module.loaders.push({
 });
 
 testWebpackConfig.module.loaders.push({
+  test: /\/spec\/javascripts\/jsx\//,
+  loaders: ["qunitJsxDependencyLoader"]
+});
+
+testWebpackConfig.module.loaders.push({
   test: /\/ember\/.*\/tests\//,
   loaders: ["qunitDependencyLoader"]
 });
