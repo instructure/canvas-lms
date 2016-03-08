@@ -40,7 +40,10 @@
     border-bottom: 1px solid $ic-border-light;
     height: 112px;
     padding: $ic-sp;
-    @include breakpoint(wide) {
+    // TODO: revisit when breakpoint fixed
+    // until we have a better breakpoint for desktop
+    // need to put in direct amount for better ux
+    @media only screen and (min-width: 1200px) {
       height: 62px;
       display: flex;
       align-items: center;
@@ -49,7 +52,10 @@
     }
     .panel__primary {
       margin-bottom: $ic-sp;
-      @include breakpoint(wide) {
+      // TODO: revisit when breakpoint fixed
+      // until we have a better breakpoint for desktop
+      // need to put in direct amount for better ux
+      @media only screen and (min-width: 1200px) {
         margin-bottom: 0;
         flex: 1;
         white-space: nowrap;
@@ -60,7 +66,10 @@
       }
     }
     .panel__secondary {
-      @include breakpoint(wide) { white-space: nowrap; }
+      // TODO: revisit when breakpoint fixed
+      // until we have a better breakpoint for desktop
+      // need to put in direct amount for better ux
+      @media only screen and (min-width: 1200px) { white-space: nowrap; }
       > div {
         display: inline-block;
         vertical-align: middle;
@@ -195,7 +204,7 @@
   bottom: 0;
   @if $use_new_styles {
     top: 112px;
-    @include breakpoint(wide) { top: 62px; }
+    @media only screen and (min-width: 1200px) { top: 62px; }
   }
   @else { top: 58px; }
 }
