@@ -24,78 +24,78 @@ describe 'new ui' do
       course_with_teacher_logged_in
     end
 
-    it 'should show breadcrumbs for course navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course navigation menu item', priority: "2", test_id: 242471 do
       get "/courses/#{@course.id}"
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course announcements navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course announcements navigation menu item', priority: "2", test_id: 856927 do
       get "/courses/#{@course.id}/announcements"
       expect(f('.home + li + li .ellipsible')).to include_text('Announcements')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course assignments navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course assignments navigation menu item', priority: "2", test_id: 856928 do
       get "/courses/#{@course.id}/assignments"
       expect(f('.home + li + li .ellipsible')).to include_text('Assignments')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course discussions navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course discussions navigation menu item', priority: "2", test_id: 856929 do
       get "/courses/#{@course.id}/discussion_topics"
       expect(f('.home + li + li .ellipsible')).to include_text('Discussions')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course grades navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course grades navigation menu item', priority: "2", test_id: 856930 do
       get "/courses/#{@course.id}/gradebook"
       expect(f('.home + li + li .ellipsible')).to include_text('Grades')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course people navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course people navigation menu item', priority: "2", test_id: 856931 do
       get "/courses/#{@course.id}/users"
       expect(f('.home + li + li .ellipsible')).to include_text('People')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course pages navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course pages navigation menu item', priority: "2", test_id: 856932 do
       get "/courses/#{@course.id}/wiki"
       expect(f('.home + li + li .ellipsible')).to include_text('Pages')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course files navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course files navigation menu item', priority: "2", test_id: 856933 do
       get "/courses/#{@course.id}/files"
       expect(f('#breadcrumbs .ellipsis')).to include_text('Files')
       expect(f('.ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course syllabus navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course syllabus navigation menu item', priority: "2", test_id: 856934 do
       get "/courses/#{@course.id}/assignments/syllabus"
       expect(f('.home + li + li .ellipsible')).to include_text('Syllabus')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course outcomes navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course outcomes navigation menu item', priority: "2", test_id: 856935 do
       get "/courses/#{@course.id}/outcomes"
       expect(f('.home + li + li .ellipsible')).to include_text('Outcomes')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course quizzes navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course quizzes navigation menu item', priority: "2", test_id: 856936 do
       get "/courses/#{@course.id}/quizzes"
       expect(f('.home + li + li .ellipsible')).to include_text('Quizzes')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course modules navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course modules navigation menu item', priority: "2", test_id: 856937 do
       get "/courses/#{@course.id}/modules"
       expect(f('.home + li + li .ellipsible')).to include_text('Modules')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show breadcrumbs for course settings navigation menu item', priority: "2", test_id: 242471 do
+    it 'breadcrumbs show for course settings navigation menu item', priority: "2", test_id: 856938 do
       get "/courses/#{@course.id}/settings"
       expect(f('.home + li + li .ellipsible')).to include_text('Settings')
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
