@@ -12,7 +12,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :resource_selection, :editor_button, :homework_submission,
                   :course_home_sub_navigation, :course_settings_sub_navigation,
                   :config_type, :config_url, :config_xml, :tool_id,
-                  :integration_type, :not_selectable
+                  :not_selectable
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -556,15 +556,6 @@ class ContextExternalTool < ActiveRecord::Base
 
     res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
     return res if res
-
-    nil
-  end
-
-  def self.find_integration_for(context, type)
-    contexts_to_search(context).each do |context|
-      tools = context.context_external_tools.active.where(integration_type: type)
-      return tools.first unless tools.empty?
-    end
 
     nil
   end

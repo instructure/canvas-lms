@@ -167,8 +167,7 @@ class ApplicationController < ActionController::Base
 
     hash = {
       :title => tool.label_for(type, I18n.locale),
-      :base_url =>  polymorphic_url([context, :external_tool], url_params),
-      :is_new => tool.integration_type == 'lor'
+      :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
