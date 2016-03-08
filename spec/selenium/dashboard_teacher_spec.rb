@@ -74,12 +74,36 @@ describe "dashboard" do
 
     end
 
-    it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108723 do
-      NotificationsCommon.setup_notification(@teacher, name: 'Assignment Created')
-      assignment_model({:submission_types => ['online_text_entry'], :course => @course})
-      get "/"
-      find('.toggle-details').click
-      expect(element_exists(fj('.fake-link:contains("Unnamed")'))).to be true
+    context 'stream items' do
+      before :once do
+        NotificationsCommon.setup_notification(@teacher, name: 'Assignment Created')
+      end
+
+      it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
+        assignment_model({:submission_types => ['online_text_entry'], :course => @course})
+        get "/"
+        find('.toggle-details').click
+        expect(element_exists(fj('.fake-link:contains("Unnamed")'))).to be true
+      end
+
+      it 'does not show an unpublished assignment under recent activity under dashboard', priority: "2", test_id: 108722 do
+        # manually creating assignment as assignment created through backend are published by default
+        get "/courses/#{@course.id}/assignments"
+        wait_for_ajaximations
+
+        # create assignment
+        f('.new_assignment').click
+        wait_for_ajaximations
+        f('#assignment_name').send_keys('unpublished assignment')
+        f("input[type=checkbox][id=assignment_text_entry]").click
+        f(".datePickerDateField[data-date-type='due_at']").send_keys(Time.zone.now + 1.day)
+
+        expect_new_page_load { f('.btn-primary[type=submit]').click }
+        wait_for_ajaximations
+
+        get "/"
+        expect(f('.no_recent_messages')).to be_truthy
+      end
     end
 
     context "moderation to do" do
