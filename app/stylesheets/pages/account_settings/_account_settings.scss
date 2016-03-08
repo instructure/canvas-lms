@@ -87,9 +87,7 @@
 .announcements_list_item {
   background: $ic-bg-light-neutral;
   margin-bottom: $ic-sp*2;
-  padding: $ic-sp;
-  @include breakpoint(wide) { padding: $ic-sp*2; }
-
+  padding: $ic-sp*2;
   .edit_notification_form {
     margin-top: $ic-sp*2;
     padding-top: $ic-sp*2;
