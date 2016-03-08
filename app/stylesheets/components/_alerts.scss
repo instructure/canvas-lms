@@ -270,12 +270,12 @@ $ic-notification-border-thickness: 2px;
   &.ic-notification--admin-created {
     .ic-notification__content {
       display: flex;
-      @include breakpoint(wide) { align-items: flex-start; }
+      @include breakpoint(desktop) { align-items: flex-start; }
     }
     .ic-notification__message { flex: 1; }
     .ic-notification__actions {
       margin-left: $ic-sp*2;
-      @include breakpoint(wide) { margin-left: $ic-sp*3; }
+      @include breakpoint(desktop) { margin-left: $ic-sp*3; }
     }
     .ic-notification__title {
       display: block;
@@ -314,28 +314,15 @@ $ic-notification-border-thickness: 2px;
   padding: $ic-sp;
   box-sizing: border-box;
   background: $ic-color-light;
-  @include breakpoint(wide) {
-    display: flex;
-    align-items: center;
-
-  }
 }
 
 .ic-notification__message {
   box-sizing: border-box;
-  margin-bottom: $ic-sp/2;
   p:last-of-type { margin-bottom: 0; }
-  @include breakpoint(wide) {
-    flex: 1;
-    margin-bottom: 0;
-  }
 }
 
 .ic-notification__actions {
   box-sizing: border-box;
-  @include breakpoint(wide) {
-    margin-left: $ic-sp*4;
-  }
 }
 
 .ic-notification__admin-actions {
