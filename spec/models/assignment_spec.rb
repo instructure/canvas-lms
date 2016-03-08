@@ -2361,6 +2361,52 @@ describe Assignment do
       expect(assignment.turnitin_settings[:current]).to be_nil
     end
   end
+  
+  context "vericite settings" do
+    before(:once) { assignment_model(course: @course) }
+
+    it "should sanitize bad data" do
+      assignment = @assignment
+      assignment.vericite_settings = {
+        :originality_report_visibility => 'invalid',
+        :exclude_quoted => true
+      }
+      expect(assignment.vericite_settings).to eql({
+        :originality_report_visibility => 'immediate',
+        :exclude_quoted => '1'
+      })
+    end
+
+    it "should persist :created across changes" do
+      assignment = @assignment
+      assignment.vericite_settings = VeriCite::Client.default_assignment_vericite_settings
+      assignment.save
+      assignment.vericite_settings[:created] = true
+      assignment.save
+      assignment.reload
+      expect(assignment.vericite_settings[:created]).to be_truthy
+
+      assignment.vericite_settings = VeriCite::Client.default_assignment_vericite_settings.merge(:exclude_quoted => '0')
+      assignment.save
+      assignment.reload
+      expect(assignment.vericite_settings[:created]).to be_truthy
+    end
+
+    it "should clear out :current" do
+      assignment = @assignment
+      assignment.vericite_settings = VeriCite::Client.default_assignment_vericite_settings
+      assignment.save
+      assignment.vericite_settings[:current] = true
+      assignment.save
+      assignment.reload
+      expect(assignment.vericite_settings[:current]).to be_truthy
+
+      assignment.vericite_settings = VeriCite::Client.default_assignment_vericite_settings.merge(:exclude_quoted => '0')
+      assignment.save
+      assignment.reload
+      expect(assignment.vericite_settings[:current]).to be_nil
+    end
+  end
 
   context "generate comments from submissions" do
     def create_and_submit

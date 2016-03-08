@@ -59,6 +59,10 @@ class GradeSummaryPresenter
   def turnitin_enabled?
     @context.turnitin_enabled? && assignments.any?(&:turnitin_enabled)
   end
+  
+  def vericite_enabled?
+    @context.vericite_enabled? && assignments.any?(&:vericite_enabled)
+  end
 
   def observed_students
     @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user)

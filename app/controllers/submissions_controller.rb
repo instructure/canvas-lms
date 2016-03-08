@@ -494,6 +494,46 @@ class SubmissionsController < ApplicationController
       end
     end
   end
+  
+  def vericite_report
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+    @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
+    @asset_string = params[:asset_string]
+    if authorized_action(@submission, @current_user, :read)
+      # vericite_data is a function, so store the results in an array to prevent multiple calls
+      vericite_data = @submission.vericite_data
+      if (report_url = vericite_data[@asset_string] && vericite_data[@asset_string][:report_url])
+        url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+      else
+        url = @submission.vericite_report_url(@asset_string, @current_user) rescue nil
+      end
+      if url
+        redirect_to url
+      else
+        flash[:notice] = t('errors.no_report', "Couldn't find a report for that submission item")
+        redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
+      end
+    end
+  end
+
+  def resubmit_to_vericite
+    return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
+
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
+      @submission.resubmit_to_vericite
+      respond_to do |format|
+        format.html {
+          flash[:notice] = t('resubmitted_to_vericite', "Successfully resubmitted to VeriCite.")
+          redirect_to named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
+        }
+        format.json { render :nothing => true, :status => :no_content }
+      end
+    end
+  end
 
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -553,7 +593,7 @@ class SubmissionsController < ApplicationController
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
           json_args = Submission.json_serialization_full_parameters({
-            :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data] : [],
+            :exclude => @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score, :turnitin_data, :vericite_data] : [],
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })

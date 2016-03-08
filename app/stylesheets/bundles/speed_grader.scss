@@ -670,6 +670,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   padding: 3px 0;
 }
 
+.vericite_info {
+  margin-top: 3px;
+  border-top: 1px solid #999999;
+  padding: 3px 0;
+}
+
 #submission_details {
   border-bottom: 1px solid $ic-border-light;
   a {
@@ -721,6 +727,20 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         }
         &:hover {
           @include fontSize(12px);
+        }
+      }
+      .vericite_score_container {
+        position: absolute;
+        top: 0;
+        right: 20px;
+      }
+      .vericite_similarity_score {
+        font-size: 9px;
+        &.submission_error, &.submission_pending {
+          padding: 1px;
+        }
+        &:hover {
+          font-size: 9px;
         }
       }
       .submission-file-download {

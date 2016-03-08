@@ -1804,6 +1804,22 @@ class Course < ActiveRecord::Base
   def turnitin_enabled?
     !!self.turnitin_settings
   end
+  
+  def vericite_enabled?
+    Canvas::Plugin.find(:vericite).try(:enabled?)
+  end
+  
+  def vericite_pledge
+    if vericite_enabled?
+      Canvas::Plugin.find(:vericite).settings[:pledge]
+    end
+  end
+  
+  def vericite_comments
+    if vericite_enabled?
+      Canvas::Plugin.find(:vericite).settings[:comments]
+    end
+  end
 
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
     return html unless html.present? && to_context

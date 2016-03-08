@@ -503,7 +503,6 @@ describe AccountsController do
         expect(response).not_to be_success
       end
     end
-  end
 
   describe "#settings" do
     it "should load account report details" do

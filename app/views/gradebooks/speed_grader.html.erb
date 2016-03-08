@@ -155,11 +155,13 @@
             <div id="submission_files_list">
               <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
                 <span class="turnitin_score_container"></span>
+                <span class="vericite_score_container"></span>
                 <a class="submission-file-download" title="<%= t('titles.download_file', "Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"><%= t('links.download_file', "Download File") %></a>
                 <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
             <div class="turnitin_info_container"></div>
+            <div class="vericite_info_container"></div>
           </div>
         </div>
 
@@ -195,9 +197,11 @@
               <%= render partial: "grading_box_extended",
                          locals: { assignment: @assignment } %>
               <span class="turnitin_score_container"></span>
+              <span class="vericite_score_container"></span>
               <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
               <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
               <div class="turnitin_info_container"></div>
+              <div class="vericite_info_container"></div>
             </div>
             <% end %>
             <% if @assignment.rubric_association %>
@@ -300,6 +304,8 @@
 <a style="display:none;" id="assignment_submission_url" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submission_id}}") %>"></a>
 <a style="display:none;" id="assignment_submission_turnitin_report_url" href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
 <a style="display:none;" id="assignment_submission_resubmit_to_turnitin_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_turnitin_url, @assignment.id, "{{ user_id }}") %>"></a>
+<a style="display:none;" id="assignment_submission_vericite_report_url" href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @assignment.id, "{{ user_id }}", "{{ asset_string }}") %>"></a>
+<a style="display:none;" id="assignment_submission_resubmit_to_vericite_url" href="<%= context_url(@context, :context_assignment_submission_resubmit_to_vericite_url, @assignment.id, "{{ user_id }}") %>"></a>
 <form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "SpeedGrader Options") %>">
   <p>
     <label for="eg_sort_by"><%= t('labels.sort_by', "Sort student list") %></label>

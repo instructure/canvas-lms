@@ -724,6 +724,7 @@ describe "Canvas Cartridge importing" do
     asmnt.due_at = 1.week.from_now
     asmnt.all_day_date = 1.week.from_now
     asmnt.turnitin_enabled = true
+    asmnt.vericite_enabled = true
     asmnt.peer_reviews = true
     asmnt.anonymous_peer_reviews = true
     asmnt.peer_review_count = 37
@@ -755,6 +756,7 @@ describe "Canvas Cartridge importing" do
     expect(asmnt_2.peer_reviews_due_at.to_i).to eq asmnt.peer_reviews_due_at.to_i
     expect(asmnt_2.all_day_date).to eq asmnt.all_day_date
     expect(asmnt_2.turnitin_enabled).to eq asmnt.turnitin_enabled
+    expect(asmnt_2.vericite_enabled).to eq asmnt.vericite_enabled
     expect(asmnt_2.peer_reviews).to eq asmnt.peer_reviews
     expect(asmnt_2.anonymous_peer_reviews).to eq asmnt.peer_reviews
     expect(asmnt_2.peer_review_count).to eq asmnt.peer_review_count

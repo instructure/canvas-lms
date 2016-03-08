@@ -280,6 +280,31 @@
             </span>
           </a>
         <% end %>
+        <% if @presenter.vericite_enabled? %>
+          <%
+            vericite = nil
+            url = '#'
+            if can_do(submission, @current_user, :view_vericite_report)
+              vericite = assignment_presenter.vericite
+              if assignment_presenter.is_text_entry?
+                url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, submission.asset_string)
+              elsif assignment_presenter.is_online_upload? && assignment_presenter.file
+                asset_string = assignment_presenter.file.asset_string
+                url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, asset_string)
+              end
+            end
+          %>
+          
+          <span class="vericite_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
+			  <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>        
+	          <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external vericite_similarity_score <%= vericite && vericite[:state] %>_score">
+	          	<%= vericite && vericite[:similarity_score] %>%
+				<span class="tooltip_wrap right">
+	              <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+	            </span>
+	          </a>
+          </span>
+        <% end %>
       </td>
       <% end %>
     </tr>

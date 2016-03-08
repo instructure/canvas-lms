@@ -42,6 +42,7 @@ define [
       assign_attributes = json.assignment || {}
       assign_attributes.assignment_overrides or= []
       assign_attributes.turnitin_settings or= {}
+      assign_attributes.vericite_settings or= {}
       json.assignment = @createAssignment(assign_attributes)
       json.publishable = json.can_publish
       json.unpublishable = !json.published or json.can_unpublish

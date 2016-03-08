@@ -26,6 +26,7 @@
         <xs:element name="allow_wiki_comments" type="xs:boolean" minOccurs="0"/>
         <xs:element name="self_enrollment" type="xs:boolean" minOccurs="0"/>
         <xs:element name="turnitin_comments" type="xs:string" minOccurs="0"/>
+        <xs:element name="vericite_comments" type="xs:string" minOccurs="0"/>
         <xs:element name="locale" type="xs:string" minOccurs="0"/>
         <xs:element name="hide_final_grade" type="xs:boolean" minOccurs="0"/>
         <xs:element name="grading_standard_enabled" type="xs:boolean" minOccurs="0"/>
@@ -103,6 +104,7 @@
       <xs:element name="submission_types" type="xs:string" minOccurs="0"/>
       <xs:element name="position" type="xs:integer" minOccurs="0"/>
       <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="vericite_enabled" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
       <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
