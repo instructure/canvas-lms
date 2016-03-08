@@ -411,7 +411,6 @@ $gradebook_checkbox_width: 16px;
   display: inline-block;
   input {
     width: 248px;
-    @include breakpoint(wide) { width: 300px; }
   }
   @if $use_new_styles {
     @include breakpoint(desktop) {
