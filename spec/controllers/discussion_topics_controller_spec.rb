@@ -369,6 +369,22 @@ describe DiscussionTopicsController do
         redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
         expect(response).to redirect_to redirect_path
       end
+
+      it "should not change the name of the child topic when navigating to it" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        child_topic = @topic.child_topic_for(@student)
+        old_title = child_topic.title
+
+        get 'index', :group_id => @group1.id, :root_discussion_topic_id => @topic.id
+
+        expect(@topic.child_topic_for(@student).title).to eq old_title
+      end
     end
 
     context 'publishing' do

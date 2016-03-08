@@ -1086,12 +1086,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-    @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
-    @topic.message = @root_topic.message
-    @topic.title = @root_topic.title
-    @topic.assignment_id = @root_topic.assignment_id
-    @topic.user_id = @root_topic.user_id
-    @topic.save
+    @topic = @root_topic.ensure_child_topic_for(@context)
     redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id, extra_params)
   end
 

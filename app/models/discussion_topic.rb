@@ -186,24 +186,28 @@ class DiscussionTopic < ActiveRecord::Base
     category = self.group_category
     return unless category && self.root_topic_id.blank?
     category.groups.active.each do |group|
-      group.shard.activate do
-        DiscussionTopic.unique_constraint_retry do
-          topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
-          topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
-          topic.message = self.message
-          topic.title = "#{self.title} - #{group.name}"
-          topic.assignment_id = self.assignment_id
-          topic.attachment_id = self.attachment_id
-          topic.group_category_id = self.group_category_id
-          topic.user_id = self.user_id
-          topic.discussion_type = self.discussion_type
-          topic.workflow_state = self.workflow_state
-          topic.allow_rating = self.allow_rating
-          topic.only_graders_can_rate = self.only_graders_can_rate
-          topic.sort_by_rating = self.sort_by_rating
-          topic.save if topic.changed?
-          topic
-        end
+      ensure_child_topic_for(group)
+    end
+  end
+
+  def ensure_child_topic_for(group)
+    group.shard.activate do
+      DiscussionTopic.unique_constraint_retry do
+        topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
+        topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
+        topic.message = self.message
+        topic.title = "#{self.title} - #{group.name}"
+        topic.assignment_id = self.assignment_id
+        topic.attachment_id = self.attachment_id
+        topic.group_category_id = self.group_category_id
+        topic.user_id = self.user_id
+        topic.discussion_type = self.discussion_type
+        topic.workflow_state = self.workflow_state
+        topic.allow_rating = self.allow_rating
+        topic.only_graders_can_rate = self.only_graders_can_rate
+        topic.sort_by_rating = self.sort_by_rating
+        topic.save if topic.changed?
+        topic
       end
     end
   end
