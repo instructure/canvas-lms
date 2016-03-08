@@ -641,11 +641,6 @@ if CANVAS_RAILS4_0
   ActiveRecord::Associations::Builder::Association.prepend(ForceDeprecationAsError)
 end
 
-unless defined? OpenDataExport
-  # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
-  ActiveRecord::Associations::Builder::Association.valid_options << :exportable
-end
-
 ActiveRecord::Relation.class_eval do
   def includes(*args)
     return super if args.empty? || args == [nil]
