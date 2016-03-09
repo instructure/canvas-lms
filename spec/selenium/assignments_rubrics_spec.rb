@@ -23,6 +23,12 @@ describe "assignment rubrics" do
       @assignment
     end
 
+    def get(url)
+      super
+      # terrible... some rubric dom handlers get set after dom ready
+      sleep 1 if url =~ %r{\A/courses/\d+/assignments/\d+\z}
+    end
+
     def mark_rubric_for_grading(rubric, expect_confirmation)
       f("#rubric_#{rubric.id} .edit_rubric_link").click
       driver.switch_to.alert.accept if expect_confirmation
@@ -34,7 +40,6 @@ describe "assignment rubrics" do
       end
       wait_for_ajaximations
     end
-
 
     it "should add a new rubric", priority: "2", test_id: 56587 do
       get "/courses/#{@course.id}/outcomes"
