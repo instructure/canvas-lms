@@ -1029,7 +1029,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :recipient, :provisional_grade_id]
+                  :anonymous, :hidden, :provisional_grade_id]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end

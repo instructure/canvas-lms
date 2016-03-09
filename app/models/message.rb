@@ -697,7 +697,6 @@ class Message < ActiveRecord::Base
   def infer_defaults
     if notification
       self.notification_name     ||= notification.name
-      self.notification_category ||= notification_category
     end
 
     self.path_type ||= communication_channel.try(:path_type)

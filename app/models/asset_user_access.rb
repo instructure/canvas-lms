@@ -223,7 +223,6 @@ class AssetUserAccess < ActiveRecord::Base
     self.asset_group_code ||= accessed[:group_code]
     self.membership_type ||= accessed[:membership_type]
     self.context = kontext
-    self.summarized_at = nil
     self.last_access = Time.now.utc
     self.display_name = self.asset_display_name
     log_action(accessed[:level])

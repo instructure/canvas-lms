@@ -200,8 +200,6 @@ module Importers
 
           migration.imported_migration_items_by_class(ContextModule).each do |event|
             event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.start_at = shift_date(event.start_at, shift_options)
-            event.end_at = shift_date(event.end_at, shift_options)
             event.save
           end
 

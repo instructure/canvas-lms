@@ -22,7 +22,6 @@ class SubmissionComment < ActiveRecord::Base
 
   belongs_to :submission #, :touch => true
   belongs_to :author, :class_name => 'User'
-  belongs_to :recipient, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
@@ -32,7 +31,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
-  attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id,
+  attr_accessible :comment, :submission, :submission_id, :author, :context_id,
                   :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request,
                   :attachments, :anonymous, :hidden, :provisional_grade_id
 
@@ -164,7 +163,6 @@ class SubmissionComment < ActiveRecord::Base
       SubmissionComment.create!({
         :comment => message,
         :submission_id => self.submission_id,
-        :recipient_id => self.recipient_id,
         :author => user,
         :context_id => self.context_id,
         :context_type => self.context_type,
@@ -263,6 +261,10 @@ class SubmissionComment < ActiveRecord::Base
         :workflow_state => "unread",
       })
     end
+  end
+
+  def recipient
+    submission.user
   end
 
   protected

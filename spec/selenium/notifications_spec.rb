@@ -72,9 +72,10 @@ describe "Notifications" do
         enrollment.accept!
 
         @assignment.assign_peer_review(@student, reviewer)
-        submission_comment_model({author: reviewer, recipient: @student})
+        submission_comment_model({author: reviewer, submission: @assignment.find_or_create_submission(@student)})
 
         get "/users/#{@student.id}/messages"
+
         # Checks that the notification is there and has the correct "Notification Name" field
         fj('.ui-tabs-anchor:contains("Meta Data")').click
         expect(ff('.table-condensed.grid td').last).to include_text('Submission Comment')
