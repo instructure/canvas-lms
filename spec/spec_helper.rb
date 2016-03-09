@@ -261,6 +261,7 @@ def truncate_all_tables
              )
         SQL
         table_names.delete('schema_migrations')
+        next if table_names.empty?
         connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
       else
         connection.tables.each { |model| truncate_table(model) }
