@@ -202,8 +202,6 @@ describe ConferencesController do
           post 'join', :course_id => @course.id, :conference_id => @conference.id
         end
 
-        after { Setting.set 'enable_page_views', 'false' }
-
         it "should let students join an active conference" do
           expect(response).to be_redirect
           expect(response['Location']).to match /wimba\.test/

@@ -230,6 +230,17 @@ describe "Roles API", type: :request do
         expect(json['workflow_state']).to eq 'inactive'
       end
 
+      it "should not be able to deactivate a role from a sub-account" do
+        sub_account = @account.sub_accounts.create!
+
+        json = api_call(:delete, "/api/v1/accounts/#{sub_account.id}/roles/#{@role.id}",
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => sub_account.id.to_param, :id => @role.id}, {},
+          {}, {:expected_status => 404})
+
+        @role.reload
+        expect(@role.workflow_state).to eq 'active'
+      end
+
       it "should reactivate an inactive role" do
         @role.update_attribute(:workflow_state, 'inactive')
 

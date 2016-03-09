@@ -697,7 +697,7 @@ define [
     indexedOverrides: ->
       indexed = { studentOverrides: {}, sectionOverrides: {} }
       _.each @assignments, (assignment) ->
-        if assignment.has_overrides
+        if assignment.has_overrides && assignment.overrides
           _.each assignment.overrides, (override) ->
             if override.student_ids
               indexed.studentOverrides[assignment.id] ?= {}
@@ -720,7 +720,7 @@ define [
       gradingPeriod = gradingPeriods[selectedPeriodId]
       effectiveDueAt = assignment.due_at
 
-      if assignment.has_overrides
+      if assignment.has_overrides && assignment.overrides
         # we'll eventually need to consider group overrides here
         # (group overrides are not yet a feature but are planned)
         sectionOverrides = []
@@ -1275,7 +1275,7 @@ define [
                                 submissionType is "attendance" and not @show_attendance
 
       if @gradebookColumnOrderSettings?.sortType
-        columns.sort @makeColumnSortFn(@gradebookColumnOrderSettings)
+        columns.sort @makeColumnSortFn(@getStoredSortOrder())
 
       columns = columns.concat(@aggregateColumns)
       headers = @parentColumns.concat(@customColumnDefinitions())

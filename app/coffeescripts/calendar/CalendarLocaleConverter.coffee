@@ -13,6 +13,7 @@ define ["underscore"], (_) ->
       "es": "es"
       "fa-IR": "fa"
       "fr": "fr"
+      "he": "he"
       "hy": null #armenian
       "ja": "ja"
       "ko": "ko"
