@@ -38,6 +38,12 @@ describe "Converting Blackboard 9 qti" do
     expect(hash[:questions].first[:questions].first).to eq({:question_type=>"question_reference", :migration_id=>"_428569_1"})
   end
 
+  it "should import multiple-answers questions" do
+    hash = get_quiz_data(bb9_question_dir, 'multiple_answers')[0].detect { |qq| qq[:migration_id] == 'question_22_1' }
+    expect(hash[:question_type]).to eq 'multiple_answers_question'
+    expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.map { |answer| answer[:weight] }).to eq [100, 0, 100, 100]
+  end
+
   it "should convert matching questions where the answers are given out of order" do
     hash = get_question_hash(bb9_question_dir, 'matching2', false)
     matches = {}
