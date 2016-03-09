@@ -150,6 +150,9 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      if @event.object?.google_calendar_id
+        params.google_calendar_id = @event.object.google_calendar_id
+
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))
@@ -169,10 +172,29 @@ define [
         $appt = $(e.target).closest('li')
         @cancelAppointment($appt)
 
+      if @event.object?.google_calendar_id
+        $.ajaxJSON '/bz/event_rsvps?id=' + encodeURIComponent(@event.object.id), 'GET', null, @rsvpCB
+
       @popover.el.find('.message_students').click preventDefault =>
         new MessageParticipantsDialog(timeslot: @event.calendarEvent).show()
 
       publish('userContent/change')
+
+    rsvpCB: (data) =>
+      element = @popover.el.find(".bz-rsvps")
+      dl = document.createElement('dl')
+      for user in data
+        dt = document.createElement('dt')
+        a = document.createElement('a')
+        a.setAttribute('href', user['user_link'])
+        a.textContent = user['user_name']
+        dt.appendChild(a)
+        dl.appendChild(dt)
+        dd = document.createElement('dd')
+        dd.textContent = user['user_status']
+        dl.appendChild(dd)
+      element.html('')
+      element.append(dl)
 
     close: =>
       if @popover

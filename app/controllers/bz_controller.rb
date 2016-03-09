@@ -18,6 +18,27 @@ class BzController < ApplicationController
     render :nothing => true
   end
 
+  def event_rsvps
+    result = []
+    CalendarEvent.find(params[:id]).get_gcal_rsvp_status.each do |attendee|
+      obj = {}
+      cc = CommunicationChannel.where(:path => attendee["email"])
+      next if cc.empty?
+      canvas_user = User.find(cc.first.user_id)
+      obj['user_link'] = user_path(canvas_user)
+      obj['user_name'] = canvas_user.name
+      obj['user_status'] = case attendee["responseStatus"]
+       when 'needsAction'
+         'Not answered'
+       else
+         attendee["responseStatus"]
+       end
+      result << obj
+    end
+
+    render :json => result
+  end
+
   def video_link
     obj = {}
 

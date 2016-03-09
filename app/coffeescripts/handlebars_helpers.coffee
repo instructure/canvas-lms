@@ -32,7 +32,10 @@ define [
     bz_linkify_text : (str) ->
       if str.match(/^http[^ ]+$/)
         thing = htmlEscape(str)
-        return new Handlebars.SafeString '<a target="_BLANK" href="'+thing+'">' + thing + '</a>'
+        text = thing
+        if(text.match(/\/hangouts\//))
+          text = 'Join video call'
+        return new Handlebars.SafeString '<a target="_BLANK" href="'+thing+'">' + text + '</a>'
       return str
 
     __i18nliner_escape: (val) ->

@@ -35,7 +35,7 @@ class CalendarEvent < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :location_name, :location_address, :start_at, :end_at, :context_id, :context_type, :workflow_state, :created_at, :updated_at,
     :user_id, :all_day, :all_day_date, :deleted_at, :cloned_item_id, :context_code, :time_zone_edited, :parent_calendar_event_id, :effective_context_code,
-    :participants_per_appointment, :override_participants_per_appointment
+    :participants_per_appointment, :override_participants_per_appointment, :google_calendar_id
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :user, :child_events]
@@ -64,6 +64,28 @@ class CalendarEvent < ActiveRecord::Base
   before_update :sync_google_calendar
   before_save :sync_google_calendar
 
+  after_destroy :kill_google_calendar
+
+  def kill_google_calendar
+    return if !google_calendar_id
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.delete,
+      :parameters => params)
+  end
+
   def sync_google_calendar
     obj = {}
 
@@ -76,13 +98,16 @@ class CalendarEvent < ActiveRecord::Base
 
     event = {
       'summary' => title,
+      'organizer' => {
+        'displayName' => 'Braven Portal'
+      },
       'start' => {
-        'dateTime' => start_at,
-        'timeZone' => 'America/Los_Angeles',
+        'dateTime' => start_at.utc_datetime,
+        'timeZone' => 'Etc/GMT',
       },
       'end' => {
-        'dateTime' => end_at,
-        'timeZone' => 'America/Los_Angeles',
+        'dateTime' => end_at.utc_datetime,
+        'timeZone' => 'Etc/GMT',
       }
     }
 
@@ -138,6 +163,10 @@ class CalendarEvent < ActiveRecord::Base
     event = results.data
 
     if !google_calendar_id && location_name.empty?
+      self.location_name = event.hangout_link
+    end
+
+    if location_name == '<Google Hangout>'
       self.location_name = event.hangout_link
     end
 
