@@ -29,6 +29,19 @@ define [
         options[key] = this[key] for key in this
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
+    bz_checked_if_ghang_link : (str) ->
+      if str == "" || str.match(/\/hangouts\//)
+        return "checked"
+      else
+        return ""
+
+    bz_checked_if_not_ghang_link : (str) ->
+      if str != "" && !str.match(/\/hangouts\//)
+        return "checked"
+      else
+        return ""
+
+
     bz_linkify_text : (str) ->
       if str.match(/^http[^ ]+$/)
         thing = htmlEscape(str)
