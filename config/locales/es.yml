@@ -8120,7 +8120,7 @@ es:
           remember_me: "Permanezca conectado"
         log_in: "Iniciar sesión"
         login_handle: "Ingrese su %{login_handle_name} y le enviaremos un enlace para cambiar su contraseña."
-        open_source_learning_management_system: "Abrir Código  LMS"
+        open_source_learning_management_system: "LMS de Abrir Código"
     logout_confirm: 
       cancel: Cancelar
       details: 
@@ -13956,7 +13956,7 @@ es:
       ? "User Research"
       : "Investigación del usuario"
       by_instructure: "Por Instructure"
-      open_source_learning_management_system: "Abrir Código  LMS"
+      open_source_learning_management_system: "LMS de Abrir Código"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Haga clic aquí para descargar"
