@@ -310,13 +310,17 @@ class Group < ActiveRecord::Base
       when 'parent_context_auto_join' then 'accepted'
       end
     attrs[:workflow_state] = new_record_state if new_record_state
-    if member = self.group_memberships.where(user_id: user).first
-      member.workflow_state = new_record_state unless member.active?
-      # only update moderator if true/false is explicitly passed in
-      member.moderator = moderator unless moderator.nil?
-      member.save if member.changed?
-    else
-      member = self.group_memberships.create(attrs)
+
+    member = nil
+    GroupMembership.unique_constraint_retry do
+      if member = self.group_memberships.where(user_id: user).first
+        member.workflow_state = new_record_state unless member.active?
+        # only update moderator if true/false is explicitly passed in
+        member.moderator = moderator unless moderator.nil?
+        member.save if member.changed?
+      else
+        member = self.group_memberships.create(attrs)
+      end
     end
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
