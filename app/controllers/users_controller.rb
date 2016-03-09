@@ -207,7 +207,7 @@ class UsersController < ApplicationController
       }
     }
     calculator = grade_calculator([enrollment.user_id], course, grading_periods)
-    totals = calculator.compute_scores.first.first.first
+    totals = calculator.compute_scores.first[:current]
     totals[:hide_final_grades] = course.hide_final_grades?
     render json: totals
   end
@@ -1961,9 +1961,9 @@ class UsersController < ApplicationController
     calculator = grade_calculator(user_ids, course, grading_periods)
     grades = {}
     calculator.compute_scores.each_with_index do |score, index|
-     computed_score = score.first.first[:grade]
-     user_id = user_ids[index]
-     grades[user_id] = computed_score
+      computed_score = score[:current][:grade]
+      user_id = user_ids[index]
+      grades[user_id] = computed_score
     end
     grades
   end
