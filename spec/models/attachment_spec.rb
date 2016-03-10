@@ -1522,4 +1522,13 @@ describe Attachment do
       expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
     end
   end
+
+  describe '#ajax_upload_params' do
+    it 'returns the attachment filename in the upload params' do
+      attachment_model filename: 'test.txt'
+      pseudonym @user
+      json = @attachment.ajax_upload_params(@user.pseudonym, '', '')
+      expect(json[:upload_params]['Filename']).to eq 'test.txt'
+    end
+  end
 end

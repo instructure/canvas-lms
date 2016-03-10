@@ -542,7 +542,7 @@ class Attachment < ActiveRecord::Base
 
     res[:id] = id
     res[:upload_params].merge!({
-       'Filename' => '',
+       'Filename' => filename,
        'key' => sanitized_filename,
        'acl' => 'private',
        'Policy' => policy_encoded,
