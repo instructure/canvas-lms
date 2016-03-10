@@ -43,7 +43,7 @@ class UserObserveesController < ApplicationController
   # @returns [User]
   def index
     includes = params[:include] || []
-    observed_users = user.observed_users.active.order_by_sortable_name
+    observed_users = user.observed_users.active_user_observers.active.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
     render json: users_json(observed_users, @current_user, session,includes )
   end
@@ -180,9 +180,7 @@ class UserObserveesController < ApplicationController
     @current_user.shard.activate do
       UserObserver.unique_constraint_retry do
         unless has_observee?(observee)
-          user.user_observees.create! do |uo|
-            uo.user_id = observee.id
-          end
+          user.user_observees.create_or_restore(user_id: observee)
           user.touch
         end
       end
@@ -194,13 +192,13 @@ class UserObserveesController < ApplicationController
       enrollment.workflow_state = 'deleted'
       enrollment.save
     end
-    user.user_observees.where(user_id: observee).destroy_all
+    user.user_observees.active.where(user_id: observee).destroy_all
     user.update_account_associations
     user.touch
   end
 
   def has_observee?(observee)
-    user.user_observees.where(user_id: observee).exists?
+    user.user_observees.active.where(user_id: observee).exists?
   end
 
   def self_or_admin_permission_check

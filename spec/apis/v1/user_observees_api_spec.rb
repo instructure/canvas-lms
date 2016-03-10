@@ -179,6 +179,14 @@ describe UserObserveesController, type: :request do
       expect(index_call(page: 2)).to eq [student.id]
     end
 
+    it 'should not include deleted observers' do
+      parent.observed_users << student
+      parent.observed_users << student2
+      parent.user_observees.where(user_id: student2).destroy_all
+
+      expect(index_call).to eq [student.id]
+    end
+
     it 'should not accept an invalid user' do
       index_call(user_id: 0, expected_status: 404)
     end
@@ -402,7 +410,7 @@ describe UserObserveesController, type: :request do
       observer_enrollment = parent.observer_enrollments.first
 
       expect(delete_call).to eq student.id
-      expect(parent.reload.observed_users).to eq []
+      expect(parent.observed_users.active_user_observers).to eq []
       expect(observer_enrollment.reload).to be_deleted
     end
 
@@ -413,7 +421,7 @@ describe UserObserveesController, type: :request do
 
       json = delete_call(user_id: external_parent.id, observee_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq external_student.id
-      expect(external_parent.reload.observed_users).to eq []
+      expect(external_parent.reload.observed_users.active_user_observers).to eq []
       expect(observer_enrollment.reload).to be_deleted
     end
 
@@ -438,13 +446,15 @@ describe UserObserveesController, type: :request do
     it 'should not allow unauthorized admins' do
       parent.observed_users << student
       delete_call(api_user: disallowed_admin, expected_status: 401)
-      expect(parent.reload.observed_users).to eq [student]
+      expect(parent.reload.observed_users.active_user_observers).to eq [student]
     end
 
     it 'should allow observer to remove observee' do
       parent.observed_users << student
       delete_call(api_user: parent, expected_status: 200)
-      expect(parent.reload.observed_users).to eq []
+      expect(parent.reload.observed_users.active_user_observers).to eq []
+      expect(parent.observed_users).to eq [student]
+      expect(parent.user_observees.first.workflow_state).to eq 'deleted'
     end
   end
 

@@ -309,9 +309,7 @@ class Login::SamlController < ApplicationController
     observee_unique_id = registration_data[:observee][:unique_id]
     observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
     unless @current_user.user_observees.where(user_id: observee).exists?
-      @current_user.user_observees.create! do |uo|
-        uo.user_id = observee.id
-      end
+      @current_user.user_observees.create_or_restore(user_id: observee)
       @current_user.touch
     end
   end
@@ -348,7 +346,7 @@ class Login::SamlController < ApplicationController
 
     # set the new user (observer) to observe the target user (observee)
     observee = @domain_root_account.pseudonyms.active.by_unique_id(observee_unique_id).first.user
-    user.user_observees << user.user_observees.create!{ |uo| uo.user_id = observee.id }
+    user.user_observees << user.user_observees.create_or_restore(user_id: observee)
 
     notify_policy = Users::CreationNotifyPolicy.new(false, unique_id: observer_unique_id)
     notify_policy.dispatch!(user, pseudonym, cc)

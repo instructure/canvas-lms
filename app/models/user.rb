@@ -53,9 +53,13 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
-  has_many :user_observers, :dependent => :delete_all
+  has_many :user_observers, dependent: :destroy, inverse_of: :user
   has_many :observers, :through => :user_observers, :class_name => 'User'
-  has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
+  has_many :user_observees,
+           class_name: 'UserObserver',
+           foreign_key: :observer_id,
+           dependent: :destroy,
+           inverse_of: :observer
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
@@ -180,6 +184,7 @@ class User < ActiveRecord::Base
     self.from("(#{scopes.join("\nUNION\n")}) users")
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
+  scope :active_user_observers, -> { where.not(user_observers: {workflow_state: 'deleted'}) }
 
   scope :has_current_student_enrollments, -> do
     where("EXISTS (?)",
@@ -1068,7 +1073,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.where(user_id: self.id).exists? }
+    given { |user| user && user.user_observees.active.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 
