@@ -44,6 +44,12 @@ describe Oauth2ProviderController do
       expect(response).to redirect_to(login_url(:canvas_login => 1))
     end
 
+    it 'should pass pseudonym_session[unique_id] to login to populate username textbox' do
+      get :auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+          "unique_id"=>"test", :force_login => true
+      expect(response).to redirect_to(login_url+'?force_login=true&pseudonym_session%5Bunique_id%5D=test')
+    end
+
     context 'with a user logged in' do
       before :once do
         user_with_pseudonym(:active_all => 1, :password => 'qwerty')
@@ -93,6 +99,7 @@ describe Oauth2ProviderController do
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
+
     end
   end
 

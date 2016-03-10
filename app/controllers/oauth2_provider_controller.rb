@@ -45,7 +45,9 @@ class Oauth2ProviderController < ApplicationController
     if @current_pseudonym && !params[:force_login]
       redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user)
     else
-      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login, :authentication_provider))
+      params["pseudonym_session"] = {"unique_id" => params[:unique_id]} if params.key?(:unique_id)
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login,
+                                         :authentication_provider, :pseudonym_session))
     end
   end
 

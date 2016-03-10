@@ -77,6 +77,11 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
       if a user already has an active Canvas web session, they will not be
       asked to re-enter their credentials.</td>
     </tr>
+    <tr>
+      <td class="mono">unique_id<span class="label optional"></span></td>
+      <td>Set to the user's username to be populated in the login form in the event
+      that the user must authenticate.</td>
+    </tr>
   </tbody>
 </table>
 
