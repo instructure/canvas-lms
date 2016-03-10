@@ -61,6 +61,7 @@ describe "Standard Common Cartridge importing" do
     tag = mod1.content_tags[1]
     expect(tag.content_type).to eq 'ContextModuleSubHeader'
     expect(tag.title).to eq "Study Guide"
+    expect(tag.migration_id).to eq "I_00002"
     expect(tag.indent).to eq 0
     index = 2
     if Qti.qti_enabled?
