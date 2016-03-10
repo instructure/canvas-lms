@@ -30,12 +30,16 @@ define [
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
     bz_checked_if_ghang_link : (str) ->
+      if typeof str == "undefined"
+        return "checked"
       if str == "" || str.match(/\/hangouts\//)
         return "checked"
       else
         return ""
 
     bz_checked_if_not_ghang_link : (str) ->
+      if typeof str == "undefined"
+        return ""
       if str != "" && !str.match(/\/hangouts\//)
         return "checked"
       else
