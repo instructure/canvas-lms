@@ -118,7 +118,6 @@ define([
      * @return {Hash} ready-to-use options hash to use as react props
      */
     createRCEProps(textarea, tinyMCEInitOptions) {
-      let textareaClassName = textarea.classList + " " + RCEStore.classKeyword
       let width = textarea.offsetWidth
       let height = textarea.offsetHeight
 
@@ -133,7 +132,7 @@ define([
         editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
         defaultContent: textarea.value || tinyMCEInitOptions.defaultContent,
         textareaId: textarea.id,
-        textareaClassName: textareaClassName,
+        textareaClassName: textarea.className,
         language: ENV.LOCALE,
         mirroredAttrs: this._attrsToMirror(textarea)
       }

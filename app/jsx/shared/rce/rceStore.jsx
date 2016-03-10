@@ -4,36 +4,33 @@ define([
 ], function($, _){
 
   let RCEStore = {
-    classKeyword: "from-react-tinymce",
-
     addToStore: function (targetId, RCEInstance) {
       window.tinyrce.editorsListing[targetId] = RCEInstance;
     },
 
-    matchingClass: function ($nodes) {
-      return _.select($nodes, (dn) => $(dn).hasClass(this.classKeyword) )
+    callOnEditor: function(textareaId, methodName, ...args) {
+      let editor = window.tinyrce.editorsListing[textareaId]
+      if (!editor) { return null }
+
+      // since exists? has a ? and cant be a regular function (yet we want the
+      // same signature as editorbox) just return true rather than calling as a
+      // fn on the editor
+      if (methodName === "exists?") {return true}
+      return editor[methodName](...args)
     },
 
-    sendFunctionToCorrespondingEditor: function(args, domNode) {
-      let rce = window.tinyrce.editorsListing[domNode.id]
-      if (!rce) { return null }
-
-      let fnString = args[0]
-
-      // since exists? has a ? and cant be a regular function (yet
-      // we want the same signature as editorbox) just return true
-      // rather than calling as a fn on rceWrapper
-      if (fnString === "exists?") {return true}
-      let fnArgs = _.rest(args)
-      let fnResult = rce[fnString](...fnArgs)
-      return fnResult
-    },
-
-    callOnRCE: function ($nodes, ...args) {
-      let returnValues = _.chain( this.matchingClass($nodes) )
-        .map(this.sendFunctionToCorrespondingEditor.bind(this, args))
-      let result = returnValues.compact().value()[0]
-      return result
+    callOnTarget: function ($target, methodName, ...args) {
+      // freshen node; see comment in RichContentEditor.freshNode
+      $target = $("#" + $target.attr("id"))
+      if (methodName == 'get_code' && !$target.data("rich_text")) {
+        // editor failed to get applied (data attribute missing);
+        // user has been typing into this field as a bare text area,
+        // and now is trying to get the contents ('get_code').
+        // The best partial failure case for trying to get its contents
+        // is to just use the data they've input.
+        return $target.val()
+      }
+      return this.callOnEditor($target.id, methodName, ...args)
     }
   };
 

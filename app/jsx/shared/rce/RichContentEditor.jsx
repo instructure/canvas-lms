@@ -57,8 +57,7 @@ define([
     var options = options || {}
     this.featureFlag = flagToHeed(options)
 
-    this.jQuery = options.jQuery || $ // useful for contextual overrides of global jquery
-    this.commandShim = new RceCommandShim({jQuery: this.jQuery})
+    this.commandShim = new RceCommandShim()
 
     // sort of crummy for now, but need to maintain an abstraction over old
     // and new sidebar usage, and this is similar to the way the old
@@ -74,14 +73,14 @@ define([
     // in order to capture any changes, lots of views like to use
     // stale nodes
     let targetId = target.attr("id")
-    return this.jQuery("#" + targetId)
+    return $("#" + targetId)
   }
 
   RichContentEditor.prototype.loadNewEditor = function(target, tinyMCEInitOptions={}){
     // avoid modifying the original options object provided
-    tinyMCEInitOptions = this.jQuery.extend({}, tinyMCEInitOptions)
+    tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-    if (this.jQuery(target).length <= 0) {
+    if ($(target).length <= 0) {
       // no actual target, just short circuit out
       return
     }
