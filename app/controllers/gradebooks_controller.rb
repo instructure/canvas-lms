@@ -70,11 +70,9 @@ class GradebooksController < ApplicationController
           @presenter.assignment_stats
         end
 
-        submissions_json = @presenter.submissions.reject { |s|
-          s.pending_review? || !s.user_can_read_grade?(@current_user)
-        }.map { |s|
-          {"assignment_id" => s.assignment_id, "score" => s.score}
-        }
+        submissions_json = @presenter.submissions.
+          reject { |s| s.pending_review? || !s.user_can_read_grade?(@current_user) }.
+          map { |s| { "assignment_id" => s.assignment_id, "score" => s.score, "excused" => s.excused? } }
 
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
