@@ -477,7 +477,8 @@ class FilesController < ApplicationController
 
     verifier_checker = Attachments::Verification.new(@attachment)
     if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
-        @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
+        @attachment.attachment_associations.where(:context_type => 'Submission').
+          any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
 
       @attachment.ensure_media_object

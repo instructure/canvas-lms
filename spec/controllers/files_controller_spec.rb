@@ -445,6 +445,16 @@ describe FilesController do
         expect(response.status).to eq(404)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
+
+      it "should view file when student's submission was deleted" do
+        @assignment = @course.assignments.create!(title: 'upload_assignment', submission_types: 'online_upload')
+        attachment_model context: @student
+        @assignment.submit_homework @student, attachments: [@attachment]
+        # create an orphaned attachment_association
+        @assignment.submissions.delete_all
+        get 'show', user_id: @student.id, id: @attachment.id, download_frd: 1
+        expect(response).to be_success
+      end
     end
 
     describe "as a teacher" do
