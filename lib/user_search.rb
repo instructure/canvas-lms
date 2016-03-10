@@ -6,11 +6,11 @@ module UserSearch
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
-      user = base_scope.where(id: db_id).first
-      if user
-        return [user]
+      scope = base_scope.where(id: db_id)
+      if scope.exists?
+        return scope
       elsif !SearchTermHelper.valid_search_term?(search_term)
-        return []
+        return User.none
       end
       # no user found by id, so lets go ahead with the regular search, maybe this person just has a ton of numbers in their name
     end

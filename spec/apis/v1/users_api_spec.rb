@@ -486,6 +486,19 @@ describe "Users API", type: :request do
         expect(users.map(&:id)).to include(user['id'])
       end
     end
+
+    it "includes last login info" do
+      @account = Account.default
+      u = User.create!(name: 'test user')
+      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+      p.current_login_at = Time.now.utc
+      p.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
+
+      expect(json.count).to eq 1
+      expect(json.first['last_login']).to eq p.current_login_at.iso8601
+    end
   end
 
   describe "user account creation" do
