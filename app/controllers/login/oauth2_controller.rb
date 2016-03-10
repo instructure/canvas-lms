@@ -27,6 +27,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
   def create
     reset_session_for_login
 
+    if params[:error_description]
+      flash[:delegated_message] = Sanitize.clean(params[:error_description])
+      return redirect_to login_url
+    end
+
     if jwt['nonce'] != session.delete(:oauth2_nonce)
       raise ActionController::InvalidAuthenticityToken
     end

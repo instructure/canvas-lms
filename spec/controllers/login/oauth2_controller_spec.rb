@@ -69,6 +69,12 @@ describe Login::Oauth2Controller do
       expect(flash[:delegated_message]).to_not be_blank
     end
 
+    it "(safely) displays an error message from the server" do
+      get :create, error_description: 'failed<script></script>'
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to eq "failed"
+    end
+
     it "provisions automatically when enabled" do
       aac.update_attribute(:jit_provisioning, true)
       aac.any_instantiation.expects(:get_token).returns('token')
