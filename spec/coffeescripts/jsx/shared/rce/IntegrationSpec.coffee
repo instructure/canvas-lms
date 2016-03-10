@@ -2,8 +2,9 @@ define [
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/rce/serviceRCELoader',
   'jquery',
-  'helpers/fakeENV'
-], (RichContentEditor, RCELoader, $, fakeENV) ->
+  'helpers/fakeENV',
+  'helpers/editorUtils'
+], (RichContentEditor, RCELoader, $, fakeENV, editorUtils) ->
 
   wikiSidebar = undefined
 
@@ -35,8 +36,7 @@ define [
       fakeENV.teardown()
       $('#fixtures').empty()
       $.getScript.restore()
-      # don't leave cached module hanging around, can break other specs
-      RCELoader.setCache(null)
+      editorUtils.resetRCE()
 
   test "instatiating a remote editor", ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true

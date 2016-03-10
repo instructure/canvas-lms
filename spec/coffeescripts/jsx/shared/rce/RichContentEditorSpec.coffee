@@ -3,7 +3,8 @@ define [
   'jsx/shared/rce/serviceRCELoader',
   'jsx/shared/rce/rceStore',
   'helpers/fakeENV'
-], (RichContentEditor, serviceRCELoader, rceStore, fakeENV) ->
+  'helpers/editorUtils'
+], (RichContentEditor, serviceRCELoader, rceStore, fakeENV, editorUtils) ->
 
   wikiSidebar = undefined
 
@@ -16,6 +17,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       serviceRCELoader.preload.restore()
+      editorUtils.resetRCE()
 
   test 'loads with CDN host if available', ->
     ENV.RICH_CONTENT_CDN_HOST = "cdn-host"
@@ -45,28 +47,28 @@ define [
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = true
       ENV.RICH_CONTENT_APP_HOST = "http://fakehost.com"
-      @originalLoadOnTarget = serviceRCELoader.loadOnTarget
       @target = {
         attr: (()-> "fakeTarget")
       }
       @fakeJquery = ()=>
         return @target # length is at least one
       @fakeJquery.extend = $.extend
-      serviceRCELoader.loadOnTarget = sinon.stub()
+      @loadOnTargetStub = sinon.stub(serviceRCELoader, "loadOnTarget")
+
     teardown: ->
-      serviceRCELoader.loadOnTarget = @originalLoadOnTarget
+      serviceRCELoader.loadOnTarget.restore()
       fakeENV.teardown()
 
   test 'calls serviceRCELoader.loadOnTarget with a target and host', ->
     richContentEditor = new RichContentEditor({riskLevel: 'basic', jQuery: @fakeJquery})
     richContentEditor.loadNewEditor(@target, {})
-    ok serviceRCELoader.loadOnTarget.calledWith(@target, {}, "http://fakehost.com")
+    ok @loadOnTargetStub.calledWith(@target, {}, "http://fakehost.com")
 
   test 'CDN host overrides app host', ->
     ENV.RICH_CONTENT_CDN_HOST = "http://fakecdn.net"
     richContentEditor = new RichContentEditor({riskLevel: 'basic', jQuery: @fakeJquery})
     richContentEditor.loadNewEditor(@target, {})
-    ok serviceRCELoader.loadOnTarget.calledWith(@target, {}, "http://fakecdn.net")
+    ok @loadOnTargetStub.calledWith(@target, {}, "http://fakecdn.net")
 
   test 'calls editorBox and set_code when feature flag off', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -88,7 +90,7 @@ define [
     notFoundJquery.extend = $.extend
     richContentEditor = new RichContentEditor({riskLevel: 'basic', jQuery: notFoundJquery})
     richContentEditor.loadNewEditor(".invalidTarget", {})
-    ok !serviceRCELoader.loadOnTarget.called
+    ok @loadOnTargetStub.notCalled
 
   module 'RichContentEditor - initSidebar',
     setup: ->
@@ -107,11 +109,11 @@ define [
         attachToEditor: (ed)->
           wikiSidebar.editor = ed
       }
-      @_loadSidebarOnTarget = serviceRCELoader.loadSidebarOnTarget
-      serviceRCELoader.loadSidebarOnTarget = (target, host, callback)->
+      sinon.stub serviceRCELoader, "loadSidebarOnTarget", (target, host, callback)->
         callback({is_a: 'remote_sidebar'})
+
     teardown: ->
-      serviceRCELoader.loadSidebarOnTarget = @_loadSidebarOnTarget
+      serviceRCELoader.loadSidebarOnTarget.restore()
       fakeENV.teardown()
 
   test 'uses wikiSidebar when feature flag off', ->
@@ -174,6 +176,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       rceStore.callOnRCE.restore()
+      editorUtils.resetRCE()
 
   test 'with flag enabled, ultimately lets RCEStore handle the message', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true
