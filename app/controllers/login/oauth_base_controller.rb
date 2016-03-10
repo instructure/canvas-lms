@@ -23,6 +23,10 @@ class Login::OauthBaseController < ApplicationController
   before_filter :run_login_hooks, :check_sa_delegated_cookie, :fix_ms_office_redirects, only: :new
 
   def new
+    # a subclass might explicitly set the AAC, so that we don't need to infer
+    # it from the URL
+    return if @aac
+
     auth_type = params[:controller].sub(%r{^login/}, '')
     # ActionController::TestCase can't deal with aliased controllers, so we have to
     # explicitly specify this
@@ -72,7 +76,7 @@ class Login::OauthBaseController < ApplicationController
     unique_ids.any? do |unique_id|
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
-    pseudonym ||= @aac.provision_user(unique_ids.first) if @aac.jit_provisioning?
+    pseudonym ||= @aac.provision_user(unique_ids.first) if !unique_ids.empty? && @aac.jit_provisioning?
 
     if pseudonym
       # Successful login and we have a user

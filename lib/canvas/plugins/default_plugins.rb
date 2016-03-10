@@ -1,3 +1,13 @@
+Canvas::Plugin.register('clever', nil,
+  name: 'Clever',
+  description: -> { t :description, 'Clever Login' },
+  website: 'https://clever.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/clever_settings',
+  encrypted_settings: [:client_secret]
+)
 Canvas::Plugin.register('facebook', nil,
   name: 'Facebook',
   description: -> { t :description, 'Facebook Login' },

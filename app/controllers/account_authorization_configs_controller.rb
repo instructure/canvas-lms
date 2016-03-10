@@ -192,7 +192,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # Each authentication provider is specified as a set of parameters as
   # described below. A provider specification must include an 'auth_type'
-  # parameter with a value of 'canvas', 'cas', 'facebook', 'github', 'google',
+  # parameter with a value of 'canvas', 'cas', 'clever', 'facebook', 'github', 'google',
   # 'ldap', 'linkedin', 'microsoft', 'openid_connect', 'saml', or 'twitter'. The other
   # recognized parameters depend on this auth_type; unrecognized parameters are discarded.
   # Provider specifications not specifying a valid auth_type are ignored.
@@ -231,6 +231,31 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   A url to redirect to when a user is authorized through CAS but is not
   #   found in Canvas.
+  #
+  # For Clever, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The Clever application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The Clever application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
+  # - district_id [Optional]
+  #
+  #   A district's Clever ID. Leave this blank to let Clever handle the details
+  #   with its District Picker. This is required for Clever Instant Login to
+  #   work in a multi-tenant environment.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), 'sis_id', 'email', 'student_number', or
+  #   'teacher_number'. Note that some fields may not be populated for
+  #   all users at Clever.
   #
   # For Facebook, the additional recognized parameters are:
   #

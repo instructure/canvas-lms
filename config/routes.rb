@@ -679,6 +679,11 @@ CanvasRails::Application.routes.draw do
   # routes, so we let this route exist only for tests
   get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
 
+  get 'login/clever' => 'login/clever#new', as: :clever_login
+  # Clever gets their own callback, cause we have to add additional processing
+  # for their Instant Login feature
+  get 'login/clever/callback' => 'login/clever#create', as: :clever_callback
+  get 'login/clever/:id' => 'login/clever#new'
   get 'login/facebook' => 'login/facebook#new', as: :facebook_login
   get 'login/github' => 'login/github#new', as: :github_login
   get 'login/google' => 'login/google#new', as: :google_login
