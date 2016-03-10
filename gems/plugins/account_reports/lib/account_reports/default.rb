@@ -19,6 +19,9 @@
 module AccountReports
   module Default
 
+    # when adding new reports to this file make sure to add a migration to
+    # enable the new report for all accounts with DataFixup::AddNewDefaultReport
+
     def self.student_assignment_outcome_map_csv(account_report)
       OutcomeReports.new(account_report).student_assignment_outcome_map
     end
