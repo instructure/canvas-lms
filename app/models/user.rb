@@ -258,7 +258,7 @@ class User < ActiveRecord::Base
 
   scope :with_last_login, lambda {
     select("users.*, MAX(current_login_at) as last_login").
-      joins("LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id").
+      joins("LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id").
       group("users.id")
   }
 
