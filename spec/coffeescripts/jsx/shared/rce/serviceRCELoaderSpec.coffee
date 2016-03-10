@@ -1,33 +1,26 @@
 define [
   'jquery'
   'jsx/shared/rce/serviceRCELoader'
-], ($, RCELoader) ->
+  'helpers/editorUtils'
+], ($, RCELoader, editorUtils) ->
   module 'loadRCE',
     setup: ->
       # make sure we don't get a cached thing from other tests
-      RCELoader.setCache(null)
+      RCELoader.cachedModule = null
       @elementInFixtures = (type) ->
         newElement = document.createElement(type)
         fixtureDiv = document.getElementById("fixtures")
         fixtureDiv.appendChild(newElement)
         newElement
-      @modifiedJquery = $
-      @originalGetScript = @modifiedJquery.getScript
-      @modifiedJquery.getScript = (__host__, cb) ->
-        # spoofing getScript behavior
-        $.globalEval( "RceModule = 'fakeModule'" )
-        cb()
+      @getScriptSpy = sinon.stub $, "getScript", (__host__, callback)=>
+        window.RceModule = 'fakeModule'
+        callback()
 
-      @getScriptSpy = sinon.spy(@modifiedJquery, "getScript");
-
-      window.$ = @modifiedJquery
       window.tinyrce = {editorsListing: {}}
 
     teardown: ->
-      RCELoader.setCache(null)
-      @modifiedJquery.getScript.restore()
-      @modifiedJquery.getScript = @originalGetScript
-      window.tinyrce = null
+      $.getScript.restore()
+      editorUtils.resetRCE()
       document.getElementById("fixtures").innerHtml = ""
 
   # loading RCE
@@ -36,15 +29,13 @@ define [
     equal RCELoader.cachedModule, null
     RCELoader.loadRCE("somehost.com", (() ->))
     equal RCELoader.cachedModule, 'fakeModule'
-    ok @getScriptSpy.calledOnce
+    ok(@getScriptSpy.calledOnce)
 
   test 'does not call get_module once a response has been cached', ->
-    RCELoader.cachedModule = "something"
-    RCELoader.setCache("foo")
-
-    ok @getScriptSpy.notCalled
+    RCELoader.cachedModule = "foo"
+    ok(@getScriptSpy.notCalled)
     RCELoader.loadRCE("somehost.com", () -> "noop")
-    ok @getScriptSpy.notCalled
+    ok(@getScriptSpy.notCalled)
 
   test 'executes a callback when RCE is loaded', ->
     cb = sinon.spy();
@@ -52,9 +43,9 @@ define [
     ok cb.called
 
   test 'uses `latest` version when hitting a cloudfront host', ->
-    ok @getScriptSpy.notCalled
+    ok(@getScriptSpy.notCalled)
     RCELoader.loadRCE("xyz.cloudfront.net/some/path", () -> "noop")
-    ok @getScriptSpy.calledWith("//xyz.cloudfront.net/some/path/latest")
+    ok(@getScriptSpy.calledWith("//xyz.cloudfront.net/some/path/latest"))
 
   # target finding
 
@@ -125,3 +116,29 @@ define [
     ta.setAttribute("name", "elementName")
     props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
     equal props.mirroredAttrs.name, "elementName"
+
+  test 'only tries to load the module once', ->
+    RCELoader.preload("host")
+    RCELoader.preload("host")
+    RCELoader.preload("host")
+    ok(@getScriptSpy.calledOnce)
+
+
+  asyncTest 'handles callbacks once module is loaded', ->
+    expect(1)
+    resolveGetScript = null
+    $.getScript.restore()
+    sinon.stub $, "getScript", (__host__, callback)=>
+      resolveGetScript = ()->
+        window.RceModule = 'fakeModule'
+        callback()
+    # first make sure all the state is fixed so test call isn't
+    # making it's own getScript call
+    RCELoader.preload("host")
+    RCELoader.loadRCE("host", (()=>))
+
+    # now setup while-in-flight load request to check
+    RCELoader.loadRCE "host", (module)=>
+      start()
+      equal(module, "fakeModule")
+    resolveGetScript()
