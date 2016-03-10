@@ -819,6 +819,21 @@ describe "Outcome Groups API", type: :request do
       end.sort_by{ |link| link['outcome']['id'] })
     end
 
+    it "should return additional information when 'full' arg passed" do
+      description = "some really cool description"
+      create_outcome(:description => description)
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                   :controller => 'outcome_groups_api',
+                   :action => 'outcomes',
+                   :account_id => @account.id.to_s,
+                   :id => @group.id.to_s,
+                   :outcome_style => "full",
+                   :format => 'json')
+
+      expect(json.first['outcome']['description']).to eq description
+    end
+
     it "should not include deleted links" do
       @outcome1 = @account.created_learning_outcomes.create!(:title => 'outcome')
       @outcome2 = @account.created_learning_outcomes.create!(:title => 'outcome')

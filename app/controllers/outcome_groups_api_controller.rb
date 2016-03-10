@@ -321,6 +321,10 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # List the immediate OutcomeLink children of the outcome group. Paginated.
   #
+  # @argument outcome_style [Optional, String]
+  #   The detail level of the outcomes. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
   # @returns [OutcomeLink]
   #
   def outcomes
@@ -340,11 +344,13 @@ class OutcomeGroupsApiController < ApplicationController
       link.context = @outcome_group.context
     end
 
+    outcome_params = params.slice(:outcome_style)
+
     # preload the links' outcomes' contexts.
     ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
 
     # render to json and serve
-    render :json => outcome_links_json(@links, @current_user, session)
+    render :json => outcome_links_json(@links, @current_user, session, outcome_params)
   end
 
   # Intentionally undocumented in the API. Used by the UI to show a list of
