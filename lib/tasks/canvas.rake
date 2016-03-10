@@ -136,9 +136,13 @@ namespace :canvas do
 
     # TODO: Once webpack is the only way, remove js:build
     if build_js
-      tasks["compile coffee, js 18n, and run r.js optimizer"] = -> {
-        build_js_tasks = ['js:generate', 'i18n:generate_js', 'js:build', 'js:webpack']
-        build_js_tasks.each do |name|
+      tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
+        prereqs = ['js:generate', 'i18n:generate_js']
+        prereqs.each do |name|
+          log_time(name) { Rake::Task[name].invoke }
+        end
+        # webpack and js:build can run concurrently
+        Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
           log_time(name) { Rake::Task[name].invoke }
         end
       }
