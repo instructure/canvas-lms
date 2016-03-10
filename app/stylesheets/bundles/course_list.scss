@@ -7,7 +7,9 @@
   /* Column widths are based on these cells */
   .course-list-star-column {
     width: 3%;
-    color: $ic-color-icon-disabled;
+    &.course-list-favorite-icon {
+      color: $ic-color-icon-disabled;
+    }
   }
   .course-list-term-column,
   .course-list-enrolled-as-column {
@@ -24,15 +26,14 @@
   .course-list-group-column {
     width: 35%;
   }
-
   .course-list-no-left-border {
     border-left: 0;
   }
-
   .course-list-table-row:hover {
     background-color: $lightBackground;
   }
 }
+
 .course-list-table td {
   white-space: nowrap;
   overflow: hidden;

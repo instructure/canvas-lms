@@ -30,7 +30,7 @@
               <%= "data-favorite-url=#{api_v1_add_favorite_course_url(current_enrollment.course_id)}" %>
           <% end %>
         >
-          <i class="icon-star"></i>
+          <i class="<%= "course-list-favorite-icon #{favorite_course ? "icon-star" : "icon-star-light"}" %>"></i>
           <span id="course_list_screenreader_message_<%= current_enrollment.course_id %>" class="screenreader-only">
             <%= tooltip_message %>
           </span>
