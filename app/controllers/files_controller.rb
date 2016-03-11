@@ -386,7 +386,7 @@ class FilesController < ApplicationController
     show
   end
 
-  # @API Get quota information
+  # @API Get public inline preview url
   # Determine the URL that should be used for inline preview of the file.
   #
   # @example_request
