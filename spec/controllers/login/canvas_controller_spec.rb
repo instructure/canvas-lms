@@ -79,10 +79,13 @@ describe Login::CanvasController do
   end
 
   it "password auth should work" do
+    session[:sentinel] = true
     post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    # session reset
+    expect(session[:sentinel]).to be_nil
   end
 
   it "password auth should work with extra whitespace around unique id " do
@@ -94,9 +97,11 @@ describe Login::CanvasController do
 
   it "should re-render if authenticity token is invalid and referer is not trusted" do
     controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+    session[:sentinel] = true
     post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' },
          :authenticity_token => '42'
     assert_status(400)
+    expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
     expect(flash[:error]).to match(/invalid authenticity token/i)
   end

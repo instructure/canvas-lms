@@ -26,21 +26,21 @@ class Login::Oauth2Controller < Login::OauthBaseController
   end
 
   def create
-    reset_session_for_login
-
     if params[:error_description]
       flash[:delegated_message] = Sanitize.clean(params[:error_description])
       return redirect_to login_url
     end
 
     begin
-      if jwt['nonce'] != session.delete(:oauth2_nonce)
+      if jwt['nonce'].blank? || jwt['nonce'] != session.delete(:oauth2_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
     rescue Canvas::Security::TokenExpired
       flash[:delegated_message] = t("It took too long to login. Please try again")
       return redirect_to login_url
     end
+
+    reset_session_for_login
 
     @aac = AccountAuthorizationConfig.find(jwt['aac_id'])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth2)

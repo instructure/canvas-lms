@@ -58,6 +58,14 @@ describe Login::Oauth2Controller do
       end
     end
 
+    it "does not destroy existing sessions if it's a bogus request" do
+      session[:sentinel] = true
+
+      get :create, state: ''
+      expect(response).not_to be_success
+      expect(session[:sentinel]).to eq true
+    end
+
     it "works" do
       session[:oauth2_nonce] = 'bob'
       aac.any_instantiation.expects(:get_token).returns('token')
@@ -66,9 +74,12 @@ describe Login::Oauth2Controller do
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
 
+      session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
       get :create, state: jwt
       expect(response).to redirect_to(dashboard_url(login_success: 1))
+      # ensure the session was reset
+      expect(session[:sentinel]).to be_nil
     end
 
     it "redirects to login if no user found" do

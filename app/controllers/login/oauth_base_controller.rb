@@ -33,8 +33,6 @@ class Login::OauthBaseController < ApplicationController
     else
       @aac = scope.first!
     end
-
-    reset_session_for_login
   end
 
   protected

@@ -26,7 +26,6 @@ class Login::SamlController < ApplicationController
   before_filter :fix_ms_office_redirects, only: :new
 
   def new
-    reset_session_for_login
     auth_redirect(aac)
   end
 
@@ -110,14 +109,12 @@ class Login::SamlController < ApplicationController
           return
         end
 
+        reset_session_for_login
+
         pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
 
         if pseudonym
-          # We have to reset the session again here -- it's possible to do a
-          # SAML login without hitting the #new action, depending on the
-          # school's setup.
-          reset_session_for_login
           # Successful login and we have a user
           @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
           user = pseudonym.login_assertions_for_user
