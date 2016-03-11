@@ -1561,6 +1561,15 @@ describe DiscussionTopic do
       ann.restore
       expect(ann.reload).to be_active
     end
+
+    it "should restore a topic with submissions to active state" do
+      discussion_topic_model(:context => @course)
+      @topic.reply_from(user: @student, text: "huttah!")
+      @topic.destroy
+
+      @topic.restore
+      expect(@topic.reload).to be_active
+    end
   end
 
   describe "reply_from" do
