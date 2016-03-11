@@ -44,6 +44,20 @@ describe Login::Oauth2Controller do
       expect(response).to_not be_redirect
     end
 
+    it "rejects logins that take more than 10 minutes" do
+      get :new, auth_type: 'facebook'
+      expect(response).to be_redirect
+      state = CGI.parse(URI.parse(response.location).query)['state'].first
+      expect(state).to_not be_nil
+
+      aac.any_instantiation.expects(:get_token).never
+      Timecop.travel(15.minutes) do
+        get :create, state: state
+        expect(response).to redirect_to(login_url)
+        expect(flash[:delegated_message]).to eq "It took too long to login. Please try again"
+      end
+    end
+
     it "works" do
       session[:oauth2_nonce] = 'bob'
       aac.any_instantiation.expects(:get_token).returns('token')

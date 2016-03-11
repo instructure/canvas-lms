@@ -20,7 +20,8 @@ class Login::Oauth2Controller < Login::OauthBaseController
   def new
     super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
-    jwt = Canvas::Security.create_jwt(aac_id: @aac.global_id, nonce: nonce)
+    expiry = Time.zone.now + Setting.get('oauth2_client_timeout', 10.minutes.to_i).to_i
+    jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce: nonce }, expiry)
     redirect_to @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
   end
 
@@ -32,8 +33,13 @@ class Login::Oauth2Controller < Login::OauthBaseController
       return redirect_to login_url
     end
 
-    if jwt['nonce'] != session.delete(:oauth2_nonce)
-      raise ActionController::InvalidAuthenticityToken
+    begin
+      if jwt['nonce'] != session.delete(:oauth2_nonce)
+        raise ActionController::InvalidAuthenticityToken
+      end
+    rescue Canvas::Security::TokenExpired
+      flash[:delegated_message] = t("It took too long to login. Please try again")
+      return redirect_to login_url
     end
 
     @aac = AccountAuthorizationConfig.find(jwt['aac_id'])
