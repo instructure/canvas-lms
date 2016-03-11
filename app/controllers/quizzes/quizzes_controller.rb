@@ -210,13 +210,14 @@ class Quizzes::QuizzesController < ApplicationController
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
-      hash = { :QUIZZES_URL => course_quizzes_url(@context),
-             :IS_SURVEY => @quiz.survey?,
-             :QUIZ => quiz_json(@quiz,@context,@current_user,session),
-             :COURSE_ID => @context.id,
-             :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
-             :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
-             :CONTEXT_ACTION_SOURCE => :quizzes  }
+      hash = {
+        ATTACHMENTS: Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
+        CONTEXT_ACTION_SOURCE: :quizzes,
+        COURSE_ID: @context.id,
+        LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
+        QUIZ: quiz_json(@quiz,@context,@current_user,session),
+        QUIZZES_URL: course_quizzes_url(@context)
+      }
       append_sis_data(hash)
       js_env(hash)
 

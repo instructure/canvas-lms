@@ -3,6 +3,7 @@
   <h4><%= render_result_protection(@quiz, @current_submission || @submission) %></h4>
 <% end %>
 
+<% js_env IS_SURVEY: @quiz.survey? %>
 <% unless show_correct_answers? %>
   <div class="alert">
     <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>"></i>

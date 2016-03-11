@@ -16,32 +16,46 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
+require_relative '../../../spec_helper'
+require_relative '../../views_helper'
 
 describe "/quizzes/quizzes/_quiz_submission" do
-  it "should render" do
+  before(:each) do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!
-    assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
-    render :partial => "quizzes/quizzes/quiz_submission"
-    expect(response).not_to be_nil
   end
 
-  it "should render when quiz results are not supposed to be shown to the student" do
-    course_with_student
-    view_context
-    quiz = @course.quizzes.create!
-    quiz.hide_results = 'always'
-    quiz.save!
+  context "quiz results are visible to the student" do
+    before(:each) do
+      quiz = @course.quizzes.create!
+      submission = quiz.generate_submission(@user)
+      assigns[:quiz] = quiz
+      assigns[:submission] = submission
+      Quizzes::SubmissionGrader.new(submission).grade_submission
+    end
 
-    assigns[:quiz] = quiz
-    assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
-    render :partial => "quizzes/quizzes/quiz_submission"
-    expect(response).not_to be_nil
+    it "renders" do
+      render :partial => "quizzes/quizzes/quiz_submission"
+      expect(response).not_to be_nil
+    end
+
+    it "sets the IS_SURVEY value in the js env" do
+      render :partial => "quizzes/quizzes/quiz_submission"
+      expect(controller.js_env.key?(:IS_SURVEY)).to eq(true)
+    end
+  end
+
+  context "quiz results are not visible to the student" do
+    it "renders" do
+      quiz = @course.quizzes.create!
+      quiz.hide_results = 'always'
+      quiz.save!
+
+      assigns[:quiz] = quiz
+      assigns[:submission] = assigns[:quiz].generate_submission(@user)
+      Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
+      render :partial => "quizzes/quizzes/quiz_submission"
+      expect(response).not_to be_nil
+    end
   end
 end
-

@@ -18,65 +18,71 @@
 
 // xsslint jqueryObject.identifier /Tpl$/
 
-define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
+define(['i18n!quizzes.show', 'jquery', 'str/htmlEscape'], function(I18n, $, htmlEscape) {
   // Create and append right/wrong arrows to all appropriate
   // answers on a quiz results page.
-  return function() {
-    var $questions = $('#questions.show_correct_answers:not(.survey_quiz)');
-    var rightAnswers     = $questions.find('.selected_answer.correct_answer'),
-        wrongAnswers     = $questions.find('.selected_answer.wrong_answer'),
-        correctAnswers   = $questions.find('.question:not(.short_answer_question, .numerical_question, .matching_question) .correct_answer:not(.selected_answer)'),
-        editableMatches  = $('#quiz_edit_wrapper').find($questions.selector).find('.question.matching_question .correct_answer:not(.selected_answer)'),
-        readOnlyMatches  = $('#quiz_show').find($questions.selector).find('.question.matching_question .correct_answer:not(.selected_answer)'),
-        shortAnswers     = $questions.filter(':not(.survey_results)').find('.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers'),
-        unansweredQ      = $('.question.unanswered .header .question_name'),
-        creditPartial    = $('#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name'),
-        creditFull       = $('#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name'),
-        creditNone       = $('#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered) .header .question_name'),
-        surveyAnswers    = $('#questions.survey_results .selected_answer'),
-        rightTpl         = $('<span />', { 'class': 'answer_arrow correct' }),
-        wrongTpl         = $('<span />', { 'class': 'answer_arrow incorrect' }),
-        correctTpl       = $('<span />', { 'class': 'answer_arrow info' }),
-        shortTpl         = $('<span />', { 'class': 'answer_arrow info' }),
-        unansweredTpl    = $('<span />', { 'class': 'answer_arrow incorrect' }),
-        creditFullTpl    = $('<span />', { 'class': 'answer_arrow correct' }),
-        creditPartialTpl = $('<span />', { 'class': 'answer_arrow incorrect' }),
-        creditNoneTpl    = $('<span />', { 'class': 'answer_arrow incorrect' }),
-        surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' }),
-        idGenerator      = 0;
+  function QuizArrowApplicator() {
+    this.$questions       = $('#questions.show_correct_answers:not(.survey_quiz)');
+    this.rightAnswers     = this.$questions.find('.selected_answer.correct_answer');
+    this.wrongAnswers     = this.$questions.find('.selected_answer.wrong_answer');
+    this.correctAnswers   = this.$questions.find('.question:not(.short_answer_question, .numerical_question, .matching_question) .correct_answer:not(.selected_answer)');
+    this.editableMatches  = $('#quiz_edit_wrapper').find(this.$questions.selector).find('.question.matching_question .correct_answer:not(.selected_answer)');
+    this.readOnlyMatches  = $('#quiz_show').find(this.$questions.selector).find('.question.matching_question .correct_answer:not(.selected_answer)');
+    this.shortAnswers     = this.$questions.filter(':not(.survey_results)').find('.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers');
+    this.unansweredQ      = $('.question.unanswered .header .question_name');
+    this.creditPartial    = $('#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name');
+    this.creditFull       = $('#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name');
+    this.creditNone       = $('#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered) .header .question_name');
+    this.surveyAnswers    = $('#questions.survey_results .selected_answer');
+    this.rightTpl         = $('<span />', { 'class': 'answer_arrow correct' });
+    this.wrongTpl         = $('<span />', { 'class': 'answer_arrow incorrect' });
+    this.correctTpl       = $('<span />', { 'class': 'answer_arrow info' });
+    this.shortTpl         = $('<span />', { 'class': 'answer_arrow info' });
+    this.unansweredTpl    = $('<span />', { 'class': 'answer_arrow incorrect' });
+    this.creditFullTpl    = $('<span />', { 'class': 'answer_arrow correct' });
+    this.creditPartialTpl = $('<span />', { 'class': 'answer_arrow incorrect' });
+    this.creditNoneTpl    = $('<span />', { 'class': 'answer_arrow incorrect' });
+    this.surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' });
+    this.idGenerator      = 0;
+  }
 
-    $.each([rightTpl, wrongTpl, correctTpl, shortTpl, surveyAnswerTpl], function() {
+  QuizArrowApplicator.prototype.applyCSS = function() {
+    $.each([this.rightTpl, this.wrongTpl, this.correctTpl, this.shortTpl, this.surveyAnswerTpl], function() {
       this.css({ left: -128, top: 5 });
     });
-    $.each([unansweredTpl, creditFullTpl, creditNoneTpl, creditPartialTpl], function() {
+    $.each([this.unansweredTpl, this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl], function() {
       this.css({ left: -108, top: 9 });
     });
+  }
 
+  QuizArrowApplicator.prototype.applyCorrectAndIncorrectArrows = function() {
+    this.rightTpl.text(I18n.t('answers.correct', 'Correct!'));
+    this.wrongTpl.text(I18n.t('answers.you_answered', 'You Answered'));
+    this.correctTpl.text(I18n.t('answers.right', 'Correct Answer'));
+    this.shortTpl.text(I18n.t('answers.correct_answers', 'Correct Answers'));
+    this.creditFullTpl.text(I18n.t('answers.correct', 'Correct!'));
+    this.creditPartialTpl.text(I18n.t('answers.partial', 'Partial'));
+    this.creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'));
 
-    rightTpl.text(I18n.t('answers.correct', 'Correct!'));
-    wrongTpl.text(I18n.t('answers.you_answered', 'You Answered'));
-    correctTpl.text(I18n.t('answers.right', 'Correct Answer'));
-    shortTpl.text(I18n.t('answers.correct_answers', 'Correct Answers'));
-    unansweredTpl.text(I18n.t('answers.unanswered', 'Unanswered'));
-    creditFullTpl.text(I18n.t('answers.correct', 'Correct!'));
-    creditPartialTpl.text(I18n.t('answers.partial', 'Partial'));
-    creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'));
-    surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'));
+    this.rightAnswers.prepend(htmlEscape(this.rightTpl));
+    this.wrongAnswers.prepend(htmlEscape(this.wrongTpl));
+    this.correctAnswers.prepend(htmlEscape(this.correctTpl));
+    this.editableMatches.parent().before(htmlEscape(this.correctTpl));
+    this.readOnlyMatches.prepend(htmlEscape(this.correctTpl));
+    this.shortAnswers.prepend(htmlEscape(this.shortTpl));
+    this.creditPartial.prepend(htmlEscape(this.creditPartialTpl));
+    this.creditFull.prepend(htmlEscape(this.creditFullTpl));
+    this.creditNone.prepend(htmlEscape(this.creditNoneTpl));
+  }
 
-    if(!ENV.IS_SURVEY){
-      rightAnswers.prepend(rightTpl);
-      wrongAnswers.prepend(wrongTpl);
-      correctAnswers.prepend(correctTpl);
-      editableMatches.parent().before(correctTpl);
-      readOnlyMatches.prepend(correctTpl);
-      shortAnswers.prepend(shortTpl);
-      creditPartial.prepend(creditPartialTpl);
-      creditFull.prepend(creditFullTpl);
-      creditNone.prepend(creditNoneTpl);
-    }
-    unansweredQ.prepend(unansweredTpl);
-    surveyAnswers.prepend(surveyAnswerTpl);
+  QuizArrowApplicator.prototype.applyAnsweredAndUnansweredArrows = function() {
+    this.unansweredTpl.text(I18n.t('answers.unanswered', 'Unanswered'));
+    this.surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'));
+    this.unansweredQ.prepend(htmlEscape(this.unansweredTpl));
+    this.surveyAnswers.prepend(htmlEscape(this.surveyAnswerTpl));
+  }
 
+  QuizArrowApplicator.prototype.makeArrowsAccessible = function() {
     // adjust these down a little so they align better w/ answers.
     $('.short_answer_question .answer_arrow').css('top', 5);
 
@@ -133,5 +139,14 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
       // got above.
       $target.attr('aria-describedby', arrowId);
     });
-  };
+  }
+
+  QuizArrowApplicator.prototype.applyArrows = function() {
+    this.applyCSS();
+    if (!ENV.IS_SURVEY) this.applyCorrectAndIncorrectArrows();
+    this.applyAnsweredAndUnansweredArrows();
+    this.makeArrowsAccessible();
+  }
+
+  return QuizArrowApplicator;
 });
