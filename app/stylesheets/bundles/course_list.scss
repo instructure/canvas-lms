@@ -17,10 +17,10 @@ table.course-list-table {
   td.course-list-enrolled-as-column {
     text-align: right;
     padding-right: 15px;
-    @if $use_new_styles == false { 
+    @if $use_new_styles == false {
       width: 20%;
       font-style: italic;
-      font-size: 12px;
+      @include fontSize(12px);
     }
   }
   td.course-list-course-title-column {
@@ -61,6 +61,6 @@ table.course-list-table {
 
 .course-list-term {
   color: #555;
-  font-size: 10px;
+  @include fontSize(10px);
   font-style: italic;
 }

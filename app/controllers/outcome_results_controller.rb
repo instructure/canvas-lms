@@ -464,7 +464,7 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = @section.students
+      @users = @section.students.to_a
     end
     @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id}

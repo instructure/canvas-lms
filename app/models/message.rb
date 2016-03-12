@@ -31,6 +31,8 @@ class Message < ActiveRecord::Base
 
   extend TextHelper
 
+  MAX_TWITTER_MESSAGE_LENGTH = 140
+
 
   # Associations
   belongs_to :asset_context, :polymorphic => true
@@ -62,8 +64,8 @@ class Message < ActiveRecord::Base
   validates :to, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :from, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :url, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :subject, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
-  validates :from_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+  validates :subject, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :from_name, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
 
   # Stream policy
@@ -560,16 +562,23 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
+      if Setting.get("notification_service_traffic", '').present?
+        send(delivery_method)
+      end
       enqueue_to_sqs
     else
       send(delivery_method)
     end
   end
 
+  # Public: Enqueues a message to the notification_service's sqs queue
+  #
+  # Returns nothing
   def enqueue_to_sqs
-    message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
-    NotificationService.process(global_id, message_body, path_type, to, remote_configuration)
-    complete_dispatch
+    notification_targets.each do |target|
+      NotificationService.process(global_id, notification_message, path_type, target, remote_configuration)
+      complete_dispatch
+    end
   rescue AWS::SQS::Errors::ServiceError => e
     Canvas::Errors.capture(
       e,
@@ -599,6 +608,44 @@ class Message < ActiveRecord::Base
       return if to =~ /^\+[0-9]+$/ ? "Twilio.com" : "email.amazonaws.com"
     else
       raise RemoteConfigurationError, "No matching path types for notification service"
+    end
+  end
+
+  # Public: Determines the message body for a notification endpoint
+  #
+  # Returns target notification message body
+  def notification_message
+    case path_type
+    when "email"
+      Mailer.create_message(self).to_s
+    when "push"
+      sns_json
+    when "twitter"
+      url = self.main_link || self.url
+      message_length = MAX_TWITTER_MESSAGE_LENGTH - url.length - 1
+      truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
+      "#{truncated_body} #{url}"
+    else
+      body
+    end
+  end
+
+  # Public: Returns all notification_service targets to send to
+  #
+  # Returns the targets in which to send the notification to
+  def notification_targets
+    case path_type
+    when "push"
+      self.user.notification_endpoints.map(&:arn)
+    when "twitter"
+      twitter_service = user.user_services.where(service: 'twitter').first
+      [
+        "access_token"=> twitter_service.token,
+        "access_token_secret"=> twitter_service.secret,
+        "user_id"=> twitter_service.service_user_id
+      ]
+    else
+      [to]
     end
   end
 

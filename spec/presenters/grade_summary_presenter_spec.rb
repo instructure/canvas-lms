@@ -327,16 +327,61 @@ describe GradeSummaryPresenter do
         a3_tag.save!
       end
 
-      it "sorts by module position, then context module tag position" do
-        expected_id_order = [assignment3.id, assignment2.id, assignment1.id]
-        expect(ordered_assignment_ids).to eq(expected_id_order)
+      context "sorting assignments only (no quizzes or discussions)" do
+
+        it "sorts by module position, then context module tag position" do
+          expected_id_order = [assignment3.id, assignment2.id, assignment1.id]
+          expect(ordered_assignment_ids).to eq(expected_id_order)
+        end
+
+        it "sorts by module position, then context module tag position, " \
+        "with those not belonging to a module sorted last" do
+          assignment3.context_module_tags.first.destroy!
+          expected_id_order = [assignment2.id, assignment1.id, assignment3.id]
+          expect(ordered_assignment_ids).to eq(expected_id_order)
+        end
       end
 
-      it "sorts by module position, then context module tag position, " \
-      "with those not belonging to a module sorted last" do
-        assignment3.context_module_tags.first.destroy!
-        expected_id_order = [assignment2.id, assignment1.id, assignment3.id]
-        expect(ordered_assignment_ids).to eq(expected_id_order)
+      context "sorting quizzes and discussions" do
+        let(:assignment_owning_quiz) do
+          assignment = @course.assignments.create!
+          quiz = quiz_model(course: @course, assignment_id: assignment.id)
+          quiz_context_module_tag =
+            quiz.context_module_tags.build(context: @course, position: 4, tag_type: 'context_module')
+          quiz_context_module_tag.context_module = first_context_module
+          quiz_context_module_tag.save!
+          assignment
+        end
+
+        let(:assignment_owning_discussion_topic) do
+          assignment = @course.assignments.create!(submission_types: "discussion_topic")
+          discussion = @course.discussion_topics.create!
+          assignment.discussion_topic = discussion
+          assignment.save!
+          discussion_context_module_tag =
+            discussion.context_module_tags.build(context: @course, position: 5, tag_type: 'context_module')
+          discussion_context_module_tag.context_module = first_context_module
+          discussion_context_module_tag.save!
+          assignment
+        end
+
+        it "handles comparing quizzes to assignments" do
+          expected_id_order = [assignment3.id, assignment2.id, assignment_owning_quiz.id, assignment1.id]
+          expect(ordered_assignment_ids).to eq(expected_id_order)
+        end
+
+        it "handles comparing discussions to assignments" do
+          expected_id_order = [assignment3.id, assignment2.id, assignment_owning_discussion_topic.id, assignment1.id]
+          expect(ordered_assignment_ids).to eq(expected_id_order)
+        end
+
+        it "handles comparing discussions, quizzes, and assignments to each other" do
+          expected_id_order = [
+            assignment3.id, assignment2.id, assignment_owning_quiz.id,
+            assignment_owning_discussion_topic.id, assignment1.id
+          ]
+          expect(ordered_assignment_ids).to eq(expected_id_order)
+        end
       end
     end
 

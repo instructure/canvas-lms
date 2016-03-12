@@ -4,13 +4,15 @@ module SpecComponents
   class Assignment
     include Assignable
 
-    attr_reader :id, :title
+    def initialize(opts)
+      course = opts[:course]
+      assignment_title = opts.fetch(:title, 'Test Assignment')
+      due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
 
-    def initialize(context, assignment_title)
       @component_assignment = assignment_model(
-        context: context,
+        context: course,
         title: assignment_title,
-        due_at: Time.zone.now.advance(days: 7)
+        due_at: due_at
       )
       @id = @component_assignment.id
       @title = @component_assignment.title
@@ -31,7 +33,11 @@ module SpecComponents
 
     private
 
-      def add_assignment_override_for_student(opts = {})
+      def add_assignment_override_for_student(opts)
+        super(opts) { |assignment_override| assignment_override.assignment = @component_assignment }
+      end
+
+      def add_assignment_override_for_section(opts)
         super(opts) { |assignment_override| assignment_override.assignment = @component_assignment }
       end
   end

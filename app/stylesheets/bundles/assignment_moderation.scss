@@ -4,7 +4,7 @@
   .ModeratedColumnHeader{
     padding-bottom: 5px;
     border-bottom: 1px solid #8495A0;
-    font-size: 11px;
+    @include fontSize(11px);
     font-weight: bold;
 
     a:link {
@@ -29,7 +29,7 @@
   .ColumnHeader{
     padding-bottom: 5px;
     border-bottom: 1px solid #8495A0;
-    font-size: 11px;
+    @include fontSize(11px);
     font-weight: bold;
 
     a:link {
@@ -116,7 +116,7 @@
 }
 
 .ModeratedGrading__Header-Instructions {
-  font-size: 20px;
+  @include fontSize(20px);
 }
 
 .ModeratedGrading__Header-PublishBtn {

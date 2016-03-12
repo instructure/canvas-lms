@@ -21,6 +21,7 @@ describe "quizzes" do
 
     before(:each) do
       course_with_teacher_logged_in
+      course_with_student(course: @course, active_enrollment: true)
       @course.update_attributes(:name => 'teacher course')
       @course.save!
       @course.reload
@@ -278,8 +279,8 @@ describe "quizzes" do
     describe "moderation" do
 
       before do
-        student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-        @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+        @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
         @context = @course
         @quiz = quiz_model
         @quiz.time_limit = 20
@@ -322,6 +323,7 @@ describe "quizzes" do
     end
 
     it "should indicate when it was last saved", priority: "1", test_id: 210065 do
+      user_session(@student)
       take_quiz do
         indicator = f('#last_saved_indicator')
         expect(indicator.text).to eq 'Not saved'
@@ -333,6 +335,7 @@ describe "quizzes" do
         wait_for_ajax_requests
         expect(indicator.text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
       end
+      user_session(@user)
     end
 
     it "should validate numerical input data", priority: "1", test_id: 210066 do
@@ -340,6 +343,7 @@ describe "quizzes" do
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
       end
+      user_session(@student)
       take_quiz do
         input = f('.numerical_question_input')
 
@@ -359,6 +363,7 @@ describe "quizzes" do
         wait_for_ajaximations
         expect(input).to have_attribute(:value, "1.0000")
       end
+      user_session(@user)
     end
 
     it "should mark dropdown questions as answered", priority: "2", test_id: 210067 do
@@ -513,7 +518,9 @@ describe "quizzes" do
       q.time_limit = 10
       q.save!
 
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+      # This user action has to be done as a student
+      user_session(@student)
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       f("#take_quiz_link").click
       sleep 1
 
@@ -522,6 +529,9 @@ describe "quizzes" do
       # force a save to create a submission
       answer_one.click
       wait_for_ajaximations
+
+      # restore user state, assuming specs aren't independent
+      user_session(@user)
 
       # add time as a the moderator. this code replicates what happens in
       # QuizSubmissions#extensions when a moderator extends a student's
@@ -574,7 +584,8 @@ describe "quizzes" do
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
+      user_session(@student)
+      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       expect_new_page_load do
         f("#take_quiz_link").click
         # In this case the UI updates on a timer, not an ajax callback
@@ -603,6 +614,7 @@ describe "quizzes" do
       f('#submit_quiz_button').click
       wait_for_ajaximations
       keep_trying_until { expect(fj('.selected_answer').text).to include attachment.display_name }
+      user_session(@user)
     end
 
     it "should notify a student of extra time given by a moderator", priority: "2", test_id: 210070 do
@@ -662,14 +674,14 @@ describe "quizzes" do
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
-    it "should not increment badge counts when taking a quiz as a teacher", priority: "2", test_id: 474290 do
+    it "should not allow a teacher to take a quiz" do
       @quiz = quiz_model({ course: @course, time_limit: 5 })
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data
       @quiz.save!
 
-      take_and_answer_quiz
-      expect(f("#section-tabs .grades .nav-badge")).to be_nil
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
+      expect(ff("#take_quiz_link").size).to eq 0
     end
   end
 end

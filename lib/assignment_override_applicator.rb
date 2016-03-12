@@ -130,12 +130,14 @@ module AssignmentOverrideApplicator
   end
 
   def self.group_override(assignment_or_quiz, user)
-    return nil unless assignment_or_quiz.is_a?(Assignment) && assignment_or_quiz.group_category
+    return nil unless assignment_or_quiz.is_a?(Assignment)
+    group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
+    return nil unless group_category_id
 
     if assignment_or_quiz.context.user_has_been_student?(user)
-      group = user.current_groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+      group = user.current_groups.where(:group_category_id => group_category_id).first
     else
-      group = assignment_or_quiz.context.groups.where(:group_category_id => assignment_or_quiz.group_category_id).first
+      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
     end
 
     if group

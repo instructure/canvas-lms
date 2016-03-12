@@ -90,7 +90,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__nav-checklist {
   list-style-type: none;
-  margin: 0; 
+  margin: 0;
   padding: 0;
   flex: 1;
   display: flex;
@@ -129,7 +129,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
     }
   }
 
-  @include breakpoint(desktop) { font-size: 15px; }
+  @include breakpoint(desktop) { @include fontSize(15px); }
 
   &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
     border-left-color: $ic-brand-primary;
@@ -164,20 +164,20 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box__headline {
   line-height: 0.85;
-  font-size: $ic-sp*3;
+  @include fontSize(36px);
   text-align: center;
   color: $ic-color-light;
   font-weight: 700;
   margin: 0;
   @include breakpoint(mini-tablet) {
-    font-size: $ic-sp*4;
+    @include fontSize(48px);
     padding: $ic-sp 0;
   }
   @include breakpoint(tablet) {
-    font-size: $ic-sp*5;
+    @include fontSize(60px);
   }
   @include breakpoint(desktop) {
-    font-size: $ic-sp*6;
+    @include fontSize(72px);
     padding: $ic-sp*2 0;
   }
 }
@@ -292,11 +292,11 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   margin-bottom: 0;
 
   @include breakpoint(desktop) {
-    font-size: 15px;
+    @include fontSize(15px);
     line-height: 1.6;
 
     @include breakpoint(short) {
-      font-size: 14px;
+      @include fontSize(14px);
       line-height: 1.3;
     }
   }

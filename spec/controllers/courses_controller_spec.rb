@@ -65,6 +65,8 @@ describe CoursesController do
         ens << @course.enroll_teacher(@user, :section => sec2, :allow_multiple_enrollments => true)
         ens.each(&:accept!)
 
+        ens[1].conclude # the current enrollment should take precedence over the concluded one
+
         user_session(@user)
         get 'index'
         expect(response).to be_success

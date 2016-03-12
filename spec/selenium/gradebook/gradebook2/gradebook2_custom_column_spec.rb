@@ -42,13 +42,13 @@ describe "gradebook2 - custom columns" do
     expect(has_notes_column.call).to be_falsey
 
     dropdown_link = f("#gradebook_settings")
-    click_dropdown_option = lambda do |option|
+    click_dropdown_option = ->(option) do
       dropdown_link.click
       ff(".gradebook_dropdown a").find { |a| a.text == option }.click
       wait_for_ajaximations
     end
-    show_notes = lambda { click_dropdown_option.("Show Notes Column") }
-    hide_notes = lambda { click_dropdown_option.("Hide Notes Column") }
+    show_notes = -> { click_dropdown_option.call("Show Notes Column") }
+    hide_notes = -> { click_dropdown_option.call("Hide Notes Column") }
 
     # create the column
     show_notes.call

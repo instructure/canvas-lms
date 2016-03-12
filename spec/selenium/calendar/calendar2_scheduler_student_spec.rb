@@ -20,7 +20,7 @@ describe "scheduler" do
     end
 
     def reserve_appointment_manual(n, comment = nil)
-      ffj('.fc-event')[n].click
+      ffj('.agenda-event .ig-row')[n].click
       if comment
         replace_content(f('#appointment-comment'), comment)
       end
@@ -41,8 +41,8 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0, "my comments")
-      expect(f('.fc-event')).to include_text "Reserved"
-      ffj('.fc-event')[0].click
+      expect(f('.agenda-event .ig-row')).to include_text "Reserved"
+      ffj('.agenda-event .ig-row')[0].click
       expect(f('.event-details-content')).to include_text "my comments"
 
       load_month_view
@@ -62,14 +62,14 @@ describe "scheduler" do
       click_appointment_link
 
       reserve_appointment_manual(0)
-      expect(f('.fc-event')).to include_text "Reserved"
+      expect(f('.agenda-event .ig-row')).to include_text "Reserved"
 
       # try to reserve the second appointment
       reserve_appointment_manual(1)
       fj('.ui-button:contains(Reschedule)').click
       wait_for_ajax_requests
 
-      event1, event2 = ff('.fc-event')
+      event1, event2 = ff('.agenda-event .ig-row')
       expect(event1).to include_text "Available"
       expect(event2).to include_text "Reserved"
     end
@@ -88,13 +88,13 @@ describe "scheduler" do
 
       reserve_appointment_manual(0)
       reserve_appointment_manual(1)
-      e1, e2, *rest = ff('.fc-event')
+      e1, e2 = ff('.agenda-event .ig-row')
       expect(e1).to include_text "Reserved"
       expect(e2).to include_text "Reserved"
 
       reserve_appointment_manual(2)
       fj('.ui-button:contains("OK")').click # "can't reserve" dialog
-      expect(f('.fc-event:nth-child(3)')).to include_text "Available"
+      expect(fj('.agenda-event .ig-row:eq(2)')).to include_text "Available"
     end
 
     it "should allow other users to fill up available timeslots" do
@@ -140,7 +140,7 @@ describe "scheduler" do
 
       # first slot full, but second available
       click_appointment_link
-      e1, e2 = ff('.fc-event')
+      e1, e2 = ff('.agenda-event .ig-row')
       expect(e1).to include_text "Filled"
       expect(e2).to include_text "Available"
     end
@@ -151,10 +151,9 @@ describe "scheduler" do
       ag.appointments.first.reserve_for(@user, @user)
       get "/calendar2"
       click_scheduler_link
-      wait_for_ajaximations
       click_appointment_link
 
-      fj('.fc-event:visible').click
+      fj('.agenda-event .ig-row').click
       expect(ff('#reservations').size).to be_zero
     end
 
@@ -226,13 +225,13 @@ describe "scheduler" do
       end
 
       it "should let me do so from the scheduler", priority: "1", test_id: 502485 do
-        fj('.fc-event.scheduler-event').click
+        fj('.agenda-event .ig-row').click
         fj('.unreserve_event_link').click
         fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 
         wait_for_ajaximations
 
-        expect(f('.fc-event')).to include_text "Available"
+        expect(f('.agenda-event .ig-row')).to include_text "Available"
       end
     end
   end

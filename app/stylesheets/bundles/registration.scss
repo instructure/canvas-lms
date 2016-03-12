@@ -94,7 +94,7 @@ a {
   min-height: 30px;
   padding: 10px 0 40px;
   color: #999;
-  font-size: 11px;
+  @include fontSize(11px);
   a {
     margin-left: 5px;
     color: #999;

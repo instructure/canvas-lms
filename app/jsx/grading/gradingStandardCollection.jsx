@@ -166,7 +166,7 @@ function(React, GradingStandard, $, I18n, _) {
     },
 
     getAddButtonCssClasses: function() {
-      var classes = "btn pull-right add_standard_link"
+      var classes = "Button pull-right add_standard_button"
       if(!this.hasAdminOrTeacherRole() || this.anyStandardBeingEdited()) classes += " disabled"
       return classes;
     },
@@ -192,10 +192,10 @@ function(React, GradingStandard, $, I18n, _) {
       return(
         <div>
           <div className="rs-margin-all pull-right">
-            <a href="#" ref="addButton" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
+            <button ref="addButton" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
               <i className="icon-add"/>
               {I18n.t(" Add grading scheme")}
-            </a>
+            </button>
           </div>
           <div id="standards" className="content-box react_grading_standards">
             {this.renderGradingStandards()}

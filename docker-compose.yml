@@ -15,7 +15,10 @@ redis:
 #     CASSANDRA_START_RPC: 'true'
 
 consul:
-  build: ./docker-compose/consul
+  image: gliderlabs/consul-server:0.5
+  command: -node canvas-consul -bootstrap
+  environment:
+    GOMAXPROCS: "2"
 
 # Uncomment the below lines to run selenium tests locally. Don't forget the
 # line in the `web` section below too.
@@ -26,12 +29,7 @@ consul:
 #    - "5900:5900"
 
 kinesis:
-  build: ./docker-compose/kinesalite
-  command: "--path /var/lib/kinesalite"
-  volumes:
-    - "./tmp/cache:/var/lib/kinesalite"
-  ports:
-    - "4567:4567"
+  image: instructure/kinesalite
   environment:
     VIRTUAL_HOST: kinesis.docker
     VIRTUAL_PORT: 4567
@@ -88,3 +86,12 @@ guard:
 #  environment:
 #    NODE_ENV: CI
 #    USE_WEBPACK: true
+
+# Uncomment below to run the LTI test tool for integration tests
+# lti-test-tool:
+#   image: instructure/lti_tool_provider_example
+#   command: bundle exec rails s -p 8080
+#   ports:
+#     - "8080:8080"
+#   environment:
+#     VIRTUAL_HOST: lti.docker

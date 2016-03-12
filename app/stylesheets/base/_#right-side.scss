@@ -172,20 +172,25 @@
   }
   &.to-do-list, &.events {
     i {
-      width: 25px;
+      width: 40px;
+      min-width: 40px;
+    }
+    .event > a {
+      display: flex;
     }
     .todo-badge-wrapper {
       display: inline-block;
       vertical-align: top;
-      min-width: 25px;
+      min-width: 40px;
     }
   }
   &.to-do-list {
     li {
       position: relative;
       a.item {
+        display: flex;
         b {
-          padding-right: 20px;
+          padding-right: 24px;
         }
       }
       a.disable_item_link {

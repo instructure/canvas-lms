@@ -73,9 +73,9 @@ class ErrorReport < ActiveRecord::Base
 
     def create_error_report(opts)
       Shackles.activate(:master) do
-        report = ErrorReport.new
-        report.assign_data(opts)
         begin
+          report = ErrorReport.new
+          report.assign_data(opts)
           report.save!
           Rails.logger.info("Created ErrorReport ID #{report.global_id}")
         rescue => e

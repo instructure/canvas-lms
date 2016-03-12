@@ -20,6 +20,10 @@ module Turnitin
     end
     handle_asynchronously :process, max_attempts: 1, priority: Delayed::LOW_PRIORITY
 
+    def resubmit(submission, asset_string)
+      self.send_later(:update_originality_data, submission, asset_string)
+    end
+
     def turnitin_client
       @turnitin_client ||= (
         lti_params = {

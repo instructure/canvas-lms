@@ -20,6 +20,7 @@ if settings.present?
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
       ActionController::InvalidAuthenticityToken
+      Folio::InvalidPage
     }
   end
 

@@ -251,9 +251,17 @@ describe Account do
     end
 
     it "should not wipe out services that are substrings of each other" do
+
+      AccountServices.register_service(
+        :google_docs_prev,
+        {
+          :name => "My google docs prev", :description => "", :expose_to_ui => :service, :default => true
+        }
+      )
+
       @a.disable_service('google_docs_previews')
-      @a.disable_service('google_docs')
-      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs'
+      @a.disable_service('google_docs_prev')
+      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs_prev'
     end
 
     describe "services_exposed_to_ui_hash" do
@@ -393,7 +401,6 @@ describe Account do
     account.account_users.create!(:user => user, :role => restricted_role)
     [ admin, user ]
   end
-
 
   it "should set up access policy correctly" do
     # stub out any "if" permission conditions
@@ -545,6 +552,16 @@ describe Account do
         ["&nbsp;&nbsp;&nbsp;&nbsp;sub2-1", sub2_1.id]
       ]
     )
+  end
+
+  it "should correctly return sub-account_ids recursively" do
+    a = Account.default
+    subs = []
+    sub = Account.create!(name: 'sub', parent_account: a)
+    subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
+    subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
+    subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+    expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
   end
 
   it "should return the correct user count" do
@@ -970,6 +987,27 @@ describe Account do
       Account.default.authentication_providers.create!(auth_type: 'ldap')
       account.authentication_providers.destroy_all
       expect(account.non_canvas_auth_configured?).to be_falsey
+    end
+  end
+
+  describe '#find_child' do
+    it 'works for root accounts' do
+      sub = Account.default.sub_accounts.create!
+      expect(Account.default.find_child(sub.id)).to eq sub
+    end
+
+    it 'works for children accounts' do
+      sub = Account.default.sub_accounts.create!
+      sub_sub = sub.sub_accounts.create!
+      sub_sub_sub = sub_sub.sub_accounts.create!
+      expect(sub.find_child(sub_sub_sub.id)).to eq sub_sub_sub
+    end
+
+    it 'raises for out-of-tree accounts' do
+      sub = Account.default.sub_accounts.create!
+      sub_sub = sub.sub_accounts.create!
+      sibling = sub.sub_accounts.create!
+      expect { sub_sub.find_child(sibling.id) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -1425,7 +1463,7 @@ describe Account do
         begin
           Account.find_cached(nonsense_id)
         rescue ::Canvas::AccountCacheError => e
-          expect(e.message).to eq("Couldn't find Account with id=#{nonsense_id}")
+          expect(e.message).to eq(CANVAS_RAILS4_0 ? "Couldn't find Account with id=#{nonsense_id}" : "Couldn't find Account with 'id'=#{nonsense_id}")
         end
       end
     end

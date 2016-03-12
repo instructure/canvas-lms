@@ -67,13 +67,13 @@
         <td class="indent"><%= inactive_students %></td>
       </tr><tr>
         <td><%= t('quizzes', %{Quizzes}) %></td>
-        <td><%= @context.quizzes.count %></td>
+        <td class="quiz_count"><%= @context.quizzes.active.before(@range_end).count %></td>
       </tr><tr>
         <td class="indent"><%= t('quiz_questions', %{Quiz Questions}) %></td>
-        <td class="indent"><%= @context.quizzes.before(@range_end).map{|q| (q.quiz_data || []).length}.sum %></td>
+        <td class="indent quiz_question_count"><%= @context.quizzes.active.before(@range_end).map{|q| (q.quiz_data || []).length}.sum %></td>
       </tr><tr>
         <td class="indent"><%= t('quiz_submissions', %{Quiz Submissions}) %></td>
-        <td class="indent"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.before(@range_end)).count %></td>
+        <td class="indent quiz_submission_count"><%= Quizzes::QuizSubmission.where(quiz_id: @context.quizzes.active.before(@range_end)).count %></td>
       </tr>
     </table>
   </div>

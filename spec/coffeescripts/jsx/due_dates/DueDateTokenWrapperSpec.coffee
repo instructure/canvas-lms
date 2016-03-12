@@ -17,6 +17,7 @@ define [
         tokens: [
           {name: "Atilla", student_id: "3", type: "student"},
           {name: "Huns", course_section_id: "4", type: "section"},
+          {name: "Reading Group 3", group_id: "3", type: "group"}
         ]
         potentialOptions: [
           {course_section_id: "1", name: "Patricians"},
@@ -29,6 +30,8 @@ define [
           {course_section_id: "4", name: "Bar"},
           {course_section_id: "5", name: "Baz"},
           {course_section_id: "6", name: "Qux"},
+          {group_id: "1", name: "Reading Group One"},
+          {group_id: "2", name: "Reading Group Two"}
         ]
         handleTokenAdd: ->
         handleTokenRemove: ->
@@ -64,8 +67,8 @@ define [
     # contend with.
     @DueDateTokenWrapper.removeTimingSafeties()
 
-    # 1 prompt, 3 sections, 4 students, 2 headers = 10
-    equal @DueDateTokenWrapper.optionsForMenu().length, 10
+    # 1 prompt, 3 sections, 4 students, 2 groups, 3 headers = 13
+    equal @DueDateTokenWrapper.optionsForMenu().length, 13
 
     @DueDateTokenWrapper.handleInput("scipio")
     # 0 sections, 1 student, 1 header = 2
@@ -74,8 +77,10 @@ define [
   test 'menu options are grouped by type', ->
     equal @DueDateTokenWrapper.optionsForMenu()[1].props.value, "course_section"
     equal @DueDateTokenWrapper.optionsForMenu()[2].props.value, "Patricians"
-    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "student"
-    equal @DueDateTokenWrapper.optionsForMenu()[6].props.value, "Seneca The Elder"
+    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "group"
+    equal @DueDateTokenWrapper.optionsForMenu()[6].props.value, "Reading Group One"
+    equal @DueDateTokenWrapper.optionsForMenu()[8].props.value, "student"
+    equal @DueDateTokenWrapper.optionsForMenu()[9].props.value, "Seneca The Elder"
 
   test 'handleTokenAdd is called when a token is added', ->
     addProp = @stub(@DueDateTokenWrapper.props, "handleTokenAdd")

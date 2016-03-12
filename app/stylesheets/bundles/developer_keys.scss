@@ -36,7 +36,7 @@
     vertical-align: middle;
     span.name {
       font-weight: bold;
-      font-size: 14px;
+      @include fontSize(14px);
     }
     &.links i {
       opacity: 0.4;

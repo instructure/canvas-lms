@@ -2109,11 +2109,7 @@ form.user_content_post_form {
 }
 
 .nav-badge {
-  border-radius: 30px;
-  background-color: $ic-brand-primary;
-  padding: 0 8px;
-  @include fontSize(9px);
-  color: #fff;
+  @include ic-badge-maker;
   float: right;
 }
 

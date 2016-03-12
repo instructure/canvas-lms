@@ -130,6 +130,26 @@ describe Enrollment do
       course_with_student(:active_all => true)
     end
 
+    it "should allow post_to_forum permission on a course if date is current" do
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+
+      expect(@enrollment.reload.state_based_on_date).to eq :active
+      expect(@course.grants_right?(@enrollment.user, :post_to_forum)).to eql(true)
+    end
+
+    it "should not allow post_to_forum permission on a course if date in future" do
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+
+      expect(@enrollment.reload.state_based_on_date).to eq :accepted
+      expect(@course.grants_right?(@enrollment.user, :post_to_forum)).to eql(false)
+    end
+
     it "should not allow read permission on a course if date inactive" do
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
@@ -1606,6 +1626,27 @@ describe Enrollment do
       expect(grading_period_grade.workflow_state).to eq('active')
       @enrollment.destroy
       expect(grading_period_grade.workflow_state).to eq('deleted')
+    end
+
+    it "should remove assingment overrides if they are only linked to this enrollment" do
+      course_with_student
+      assignment = assignment_model(:course => @course)
+      ao = AssignmentOverride.new()
+      ao.assignment = assignment
+      ao.title = "ADHOC OVERRIDE"
+      ao.workflow_state = "active"
+      ao.set_type = "ADHOC"
+      ao.save!
+      assignment.reload
+      override_student = ao.assignment_override_students.build
+      override_student.user = @user
+      override_student.save!
+
+      expect(ao.workflow_state).to eq("active")
+      @user.enrollments.destroy_all
+
+      ao.reload
+      expect(ao.workflow_state).to eq("deleted")
     end
   end
 

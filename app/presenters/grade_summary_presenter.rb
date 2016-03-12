@@ -296,8 +296,8 @@ class GradeSummaryPresenter
   def sorted_by_modules(assignments)
     Assignment.preload_context_module_tags(assignments, include_context_modules: true)
     assignments.sort do |a, b|
-      a_tags = a.context_module_tags
-      b_tags = b.context_module_tags
+      a_tags = a.all_context_module_tags
+      b_tags = b.all_context_module_tags
       # assignments without modules come after assignments with modules
       next -1 if a_tags.present? && b_tags.empty?
       next 1 if a_tags.empty? && b_tags.present?

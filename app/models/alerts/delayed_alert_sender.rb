@@ -43,7 +43,7 @@ module Alerts
           matches = true
 
           alert.criteria.each do |criterion|
-            alert_checker = alert_checkers[criterion.criterion_type] ||= Alerts.const_get(criterion.criterion_type).new(course, student_ids, teacher_ids)
+            alert_checker = alert_checkers[criterion.criterion_type] ||= Alerts.const_get(criterion.criterion_type, false).new(course, student_ids, teacher_ids)
             matches = !alert_checker.should_not_receive_message?(user_id, criterion.threshold.to_i)
             break unless matches
           end

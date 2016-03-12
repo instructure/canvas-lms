@@ -23,8 +23,10 @@ In order to use the gem in Rails, you'll need an initializer something like this
 config/initializers/broadcast_policy.rb
 
 require 'broadcast_policy'
-BroadcastPolicy.notifier = lambda { Notifier.new }
-BroadcastPolicy.notification_finder = lambda { NotificationFinder.new(Nofication.all) }
+Rails.configuration.to_prepare do
+  BroadcastPolicy.notifier = lambda { Notifier.new }
+  BroadcastPolicy.notification_finder = lambda { NotificationFinder.new(Notification.all_cached) }
+end
 ActiveRecord::Base.send(:extend, BroadcastPolicy::ClassMethods)
 
 The two BroadcastPolicy services are necessary to supply the canvas domain objects

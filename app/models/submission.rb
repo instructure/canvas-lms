@@ -462,12 +462,24 @@ class Submission < ActiveRecord::Base
     self.save
 
     @submit_to_turnitin = true
-    submit_to_turnitin_later
+    turnitinable_by_lti? ? retrieve_lti_tii_score : submit_to_turnitin_later
+  end
+
+  def retrieve_lti_tii_score
+    if (tool = ContextExternalTool.tool_for_assignment(self.assignment))
+      turnitin_data.select {|_,v| v.key?(:outcome_response) }.each do |k, v|
+        Turnitin::OutcomeResponseProcessor.new(tool, self.assignment, self.user, v[:outcome_response].as_json).resubmit(self, k)
+      end
+    end
   end
 
   def turnitinable?
     %w(online_upload online_text_entry).include?(submission_type) &&
       assignment.turnitin_enabled?
+  end
+
+  def turnitinable_by_lti?
+    turnitin_data.select{|_, v| v.is_a?(Hash) && v.key?(:outcome_response)}.any?
   end
 
   def touch_graders
@@ -596,7 +608,7 @@ class Submission < ActiveRecord::Base
       self.quiz_submission ||= Quizzes::QuizSubmission.where(submission_id: self).first
       self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id: self.user_id, quiz_id: self.assignment.quiz).first rescue nil
     end
-    @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
+    @just_submitted = (self.submitted? || self.pending_review?) && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
       self.grade = assignment ?
         assignment.score_to_grade(score, grade) :

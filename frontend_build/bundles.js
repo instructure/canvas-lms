@@ -148,7 +148,6 @@ entries['vendor'] = [
   'vendor/mediaelement-and-player',
   'vendor/raphael',
   'vendor/redux',
-  'vendor/redux-promise',
   'vendor/slickgrid/slick.grid',
   'vendor/slickgrid/slick.editors',
   'vendor/slickgrid/plugins/slick.rowselectionmodel',

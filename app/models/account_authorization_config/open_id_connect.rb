@@ -32,7 +32,16 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
       :token_url,
       :scope,
       :login_attribute,
+      :end_session_endpoint,
       :jit_provisioning ].freeze
+  end
+
+  def end_session_endpoint=(value)
+    self.log_out_url = value
+  end
+
+  def end_session_endpoint
+    log_out_url
   end
 
   def login_attribute
@@ -43,6 +52,10 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
     jwt_string = token.params['id_token'.freeze]
     jwt = ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
     jwt[login_attribute]
+  end
+
+  def user_logout_redirect(_controller, _current_user)
+    end_session_endpoint.presence
   end
 
   protected

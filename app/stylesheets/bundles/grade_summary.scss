@@ -391,20 +391,20 @@ $outcome-border: 1px solid #BCC2CA;
     }
     .group-title {
       margin: 0;
-      font-size: 20px;
+      @include fontSize(20px);
       line-height: 40px;
     }
     .group-status {
       float: right;
       top: 8px;
-      font-size: 30px;
+      @include fontSize(30px);
       position: relative;
       strong {
         color: #2a333b;
       }
       span {
         display: block;
-        font-size: 14px;
+        @include fontSize(14px);
       }
       .pill {
         color: white;
@@ -578,7 +578,7 @@ $outcome-border: 1px solid #BCC2CA;
   }
   .score {
     color: #959595;
-    font-size: 18px;
+    @include fontSize(18px);
     float: left;
     strong {
       color: #2a333b;
@@ -629,7 +629,7 @@ $outcome-border: 1px solid #BCC2CA;
         top: 13px;
       }
       .score {
-        font-size: 14px;
+        @include fontSize(14px);
       }
     }
   }

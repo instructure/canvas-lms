@@ -23,7 +23,7 @@ module Api::V1::WikiPage
 
   WIKI_PAGE_JSON_ATTRS = %w(url title created_at updated_at editing_roles)
 
-  def wiki_page_json(wiki_page, current_user, session, include_body = true)
+  def wiki_page_json(wiki_page, current_user, session, include_body = true, opts={})
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['page_id'] = wiki_page.id
     hash['editing_roles'] ||= 'teachers'
@@ -32,7 +32,7 @@ module Api::V1::WikiPage
     hash['hide_from_students'] = !hash['published'] # deprecated, but still here for now
     hash['front_page'] = wiki_page.is_front_page?
     hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
-    locked_json(hash, wiki_page, current_user, 'page')
+    locked_json(hash, wiki_page, current_user, 'page', :deep_check_if_needed => opts[:deep_check_if_needed])
     if include_body && !hash['locked_for_user'] && !hash['lock_info']
       hash['body'] = api_user_content(wiki_page.body)
       wiki_page.increment_view_count(current_user, wiki_page.context)

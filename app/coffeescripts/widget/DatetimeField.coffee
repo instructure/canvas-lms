@@ -1,8 +1,11 @@
 define [
   'i18n!datepicker'
   'jquery'
+  'underscore'
   'timezone'
-], (I18n, $, tz) ->
+  'jquery.instructure_date_and_time' # for $input.datepicker
+  'compiled/jquery.rails_flash_notifications' # for $.screenReaderFlashMessageExclusive
+], (I18n, $, {debounce}, tz) ->
 
   # translate a strftime style format string (guaranteed to only use %d, %-d,
   # %b, and %Y, though in dynamic order) into a datepicker style format string
@@ -43,6 +46,13 @@ define [
 
       # when the input changes, update this object from the new value
       @$field.bind "change focus blur keyup", @setFromValue
+      @$field.bind "change focus keyup", @alertScreenreader
+
+      # debounce so that as we flash interpretations of what they're typing, we
+      # do it once when they finish (or at least pause) typing instead of every
+      # keystroke. see comment in alertScreenreader for why we debounce this
+      # instead of alertScreenreader itself.
+      @debouncedSRFME = debounce $.screenReaderFlashMessageExclusive, 1000
 
       # process initial value
       @setFromValue()
@@ -168,7 +178,7 @@ define [
     update: (updates) ->
       @updateData()
       @updateSuggest()
-      @updateAriaAlert()
+      @updateAria()
 
     updateData: ->
       iso8601 = @datetime?.toISOString() || ''
@@ -201,32 +211,31 @@ define [
           'time-ampm': null
 
     updateSuggest: ->
-      text = @formatSuggest()
-      screenreaderSuggest = text
+      localText = @formatSuggest()
+      @screenreaderAlert = localText
       if @$courseSuggest
         courseText = @formatSuggestCourse()
         if courseText
-          text = @localLabel + text
+          localText = @localLabel + localText
           courseText = @courseLabel + courseText
-          screenreaderSuggest = "#{text}\n#{courseText}"
+          @screenreaderAlert = "#{localText}\n#{courseText}"
         @$courseSuggest.text(courseText)
-      @$field.data('screenreader-suggest', screenreaderSuggest)
       @$suggest
         .toggleClass('invalid_datetime', @invalid)
-        .text(text)
+        .text(localText)
 
-    updateAriaAlert: ->
-      if @$field.data('accessible-message-timeout')
-        # clear any previously scheduled message; we're about to reschedule
-        # iff still needed
-        clearTimeout(@$field.data('accessible-message-timeout'))
-        @$field.removeData('accessible-message-timeout')
-      if @invalid
-        # set timeout to speak the parse error via #aria_alerts
-        callback = =>
-          $('#aria_alerts').text(@parseError)
-          @$field.removeData('accessible-message-timeout')
-        @$field.data('accessible-message-timeout', setTimeout(callback, 2000))
+    alertScreenreader: =>
+      # only alert if the value in the field changed (e.g. don't alert on arrow
+      # keys). not debouncing around alertScreenreader itself, because if so,
+      # the retrieval of val() here gets delayed and can do weird stuff while
+      # typing is ongoing
+      alertingFor = @$field.val()
+      if alertingFor isnt @lastAlertedFor
+        @debouncedSRFME(@screenreaderAlert)
+        @lastAlertedFor = alertingFor
+
+    updateAria: ->
+      @$field.attr("aria-invalid", !!@invalid)
 
     formatSuggest: ->
       if @blank

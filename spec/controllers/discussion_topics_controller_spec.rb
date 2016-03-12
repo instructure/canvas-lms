@@ -61,6 +61,12 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
+    it 'does not show announcements without :read_announcements' do
+      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      get 'index', course_id: @course.id
+      assert_unauthorized
+    end
+
     it "should load for :view_group_pages students" do
       @course.account.role_overrides.create!(
         role: student_role,
@@ -167,14 +173,14 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    it "should work for announcements in a public course" do
+    it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
         :title => "some announcement",
         :message => "some message"
       )
       get 'show', :course_id => @course.id, :id => @announcement.id
-      expect(response).to be_success
+      expect(response).to_not be_success
     end
 
     it "should not display announcements in private courses to users who aren't logged in" do

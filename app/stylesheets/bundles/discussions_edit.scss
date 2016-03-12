@@ -1,5 +1,7 @@
+@import "base/_environment.scss";
+
 .removeAttachment {
-  font-size: 20px;
+  @include fontSize(20px);
   color: black;
   text-decoration: none;
 }

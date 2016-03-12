@@ -1,4 +1,4 @@
-define [ 'compiled/str/TextHelper' ], ({delimit, truncateText}) ->
+define [ 'compiled/str/TextHelper' ], ({delimit, truncateText, formatMessage}) ->
   module 'TextHelper'
 
   test 'delimit: comma-delimits long numbers', ->
@@ -15,6 +15,10 @@ define [ 'compiled/str/TextHelper' ], ({delimit, truncateText}) ->
     equal delimit(123), '123'
     equal delimit(0), '0'
     equal delimit(null), '0'
+
+  test 'no double encoding of url', ->
+    equal formatMessage("https://blah.blee.com/Steven%20Test/thing%20that%20cool…anvas_non_Demonstration_-_Flash_%28joel%29_-_123456_03.41.18PM.html "),
+     "<a href='https:&#x2F;&#x2F;blah.blee.com&#x2F;Steven%20Test&#x2F;thing%20that%20cool…anvas_non_Demonstration_-_Flash_%28joel%29_-_123456_03.41.18PM.html'>https:&#x2F;&#x2F;blah.blee.com&#x2F;Steven%20Test&#x2F;thing%20that%20cool…anvas_non_Demonstration_-_Flash_%28joel%29_-_123456_03.41.18PM.html</a> "
 
   test 'delimit: should not error on NaN', ->
     equal delimit(0/0), 'NaN'

@@ -231,6 +231,8 @@ describe User do
   it "should be able to remove itself from a root account" do
     account1 = Account.create
     account2 = Account.create
+    sub = account2.sub_accounts.create!
+
     user = User.create
     user.register!
     p1 = user.pseudonyms.create(:unique_id => "user1")
@@ -241,6 +243,8 @@ describe User do
     p2.save!
     account1.account_users.create!(user: user)
     account2.account_users.create!(user: user)
+    sub.account_users.create!(user: user)
+
     course1 = account1.courses.create
     course2 = account2.courses.create
     course1.offer!
@@ -253,10 +257,12 @@ describe User do
     enrollment2.save!
     expect(user.associated_account_ids.include?(account1.id)).to be_truthy
     expect(user.associated_account_ids.include?(account2.id)).to be_truthy
+
     user.remove_from_root_account(account2)
     user.reload
     expect(user.associated_account_ids.include?(account1.id)).to be_truthy
     expect(user.associated_account_ids.include?(account2.id)).to be_falsey
+    expect(user.account_users.where(:account_id => [account2, sub])).to be_empty
   end
 
   it "should search by multiple fields" do

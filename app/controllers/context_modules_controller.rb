@@ -155,9 +155,7 @@ class ContextModulesController < ApplicationController
 
       # # Background this, not essential that it happen right away
       # ContextModule.send_later(:update_tag_order, @context)
-      respond_to do |format|
-        format.json { render :json => @modules.map{ |m| m.as_json(include: :content_tags, methods: :workflow_state) } }
-      end
+      render :json => @modules.map{ |m| m.as_json(include: :content_tags, methods: :workflow_state) }
     end
   end
 
@@ -306,9 +304,7 @@ class ContextModulesController < ApplicationController
       ContentTag.update_could_be_locked(affected_items)
       @context.touch
       @module.reload
-      respond_to do |format|
-        format.json { render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session}) }
-      end
+      render :json => @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
     end
   end
 
@@ -443,16 +439,12 @@ class ContextModulesController < ApplicationController
       elsif params[:unpublish]
         @module.unpublish
       end
-      respond_to do |format|
-        if @module.update_attributes(params[:context_module])
-          format.json do
-            json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
-            json['context_module']['relock_warning'] = true if @module.relock_warning?
-            render :json => json
-          end
-        else
-          format.json { render :json => @module.errors, :status => :bad_request }
-        end
+      if @module.update_attributes(params[:context_module])
+        json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
+        json['context_module']['relock_warning'] = true if @module.relock_warning?
+        render :json => json
+      else
+        render :json => @module.errors, :status => :bad_request
       end
     end
   end

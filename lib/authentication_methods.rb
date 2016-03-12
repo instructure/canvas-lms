@@ -76,9 +76,20 @@ module AuthenticationMethods
         raise AccessTokenError
       end
       @authenticated_with_jwt = true
-    rescue JSON::JWT::InvalidFormat, Canvas::Security::TokenExpired, Canvas::Security::InvalidToken
-      # could still be a regular access token
+    rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
+           Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
+           Canvas::Security::InvalidToken,       # Looks like garbage
+           Canvas::DynamicSettings::ConsulError  # no config present for talking to consul
+      # these will happen for some configurations (no consul)
+      # and for some normal use cases (old token, access token),
+      # so we can return and move on
       return
+    rescue  Faraday::ConnectionFailed,            # consul config present, but couldn't connect
+            Faraday::ClientError,                 # connetion established, but something went wrong
+            Diplomat::KeyNotFound => exception    # talked to consul, but data missing
+      # these are indications of infrastructure of data problems
+      # so we should log them for resolution, but recover gracefully
+      Canvas::Errors.capture_exception(:jwt_check, exception)
     end
   end
 

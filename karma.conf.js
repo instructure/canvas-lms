@@ -19,6 +19,7 @@ var usingWebpack = (process.env.USE_WEBPACK == 'True' ||
 if(usingWebpack){
   karmaFiles = [
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
+    'spec/javascripts/support/axe.js',
     {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true},
     {pattern: 'spec/javascripts/fixtures/*', included: false, served: true}
   ];
@@ -30,6 +31,7 @@ if(usingWebpack){
     'node_modules/karma-requirejs/lib/adapter.js',
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
+    'spec/javascripts/support/axe.js',
     {pattern: 'public/javascripts/*.js', included: false, served: true},
     {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},
     {pattern: 'spec/javascripts/tests.js', included: false, served: true},

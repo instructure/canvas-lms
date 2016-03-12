@@ -80,14 +80,13 @@ class Course < ActiveRecord::Base
                   :organize_epub_by_content_type
 
   time_zone_attribute :time_zone
-  def time_zone_with_root_account
+  def time_zone
     if read_attribute(:time_zone)
-      time_zone_without_root_account
+      super
     else
       root_account.default_time_zone
     end
   end
-  alias_method_chain :time_zone, :root_account
 
   serialize :tab_configuration
   serialize :settings, Hash
@@ -752,7 +751,9 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
-    self.course_format = nil if self.course_format && !['on_campus', 'online'].include?(self.course_format)
+    if self.course_format && !['on_campus', 'online', 'blended'].include?(self.course_format)
+      self.course_format = nil
+    end
     true
   end
 
@@ -1092,7 +1093,8 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user| (self.active_enrollment_allows(user, permission) || self.account_membership_allows(user, permission)) && (!details[:if] || send(details[:if])) }
+      given {|user| (self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) || self.account_membership_allows(user, permission)) &&
+        (!details[:if] || send(details[:if])) }
       can permission
     end
 
@@ -1147,15 +1149,15 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
+    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :use_student_view, :read_outcomes, :view_unpublished_items]
 
-    # overrideable permissions for concluded admins
-    [:read_question_banks, :view_all_grades].each do |permission|
+    # overrideable permissions for concluded users
+    RoleOverride.concluded_permission_types.each do |permission|
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).any?{|e| e.admin? && e.has_permission_to?(permission)} ||
+          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission)} ||
             user.cached_not_ended_enrollments.any? do |e|
-              e.course_id == self.id && e.admin? && e.completed? && e.has_permission_to?(permission)
+              e.course_id == self.id && e.completed? && e.has_permission_to?(permission)
             end
           )
       end
@@ -1182,7 +1184,7 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can :read, :read_grades, :read_forum, :read_outcomes
+    can :read, :read_grades, :read_outcomes
 
     # Admin
     given { |user| self.account_membership_allows(user) }
@@ -1214,7 +1216,7 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def active_enrollment_allows(user, permission)
+  def active_enrollment_allows(user, permission, allow_future=true)
     return false unless user && permission
 
     @enrollment_lookup ||= {}
@@ -1222,7 +1224,7 @@ class Course < ActiveRecord::Base
       self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
-    @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
+    @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
   end
 
   def self.find_all_by_context_code(codes)
@@ -1258,27 +1260,6 @@ class Course < ActiveRecord::Base
 
   def concluded?
     completed? || soft_concluded?
-  end
-
-  def state_sortable
-    case state
-    when :invited
-      1
-    when :creation_pending
-      1
-    when :active
-      0
-    when :deleted
-      5
-    when :course_inactivated
-      3
-    when :rejected
-      4
-    when :completed
-      2
-    else
-      6
-    end
   end
 
   def account_chain(include_site_admin: false)
@@ -2415,7 +2396,7 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.temp_record.grants_right?(user, :read)
+          unless announcements.temp_record.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 

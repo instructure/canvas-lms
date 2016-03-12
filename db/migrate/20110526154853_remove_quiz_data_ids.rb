@@ -2,8 +2,8 @@
 class RemoveQuizDataIds < ActiveRecord::Migration
   tag :predeploy
 
-  class QuizQuestionDataMigrationARShim < ActiveRecord::Base;
-    attr_accessible
+  class QuizQuestionDataMigrationARShim < ActiveRecord::Base
+    strong_params
     self.table_name = "quiz_questions"
     serialize :question_data
   end

@@ -46,7 +46,6 @@ define [
       @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
       @$calendarViewButtons.on('click', 'button', @toggleView)
       $.subscribe('Calendar/loadStatus', @animateLoading)
-      @$schedulerDoneButton
 
     toggleView: (e) ->
       e.preventDefault()

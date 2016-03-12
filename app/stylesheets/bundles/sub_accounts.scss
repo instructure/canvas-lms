@@ -8,8 +8,9 @@
 }
 
 .account > .header {
-  font-size: 1.2em;
-  padding: 3px 5px;
+  padding: $ic-sp/3 $ic-sp;
+  box-sizing: border-box;
+  .name { @if $use_new_styles { font-weight: 500; } }
 }
 
 .account.editing_account > .header .edit_account {
@@ -21,29 +22,19 @@
 }
 
 .header .links {
-  padding-left: 5px;
-  opacity: 0.3;
+  padding-left: $ic-sp;
   float: right;
 }
 
-.header .links .btn {
-  padding: 0;
-}
-
 .header.header_hover {
-  background-color: #eee;
-  border-radius: 5px;
-}
-
-.header.header_hover .links {
-  opacity: 1;
+  background-color: $ic-bg-light-primary;
+  border-radius: $baseBorderRadius;
 }
 
 .header {
   .courses_count, .sub_accounts_count {
-    color: #888;
-    font-size: 0.7em;
-    line-height: 1.3em;
+    color: $ic-font-color--subdued;
+    @include fontSize(12px);
   }
 }
 

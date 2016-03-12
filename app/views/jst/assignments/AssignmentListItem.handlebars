@@ -18,14 +18,14 @@
         <div class="ellipses modules">
           {{#if has_modules}}
             {{#ifEqual module_count 1}}
-              {{module_name}} {{#t "module"}}Module{{/t}}
+              {{module_name}} {{#t}}Module{{/t}}
             {{else}}
               <a
                 href='#'
                 title='{{joined_names}}'
                 class="tooltip_link"
                 data-tooltip-selector="#module_tooltip_{{labelId}}"
-              >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
+              >{{#t}}Multiple Modules{{/t}}</a>
             {{/ifEqual}}
             <div id="module_tooltip_{{labelId}}" style="display:none;">
               {{#each modules}}
@@ -42,13 +42,13 @@
       <div class="ellipses js-score {{alignTextClass}}">
         <span class="screenreader-only">
           {{#if pointsPossible}}
-            {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
+            {{#t}}{{pointsPossible}} Points Possible{{/t}}
           {{else}}
-            {{#t "no_points_possible"}}No Points Possible{{/t}}
+            {{#t}}No Points Possible{{/t}}
           {{/if}}
         </span>
         <span class="non-screenreader" aria-hidden="true">
-          {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+          {{#if pointsPossible}}{{#t}}{{pointsPossible}} pts{{/t}}{{/if}}
         </span>
       </div>
 
@@ -80,7 +80,7 @@
             tabindex="0"
             href="#"
           >
-            <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+            <span class="screenreader-only">{{#t}}Settings{{/t}}</span>
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           </a>
 
@@ -94,7 +94,7 @@
                 href="#"
                 class="edit_assignment icon-edit"
                 id="assignment_{{id}}_settings_edit_item"
-                aria-label="{{#t 'assignment_edit'}}Edit Assignment {{name}}{{/t}}"
+                aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
               >{{#t "edit"}}Edit{{/t}}</a>
             </li>
@@ -104,7 +104,7 @@
                 href="#"
                 class="delete_assignment icon-trash"
                 id="assignment_{{id}}_settings_delete_item"
-                aria-label="{{#t 'assignment_delete'}}Delete Assignment {{name}}{{/t}}"
+                aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
                 data-focus-returns-to="assign_{{id}}_manage_link"
               >{{#t "delete"}}Delete{{/t}}</a>
             </li>
@@ -115,9 +115,9 @@
                 href="#"
                 class="move_assignment icon-updown"
                 id="assignment_{{id}}_settings_move_item"
-                aria-label='{{#t 'assignment_move'}}Move Assignment {{name}}{{/t}}'
+                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
                 data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t "move"}}Move To…{{/t}}</a>
+              >{{#t}}Move To…{{/t}}</a>
             </li>
             {{/if}}
             {{>ExternalTools/external_tools_menu menu_tools}}

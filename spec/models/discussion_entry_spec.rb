@@ -77,6 +77,19 @@ describe DiscussionEntry do
     expect(topic.message).to eql("<a href=\"#\">only this should stay</a>")
   end
 
+  it 'does not allow viewing when in an announcement without :read_announcements' do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+    # because :post_to_forum implies :read in about half of discussions, and this is one such place
+    @course.account.role_overrides.create!(permission: 'post_to_forum', role: student_role, enabled: false)
+
+    topic = @course.announcements.create!(:user => @teacher, :message => "announcement text")
+    entry = topic.discussion_entries.create!(user: @teacher, message: 'reply text')
+
+    expect(entry.grants_right?(@student, :read)).to be(false)
+  end
+
   context "entry notifications" do
     before :once do
       course_with_teacher(:active_all => true)

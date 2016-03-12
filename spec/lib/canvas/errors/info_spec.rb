@@ -76,8 +76,14 @@ module Canvas
             Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
           end.not_to raise_error
         end
-      end
 
+        it "has a max limit on the request_parameters data size" do
+          req = stub(env: {}, remote_ip: "", url: "",
+                     path_parameters: {}, query_parameters: {}, request_parameters: {"body" => ("a"*(described_class::MAX_DATA_SIZE*2))})
+          env_stuff = described_class.useful_http_env_stuff_from_request(req)
+          expect(env_stuff['request_parameters'].size).to eq(described_class::MAX_DATA_SIZE)
+        end
+      end
 
       describe ".useful_http_headers" do
         it "returns some oauth header info" do

@@ -10,5 +10,6 @@ define (require) ->
 
     install: (deliver) ->
       @bind window, 'blur', ->
-        deliver()
+        unless document.activeElement.tagName == "IFRAME"
+          deliver()
       , throttle: @getOption('frequency')

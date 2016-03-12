@@ -116,6 +116,9 @@ describe "threaded discussions" do
   end
 
   it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
+    @enrollment.workflow_state = 'active'
+    @enrollment.save!
+
     # Reset discussion created_at time to two minutes ago
     @topic.update_attribute(:posted_at, Time.zone.now - 2.minute)
 
@@ -131,7 +134,7 @@ describe "threaded discussions" do
 
     edit_entry(reply, "Reply edited")
     reply.reload
-    edited_at = (reply[:updated_at].to_time.strftime('%b %-d at %-l:%M') << reply[:updated_at].to_time.strftime('%p').downcase).to_s
+    edited_at = reply[:updated_at].to_time.utc.strftime('%b %-d at %-l:%M%P')
     displayed_edited_at = f('.discussion-fyi').text
 
     # Verify displayed edit time includes object update time
@@ -139,7 +142,6 @@ describe "threaded discussions" do
 
     # Verify edit time is later than reply time
     expect(replied_at).to be < (edited_at)
-
   end
 
   it "should delete a reply", priority: "1", test_id: 150515 do

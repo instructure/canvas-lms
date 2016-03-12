@@ -49,7 +49,7 @@ describe "discussion availability" do
 
   it "should not allow posting to a delayed discussion created by a student", priority: "1", test_id: 150523 do
     student2 = user_with_pseudonym(username: 'student2@example.com', active_all: 1)
-    student_in_course(user: student2)
+    student_in_course(user: student2).accept!
     user_session(student2)
     unlock_at_time = @discussion_topic1.delayed_post_at.strftime('%b %-d')
     get "/courses/#{@course.id}/discussion_topics"

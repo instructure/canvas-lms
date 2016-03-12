@@ -16,7 +16,7 @@
   #gradebook_grid {
     input.editor-text {
       border: none;
-      font-size: 14px;
+      @include fontSize(14px);
       width: 100%;
       padding: 0;
       outline: default;

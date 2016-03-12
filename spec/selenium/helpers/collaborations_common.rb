@@ -48,15 +48,15 @@ module CollaborationsCommon
   # title - The title of the new collaboration (default: "New collaboration").
   #
   # Returns a boolean.
-  def create_collaboration!(type, title = 'New collaboration')
-    unless PluginSetting.where(:name => type).exists?
-      PluginSetting.create!(:name => type, :settings => {})
-      PluginSetting.create!(:name => 'google_drive', :settings => {}) if type == "google_docs"
-    end
-    # PluginSetting.where(:name => type).destroy_all
-    # PluginSetting.where(:name => 'google_drive').destroy_all
+  def create_collaboration!(collaboration_type, title = 'New collaboration')
 
-    name = Collaboration.collaboration_types.detect{|t| t[:type] == type}[:name]
+    plugin_type = collaboration_type
+    plugin_type = 'google_drive' if plugin_type == 'google_docs'
+    unless PluginSetting.where(:name => plugin_type).exists?
+      PluginSetting.create!(:name => plugin_type, :settings => {})
+    end
+
+    name = Collaboration.collaboration_types.detect{|t| t[:type] == collaboration_type}[:name]
 
     @collaboration         = Collaboration.typed_collaboration_instance(name)
     @collaboration.context = @course

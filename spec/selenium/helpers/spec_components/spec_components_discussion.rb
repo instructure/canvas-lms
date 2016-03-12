@@ -4,20 +4,22 @@ module SpecComponents
   class Discussion
     include Assignable
 
-    attr_reader :id, :title
+    def initialize(opts)
+      course = opts[:course]
+      discussion_title = opts.fetch(:title, 'Test Discussion')
+      due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
 
-    def initialize(context, discussion_title)
       @component_discussion = assignment_model(
-        context: context,
+        context: course,
         title: discussion_title,
-        due_at: Time.zone.now.advance(days: 7),
-        submission_types: 'discussion_topic'
+        submission_types: 'discussion_topic',
+        due_at: due_at
       )
       @id = @component_discussion.discussion_topic.id
       @title = @component_discussion.discussion_topic.title
     end
 
-    def assign_to(opts = {})
+    def assign_to(opts)
       add_assignment_override(@component_discussion, opts)
     end
 
@@ -30,7 +32,11 @@ module SpecComponents
 
     private
 
-      def add_assignment_override_for_student(opts = {})
+      def add_assignment_override_for_student(opts)
+        super(opts) { |assignment_override| assignment_override.assignment = @component_discussion }
+      end
+
+      def add_assignment_override_for_section(opts)
         super(opts) { |assignment_override| assignment_override.assignment = @component_discussion }
       end
   end

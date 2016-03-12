@@ -179,19 +179,6 @@ define [
     @field.setFromValue()
     equal @field.$suggest.text(), 'Mon Jul 21, 1969 2:56am'
 
-  test 'should set aria alert on failure', ->
-    clock = sinon.useFakeTimers()
-    $aria_alerts = $('<div id="aria_alerts">')
-    $aria_alerts.appendTo $('#fixtures')
-
-    @$field.val('invalid')
-    @field.setFromValue()
-    clock.tick(2000)
-    equal $aria_alerts.text(), "That's not a date!"
-
-    $aria_alerts.remove()
-    clock.restore()
-
   module 'parseValue',
     setup: ->
       @snapshot = tz.snapshot()
@@ -382,48 +369,49 @@ define [
     @field.updateSuggest()
     ok @field.$suggest.hasClass('invalid_datetime')
 
-  test 'puts suggest text in screenreader-suggest data attribute', ->
-    value = 'suggested value'
-    @field.formatSuggest = -> value
-    @field.updateSuggest()
-    equal @$field.data('screenreader-suggest'), value
-
-  test 'puts combined suggest text in screenreader-suggest when there is course suggest text', ->
-    @field.$courseSuggest = $('<div>')
-    value = 'suggested value'
-    courseValue = 'suggested course value'
-    @field.formatSuggest = -> value
-    @field.formatSuggestCourse = -> courseValue
-    @field.updateSuggest()
-    equal @$field.data('screenreader-suggest'), "Local: #{value}\nCourse: #{courseValue}"
-
-  module 'updateAriaAlert',
+  module 'alertScreenreader',
     setup: ->
-      @clock = sinon.useFakeTimers()
-      @$aria_alerts = $('<div id="aria_alerts">')
-      @$aria_alerts.appendTo $('#fixtures')
       @$field = $('<input type="text" name="due_at">')
       @field = new DatetimeField(@$field, {})
+      # our version of lodash doesn't play nice with sinon fake timers, so it's
+      # not feasible to confirm $.screenReaderFlashMessageExclusive itself gets
+      # called. but we can confirm this step, despite the coupling to
+      # implementation
+      @spy(@field, 'debouncedSRFME')
 
-    teardown: ->
-      @$aria_alerts.remove()
-      @clock.restore()
+  test 'should alert screenreader on failure', ->
+    @$field.val('invalid')
+    @$field.change()
+    ok @field.debouncedSRFME.withArgs("That's not a date!").called
 
-  test 'waits two seconds before alerting', ->
-    @field.invalid = true
-    @field.updateAriaAlert()
-    @clock.tick(1999)
-    equal @$aria_alerts.text(), ''
-    @clock.tick(1)
-    equal @$aria_alerts.text(), @field.parseError
+  test 'flashes suggest text to screenreader', ->
+    value = 'suggested value'
+    @field.formatSuggest = -> value
+    @$field.change()
+    ok @field.debouncedSRFME.withArgs(value).called
 
-  test 'clears existing timeout if any', ->
-    @field.invalid = true
-    @field.updateAriaAlert()
-    @clock.tick(1500)
-    @field.updateAriaAlert()
-    @clock.tick(500)
-    equal @$aria_alerts.text(), ''
+  test 'flashes combined suggest text to screenreader when there is course suggest text', ->
+    @field.$courseSuggest = $('<div>')
+    localValue = 'suggested value'
+    courseValue = 'suggested course value'
+    combinedValue = "Local: #{localValue}\nCourse: #{courseValue}"
+    @field.formatSuggest = -> localValue
+    @field.formatSuggestCourse = -> courseValue
+    @$field.change()
+    ok @field.debouncedSRFME.withArgs(combinedValue).called
+
+  test 'does not reflash same suggest text when key presses do not change anything', ->
+    value = 'suggested value'
+    @field.formatSuggest = -> value
+    @$field.change()
+    ok @field.debouncedSRFME.withArgs(value).calledOnce
+    @$field.change()
+    ok @field.debouncedSRFME.withArgs(value).calledOnce
+
+  # TODO: add spec asserting actual call to $.screenReaderFlashMessageExclusive
+  # is debounced, so e.g. three triggers with different suggest values within
+  # ~100ms only actually creates one alert. will require upgrading lodash first
+  # so we can use debounced.flush()
 
   module 'formatSuggest',
     setup: ->

@@ -1185,7 +1185,7 @@ describe DiscussionTopicsController, type: :request do
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
@@ -1197,7 +1197,7 @@ describe DiscussionTopicsController, type: :request do
   it "should fulfill module viewed requirements when re-marking a topic read" do
     @module = @course.context_modules.create!(:name => "some module")
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -1219,7 +1219,7 @@ describe DiscussionTopicsController, type: :request do
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",

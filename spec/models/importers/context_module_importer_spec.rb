@@ -144,7 +144,7 @@ describe "Importing modules" do
     context = get_import_context
     migration = @course.content_migrations.create!
     migration.migration_settings[:migration_ids_to_import] = {:copy => {:context_modules => {'i2ef97656ba4eb818e23343af83e5a1c2' => '1'}}}
-    Importers::ContextModuleImporter.select_linked_module_items(data, migration)
+    Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
     expect(migration.import_object?('assignments', 'i5081fa7128437fc599f6ca652214111e')).to be_truthy
     expect(migration.import_object?('assignments', 'i852f8d38d28428ad2b3530e4f9017cff')).to be_falsy
     expect(migration.import_object?('quizzes', 'i0f944b0a62b3f92d42260381c2c8906d')).to be_truthy

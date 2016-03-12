@@ -27,18 +27,17 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
     },
 
     componentDidMount: function() {
-      if(this.props.justAdded) this.refs.title.getDOMNode().focus();
+      if(this.props.justAdded) React.findDOMNode(this.refs.title).focus();
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       if(this.props.editing !== prevProps.editing){
-       this.refs.title.getDOMNode().focus();
-       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
+        React.findDOMNode(this.refs.title).focus();
+        this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
       }
     },
 
     triggerEditGradingStandard: function(event) {
-      event.preventDefault();
       this.props.onSetEditingStatus(this.props.uniqueId, true);
     },
 
@@ -57,7 +56,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
         });
       }else{
         this.setState({showAlert: true}, function() {
-          this.refs.invalidStandardAlert.getDOMNode().focus();
+          React.findDOMNode(this.refs.invalidStandardAlert).focus();
         });
       }
     },
@@ -103,7 +102,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
 
     hideAlert: function() {
       this.setState({showAlert: false}, function(){
-        this.refs.title.getDOMNode().focus();
+        React.findDOMNode(this.refs.title).focus();
       });
     },
 
@@ -218,17 +217,17 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
       if(!this.props.editing){
         return(
           <div>
-            <a href="#" onClick={this.triggerEditGradingStandard} title={I18n.t("Edit Grading Scheme")}
-               ref="editLink" tabIndex="1"
-               className={"edit_grading_standard_link no-hover " + (this.assessedAssignment() ? "read_only" : "")}>
-               <span className="screenreader-only">{I18n.t("Edit Grading Scheme")}</span>
-              <i className="icon-edit standalone-icon"/>
-            </a>
-            <a href="#" title={I18n.t("Delete Grading Scheme")} onClick={this.triggerDeleteGradingStandard}
-               ref="deleteLink" className="delete_grading_standard_link no-hover" tabIndex="1">
+            <button ref="editButton"
+                    className={"Button Button--icon-action edit_grading_standard_button " + (this.assessedAssignment() ? "read_only" : "")}
+                    onClick={this.triggerEditGradingStandard} type="button">
+              <span className="screenreader-only">{I18n.t("Edit Grading Scheme")}</span>
+              <i className="icon-edit"/>
+            </button>
+            <button ref="deleteButton" className="Button Button--icon-action delete_grading_standard_button"
+                    onClick={this.triggerDeleteGradingStandard} type="button">
                <span className="screenreader-only">{I18n.t("Delete Grading Scheme")}</span>
-              <i className="icon-trash standalone-icon"/>
-            </a>
+              <i className="icon-trash"/>
+            </button>
           </div>
         );
       }
@@ -250,7 +249,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
       return (
         <div>
           {this.renderTitle()}
-          {this.renderDisabledLinks()}
+          {this.renderDisabledIcons()}
           <div className="pull-left cannot-manage-notification">
             {this.renderCannotManageMessage()}
           </div>
@@ -258,7 +257,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
       );
     },
 
-    renderDisabledLinks: function() {
+    renderDisabledIcons: function() {
       if (this.props.permissions.manage &&
          this.props.standard.context_code && (this.props.standard.context_code != ENV.context_asset_string)) {
         var url = "/" + splitAssetString(this.props.standard.context_code).join('/') + "/grading_standards";
@@ -272,10 +271,10 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
                   <i className="icon-more standalone-icon"/>
                 </a>);
       } else {
-        return (<div className="disabled-links" ref="disabledLinks">
-                <i className="icon-edit standalone-icon"/>
-                <i className="icon-trash standalone-icon"/>
-              </div>);
+        return (<div className="disabled-buttons" ref="disabledButtons">
+                  <i className="icon-edit"/>
+                  <i className="icon-trash"/>
+                </div>);
       }
     },
 
@@ -319,7 +318,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
             <div>
               <table>
                 <caption className="screenreader-only">
-                  {I18n.t("A table containing the name of the grading scheme and icons for editing or deleting the scheme.")}
+                  {I18n.t("A table containing the name of the grading scheme and buttons for editing or deleting the scheme.")}
                 </caption>
                 <thead>
                   <tr>
@@ -340,7 +339,7 @@ function(React, DataRow, $, I18n, _, splitAssetString) {
               </table>
               <table className="grading_standard_data">
                 <caption className="screenreader-only">
-                  {I18n.t("A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains an icon to add a new row below, and an icon to delete the current row.")}
+                  {I18n.t("A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.")}
                 </caption>
                 <thead ariaHidden="true"><tr><td></td><td></td><td></td><td></td><td></td></tr></thead>
                 <tbody>

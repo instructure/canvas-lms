@@ -136,6 +136,15 @@ $ pip install docker-compose
 
 ### Bootstrapping
 
+#### In a hurry?
+These commands should get you going?
+
+```bash
+cp docker-compose/config/* config/
+docker-compose run --rm web script/docker_first_time_setup.sh
+```
+
+#### Not in a hurry. Or I want to see whats happening
 With those dependencies installed, go to your Canvas directory and run
 the following:
 
@@ -208,7 +217,7 @@ $ open vnc://secret:secret@selenium.docker/
 
 ## Troubleshooting
 
-If you are having trouble running the `web` or `kinesis` containers, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
+If you are having trouble running the `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
 
 ```
 chown -R 1000:1000 canvas-lms

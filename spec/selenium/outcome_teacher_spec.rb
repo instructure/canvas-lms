@@ -142,8 +142,7 @@ describe "outcomes as a teacher" do
       group = outcome_group_model
       get outcome_url
       wait_for_ajaximations
-
-      fj('.outcomes-sidebar .outcome-link').click
+      f('.outcomes-sidebar .outcome-link').click
       wait_for_ajaximations
 
       f(".move_button").click()
@@ -154,11 +153,11 @@ describe "outcomes as a teacher" do
       expect(ffj('.ui-dialog-content').length).to eq 1
 
       # move the outcome
-      fj('.treeLabel').click
+      f('.treeLabel').click
       wait_for_ajaximations
       ff('[role=treeitem] a span')[1].click
       wait_for_ajaximations
-      fj('.form-controls .btn-primary').click
+      f('.form-controls .btn-primary').click
       wait_for_ajaximations
 
       keep_trying_until do
@@ -177,16 +176,16 @@ describe "outcomes as a teacher" do
       expect(LearningOutcomeGroup.where(id: @outcome_group).first.child_outcome_links.first.content.id).to eq @outcome.id
 
       #confirm that error appears if moving into parent group it already belongs to
-      fj('.outcomes-sidebar .outcome-link').click
+      f('.outcomes-sidebar .outcome-link').click
       wait_for_ajaximations
       f(".move_button").click()
       wait_for_ajaximations
 
-      fj('.treeLabel').click
+      f('.treeLabel').click
       wait_for_ajaximations
 
       ff('[role=treeitem] a span')[1].click
-      fj('.form-controls .btn-primary').click
+      f('.form-controls .btn-primary').click
       wait_for_ajaximations
 
       expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"

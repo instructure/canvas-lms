@@ -30,7 +30,7 @@ define [
         @role_id = role_ids[0]
         json.role_id = @role_id
 
-      json.roles = _.filter(ENV.ALL_ROLES, (role) -> role.base_role_name != "ObserverEnrollment")
+      json.roles = ENV.ALL_ROLES
       json
 
     update: (e) =>

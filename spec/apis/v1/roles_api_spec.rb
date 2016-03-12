@@ -230,6 +230,17 @@ describe "Roles API", type: :request do
         expect(json['workflow_state']).to eq 'inactive'
       end
 
+      it "should not be able to deactivate a role from a sub-account" do
+        sub_account = @account.sub_accounts.create!
+
+        json = api_call(:delete, "/api/v1/accounts/#{sub_account.id}/roles/#{@role.id}",
+          { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => sub_account.id.to_param, :id => @role.id}, {},
+          {}, {:expected_status => 404})
+
+        @role.reload
+        expect(@role.workflow_state).to eq 'active'
+      end
+
       it "should reactivate an inactive role" do
         @role.update_attribute(:workflow_state, 'inactive')
 
@@ -389,8 +400,8 @@ describe "Roles API", type: :request do
       api_call_with_settings(:explicit => '1', :enabled => '0')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to be_falsey
-      expect(override.locked).to be_nil
+      expect(override.enabled).to eq false
+      expect(override.locked).to eq false
 
       override.destroy
       r = @account.roles.first
@@ -400,8 +411,8 @@ describe "Roles API", type: :request do
       api_call_with_settings(:locked => '1')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
       expect(override).to_not be_nil
-      expect(override.enabled).to be_nil
-      expect(override.locked).to be_truthy
+      expect(override.enabled).to eq true
+      expect(override.locked).to eq true
     end
 
     it "should discard restricted permissions" do

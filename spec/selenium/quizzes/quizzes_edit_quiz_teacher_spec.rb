@@ -51,7 +51,7 @@ describe 'editing a quiz' do
       end
 
       it 'saves question changes with the |Save it now| button', priority: "1", test_id: 140647 do
-        course_with_student(course: @course)
+        course_with_student(course: @course, active_enrollment: true)
 
         # add new question without saving changes
         click_questions_tab
@@ -76,7 +76,7 @@ describe 'editing a quiz' do
         expect(fj('.unpublished_warning', '.alert')).not_to be_displayed
 
         # verify the student sees the changes
-        @user = @student
+        user_session(@student)
         take_quiz do
           expect(fj('.display_question.question.multiple_choice_question').text).to \
             include_text question_description

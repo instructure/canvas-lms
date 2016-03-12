@@ -27,11 +27,11 @@ describe CollaborationsController, type: :request do
     course_with_teacher_logged_in :active_all => true, :name => "teacher 1"
 
     UserService.register(
-      :service => "google_docs",
+      :service => "google_drive",
       :token => "token",
       :secret => "secret",
       :user => @user,
-      :service_domain => "google.com",
+      :service_domain => "drive.google.com",
       :service_user_id => "service_user_id",
       :service_user_name => "service_user_name"
     )

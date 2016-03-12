@@ -1,7 +1,6 @@
 @import 'base/environment';
 
 .tree {
-  outline: none;
   @include fontSize(12px);
   &, ul {
     @include reset-list;

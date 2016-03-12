@@ -32,8 +32,12 @@ define [
         if !!model.get('hidden') != hidden
           anyChanged = true
           model.set('hidden', hidden)
-
       @render() if anyChanged
+
+    matchingCount: (term) =>
+      _.select( @collection.models, (m) =>
+        @filter(m, term)
+      ).length
 
     filter: (model, term) =>
       return true unless term

@@ -21,10 +21,11 @@ gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_s
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.4.6'
+  gem 'scrypt', '2.0.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.18'
+gem 'switchman', '1.4.4'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -128,7 +129,6 @@ gem 'canvas_text_helper', path: 'gems/canvas_text_helper'
 gem 'canvas_time', path: 'gems/canvas_time'
 gem 'canvas_unzip', path: 'gems/canvas_unzip'
 gem 'csv_diff', path: 'gems/csv_diff'
-gem 'google_docs', path: 'gems/google_docs'
 gem 'google_drive', path: 'gems/google_drive'
 gem 'html_text_helper', path: 'gems/html_text_helper'
 gem 'incoming_mail_processor', path: 'gems/incoming_mail_processor'

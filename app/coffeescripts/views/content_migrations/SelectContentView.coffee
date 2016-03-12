@@ -37,6 +37,12 @@ define [
       @model.clear(silent: true)
       @model.set attr
 
+      @$el.find('.module_options').each ->
+        $mo = $(this)
+        if $mo.find('input[value="separate"]').is(':checked')
+          $mo.data('checkbox').prop(checked: false)
+          $('input[name="copy\[all_context_modules\]"]').prop(checked: false)
+
       if _.isEmpty(@getFormData())
         event.preventDefault()
         alert(I18n.t('no_content_selected', 'You have not selected any content to import.'))
@@ -47,9 +53,9 @@ define [
           @model.trigger 'continue'
 
     # Fetch top level checkboxes that have lower level checkboxes.
-    # If the dialog has been opened before it will cache the old 
-    # dialog window and re-open it instead of fetching the 
-    # check boxes again. 
+    # If the dialog has been opened before it will cache the old
+    # dialog window and re-open it instead of fetching the
+    # check boxes again.
     # @api private
 
     firstOpen: =>
@@ -96,7 +102,7 @@ define [
       @$el.on 'click', "#cancelSelect", => @close()
       @$el.on "change", "input[type=checkbox]", @setSubmitButtonState
 
-    # These are the classes that help modify the tree. These methods will add events to the 
+    # These are the classes that help modify the tree. These methods will add events to the
     # tree and keep things like scroll position correct as well as ensuring focus is being mantained.
 
     maintainTheTree: ($tree) =>

@@ -47,7 +47,7 @@ define([
               {this.state.recent_activity_dashboard ? I18n.t("Show dashcard view") : I18n.t("Show recent activity stream")}
             </span>
             <div className="dashboard-toggle-button-layout" aria-hidden={true}>
-              <div 
+              <div
                 className={
                   (this.state.recent_activity_dashboard ?
                     "dashboard-toggle-button-icon"
@@ -59,7 +59,7 @@ define([
                 <SVGWrapper url="/images/svg-icons/svg_icon_dashboard2.svg"/>
               </div>
               <div className="dashboard-toggle-button-switch"></div>
-              <div 
+              <div
                 className={
                   (this.state.recent_activity_dashboard ?
                     "dashboard-toggle-button-icon dashboard-toggle-button-icon--active"

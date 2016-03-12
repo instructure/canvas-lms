@@ -59,43 +59,66 @@ describe "courses/_settings_sidebar.html.erb" do
     end
   end
 
-  describe "course settings sub navigation external tools" do
-    def create_course_settings_sub_navigation_tool(options = {})
-        @course.root_account.enable_feature!(:lor_for_account)
-        defaults = {
-          name: options[:name] || "external tool",
-          consumer_key: 'test',
-          shared_secret: 'asdf',
-          url: 'http://example.com/ims/lti',
-          course_settings_sub_navigation: { icon_url: '/images/delete.png' },
-        }
-        @course.context_external_tools.create!(defaults.merge(options))
-    end
-
+  describe "course settings sub navigation" do
     before do
       view_context(@course, @user)
       assigns[:current_user] = @user
       @controller.instance_variable_set(:@context, @course)
     end
 
-    it "should display all configured tools" do
-      num_tools = 3
-      (1..num_tools).each do |n|
-        create_course_settings_sub_navigation_tool(name: "tool #{n}")
+    describe "external tools" do
+      def create_course_settings_sub_navigation_tool(options = {})
+          @course.root_account.enable_feature!(:lor_for_account)
+          defaults = {
+            name: options[:name] || "external tool",
+            consumer_key: 'test',
+            shared_secret: 'asdf',
+            url: 'http://example.com/ims/lti',
+            course_settings_sub_navigation: { icon_url: '/images/delete.png' },
+          }
+          @course.context_external_tools.create!(defaults.merge(options))
       end
-      assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
-      render
-      doc = Nokogiri::HTML.parse(response.body)
-      expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
+
+      it "should display all configured tools" do
+        num_tools = 3
+        (1..num_tools).each do |n|
+          create_course_settings_sub_navigation_tool(name: "tool #{n}")
+        end
+        assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
+        render
+        doc = Nokogiri::HTML.parse(response.body)
+        expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
+      end
+
+      it "should include the launch type parameter" do
+        create_course_settings_sub_navigation_tool
+        assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
+        render
+        doc = Nokogiri::HTML.parse(response.body)
+        tool_link = doc.at_css('.course-settings-sub-navigation-lti')
+        expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
+      end
     end
 
-    it "should include the launch type parameter" do
-      create_course_settings_sub_navigation_tool
-      assigns[:course_settings_sub_navigation_tools] = @course.context_external_tools.to_a
-      render
-      doc = Nokogiri::HTML.parse(response.body)
-      tool_link = doc.at_css('.course-settings-sub-navigation-lti')
-      expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
+    describe "conditional release" do
+      it "doesn't show button by default" do
+        render
+        expect(response.body).not_to match(/conditional-release/)
+      end
+
+      it "shows button when feature flag is set" do
+        @course.enable_feature!(:conditional_release)
+        render
+        expect(response.body).to match(/conditional-release/)
+      end
+
+      it "does not show button to user lacking manage content" do
+        @course.enable_feature!(:conditional_release)
+        RoleOverride.clear_cached_contexts # because something in the before block initializes a cache
+        @course.account.role_overrides.create!(permission: "manage_content", role: teacher_role, enabled: false)
+        render
+        expect(response.body).not_to match(/conditional-release/)
+      end
     end
   end
 

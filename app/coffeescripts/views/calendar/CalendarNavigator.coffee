@@ -24,12 +24,6 @@ define [
       'click .navigation_title'     : '_onTitleClick'
       'keyclick .navigation_title'  : '_onTitleClick'
 
-    messages:
-      invalid_date: I18n.t('input_is_invalid_date', "Input is not a valid date.")
-      screenreader_date_suggestion: (dateText) ->
-        I18n.t 'screenreader_date_suggestion', '%{date}. Press enter to accept.',
-          date: dateText
-
     # options:
     #   hide       - set to true if this navigator should start hidden
     initialize: ->
@@ -124,15 +118,6 @@ define [
       return unless @_pickerShowing
       return if @_previousDateFieldValue == @$dateField.val()
       @_previousDateFieldValue = @$dateField.val()
-
-      if @$dateField.data('invalid')
-        @$dateField.attr("aria-invalid", "true")
-        $.screenReaderFlashMessage(@messages.invalid_date)
-      else
-        @$dateField.attr("aria-invalid", "false")
-        message = @$dateField.data('screenreader-suggest')
-        message = @messages.screenreader_date_suggestion(message)
-        $.screenReaderFlashMessage(message)
 
     _onPickerSelect: =>
       @_dateFieldSelect()

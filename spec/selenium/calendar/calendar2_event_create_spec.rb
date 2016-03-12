@@ -109,6 +109,25 @@ describe "calendar2" do
         expect((repeat_event[1].start_at).to_date).to eq((Time.zone.now + 1.week).to_date)
         expect((repeat_event[2].start_at).to_date).to eq((Time.zone.now + 2.weeks).to_date)
       end
+
+      it "should move calendar events to a different date by dragging and dropping", priority: "2", test_id: 138889 do
+        event_title = "Test Event"
+        event = make_event(title: event_title, context: @course)
+        get '/calendar2'
+        fj('.fc-event:visible').click
+        previous_date = (f('.event-details-timestring').text).to_datetime.strftime('%Y-%m-%d')
+        if event.start_at.friday?
+          drag_and_drop_element(fj('.fc-event:visible'), fj('.calendar .fc-week .fc-thu'))
+          current_date = fj('.calendar .fc-week .fc-thu').attribute('data-date')
+        else
+          drag_and_drop_element(fj('.fc-event:visible'), fj('.calendar .fc-week .fc-fri'))
+          current_date = fj('.calendar .fc-week .fc-fri').attribute('data-date')
+        end
+        fj('.fc-event:visible').click
+        modified_date_in_the_event = (f('.event-details-timestring').text).to_datetime.strftime('%Y-%m-%d')
+        expect(previous_date).not_to eq(current_date)
+        expect(current_date).to eq(modified_date_in_the_event)
+      end
     end
   end
 end

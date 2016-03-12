@@ -324,6 +324,9 @@ module GroupsCommon
   end
 
   def expand_files_on_content_pane
+    Selenium::WebDriver::Wait.new(timeout: 5).until do
+      fj('.ui-state-default.ui-corner-top:contains("Files")').present?
+    end
     fj('.ui-state-default.ui-corner-top:contains("Files")').click
     wait_for_ajaximations
     f('.sign.plus').click

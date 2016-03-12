@@ -68,20 +68,8 @@ class CollaborationsController < ApplicationController
     @collaborations = @context.collaborations.active
     log_asset_access([ "collaborations", @context ], "collaborations", "other")
 
-    safe_token_valid = lambda do |service|
-      begin
-        self.send(service).verify_access_token
-      rescue => e
-        Canvas::Errors.capture(e, { source: 'rescue nil' })
-        false
-      end
-    end
-
-    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
-      (!logged_in_user.user_services.where(service: 'google_drive').first ||
-      !safe_token_valid.call(:google_drive_connection))
-
-    @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
+    # this will set @user_has_google_drive
+    user_has_google_drive
 
     @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
     @has_etherpad_collaborations = @collaborations.any? {|c| c.collaboration_type == 'EtherPad'}
@@ -108,7 +96,7 @@ class CollaborationsController < ApplicationController
           flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
-      rescue GoogleDocs::DriveConnectionException => drive_exception
+      rescue GoogleDrive::ConnectionException => drive_exception
         Canvas::Errors.capture(drive_exception)
         flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
         redirect_to named_context_url(@context, :context_collaborations_url)
@@ -163,7 +151,7 @@ class CollaborationsController < ApplicationController
           format.json { render :json => @collaboration.errors, :status => :bad_request }
         end
       end
-    rescue GoogleDocs::DriveConnectionException => error
+    rescue GoogleDrive::ConnectionException => error
       Rails.logger.warn error
       flash[:error] = t 'errors.update_failed', "Collaboration update failed" # generic failure message
       if error.message.include?('File not found')

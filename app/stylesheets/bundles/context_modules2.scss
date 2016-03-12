@@ -92,7 +92,7 @@
   }
   .module-published-button {
     color: #33802a;
-    font-size: 14px;
+    @include fontSize(14px);
     display: inline-block;
     padding-bottom: 3px;
     line-height: 22px;
@@ -172,7 +172,7 @@
   }
 
   .prereqs {
-    font-size: 14px;
+    @include fontSize(14px);
     padding: 4px 12px;
     line-height: 22px;
     display: inline-block;

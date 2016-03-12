@@ -50,9 +50,11 @@ define [
           {get: ((attr) -> {course_section_id: 1 }[attr])},
           {get: ((attr) -> {course_section_id: 2 }[attr])},
           {get: ((attr) -> {student_ids: [1,2,3] }[attr])},
+          {get: ((attr) -> {group_id: 2 }[attr])}
         ]
         sections: {2: {name: "section name"}}
         students: {2: {name: "student name"}}
+        groups: {2: {name: "group name"}}
         dates: {}
         canDelete: false
         rowKey: "nullnullnull"
@@ -80,13 +82,18 @@ define [
 
   test 'tokenizing ADHOC overrides works', ->
     tokens = @dueDateRow.tokenizedOverrides()
-    equal 5, tokens.length
+    equal 6, tokens.length
     equal 3, _.filter(tokens, (t) -> t["type"] == "student").length
 
   test 'tokenizing section overrides works', ->
     tokens = @dueDateRow.tokenizedOverrides()
-    equal 5, tokens.length
+    equal 6, tokens.length
     equal 2, _.filter(tokens, (t) -> t["type"] == "section").length
+
+  test 'tokenizing group overrides works', ->
+    tokens = @dueDateRow.tokenizedOverrides()
+    equal 6, tokens.length
+    equal 1, _.filter(tokens, (t) -> t["type"] == "group").length
 
   test 'section tokens are given their proper name if loaded', ->
     tokens = @dueDateRow.tokenizedOverrides()
@@ -98,8 +105,12 @@ define [
     token = _.find(tokens, (t) -> t["name"] == "student name")
     ok !!token
 
+  test 'group tokens are their proper name if loaded', ->
+    tokens = @dueDateRow.tokenizedOverrides()
+    token = _.find(tokens, (t) -> t["name"] == "group name")
+    ok !!token
+
   test 'student tokens are given the name "Loading..." if they havent loaded', ->
     tokens = @dueDateRow.tokenizedOverrides()
     token = _.find(tokens, (t) -> t["name"] == "Loading...")
     ok !!token
-

@@ -59,7 +59,10 @@ class QuestionBanksController < ApplicationController
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
-    js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+    js_env({
+      :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+      :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+    })
 
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)

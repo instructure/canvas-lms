@@ -7,7 +7,11 @@ describe 'quizzes regressions' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) { course_with_teacher_logged_in(course_name: 'teacher course') }
+  before(:each) do
+    course_with_teacher_logged_in(course_name: 'teacher course')
+    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+  end
 
   it 'calendar pops up on top of #main', priority: "1", test_id: 209957 do
     get "/courses/#{@course.id}/quizzes/new"
@@ -16,31 +20,6 @@ describe 'quizzes regressions' do
     cal = f('#ui-datepicker-div')
     expect(cal).to be_displayed
     expect(cal.style('z-index')).to be > f('#main').style('z-index')
-  end
-
-  it 'can flag a quiz question while taking a quiz as a teacher', priority: "1", test_id: 209958 do
-    quiz_with_new_questions(false)
-
-    open_quiz_show_page
-
-    expect_new_page_load do
-      f('#take_quiz_link').click
-      wait_for_ajaximations
-    end
-
-    # flag first question
-    hover_and_click("#question_#{@quest1.id} .flag_question")
-
-    # click second answer
-    f("#question_#{@quest2.id} .answers .answer:first-child input").click
-    f('#submit_quiz_button').click
-
-    # dismiss dialog and submit quiz
-    confirm_dialog = driver.switch_to.alert
-    confirm_dialog.dismiss
-    f("#question_#{@quest1.id} .answers .answer:last-child input").click
-    expect_new_page_load { f('#submit_quiz_button').click }
-    expect(f('#quiz_title').text).to eq @quiz.title
   end
 
   it 'marks questions as answered when the window loses focus', priority: "1", test_id: 209959 do

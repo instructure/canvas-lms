@@ -4,7 +4,7 @@ module Services
       enabled = check_feature_flag(root_account)
       env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
       if enabled
-        settings = Canvas::DynamicSettings.find("rich-content-service")
+        settings = Canvas::DynamicSettings.from_cache("rich-content-service", expires_in: 5.minutes)
         env_hash[:RICH_CONTENT_APP_HOST] = settings["app-host"]
         env_hash[:RICH_CONTENT_CDN_HOST] = settings["cdn-host"]
       end

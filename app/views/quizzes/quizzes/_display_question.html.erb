@@ -90,7 +90,7 @@
       <span class="question_type"><%= (question_type.try_rescue(:question_type)) %></span>
       <span class="answer_selection_type"></span>
       <% if question_bank_id %>
-        <a href="<%= context_url(@context, :context_question_bank_assessment_question_url, question_bank_id, hash_get(question, :id, "{{ id }}")) %>" class="update_question_url">&nbsp;</a>
+        <a href="<%= context_url(@context, :context_question_bank_assessment_question_url, question_bank_id, hash_get(question, :id, "{{ id }}")) %>" class="update_question_url" tabindex="-1" aria-hidden="true">&nbsp;</a>
       <% else %>
         <a href="<%= context_url(@context, :context_quiz_quiz_question_url, @quiz.id, hash_get(question, :id, "{{ id }}")) %>" class="update_question_url">&nbsp;</a>
       <% end %>

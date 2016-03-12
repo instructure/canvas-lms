@@ -2,10 +2,14 @@ define([
   'jsx/shared/rce/serviceRCELoader'
 ], function(serviceRCELoader){
   function loadRCEViaService (target, tinyMCEInitOptions) {
+    if (!$(target).length) {
+      // no actual target, just short circuit out
+      return
+    }
     serviceRCELoader.loadOnTarget(
       target,
       tinyMCEInitOptions,
-      window.ENV.RICH_CONTENT_APP_HOST
+      window.ENV.RICH_CONTENT_CDN_HOST || window.ENV.RICH_CONTENT_APP_HOST
     )
   }
 

@@ -269,6 +269,7 @@ class RoleOverridesController < ApplicationController
   #     read_forum                       -- [STADO] View discussions
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions
+  #     read_announcements               -- [STADO] View announcements
   #     read_question_banks              -- [ TADo] View and link to question banks
   #     read_reports                     -- [ TAD ] View usage reports for the course
   #     read_roster                      -- [STADo] See the list of users
@@ -375,6 +376,8 @@ class RoleOverridesController < ApplicationController
       elsif @role.built_in?
         return render :json => {:message => t('cannot_remove_built_in_role', "Cannot remove a built-in role")}, :status => :bad_request
       end
+      raise ActiveRecord::RecordNotFound unless @role.account == @context
+
       @role.deactivate!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }

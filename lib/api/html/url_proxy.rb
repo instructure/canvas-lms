@@ -87,8 +87,19 @@ module Api
         proxy.media_object_thumbnail_url(media_id, width: 550, height: 448, type: 3, host: host, protocol: protocol)
       end
 
+      def media_context
+        case context
+        when Group
+          context.context
+        when CourseSection
+          context.course
+        else
+          context
+        end
+      end
+
       def media_redirect_url(media_id, media_type)
-        proxy.polymorphic_url([context, :media_download], entryId: media_id, media_type: media_type, redirect: '1', host: host, protocol: protocol)
+        proxy.polymorphic_url([media_context, :media_download], entryId: media_id, media_type: media_type, redirect: '1', host: host, protocol: protocol)
       end
 
       # rewrite any html attributes that are urls but just absolute paths, to

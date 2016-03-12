@@ -956,7 +956,7 @@ class ApplicationController < ActionController::Base
   #
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
-  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
+  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
     user = @current_user
     user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
     return unless user && @context && asset
@@ -978,14 +978,16 @@ class ApplicationController < ActionController::Base
                    'unknown'
                  end
 
-    @accessed_asset = {
-      :user => user,
-      :code => code,
-      :group_code => group_code,
-      :category => asset_category,
-      :membership_type => membership_type,
-      :level => level
-    }
+    if !@accessed_asset || overwrite
+      @accessed_asset = {
+        :user => user,
+        :code => code,
+        :group_code => group_code,
+        :category => asset_category,
+        :membership_type => membership_type,
+        :level => level
+      }
+    end
 
     Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
 
@@ -1327,7 +1329,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        log_asset_access(@tool, "external_tools", "external_tools")
+        log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
         @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
@@ -1504,8 +1506,6 @@ class ApplicationController < ActionController::Base
         !!LinkedIn::Connection.config
       elsif feature == :diigo
         !!Diigo::Connection.config
-      elsif feature == :google_docs
-        !!GoogleDocs::Connection.config
       elsif feature == :google_drive
         Canvas::Plugin.find(:google_drive).try(:enabled?)
       elsif feature == :etherpad
@@ -1913,7 +1913,7 @@ class ApplicationController < ActionController::Base
     end
 
     if @page
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session)
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
       hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
@@ -1957,29 +1957,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def google_docs_connection
-    ## @real_current_user first ensures that a masquerading user never sees the
-    ## masqueradee's files, but in general you may want to block access to google
-    ## docs for masqueraders earlier in the request
-    if logged_in_user
-      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', logged_in_user].cache_key) do
-        service = logged_in_user.user_services.where(service: "google_docs").first
-        service && [service.token, service.secret]
-      end
-      raise GoogleDocs::NoTokenError unless service_token && service_secret
-      google_docs = GoogleDocs::Connection.new(service_token, service_secret)
-    else
-      google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
-    end
-    google_docs
-  end
-
   def self.google_drive_timeout
     Setting.get('google_drive_timeout', 30).to_i
   end
 
   def google_drive_connection
-    return unless Canvas::Plugin.find(:google_drive).try(:settings)
+    return @google_drive_connection if @google_drive_connection
+
     ## @real_current_user first ensures that a masquerading user never sees the
     ## masqueradee's files, but in general you may want to block access to google
     ## docs for masqueraders earlier in the request
@@ -1993,24 +1977,7 @@ class ApplicationController < ActionController::Base
       access_token = session[:oauth_gdrive_access_token]
     end
 
-    GoogleDocs::DriveConnection.new(refresh_token, access_token, ApplicationController.google_drive_timeout) if refresh_token && access_token
-  end
-
-  def google_service_connection
-    google_drive_connection || google_docs_connection
-  end
-
-  def google_drive_user_client
-    if logged_in_user
-      refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', logged_in_user].cache_key) do
-        service = logged_in_user.user_services.where(service: "google_drive").first
-        service && [service.token, service.access_token]
-      end
-    else
-      refresh_token = session[:oauth_gdrive_refresh_token]
-      access_token = session[:oauth_gdrive_access_token]
-    end
-    google_drive_client(refresh_token, access_token)
+    @google_drive_connection = GoogleDrive::Connection.new(refresh_token, access_token, ApplicationController.google_drive_timeout)
   end
 
   def google_drive_client(refresh_token=nil, access_token=nil)
@@ -2023,6 +1990,9 @@ class ApplicationController < ActionController::Base
     GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 
+  def user_has_google_drive
+    @user_has_google_drive ||= google_drive_connection.authorized?
+  end
 
   def twitter_connection
     if @current_user

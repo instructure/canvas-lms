@@ -178,18 +178,6 @@ def pend_with_bullet
   end
 end
 
-def require_webmock
-  # pull in webmock for selected tests, but leave it disabled by default.
-  # funky require order is to skip typhoeus because of an incompatibility
-  # see: https://github.com/typhoeus/typhoeus/issues/196
-  require 'webmock/util/version_checker'
-  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
-  require 'webmock/http_lib_adapters/http_lib_adapter'
-  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
-  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
-  require 'webmock/rspec'
-end
-
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
 # so we remove rspec's definition. This does not prevent 'context' from being
@@ -231,11 +219,12 @@ def truncate_all_tables
       # use custom SQL to exclude tables from extensions
       schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT tablename
-         FROM pg_tables
-         WHERE schemaname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-           AND NOT tablename IN (
-             SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+         SELECT relname
+         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+           AND relkind='r'
+           AND NOT EXISTS (
+             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
            )
       SQL
       table_names.delete('schema_migrations')
@@ -546,10 +535,6 @@ RSpec.configure do |config|
 
   def default_uploaded_data
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
-  end
-
-  def valid_gradebook_csv_content
-    File.read(File.expand_path(File.join(File.dirname(__FILE__), %w(fixtures default_gradebook.csv))))
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)

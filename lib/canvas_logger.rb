@@ -1,7 +1,9 @@
 require 'active_support'
 
 class CanvasLogger < ActiveSupport::Logger
-  attr_reader :log_path
+  CAPTURE_LIMIT = 10_000
+
+  attr_reader :log_path, :captured_messages
 
   def initialize(log_path, level = DEBUG, options = {})
     unless File.exist?(log_path)
@@ -21,6 +23,11 @@ class CanvasLogger < ActiveSupport::Logger
       context = Thread.current[:context] || {}
       message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}"
     end
+
+    if @captured_messages && @captured_messages.length < CAPTURE_LIMIT
+      @captured_messages << "[#{Time.now.to_s}] #{message}"
+    end
+
     super(severity, message, progname)
   end
 
@@ -33,5 +40,14 @@ class CanvasLogger < ActiveSupport::Logger
     old_logdev = @logdev
     @logdev = ::Logger::LogDevice.new(log_path, :shift_age => 0, :shift_size => 1048576)
     old_logdev.close
+  end
+
+  def capture_messages
+    @captured_messages = []
+    begin
+      yield
+    ensure
+      @captured_messages = nil
+    end
   end
 end

@@ -469,39 +469,61 @@ class ActiveRecord::Base
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
-  #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
-  def self.belongs_to(name, options={})
-    if types = options.delete(:types)
-      add_polymorph_methods(name, Array(types))
+  #   belongs_to :context, polymorphic: [:course, :account]
+  def self.belongs_to(name, scope = nil, options={})
+    options = scope if scope.is_a?(Hash)
+
+    if options[:polymorphic].is_a?(Array)
+      add_polymorph_methods(name, options[:polymorphic])
     end
     super
   end
 
   def self.add_polymorph_methods(generic, specifics)
+    unless @polymorph_module
+      @polymorph_module = Module.new
+      include(@polymorph_module)
+    end
+
+    specific_classes = specifics.map(&:to_s).map(&:classify).sort
+    validates "#{generic}_type", inclusion: { in: specific_classes }, allow_nil: true
+
+    @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{generic}=(record)
+        if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
+          message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+          raise ActiveRecord::AssociationTypeMismatch, message
+        end
+        super
+      end
+    RUBY
+
     specifics.each do |specific|
-      next if method_defined?(specific.to_sym)
       class_name = specific.to_s.classify
+
+      # ensure we capture this class's table name
+      table_name = self.table_name
+      belongs_to specific, -> { where(table_name => { "#{generic}_type" => class_name }) }, foreign_key: "#{generic}_id"
+
       correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
 
-      class_eval <<-CODE
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{specific}
         #{generic} if #{correct_type}
       end
 
-      def #{specific}=(val)
-        if val.nil?
-          # we don't want to unset it if it's currently some other type, i.e.
-          # foo.bar = Bar.new
-          # foo.baz = nil
-          # foo.bar.should_not be_nil
-          self.#{generic} = nil if #{correct_type}
-        elsif val.is_a?(#{class_name})
-          self.#{generic} = val
-        else
-          raise ArgumentError, "argument is not a #{class_name}"
-        end
+      def #{specific}=(record)
+        # we don't want to unset it if it's currently some other type, i.e.
+        # foo.bar = Bar.new
+        # foo.baz = nil
+        # foo.bar.should_not be_nil
+        return if record.nil? && !(#{correct_type})
+        association(:#{specific}).send(:raise_on_type_mismatch!, record) if record
+
+        self.#{generic} = record
       end
-      CODE
+
+      RUBY
     end
   end
 
@@ -555,24 +577,6 @@ class ActiveRecord::Base
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
       ids = connection.select_rows("select min(id), max(id) from (#{next_subquery_scope.to_sql}) as subquery").first
-    end
-  end
-
-  class << self
-    def deconstruct_joins(joins_sql=nil)
-      unless joins_sql
-        joins_sql = ''
-        add_joins!(joins_sql, nil)
-      end
-      tables = []
-      join_conditions = []
-      joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
-        # this could probably be improved
-        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
-        tables << $1
-        join_conditions << $2
-      end
-      [tables, join_conditions]
     end
   end
 
@@ -673,9 +677,10 @@ ActiveRecord::Relation.class_eval do
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           end
         end
-        # not ensure; if the transaction rolls back due to another exception, it will
-        # automatically close
-        connection.execute("CLOSE #{cursor}")
+      ensure
+        unless $!.is_a?(ActiveRecord::StatementInvalid)
+          connection.execute("CLOSE #{cursor}")
+        end
       end
     end
   end
@@ -787,117 +792,12 @@ ActiveRecord::Relation.class_eval do
         end
       end
     ensure
-      temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
-      connection.execute "DROP #{temporary}TABLE #{table}"
-    end
-  end
-
-  def update_all_with_joins(updates)
-    if joins_values.any?
-      case connection.adapter_name
-      when 'PostgreSQL'
-        stmt = Arel::UpdateManager.new(arel.engine)
-
-        stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-        from = from_value.try(:first)
-        stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
-        stmt.key = table[primary_key]
-
-        sql = stmt.to_sql
-
-        join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
-        tables, join_conditions = deconstruct_joins(join_sql)
-
-        unless tables.empty?
-          sql.concat(' FROM ')
-          sql.concat(tables.join(', '))
-          sql.concat(' ')
-        end
-
-        scope = self
-        join_conditions.each { |join| scope = scope.where(join) }
-        binds = scope.bind_values.dup
-        if CANVAS_RAILS4_0
-          where_statements = scope.arel.constraints.map do |node|
-            connection.visitor.accept(node) do
-              connection.quote(*binds.shift.reverse)
-            end
-          end
-          sql.concat('WHERE ' + where_statements.join(' AND '))
-        else
-          sql_string = Arel::Collectors::Bind.new
-          scope.arel.constraints.map do |node|
-            connection.visitor.accept(node, sql_string)
-          end
-          sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-        end
-
-        connection.update(sql, "#{name} Update")
-      else
-        update_all_without_joins(updates)
+      unless $!.is_a?(ActiveRecord::StatementInvalid)
+        temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
+        connection.execute "DROP #{temporary}TABLE #{table}"
       end
-    else
-      update_all_without_joins(updates)
     end
   end
-  alias_method_chain :update_all, :joins
-
-  def delete_all_with_joins(conditions = nil)
-    if joins_values.any?
-      if conditions
-        where(conditions).delete_all
-      else
-        case connection.adapter_name
-        when 'PostgreSQL'
-          sql = "DELETE FROM #{quoted_table_name} "
-
-          join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
-          tables, join_conditions = deconstruct_joins(join_sql)
-
-          sql.concat('USING ')
-          sql.concat(tables.join(', '))
-          sql.concat(' ')
-
-          scope = self
-          join_conditions.each { |join| scope = scope.where(join) }
-
-          binds = scope.bind_values.dup
-          if CANVAS_RAILS4_0
-            where_statements = scope.arel.constraints.map do |node|
-              connection.visitor.accept(node) do
-                connection.quote(*binds.shift.reverse)
-              end
-            end
-            sql.concat('WHERE ' + where_statements.join(' AND '))
-          else
-            sql_string = Arel::Collectors::Bind.new
-            scope.arel.constraints.map do |node|
-              connection.visitor.accept(node, sql_string)
-            end
-            sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
-          end
-        when 'MySQL', 'Mysql2'
-          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
-        else
-          raise "Joins in delete not supported!"
-        end
-
-        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
-      end
-    else
-      delete_all_without_joins(conditions)
-    end
-  end
-  alias_method_chain :delete_all, :joins
-
-  def delete_all_with_limit(conditions = nil)
-    if limit_value || offset_value
-      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
-      return unscoped.where(primary_key => scope).delete_all
-    end
-    delete_all_without_limit(conditions)
-  end
-  alias_method_chain :delete_all, :limit
 
   def lock_with_exclusive_smarts(lock_type = true)
     if lock_type == :no_key_update
@@ -975,6 +875,132 @@ ActiveRecord::Relation.class_eval do
     engine.where("#{uniq_identifier} IN (#{sub_query})")
   end
 end
+
+module UpdateAndDeleteWithJoins
+  def deconstruct_joins(joins_sql=nil)
+    unless joins_sql
+      joins_sql = ''
+      add_joins!(joins_sql, nil)
+    end
+    tables = []
+    join_conditions = []
+    joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
+      # this could probably be improved
+      raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
+      tables << $1
+      join_conditions << $2
+    end
+    [tables, join_conditions]
+  end
+
+  def update_all(updates, *args)
+    if joins_values.any?
+      case connection.adapter_name
+        when 'PostgreSQL'
+          stmt = Arel::UpdateManager.new(arel.engine)
+
+          stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+          from = from_value.try(:first)
+          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
+          stmt.key = table[primary_key]
+
+          sql = stmt.to_sql
+
+          join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+          tables, join_conditions = deconstruct_joins(join_sql)
+
+          unless tables.empty?
+            sql.concat(' FROM ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+          end
+
+          scope = self
+          join_conditions.each { |join| scope = scope.where(join) }
+          binds = scope.bind_values.dup
+          if CANVAS_RAILS4_0
+            where_statements = scope.arel.constraints.map do |node|
+              connection.visitor.accept(node) do
+                connection.quote(*binds.shift.reverse)
+              end
+            end
+            sql.concat('WHERE ' + where_statements.join(' AND '))
+          else
+            sql_string = Arel::Collectors::Bind.new
+            scope.arel.constraints.map do |node|
+              connection.visitor.accept(node, sql_string)
+            end
+            sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+          end
+
+          connection.update(sql, "#{name} Update")
+        else
+          super
+      end
+    else
+      super
+    end
+  end
+
+  def delete_all(conditions = nil, *args)
+    if joins_values.any?
+      if conditions
+        where(conditions).delete_all
+      else
+        case connection.adapter_name
+          when 'PostgreSQL'
+            sql = "DELETE FROM #{quoted_table_name} "
+
+            join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+            tables, join_conditions = deconstruct_joins(join_sql)
+
+            sql.concat('USING ')
+            sql.concat(tables.join(', '))
+            sql.concat(' ')
+
+            scope = self
+            join_conditions.each { |join| scope = scope.where(join) }
+
+            binds = scope.bind_values.dup
+            if CANVAS_RAILS4_0
+              where_statements = scope.arel.constraints.map do |node|
+                connection.visitor.accept(node) do
+                  connection.quote(*binds.shift.reverse)
+                end
+              end
+              sql.concat('WHERE ' + where_statements.join(' AND '))
+            else
+              sql_string = Arel::Collectors::Bind.new
+              scope.arel.constraints.map do |node|
+                connection.visitor.accept(node, sql_string)
+              end
+              sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
+            end
+          when 'MySQL', 'Mysql2'
+            sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
+          else
+            raise "Joins in delete not supported!"
+        end
+
+        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
+      end
+    else
+      super
+    end
+  end
+end
+ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
+
+module DeleteAllWithLimit
+  def delete_all(*args)
+    if limit_value || offset_value
+      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      return unscoped.where(primary_key => scope).delete_all
+    end
+    super
+  end
+end
+ActiveRecord::Relation.prepend(DeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)
@@ -1314,42 +1340,6 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   # own special way. re-implement, but as a relation
   def distinct
     scope.distinct
-  end
-end
-
-if Rails.version >= '3' && Rails.version < '4'
-  ActiveRecord::Sanitization::ClassMethods.module_eval do
-    def quote_bound_value_with_relations(value, c = connection)
-      if ActiveRecord::Relation === value
-        value.to_sql
-      else
-        quote_bound_value_without_relations(value, c)
-      end
-    end
-    alias_method_chain :quote_bound_value, :relations
-  end
-end
-
-if Rails.version < '4'
-  klass = ActiveRecord::ConnectionAdapters::Mysql2Column if defined?(ActiveRecord::ConnectionAdapters::Mysql2Column)
-  klass = ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column if defined?(ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column)
-  if klass
-    klass.class_eval do
-      def extract_default(default)
-        if sql_type =~ /blob/i || type == :text
-          if default.blank?
-            # CHANGED - don't believe the '' default
-            return nil
-          else
-            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
-          end
-        elsif missing_default_forged_as_empty_string?(default)
-          nil
-        else
-          super
-        end
-      end
-    end
   end
 end
 

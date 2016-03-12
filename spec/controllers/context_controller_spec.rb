@@ -202,5 +202,35 @@ describe ContextController do
       post :undelete_item, course_id: @course.id, asset_string: 'teacher_name_1'
       expect(response.status).to eq 500
     end
+
+    it 'allows undeleting a "normal" association' do
+      user_session(@teacher)
+      assignment_model(course: @course)
+      @assignment.destroy
+
+      post :undelete_item, course_id: @course.id, asset_string: @assignment.asset_string
+      expect(@assignment.reload).not_to be_deleted
+    end
+
+    it 'allows undeleting wiki pages' do
+      # wiki pages are special because they have to go through context.wiki
+      user_session(@teacher)
+      page = @course.wiki.wiki_pages.create(:title => "some page")
+      page.workflow_state = 'deleted'
+      page.save!
+
+      post :undelete_item, course_id: @course.id, asset_string: page.asset_string
+      expect(page.reload).not_to be_deleted
+    end
+
+    it 'allows undeleting attachments' do
+      # attachments are special because they use file_state
+      user_session(@teacher)
+      attachment_model
+      @attachment.destroy
+
+      post :undelete_item, course_id: @course.id, asset_string: @attachment.asset_string
+      expect(@attachment.reload).not_to be_deleted
+    end
   end
 end

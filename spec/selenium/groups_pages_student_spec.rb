@@ -306,9 +306,8 @@ describe "groups" do
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
       before(:each) do
-        set_up_google_docs
-        unless PluginSetting.where(name: 'google_docs').exists?
-          PluginSetting.create!(name: 'google_docs', settings: {})
+        setup_google_drive
+        unless PluginSetting.where(name: 'google_drive').exists?
           PluginSetting.create!(name: 'google_drive', settings: {})
         end
       end

@@ -234,6 +234,21 @@ describe CalendarEvent do
         expect(ev.description).to include("verifier")
       end
 
+      it "should work with media comments in course section events" do
+        course_model
+        @course.offer
+        @course.is_public = true
+
+        @course.media_objects.create!(:media_id => '0_12345678')
+        event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
+          :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
+        event.effective_context_code = @course.asset_string
+        event.save!
+
+        ics = event.to_ics
+        expect(ics.gsub(/\s+/, '')).to include("/courses/#{@course.id}/media_download?entryId=0_12345678")
+      end
+
       it "should add a course code to the summary of an event that has a course as an effective_context" do
         course_model
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
@@ -464,6 +479,12 @@ describe CalendarEvent do
 
       it "should notify admins when a user reserves", priority: "1", test_id: 193144 do
         reservation = @appointment.reserve_for(@user, @user)
+        expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
+        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
+      end
+
+      it "should notify admins when a user reserves a group appointment" do
+        reservation = @appointment2.reserve_for(@group, @student1)
         expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
       end

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe MarkDonePresenter do
 
   before :each do
-    course_with_student
+    course_with_student(:active_all => true)
   end
 
   let(:the_module) { @course.context_modules.create(:name => "mark_as_done_module") }

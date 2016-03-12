@@ -253,6 +253,7 @@ describe PageView do
 
   describe "for_users" do
     before :once do
+      Setting.set('enable_page_views', 'db')
       course_model
       @page_view = PageView.new { |p| p.assign_attributes({ :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcde", :interaction_seconds => 5, :user => @user }, :without_protection => true) }
       @page_view.save!

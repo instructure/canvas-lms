@@ -26,6 +26,7 @@
                aria-labelledby="onlyGradedAccessibleLabel"
                {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
       </span>
+      <div id="searchResultCount" aria-live="polite" class="screenreader-only"></div>
     </div>
     <div class="pull-right form-inline">
       {{#if options.atom_feed_url}}

@@ -93,11 +93,11 @@ input.input-block-level {
   padding: 10px 15px;
   width: 240px;
   margin-bottom: 15px;
-  font-size: 20px;
+  @include fontSize(20px);
 }
 label {
   padding: 10px 15px;
-  font-size: 15px;
+  @include fontSize(15px);
 }
 input::-webkit-input-placeholder {
   color: #898989;
@@ -105,7 +105,7 @@ input::-webkit-input-placeholder {
 .error {
   background: #faa;
   color: #a00;
-  font-size: 20px;
+  @include fontSize(20px);
   text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
   margin: 15px 0;
   padding: 10px 5px;

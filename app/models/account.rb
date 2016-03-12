@@ -116,14 +116,13 @@ class Account < ActiveRecord::Base
   include TimeZoneHelper
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
-  def default_time_zone_with_root_account
+  def default_time_zone
     if read_attribute(:default_time_zone) || root_account?
-      default_time_zone_without_root_account
+      super
     else
       root_account.default_time_zone
     end
   end
-  alias_method_chain :default_time_zone, :root_account
   alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
@@ -745,16 +744,7 @@ class Account < ActiveRecord::Base
 
   def self.sub_account_ids_recursive(parent_account_id)
     if connection.adapter_name == 'PostgreSQL'
-      sql = "
-          WITH RECURSIVE t AS (
-            SELECT id, parent_account_id FROM #{Account.quoted_table_name}
-            WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
-            UNION
-            SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
-            INNER JOIN t ON accounts.parent_account_id = t.id
-            WHERE accounts.workflow_state <> 'deleted'
-          )
-          SELECT id FROM t"
+      sql = Account.sub_account_ids_recursive_sql(parent_account_id)
       Account.find_by_sql(sql).map(&:id)
     else
       account_descendants = lambda do |ids|
@@ -763,6 +753,18 @@ class Account < ActiveRecord::Base
       end
       account_descendants.call([parent_account_id])
     end
+  end
+
+  def self.sub_account_ids_recursive_sql(parent_account_id)
+    "WITH RECURSIVE t AS (
+       SELECT id, parent_account_id FROM #{Account.quoted_table_name}
+       WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
+       UNION
+       SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
+       INNER JOIN t ON accounts.parent_account_id = t.id
+       WHERE accounts.workflow_state <> 'deleted'
+     )
+     SELECT id FROM t"
   end
 
   def associated_accounts
@@ -1464,18 +1466,13 @@ class Account < ActiveRecord::Base
 
   def self.serialization_excludes; [:uuid]; end
 
-  # This could be much faster if we implement a SQL tree for the account tree
-  # structure.
   def find_child(child_id)
-    child_id = child_id.to_i
-    child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id = #{self.id}").map(&:to_i)
-    until child_ids.empty?
-      if child_ids.include?(child_id)
-        return self.class.find(child_id)
-      end
-      child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id IN (#{child_ids.join(",")})").map(&:to_i)
-    end
-    return false
+    return all_accounts.find(child_id) if root_account?
+
+    child = Account.find(child_id)
+    raise ActiveRecord::RecordNotFound unless child.account_chain.include?(self)
+
+    child
   end
 
   def manually_created_courses_account

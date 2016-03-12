@@ -26,13 +26,14 @@ define [
   'compiled/contextColorer'
   'compiled/util/deparam'
   'str/htmlEscape'
+  'compiled/calendar/CalendarEventFilter'
 
   'fullcalendar-with-lang-all'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape) ->
+], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -49,10 +50,14 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
+      # In theory this is no longer necessary, but it performs some function that
+      # another file depends on or perhaps even this one. Whatever the dependency
+      # is it is not clear, without more research, what effect this has on the
+      # calendar system
       @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
       @schedulerNavigator.hide()
 
-      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
+      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource, calendar: this)
       @scheduler = new Scheduler(".scheduler-wrapper", this)
 
       fullCalendarParams = @initializeFullCalendarParams()
@@ -168,53 +173,7 @@ define [
       @gotoDate(fcUtil.now())
 
     # FullCalendar callbacks
-
     getEvents: (start, end, timezone, cb) =>
-      # We want to filter events received from the datasource. It seems like you should be able
-      # to do this at render time as well, and return "false" in eventRender, but on the agenda
-      # view that still assumes that the item is taking up space even though it's not displayed.
-      filterEvents = (events) =>
-        # De-dupe, and remove any actual scheduled events (since we don't want to
-        # display that among the placeholders.)
-        eventIds = {}
-        return events unless events.length > 0
-        for idx in [events.length - 1..0] # CS doesn't have a way to iterate a list in reverse ?!
-          event = events[idx]
-
-          keep = true
-          # De-dupe
-          if eventIds[event.id]
-            keep = false
-          else if event.isAppointmentGroupEvent()
-            if !@displayAppointmentEvents
-              # Handle normal calendar view, not scheduler view
-              if !event.calendarEvent.reserve_url
-                # If there is not a reserve_url set, then it is an
-                # actual, scheduled event and not just a placeholder.
-                keep = true
-              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved && event.can_edit
-                # If this *is* a placeholder, and it has child events, and it's not reserved by me,
-                # that means people have signed up for it, so we want to display it if I am able to
-                #  manage it (as a teacher or TA might)
-                keep = true
-              else
-                keep = false
-            else
-              if @displayAppointmentEvents.id == event.calendarEvent?.appointment_group_id
-                # If this is an actual event for an appointment, don't show it
-                keep = !!event.calendarEvent.reserve_url
-              else
-                # If this is an appointment event for a different appointment group, and it's full, show it
-                keep = !event.calendarEvent.reserve_url
-
-          # needed for undated assignement edit
-          keep = false if !event.start
-
-          events.splice(idx, 1) unless keep
-          eventIds[event.id] = true
-
-        events
-
       @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
@@ -226,9 +185,9 @@ define [
               event.removeClass('current-appointment-group')
             for event in aEvents
               event.addClass('current-appointment-group')
-            cb(filterEvents(events.concat(aEvents)))
+            cb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
         else
-          cb(filterEvents(events))
+          cb(calendarEventFilter(@displayAppointmentEvents, events))
 
     # Close all event details popup on the page and have them cleaned up.
     closeEventPopups: ->
@@ -244,22 +203,6 @@ define [
 
     eventRender: (event, element, view) =>
       $element = $(element)
-      if event.isAppointmentGroupEvent() && @displayAppointmentEvents &&
-          @displayAppointmentEvents.id == event.calendarEvent.appointment_group_id
-        # We are in the scheduler view, and this event is part of the currently
-        # displayed appointment group. If it's a real event, and not a placeholder,
-        # we don't want to display it.
-
-        # If this is a time slot event, we don't actually want to display the title -
-        # just the reservation status.
-        status = I18n.t('Available')
-        if event.calendarEvent.available_slots > 0
-          status = I18n.t('%{availableSlots} Available', {availableSlots: event.calendarEvent.available_slots})
-        if event.calendarEvent.available_slots == 0
-          status = I18n.t('Filled')
-        if event.calendarEvent.reserved == true
-          status = I18n.t('Reserved')
-        $element.find('.fc-title').text(status)
 
       startDate = event.startDate()
       endDate = event.endDate()
@@ -646,13 +589,16 @@ define [
       @header.showPrevNext()
       @header.hideAgendaRecommendation()
 
+      if view != 'scheduler'
+        @updateFragment appointment_group_id: null
+        @scheduler.viewingGroup = null
+        @agenda.viewingGroup = null
 
       if view != 'scheduler' and view != 'agenda'
         # rerender title so agenda title doesnt stay
-        viewObj = @calendar.fullCalendar('getView');
+        viewObj = @calendar.fullCalendar('getView')
         @viewRender(viewObj)
 
-        @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
         @header.showAgendaRecommendation()
@@ -662,7 +608,6 @@ define [
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
         @calendar.fullCalendar('render')
       else if view == 'scheduler'
-        @calendar.addClass('scheduler-mode')
         @calendar.hide()
         @header.showSchedulerTitle()
         @schedulerNavigator.hide()
@@ -675,6 +620,9 @@ define [
     loadAgendaView: ->
       date = @getCurrentDate()
       @agendaViewFetch(date)
+
+    hideAgendaView: ->
+      @agenda.hide()
 
     formatDate: (date, format) ->
       tz.format(fcUtil.unwrap(date), format)
@@ -694,13 +642,13 @@ define [
         )
       , 500
 
-    showSchedulerSingle: ->
-      @calendar.show()
-      @calendar.fullCalendar('changeView', 'agendaWeek')
+    showSchedulerSingle: (group) ->
+      @agenda.viewingGroup = group
+      @loadAgendaView()
       @header.showDoneButton()
-      @schedulerNavigator.show()
 
     schedulerSingleDoneClick: =>
+      @agenda.viewingGroup = null
       @scheduler.doneClick()
       @header.showSchedulerTitle()
       @schedulerNavigator.hide()

@@ -22,6 +22,7 @@ define([
   'jquery' /* $ */,
   'react',
   'jsx/context_modules/FileSelectBox',
+  'underscore',
   'jquery.instructure_date_and_time' /* datetime_field */,
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */,
@@ -32,7 +33,7 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData */
-], function(INST, I18n, $, React, FileSelectBox) {
+], function(INST, I18n, $, React, FileSelectBox, _) {
 
   $(document).ready(function() {
 
@@ -89,6 +90,11 @@ define([
           }
         }
       }).fixDialogButtons();
+
+      var visibleModuleItemSelect = $('#select_context_content_dialog .module_item_select:visible')[0];
+      if (visibleModuleItemSelect &&  visibleModuleItemSelect.selectedIndex != -1) {
+        $(".add_item_button").removeClass('disabled');
+      }
       $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
     }
     $("#select_context_content_dialog .cancel_button").click(function() {
@@ -96,8 +102,10 @@ define([
       $dialog.dialog('close');
     });
     $("#select_context_content_dialog select, #select_context_content_dialog input[type=text], .module_item_select").keycodes('return', function(event) {
-      $(event.currentTarget).blur();
-      $(this).parents(".ui-dialog").find(".add_item_button").last().click();
+      if(!$('.add_item_button').hasClass('disabled')){ // button is enabled
+        $(event.currentTarget).blur();
+        $(this).parents(".ui-dialog").find(".add_item_button").last().click();
+      }
     });
     $("#select_context_content_dialog .add_item_button").click(function() {
       var submit = function(item_data) {
@@ -320,6 +328,15 @@ define([
     });
     var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
     $("#add_module_item_select").change(function() {
+      // Don't disable the form button for these options
+      var selectedOption = $(this).val();
+      var doNotDisable = _.contains(['external_url', 'context_external_tool', 'context_module_sub_header'], selectedOption);
+      if (doNotDisable) {
+        $(".add_item_button").removeClass('disabled');
+      } else {
+        $(".add_item_button").addClass('disabled');
+      }
+
       $("#select_context_content_dialog .module_item_option").hide();
       if ($(this).val() === 'attachment') {
         React.render(React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
@@ -354,6 +371,11 @@ define([
     })
 
     $('#select_context_content_dialog').on('change', '.module_item_select', function () {
+      var currentSelectItem = $(this)[0];
+      if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
+        $(".add_item_button").removeClass('disabled');
+      }
+
       if($(this).val() == "new") {
         $(this).parents(".module_item_option").find(".new").show().focus().select();
       } else {

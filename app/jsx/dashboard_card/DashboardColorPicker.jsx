@@ -35,18 +35,21 @@ define([
       if (this.isMounted()) {
         var container = this.getDOMNode();
         var settingsToggle = this.props.settingsToggle.getDOMNode();
-        if (!$(container).is(e.target) &&
-              !$(settingsToggle).is(e.target) &&
-              $(container).has(e.target).length === 0
-           ) {
-          this.props.doneEditing();
+        if (!$.contains(container, e.target) && !$.contains(settingsToggle, e.target) && this.props.isOpen) {
+          this.props.doneEditing(e);
         }
       }
     },
 
     checkEsc: function(e){
-      if (e.keyCode == 27) {
-        this.props.doneEditing();
+      if (e.keyCode != 27) {
+        return
+      }
+      if (this.isMounted()) {
+        var container = this.getDOMNode();
+        if ($.contains(container, document.activeElement) && this.props.isOpen) {
+          this.props.doneEditing(e);
+        }
       }
     },
 
@@ -91,19 +94,25 @@ define([
         (this.leftPlusElement() - 360)
     },
 
-    pickerToolTipStyle: function(){
-      return {
-        position: 'absolute',
-        top: this.topPosition(),
-        left: this.leftPosition(),
-        zIndex: 9999
-      };
+    pickerToolTipStyle: function() {
+      if (this.props.isOpen) {
+        return {
+          position: 'absolute',
+          top: this.topPosition(),
+          left: this.leftPosition(),
+          zIndex: 9999
+        };
+      } else {
+        return {
+          display: 'none'
+        };
+      }
     },
 
     render: function () {
       var classes = cx({
         'ic-DashboardCardColorPicker': true,
-        'right': !this.tooltipOnRight(),
+        'right': this.isOpen && !this.tooltipOnRight(),
         'horizontal': true
       });
 
@@ -111,7 +120,7 @@ define([
         <div id        = {this.props.elementID}
              className = {classes}
              style     = {this.pickerToolTipStyle()} >
-          <ColorPicker isOpen           = {true}
+          <ColorPicker isOpen           = {this.props.isOpen}
                        assetString      = {this.props.assetString}
                        afterClose       = {this.props.doneEditing}
                        afterUpdateColor = {this.props.handleColorChange}

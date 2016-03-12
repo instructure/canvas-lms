@@ -22,6 +22,9 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :user
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
 
+  after_save :destroy_override_if_needed
+  after_destroy :destroy_override_if_needed
+
   attr_accessible :user
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id]
@@ -68,4 +71,23 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     end
   end
   protected :default_values
+
+  def destroy_override_if_needed
+    assignment_override.destroy_if_empty_set
+  end
+  protected :destroy_override_if_needed
+
+  def self.clean_up_for_assignment(assignment)
+    return unless assignment.context_type == "Course"
+
+    valid_student_ids = Enrollment
+      .where(course_id: assignment.context_id)
+      .where.not(workflow_state: "deleted")
+      .pluck(:user_id)
+
+    AssignmentOverrideStudent
+      .where(assignment: assignment)
+      .where.not(user_id: valid_student_ids)
+      .each(&:destroy)
+  end
 end
