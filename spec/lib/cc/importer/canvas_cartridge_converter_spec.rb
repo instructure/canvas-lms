@@ -1420,9 +1420,11 @@ describe "matching question reordering" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
+    if Qti.qti_enabled?
+      @converter.delete_unzipped_archive
+      if File.exist?(@export_folder)
+        FileUtils::rm_rf(@export_folder)
+      end
     end
     truncate_all_tables
   end

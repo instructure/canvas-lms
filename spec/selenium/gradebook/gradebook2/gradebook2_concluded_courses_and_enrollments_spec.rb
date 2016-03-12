@@ -17,8 +17,12 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       expect(ff('.student-name').count).to eq @course.students.count
 
+      f('#gradebook_settings').click
+
       # select the option and we'll now show concluded
-      expect_new_page_load { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
+      expect_new_page_load do
+        f('label[for="show_concluded_enrollments"]').click
+      end
       wait_for_ajaximations
 
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
@@ -54,7 +58,10 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
-      expect_fired_alert { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
+      expect_fired_alert do
+        f('#gradebook_settings').click
+        f('label[for="show_concluded_enrollments"]').click
+      end
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
@@ -65,11 +72,10 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(ff('.grade', cell)).to be_blank
     end
 
-    it "should hide mutable actions from the menu", priority: "1", test_id: 210028 do
-      open_gradebook_settings do |menu|
-        expect(ff("a.gradebook_upload_link", menu)).to be_blank
-        expect(ff("a.set_group_weights", menu)).to be_blank
-      end
+    it "should hide gradebook upload link and set group weight actions from the menu", priority: "1", test_id: 210028 do
+      f('#gradebook_settings').click
+      expect(f("a.gradebook_upload_link")).to_not be_present
+      expect(f("a.set_group_weights")).to_not be_present
     end
   end
 end

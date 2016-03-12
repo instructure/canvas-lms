@@ -47,6 +47,14 @@ describe "courses" do
         expect(@course.lock_all_announcements).to be_truthy
       end
 
+      it "should display a creative commons license when set", priority: "1", test_id: 272274 do
+        @course.license =  'cc_by_sa'
+        @course.save!
+        get "/courses/#{@course.id}"
+        wait_for_ajaximations
+        expect(f('.public-license-text').text).to include('This course content is offered under a')
+      end
+
       it "should allow unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')

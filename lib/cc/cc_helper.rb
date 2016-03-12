@@ -169,7 +169,7 @@ module CCHelper
           # This is a media object referencing an attachment that it shouldn't be
           "/media_objects/#{$1}"
         else
-          match.url.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+          match.url.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
         end
       end
       @rewriter.set_handler('files') do |match|
@@ -185,7 +185,7 @@ module CCHelper
             obj = match.obj_class.where(id: match.obj_id).first
           end
           next(match.url) unless obj && @rewriter.user_can_view_content?(obj)
-          folder = obj.folder.full_name.gsub(/course( |%20)files/, WEB_CONTENT_TOKEN)
+          folder = obj.folder.full_name.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
           folder = folder.split("/").map{|part| URI.escape(part)}.join("/")
 
           @referenced_files[obj.id] = CCHelper.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]

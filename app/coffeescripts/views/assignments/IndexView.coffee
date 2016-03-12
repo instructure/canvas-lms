@@ -9,6 +9,7 @@ define [
   'jst/assignments/NoAssignmentsSearch'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'compiled/userSettings'
+  'compiled/jquery.rails_flash_notifications'
 ], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings) ->
 
   class IndexView extends Backbone.View
@@ -90,9 +91,13 @@ define [
       else
         regex = new RegExp(@cleanSearchTerm(term), 'ig')
         #search
-        atleastoneGroup = false
-        @collection.each (group) =>
-          atleastoneGroup = true if group.groupView.search(regex, gradingPeriod)
+        matchingAssignmentCount = @collection.reduce( (runningTotal, group) ->
+          additionalCount = group.groupView.search(regex, gradingPeriod)
+          runningTotal + additionalCount
+        , 0)
+
+        atleastoneGroup = matchingAssignmentCount > 0
+        @alertForMatchingGroups(matchingAssignmentCount)
 
         #add noAssignments placeholder
         if !atleastoneGroup
@@ -108,6 +113,15 @@ define [
           if @noAssignments?
             @noAssignments.remove()
             @noAssignments = null
+
+    alertForMatchingGroups: (numAssignments) ->
+      msg = I18n.t({
+          one: "1 assignment found."
+          other: "%{count} assignments found."
+          zero: "No matching assignments found."
+        }, count: numAssignments
+      )
+      $.screenReaderFlashMessageExclusive(msg)
 
     cleanSearchTerm: (text) ->
       text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")

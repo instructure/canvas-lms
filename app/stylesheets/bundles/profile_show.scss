@@ -50,7 +50,7 @@
 .report_picture {
   margin: 0;
   text-align: center;
-  font-size: 12px;
+  @include fontSize(12px);
 }
 
 .more_user_information {
@@ -61,7 +61,7 @@
   }
   legend {
     margin: 0;
-    font-size: 14px;
+    @include fontSize(14px);
     margin: 1em 0 0.5em 0;
     color: $gray;
     border-bottom: solid 1px $borderColor;

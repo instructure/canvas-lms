@@ -380,6 +380,7 @@ describe ContentMigration do
       quiz.quiz_type = 'practice_quiz'
       quiz.save!
 
+      asmnt.reload
       asmnt.workflow_state = 'deleted'
       asmnt.save!
 

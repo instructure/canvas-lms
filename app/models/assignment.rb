@@ -108,7 +108,7 @@ class Assignment < ActiveRecord::Base
       :points_possible,
       I18n.t(
         "invalid_points_possible",
-        "The value of possible points for this assigment must be zero or greater."
+        "The value of possible points for this assignment must be zero or greater."
       )
     )
   end
@@ -253,7 +253,8 @@ class Assignment < ActiveRecord::Base
               :process_if_quiz,
               :default_values,
               :update_submissions_if_details_changed,
-              :maintain_group_category_attribute
+              :maintain_group_category_attribute,
+              :validate_assignment_overrides
 
   after_save  :update_grades_if_details_changed,
               :touch_assignment_group,
@@ -263,7 +264,6 @@ class Assignment < ActiveRecord::Base
               :update_submissions_later,
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
-              :validate_assignment_overrides,
               :update_cached_due_dates,
               :touch_submissions_if_muted
 
@@ -271,8 +271,8 @@ class Assignment < ActiveRecord::Base
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
-  def validate_assignment_overrides
-    if group_category_id_changed?
+  def validate_assignment_overrides(opts={})
+    if opts[:force_override_destroy] || group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.
@@ -282,6 +282,8 @@ class Assignment < ActiveRecord::Base
           o.destroy
         }
     end
+
+    AssignmentOverrideStudent.clean_up_for_assignment(self)
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
@@ -1222,7 +1224,7 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if (opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment]))
+    if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
       uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
@@ -1262,6 +1264,7 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
+    ts = Time.now.to_s
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
@@ -1429,7 +1432,7 @@ class Assignment < ActiveRecord::Base
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-    includes = [:versions, :quiz_submission]
+    includes = [:versions, :quiz_submission, :user]
     includes << (grading_role == :grader ? :submission_comments : :all_submission_comments)
     submissions = self.submissions.where(:user_id => students).preload(*includes)
 
@@ -1460,22 +1463,9 @@ class Assignment < ActiveRecord::Base
         json.merge! provisional_grade.grade_attributes
       end
 
-      if grade_as_group?
-        group_id = (provisional_grade || sub).group_id
-        json[:submission_comments] = unique_comments(group_id).as_json(
-          :include_root => false,
-          :methods => submission_comment_methods,
-          :only => comment_fields
-        )
-      else
-        json[:submission_comments] = (provisional_grade || sub)
-          .submission_comments
-          .as_json(
-            :include_root => false,
-            :methods => submission_comment_methods,
-            :only => comment_fields
-          )
-      end
+      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
+                                                                                          :methods => submission_comment_methods,
+                                                                                          :only => comment_fields)
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -1515,6 +1505,12 @@ class Assignment < ActiveRecord::Base
                                    elsif quiz && sub.quiz_submission
                                      qs_versions[sub.quiz_submission.id].map do |v|
                                        qs = v.model
+                                       # copy already-loaded associations over to the
+                                       # model so we don't have to load them again
+                                       # when qs.late? gets called
+                                       qs.quiz = quiz
+                                       qs.submission = sub
+
                                        {submission: {
                                          grade: qs.score,
                                          show_grade_in_dropdown: true,
@@ -2224,15 +2220,4 @@ class Assignment < ActiveRecord::Base
       context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
-
-  private
-
-  def unique_comments(group_id)
-    submissions.where(group_id: group_id)
-      .map(&:submission_comments)
-      .flatten
-      .uniq { |comment| [comment.author_id, comment.comment] }
-      .sort_by(&:updated_at)
-  end
-
 end

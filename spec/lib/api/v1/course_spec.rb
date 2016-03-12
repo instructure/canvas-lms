@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe Api::V1::Course do
   include Api::V1::Course
 
+  def feeds_calendar_url(feed_code)
+    "feed_calendar_url(#{feed_code.inspect})"
+  end
+
   describe "#course_settings_json" do
   	it "should return course settings hash" do
   		course
@@ -33,5 +37,13 @@ describe Api::V1::Course do
   		expect(course_settings[:grading_standard_enabled]).to eq true
   		expect(course_settings[:grading_standard_id]).to eq grading_standard.id
   	end
+  end
+
+  describe "#course_json" do
+    it "should work for a logged-out user" do
+      course
+      hash = course_json(@course, nil, nil, [], nil)
+      expect(hash['id']).to be_present
+    end
   end
 end

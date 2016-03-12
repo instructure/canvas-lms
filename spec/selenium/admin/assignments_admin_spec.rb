@@ -12,7 +12,7 @@ describe "assignments" do
     end
 
     it "should not show google docs tab for masquerading admin" do
-      PluginSetting.create!(:name => 'google_docs', :settings => {})
+      PluginSetting.create!(:name => 'google_drive', :settings => {})
       get "/users/#{@student.id}/masquerade"
       expect_new_page_load { f('.masquerade_button').click }
 

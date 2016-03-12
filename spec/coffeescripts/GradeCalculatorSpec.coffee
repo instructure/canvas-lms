@@ -77,6 +77,18 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertGrade result, 'current', 10, 0
     assertDropped result.group_sums[0]['current'].submissions, [0,0], [5,0], [20,0]
 
+  test "returns 0 points possible for current with no submissions and precent scoring", ->
+    @submissions = []
+    @setup_grades @group, [[null, 5], [null, 5], [null, 5]]
+    result = GradeCalculator.calculate @submissions, [@group], 'percent'
+    assertGrade result, 'current', null, 0
+
+  test "returns 100 points possible for final with no submissions and precent scoring", ->
+    @submissions = []
+    @setup_grades @group, [[null, 5], [null, 5], [null, 5]]
+    result = GradeCalculator.calculate @submissions, [@group], 'percent'
+    assertGrade result, 'final', null, 100
+
   test "no drop rules", ->
     @group.rules = {}
 

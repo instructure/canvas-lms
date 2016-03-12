@@ -2,8 +2,9 @@ define [
   'react'
   'underscore'
   'jsx/dashboard_card/DashboardCard'
-  'jsx/dashboard_card/CourseActivitySummaryStore'
-], (React, _, DashboardCard, CourseActivitySummaryStore) ->
+  'jsx/dashboard_card/CourseActivitySummaryStore',
+  'helpers/assertions'
+], (React, _, DashboardCard, CourseActivitySummaryStore, assertions) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -20,6 +21,7 @@ define [
       }]
       @props = {
         shortName: 'Bio 101',
+        assetString: 'foo',
         href: '/courses/1',
         courseCode: '101',
         id: 1
@@ -29,6 +31,7 @@ define [
     teardown: ->
       localStorage.clear()
       React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      @wrapper.remove() if @wrapper
 
   test 'render', ->
     DashCard = React.createElement(DashboardCard, @props)
@@ -46,6 +49,19 @@ define [
       }
     })
     ok renderSpy.called, 'should re-render on state update'
+
+  test 'it should be accessible', (assert) ->
+    DashCard = React.createElement(DashboardCard, @props)
+
+    @wrapper = $('<div>').appendTo('body')[0]
+
+    @component = React.render(DashCard, @wrapper)
+
+    $html = $(React.findDOMNode(@component))
+
+    done = assert.async()
+    assertions.isAccessible $html, done
+
 
   test 'unreadCount', ->
     DashCard = React.createElement(DashboardCard, @props)

@@ -19,6 +19,8 @@ describe "context modules" do
       @external_url_tag = @module1.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
                                             :title => 'pls view', :indent => 1)
       @external_url_tag.publish
+      @header_tag = @module1.add_item(:type => "sub_header", :title => "silly tag")
+
       @module1.completion_requirements = {
           @assignment_tag.id => {:type => 'must_submit'},
           @external_url_tag.id => {:type => 'must_view'}}
@@ -61,6 +63,7 @@ describe "context modules" do
       f("#progression_student_#{@students[1].id}").click
       wait_for_ajaximations
       expect(f("#progression_student_#{@students[1].id}_module_#{@module1.id} .status").text).to include("In Progress")
+      expect(f("#progression_student_#{@students[1].id}_module_#{@module1.id} .items").text).to_not include(@header_tag.title)
       expect(f("#progression_student_#{@students[1].id}_module_#{@module1.id} .items").text).not_to include(@assignment_tag.title)
       expect(f("#progression_student_#{@students[1].id}_module_#{@module1.id} .items").text).to include(@external_url_tag.title)
       expect(f("#progression_student_#{@students[1].id}_module_#{@module2.id} .status").text).to include("Locked")

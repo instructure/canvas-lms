@@ -1,16 +1,17 @@
 define [
   'jquery'
   'Backbone'
+  'i18n!content_migrations'
   'jst/content_migrations/ContentCheckbox'
   'jst/content_migrations/ContentCheckboxCollection'
   'compiled/collections/content_migrations/ContentCheckboxCollection'
   'compiled/views/CollectionView'
   'compiled/str/TextHelper'
-], ($, Backbone, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
+], ($, Backbone, I18n, template, checkboxCollectionTemplate, CheckboxCollection, CollectionView, TextHelper) ->
   class ContentCheckboxView extends Backbone.View
     template: template
     tagName: 'li'
-    attributes: -> 
+    attributes: ->
       attr = {}
       attr.role = "treeitem"
       attr.id = "treeitem-#{@cid}"
@@ -25,13 +26,13 @@ define [
 
       attr
 
-    els: 
+    els:
       '[data-content=sublevelCheckboxes]' : '$sublevelCheckboxes'
 
-    # Bind a change event only to top level checkboxes that are 
+    # Bind a change event only to top level checkboxes that are
     # initially loaded.
 
-    initialize: -> 
+    initialize: ->
       super
       @hasSubItemsUrl = !!@model.get('sub_items_url')
       @hasSubItems = !!@model.get('sub_items')
@@ -39,12 +40,20 @@ define [
       if @hasSubItemsUrl || @hasSubItems
         @$el.on "fetchCheckboxes", @fetchCheckboxes
 
-    toJSON: -> 
+    toJSON: ->
       json = super
       json.hasSubCheckboxes = @hasSubItems || @hasSubItemsUrl
       json.isTopLevel = @model.collection?.isTopLevel
       json.iconClass = @getIconClass()
-      json.count = @model.get('count')
+
+      if json.type == 'context_modules' && json.submodule_count
+        @hasSubModules = true
+        json.showModuleOptions = true
+        json.sub_count = I18n.t({
+            one: "%{count} sub-module",
+            other: "%{count} sub-modules"
+          },
+          {count: json.submodule_count})
 
       json.screenreaderType = {
         assignment_groups: 'group'
@@ -74,17 +83,25 @@ define [
       attachments:                  "icon-document"
       assignment_groups:            "icon-folder"
       folders:                      "icon-folder"
-    
+
     # This retrieves the iconClass out of the iconClasses object map
     # @api private
 
     getIconClass: -> @iconClasses[@model.get('type')]
 
     # If this checkbox model has sublevel checkboxes, create a new collection view
-    # and render the sub-level checkboxes in the collection view. 
+    # and render the sub-level checkboxes in the collection view.
     # @api custom backbone override
 
     afterRender: ->
+      if @model.get('type') == 'context_modules' && !@model.get('count')
+        $checkbox = @$el.find("#checkbox-#{@cid}")
+        $checkbox.data('moduleCheckbox', true)
+        if @hasSubModules
+          $mo = @$el.find('.module_options')
+          $mo.hide().data('checkbox', $checkbox)
+          $checkbox.data('moduleOptions', $mo)
+
       if @hasSubItemsUrl || @hasSubItems
         @$el.attr('aria-expanded', false)
 
@@ -96,7 +113,7 @@ define [
       if @model.get('linked_resource')
         @attachLinkedResource()
 
-    # Determins if we should hide the sublevel checkboxes or 
+    # Determins if we should hide the sublevel checkboxes or
     # fetch new ones based on clicking the carrot next to it.
     # @returns undefined
     # @api private
@@ -116,20 +133,20 @@ define [
     # the collection so it doesn't call the server twice.
     # @api private
 
-    fetchSublevelCheckboxes: (silent) -> 
+    fetchSublevelCheckboxes: (silent) ->
       @sublevelCheckboxes = new CheckboxCollection null,
                               ariaLevel: @model.collection?.ariaLevel + 1
       @sublevelCheckboxes.url = @model.get('sub_items_url')
 
       dfd = @sublevelCheckboxes.fetch()
-      dfd.done => 
+      dfd.done =>
         @$el.trigger 'doneFetchingCheckboxes', @$el.find("#checkbox-#{@cid}")
       @$el.disableWhileLoading dfd unless silent
       dfd
-    
+
     # Render all sublevel checkboxes in a collection view. The template
     # should take care of rendering any "sublevel" checkboxes that may
-    # be on each of these models. 
+    # be on each of these models.
     # @api private
 
     renderSublevelCheckboxes: ->

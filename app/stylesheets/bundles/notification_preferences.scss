@@ -161,7 +161,7 @@ thead th {
     margin-left: 1.1em;
     label {
       display: block;
-      font-size: 13px;
+      @include fontSize(13px);
     }
   }
   .no-touch & {

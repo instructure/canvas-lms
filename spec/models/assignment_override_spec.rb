@@ -632,6 +632,35 @@ describe AssignmentOverride do
     end
   end
 
+  describe "destroy_if_empty_set" do
+    before do
+      @override = assignment_override_model
+    end
+
+    it "does nothing if it is not ADHOC" do
+      @override.stubs(:set_type).returns "NOT_ADHOC"
+      @override.expects(:destroy).never
+
+      @override.destroy_if_empty_set
+    end
+
+    it "does nothing if the set is not empty" do
+      @override.stubs(:set_type).returns "ADHOC"
+      @override.stubs(:set).returns [1,2,3]
+      @override.expects(:destroy).never
+
+      @override.destroy_if_empty_set
+    end
+
+    it "destroys itself if the set is empty" do
+      @override.stubs(:set_type).returns 'ADHOC'
+      @override.stubs(:set).returns []
+      @override.expects(:destroy).once
+
+      @override.destroy_if_empty_set
+    end
+  end
+
   describe "applies_to_students" do
     before do
       student_in_course
@@ -660,6 +689,40 @@ describe AssignmentOverride do
       @course.enroll_student(@student,:enrollment_state => 'active', :section => @override.set)
 
       expect(@override.applies_to_students).to eq [@student]
+    end
+  end
+
+  describe "assignment_edits" do
+    before do
+      @override = assignment_override_model
+    end
+
+    it "returns false if no students who are active in course for ADHOC" do
+      @override.stubs(:set_type).returns "ADHOC"
+      @override.stubs(:set).returns []
+
+      expect(@override.set_not_empty?).to eq false
+    end
+
+    it "returns true if no students who are active in course and CourseSection or Group" do
+      @override.stubs(:set_type).returns "CourseSection"
+      @override.stubs(:set).returns []
+
+      expect(@override.set_not_empty?).to eq true
+
+      @override.stubs(:set_type).returns "Group"
+
+      expect(@override.set_not_empty?).to eq true
+    end
+
+    it "returns true if has students who are active in course for ADHOC" do
+      student = student_in_course(course: @override.assignment.context)
+      @override.set_type = "ADHOC"
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = student.user
+      @override_student.save!
+
+      expect(@override.set_not_empty?).to eq true
     end
   end
 end

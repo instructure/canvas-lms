@@ -88,6 +88,7 @@ class ActiveRecord::Base
     'eportfolio_entries' => %w(attachment_id artifact_type).freeze,
     'external_feeds' => %w(body_match feed_type feed_purpose).freeze,
     'failed_jobs' => %w(original_id).freeze,
+    'feature_flags' => %w(locking_account_id).freeze,
     'gradebook_uploads' => %w(context_type context_id).freeze,
     'grading_periods' => %w(course_id account_id).freeze,
     'groups' => %w(sis_name type groupable_id groupable_type hashtag

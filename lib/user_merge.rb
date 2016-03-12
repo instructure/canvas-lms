@@ -245,10 +245,10 @@ class UserMerge
 
       ContextModuleProgression.
         where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user]).
-        order("CASE WHEN workflow_state = 'Completed' THEN 0
-                    WHEN workflow_state = 'Started' THEN 1
-                    WHEN workflow_state = 'Unlocked' THEN 2
-                    WHEN workflow_state = 'Locked' THEN 3
+        order("CASE WHEN workflow_state = 'completed' THEN 0
+                    WHEN workflow_state = 'started' THEN 1
+                    WHEN workflow_state = 'unlocked' THEN 2
+                    WHEN workflow_state = 'locked' THEN 3
                 END DESC").first.destroy
     end
   end

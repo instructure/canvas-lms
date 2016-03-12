@@ -78,7 +78,6 @@ define [
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
 
-
     open: ->
       @$menu.popup 'open'
 
@@ -97,6 +96,14 @@ define [
       @$ariaMenuWrapper.removeAttr 'role'
       @$menu.removeClass "ui-state-open"
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
+
+      # passing a returnFocusTo option when initializing a kylemenu provides an
+      # interface to ensure focus is not lost and returned to the body. This was
+      # introduced specifically to address the complexity of dynamically-
+      # generated menus. This rule will not be honored if the returnFocusTo
+      # element becomes disabled.
+      if @opts.returnFocusTo && !@opts.returnFocusTo.prop("disabled")
+        @opts.returnFocusTo.focus()
 
     close: =>
       @$menu.hasClass('ui-state-open') && @$menu.popup('close').removeClass('ui-state-open')

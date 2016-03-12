@@ -39,9 +39,8 @@ describe "gradebook2 - total points toggle" do
   end
 
   it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
-    should_show_percentages
-
     get "/courses/#{@course.id}/gradebook2"
+    should_show_percentages
     toggle_grade_display
 
     expected_points = 15, 10, 10

@@ -197,6 +197,8 @@ module BasicLTI
           submission_hash[:submission_type] = 'online_url'
         end
 
+        old_submission = assignment.submissions.where(user_id: user.id).first
+
         if raw_score
           submission_hash[:grade] = raw_score
         elsif new_score
@@ -233,7 +235,10 @@ to because the assignment has no points possible.
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
-          unless @submission
+          if @submission
+            @submission.submission_type = old_submission.submission_type if old_submission
+            @submission.save
+          else
             self.code_major = 'failure'
             self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
           end

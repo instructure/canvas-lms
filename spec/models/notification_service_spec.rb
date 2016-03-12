@@ -21,11 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe NotificationService do
   before(:once) do
-      @au = AccountUser.create(:account => account_model)
-      @au.account.root_account.enable_feature!(:notification_service)
-      @message = generate_message(:account_user_notification, :email, @au)
+      user_model
+      @au = tie_user_to_account(@user, account: account_model)
+      @account.root_account.enable_feature!(:notification_service)
+      @message = generate_message(:account_user_notification, :email, @au, user: @user)
       @message.user.account.root_account.enable_feature!(:notification_service)
       @message.save!
+      @message.to = "testing123"
+      @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
   end
   before(:each) do
     @queue = stub('notification queue')
@@ -39,6 +42,7 @@ describe NotificationService do
       expect{@message.deliver}.not_to raise_error
     end
     it "processes twitter message type" do
+      @user.user_services.create!(service: 'twitter', service_user_name: 'user', service_user_id: 'user', visible: true)
       @queue.expects(:send_message).once
       @message.path_type = "twitter"
       expect{@message.deliver}.not_to raise_error
@@ -56,7 +60,12 @@ describe NotificationService do
     end
     it "processes push notification message type" do
       @queue.expects(:send_message).once
+      sns_client = mock()
+      sns_client.stubs(:create_platform_endpoint).returns(endpoint_arn: 'arn')
+      NotificationEndpoint.any_instance.stubs(:sns_client).returns(sns_client)
+      @at.notification_endpoints.create!(token: 'token')
       @message.path_type = "push"
+      @message.deliver
       expect{@message.deliver}.not_to raise_error
     end
     it "throws error if cannot connect to queue" do
@@ -64,6 +73,13 @@ describe NotificationService do
       expect{@message.deliver}.to raise_error(AWS::SQS::Errors::ServiceError)
       expect(@message.transmission_errors).to include("AWS::SQS::Errors::ServiceError")
       expect(@message.workflow_state).to eql("staged")
+    end
+    it "will send to both services" do
+      Setting.set("notification_service_traffic", "true")
+      @queue.expects(:send_message).once
+      @message.path_type = "email"
+      @message.expects(:deliver_via_email).once
+      expect{@message.deliver}.not_to raise_error
     end
   end
 end

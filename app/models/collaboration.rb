@@ -150,7 +150,17 @@ class Collaboration < ActiveRecord::Base
   # Returns an array of type hashes w/ 'name' and 'type' keys.
   def self.collaboration_types
     Canvas::Plugin.all_for_tag(:collaborations).select(&:enabled?).map do |plugin|
-      HashWithIndifferentAccess.new({ 'name' => plugin.name, 'type' => plugin.id })
+      # google_drive is really a google_docs_collaboration
+      # eventually this will go away. baby steps...
+      if plugin.id == 'google_drive'
+        type = 'google_docs'
+        name = 'Google Docs'
+      else
+        type = plugin.id
+        name = plugin.name
+      end
+
+      HashWithIndifferentAccess.new({ 'name' => name, 'type' => type })
     end
   end
 
@@ -219,7 +229,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a title string.
   def title
-    read_attribute(:title) || self.parse_data.title
+    read_attribute(:title) || self.parse_data["title"]
   rescue NoMethodError
     t('#collaboration.default_title', 'Unnamed Collaboration')
   end

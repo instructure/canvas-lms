@@ -16,8 +16,6 @@
   <% else %>
     <%= t(:quiz_not_yet_taken, "The quiz hasn't been taken yet.") %>
   <% end %>
-<% elsif @quiz.anonymous_survey? %>
-  <%= t("This student's responses are hidden because this assignment is anonymous.") %>
 <% elsif !(@current_submission || @submission).results_visible_for_user?(@current_user) %>
   <div class="quiz_score" style="<%= hidden if @quiz.ungraded? %>">
     <% if @quiz.allowed_attempts != 1 %>

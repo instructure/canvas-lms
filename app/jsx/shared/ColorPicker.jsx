@@ -65,13 +65,8 @@ define([
     },
 
     componentDidMount () {
-      // focus course nickname input first if it's there, otherwise the first
-      // color swatch
-      if (this.refs.courseNicknameEdit) {
-        this.refs.courseNicknameEdit.focus();
-      } else if (this.refs.colorSwatch0) {
-        this.refs.colorSwatch0.getDOMNode().focus();
-      }
+      this.setFocus();
+
       if (this.props.hideOnScroll) {
         $(window).on('scroll', this.closeModal);
       }
@@ -88,9 +83,19 @@ define([
         isOpen: nextProps.isOpen
       }, () => {
         if (this.state.isOpen) {
-          this.refs.colorSwatch0.getDOMNode().focus();
+          this.setFocus();
         }
       });
+    },
+
+    setFocus () {
+      // focus course nickname input first if it's there, otherwise the first
+      // color swatch
+      if (this.refs.courseNicknameEdit) {
+        this.refs.courseNicknameEdit.focus();
+      } else if (this.refs.colorSwatch0) {
+        this.refs.colorSwatch0.getDOMNode().focus();
+      }
     },
 
     // ===============
@@ -102,7 +107,6 @@ define([
         this.setState({
           isOpen: false
         });
-
 
         if (this.props.afterClose) {
           this.props.afterClose()
@@ -157,6 +161,11 @@ define([
       // both API calls update the same User model and thus need to be performed serially
       $.when(this.setColorForCalendar(color)).then(() => {
         $.when(this.setCourseNickname()).then(() => {
+          if (this.isMounted()) {
+            this.setState({
+              saveInProgress: false
+            });
+          }
           this.closeModal();
         });
       });

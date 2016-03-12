@@ -226,12 +226,36 @@ module PostgreSQLAdapterExtensions
     select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
   end
 
+  def set_search_path_on_function(function, args = "()", search_path = Shard.current.name)
+    execute("ALTER FUNCTION #{quote_table_name(function)}#{args} SET search_path TO #{search_path}")
+  end
+
+  # temporarily adds schema to the search_path (i.e. so you can use an extension that won't work
+  # using qualified names)
+  def add_schema_to_search_path(schema)
+    if schema_search_path.split(',').include?(schema)
+      yield
+    else
+      old_search_path = schema_search_path
+      transaction(requires_new: true) do
+        begin
+          self.schema_search_path += ",#{schema}"
+          yield
+        ensure
+          # the transaction rolling back or committing will revert the search path change;
+          # we don't need to do another query to set it
+          @schema_search_path = old_search_path
+        end
+      end
+    end
+  end
+
   private
 
-  OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID if Rails.version >= '4'
+  OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID
 
   def initialize_type_map(*args)
-    return super if Rails.version >= '4.2'
+    return super unless CANVAS_RAILS4_0
 
     known_type_names = OID::NAMES.keys.map { |n| "'#{n}'" } + OID::NAMES.keys.map { |n| "'_#{n}'" }
     known_type_names.concat(%w{'name' 'oidvector' 'int2vector' 'line' 'point' 'box' 'lseg'})
@@ -243,7 +267,7 @@ module PostgreSQLAdapterExtensions
     result = execute(sql, 'SCHEMA')
     leaves, nodes = result.partition { |row| row['typelem'] == '0' }
 
-    if Rails.version < '4.1'
+    if CANVAS_RAILS4_0
       # populate the leaf nodes
       leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
         OID::TYPE_MAP[row['oid'].to_i] = OID::NAMES[row['typname']]

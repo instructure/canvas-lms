@@ -5,6 +5,8 @@ require 'json'
 require 'jira_ref_parser'
 require 'yaml'
 
+Dir.chdir(ENV["GERGICH_GIT_PATH"]) if ENV["GERGICH_GIT_PATH"]
+
 def comment(severity, line, message, link_to_guidelines = false)
   $stderr.puts "line #{line}: [#{severity}]: #{message}"
   if ENV['GERRIT_REFSPEC']

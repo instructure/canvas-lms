@@ -438,6 +438,55 @@ describe Submission do
   end
 
   context "turnitin" do
+
+    context "Turnitin LTI" do
+      let(:lti_tii_data) do
+        {
+            "attachment_42" => {
+                :status => "error",
+                :outcome_response => {
+                    "outcomes_tool_placement_url" => "https://api.turnitin.com/api/lti/1p0/invalid?lang=en_us",
+                    "paperid" => "607954245",
+                    "lis_result_sourcedid" => "10-5-42-8-invalid"
+                },
+                :public_error_message => "Turnitin has not returned a score after 11 attempts to retrieve one."
+            }
+        }
+      end
+
+      let(:submission) { Submission.new }
+
+      describe "#turnitinable_by_lti?" do
+        it 'returns true if there is an associated lti tool and data stored' do
+          submission.turnitin_data = lti_tii_data
+          expect(submission.turnitinable_by_lti?).to be true
+        end
+      end
+
+      describe "#resubmit_lti_tii" do
+        let(:tool) do
+          @course.context_external_tools.create(
+              name: "a",
+              consumer_key: '12345',
+              shared_secret: 'secret',
+              url: 'http://example.com/launch')
+        end
+
+        it 'resubmits errored tii attachments' do
+          a = @course.assignments.create!(title: "test",
+                                          submission_types: 'external_tool',
+                                          external_tool_tag_attributes: {url: tool.url})
+          submission.assignment = a
+          submission.turnitin_data = lti_tii_data
+          submission.user = @user
+          outcome_response_processor_mock = mock('outcome_response_processor')
+          outcome_response_processor_mock.expects(:resubmit).with(submission, "attachment_42")
+          Turnitin::OutcomeResponseProcessor.stubs(:new).returns(outcome_response_processor_mock)
+          submission.retrieve_lti_tii_score
+        end
+      end
+    end
+
     context "submission" do
       def init_turnitin_api
         @turnitin_api = Turnitin::Client.new('test_account', 'sekret')

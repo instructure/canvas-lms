@@ -148,8 +148,8 @@ describe RoleOverridesController do
         post_with_settings(:override => 'unchecked')
         override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
-        expect(override.enabled).to be_falsey
-        expect(override.locked).to be_nil
+        expect(override.enabled).to eq false
+        expect(override.locked).to eq false
         override.destroy
       end
 
@@ -157,8 +157,8 @@ describe RoleOverridesController do
         post_with_settings(:locked => 'true')
         override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
         expect(override).not_to be_nil
-        expect(override.enabled).to be_nil
-        expect(override.locked).to be_truthy
+        expect(override.enabled).to eq true
+        expect(override.locked).to eq true
       end
     end
   end

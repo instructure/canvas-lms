@@ -40,6 +40,7 @@ describe "admin sub accounts" do
     click_account_action_link(default_account_id, '.add_sub_account_link')
     edit_account_info('#new_account #account_name', new_account_name)
     sub_accounts = ff('.sub_accounts .sub_account')
+    check_element_has_focus f(".account > .header .name", sub_accounts[0])
     expect(sub_accounts.count).to eq 1
     expect(sub_accounts[0]).to include_text(new_account_name)
     expect(Account.last.name).to eq new_account_name
@@ -52,6 +53,7 @@ describe "admin sub accounts" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
     }.to change(Account.default.sub_accounts, :count).by(-1)
+    check_element_has_focus f("#account_#{Account.default.id} > .header .name")
     sub_accounts = ff('.sub_accounts .sub_account')
     sub_accounts.each { |account| expect(account).not_to include_text(sub_account.name) }
   end
@@ -61,6 +63,7 @@ describe "admin sub accounts" do
     sub_account = create_sub_account_and_go
     click_account_action_link(sub_account.id, '.edit_account_link')
     edit_account_info("#account_#{sub_account.id} #account_name", edit_name)
+    check_element_has_focus f("#account_#{sub_account.id} > .header .name")
     expect(f("#account_#{sub_account.id}")).to include_text(edit_name)
     expect(Account.where(id: sub_account).first.name).to eq edit_name
   end
@@ -97,9 +100,11 @@ describe "admin sub accounts" do
     check_sub_accounts
     click_account_action_link(default_account_id, '.collapse_sub_accounts_link')
     wait_for_ajaximations
+    check_element_has_focus f("#account_#{default_account_id} > .header .expand_sub_accounts_link")
     check_sub_accounts(false)
     click_account_action_link(default_account_id, '.expand_sub_accounts_link')
     wait_for_ajaximations
+    check_element_has_focus f("#account_#{default_account_id} > .header .collapse_sub_accounts_link")
     check_sub_accounts
   end
 

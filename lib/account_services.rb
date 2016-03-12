@@ -6,16 +6,11 @@ module AccountServices
 
   def self.allowable_services
     AllowedServicesHash.new.merge({
-        :google_docs => {
-            :name => I18n.t("Google Docs"),
-            :description => "",
-            :expose_to_ui => :service,
-            :expose_to_ui_proc => proc { !!GoogleDocs::Connection.config }
-        },
         :google_drive => {
             :name => I18n.t("Google Drive"),
             :description => "",
-            :expose_to_ui => false
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!GoogleDrive::Connection.config }
         },
         :google_docs_previews => {
             :name => I18n.t("Google Docs Preview"),

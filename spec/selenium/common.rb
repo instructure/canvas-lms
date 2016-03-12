@@ -65,7 +65,7 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
-  def check_exception(exception)
+  def maybe_recover_from_exception(exception)
     case exception
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
       if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
@@ -73,18 +73,20 @@ shared_context "in-process server selenium tests" do
         # this will cause the selenium driver to get re-initialized if it
         # crashes for some reason
         $selenium_driver = nil
+        return true
       end
     end
+    false
   end
 
   around do |example|
     begin
       example.run
     rescue # before/after/around ... always re-raise so the example fails
-      check_exception $ERROR_INFO
+      maybe_recover_from_exception $ERROR_INFO
       raise
     end
-    check_exception example.example.exception
+    maybe_recover_from_exception example.example.exception
   end
 
   prepend_before :each do
@@ -96,10 +98,19 @@ shared_context "in-process server selenium tests" do
   end
 
   append_before :all do
-    $selenium_driver ||= setup_selenium
-    default_url_options[:host] = $app_host_and_port
-    close_modal_if_present
-    resize_screen_to_normal
+    retry_count = 0
+    begin
+      $selenium_driver ||= setup_selenium
+      default_url_options[:host] = $app_host_and_port
+      close_modal_if_present
+      resize_screen_to_normal
+    rescue
+      if maybe_recover_from_exception($ERROR_INFO) && (retry_count += 1) < 3
+        retry
+      else
+        raise
+      end
+    end
   end
 
   append_before :each do
@@ -127,7 +138,7 @@ shared_context "in-process server selenium tests" do
           if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
             arg_list = "*args"
             arg_list << ", &Proc.new" if method_name == "transaction"
-            conn.class.class_eval <<-RUBY
+            conn.class.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{method_name}_with_synchronization(*args)
                 SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
               end
@@ -143,6 +154,16 @@ shared_context "in-process server selenium tests" do
     end
   end
 
+  around do |example|
+    Rails.logger.capture_messages do
+      example.run
+    end
+  end
+
+  before do |example|
+    SeleniumDriverSetup.note_recent_spec_run(example)
+  end
+
   after(:each) do |example|
     clear_timers!
     # while disallow_requests! would generally get these, there's a small window
@@ -153,7 +174,7 @@ shared_context "in-process server selenium tests" do
       # we want to ignore selenium errors when attempting to wait here
       nil
     end
-    record_errors(example)
+    record_errors(example, Rails.logger.captured_messages)
     SeleniumDriverSetup.disallow_requests!
     truncate_all_tables unless self.use_transactional_fixtures
   end

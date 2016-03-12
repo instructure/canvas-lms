@@ -3,19 +3,23 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'rubocop'
 require 'rubocop_canvas/version'
 
-require 'rubocop_canvas/helpers/migration_tags'
+# helpers
 require 'rubocop_canvas/helpers/comments'
+require 'rubocop_canvas/helpers/consts'
 require 'rubocop_canvas/helpers/diff_parser'
-require 'rubocop_canvas/helpers/git_proxy'
 require 'rubocop_canvas/helpers/file_sieve'
+require 'rubocop_canvas/helpers/git_proxy'
+require 'rubocop_canvas/helpers/migration_tags'
 
-require 'rubocop_canvas/cops/lint/freeze_constants'
-require 'rubocop_canvas/cops/rails/smart_time_zone'
+# cops
 require 'rubocop_canvas/cops/datafixup/find_ids'
+require 'rubocop_canvas/cops/lint/freeze_constants'
+require 'rubocop_canvas/cops/lint/specs_f_over_fj'
 require 'rubocop_canvas/cops/migration/concurrent_index'
 require 'rubocop_canvas/cops/migration/primary_key'
 require 'rubocop_canvas/cops/migration/remove_column'
 require 'rubocop_canvas/cops/migration/send_later'
+require 'rubocop_canvas/cops/rails/smart_time_zone'
 
 module RuboCop
   module Canvas

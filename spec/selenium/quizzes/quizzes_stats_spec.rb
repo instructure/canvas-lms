@@ -35,7 +35,7 @@ describe 'quizzes stats' do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         # take the quiz
-        f('#take_quiz_link').click
+        f('#preview_quiz_button').click
         wait_for_ajaximations
         f('#submit_quiz_button').click
         driver.switch_to.alert.accept

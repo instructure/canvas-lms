@@ -20,7 +20,13 @@ define([
       if(this.cachedModule !== null){
         cb(this.cachedModule)
       } else {
-        $.getScript('http://'+ host +'/get_module', (res) => {
+        // trim trailing slash if there is one, as we're going to add one below
+        host = host.replace(/\/$/, "")
+        var moduleUrl = '//'+ host +'/get_module'
+        if(host.indexOf("cloudfront") > -1){
+          moduleUrl = '//' + host + '/latest'
+        }
+        $.getScript(moduleUrl, (res) => {
           loadEventListeners()
           if(!this.cachedModule){ this.setCache(RceModule) }
           cb(this.cachedModule);

@@ -328,6 +328,15 @@ module QuizzesCommon
     complete_and_submit_quiz(submit)
   end
 
+  def wait_for_quiz_publish_button_to_populate
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until do
+      f('#quiz-publish-link').present? &&
+      f('#quiz-publish-link').text.present? &&
+      f('#quiz-publish-link').text.strip!.split("\n") != []
+    end
+  end
+
   # @argument answer_chooser [#call]
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)

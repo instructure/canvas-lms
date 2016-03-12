@@ -3430,6 +3430,13 @@ describe 'Submissions API', type: :request do
         json = api_call_as_user(teacher, :get, path, params)
         expect(json.size).to eq 1
       end
+
+      it 'includes the group_id and group_name if include[]=group is passed' do
+        params[:include] = %w/group/
+        json = api_call_as_user(teacher, :get, path, params)
+        expect(json.first.fetch('group').fetch('id')).to eq group.id
+        expect(json.first.fetch('group').fetch('name')).to eq group.name
+      end
     end
   end
 end

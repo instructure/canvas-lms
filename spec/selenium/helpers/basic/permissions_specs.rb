@@ -235,8 +235,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled.nil?).to be_truthy
-          expect(role_override.locked).to be_truthy
+          expect(role_override.enabled).to eq true
+          expect(role_override.locked).to eq true
         end
       end
     end
@@ -247,8 +247,8 @@ shared_examples_for "permission tests" do
       let!(:role) { add_new_course_role role_name }
 
       before do
-        f("#course_role_link").click
         get url
+        f("#course_role_link").click
       end
 
       it "enables a permission" do
@@ -312,8 +312,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled.nil?).to be_truthy
-          expect(role_override.locked).to be_truthy
+          expect(role_override.enabled).to eq true
+          expect(role_override.locked).to eq true
         end
       end
 

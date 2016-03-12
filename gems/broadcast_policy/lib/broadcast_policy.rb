@@ -58,6 +58,7 @@ module BroadcastPolicy #:nodoc:
 
   def self.notifier=(notifier_or_proc)
     if notifier_or_proc.respond_to?(:call)
+      @notifier = nil
       @notifier_proc = notifier_or_proc
     else
       @notifier = notifier_or_proc
@@ -71,6 +72,7 @@ module BroadcastPolicy #:nodoc:
 
   def self.notification_finder=(notification_finder_or_proc)
     if notification_finder_or_proc.respond_to?(:call)
+      @notification_finder = nil
       @notification_finder_proc = notification_finder_or_proc
     else
       @notification_finder = notification_finder_or_proc

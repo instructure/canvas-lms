@@ -8,7 +8,7 @@ describe "dashboard" do
 
   shared_examples_for 'load events list' do
     it "should load events list sidebar", priority: "2", test_id: 210275 do
-      driver.navigate.to(app_host)
+      get "/"
       wait_for_ajaximations
       expect(f('.events_list')).to be_displayed
     end

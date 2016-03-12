@@ -67,7 +67,8 @@ describe "gradebook performance" do
       expect(visible_students.count).to eq @course.students.count
 
       # select the option and we'll now show concluded
-      open_gradebook_settings(f('label[for="show_concluded_enrollments"]'))
+      f('#gradebook_settings').click
+      f('label[for="show_concluded_enrollments"]').click
       wait_for_ajax_requests
 
       expect(visible_students.count).to eq @course.all_students.count
@@ -83,7 +84,10 @@ describe "gradebook performance" do
       expect(visible_students.count).to eq @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
-      expect_fired_alert { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
+      f('#gradebook_settings').click
+      expect_fired_alert do
+        f('label[for="show_concluded_enrollments"]').click
+      end
       expect(visible_students.count).to eq @course.all_students.count
     end
 

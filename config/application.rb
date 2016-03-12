@@ -18,7 +18,7 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-if Rails.version < '4.1'
+if CANVAS_RAILS4_0
   ActiveRecord::Base.class_eval do
     mattr_accessor :dump_schema_after_migration, instance_writer: false
     self.dump_schema_after_migration = true

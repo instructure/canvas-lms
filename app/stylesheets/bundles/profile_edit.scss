@@ -22,7 +22,7 @@
     }
   }
   .data_description {
-    font-size: 0.8em; 
+    font-size: 0.8em;
     color: $ic-color-dark;
   }
 }
@@ -183,7 +183,7 @@ li[id$=service_google_docs] {
 
 .select-photo-link {
   display: block;
-  font-size: 18px;
+  @include fontSize(18px);
   font-weight: bold;
   padding: 0 0 16px 0;
   text-align: center;

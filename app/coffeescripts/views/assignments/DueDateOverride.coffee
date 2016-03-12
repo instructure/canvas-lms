@@ -6,7 +6,8 @@ define [
   'compiled/util/DateValidator'
   'i18n!overrides'
   'jsx/due_dates/DueDates'
-], (Backbone, _, React, template, DateValidator, I18n, DueDates) ->
+  'jsx/due_dates/StudentGroupStore'
+], (Backbone, _, React, template, DateValidator, I18n, DueDates, StudentGroupStore) ->
 
   class DueDateOverrideView extends Backbone.View
 
@@ -24,7 +25,8 @@ define [
         overrides: @model.overrides.models,
         syncWithBackbone: @setNewOverridesCollection,
         sections: @model.sections.models,
-        defaultSectionId: @model.defaultDueDateSectionId
+        defaultSectionId: @model.defaultDueDateSectionId,
+        selectedGroupSetId: @model.assignment.get("group_category_id")
       })
 
       React.render(DueDatesElement, div)
@@ -33,6 +35,7 @@ define [
       return errors unless data
       errors = @validateDates(data, errors)
       errors = @validateTokenInput(data,errors)
+      errors = @validateGroupOverrides(data,errors)
       errors
 
     validateDates: (data, errors) =>
@@ -59,6 +62,30 @@ define [
         $nameInput = $($inputWrapper).find("input")
         errors = _.extend(errors, { blankOverrides: [message: blankOverrideMsg] })
         $nameInput.errorBox(blankOverrideMsg).css("z-index", "20")
+      errors
+
+    validateGroupOverrides: (data, errors) =>
+      # if the StudentGroupStore hasn't gotten all of the group data
+      # then skip the front end validation as it might result
+      # in an annoying false positive
+      # note: the backend will still catch this issue
+      return errors unless StudentGroupStore.fetchComplete()
+
+      validGroups = StudentGroupStore.groupsFilteredForSelectedSet()
+      validGroupIds = _.pluck(validGroups, "id")
+      groupOverrides = _.filter(data.assignment_overrides, (ao) -> !!ao.group_id)
+      invalidGroupOverrides = _.filter(groupOverrides, (ao) ->
+        ao.group_id not in validGroupIds
+      )
+      invalidGroupOverrideRowKeys = _.pluck(invalidGroupOverrides, "rowKey")
+      invalidGroupOverrideMessage = I18n.t('invalid_group_override', "You cannot assign to a group outside of the assignment's group set")
+      for row in $('.Container__DueDateRow-item')
+        rowKey = "#{$(row).data('row-key')}"
+        continue unless _.contains(invalidGroupOverrideRowKeys, rowKey)
+        identifier = 'tokenInputFor' + rowKey
+        $nameInput = $('[data-row-identifier="'+identifier+'"]').find("input")
+        errors = _.extend(errors, { invalidGroupOverride: [message: invalidGroupOverrideMessage] })
+        $nameInput.errorBox(invalidGroupOverrideMessage).css("z-index", "20")
       errors
 
     # ==============================

@@ -268,7 +268,12 @@ class DiscussionTopicsController < ApplicationController
   #
   # @returns [DiscussionTopic]
   def index
-    return unless authorized_action(@context.discussion_topics.temp_record, @current_user, :read)
+    if params[:only_announcements]
+      return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
+    else
+      return unless authorized_action(@context.discussion_topics.temp_record, @current_user, :read)
+    end
+
     return child_topic if is_child_topic?
 
     scope = if params[:only_announcements]
@@ -402,7 +407,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
           (assignment_overrides_json(
-            @topic.assignment.overrides_for(@current_user)
+            @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
             ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
@@ -1057,11 +1062,15 @@ class DiscussionTopicsController < ApplicationController
         params[:assignment][:published] = @topic.published?
         params[:assignment][:name] = @topic.title
 
-        assignment_params = params[:assignment].except('anonymous_peer_reviews')
-        update_api_assignment(@assignment, assignment_params, @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
+        @assignment.workflow_state = @topic.published? ? "published" : "unpublished"
         @topic.assignment = @assignment
+        @topic.save_without_broadcasting!
+
+        assignment_params = params[:assignment].except('anonymous_peer_reviews')
+        update_api_assignment(@assignment.reload, assignment_params, @current_user)
+
         @topic.save!
       end
     end
@@ -1075,6 +1084,7 @@ class DiscussionTopicsController < ApplicationController
         :student_id => params[:student_id]
       }
     end
+
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
     @topic.message = @root_topic.message

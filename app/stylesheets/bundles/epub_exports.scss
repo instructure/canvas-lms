@@ -9,7 +9,7 @@
 
 .epub-exports-admin-controls {
   a {
-    font-size: 14px;
+    @include fontSize(14px);
     line-height: 20px;
     padding: 8px 14px;
   }

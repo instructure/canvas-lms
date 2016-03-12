@@ -4,15 +4,6 @@
   #wrapper-container { min-width: 1150px; }
 }
 
-.scheduler-mode {
-  .fc-event {
-    opacity: 0.7;
-  }
-  .fc-event.current-appointment-group {
-    opacity: 1;
-  }
-}
-
 .scheduler-content {
   padding: 1em;
   background-color: $bodyBackground;
@@ -33,7 +24,7 @@
     display: none;
   }
   .appointment-group-item.active {
-    display: block;
+    display: flex;
   }
   .appointment-group-item {
     border-top: none;
@@ -50,6 +41,9 @@
 }
 
 .appointment-group-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   border-top: 1px solid #ccc;
   min-height: 68px;
   padding: 6px 0 26px;

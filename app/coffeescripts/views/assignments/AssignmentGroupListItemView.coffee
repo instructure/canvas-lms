@@ -207,17 +207,19 @@ define [
 
     search: (regex, gradingPeriod) ->
       @resetBorders()
+      assignmentCount = @collection.reduce( (count, as) =>
+        count++ if as.search(regex, gradingPeriod)
+        count
+      , 0)
 
-      atleastone = false
-      @collection.each (as) =>
-        atleastone = true if as.search(regex, gradingPeriod)
+      atleastone = assignmentCount > 0
       if atleastone
         @show()
         @expand(false)
         @borderFix()
       else
         @hide()
-      atleastone
+      assignmentCount
 
     endSearch: ->
       @resetBorders()

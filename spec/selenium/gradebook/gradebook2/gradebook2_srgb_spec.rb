@@ -216,7 +216,7 @@ describe "screenreader gradebook" do
     assignment.grade_student @students[1], grade: 5
     get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
     f('a.assignment_header_drop').click
-    fj('#ui-id-18').click
+    ff('.gradebook-header-menu a').find{|a| a.text == "Assignment Details"}.click
 
     data = [
       'Average Score: 10',

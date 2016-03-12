@@ -1,19 +1,23 @@
 require File.expand_path(File.dirname(__FILE__)+'/../../../../spec/apis/api_spec_helper')
 
-class Woozel < ActiveRecord::Base
-  simply_versioned :explicit => true
-end
-
-Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-
 describe 'simply_versioned' do
-  before do
+  before :all do
+    class Woozel < ActiveRecord::Base
+      simply_versioned :explicit => true
+    end
+    Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+
     Woozel.connection.create_table :woozels, :force => true do |t|
       t.string :name
     end
   end
-  after do
+
+  after :all do
     Woozel.connection.drop_table :woozels
+    Woozel.remove_connection
+    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(Woozel)
+    Object.send(:remove_const, :Woozel)
+    GC.start
   end
 
   describe "explicit versions" do
@@ -136,6 +140,11 @@ describe 'simply_versioned' do
         woozel.simply_versioned_options[:on_load] = on_load
         woozel.reload
       end
+
+      after do
+        woozel.simply_versioned_options[:on_load] = nil
+      end
+
       it "can modify a version after loading" do
         expect(YAML::load(woozel.current_version.yaml)['name']).to eq 'test'
         expect(woozel.current_version.model.name).to eq 'test override'

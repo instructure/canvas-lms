@@ -18,7 +18,7 @@
 
 class UserService < ActiveRecord::Base
   include Workflow
-  
+
   belongs_to :user
   attr_accessor :password
   attr_accessible :user, :service, :protocol, :token, :secret, :service_user_url, :service_user_id, :service_user_name, :service_domain, :visible
@@ -29,11 +29,11 @@ class UserService < ActiveRecord::Base
   after_save :assert_relations
   after_save :touch_user
   after_destroy :remove_related_channels
-  
+
   def should_have_communication_channel?
     [CommunicationChannel::TYPE_TWITTER, CommunicationChannel::TYPE_YO].include?(service) && self.user
   end
-  
+
   def assert_relations
     if should_have_communication_channel?
       cc = self.user.communication_channels.where(path_type: service).first_or_initialize
@@ -47,7 +47,7 @@ class UserService < ActiveRecord::Base
     end
     true
   end
-  
+
   def remove_related_channels
     # should this include twitter?
     if [CommunicationChannel::TYPE_YO].include?(self.service) && self.user
@@ -56,25 +56,25 @@ class UserService < ActiveRecord::Base
     end
     true
   end
-  
+
   def assert_communication_channel
     # why is twitter getting special treatment?
     self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
-  
+
   def infer_defaults
     self.refresh_at ||= Time.now.utc
   end
   protected :infer_defaults
-  
+
   workflow do
     state :active do
       event :failed_request, :transitions_to => :failed
     end
-    
+
     state :failed
   end
-  
+
   scope :of_type, lambda { |type| where(:type => type.to_s) }
 
   scope :to_be_polled, -> { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
@@ -84,20 +84,20 @@ class UserService < ActiveRecord::Base
     where(:service => service.to_s)
   }
   scope :visible, -> { where("visible") }
-  
+
   def service_name
     self.service.titleize rescue ""
   end
-  
+
   def password=(password)
     self.crypted_password, self.password_salt = Canvas::Security.encrypt_password(password, 'instructure_user_service')
   end
-  
+
   def decrypted_password
     return nil unless self.password_salt && self.crypted_password
     Canvas::Security.decrypt_password(self.crypted_password, self.password_salt, 'instructure_user_service')
   end
-  
+
   def self.register(opts={})
     raise "User required" unless opts[:user]
     token = opts[:access_token] ? opts[:access_token].token : opts[:token]
@@ -117,7 +117,7 @@ class UserService < ActiveRecord::Base
     user_service.save!
     user_service
   end
-  
+
   def self.register_from_params(user, params={})
     opts = {}
     opts[:user] = user
@@ -153,19 +153,17 @@ class UserService < ActiveRecord::Base
     end
     register(opts)
   end
-  
+
   def has_profile_link?
-    service != 'google_docs'
+    true
   end
-  
+
   def has_readable_user_name?
-    service == 'google_docs'
+    service == 'google_drive'
   end
-  
+
   def self.sort_position(type)
     case type
-    when 'google_docs'
-      1
     when 'google_drive'
       2
     when 'skype'
@@ -184,11 +182,9 @@ class UserService < ActiveRecord::Base
       999
     end
   end
-  
+
   def self.short_description(type)
     case type
-    when 'google_docs'
-      t '#user_service.descriptions.google_docs', 'Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations.'
     when 'google_drive'
       t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
     when 'google_calendar'
@@ -209,11 +205,9 @@ class UserService < ActiveRecord::Base
       ''
     end
   end
-  
+
   def self.registration_url(type)
     case type
-    when 'google_docs'
-      'http://docs.google.com'
     when 'google_drive'
       'https://www.google.com/drive/'
     when 'google_calendar'
@@ -234,11 +228,9 @@ class UserService < ActiveRecord::Base
       nil
     end
   end
-  
+
   def service_user_link
     case service
-      when 'google_docs'
-        'http://docs.google.com'
       when 'google_drive'
         'https://myaccount.google.com/?pli=1'
       when 'google_calendar'
@@ -259,15 +251,15 @@ class UserService < ActiveRecord::Base
         'http://www.instructure.com'
     end
   end
-  
+
   def self.configured_services
-    [:google_docs, :google_drive, :twitter, :yo, :linked_in, :diigo]
+    [:google_drive, :twitter, :yo, :linked_in, :diigo]
   end
-  
+
   def self.configured_service?(service)
     configured_services.include?((service || "").to_sym)
   end
-  
+
   def self.service_type(type)
     if type == 'google_docs' || type == 'google_drive'
       'DocumentService'

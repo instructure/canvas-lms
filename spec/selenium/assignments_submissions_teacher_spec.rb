@@ -62,7 +62,7 @@ describe "submissions" do
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
 
-      type_in_tiny('#submission_body', 'my assigment submission')
+      type_in_tiny('#submission_body', 'my assignment submission')
       expect_new_page_load { submit_form(assignment_form) }
 
       expect(@course.student_view_student.submissions.count).to eq 1

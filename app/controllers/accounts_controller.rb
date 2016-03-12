@@ -564,6 +564,9 @@ class AccountsController < ApplicationController
           @account[:settings][:edit_institution_email] = value_to_boolean(can_edit_email)
         end
 
+        remove_ip_filters = params[:account].delete(:remove_ip_filters)
+        params[:account][:ip_filters] = [] if remove_ip_filters
+
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }

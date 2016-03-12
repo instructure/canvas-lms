@@ -40,39 +40,20 @@ class GradebookImporter
   attr_reader :context, :contents, :attachment, :assignments, :students,
               :submissions, :missing_assignments, :missing_students, :upload
 
-  # TODO: reduce these to "gradebook_upload" and "attachment" once job queue
-  # is clear of old enqueued jobs
-  def self.create_from(progress, gradebook_upload_or_course, user, attachment_or_contents)
-    self.new(gradebook_upload_or_course, attachment_or_contents, user, progress).parse!
+  def self.create_from(progress, gradebook_upload, user, attachment)
+    self.new(gradebook_upload, attachment, user, progress).parse!
   end
 
-  def initialize(context=nil, csv_contents_or_attachment=nil, user=nil, progress=nil)
-    # TODO: change the parameter to "gradebook_upload", and remove these conditionals
-    # once we know the S3 pipeline works and old jobs are cleared
-    if context.is_a?(GradebookUpload)
-      @upload = context
-      @context = @upload.course
-    else
-      @context = context
-    end
+  def initialize(upload=nil, attachment=nil, user=nil, progress=nil)
+    @upload = upload
+    @context = upload.course
 
     raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(@context)
-    # TODO: Change this error to "Must provide attachment id when we're sure S3 pipeline works"
-    raise ArgumentError, "Must provide CSV contents or attachment." unless csv_contents_or_attachment
+    raise ArgumentError, "Must provide attachment." unless attachment
 
     @user = user
-    # TODO: change the parameter to "attachment", and remove these conditionals
-    # once we know the S3 pipeline works and old jobs are cleared
-    if csv_contents_or_attachment.is_a?(Attachment)
-      @attachment = csv_contents_or_attachment
-    else
-      @contents = csv_contents_or_attachment
-    end
+    @attachment = attachment
     @progress = progress
-
-    # TODO: remove this line entirely
-    # once we know the S3 pipeline works and old jobs are cleared
-    @upload ||= GradebookUpload.new course: @context, user: @user, progress: @progress
 
     if @context.feature_enabled?(:differentiated_assignments)
       @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
@@ -401,20 +382,12 @@ class GradebookImporter
   end
 
   def csv_stream
-    if contents # TODO: remove this branch entirely when S3 is proved to work
-      CSV.parse(contents, CSV_PARSE_OPTIONS) do |row|
-        yield row
-      end
-    elsif attachment
-      csv_file = attachment.open(need_local_file: true)
-      # using "foreach" rather than "parse" processes a chunk of the
-      # file at a time rather than loading the whole file into memory
-      # at once, a boon for memory consumption
-      CSV.foreach(csv_file.path, CSV_PARSE_OPTIONS) do |row|
-        yield row
-      end
-    else
-      raise "We have no gradebook input to iterate over..."
+    csv_file = attachment.open(need_local_file: true)
+    # using "foreach" rather than "parse" processes a chunk of the
+    # file at a time rather than loading the whole file into memory
+    # at once, a boon for memory consumption
+    CSV.foreach(csv_file.path, CSV_PARSE_OPTIONS) do |row|
+      yield row
     end
   end
 

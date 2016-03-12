@@ -38,6 +38,7 @@ group :test do
   gem 'timecop', '0.6.3'
   gem 'jira_ref_parser', '1.0.0'
   gem 'headless', '2.2.0', require: false
+  gem 'escape_code', '0.2'
 
   unless CANVAS_RAILS4_0
     gem 'rails-dom-testing', '1.0.7'

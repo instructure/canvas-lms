@@ -24,7 +24,7 @@ module Canvas::Migration::Helpers
     end
 
     def valid_type?(type=nil)
-      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type}
+      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_")
     end
 
     def get_content_list(type=nil, source=nil)
@@ -71,16 +71,20 @@ module Canvas::Migration::Helpers
 
       content_list = []
       if type
-        if course_data[type]
+        if match_data = type.match(/submodules_(.*)/)
+          (submodule_data(course_data['context_modules'], match_data[1]) || []).each do |item|
+            content_list << item_hash('context_modules', item)
+          end
+        elsif course_data[type]
           case type
-            when 'assignments'
-              assignment_data(content_list, course_data)
-            when 'attachments'
-              attachment_data(content_list, course_data)
-            else
-              course_data[type].each do |item|
-                content_list << item_hash(type, item)
-              end
+          when 'assignments'
+            assignment_data(content_list, course_data)
+          when 'attachments'
+            attachment_data(content_list, course_data)
+          else
+            course_data[type].each do |item|
+              content_list << item_hash(type, item)
+            end
           end
         end
       else
@@ -150,10 +154,11 @@ module Canvas::Migration::Helpers
               title: item['title'],
               migration_id: item['migration_id']
       }
-      if type == 'attachments'
+      case type
+      when 'attachments'
         hash[:path] = item['path_name']
         hash[:title] = item['file_name']
-      elsif type == 'assessment_question_banks'
+      when 'assessment_question_banks'
         if hash[:title].blank? && @migration && @migration.context.respond_to?(:assessment_question_banks)
           if hash[:migration_id] && bank = @migration.context.assessment_question_banks.where(migration_id: hash[:migration_id]).first
             hash[:title] = bank.title
@@ -163,8 +168,13 @@ module Canvas::Migration::Helpers
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
           hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank')
         end
+      when 'context_modules'
+        hash[:item_count] = item['item_count']
+        if item['submodules']
+          hash[:submodule_count] = item['submodules'].count
+          add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
+        end
       end
-
       hash = add_linked_resource(type, item, hash)
       hash
     end
@@ -336,6 +346,19 @@ module Canvas::Migration::Helpers
         folder.active_file_attachments.each do |att|
           item[:sub_items] << course_item_hash('attachments', att)
         end
+      end
+    end
+
+    def submodule_data(modules, parent_mig_id)
+      if mod = modules.detect{|m| m['migration_id'] == parent_mig_id}
+        mod['submodules']
+      else
+        modules.each do |mod|
+          if mod['submodules'] && (sm_data = submodule_data(mod['submodules'], parent_mig_id))
+            return sm_data
+          end
+        end
+        nil
       end
     end
 

@@ -512,12 +512,12 @@ describe "API Authentication", type: :request do
     end
 
     def wrapped_jwt_from_service
-      services_jwt = Canvas::Security::ServicesJwt.generate(@user.global_id, false)
+      services_jwt = Canvas::Security::ServicesJwt.generate({sub: @user.global_id}, false)
       payload = {
         iss: "some other service",
         user_token: services_jwt
       }
-      wrapped_jwt = Canvas::Security.create_jwt(payload, nil, signing_secret)
+      wrapped_jwt = Canvas::Security.create_jwt(payload, nil, fake_signing_secret)
       Canvas::Security.base64_encode(wrapped_jwt)
     end
 
@@ -589,6 +589,12 @@ describe "API Authentication", type: :request do
     it "should allow passing the access token in the authorization header" do
       check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "recovers gracefully if consul is missing encryption data" do
+      Diplomat::Kv.stubs(:get).raises(Diplomat::KeyNotFound, "cannot find some secret")
+      check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
+      assert_status(200)
     end
 
     it "should allow passing the access token in the post body" do

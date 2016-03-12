@@ -22,6 +22,7 @@ define [
       window.tinyrce = {editorsListing: {}}
 
     teardown: ->
+      RCELoader.setCache(null)
       @modifiedJquery.getScript.restore()
       @modifiedJquery.getScript = @originalGetScript
       window.tinyrce = null
@@ -31,9 +32,7 @@ define [
 
   test 'caches the response of get_module when called', ->
     equal RCELoader.cachedModule, null
-    RCELoader.loadRCE("somehost.com", () ->
-      console.log "callback run"
-    )
+    RCELoader.loadRCE("somehost.com", (() ->))
     equal RCELoader.cachedModule, 'fakeModule'
     ok @getScriptSpy.calledOnce
 
@@ -49,6 +48,11 @@ define [
     cb = sinon.spy();
     RCELoader.loadRCE("dontCare", cb)
     ok cb.called
+
+  test 'uses `latest` version when hitting a cloudfront host', ->
+    ok @getScriptSpy.notCalled
+    RCELoader.loadRCE("xyz.cloudfront.net/some/path", () -> "noop")
+    ok @getScriptSpy.calledWith("//xyz.cloudfront.net/some/path/latest")
 
   # target finding
 

@@ -2,11 +2,41 @@
   <ul class="scheduler-content" id="appointment-group-list">
     {{#each appointment_groups}}
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>
+        <div>
+          <h3><a class="view_calendar_link" href="#">{{title}}</a></h3>
+          <div class='ag-context'>
+            {{#toSentence contexts}}<a href="{{url}}">{{name}}</a>{{/toSentence}}
+          </div>
+          {{#if location_name}}
+            <div class="ag-location">
+              <strong>{{#t "location"}}Location:{{/t}}</strong>
+              <span>{{location_name}}</span>
+            </div>
+          {{/if}}
+          {{#if description}}
+            <p class="ag-description">{{newlinesToBreak description}}</p>
+          {{/if}}
+          {{#if is_manageable}}
+            <div class="ag-x-of-x-signed-up">
+              {{#ifEqual participant_type "Group"}}
+                {{#t "x_groups_have_signed_up"}}
+                  {{participant_count}} groups have signed up
+                {{/t}}
+              {{else}}
+                {{#t "x_people_have_signed_up"}}
+                  {{participant_count}} people have signed up
+                {{/t}}
+              {{/ifEqual}}
+              {{#unless published}}(unpublished){{/unless}}
+            </div>
+          {{/if}}
+        </div>
+
         {{#if is_manageable}}
           <div class="admin-links">
             <button class="al-trigger btn btn-mini">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+              <span class="screenreader-only">{{#t "manage"}}Manage {{title}} appointment group{{/t}}</span>
             </button>
             <ul class="al-options">
               <li><a class="edit_link" href="#"><i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}</a></li>
@@ -18,46 +48,18 @@
         {{#if requiring_action}}
           <div class="alert alert-warning">
             <div>
-              You can <a class="view_calendar_link" href="#">sign up</a> for this.
+              {{#t}}<span class="screenreader-only">{{title}} appointment group</span> You can <a class="view_calendar_link" href="#">sign up</a> for this.{{/t}}
             </div>
           </div>
         {{else}}
           {{#if reserved_times}}
             <div class="alert alert-success">
-              <div>{{#t "signed_up_for" }}You're signed up for{{/t}}</div>
+              <div>{{#t "signed_up_for" }}<span class="screenreader-only">{{title}} appointment group</span> You're signed up for{{/t}}</div>
               {{#each reserved_times}}
                 <div><strong><a href="#" class="show_event_link" data-event-id="{{id}}">{{{formatted_time}}}</a></strong></div>
               {{/each}}
             </div>
           {{/if}}
-        {{/if}}
-
-        <h3><a class="view_calendar_link" href="#">{{title}}</a></h3>
-        <div class='ag-context'>
-          {{#toSentence contexts}}<a href="{{url}}">{{name}}</a>{{/toSentence}}
-        </div>
-        {{#if location_name}}
-          <div class="ag-location">
-            <strong>{{#t "location"}}Location:{{/t}}</strong>
-            <span>{{location_name}}</span>
-          </div>
-        {{/if}}
-        {{#if description}}
-          <p class="ag-description">{{newlinesToBreak description}}</p>
-        {{/if}}
-        {{#if is_manageable}}
-          <div class="ag-x-of-x-signed-up">
-            {{#ifEqual participant_type "Group"}}
-              {{#t "x_groups_have_signed_up"}}
-                {{participant_count}} groups have signed up
-              {{/t}}
-            {{else}}
-              {{#t "x_people_have_signed_up"}}
-                {{participant_count}} people have signed up
-              {{/t}}
-            {{/ifEqual}}
-            {{#unless published}}(unpublished){{/unless}}
-          </div>
         {{/if}}
       </li>
     {{/each}}

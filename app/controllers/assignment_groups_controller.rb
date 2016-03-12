@@ -154,9 +154,7 @@ class AssignmentGroupsController < ApplicationController
       groups.each{|assignment_group| AssignmentGroup.notify_observers(:assignments_changed, assignment_group)}
       ids = @group.active_assignments.map(&:id)
       @context.recompute_student_scores rescue nil
-      respond_to do |format|
-        format.json { render :json => {:reorder => true, :order => ids}, :status => :ok }
-      end
+      render :json => {:reorder => true, :order => ids}, :status => :ok
     end
   end
 

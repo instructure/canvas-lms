@@ -175,27 +175,27 @@ $discussion-dark-text: $ic-color-dark;
 
 .topic {
   h1.discussion-title {
-    font-size: 19px;
+    @include fontSize(19px);
     font-weight: normal;
     line-height: 30px;
   }
   h2.discussion-title {
-    font-size: 16px;
+    @include fontSize(16px);
   }
   .discussion-title {
-    font-size: 19px;
+    @include fontSize(19px);
   }
 }
 
 .discussion-title {
-  font-size: 13px;
+  @include fontSize(13px);
   font-weight: bold;
   line-height: 23px;
   margin: 0;
 }
 
 .discussion-subtitle {
-  font-size: 11px;
+  @include fontSize(11px);
   margin: 0;
 }
 
@@ -204,7 +204,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-pubdate {
-  font-size: 11px;
+  @include fontSize(11px);
   color: $discussion-dark-text;
   line-height: 23px;
 }
@@ -215,13 +215,14 @@ $discussion-dark-text: $ic-color-dark;
   }
   .discussion-title {
     font-size: 14px !important;
+    font-size: 0.875rem !important;
   }
 }
 
 
 .discussion-fyi {
   font-style: italic;
-  font-size: 12px;
+  @include fontSize(12px);
   color: darken($ic-color-neutral, 45);
 }
 
@@ -362,7 +363,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .entry {
   .cancel_button {
-    font-size: 11px;
+  @include fontSize(11px);
   }
 }
 
@@ -413,7 +414,7 @@ $discussion-dark-text: $ic-color-dark;
     min-height: 0;
   }
   .discussion-title {
-    font-size: 12px;
+    @include fontSize(12px);
     font-style: italic;
   }
 }
@@ -428,7 +429,7 @@ $discussion-dark-text: $ic-color-dark;
   border-top: 1px solid $border;
   background: white;
   padding: 10px 10px 13px 10px;
-  font-size: 10px;
+  @include fontSize(10px);
   font-weight: bold;
   @include clearfix;
   a {
@@ -466,7 +467,7 @@ $discussion-dark-text: $ic-color-dark;
 .entry-controls {
   overflow: auto;
   padding: 10px;
-  font-size: 12px;
+  @include fontSize(12px);
 
   .new-and-total-badge {
     float: left;
@@ -507,7 +508,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-page-nav {
   ul {
-    font-size: 12px;
+    @include fontSize(12px);
     margin: 0;
     padding-bottom: 20px;
     list-style: none;
@@ -530,7 +531,7 @@ $discussion-dark-text: $ic-color-dark;
 .new-and-total-badge {
   .new-items, .total-items {
     font-weight: normal;
-    font-size: 10px;
+    @include fontSize(10px);
   }
 }
 
@@ -559,7 +560,7 @@ $discussion-dark-text: $ic-color-dark;
   }
   @else {
     padding: 3px 10px;
-    font-size: 11px;
+    @include fontSize(11px);
   }
   &:hover, &:focus {
     color: #444;
@@ -595,7 +596,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .accessibility-warning {
   @include accessibility-prompt;
-  font-size: 14px;
+  @include fontSize(14px);
 }
 
 .collapsable:hover, .collapsable:focus {

@@ -59,6 +59,45 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "assignment overrides_for" do
+    before do
+      student_in_course(:course => course)
+    end
+
+    context "with adhoc" do
+      before do
+        override.override_due_at(7.days.from_now)
+        override.set_type = "ADHOC"
+        override.save!
+
+      end
+
+      it "returns adhoc overrides when active students enrolled in adhoc set" do
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
+      end
+
+      it "returns nothing when no active students enrolled in adhoc set" do
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true)).to be_empty
+      end
+
+      it "returns nothing when active students enrolled in adhoc set removed" do
+        override_student = override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true).size).to eq 1
+
+        override_student.user.enrollments.delete_all
+
+        expect(overridable.overrides_for(@student, ensure_set_not_empty: true)).to be_empty
+      end
+    end
+  end
+
   describe "has_overrides?" do
     subject { overridable.has_overrides? }
 

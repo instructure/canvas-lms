@@ -66,6 +66,8 @@ class Enrollment < ActiveRecord::Base
   after_save :update_cached_due_dates
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
+  after_save :update_assignment_overrides_if_needed
+  after_destroy :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :available_at, :soft_completed_at
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
@@ -460,7 +462,7 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
-  def inactivate
+  def deactivate
     self.workflow_state = "inactive"
     self.user.touch
     self.save
@@ -530,22 +532,22 @@ class Enrollment < ActiveRecord::Base
     true
   end
 
-  def course_name
-    self.course.nickname_for(self.user) || t('#enrollment.default_course_name', "Course")
+  def course_name(display_user = nil)
+    self.course.nickname_for(display_user) || t('#enrollment.default_course_name', "Course")
   end
 
-  def short_name(length=nil)
+  def short_name(length = nil, display_user = nil)
     return @short_name if @short_name
     @short_name = self.course_section.display_name if self.course_section && self.root_account && self.root_account.show_section_name_as_course_name
-    @short_name ||= self.course_name
+    @short_name ||= self.course_name(display_user)
     @short_name = @short_name[0..length] if length
     @short_name
   end
 
-  def long_name
+  def long_name(display_user = nil)
     return @long_name if @long_name
-    @long_name = self.course_name
-    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course_name
+    @long_name = self.course_name(display_user)
+    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course_name(display_user)
     @long_name
   end
 
@@ -758,7 +760,7 @@ class Enrollment < ActiveRecord::Base
   def has_permission_to?(action)
     @permission_lookup ||= {}
     unless @permission_lookup.has_key? action
-      @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role)
+      @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role, course)
     end
     @permission_lookup[action].include?(:self)
   end
@@ -1163,6 +1165,17 @@ class Enrollment < ActiveRecord::Base
       self.class.connection.after_transaction_commit do
         User.where(id: self.course.admins).touch_all
       end
+    end
+  end
+
+  def update_assignment_overrides_if_needed
+    if self.workflow_state == 'deleted' && self.workflow_state_was != 'deleted'
+      assignment_ids = Assignment.where(context_id: self.course_id, context_type: 'Course').pluck(:id)
+      return unless assignment_ids
+
+      AssignmentOverrideStudent
+        .where(user_id: self.user_id, assignment_id: assignment_ids)
+        .find_each(&:destroy)
     end
   end
 end

@@ -19,6 +19,9 @@
 require 'aws-sdk'
 
 class NotificationService
+  DEFAULT_CONFIG = {
+    notification_service_queue_name: 'notification-service'
+  }.freeze
 
   def self.process(global_id, body, type, to, remote)
     self.notification_queue.send_message({
@@ -32,11 +35,8 @@ class NotificationService
 
   def self.notification_queue
     return @notification_queue if defined?(@notification_queue)
-    @config ||= ConfigFile.load('notification_service').try(:symbolize_keys)
-    sqs = AWS::SQS.new(
-      access_key_id: @config[:access_key_id],
-      secret_access_key: @config[:secret_access_key],
-      region: @config[:region])
-    @notification_queue = sqs.queues.named(@config[:notification_service_name])
+    @config ||= DEFAULT_CONFIG.merge(ConfigFile.load('notification_service').try(:symbolize_keys))
+    sqs = AWS::SQS.new(@config)
+    @notification_queue = sqs.queues.named(@config[:notification_service_queue_name])
   end
 end

@@ -73,6 +73,7 @@ describe "discussion assignments" do
       assignment_form = f('#submit_online_text_entry_form')
       type_in_tiny 'textarea', 'something to submit'
       submit_form(assignment_form)
+      wait_for_ajaximations
       user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f('.new-and-total-badge .new-items').text).to include "1"

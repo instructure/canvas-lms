@@ -326,6 +326,11 @@ describe AppointmentGroup do
       @course3.destroy
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
     end
+
+    it "should ignore concluded courses when performing permissions checks" do
+      @course3.complete!
+      expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
+    end
   end
 
   context "notifications" do

@@ -2085,7 +2085,7 @@ describe CoursesController, type: :request do
           @inactive_user = user_with_pseudonym(:name => "Inactive User")
           student_in_course(:course => @course1, :user => @inactive_user)
           @inactive_enroll = @inactive_user.enrollments.first
-          @inactive_enroll.inactivate
+          @inactive_enroll.deactivate
         end
 
         it "excludes users with inactive enrollments for students" do

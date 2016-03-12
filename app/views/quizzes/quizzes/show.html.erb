@@ -105,7 +105,7 @@
           class='btn quiz-publish-button <%= "disabled" unless @quiz.can_unpublish? %>'
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
-	<%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
+        <%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>
 
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
@@ -294,7 +294,11 @@
       <% end %>
     </div>
 
-    <% if @quiz.available? %>
+    <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+      <div class="preview_quiz_button">
+        <%= link_to_preview_quiz('class' => "btn btn-primary", 'id' => "preview_quiz_button", 'preview' => 1) %>
+      </div>
+    <% elsif @quiz.available? %>
       <% if @can_take %>
         <% if @submission && @submission.untaken? %>
           <div class="take_quiz_button">

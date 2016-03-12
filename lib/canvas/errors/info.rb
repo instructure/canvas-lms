@@ -9,6 +9,7 @@ module Canvas
     class Info
 
       attr_reader :req, :account, :user, :rci, :type
+      MAX_DATA_SIZE = 65535
 
       def initialize(request, root_account, user, opts={})
         @req = request
@@ -87,7 +88,7 @@ module Canvas
           'REQUEST_URI' => f.filter_uri(req.url),
           'path_parameters' => f.filter_params(req.path_parameters.dup).inspect,
           'query_parameters' => f.filter_params(req.query_parameters.dup).inspect,
-          'request_parameters' => f.filter_params(req.request_parameters.dup).inspect,
+          'request_parameters' => f.filter_params(req.request_parameters.dup).inspect[0,MAX_DATA_SIZE],
         }
       end
       private_class_method :filtered_request_params

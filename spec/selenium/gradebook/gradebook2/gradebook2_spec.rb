@@ -110,7 +110,8 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    open_gradebook_settings
+    f('#gradebook_settings').click
+    expect(f('.gradebook_dropdown')).to be_displayed
   end
 
   it "should validate assignment details", priority: "1", test_id: 210048 do

@@ -189,6 +189,19 @@ describe "discussions" do
         confirm(:off)
       end
 
+      it "should show correct date when saving" do
+        Timecop.freeze do
+          topic.lock_at = Time.zone.now - 5.days
+          topic.save!
+          teacher.time_zone = "Hawaii"
+          teacher.save!
+          get url
+          f('.form-actions button[type=submit]').click
+          get url
+          expect(topic.reload.lock_at).to eq (Time.zone.now - 5.days).beginning_of_minute
+        end
+      end
+
       it "should toggle checkboxes when clicking their labels", priority: "1", test_id: 270924 do
         get url
 

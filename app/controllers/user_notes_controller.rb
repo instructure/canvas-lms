@@ -41,9 +41,8 @@ class UserNotesController < ApplicationController
         @users = @context.students_visible_to(@current_user).order_by_sortable_name
         @is_course = true
       end
-      count = @users.count
       @users = @users.order("users.last_user_note").order_by_sortable_name
-      @users = @users.paginate(:page => params[:page], :per_page => 20, :total_entries=>count)
+      @users = @users.paginate(:page => params[:page], :per_page => 20)
     end
   end
 

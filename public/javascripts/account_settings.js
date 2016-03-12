@@ -35,14 +35,23 @@ define([
 
     $("#account_settings").submit(function() {
       var $this = $(this);
+      var remove_ip_filters = true;
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
       }).filter(":not(.blank)").each(function() {
         var name = $.trim($(this).parents(".ip_filter").find(".name").val().replace(/\[|\]/g, '_'));
         if(name) {
+          remove_ip_filters = false;
           $(this).attr('name', 'account[ip_filters][' + name + ']');
         }
       });
+
+      if (remove_ip_filters) {
+        $this.append("<input class='remove_ip_filters' type='hidden' name='account[remove_ip_filters]' value='1'/>");
+      } else {
+        $this.find('.remove_ip_filters').remove(); // just in case it's left over after a failed validation
+      }
+
       var validations = {
         object_name: 'account',
         required: ['name'],

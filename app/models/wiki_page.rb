@@ -208,7 +208,7 @@ class WikiPage < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false unless self.could_be_locked
-    Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
+    Rails.cache.fetch([locked_cache_key(user), opts[:deep_check_if_needed]].cache_key, :expires_in => 1.minute) do
       locked = false
       if item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
@@ -298,7 +298,7 @@ class WikiPage < ActiveRecord::Base
     return true if wiki.grants_right?(user, session, :manage)
 
     return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
-    return false if locked_for?(user)
+    return false if locked_for?(user, :deep_check_if_needed => true)
 
     true
   end

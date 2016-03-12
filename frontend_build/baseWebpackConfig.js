@@ -55,6 +55,7 @@ module.exports = {
   },
   module: {
     preLoaders: [],
+    noParse: [],
     loaders: [
       {
         test: /\.js$/,
@@ -67,8 +68,16 @@ module.exports = {
       },
       {
         test: /\.jsx$/,
-        include: [path.resolve(__dirname, "../app/jsx")],
-        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, /client_apps\/canvas_quizzes\/apps\//],
+        include: [
+          path.resolve(__dirname, "../app/jsx"),
+          /gems\/plugins\/.*\/app\/jsx\//
+        ],
+        exclude: [
+          /(node_modules|bower)/,
+          /public\/javascripts\/vendor/,
+          /public\/javascripts\/translations/,
+          /client_apps\/canvas_quizzes\/apps\//
+        ],
         loaders: [
           'babel?cacheDirectory=tmp',
           'jsxYankPragma'

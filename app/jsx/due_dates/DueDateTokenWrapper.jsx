@@ -14,6 +14,7 @@ define([
   var DueDateWrapperConsts = {
     MINIMUM_SEARCH_LENGTH: 3,
     MAXIMUM_STUDENTS_TO_SHOW: 7,
+    MAXIMUM_GROUPS_TO_SHOW: 5,
     MAXIMUM_SECTIONS_TO_SHOW: 3,
     MS_TO_DEBOUNCE_SEARCH: 800,
   }
@@ -34,6 +35,7 @@ define([
     MINIMUM_SEARCH_LENGTH: DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH,
     MAXIMUM_STUDENTS_TO_SHOW: DueDateWrapperConsts.MAXIMUM_STUDENTS_TO_SHOW,
     MAXIMUM_SECTIONS_TO_SHOW: DueDateWrapperConsts.MAXIMUM_SECTIONS_TO_SHOW,
+    MAXIMUM_GROUPS_TO_SHOW: DueDateWrapperConsts.MAXIMUM_GROUPS_TO_SHOW,
     MS_TO_DEBOUNCE_SEARCH: DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH,
 
     // This is useful for testing to make it so the debounce is not used
@@ -60,7 +62,7 @@ define([
     handleInput(userInput) {
       this.setState(
         { userInput: userInput, currentlyTyping: true },function(){
-          if(this.safetiesOff){
+          if (this.safetiesOff) {
             this.fetchStudents()
           } else {
             this.safeFetchStudents()
@@ -150,13 +152,17 @@ define([
     },
 
     filteredTagsForType(type){
-      var groupedTags = this.groupBySectionOrStudent(this.filteredTags())
+      var groupedTags = this.groupByTagType(this.filteredTags())
       return groupedTags && groupedTags[type] || []
     },
 
-    groupBySectionOrStudent(options){
-      return _.groupBy(options, function(opt){
-        return opt["course_section_id"] ? "course_section" : "student"
+    groupByTagType(options){
+      return _.groupBy(options, (opt) => {
+        if (opt["course_section_id"]) {
+          return "course_section"
+        } else {
+          return !!opt["group_id"] ? "group" : "student"
+        }
       })
     },
 
@@ -184,18 +190,26 @@ define([
 
     optionsForMenu() {
       var options = this.promptText() ?
-        _.union([this.promptOption()], this.sectionAndStudentOptions()) :
-        this.sectionAndStudentOptions()
+        _.union([this.promptOption()], this.optionsForAllTypes()) :
+        this.optionsForAllTypes()
 
       return options
     },
 
-    sectionAndStudentOptions(){
-      return _.union(this.sectionOptions(), this.studentOptions())
+    optionsForAllTypes(){
+      return _.union(
+        this.sectionOptions(),
+        this.groupOptions(),
+        this.studentOptions()
+      )
     },
 
     studentOptions(){
       return this.optionsForType("student")
+    },
+
+    groupOptions(){
+      return this.optionsForType("group")
     },
 
     sectionOptions(){
@@ -209,14 +223,23 @@ define([
     },
 
     headerOption(heading){
-      var headerText = heading === "student" ? I18n.t("Student") : I18n.t("Course Section")
+      var headerText = {
+        "student": I18n.t("Student"),
+        "course_section": I18n.t("Course Section"),
+        "group": I18n.t("Group"),
+      }[heading]
       return <ComboboxOption className="ic-tokeninput-header" value={heading} key={heading}>
                {headerText}
              </ComboboxOption>
     },
 
     selectableOptions(type){
-      var numberToShow = type === "student" ? this.MAXIMUM_STUDENTS_TO_SHOW : this.MAXIMUM_SECTIONS_TO_SHOW
+      var numberToShow = {
+        "student": this.MAXIMUM_STUDENTS_TO_SHOW,
+        "course_section": this.MAXIMUM_SECTIONS_TO_SHOW,
+        "group": this.MAXIMUM_GROUPS_TO_SHOW,
+      }[type] || 0
+
       return _.chain(this.filteredTagsForType(type))
         .take(numberToShow)
         .map((set) => this.selectableOption(set))
@@ -270,7 +293,10 @@ define([
       var allStudentTags = this.filteredTagsForType("student")
       var hidingStudents = allStudentTags && allStudentTags.length > this.MAXIMUM_STUDENTS_TO_SHOW
 
-      return hidingSections || hidingStudents
+      var allGroupTags = this.filteredTagsForType("group")
+      var hidingGroups = allGroupTags && allGroupTags.length > this.MAXIMUM_GROUPS_TO_SHOW
+
+      return hidingSections || hidingStudents || hidingGroups
     },
 
     // ---- render ----

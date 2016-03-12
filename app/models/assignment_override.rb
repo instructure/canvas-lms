@@ -43,13 +43,15 @@ class AssignmentOverride < ActiveRecord::Base
     :if => lambda{ |override| override.assignment? && override.active? && concrete_set.call(override) }
   validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
     :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
+
   validate :if => concrete_set do |record|
     if record.set && record.assignment && record.active?
       case record.set
       when CourseSection
         record.errors.add :set, "not from assignment's course" unless record.set.course_id == record.assignment.context_id
       when Group
-        record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == record.assignment.group_category_id
+        valid_group_category_id = record.assignment.group_category_id || record.assignment.discussion_topic.try(:group_category_id)
+        record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == valid_group_category_id
       end
     end
   end
@@ -68,6 +70,12 @@ class AssignmentOverride < ActiveRecord::Base
 
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
+
+  def set_not_empty?
+    overridable = assignment? ? assignment : quiz
+    ['CourseSection', 'Group'].include?(self.set_type) ||
+    set.any? && overridable.context.current_enrollments.where(user_id: set).exists?
+  end
 
   def update_cached_due_dates
     return unless assignment?
@@ -234,7 +242,6 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_title_if_needed
-
     if set_type != 'ADHOC' && set
       self.title = set.name
     elsif set_type == 'ADHOC' && set.any?
@@ -253,6 +260,11 @@ class AssignmentOverride < ActiveRecord::Base
       },
       count: students.count
      )
+  end
+
+  def destroy_if_empty_set
+    return unless set_type == 'ADHOC'
+    self.destroy if set.empty?
   end
 
   has_a_broadcast_policy

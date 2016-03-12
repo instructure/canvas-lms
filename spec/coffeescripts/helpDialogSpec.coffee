@@ -6,20 +6,13 @@ define [
 ], ($,helpDialog,fakeENV)->
   # more tests are in spec/selenium/help_dialog_spec.rb
 
-  # mock INST.browser for test to work
-  originalBrowser = null
-
   module 'HelpDialog',
     setup: ->
       fakeENV.setup()
-      @clock = sinon.useFakeTimers()
+      helpDialog.animateDuration = 0
       @server = sinon.fakeServer.create()
       @server.respondWith '/help_links', '[]'
       @server.respondWith '/api/v1/courses.json', '[]'
-      originalBrowser = window.INST.browser
-      window.INST.browser =
-        ie: true
-        version: 8
 
     teardown: ->
       fakeENV.teardown()
@@ -30,12 +23,9 @@ define [
         helpDialog.$dialog.dialog('close')
         helpDialog.$dialog = null
 
-      @clock.restore()
-
       # reset the shared object
       helpDialog.dialogInited = false
       helpDialog.teacherFeedbackInited = false
-      window.INST.browser = originalBrowser
       $(".ui-dialog").remove()
       $('[id^=ui-id-]').remove()
       $("#help-dialog").remove()
@@ -53,6 +43,15 @@ define [
     @server.respond()
 
     helpDialog.switchTo "#teacher_feedback"
-    @clock.tick 200
-
     ok helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), "textarea shows up"
+
+  test 'focus management', ->
+    helpDialog.open()
+    @server.respond()
+
+    helpDialog.switchTo "#create_ticket"
+    equal document.activeElement, helpDialog.$dialog.find('#error_subject')[0], 'focuses first input'
+    ok !helpDialog.$dialog.find('#help-dialog-options').is(':visible'), 'out of view screen is hidden'
+
+    helpDialog.switchTo "#help-dialog-options"
+    ok helpDialog.$dialog.find('#help-dialog-options').is(':visible'), 'menu screen appears again'

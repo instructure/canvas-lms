@@ -36,7 +36,7 @@ describe "/shared/_select_content_dialog" do
     expect(%w(unpublished_page published_page) - options.map(&:text)).to be_empty
   end
 
-  it "should not offer to create assigments or quizzes if the user doesn't have permission" do
+  it "should not offer to create assignments or quizzes if the user doesn't have permission" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     existing_quiz = @course.quizzes.create! title: 'existing quiz'
@@ -49,7 +49,7 @@ describe "/shared/_select_content_dialog" do
     expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).to be_empty
   end
 
-  it "should offer to create assigments if the user has permission" do
+  it "should offer to create assignments if the user has permission" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     view_context

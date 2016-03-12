@@ -391,7 +391,7 @@ class CoursesController < ApplicationController
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
-          e = enrollments.first
+          e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
             e.course_section = nil
             e.readonly!
@@ -411,8 +411,8 @@ class CoursesController < ApplicationController
         end
         @visible_groups = @current_user.visible_groups
 
-        @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
-        [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
+        @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
+        [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))] }}
       }
 
       format.json {
@@ -580,7 +580,7 @@ class CoursesController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
   # @argument course[course_format] [String]
-  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
+  #   Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted course with matching sis_course_id if possible.
@@ -596,7 +596,7 @@ class CoursesController < ApplicationController
       end
 
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
-        @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
+        @sub_account = @account.find_child(sub_account_id)
       end
 
       term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
@@ -888,8 +888,8 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course},
-          Enrollment.where(:course_id => @context))
+        ActiveRecord::Associations::Preloader.new.preload(users, :not_ended_enrollments, Enrollment.where(:course_id => @context))
+        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course})
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')

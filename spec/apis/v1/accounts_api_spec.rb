@@ -71,6 +71,26 @@ describe "Accounts API", type: :request do
       ]
     end
 
+    it "doesn't include deleted accounts" do
+      @a2.destroy
+      json = api_call(:get, "/api/v1/accounts.json",
+                      { :controller => 'accounts', :action => 'index', :format => 'json' })
+
+      expect(json.sort_by { |a| a['id'] }).to eq [
+        {
+          'id' => @a1.id,
+          'name' => 'root',
+          'root_account_id' => nil,
+          'parent_account_id' => nil,
+          'default_time_zone' => 'Etc/UTC',
+          'default_storage_quota_mb' => 123,
+          'default_user_storage_quota_mb' => 45,
+          'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
+        },
+      ]
+    end
+
     it "should return accounts found through admin enrollments with the account list (but in limited form)" do
       course_with_teacher(:user => @user, :account => @a1)
       course_with_teacher(:user => @user, :account => @a1)# don't find it twice

@@ -56,7 +56,7 @@ HEREDOC
 <div id="collaborations">
 <% @collaborations.each do |collaboration| %>
   <% if can_do(collaboration, @current_user, :read) %>
-    <% if !collaboration.is_a?(GoogleDocsCollaboration) || (collaboration.is_a?(GoogleDocsCollaboration) && !@google_drive_upgrade) %>
+    <% if !collaboration.is_a?(GoogleDocsCollaboration) || (collaboration.is_a?(GoogleDocsCollaboration) && @user_has_google_drive) %>
       <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
         <div class="collaboration-header clearfix">
           <h2>
@@ -81,7 +81,7 @@ HEREDOC
                 :at => datetime_string(collaboration.created_at) %>
         </small>
       </div>
-    <% elsif  @google_drive_upgrade %>
+    <% elsif !@user_has_google_drive %>
         <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
           <h3><%= collaboration.title %></h3>
           <div style="margin-bottom: 5px;" class="description">

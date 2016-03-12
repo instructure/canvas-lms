@@ -236,7 +236,7 @@ describe UserMerge do
     end
 
     it "should remove conflicting module progressions" do
-      course1.enroll_user(user1)
+      course1.enroll_user(user1, 'StudentEnrollment', enrollment_state:'active')
       course1.enroll_user(user2, 'StudentEnrollment', enrollment_state:'active')
       assignment = course1.assignments.create!(title:"some assignment")
       assignment2 = course1.assignments.create!(title:"some second assignment")

@@ -114,6 +114,12 @@ This identifier must not change for the user, and must be globally unique. In th
  this is called the SIS ID.</td>
 </tr>
 <tr>
+<td>integration_id</td>
+<td>text</td>
+<td>A secondary unique identifier useful for more complex SIS integrations.
+This identifier must not change for the user, and must be globally unique.</td>
+</tr>
+<tr>
 <td>login_id</td>
 <td>text</td>
 <td><b>Required field</b>. The name that a user will use to login to Instructure. If you have an

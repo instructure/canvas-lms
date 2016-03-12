@@ -192,7 +192,7 @@ describe "Outcome Results API", type: :request do
 
       it "does not allow students to read other users' results via csv" do
         user_session outcome_students[0]
-        get "courses/#{@course.id}/outcome_rollups.csv"
+        get "/courses/#{@course.id}/outcome_rollups.csv"
         assert_status(403)
       end
 
@@ -260,7 +260,7 @@ describe "Outcome Results API", type: :request do
       it "returns a csv file" do
         outcome_result
         user_session @user
-        get "courses/#{@course.id}/outcome_rollups.csv"
+        get "/courses/#{@course.id}/outcome_rollups.csv"
         expect(response).to be_success
         expect(response.body).to eq "Student name,Student ID,new outcome result,new outcome mastery points\n"+
           "User,#{outcome_student.id},3,3\n"

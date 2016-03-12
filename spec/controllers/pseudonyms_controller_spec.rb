@@ -374,6 +374,11 @@ describe PseudonymsController do
       post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :sis_user_id => 'sis1' }
       expect(response).to be_success
       expect(@pseudonym1.reload.sis_user_id).to eq 'sis1'
+
+      post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :integration_id => 'sis2' }
+      expect(response).to be_success
+      expect(@pseudonym1.reload.integration_id).to eq 'sis2'
+
     end
 
     it "should be able to change unique_id with permission" do

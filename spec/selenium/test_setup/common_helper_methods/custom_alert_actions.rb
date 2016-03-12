@@ -52,7 +52,7 @@ module CustomAlertActions
 
   def close_modal_if_present
     driver.title # if an alert is present, this will trigger the error below
-  rescue Selenium::WebDriver::Error::UnhandledAlertError
+  rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
     driver.switch_to.alert.accept
   end
 end

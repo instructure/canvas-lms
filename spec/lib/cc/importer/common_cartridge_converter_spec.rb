@@ -21,7 +21,7 @@ describe "Standard Common Cartridge importing" do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
   end
-  
+
   after(:all) do
     @converter.delete_unzipped_archive
     if File.exist?(@export_folder)
@@ -37,18 +37,18 @@ describe "Standard Common Cartridge importing" do
       expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
   end
-  
+
   it "should import discussion topics" do
     expect(@course.discussion_topics.count).to eq 2
     file1_id = @course.attachments.where(migration_id: "I_media_R").first.id
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
-    
+
     dt =  @course.discussion_topics.where(migration_id: "I_00006_R").first
     expect(dt.message).to match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
     dt.attachment_id = file2_id
-    
+
     dt =  @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>} 
+    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>}
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
@@ -80,7 +80,7 @@ describe "Standard Common Cartridge importing" do
     expect(tag.title).to eq "Wikipedia - Your Mom"
     expect(tag.url).to eq "http://en.wikipedia.org/wiki/Maternal_insult"
     expect(tag.indent).to eq 0
-    
+
     mod1 = @course.context_modules.where(migration_id: "m2").first
     expect(mod1.name).to eq "Attachment module"
     expect(mod1.content_tags.count).to eq 5
@@ -104,7 +104,7 @@ describe "Standard Common Cartridge importing" do
         expect(tag.content_type).to eq 'Attachment'
         expect(tag.content_id).to eq @course.attachments.where(migration_id: "f5").first.id
         expect(tag.indent).to eq 2
-    
+
     mod1 = @course.context_modules.where(migration_id: "m3").first
     expect(mod1.name).to eq "Misc Module"
     expect(mod1.content_tags.count).to eq 4
@@ -206,15 +206,15 @@ describe "Standard Common Cartridge importing" do
       skip("Can't import assessment data with python QTI tool.")
     end
   end
-  
+
   context "re-importing the cartridge" do
-    
+
     append_before do
       @migration2 = ContentMigration.create(:context => @course)
       @migration2.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
-    
+
     it "should import webcontent" do
       expect(@course.attachments.count).to eq 20
       expect(@course.attachments.active.count).to eq 10
@@ -226,7 +226,7 @@ describe "Standard Common Cartridge importing" do
         expect(atts.any?{|a|a.file_state = 'available'}).to eq true
       end
     end
-    
+
     it "should point to new attachment from module" do
       expect(@course.context_modules.count).to eq 3
 
@@ -406,6 +406,38 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
+  context "sub-modules" do
+    it "list submodules in the overview" do
+      overview = JSON.parse(File.read(@course_data['overview_file_path']))
+      root_mod = overview['modules'][1]
+      sub_mod = root_mod['submodules'].first
+      expect(sub_mod['title']).to eq "Sub-Folder"
+      expect(sub_mod['migration_id']).to eq "sf1"
+
+      sub_mod2 = sub_mod['submodules'].first
+      expect(sub_mod2['title']).to eq "Sub-Folder 2"
+      expect(sub_mod2['migration_id']).to eq "sf2"
+    end
+
+    it "should import submodules individually if selected" do
+      course
+      @migration = ContentMigration.create(:context => @course)
+      @migration.migration_settings[:migration_ids_to_import] = {
+        :copy => {"context_modules" => {"sf2" => "1"}}
+      }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+
+      expect(@course.context_modules.count).to eq 1
+      mod = @course.context_modules.first
+
+      expect(mod.name).to eq "Sub-Folder 2" # imports as a top-level module
+
+      expect(mod.content_tags.count).to eq 1
+      tag = mod.content_tags.first
+      expect(tag.title).to eq "Assignment 2"
+      expect(tag.content).to be_present
+    end
+  end
 end
 
 describe "More Standard Common Cartridge importing" do

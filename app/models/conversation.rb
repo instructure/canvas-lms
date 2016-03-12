@@ -121,6 +121,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def add_participants(current_user, users, options={})
+    message = nil
     self.shard.activate do
       user_ids = users.map(&:id).uniq
       raise "can't add participants to a private conversation" if private?
@@ -172,10 +173,12 @@ class Conversation < ActiveRecord::Base
           SQL
 
           # announce their arrival
-          add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
+          message = add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
         end
       end
+      self.touch
     end
+    message
   end
 
   def add_event_message(current_user, event_data={}, options={})
@@ -375,10 +378,12 @@ class Conversation < ActiveRecord::Base
         # so we'll hard-delete them before reinserting. It would probably be better
         # to update them instead, but meh.
         inserting_user_ids = message_participant_data.map { |d| d[:user_id] }
-        ConversationMessageParticipant.where(
-          :conversation_message_id => message.id, :user_id => inserting_user_ids
-          ).delete_all
-        ConversationMessageParticipant.bulk_insert message_participant_data
+        ConversationMessageParticipant.unique_constraint_retry do
+          ConversationMessageParticipant.where(
+            :conversation_message_id => message.id, :user_id => inserting_user_ids
+            ).delete_all
+          ConversationMessageParticipant.bulk_insert message_participant_data
+        end
       end
     end
   end

@@ -218,6 +218,6 @@ define [
 
   test 'deleteGradingStandard calls confirmDelete', ->
     confirmDelete = @spy($.fn, "confirmDelete")
-    deleteLink = @gradingStandardCollection.refs.gradingStandard1.refs.deleteLink.getDOMNode()
-    Simulate.click(deleteLink)
+    deleteButton = @gradingStandardCollection.refs.gradingStandard1.refs.deleteButton.getDOMNode()
+    Simulate.click(deleteButton)
     ok confirmDelete.calledOnce

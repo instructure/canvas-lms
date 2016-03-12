@@ -23,7 +23,9 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
+  attr_accessible :context, :permission, :role, :enabled, :locked, :applies_to_self, :applies_to_descendants
+  validates :enabled, inclusion: [true, false]
+  validates :locked, inclusion: [true, false]
 
   validate :must_apply_to_something
 
@@ -103,7 +105,8 @@ class RoleOverride < ActiveRecord::Base
           'ObserverEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :post_to_forum => {
         :label => lambda { t('permissions.post_to_forum', "Post to discussions") },
@@ -123,7 +126,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :restrict_future_enrollments => true
       },
       :moderate_forum => {
         :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
@@ -143,6 +147,28 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'AccountAdmin'
         ]
+      },
+      :read_announcements => {
+        :label => lambda { t('View announcements') },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'ObserverEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ],
+        :applies_to_concluded => true
       },
       :send_messages => {
         :label => lambda { t('permissions.send_messages', "Send messages to individual course members") },
@@ -275,7 +301,8 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_grades => {
         :label => lambda { t('permissions.manage_grades', "Edit grades") },
@@ -509,7 +536,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_calendar => {
         :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
@@ -753,6 +781,11 @@ class RoleOverride < ActiveRecord::Base
     Permissions.retrieve
   end
 
+  # permissions that apply to concluded courses/enrollments
+  def self.concluded_permission_types
+    self.permissions.select{|k, p| p[:applies_to_concluded]}.keys
+  end
+
   def self.manageable_permissions(context, base_role_type=nil)
     permissions = self.permissions.dup
     permissions.reject!{ |k, p| p[:account_only] == :site_admin } unless context.site_admin?
@@ -892,7 +925,16 @@ class RoleOverride < ActiveRecord::Base
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
-      unless override.enabled.nil?
+      # override.enabled.nil? is no longer possible, but is important for the migration that removes nils
+      if override.new_record? || override.enabled.nil?
+        if last_override
+          if generated_permission[:enabled] == [:descendants]
+            generated_permission[:enabled] = [:self, :descendants]
+          elsif generated_permission[:enabled] == [:self]
+            generated_permission[:enabled] = nil
+          end
+        end
+      else
         generated_permission[:explicit] = true if last_override
         if hit_role_context
           generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil
@@ -947,6 +989,10 @@ class RoleOverride < ActiveRecord::Base
           :role => role)
         role_override.enabled = settings[:override] unless settings[:override].nil?
         role_override.locked = settings[:locked] unless settings[:locked].nil?
+        role_override.applies_to_self = settings[:applies_to_self] unless settings[:applies_to_self].nil?
+        unless settings[:applies_to_descendants].nil?
+          role_override.applies_to_descendants = settings[:applies_to_descendants]
+        end
         role_override.save!
       elsif role_override
         role_override.destroy

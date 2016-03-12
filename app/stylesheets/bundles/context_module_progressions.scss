@@ -8,13 +8,13 @@
 #progression_modules {
   min-height: 450px;
   @if $use_new_styles {
-    .message, .student-header { 
+    .message, .student-header {
       margin: 0;
       line-height: 1.2;
     }
   }
   @else {
-    .message, .student-header { margin-left: 25px; }  
+    .message, .student-header { margin-left: 25px; }
   }
   .collectionViewItems {
     list-style-type: none;
@@ -33,7 +33,7 @@
           text-align: right;
           .subtitle {
             color: $ic-hint-text;
-            font-size: 12px;
+            @include fontSize(12px);
             font-weight: normal;
           }
         }

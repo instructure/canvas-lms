@@ -79,7 +79,7 @@
 .event-details-timestring {
   margin: 5px 0 10px;
   color: #666666;
-  font-size: 14px;
+  @include fontSize(14px);
 }
 
 .event-details-links {
@@ -144,7 +144,7 @@
   @include user-select(none);
   padding: $buttonPadding;
   //these are just ui-state-default colors
-  font-size: 12px;
+  @include fontSize(12px);
   border: 1px solid $borderColorDefault;
   color: $fcDefault;
   font-weight: normal;

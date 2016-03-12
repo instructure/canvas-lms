@@ -495,10 +495,9 @@ class SubmissionsController < ApplicationController
 
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = google_service_connection
-
     # since google drive can have many different export types, we need to send along our preferred extensions
-    document_response, display_name, file_extension = google_docs.download(document_id, @assignment.allowed_extensions)
+    document_response, display_name, file_extension, content_type = google_drive_connection.download(document_id,
+                                                                                         @assignment.allowed_extensions)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
@@ -525,7 +524,7 @@ class SubmissionsController < ApplicationController
       end
 
       @attachment = @assignment.attachments.new(
-        uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
+        uploaded_data: Rack::Test::UploadedFile.new(path, content_type, true),
         display_name: display_name, user: @current_user
       )
       @attachment.save!

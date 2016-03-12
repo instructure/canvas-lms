@@ -236,6 +236,10 @@ module Lti
                        -> { sis_pseudonym.sis_user_id },
                        PSEUDONYM_GUARD
 
+    register_expansion 'Canvas.user.sisIntegrationId', [],
+                       -> { sis_pseudonym.integration_id },
+                       PSEUDONYM_GUARD
+
     register_expansion 'Person.sourcedId', [],
                        -> { sis_pseudonym.sis_user_id },
                        PSEUDONYM_GUARD

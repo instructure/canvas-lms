@@ -24,7 +24,16 @@ define([
     },
 
     nameTooLong (a) {
-      if (a.name.length > 30){
+      if (_.unescape(a.name).length > 30){
+        return true
+      }
+      else{
+        return false
+      }
+    },
+
+    nameEmpty (a) {
+      if (a.name.length == 0){
         return true
       }
       else{
@@ -77,6 +86,9 @@ define([
 
       ////Name too long
       if(assignmentUtils.nameTooLong(a)) return true
+
+      ////Name empty
+      if(assignmentUtils.nameEmpty(a)) return true
 
       ////Non-override missing due_at
       var has_overrides = a.overrides != undefined ? a.overrides.length > 0 : false

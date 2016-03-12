@@ -213,7 +213,7 @@ namespace :lint do
   end
 end
 
-if Rails.version < '4.1'
+if CANVAS_RAILS4_0
   old_task = Rake::Task['db:_dump']
   old_actions = old_task.actions.dup
   old_task.actions.clear

@@ -15,6 +15,10 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
   <%= f.password_field :token_url, class: 'ic-Input' %>
 </div>
 <div class="ic-Form-control">
+  <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label' %>
+  <%= f.text_field :end_session_endpoint, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
   <%= f.label :scope, 'Scope', class: 'ic-Label' %>
   <%= f.text_field :scope, class: 'ic-Input' %>
 </div>

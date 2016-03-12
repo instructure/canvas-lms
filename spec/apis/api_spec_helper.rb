@@ -53,7 +53,22 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   if opts[:expected_status]
     assert_status(opts[:expected_status])
   else
-    expect(response).to be_success, response.body
+    unless response.success?
+      error_message = response.body
+      begin
+        json = JSON.parse(response.body)
+        error_report_id = json['error_report_id']
+        error_report = ErrorReport.find_by(id: error_report_id) if error_report_id
+        if error_report
+          error_message << "\n"
+          error_message << error_report.message
+          error_message << "\n"
+          error_message << error_report.backtrace
+        end
+      rescue JSON::ParserError
+      end
+    end
+    expect(response).to be_success, error_message
   end
 
   if response.headers['Link']

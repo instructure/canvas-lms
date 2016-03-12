@@ -32,8 +32,8 @@ describe "sub account grading schemes" do
       it 'should disable add grading scheme button during update', priority: "2", test_id: 164232 do
         simple_grading_standard(account)
         get url
-        f('.edit_grading_standard_link').click
-        expect(f('#react_grading_tabs .add_standard_link')).to have_class('disabled')
+        f('.edit_grading_standard_button').click
+        expect(f('#react_grading_tabs .add_standard_button')).to have_class('disabled')
       end
 
       it 'should disable other grading schemes from being edited', priority: "2", test_id: 307626 do
@@ -41,8 +41,8 @@ describe "sub account grading schemes" do
           simple_grading_standard(account)
         end
         get url
-        f('.edit_grading_standard_link').click
-        expect(f('.disabled-links')).to be_truthy
+        f('.edit_grading_standard_button').click
+        expect(f('.disabled-buttons')).to be_truthy
       end
 
       it 'should allow all available grading schemes to be edited on page load', priority: "2", test_id: 310145 do

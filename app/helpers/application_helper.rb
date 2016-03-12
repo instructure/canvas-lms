@@ -260,13 +260,13 @@ module ApplicationHelper
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    common_bundles = []
-    common_bundles = ["#{js_base_url}/vendor.bundle.js", "#{js_base_url}/instructure-common.bundle.js"] if use_webpack?
-    paths = js_bundles.inject(common_bundles) do |ary, (bundle, plugin)|
+    paths = []
+    paths = ["#{js_base_url}/vendor.bundle.js", "#{js_base_url}/instructure-common.bundle.js"] if use_webpack?
+    js_bundles.each do |(bundle, plugin)|
       if use_webpack?
-        ary << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
+        paths << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
       else
-        ary << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
+        paths << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
       end
     end
     javascript_include_tag(*paths, type: nil)

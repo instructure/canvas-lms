@@ -1,6 +1,6 @@
 module SpecComponents
   module Assignable
-    attr_reader :title
+    attr_reader :id, :title
 
     def assign_to(_opts = {})
       raise NotImplementedError, 'You must implement the assign_to() method!'
@@ -13,37 +13,48 @@ module SpecComponents
     private
 
       def add_assignment_override(assignment, opts)
-        return if opts[:user].nil? || opts[:section].nil? || opts[:group].nil?
+        raise ArgumentError, 'Missing argument for assignment override!' if opts[:user].nil? && opts[:section].nil? && opts[:group].nil?
+
         add_assignment_override_for_student(opts) if opts[:user]
-        add_assignment_override_for_section(assignment, opts) if opts[:section]
+        add_assignment_override_for_section(opts) if opts[:section]
         add_assignment_override_for_group(opts) if opts[:group]
+
         assignment.only_visible_to_overrides = true
         assignment.save!
         assignment.reload
       end
 
       def add_assignment_override_for_student(opts)
-        assignment_override = AssignmentOverride.new()
+        assignment_override = create_assignment_override(opts)
         yield assignment_override
-        assignment_override.title = 'ADHOC OVERRIDE'
-        assignment_override.workflow_state = 'active'
+
+        assignment_override.title = 'Student Override'
         assignment_override.set_type = 'ADHOC'
-        set_override_dates(assignment_override, opts)
         assignment_override.save!
+
         override_student = assignment_override.assignment_override_students.build
         override_student.user = opts[:user]
         override_student.save!
       end
 
-      def add_assignment_override_for_section(assignment, opts)
-        override = assignment.assignment_overrides.build
-        override.set = opts[:section]
-        set_override_dates(override, opts)
-        override.save!
+      def add_assignment_override_for_section(opts)
+        assignment_override = create_assignment_override(opts)
+        yield assignment_override
+
+        assignment_override.set = opts[:section]
+        assignment_override.set_type = 'CourseSection'
+        assignment_override.save!
       end
 
       def add_assignment_override_for_group(opts)
         # TODO: define this after DA for Groups is merged
+      end
+
+      def create_assignment_override(opts)
+        assignment_override = AssignmentOverride.new()
+        assignment_override.workflow_state = 'active'
+        set_override_dates(assignment_override, opts)
+        assignment_override
       end
 
       def set_override_dates(override, opts = {})

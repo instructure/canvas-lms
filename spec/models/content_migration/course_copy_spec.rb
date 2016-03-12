@@ -107,6 +107,23 @@ describe ContentMigration do
       expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
     end
 
+    it "should preserve links to files in poorly named folders" do
+      rf = Folder.root_folders(@copy_from).first
+      folder = rf.sub_folders.create!(:name => "course files", :context => @copy_from)
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => folder, :context => @copy_from)
+      topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
+
+      run_course_copy
+
+      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      expect(new_att).not_to be_nil
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      expect(new_topic).not_to be_nil
+
+      expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
+    end
+
     it "should keep date-locked files locked" do
       student = user
       @copy_from.enroll_student(student)

@@ -12,4 +12,10 @@ describe AccountAuthorizationConfig::OpenIDConnect do
     end
   end
 
+  describe "#user_logout_url" do
+    it "returns the end_session_endpoint" do
+      ap = AccountAuthorizationConfig::OpenIDConnect.new(end_session_endpoint: "http://somewhere/logout")
+      expect(ap.user_logout_redirect(nil, nil)).to eq "http://somewhere/logout"
+    end
+  end
 end

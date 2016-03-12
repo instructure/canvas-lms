@@ -30,7 +30,7 @@
           </a>
           <%= form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
             <div style="font-size: 0.8em;">
-              <%= mt :reupload_instructions, <<-EOT
+              <%= mt <<-EOT
   If you made changes to the student submission files you downloaded
   before, just zip them back up and upload the zip with the form below.
   Students will see the modified files in their comments for the submission.

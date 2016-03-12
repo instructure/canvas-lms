@@ -655,4 +655,20 @@ describe "context modules" do
     expect(prog).to be_completed
     expect(prog.requirements_met.count).to eq 3
   end
+
+  it "should not lock a page module item on first load" do
+    course_with_student_logged_in(:active_all => true)
+    page = @course.wiki.wiki_pages.create!(:title => "some page", :body => "some body")
+    page.set_as_front_page!
+
+    mod = @course.context_modules.create!(:name => "module")
+    tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
+    mod.require_sequential_progress = true
+    mod.completion_requirements = {tag.id => {:type => 'must_view'}}
+    mod.save!
+
+    get "/courses/#{@course.id}/pages/#{page.url}"
+
+    expect(f('.user_content')).to include_text(page.body)
+  end
 end
