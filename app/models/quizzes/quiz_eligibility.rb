@@ -121,13 +121,13 @@ class Quizzes::QuizEligibility
       return false if section_restricted && section_active
     end
 
-    # If there aren't any section restrictions and the course is restricted
-    return false if !term_active && course_restricted && course_active && !any_section_restriction
+    # he's in a section that's restricted, but not one that's active; it's restricted
+    return true if any_section_restriction
+
+    return !course_active if course_restricted
 
     # fall back to the term if there aren't any other restrictions
-    return false if term_active && !course_restricted && !any_section_restriction
-
-    true
+    !term_active
   end
 
   def store_session_access_code(access_code)

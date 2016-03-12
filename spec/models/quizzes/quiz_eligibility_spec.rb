@@ -149,6 +149,15 @@ describe Quizzes::QuizEligibility do
           expect(eligibility.potentially_eligible?).to be_truthy
         end
 
+        it "returns true if active course overrides an active term" do
+          eligibility.stubs(:term).returns(active_term)
+          eligibility.stubs(:course).returns(restricted_active_course)
+          restricted_active_course.stubs(:enrollment_term).returns(active_term)
+          eligibility.stubs(:student_sections).returns([concluded_section])
+          expect(eligibility.eligible?).to be_truthy
+          expect(eligibility.potentially_eligible?).to be_truthy
+        end
+
         it "returns false and ignores section" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
