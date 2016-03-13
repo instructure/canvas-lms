@@ -14,6 +14,7 @@ require 'rubocop_canvas/helpers/migration_tags'
 
 # cops
 require 'rubocop_canvas/cops/datafixup/find_ids'
+
 require 'rubocop_canvas/cops/lint/freeze_constants'
 require 'rubocop_canvas/cops/lint/sleep'
 require 'rubocop_canvas/cops/lint/specs_before_all'
@@ -23,6 +24,8 @@ require 'rubocop_canvas/cops/lint/specs_execute_script'
 require 'rubocop_canvas/cops/lint/specs_f_over_fj'
 require 'rubocop_canvas/cops/lint/specs_helper_modules'
 require 'rubocop_canvas/cops/lint/specs_rm_rf'
+require 'rubocop_canvas/cops/lint/timecop_no_block'
+
 require 'rubocop_canvas/cops/migration/concurrent_index'
 require 'rubocop_canvas/cops/migration/primary_key'
 require 'rubocop_canvas/cops/migration/remove_column'
