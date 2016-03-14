@@ -178,7 +178,6 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
       record.course &&
       !record.user.registered? &&
-      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 

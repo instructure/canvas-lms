@@ -180,7 +180,23 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.workflow_state).to eq 'invited'
       end
 
-      it "should default observer enrollments to 'active' state" do
+      it "should not default observer enrollments to 'active' state if the user is not registered" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'ObserverEnrollment',
+              :course_section_id => @section.id,
+              :limit_privileges_to_course_section => true
+            }
+          }
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'invited'
+      end
+
+      it "should default observer enrollments to 'active' state if the user is registered" do
+        @unenrolled_user.register!
         json = api_call :post, @path, @path_options,
           {
             :enrollment => {
