@@ -21,14 +21,14 @@ module.exports = function(source){
   });
 
   // add a qunit reference in the AMD callback to capture the qunit dependency
-  newSource = newSource.replace(/define.*\],\s*\(.*[a-zA-Z].*\)\s*=>/, function(match){
+  newSource = newSource.replace(/define[\s\S]*\],\s*\(.*[a-zA-Z].*\)\s*=>/, function(match){
     return match.replace(/\],\s*\(/, function(innerMatch){
       return innerMatch + "qunit,";
     });
   });
 
   // don't want the comma if the list is empty
-  newSource = newSource.replace(/define.*\],\s*\(\s*\)\s*=>/, function(match){
+  newSource = newSource.replace(/define[\s\S]*\],\s*\(\s*\)\s*=>/, function(match){
     return match.replace(/\],\s*\(/, function(innerMatch){
       return innerMatch + "qunit";
     });
