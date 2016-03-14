@@ -258,7 +258,7 @@ namespace :db do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
       migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
-      migrations.select! { |m| m.tags.include?(:predeploy) }
+      migrations = migrations.select { |m| m.tags.include?(:predeploy) }
       ActiveRecord::Migrator.new(:up, migrations).migrate
     end
   end
