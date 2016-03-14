@@ -16,8 +16,6 @@ define [
         window.RceModule = 'fakeModule'
         callback()
 
-      window.tinyrce = {editorsListing: {}}
-
     teardown: ->
       $.getScript.restore()
       editorUtils.resetRCE()

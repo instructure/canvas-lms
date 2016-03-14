@@ -25,9 +25,6 @@ define [
            renderCallback()
       }
       sinon.stub($, "getScript", ((url, callback)=>
-        window.tinyrce = {
-          editorsListing: []
-        }
         window.RceModule = @fakeRceModule
         callback()
       ));

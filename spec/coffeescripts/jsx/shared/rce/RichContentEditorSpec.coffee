@@ -1,11 +1,11 @@
 define [
   'jsx/shared/rce/RichContentEditor',
+  'jsx/shared/rce/RceCommandShim',
   'jsx/shared/rce/serviceRCELoader',
-  'jsx/shared/rce/rceStore',
   'helpers/fakeENV'
   'helpers/editorUtils'
   'helpers/fixtures'
-], (RichContentEditor, serviceRCELoader, rceStore, fakeENV, editorUtils, fixtures) ->
+], (RichContentEditor, RceCommandShim, RCELoader, fakeENV, editorUtils, fixtures) ->
 
   wikiSidebar = undefined
 
@@ -13,11 +13,11 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = true
-      @preloadSpy = sinon.spy(serviceRCELoader, "preload");
+      @preloadSpy = sinon.spy(RCELoader, "preload");
 
     teardown: ->
       fakeENV.teardown()
-      serviceRCELoader.preload.restore()
+      RCELoader.preload.restore()
       editorUtils.resetRCE()
 
   test 'loads with CDN host if available', ->
@@ -50,27 +50,27 @@ define [
       ENV.RICH_CONTENT_APP_HOST = "http://fakehost.com"
       fixtures.setup()
       @$target = fixtures.create('<textarea id="myEditor" />')
-      sinon.stub(serviceRCELoader, 'loadOnTarget')
+      sinon.stub(RCELoader, 'loadOnTarget')
 
     teardown: ->
       fakeENV.teardown()
       fixtures.teardown()
-      serviceRCELoader.loadOnTarget.restore()
+      RCELoader.loadOnTarget.restore()
 
-  test 'calls serviceRCELoader.loadOnTarget with a target and host', ->
+  test 'calls RCELoader.loadOnTarget with a target and host', ->
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
     richContentEditor.loadNewEditor(@$target, {})
-    ok serviceRCELoader.loadOnTarget.calledOnce
+    ok RCELoader.loadOnTarget.calledOnce
     # because of freshening it will be the same dom node, but not the same
     # jquery object by reference
-    equal serviceRCELoader.loadOnTarget.firstCall.args[0].get(0), @$target.get(0)
-    equal serviceRCELoader.loadOnTarget.firstCall.args[2], "http://fakehost.com"
+    equal RCELoader.loadOnTarget.firstCall.args[0].get(0), @$target.get(0)
+    equal RCELoader.loadOnTarget.firstCall.args[2], "http://fakehost.com"
 
   test 'CDN host overrides app host', ->
     ENV.RICH_CONTENT_CDN_HOST = "http://fakecdn.net"
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
     richContentEditor.loadNewEditor(@$target, {})
-    equal serviceRCELoader.loadOnTarget.firstCall.args[2], "http://fakecdn.net"
+    equal RCELoader.loadOnTarget.firstCall.args[2], "http://fakecdn.net"
 
   test 'calls editorBox and set_code when feature flag off', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -85,7 +85,7 @@ define [
   test 'skips instantiation when called with empty target', ->
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
     richContentEditor.loadNewEditor("#fixtures .invalidTarget", {})
-    ok serviceRCELoader.loadOnTarget.notCalled
+    ok RCELoader.loadOnTarget.notCalled
 
   module 'RichContentEditor - initSidebar',
     setup: ->
@@ -104,12 +104,11 @@ define [
         attachToEditor: (ed)->
           wikiSidebar.editor = ed
       }
-      sinon.stub serviceRCELoader, "loadSidebarOnTarget", (target, host, callback)->
-        callback({is_a: 'remote_sidebar'})
+      sinon.stub(RCELoader, "loadSidebarOnTarget").callsArgWith(2, {is_a: 'remote_sidebar'})
 
     teardown: ->
-      serviceRCELoader.loadSidebarOnTarget.restore()
       fakeENV.teardown()
+      RCELoader.loadSidebarOnTarget.restore()
 
   test 'uses wikiSidebar when feature flag off', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -159,31 +158,24 @@ define [
       fakeENV.setup()
       fixtures.setup()
       @$target = fixtures.create('<textarea id="myEditor" />')
-      @$target.editorBox = sinon.spy()
-      sinon.stub(rceStore, "callOnTarget")
+      sinon.stub(RceCommandShim.prototype, 'send').returns('methodResult')
 
     teardown: ->
       fakeENV.teardown()
       fixtures.teardown()
-      rceStore.callOnTarget.restore()
+      RceCommandShim.prototype.send.restore()
       editorUtils.resetRCE()
 
-  test 'with flag enabled, ultimately lets RCEStore handle the message', ->
+  test 'proxies to RceCommandShim', ->
+    richContentEditor = new RichContentEditor({riskLevel: 'basic'})
+    equal richContentEditor.callOnRCE(@$target, 'methodName', 'methodArg'), 'methodResult'
+    ok RceCommandShim.prototype.send.calledWith(@$target, 'methodName', 'methodArg')
+
+  test 'with flag enabled freshens node before passing to RceCommandShim', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true
     ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = true
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
-    richContentEditor.callOnRCE(@$target, "someMethod")
-    ok @$target.editorBox.notCalled
-    ok rceStore.callOnTarget.calledOnce
-    # because of freshening it will be the same dom node, but not the same
-    # jquery object by reference
-    equal rceStore.callOnTarget.firstCall.args[0].get(0), @$target.get(0)
-    equal rceStore.callOnTarget.firstCall.args[1], "someMethod"
-
-  test 'with flag disabled, lets editorbox work it out', ->
-    ENV.RICH_CONTENT_SERVICE_ENABLED = false
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = false
-    richContentEditor = new RichContentEditor({riskLevel: 'basic'})
-    richContentEditor.callOnRCE(@$target, "someMethod")
-    ok rceStore.callOnTarget.notCalled
-    ok @$target.editorBox.calledWith("someMethod")
+    $freshTarget = $(@$target) # new jquery obj of same node
+    sinon.stub(richContentEditor, 'freshNode').withArgs(@$target).returns($freshTarget)
+    equal richContentEditor.callOnRCE(@$target, 'methodName', 'methodArg'), 'methodResult'
+    ok RceCommandShim.prototype.send.calledWith($freshTarget, 'methodName', 'methodArg')

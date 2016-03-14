@@ -1,42 +1,32 @@
 define [
   'jquery'
   'compiled/views/tinymce/InsertUpdateImageView'
-  'helpers/fakeENV'
-], ($, InsertUpdateImageView, fakeENV) ->
+  'jsx/shared/rce/RceCommandShim'
+], ($, InsertUpdateImageView, RceCommandShim) ->
   fakeEditor = undefined
-  $fakeEditor = undefined
 
   module "InsertUpdateImageView#update",
     setup: ->
-      fakeENV.setup()
-
       fakeEditor = {
-        id: "someId",
-        bookmarkMoved: false,
-        focus: (()=>),
+        id: "someId"
+        focus: ()->
         dom: {
           createHTML: (()=> return "<a href='#'>stub link html</a>")
-        },
+        }
         selection: {
-          getBookmark: (()=> {})
-          moveToBookmark: (prevSelect)=>
-            fakeEditor.bookmarkMoved = true
+          getBookmark: ()->
+          moveToBookmark: ()->
         }
       }
 
-      $fakeEditor = {
-        editorBoxCalled: false,
-        editorBox: ()=>
-          $fakeEditor.editorBoxCalled = true
-      }
+      sinon.stub(RceCommandShim.prototype, 'send')
 
     teardown: ->
-      fakeENV.teardown()
       $("#fixtures").html("")
+      RceCommandShim.prototype.send.restore()
 
-  test "it uses editorBox when feature flag disabled", ->
-    window.ENV.RICH_CONTENT_SERVICE_ENABLED = false
+  test "it uses RceCommandShim to call insert_code", ->
     view = new InsertUpdateImageView(fakeEditor, "<div></div>")
-    view.$editor = $fakeEditor
+    view.$editor = '$fakeEditor'
     view.update()
-    equal($fakeEditor.editorBoxCalled, true)
+    ok RceCommandShim.prototype.send.calledWith('$fakeEditor', 'insert_code', view.generateImageHtml())

@@ -2,9 +2,9 @@ define([
   'jquery',
   'underscore',
   'jsx/shared/rce/editorOptions',
-  'jsx/shared/rce/rceStore',
-  'jsx/shared/rce/loadEventListeners'
-], function($, _, editorOptions, RCEStore, loadEventListeners){
+  'jsx/shared/rce/loadEventListeners',
+  'jsx/shared/rce/polyfill'
+], function($, _, editorOptions, loadEventListeners, polyfill) {
   let RCELoader = {
     preload(host) {
       this.loadRCE(host, function(){})
@@ -16,12 +16,12 @@ define([
       const renderingTarget = getTargetFn(textarea)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
-      const renderCallback = function(rceInstance){
-        RCEStore.addToStore(textarea.id, rceInstance)
-      }
-
-      this.loadRCE(host, function (RCE) {
-        RCE.renderIntoDiv(renderingTarget, propsForRCE, renderCallback)
+      this.loadRCE(host, function(RCE) {
+        RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
+          // same as freshen node in RichContentEditor
+          let $textarea = $('#' + textarea.id)
+          $textarea.data('remoteEditor', polyfill.wrapEditor(remoteEditor))
+        })
       })
     },
 

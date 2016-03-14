@@ -52,7 +52,12 @@ define [
       @titleInput = @view.$el.find('[name=title]')
       @bodyInput = @view.$el.find('[name=body]')
 
-      # stub the 'is_dirty' command of the editorBox
+      # stub the 'is_dirty' RCE command. NOTE: this stubs only the editorBox
+      # version with the feature flag off. force these specs to start failing
+      # when run with the feature flag on, at which point this will need to be
+      # updated to stub remoteEditor instead
+      ok !@bodyInput.data('remoteEditor')
+      ok @bodyInput.data('rich_text')
       model = @wikiPage
       bodyInput = @bodyInput
       editorBox = bodyInput.editorBox

@@ -68,7 +68,7 @@ define([
     this.remoteSidebar = undefined
   }
 
-  RichContentEditor.prototype.freshNode = function(target){
+  RichContentEditor.prototype.freshNode = function(target) {
     // we need to make sure we have the latest node
     // in order to capture any changes, lots of views like to use
     // stale nodes
@@ -150,12 +150,10 @@ define([
   }
 
   RichContentEditor.prototype.callOnRCE = function(target, methodName, ...args){
-    if(this.featureFlag){
+    if (this.featureFlag) {
       target = this.freshNode(target)
-      return this.commandShim.send(target, methodName, ...args)
-    } else {
-      return target.editorBox(methodName, ...args)
     }
+    return this.commandShim.send(target, methodName, ...args)
   }
 
 
