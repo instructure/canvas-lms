@@ -518,10 +518,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
   #
   # @argument course[is_public_to_auth_users] [Boolean]
-  #   Set to true if course if public to authenticated users.
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -1926,7 +1926,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
+  #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
