@@ -91,4 +91,30 @@ describe PageViewsController do
       end
     end
   end
+
+  context "pv4" do
+    before do
+      PageView.stubs(:pv4?).returns(true)
+      ConfigFile.stub('pv4', {})
+    end
+
+    describe "GET 'index'" do
+      it "properly plumbs through time restrictions" do
+        account_admin_user
+        user_session(@user)
+
+        PageView::Pv4Client.any_instance.expects(:fetch).
+          with(
+            @user.global_id,
+            start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
+            end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
+            last_page_view_id: nil,
+            limit: 25).
+          returns([])
+        get 'index', user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
+            end_time: "2016-03-15T00:00:00Z", per_page: 25, format: :json
+        expect(response).to be_success
+      end
+    end
+  end
 end
