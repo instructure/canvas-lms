@@ -1,6 +1,6 @@
 common: &common
   adapter: postgresql
-  host: postgres
+  host: canvasdb
   encoding: utf8
   username: postgres
   timeout: 5000
