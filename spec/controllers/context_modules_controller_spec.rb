@@ -647,6 +647,32 @@ describe ContextModulesController do
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
     end
+
+    it "should return past_due if survey quiz is past due" do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
+      @quiz.publish!
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json'
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["past_due"]).to be_present
+    end
+
+    it "should not return past_due if survey quiz is completed" do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
+      @quiz.publish!
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      @quiz.generate_submission(@student).complete!
+      
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["past_due"]).to be_blank
+    end
   end
 
   describe "GET 'show'" do
