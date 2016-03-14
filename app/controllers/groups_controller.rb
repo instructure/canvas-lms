@@ -203,9 +203,10 @@ class GroupsController < ApplicationController
       format.html do
         groups_scope = groups_scope.by_name
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
-        groups_scope = groups_scope.preload(:group_category)
+        groups_scope = groups_scope.preload(:group_category, :context)
 
         groups = groups_scope.shard(@current_user).to_a
+        groups.select!{|group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read)}
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
