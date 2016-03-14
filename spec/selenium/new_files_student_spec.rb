@@ -9,9 +9,11 @@ describe "better_file_browsing" do
     def student_goto_files
       user_session(@student)
       get "/courses/#{@course.id}/files"
+      wait_for_ajaximations
     end
 
     def verify_hidden_item_not_searchable_as_student(search_text)
+      refresh_page
       student_goto_files
       f("input[type='search']").send_keys "#{search_text}"
       driver.action.send_keys(:return).perform

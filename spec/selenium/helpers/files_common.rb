@@ -117,6 +117,7 @@ module FilesCommon
       end
     end
     ff('.btn.btn-primary')[1].click
+    wait_for_ajaximations
   end
 
   def should_make_folders_in_the_menu_droppable
