@@ -748,8 +748,9 @@ class CoursesController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
-  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type[] [String, "teacher"|"student"|"student_view"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
+  #   "student_view" implies include[]=test_student.
   #   This argument is ignored if enrollment_role is given.
   #
   # @argument enrollment_role [String] Deprecated
@@ -830,7 +831,7 @@ class CoursesController < ApplicationController
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
-      if not includes.include?('test_student')
+      unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
         end
