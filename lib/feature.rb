@@ -379,7 +379,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'rich_content_service_with_sidebar' =>
