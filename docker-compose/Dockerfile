@@ -22,7 +22,7 @@ RUN dpkg-reconfigure locales
 #RUN gem uninstall bundler \
 #  && gem install bundler -v 1.7.10
 # 1.7.10 has a bug preventing bundle install to work.  Error is "NoMethodError: undefined method `spec' for nil:NilClass"
-RUN gem uninstall bundler \
+RUN gem uninstall bundler -i /usr/local/lib/ruby/gems/2.1.0 bundler \
   && gem install bundler -v 1.7.15
 
 RUN mkdir /app
@@ -35,6 +35,12 @@ RUN mkdir /home/docker \
 ENV PATH /usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 USER docker
 
-RUN bundle config path /app/vendor/bundle/docker/$(ruby -e 'print RUBY_VERSION')/
-RUN bundle config bin /usr/local/bundle/bin
+# Note that setting the path where the gems go to /app/vendor causes them to be built to the
+# local machine since /app is mounted to the root dir on the local machine.  This is done using
+# docker-compose run web bundle install after the contain is created.
+#RUN bundle config path /app/vendor/bundle/docker/2.1
+# This is set already (by the base image I think), so our change above doesn't take effect
+ENV BUNDLE_PATH /app/vendor/bundle/docker/2.1
+# No idea why this was here.  It's the default anyway.
+#RUN bundle config bin /usr/local/bundle/bin
 ENV RAILS_ENV development
