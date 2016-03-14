@@ -11,7 +11,7 @@
 <h1 class="screenreader-only"><%= t('page_header_title', 'Gradebook') %></h1>
   <div class="gradebook-header">
     <div class="accessibility_warning">
-      <%= link_to t(:accessibility_warning, 'Warning: The Gradebook Grid View is not accessible. Click here to use the Individual View instead.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>
+      <%= link_to t(:accessibility_warning, 'Warning: For improved accessibility, please click here to use the Individual View Gradebook.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>
     </div>
     <% if @context.feature_enabled?(:outcome_gradebook) || @context.feature_enabled?(:post_grades) %>
       <nav class="gradebook-navigation">
