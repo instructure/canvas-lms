@@ -30,6 +30,8 @@ describe DataFixup::PsychMigration do
   end
 
   it "should queue a job with a progress model on production" do
+    Account.where(:id => Account.default).update_all(:settings => bad_yaml)
+
     user
     User.where(:id => @user).update_all(:preferences => bad_yaml)
 
@@ -39,7 +41,8 @@ describe DataFixup::PsychMigration do
     expect(User.where(:id => @user).pluck("preferences AS p1").first).to eq bad_yaml # should not have run yet
 
     progresses = Progress.where(:tag => 'psych_migration').to_a
-    expect(progresses.map{|prog| prog.results[:model_name]}).to match_array(DataFixup::PsychMigration.columns_hash.keys.map(&:name))
+    expected = DataFixup::PsychMigration.columns_hash.keys.select{|m| m.shard(Shard.current).exists?}.map(&:name)
+    expect(progresses.map{|prog| prog.results[:model_name]}).to match_array(expected)
 
     progress = progresses.detect{|prog| prog.results[:model_name] == "User"}
     expect(progress).to be_queued
@@ -56,6 +59,9 @@ describe DataFixup::PsychMigration do
 
     yaml = User.where(:id => @user).pluck("preferences AS p1").first
     expect(yaml).to eq fixed_yaml
+
+    yaml2 = Account.where(:id => Account.default).pluck("settings AS s1").first
+    expect(yaml2).to eq fixed_yaml
   end
 
   it "should split into multiple jobs with id ranges if needed" do
