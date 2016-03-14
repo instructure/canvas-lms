@@ -938,10 +938,12 @@ class DiscussionTopic < ActiveRecord::Base
       submission = self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
     end
     topic = self.root_topic? ? self.child_topic_for(user) : self
-    attachment_ids = topic.discussion_entries.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
-    if attachment_ids.any?
-      submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
-      submission.save! if submission.changed?
+    if topic
+      attachment_ids = topic.discussion_entries.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
+      if attachment_ids.any?
+        submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
+        submission.save! if submission.changed?
+      end
     end
   end
 
