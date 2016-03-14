@@ -13,21 +13,22 @@ module DataFixup::PsychMigration
           ranges.each do |start_at, end_at|
             queue_migration(model, columns, start_at, end_at)
           end
-        else
-          queue_migration(model, columns)
         end
       end
     end
 
-    def queue_migration(model, columns, start_at=nil, end_at=nil)
+    def queue_migration(model, columns, start_at, end_at)
       args = [model, columns, start_at, end_at]
       if run_immediately?
         self.migrate_yaml(nil, *args)
-      else
+      elsif Account.site_admin
         progress = Progress.create!(:context => Account.site_admin, :tag => "psych_migration")
         progress.set_results({:model_name => model.name, :start_at => start_at, :end_at => end_at})
         progress.process_job(self, :migrate_yaml, {:n_strand => ["psych_migration", Shard.current.database_server.id],
           :priority => Delayed::MAX_PRIORITY, :max_attempts => 1}, *args)
+      else
+        self.send_later_enqueue_args(:migrate_yaml, {:n_strand => ["psych_migration", Shard.current.database_server.id],
+          :priority => Delayed::MAX_PRIORITY, :max_attempts => 1}, nil, *args)
       end
     end
 
@@ -112,12 +113,14 @@ module DataFixup::PsychMigration
 
     def id_ranges(model)
       # try to partition off ranges of ids in the table with at most 1,000,000 ids per partition
-      return unless model.primary_key == "id"
+      unless model.primary_key == "id"
+        return model.exists? ? [[nil, nil]] : false
+      end
 
       ranges = []
-      scope = model.shard(Shard.current).where("id < ?", Shard::IDS_PER_SHARD)
+      scope = model.shard(Shard.current)
       start_id = scope.minimum(:id)
-      return unless start_id
+      return false unless start_id
 
       current_min = start_id
 
@@ -133,7 +136,7 @@ module DataFixup::PsychMigration
         current_min = next_min
       end
 
-      ranges if ranges.any?
+      ranges.any? ? ranges : [[nil, nil]]
     end
   end
 end
