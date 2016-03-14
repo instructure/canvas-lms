@@ -177,4 +177,10 @@ module WikiAndTinyCommon
   def wiki_page_editor_id
     f('textarea.body')['id']
   end
+
+  def expand_root_folder
+    @tree1 = driver.find_element(:id, :tree1)
+    root_folders = @tree1.find_elements(:css, 'li.folder')
+    root_folders.first.find_element(:css, '.sign.plus').click
+  end
 end

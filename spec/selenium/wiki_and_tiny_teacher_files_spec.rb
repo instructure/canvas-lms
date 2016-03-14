@@ -293,7 +293,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      expand_root_folder
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 2
       expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
@@ -305,7 +305,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      expand_root_folder
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 2
     end
@@ -321,7 +321,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       keep_trying_until do
-        fj('li.folder span').click
+        expand_root_folder
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 2
       end
@@ -338,7 +338,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       keep_trying_until do
-        fj('li.folder span').click
+        expand_root_folder
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 2
       end
