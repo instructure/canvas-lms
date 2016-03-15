@@ -4,6 +4,8 @@
 # These credentials are required access to the Calendar API
 #
 # To get these values, we did the following:
+# NOTE: for now all instructions were actually done for the braven.developers@gmail account and NOT braven.portal@gmail.
+#       But we do want to cutover to the new account so the event invites are a bit more user friendly.
 # * Created a new normal gmail account called Braven Portal (braven.portal@gmail.com)
 #    * Note: it can't be a bebraven.org account b/c there are frequently permissions issues with external folks.
 # * Login to the Google account
