@@ -60,6 +60,8 @@ npm-debug.log
 
 # generated client app stuff
 /public/javascripts/client_apps/
+/script/client_secrets.json
+/script/google_calendar_auth.json
 
 # remove this once we move jquery into bower
 /public/javascripts/bower/jquery/
