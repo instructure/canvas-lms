@@ -15,6 +15,7 @@ require 'rubocop_canvas/helpers/migration_tags'
 # cops
 require 'rubocop_canvas/cops/datafixup/find_ids'
 require 'rubocop_canvas/cops/lint/freeze_constants'
+require 'rubocop_canvas/cops/lint/sleep'
 require 'rubocop_canvas/cops/lint/specs_before_all'
 require 'rubocop_canvas/cops/lint/specs_ensure_spec_extension'
 require 'rubocop_canvas/cops/lint/specs_execute_script'

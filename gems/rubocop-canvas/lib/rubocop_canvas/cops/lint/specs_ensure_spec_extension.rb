@@ -9,11 +9,10 @@ module RuboCop
 
         MSG = "Spec files need to end with \"_spec.rb\" for rspec to find and run them."
         METHODS = [:context, :describe].freeze
-        SPEC_FILE_NAME_REGEX = /_spec\.rb$/
 
         def on_send(node)
           return unless top_level_describe?(node)
-          return if file_name =~ SPEC_FILE_NAME_REGEX
+          return if named_as_spec?
           add_offense node, :expression, MSG
         end
 
