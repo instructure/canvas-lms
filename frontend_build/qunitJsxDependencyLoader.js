@@ -43,5 +43,13 @@ module.exports = function(source){
     return match.replace("test", "qunit.test");
   });
 
+  newSource = newSource.replace(/^\s+asyncTest\(/gm, function(match){
+    return match.replace("asyncTest", "qunit.asyncTest");
+  });
+
+  newSource = newSource.replace(/^\s+start\(/gm, function(match){
+    return match.replace("start", "qunit.start");
+  });
+
   return newSource;
 };
