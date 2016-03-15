@@ -703,8 +703,9 @@ describe "content migrations", :non_parallel do
     wait_for_ajaximations
 
     expect(submod.find_element(:css, ".module_options")).to be_displayed # should show the module option now
-    submod.find_element(:css, '.module_options input[value="separate"]').click # select to import submodules individually
-
+    # select to import submodules individually
+    radio_to_click = submod.find_element(:css, 'input[type="radio"][value="separate"]')
+    driver.action.move_to(radio_to_click).click.perform
     f(".selectContentDialog input[type=submit]").click
     wait_for_ajaximations
 
