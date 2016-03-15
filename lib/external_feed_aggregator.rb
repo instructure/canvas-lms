@@ -64,7 +64,7 @@ class ExternalFeedAggregator
       begin
         require 'atom'
         atom = Atom::Feed.load_feed(body)
-        feed.title = atom.title
+        feed.title = atom.title.to_s
         feed.save
         @logger.info("#{atom.entries.length} atom entries found")
         entries = feed.add_atom_entries(atom)
