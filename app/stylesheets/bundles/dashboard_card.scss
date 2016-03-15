@@ -42,6 +42,7 @@ $ic-DashboardCard-toggle-size: 60px;
   background: $ic-color-light;
   width: 262px;
   display: inline-block;
+  vertical-align: top;
   margin: 0 $ic-sp*3 $ic-sp*3 0;
   .no-touch & {
     &:hover { box-shadow: 0 4px 18px rgba(black, 0.25); }
@@ -125,14 +126,12 @@ $ic-DashboardCard-toggle-size: 60px;
 
 .ic-DashboardCard__action-container {
   background: $ic-color-light;
-  &:not(.ic-DashboardCard__action-container--is-empty) {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   &.ic-DashboardCard__action-container--is-empty {
-    background: $ic-color-light;
-    box-sizing: border-box;
+    display: block;
     height: $ic-DashboardCard-action-height;
   }
   .ic-DashboardCard__action {
