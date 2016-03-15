@@ -57,7 +57,8 @@ define([], function(){
         "instructure_equation": "/javascripts/tinymce_plugins/instructure_equation/plugin.js",
         "instructure_equella": "/javascripts/tinymce_plugins/instructure_equella/plugin.js",
         "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js",
-        "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js"
+        "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js",
+        "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js"
       },
       language_load: false,
       relative_urls: false,
@@ -91,7 +92,7 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      valid_children: "+body[style|script|svg]",
+      valid_children: "+body[style|script|svg|textarea]",
 
       content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
       browser_spellcheck: true
@@ -186,7 +187,9 @@ define([], function(){
    */
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
-    return this.balanceButtons(instructure_buttons);
+    var stuff = this.balanceButtons(instructure_buttons);
+    stuff[0] += (",bz_retained_field");
+    return stuff;
   };
 
   return EditorConfig;
