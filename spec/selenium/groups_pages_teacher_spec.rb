@@ -30,12 +30,12 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "home page" do
-      it_behaves_like 'home_page', 'teacher'
+      it_behaves_like 'home_page', :teacher
     end
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
-      it_behaves_like 'announcements_page', 'teacher'
+      it_behaves_like 'announcements_page', :teacher
 
       it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
         @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)
@@ -80,7 +80,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "people page" do
-      it_behaves_like 'people_page', 'teacher'
+      it_behaves_like 'people_page', :teacher
 
       it "should display and show a list of group members", priority: "2", test_id: 324929 do
         get people_page
@@ -92,7 +92,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      it_behaves_like 'discussions_page', 'teacher'
+      it_behaves_like 'discussions_page', :teacher
 
       it "should allow teachers to create discussions within a group", priority: "1", test_id: 285586 do
         get discussions_page
@@ -133,7 +133,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      it_behaves_like 'pages_page', 'teacher'
+      it_behaves_like 'pages_page', :teacher
 
       it "should allow teachers to create a page", priority: "1", test_id: 289993 do
         get pages_page
@@ -149,7 +149,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "Files page" do
-      it_behaves_like 'files_page', 'teacher'
+      it_behaves_like 'files_page', :teacher
 
       it "should allow teacher to add a new folder", priority: "2", test_id: 303703 do
         get files_page
@@ -208,7 +208,7 @@ describe "groups" do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
       end
 
-      it_behaves_like 'conferences_page', 'teacher'
+      it_behaves_like 'conferences_page', :teacher
     end
   end
 end

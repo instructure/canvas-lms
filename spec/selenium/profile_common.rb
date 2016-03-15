@@ -1,11 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
+require_relative 'helpers/shared_examples_common'
+include SharedExamplesCommon
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
 
 shared_examples 'profile_settings_page' do |context|
-  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, 68936, 352617, 352618) do
+  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
     enable_avatars
     get "/profile/settings"
     driver.mouse.move_to f('.avatar.profile_pic_link.none')
@@ -21,7 +23,7 @@ end
 
 
 shared_examples 'profile_user_about_page' do |context|
-  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, 358573, 358574, 358575) do
+  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
     enable_avatars
     get "/about/#{@user.id}"
 
@@ -35,7 +37,7 @@ shared_examples 'profile_user_about_page' do |context|
 end
 
 shared_examples 'user settings page change pic window' do |context|
-  it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, 68938, 368784, 368785) do
+  it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
     enable_avatars
     get '/profile/settings'
 
@@ -66,7 +68,7 @@ shared_examples 'user settings page change pic window' do |context|
 end
 
 shared_examples 'user settings change pic cancel' do |context|
-  it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, 68939, 372132, 372133) do
+  it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, student: 68939, teacher: 372132, admin: 372133) do
     enable_avatars
     get '/profile/settings'
 
@@ -84,7 +86,7 @@ end
 
 
 shared_examples 'user settings profile pic gravatar link' do |context|
-  it 'opens the Gravatar homepage', priority: "1", test_id: pick_test_id(context, "69159", "403055", "403056") do
+  it 'opens the Gravatar homepage', priority: "1", test_id: pick_test_id(context, student: 69159, teacher: 403055, admin: 403056) do
     skip "depends on external service"
     enable_avatars
     get '/profile/settings'
@@ -121,38 +123,13 @@ end
 # ======================================================================================================================
 # Helper Methods
 # ======================================================================================================================
-
-def enable_avatars
-  a = Account.default.reload
-  a.enable_service('avatars')
-  a.settings[:enable_profiles] = true
-  a.save!
-  a
-end
-
-
-def pick_test_id(context, id1, id2, id3)
-  case context
-  when 'student'
-    id1
-  when 'teacher'
-    id2
-  when 'admin'
-    id3
-  else
-    raise('Error: Invalid context for "test id"')
+shared_context 'profile common' do
+  def enable_avatars
+    a = Account.default.reload
+    a.enable_service('avatars')
+    a.settings[:enable_profiles] = true
+    a.save!
+    a
   end
 end
 
-def pick_priority(context, p1, p2, p3)
-  case context
-  when 'student'
-    p1
-  when 'teacher'
-    p2
-  when 'admin'
-    p3
-  else
-    raise('Error: Invalid context for "test priority"')
-  end
-end
