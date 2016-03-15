@@ -269,8 +269,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       text = "<p><sup>This is my text</sup></p>"
       wysiwyg_state_setup(text)
 
-      f('.mce-i-superscript').send_keys(:shift)
-      f('.mce-i-superscript').click
+      shift_click_button('.mce-i-superscript')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce sup')).to be_nil
       end
@@ -280,7 +279,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup
 
       f('.mce-i-subscript').click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce sub')).to be_displayed
       end
@@ -290,8 +288,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       text = "<p><sub>This is my text</sub></p>"
       wysiwyg_state_setup(text)
 
-      f('.mce-i-subscript').send_keys(:shift)
-      f('.mce-i-subscript').click
+      shift_click_button('.mce-i-subscript')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce sub')).to be_nil
       end
@@ -369,7 +366,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       driver.find_element(:xpath, "//div[text()[contains(.,'Advanced')]]").click
       ff('.mce-placeholder')[1].send_keys("green")
       f('.mce-primary').click
-
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce tr').length).to eq 5
         expect(ff('#tinymce td').length).to eq 20
@@ -382,7 +378,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(table)
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce table')).to be_nil
       end
@@ -390,9 +385,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should add bold text to the rce", priority: "1", test_id: 285128 do
       wysiwyg_state_setup
-
       f('.mce-i-bold').click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce strong')).to be_displayed
       end
@@ -401,9 +394,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should remove bold from text in rce", priority: "1", test_id: 417603 do
       text = "<p><strong>This is my text</strong></p>"
       wysiwyg_state_setup(text)
-
-      f('.mce-i-bold').send_keys(:shift)
-      f('.mce-i-bold').click
+      shift_click_button('.mce-i-bold')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce strong')).to be_nil
       end
@@ -411,9 +402,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should add italic text to the rce", priority: "1", test_id: 285129 do
       wysiwyg_state_setup
-
       f('.mce-i-italic').click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce em')).to be_displayed
       end
@@ -422,9 +411,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should remove italic from text in rce", priority: "1", test_id: 417607 do
       text = "<p><em>This is my text</em></p>"
       wysiwyg_state_setup(text)
-
-      f('.mce-i-italic').send_keys(:shift)
-      f('.mce-i-italic').click
+      shift_click_button('.mce-i-italic')
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce em')).to be_nil
       end
@@ -432,28 +419,22 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should underline text in the rce", priority: "1", test_id: 285356 do
       wysiwyg_state_setup
-
       f('.mce-i-underline').click
-
       validate_wiki_style_attrib("text-decoration", "underline", "p span")
     end
 
     it "should remove underline from text in the rce", priority: "1", test_id: 460408 do
-      text = "<p><em>This is my text</em></p>"
+      text = "<p><u>This is my text</u></p>"
       wysiwyg_state_setup(text)
-
-      f('.mce-i-italic').send_keys(:shift)
-      f('.mce-i-italic').click
+      shift_click_button('.mce-i-underline')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce em')).to be_nil
+        expect(f('#tinymce u')).to be_nil
       end
     end
 
     it "should change text to right-to-left in the rce", priority: "1", test_id: 401335 do
       wysiwyg_state_setup(text = "rtl")
-
       f(".mce-i-#{text}").click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce p').attribute('dir')).to eq text
       end
@@ -462,17 +443,13 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should remove right-to-left from text in the rce", priority: "1", test_id: 547797 do
       text = "<p dir=\"rtl\">This is my text</p>"
       wysiwyg_state_setup(text)
-
-      f('.mce-i-rtl').send_keys(:shift)
-      f('.mce-i-rtl').click
+      shift_click_button('.mce-i-rtl')
       validate_wiki_style_attrib_empty("p")
     end
 
     it "should change text to left-to-right in the rce", priority: "1", test_id: 547548 do
       wysiwyg_state_setup(text = "ltr")
-
       f(".mce-i-#{text}").click
-
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce p').attribute('dir')).to eq text
       end
@@ -481,9 +458,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should remove left-to-right from text in the rce", priority: "1", test_id: 550312 do
       text = "<p dir=\"ltr\">This is my text</p>"
       wysiwyg_state_setup(text)
-
-      f('.mce-i-ltr').send_keys(:shift)
-      f('.mce-i-ltr').click
+      shift_click_button('.mce-i-ltr')
       validate_wiki_style_attrib_empty("p")
     end
 
