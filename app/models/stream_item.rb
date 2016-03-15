@@ -73,6 +73,11 @@ class StreamItem < ActiveRecord::Base
       res.instance_variable_set(:@participants, users)
     end
 
+    # unnecessary after old stream items have expired
+    if res.is_a?(Conversation) && !data.has_key?('updated_at')
+      data['updated_at'] = Time.now.utc
+    end
+
     unless CANVAS_RAILS4_0
       data = res.class.attributes_builder.build_from_database(data) # @attributes is now an AttributeSet
     end
