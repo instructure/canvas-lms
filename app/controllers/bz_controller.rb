@@ -8,7 +8,32 @@ require 'google/api_client/auth/storages/file_store'
 class BzController < ApplicationController
 
   before_filter :require_user, :only => [:last_user_url]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
+
+  def user_retained_data
+    result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
+    data = ''
+    unless result.empty?
+      data = result.first.value
+    end
+    render :json => data
+  end
+
+  def set_user_retained_data
+    result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
+    data = nil
+    if result.empty?
+      data = RetainedData.new()
+      data.user_id = @current_user.id
+      data.name = params[:name]
+    else
+      data = result.first
+    end
+
+    data.value = params[:value]
+    data.save
+    render :nothing => true
+  end
 
   def last_user_url
     @current_user.last_url = params[:last_url]
