@@ -797,7 +797,7 @@ class CoursesController < ApplicationController
   # @returns [User]
   def users
     get_context
-    if authorized_action(@context, @current_user, :read_roster)
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       #backcompat limit param
       params[:per_page] ||= params[:limit]
 
