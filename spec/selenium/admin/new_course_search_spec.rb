@@ -34,7 +34,8 @@ describe "new account course search" do
 
     expect(get_rows.count).to eq 2
 
-    f('.course_search_bar input[type=checkbox]').click # hide anymore
+    hide_checkbox = f('.course_search_bar input[type=checkbox]')
+    driver.action.move_to(hide_checkbox).click.perform
     f('.course_search_bar button').click
     wait_for_ajaximations
 
