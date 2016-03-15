@@ -116,13 +116,24 @@ module DiscussionsCommon
   end
 
   def set_checkbox(selector, check)
-    fj(selector + (check ? ':not(:checked)' : ':checked')).try(:click)
+    cb = fj(selector + (check ? ':not(:checked)' : ':checked'))
+    driver.action.move_to(cb).click.perform
   end
 
   def filter(opts)
     replace_content(f('#searchTerm'), opts[:term] || '')
-    set_checkbox('#onlyGraded', opts[:only_graded])
-    set_checkbox('#onlyUnread', opts[:only_unread])
+    wait_for_ajaximations
+    f('#searchTerm').send_keys(:return)
+    # logic for dealing with options
+      case opts
+      when {:only_graded=>true}
+        set_checkbox('#onlyGraded', opts[:only_graded])
+      when {:only_unread=>true}
+        set_checkbox('#onlyUnread', opts[:only_unread])
+      when {:only_unread=>true, :only_graded=>true}
+        set_checkbox('#onlyGraded', opts[:only_graded])
+        set_checkbox('#onlyUnread', opts[:only_unread])
+      end
     wait_for_animations
   end
 
