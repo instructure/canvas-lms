@@ -5,9 +5,12 @@ define [
   'Backbone'
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
+  'react'
+  'jsx/editor/SwitchEditorControl'
   'jsx/shared/rce/RichContentEditor'
   'tinymce.editor_box'
-], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts, RichContentEditor) ->
+], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts,
+    React, SwitchEditorControl, RichContentEditor) ->
 
   richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
   richContentEditor.preloadRemoteModule()
@@ -58,7 +61,6 @@ define [
       @el.detach()
       if @options.switchViews
         @switchViews.insertBefore @textArea
-        @switchViews.find('a').toggle() if !@switchViews.find('a').first().is(":visible")
       @infoIcon ||= (new KeyboardShortcuts()).render().$el
       @infoIcon.css("float", "right")
       @infoIcon.insertAfter @switchViews
@@ -128,22 +130,19 @@ define [
           @display()
           @editButton.focus()
       )
+
     ##
     # create the switch views links to go between rich text and a textarea
     # @api private
     createSwitchViews: ->
-      $switchToHtmlLink = $('<a/>', href: "#")
-      $switchToVisualLink = $switchToHtmlLink.clone()
-      $switchToHtmlLink.text(I18n.t('switch_editor_html', 'HTML Editor'))
-      $switchToVisualLink.hide().text(I18n.t('switch_editor_rich_text', 'Rich Content Editor'))
-      $switchViewsContainer = $('<div/>', style: "float: right")
-      $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
-      $switchViewsContainer.find('a').click preventDefault (e) =>
-        richContentEditor.callOnRCE(@textarea, 'toggle')
-        # hide the clicked link, and show the other toggle link.
-        # todo: replace .andSelf with .addBack when JQuery is upgraded.
-        $(e.currentTarget).siblings('a').andSelf().toggle()
-      return $switchViewsContainer
+      component = React.createElement(SwitchEditorControl, {
+        textarea: @textArea,
+        richContentEditor: richContentEditor
+      })
+
+      $container = $("<div class='switch-views'></div>")
+      React.render(component, $container[0])
+      return $container
 
 
   _.extend(EditorToggle.prototype, Backbone.Events)
