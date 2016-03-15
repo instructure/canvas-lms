@@ -107,12 +107,20 @@ module DataFixup::PsychMigration
       result
     end
 
-    def range_size
-      1_000_000
+    MODEL_RANGE_MAP = {
+      'AssessmentQuestion' => 100_000,
+      'ContextModuleProgression' => 100_000,
+      'ErrorReport' => 100_000,
+      'Quizzes::QuizSubmission' => 10_000,
+      'Version' => 100_000
+    }
+
+    def range_size(model)
+      MODEL_RANGE_MAP[model.name] || 500_000
     end
 
     def id_ranges(model)
-      # try to partition off ranges of ids in the table with at most 1,000,000 ids per partition
+      # try to partition off ranges of ids in the table with at most 500,000 ids per partition
       unless model.primary_key == "id"
         return model.exists? ? [[nil, nil]] : false
       end
@@ -123,9 +131,10 @@ module DataFixup::PsychMigration
       return false unless start_id
 
       current_min = start_id
+      size = range_size(model)
 
       while current_min
-        current_max = current_min + range_size - 1
+        current_max = current_min + size - 1
 
         next_min = scope.where("id > ?", current_max).minimum(:id)
         if next_min
