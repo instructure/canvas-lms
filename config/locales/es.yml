@@ -843,7 +843,7 @@ es:
       create_courses_description: "(Administradores de Cuenta siempre pueden crear cursos)"
       create_courses_title: "Quien puede crear cursos nuevos"
       custom_links_to_include_in_the_help_dialog_popup: "Enlaces personalizados para incluír en la ventana emergente de ayuda"
-      default_language_description: "Esto sobrescribirá la configuración de lenguajes de cualquier navegador/OS.  Los lenguajes preferidos aún pueden ser establecidos en el nivel de curso/usuario."
+      default_language_description: "Esto sobrescribirá la configuración de idiomas de cualquier navegador/OS.  Los idiomas preferidos aún pueden ser establecidos en el nivel de curso/usuario."
       delete: borrar
       delete_announcement_tooltip: "Borrar este anuncio"
       email_notification_from_description: "Esta configuración permite al Admin marcar o etiquetar el texto 'Desde' en todas las notificaciones enviadas desde Canvas para esta cuenta."
@@ -883,7 +883,7 @@ es:
         allow_sis_import: "Importaciones de SIS"
         author_email_in_notifications: "Mostrar las direcciones de correo electrónico del remitente para las notificaciones de interacciones del usuario"
         canvas_authentication: "Autenticación de Canvas"
-        default_language: "Lenguaje Predeterminado"
+        default_language: "Idioma Predeterminado"
         default_time_zone: "Zona Horaria Predeterminada"
         domain: "Dominio:"
         edit_institution_email: "Los usuarios pueden eliminar las direcciones de correo electrónico que les ha asignado la organización"
@@ -4627,7 +4627,7 @@ es:
         hide_final_grades: "Ocultar los totales en el resumen de calificaciones de los alumnos"
         indexed: "Incluír este curso en el índice público del curso"
         is_public_to_auth_users: "Hacer este curso visible a los usuarios autenticados"
-        language: Lenguaje
+        language: Idioma
         license: Licencia
         open_enrollment: "Agregar un enlace de \"Unirse a este Curso\" a la página de inicio del curso"
         public_syllabus: "Hacer que el programa de estudios de este curso sea visible públicamente"
@@ -4641,7 +4641,7 @@ es:
         storage_quota: "Almacenaje de Archivos"
         time_zone: "Huso horario"
         turnitin_comments: "Comentarios de Envios en Turnitin"
-      language_overrides_preferences: "Esto sobrescribirá cualquier preferencias de usuarios/sistemas. Esto sólo se recomienda para cursos en otro lenguaje que no sea el inglés"
+      language_overrides_preferences: "Esto sobrescribirá cualquier preferencias de usuarios/sistemas. Esto sólo se recomienda para cursos en otro idioma que no sea el Inglés"
       links: 
         more_options: "más opciones"
         move_course: "Mover a Otra Cuenta"
@@ -11434,7 +11434,7 @@ es:
       headers: 
         notification_preferences: "Preferencias de Notificación"
       page_title: "Preferencias de Notificación"
-      weekly_notification_range: "Tus notificaciones semanales se enviarán %{weekday} entre %{start_time} y %{end_time}."
+      weekly_notification_range: "Sus notificaciones semanales se enviarán %{weekday} entre %{start_time} y %{end_time}."
     confirming_contact: Confirmando...
     confirms: 
       delete_access_key: "¿Seguro que quiere borrar esta clave de acceso?"
@@ -11531,7 +11531,7 @@ es:
         expires_at: Expira
         headers: 
           approved_integrations: "Integraciones Aprobadas"
-        locale: Lenguaje
+        locale: Idioma
         name: "Nombre Completo"
         new_password: "Contraseña Nueva"
         old_password: "Contraseña Vieja"
@@ -16042,7 +16042,7 @@ es:
       choose_a_language: "--Elegir un idioma--"
       error_message: "*Error:* Debe seleccionar un idioma y un archivo de pista válido."
       file: Archivo
-      language: Lenguaje
+      language: Idioma
       media_track_form_button: "Ir a la herramienta de creación de subtítulos"
       upload_media_track_form_description: "Una vez que tenga una pista de subtítulos en formato SRT o *WebVTT*, podrá cargarla aquí."
       upload_media_track_form_description_1: "Copiar esta URL de vídeo:"
