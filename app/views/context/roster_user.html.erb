@@ -107,7 +107,15 @@
                       :wrapper => '<span class="associated_user_name">\1</span>' %>
                 </div>
               <% end %>
-              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
+              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
+                <% if enrollment.inactive? %>
+                  <%= t 'inactive' %>
+                <% elsif enrollment.completed_at %>
+                  <%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %>
+                <% else %>
+                  <%= t 'completed' %>
+                <% end %>
+              </div>
             </td>
             <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
