@@ -412,6 +412,14 @@ END
       development: true,
       root_opt_in: false,
     },
+    'wrap_calendar_event_titles' =>
+    {
+      display_name: -> { I18n.t('Wrap event titles in Calendar month view') },
+      description: -> { I18n.t("Show calendar events in the month view on multiple lines if the title doesn't fit on a single line") },
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true
+    }
   )
 
   def self.definitions
