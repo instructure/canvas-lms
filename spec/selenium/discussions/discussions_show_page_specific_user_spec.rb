@@ -151,6 +151,23 @@ describe "discussions" do
           end
         end
       end
+
+      it "should not show when users are inactive" do
+        other_student = student_in_course(course: course, name: 'student', active_all: true).user
+        topic.reply_from(:user => other_student, :text => "reply")
+
+        other_student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to_not include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to_not include_text("inactive")
+      end
     end
 
     context "as a teacher" do
@@ -351,6 +368,22 @@ describe "discussions" do
           wait_for_ajaximations
           expect(get_all_replies.first).to include_text fake_student.name
         end
+      end
+
+      it "should show when users are inactive" do
+        topic.reply_from(:user => student, :text => "reply")
+
+        student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to include_text("inactive")
       end
     end
 
