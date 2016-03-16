@@ -11,6 +11,7 @@ describe 'quizzes accessibility' do
   end
 
   it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
+    driver.manage.window.maximize
     # -------------------------------------------------------------------------
     # adapted from:
     #   file: quizzes_question_creation_spec

@@ -118,6 +118,7 @@ describe 'new ui' do
     end
 
     it 'should not break tiny mce css', priority: "2", test_id: 244891 do
+      skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       mce_icons = f('.mce-ico')
       expect(mce_icons.css_value('font-family')).to eq('tinymce,Arial')

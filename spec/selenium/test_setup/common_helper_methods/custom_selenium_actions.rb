@@ -314,4 +314,9 @@ module CustomSeleniumActions
   def replace_value(selector, value)
     driver.execute_script("$('#{selector}').val(#{value})")
   end
+
+  def move_to_click(selector)
+    el = driver.find_element :css, selector
+    driver.action.move_to(el).click.perform
+  end
 end

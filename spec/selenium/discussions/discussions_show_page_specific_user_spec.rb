@@ -332,6 +332,7 @@ describe "discussions" do
 
       context "in student view" do
         it "should allow student view student to read/post", priority:"2", test_id: 344545 do
+          driver.manage.window.maximize
           enter_student_view
           get url
           expect(get_all_replies.count).to eq 0

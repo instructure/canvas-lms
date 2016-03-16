@@ -433,6 +433,8 @@ describe "speed grader" do
     end
 
     it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+      skip_if_chrome('This test applies to Firefox')
+      skip_if_ie('This test applies to Firefox')
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
       expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
     end
