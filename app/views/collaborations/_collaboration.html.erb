@@ -1,44 +1,41 @@
-<% collaboration ||= nil; show_context ||= false; brief ||= false %>
-<div id="collaboration_<%= collaboration ? collaboration.id : 'blank' %>" class="communication_message collaboration <%= collaboration.style_class rescue '' %> <%= 'brief_communication_message' if brief %> <%= 'show_context_communication_message' if show_context %>">
-  <div class="header">
-    <div class="header_title">
-      <%= image_tag "google_docs_icon.png", :alt => t('titles.collaboration', "Collaboration"), :title => t('titles.collaboration', "Collaboration"), :style => brief ? "width: 20px;" : "" %>
-      <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" target="_blank" class="title external_link"><%= collaboration.title rescue nbsp %></a>
-      <span class="context_code"><%= @context.short_name rescue "" %></span>
-      <a href="<%= context_url(@context, :context_user_url, collaboration ? collaboration.user_id : '{{ user_id }}') %>" class="user_name"><%= context_user_name(@context, collaboration.user) rescue nbsp %></a>
-    </div>
-    <div class="link_box">
-      <span class="links">
-      <% if can_do(collaboration, @current_user, :delete) %>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link"><%= image_tag "edit.png", :alt => t('Edit this Collaboration') %></a>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.delete', "Delete this Collaboration" %>" class="delete_collaboration_link"><%= image_tag "delete.png", :alt => t('Delete this Collaboration') %></a>
-      <% end %>
-      </span>
-    </div>
-    <div class="post_date created_at"><%= datetime_string(collaboration.created_at) rescue nbsp %></div>
-    <div class="clear"></div>
-  </div>
-  <div class="content">
-    <div class="message user_content formatted_body"><%= user_content(collaboration.try(:description)) || nbsp %></div>
-    <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
-    <div class="links">
-      <% link = t 'links.show_participants', { :one => "*1* Participant", :other => "*%{count}* Participants" },
-            :count => ((collaboration.users + [collaboration.user]).compact.uniq.length rescue "0"),
-            :wrapper => '<span class="users_count">\1</span>' %>
-      <a href="<%= context_url(@context, :context_users_url, :all_messages => 1) %>#message_none" class="show_participants_link brief_footer_link"><%= link %></a>
-      <a href="#" class="show_participants_link verbose_footer_link"><%= link %></a>
-    </div>
-    <div class="clear"></div>
-  </div>
-  <div class="footer">
-    <ul style="display: none;" class="collaborators">
-      <li><b><%= context_user_name(@context, collaboration.user) %></b></li>
-      <% (collaboration.users.uniq - [collaboration.user]).each do |user| %>
-        <li>
-          <%= context_user_name(@context, user) %>
-          <span class="id" style="display: none;"><%= user.id %></span>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-</div>
+<% if can_do(collaboration, @current_user, :read) %>
+    <% if !collaboration.is_a?(GoogleDocsCollaboration) || (collaboration.is_a?(GoogleDocsCollaboration) && @user_has_google_drive) %>
+        <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
+          <div class="collaboration-header clearfix">
+            <h2>
+              <a class="title" href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" target="_blank"><%= collaboration.title %></a>
+            </h2>
+            <% if can_do(collaboration, @current_user, :update) || can_do(collaboration, @current_user, :delete) %>
+                <div class="links">
+                  <% if can_do(collaboration, @current_user, :update) %>
+                      <a class="edit_collaboration_link no-hover" role="button" href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.edit', "Edit this Collaboration" %>"><%= image_tag "edit.png", :alt => t('Edit this Collaboration') %></a>
+                  <% end %>
+                  <% if can_do(collaboration, @current_user, :delete) %>
+                      <a class="delete_collaboration_link no-hover" role="button" href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" title="<%= t 'links.delete', "Delete this Collaboration" %>"><%= image_tag "delete.png", :alt => t('Delete this Collaboration') %></a>
+                  <% end %>
+                </div>
+            <% end %>
+          </div>
+          <div class="description"><%= collaboration.description %></div>
+          <small <%= context_sensitive_datetime_title(collaboration.created_at, @context) %>>
+            <%= t :started_by, "Started by *%{user}*, %{at}",
+                  :user => context_user_name(@context, collaboration.user),
+                  :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
+                  :at => datetime_string(collaboration.created_at) %>
+          </small>
+        </div>
+    <% elsif !@user_has_google_drive %>
+        <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
+          <h3><%= collaboration.title %></h3>
+          <div style="margin-bottom: 5px;" class="description">
+            <a href="<%= oauth_url(:service => :google_drive, :return_to => (request.url)) %>"><%= t 'google.drive.upgrade.description', "To access this collaboration you must authorize Canvas to access your Google Drive account" %></a>
+          </div>
+          <small <%= context_sensitive_datetime_title(collaboration.created_at, @context) %>>
+            <%= t :started_by, "Started by *%{user}*, %{at}",
+                  :user => context_user_name(@context, collaboration.user),
+                  :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
+                  :at => datetime_string(collaboration.created_at) %>
+          </small>
+        </div>
+    <% end %>
+<% end %>
