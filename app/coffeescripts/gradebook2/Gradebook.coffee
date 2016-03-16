@@ -26,7 +26,6 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
-  # 'compiled/gradebook2/PostGradesDialog'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
   'jst/gradebook2/column_header'
@@ -80,11 +79,12 @@ define [
       @assignmentsToHide = userSettings.contextGet('hidden_columns') || []
       @sectionToShow = userSettings.contextGet 'grading_show_only_section'
       @sectionToShow = @sectionToShow && String(@sectionToShow)
-      @show_attendance = userSettings.contextGet 'show_attendance'
+      @show_attendance = !!userSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
       @userFilterRemovedRows = []
-      @show_concluded_enrollments = userSettings.contextGet 'show_concluded_enrollments'
-      @show_concluded_enrollments = true if @options.course_is_concluded
+      @show_concluded_enrollments =
+        @options.course_is_concluded || !!userSettings.contextGet('show_concluded_enrollments')
+      @show_inactive_enrollments = !!userSettings.contextGet('show_inactive_enrollments')
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
@@ -99,12 +99,6 @@ define [
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
       $.subscribe 'currentSection/change',            @updateCurrentSection
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
-
-      studentsUrl = if @show_concluded_enrollments
-        'students_url_with_concluded_enrollments'
-      else
-        'students_url'
-
 
       assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
@@ -129,14 +123,13 @@ define [
 
         sectionsURL: @options.sections_url
 
-        studentsURL: @options[studentsUrl]
+        studentsURL: @options[@studentsUrl()]
         studentsPageCb: @gotChunkOfStudents
 
         submissionsURL: @options.submissions_url
         submissionsParams: submissionParams
         submissionsChunkCb: @gotSubmissionsChunk
         submissionsChunkSize: @options.chunk_size
-
         customColumnDataURL: @options.custom_column_data_url
         customColumnDataPageCb: @gotCustomColumnDataChunk
       )
@@ -248,8 +241,9 @@ define [
     gotCustomColumnDataChunk: (column, columnData) =>
       for datum in columnData
         student = @student(datum.user_id)
-        student["custom_col_#{column.id}"] = datum.content
-        @grid?.invalidateRow(student.row)
+        if student? #ignore filtered students
+          student["custom_col_#{column.id}"] = datum.content
+          @grid?.invalidateRow(student.row)
       @grid?.render()
 
     doSlickgridStuff: =>
@@ -1065,18 +1059,34 @@ define [
       @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('.gradebook_dropdown')
-      $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (_i, setting) =>
-        $settingsMenu.find("##{setting}").prop('checked', !!@[setting]).change (event) =>
-          if setting is 'show_concluded_enrollments' and @options.course_is_concluded and @show_concluded_enrollments
-            $("##{setting}").prop('checked', true)
-            $settingsMenu.menu("refresh")
-            return alert(I18n.t 'concluded_course_error_message', 'This is a concluded course, so only concluded enrollments are available.')
-          @[setting] = $(event.target).is(':checked')
-          userSettings.contextSet setting, @[setting]
-          window.location.reload() if setting is 'show_concluded_enrollments'
-          @grid.setColumns @getVisibleGradeGridColumns() if setting is 'show_attendance'
-          # TODO: don't buildRows?
-          @buildRows()
+      showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
+      showConcludedEnrollmentsEl.prop('checked', @show_concluded_enrollments).change (event) =>
+        if @options.course_is_concluded and @show_concluded_enrollments
+          showConcludedEnrollmentsEl.prop('checked', true)
+          $settingsMenu.menu("refresh")
+          return alert(I18n.t 'concluded_course_error_message', 'This is a concluded course, so only concluded enrollments are available.')
+        @show_concluded_enrollments  = showConcludedEnrollmentsEl.is(':checked')
+        userSettings.contextSet 'show_concluded_enrollments', @show_concluded_enrollments
+        window.location.reload()
+
+      showInactiveEnrollmentsEl = $settingsMenu.find("#show_inactive_enrollments")
+      showInactiveEnrollmentsEl.prop('checked', @show_inactive_enrollments).change (event) =>
+        @show_inactive_enrollments = showInactiveEnrollmentsEl.is(':checked')
+        userSettings.contextSet 'show_inactive_enrollments', @show_inactive_enrollments
+        window.location.reload()
+
+      includeUngradedAssignmentsEl = $settingsMenu.find("#include_ungraded_assignments")
+      includeUngradedAssignmentsEl.prop('checked', @include_ungraded_assignments).change (event) =>
+        @include_ungraded_assignments = includeUngradedAssignmentsEl.is(':checked')
+        userSettings.contextSet 'include_ungraded_assignments', @include_ungraded_assignments
+        @buildRows()
+
+      showAttendanceEl = $settingsMenu.find("#show_attendance")
+      showAttendanceEl.prop('checked', @show_attendance).change (event) =>
+        @show_attendance = showAttendanceEl.is(':checked')
+        userSettings.contextSet 'show_attendance', @show_attendance
+        @grid.setColumns @getVisibleGradeGridColumns()
+        @buildRows()
 
       # don't show the "show attendance" link in the dropdown if there's no attendance assignments
       unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
@@ -1671,3 +1681,13 @@ define [
       @isAllGradingPeriods(selectedPeriodId)
 
     fieldsToExcludeFromAssignments: ['description', 'needs_grading_count']
+
+    studentsUrl: ->
+      switch
+        when @show_concluded_enrollments && @show_inactive_enrollments
+          'students_with_concluded_and_inactive_enrollments_url'
+        when @show_concluded_enrollments
+          'students_with_concluded_enrollments_url'
+        when @show_inactive_enrollments
+          'students_with_inactive_enrollments_url'
+        else 'students_url'

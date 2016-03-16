@@ -810,7 +810,7 @@ define [
     fetchCorrectEnrollments: (->
       return if (@get('enrollments.isLoading'))
       if @get('showConcludedEnrollments')
-        url = ENV.GRADEBOOK_OPTIONS.enrollments_url_with_concluded_enrollments
+        url = ENV.GRADEBOOK_OPTIONS.enrollments_with_concluded_url
       else
         url = ENV.GRADEBOOK_OPTIONS.enrollments_url
 

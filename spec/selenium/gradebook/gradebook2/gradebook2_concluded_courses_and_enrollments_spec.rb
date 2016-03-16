@@ -7,7 +7,7 @@ describe "gradebook2 - concluded courses and enrollments" do
   let!(:setup) { gradebook_data_setup }
 
   context "active course" do
-    it "should not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
+    it "does not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
       @student_1.enrollments.where(course_id: @course).first.conclude
 
       expect(@course.students.count).to eq @all_students.size - 1
@@ -17,15 +17,52 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       expect(ff('.student-name').count).to eq @course.students.count
 
-      f('#gradebook_settings').click
-
-      # select the option and we'll now show concluded
+      # show concluded
       expect_new_page_load do
+        f('#gradebook_settings').click
         f('label[for="show_concluded_enrollments"]').click
       end
       wait_for_ajaximations
 
-      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
+      expect(ff('.student-name').count).to eq @course.all_students.count
+
+      # hide concluded
+      expect_new_page_load do
+        f('#gradebook_settings').click
+        f('label[for="show_concluded_enrollments"]').click
+      end
+      wait_for_ajaximations
+
+      expect(ff('.student-name').count).to eq @course.students.count
+    end
+
+    it "does not show inactive enrollments by default and they can be toggled", priority: "1" do
+      @student_1.enrollments.where(course_id: @course).first.deactivate
+
+      expect(@course.students.count).to eq @all_students.size - 1
+      expect(@course.all_students.count).to eq @all_students.size
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      expect(ff('.student-name').count).to eq @course.students.count
+
+      # show deactivated
+      expect_new_page_load do
+        f('#gradebook_settings').click
+        f('label[for="show_inactive_enrollments"]').click
+      end
+      wait_for_ajaximations
+
+      expect(ff('.student-name').count).to eq @course.all_students.count
+
+      # hide deactivated
+      expect_new_page_load do
+        f('#gradebook_settings').click
+        f('label[for="show_inactive_enrollments"]').click
+      end
+      wait_for_ajaximations
+
+      expect(ff('.student-name').count).to eq @course.students.count
     end
 
     it "should not throw an error when setting the default grade when concluded enrollments exist" do
@@ -55,14 +92,14 @@ describe "gradebook2 - concluded courses and enrollments" do
     end
 
     it "should show concluded enrollments in concluded courses by default", priority: "1", test_id: 210021 do
-      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
+      expect(ff('.student-name').count).to eq @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
       expect_fired_alert do
         f('#gradebook_settings').click
         f('label[for="show_concluded_enrollments"]').click
       end
-      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
+      expect(ff('.student-name').count).to eq @course.all_students.count
     end
 
     it "should not allow editing grades", priority: "1", test_id: 210027 do

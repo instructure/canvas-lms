@@ -641,3 +641,30 @@ define [
 
   test "includes 'needs_grading_count' in the response", ->
     ok _.contains(@excludedFields, 'needs_grading_count')
+
+  module 'Gradebook#studentsUrl',
+    setupThis:(options) ->
+      options = options || {}
+      defaults = {
+        show_concluded_enrollments: false
+        show_inactive_enrollments: false
+      }
+      _.defaults options, defaults
+
+    setup: ->
+      @studentsUrl = Gradebook.prototype.studentsUrl
+
+  test 'enrollmentUrl returns "students_url"', ->
+    equal @studentsUrl.call(@setupThis()), 'students_url'
+
+  test 'when concluded only, enrollmentUrl returns "students_with_concluded_enrollments_url"', ->
+    self = @setupThis(show_concluded_enrollments: true)
+    equal @studentsUrl.call(self), 'students_with_concluded_enrollments_url'
+
+  test 'when inactive only, enrollmentUrl returns "students_with_inactive_enrollments_url"', ->
+    self = @setupThis(show_inactive_enrollments: true)
+    equal @studentsUrl.call(self), 'students_with_inactive_enrollments_url'
+
+  test 'when show concluded and hide inactive are true, enrollmentUrl returns "students_with_concluded_and_inactive_enrollments_url"', ->
+    self = @setupThis(show_concluded_enrollments: true, show_inactive_enrollments: true)
+    equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'

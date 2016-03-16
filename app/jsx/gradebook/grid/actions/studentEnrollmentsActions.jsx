@@ -2,25 +2,32 @@ define([
   'bower/reflux/dist/reflux',
   'compiled/userSettings',
   'jsx/gradebook/grid/constants',
-  'jsx/gradebook/grid/helpers/depaginator'
-], function (Reflux, UserSettings, GradebookConstants, depaginate) {
+  'jsx/gradebook/grid/helpers/enrollmentsUrlHelper',
+  'jsx/gradebook/grid/helpers/depaginator',
+], function (Reflux, UserSettings, GradebookConstants, EnrollmentsUrlHelper, depaginate) {
+
   var StudentEnrollmentsActions = Reflux.createActions({
     load: { asyncResult: true },
     search: { asyncResult: false }
-  })
+  });
+
+  function showConcluded() {
+    return UserSettings.contextGet('showConcludedEnrollments') ||
+      GradebookConstants.course_is_concluded;
+  }
+
+  function showInactive() {
+    return UserSettings.contextGet('showInactiveEnrollments');
+  }
 
   StudentEnrollmentsActions.load.listen(function() {
     var self = this,
-      studentsUrl, showConcludedEnrollments;
+      urlKey = EnrollmentsUrlHelper({
+        showConcluded: showConcluded(),
+        showInactive: showInactive()
+      });
 
-    showConcludedEnrollments = UserSettings.contextGet('showConcludedEnrollments') ||
-      GradebookConstants.course_is_concluded;
-
-    studentsUrl = showConcludedEnrollments ?
-      GradebookConstants.enrollments_url_with_concluded_enrollments :
-      GradebookConstants.enrollments_url;
-
-    depaginate(studentsUrl)
+    depaginate(GradebookConstants[urlKey])
       .then(self.completed)
       .fail((jqxhr, textStatus, error) => self.failed(error));
   });
