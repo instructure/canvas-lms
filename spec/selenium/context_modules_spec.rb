@@ -461,8 +461,8 @@ describe "context modules" do
 
       mod1 = @course.context_modules.where(:name => first_module_name).first
       mod3 = @course.context_modules.where(:name => third_module_name).first
-      context_module = f("#context_module_#{mod3.id}")
-      driver.action.move_to(context_module).perform
+
+      move_to_click("#context_module_#{mod3.id}")
       f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
       f("#context_module_#{mod3.id} .edit_module_link").click
       expect(add_form).to be_displayed
