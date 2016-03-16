@@ -46,7 +46,7 @@ class MessageMigration < ActiveRecord::Migration
         #{connection.quote_table_name('context_messages')}
     SQL
     change_column :__migrated_messages, :signature, :text if mysql
-    add_index :__migrated_messages, :id
+    execute "CREATE INDEX index__migrated_messages_on_id ON __migrated_messages (id)"
 
     execute <<-SQL
       CREATE TEMPORARY TABLE __migrated_message_participants #{table_opts}
@@ -56,7 +56,7 @@ class MessageMigration < ActiveRecord::Migration
       FROM
         #{connection.quote_table_name('context_message_participants')}
     SQL
-    add_index :__migrated_message_participants, :migrated_message_id, :name => :index_mmp_on_message_id
+    execute "CREATE INDEX index_mmp_on_message_id ON __migrated_message_participants (migrated_message_id)"
 
     if mysql
       execute  <<-SQL
@@ -77,7 +77,7 @@ class MessageMigration < ActiveRecord::Migration
         GROUP BY migrated_message_id
       SQL
     end
-    add_index :__migrated_message_participant_strings, :migrated_message_id, :name => :index_mmps_on_migrated_message_id
+    execute "CREATE INDEX index_mmps_on_migrated_message_id ON __migrated_message_participant_strings (migrated_message_id)"
 
     execute <<-SQL
       UPDATE __migrated_messages #{mysql ? ", __migrated_message_participant_strings" : ""}
@@ -88,7 +88,7 @@ class MessageMigration < ActiveRecord::Migration
     if mysql
       execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature(767))"
     else
-      add_index :__migrated_messages, :signature
+      execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature)"
     end
 
     execute <<-SQL
@@ -141,7 +141,7 @@ class MessageMigration < ActiveRecord::Migration
       SELECT c.id, mp.user_id, TRUE, 'read', FALSE, FALSE
       FROM __migrated_message_participants mp,
         (#{subquery}) AS m,
-        conversations c
+        #{Conversation.quoted_table_name} c
       WHERE migrated_message_id = m.id
         AND migration_signature = signature
         AND private_hash IS NULL
@@ -224,7 +224,7 @@ class MessageMigration < ActiveRecord::Migration
     update <<-SQL
       UPDATE #{Attachment.quoted_table_name} #{mysql ? ', conversation_messages' : ''}
       SET context_id = conversation_messages.id, context_type = 'ConversationMessage'
-      #{mysql ? '' : 'FROM conversation_messages'}
+      #{mysql ? '' : "FROM #{ConversationMessage.quoted_table_name}"}
       WHERE attachments.context_type = 'ContextMessage' AND conversation_messages.context_message_id = attachments.context_id
     SQL
 
@@ -286,7 +286,7 @@ class MessageMigration < ActiveRecord::Migration
       WHERE conversation_message_id = cm.id AND conversation_participant_id = cp.id
       GROUP BY conversation_participant_id
     SQL
-    add_index :__migrated_conversation_stats, :conversation_participant_id, :name => :index_mcs_on_cpi
+    execute "CREATE INDEX index_mcs_on_cpi ON __migrated_conversation_stats (conversation_participant_id)"
 
     update <<-SQL
       UPDATE #{ConversationParticipant.quoted_table_name} #{mysql ? ', __migrated_conversation_stats' : ''}
