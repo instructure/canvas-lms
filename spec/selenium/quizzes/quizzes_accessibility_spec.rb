@@ -11,7 +11,7 @@ describe 'quizzes accessibility' do
   end
 
   it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
-    driver.manage.window.maximize
+    skip_if_chrome('Can not get to student view in Chrome')
     # -------------------------------------------------------------------------
     # adapted from:
     #   file: quizzes_question_creation_spec
