@@ -18,6 +18,7 @@ describe "assignments menu tools" do
     end
 
     it "should show tool launch links in the gear for items on the index", priority: "2", test_id: 210087 do
+      skip_if_chrome("Test doesn't play well with Chrome")
       plain_assignment = @assignment
 
       quiz_assignment = assignment_model(:submission_types => "online_quiz", :course => @course)
