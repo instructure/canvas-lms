@@ -31,6 +31,7 @@
 #   of a specific user.
 #   - In your default browser, login as: braven.portal@bebraven.org
 #   - Install the API client gem: gem install google-api-client
+#   - Make sure there isn't already a file called google_calendar_auth.json next to this script.
 #   - Run: ruby create_google_calendar_auth.rb
 #   - Click "Allow" when the browser asks you to give access to 
 # * The refresh token and other settings are now saved in the google_calendar_auth.json file
@@ -60,19 +61,19 @@
 require 'openssl'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
-require 'google/api_client'
-require 'google/api_client/client_secrets'
-require 'google/api_client/auth/installed_app'
-require 'google/api_client/auth/storage'
-require 'google/api_client/auth/storages/file_store'
+#require 'google/api_client'
+#require 'google/api_client/client_secrets'
+#require 'google/api_client/auth/installed_app'
+#require 'google/api_client/auth/storage'
+#require 'google/api_client/auth/storages/file_store'
 
 # NOTE: I was having trouble getting ruby to load the above scripts from the unpacked gem, so I commented out
 # the above requires and hardcoded the paths below to my custom installed_app.rb dir
-##require '~/src/google-api-client/lib/google/api_client'
-#require '~/src/google-api-client/lib/google/api_client/client_secrets'
-#require '~/src/google-api-client/lib/google/api_client/auth/installed_app'
-#require '~/src/google-api-client/lib/google/api_client/auth/storage'
-#require '~/src/google-api-client/lib/google/api_client/auth/storages/file_store'
+#require '~/src/google-api-client/lib/google/api_client'
+require '~/src/google-api-client/lib/google/api_client/client_secrets'
+require '~/src/google-api-client/lib/google/api_client/auth/installed_app'
+require '~/src/google-api-client/lib/google/api_client/auth/storage'
+require '~/src/google-api-client/lib/google/api_client/auth/storages/file_store'
 
 require 'fileutils'
 
