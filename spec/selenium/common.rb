@@ -177,5 +177,6 @@ shared_context "in-process server selenium tests" do
     record_errors(example, Rails.logger.captured_messages)
     SeleniumDriverSetup.disallow_requests!
     truncate_all_tables unless self.use_transactional_fixtures
+    driver.quit if driver.browser == :chrome
   end
 end
