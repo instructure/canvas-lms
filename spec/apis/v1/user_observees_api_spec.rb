@@ -140,7 +140,6 @@ describe UserObserveesController, type: :request do
   def delete_call(opts={})
     params[:user_id] = opts[:user_id] || parent.id
     params[:observee_id] = opts[:observee_id] || student.id
-
     json = api_call_as_user(
       opts[:api_user] || allowed_admin,
       :delete,
@@ -436,16 +435,16 @@ describe UserObserveesController, type: :request do
       delete_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
     end
 
-    it 'should not allow self managed users' do
-      parent.observed_users << student
-      delete_call(api_user: parent, expected_status: 401)
-      expect(parent.reload.observed_users).to eq [student]
-    end
-
     it 'should not allow unauthorized admins' do
       parent.observed_users << student
       delete_call(api_user: disallowed_admin, expected_status: 401)
       expect(parent.reload.observed_users).to eq [student]
+    end
+
+    it 'should allow observer to remove observee' do
+      parent.observed_users << student
+      delete_call(api_user: parent, expected_status: 200)
+      expect(parent.reload.observed_users).to eq []
     end
   end
 

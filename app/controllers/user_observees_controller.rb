@@ -22,8 +22,8 @@
 class UserObserveesController < ApplicationController
   before_filter :require_user
 
-  before_filter :self_or_admin_permission_check, only: [:index, :create, :show]
-  before_filter :admin_permission_check, except: [:index, :create, :show]
+  before_filter :self_or_admin_permission_check, except: [:update]
+  before_filter :admin_permission_check, only: [:update]
 
   # @API List observees
   #
