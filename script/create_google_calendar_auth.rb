@@ -31,6 +31,7 @@
 #   of a specific user.
 #   - In your default browser, login as: braven.portal@bebraven.org
 #   - Install the API client gem: gem install google-api-client
+#   - Make sure there isn't already a file called google_calendar_auth.json next to this script.
 #   - Run: ruby create_google_calendar_auth.rb
 #   - Click "Allow" when the browser asks you to give access to 
 # * The refresh token and other settings are now saved in the google_calendar_auth.json file
