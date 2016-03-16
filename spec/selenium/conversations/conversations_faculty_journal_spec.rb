@@ -74,6 +74,7 @@ describe "conversations new" do
       f('#new_user_note_button').click
       replace_content(f('#user_note_title'),'FJ Title 2')
       replace_content(f('textarea'),'FJ Body text 2')
+      wait_for_ajaximations
       f('.send_button').click
       time = format_time_for_view(Time.zone.now)
       get student_user_notes_url
@@ -149,6 +150,7 @@ describe "conversations new" do
     end
 
     it "should have the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
+      skip_if_chrome('Fragile in Chrome')
       f('#compose-btn').click
       expect(f('.user_note')).not_to be_displayed
       compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
@@ -165,6 +167,7 @@ describe "conversations new" do
     end
 
     it "should have the Journal entry checkbox visible", priority: "1", test_id: 75008 do
+      skip_if_chrome('Fragile in Chrome')
       f('#compose-btn').click
       expect(f('.user_note')).not_to be_displayed
       compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
