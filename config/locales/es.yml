@@ -224,7 +224,9 @@ es:
       login_handle_name_description: "La etiqueta usada para identificadores de inicio de sesión únicos. Ejemplos: Inicio de sesión, Nombre de usuario, ID del estudiante, etc."
       unknown_user_url_description: "La URL de redirección para cuando un usuario no autenticado no es encontrado en Canvas."
   account_domain_78f43049: "Dominio de la cuenta"
+  account_id_2c3b4f15: "id de la cuenta"
   account_name_13ed649: "%{account_name}"
+  account_name_7f63a13: "nombre de la cuenta"
   account_name_analytics_62bf60ae: "Análisis de %{account.name} "
   account_navigation_80bbefd4: "Navegación de la cuenta"
   account_notification: 
@@ -345,6 +347,7 @@ es:
     student: 
       enrollment_state: "Incluir estado de inscripción: verdadero;"
       enrollment_states: "Estados de inscripción: %{states};"
+  account_roles_d13f8f75: "Roles de la cuenta"
   account_settings: 
     account: Cuenta
     account_name_too_long: "El nombre de la cuenta es demasiado largo"
@@ -367,6 +370,7 @@ es:
       open_registration_delegated_warning_dialog: "Un proveedor de identidad externo está activo"
       what_are_quiz_ip_filters: "¿Cuáles son los Filtros para las Evaluaciones IP?"
     user: Usuario
+  account_sis_id_2e4a461: "id del SIS del curso"
   account_surveys_b0039876: "Encuestas de la cuenta"
   account_user: 
     types: 
@@ -1268,6 +1272,7 @@ es:
   activity_by_date_878c5b49: "Actividad por fecha"
   add_2nd_review_ea988088: "Agregar 2da evaluación"
   add_8523c19b: Agregar
+  add_a_new_announcement_878b717f: "Agregar un anuncio nuevo"
   add_a_new_course_4a041207: "Agregar un curso nuevo"
   add_a_new_user_c440d053: "Agregar un usuario nuevo"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Agregar un revisor para los estudiantes seleccionados"
@@ -1385,15 +1390,18 @@ es:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Permite la programación de los eventos recurrentes del calendario"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Permite que los usuarios con números de teléfono internacionales reciban mensajes de texto de Canvas."
   always_3a59e701: Siempre
+  always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Siempre cargue el RCE y la barra lateral desde un servicio de contenido enriquecido de Canvas en todas partes"
   an_error_accurred_selecting_provisional_grades_61b36f64: "Ha ocurrido un error al seleccionar las calificaciones provisionales"
   an_error_occured_please_try_again_e59b65b: "Se produjo un error. Por favor, inténtelo de nuevo."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Se produjo un error al intentar generar este tema. Inténtelo de nuevo."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Se ha producido un error*, por favor envíe su respuesta en otro momento"
   an_error_occurred_publishing_grades_cfdf7631: "Ha ocurrido un error al publicar las calificaciones"
+  an_error_occurred_selecting_provisional_grades_9d7bcda: "Ha ocurrido un error al seleccionar las calificaciones provisionales"
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Ha ocurrido un error al intentar aplicar este tema, por favor inténtelo nuevamente."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Se produjo un error al intentar generar este tema. Inténtelo de nuevo."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Se produjo un error al intentar preparar la descarga. Inténtelo de nuevo."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Se ha producido un error al configurar el derecho de uso para %{filename}"
+  an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Se ha producido un error al tratar de contactar Turnitin."
   an_item_named_name_already_exists_in_this_location_147b7312: "Ya existe un elemento llamado \"%{name}\" en esta ubicación. ¿Desea reemplazar el archivo existente?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Se produjo un error desconocido en el servidor. Inténtelo de nuevo."
   an_update_is_available_for_toolname_bba3fa2: "Hay una actualización disponible para %{toolName}"
@@ -1429,9 +1437,15 @@ es:
   angel_file_description: "Formato .zip de exportación de Angel"
   announcement: 
     no_title: "Sin Título"
+  announcement_creation_failed_f7d227f5: "Falló la creación del anuncio"
   announcement_ends_at_4ccc2a7e: "Los anuncios terminan el"
   announcement_fb4cb645: Anuncio
+  announcement_not_found_d6d124c3: "Anuncio no encontrado"
   announcement_starts_at_2e987a38: "Los anuncios comienzan el"
+  announcement_successfully_created_731a707f: "Anuncio creado exitosamente"
+  announcement_successfully_updated_7bc5130: "Anuncio subido exitosamente"
+  announcement_type_b231573b: "Tipo de anuncio"
+  announcement_update_failed_6a6ec9fe: "Falló la carga del anuncio"
   announcements: 
     announcements_crumb: Anuncios
     error_draft_state: "Este tema no se puede marcar como borrador porque es un anuncio."
@@ -1474,10 +1488,12 @@ es:
   anonymous_user: "Usuario anónimo"
   anonymous_user_d984b9ce: "Usuario anónimo"
   another_configuration_is_currently_selected_select_95b394e: "Otra configuración está seleccionada en este momento. El seleccionar esta configuración anulará la selección de la otra."
+  answer_description_6b353cfd: "Descripción de la respuesta"
   answer_distribution_2a956e3f: "Distribución de la respuesta"
   answer_text_80_character_limit_2fce1113: "Texto de la Respuesta (límite de 80 caracteres)"
   answer_text_909894d6: "Texto de la Respuesta"
   answer_weight_43420dc5: "Ponderación de respuestas"
+  answers_which_scored_in_the_bottom_27_74409483: "Las respuestas que obtuvieron una puntuación en lo más bajo del 27%"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   api_url_3ee7cb0a: "URL de la API"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center aparecerá en la pestaña \"Apps\" en la página de configuración de un curso o una cuenta. La URL que aparece más abajo deberá dirigir a un punto del App Center válido (por ejemplo, %{url}, asegúrese de omitir la barra final."
