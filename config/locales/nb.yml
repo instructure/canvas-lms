@@ -11960,7 +11960,6 @@ nb:
   qti_img_matching_question: "Importert matchende spørsmål inneholder bilder på begge sider, som støttes ikke"
   qti_img_matching_question_distractors: "Importert matchende spørsmål inneholder bilder innenfor valg, og kan ikke rettes fordi den også inneholder distraktører"
   qti_name: QTI-konvertør
-  qualified_locale: nb-NO
   question_9121487: Spørsmål
   question_answered: Besvart
   question_bank: 

@@ -42,8 +42,18 @@ namespace :i18n do
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
+    special_keys = %w{
+      locales
+      crowdsourced
+      custom
+      deprecated_for
+      bigeasy_locale
+      fullcalendar_locale
+      moment_locale
+    }.freeze
+
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except('locales', 'qualified_locale')}.ya2yaml(:syck_compatible => true))
+      file.write({'en' => @translations.except(*special_keys)}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
   end

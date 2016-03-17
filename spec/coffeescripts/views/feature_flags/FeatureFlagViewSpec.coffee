@@ -27,7 +27,7 @@ define [
   test 'should format release date with locale-appropriate format string', ->
     releaseDate = tz.parse('2100-07-04T00:00:00Z')
 
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.medium': '%-d %b %Y'

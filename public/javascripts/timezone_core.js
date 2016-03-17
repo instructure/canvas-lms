@@ -5,11 +5,11 @@ define([
   "vendor/timezone",
   "i18nObj",
   "moment",
-  "moment_formats",
-  "locale_converter"
-], function($, _, require, tz, I18n, moment, MomentFormats, LocaleConverter) {
+  "moment_formats"
+], function($, _, require, tz, I18n, moment, MomentFormats) {
   // start with the bare vendor-provided tz() function
   var currentLocale = "en_US" // default to US locale
+  var momentLocale = "en"
   var _tz = tz;
   var _preloadedData = {};
 
@@ -28,13 +28,12 @@ define([
                         "moment() directly for any other signature");
 
       // call out to moment, leaving the result alone if invalid
-      var localeToUse = LocaleConverter.convertToMoment(currentLocale)
-      var m = moment.apply(null, [input, format, localeToUse]);
+      var m = moment.apply(null, [input, format, momentLocale]);
       if (m._pf.unusedTokens.length > 0) {
         // we didn't use strict at first, because we want to accept when
         // there's unused input as long as we're using all tokens. but if the
         // best non-strict match has unused tokens, reparse with strict
-        m = moment.apply(null, [input, format, localeToUse, true]);
+        m = moment.apply(null, [input, format, momentLocale, true]);
       }
       if (!m.isValid()) return m;
 
@@ -219,17 +218,19 @@ define([
     // allow snapshotting and restoration, and extending through the
     // vendor-provided tz()'s functional composition
     snapshot: function() {
-      return [_tz, currentLocale];
+      return [_tz, currentLocale, momentLocale];
     },
 
     restore: function(snapshot) {
       // we can't actually check that the snapshot has appropriate values, but
-      // we can at least verify the shape of [function, string]
+      // we can at least verify the shape of [function, string, string]
       if (!_.isArray(snapshot)) throw new Error('invalid tz() snapshot');
       if (typeof snapshot[0] !== 'function') throw new Error('invalid tz() snapshot');
       if (!_.isString(snapshot[1])) throw new Error('invalid tz() snapshot');
+      if (!_.isString(snapshot[2])) throw new Error('invalid tz() snapshot');
       _tz = snapshot[0];
       currentLocale = snapshot[1];
+      momentLocale = snapshot[2];
     },
 
     extendConfiguration: function() {
@@ -280,10 +281,16 @@ define([
     },
 
     changeLocale: function(){
-      currentLocale = arguments.length > 1 ?
-        arguments[1] :
-        arguments[0]
-      return this.applyFeature.apply(this, arguments);
+      if (arguments.length > 2) {
+        currentLocale = arguments[1];
+        momentLocale = arguments[2];
+      } else {
+        currentLocale = arguments[0];
+        momentLocale = arguments[1];
+      };
+      // take off the momentLocale before passing up the chain
+      var args = [].slice.apply(arguments).slice(0, arguments.length - 1);
+      return this.applyFeature.apply(this, args);
     },
 
     isMidnight: function(date, options){

@@ -11964,7 +11964,6 @@ fr:
   qti_img_matching_question: "La question correspondante importée contient des images des deux côtés, ce qui n’est pas pris en charge"
   qti_img_matching_question_distractors: "La question correspondante importée contient des images à l’intérieur des choix, ce qui ne peut pas être rectifié car elle contient aussi des distracteurs"
   qti_name: "Convertisseur QTI"
-  qualified_locale: fr-FR
   question_9121487: Question
   question_answered: "Réponse donnée"
   question_bank: 

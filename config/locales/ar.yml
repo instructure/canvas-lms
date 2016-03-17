@@ -12394,7 +12394,6 @@ ar:
   qti_img_matching_question: "يشتمل سؤال المطابقة الذي تم استيراده على صور في كلا الجانبين، وهذا غير مدعوم"
   qti_img_matching_question_distractors: "يشتمل سؤال المطابقة الذي تم استيراده على صور ضمن الخيارات، ولا يمكن إصلاح ذلك لأنه يشتمل على عناصر تشتيت أيضًا"
   qti_name: "محول QTI"
-  qualified_locale: ar-SA
   question_9121487: السؤال
   question_answered: "تمت الإجابة"
   question_bank: 

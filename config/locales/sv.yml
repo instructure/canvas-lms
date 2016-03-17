@@ -12052,7 +12052,6 @@ sv:
   qti_img_matching_question: "De importerade matchande frågorna innehåller bilder på båda sidorna, det stödjs inte"
   qti_img_matching_question_distractors: "De importerade matchande frågorna innehåller bilder i valen, och kunde inte fixa eftersom de också innehåller distraheringar"
   qti_name: QTI-konverterare
-  qualified_locale: sv-SE
   question_9121487: Fråga
   question_answered: Svarad
   question_bank: 

@@ -11339,7 +11339,6 @@ he:
   qti_img_matching_question: "השאלה התואמת שיובאה מכילה תמונות משני הצדדים, דבר שאינו נתמך."
   qti_img_matching_question_distractors: "השאלה התואמת מכילה תמונות בתוך איזור הבחירה, ואין אפשרות לבצע תיקון כיון שנכללים גם הטעיות"
   qti_name: "ממיר QTI"
-  qualified_locale: he-IL
   question_9121487: שאלה
   question_answered: "ניתנה תשובה"
   question_bank: 
