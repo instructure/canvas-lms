@@ -13386,7 +13386,7 @@ sv:
   remove_row_f9d59cba: "Ta bort rad"
   remove_student_from_recipients_4b206e35: "Ta bort %{student} från mottagare"
   remove_these_dates_48453a81: "Radera dessa datumen"
-  remove_this_rubric_from_my_list_c7d80704: "Ta bort den här värderingsmallen från min lista"
+  remove_this_rubric_from_my_list_c7d80704: "Ta bort den här Rubriken från min lista"
   remove_this_section_9a88ca43: "Ta bort den här sektionen"
   rename_45608f54: "Döp om"
   rename_c_name_section_e0e92c97: "Döp om %{c.name} sektionen"
@@ -15300,6 +15300,7 @@ sv:
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Den här uppgiften har släppts och kommer inte räknas in i den total uträkningen."
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Den här uppgiften är ursäktad och kommer inte räknas in i den totala uträkningen"
   this_assignment_is_overdue_a44bea3b: "Uppgiften är sen"
+  this_assignment_will_no_longer_count_towards_your__a6eb6778: "Den här uppgiften kommer inte längre att räknas mot ditt betyg."
   this_conference_may_be_recorded_f76deeeb: "Konferensen kan komma att spelas in."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Kursen kan inte läggas till i kursmenyn just nu."
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Kursen har inte börjat än. Du kommer inte kunna delta i kursen förrens %{date}."
@@ -15337,6 +15338,7 @@ sv:
   this_quiz_has_been_excused_d89d2b74: "Quiz har slutförts."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Detta Quiz är avpublicerad* endast lärare kan se detta Quiz tills den är publicerad."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denna inspelaren använder Flash. Därför kan det vara enklare att föra din inspelning på din maskin och använda mediauppladdaren för att ladda upp den."
+  this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Den här rapporten visar alla kurser för en given term. Den resulterande csv-filen kommer att ha en rad per kurs och kommer att visa kurs-id, kursens sis-id, kursens kortnamn, kursnamn, konto-id, kontots sis-id, kontonamn, använt utrymmer i MB."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna sample-sidan inkluderar vanliga UI element i Canvas för att hjlpa dig bygga ditt eget märke. När du börjar ändra färgvärden och bilder i den vänstra menyn, kommer du se en *Förhandsvisa Dina Ändringar* -knapp. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Elevens respons är dold efter som uppgiften är anonym."
   this_student_wrote_f1a3f22d: "Eleven skrev:"
@@ -15541,6 +15543,7 @@ sv:
     new_topic: "Nytt diskussionsämne"
   title_52b8638d: "Titel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} mötesgrupp* Du kan **registrera dig** för det här."
+  title_ee03d132: Titel
   title_is_off_6c823e2d: "%{title} är av"
   title_is_on_2b72a9b7: "%{title} är på"
   title_separator: ":"
@@ -15567,6 +15570,7 @@ sv:
       Om leverantören kan konfigurera giltiga callback eller omdirigera URLs, använd %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "För att länka kursobservatör *%{name}* elev skriver du in elevens namn nedanför för att hitta dem och därefter klickar du på Uppdatera."
   to_minscore_43e5452e: "till %{minScore}%"
+  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "För att förhandsvisa Theme Editor-märkning kommer du att behöva *stäng av högkontrast UI*."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Ange domänen här för att begränsa användare från särskilda Google Apps domäner."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "För att visa uppgift måste du se till att *Agenda* vy är aktiv."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Starta dashcard vy eller senaste aktivitet flöde"
@@ -15627,11 +15631,14 @@ sv:
   unchanged_aca18e02: "[Oändrad]"
   undated_items_toggle_list_visibility_6219e641: "Odaterade föremål öppnar list-synlighet"
   undo_a7be8fef: Ångra
+  unenrolled_users_e7632d24: "Inskrivna användare"
+  ungraded_answers_31ef2df7: "Ej betygsatta svar"
   ungraded_submissions_44efb0ec: "Ej betygsatta inlämningar"
   ungraded_survey_ad7de790: "Ej betygsatt undersökning"
   unknown: Okänd
   unknown_47a3b725: Okänd
   unknown_account_74d30b82: "Okänt konto"
+  unknown_answers_9688a2bc: "Okända svar"
   unknown_content_type_ae6d08e8: "Okänd innehållstyp"
   unknown_question_bank: "Okänd frågebank"
   unknown_quiz: "Okänd quiz"
@@ -15658,6 +15665,7 @@ sv:
   unpublished_courses_title: "Avpublicerade kurser"
   unpublished_dfd8801: opublicerad
   unread_e9c1b19c: Oläst
+  unregister_service_985238e9: "Avregistrera Service"
   unstarted_932f2990: "Ej startad"
   unsupported_package: "Innehållspaket som inte kan hanteras"
   until_8bdea3de: tills
@@ -15679,10 +15687,12 @@ sv:
   upload_data_dc4fa4cb: "Ladda upp data"
   upload_drop_zone: 
     drop_to_upload: "Släpp föremå för att ladda upp"
+  upload_failed_quota_exceeded_ff3af659: "Uppladdning misslyckades, kvoten är överskriden"
   upload_media_ce31135a: "Ladda upp media"
   upload_successful_ca47465f: "Laddades upp"
   upper_limit_of_range_c454a8f2: "Räckviddens övre gräns"
   url_cc9398ca: "URL:"
+  url_is_required_4689ed84: "URL krävs"
   url_type_3ece27d2: URLtyp
   usage_right_ff96f3e2: "Användarrättigheter:"
   usage_rights_f0960ad6: Användarrättigheter
@@ -15693,6 +15703,8 @@ sv:
   use_new_folder_tree_in_files_eb5a451b: "Använd ett nytt mappträd i filer"
   use_remote_service_for_notifications_9fe667c6: "Använda fjärrtjänster för aviseringar"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Använd fjärrversion av Rich Content Editor"
+  use_remote_version_of_rich_content_editor_and_side_a058a664: "Använd fjärrversion av Rich Content Editor OCH sidofält"
+  use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Använd fjärrversion av Rich Content Editor OCH sidofält i högriskområden som test"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Använd det nya quiz LTI-verktyget istället för vanliga canvas quizzes"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Använd den här konfigurationen för registrering av förälder/observatör "
   used_by_permission_314a78dd: "Använd med behörighet"
@@ -16135,6 +16147,7 @@ sv:
   view_next_file_a8a4a885: "Visa nästa fil"
   view_previous_file_b846db4f: "Visa förra filen"
   view_question_banks_188a9e0f: "Visa frågebanker"
+  view_rubric_evaluation_b1b0db2a: "Visa Rubrikutvärdering"
   view_student_analytics_6b8ccd42: "Visa elevanalyser"
   view_the_assignment_e61ca4fc: "Visa denna uppgiften"
   view_toolname_placements_4a5724d1: "Visa %{toolName} placeringar"
@@ -16143,6 +16156,7 @@ sv:
   viewing_folders_is_not_available_798a15e1: "Visning av mappar är inte tillgängligt"
   visit_864b4060: Besök
   visit_group_group_name_7a816081: "Besök gruppen %{group_name}"
+  warning_6576b5b8: varning
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Varning: Crocodoc har begränsningar när det används i Firefox. Kommentarer kommer inte alltid sparas."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Varning: För förbättrade tillgång till filer som rör sig, använd Move To DIalog alternativet som hittas i menyn."
   warning_icon_f64936d7: varningsikon
@@ -16182,6 +16196,7 @@ sv:
   welcome_to_the_canvas_theme_editor_73091d1: "Välkommen till Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Välkommen till dina kuser! För att ändra listan av kurser, klickar du på \"Alla kurser\" länken och stjärnmarkerar de kurser du vill visa. "
   well_below_mastery_37664bdc: "Når inte målen"
+  what_are_self_sign_up_groups_af1f002a: "Vad är självregistreringsgrupper?"
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "När den är aktiverad kan javascript och CSS-filer laddas upp i *%{t_theme_editor}*"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs. Du kan välja om den ska visa en kursström, en lista över kursmoduler, en kursplan eller en sidan som du skapat. Den är förinställd på kursström."
@@ -16341,6 +16356,7 @@ sv:
         zero: "Ingen %{model} hittades"
     page_gap: "&hellip;"
     previous_label: "&#8592; föregående"
+  will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(vi kommer att skicka till alla om inga val görs)"
   will_unlock_unlock_date_1024c38d: "Kommer låsas upp %{unlock_date}"
   wimba_conference: 
     external_urls: 
@@ -16447,6 +16463,7 @@ sv:
       Du bör konfigurera %{callback_url} som Callback URL, och ställa in tillgångsnivån
       Läs, Skriv och tillgång till direktmeddelanden
       Efter att du skapat din applikation skriver du ner Konsumentnyckeln och Konsument hemligheten, och anger dem här.
+  you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du kommer inte att kunna förhandstitta på dina ändringar"
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din uppgiftslista kan nu hittas på *Kalender* sidan."
   your_assignments_list_has_improved_3eded80e: "Din *Uppgifts* -list har förbättrats!"
