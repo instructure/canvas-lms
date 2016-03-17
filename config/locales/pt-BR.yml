@@ -11994,7 +11994,6 @@ pt-BR:
   qti_img_matching_question: "A questão correspondente importada contém imagens em ambos os lados, o que não é suportado"
   qti_img_matching_question_distractors: "A questão correspondente importada contém imagens em ambos os lados e não pode ser fixado pois também contém respostas erradas"
   qti_name: "Conversor QTI"
-  qualified_locale: pt-BR
   question_9121487: Pergunta
   question_answered: Respondida
   question_bank: 

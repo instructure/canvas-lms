@@ -11965,7 +11965,6 @@ nl:
   qti_img_matching_question: "Geïmporteerde overeenkomstige vraag bevat afbeelding aan beide zijden, die niet ondersteund wordt"
   qti_img_matching_question_distractors: "Geïmporteerde overeenkomstige vraag bevat afbeeldingen binnen de keuzes, en kan niet opgelost worden omdat het ook onjuiste opties bevat"
   qti_name: "QTI Converter"
-  qualified_locale: nl-NL
   question_9121487: "Vraag "
   question_answered: Beantwoord
   question_bank: 

@@ -11974,7 +11974,6 @@ ja:
   qti_img_matching_question: インポートされた一致問題は両側に画像を含んでいますが、この形式はサポートされていません
   qti_img_matching_question_distractors: インポートされた一致問題は選択肢内に画像を含んでおり、さらにデストラクタも含んでいるため修正できませんでした
   qti_name: "QTI コンバータ"
-  qualified_locale: ja-JP
   question_9121487: 質問
   question_answered: 解答済み
   question_bank: 

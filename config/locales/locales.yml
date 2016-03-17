@@ -1,102 +1,108 @@
 en:
   locales:
     en: English (US)
-  qualified_locale: en-US
+  bigeasy_locale: en_US
 es:
   locales:
     es: Español
-  qualified_locale: es-ES
+  bigeasy_locale: es_ES
 de:
   locales:
     de: Deutsch
-  qualified_locale: de-DE
+  bigeasy_locale: de_DE
 ru:
   locales:
     ru: pу́сский
-  qualified_locale: ru-RU
+  bigeasy_locale: ru_RU
 fr:
   locales:
     fr: Français
-  qualified_locale: fr-FR
+  bigeasy_locale: fr_FR
 pl:
   locales:
     pl: Polski
-  qualified_locale: pl-PL
+  bigeasy_locale: pl_PL
 zh-Hans:
   locales:
     zh-Hans: 简体中文
-  qualified_locale: zh-CN
+  bigeasy_locale: zh_CN
+  fullcalendar_locale: zh-cn
+  moment_locale: zh-cn
 zh-Hant:
   locales:
     zh-Hant: 繁體中文
-  qualified_locale: zh-HK
+  bigeasy_locale: zh_HK
+  fullcalendar_locale: zh-cn
+  moment_locale: zh-tw
 ar:
   locales:
     ar: العربية
-  qualified_locale: ar-SA
+  bigeasy_locale: ar_SA
+  moment_locale: ar-sa
 pt:
   locales:
     pt: Português
-  qualified_locale: pt-PT
+  bigeasy_locale: pt_PT
 pt-BR:
   locales:
     pt-BR: Português do Brasil
-  qualified_locale: pt-BR
 ja:
   locales:
     ja: 日本語
-  qualified_locale: ja-JP
+  bigeasy_locale: ja_JP
 mi:
   locales:
     mi: Reo Māori (Aotearoa)
-  qualified_locale: mi-NZ
+  bigeasy_locale: mi_NZ
+  fullcalendar_locale: en
+  moment_locale: mi-nz
 nl:
   locales:
     nl: Nederlands
-  qualified_locale: nl-NL
+  bigeasy_locale: nl_NL
   crowdsourced: false
 nb:
   locales:
     nb: Norwegian (Bokmål)
-  qualified_locale: nb-NO
+  bigeasy_locale: nb_NO
 ko:
   locales:
     ko: 한국말 (crowd-sourced)
-  qualified_locale: ko-KR
+  bigeasy_locale: ko_KR
   crowdsourced: true
 en-GB:
   locales:
     en-GB: English (United Kingdom)
-  qualified_locale: en-GB
 en-AU:
   locales:
     en-AU: English (Australia)
-  qualified_locale: en-AU
 tr:
   locales:
     tr: Türkçe (crowd-sourced)
-  qualified_locale: tr-TR
+  bigeasy_locale: tr_TR
   crowdsourced: true
 fa:
   locales:
     fa: فارسی (crowd-sourced)
-  qualified_locale: fa-IR
+  bigeasy_locale: fa_IR
   crowdsourced: true
 da:
   locales:
     da: Dansk
-  qualified_locale: da-DK
+  bigeasy_locale: da_DK
 hy:
   locales:
     hy: Հայերեն (crowd-sourced)
-  qualified_locale: hy-AM
+  bigeasy_locale: hy_AM
+  fullcalendar_locale: en
+  moment_locale: hy-am
   crowdsourced: true
 sv:
   locales:
     sv: Svenska
-  qualified_locale: sv-SE
+  bigeasy_locale: sv_SE
 he:
   locales:
     he: עברית (crowd-sourced)
+  bigeasy_locale: he_IL
   crowdsourced: true
-  qualified_locale: he-IL

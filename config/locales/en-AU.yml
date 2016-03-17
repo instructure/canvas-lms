@@ -11996,7 +11996,6 @@ en-AU:
   qti_img_matching_question: "Imported matching question contains images on both sides, which is unsupported"
   qti_img_matching_question_distractors: "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
   qti_name: "QTI Converter"
-  qualified_locale: en-AU
   question_9121487: Question
   question_answered: Answered
   question_bank: 

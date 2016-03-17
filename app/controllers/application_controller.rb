@@ -126,7 +126,13 @@ class ApplicationController < ActionController::Base
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-      @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
+      unless @js_env[:LOCALE]
+        @js_env[:LOCALE] = I18n.locale.to_s
+        @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
+        @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
+        @js_env[:MOMENT_LOCALE] = I18n.moment_locale
+      end
+
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 

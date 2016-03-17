@@ -11669,7 +11669,6 @@ tr:
   qti_img_matching_question: "İçeri aktarılan eşleştirme sorularının her iki tarafında görseller var ve bu desteklenmemektedir"
   qti_img_matching_question_distractors: "İçe aktarılan eşleştirme sorularındaki seçeneklerde görseller var ve çeldiriciler de içerdiği için bu düzeltilemez "
   qti_name: "QTI Dönüştürücü"
-  qualified_locale: tr-TR
   question_9121487: Soru
   question_answered: Cevaplandı
   question_bank: 

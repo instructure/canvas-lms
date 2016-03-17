@@ -141,8 +141,16 @@ I18n.send(:extend, Module.new {
   end
   alias :t :translate
 
-  def qualified_locale
-    backend.direct_lookup(locale.to_s, "qualified_locale") || "en-US"
+  def bigeasy_locale
+    backend.direct_lookup(locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
+  end
+
+  def fullcalendar_locale
+    backend.direct_lookup(locale.to_s, "fullcalendar_locale") || locale.to_s.downcase
+  end
+
+  def moment_locale
+    backend.direct_lookup(locale.to_s, "moment_locale") || locale.to_s.downcase
   end
 })
 

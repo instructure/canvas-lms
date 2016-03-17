@@ -11934,7 +11934,6 @@ es:
   qti_img_matching_question: "La pregunta importada correspondiente contiene imágenes en ambos lados. Esta opción no es compatible"
   qti_img_matching_question_distractors: "La pregunta importada correspondiente contiene imágenes dentro de las opciones, y no se pudo corregir porque también contiene distractores"
   qti_name: "Conversor de QTI"
-  qualified_locale: es-ES
   question_9121487: Pregunta
   question_answered: Contestado
   question_bank: 

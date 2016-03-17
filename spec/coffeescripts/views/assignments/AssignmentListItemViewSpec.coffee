@@ -339,7 +339,7 @@ define [
     equal spy.callCount, 0
 
   test "renders lockAt/unlockAt with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'
@@ -373,7 +373,7 @@ define [
     equal $("span", $dds.last()).last().text().trim(), 'Aug 27'
 
   test "renders due date column with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'
