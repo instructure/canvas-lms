@@ -223,6 +223,16 @@ module CustomSeleniumActions
     el.send_keys *keys
   end
 
+  def clear_content(selector)
+    el = driver.find_element :css, selector
+    driver.action.move_to(el).click.perform
+    driver.action.key_down(:command)
+        .send_keys('a')
+        .key_up(:command)
+        .perform
+    driver.action.send_keys(:backspace).perform
+  end
+
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'

@@ -168,7 +168,7 @@ describe "discussions" do
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#has_group_category').click
-        drop_down = get_options('#assignment_group_category_id').map(&:text)
+        drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
         expect(drop_down).to include('category 1')
         click_option('#assignment_group_category_id', @category1.name)
         expect_new_page_load {submit_form('.form-actions')}
@@ -185,6 +185,7 @@ describe "discussions" do
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#use_for_grading').click
         f('#discussion_topic_assignment_points_possible').send_keys('10')
+        wait_for_ajaximations
         click_option('#assignment_group_id', assignment_group.name)
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
@@ -283,7 +284,7 @@ describe "discussions" do
         edit_name = 'edited discussion name'
         get url
         expect_new_page_load { f(".edit-btn").click }
-
+        clear_content('input[name=title]')
         edit(edit_name, 'edit message')
       end
 
