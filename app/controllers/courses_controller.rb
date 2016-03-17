@@ -1750,9 +1750,10 @@ class CoursesController < ApplicationController
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
       list = UserList.new(params[:user_list],
-                          :root_account => @context.root_account,
-                          :search_method => @context.user_list_search_mode_for(@current_user),
-                          :initial_type => params[:enrollment_type])
+                          root_account: @context.root_account,
+                          search_method: @context.user_list_search_mode_for(@current_user),
+                          initial_type: params[:enrollment_type],
+                          current_user: @current_user)
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|

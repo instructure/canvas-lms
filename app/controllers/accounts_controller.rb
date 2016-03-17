@@ -876,8 +876,9 @@ class AccountsController < ApplicationController
     end
 
     list = UserList.new(params[:user_list],
-                        :root_account => @context.root_account,
-                        :search_method => @context.user_list_search_mode_for(@current_user))
+                        root_account: @context.root_account,
+                        search_method: @context.user_list_search_mode_for(@current_user),
+                        current_user: @current_user)
     users = list.users
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
