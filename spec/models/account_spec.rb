@@ -519,6 +519,19 @@ describe Account do
     end
   end
 
+  context "sharding" do
+    specs_require_sharding
+
+    it "queries for enrollments correctly when another shard is active" do
+      teacher_in_course
+      @enrollment.accept!
+
+      @shard1.activate do
+        expect(Account.default.grants_right?(@user, :read_sis)).to eq true
+      end
+    end
+  end
+
   it "should allow no_enrollments_can_create_courses correctly" do
     a = Account.default
     a.settings = { :no_enrollments_can_create_courses => true }
