@@ -10,16 +10,12 @@ define([
     'highrisk': "RICH_CONTENT_HIGH_RISK_ENABLED"
   }
 
-  function serviceHost() {
-    return window.ENV.RICH_CONTENT_CDN_HOST || window.ENV.RICH_CONTENT_APP_HOST
-  }
-
   function loadRCEViaService (target, tinyMCEInitOptions) {
-    serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, serviceHost())
+    serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions)
   }
 
   function loadSidebarViaService (target, callback){
-    serviceRCELoader.loadSidebarOnTarget(target, serviceHost(), callback)
+    serviceRCELoader.loadSidebarOnTarget(target, callback)
   }
 
   function loadRCEViaEditorBox(target, tinyMCEInitOptions){
@@ -145,7 +141,7 @@ define([
 
   RichContentEditor.prototype.preloadRemoteModule = function(){
     if (this.featureFlag) {
-      serviceRCELoader.preload(serviceHost())
+      serviceRCELoader.preload()
     }
   }
 

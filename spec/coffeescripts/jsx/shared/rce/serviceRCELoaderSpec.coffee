@@ -2,9 +2,12 @@ define [
   'jquery'
   'jsx/shared/rce/serviceRCELoader'
   'helpers/editorUtils'
-], ($, RCELoader, editorUtils) ->
+  'helpers/fakeENV'
+], ($, RCELoader, editorUtils, fakeENV) ->
   module 'loadRCE',
     setup: ->
+      fakeENV.setup()
+      ENV.RICH_CONTENT_APP_HOST = 'app-host'
       # make sure we don't get a cached thing from other tests
       RCELoader.cachedModule = null
       @elementInFixtures = (type) ->
@@ -17,33 +20,36 @@ define [
         callback()
 
     teardown: ->
+      fakeENV.teardown()
       $.getScript.restore()
       editorUtils.resetRCE()
       document.getElementById("fixtures").innerHtml = ""
 
   # loading RCE
 
+  test 'calls getScript with ENV.RICH_CONTENT_APP_HOST and /get_module if no CDN host', ->
+    RCELoader.loadRCE(()->)
+    ok @getScriptSpy.calledWith("//app-host/get_module")
+
+  test 'prefers ENV.RICH_CONTENT_APP_HOST with /latest over app host for getScript call', ->
+    ENV.RICH_CONTENT_CDN_HOST = 'cdn-host'
+    RCELoader.loadRCE(()->)
+    ok @getScriptSpy.calledWith("//cdn-host/latest")
+
   test 'caches the response of get_module when called', ->
-    equal RCELoader.cachedModule, null
-    RCELoader.loadRCE("somehost.com", (() ->))
+    RCELoader.cachedModule = null
+    RCELoader.loadRCE(()->)
     equal RCELoader.cachedModule, 'fakeModule'
-    ok(@getScriptSpy.calledOnce)
 
   test 'does not call get_module once a response has been cached', ->
     RCELoader.cachedModule = "foo"
-    ok(@getScriptSpy.notCalled)
-    RCELoader.loadRCE("somehost.com", () -> "noop")
-    ok(@getScriptSpy.notCalled)
+    RCELoader.loadRCE(()->)
+    ok @getScriptSpy.notCalled
 
   test 'executes a callback when RCE is loaded', ->
-    cb = sinon.spy();
-    RCELoader.loadRCE("dontCare", cb)
+    cb = sinon.spy()
+    RCELoader.loadRCE(cb)
     ok cb.called
-
-  test 'uses `latest` version when hitting a cloudfront host', ->
-    ok(@getScriptSpy.notCalled)
-    RCELoader.loadRCE("xyz.cloudfront.net/some/path", () -> "noop")
-    ok(@getScriptSpy.calledWith("//xyz.cloudfront.net/some/path/latest"))
 
   # target finding
 
@@ -75,14 +81,12 @@ define [
     customFn = ()->
       return "someCustomTarget"
 
-    loadingSpy = sinon.stub(RCELoader, "loadRCE")
     renderIntoDivSpy = sinon.spy()
-    fakeRCE = { renderIntoDiv: renderIntoDivSpy}
+    fakeRCE = { renderIntoDiv: renderIntoDivSpy }
+    sinon.stub(RCELoader, "loadRCE").callsArgWith(0, fakeRCE)
 
     # execute renderIntoDivSpy
-    RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn}, "www.some-host.com")
-    call = loadingSpy.getCall(0)
-    call.args[1](fakeRCE)
+    RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn})
     ok renderIntoDivSpy.calledWith("someCustomTarget")
     RCELoader.loadRCE.restore()
 
@@ -116,9 +120,9 @@ define [
     equal props.mirroredAttrs.name, "elementName"
 
   test 'only tries to load the module once', ->
-    RCELoader.preload("host")
-    RCELoader.preload("host")
-    RCELoader.preload("host")
+    RCELoader.preload()
+    RCELoader.preload()
+    RCELoader.preload()
     ok(@getScriptSpy.calledOnce)
 
 
@@ -132,11 +136,11 @@ define [
         callback()
     # first make sure all the state is fixed so test call isn't
     # making it's own getScript call
-    RCELoader.preload("host")
-    RCELoader.loadRCE("host", (()=>))
+    RCELoader.preload()
+    RCELoader.loadRCE(()->)
 
     # now setup while-in-flight load request to check
-    RCELoader.loadRCE "host", (module)=>
+    RCELoader.loadRCE (module) =>
       start()
       equal(module, "fakeModule")
     resolveGetScript()

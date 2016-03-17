@@ -12,36 +12,25 @@ define [
   module 'RichContentEditor - preloading',
     setup: ->
       fakeENV.setup()
-      ENV.RICH_CONTENT_SERVICE_ENABLED = true
-      @preloadSpy = sinon.spy(RCELoader, "preload");
+      @preloadSpy = sinon.spy(RCELoader, "preload")
 
     teardown: ->
       fakeENV.teardown()
       RCELoader.preload.restore()
       editorUtils.resetRCE()
 
-  test 'loads with CDN host if available', ->
-    ENV.RICH_CONTENT_CDN_HOST = "cdn-host"
-    ENV.RICH_CONTENT_APP_HOST = "app-host"
+  test 'loads via RCELoader.preload when service enabled', ->
+    ENV.RICH_CONTENT_SERVICE_ENABLED = true
+    ENV.RICH_CONTENT_APP_HOST = 'app-host'
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
     richContentEditor.preloadRemoteModule()
-    ok @preloadSpy.calledWith("cdn-host")
-
-  test 'uses app host if no cdn host', ->
-    ENV.RICH_CONTENT_CDN_HOST = undefined
-    ENV.RICH_CONTENT_APP_HOST = "app-host"
-    richContentEditor = new RichContentEditor({riskLevel: 'basic'})
-    richContentEditor.preloadRemoteModule()
-    ok @preloadSpy.calledWith("app-host")
+    ok @preloadSpy.called
 
   test 'does nothing when service disabled', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = undefined
-    ENV.RICH_CONTENT_CDN_HOST = "cdn-host"
-    ENV.RICH_CONTENT_APP_HOST = "app-host"
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
     richContentEditor.preloadRemoteModule()
     ok @preloadSpy.notCalled
-
 
   module 'RichContentEditor - loading editor',
     setup: ->
@@ -57,20 +46,12 @@ define [
       fixtures.teardown()
       RCELoader.loadOnTarget.restore()
 
-  test 'calls RCELoader.loadOnTarget with a target and host', ->
+  test 'calls RCELoader.loadOnTarget with target and options', ->
     richContentEditor = new RichContentEditor({riskLevel: 'basic'})
-    richContentEditor.loadNewEditor(@$target, {})
-    ok RCELoader.loadOnTarget.calledOnce
-    # because of freshening it will be the same dom node, but not the same
-    # jquery object by reference
-    equal RCELoader.loadOnTarget.firstCall.args[0].get(0), @$target.get(0)
-    equal RCELoader.loadOnTarget.firstCall.args[2], "http://fakehost.com"
-
-  test 'CDN host overrides app host', ->
-    ENV.RICH_CONTENT_CDN_HOST = "http://fakecdn.net"
-    richContentEditor = new RichContentEditor({riskLevel: 'basic'})
-    richContentEditor.loadNewEditor(@$target, {})
-    equal RCELoader.loadOnTarget.firstCall.args[2], "http://fakecdn.net"
+    sinon.stub(richContentEditor, 'freshNode').withArgs(@$target).returns(@$target)
+    options = {}
+    richContentEditor.loadNewEditor(@$target, options)
+    ok RCELoader.loadOnTarget.calledWith(@$target, options)
 
   test 'calls editorBox and set_code when feature flag off', ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
@@ -104,7 +85,7 @@ define [
         attachToEditor: (ed)->
           wikiSidebar.editor = ed
       }
-      sinon.stub(RCELoader, "loadSidebarOnTarget").callsArgWith(2, {is_a: 'remote_sidebar'})
+      sinon.stub(RCELoader, "loadSidebarOnTarget").callsArgWith(1, {is_a: 'remote_sidebar'})
 
     teardown: ->
       fakeENV.teardown()

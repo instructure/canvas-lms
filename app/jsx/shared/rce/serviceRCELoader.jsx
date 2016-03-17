@@ -5,18 +5,19 @@ define([
   'jsx/shared/rce/loadEventListeners',
   'jsx/shared/rce/polyfill'
 ], function($, _, editorOptions, loadEventListeners, polyfill) {
+
   let RCELoader = {
-    preload(host) {
-      this.loadRCE(host, function(){})
+    preload() {
+      this.loadRCE(function(){})
     },
 
-    loadOnTarget(target, tinyMCEInitOptions, host) {
+    loadOnTarget(target, tinyMCEInitOptions) {
       const textarea = this.getTargetTextarea(target)
       const getTargetFn = tinyMCEInitOptions.getRenderingTarget || this.getRenderingTarget
       const renderingTarget = getTargetFn(textarea)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
-      this.loadRCE(host, function(RCE) {
+      this.loadRCE(function(RCE) {
         RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
           // same as freshen node in RichContentEditor
           let $textarea = $('#' + textarea.id)
@@ -25,9 +26,9 @@ define([
       })
     },
 
-    loadSidebarOnTarget(target, host, callback){
+    loadSidebarOnTarget(target, callback){
       let props = {}
-      this.loadRCE(host, function (RCE) {
+      this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, callback)
       })
     },
@@ -48,7 +49,7 @@ define([
     *
     * @private
     */
-    loadRCE(host, cb) {
+    loadRCE(cb) {
       if(this.cachedModule !== null){
         cb(this.cachedModule)
       } else {
@@ -58,7 +59,7 @@ define([
           // multiple times, so anybody who wants the module can queue up
           // a callback, but first one to this point performs the load
           this.loadingFlag = true
-          let moduleUrl = this.buildModuleUrl(host)
+          let moduleUrl = this.buildModuleUrl()
           $.getScript(moduleUrl, (res) => { this.onRemoteLoad() })
         }
       }
@@ -145,14 +146,18 @@ define([
      * @private
      * @return {String} ready-to-use URL for loading RCE remotely
      */
-    buildModuleUrl(host) {
+    buildModuleUrl() {
+      let host, path
+      if (window.ENV.RICH_CONTENT_CDN_HOST) {
+        host = window.ENV.RICH_CONTENT_CDN_HOST
+        path = '/latest'
+      } else {
+        host = window.ENV.RICH_CONTENT_APP_HOST
+        path = '/get_module'
+      }
       // trim trailing slash if there is one, as we're going to add one below
       host = host.replace(/\/$/, "")
-      var moduleUrl = '//'+ host +'/get_module'
-      if(host.indexOf("cloudfront") > -1){
-        moduleUrl = '//' + host + '/latest'
-      }
-      return moduleUrl
+      return '//' + host + path
     },
 
     /**
