@@ -9,7 +9,7 @@ module Canvas
     KV_NAMESPACE = "/config/canvas".freeze
 
     class << self
-      attr_accessor :config, :cache
+      attr_accessor :config, :cache, :fallback_data
 
       def config=(conf_hash)
         @config = conf_hash
@@ -27,10 +27,14 @@ module Canvas
       end
 
       def find(key)
-        raise(ConsulError, "Unable to contact consul without config") if config.nil?
-        config_records = store_get(key)
-        config_records.each_with_object({}) do |node, hash|
-          hash[node[:key].split("/").last] = node[:value]
+        if config.nil?
+          return fallback_data.fetch(key) if fallback_data.present?
+          raise(ConsulError, "Unable to contact consul without config")
+        else
+          config_records = store_get(key)
+          config_records.each_with_object({}) do |node, hash|
+            hash[node[:key].split("/").last] = node[:value]
+          end
         end
       end
 

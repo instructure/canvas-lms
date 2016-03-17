@@ -14,7 +14,10 @@ module Canvas
       rescue Faraday::ConnectionFailed
         # don't fail the test if there is no consul running
       end
+      Canvas::DynamicSettings.reset_cache!
+      Canvas::DynamicSettings.fallback_data = nil
     end
+
     let(:parent_key){ "rich-content-service" }
     let(:diplomat_read_options){ { recurse: true, consistency: 'stale' } }
 
@@ -58,60 +61,82 @@ module Canvas
     end
 
     describe ".find" do
+      describe "with consul config" do
+        # we don't need to interact with a real consul for unit tests
+        before(:each) do
+          DynamicSettings.config = {} # just to be not nil
+          DynamicSettings.fallback_data = nil
+          Diplomat::Kv.stubs(:put)
+          Diplomat::Kv.stubs(:get).
+            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            returns(
+              [
+                { key: "#{parent_key}/app-host", value: "rce.insops.com"},
+                { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
+              ]
+            )
+        end
 
-      # we don't need to interact with a real consul for unit tests
-      before(:each) do
-        DynamicSettings.config = {} # just to be not nil
-        Diplomat::Kv.stubs(:put)
-        Diplomat::Kv.stubs(:get).
-          with("/config/canvas/#{parent_key}", diplomat_read_options).
-          returns(
-            [
-              { key: "#{parent_key}/app-host", value: "rce.insops.com"},
-              { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
-            ]
+        it "loads the children of a k/v node as a hash" do
+          rce_settings = DynamicSettings.find(parent_key)
+          expect(rce_settings).to eq({
+            "app-host" => "rce.insops.com",
+            "cdn-host" => "asdfasdf.cloudfront.com"
+          })
+        end
+
+        it "uses the last found value on catastrophic outage" do
+          DynamicSettings.reset_cache!(hard: true)
+          DynamicSettings.find(parent_key)
+          # some values are now stored in case of connection failure
+          Diplomat::Kv.stubs(:get).
+            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            raises(Faraday::ConnectionFailed, "could not contact consul")
+
+          rce_settings = DynamicSettings.find(parent_key)
+          expect(rce_settings).to eq({
+            "app-host" => "rce.insops.com",
+            "cdn-host" => "asdfasdf.cloudfront.com"
+          })
+        end
+
+        it "cant recover with no value cached for connection failure" do
+          DynamicSettings.reset_cache!(hard: true)
+          Diplomat::Kv.stubs(:get).
+            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            raises(Faraday::ConnectionFailed, "could not contact consul")
+
+          expect{ DynamicSettings.find(parent_key) }.to(
+            raise_error(Faraday::ConnectionFailed)
           )
+        end
       end
 
-      it "explodes when trying to access it without a config file" do
-        DynamicSettings.config = nil
-        expect{ DynamicSettings.find(parent_key) }.to(
-          raise_error(DynamicSettings::ConsulError)
-        )
-      end
+      describe "without consul config" do
+        before(:each){ DynamicSettings.config = nil }
 
-      it "loads the children of a k/v node as a hash" do
-        rce_settings = DynamicSettings.find(parent_key)
-        expect(rce_settings).to eq({
-          "app-host" => "rce.insops.com",
-          "cdn-host" => "asdfasdf.cloudfront.com"
-        })
-      end
+        it "will load settings from fallback hash" do
+          fallback_data = {
+            'canvas' => {
+              'encryption-secret' => 'asdf',
+              'signing-secret' => 'fdas'
+            }
+          }.with_indifferent_access
+          DynamicSettings.fallback_data = fallback_data
+          canvas_settings = DynamicSettings.find("canvas")
+          expect(canvas_settings).to eq({
+            'encryption-secret' => 'asdf',
+            'signing-secret' => 'fdas'
+          })
+        end
 
-      it "uses the last found value on catastrophic outage" do
-        DynamicSettings.reset_cache!(hard: true)
-        DynamicSettings.find(parent_key)
-        # some values are now stored in case of connection failure
-        Diplomat::Kv.stubs(:get).
-          with("/config/canvas/#{parent_key}", diplomat_read_options).
-          raises(Faraday::ConnectionFailed, "could not contact consul")
-
-        rce_settings = DynamicSettings.find(parent_key)
-        expect(rce_settings).to eq({
-          "app-host" => "rce.insops.com",
-          "cdn-host" => "asdfasdf.cloudfront.com"
-        })
-      end
-
-      it "cant recover with no value cached for connection failure" do
-        DynamicSettings.reset_cache!(hard: true)
-        Diplomat::Kv.stubs(:get).
-          with("/config/canvas/#{parent_key}", diplomat_read_options).
-          raises(Faraday::ConnectionFailed, "could not contact consul")
-
-        expect{ DynamicSettings.find(parent_key) }.to(
-          raise_error(Faraday::ConnectionFailed)
-        )
+        it "errors if no fallback data" do
+          DynamicSettings.fallback_data = nil
+          expect{ DynamicSettings.find("canvas") }.to(
+            raise_error(DynamicSettings::ConsulError,
+                        "Unable to contact consul without config")
+          )
+        end
       end
     end
 
