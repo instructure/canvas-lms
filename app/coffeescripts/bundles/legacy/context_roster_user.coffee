@@ -14,18 +14,6 @@ require [
       , ((data) ->
         ), (data) ->
 
-    $(".link_enrollment_link").click (event) ->
-      event.preventDefault()
-      $link = $(this)
-      name = $("#name_and_email .name").text()
-      id = $link.attr("data-id")
-      associated_id = $link.attr("data-associated-id")
-      link_enrollment.choose name, id, associated_id, (enrollment) ->
-        $link.attr "data-id", enrollment.id
-        $link.attr "data-associated-id", enrollment.associated_user_id
-        $link.parents(".enrollment").find(".associated_user_name").text enrollment.associated_user_name
-        $link.parents(".enrollment").find(".associated_user").showIf enrollment.associated_user_id
-
     $(".unconclude_enrollment_link").click (event) ->
       event.preventDefault()
       $enrollment = $(this).parents(".enrollment")

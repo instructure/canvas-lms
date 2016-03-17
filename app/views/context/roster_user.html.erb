@@ -127,11 +127,6 @@
                     <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
                   </div>
                 <% end %>
-                <% if can_do(@context, @current_user, :manage_admin_users) && enrollment.is_a?(ObserverEnrollment) %>
-                  <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
-                    <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>
-                  </div>
-                <% end %>
                 <div><% if enrollment.defined_by_sis? %>
                   <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
                 <% else %>
