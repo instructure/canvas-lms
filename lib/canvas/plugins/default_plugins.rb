@@ -244,6 +244,16 @@ Canvas::Plugin.register('grade_export', :sis, {
                  :success_timeout => "600",
                  :format_type => "instructure_csv" }
 })
+Canvas::Plugin.register('i18n', nil, {
+    :name => lambda{ t :name, 'I18n' },
+    :description => lambda{ t :description, 'Custom Locales' },
+    :website => 'https://www.instructure.com',
+    :author => 'Instructure',
+    :author_website => 'http://www.instructure.com',
+    :version => '1.0.0',
+    :settings_partial => 'plugins/i18n_settings',
+    :validator => 'I18nValidator'
+})
 Canvas::Plugin.register('sis_import', :sis, {
   :name => lambda{ t :name, 'SIS Import' },
   :description => lambda{ t :description, 'Import SIS Data' },

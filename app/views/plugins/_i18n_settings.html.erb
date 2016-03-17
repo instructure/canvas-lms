@@ -1,0 +1,10 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+    <table style="width: 500px;" class="formtable">
+      <% LocaleSelection.custom_locales.each do |locale| %>
+          <tr>
+            <td><%= f.blabel locale, I18n.send(:t, :locales, :locale => locale)[locale] %></td>
+            <td><%= f.check_box locale, :enabled => settings[locale] %></td>
+          </tr>
+      <% end %>
+    </table>
+<% end %>
