@@ -150,10 +150,10 @@ class AssessmentItemConverter
         @question[:question_bank_id] = bank
       end
       if score =  get_node_att(meta, 'instructureField[name=max_score]', 'value')
-        @question[:points_possible] = score.to_f
+        @question[:points_possible] = [score.to_f, 0.0].max
       end
       if score = get_node_att(meta, 'instructureField[name=points_possible]', 'value')
-        @question[:points_possible] = score.to_f
+        @question[:points_possible] = [score.to_f, 0.0].max
       end
       if ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value')
         @question[:assessment_question_migration_id] = ref
