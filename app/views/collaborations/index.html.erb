@@ -54,7 +54,7 @@ HEREDOC
   <% end %>
 </div>
 <div id="collaborations">
-  <%= render partial: 'collaborations/collaboration', collection: @collaborations %>
+  <%= @collaborations.map {|c| collaboration(c, @current_user, @user_has_google_drive)}.join.html_safe %>
 </div>
 <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
   <%= render :partial => 'collaborations/forms' %>

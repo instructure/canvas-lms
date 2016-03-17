@@ -64,8 +64,7 @@ class CollaborationsController < ApplicationController
       tab_enabled?(@context.class::TAB_COLLABORATIONS)
 
     add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :collaborations]))
-
-    @collaborations = @context.collaborations.active
+    @collaborations = @context.collaborations.active.select { |c| can_do(c, @current_user, :read) }
     log_asset_access([ "collaborations", @context ], "collaborations", "other")
 
     # this will set @user_has_google_drive
