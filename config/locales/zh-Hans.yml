@@ -8140,7 +8140,7 @@ zh-Hans:
   loading_bde52856: 加载
   loading_more_results_def6df65: 正在载入更多的结果...
   locales: 
-    zh: 简体中文
+    zh-Hans: 简体中文
   lock_at_time_3c8a044e: "请看: %{time}"
   lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
   lock_date_cannot_be_after_section_end_d37da70c: 锁定日期不能晚于章节结束日期

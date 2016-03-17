@@ -89,7 +89,7 @@ fa:
   qualified_locale: fa
   crowdsourced: true
 fa-IR:
-  qualified_locale: fa-IR
+  qualified_locale: fa
   crowdsourced: true
   deprecated_for: fa
 da:
