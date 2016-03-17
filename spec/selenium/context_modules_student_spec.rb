@@ -231,6 +231,7 @@ describe "context modules" do
     end
 
     it "should allow a student view student to progress through module content" do
+      skip_if_chrome('breaks because of masquerade_bar')
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student
 
