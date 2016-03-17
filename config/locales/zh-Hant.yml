@@ -8103,7 +8103,7 @@ zh-Hant:
   loading_bde52856: 載入
   loading_more_results_def6df65: 正在載入更多結果...
   locales: 
-    zh_Hant: 繁體中文
+    zh-Hant: 繁體中文
   lock_at_time_3c8a044e: "鎖定於： %{time}"
   lock_date_cannot_be_after_course_end_a473158b: 鎖定日期不得晚於結課日期
   lock_date_cannot_be_after_section_end_d37da70c: 鎖定日期不得晚於章節結束之日
