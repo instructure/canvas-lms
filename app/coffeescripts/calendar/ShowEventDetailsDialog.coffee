@@ -185,13 +185,14 @@ define [
       dl = document.createElement('dl')
       for user in data
         dt = document.createElement('dt')
+        dt.setAttribute("data-response-status", user['user_status'])
         a = document.createElement('a')
         a.setAttribute('href', user['user_link'])
         a.textContent = user['user_name']
         dt.appendChild(a)
         dl.appendChild(dt)
         dd = document.createElement('dd')
-        dd.textContent = user['user_status']
+        dd.textContent = user['user_status_text']
         dl.appendChild(dd)
       element.html('')
       element.append(dl)

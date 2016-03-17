@@ -22,12 +22,16 @@ class BzController < ApplicationController
     result = []
     CalendarEvent.find(params[:id]).get_gcal_rsvp_status.each do |attendee|
       obj = {}
-      cc = CommunicationChannel.where(:path => attendee["email"])
+      # Going to look up unconfirmed emails too because the imported emails might
+      # not be formally confirmed in canvas while still being good for us (we confirmed
+      # via the join server already)
+      cc = CommunicationChannel.where(:path => attendee["email"], :path_type => 'email', :workflow_state => ['active', 'unconfirmed'])
       next if cc.empty?
       canvas_user = User.find(cc.first.user_id)
       obj['user_link'] = user_path(canvas_user)
       obj['user_name'] = canvas_user.name
-      obj['user_status'] = case attendee["responseStatus"]
+      obj['user_status'] = attendee["responseStatus"]
+      obj['user_status_text'] = case attendee["responseStatus"]
        when 'needsAction'
          'Not answered'
        else
