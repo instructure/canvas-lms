@@ -65,7 +65,7 @@ he:
       description: "יש צורך בהרשאות לחשבון  [Academic Benchmark](%{url}) "
       labels: 
         api_key: "מפתח API"
-        api_url: "URL של ה API "
+        api_url: "כתובת דף ה API "
         common_core_guid: " מזהה ייחודי (GUID) של הליבה המשותפת (אופציונלי)"
   accept_2fdd362e: קבלה
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "הפורמטים האפשריים: hex, rgb, rgba, hsl"
@@ -82,7 +82,7 @@ he:
     default_site_administrator_account_name: "מנהל אתר"
     default_term_name: "תקופת לימודים ברירת מחדל"
     errors: 
-      invalid_discovery_url: "ה discovery URL אינו תקין"
+      invalid_discovery_url: "כתובת דף ה discovery אינה תקינה"
     feedback_coach: "שאל/י את הקהילה"
     feedback_coach_sub: "קבלת עזרה ממומחה קנבס"
     feedback_feature_request_sub: "יש לך הצעה לשיפור קנבס?"
@@ -213,7 +213,7 @@ he:
       logout_response_from_idp: "תשובת ההזדהות שהתקבלה ממנגנון ההזדהות"
     sso_settings_form: 
       change_password_url_help: "השאירו ריק להתנהגות ברירת מחדל של קנבס"
-      discovery_url_description: "אם הוגדר discovery URL, קנבס ינתב את כל המשתמשים לכתובת זו באם יש צורך בהזדהות. דף זה יצטרך להנחות את המשתמשים היכן מבצעים את הלוג-אין. אם לא הוגדר  discovery URL, הקונפיגורציה הראשונית תשמש כנסיון לאמת את זהות המשתמש."
+      discovery_url_description: "אם הוגדרה כתובת דף discovery , קנבס ינתב את כל המשתמשים לכתובת זו באם יש צורך בהזדהות. דף זה יצטרך להנחות את המשתמשים היכן מבצעים את הלוג-אין. אם לא הוגדרה הכתובת, הקונפיגורציה הראשונית תשמש כנסיון לאמת את זהות המשתמש."
       login_handle_name_description: "הכיתוב המשמש למזהי התחברות יחודיים. לדוגמא: מזהה משתמש, שם משתמש, מספר תלמיד וכו'."
       unknown_user_url_description: "כתובת הדף לניתוב כאשר משתמש מזוהה לא אותר במערכת קנבס."
   account_domain_78f43049: "דומיין החשבון"
@@ -2269,7 +2269,7 @@ he:
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "לפני שתוכל/י לערוך את הפרופיל שלך, יש צורך לאמת את כתובת הדוא\"ל שלך  (%{email}) ע\"י הקלקה על הקישור בהודעת הדוא\"ל שנשלחה אליך. אם אינך רואה אותה, *בבקשה להקליק על שיגור מחדש של ההודעה*, ולודא שלא נשלחה לתיבת דואר הזבל שלך."
   beginning_date_2d2a29ac: "זמן תחילה"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "מתחת לשדה חיפוש זה יש רשימה של %{content_type}. בעת ההקלדה, הרשימה תסונן להתאים לשאילתה שלכם. הודעות דיון יסוננו בכל דרך בה תבחרו."
-  beta_url_3c7b88ec: "כתובת URL גירסת ביתא:"
+  beta_url_3c7b88ec: "כתובת דף גירסת הביתא:"
   better_file_browsing_description: |-
       זהו ממשק משתמש חדש לעיון בקבצים, ידידותי ופשוט יותר.  אם תפעילו ברמת הקורס,
       כל משתמשי הקורס יראו את הממשק החדש. כדי לגרום לכך שגם ייראה כאשר הם מנווטים אל דף הקבצים האישיים של המשתמש ('/files') יש צורך להפעיל גם לחשבון בו הם חברים.
@@ -2398,7 +2398,7 @@ he:
     view_course_roster: "הצג לוח משתתפי הקורס"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "כברירת מחדל כל הקישורים מופעלים לקורס. תלמידים לא יראו קישורים לאיזורים ללא תוכן. למשל, אם טרם הגדרת בחנים, הקישור לבחנים לא יוצג. ניתן למיין ובאופן יזום להסיר קישורים אלו אם ישנם אזורים של הקורס שאינך רוצה שתלמידים יכנסו אליהם."
   by_lti_2_registration_url_e421e523: "הכתובת להרשמה באמצעות LTI 2"
-  by_url_a163275e: "לפי URL"
+  by_url_a163275e: "לפי כתובת דף"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: סגירה
@@ -2801,7 +2801,7 @@ he:
         aws_creds_required: "הרשאות ה AWS נדרשות."
         endpoint_or_region_required: "איזור ה AWS (או נקודת קצה) נדרשים."
         fields_required: "השדה \"%{field}\" נדרש"
-        invalid_live_events_url: "נקודת קצה לא חוקית, נדרש URL תקין. "
+        invalid_live_events_url: "נקודת קצה לא חוקית, נדרשת כתובת דף תקינה. "
         invalid_url: "כתובת דף אינטרנט לא תקינה"
         login_expiration_minimum: "פקיעת תוקף Session חייבת להיות 20 דקות או יותר"
         need_integer: "בבקשה לספק ערך מספרי שלם עבור המטמון של רשימת הנגן"
@@ -3539,7 +3539,7 @@ he:
       restoring: משחזר...
   context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
-    url_or_domain_required: "שיש להגדיר URL או דומיין "
+    url_or_domain_required: "יש להגדיר כתובת דף או דומיין "
   context_level_56d88f5b: "(רמת ה %{context} )"
   context_module: 
     requirements: 
@@ -5107,7 +5107,7 @@ he:
     redirect_uri: "URI-כתובת:  %{redirect_uri}"
   developer_key_form: 
     cancel: ביטול
-    icon_url: "צלמית URL:"
+    icon_url: "צלמית כתובת דף:"
     key_name: "שם מפתח:"
     owner_email: "בעל כתובת הדוא\"ל"
     redirect_uri: "הפנית URI:"
@@ -5236,7 +5236,7 @@ he:
       sort_by_likes: "מיון לפי סימוני אהבתי"
       topic_title: "כותרת נושא"
       until: "עד אשר"
-      use_for_grading: הוערך
+      use_for_grading: מוערך
       users_must_post_before_seeing_replies: "התלמיד חייב לפרסם לפני שיעיין בתגובות"
     entry: 
       authors_name: "שם העורכ/ת"
@@ -5595,7 +5595,7 @@ he:
       relationships: יחסים
     titles: 
       insert_edit_image: "הוספת / עריכת תמונה"
-    url: "URL:"
+    url: "כתובת דף:"
   editor_accessibility: 
     accessibles: 
       background_color: "צבע רקע, יש ללחוץ כדי לבחור"
@@ -5605,7 +5605,7 @@ he:
       formatting: "עיצוב, יש ללחוץ כדי לבחור"
       rte_help: "איזור תוכן עשיר. יש ללחוץ ALT+F8 לעזרה"
   editor_button_6647db9c: "כפתור עורך"
-  either_the_url_or_domain_should_be_set_c29cf8c1: "הזנת ה URL או הדומיין שיש להגדיר"
+  either_the_url_or_domain_should_be_set_c29cf8c1: "הזנת כתובת הדף או הדומיין שיש להגדיר"
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "או שהנך משתמש/ת חדש/ה או ש*תנאי השימוש* השתנו מאז הסכמתך האחרונה. נא לאשר הסכמה ל*תנאי השימוש* ו **מדיניות הפרטיות** לפני שממשיכים."
   email: 
     default_from_name: "קנבס מבית Instructure"
@@ -5772,7 +5772,7 @@ he:
         submission: "הגשת תלמיד למשימה  %{assignment}, בוצעה בתאריך %{created_date} "
       links: 
         download_attachment: "יש להקליק כאן כדי להוריד את *%{attachment}* "
-        submission_url: "הצגת ה URL אשר משמש להגשת משימה זו."
+        submission_url: "הצגת כתובת הדף אשר משמש להגשת משימה זו."
       not_rendered: "היו כאן כבר הגשות, אך לא ניתן למצאן או שלא ניתן לתמוך בסוג ההגשה בתהליך הייצוא"
       rich_text: 
         default_content: "טרם הוקלד דבר "
@@ -6077,7 +6077,7 @@ he:
     discussion_topic_menu_configured: "התפריט של נושא שיחה קונפג"
     edit_view: 
       anonymous: אנונימי
-      by_url: "באמצעות URL"
+      by_url: "באמצעות כתובת הדף"
       by_xml: "הדבקת XML"
       config_url: "כתובת דף הקונפיגורציה"
       configuration_type: "סוג קונפיגורציה"
@@ -6699,7 +6699,7 @@ he:
       labels: 
         grade: ציון
     history: 
-      graded_on_submission: "הוערך בעת ההגשה"
+      graded_on_submission: "מוערך בעת ההגשה"
       grades_for_date: "ציונים לתאריך"
       headers: 
         after: אחרי
@@ -6854,9 +6854,9 @@ he:
       submissions_upload: "העלאת  הגשות משימה %{assignment} "
     titles: 
       total: סה"כ
-  graded_25cd3fcd: הוערך
-  graded_quiz_7fabdf1f: "בוחן שהוערך"
-  graded_survey_c0f0c395: "סקר שהוערך"
+  graded_25cd3fcd: מוערך
+  graded_quiz_7fabdf1f: "בוחן מוערך"
+  graded_survey_c0f0c395: "סקר מוערך"
   grades_a61eba0a: ציונים
   grading_box: 
     out_of_points_possible: "מתוך %{assignment.points_possible}"
@@ -9910,8 +9910,8 @@ he:
   not_available_487d3648: "לא זמין"
   not_available_until_next_submission_2175158: "לא זמין עד ההגשה הבאה"
   not_completed_d70acea3: "טרם הושלם"
-  not_graded_e027c866: "לא הוערך/ה"
-  not_graded_e78bcd50: "לא הוערך/ה"
+  not_graded_e027c866: "לא מוערך"
+  not_graded_e78bcd50: "לא מוע/ה"
   not_installed_37a21a76: "לא הותקן"
   not_now_97efd947: "לא כעת"
   not_yet_completed_345a0bca: "טרם הושלם"
@@ -13869,7 +13869,7 @@ he:
       unauthorized_user_is_other: "%{current_user}, אינך מורשה להציג דף זה. הקישור שבו השתמשת היה של **%{unauthorized_user} (%{unauthorized_user_email})**. אם זה שם המשתמש שלך, נא להתנתק ולהתחבר מחדש עם כתובת הדוא\"ל הנכונה כדי לקבל גישה לדף זה."
     unauthorized_feed: 
       bad_params: "הפרמטרים לפיד שאליו ניסית לגשת אינם תקינים."
-      feedback: "אם את/ה די בטוח/ה שכתובת הדף הזה (URL) צריכה לעבוד, בקשה לספר לנו כיצד הגעת לכאן ע\"י הקלקה העל הקישור שלהלן, ואנו נבדוק זאת."
+      feedback: "אם את/ה די בטוח/ה שכתובת הדף הזה צריכה לעבוד, בקשה לספר לנו כיצד הגעת לכאן ע\"י הקלקה העל הקישור שלהלן, ואנו נבדוק זאת."
       links: 
         feedback: "מה חיפשת?"
       title: "פיד לא תקין"
@@ -14921,7 +14921,7 @@ he:
   unenrolled_users_e7632d24: "משתמשים לא רשומים"
   ungraded_answers_31ef2df7: "תשובות ללא הערכה"
   ungraded_submissions_44efb0ec: "הגשות שלא הוערכו"
-  ungraded_survey_ad7de790: "סקר שלא הוערך"
+  ungraded_survey_ad7de790: "סקר שלא להערכה"
   unknown: "לא מוכר"
   unknown_47a3b725: "לא מוכר"
   unknown_account_74d30b82: "חשבון לא מוכר"
@@ -14975,9 +14975,9 @@ he:
   upload_media_ce31135a: "העלאת מדיה"
   upload_successful_ca47465f: "העלאה הצליחה"
   upper_limit_of_range_c454a8f2: "גבול עליון לטווח"
-  url_cc9398ca: "URL:"
+  url_cc9398ca: "כתובת דף:"
   url_is_required_4689ed84: "כתובת דף נדרשת"
-  url_type_3ece27d2: "סוג כתובת דף URL"
+  url_type_3ece27d2: "סוג כתובת דף"
   usage_right_ff96f3e2: "זכויות שימוש"
   usage_rights_f0960ad6: "זכויות שימוש"
   usage_rights_have_been_set_d1b433c7: "זכויות שימוש הוגדרו"
