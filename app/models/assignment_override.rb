@@ -122,7 +122,7 @@ class AssignmentOverride < ActiveRecord::Base
   scope :active, -> { where(:workflow_state => 'active') }
 
   scope :visible_students_only, -> (visible_ids) do
-    select("#{AssignmentOverride.quoted_table_name}.*").
+    select("assignment_overrides.*").
     joins(:assignment_override_students).
     where(
       assignment_override_students: { user_id: visible_ids },
