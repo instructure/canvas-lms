@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AssignmentOverride do
   before :once do
@@ -731,6 +731,17 @@ describe AssignmentOverride do
       @override_student.save!
 
       expect(@override.set_not_empty?).to eq true
+    end
+  end
+
+  describe '.only_visible_to' do
+    specs_require_sharding
+
+    it "references tables correctly for an out of shard query" do
+      # the critical thing is visible_students_only is called the default shard,
+      # but the query executes on a different shard, but it should still be
+      # well-formed (especially with qualified names)
+      AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
     end
   end
 end
