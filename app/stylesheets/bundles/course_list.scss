@@ -46,3 +46,10 @@
 .content--hasMarginTop {
   margin-top: $ic-sp*2;
 }
+
+.course-color-block:before {
+  content:'\25FC';
+  @include fontSize(20px);
+  padding-right: $ic-sp/2;
+  vertical-align: middle;
+}
