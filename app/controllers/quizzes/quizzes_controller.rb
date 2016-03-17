@@ -697,7 +697,7 @@ class Quizzes::QuizzesController < ApplicationController
   private
 
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+    rce_js_env(:highrisk)
   end
 
   def get_banks(quiz)

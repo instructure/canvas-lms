@@ -27,7 +27,7 @@ define([
     },
 
     loadSidebarOnTarget(target, callback){
-      let props = {}
+      let props = { jwt: ENV.JWT }
       this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, callback)
       })

@@ -1,12 +1,19 @@
 module Services
   class RichContent
-
-    def self.env_for(root_account, risk_level: :highrisk)
+    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil)
       enabled = check_feature_flag(root_account, :rich_content_service)
-      env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
+      env_hash = {
+        RICH_CONTENT_SERVICE_ENABLED: enabled
+      }
       if enabled
         env_hash = env_hash.merge(fine_grained_flags(root_account, risk_level))
         env_hash = env_hash.merge(service_settings)
+        if user && domain
+          env_hash[:JWT] = Canvas::Security::ServicesJwt.generate(
+            sub: user.global_id,
+            domain: domain
+          )
+        end
       end
       env_hash
     end

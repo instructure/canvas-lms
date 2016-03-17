@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+    rce_js_env(:highrisk)
     @assignment ||= @context.assignments.find(params[:id])
     if @assignment.deleted?
       respond_to do |format|
@@ -285,7 +285,7 @@ class AssignmentsController < ApplicationController
   end
 
   def syllabus
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
+    rce_js_env(:sidebar)
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
@@ -372,7 +372,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+    rce_js_env(:highrisk)
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]

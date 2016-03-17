@@ -140,7 +140,7 @@ class WikiPagesController < ApplicationController
 
   private
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
+    rce_js_env(:sidebar)
   end
 
   def wiki_page_jsenv(context)

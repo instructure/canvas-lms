@@ -146,6 +146,12 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  # add keys to JS environment necessary for the RCE at the given risk level
+  def rce_js_env(risk_level, root_account: @domain_root_account, domain: request.env['HTTP_HOST'])
+    js_env(Services::RichContent.env_for(root_account, risk_level: risk_level, user: @current_user, domain: domain))
+  end
+  helper_method :rce_js_env
+
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
     return [] if context.is_a?(Group)
 

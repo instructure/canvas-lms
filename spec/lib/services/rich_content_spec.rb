@@ -44,6 +44,16 @@ module Services
         described_class.env_for(root_account)
       end
 
+      it "includes a JWT for the domain and user's global id" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        domain = stub("domain")
+        jwt = stub("jwt")
+        Canvas::Security::ServicesJwt.stubs(:generate).with(sub: user.global_id, domain: domain).returns(jwt)
+        env = described_class.env_for(root_account, user: user, domain: domain)
+        expect(env[:JWT]).to eql(jwt)
+      end
+
       context "with only lowest level flag on" do
         let(:root_account){ stub("root_account") }
 
