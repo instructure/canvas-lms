@@ -173,7 +173,7 @@ module CustomSeleniumActions
   end
 
   def switch_views_available?
-    fj('a.switch_views:visible').present?
+    fj('a.switch_views:visible').present? || fj('a.toggle_question_content_views_link:visible').present?
   end
 
   def switch_editor_views(tiny_controlling_element)
@@ -183,7 +183,7 @@ module CustomSeleniumActions
     selector = tiny_controlling_element.to_s.to_json
     keep_trying_until { switch_views_available? }
     driver.execute_script(%Q{
-      $(#{selector}).parent().parent().find("a.switch_views:visible").click();
+      $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
     })
   end
 
@@ -197,9 +197,7 @@ module CustomSeleniumActions
       raise "Must provide iframe Id if we can't switch views" unless iframe_id
       in_frame iframe_id do
         tinymce_element = f("body")
-        puts "contents: #{tinymce_element.text}"
         while tinymce_element.text.length > 0 do
-          puts "contents: #{tinymce_element.text}"
           tinymce_element.click
           tinymce_element.send_keys(Array.new(100, :backspace))
           tinymce_element = f("body")
@@ -215,20 +213,26 @@ module CustomSeleniumActions
     end
 
     iframe_id = driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').find('iframe')[0];")['id']
-    text_lines = text.split("\n")
 
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
-    in_frame iframe_id do
-      tinymce_element = f("body")
-      tinymce_element.click
-      if text_lines.size > 1
-        text_lines.each_with_index do |line, index|
-          tinymce_element.send_keys(line)
-          tinymce_element.send_keys(:return) unless index >= text_lines.size - 1
+    if text.length > 1000
+      switch_editor_views(tiny_controlling_element)
+      driver.execute_script("return $(#{selector}).val('#{text}')")
+      switch_editor_views(tiny_controlling_element)
+    else
+      text_lines = text.split("\n")
+      in_frame iframe_id do
+        tinymce_element = f("body")
+        tinymce_element.click
+        if text_lines.size > 1
+          text_lines.each_with_index do |line, index|
+            tinymce_element.send_keys(line)
+            tinymce_element.send_keys(:return) unless index >= text_lines.size - 1
+          end
+        else
+          tinymce_element.send_keys(text)
         end
-      else
-        tinymce_element.send_keys(text)
       end
     end
   end
