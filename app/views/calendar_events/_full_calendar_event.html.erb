@@ -26,30 +26,24 @@
 
     <% rsvps = calendar_event.get_gcal_rsvp_status %>
     <% unless rsvps.empty? %>
-    <table class="bz-rsvps">
-    <caption>RSVPs</caption>
-    <thead><tr><th>Person</th><th>Status</th></tr><thead>
-    <tbody>
+    <dl class="bz-rsvps">
     <% rsvps.each do |attendee| %>
       <%
         cc = CommunicationChannel.where(:path => attendee["email"])
         next if cc.empty?
         canvas_user = User.find(cc.first.user_id)
       %>
-      <tr>
-        <td><%= link_to canvas_user.name, user_path(canvas_user) %></td>
-        <td>
+        <dt data-response-status="<%= attendee["responseStatus"] %>" ><%= link_to canvas_user.name, user_path(canvas_user) %></dt>
+        <dd>
           <% case attendee["responseStatus"] %>
           <% when 'needsAction' %>
             Not answered
           <% else %>
             <%= attendee["responseStatus"] %>
           <% end %>
-        </td>
-      </tr>
+        </dd>
     <% end %>
-    </tbody>
-    </table>
+    </dl>
     <% end %>
   </div>
 </div>
