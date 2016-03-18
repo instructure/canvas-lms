@@ -1,6 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module Gradebook2Common
+  shared_context 'gradebook_components' do
+    let(:gradebook_settings_cog) { f('#gradebook_settings') }
+    let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
+  end
   def init_course_with_students(num = 1)
     course_with_teacher_logged_in
 
