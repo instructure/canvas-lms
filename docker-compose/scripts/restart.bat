@@ -1,3 +1,2 @@
 #!/bin/bash
-cd ~/src/canvas-lms
-docker-compose restart web
+docker-compose restart canvasweb
