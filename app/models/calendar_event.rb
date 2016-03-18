@@ -64,8 +64,6 @@ class CalendarEvent < ActiveRecord::Base
   before_update :sync_google_calendar
   before_save :sync_google_calendar
 
-  after_destroy :kill_google_calendar
-
   def kill_google_calendar
     return if !google_calendar_id
 
@@ -87,6 +85,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def sync_google_calendar
+    return if @child_event_data
     obj = {}
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
@@ -470,6 +469,7 @@ class CalendarEvent < ActiveRecord::Base
       end
       true
     end
+    kill_google_calendar
   end
 
   def time_zone_edited
