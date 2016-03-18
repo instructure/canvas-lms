@@ -40,7 +40,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     keep_trying_until { !f("#spinner").displayed? }
     submit_form('#gradebook_grid_form')
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_ajaximations
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"

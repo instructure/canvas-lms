@@ -90,10 +90,10 @@ describe 'Account Grading Periods' do
     end
 
     it 'updates a grading period', priority: "1", test_id: 248024 do
+      skip_if_chrome('broken')
       account_grading_period = create_grading_periods_for(@account).first
       id = account_grading_period.id
       get "/accounts/#{@account.id}/grading_standards"
-
       # edit grading period
       replace_content(f("#period_title_#{id}"), title + "\n")
       replace_content(f("#period_start_date_#{id}"), start_date + "\n")
