@@ -224,7 +224,9 @@ nb:
       login_handle_name_description: "Etiketten som brukes for unike innloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Student ID, osv."
       unknown_user_url_description: "URL-adressen å omdirigere til når en autentisert bruker ikke er funnet i Canvas."
   account_domain_78f43049: Konto-domene
+  account_id_2c3b4f15: konto-ID
   account_name_13ed649: "%{account_name}"
+  account_name_7f63a13: kontonavn
   account_name_analytics_62bf60ae: "Analyser av %{account.name} "
   account_navigation_80bbefd4: Kontonavigering
   account_notification: 
@@ -345,6 +347,7 @@ nb:
     student: 
       enrollment_state: "Inkluder påmeldingsstatus: true;"
       enrollment_states: "Påmeldingsstatus: %{states};"
+  account_roles_d13f8f75: Kontoroller
   account_settings: 
     account: Konto
     account_name_too_long: "Kontonavnet er for langt"
@@ -367,6 +370,7 @@ nb:
       open_registration_delegated_warning_dialog: "En ekstern \"Identity Provider\" er slått på"
       what_are_quiz_ip_filters: "Hva er IP-filtere for prøver?"
     user: Bruker
+  account_sis_id_2e4a461: "konto sis-id"
   account_surveys_b0039876: Kontoundersøkelser
   account_user: 
     types: 
@@ -1264,6 +1268,7 @@ nb:
   activity_by_date_878c5b49: "Aktivitet etter Dato"
   add_2nd_review_ea988088: "Legg til vurdering nr 2."
   add_8523c19b: "Legg til"
+  add_a_new_announcement_878b717f: "Legg til en ny kunngjøring"
   add_a_new_course_4a041207: "Legg til et nytt kurs"
   add_a_new_user_c440d053: "Legg til en ny bruker"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Legg til en sensor for de valgte studentene"
@@ -1427,7 +1432,12 @@ nb:
     no_title: "Ingen tittel"
   announcement_ends_at_4ccc2a7e: "Kunngjøring slutter på"
   announcement_fb4cb645: Kunngjøring
+  announcement_not_found_d6d124c3: "Kunngjøring ikke funnet"
   announcement_starts_at_2e987a38: "Kunngjøring begynner på"
+  announcement_successfully_created_731a707f: "Kunngjøring ble opprettet"
+  announcement_successfully_updated_7bc5130: "Kunngjøring ble oppdatert"
+  announcement_type_b231573b: Kunngjøringstype
+  announcement_update_failed_6a6ec9fe: "Oppdatering av kunngjøring mislyktes"
   announcements: 
     announcements_crumb: Kunngjøringer
     error_draft_state: "Dette temaet kan ikke få kladdstatus fordi det er en kunngjøring."
@@ -1470,6 +1480,7 @@ nb:
   anonymous_user: "Anonym bruker"
   anonymous_user_d984b9ce: "Anonym bruker"
   another_configuration_is_currently_selected_select_95b394e: "En annen konfigurasjon er valgt. Hvis du velger denne konfigurasjonen, fjerner du den andre."
+  answer_description_6b353cfd: Svarbeskrivelse
   answer_distribution_2a956e3f: Svarfordeling
   answer_text_80_character_limit_2fce1113: "Svartekst (80 tegn maks)"
   answer_text_909894d6: Svartekst
@@ -2747,6 +2758,7 @@ nb:
       loading_undated_events: "Laster udaterte elementer…"
       no_undated_events: "Ingen udaterte elementer."
       show_undated_events: "Viser udaterte elementer"
+  calendar_283a9ed9: kalender
   calendar_d14cfc8f: Kalender
   calendar_event: 
     errors: 
@@ -2928,6 +2940,7 @@ nb:
   close_picker_256aca8a: "Lukk picker"
   collaboration: 
     default_title: "Samarbeid uten navn"
+  collaboration_71c024f4: Samarbeid
   collaboration_was_deleted_9cf9934b: "Samarbeid ble slettet"
   collaborations: 
     collaboration: 
@@ -3031,6 +3044,7 @@ nb:
       resolution: "Ta kontakt med oppretteren og la dem vite."
     titles: 
       delete: "Slette samarbeid?"
+  collapse_group_c2af7cad: "Skjul gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Kollapse Sub diskusjon"
   collapsed_510aa02a: Skjult
@@ -4259,6 +4273,7 @@ nb:
   course_quizzes_c337653c: Kurs-quiz
   course_restore: 
     restore_error: "En feil oppsto under forsøket på å gjenopprette kurset. Kurset ble ikke gjenopprettet."
+  course_roles_1314f962: Kursroller
   course_search: 
     cant_be_blank: "Kan ikke være tom"
   course_section: 
@@ -5158,9 +5173,11 @@ nb:
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
   delete_grading_period_dba36e59: "Slett vurderingsperioden"
   delete_grading_scheme_6b308832: "Slett karaktersettingsplan"
+  delete_group_86c381ec: "Slett gruppe"
   delete_my_account_41060aad: "Slett kontoen min"
   delete_quiz_142b8099: "Slett prøve"
   delete_requirement_bce2d943: "Slett krav"
+  delete_rubric_9b66412d: "Slett rubrikk"
   delete_selected_a023ccf8: "Slett valgt"
   delete_survey_56fddbbd: "Slett undersøkelse"
   delete_this_answer_f1802eaa: "Slett dette svaret"
@@ -5687,6 +5704,7 @@ nb:
   edit_course_role_3b992fc2: "Redigere kursrolle"
   edit_current_message_da650d4c: "Redigere denne meldingen"
   edit_grading_scheme_53091236: "Rediger karaktersettingsplan"
+  edit_group_c8679dba: "Redigere gruppe"
   edit_module_item_83258f6d: "Rediger modul/element"
   edit_permissions_for_count_items_d65e3855: 
     one: "Rediger tillatelser for: %{itemName}"
@@ -5714,6 +5732,7 @@ nb:
       criterion_long_description: "Lang beskrivelse av kriterium"
       find_existing_rubric: "Finner eksisterende vurderingsskjemaer"
   edit_survey_b0d6890d: "Rediger undersøkelse"
+  edit_this_announcement_ae6e17b3: "Redigere denne kunngjøringen"
   edit_this_question_1c82c3cf: "Rediger dette spørsmålet"
   edit_toolname_app_23cfbb8: "Rediger %{toolName} App"
   edit_your_catalog_account_cce59310: "Redigere din Catalog-konto"
@@ -6106,6 +6125,7 @@ nb:
         body2: "Flott! For å fullføre innleggingen av innleveringen må du velge hvilken seksjon du ønsker å legge den til på og gi siden et navn. Etter at du har klikket på \"Legg til side\" blir du ført den nye siden så du kan redigere den mer detaljert."
   eportfolios_f6dc4579: ePortfolios
   epub_exporting_f5592ff2: ePub-eksport
+  error_59293a2c: feil
   error_98e81528: Feil
   error_deleting_name_reason_11f9d399: "Sletting Feil %{name}: %{reason}"
   error_message_2b9d12ee: "Feil: %{message}"
@@ -6502,6 +6522,7 @@ nb:
       no_rubric_outcomes_found: "Ingen læringsmål basert på vurderingsskjemaer funnet"
     titles: 
       find_outcome: "Finn læringsmål"
+  finished_19aaf6f5: Ferdig
   first_reviewer_9ea05caa: "Første sensor"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, og %{others_count} andre"
   flash_6afbf65a: blitz
@@ -7637,6 +7658,7 @@ nb:
     online_url_submission: "ONline URL-innlevering"
     quiz_submission: Prøveinnlevering
     text_entry_submission: "Innlevering med fritekstsvar"
+  id_ac7afadf: id
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID allerede benyttet for denne kontoen og autentiseringsleverandør"
   idp_entity_id_25c51837: "IdP Entity ID"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktivert, må innholdsdesignere gi informasjon om opphavsrett og lisens for filer før de publiseres. Gjelder kun om Better File Browsing er aktivert."
@@ -7676,6 +7698,7 @@ nb:
   immediately_c128ede6: Umiddelbart
   import_1b31507: Importer
   import_content_b2fd6620: "Importer innhold"
+  import_sis_data_428cc803: "Importer SIS-data"
   important_note_educational_institutions_have_an_ob_c9350304: "* Viktig: Utdanningsinstitusjoner har en plikt til å gjøre innholdet sitt så tilgjengelig som mulig . Instructure anbefaler minst en 3: 1 tekst-til - background-color ratio for å holde teksten lesbar. Enkelt teste dine kontrastforhold med ** WebAIM Color Contrast Checker *** ."
   importers/assignment_importer: 
     errors: 
@@ -7735,6 +7758,8 @@ nb:
   info_8f47054a: Info
   info_panel_displayed_51d481cc: "Info-panel vises"
   info_panel_hidden_bf7c3b7b: "Info-panel skjult"
+  information_7f11072: Informasjon
+  information_816d9fa5: informasjon
   inner_box_background_6f9092f: "Innerste boksbakgrunn"
   inner_box_border_d0524b03: "Innerste boksramme"
   insert_math_equation_57c6e767: "Sett Matte Likning"
@@ -8320,6 +8345,7 @@ nb:
     my_courses: "Mine kurs"
   message: 
     default_subject: "Canvas varsel"
+  message_5c38209d: Melding
   message_896d2ed0: "%{message}"
   message_body_1f782712: Meldingsinnhold
   message_reply_failed_subject_5d27a0c9: "Melding-svar mislyktes: %{subject}"
@@ -10310,6 +10336,7 @@ nb:
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
   name_app_has_been_deleted_fb2d9426: "%{name} app har blitt slettet"
+  name_badfe525: navn
   name_error_fee4236: "Navn Feil"
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*navn* har blitt installert, men har ennå ikke blitt aktivert."
   name_is_currently_status_9065c996: "*navn* er for tiden **status**."
@@ -11935,6 +11962,7 @@ nb:
       move_copy: Flytt/kopier
       select_bank: "Velg en målbank for dette spørsmålet:"
       show_details: "Vis spørsmålsdetaljer"
+  question_f06476d1: spørsmål
   question_group_837b8014: Spørsmålsgruppe
   question_unanswered: "Ikke besvart ennå"
   questions_a955145c: Spørsmål
@@ -13552,6 +13580,7 @@ nb:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Samme verdi som 'Canvas_URL__c', vil kanskje gå vekk snart"
   sample_data_e4fd01ff: Prøve-data
   save_11a80ec3: Lagre
+  save_changes_698abe77: "Lagre endringer"
   saving_d55dd90e: Lagrer…
   saving_recording_e111cb05: "Lagrer opptak ..."
   schedule_student_availability_332154a: "Planlegg studenttilgjengelighet"
@@ -13865,6 +13894,7 @@ nb:
   self_registration_156392d6: Egenregistrering
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send tilpassede felt (avmarker med mindre du bruker Canvas zendesk)"
   send_e3bd0ed0: Send
+  send_to_ce05b460: "Send til"
   sends_international_text_messages_from_a_phone_num_10afbad6: "Sender internasjonale tekstmeldinger fra et telefonnummer i mottakerlandet, dersom det er mulig."
   sequence_footer: 
     next_module: "Neste modul:"
@@ -14583,6 +14613,7 @@ nb:
       titles: 
         uploading: "Laster opp. Vennligst vent."
   shared_secret_892c88f2: "Delt hemmelighet"
+  short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bør være selvforklarende, Canvas ID til rapporterende brukeren"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul kursmeny"
   show_by_date_e3967761: "Vis etter dato"
@@ -14613,6 +14644,7 @@ nb:
   sis_export_title: "SIS eksport"
   sis_grade_export_settings_45a9f709: "SIS innstillinger for karakter-eksport"
   sis_id_4495a887: SIS-ID
+  sis_id_8c2029e1: sis-id
   sis_import: 
     buttons: 
       process_data: "Behandler data"
@@ -15164,6 +15196,8 @@ nb:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet lar deg sette opp tidsspor som studenter (eller studentgrupper) kan melde seg på. For å komme i gang klikk på knappen nedenfor"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets alvorlighetsgrad, slik som valgt i en rullegardinsliste."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvei-ikonet for iOS/Android-enheter. 180x180 png"
+  the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den angitte brukeren (%{id}) er ikke student på dette kurset"
+  the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den angitte brukeren er ikke student på dette kurset"
   the_state_parameter_is_required_ffadf213: "Staten parameteren er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Den øverste spor representerer dager hvor *student sendte meldinger* til kursinstruktører. Den nederste sporet er for **meldinger fra instruktørene** til studenter."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik ID brukt for representasjon av den spesifikke forespørsel/respons-syklusen denne feilrapporten skjedde rundt"
@@ -15434,6 +15468,7 @@ nb:
     new_topic: "Nytt diskusjonstema"
   title_52b8638d: "Tittel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} avtalegruppe* Du kan **registrere deg** for dette."
+  title_ee03d132: Tittel
   title_is_off_6c823e2d: "%{title} er av"
   title_is_on_2b72a9b7: "%{title} er på"
   title_separator: ":"
@@ -16028,6 +16063,7 @@ nb:
   viewing_folders_is_not_available_798a15e1: "Se mapper er ikke tilgjengelig"
   visit_864b4060: Besøk
   visit_group_group_name_7a816081: "Gå til gruppe %{group_name}"
+  warning_6576b5b8: advarsel
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Advarsel: Crocodoc har begrensninger når den brukes i Firefox. Kommentarer vil ikke alltid lagres."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: For bedre tilgjengelighet i å flytte filer, kan du bruke Flytt til Dialog alternativet finner du i menyen."
   warning_icon_f64936d7: varselsiko
