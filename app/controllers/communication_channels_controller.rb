@@ -472,25 +472,48 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def bouncing_channel_report
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
-      res = BulkBounceCountResetter.new(bouncing_channel_args).bouncing_channel_report
-      send_data(res, type: 'text/csv')
+    generate_bulk_report do
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
     end
   end
 
   def bulk_reset_bounce_counts
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
-      resetter = BulkBounceCountResetter.new(bouncing_channel_args)
-      resetter.send_later(:bulk_reset_bounce_counts)
-      render json: {scheduled_reset_approximate_count: resetter.count}
+    perform_bulk_action do
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
+    end
+  end
+
+  def unconfirmed_channel_report
+    generate_bulk_report do
+      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
+    end
+  end
+
+  def bulk_confirm
+    perform_bulk_action do
+      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
     end
   end
 
   protected
-  def bouncing_channel_args
+  def bulk_action_args
     account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.slice(:after, :before, :pattern).symbolize_keys
+    args = params.slice(:after, :before, :pattern, :with_invalid_paths, :path_type).symbolize_keys
     args.merge!({account: account})
+  end
+
+  def generate_bulk_report
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      action = yield
+      send_data(action.report, type: 'text/csv')
+    end
+  end
+
+  def perform_bulk_action
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      action = yield
+      render json: action.perform!
+    end
   end
 
   def has_api_permissions?
