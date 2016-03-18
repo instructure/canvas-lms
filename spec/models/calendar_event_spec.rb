@@ -345,6 +345,7 @@ describe CalendarEvent do
     context "with calendar event created" do
       before :once do
         course_with_student(active_all: true)
+        course_with_observer(active_all: true, active_cc: true, associated_user_id: @student.id, course: @course)
         @event1 = @course.calendar_events.build(title: "test")
         @event1.updating_user = @teacher
         @event1.save!
@@ -368,6 +369,10 @@ describe CalendarEvent do
 
         it "should not send to creating teacher" do
           expect(@users).not_to include(@teacher.id)
+        end
+
+        it "sends to observers" do
+          expect(@users).to include(@observer.id)
         end
       end
 
@@ -394,6 +399,10 @@ describe CalendarEvent do
 
           it "should not send to editing teacher" do
             expect(@users).not_to include(@teacher.id)
+          end
+
+          it "sends to observers" do
+            expect(@users).to include(@observer.id)
           end
         end
       end

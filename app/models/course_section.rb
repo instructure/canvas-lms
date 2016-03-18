@@ -65,6 +65,10 @@ class CourseSection < ActiveRecord::Base
     end
   end
 
+  def participating_observers
+    User.observing_students_in_course(participating_students.map(&:id), course.id)
+  end
+
   def participating_students
     course.participating_students.where(:enrollments => { :course_section_id => self })
   end
@@ -73,8 +77,10 @@ class CourseSection < ActiveRecord::Base
     course.participating_admins.where("enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", self, false)
   end
 
-  def participants
-    participating_students + participating_admins
+  def participants(include_observers=false)
+    ps = participating_students + participating_admins
+    ps += participating_observers if include_observers
+    ps
   end
 
   def available?
