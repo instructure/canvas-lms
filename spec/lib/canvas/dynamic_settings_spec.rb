@@ -47,10 +47,10 @@ module Canvas
         }
 
         Diplomat::Kv.expects(:put)
-          .with("/config/canvas/rich-content-service/app-host", "rce.docker")
+          .with("config/canvas/rich-content-service/app-host", "rce.docker")
           .at_least_once
         Diplomat::Kv.expects(:put)
-          .with("/config/canvas/rich-content-service/cdn-host", "rce.docker")
+          .with("config/canvas/rich-content-service/cdn-host", "rce.docker")
           .at_least_once
 
         DynamicSettings.config = valid_config.merge({
@@ -68,7 +68,7 @@ module Canvas
           DynamicSettings.fallback_data = nil
           Diplomat::Kv.stubs(:put)
           Diplomat::Kv.stubs(:get).
-            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            with("config/canvas/#{parent_key}", diplomat_read_options).
             returns(
               [
                 { key: "#{parent_key}/app-host", value: "rce.insops.com"},
@@ -85,12 +85,29 @@ module Canvas
           })
         end
 
+        it "handles config sets with only one value" do
+          # consul has some interesting behavior with single values, so we have to
+          # crawl by key
+          Diplomat::Kv.stubs(:get).
+            with("config/canvas/single-parent", diplomat_read_options.merge({keys: true})).
+            returns(["config/canvas/single-parent/single-key"])
+          Diplomat::Kv.stubs(:get).
+            with("config/canvas/single-parent", diplomat_read_options).
+            returns("single-value")
+          Diplomat::Kv.stubs(:get).
+            with("config/canvas/single-parent/single-key", diplomat_read_options).
+            returns("single-value")
+          rce_settings = DynamicSettings.find("single-parent")
+          expect(rce_settings).to eq({"single-key" => "single-value"})
+        end
+
+
         it "uses the last found value on catastrophic outage" do
           DynamicSettings.reset_cache!(hard: true)
           DynamicSettings.find(parent_key)
           # some values are now stored in case of connection failure
           Diplomat::Kv.stubs(:get).
-            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            with("config/canvas/#{parent_key}", diplomat_read_options).
             raises(Faraday::ConnectionFailed, "could not contact consul")
 
           rce_settings = DynamicSettings.find(parent_key)
@@ -103,7 +120,7 @@ module Canvas
         it "cant recover with no value cached for connection failure" do
           DynamicSettings.reset_cache!(hard: true)
           Diplomat::Kv.stubs(:get).
-            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            with("config/canvas/#{parent_key}", diplomat_read_options).
             raises(Faraday::ConnectionFailed, "could not contact consul")
 
           expect{ DynamicSettings.find(parent_key) }.to(
@@ -145,14 +162,14 @@ module Canvas
       after(:each){ DynamicSettings.reset_cache! }
 
       def stub_consul_with(value)
-        Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", diplomat_read_options).returns(
+        Diplomat::Kv.stubs(:get).with("config/canvas/#{parent_key}", diplomat_read_options).returns(
           [{ key: "#{parent_key}/app-host", value: value}]
         )
       end
 
       it "only queries consul the first time" do
         Diplomat::Kv.expects(:get).
-          with("/config/canvas/#{parent_key}", diplomat_read_options).
+          with("config/canvas/#{parent_key}", diplomat_read_options).
           once. # and only once, going to hit it several times
           returns([{ key: "#{parent_key}/app-host", value: "rce.insops.com"}])
         5.times{ DynamicSettings.from_cache(parent_key) }
@@ -221,7 +238,7 @@ module Canvas
 
         it "still returns old values if connection fails after timeout" do
           Diplomat::Kv.stubs(:get).
-            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            with("config/canvas/#{parent_key}", diplomat_read_options).
             raises(Faraday::ConnectionFailed, "could not contact consul")
           value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("rce.insops.com")

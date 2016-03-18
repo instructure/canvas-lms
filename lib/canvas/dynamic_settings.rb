@@ -6,7 +6,7 @@ module Canvas
     class ConsulError < StandardError
     end
 
-    KV_NAMESPACE = "/config/canvas".freeze
+    KV_NAMESPACE = "config/canvas".freeze
 
     class << self
       attr_accessor :config, :cache, :fallback_data
@@ -85,8 +85,9 @@ module Canvas
           # kind-of recover in case of big failure
           @strategic_reserve ||= {}
           consul_value = Canvas.timeout_protection('consul', {raise_on_timeout: true}) do
-            Diplomat::Kv.get("#{KV_NAMESPACE}/#{key}", {recurse: true, consistency: 'stale'})
+            diplomat_get(key)
           end
+
           @strategic_reserve[key] = consul_value
           consul_value
         rescue Faraday::ConnectionFailed,
@@ -108,6 +109,22 @@ module Canvas
         Canvas.timeout_protection('consul') do
           Diplomat::Kv.put("#{KV_NAMESPACE}/#{key}", value)
         end
+      end
+
+      def diplomat_get(key)
+        parent_key = "#{KV_NAMESPACE}/#{key}"
+        read_options = {recurse: true, consistency: 'stale'}
+        diplomat_val = Diplomat::Kv.get(parent_key, read_options)
+        if diplomat_val && !diplomat_val.is_a?(Array)
+          diplomat_val = []
+          Diplomat::Kv.get(parent_key, read_options.merge({keys: true})).each do |full_key|
+            diplomat_val << {
+              key: full_key,
+              value: Diplomat::Kv.get(full_key, read_options)
+            }
+          end
+        end
+        diplomat_val
       end
     end
 
