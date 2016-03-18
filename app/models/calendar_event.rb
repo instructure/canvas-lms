@@ -86,6 +86,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def sync_google_calendar
+    # Skip syncing when it has children because parent events are dummies just to hold it
     return if @child_event_data
     obj = {}
 
@@ -170,7 +171,11 @@ class CalendarEvent < ActiveRecord::Base
       self.location_name = event.hangout_link
     end
 
-    self.google_calendar_id = event.id
+    # We don't want to reset the id on an edit to ensure it
+    # stays consistent
+    if !google_calendar_id
+      self.google_calendar_id = event.id
+    end
   end
 
   def get_gcal_rsvp_status
