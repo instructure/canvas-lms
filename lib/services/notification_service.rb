@@ -24,11 +24,10 @@ module Services
       notification_service_queue_name: 'notification-service'
     }.freeze
 
-    def self.process(global_id, body, type, to, remote)
+    def self.process(global_id, body, type, to)
       self.notification_queue.send_message({
         'global_id' => global_id,
         'type' => type,
-        'delivery' => { 'remote' => remote },
         'message' => body,
         'target' => to,
         'request_id' => RequestContextGenerator.request_id

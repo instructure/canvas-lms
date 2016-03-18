@@ -104,7 +104,6 @@ module Services
           expected = {
             global_id: 1,
             type: 'email',
-            delivery: { remote: nil },
             message: 'hello',
             target: 'alice@example.com',
             request_id: req_id
@@ -113,7 +112,7 @@ module Services
           spy = SendMessageSpy.new
           NotificationService.stubs(:notification_queue).returns(spy)
 
-          NotificationService.process(1, 'hello', 'email', 'alice@example.com', nil)
+          NotificationService.process(1, 'hello', 'email', 'alice@example.com')
           compare_json(expected, spy.sent_hash)
         end
       end

@@ -580,8 +580,7 @@ class Message < ActiveRecord::Base
         global_id,
         notification_message,
         path_type,
-        target,
-        remote_configuration
+        target
       )
       complete_dispatch
     end
