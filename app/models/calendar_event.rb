@@ -64,8 +64,6 @@ class CalendarEvent < ActiveRecord::Base
   before_update :sync_google_calendar
   before_save :sync_google_calendar
 
-  after_destroy :kill_google_calendar
-
   def kill_google_calendar
     return if !google_calendar_id
 
@@ -78,6 +76,7 @@ class CalendarEvent < ActiveRecord::Base
 
     params = {
       :calendarId => 'primary',
+      :sendNotifications => true,
       :eventId => google_calendar_id
     }
 
@@ -87,6 +86,8 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def sync_google_calendar
+    # Skip syncing when it has children because parent events are dummies just to hold it
+    return if @child_event_data
     obj = {}
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
@@ -170,7 +171,11 @@ class CalendarEvent < ActiveRecord::Base
       self.location_name = event.hangout_link
     end
 
-    self.google_calendar_id = event.id
+    # We don't want to reset the id on an edit to ensure it
+    # stays consistent
+    if !google_calendar_id
+      self.google_calendar_id = event.id
+    end
   end
 
   def get_gcal_rsvp_status
@@ -470,6 +475,7 @@ class CalendarEvent < ActiveRecord::Base
       end
       true
     end
+    kill_google_calendar
   end
 
   def time_zone_edited
