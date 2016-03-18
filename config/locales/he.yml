@@ -708,7 +708,7 @@ he:
       account_reports: 
         default: 
           lti_reports: 
-            text: "דוח זה מספק יצוא נתונים המראים מידע על שימוש ב LTI (כלי לימוד משולבים) "
+            text: "דוח זה מספק יצוא נתונים המראים מידע על שימוש בכלי למידה משולבים (אל. טי. איי.) "
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1416,19 +1416,19 @@ he:
     error_draft_state: "נושא זה אינו יכול להיות במצב טיוטא כיון שזו הכרזה."
     external_feed: 
       alts: 
-        deleted_feed: "מחק Feed זה."
+        deleted_feed: "מחק פיד זה."
       labels: 
         keyword: "מילת מפתח"
       messages: 
         external_feed_post_count: 
           one: "פרסום אחד נוסף"
           other: "%{count} פרסומים נוספו"
-    feed_name: " FEED הכרזות בקורס %{course}"
+    feed_name: " פיד הכרזות בקורס %{course}"
     index: 
-      feed_title_course: "Atom Feed של הכרזות קורס"
-      feed_title_group: "Atom Feed של הכרזות  קבוצה"
-      podcast_title_course: "Podcast Feed של הכרזות קורס"
-      podcast_title_group: "Podcast Feed של הכרזות  קבוצה"
+      feed_title_course: "אטום פיד של הכרזות קורס"
+      feed_title_group: "אטום פיד של הכרזות  קבוצה"
+      podcast_title_course: "פודקאסט פיד של הכרזות קורס"
+      podcast_title_group: "פודקאסט פיד של הכרזות  קבוצה"
     index_view: 
       announcements_title: הכרזות
       delete: ביטול
@@ -1443,9 +1443,9 @@ he:
       try_disabling_the_unread_filters: "יש לנסות ולנטרל את מסנן ה\"לא נקראו\""
       unread: "לא נקראו"
       your_search_did_not_match_any_announcements: "החיפוש לא תאם אף הכרזה."
-    podcast_feed_description_course: "כל קובץ מדיה המקושר או מוטבע בתוך ההכרזות בקורס  \"%{course}\" יוצג ב FEED זה."
-    podcast_feed_description_group: "כל קובץ מדיה המקושר או מוטבע בתוך הכרזות הקבוצה \"%{group}\" יוצג ב FEED זה."
-    podcast_feed_name: "הכרזות Podcast Feed בקורס %{course} "
+    podcast_feed_description_course: "כל קובץ מדיה המקושר או מוטבע בתוך ההכרזות בקורס  \"%{course}\" יוצג בפיד זה."
+    podcast_feed_description_group: "כל קובץ מדיה המקושר או מוטבע בתוך הכרזות הקבוצה \"%{group}\" יוצג בפיד זה."
+    podcast_feed_name: "הכרזות פודקאסט פיד בקורס %{course} "
   announcements_a4b8ed4a: הכרזות
   anonymous_e1b8ad27: אנונימי
   anonymous_grading_ccb5045c: "מתן ציונים אנונימי"
@@ -1468,7 +1468,7 @@ he:
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "מצרף מספר לסיומת כל כותרת אירוע (למשל אירוע 1, אירוע 2, וכו') עבור append_iterator"
   application: 
     errors: 
-      feed_not_found: "ה FEED לא נמצא"
+      feed_not_found: "הפיד לא נמצא"
       feed_private: "התוכן התואם הפך לפרטי, כך שפידים ציבוריים כמו זה לא יהיו נצפים יותר."
       feed_private_course: "הקורס התואם הפך לפרטי, כך שפידים ציבוריים כגון זה לא יוכלו יותר להיות נצפים."
       feed_private_group: "הקבוצה התואמת הפכה לפרטית, כך שפידים ציבוריים כגון זה לא יוכלו יותר להיות נצפים."
@@ -1476,7 +1476,7 @@ he:
       feed_unpublished_group: "פידים לקבוצה זו אינם ניתנים לגישה טרם פרסומה."
       invalid_external_tool: "לא נמצאו הגדרות תקפות לקישור זה"
       invalid_external_tool_id: "לא נמצאו הגדרו תקפות לכלי זה"
-      invalid_feed_parameters: "פרמטרים לא תקפים ל FEED."
+      invalid_feed_parameters: "פרמטרים לא תקפים ל\"פיד\"."
       invalid_tag_type: "סוג פריט אינו מוכר לתג זה"
       invalid_verification_code: "קוד האימות אינו תקף"
       mismatched_verification_code: "קוד האימות אינו תואם לאף משתמש אשר רשום כעת"
@@ -2749,7 +2749,7 @@ he:
       calendar_feed_instructions: "העתקת הקישור שבהמשך והדבקתו לאפליקצית יומן כלשהי אשר תומכת בפידים של iCal  למשל (Google Calendar, iCal, Outlook וכו'.)"
       calendars: יומנים
       feed_dialog_title: "פיד ליומן"
-      feed_title: "Atom Feed ליומן קורס"
+      feed_title: "אטום פיד ליומן קורס"
       links: 
         feed: "הקלק/י כאן לעיין בפיד"
       page_title_header: יומן
@@ -2905,7 +2905,7 @@ he:
         loading: טוען
         people: אנשים
         remove_all: "הסרת כולם"
-      member_instructions: "הקלקה על משתמש או קבוצה בעמודה הקיצונית כדי להוסיף שותפים לפעולה"
+      member_instructions: "יש להקליק על משתמש או קבוצה בעמודה הקיצונית כדי להוסיף שותפים לפעילות"
     edit: 
       buttons: 
         cancel: ביטול
@@ -2963,7 +2963,7 @@ he:
           מבלי הצורך בשיגור הודעות דוא"ל.
       description_teacher: |-
           **למה הכוונה במושג שיתופי פעולה?** אנו מתכוונים לכלים אינטרנטיים אשר
-           די סביר שהתלמידים שלכם כבר מכירים. תלמידים יוכלו להשתמש באמצעים כגון [Google Docs](%{google_url})
+           די סביר שהתלמידים שלכם כבר מכירים. תלמידים יוכלו להשתמש באמצעים כגון [גוגל דוקס](%{google_url})
            לעבוד בשיתוף על משימות כגון עבודות קבוצתיות או רשימת הערות. דף זה מאפשר להם
            (ולך) מקום ידידותי לעקוב אחר פעילות משותפת, וכן לבצע עריכה ללא העברתם בדוא"ל.
       google: 
@@ -2978,7 +2978,7 @@ he:
       page_title: "שיתוף פעולה "
       started_by: "נפתח ע\"י *%{user}* ב, %{at}"
       titles: 
-        current: "שיתופי פעולה עכשויים"
+        current: "שיתופי פעולה מקוונים"
     show: 
       error_cause_1: "בעל/ת חשבון הגוגל דרייב שונה מאשר החשבון שבשימוש עמו מנסים ליצור את שיתוף הפעולה."
       error_cause_2: "יוצר שיתוף הפעולה אינו הבעלים של מסמך הגוגל דוקס יותר."
@@ -3104,7 +3104,7 @@ he:
     general_error_with_message: "שגיאת התחברות לשיחת ועידה. הודעה: '%{message}'"
     inactive_error: "שיחת הועידה לא פעילה"
     index: 
-      concluded_conferences: "כנסים שנסתיימו וסוכמו"
+      concluded_conferences: "שיחות ועידה שנסתיימו וסוכמו"
       conference: "שיחת ועידה"
       conference_header: "שיחות ועידה"
       new_conference: "שיחת ועידה חדשה"
@@ -4008,7 +4008,7 @@ he:
   course_and_user_search_ebc1ae41: "חיפוש קורס ומשתמשים"
   course_announcements_76b07340: "הכרזות קורס"
   course_assignments_833b8cf1: "משימות קורס"
-  course_atom_feed_9d95214e: "Atom Feed של הקורס"
+  course_atom_feed_9d95214e: "אטום פיד של הקורס"
   course_calendar_7d3cba7b: "יומן הקורס"
   course_catalog_4cc7c8ce: "קטלוג הקורס"
   course_collaborations_dadb327e: "שיתופי הפעולה בקורס"
@@ -4333,7 +4333,7 @@ he:
       titles: 
         courses: קורסים
         rss: 
-          course_announcements: "הכרזות Atom Feed בקורס"
+          course_announcements: "הכרזות אטום פיד בקורס"
     link_enrollment: 
       buttons: 
         link: "קישור לתלמיד"
@@ -5148,7 +5148,7 @@ he:
     deleted_entry_notice: "המופע בוטל"
     disabled_podcasts_notice: "פודקאסטים לא הופעלו לנושא זה"
     podcast_description: "כל קובץ מדיה אשר מקושר מ או משולב במופעים שבנושא \"%{title}\"  יוצג בפיד זה."
-    podcast_feed_title: " Podcast Feed של פרסומי %{title} "
+    podcast_feed_title: " פודקאסט פיד של פרסומי %{title} "
     posts_feed_title: "פיד פרסומי %{title} "
     updated_entry_notice: "המופע עודכן בהצלחה"
   discussion_entry: 
@@ -5224,7 +5224,7 @@ he:
         published: פורסם
         save_and_publish: "שמירה ופרסום"
       delay_posting: "עיכוב פרסום"
-      enable_podcast_feed: "השראת פידים לפודקאסט"
+      enable_podcast_feed: "הרשאת פידים לפודקאסט"
       include_replies_in_podcast_feed: "הכללת תגובות תלמידים בפיד של פודקאסט"
       only_graders_can_like: "רק מעריכים יכולים לסמן אהבתי"
       options: אפשרויות
@@ -5267,7 +5267,7 @@ he:
     group_discussion_locked: "תלמידים כבר תרמו לדיון זה, כך שהגדרות קבוצתיות אינן ניתנות לשינוי"
     group_discussion_title: "דיון קבוצתי"
     index: 
-      course_discussions_atom_feed_title: "Atom Feed של דיוני הקורס"
+      course_discussions_atom_feed_title: "אטום פיד של דיוני הקורס"
     index_view: 
       assignments: משימות
       delete: ביטול
@@ -5315,8 +5315,8 @@ he:
       collapse_replies: "כיווץ התגובות"
       confirm_delete_discussion: "האם אתם בטוחים כי ברצונכם לבטל את הדיון?"
       delete: ביטול
-      discussion_atom_feed_title: " Atom Feed של דיון"
-      discussion_podcast_feed_title: "Podcast Feed של דיון"
+      discussion_atom_feed_title: " אטום פיד של דיון"
+      discussion_podcast_feed_title: "פודקאסט פיד של דיון"
       edit: עריכה
       edited_by: "נושא זה נערך ע\"י %{user}"
       expand_replies: "הרחבת תגובות"
@@ -5335,7 +5335,7 @@ he:
       show_rubric: "הצגת רובריקות"
       speed_grader: SpeedGrader™
       topic: נושא
-      topic_podcast_feed_link: "נושא הPodcast Feed"
+      topic_podcast_feed_link: "נושא הפודקאסט פיד"
       topic_subscribe: הרשמה
       topic_subscribe_tooltip: "ההרשמה הוסרה ולא תשלחנה אליך הודעות חדשות"
       topic_subscribed_tooltip: "נרשמת והודעות חדשות ישלחו אליך"
@@ -5355,7 +5355,7 @@ he:
       manage: ניהול
       open_to_comments: "פתוח להערות"
       this_topic_is_used_for_grading: "נושא זה כלול בהערכה"
-      topic_podcast_feed: "נושא הPodcast Feed "
+      topic_podcast_feed: "נושא הפודקאסט פיד"
     this_is_a_group_discussion: "זוהי קבוצת דיון"
     topic_deleted_notice: "%{topic_title} בוטל בהצלחה"
     unread_count_tooltip: 
@@ -5447,7 +5447,7 @@ he:
   dismiss_dacdb625: פטור
   display_course_catalog: "הצגת רשימה ניתנת לחיפוש של קורסים מחשבון בסיס זה המאפשרים \"הכללת קורס זה באינדקס הקורסים הפתוחים לכל\" "
   display_name_b80c243e: "שם להצגה"
-  display_total_grades_when_the_all_grading_periods__1d2b5cf: "הצגת כלל הציונים כאשר נבחרת אפשרות מהרשימה הנפתחת \"כל תקופות ההערכה\" (תקופות ציונים מרובות צריכות להיות מופעלת)"
+  display_total_grades_when_the_all_grading_periods__1d2b5cf: "הצגת כלל הציונים כאשר נבחרת אפשרות מהרשימה הנפתחת \"כל תקופות ההערכה\" (האפשרות תקופות ציונים מרובות צריכה להיות מופעלת)"
   display_totals_for_all_grading_periods_ad1ea050: "הצגת סה\"כ של \"כל תקופות ההערכה\""
   domain_3b54c511: דומיין
   domain_is_required_1d4c8b25: "נדרש דומיין"
@@ -5856,7 +5856,7 @@ he:
       links: 
         skip_navigation: "דלג על הניווט"
       logo: לוגו
-    title: "Feed לפורטפוליו %{portfolio_name} "
+    title: "פיד לפורטפוליו %{portfolio_name} "
     user_index: 
       buttons: 
         add_eportfolio: "הקם ePortfolio"
@@ -6028,8 +6028,8 @@ he:
         add_feed: "הוספת פיד"
         adding_feed: "מוסיף פיד..."
       descriptions: 
-        add_new_feed: "ניתן להוסיף פרסומים מ RSS או Atom Feed אוטומאטית כהכרזות לקורס זה. פשוט הדבק את כתובת הפיד שבהמשך וכל מופע חדש יתווסף."
-      feed_url_label: "Feed URL"
+        add_new_feed: "ניתן להוסיף פרסומים מאר. אס. אס או אטום פיד אוטומאטית כהכרזות לקורס זה. פשוט הדבק את כתובת הפיד שבהמשך וכל מופע חדש יתווסף."
+      feed_url_label: "כתובת דף פיד"
       keyword: "מילת מפתח:"
       labels: 
         match_phrase_checkbox: "הוסף/י רק פרסומים עם ביטוי ספציפי בכותרת"
@@ -6133,7 +6133,9 @@ he:
       all: הכל
       app_headder: "אפליקציות חיצוניות "
       external_tools_note: "אפליקציות הנן דרך נוחה להוסיף תכונות חדשות לקנבס. הן יכולות להתווסף לקורסים ספציפיים או לכל הקורסים בחשבון. עם הגדרתן, תוכלו להתקשר אליהם דרך המודולים של הקורס וליצור משימות עבור כלי הערכה."
-      external_tools_references: "*להלן כמה כלי LTI* אשר עובדים היטב עם קנבס. ניתן גם  לבדוק את ** נושאי קהילת קנבס לגבי כלי LTI **"
+      external_tools_references: |-
+          *להלן כמה בכלי למידה משולבים - אל. טי. איי. I* אשר עובדים היטב עם קנבס. ניתן גם  לבדוק c  ** נושאי קהילת קנבס לגבי  כלי אל. טי. איי.  **
+          LTI Tools
       installed: הותקן
       not_installed: "לא הותקן"
       search_filter: "סינון לפי שם"
@@ -6682,7 +6684,7 @@ he:
       export_current_gradebook: נוכחי
       filter_by_student: "סינון לפי שם תלמיד או מזהה משני"
       grades: ציונים
-      hide_student_names: "הסתר את שמות התלמידים"
+      hide_student_names: "הסתרת שמות התלמידים"
       include_ungraded: "התיחסות לאי מתן ציון כאל 0"
       individual_view: "תצוגה אישית"
       learning_mastery: "לימוד להתמחות"
@@ -7063,7 +7065,7 @@ he:
       course_group_explanation: "קבוצות תלמידים הנן דרך יעילה לארגן תלמידים לפעילות כמו קבוצת פרויקט או כתיבת עבודה. כל קבוצת תלמידים מקבלת יומן יעודי, לוח דיונים וכלי שיתוף כדי לארגן לעצמם את העבודה המשותפת בדרך יותר יעילה "
       drag_and_drop_instructions: "הקלקה וגרירה כדי להעביר תלמיד לקבוצה אחרת"
       get_started_info: "כדי להתחיל בתהליך, יש להקליק על הקישור \"הכנת אוסף קבוצות חדש\" שבצד המסך"
-      group_assignment_instructions: "ניתן להקצות תלמידים באופן אקראי לקבוצות בעלות גודל מוגדר, או ידנית ליצור ולארגן את הקבוצות. לאחר יצירתן, ניתן להגדיר משימות קבוצה ל\"הגשה קבוצתית\", שמשמעו שכל קבוצה תגיש הגשה משותפת אחת עבור על חברי הקבוצה."
+      group_assignment_instructions: "ניתן להקצות תלמידים באופן אקראי לקבוצות בעלות גודל מוגדר, או ידנית ליצור ולארגן את הקבוצות. לאחר יצירתן, ניתן להגדיר משימות קבוצה ל\"הגשה קבוצתית\", שמשמעו שכל קבוצה תגיש הגשה משותפת אחת עבור כל חברי הקבוצה."
       group_pages: "דפי קבוצה"
       headings: 
         account_groups: "קבוצת תלמידים ברמת החשבון"
@@ -7158,8 +7160,8 @@ he:
       group_categories: 
         account_group_explanation: "קבוצות תלמידים ברמת החשבון הנן דרך טובה לקבץ תלמידים ללא הצורך בייחוס לקורס מסויים. כל קבוצת תלמידים מקבלת יומן משלה, קבוצת דיון וכלי שיתוף כדי שיוכלו לארגן את עצמם ולעבוד יחדיו בצורה יעילה יותר. "
         add_group_set: "הוספת אוסף קבוצות"
-        course_group_explanation: "קבוצות תלמידים הנן דרך יעילה לארגן תלמידים לפעילות כמו קבוצת פרויקט או כתיבת עבודה. כל קבוצת תלמידים מקבלת היומן פרטי, לוח דיונים וכלי שיתוף כדי לארגן לעצמם את העבודה המשותפת בדרך יותר יעילה."
-        group_assignment_instructions: "ניתן להקצות באופן אקראי תלמידים לקבוצות בעלות גודל מוגדר, או ידנית ליצור ולארגן את הקבוצות. לאחר יצירתן, ניתן להגדיר משימות קבוצה ל\"הגשה קבוצתית\", שמשמעו שכל קבוצה תגיש הגשה משותפת אחת עבור על חברי הקבוצה. "
+        course_group_explanation: "קבוצות תלמידים הנן דרך יעילה לארגן תלמידים לפעילות כמו קבוצת פרויקט או כתיבת עבודה. כל קבוצת תלמידים מקבלת יומן פרטי, לוח דיונים וכלי שיתוף כדי לארגן לעצמה את העבודה המשותפת בדרך יותר יעילה."
+        group_assignment_instructions: "ניתן להקצות באופן אקראי תלמידים לקבוצות בעלות גודל מוגדר, או ידנית ליצור ולארגן את הקבוצות. לאחר יצירתן, ניתן להגדיר משימות קבוצה ל\"הגשה קבוצתית\", שמשמעו שכל קבוצה תגיש הגשה משותפת אחת עבור כל חברי הקבוצה. "
         group_set: "אוסף קבוצות"
         headings: 
           account_groups: "קבוצות תלמידים ברמת החשבון "
@@ -7287,7 +7289,7 @@ he:
     show: 
       coming_up: בקרוב
       edit_group: "עריכת קבוצה"
-      group_atom_feed: "Atom Feed של קבוצה"
+      group_atom_feed: "אטום פיד של קבוצה"
       new_announcement: "הכרזה חדשה"
     status: 
       assigning_students: "מצוות תלמידים..."
@@ -9680,7 +9682,7 @@ he:
     discussion_topic_type: "נושא דיון"
     ecollege: 
       course_not_found: "קורס ה ECollege לא נמצא."
-    external_feed_type: "פיד (FEED) חיצוני"
+    external_feed_type: "פיד חיצוני"
     external_tool_type: "כלי חיצוני"
     file_type: קובץ
     grading_standard_type: "תקן הערכה"
@@ -10341,7 +10343,7 @@ he:
         main: 
           manage: 
             description: |-
-                *תוצאות למידה נוצרות כאן כדי לעקוב אחר ההתמחות בקורס. כדי להתחיל, יש לבחון את התפריט לאורך הבשורה העליונה. יש להקליק על כפתור "חדש" כדי ליצור תוצאת למידה חדשה, או הכפתור "מצא" שיאפשר לך להשתמש בתוצאות שכבר נוצרו ע"י הארגון או המדינה.
+                *תוצאות למידה נוצרות כאן כדי לעקוב אחר ההתמחות בקורס. כדי להתחיל, יש לבחון את התפריט שבשורה העליונה ולהקליק על כפתור "תוצאת למידה חדשה" כדי ליצור אותה, או הכפתור "מצא" שיאפשר לך להשתמש בתוצאות שכבר נוצרו ע"י הארגון או המדינה.
                 בעת יצירת או שימוש בתוצאות הלמידה שלך ניתן יהיה להעזר בפאנל הצידי לנווט דרך תוצאות למידה שלך. ניתן לגרור ולשחרר תוצאות בין הרמות השונות כדי לייצר מבנה.* *וחשוב יותר, קנבס מאפשר לך להוסיף ציוני משימה. ברגע שהתוצאות יוגדרו. יש להקליק על "ניהול רובריקות" כדי להתחיל להשתמש בתוצאות לצורך הערכה.*
             title: "הגדרות תוצאות למידה"
     mastery_error: "צריך להיות גדול או שווה 0"
@@ -10784,7 +10786,7 @@ he:
       labels: 
         download_url: "כתובת הדף להורדת דפדפן ה LockDown "
         plugin_enabled: מופעל
-        use_lti_tool: "ניהול LockDown Browser של הגדרות בחנים נעשית בכלי LTI (הדבר נדרש לצורך מעקב ופיקוח)"
+        use_lti_tool: "ניהול LockDown Browser של הגדרות בחנים נעשית בכלי למידה משולבים - אל. טי. איי. (הדבר נדרש לצורך מעקב ופיקוח)"
     med_cornell_export: 
       labels: 
         password: "סיסמה להזדהות"
@@ -12998,7 +13000,7 @@ he:
       index: 
         assignment_in_speedgrader: "ניתן לראות משימה זו ב speedgrader"
         assignment_info: "מידע על משימה"
-        empty_assignment_selection: "בחירת משימה להצגת מידע נוסף כאן"
+        empty_assignment_selection: "בחירת משימה להצגת מידע נוסף"
         no_points_possible_warning: "משימות בקבוצה זו הם ללא ניקוד אפשרי ואינן יכולות להכלל כחלק מחישוב הציון"
         warning: אזהרה
     components: 
@@ -13028,9 +13030,9 @@ he:
       switch_to_gradebook2: "מעבר אל ברירת המחדל של ספר הציונים "
     learning_mastery: 
       download_results: "הורדת תוצאות (CSV.)"
-      empty_student_selection: "בחירת תלמיד כדי לעיין במידע נוסף - כאן"
+      empty_student_selection: "בחירת תלמיד כדי לעיין במידע נוסף"
       empty_submission_selection: "בחירת תלמיד ותוצאות הלמידה כדי לעיין בתוצאות"
-      hide_student_names_label: "הסתר את שמות התלמידים"
+      hide_student_names_label: "הסתרת שמות התלמידים"
       result: תוצאה
       result_for: "תוצאות עבור:"
       results_loading: "התוצאות לתלמיד זה עדיין בטעינה..."
@@ -13039,7 +13041,7 @@ he:
       student_info: "מידע על תלמיד"
     outcome_information: 
       avg_score: "ציון ממוצע"
-      empty_outcome_selection: "בחירת תוצאות למידה כדי לעיין במידע נוסף - כאן"
+      empty_outcome_selection: "בחירת תוצאות למידה כדי לעיין במידע נוסף"
       high_score: "ציון גבוה"
       low_score: "ציון נמוך"
       outcome_info: "מידע על תוצאות למידה"
@@ -13079,7 +13081,7 @@ he:
         secondary_id: "מזהה משני"
         sections: "הקבצות:"
       index: 
-        empty_student_selection: "בחירת תלמיד כדי לעיין במידע נוסף - כאן "
+        empty_student_selection: "בחירת תלמיד כדי לעיין במידע נוסף"
         grades: ציונים
         student_info: "מידע על תלמיד "
         submissions_loading: "ההגשות של תלמיד זה עדיין בטעינה..."
@@ -13198,7 +13200,7 @@ he:
         crosslist_this_section: "ביצוע רישום צולב להקבצה זו"
         current_enrollments: "הרשמות נוכחיות"
         decrosslist_section: "ביטול רישום צולב של הקבצה זו"
-  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*ראה/י כמה כלי LTI* אשר עובדים בצורה יפה עם קנבס"
+  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*ראה/י כמה כלי למידה משולבים* אשר עובדים בצורה יפה עם קנבס"
   select_a_grading_period_5ea50f1: "בחירת תקופת הערכה..."
   select_a_grading_period_aab25483: "בחירת תקופת הערכה..."
   select_a_predefined_color_c77ab2f5: "בחירת צבע מוגדר מראש"
@@ -13804,7 +13806,7 @@ he:
       discussion_topic_select_label: "בחירת הנושא אותו רוצים לשייך, או הוספת הנושא ע\"י בחירת \"נושא חדש\"."
       domain_match_notice: "כדי להשתמש בכלי זה הדומיין צריך התאמה של הדומיין %{domain}"
       external_tool_item: "כלי חיצוני"
-      external_tool_notice: "בחירת הכלי מהרשימה הבאה, או הקלדת כתובת הדף של כלי חיצוני שכבר ידוע לך שקונפג עם ה LTI הבסיסי - כדי להוסיף קישור ל*מודול* זה."
+      external_tool_notice: "בחירת הכלי מהרשימה הבאה, או הקלדת כתובת הדף של כלי חיצוני שכבר ידוע לך שקונפג עבור כלי הלמידה המשולב הבסיסי - כדי להוסיף קישור ל*מודול* זה."
       external_url_item: "כתובת דף חיצוני"
       external_url_notice: "הקלד/י כתובת ושם דף כדי להוסיף  ב*מודול* זה קישור לדף אתר כלשהו."
       file_item: קובץ
@@ -14196,7 +14198,7 @@ he:
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "שמות תלמידים צריכים להיות סמויים כיוון שזהו סקר אנונימי"
   student_outcome_gradebook_description: |-
       ספר הציונים של התמחות למידת תלמידים מספק אמצעי לתלמידים לעיין בקלות 
-      בהתקדמותם בתוצאות הלמידה. התוצאות מוצגות במעין פורמט ספר הציונים וההתקדמות מוצגת הן בצורה מספרית והן כהתמה/קרוב להתמחות/טעון שיפור
+      בהתקדמותם בתוצאות הלמידה. התוצאות מוצגות במעין פורמט ספר הציונים וההתקדמות מוצגת הן בצורה מספרית והן כהתמחה/קרוב להתמחות/טעון שיפור
   student_viewed_document_9065adb8: "מסמך תלמיד שנצפה"
   students_1b8cd07b: תלמידים
   students_being_observed_4de3e520: "תלמידים בהשגחה"
@@ -14988,7 +14990,7 @@ he:
   use_remote_version_of_rich_content_editor_52f7fc4b: "שימוש בגירסה מרוחקת של Rich Content Editor"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "השתמש/י בגירסה המרוחקת של עורך התוכן העשיר וסרגל הצד."
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "השתמש/י בגירסה המרוחקת של עורך התוכן העשיר וסרגל הצד בחלקים רגישים כגון בחנים."
-  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "השתמש/י בכלי בחני LTI החדש במקום בחני קנבס הרגילים"
+  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "השתמש/י בכלי הלמידה המשולב החדש לבחנים במקום בחני קנבס הרגילים"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "שימוש בקונפיגורציה הזו לצורך רישום הורה/משקיף"
   used_by_permission_314a78dd: "שומש ברשות"
   user: 
@@ -15380,7 +15382,7 @@ he:
     twitter_fail_whale: "אישור הגישה לטוויטר נכשל. יש לנסות שוב."
     user_dashboard: 
       dashboard: "לוח המחוונים"
-      user_atom_feed: "ה Atom Feed  של המשתמש (לכל הקורסים)"
+      user_atom_feed: "האטום פיד  של המשתמש (לכל הקורסים)"
       user_dashboard: "לוח המחוונים של המשתמש"
     user_is_deleted: "%{user_name} בוטל"
     user_merge_fail: "מיזוג המשתמש נכשל. יש לוודא שהרשאותיך מספיקות ולנסות שוב."
