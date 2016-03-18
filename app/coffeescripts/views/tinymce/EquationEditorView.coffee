@@ -182,5 +182,5 @@ define [
       $div = $(document.createElement('div')).append($img)
 
       @restoreCaret()
-      new RceCommandShim().send(@$editor, 'insert_code', $div.html())
+      RceCommandShim.send(@$editor, 'insert_code', $div.html())
       @$el.dialog('close')

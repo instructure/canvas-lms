@@ -45,8 +45,6 @@ define([
     image_not_found: I18n.t('image_not_found', 'Image not found, please try a new URL')
   };
 
-  var rceShim = new RceCommandShim();
-
   function initShared () {
     $box = $('<div/>', {html: htmlEscape(TRANSLATIONS.instructions) + "<form id='instructure_embed_prompt_form' style='margin-top: 5px;'><table class='formtable'><tr><td>"+ htmlEscape(TRANSLATIONS.url) +"</td><td><input type='text' class='prompt' style='width: 250px;' value='http://'/></td></tr><tr><td class='nobr'>"+htmlEscape(TRANSLATIONS.alt_text)+"</td><td><input type='text' class='alt_text' style='width: 150px;' value=''/></td></tr><tr><td colspan='2' style='text-align: right;'><input type='submit' class='btn' value='Embed Image'/></td></tr></table></form><div class='actions'></div>"}).hide();
     $altText = $box.find('.alt_text');
@@ -81,7 +79,7 @@ define([
       var title = data.title,
           html = '<a href="' + htmlEscape(data.link_url) + '"><img src="' + htmlEscape(data.image_url) + '" title="' + htmlEscape(title) + '"alt="' + htmlEscape(title) + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
-      rceShim.send($editor, 'insert_code', html);
+      RceCommandShim.send($editor, 'insert_code', html);
     });
   }
 
@@ -91,7 +89,7 @@ define([
 
     event.preventDefault();
     var html = "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>";
-    rceShim.send($editor, 'insert_code', html);
+    RceCommandShim.send($editor, 'insert_code', html);
     $box.dialog('close');
   }
 

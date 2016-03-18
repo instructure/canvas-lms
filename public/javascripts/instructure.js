@@ -25,7 +25,6 @@ define([
   'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
-  'wikiSidebar',
   'jsx/shared/rce/RichContentEditor',
   'instructure_helper',
   'jqueryui/draggable',
@@ -44,7 +43,6 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
   'compiled/jquery/mediaCommentThumbnail',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
@@ -54,10 +52,9 @@ define([
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar, RichContentEditor) {
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
 
-  var richContentEditor = new RichContentEditor({riskLevel: "sidebar", sidebar: wikiSidebar})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -483,19 +480,16 @@ define([
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      richContentEditor.loadNewEditor($editor)
-      richContentEditor.callOnRCE($editor, 'focus', true)
-      richContentEditor.initSidebar()
-      richContentEditor.attachSidebarTo($editor, function(){
-        $("#sidebar_content").hide();
+      RichContentEditor.initSidebar({
+        show: function() { $('#sidebar_content').hide() },
+        hide: function() { $('#sidebar_content').show() }
       })
+      RichContentEditor.loadNewEditor($editor, { focus: true })
     }).bind('richTextEnd', function(event, $editor) {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      richContentEditor.callOnRCE($editor, 'destroy');
-      richContentEditor.hideSidebar()
-      $("#sidebar_content").show();
+      RichContentEditor.destroyRCE($editor);
     });
 
     $(".cant_record_link").click(function(event) {

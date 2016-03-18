@@ -28,7 +28,6 @@ define([
 ], function(tinymce, $, htmlEscape, LinkableEditor, RceCommandShim) {
 
   var lastLookup = null;
-  var rceShim = new RceCommandShim();
 
   /**
    * A module for holding helper functions pulled out of the mess below.
@@ -191,7 +190,7 @@ define([
                     $("#instructure_link_prompt").dialog('close');
                     $.findLinkForService($(this).data('service').service, function(data) {
                       $("#instructure_link_prompt").dialog('close');
-                      rceShim.send($editor, 'create_link', {
+                      RceCommandShim.send($editor, 'create_link', {
                         title: data.title,
                         url: data.url,
                         classes: priorClasses
@@ -219,14 +218,14 @@ define([
               var $editor = $box.data('editor');
               var $target = $(event.target);
               event.preventDefault();
-              rceShim.send($editor, 'insert_code', Links.buttonToImg($target));
+              RceCommandShim.send($editor, 'insert_code', Links.buttonToImg($target));
               $box.dialog('close');
             });
             // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
             $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
               var $editor = $box.data('editor');
               event.preventDefault();
-              rceShim.send($editor, 'create_link', $(event.target).closest('img').attr('alt'));
+              RceCommandShim.send($editor, 'create_link', $(event.target).closest('img').attr('alt'));
               $box.dialog('close');
             });
             $box.find("#instructure_link_prompt_form .prompt").bind('change keyup', function() {

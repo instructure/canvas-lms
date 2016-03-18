@@ -1,13 +1,23 @@
-define([ 'react', 'jsx/editor/SwitchEditorControl'], (React, SwitchEditorControl) => {
+define([
+  'react',
+  'jsx/editor/SwitchEditorControl',
+  'jsx/shared/rce/RichContentEditor'
+], (React, SwitchEditorControl, RichContentEditor) => {
   var TestUtils = React.addons.TestUtils
 
-  module("SwitchEditorControl");
+  module("SwitchEditorControl", {
+    setup() {
+      sinon.stub(RichContentEditor, 'callOnRCE')
+    },
+
+    teardown() {
+      RichContentEditor.callOnRCE.restore()
+    }
+  });
 
   test('changes text on each click', ()=>{
-    let element = React.createElement(SwitchEditorControl, {
-      textarea: {},
-      richContentEditor: {callOnRCE: ()=>{}}
-    })
+    let textarea = {}
+    let element = React.createElement(SwitchEditorControl, {textarea: textarea})
     let component = TestUtils.renderIntoDocument(element)
     let link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
     equal(link.props.className, "switch-views__link__html")
@@ -17,13 +27,11 @@ define([ 'react', 'jsx/editor/SwitchEditorControl'], (React, SwitchEditorControl
 
   test("passes textarea through to editor for toggling", ()=>{
     let textarea = {id: "the text area"}
-    let rceStub = sinon.stub()
-    let rce = {callOnRCE: rceStub}
-    let element = React.createElement(SwitchEditorControl, {textarea: textarea, richContentEditor: rce})
+    let element = React.createElement(SwitchEditorControl, {textarea: textarea})
     let component = TestUtils.renderIntoDocument(element)
     let link = TestUtils.findRenderedDOMComponentWithTag(component, 'a')
     TestUtils.Simulate.click(link.getDOMNode())
-    ok(rceStub.calledWith(textarea))
+    ok(RichContentEditor.callOnRCE.calledWith(textarea))
   })
 
 

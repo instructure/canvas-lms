@@ -10,7 +10,6 @@ define [
       fakeENV.setup()
       ENV.RICH_CONTENT_SERVICE_ENABLED = true
       @loadOnTargetStub = sinon.stub(serviceRCELoader, "loadOnTarget")
-      globalAnnouncements.refreshEditor()
 
     teardown: ->
       serviceRCELoader.loadOnTarget.restore()

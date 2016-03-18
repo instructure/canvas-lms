@@ -33,8 +33,6 @@ define([
   'jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */,
   'jquery.templateData' /* getTemplateData */,
   'media_comments' /* mediaComment */,
-  'compiled/tinymce',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool,
@@ -42,8 +40,7 @@ define([
 
   window.submissionAttachmentIndex = -1;
 
-  var richContentEditor = new RichContentEditor({riskLevel: "highrisk"});
-  richContentEditor.preloadRemoteModule();
+  RichContentEditor.preloadRemoteModule();
 
   $(document).ready(function() {
     var submitting = false,
@@ -211,7 +208,7 @@ define([
 
     $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
-      richContentEditor.callOnRCE($("#submit_online_text_entry_form textarea:first"), 'toggle')
+      RichContentEditor.callOnRCE($("#submit_online_text_entry_form textarea:first"), 'toggle')
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
@@ -233,8 +230,8 @@ define([
         activate: function(event, ui) {
           if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!richContentEditor.callOnRCE($el, 'exists?')) {
-              richContentEditor.loadNewEditor($el);
+            if (!RichContentEditor.callOnRCE($el, 'exists?')) {
+              RichContentEditor.loadNewEditor($el);
             }
           }
 
@@ -245,8 +242,8 @@ define([
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
-            if (!richContentEditor.callOnRCE($el, 'exists?')) {
-              richContentEditor.loadNewEditor($el);
+            if (!RichContentEditor.callOnRCE($el, 'exists?')) {
+              RichContentEditor.loadNewEditor($el);
             }
           }
 

@@ -109,7 +109,7 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
       // User-generated incorrect answers are not tagged with an @id, so we
       // auto-generate ones:
       if (!arrowId) {
-        arrowId = [ 'user_answer', ++idGenerator ].join('_');
+        arrowId = [ 'user_answer', ++this.idGenerator ].join('_');
       }
 
       // Suffix it with _arrow to avoid conflicts

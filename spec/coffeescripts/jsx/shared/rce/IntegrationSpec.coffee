@@ -6,8 +6,6 @@ define [
   'helpers/editorUtils'
 ], (RichContentEditor, RCELoader, $, fakeENV, editorUtils) ->
 
-  wikiSidebar = undefined
-
   module 'Rce Abstraction - integration',
     setup: ->
       fakeENV.setup()
@@ -37,24 +35,16 @@ define [
 
   test "instatiating a remote editor", ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = true
-    ENV.RICH_CONTENT_SIDEBAR_ENABLED = true
-    ENV.RICH_CONTENT_HIGH_RISK_ENABLED = true
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = true
-    richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
-    richContentEditor.preloadRemoteModule()
+    RichContentEditor.preloadRemoteModule()
     target = $("#big_rce_text")
-    richContentEditor.loadNewEditor(target, { manageParent: true })
+    RichContentEditor.loadNewEditor(target, { manageParent: true })
     equal(window.RceModule, @fakeRceModule)
     equal(target.parent().attr("id"), "tinymce-parent-of-big_rce_text")
     equal(target.parent().find("#fake-editor").length, 1)
 
   test "instatiating a local editor", ->
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
-    ENV.RICH_CONTENT_SIDEBAR_ENABLED = false
-    ENV.RICH_CONTENT_HIGH_RISK_ENABLED = false
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = false
-    richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
-    richContentEditor.preloadRemoteModule()
+    RichContentEditor.preloadRemoteModule()
     target = $("#big_rce_text")
-    richContentEditor.loadNewEditor(target, { manageParent: true })
+    RichContentEditor.loadNewEditor(target, { manageParent: true })
     equal($("#fake-editor").length, 0)

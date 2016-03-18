@@ -11,7 +11,7 @@ define([
       this.loadRCE(function(){})
     },
 
-    loadOnTarget(target, tinyMCEInitOptions) {
+    loadOnTarget(target, tinyMCEInitOptions, callback) {
       const textarea = this.getTargetTextarea(target)
       const getTargetFn = tinyMCEInitOptions.getRenderingTarget || this.getRenderingTarget
       const renderingTarget = getTargetFn(textarea)
@@ -19,17 +19,17 @@ define([
 
       this.loadRCE(function(RCE) {
         RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
-          // same as freshen node in RichContentEditor
-          let $textarea = $('#' + textarea.id)
-          $textarea.data('remoteEditor', polyfill.wrapEditor(remoteEditor))
+          callback(textarea, polyfill.wrapEditor(remoteEditor))
         })
       })
     },
 
-    loadSidebarOnTarget(target, callback){
+    loadSidebarOnTarget(target, callback) {
       let props = { jwt: ENV.JWT }
       this.loadRCE(function (RCE) {
-        RCE.renderSidebarIntoDiv(target, props, callback)
+        RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
+          callback(polyfill.wrapSidebar(remoteSidebar))
+        })
       })
     },
 

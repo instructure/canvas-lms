@@ -7,18 +7,12 @@ define([
 ], function(I18n, $, RichContentEditor) {
   // optimization so user isn't waiting on RCS to
   // respond when they hit announcements
-  richContentEditor = new RichContentEditor({riskLevel: "basic"})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   // account_settings.js mixes a lot of dom management for each of it's
   // tabs, so this file is meant to encapsulate just the javascript
   // used for working with the Announcements tab
   return {
-    refreshEditor: function(){
-      // useful for re-checking feature flags if global state has changed
-      richContentEditor = new RichContentEditor({riskLevel: "basic"})
-    },
-
     bindDomEvents: function(){
       $(".add_notification_toggle_focus").click(function() {
         var aria_expanded = $('add_notification_form').attr('aria-expanded') === "true";
@@ -91,7 +85,7 @@ define([
     augmentView: function(){
       $("#add_notification_form textarea").width('100%');
       $("textarea.edit_notification_form, #add_notification_form textarea").each(function(i){
-        richContentEditor.loadNewEditor($(this));
+        RichContentEditor.loadNewEditor($(this));
       })
     }
   };

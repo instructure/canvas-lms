@@ -6,17 +6,13 @@ define [
   'Backbone'
   'jst/calendar/editCalendarEventFull'
   'compiled/views/calendar/MissingDateDialogView'
-  'wikiSidebar'
   'jsx/shared/rce/RichContentEditor'
   'compiled/object/unflatten'
   'compiled/util/deparam'
   'compiled/views/editor/KeyboardShortcuts'
-  'tinymce.editor_box'
-  'compiled/tinymce'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, RichContentEditor, unflatten, deparam, KeyboardShortcuts) ->
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "sidebar", sidebar: wikiSidebar})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   ##
   # View for editing a calendar event on it's own page
@@ -76,9 +72,8 @@ define [
       @$(".date_field").date_field()
       @$(".time_field").time_field()
       $textarea = @$('textarea')
-      richContentEditor.loadNewEditor($textarea, { manageParent: true })
-      richContentEditor.initSidebar()
-      richContentEditor.attachSidebarTo($textarea)
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true })
 
       _.defer(@attachKeyboardShortcuts)
       _.defer(@toggleDuplicateOptions)
@@ -106,7 +101,7 @@ define [
       @updateRemoveChildEvents(e)
     toggleHtmlView: (event) ->
       event?.preventDefault()
-      richContentEditor.callOnRCE($("textarea[name=description]"), 'toggle')
+      RichContentEditor.callOnRCE($("textarea[name=description]"), 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()

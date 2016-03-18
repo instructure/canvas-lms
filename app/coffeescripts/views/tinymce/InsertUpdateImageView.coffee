@@ -35,7 +35,6 @@ define [
       @$editor = $("##{@editor.id}")
       @prevSelection = @editor.selection.getBookmark()
       @$selectedNode = $(selectedNode)
-      @rceShim = new RceCommandShim()
       super
       @render()
       @show()
@@ -143,6 +142,6 @@ define [
 
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)
-      @rceShim.send(@$editor, 'insert_code', @generateImageHtml())
+      RceCommandShim.send(@$editor, 'insert_code', @generateImageHtml())
       @editor.focus()
       @close()

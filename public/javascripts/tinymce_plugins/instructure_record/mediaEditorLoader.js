@@ -24,11 +24,10 @@ define([
 ], function($, htmlEscape, RceCommandShim) {
 
   var mediaEditorLoader = {
-    rceShim: new RceCommandShim(),
     insertCode: function(ed, mediaCommentId, mediaType){
       var $editor = $("#" + ed.id);
       var linkCode = this.makeLinkHtml(mediaCommentId, mediaType)
-      this.rceShim.send($editor, 'insert_code', linkCode);
+      RceCommandShim.send($editor, 'insert_code', linkCode);
     },
 
     makeLinkHtml: function(mediaCommentId, mediaType) {

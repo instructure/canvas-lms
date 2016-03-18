@@ -1,40 +1,36 @@
 define([
   'jsx/shared/rce/serviceRCELoader',
   'jsx/shared/rce/RceCommandShim',
-  'jquery'
-], function(serviceRCELoader, RceCommandShim, $){
+  'jsx/shared/rce/Sidebar',
+  'jsx/shared/rce/featureFlag',
+  'jquery',
 
-  var flagMap = {
-    'basic': "RICH_CONTENT_SERVICE_ENABLED",
-    'sidebar': "RICH_CONTENT_SIDEBAR_ENABLED",
-    'highrisk': "RICH_CONTENT_HIGH_RISK_ENABLED"
+  // for legacy pathways
+  'tinymce.editor_box',
+  'compiled/tinymce'
+], function(serviceRCELoader, RceCommandShim, Sidebar, featureFlag, $) {
+
+  function loadServiceRCE(target, tinyMCEInitOptions, callback) {
+    serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
+      // same as freshNode
+      let $textarea = $('#' + textarea.id)
+      $textarea.data('remoteEditor', remoteEditor)
+      if (callback) {
+        callback()
+      }
+    })
   }
 
-  function loadRCEViaService (target, tinyMCEInitOptions) {
-    serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions)
-  }
-
-  function loadSidebarViaService (target, callback){
-    serviceRCELoader.loadSidebarOnTarget(target, callback)
-  }
-
-  function loadRCEViaEditorBox(target, tinyMCEInitOptions){
-    return tinyMCEInitOptions.defaultContent ?
+  function loadLegacyRCE(target, tinyMCEInitOptions, callback) {
+    tinyMCEInitOptions.defaultContent ?
       target.editorBox(tinyMCEInitOptions).editorBox('set_code', tinyMCEInitOptions.defaultContent) :
       target.editorBox(tinyMCEInitOptions)
+    if (callback) {
+      callback()
+    }
   }
 
-  function flagToHeed(options){
-    var riskLevel = options.riskLevel || 'highrisk'
-    var flagToHeed = flagMap[riskLevel]
-    return window.ENV[flagToHeed]
-  }
-
-  function sidebarContainer(){
-    return document.getElementById("editor_tabs")
-  }
-
-  function establishParentNode(target){
+  function establishParentNode(target) {
     // some areas would wipe out the whole form
     // if we rendered a new editor into the textarea parent
     // element, so this is some helper functionality to create/reuse
@@ -42,116 +38,136 @@ define([
     let targetId = target.attr("id")
     // xsslint safeString.identifier targetId parentId
     let parentId = "tinymce-parent-of-" + targetId
-    if(target.parent().attr("id") == parentId){
+    if (target.parent().attr("id") == parentId) {
       return // parent wrapper already exits
-    }else{
+    } else {
       return target.wrap( "<div id='"+ parentId +"'></div>")
     }
   }
 
-  var RichContentEditor = function(options){
-    var options = options || {}
-    this.featureFlag = flagToHeed(options)
+  const RichContentEditor = {
+    /**
+     * start the remote module (if the feature flag is on) loading so that it's
+     * hopefully done by the time initSidebar and loadNewEditor are called.
+     * should typically be called at the top of any source file that calls one
+     * of those.
+     *
+     * @public
+     */
+    preloadRemoteModule() {
+      if (featureFlag()) {
+        serviceRCELoader.preload()
+      }
+    },
 
-    this.commandShim = new RceCommandShim()
+    /**
+     * load the sidebar. can pass callbacks to execute any time the sidebar is
+     * shown (`show`) or hidden (`hide`).
+     *
+     * @public
+     */
+    initSidebar(subscriptions={}) {
+      Sidebar.init(subscriptions)
+    },
 
-    // sort of crummy for now, but need to maintain an abstraction over old
-    // and new sidebar usage, and this is similar to the way the old
-    // wikiSidebar is basically a singleton.  Once we get rid of the
-    // old wikiSidebar, we can hand the object/component itself back to use cases
-    // and let them interact with it directly
-    this.wikiSidebar = options.sidebar
-    this.remoteSidebar = undefined
-  }
+    /**
+     * load an editor into the target element with the given options. most
+     * options are passed on to tinymce, but locally:
+     *
+     *   focus (boolean)
+     *     claim the new editor as active immediately after it's loaded
+     *     (including showing the sidebar if any)
+     *
+     *   manageParent (boolean)
+     *     ensure the target element has a containing div that doesn't contain
+     *     the element's siblings, so when the RCE is rendered into the
+     *     container it doesn't wipe out other parts of the DOM
+     *
+     * @public
+     */
+    loadNewEditor(target, tinyMCEInitOptions={}) {
+      // avoid modifying the original options object provided
+      tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-  RichContentEditor.prototype.freshNode = function(target) {
-    // we need to make sure we have the latest node
-    // in order to capture any changes, lots of views like to use
-    // stale nodes
-    let targetId = target.attr("id")
-    return $("#" + targetId)
-  }
-
-  RichContentEditor.prototype.loadNewEditor = function(target, tinyMCEInitOptions={}){
-    // avoid modifying the original options object provided
-    tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
-
-    if ($(target).length <= 0) {
-      // no actual target, just short circuit out
-      return
-    }
-
-    if(this.featureFlag){
-      target = this.freshNode(target)
-
-      if(tinyMCEInitOptions.manageParent){
-        // if the direct parent of a textarea is the form itself,
-        // we'd wipe the whole form out if we rendered into it's parent.
-        //  This option lets users specify that they want RichContentEditor
-        // to maintain a parent node for rendering
-        delete tinyMCEInitOptions.manageParent
-        establishParentNode(target)
+      if ($(target).length <= 0) {
+        // no actual target, just short circuit out
+        return
       }
 
-      loadRCEViaService(target, tinyMCEInitOptions)
-    }else{
-      loadRCEViaEditorBox(target, tinyMCEInitOptions)
-    }
-  }
-
-  RichContentEditor.prototype.initSidebar = function(){
-    if (this.featureFlag) {
-      loadSidebarViaService(sidebarContainer(), (sidebarInstance)=>{
-        this.remoteSidebar = sidebarInstance
-      })
-    } else {
-      this.wikiSidebar && this.wikiSidebar.init()
-
-    }
-  }
-
-  RichContentEditor.prototype.hideSidebar = function(){
-    if (this.featureFlag) {
-      //currentSidebar.hide()
-      console.log("would have hidden sidebar; UNIMPLEMENTED")
-    } else {
-      if(this.wikiSidebar){
-        this.wikiSidebar.hide()
+      let callback = undefined
+      if (tinyMCEInitOptions.focus) {
+        // call activateRCE once loaded
+        callback = this.activateRCE.bind(this, target)
       }
-    }
-  }
 
-  RichContentEditor.prototype.attachSidebarTo = function(target, callback){
-    var hasSidebar = this.wikiSidebar || this.remoteSidebar
-    if (hasSidebar) {
-      if (this.featureFlag) {
-        //currentSidebar.attachToEditor(target)
+      if (featureFlag()) {
         target = this.freshNode(target)
-        console.log("would have attached sidebar to editor; UNIMPLEMENTED")
-        sidebarContainer().style.display = ''
+
+        if (tinyMCEInitOptions.manageParent) {
+          delete tinyMCEInitOptions.manageParent
+          establishParentNode(target)
+        }
+
+        loadServiceRCE(target, tinyMCEInitOptions, callback)
       } else {
-        this.wikiSidebar.attachToEditor(target)
-        this.wikiSidebar.show()
+        loadLegacyRCE(target, tinyMCEInitOptions, callback)
       }
-      if(callback){
-        callback()
+
+      // listen for editor_box_focus events on our target, and trigger
+      // activateRCE from them
+      target.on('editor_box_focus', () => this.activateRCE(target))
+    },
+
+    /**
+     * call a function on the target editor.
+     *
+     * @public
+     */
+    callOnRCE(target, methodName, ...args) {
+      if (featureFlag()) {
+        target = this.freshNode(target)
       }
+      return RceCommandShim.send(target, methodName, ...args)
+    },
+
+    /**
+     * remove the target editor. if there's a sidebar, hide it
+     *
+     * @public
+     */
+    destroyRCE(target) {
+      if (featureFlag()) {
+        target = this.freshNode(target)
+      }
+      RceCommandShim.destroy(target)
+      Sidebar.hide()
+    },
+
+    /**
+     * make the target the active editor, including to be recipient of sidebar
+     * events. if there's a sidebar, make sure it's showing
+     *
+     * @private
+     */
+    activateRCE(target) {
+      if (featureFlag()) {
+        target = this.freshNode(target)
+      }
+      RceCommandShim.focus(target)
+      Sidebar.show()
+    },
+
+    /**
+     * we need to make sure we have the latest node in order to capture any
+     * changes, lots of views like to use stale nodes
+     *
+     * @private
+     */
+    freshNode(target) {
+      let targetId = target.attr("id")
+      return $("#" + targetId)
     }
   }
-
-  RichContentEditor.prototype.preloadRemoteModule = function(){
-    if (this.featureFlag) {
-      serviceRCELoader.preload()
-    }
-  }
-
-  RichContentEditor.prototype.callOnRCE = function(target, methodName, ...args){
-    if (this.featureFlag) {
-      target = this.freshNode(target)
-    }
-    return this.commandShim.send(target, methodName, ...args)
-  }
-
 
   return RichContentEditor
-});
+})

@@ -3,18 +3,14 @@ define [
   'jsx/shared/rce/serviceRCELoader'
   'helpers/editorUtils'
   'helpers/fakeENV'
-], ($, RCELoader, editorUtils, fakeENV) ->
+  'helpers/fixtures'
+], ($, RCELoader, editorUtils, fakeENV, fixtures) ->
   module 'loadRCE',
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'app-host'
       # make sure we don't get a cached thing from other tests
       RCELoader.cachedModule = null
-      @elementInFixtures = (type) ->
-        newElement = document.createElement(type)
-        fixtureDiv = document.getElementById("fixtures")
-        fixtureDiv.appendChild(newElement)
-        newElement
       @getScriptSpy = sinon.stub $, "getScript", (__host__, callback)=>
         window.RceModule = 'fakeModule'
         callback()
@@ -23,7 +19,6 @@ define [
       fakeENV.teardown()
       $.getScript.restore()
       editorUtils.resetRCE()
-      document.getElementById("fixtures").innerHtml = ""
 
   # loading RCE
 
@@ -51,80 +46,11 @@ define [
     RCELoader.loadRCE(cb)
     ok cb.called
 
-  # target finding
-
-  test 'finds a target textarea if a textarea is passed in', ->
-    ta = @elementInFixtures('textarea');
-    targetTextarea = RCELoader.getTargetTextarea(ta)
-    equal targetTextarea, ta
-
-  test 'finds a target textarea if a normal div is passed in', ->
-    d = @elementInFixtures('div')
-    ta = document.createElement('textarea')
-    ta.setAttribute("id", "theTarget")
-    d.appendChild(ta)
-    targetTextarea = RCELoader.getTargetTextarea(d)
-    equal targetTextarea.id, "theTarget"
-
-  test 'returns the textareas parent as the renderingTarget when no custom function given', ->
-    d = @elementInFixtures('div')
-    ta = document.createElement('textarea')
-    ta.setAttribute("id", "theTarget")
-    d.appendChild(ta)
-    renderingTarget = RCELoader.getRenderingTarget(ta)
-    equal renderingTarget, d
-
-  test 'uses a custom get target function if given', ->
-    d = @elementInFixtures('div')
-    ta = document.createElement('textarea')
-    d.appendChild(ta)
-    customFn = ()->
-      return "someCustomTarget"
-
-    renderIntoDivSpy = sinon.spy()
-    fakeRCE = { renderIntoDiv: renderIntoDivSpy }
-    sinon.stub(RCELoader, "loadRCE").callsArgWith(0, fakeRCE)
-
-    # execute renderIntoDivSpy
-    RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn})
-    ok renderIntoDivSpy.calledWith("someCustomTarget")
-    RCELoader.loadRCE.restore()
-
-  # propsForRCE construction
-
-  test 'extracts content from the target', ->
-    ta = @elementInFixtures('textarea')
-    ta.value = "some text here";
-    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
-    equal props.defaultContent, "some text here"
-
-  test 'passes the textarea height into tinyOptions', ->
-    taHeight = "123"
-    ta = {
-      offsetHeight: taHeight
-    }
-
-    opts = {defaultContent: "default text"}
-    props = RCELoader.createRCEProps(ta, opts)
-    equal opts.tinyOptions.height, taHeight
-
-  test 'falls back to defaultContent if target has no content', ->
-    ta = @elementInFixtures('textarea')
-    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
-    equal props.defaultContent, "default text"
-
-  test 'adds the elements name attribute to mirroedAttrs', ->
-    ta = @elementInFixtures('textarea')
-    ta.setAttribute("name", "elementName")
-    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
-    equal props.mirroredAttrs.name, "elementName"
-
   test 'only tries to load the module once', ->
     RCELoader.preload()
     RCELoader.preload()
     RCELoader.preload()
     ok(@getScriptSpy.calledOnce)
-
 
   asyncTest 'handles callbacks once module is loaded', ->
     expect(1)
@@ -144,3 +70,95 @@ define [
       start()
       equal(module, "fakeModule")
     resolveGetScript()
+
+  module 'loadOnTarget',
+    setup: ->
+      fixtures.setup()
+      @$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
+      @$textarea = fixtures.find('#theTarget')
+      @editor = {}
+      @rce = { renderIntoDiv: sinon.stub().callsArgWith(2, @editor) }
+      sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, @rce)
+
+    teardown: ->
+      fixtures.teardown()
+      RCELoader.loadRCE.restore()
+
+  # target finding
+
+  test 'finds a target textarea if a textarea is passed in', ->
+    equal RCELoader.getTargetTextarea(@$textarea), @$textarea.get(0)
+
+  test 'finds a target textarea if a normal div is passed in', ->
+    equal RCELoader.getTargetTextarea(@$div), @$textarea.get(0)
+
+  test 'returns the textareas parent as the renderingTarget when no custom function given', ->
+    equal RCELoader.getRenderingTarget(@$textarea.get(0)), @$div.get(0)
+
+  test 'uses a custom get target function if given', ->
+    customFn = -> "someCustomTarget"
+    RCELoader.loadOnTarget(@$textarea, {getRenderingTarget: customFn}, ()->)
+    ok @rce.renderIntoDiv.calledWith("someCustomTarget")
+
+  # propsForRCE construction
+
+  test 'extracts content from the target', ->
+    @$textarea.val('some text here')
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(@$textarea.get(0), opts)
+    equal props.defaultContent, "some text here"
+
+  test 'falls back to defaultContent if target has no content', ->
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(@$textarea.get(0), opts)
+    equal props.defaultContent, "default text"
+
+  test 'passes the textarea height into tinyOptions', ->
+    taHeight = "123"
+    textarea = { offsetHeight: taHeight }
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(textarea, opts)
+    equal opts.tinyOptions.height, taHeight
+
+  test 'adds the elements name attribute to mirroredAttrs', ->
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(@$textarea.get(0), opts)
+    equal props.mirroredAttrs.name, "elementName"
+
+  test 'renders with rce', ->
+    RCELoader.loadOnTarget(@$div, {}, ()->)
+    ok @rce.renderIntoDiv.calledWith(@$div.get(0))
+
+  test 'yields editor to callback', ->
+    cb = sinon.spy()
+    RCELoader.loadOnTarget(@$div, {}, cb)
+    ok cb.calledWith(@$textarea.get(0), @editor)
+
+  test 'ensures yielded editor has call and focus methods', ->
+    cb = sinon.spy()
+    RCELoader.loadOnTarget(@$div, {}, cb)
+    equal typeof @editor.call, 'function'
+    equal typeof @editor.focus, 'function'
+
+  module 'loadSidebarOnTarget',
+    setup: ->
+      fixtures.setup()
+      @$div = fixtures.create('<div />')
+      @sidebar = {}
+      @rce = { renderSidebarIntoDiv: sinon.stub().callsArgWith(2, @sidebar) }
+      sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, @rce)
+
+    teardown: ->
+      fixtures.teardown()
+      RCELoader.loadRCE.restore()
+
+  test 'yields sidebar to callback', ->
+    cb = sinon.spy()
+    RCELoader.loadSidebarOnTarget(@$div, cb)
+    ok cb.calledWith(@sidebar)
+
+  test 'ensures yielded sidebar has show and hide methods', ->
+    cb = sinon.spy()
+    RCELoader.loadSidebarOnTarget(@$div, cb)
+    equal typeof @sidebar.show, 'function'
+    equal typeof @sidebar.hide, 'function'

@@ -2,7 +2,6 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'wikiSidebar'
   'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
   'compiled/views/ValidatedFormView'
@@ -10,12 +9,9 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
   'compiled/views/editor/KeyboardShortcuts'
-  'compiled/tinymce'
-  'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+], ($, _, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "sidebar", sidebar: wikiSidebar})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -89,13 +85,16 @@ define [
         (ev || window.event).returnValue = warning
         return warning
 
+    # separated out so we can easily stub it
+    scrollSidebar: $.scrollSidebar
+
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
     afterRender: ->
       super
-      richContentEditor.loadNewEditor(@$wikiPageBody, { manageParent: true })
-      @initWikiSidebar()
+      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.loadNewEditor(@$wikiPageBody, { focus: true, manageParent: true })
 
       @checkUnsavedOnLeave = true
       $(window).on 'beforeunload', @onUnload
@@ -120,18 +119,13 @@ define [
 
       @$helpDialog.html((new KeyboardShortcuts()).render().$el)
 
-
-    # Initialize the wiki sidebar
-    # @api private
-    initWikiSidebar: ->
-      $ ()=>
-        richContentEditor.initSidebar()
-        $.scrollSidebar()
-        richContentEditor.attachSidebarTo(@$wikiPageBody)
+    destroyEditor: ->
+      RichContentEditor.destroyRCE(@$wikiPageBody)
+      @$el.remove()
 
     switchViews: (event) ->
       event?.preventDefault()
-      richContentEditor.callOnRCE(@$wikiPageBody, 'toggle')
+      RichContentEditor.callOnRCE(@$wikiPageBody, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()
@@ -152,8 +146,8 @@ define [
       errors
 
     hasUnsavedChanges: ->
-      hasEditor = richContentEditor.callOnRCE(@$wikiPageBody, 'exists?')
-      dirty =  hasEditor && richContentEditor.callOnRCE(@$wikiPageBody, 'is_dirty')
+      hasEditor = RichContentEditor.callOnRCE(@$wikiPageBody, 'exists?')
+      dirty =  hasEditor && RichContentEditor.callOnRCE(@$wikiPageBody, 'is_dirty')
       if not dirty and @toJSON().CAN.EDIT_TITLE
         dirty = (@model.get('title') || '') isnt (@getFormData().title || '')
       dirty

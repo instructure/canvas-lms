@@ -6,7 +6,9 @@ define([
 ], function(_, EditorConfig, setupAndFocusTinyMCEConfig, INST){
   return function(width, id, tinyMCEInitOptions, enableBookmarkingOverride, tinymce){
     var editorConfig = new EditorConfig(tinymce, INST, width, id);
-    var autoFocus = tinyMCEInitOptions.focus ? id : null
+
+    // RichContentEditor takes care of the autofocus functionality at a higher level
+    var autoFocus = undefined
 
     return _.extend({},
       editorConfig.defaultConfig(),

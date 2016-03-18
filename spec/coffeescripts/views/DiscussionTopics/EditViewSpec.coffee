@@ -45,7 +45,7 @@ GroupCategorySelector, fakeENV) ->
             views: {}
 
       (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
-      @stub(app, "_initializeWikiSidebar")
+      @stub(app, 'scrollSidebar')
       app.render()
 
   test 'renders', ->

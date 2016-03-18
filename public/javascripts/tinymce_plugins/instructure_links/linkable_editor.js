@@ -23,7 +23,6 @@ define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
     this.id = editor.id;
     this.selectedContent = editor.selection.getContent();
     this.$editorEl = $editorEl;
-    this.rceShim = new RceCommandShim();
 
     /**
      * Builds a jquery object wrapping the target text area for the
@@ -51,7 +50,7 @@ define(["jquery", 'jsx/shared/rce/RceCommandShim'], function($, RceCommandShim){
      * @param {String} classes any css classes to apply to the new link
      */
     this.createLink = function(text, classes){
-      this.rceShim.send(this.getEditor(), "create_link",{
+      RceCommandShim.send(this.getEditor(), "create_link",{
         url: text,
         classes: classes,
         selectedContent: this.selectedContent

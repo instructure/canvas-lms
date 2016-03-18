@@ -1,38 +1,68 @@
-define(['jquery'], function($) {
+define([
+  'jquery',
 
+  // for legacy pathways
+  'wikiSidebar'
+], function($, wikiSidebar) {
 
-  var RceCommandShim = function() {}
-
-  RceCommandShim.prototype.send = function ($target, methodName, ...args) {
-    let remoteEditor = $target.data('remoteEditor')
-    if (remoteEditor) {
-      // just proxy to the remote editor
-      return remoteEditor.call(methodName, ...args)
-    } else if ($target.data('rich_text')) {
-      // no remote editor, but does have tinymce: feature flag is off, use
-      // editorBox
-      return $target.editorBox(methodName, ...args)
-    } else {
-      // one of the two should have been set by a call to
-      // RichContentEditor#loadOnTarget. but:
-      //
-      //  (1) maybe RichContentEditor#loadOnTarget failed; or
-      //
-      //  (2) some spec called it incidentally without having called
-      //  loadOnTarget first
-      //
-      // in either case, just tell the caller that `exists?` is false,
-      // `get_code` is the textarea value, and ignore anything else.
-      //
-      if (methodName == 'exists?') {
-        return false
-      } else if (methodName == 'get_code') {
-        return $target.val()
+  // for each command, there are three possibilities:
+  //
+  //   .data('remoteEditor') is set:
+  //     feature flag is on and succeeded, just use the remote editor call
+  //
+  //   .data('rich_text') is set:
+  //     feature flag is off, use the legacy editorBox/wikiSidebar interface
+  //
+  //   neither is set:
+  //     probably feature flag is on but failed, or maybe just a poorly set up
+  //     spec (or worst case, poorly set up actual usage... booo). the action
+  //     will do the best it can (see send for example), but often will be a
+  //     no-op
+  //
+  const RceCommandShim = {
+    send($target, methodName, ...args) {
+      let remoteEditor = $target.data('remoteEditor')
+      if (remoteEditor) {
+        return remoteEditor.call(methodName, ...args)
+      } else if ($target.data('rich_text')) {
+        return $target.editorBox(methodName, ...args)
       } else {
-        console.warn("calling '" + methodName + "' on an RCE instance that hasn't fully loaded, ignored")
+        // we're not set up, so tell the caller that `exists?` is false,
+        // `get_code` is the textarea value, and ignore anything else.
+        if (methodName == 'exists?') {
+          return false
+        } else if (methodName == 'get_code') {
+          return $target.val()
+        } else {
+          console.warn("called send('" + methodName + "') on an RCE instance that hasn't fully loaded, ignored")
+        }
+      }
+    },
+
+    focus($target) {
+      let remoteEditor = $target.data('remoteEditor')
+      if (remoteEditor) {
+        remoteEditor.focus()
+      } else if ($target.data('rich_text')) {
+        wikiSidebar.attachToEditor($target)
+      } else {
+        console.warn("called focus() on an RCE instance that hasn't fully loaded, ignored")
+      }
+    },
+
+    destroy($target) {
+      let remoteEditor = $target.data('remoteEditor')
+      if (remoteEditor) {
+        // detach the remote editor reference after destroying it
+        remoteEditor.destroy()
+        $target.data('remoteEditor', null)
+      } else if ($target.data('rich_text')) {
+        $target.editorBox('destroy')
+      } else {
+        console.warn("called destroy() on an RCE instance that hasn't fully loaded, ignored")
       }
     }
   }
 
   return RceCommandShim
-});
+})

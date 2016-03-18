@@ -39,8 +39,6 @@ define([
   'jquery.instructure_misc_plugins' /* confirmDelete, showIf */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
-  'compiled/tinymce',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/sortable' /* /\.sortable/ */
@@ -48,8 +46,7 @@ define([
 
   // optimization so user isn't waiting on RCS to
   // respond when they hit edit
-  richContentEditor = new RichContentEditor({riskLevel: "basic"})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   var ePortfolioValidations = {
     object_name: 'eportfolio',
@@ -76,7 +73,7 @@ define([
         if(section_type == "rich_text") {
           data[name + '[section_type]'] = "rich_text";
           var $richText = $section.find('.edit_section');
-          var editorContent = richContentEditor.callOnRCE($richText, "get_code")
+          var editorContent = RichContentEditor.callOnRCE($richText, "get_code")
           if (editorContent){ data[name + '[content]'] = editorContent;}
         } else if(section_type == "html") {
           data[name + '[section_type]'] = "html";
@@ -157,7 +154,7 @@ define([
         } else if(edit_type == "edit_rich_text_content") {
           var $richText = $edit.find(".edit_section")
           $richText.attr('id', 'edit_' + $section.attr('id'));
-          richContentEditor.loadNewEditor($richText, {defaultContent: sectionData.section_content})
+          RichContentEditor.loadNewEditor($richText, {defaultContent: sectionData.section_content})
         }
       });
       $("#edit_page_form :text:first").focus().select();
@@ -182,7 +179,7 @@ define([
           $section.find(".section_content").after($preview);
         } else if (section_type == "rich_text") {
           var $richText = $section.find('.edit_section)');
-          var editorContent = richContentEditor.callOnRCE($richText, "get_code");
+          var editorContent = RichContentEditor.callOnRCE($richText, "get_code");
           if (editorContent){ $preview.html($.raw(editorContent)) }
           $section.find(".section_content").after($preview);
         }
@@ -192,7 +189,7 @@ define([
       $("#page_content .preview_section").remove();
     }).end().find(".cancel_button").click(function() {
       $("#edit_page_form .edit_rich_text_content .edit_section").each(function() {
-        richContentEditor.callOnRCE($(this), "destroy");
+        RichContentEditor.destroyRCE($(this));
       });
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing');
       $("#page_content .section.unsaved").remove();
@@ -214,11 +211,11 @@ define([
             var code = $section.find(".edit_section").val();
             if(section_type == "rich_text") {
               var $richText = $section.find('.edit_section')
-              var editorContent = richContentEditor.callOnRCE($richText, "get_code")
+              var editorContent = RichContentEditor.callOnRCE($richText, "get_code")
               if (editorContent){
                 $section.find(".section_content").html($.raw(editorContent));
               }
-              richContentEditor.callOnRCE($richText, "destroy")
+              RichContentEditor.destroyRCE($richText);
             } else {
               $section.find(".section_content").html($.raw(code));
             }
@@ -231,7 +228,7 @@ define([
       },
       beforeSubmit: function(data) {
         $("#edit_page_form .edit_rich_text_content .edit_section").each(function() {
-          richContentEditor.callOnRCE($(this), "destroy");
+          RichContentEditor.destroyRCE($(this));
         });
         $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing').removeClass('previewing');
         $("#page_content .section.unsaved,#page_content .section .form_content").remove();
@@ -251,7 +248,7 @@ define([
     });
     $("#edit_page_form .switch_views_link").click(function(event) {
       event.preventDefault();
-      richContentEditor.callOnRCE($("#edit_page_content"), "toggle")
+      RichContentEditor.callOnRCE($("#edit_page_content"), "toggle")
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".switch_views_link").andSelf().toggle();
     });
@@ -285,14 +282,11 @@ define([
       } else if(edit_type == "edit_rich_text_content") {
         var $richText = $edit.find(".edit_section")
         $richText.attr('id', 'edit_' + $section.attr('id'));
-        richContentEditor.loadNewEditor($richText, {defaultContent: ""})
+        RichContentEditor.loadNewEditor($richText, {focus: true, defaultContent: ""})
       }
       $section.hide().slideDown('fast', function() {
         $("html,body").scrollTo($section);
-        if(section_type == "rich_text") {
-          var $richText = $edit.find(".edit_section")
-          richContentEditor.callOnRCE($richText, "focus")
-        } else if(section_type == "html") {
+        if (section_type == "html") {
           $edit.find(".edit_section").focus().select();
         }
       });
@@ -315,14 +309,14 @@ define([
         var $section = $(ui.item);
         if($section.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
           var $richText = $section.find('.edit_section');
-          richContentEditor.callOnRCE($richText, "destroy");
+          RichContentEditor.destroyRCE($richText);
         }
       },
       stop: function(event, ui) {
         var $section = $(ui.item);
         if($section.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
           var $richText = $section.find('.edit_section');
-          richContentEditor.loadNewEditor($richText)
+          RichContentEditor.loadNewEditor($richText)
         }
       }
     });

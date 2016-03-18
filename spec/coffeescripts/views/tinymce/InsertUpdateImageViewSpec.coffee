@@ -19,14 +19,14 @@ define [
         }
       }
 
-      sinon.stub(RceCommandShim.prototype, 'send')
+      sinon.stub(RceCommandShim, 'send')
 
     teardown: ->
       $("#fixtures").html("")
-      RceCommandShim.prototype.send.restore()
+      RceCommandShim.send.restore()
 
   test "it uses RceCommandShim to call insert_code", ->
     view = new InsertUpdateImageView(fakeEditor, "<div></div>")
     view.$editor = '$fakeEditor'
     view.update()
-    ok RceCommandShim.prototype.send.calledWith('$fakeEditor', 'insert_code', view.generateImageHtml())
+    ok RceCommandShim.send.calledWith('$fakeEditor', 'insert_code', view.generateImageHtml())
