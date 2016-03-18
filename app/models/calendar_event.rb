@@ -76,6 +76,7 @@ class CalendarEvent < ActiveRecord::Base
 
     params = {
       :calendarId => 'primary',
+      :sendNotifications => true,
       :eventId => google_calendar_id
     }
 
