@@ -1,2 +1,2 @@
 #!/bin/bash
-docker-compose run --rm web /bin/bash
+docker-compose run --rm canvasweb /bin/bash
