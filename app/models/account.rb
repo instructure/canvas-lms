@@ -933,7 +933,7 @@ class Account < ActiveRecord::Base
           if user && (!details[:if] || send(details[:if]))
             role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
               where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).distinct.pluck(:role_id)
-            role_ids.any?{|role_id| RoleOverride.permission_for(self, permission, self.get_role_by_id(role_id))[:enabled] }
+            role_ids.any?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, permission, role)[:enabled] }
           end
         }
         can permission

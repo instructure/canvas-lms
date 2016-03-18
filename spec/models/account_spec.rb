@@ -910,7 +910,17 @@ describe Account do
       Account.default.role_overrides.create!(:permission => "read_sis", :role => role, :enabled => false)
       AdheresToPolicy::Cache.clear
       RoleOverride.clear_cached_contexts
-      
+
+      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
+    end
+
+    it "should not break trying to check :read_sis for sub-account custom teachers" do
+      user_with_pseudonym(:active_all => 1)
+      sub_account = Account.default.sub_accounts.create!
+      role = custom_teacher_role("teecher", :account => sub_account)
+
+      @course = sub_account.courses.create!
+      @course.enroll_teacher(@user, :role => role).accept!
       expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
     end
 
