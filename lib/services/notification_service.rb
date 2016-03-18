@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,25 +20,34 @@ require 'aws-sdk'
 
 module Services
   class NotificationService
-    DEFAULT_CONFIG = {
-      notification_service_queue_name: 'notification-service'
-    }.freeze
-
     def self.process(global_id, body, type, to)
-      self.notification_queue.send_message({
-        'global_id' => global_id,
-        'type' => type,
-        'message' => body,
-        'target' => to,
-        'request_id' => RequestContextGenerator.request_id
+      return unless notification_queue.present?
+
+      notification_queue.send_message({
+        global_id: global_id,
+        type: type,
+        message: body,
+        target: to,
+        request_id: RequestContextGenerator.request_id
       }.to_json)
     end
 
-    def self.notification_queue
-      return @notification_queue if defined?(@notification_queue)
-      @config ||= DEFAULT_CONFIG.merge(ConfigFile.load('notification_service').try(:symbolize_keys))
-      sqs = AWS::SQS.new(@config)
-      @notification_queue = sqs.queues.named(@config[:notification_service_queue_name])
+    class << self
+      private
+
+      def notification_queue
+        return nil if config.blank?
+
+        @notification_queue ||= begin
+          queue_name = config['notification_service_queue_name']
+          sqs = AWS::SQS.new(config)
+          sqs.queues.named(queue_name)
+        end
+      end
+
+      def config
+        ConfigFile.load('notification_service') || {}
+      end
     end
   end
 end
