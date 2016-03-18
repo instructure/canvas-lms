@@ -576,7 +576,13 @@ class Message < ActiveRecord::Base
   # Returns nothing
   def enqueue_to_sqs
     notification_targets.each do |target|
-      NotificationService.process(global_id, notification_message, path_type, target, remote_configuration)
+      Services::NotificationService.process(
+        global_id,
+        notification_message,
+        path_type,
+        target,
+        remote_configuration
+      )
       complete_dispatch
     end
   rescue AWS::SQS::Errors::ServiceError => e
