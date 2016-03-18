@@ -565,7 +565,7 @@ class Course < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
-    p.to { participating_students }
+    p.to { participating_students + participating_observers }
     p.whenever { |record|
       (record.available? && @grade_weight_changed) ||
       (
