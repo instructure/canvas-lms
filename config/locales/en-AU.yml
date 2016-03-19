@@ -7614,6 +7614,7 @@ en-AU:
     submit_this_support_request: "Submit Ticket"
     which_course_is_this_question_about: "Which course is this question about?"
     your_email_address: "Your email address"
+  help_with_content_licensing_a146fb0e: "Help with content licensing"
   helpers: 
     accessible_date_format: "YYYY-MM-DD hh:mm"
     accessible_date_only_format: YYYY-MM-DD
@@ -10454,6 +10455,7 @@ en-AU:
   not_available_until_next_submission_2175158: "Not available until next submission"
   not_completed_d70acea3: "Not completed"
   not_graded_e027c866: "Not Marked"
+  not_graded_e78bcd50: "Not marked"
   not_installed_37a21a76: "Not Installed"
   not_now_97efd947: "Not now"
   not_yet_completed_345a0bca: "Not yet completed"
@@ -14719,6 +14721,7 @@ en-AU:
   sis_export_title: "SIS Export"
   sis_grade_export_settings_45a9f709: "SIS Mark Export Settings"
   sis_id_4495a887: "SIS ID"
+  sis_id_8c2029e1: "sis ID"
   sis_import: 
     buttons: 
       process_data: "Process Data"
@@ -15235,6 +15238,7 @@ en-AU:
   text_input_d3480b8c: "Text input"
   that_user_account_has_been_deleted_please_contact__350e0e0: "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "The account ID of the account to which the reporting user belongs"
+  the_announcement_title_could_not_be_linked_to_the__78c747f3: "The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"."
   the_app_was_activated_a84e055f: "The app was activated"
   the_app_was_added_58e2836a: "The app was added"
   the_app_was_added_successfully_3f785a23: "The app was added successfully"
@@ -15244,8 +15248,10 @@ en-AU:
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organising your files is easy with Canvas.  We'll show you how."
   the_following_fields_are_invalid_fields_b3565800: "The following fields are invalid: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "The full hostname for the account instance (something.instructure.com, for example)"
+  the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "The mark for this assignment will not sync to the student information system."
   the_grade_for_this_assignment_will_not_sync_to_the_8f4571aa: "The mark for this assignment will not sync to the student information system. Click here to toggle this setting."
   the_grade_for_this_assignment_will_sync_to_the_stu_29c3b522: "The mark for this assignment will sync to the student information system. Click here to toggle this setting."
+  the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "The mark for this assignment will sync to the student information system."
   the_grade_for_this_assignment_will_sync_to_the_stu_5fb4c455: "The mark for this assignment will sync to the student information system. Click to here to toggle this setting."
   the_grading_period_was_deleted_7814a349: "The grading period was deleted."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "The institution you logged in from is not configured on this account."
@@ -15273,6 +15279,7 @@ en-AU:
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "The severity of the issue, as selected by the user from a dropdown menu."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "The shortcut icon for iOS/Android devices. 180x180 png"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course."
+  the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course."
   the_state_parameter_is_required_ffadf213: "The state parameter is required"
   the_top_track_represents_days_on_which_the_student_2a347099: "The top track represents days on which the *student sent messages* to course instructors. The bottom track is for **messages from the instructors** to the student."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "The unique ID used for representing the specific request/response cycle this error report occurred in"
@@ -15668,6 +15675,7 @@ en-AU:
   unpublished_courses_title: "Unpublished Courses"
   unpublished_dfd8801: unpublished
   unread_e9c1b19c: Unread
+  unregister_service_985238e9: "Unregister Service"
   unstarted_932f2990: Unstarted
   unsupported_package: "Unsupported content package"
   until_8bdea3de: until
@@ -15705,6 +15713,8 @@ en-AU:
   use_new_folder_tree_in_files_eb5a451b: "Use new folder tree in Files"
   use_remote_service_for_notifications_9fe667c6: "Use remote service for notifications"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Use remote version of Rich Content Editor"
+  use_remote_version_of_rich_content_editor_and_side_a058a664: "Use remote version of Rich Content Editor AND sidebar"
+  use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Use remote version of Rich Content Editor AND sidebar in high-risk areas like quizzes"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool in place of regular canvas quizzes."
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Use this configuration for parent/observer registration"
   used_by_permission_314a78dd: "Used by Permission"
@@ -16353,6 +16363,7 @@ en-AU:
         zero: "No %{model} found"
     page_gap: "&hellip;"
     previous_label: "&#8592; Previous"
+  will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(will send to everyone if no selections are made)"
   will_unlock_unlock_date_1024c38d: "Will unlock %{unlock_date}"
   wimba_conference: 
     external_urls: 
