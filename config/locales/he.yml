@@ -5136,7 +5136,7 @@ he:
     save_settings: "שמירת הגדרות"
     saving: שומר...
   different_course_b875770e: "קורס שונה"
-  diigo_993c4646: Diigo
+  diigo_993c4646: דייגו
   disable_a5c05db3: השבתה
   disabled_18c33a73: "(לא פעיל)"
   disabled_3b1b332a: "לא פעיל"
@@ -7562,7 +7562,7 @@ he:
     no_items: "אין פריטים"
     no_results_found: "לא נמצאו תוצאות"
     status: 
-      diigo_search_throttling: "Diigo מגביל משתמשים לחיפוש אחד כל עשר שניות. נא להמתין..."
+      diigo_search_throttling: "דייגו מגביל משתמשים לחיפוש אחד כל עשר שניות. נא להמתין..."
       posting_message: "מפרסם הודעה..."
       searching: מחפש...
     switched_roles_message: 
@@ -7901,7 +7901,7 @@ he:
         page_title: "התחברות לקנבס"
       new_login_content: 
         ? "User Research"
-        : "מחקר משתמשים"
+        : "מבדקי שימוש"
         back_to_login: "חזרה לדף ההתחברות "
         browse_courses: "עיון ברשימת הקורסים "
         buttons: 
@@ -10592,8 +10592,8 @@ he:
       labels: 
         endpoint_uri: "כתובת URI לפרסום נתונים אל (https://www.somewhere.com/endpoint/path )"
     diigo: 
-      description: "אינטגרצית Diigo"
-      name: Diigo
+      description: "אינטגרצית דייגו"
+      name: דייגו
     diigo_settings: 
       labels: 
         api_key: "מפתח API"
@@ -11026,7 +11026,7 @@ he:
         select_image: "בחירת תמונה"
         update_settings: "עידכון הגדרות"
       delicious_description: "Delicious הנו כלי שמאפשר לך לשמור ולשתף את הסימניות שלך עם אחרים. עורך התוכן העשיר של קנבס יאפשר לך לחפש את תגי ה Delicious כדי לקשרם בקלות מתוך קנבס למקורות אחרים אשר ימצאו כמועילים."
-      diigo_description: "Diigo הנו כלי סימניות חברתי שעוצב במיוחד למטרות מחקר והוראה. עורך התוכן העשיר של קנבס יאפשר לך לחפש את תגי Diigo שלך כדי לקשר בקלות מתוך קנבס אל מקורות שימצאו מועילים,"
+      diigo_description: "דייגו הנו כלי סימניות חברתי שעוצב במיוחד למטרות מחקר והוראה. עורך התוכן העשיר של קנבס יאפשר לך לחפש את תגי דייגו שלך כדי לקשר בקלות מתוך קנבס אל מקורות שימצאו מועילים,"
       error_loading_token_details: "שגיאה בהעלאת פרטי האסימון"
       feature_options: "תכונות אפשריות"
       full_token_warning: |-
@@ -11041,7 +11041,7 @@ he:
         application_abbrev: אפליקציה
         dates: תאריכים
         delicious_login: "לוג-אין של Delicious "
-        diigo_login: "לוג-אין של Diigo "
+        diigo_login: "לוג-אין של דייגו "
         generate_access_token: "יצירת אסימון גישה"
         google_drive_access: "גישה לגוגל דרייב"
         inbox_opt_out: "עזיבת תיבת הדואר של השיחות"
@@ -11098,7 +11098,7 @@ he:
         configure_mfa: "הגדרת הזדהות רבי מימדית"
         delete_account: "ביטול חשבוני"
         delicious: Delicious
-        diigo: Diigo
+        diigo: דייגו
         disable_mfa: "הפסקת השירות של הזדהות רב מימדית"
         edit_settings: "עריכת הגדרות"
         google_drive: "גוגל דרייב"
@@ -11125,7 +11125,7 @@ he:
         authorize_yo: "לוג-אין של Yo "
         click_to_change_profile_pic: "הקלק/י כדי לשנות את תמונת פרופיל"
         delicious_login: "לוג-אין של Delicious"
-        diigo_login: "לוג-אין של Diigo"
+        diigo_login: "לוג-אין של דייגו"
         new_access_token: "אסימון גישה חדש "
         register_skype: "רישום סקייפ"
         remove_account_from_profile: "הסרת חשבון מפרופיל זה"
@@ -13392,7 +13392,7 @@ he:
         user_menu: "תפריט משתמש"
     canvas_footer: 
       ? "User Research"
-      : "מחקר משתמש"
+      : "מבדקי שימוש"
       by_instructure: "ע\"י Instructure"
       open_source_learning_management_system: "מערכת LMS קוד פתוח"
     components: 
@@ -15140,7 +15140,7 @@ he:
   user_service: 
     descriptions: 
       delicious: "Delicious הנו כלי אינטרקטיבי לשיתוף קישורים. ניתן לסמן כל דף שהוא באינטרנט להתיחסות בעתיד. ניתן גם לקשר לחשבונות של משתמשי Delicious אחרים כדי לשתף קישורים בעלי ענין משותף."
-      diigo: "Diigo הנו כלי אינטרקטיבי לשיתוף קישורים. ניתן לסמן כל דף שהוא באינטרנט להתיחסות בעתיד. ניתן גם לקשר לחשבונות של משתמשי Diigo אחרים כדי לשתף קישורים בעלי ענין משותף."
+      diigo: "דייגו הנו כלי אינטרקטיבי לשיתוף קישורים. ניתן לסמן כל דף שהוא באינטרנט להתיחסות בעתיד. ניתן גם לקשר לחשבונות של משתמשי דייגו אחרים כדי לשתף קישורים בעלי ענין משותף."
       google_drive: "תלמידים יכולים להשתמש בגוגל דרייב כדי לשתף פרוייקטים בקבוצה. גוגל דרייב מאפשר שיתוף בזמן אמת של עריכת תכני מסמכים, גליונות אלקטרוניים ומצגות. "
       linked_in: "לינקדאין הנו משאב לרשתות עסקיות. רבים מהקשרים שאת/ה בונה בזמן ביה\"ס יכולים להועיל בשלב השתלבותך במעגל העבודה."
       skype: "סקייפ הנו כלי חינמי לשיחות מקוונות של קול ווידאו."
