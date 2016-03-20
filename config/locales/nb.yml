@@ -1491,7 +1491,7 @@ nb:
   answer_weight_43420dc5: Svarvekt
   answers_which_scored_in_the_bottom_27_74409483: "Svar som scoret i bunnen 27%"
   answers_which_scored_in_the_middle_46_46466ffd: "Svar som scoret i midten 46%"
-  answers_which_scored_in_the_top_27_a605232d: "Svar som scoret på toppen 27%"
+  answers_which_scored_in_the_top_27_a605232d: "Svar som scoret blant de øverste 27%"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svarene vil bli vist etter ditt siste forsøk"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Senter vil vises i \"Apps\" kategorien på siden av enten et kurs eller konto innstillinger. URL som er angitt nedenfor skal peke til en gyldig App senter endepunkt (for example, %{url} -- sørg for å utelate etterfølgende skråstrek"
@@ -6470,6 +6470,7 @@ nb:
     replace: Erstatt
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Filen(e) blir inkludert på alle sidene i Canvas PC-app"
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "Filen(e) blir inkludert når brukerinnholdet vises i Canvas iOS eller Android apper."
+  file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} gjeldende kvote brukerfil"
   file_status: 
     hidden_status: "Skjult. Tilgjengelig med en lenke"
     published_status: Publisert
@@ -6538,6 +6539,7 @@ nb:
   find_flickr_image_view: 
     find_cc_on_flickr: "Finn Creative Commons-bilder på Flickr"
     search: Søk
+  find_ip_address_filter_96ec70bb: "Finn IP-adressefilter"
   find_outcome: 
     errors: 
       outcome_retrieval_failed: "Henting av læringsmål feilet uventet. Vennligst forsøk igjen."
@@ -7603,6 +7605,7 @@ nb:
     submit_this_support_request: "Send inn feilmelding"
     which_course_is_this_question_about: "Hvilket kurs gjelder spørsmålet?"
     your_email_address: "Din epostadresse"
+  help_with_content_licensing_a146fb0e: "Hjelp for lisensiering av innhold"
   helpers: 
     accessible_date_format: "ÅÅÅÅ-MM-DD tt:mm"
     accessible_date_only_format: DD-MM-ÅÅÅÅ
@@ -7758,6 +7761,7 @@ nb:
     title_for_topics_category: "%{category}-temaer"
     warnings: 
       truncated_wiki_title: "Tittelen for følgende wikiside ble forkortet: %{title}"
+  in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "I tilfeller der det er tilgjengelig, last RCE og wiki-sidestolpen fra en rikholdig canvas innholdstjeneste"
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "I tilfeller der det er tilgjengelig, last RCE fra en rikholdig innholdstjeneste fra canvas"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For å fullføre prosessen blir du omdirigert til en påloggingsside der du vil trenge logge inn med ditt barns opplysninger."
   in_progress_646a8aef: Pågår
@@ -10306,6 +10310,7 @@ nb:
   more_courses_5ebbe998: "Flere kurs"
   more_info_at_course_name_56dc8c10: "Mer info på %{course_name}"
   more_information_3dfb76b5: "Mer informasjo"
+  more_than_999_submissions_need_grading_bc087dd0: "Mer enn 999 innleveringer trenger vurdering"
   more_than_9_submissions_need_grading_30157d49: "Mer enn 9 innleveringer krever vurdering"
   more_than_a19b440: "%{more_than}+"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Nyligste resultatet teller som %{calculation_int}% av mester-vekten, gjennomsnittet av andre resultater teller som %{remainder}% av vekten. Minst 2 resultater må foreligge før en sum beregnes."
@@ -11849,7 +11854,7 @@ nb:
   public_domain_112ed397: "Åpent område"
   publish_5211dca3: Publiser
   publish_aa888e3c: "Publisere:"
-  publish_announcement_fec6d7e2: "Publiser kunngjøringer"
+  publish_announcement_fec6d7e2: "Publisere kunngjøringer"
   publish_btn_module: 
     buttons: 
       publish: Publiser
@@ -13443,7 +13448,7 @@ nb:
       manage_role_overrides: "Administrer tillatelser"
       manage_rubrics: "Opprett og rediger vurderingsveiledninger"
       manage_sections: "Administrer (opprett/rediger/slett) kursklasser"
-      manage_sis: "Importer og administrer SIS data"
+      manage_sis: "Administrere SIS-data"
       manage_site_settings: "Administrer innstillinger for programtillegg og de som gjelder for hele installasjonen"
       manage_storage_quotas: "Behandle lagringskvoter"
       manage_students: "Legg til/fjern studenter på kurset"
@@ -13926,6 +13931,9 @@ nb:
   send_a_message_to_the_teacher_1ae115b6: "Send en melding til foreleseren"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send tilpassede felt (avmarker med mindre du bruker Canvas zendesk)"
   send_e3bd0ed0: Send
+  send_this_announcement_to_unenrolled_users_4ea549d7: "Send denne kunngjøringen til avregistrerte brukere"
+  send_this_announcement_to_users_with_the_account_r_bd69c809: "Send denne kunngjøringen til brukere med kontorolle %{role}"
+  send_this_announcement_to_users_with_the_course_ro_46904d40: "Send denne kunngjøringen til brukere med kursrolle %{role}"
   send_to_ce05b460: "Send til"
   sends_international_text_messages_from_a_phone_num_10afbad6: "Sender internasjonale tekstmeldinger fra et telefonnummer i mottakerlandet, dersom det er mulig."
   sequence_footer: 
@@ -14740,6 +14748,7 @@ nb:
     users: 
       user_search_label: Brukersøk
       users_matching_label: "Matchende brukere"
+  site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Kun sideadministrasjon. Send til 1 / %{denominator} brukere med aktive kontoer hver måned. "
   size_b30e1077: Størrelse
   skip_to_content_22ad1d00: "Gå til innhold"
   skipped_file_filename_due_to_error_94f0194: "Hoppet over fil %{filename} på grunn av en feil"
@@ -15191,6 +15200,7 @@ nb:
   text_input_d3480b8c: Tekst-felt
   that_user_account_has_been_deleted_please_contact__350e0e0: "Den brukerkontoen er slettet. Kontakt systemadministratoren for å reaktivere kontoen."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID til denne kontoen rapporteringsbrukeren tilhører"
+  the_announcement_title_could_not_be_linked_to_the__78c747f3: "Kunngjøringen \"%{title}\" kunne ikke knyttes til modulen \"%{mod_title}\""
   the_app_was_activated_a84e055f: "Appen var aktivert"
   the_app_was_added_58e2836a: "App ble lagt"
   the_app_was_added_successfully_3f785a23: "App ble lagt til"
@@ -15200,8 +15210,10 @@ nb:
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Files kategorien er stedet til å dele forelesnings lysbilder, eksempel dokumenter, studie hjelper -- noe som helst elevene vil ønske å laste ned. Laste opp og organisere filene dine er lett med Canvas. Vi viser deg hvordan."
   the_following_fields_are_invalid_fields_b3565800: "Følgende felt er ugyldige: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fulle vertsnavnet for kontoen (noe.instructure.com f.eks.)"
+  the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Karakteren på denne oppgaven vil ikke synkroniseres med studentens informasjonssystem. "
   the_grade_for_this_assignment_will_not_sync_to_the_8f4571aa: "Karakteren for denne oppgaven vil ikke synkronisere med student informasjonssystemet. Klikk her for skifte denne innstillingen."
   the_grade_for_this_assignment_will_sync_to_the_stu_29c3b522: "Karakteren for denne oppgaven vil synkronisere med student informasjonssystemet. Klikk her for å skifte denne innstillingen."
+  the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Karakteren på denne oppgaven vil synkroniseres med studentens informasjonssystem."
   the_grade_for_this_assignment_will_sync_to_the_stu_5fb4c455: "Vurderingen av denne oppgaven vil synkronisere med student informasjonssystemet. Klikk her for å skifte denne innstillingen."
   the_grading_period_was_deleted_7814a349: "Vurderingsperioden ble slettet"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institusjonen du logget inn fra er ikke konfigurert på denne kontoen."
@@ -15261,6 +15273,7 @@ nb:
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Denne innleveringen er droppet og blir ikke tatt med i beregningen"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Denne innleveringen er fritatt og blir ikke vurdert i den totale beregningen"
   this_assignment_is_overdue_a44bea3b: "Dette oppdraget er forsinket"
+  this_assignment_will_no_longer_count_towards_your__a6eb6778: "Denne oppgaven vil ikke lenger telle mot din karakter,"
   this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette kurset kan ikke legges til kurs menyen på dette tidspunktet."
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Dette kurset har ikke begynt enda. Du vil ha anledning til å delta på dette kurset før %{date}."
@@ -15298,6 +15311,7 @@ nb:
   this_quiz_has_been_excused_d89d2b74: "Denne prøven har blitt fritatt"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne prøven er ikke publisert* Kun forelesere kan se prøven fram til den blir publisert."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denne opptakeren bruker Flash. Som et resultat finner du det kanskje enklere å foreta et opptak på din lokale maskin, og deretter bruke 'last opp media' fanen for å laste den opp."
+  this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Denne rapporten viser alle kursene i et gitt semester. Den resulterende CSV-filen vil ha en rad per kurs, og vil vise kurs-ID, kursets SIS-ID, kursets kortnavn, kursets navn, konto-ID, kontoens SIS-ID, kontonavn og brukt lagringsplass i MB."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne prøven siden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevarebygging. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidebar , vil du se en * forhåndsvise endringene * knapp . Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Svarene fra denne studenten er skult ettersom oppgaven er anonym."
   this_student_wrote_f1a3f22d: "Denne student skrev:"
@@ -15529,6 +15543,7 @@ nb:
       Om tilbyderen kan konfigurere gyldig callback eller omdirigerings URL-adresser, bruk %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "For å koble kursobservatøren *%{name}* til en student, skriv inn navnet på studenten nedenfor for å finne den og så klikk Oppdater."
   to_minscore_43e5452e: "til %{minScore}%"
+  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å forhåndsvise tema-editorens merke, må du *slå av høy kontrast UI*."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Skriv inn domenet her for å begrense brukere fra et spesifikt Google Apps domene."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "For å vise oppgaver, sørge for at *Agenda* visningen er aktiv."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Bytt dashcard-visning og nylig aktivitetsstrøm"
@@ -15588,11 +15603,14 @@ nb:
   unchanged_aca18e02: "[Unchanged]"
   undated_items_toggle_list_visibility_6219e641: "Udaterte gjenstander veksler synligheten på listen"
   undo_a7be8fef: Angre
+  unenrolled_users_e7632d24: "Uregistrerte brukere"
+  ungraded_answers_31ef2df7: "Svar uten vurdering"
   ungraded_submissions_44efb0ec: "Usorterte innleveringer"
   ungraded_survey_ad7de790: "Ikke vurdert undersøkelse"
   unknown: Ukjent
   unknown_47a3b725: Ukjent
   unknown_account_74d30b82: "ukjent konto"
+  unknown_answers_9688a2bc: "Ukjente svar"
   unknown_content_type_ae6d08e8: "Ukjent innholdstype"
   unknown_question_bank: "Ukjent spørsmålsbank"
   unknown_quiz: "Ukjent prøve"
@@ -15619,6 +15637,7 @@ nb:
   unpublished_courses_title: "Ikke publiserte kurs"
   unpublished_dfd8801: upublisert
   unread_e9c1b19c: Ulest
+  unregister_service_985238e9: "Avregistrer tjenesten"
   unstarted_932f2990: "Ikke påbegynt"
   unsupported_package: "Ustøttet innholdspakke"
   until_8bdea3de: til
@@ -15640,10 +15659,12 @@ nb:
   upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slippe elementer for å laste opp"
+  upload_failed_quota_exceeded_ff3af659: "Opplasting mislyktes, kvote overskredet"
   upload_media_ce31135a: "Last opp Media"
   upload_successful_ca47465f: "Opplasting vellykket"
   upper_limit_of_range_c454a8f2: "Øvre grense for utvalg"
   url_cc9398ca: "URL:"
+  url_is_required_4689ed84: "URL er påkrevd"
   url_type_3ece27d2: "URL type"
   usage_right_ff96f3e2: "Bruks Rettighet:"
   usage_rights_f0960ad6: "Bruksrettigheter:"
@@ -15654,6 +15675,8 @@ nb:
   use_new_folder_tree_in_files_eb5a451b: "Bruk nytt mappetre i filer"
   use_remote_service_for_notifications_9fe667c6: "Bruk fjerntjeneste for varslinger"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Bruk ekstern versjon av 'Rich Content Editor'"
+  use_remote_version_of_rich_content_editor_and_side_a058a664: "Bruk ekstern versjon av  'Rich Content Editor' OG sidestolpe"
+  use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Bruk eksterne versjon av 'Rich Content Editor' OG sidestolpe i høyrisikoområder som quizer"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye test-LTI-verktøyet i stedet for vanlige canvas-tester"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Bruk denne konfigurasjonen for foreldre/observatør-påmelding"
   used_by_permission_314a78dd: "Brukt med tillatelse"
@@ -16089,6 +16112,7 @@ nb:
   view_next_file_a8a4a885: "Se neste fil"
   view_previous_file_b846db4f: "Se forrige fil"
   view_question_banks_188a9e0f: "Vis Spørsmåls Banker"
+  view_rubric_evaluation_b1b0db2a: "Vis rubrikk-evaluering"
   view_student_analytics_6b8ccd42: "Vis Student Analytics"
   view_the_assignment_e61ca4fc: "Se oppgaven"
   view_toolname_placements_4a5724d1: "Vis %{toolName} plasseringer"
@@ -16137,6 +16161,7 @@ nb:
   welcome_to_the_canvas_theme_editor_73091d1: "Velkommen til Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkommen til dine kurs! For å tilpasse listen over kurs, klikk på \"alle kurs\" og stjernemarker kursene du vil se."
   well_below_mastery_37664bdc: "Vel Nedenfor Mestring"
+  what_are_self_sign_up_groups_af1f002a: "Hva er selvregistrerings grupper?"
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Når aktivert, kan globale JavaScript og CSS-filer lastes opp i *%{t_theme_editor}*."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når folk besøker kurset, er dette siden de får se. Du kan sette den til å vise en aktivitet stream, listen over kursmoduler, et kursoversikt, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsforløp."
@@ -16296,6 +16321,7 @@ nb:
         zero: "Fant ingen %{model}"
     page_gap: "&hellip;"
     previous_label: "8592; Forrige"
+  will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(vil sende til alle hvis ingen valg er gjort)"
   will_unlock_unlock_date_1024c38d: "Vil låse opp %{unlock_date}"
   wimba_conference: 
     external_urls: 
@@ -16403,6 +16429,7 @@ nb:
       Du bør konfigurere %{callback_url} som Callback URL, og sette Tilgangsnivået til
       Lese, skrive og og få tilgang til direktemeldinger
       Etter at du oppretter applikasjonen, noter Consumer Key og Consumer Secret, og oppgi dem her.
+  you_will_not_be_able_to_preview_your_changes_f7b868fb: "Du vil ikke kunne forhåndsvise endringene dine"
   your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din Oppgavelisten kan nå bli funnet på *Kalender* side."
   your_assignments_list_has_improved_3eded80e: "*Oppdrag* lista ditt har blitt forbedret"
