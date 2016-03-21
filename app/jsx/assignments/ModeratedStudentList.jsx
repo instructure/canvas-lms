@@ -102,13 +102,15 @@ define([
     },
 
     renderFinalGrade (student) {
-      if (student.selected_provisional_grade_id || (student.provisional_grades && student.provisional_grades.length < 2)) {
-        var grade = _.find(student.provisional_grades, (pg) => {
-          return pg.provisional_grade_id === student.selected_provisional_grade_id;
-        });
+      if (student.selected_provisional_grade_id || (student.provisional_grades && student.provisional_grades.length === 1)) {
+        var grade;
         // If they only have one provisional grade show that as the grade
-        if (student.provisional_grades.length < 2) {
-          grade = student.provisional_grades[0]
+        if (student.provisional_grades.length === 1) {
+          grade = student.provisional_grades[0];
+        } else {
+          grade = _.find(student.provisional_grades, (pg) => {
+            return pg.provisional_grade_id === student.selected_provisional_grade_id;
+          });
         }
         return (
           <div className='col-xs-2' role="gridcell">

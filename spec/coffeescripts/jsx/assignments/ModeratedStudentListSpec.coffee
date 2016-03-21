@@ -27,6 +27,18 @@ define [
       }
     ]
   }
+  fakeUngradedStudentList = {students:
+    [
+      {
+        'id': 3
+        'display_name': 'a@example.edu'
+        'avatar_image_url': 'https://canvas.instructure.com/images/messages/avatar-50.png'
+        'html_url': 'http://localhost:3000/courses/1/users/3'
+        'in_moderation_set': false
+        'selected_provisional_grade_id': null
+      }
+    ]
+  }
 
   module 'ModeratedStudentList'
 
@@ -95,6 +107,22 @@ define [
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
     equal gradeColumns[0].props.children[1].props.children, 4
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
+  test 'properly renders final grade if there are no provisional grades', ->
+    newFakeStudentList = _.extend({}, fakeUngradedStudentList)
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: newFakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub'
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+
+    gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
+    equal gradeColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'grade column is a dash'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'does not show radio button if there is only one provisional grade', ->
