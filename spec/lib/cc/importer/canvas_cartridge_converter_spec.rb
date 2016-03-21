@@ -1320,6 +1320,57 @@ XML
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
     end
 
+    it "should add warnings for quiz questions" do
+      data = {
+        "assessments" => {
+          "assessments" => [{
+            "questions" => [{
+              "answers" => [],
+              "correct_comments" => "",
+              "incorrect_comments" => "",
+              "question_text" => "<a href='/badlink/toabadplace'>mwhahaha</a>",
+              "question_name" => "Question",
+              "migration_id" => "i340ed54b48e0de110bda151e00a3bbfd",
+              "question_type" => "essay_question"
+            }],
+            "quiz_type" => "assignment",
+            "question_count" => 1,
+            "title" => "Week 1 - Activity 4 Quiz",
+            "quiz_name" => "Week 1 - Activity 4 Quiz",
+            "migration_id" => "i18b97d4d9de02036d8b8861645c5f8ec",
+            "allowed_attempts" => -1,
+            "description" => "description",
+            "scoring_policy" => "keep_highest",
+            "assignment_group_migration_id" => "ia517adfdd9051a85ec5cfb1c57b9b853",
+            "points_possible" => 1,
+            "lock_at" => 1360825140000,
+            "unlock_at" => 1359615600000,
+            "due_at" => 1360220340000,
+            "anonymous_submissions" => false,
+            "show_correct_answers" => false,
+            "require_lockdown_browser" => false,
+            "require_lockdown_browser_for_results" => false,
+            "shuffle_answers" => false,
+            "available" => true,
+            "cant_go_back" => false,
+            "one_question_at_a_time" => false
+          }]
+        }
+      }.with_indifferent_access
+
+      migration = ContentMigration.create(:context => @copy_to)
+      migration.migration_settings[:migration_ids_to_import] = {:copy => {"all_quizzes" => 1}}
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+
+      quiz = @copy_to.quizzes.first
+
+      expect(migration.migration_issues.count).to eq 1
+      warning = migration.migration_issues.first
+      expect(warning.issue_type).to eq "warning"
+      expect(warning.description.start_with?("Missing links found in imported content")).to eq true
+      expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}/edit"
+    end
+
     it "should add warnings for wiki pages" do
       data = {
         "wikis" => [{
