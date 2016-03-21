@@ -9,7 +9,7 @@ he:
   2_final_score_7b0fd15e: "2- ציון סופי"
   2nd_reviewer_94fdbcd: "בודק/ת מספר 2"
   451_message: 
-    description: "אין הרשאה לגשת לאתר זה לנמצאים במדינה המוגבלת בקשרי המסחר עם ארה\"ב."
+    description: "אין הרשאה לגשת לאתר זה לנמצאים במדינה המוגבלת בקשרי המסחר עם ארה\"ב"
     headings: 
       page: "אינך מורשה"
     title: "אינך מורשה"
@@ -30,7 +30,7 @@ he:
   GroupDetailView: 
     delete_confirm: "האם אתה בטוח שאתה מעוניין להסיר את הקבוצה הזו?"
     flash: 
-      removeError: "לא ניתן להסיר את הקבוצה. אנא נסה שנית מאוחר יותר."
+      removeError: "לא ניתן להסיר את הקבוצה. אנא נסה שנית מאוחר יותר"
       removed: "קבוצה הוסרה בהצלחה."
     student_count: 
       one: "תלמיד אחד"
@@ -1073,7 +1073,7 @@ he:
       import_log_title: "ייבוא יומן התקדמות"
       import_started_message: "תהליך הייבוא החל. התהליך יכול לקחת זמן רב בייבוא של נתונים מרובים. אפשר לעזוב את הדף זה ולחזור אליו בהמשך."
       import_type_label: "סוג ייבוא"
-      imported_message: "כל נתוני המערכת הבית ספרית יובאו בהצלחה."
+      imported_message: "כל נתוני המערכת הבית ספרית יובאו בהצלחה"
       imported_with_messages_message: "נתוני המערכת הבית ספרית יובאו אך עם ההודעות הבאות:"
       last_batch_title: "ריצת אצבה אחרונה"
       override_sis_stickiness_instructions: |-
@@ -1627,9 +1627,9 @@ he:
     errors: 
       cannot_delete_group: "אין אפשרות לבטל קבוצה עם משימה נעולה"
     notices: 
-      created: "קבוצת משימה נוצרה בהצלחה."
+      created: "קבוצת משימה נוצרה בהצלחה"
       deleted: "קבוצה זו בוטלה"
-      updated: "קבוצת המשימה עודכנה בהצלחה."
+      updated: "קבוצת המשימה עודכנה בהצלחה"
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "אין אפשרות לבטל קבוצה עם משימה נעולה"
@@ -3925,8 +3925,8 @@ he:
     one: "קובץ אחד הועלה"
     other: "%{count} קבצים הועלו"
   count_items_deleted_successfully_a287aa53: 
-    one: "%{count} פריטים בוטלו בהצלחה."
-    other: "%{count} פריטים בוטלו בהצלחה."
+    one: "%{name}  בוטל בהצלחה"
+    other: "%{count} פריטים בוטלו בהצלחה"
   count_items_selected_91814713: 
     one: "%{count} פריטים נבחרו"
     other: "%{count} פריטים נבחרו"
@@ -4612,7 +4612,7 @@ he:
       license_notice: "תוכן קורס זה מוצע במסגרת רשיון %{license_type}. ניתן להניח שתכנים של הקורס כפופים לרשיון זה, אלא אם צוין אחרת. "
       links: 
         choose_home_page: "בחירת דף הבית "
-        course_setup: "רשימת תיוג להקמת אתר"
+        course_setup: "רשימת תיוג לבנית קורס"
         drop_course: "עזיבת קורס זה"
         join_course: "הצטרפות לקורס זה "
         new_announcement: "הכרזה חדשה"
@@ -5256,7 +5256,7 @@ he:
     error_group_change: "אין אפשרות לשנות קיבוץ בדיון שכולל תגובות"
     flash: 
       fail: "הביטול של ההכרזה נכשל"
-      removed: "ההכרזה בוטלה בהצלחה."
+      removed: "ההכרזה בוטלה בהצלחה"
     group_assignment_discussion_entry: 
       posts: 
         one: "פרסום אחד"
@@ -5671,7 +5671,7 @@ he:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את המזהה היחודי של קנבס למשתמש"
   enter_or_find_an_external_tool_url_6aebbd0d: "הקלדת או מציאת כתובת דף הכלי החיצוני"
   enter_your_question_and_multiple_answers_31370054: "הזנת שאלתך ותשובות מרובות."
-  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "הזנ/י את שאלתך, תוך ציון היכן כל תיבה ריקה צריך להמצא. תלמידים חייבים להקליד את התשובות לתוך תיבות המלל בכל תיבה."
+  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "הזנ/י את שאלתך, תוך ציון היכן כל תיבה ריקה צריך להמצא. תלמידים חייבים להקליד את התשובות לתוך תיבות המלל בכל תיבה"
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "הקלד/י שאלתך, תוך הגדרת המיקום שכל רשימה נפתחת צריכה להשתלב. ואז הגדר/י תשובות אפשריות לכל רשימה נפתחת."
   enter_your_question_text_4729b886: "הזנת מלל שאלתך"
   enter_your_question_text_students_will_see_the_que_f19af9e9: "הזנת מלל שאלתך. תלמידים יראו את השאלה המלווה בתיבת מלל קטנה אליה יקלידו את תשובתם"
@@ -6194,7 +6194,7 @@ he:
         יחושב ללא נקודות המשימה.
     google_docs_domain_restriction: "מגבלות דומיין גוגל דוקס"
     gradebook_list_students_by_sortable_name: "ספר הציונים - הצגת תלמידים לפי השם למיון"
-    high_contrast: "ממשק משתמש בקונטרסט גבוה"
+    high_contrast: "ממשק משתמש בקונטרסט רב"
     html5_first_videos: "העדפת HTML5 לניגון סרטון וידאו"
     k12: "תכונות ייחודיות לבתי ספר"
     learning_mastery_gradebook: "ספר הציונים ללימודי התמחות"
@@ -6266,7 +6266,7 @@ he:
         upload: "העלאת קובץ"
     notices: 
       deleted: "הקובץ %{display_name}  בוטל"
-      updated: "הקובץ עודכן בהצלחה."
+      updated: "הקובץ עודכן בהצלחה"
     show: 
       messages: 
         file_locked: "קובץ זה טרם שוחרר מנעילה "
@@ -7428,7 +7428,7 @@ he:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "אם מופעל, מעצבי תוכן חייבים לספק זכויות יוצרים ולבצע רישוי למידע בקבצים אלו לפני שיוכלו לפרסם. רלוונטי רק אם Better File Browsing גם כן מופעל."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "אם מופעל, הפרמטרים של השאילתה לא יועתקו לגוף דף כתובות היעד בעת תחילת מהלך LTI"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "אם משנים את הניקוד האפשרי למשימה יש צורך להעריך אותה מחדש"
-  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "אם לא ייבחרו זכויות השימוש כעת, הקובץ לא יפורסם בתום ההעלאה שלו."
+  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "אם לא ייבחרו זכויות השימוש כעת, הקובץ לא יפורסם בתום ההעלאה שלו"
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "אם תכונה זו תופעלת, יש לוודא שחשבון ה salesforce מכיל את השדות הגמישים האלה בדיוק באותם השמות שברשימה הצידית של הטבלה."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "אם תעזוב את הדף כעת, קובץ הזיפ שנמצא בתהליך הכנה להורדה יבוטל."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
@@ -8061,7 +8061,7 @@ he:
       media_contribution: "תרומת מדיה"
       play_comment: "ניגון הערת מדיה"
       record_upload_media_comment: "הקלטת/העלאת הערת מדיה"
-    track_uploaded_successfully: "הערוץ הועלה בהצלחה. נא לרענן את הדף."
+    track_uploaded_successfully: "הערוץ הועלה בהצלחה. נא לרענן את הדף"
     upload: העלאה
     uploading: מעלה...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "המדיה נכנסה לתור להמרה, יש לנסות שוב עוד מעט"
@@ -8099,7 +8099,7 @@ he:
   messages: 
     account_suspended: 
       email: 
-        body: "%{institution} הושעה. יש ליצור קשר עם מנהל המערכת שלך כדי לברר את הסיבה."
+        body: "%{institution} הושעה. יש ליצור קשר עם מנהל המערכת שלך כדי לברר את הסיבה"
         subject: "מוסד / ארגון זה הושעה"
     account_user_notification: 
       email: 
@@ -9721,7 +9721,7 @@ he:
   module_90d9fd32: מודול
   module_completed_50c50762: "המודול הושלם"
   module_in_progress_fa600662: "המודול בתהליך"
-  module_item_module_item_name_was_successfully_dele_8626d846: "פריט מודול %{module_item_name} בוטל בהצלחה."
+  module_item_module_item_name_was_successfully_dele_8626d846: "פריט מודול %{module_item_name} בוטל בהצלחה"
   module_item_types: 
     assignment: משימה
     disuccsion: דיון
@@ -9733,7 +9733,7 @@ he:
     sub_header: "כותרת משנה"
   module_locked_f6a7ea9d: "מודול נעול"
   module_menu_3201af4e: "תפריט מודול"
-  module_module_name_was_successfully_deleted_fc9e9d47: "מודול %{module_name} בוטל בהצלחה."
+  module_module_name_was_successfully_deleted_fc9e9d47: "מודול %{module_name} בוטל בהצלחה"
   modules: 
     add_module_item_dialog: 
       item_type: "סוג:"
@@ -9839,7 +9839,7 @@ he:
     see_grade: "ציוניהם עבור המשימה"
     students_will_see: "תלמידים יוכלו לראות שמשימה זו אינה פעילה"
     submission_comments: "הערות הגשה"
-    sure_you_want_to_mute: "בטוח/ה שרוצה להשתיק משימה זו? כאשר היא אינה פעילה, תלמידים לא יקבלו התראות ולא יוכלו לעיין בה."
+    sure_you_want_to_mute: "בטוח/ה שרוצה להשתיק משימה זו? כאשר היא אינה פעילה, תלמידים לא יקבלו התראות ולא יוכלו לעיין בה"
   muted_283cfa0f: (מושתק/ת)
   my_dashboard_b724020: "לוח המחוונים שלי"
   n_554bc493: "n"
@@ -11650,7 +11650,7 @@ he:
     : שגוי
     file_uploaded_or_removed: 
       quizzes: 
-        file_successfully_uploaded: "הקובץ שלך עלה בהצלחה."
+        file_successfully_uploaded: "הקובץ שלך עלה בהצלחה"
         files_removed: "%{display_name} הוסר."
     final_answer: "תשובה סופית"
     headers: 
@@ -11665,7 +11665,7 @@ he:
       default_title: "בוחן ללא שם"
       flash: 
         fail: "ביטול בוחן נכשל."
-        removed: "בוחן בוטל בהצלחה."
+        removed: "בוחן בוטל בהצלחה"
       multiple_due_dates: "תאריכים מרובים"
     index_view: 
       add_quiz: בוחן
@@ -11869,7 +11869,7 @@ he:
           download_submissions: "הורדת כל הקבצים"
       equations_help: 
         equation_functions: "בנוסף למשתנים, יש גם אוסף של פונקציות עזר בהן ניתן לייצר ערכים שימושיים. למשל: %{example} לעיון בהסבר של פונקצית עזר, יש לבחור אותה מתוך הרשימה הבאה:"
-        equation_intro: "שאלות מחושבות מבוססות על נוסחה אחת או יותר המחושבות לפי הסדר. ניתן להגדיר משתני ביניים לפונקציות אלה, אך התוצאה המספרית של הנוסחה האחרונה בתור  היא המקור ליצירת התשובה הנכונה. למשל: %{example} לאוסף זה של נוסחות, התשובה היא 71. אף על פי כן, אין משתנים מוגדרים מראש, כך שכל התלמידים יקבלו את אותה השאלה עם אותה התשובה. למידע נוסף על משתנים ניתן לעיין בלשונית \"משתנים\"."
+        equation_intro: "שאלות מחושבות מבוססות על נוסחה אחת או יותר המחושבות לפי הסדר. ניתן להגדיר משתני ביניים לפונקציות אלה, אך התוצאה המספרית של הנוסחה האחרונה בתור  היא המקור ליצירת התשובה הנכונה. למשל: %{example} לאוסף זה של נוסחות, התשובה היא 71. אף על פי כן, אין משתנים מוגדרים מראש, כך שכל התלמידים יקבלו את אותה השאלה עם אותה התשובה. למידע נוסף על משתנים ניתן לעיין בלשונית \"משתנים\""
         equation_variables2: "ניתן גם להגדיר משתנים באיזור המלל של השאלת, תוך שימוש בסוגריים (\"מה זה [a] + [b]?\"). לכל משתנה, ניתן לראות את \"ערך לדוגמה\" המבוסס על הגדרות המשתנה. הדבר מאפשר לך לבדוק את החישוב שלך ולוודא שהנוסחה עובדת. למשל, אם השאלה היא \"מה זה  [a] + 5?\" אזי המערכת תבקש ממך להגדיר את המשתנה a. אם ערך הדוגמה ל a היה 5.2, יכולת לכתוב: %{example}. בעזרת נוסחה זו ניתן לייצר כל מספר של אוספי פתרונות, עם ערך משתנה של a בכל אוסף. תלמיד אחד יראה את השאלה \"מה זה 5.2 + 5?\" ואחר יראה \"מה זה 9 + 5?\". "
         links: 
           functions: פונקציות
@@ -12534,8 +12534,8 @@ he:
           other: "יש לך %{count} שאלות שטרם נענו  (פירוט בסרגל הצידי).  לשלוח בכל מקרה?"
         unfinished_quiz: "את/ת עומד/ת לעזוב את הבוחן לפני סיומו. להמשיך בכל זאת?"
         unseen_questions: 
-          one: "ישנה עדיין שאלה שטרם עיינת בה.  לשלוח בכל מקרה?"
-          other: "יש עוד %{count} שאלות שלא ראית.  לשלוח בכל זאת?"
+          one: "ישנה עדיין שאלה שטרם עיינת בה.  האם לשלוח בכל מקרה?"
+          other: "יש עוד %{count} שאלות שלא ראית.  האם לשלוח בכל זאת"
       days_count: 
         one: "יום אחד"
         other: "%{count} ימים"
@@ -12926,7 +12926,7 @@ he:
   rubrics: 
     index: 
       account_rubrics: "רובריקות חשבון"
-      are_you_sure_prompt: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה."
+      are_you_sure_prompt: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה"
       buttons: 
         add_rubric: "הוספת רובריקה"
       course_rubrics: "רובריקות קורס"
@@ -12942,7 +12942,7 @@ he:
       buttons: 
         delete: "ביטול רובריקה "
       prompts: 
-        are_you_sure_delete: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה. "
+        are_you_sure_delete: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה"
       rubric_can_not_modify: "אין אפשרות לעדכן רובריקות לאחר שהחל השימוש בהן ביותר ממקום אחד."
       titles: 
         edit_rubric: "עריכת רובריקה "
@@ -12959,7 +12959,7 @@ he:
         one: "נקודה אפשרית"
         other: "נקודות אפשריות"
       prompts: 
-        are_you_sure_delete: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה. "
+        are_you_sure_delete: "בטוח/ה שרוצה לבטל רובריקה זו? כל קורס הקשור כעת עם רובריקה זו יוכל עדיין לגשת אליה, אך קורסים חדשים לא יוכלו להשתמש בה"
         are_you_sure_remove: "בטוח/ה שרוצה להסיר רובריקה זו מהרשימה שלכם?"
       remove_rubric: "הסרת רובריקה זו מהרשימה שלי"
   salesforce_account_id_eb5c78ad: "מזהה חשבון Salesforce "
@@ -13713,7 +13713,7 @@ he:
         find_outcome: "מציאת תוצאות למידה"
         find_rubric: "חיפוש רובריקה"
       messages: 
-        locked: "אין אפשרות לשנות רובריקה לאחר שהתחלת להשתמש בה."
+        locked: "אין אפשרות לשנות רובריקה לאחר שהתחלת להשתמש בה"
         rubric_in_use: 
           one: "יש לזכור שתלמיד/ה אחד/ת כבר הוערך/ה בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות."
           other: "יש לזכור ש %{count} תלמידים כבר הוערכו בעזרת הרובריקה הזו. שינוי שלה ישפיע על ההערכות."
@@ -14042,7 +14042,7 @@ he:
       terms: "מחציות: %{term_count}"
       users: "משתמשים: %{user_count}"
     messages: 
-      import_complete_success: "הייבוא הסתיים וכל הרשומות ייובאו בהצלחה."
+      import_complete_success: "הייבוא הסתיים וכל הרשומות ייובאו בהצלחה"
       import_complete_warnings: "נתוני המערכת הבית ספרית SIS יובאו אך עם ההודעות הבאות:"
     notices: 
       processing_takes_awhile: "יקח זמן מה..."
@@ -14284,7 +14284,7 @@ he:
     view_rubric_assessment_in_the_speedgrader: "הצגת הערכות רובריקה ב SpeedGrader"
   submission_in_another_grading_period_e754b329: "הגשה בתקופת הערכה אחרת"
   submissions: 
-    assignment_submit_success: "המשימה הוגשה בהצלחה."
+    assignment_submit_success: "המשימה הוגשה בהצלחה"
     assignment_submitted: "המשימה הוגשה."
     click_to_download: "יש להקליק כאן כדי להוריד %{size_of_file}"
     creating_zip: "מכין קובץ זיפ..."
@@ -15145,7 +15145,7 @@ he:
       linked_in: "לינקדאין הנו משאב לרשתות עסקיות. רבים מהקשרים שאת/ה בונה בזמן ביה\"ס יכולים להועיל בשלב השתלבותך במעגל העבודה."
       skype: "סקייפ הנו כלי חינמי לשיחות מקוונות של קול ווידאו."
       twitter: "טוויטר הנו משאב מצוין לתקשורת חוץ כיתתית."
-      yo: "Yo הנו כלי התקשרות המבוסס על הקלקות ללא צורך כתיבה."
+      yo: "Yo הנו כלי התקשרות המבוסס על הקלקות ללא צורך כתיבה"
   user_settings_785eed40: "הגדרות המשתמש"
   user_successfully_deactivated_9d92d80d: "המשתמש הושבת בהצלחה"
   user_successfully_re_activated_b897e35b: "משתמש הופעל מחדש בהצלחה"
@@ -15403,7 +15403,7 @@ he:
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "יתכן שמשתמשי תוכנות קריאת מסך יצטרכו לנטרל את פעולת הסמן הוירטואלי כדי להשתמש בקיצורי המקלדת הללו. "
   validate: 
     is_required: "חובה למלא שדה זה"
-  validate_links_in_content_b1630fba: "יש לודא את תקינות הקישורים שבתוכן."
+  validate_links_in_content_b1630fba: "בדיקת תקינות הקישורים שבתוכן."
   vanity_url_76f93382: "כתובת דף קלה לזכירה"
   video_b9f27375: וידאו
   video_content_is_not_supported_by_your_device_or_a_25214f57: "תוכן הוידאו אינו נתמך במכשיר או האפליקציה שלך."
