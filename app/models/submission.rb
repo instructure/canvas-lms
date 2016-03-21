@@ -779,14 +779,14 @@ class Submission < ActiveRecord::Base
     }
 
     p.dispatch :submission_graded
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_grade_changed?
