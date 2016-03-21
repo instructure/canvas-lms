@@ -19,6 +19,8 @@
 require_relative '../spec_helper'
 
 describe PluginsController do
+  include Rails.application.routes.url_helpers
+
   describe "#update" do
     it "still enables plugins even with no settings posted" do
       expect(PluginSetting.find_by(name: 'error_reporting')).to be_nil
