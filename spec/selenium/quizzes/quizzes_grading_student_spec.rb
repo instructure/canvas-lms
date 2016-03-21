@@ -37,6 +37,7 @@ describe 'Viewing graded quizzes' do
 
         edit_first_question
         select_different_correct_answer(1)
+        wait_for_ajaximations
         close_regrade_tooltip
 
         select_regrade_option(1)

@@ -321,6 +321,7 @@ describe 'Speedgrader' do
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
+      skip_if_chrome('broken')
       init_course_with_students
 
       quiz = seed_quiz_with_submission(10)
