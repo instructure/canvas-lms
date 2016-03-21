@@ -170,7 +170,7 @@ class Collaboration < ActiveRecord::Base
     plugin_collabs = collaboration_types.any? do |type|
       collaboration_class(type['type'].titleize.gsub(/\s/, '')).present?
     end
-    external_tool_collabs = ContextExternalTool.all_tools_for(context, placements: :collaboration).any?
+    external_tool_collabs = ContextExternalTool.all_tools_for(context, placements: :collaboration).exists?
     plugin_collabs || external_tool_collabs
   end
 

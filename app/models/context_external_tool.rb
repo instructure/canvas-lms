@@ -515,10 +515,12 @@ class ContextExternalTool < ActiveRecord::Base
     contexts.concat contexts_to_search(context)
     return nil if contexts.empty?
 
-    scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
-    scope = scope.placements(*placements)
-    scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
-    scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
+    context.shard.activate do
+      scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      scope = scope.placements(*placements)
+      scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
+    end
   end
 
   def self.find_external_tool_by_id(id, context)
