@@ -116,7 +116,7 @@ class SubmissionComment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :submission_comment
-    p.to { [submission.user] - [author] }
+    p.to { ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author] }
     p.whenever {|record|
       record.just_created &&
       record.provisional_grade_id.nil? &&
