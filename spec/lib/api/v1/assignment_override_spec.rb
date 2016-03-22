@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 class Subject
   include Api::V1::AssignmentOverride
@@ -21,6 +22,27 @@ describe "Api::V1::AssignmentOverride" do
       expect(result.first[:due_at]).to eq nil
       expect(result.first[:unlock_at]).to eq nil
       expect(result.first[:lock_at]).to eq nil
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works even with global ids for students" do
+        course_with_student
+
+        # Mock sharding data
+        @shard1.activate { @user = User.create!(name: "Shardy McShardface")}
+        @course.enroll_student @user
+
+        override = { :student_ids => [@student.global_id] }
+
+        subj = Subject.new
+        subj.stubs(:api_find_all).returns [@student]
+        assignment = stub(:context => stub(:students => stub(:active)))
+        result = subj.interpret_assignment_override_data(assignment, override,'ADHOC')
+        expect(result[1]).to be_nil
+        expect(result.first[:students]).to eq [@student]
+      end
     end
   end
 

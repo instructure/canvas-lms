@@ -119,6 +119,7 @@ module Api::V1::AssignmentOverride
         # make sure they were all valid
         found_ids = students.map{ |s| [
           s.id.to_s,
+          s.global_id.to_s,
           ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
           ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack('H*')}" if s.pseudonym),
           ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
