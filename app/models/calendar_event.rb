@@ -87,7 +87,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def sync_google_calendar
     # Skip syncing when it has children because parent events are dummies just to hold it
-    return if @child_event_data
+    return if @child_event_data || (child_events && child_events.count > 0)
     obj = {}
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
