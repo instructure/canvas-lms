@@ -56,7 +56,7 @@ module CustomSeleniumActions
   def fj(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
     begin
-      find_with_jquery selector, scope
+      keep_trying_until { find_with_jquery selector, scope }
     rescue
       nil
     end
