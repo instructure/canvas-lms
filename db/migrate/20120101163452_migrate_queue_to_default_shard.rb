@@ -15,10 +15,8 @@ class MigrateQueueToDefaultShard < ActiveRecord::Migration
     # create the correct schema in the default shard
     migrations = jobs_migrations
     migrations.each do |m|
+      next unless ActiveRecord::SchemaMigration.where(version: m.version.to_s).exists?
       m.migrate(:up)
-      unless ActiveRecord::SchemaMigration.where(version: m.version.to_s).exists?
-        ActiveRecord::SchemaMigration.create!(version: m.version.to_s)
-      end
     end
 
     # now copy stuff over
