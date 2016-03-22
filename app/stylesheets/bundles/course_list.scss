@@ -28,6 +28,9 @@
 
   .course-list-table-row:hover {
     background-color: $lightBackground;
+    span:not(.course-list-favorite-course) > .icon-star {
+      color: #fff;
+    }
   }
 }
 .course-list-table td {
