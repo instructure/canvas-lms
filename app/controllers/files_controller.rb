@@ -103,6 +103,7 @@ class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
   before_filter :require_context, :except => [:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status,:public_url]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
+  before_filter :open_cors, only: [:api_create, :api_create_success, :show_thumbnail]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
   before_filter :verify_api_id, only: [:api_show, :api_create_success, :api_file_status, :api_update, :destroy]
@@ -1105,6 +1106,14 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def open_cors
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
+    headers['Access-Control-Request-Method'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  end
+
   def render_attachment_json(attachment, deleted_attachments, folder = attachment.folder)
     json = {
       :attachment => attachment.as_json(

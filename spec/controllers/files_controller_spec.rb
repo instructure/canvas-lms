@@ -933,6 +933,12 @@ describe FilesController do
       expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
     end
 
+    it "opens up cors headers" do
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      post "api_create", params[:upload_params].merge(:file => @content)
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
+    end
+
     it "should reject a blank policy" do
       post "api_create", { :file => @content }
       assert_status(400)
