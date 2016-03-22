@@ -1145,9 +1145,9 @@
           }
         },
         "es5-shim": {
-          "version": "4.0.3",
-          "from": "https://registry.npmjs.org/es5-shim/-/es5-shim-4.0.3.tgz",
-          "resolved": "https://registry.npmjs.org/es5-shim/-/es5-shim-4.0.3.tgz"
+          "version": "4.0.5",
+          "from": "https://registry.npmjs.org/es5-shim/-/es5-shim-4.0.5.tgz",
+          "resolved": "https://registry.npmjs.org/es5-shim/-/es5-shim-4.0.5.tgz"
         },
         "jasmine-core": {
           "version": "2.0.4",
