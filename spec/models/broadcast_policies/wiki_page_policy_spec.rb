@@ -47,7 +47,7 @@ module BroadcastPolicies
         expect(policy.should_dispatch_updated_wiki_page?).to be_falsey
       end
 
-      specify { wont_send_when { wiki_page.stubs(:created_at).returns 1.minute.ago } }
+      specify { wont_send_when { wiki_page.stubs(:created_at).returns 30.seconds.ago } }
       specify { wont_send_when { wiki_page.stubs(:published?).returns false } }
       specify { wont_send_when { wiki_page.stubs(:wiki_page_changed).returns false } }
       specify { wont_send_when { wiki_page.stubs(:prior_version).returns nil } }
