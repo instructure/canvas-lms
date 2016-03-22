@@ -150,11 +150,6 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  concern :zip_file_imports do
-    resources :zip_file_imports, only: [:new, :create, :show]
-    get 'imports/files' => 'content_imports#files', as: :import_files
-  end
-
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -216,7 +211,6 @@ CanvasRails::Application.routes.draw do
 
     get 'attendance' => 'gradebooks#attendance'
     get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user
-    concerns :zip_file_imports
 
     # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     get 'imports/list' => 'content_imports#index', as: :import_list
@@ -488,7 +482,6 @@ CanvasRails::Application.routes.draw do
     concerns :discussions
     resources :calendar_events
     concerns :files, :file_images, :relative_files, :folders
-    concerns :zip_file_imports
 
     resources :external_tools, only: :show do
       collection do
@@ -718,7 +711,6 @@ CanvasRails::Application.routes.draw do
     match 'masquerade', via: [:get, :post]
     delete :delete
     concerns :files, :file_images
-    concerns :zip_file_imports
 
     resources :page_views, only: :index
     resources :folders do

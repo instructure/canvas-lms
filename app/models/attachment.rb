@@ -42,7 +42,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :context, exhaustive: false, polymorphic:
       [:account, :assessment_question, :assignment, :attachment,
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
-       :gradebook_upload, :group, :submission, :zip_file_import,
+       :gradebook_upload, :group, :submission,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',

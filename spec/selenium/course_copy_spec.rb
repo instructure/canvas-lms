@@ -9,21 +9,6 @@ describe "course copy" do
     expect(header.text).to eq @course.course_code
   end
 
-  def upload_helper
-    filename, fullpath, data = get_file('attachments.zip')
-    f('#zip_file').send_keys(fullpath)
-    submit_form('#zip_file_import_form')
-    keep_trying_until { Delayed::Job.count > 0 }
-    expect_new_page_load { Delayed::Job.last.invoke_job }
-    validate_course_main_page
-    folder = Folder.root_folders(@course).first
-    expect(folder.attachments.active.map(&:display_name)).to eq ["first_entry.txt"]
-    expect(folder.sub_folders.active.count).to eq 1
-    sub = folder.sub_folders.active.first
-    expect(sub.name).to eq "adir"
-    expect(sub.attachments.active.map(&:display_name)).to eq ["second_entry.txt"]
-  end
-
   describe "course copy through course copying" do
     it "should copy the course" do
       course_with_admin_logged_in
@@ -198,23 +183,5 @@ describe "course copy" do
         expect(f('button.btn-primary').attribute('disabled')).to be_blank
       end
     end
-  end
-
-  describe "course file imports" do
-
-    before (:each) do
-      skip('193')
-      course_with_teacher_logged_in(:course_code => 'first files course')
-      @second_course = Course.create!(:name => 'second files course')
-      @second_course.offer!
-      @second_course.enroll_teacher(@user).accept!
-      @second_course.reload
-      get "/courses/#{@course.id}/imports/files"
-    end
-
-    it "should successfully import a zip file" do
-      upload_helper
-    end
-
   end
 end

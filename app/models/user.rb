@@ -124,7 +124,6 @@ class User < ActiveRecord::Base
   has_many :all_conversations, -> { preload(:conversation) }, class_name: 'ConversationParticipant'
   has_many :conversation_batches, -> { preload(:root_conversation_message) }
   has_many :favorites
-  has_many :zip_file_imports, :as => :context
   has_many :messages
   has_many :sis_batches
   has_many :sis_post_grades_statuses

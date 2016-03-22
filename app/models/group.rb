@@ -59,7 +59,6 @@ class Group < ActiveRecord::Base
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
-  has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy

@@ -1,9 +1,0 @@
-<% content_for :page_title do %><%= t :page_title, "Import Files" %><% end %>
-
-<div class="content-imports-wrapper">
-  <h2><%= t :page_title, "Import Files" %></h2>
-  <p><%= t :description, "You can upload a zipped collection of files into your course and we'll extract them all out for you.  This is an easy way to move files from another system into Canvas." %>
-  </p>
-  <%= render :partial => 'shared/zip_file_import_form' %>
-</div>
-<% js_bundle 'legacy/content_imports_files' %>
