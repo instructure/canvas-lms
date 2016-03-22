@@ -2,7 +2,7 @@ common: &common
   adapter: postgresql
   host: canvasdb
   encoding: utf8
-  username: postgres
+  username: canvas
   timeout: 5000
   prepared_statements: false
 
