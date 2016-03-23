@@ -112,28 +112,36 @@ class CalendarEvent < ActiveRecord::Base
       }
     }
 
-    event['attendees'] = []
+    # Need to fetch existing attendee status (if available)
+    # to the RSVP is unmodified across updates
+    event['attendees'] = get_gcal_rsvp_status
 
-    if context_type == 'CourseSection'
-      CourseSection.find(context_id).students.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
-      end
-      CourseSection.find(context_id).tas.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
-      end
-    end
+    # If attendees are already there, we do not need
+    # to rebuild that list
+    unless event['attendees'].length > 0
 
-    if context_type == 'Course'
-      Course.find(context_id).students.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
+      if context_type == 'CourseSection'
+        CourseSection.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        CourseSection.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
       end
-      Course.find(context_id).tas.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
+
+      if context_type == 'Course'
+        Course.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        Course.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
       end
+
     end
 
     # note: we can set event.reminder_overrides[].minutes to change the time, but I'm leaving default for now
