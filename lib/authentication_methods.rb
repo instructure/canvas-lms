@@ -18,19 +18,6 @@
 
 module AuthenticationMethods
 
-  def authorized(*groups)
-    authorized_roles = groups
-    return true
-  end
-
-  def authorized_roles
-    @authorized_roles ||= []
-  end
-
-  def consume_authorized_roles
-    authorized_roles = []
-  end
-
   def load_pseudonym_from_policy
     if (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
