@@ -1,4 +1,5 @@
 class GradeSummaryAssignmentPresenter
+  include TextHelper
   attr_reader :assignment, :submission
 
   def initialize(summary, current_user, assignment, submission)
@@ -107,7 +108,7 @@ class GradeSummaryAssignmentPresenter
     if has_no_score_display?
       ''
     else
-      "#{submission.published_score} #{published_grade}"
+      "#{round_if_whole(submission.published_score)} #{published_grade}"
     end
   end
 

@@ -66,7 +66,7 @@ module QuizzesHelper
     if score.nil?
       '_'
     else
-      score.to_f.round(precision).to_s
+      round_if_whole(score.to_f.round(precision)).to_s
     end
   end
 
@@ -683,7 +683,7 @@ module QuizzesHelper
   end
 
   def points_possible_display
-    @quiz.quiz_type == "survey" ? "" : @quiz.points_possible
+    @quiz.quiz_type == "survey" ? "" : round_if_whole(@quiz.points_possible)
   end
 
 end

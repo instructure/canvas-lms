@@ -75,7 +75,7 @@
         <div class="points_text" style="<%= hidden unless assignment && assignment.points_possible %>">
           <% ot(:points_out_of, '%{points} out of %{possible}', :points => capture { %>
           <a href="<%= submission_url %>" class="grade" style="display: none;">--</a><% }, :possible => capture { %>
-          <span class="points_possible"><%= assignment.points_possible %></span><% }) %>
+          <span class="points_possible"><%= round_if_whole(assignment.points_possible)%></span><% }) %>
           <a title="<%= t 'links.submission_comments', 'Submission Comments' %>"
              style="display: none;"
              href="<%= submission_url %>" class="no-hover submission_comment_link">

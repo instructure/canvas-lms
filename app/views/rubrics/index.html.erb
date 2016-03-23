@@ -43,7 +43,7 @@
       </span>
       <span class="details">
         <%= rubric.criteria.length %> <%= rubric.criteria.length == 1 ? 'criterion' : 'criteria' %><br/>
-        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => rubric.points_possible) %>
+        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => round_if_whole(rubric.points_possible)) %>
       </span>
     </li>
   <% end %>

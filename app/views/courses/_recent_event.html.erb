@@ -58,7 +58,7 @@
             <%= readable_grade(submission) %>
             &bullet;
           <% elsif recent_event.points_possible %>
-            <%= t({one: '1 point', other: '%{count} points'}, count: recent_event.points_possible) %>
+            <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(recent_event.points_possible)) %>
             &bullet;
           <% end %>
           <%= due_at(recent_event, @current_user) %>

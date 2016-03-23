@@ -706,7 +706,7 @@ class Assignment < ActiveRecord::Base
     result = score.to_f
     case self.grading_type
     when "percent"
-      result = "#{score_to_grade_percent(score)}%"
+      result = "#{round_if_whole(score_to_grade_percent(score))}%"
     when "pass_fail"
       passed = if points_possible && points_possible > 0
                  score.to_f > 0
@@ -730,7 +730,7 @@ class Assignment < ActiveRecord::Base
         result = grading_standard_or_default.score_to_grade(score.to_f)
       end
     end
-    result.to_s
+    round_if_whole(result).to_s
   end
 
   def interpret_grade(grade)

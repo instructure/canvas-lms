@@ -83,7 +83,7 @@ describe "site-wide" do
       get "/courses/#{@course.id}"
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
       expect(response[x_canvas_meta]).to match(%r{t=Course;})
-      expect(response[x_canvas_meta]).to match(%r{x=5;})
+      expect(response[x_canvas_meta]).to match(%r{x=5.0;})
     end
   end
 

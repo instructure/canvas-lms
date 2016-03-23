@@ -13,7 +13,7 @@
           <%= t :needs_grading_count, { one: "1 needs grading", other: "%{count} need grading"}, count: Assignments::NeedsGradingCountQuery.new(menu_assignment, @current_user).count %>
         <% elsif key == :assignments_recently_graded %>
           <% if menu_assignment.grading_type == 'points' %>
-              <%= "#{menu_assignment.score}/#{menu_assignment.points_possible}" %>
+              <%= "#{menu_assignment.score}/#{round_if_whole(menu_assignment.points_possible)}" %>
           <% else %>
               <%= "#{menu_assignment.grade}" %>
           <% end %>
@@ -30,5 +30,5 @@
                       end
     %>
     <span class="subtitle"><%= context_name %></span>
-  </a>  
+  </a>
 </li>

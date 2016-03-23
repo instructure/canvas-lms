@@ -249,9 +249,9 @@ describe "Course Account Reports" do
                                'Math', '1.23']
       expect(parsed[1]).to eq [@course3.id.to_s, 'SIS_COURSE_ID_3', 'SCI101',
                                'Science 101', @account.id.to_s, nil,
-                               @account.name, '0']
+                               @account.name, '0.0']
       expect(parsed[2]).to eq [@course5.id.to_s, nil, 'Tal101', 'talking 101',
-                               @account.id.to_s, nil, @account.name, '92']
+                               @account.id.to_s, nil, @account.name, '92.0']
       expect(parsed[3]).to eq [@course4.id.to_s, nil, 'self', 'self help',
                                @account.id.to_s, nil, @account.name, '4.65']
     end

@@ -95,18 +95,6 @@ module MaintainAliases
 end
 SafeYAML::SafeToRubyVisitor.prepend(MaintainAliases)
 
-module FloatUnmonkeyPatch
-  # TODO: remove when gems/canvas_ext/lib/canvas_ext/float.rb monkeypatch is finally removed
-  def visit_Float(float)
-    if float.nan? || float.infinite?
-      super
-    else
-      @emitter.scalar(float.to_s_without_round_whole, nil, nil, true, false, Psych::Nodes::Scalar::ANY)
-    end
-  end
-end
-Psych::Visitors::YAMLTree.prepend(FloatUnmonkeyPatch)
-
 module FloatScannerFix
   def tokenize string
     return nil if string.empty?

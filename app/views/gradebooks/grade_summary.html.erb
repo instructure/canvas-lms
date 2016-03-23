@@ -238,7 +238,7 @@
           </div>
         </div>
       </td>
-      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= assignment.points_possible %></td>
+      <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= round_if_whole(assignment.points_possible) %></td>
       <% if !assignment.special_class %>
       <td class="details">
         <a href="#" class="toggle_comments_link tooltip" aria-label="<%= t(:comment_count_screenreader, 'Read comments') %>" <% if assignment_presenter.has_comments? && !assignment_presenter.assignment.muted? %>aria-expanded="false" aria-controls="comments_thread_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? && !assignment_presenter.assignment.muted? %>">
@@ -309,15 +309,15 @@
                     <% high, low, mean = assignment_presenter.grade_distribution %>
                     <td>
                       <%= before_label(:mean, "Mean") %>
-                      <%= mean %>
+                      <%= round_if_whole(mean) %>
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
-                      <%= high %>
+                      <%= round_if_whole(high) %>
                     </td>
                     <td>
                       <%= before_label(:low, "Low") %>
-                      <%= low %>
+                      <%= round_if_whole(low) %>
                     </td>
                     <td>
                       <% graph = assignment_presenter.graph %>
@@ -330,7 +330,7 @@
                         <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 10px; margin: 5px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
                         <% if submission && submission.score %>
                           <div class="grade-summary-graph-component" style="top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
-                            <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => assignment.points_possible) %>">&nbsp;
+                            <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => round_if_whole(assignment.points_possible)) %>">&nbsp;
                           </div>
                         <% end %>
                       </div>

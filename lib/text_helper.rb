@@ -229,4 +229,16 @@ module TextHelper
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.strip.html_safe
   end
+
+  def round_if_whole(value)
+    TextHelper.round_if_whole(value)
+  end
+
+  def self.round_if_whole(value)
+    if value.is_a?(Float) && (i = value.to_i) == value
+      i
+    else
+      value
+    end
+  end
 end

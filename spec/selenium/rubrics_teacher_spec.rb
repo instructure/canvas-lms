@@ -91,7 +91,7 @@ describe "course rubrics" do
 
       expect(f('tr.learning_outcome_criterion .criterion_description .description').text).to eq @outcome.title
       expect(ff('tr.learning_outcome_criterion td.rating .description').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:description] }
-      expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| c[:points].to_s }
+      expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq @outcome.data[:rubric_criterion][:ratings].map { |c| round_if_whole(c[:points]).to_s }
       submit_form('#edit_rubric_form')
       wait_for_ajaximations
       rubric = Rubric.order(:id).last

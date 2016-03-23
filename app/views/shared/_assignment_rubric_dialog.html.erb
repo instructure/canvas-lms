@@ -11,7 +11,7 @@
     <input type="hidden" name="rubric_association[association_id]" value="<%= @assignment.id %>"/>
     <input type="hidden" name="rubric_association[purpose]" value="grading"/>
   </div>
-  <div class="assignment_points_possible" style="display: none;"><%= @assignment.points_possible %></div>
+  <div class="assignment_points_possible" style="display: none;"><%= round_if_whole(@assignment.points_possible) %></div>
   <% if can_do(@assignment, @current_user, :update) %>
     <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
   <% end %>
