@@ -109,7 +109,6 @@ class ActiveRecord::Base
     'grading_periods' => %w(course_id account_id).freeze,
     'groups' => %w(sis_name type groupable_id groupable_type hashtag
                    show_public_context_messages default_wiki_editing_roles).freeze,
-    'inbox_items' => %w{sender}.freeze,
     'learning_outcome_results' => %w{comments}.freeze,
     'learning_outcome_question_results' => %w{context_code context_id context_type}.freeze,
     'lti_resource_placements' => %w(resource_handler_id).freeze,

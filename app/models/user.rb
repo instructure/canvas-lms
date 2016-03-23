@@ -102,7 +102,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
 
-  has_many :inbox_items, -> { order('created_at DESC') }
   has_many :submission_comment_participants
   has_many :submission_comments, -> { preload(submission: [:assignment, :user]) }, through: :submission_comment_participants
   has_many :collaborators
@@ -825,15 +824,6 @@ class User < ActiveRecord::Base
 
   def short_name
     read_attribute(:short_name) || name
-  end
-
-  def unread_inbox_items_count
-    count = read_attribute(:unread_inbox_items_count)
-    if count.nil?
-      self.unread_inbox_items_count = count = self.inbox_items.unread.count rescue 0
-      self.save
-    end
-    count
   end
 
   workflow do
