@@ -154,6 +154,19 @@ define [
       return '' unless date
       I18n.l "time.formats.#{i18n_format}", date
 
+    # convert a date to a string, using the given i18n format in the date.formats namespace
+    # Adjusts according to the user's Canvas setting for timezone
+    tDateToStringTZAdjusted : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "date.formats.#{i18n_format}", new Date(date.getTime() + ((date.getTimezoneOffset()*60 - -ENV['TIMEZONE_OFFSET'])*1000))
+
+    # convert a date to a time string, using the given i18n format in the time.formats namespace
+    # Adjusts according to the user's Canvas setting for timezone
+    tTimeToStringTZAdjusted : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "time.formats.#{i18n_format}", new Date(date.getTime() + ((date.getTimezoneOffset()*60 - -ENV['TIMEZONE_OFFSET'])*1000))
+
+
     tTimeHours : (date = '') ->
       if date.getMinutes() == 0 and date.getSeconds() == 0
         I18n.l "time.formats.tiny_on_the_hour", date

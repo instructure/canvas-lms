@@ -65,7 +65,7 @@ class CalendarEvent < ActiveRecord::Base
   before_save :sync_google_calendar
 
   def kill_google_calendar
-    return if !google_calendar_id
+    return if !google_calendar_id || google_calendar_id.empty?
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
@@ -87,7 +87,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def sync_google_calendar
     # Skip syncing when it has children because parent events are dummies just to hold it
-    return if @child_event_data
+    return if @child_event_data || (child_events && child_events.count > 0)
     obj = {}
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
@@ -152,18 +152,18 @@ class CalendarEvent < ActiveRecord::Base
       :sendNotifications => true
     }
 
-    if google_calendar_id
+    if google_calendar_id && !google_calendar_id.empty?
       params[:eventId] = google_calendar_id
     end
 
     results = client.execute!(
-      :api_method => google_calendar_id ? calendar_api.events.update : calendar_api.events.insert,
+      :api_method => (!google_calendar_id.nil? && !google_calendar_id.empty?) ? calendar_api.events.update : calendar_api.events.insert,
       :parameters => params,
       :body_object => event)
 
     event = results.data
 
-    if !google_calendar_id && location_name.empty?
+    if (google_calendar_id.nil? || google_calendar_id.empty?) && location_name.empty?
       self.location_name = event.hangout_link
     end
 
@@ -173,13 +173,13 @@ class CalendarEvent < ActiveRecord::Base
 
     # We don't want to reset the id on an edit to ensure it
     # stays consistent
-    if !google_calendar_id
+    if google_calendar_id.nil? || google_calendar_id.empty?
       self.google_calendar_id = event.id
     end
   end
 
   def get_gcal_rsvp_status
-    return [] if !google_calendar_id
+    return [] if !google_calendar_id || google_calendar_id.empty?
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
