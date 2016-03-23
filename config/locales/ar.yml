@@ -1415,7 +1415,7 @@ ar:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "السماح بجدولة أحداث التقويم المتكررة"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "السماح للمستخدمين الذين يملكون رقم هاتف أجنبي بتلقي الرسائل النصية من Canvas."
   always_3a59e701: دائمًا
-  always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "تحميل RCE والشريد الجانبي دائمًا من خدمة محتويات Canvas الثرية في كل مكان"
+  always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "تحميل RCE والشريط الجانبي دائمًا من خدمة محتويات Canvas الثرية في كل مكان"
   an_error_accurred_selecting_provisional_grades_61b36f64: "حدث خطأ أثناء تحديد الدرجات المؤقتة"
   an_error_occured_please_try_again_e59b65b: "حدث خطأ. يرجى المحاولة مرة أخرى."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "حدث خطأ أثناء محاولة إنشاء هذا النسق، يرجى المحاولة مرة أخرى."
@@ -1522,6 +1522,9 @@ ar:
   answer_text_80_character_limit_2fce1113: "نص الإجابة (80 حرفًا كحد أقصى)"
   answer_text_909894d6: "نص الإجابة"
   answer_weight_43420dc5: "وزن الإجابة"
+  answers_which_scored_in_the_bottom_27_74409483: "الأجوبة التي حصلت على نتائج موجودة ضمن أدنى 27% نتيجة"
+  answers_which_scored_in_the_middle_46_46466ffd: "الأجوبة التي حصلت على نتائج موجودة ضمن متوسط 46% من النتائج"
+  answers_which_scored_in_the_top_27_a605232d: "الأجوبة التي حصلت على نتائج موجودة ضمن أعلى 27% نتيجة"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "سيتم عرض الإجابات بعد آخر محاولة"
   api_url_3ee7cb0a: "URL واجهة برمجة التطبيقات"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "يظهر مركز التطبيقات في علامة التبويب \"التطبيقات\" في صفحة إعدادات المساق أو صفحة إعدادات الحساب. من المفترض أن يشير عنوان URL الموجود أدناه إلى نقطة نهاية صالحة لمركز التطبيقات (على سبيل المثال، %{url} -- تأكد من حذف الشرطة المائلة اللاحقة"
@@ -2389,6 +2392,8 @@ ar:
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "تحلى بالشجاعة واطلب من المعلم إصلاح هذا الارتباط؟"
+  before_implementing_custom_css_or_javascript_pleas_128da8cd: "قبل إنجاز CSS أو JavaScripts مخصصة، يرجى الاطلاع على * وثائقنا*."
+  before_implementing_custom_css_or_javascript_pleas_65423572: "قبل إنجاز CSS أو JavaScripts مخصصة، يرجى الاطلاع على *وثائقنا*."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "قبل نشر هذا الملف، يجب عليك تعيين حقوق الاستخدام."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "قبل أن تتمكن من النشر، يجب تعيين حقوق الاستخدام في ملفاتك."
   before_using_this_feature_we_recommend_trying_the__1dea6042: "قبل استخدام هذه الميزة، ننصح بمحاولة استخدام **%{t_theme_editor}** لوضع العلامة. يسمح تفعيل هذه الميزة بتحميل ملفات JavaScript و CSS مخصصة إلى محرر القالب. التعديلات التي تم إدخالها باستخدام هذه الطريقة قد تتعارض مع التغييرات التي سيتم إدخالها لاحقًا على Canvas Dom (عل ىسبيل المثال: أسماء عناصر الفئة أو بنية HTML) وبالتالي لا يمكن دعمها. يجب أن يكون لدى مستخدمي هذه الميزة معرفة متقدمة لـ JavaScript وينبغي أن يحافظوا على رموزهم الخاصة. *استخدمه على مسؤوليتك الخاصة!*"
@@ -3140,6 +3145,7 @@ ar:
       resolution: "الاتصال بالمنشِئ وإخباره."
     titles: 
       delete: "هل تريد حذف التعاون؟"
+  collapse_group_c2af7cad: "طي المجموعة"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "طي قائمة أعضاء مجموعة %{groupName}"
   collapse_subdiscussion_89af1f5c: "طي المناقشة الفرعية"
   collapsed_510aa02a: "تم الطي"
@@ -5152,6 +5158,7 @@ ar:
       assign_blanks: "تخصيص الأصفار للطلاب الذين لم يتم إرسالهم"
     out_of_points_possible: "من %{assignment.points_possible}"
     this_is_permanent: "لا يمكن التراجع عن إنشاء منحنى للدرجات. ستتوفر محفزظات الدرجة التي تم إنشاء منحنى لها مسبقًا، إلا أنه لا يمكن التراجع عن إجراء إنشاء منحنى."
+  custom_css_and_javascript_may_cause_accessibility__93d2a823: "قد تؤدي CSS و JavaScript المخصصة إلى حدوث مشاكل أو تعارضات مع تحديثات Canvas في المستقبل!"
   custom_fields_fc3e55af: "حقول مخصصة"
   cutoff_score_74254c89: "أدنى درجة للاجتياز"
   cyan_c1d5f68a: سماوي
@@ -5966,6 +5973,7 @@ ar:
   due_no_due_date_3c1d1651: "موعد الاستحقاق: لا يوجد تاريخ استحقاق"
   due_on_date_5ffb2182: "تاريخ الاستحقاق"
   due_time_9acd6b69: "موعد الاستحقاق %{time}"
+  duplicate_provider_provider_d9842134: "تكرار موفر الهوية %{provider}"
   e_c2991d1b: e
   e_mail_only_2cc5e513: "البريد الإلكتروني فقط"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "يمثل كل شريط مهمة واحدة. وتمثل الطبقة الخضراء النسبة المئوية للطلاب الذين سلموا إرسالهم *في الوقت المحدد*. بينما الإرسالات **المتأخرة** تمثّل باللون الأصفر والإرسالات ***المفقودة*** باللون الأحمر."
@@ -6751,6 +6759,7 @@ ar:
     replace: استبدال
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "سيتم تضمين الملف (الملفات) على جميع الصفحات في تطبيق مكتب Canvas."
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "سيتم تضمين الملف (الملفات) عندما يُعرض محتوى المستخدم في تطبيقات Canvas الخاصة بأنظمة iOS أو Android."
+  file_size_limit_user_file_quota_applies_19b9b466: "تنطبق حصة ملف المستخدم %{file_size_limit}"
   file_status: 
     hidden_status: "مخفي. يتوفر مع ارتباط"
     published_status: منشور
@@ -6829,6 +6838,7 @@ ar:
       no_rubric_outcomes_found: "لم يتم العثور على نتائج تم تكوينها بواسطة العنوان"
     titles: 
       find_outcome: "العثور على نتيجة"
+  finished_19aaf6f5: "تم الانتهاء"
   first_reviewer_9ea05caa: "المراجع الأول"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students} و %{others_count} آخرين"
   flash_6afbf65a: Flash
@@ -7427,6 +7437,7 @@ ar:
       submissions_upload: "تحميل إرسالات %{assignment}"
     titles: 
       total: الإجمالي
+  graded_25cd3fcd: "تم تقييم الدرجات"
   graded_quiz_7fabdf1f: "اختبار تم تقييم درجاته"
   graded_survey_c0f0c395: "استطلاع تم تقييم درجاته"
   grades_a61eba0a: الدرجات
@@ -14561,6 +14572,9 @@ ar:
   send_a_message_to_the_teacher_1ae115b6: "إرسال رسالة إلى المعلم"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "إرسال الحقول المخصصة (قم بإلغاء التحديد ما لم تستخدم Canvas zendesk)"
   send_e3bd0ed0: إرسال
+  send_this_announcement_to_unenrolled_users_4ea549d7: "إرسال هذا الإعلان إلى المستخدمين غير المسجلين"
+  send_this_announcement_to_users_with_the_account_r_bd69c809: "إرسال هذا الإعلان إلى المستخدمين الذين لديهم دور الحساب %{role}"
+  send_this_announcement_to_users_with_the_course_ro_46904d40: "إرسال هذا الإعلان إلى المستخدمين الذين لديهم دور المساق %{role}"
   send_to_ce05b460: "إرسال إلى"
   sends_international_text_messages_from_a_phone_num_10afbad6: "يقوم بإرسال رسائل نصية دولية من رقم هاتف في بلد المستلم، إذا أمكن ذلك."
   sequence_footer: 
@@ -15389,6 +15403,7 @@ ar:
     users: 
       user_search_label: "البحث عن مستخدم"
       users_matching_label: "مطابقة المستخدمين"
+  site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "مسؤول الموقع فقط. الإرسال إلى 1 مقسم على %{denominator} مستخدمين مرتبطين بحسابات نشطة شهريًا."
   size_b30e1077: الحجم
   skip_to_content_22ad1d00: "المرور إلى المحتوى"
   skipped_file_filename_due_to_error_94f0194: "تم تخطي الملف %{filename} بسبب خطأ"
@@ -15493,6 +15508,7 @@ ar:
     no_answer: "لا توجد إجابة"
   status_e7fdbe06: الحالة
   step: خطوة
+  storage_used_in_mb_c75fbd9c: "حجم التخزين المستخدم بالميجابايت"
   stream_items_api: 
     assessment_request_title: "مراجعة نظيرة لـ %{title}"
   student_5da6bfd1: الطالب
@@ -15868,6 +15884,7 @@ ar:
   text_input_d3480b8c: "إدخال النص"
   that_user_account_has_been_deleted_please_contact__350e0e0: "لقد تم حذف حساب المستخدم. يرجى الاتصال بمسؤول النظام لإعادة تنشيط حسابك."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "معرف الحساب التابع للمستخدم الذي يقوم بالإبلاغ"
+  the_announcement_title_could_not_be_linked_to_the__78c747f3: "لا يمكن ربط الإعلان \"%{title}\" بالوحدة \"%{mod_title}\""
   the_app_was_activated_a84e055f: "تم تنشيط التطبيق"
   the_app_was_added_58e2836a: "تمت إضافة التطبيق"
   the_app_was_added_successfully_3f785a23: "تمت إضافة التطبيق بنجاح"
@@ -15877,8 +15894,10 @@ ar:
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "تعتبر علامة التبويب الملفات هي المكان المناسب لمشاركة شرائح المحاضرة ومستندات الأمثلة وتعليمات الدراسة؛ وأي شيء يريد الطلاب تنزيله. إن تحميل الملفات وتنظيمها صار سهلا ً عبر Canvas. وسنوضح لك كيف ذلك."
   the_following_fields_are_invalid_fields_b3565800: "الحقول التالية غير صالحة: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "اسم المضيف بأكمله لمثيل الحساب (على ىسبيل المثال، something.instructure.com)"
+  the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "لن يتزامن تقييم هذه المهمة مع نظام معلومات الطالب."
   the_grade_for_this_assignment_will_not_sync_to_the_8f4571aa: "لن يتزامن تقييم هذه المهمة مع نظام معلومات الطالب. انقر هنا لتبديل هذا الإعداد."
   the_grade_for_this_assignment_will_sync_to_the_stu_29c3b522: "سيتزامن تقييم هذه المهمة مع نظام معلومات الطالب. انقر هنا لتبديل هذا الإعداد."
+  the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "سيتزامن تقييم هذه المهمة مع نظام معلومات الطالب."
   the_grade_for_this_assignment_will_sync_to_the_stu_5fb4c455: "سيتزامن تقييم هذه المهمة مع نظام معلومات الطالب. انقر هنا لتبديل هذا الإعداد."
   the_grading_period_was_deleted_7814a349: "تم حذف فترة تقييم الدرجات"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "المؤسسة التي سجّلت الدخول منها ليست مكوّنة على هذا الحساب."
@@ -15978,6 +15997,7 @@ ar:
   this_quiz_has_been_excused_d89d2b74: "هذا الامتحان لم يعد إجباري"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "يستخدم هذا المسجل Flash. نتيجة لذلك، قد تجد بأنه أسهل للقيام بالتسجيل على جهازك المحلي، ثم استخدام علامة تبويب تحميل الوسائط لتحميله."
+  this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "يعرض هذا التقرير جميع المساقات لمدة محددة. سيشتمل ملف csv الناتج على صف واحد لكل مساق وسيعرض معرف المساق و معرف sis للمساق والاسم المختصر للمساق واسم المساق ومعرف sis للحساب واسم الحساب وحجم التخزين المستخدم بالميجابايت."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "تحتوي هذه الصفحة النموذجية على العناصر الشائعة لواجهة مستخدم Canvas لمساعدتك على إنشاء علامتك الخاصة. بعدما تقوم بإدخال تغييرات على الألوان والصور في الشريط الجانبي الأيسر، سترى زر *معاينة تغييراتك*. انقر فوقه لتحديث هذه الصفحة ومشاهدة التغييرات."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "أجوبة هذا الطالب مخفية لأن هذه المهمة مجهولة الهوية."
   this_student_wrote_f1a3f22d: "كتب هذا الطالب:"
@@ -16217,6 +16237,7 @@ ar:
       إذا كان المورد قادراً على تكوين عناوين URL صالحة لرد الاتصال أو إعادة التوجيه، استخدم %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "لربط مراقب الدورة *%{name}* مع طالب ما، قم بكتابة اسم الطالب للعثور عليه ثم انقر فوق تحديث."
   to_minscore_43e5452e: "إلى %{minScore}%"
+  to_preview_theme_editor_branding_you_will_need_to__462dda1a: "لمعاينة علامة محرر النسق، يتعين عليك *إيقاف تشغيل واجهة المستخدم عالية التباين*."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "لتقييد مجال معين من Google Apps للمستخدمين، أدخل المجال هنا."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "لعرض المهام، تأكد من أن طريقة عرض *جدول الأعمال* نشطة."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "تبديل عرض لوحة المعلومات أو تدفق أحدث نشاط"
@@ -16333,6 +16354,7 @@ ar:
   upload_data_dc4fa4cb: "تحميل البيانات"
   upload_drop_zone: 
     drop_to_upload: "إسقاط العناصر لتحميلها"
+  upload_failed_quota_exceeded_ff3af659: "فشل التحميل، تم تجاوز الحصة"
   upload_media_ce31135a: "تحميل الوسائط"
   upload_successful_ca47465f: "تم التحميل بنجاح"
   upper_limit_of_range_c454a8f2: "الحد الأقصى للنطاق"
@@ -16348,6 +16370,8 @@ ar:
   use_new_folder_tree_in_files_eb5a451b: "استخدام شجرة المجلد الجديدة في \"الملفات\""
   use_remote_service_for_notifications_9fe667c6: "استخدام الخدمة عن بعد للإخطارات"
   use_remote_version_of_rich_content_editor_52f7fc4b: "استخدام الإصدار عن بعد لـ Rich Content Editor"
+  use_remote_version_of_rich_content_editor_and_side_a058a664: "استخدام الإصدار عن بعد لـ Rich Content Editor والشريط الجانبي"
+  use_remote_version_of_rich_content_editor_and_side_ebaaa986: "استخدام الإصدار عن بعد لـ Rich Content Editor والشريط الجانبي في أماكن عالية الخطورة مثل الاختبارات"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "استخدام أداة اختبار LTI الجديدة بدلاً من اختبارات Canvas"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "استخدام هذا التكوين لتسجيل ولي الأمر/المراقب."
   used_by_permission_314a78dd: "تستخدم بإذن"
@@ -17028,6 +17052,7 @@ ar:
         zero: "لم يتم العثور على %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; السابق"
+  will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(سيتم الإرسال إلى الجميع في حال عدم القيام باختيارات)"
   will_unlock_unlock_date_1024c38d: "سيتم إلغاء التأمين بتاريخ %{unlock_date}"
   wimba_conference: 
     external_urls: 
@@ -17133,6 +17158,7 @@ ar:
       سوف تحتاج لـ [تسجيل تطبيق على Twitter](%{twitter_url}).
       عليك بتكوين %{callback_url} كعنوان URL لرد الاتصال، ثم تعيين مستوى الوصول على "قراءة" و "كتابة" و "وصول" إلى الرسائل المباشرة.
       بعد إنشاء التطبيق، قم بتدوين مفتاح العميل وكلمة سر العميل، ثم أدخلهما هنا.
+  you_will_not_be_able_to_preview_your_changes_f7b868fb: "لن تكون قادرًا على معاينة تغييراتك"
   your_answer_8dad6ea4: "إجابتك:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "يمكن الآن العثور على قائمة المهام الخاصة بك في صفحة *التقويم*."
   your_assignments_list_has_improved_3eded80e: "تم تحسين قائمة *المهام* الخاصة بك!"
