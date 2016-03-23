@@ -86,10 +86,10 @@ tr:
 fa:
   locales:
     fa: فارسی (crowd-sourced)
-  qualified_locale: fa
+  qualified_locale: fa-IR
   crowdsourced: true
 fa-IR:
-  qualified_locale: fa
+  qualified_locale: fa-IR
   crowdsourced: true
   deprecated_for: fa
 da:
