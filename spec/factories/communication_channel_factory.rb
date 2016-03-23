@@ -31,7 +31,7 @@ def communication_channel_valid_attributes
 end
 
 def communication_channel(user, opts={})
-  username = opts[:username] || "nobody@example.com"
+  username = opts[:username] || "nobody-#{user.id}@example.com"
   @cc = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
     cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
     cc.workflow_state = opts[:cc_state] if opts[:cc_state]
