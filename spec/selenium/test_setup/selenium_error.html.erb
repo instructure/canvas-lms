@@ -32,7 +32,17 @@
 
     <h2>Previous Spec Runs</h2>
     <pre style="overflow: auto; max-height: 300px;">(newest)
-<%= recent_spec_runs.reverse.join("\n") %>
+<%= recent_spec_runs.reverse.map do |run|
+  if run[:pending]
+    result = ' (pending)'
+  elsif run[:exception]
+    result = ' (failed)'
+  else
+    result = ''
+  end
+
+  "#{run[:location]}#{result}"
+end.join("\n") %>
 (oldest)</pre>
 
     <h2>Screenshot</h2>

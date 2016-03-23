@@ -208,7 +208,11 @@ module SeleniumDriverSetup
 
   def self.note_recent_spec_run(example)
     @recent_spec_runs ||= []
-    @recent_spec_runs << { location: example.metadata[:location], exception: example.exception }
+    @recent_spec_runs << {
+      location: example.metadata[:location],
+      exception: example.exception,
+      pending: example.pending
+    }
     @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
 
     if ENV["ABORT_ON_CONSISTENT_BADNESS"]
@@ -248,7 +252,7 @@ module SeleniumDriverSetup
     screenshot_name = summary_name + ".png"
     driver.save_screenshot(errors_path.join(screenshot_name))
 
-    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs.map { |r| r[:location] }
+    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
 
     log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
 
