@@ -100,7 +100,7 @@ module SeleniumDriverSetup
     begin
       tries ||= 3
       puts "Thread: provisioning selenium chrome ruby driver"
-      driver = Selenium::WebDriver.for :chrome
+      driver = Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
     rescue StandardError => e
       puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
       sleep 2
