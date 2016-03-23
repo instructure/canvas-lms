@@ -25,6 +25,13 @@ body.files {
   margin-left: 0; margin-right: 0;
 }
 
+// hides the course menu hamburger in the personal files breadcrumb
+body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
+  > .ic-app-course-nav-toggle {
+    display: none;
+  }
+}
+
 .ef-main-buttons{
   .ui-buttonset, .ui-button {
     display: inline-block;
