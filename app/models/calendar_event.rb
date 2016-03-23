@@ -65,7 +65,7 @@ class CalendarEvent < ActiveRecord::Base
   before_save :sync_google_calendar
 
   def kill_google_calendar
-    return if !google_calendar_id || google_calendar_id.empty?
+    return if google_calendar_id.nil? || google_calendar_id.empty?
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
@@ -112,28 +112,36 @@ class CalendarEvent < ActiveRecord::Base
       }
     }
 
-    event['attendees'] = []
+    # Need to fetch existing attendee status (if available)
+    # to the RSVP is unmodified across updates
+    event['attendees'] = get_gcal_rsvp_status
 
-    if context_type == 'CourseSection'
-      CourseSection.find(context_id).students.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
-      end
-      CourseSection.find(context_id).tas.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
-      end
-    end
+    # If attendees are already there, we do not need
+    # to rebuild that list
+    unless event['attendees'].length > 0
 
-    if context_type == 'Course'
-      Course.find(context_id).students.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
+      if context_type == 'CourseSection'
+        CourseSection.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        CourseSection.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
       end
-      Course.find(context_id).tas.active.all.each do |user|
-        next if !BeyondZConfiguration.safe_to_email? user.email
-        event['attendees'] << { email: user.email }
+
+      if context_type == 'Course'
+        Course.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        Course.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
       end
+
     end
 
     # note: we can set event.reminder_overrides[].minutes to change the time, but I'm leaving default for now
@@ -454,6 +462,7 @@ class CalendarEvent < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy(update_context_or_parent=true)
     transaction do
+      kill_google_calendar
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!
@@ -475,7 +484,6 @@ class CalendarEvent < ActiveRecord::Base
       end
       true
     end
-    kill_google_calendar
   end
 
   def time_zone_edited
