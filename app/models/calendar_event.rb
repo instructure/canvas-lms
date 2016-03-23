@@ -65,7 +65,7 @@ class CalendarEvent < ActiveRecord::Base
   before_save :sync_google_calendar
 
   def kill_google_calendar
-    return if !google_calendar_id || google_calendar_id.empty?
+    return if google_calendar_id.nil? || google_calendar_id.empty?
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
@@ -462,6 +462,7 @@ class CalendarEvent < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy(update_context_or_parent=true)
     transaction do
+      kill_google_calendar
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!
@@ -483,7 +484,6 @@ class CalendarEvent < ActiveRecord::Base
       end
       true
     end
-    kill_google_calendar
   end
 
   def time_zone_edited
