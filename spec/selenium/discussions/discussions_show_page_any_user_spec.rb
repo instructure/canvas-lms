@@ -247,6 +247,16 @@ describe "discussions" do
         end
       end
 
+      it "should not show keyboard shortcut modal during html editing", priority: "2", test_id: 846539 do
+        get url
+        f('.discussion-reply-action').click
+        wait_for_ajaximations
+        fln('HTML Editor').click
+        wait_for_ajaximations
+        f('.reply-textarea').send_keys("< , > , ?, /")
+        expect(f('.ui-dialog')).not_to be_displayed
+      end
+
       it "should strip embed tags inside user content object tags", priority: "2", test_id: 345485 do
         # this avoids the js translation of user content trying to embed the same content twice
         message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}

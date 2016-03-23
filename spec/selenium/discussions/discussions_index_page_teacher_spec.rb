@@ -202,6 +202,21 @@ describe "discussions" do
           expect(f('.discussion-list li.discussion')).to be_nil
         end
 
+        it "should restore a deleted topic with replies", priority: "2", test_id: 927756 do
+          topic.reply_from(user: student, text: 'student reply')
+          topic.workflow_state = "deleted"
+          topic.save!
+          get "/courses/#{@course.id}/undelete"
+          expect(f('#deleted_items_list').text).to include('teacher topic title')
+          f('.restore_link').click
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          get url
+          expect(f('#open-discussions .discussion-title').text).to include('teacher topic title')
+          fln('teacher topic title').click
+          expect(ff('.discussion-entries .entry').count).to eq(1)
+        end
+
         it "should sort the discussions", priority: "1", test_id: 150509 do
           topics = 4.times.map do |n|
             DiscussionTopic.create!(context: course, user: teacher,

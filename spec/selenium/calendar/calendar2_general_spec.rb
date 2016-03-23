@@ -228,6 +228,19 @@ describe "calendar2" do
       end
     end
 
+    it "should only consider active enrollments for upcoming events list", priority: "2", test_id: 854796 do
+      make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
+      get "/"
+      expect(f('.coming_up').text).to include('Test Event')
+      term = EnrollmentTerm.find(@course.enrollment_term_id)
+      term.end_at = Time.zone.now.advance(days: -5)
+      term.save!
+      keep_trying_until do
+       refresh_page
+       expect(f('.coming_up').text).to include('Nothing for the next week')
+      end
+    end
+
     it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do
       create_graded_discussion
 
