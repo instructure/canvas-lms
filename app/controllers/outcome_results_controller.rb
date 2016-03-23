@@ -37,14 +37,19 @@
 #           "description": "The student's score"
 #         },
 #         "submitted_or_assessed_at": {
-#           "description": "The datetime the resulting OutcomeResult was submitted at, or absent that, when it was assessed.",
 #           "example": "2013-02-01T00:00:00-06:00",
-#           "type": "datetime"
+#           "type": "datetime",
+#           "description": "The datetime the resulting OutcomeResult was submitted at, or absent that, when it was assessed."
 #         },
 #         "links": {
 #           "example": {"user": "3", "learning_outcome": "97", "alignment": "53"},
 #           "type": "object",
 #           "description": "Unique identifiers of objects associated with this result"
+#         },
+#         "percent": {
+#           "example": "0.65",
+#           "type": "number",
+#           "description": "score's percent of maximum points possible for outcome, scaled to reflect any custom mastery levels that differ from the learning outcome"
 #         }
 #       }
 #     }

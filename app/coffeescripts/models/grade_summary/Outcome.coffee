@@ -12,15 +12,17 @@ define [
       super
       @set 'friendly_name', @get('display_name') || @get('title')
       @set 'hover_name', (@get('title') if @get('display_name'))
+      @set 'scaled_score', (@scaledScore())
 
     parse: (response) ->
       super _.extend(response, {
-        submitted_or_assessed_at: tz.parse(response.submitted_or_assessed_at)
+        submitted_or_assessed_at: tz.parse(response.submitted_or_assessed_at),
+        question_bank_result: response.links?.alignment?.includes("assessment_question_bank")
       })
 
     status: ->
       if @scoreDefined()
-        score = @get('score')
+        score = @score()
         mastery = @get('mastery_points')
         if score >= mastery + (mastery / 2)
           'exceeds'
@@ -43,20 +45,28 @@ define [
       }[@status()]
 
     roundedScore: ->
-      score = @get('score')
-      if _.isNumber(score)
-        Math.round(score * 100.0) / 100.0
+      if @scoreDefined()
+        Math.round(@score() * 100.0) / 100.0
       else
         null
 
     scoreDefined: ->
       _.isNumber(@get('score'))
 
+    scaledScore: ->
+      is_aggregate_score = @get('question_bank_result')
+      return unless @scoreDefined() && is_aggregate_score
+      @get('percent') * @get('points_possible')
+
+    score: ->
+      @get('scaled_score') || @get('score')
+
     percentProgress: ->
-      if @scoreDefined()
-        @get('score')/@get('points_possible') * 100
+      return 0 unless @scoreDefined()
+      if @get('percent')
+        @get('percent') * 100
       else
-        0
+        @score()/@get('points_possible') * 100
 
     masteryPercent: ->
       @get('mastery_points')/@get('points_possible') * 100

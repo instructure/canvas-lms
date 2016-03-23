@@ -15,6 +15,10 @@ define [
 
     initialize: ->
       super
+      @model = Outcome.extend defaults: {
+        points_possible: @outcome.get('points_possible'),
+        mastery_points: @outcome.get('mastery_points')
+      }
       @course_id = ENV.context_asset_string?.replace('course_', '')
       @user_id = ENV.student_id
       @on('reset', @handleReset)
@@ -26,8 +30,6 @@ define [
     handleAdd: (model) =>
       alignment_id = model.get('links').alignment
       model.set('alignment_name', @alignments.get(alignment_id)?.get('name'))
-      model.set('mastery_points', @outcome.get('mastery_points'))
-      model.set('points_possible', @outcome.get('points_possible'))
 
     parse: (response) ->
       @alignments ?= new Backbone.Collection([])

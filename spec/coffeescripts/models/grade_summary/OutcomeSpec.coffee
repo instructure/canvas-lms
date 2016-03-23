@@ -24,6 +24,11 @@ define [
     outcome = new Outcome({score: 1, mastery_points: 3})
     equal outcome.status(), 'remedial'
 
+  test "#status should accurately reflect the scaled aggregate score on question bank results", ->
+    # score must be defined, but is not used to get a scaled aggregate score
+    outcome = new Outcome({percent: 0.60, score: 0, mastery_points: 3, points_possible: 5, question_bank_result: true})
+    equal outcome.status(), 'mastery'
+
   test "#status should be undefined if there is no score", ->
     outcome = new Outcome({mastery_points: 3})
     equal outcome.status(), 'undefined'
@@ -33,9 +38,13 @@ define [
     outcome = new Outcome({points_possible: 3})
     equal outcome.percentProgress(), 0
 
-  test "#percentProgress should be score over points possible", ->
+  test "#percentProgress should be score over points possible if 'percent' is not defined", ->
     outcome = new Outcome({score: 5, points_possible: 10})
     equal outcome.percentProgress(), 50
+
+  test "#percentProgress should be percentage of points possible if 'percent' is defined", ->
+    outcome = new Outcome({score: 5, points_possible: 10, percent: 0.6})
+    equal outcome.percentProgress(), 60
 
   test "#masteryPercent should be master_points over points possible", ->
     outcome = new Outcome({mastery_points: 5, points_possible: 10})
