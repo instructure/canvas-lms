@@ -1,7 +1,10 @@
 require "fileutils"
 
 module SeleniumDriverSetup
-  RECENT_SPEC_RUNS_LIMIT = 10
+  # Number of recent specs to show in failure pages
+  RECENT_SPEC_RUNS_LIMIT = 500
+  # Number of identical failures in a row before we abort this worker
+  RECENT_SPEC_FAILURE_LIMIT = 10
 
   def setup_selenium
 
@@ -209,9 +212,9 @@ module SeleniumDriverSetup
     @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
 
     if ENV["ABORT_ON_CONSISTENT_BADNESS"]
-      recent_errors = @recent_spec_runs.map { |run| run[:exception] && run[:exception].to_s }.compact
-      if recent_errors.size >= RECENT_SPEC_RUNS_LIMIT && recent_errors.uniq.size == 1
-        $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_RUNS_LIMIT} times in a row, aborting"
+      recent_errors = @recent_spec_runs.last(RECENT_SPEC_FAILURE_LIMIT).map { |run| run[:exception] && run[:exception].to_s }.compact
+      if recent_errors.size >= RECENT_SPEC_FAILURE_LIMIT && recent_errors.uniq.size == 1
+        $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_FAILURE_LIMIT} times in a row, aborting"
         RSpec.world.wants_to_quit = true
       end
     end

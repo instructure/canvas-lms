@@ -31,7 +31,9 @@
     </pre>
 
     <h2>Previous Spec Runs</h2>
-    <pre><%= recent_spec_runs.join("\n") %></pre>
+    <pre style="overflow: auto; max-height: 300px;">(newest)
+<%= recent_spec_runs.reverse.join("\n") %>
+(oldest)</pre>
 
     <h2>Screenshot</h2>
     <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
