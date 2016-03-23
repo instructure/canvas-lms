@@ -292,28 +292,17 @@ namespace :js do
     threads.each(&:join)
   end
 
-  desc "build webpack js for production"
+  desc "build webpack js"
   task :webpack do
     if CANVAS_WEBPACK
-      if ENV['RAILS_ENV'] == 'production'
+      if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`
-        raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
       else
-        commands = ['npm run webpack-development']
-
-        # if this var is set, we'll need to have optimized version of the
-        # webpack bundles available too
-        if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-          commands << 'npm run webpack-production'
-        end
-        require 'parallel'
-        Parallel.each(commands) do |command|
-          puts "--> Running #{command}"
-          system(command)
-          raise "Error running #{command}\nABORTING" if $?.exitstatus != 0
-        end
+        puts "--> Building DEVELOPMENT webpack bundles"
+        `npm run webpack-development`
       end
+      raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
     end
   end
 

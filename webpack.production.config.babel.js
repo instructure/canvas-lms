@@ -23,11 +23,13 @@ if(process.env.NODE_ENV == 'production'){
 productionWebpackConfig.devtool = undefined;
 productionWebpackConfig.output.path = __dirname + '/public/webpack-dist-optimized';
 productionWebpackConfig.output.publicPath = publicPath;
-productionWebpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
-  sourceMap: false,
-  mangle: false,
-  comments: false
-}));
 
+if (!process.env.JS_BUILD_NO_UGLIFY) {
+  productionWebpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
+    sourceMap: false,
+    mangle: false,
+    comments: false
+  }));
+}
 
 module.exports = productionWebpackConfig;
