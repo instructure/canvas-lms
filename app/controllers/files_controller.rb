@@ -364,18 +364,6 @@ class FilesController < ApplicationController
     end
   end
 
-  def text_show
-    @attachment = @context.attachments.find(params[:file_id])
-    if authorized_action(@attachment,@current_user,:read)
-      if @attachment.grants_right?(@current_user, :download)
-        @headers = false
-        render
-      else
-        show
-      end
-    end
-  end
-
   def assessment_question_show
     @context = AssessmentQuestion.find(params[:assessment_question_id])
     @attachment = @context.attachments.find(params[:id])
@@ -676,13 +664,6 @@ class FilesController < ApplicationController
       #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
       response.headers["Cache-Control"] = "private, max-age=86400"
       response.headers["Expires"] = 1.day.from_now.httpdate
-    end
-  end
-
-  # GET /files/new
-  def new
-    @attachment = @context.attachments.build
-    if authorized_action(@attachment, @current_user, :create)
     end
   end
 

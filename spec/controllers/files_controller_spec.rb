@@ -586,19 +586,6 @@ describe FilesController do
     end
   end
 
-  describe "GET 'new'" do
-    it "should require authorization" do
-      get 'new', :course_id => @course.id
-      assert_unauthorized
-    end
-
-    it "should assign variables" do
-      user_session(@teacher)
-      get 'new', :course_id => @course.id
-      expect(assigns[:attachment]).not_to be_nil
-    end
-  end
-
   describe "POST 'create'" do
     it "should require authorization" do
       post 'create', :course_id => @course.id, :attachment => {:display_name => "bob"}

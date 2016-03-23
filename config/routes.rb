@@ -76,7 +76,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :files do
-    resources :files do
+    resources :files, :except => [:new] do
       get 'inline' => 'files#text_show', as: :text_inline
       get 'download' => 'files#show', download: '1'
       get 'download.:type' => 'files#show', as: :typed_download, download: '1'
@@ -832,7 +832,7 @@ CanvasRails::Application.routes.draw do
   # top-level assignments available, maybe we should change the specs instead.
   resources :assignments, only: [:index, :show]
 
-  resources :files do
+  resources :files, :except => [:new] do
     get 'download' => 'files#show', download: '1'
   end
 
