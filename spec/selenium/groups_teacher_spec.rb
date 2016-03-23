@@ -292,6 +292,7 @@ describe "new groups" do
     end
 
     it 'moves non-leader', priority: "1", test_id: 96024 do
+      skip_if_chrome('research')
       group_test_setup(4,1,2)
       add_user_to_group(@students[0], @testgroup.first, true)
       2.times do |n|

@@ -60,7 +60,7 @@ describe 'quizzes question creation edge cases' do
     wait_for_ajax_requests
 
     # check to see if the questions displays correctly
-    f('#show_question_details').click
+    move_to_click('#show_question_details')
     quiz.reload
     finished_question = f("#question_#{quiz.quiz_questions[0].id}")
     expect(finished_question).to be_displayed

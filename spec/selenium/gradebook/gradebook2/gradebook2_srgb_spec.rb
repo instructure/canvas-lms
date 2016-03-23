@@ -306,7 +306,7 @@ describe "screenreader gradebook" do
       # When the modal closes
       # by setting a grade the "set default grade" button should have focus
       f(".button_type_submit").click
-      driver.switch_to.alert.accept
+      accept_alert
       check_element_has_focus(f "#set_default_grade")
 
       # by the close button the "set default grade" button should have focus
