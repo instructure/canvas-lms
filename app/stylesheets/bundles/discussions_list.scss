@@ -172,8 +172,11 @@ $announcements_disscussion-summary-color: $ic-color-dark;
   }
 
   &.droppable-hover {
-    > * {
-      opacity: 0.5;
+    @if $use_high_contrast {
+      box-shadow: inset 0 0 0 2px $ic-link-color;
+    }
+    @else {
+      > * { opacity: 0.5; }
     }
   }
 
