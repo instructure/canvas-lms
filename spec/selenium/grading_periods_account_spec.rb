@@ -122,7 +122,7 @@ describe 'Account Grading Periods' do
     end
 
     it 'deletes an unsaved grading period', priority: "1", test_id: 202314 do
-      get "/courses/#{@course.id}/grading_standards"
+      get "/accounts/#{@account.id}/grading_standards"
       f('#add-period-button').click
       expect(ff('.grading-period').length).to be(1)
       ff('.icon-delete-grading-period').first.click
@@ -152,7 +152,7 @@ describe 'Account Grading Periods' do
           expect(f("#period_end_date_#{@id}")).to have_value(format_time_for_view(@account_grading_period.end_date, :medium))
         end
 
-        it 'is inherited by sub-account, editing from sub-account page creates a copy', priority: "1", test_id: 250248 do
+        it 'is inherited by sub-account, can edit at sub-account page', priority: "1", test_id: 250248 do
           sub_account = Account.create(name: 'sub account from default account', parent_account: Account.default)
 
           # access from sub-account grading_standards page
@@ -161,22 +161,12 @@ describe 'Account Grading Periods' do
           # edit grading period
           replace_content(f("#period_title_#{@id}"), title + "\n")
           replace_content(f("#period_start_date_#{@id}"), start_date + "\n")
-          replace_content(f("#period_end_date_#{@id}"), end_date + "\n")
           f('#update-button').click
           wait_for_ajax_requests
 
-          # should have created a new sub-account grading period - original should NOT change
-          @account_grading_period.reload  # make sure original grading period is updated in case it changed
-
-          new_grading_period = GradingPeriod.where(title: title).first
-          new_id = new_grading_period.id
-          expect(new_id).to_not eq(@id)
-          expect(new_grading_period).to_not be(@account_grading_period) # check for same object
-
           # check UI
-          expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
-          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
+          expect(f("#period_title_#{@id}")).to have_value(title)
+          expect(f("#period_start_date_#{@id}")).to have_value(format_time_for_view(start_date, :medium))
         end
 
         it 'is inherited by course, reads account grading period', priority: "1", test_id: 250249 do
@@ -187,35 +177,9 @@ describe 'Account Grading Periods' do
           expect(ff('.grading-period').length).to eq(1)
           expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
         end
-
-        it 'is inherited by course, editing from sub-account page creates a copy', priority: "1", test_id: 250250 do
-          # access from course grading_standards page
-          get "/courses/#{@course.id}/grading_standards"
-
-          # edit grading period
-          replace_content(f("#period_title_#{@id}"), title + "\n")
-          replace_content(f("#period_start_date_#{@id}"), start_date + "\n")
-          replace_content(f("#period_end_date_#{@id}"), end_date + "\n")
-          f('#update-button').click
-          wait_for_ajax_requests
-
-          # should have created a new sub-account grading period - original should NOT change
-          @account_grading_period.reload  # make sure original grading period is updated in case it changed
-
-          new_grading_period = GradingPeriod.where(title: title).first
-          new_id = new_grading_period.id
-          expect(new_id).to_not eq(@id)
-          expect(new_grading_period).to_not be(@account_grading_period) # check for same object
-
-          # check UI
-          expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
-          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
-        end
       end # as admin
 
       context 'as sub-admin' do
-
         before(:each) do
           sub_account = Account.create(name: 'sub account from default account', parent_account: Account.default)
           sub_admin = account_admin_user({account: sub_account, name: "sub-admin"})
@@ -229,49 +193,16 @@ describe 'Account Grading Periods' do
 
         it 'is inherited by sub-account, sub-admin reads account grading period', priority: "1", test_id: 250251 do
           expect(ff('.grading-period').length).to eq(1)
-          expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
+          expect(f("#period_title_#{@id}").text).to eq(@account_grading_period.title)
         end
 
-        it 'is inherited by sub-account, as sub-admin, editing from sub-account page creates a copy', priority: "1", test_id: 250252 do
-          # edit grading period
-          replace_content(f("#period_title_#{@id}"), title + "\n")
-          replace_content(f("#period_start_date_#{@id}"), start_date + "\n")
-          replace_content(f("#period_end_date_#{@id}"), end_date + "\n")
-          f('#update-button').click
-          wait_for_ajax_requests
-
-          # should have created a new sub-account grading period - original should NOT change
-          @account_grading_period.reload  # make sure original grading period is updated in case it changed
-
-          new_grading_period = GradingPeriod.where(title: title).first
-          new_id = new_grading_period.id
-          expect(new_id).to_not eq(@id)
-          expect(new_grading_period).to_not be(@account_grading_period) # check for same object
-
-          # check UI
-          expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
-          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
-        end
-
-        it 'is inherited by sub-account, deleting as sub-admin reverts to account grading period', priority: "1", test_id: 250257 do
-          # edit grading period
-          replace_content(f("#period_title_#{@id}"), title + "\n")
-          f('#update-button').click
-          refresh_page
-
-          # delete the last sub-account grading period
-          ff('.icon-delete-grading-period').first.click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-
-          expect(ff('.grading-period').length).to be(1)
-          expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
+        it 'is inherited by sub-account, cannot delete admin grading periods ' \
+        'as sub-admin', priority: "1", test_id: 250257 do
+          expect(f('.icon-delete-grading-period')).not_to be_present
         end
       end # as sub-admin
 
       context 'as a teacher' do
-
         before(:each) do
           course_with_teacher(course: @course, name: 'teacher', active_enrollment: true)
           user_session @teacher
@@ -282,66 +213,7 @@ describe 'Account Grading Periods' do
 
         it 'is inherited by course, reads account grading period', priority: "1", test_id: 250253 do
           expect(ff('.grading-period').length).to eq(1)
-          expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
-        end
-
-        it 'is inherited by course, editing from course page creates a copy', priority: "1", test_id: 250254 do
-          # edit grading period
-          replace_content(f("#period_title_#{@id}"), title + "\n")
-          replace_content(f("#period_start_date_#{@id}"), start_date + "\n")
-          replace_content(f("#period_end_date_#{@id}"), end_date + "\n")
-          f('#update-button').click
-          wait_for_ajax_requests
-
-          # should have created a new sub-account grading period - original should NOT change
-          @account_grading_period.reload  # make sure original grading period is updated in case it changed
-
-          new_grading_period = GradingPeriod.where(title: title).first
-          new_id = new_grading_period.id
-          expect(new_id).to_not eq(@id)
-          expect(new_grading_period).to_not be(@account_grading_period) # check for same object
-
-          # check UI
-          expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
-          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
-        end
-
-        it 'is inherited by course, deleting reverts to account grading period', priority: "1", test_id: 250259 do
-          # edit grading period
-          replace_content(f("#period_title_#{@id}"), title + "\n")
-          f('#update-button').click
-          refresh_page
-
-          # delete the last sub-account grading period
-          ff('.icon-delete-grading-period').first.click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-
-          expect(ff('.grading-period').length).to be(1)
-          expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
-          expect(f('#admin-periods-message').text).to eq('These grading periods were created for you by an administrator.')
-        end
-
-        it 'is inherited by course, deleting second to last GP displays message', priority: "1", test_id: 250260 do
-          # add a grading period
-          f('#add-period-button').click
-          f('#period_title_new2').send_keys title, :return
-          f('#period_start_date_new2').send_keys start_date, :return
-          f('#period_end_date_new2').send_keys end_date, :return
-          f('#update-button').click
-          refresh_page
-
-          # delete the second to last sub-account grading period
-          ff('.icon-delete-grading-period').first.click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-
-          expect(f('#disable-feature-message').text).to eq('You can disable this feature here.')
-        end
-
-        it 'is inherited by course, displays inherited grading periods message', priority: "1", test_id: 255259 do
-          expect(f('#admin-periods-message').text).to eq('These grading periods were created for you by an administrator.')
+          expect(f("#period_title_#{@id}").text).to eq(@account_grading_period.title)
         end
       end # as a teacher
     end # inheritance

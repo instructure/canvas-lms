@@ -75,8 +75,15 @@ class GradingPeriodsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
       paginated_grading_periods, meta = paginate_for(grading_periods)
-
-      render json: serialize_json_api(paginated_grading_periods, meta)
+      can_create_grading_periods = @context.is_a?(Account) &&
+        @context.root_account? && @context.grants_right?(@current_user, :manage)
+      can_toggle_grading_periods = @domain_root_account.grants_right?(@current_user, :manage) ||
+                       @context.feature_allowed?(:multiple_grading_periods, exclude_enabled: true)
+      permissions = {
+        can_create_grading_periods: can_create_grading_periods,
+        can_toggle_grading_periods: can_toggle_grading_periods
+      }.as_json
+      render json: serialize_json_api(paginated_grading_periods, meta).merge(permissions)
     end
   end
 
@@ -177,11 +184,10 @@ class GradingPeriodsController < ApplicationController
     periods = find_or_build_periods_with_params(params[:grading_periods])
     @context.grading_periods.transaction do
       periods.each { |period| authorized_action(period, @current_user, :manage) }
-      errors = no_overlapping_for_new_periods_validation_errors(periods)
-        .concat(validation_errors(periods))
-
+      errors = no_overlapping_for_new_periods_validation_errors(periods).
+        concat(validation_errors(periods))
       if errors.present?
-        render json: {errors: errors}, status: :bad_reqeust
+        render json: { errors: errors }, status: :bad_request
       else
         periods.each(&:save!)
         paginated_periods, meta = paginate_for(periods)
@@ -213,14 +219,10 @@ class GradingPeriodsController < ApplicationController
 
   def find_or_build_periods_with_params(periods_params)
     periods_params.map do |period_params|
-      if (period = @context.grading_periods.active.where(id: period_params[:id]).first)
-        period.assign_attributes(period_params.except(:id))
-        period
-      else
-        context_grading_period_group
-          .grading_periods
-          .build(period_params.except(:id))
-      end
+      period = GradingPeriod.context_find(@context, period_params[:id])
+      period ||= context_grading_period_group.grading_periods.build
+      period.assign_attributes(period_params.except(:id))
+      period
     end
   end
 

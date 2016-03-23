@@ -52,10 +52,57 @@ describe GradingPeriodsController do
     end
 
     describe 'GET index' do
+      let(:sub_account_admin) { account_admin_user(account: sub_account) }
+      context "can_create_grading_periods" do
+        it "is a key returned with the collection" do
+          get :index, account_id: root_account.id
+          expect(json_parse).to have_key 'can_create_grading_periods'
+        end
+
+        it "returns true if the context is a root account " \
+        "and the user is a root account admin" do
+          get :index, account_id: root_account.id
+          expect(json_parse['can_create_grading_periods']).to eq true
+        end
+
+        it "returns false if the context is not a root account, " \
+        "even if the user is a root account admin" do
+          get :index, account_id: sub_account.id
+          expect(json_parse['can_create_grading_periods']).to eq false
+        end
+      end
+
+      context "can_toggle_grading_periods" do
+        it "is a key returned with the collection" do
+          get :index, account_id: root_account.id
+          expect(json_parse).to have_key 'can_toggle_grading_periods'
+        end
+
+        it "returns true if the user is a root account admin" do
+          get :index, account_id: root_account.id
+          expect(json_parse['can_toggle_grading_periods']).to eq true
+        end
+
+        it "returns false if the user is not a root account admin and the multiple grading "\
+        "periods feature flag is not in an 'allowed' state" do
+          user_session(sub_account_admin)
+          get :index, account_id: sub_account.id
+          expect(json_parse['can_toggle_grading_periods']).to eq false
+        end
+
+        it "returns true if the user is not a root account admin and the multiple grading "\
+        "periods feature flag is in an 'allowed' state" do
+          root_account.allow_feature!(:multiple_grading_periods)
+          user_session(sub_account_admin)
+          get :index, account_id: sub_account.id
+          expect(json_parse['can_toggle_grading_periods']).to eq true
+        end
+      end
+
       context 'when context is a sub account' do
         before do
           get :index, { account_id: sub_account.id }
-          @json = JSON.parse(remove_while.call(response.body))
+          @json = json_parse
         end
 
         it 'contains one grading periods' do
@@ -281,141 +328,6 @@ describe GradingPeriodsController do
         let(:course_id)  { course.id }
       end
     end
-
-    shared_examples "updating parent periods" do |args|
-      describe "updating the #{args[:parent_period]} period" do
-        let(:changed_period_params) do
-          {
-            id:         parent_period.id,
-            title:      'A New Title',
-            start_date: 1.years.from_now(now),
-            end_date:   2.year.from_now(now)
-          }
-        end
-
-        it "copies the grading period to the #{args[:context]}" do
-          expect {
-            put :batch_update, {
-              account_id: account_id,
-              course_id: course_id,
-              grading_periods: [changed_period_params]
-            }
-          }.to change{ scope.grading_periods.count }.by 1
-          scoped_period = scope.grading_periods.where(title: changed_period_params[:title]).first
-          expect(scoped_period.id).to_not eq parent_period.id
-          expect(scoped_period.title).to eq changed_period_params[:title]
-          expect(scoped_period.start_date).to eq changed_period_params[:start_date]
-          expect(scoped_period.end_date).to eq changed_period_params[:end_date]
-        end
-      end
-
-      describe "saving the #{args[:parent_period]} account period and creating a new period" do
-        let(:unchanged_period_params) do
-          {
-            id:         parent_period.id,
-            title:      parent_period.title,
-            start_date: parent_period.start_date,
-            end_date:   parent_period.end_date
-          }
-        end
-
-        let(:new_period_params) do
-          {
-            title:      'new sub account period',
-            start_date: parent_period.start_date + 10.days,
-            end_date:   parent_period.end_date   + 10.days
-          }
-        end
-
-        it "copies the grading period to the #{args[:context]} and creates the new period" do
-          # OPTIMIZE: wrapping the `put :batch_update` in a let/let! doesn't seem to
-          # cache the action so these specs are collapsed into one `it` block.
-          # the result has been a speedup of 2x. If it's possible to cache
-          # the `put :batch_update`, please split up these expectations!
-          expect {
-            put :batch_update, {
-              account_id: account_id,
-              course_id: course_id,
-              grading_periods: [unchanged_period_params, new_period_params]
-            }
-          }.to change{ scope.grading_periods.count }.by 2
-
-          copied_period = scope.grading_periods.where(title: unchanged_period_params[:title]).first
-          expect(copied_period.id).to_not     eq unchanged_period_params[:id]
-          expect(copied_period.title).to      eq unchanged_period_params[:title]
-          expect(copied_period.start_date).to eq unchanged_period_params[:start_date]
-          expect(copied_period.end_date).to   eq unchanged_period_params[:end_date]
-
-          new_period = scope.grading_periods.where(title: new_period_params[:title]).first
-          expect(new_period.title).to      eq new_period_params[:title]
-          expect(new_period.start_date).to eq new_period_params[:start_date]
-          expect(new_period.end_date).to   eq new_period_params[:end_date]
-        end
-      end
-    end
-
-    context "given a root account with one period" do
-      let!(:root_period) { root_group.grading_periods.create!(first_period_params) }
-      let(:root_group) { root_account.grading_period_groups.create! }
-
-      context "as a user associated with a sub account" do
-        let(:sub_account) { root_account.sub_accounts.create! }
-        let!(:login_and_enable_multiple_grading_periods) do
-          user =  User.create!
-          sub_account.account_users.create!(:user => user)
-          user_session(user)
-        end
-
-        include_examples "updating parent periods", context: 'sub account', parent_period: 'root account' do
-          let(:parent_period) { root_period }
-          let(:account_id) { sub_account.id }
-          let(:course_id)  { nil }
-          let(:scope)    { sub_account }
-        end
-      end
-
-      context "as a user associated with a course" do
-        let(:sub_account) { root_account.sub_accounts.create! }
-        let(:course) { sub_account.courses.create! }
-        let(:group) { root_account.grading_period_groups.create! }
-        let!(:login_and_enable_multiple_grading_periods) do
-          user =  User.create!
-          sub_account.account_users.create!(:user => user)
-          user_session(user)
-        end
-
-        include_examples "updating parent periods", context: 'course', parent_period: 'root account' do
-          let(:parent_period) { root_period }
-          let(:account_id) { nil }
-          let(:course_id)  { course.id }
-          let(:scope)    { course }
-        end
-
-      end
-    end
-
-    context "given a sub account with one period" do
-      let!(:sub_account_period) { sub_account_group.grading_periods.create!(first_period_params) }
-      let(:sub_account_group)   { sub_account.grading_period_groups.create! }
-      let(:sub_account)         { root_account.sub_accounts.create! }
-
-      context "as a user associated with a course" do
-        let(:course) { sub_account.courses.create! }
-        let(:group) { root_account.grading_period_groups.create! }
-        let!(:login_and_enable_multiple_grading_periods) do
-          user =  User.create!
-          sub_account.account_users.create!(:user => user)
-          user_session(user)
-        end
-
-        include_examples "updating parent periods", context: 'course', parent_period: 'sub account' do
-          let(:parent_period) { sub_account_period }
-          let(:account_id) { nil }
-          let(:course_id)  { course.id }
-          let(:scope)    { course }
-        end
-      end
-    end
   end
 
   context "it responds with json" do
@@ -427,7 +339,7 @@ describe GradingPeriodsController do
 
     it "when success" do
       put :batch_update, { account_id: root_account.id, course_id: nil, grading_periods: [] }
-      expect(response).to be_success
+      expect(response).to be_ok
       json = JSON.parse(response.body)
       expect(json['grading_periods']).to be_empty
       expect(json).to_not includes 'errors'
@@ -435,7 +347,7 @@ describe GradingPeriodsController do
 
     it "when failure" do
       put :batch_update, { account_id: root_account.id, course_id: nil, grading_periods: [{title: ''}] }
-      expect(response).to be_error
+      expect(response).not_to be_ok
       json = JSON.parse(response.body)
       expect(json['errors']).to be_present
       expect(json).to_not have_key 'grading_periods'

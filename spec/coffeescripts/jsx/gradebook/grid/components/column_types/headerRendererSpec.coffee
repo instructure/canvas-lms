@@ -17,6 +17,7 @@ define [
       assignment:
         due_at: '2015-07-17T05:59:59Z'
       enrollments: []
+      submissions: {}
 
   renderComponent = (data) ->
     element = React.createElement(HeaderRenderer, data)

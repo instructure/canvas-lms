@@ -27,10 +27,10 @@ module FeatureFlags
     false
   end
 
-  def feature_allowed?(feature)
+  def feature_allowed?(feature, exclude_enabled: false)
     flag = lookup_feature_flag(feature)
-    return flag.enabled? || flag.allowed? if flag
-    false
+    return false unless flag
+    exclude_enabled ? flag.allowed? : flag.enabled? || flag.allowed?
   end
 
   def set_feature_flag!(feature, state)

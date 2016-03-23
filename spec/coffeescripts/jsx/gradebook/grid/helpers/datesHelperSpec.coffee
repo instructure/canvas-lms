@@ -1,7 +1,10 @@
 define [
   'jsx/gradebook/grid/helpers/datesHelper'
   'underscore'
-], (DatesHelper, _) ->
+  'timezone'
+  'vendor/timezone/America/Detroit'
+  'vendor/timezone/America/Juneau'
+], (DatesHelper, _, tz, detroit, juneau) ->
 
   defaultAssignment = ->
     {
@@ -38,3 +41,33 @@ define [
 
     ok _.isDate(assignment.created_at)
     ok _.isUndefined(assignment.undefined_due_at)
+
+  module 'DatesHelper#formatDateForDisplay',
+    setup: ->
+      @snapshot = tz.snapshot()
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'formats the date for display, adjusted for the timezone', ->
+    assignment = defaultAssignment()
+    tz.changeZone(detroit, 'America/Detroit')
+    formattedDate = DatesHelper.formatDateForDisplay(assignment.due_at)
+    equal formattedDate, "Jul 14, 2015 at 2:35pm"
+
+    tz.changeZone(juneau, 'America/Juneau')
+    formattedDate = DatesHelper.formatDateForDisplay(assignment.due_at)
+    equal formattedDate, "Jul 14, 2015 at 10:35am"
+
+  module 'DatesHelper#isMidnight',
+    setup: ->
+      @snapshot = tz.snapshot()
+    teardown: ->
+      tz.restore(@snapshot)
+
+  test 'returns true if the time is midnight, adjusted for the timezone', ->
+    date = "2015-07-14T04:00:00Z"
+    tz.changeZone(detroit, 'America/Detroit')
+    ok DatesHelper.isMidnight(date)
+
+    tz.changeZone(juneau, 'America/Juneau')
+    notOk DatesHelper.isMidnight(date)

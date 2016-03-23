@@ -1,7 +1,9 @@
 define([
   'underscore',
-  'timezone'
-], function (_, tz) {
+  'jquery',
+  'timezone',
+  'jquery.instructure_date_and_time'
+], function (_, $, tz) {
   var DatesHelper = {
     parseDates: function(object, datesToParse) {
       _.each(datesToParse, (dateString) => {
@@ -9,6 +11,14 @@ define([
         if (propertyExists) object[dateString] = tz.parse(object[dateString]);
       });
       return object;
+    },
+
+    formatDateForDisplay: function(date) {
+      return $.datetimeString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
+    },
+
+    isMidnight: function(date) {
+      return tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE });
     }
   };
   return DatesHelper;

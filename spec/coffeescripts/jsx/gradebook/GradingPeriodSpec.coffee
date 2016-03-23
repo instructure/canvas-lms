@@ -3,9 +3,11 @@ define [
   'jquery'
   'underscore'
   'jsx/grading/gradingPeriod'
+  'helpers/fakeENV'
+  'jsx/gradebook/grid/helpers/datesHelper'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.rails_flash_notifications'
-], (React, $, _, GradingPeriod) ->
+], (React, $, _, GradingPeriod, fakeENV, DatesHelper) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -14,6 +16,7 @@ define [
       @stub($, 'flashMessage', -> )
       @stub($, 'flashError', -> )
       @server = sinon.fakeServer.create()
+      fakeENV.setup()
       ENV.GRADING_PERIODS_URL = "api/v1/courses/1/grading_periods"
 
       @createdPeriodData = "grading_periods":[
@@ -37,74 +40,45 @@ define [
         endDate: new Date("2015-05-31T00:00:00Z")
         weight: null
         disabled: false
-        permissions:
-          read: true
-          manage: true
-        cannotDelete: -> false
+        permissions: { read: true, manage: true }
         onDeleteGradingPeriod: ->
         updateGradingPeriodCollection: sinon.spy()
-        isOverlapping: ->
 
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
       @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
       @server.respond()
     teardown: ->
       React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
-      ENV.GRADING_PERIODS_URL = null
+      fakeENV.teardown()
       @server.restore()
 
   test 'sets initial state properly', ->
-    deepEqual @gradingPeriod.state.id, @props.id
-    deepEqual @gradingPeriod.state.title, @props.title
-    deepEqual @gradingPeriod.state.startDate, @props.startDate
-    deepEqual @gradingPeriod.state.endDate, @props.endDate
-    deepEqual @gradingPeriod.state.weight, @props.weight
-    deepEqual @gradingPeriod.state.permissions, @props.permissions
-    ok @gradingPeriod.state.shouldUpdateBeDisabled
+    equal @gradingPeriod.state.title, @props.title
+    equal @gradingPeriod.state.startDate, @props.startDate
+    equal @gradingPeriod.state.endDate, @props.endDate
+    equal @gradingPeriod.state.weight, @props.weight
 
-  test 'handleDateChange changes the state of the respective date passed in', ->
-    startDateInput = @gradingPeriod.refs.startDate.getDOMNode()
-    newDate = new Date("Feb 20, 2015 2:55 am")
-    startDateInput.value = $.datetimeString(newDate, format: "medium")
-    fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    $(startDateInput).blur()
-    @gradingPeriod.handleDateChange(fakeEvent)
-    deepEqual @gradingPeriod.state.startDate.toUTCString(), new Date("Feb 20, 2015 2:55 am").toUTCString()
-
-  test 'handleDateChange calls replaceInputWithDate', ->
-    fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
+  test 'onDateChange calls replaceInputWithDate', ->
     replaceInputWithDate = @stub(@gradingPeriod, 'replaceInputWithDate')
-    @gradingPeriod.handleDateChange(fakeEvent)
+    @gradingPeriod.onDateChange("startDate", "period_start_date_1")
     ok replaceInputWithDate.calledOnce
 
-  test 'handleDateChange calls updateGradingPeriodCollection', ->
-    fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    @gradingPeriod.handleDateChange(fakeEvent)
+  test 'onDateChange calls updateGradingPeriodCollection', ->
+    @gradingPeriod.onDateChange("startDate", "period_start_date_1")
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
-  test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
-    ok !@gradingPeriod.isNewGradingPeriod()
-
-  test 'isNewGradingPeriod returns true if the id contains "new"', ->
-    @gradingPeriod.setState({id: "new1"})
-    ok @gradingPeriod.isNewGradingPeriod()
-
-  test 'handleTitleChange changes the title state', ->
+  test 'onTitleChange changes the title state', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    @gradingPeriod.handleTitleChange(fakeEvent)
+    @gradingPeriod.onTitleChange(fakeEvent)
     deepEqual @gradingPeriod.state.title, "MXP: Most Xtreme Primate"
 
-  test 'handleTitleChange calls updateGradingPeriodCollection', ->
+  test 'onTitleChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    @gradingPeriod.handleTitleChange(fakeEvent)
+    @gradingPeriod.onTitleChange(fakeEvent)
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'replaceInputWithDate calls formatDateForDisplay', ->
-    formatDate = @stub(@gradingPeriod, 'formatDateForDisplay')
-    @gradingPeriod.replaceInputWithDate(@gradingPeriod.refs.startDate)
+    formatDate = @stub(DatesHelper, 'formatDateForDisplay')
+    fakeDateElement = { val: -> }
+    @gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
     ok formatDate.calledOnce
-
-  test 'triggerDeleteGradingPeriod calls onDeleteGradingPeriod', ->
-    deletePeriod = @stub(@gradingPeriod.props, 'onDeleteGradingPeriod')
-    @gradingPeriod.triggerDeleteGradingPeriod()
-    ok deletePeriod.calledOnce

@@ -41,7 +41,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
-    joins(:grading_period_group).where(grading_period_groups: context_with_ids)
+    joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)
   end
 
   # Takes a context and returns an Array (not an ActiveRecord::Relation)
