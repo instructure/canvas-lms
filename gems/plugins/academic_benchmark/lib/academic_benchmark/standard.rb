@@ -144,7 +144,7 @@ class Standard
                       {:description => "Meets Expectations", :points => 3},
                       {:description => "Does Not Meet Expectations", :points => 0}]
     hash[:mastery_points] = 3
-    hash[:points_possible] = 3
+    hash[:points_possible] = 5
   end
 end
 end
