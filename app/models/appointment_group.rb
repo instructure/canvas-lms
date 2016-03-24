@@ -269,7 +269,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def possible_users
     participant_type == 'User' ?
-      possible_participants.uniq :
+      possible_participants(include_observers: true).uniq :
       possible_participants.flatten.map(&:participants).flatten.uniq
   end
 
@@ -281,11 +281,16 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  def possible_participants(registration_status=nil)
+  def possible_participants(registration_status: nil, include_observers: false)
     participants = if participant_type == 'User'
+                     participant_func = if include_observers
+                                          ->(c) {c.participating_students + c.participating_observers}
+                                        else
+                                          ->(c) {c.participating_students}
+                                        end
                      sub_contexts.empty? ?
-                       contexts.map(&:participating_students).flatten :
-                       sub_contexts.map(&:participating_students).flatten
+                       contexts.map(&participant_func).flatten :
+                       sub_contexts.map(&participant_func).flatten
                    else
                      # FIXME?
                      sub_contexts.map(&:groups).flatten
@@ -467,7 +472,7 @@ class AppointmentGroup < ActiveRecord::Base
     return @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
     @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes
-      user_codes = user.appointment_context_codes[:primary] |
+      user_codes = user.appointment_context_codes(include_observers: true)[:primary] |
         manageable_codes[:full] | manageable_codes[:limited]
       context_codes & user_codes
     end

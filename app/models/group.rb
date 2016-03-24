@@ -177,8 +177,12 @@ class Group < ActiveRecord::Base
   end
 
   def participants(include_observers=false)
-    # argument needed because #participants is polymorphic for contexts
-    participating_users.uniq
+    users = participating_users.uniq.all
+    if include_observers && self.context.is_a?(Course)
+      (users + User.observing_students_in_course(users, self.context)).flatten.uniq
+    else
+      users
+    end
   end
 
   def context_code
