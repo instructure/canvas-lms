@@ -464,7 +464,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def context_codes_for_user(user)
     @context_codes_for_user ||= {}
-    @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
+    return @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
     @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes
       user_codes = user.appointment_context_codes[:primary] |
