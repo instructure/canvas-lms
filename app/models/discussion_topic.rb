@@ -175,18 +175,18 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def refresh_subtopics
-    if self.root_topic_id.blank?
-      # delete any lingering child topics
-      self.shard.activate do
-        DiscussionTopic.where(:root_topic_id => self).update_all(:workflow_state => "deleted")
+    sub_topics = []
+    category = self.group_category
+
+    if category && self.root_topic_id.blank? && !self.deleted?
+      category.groups.active.each do |group|
+        sub_topics << ensure_child_topic_for(group)
       end
     end
-    return if self.deleted?
-
-    category = self.group_category
-    return unless category && self.root_topic_id.blank?
-    category.groups.active.each do |group|
-      ensure_child_topic_for(group)
+    
+    self.shard.activate do
+      # delete any lingering child topics
+      DiscussionTopic.where(:root_topic_id => self).where.not(:id => sub_topics).update_all(:workflow_state => "deleted")
     end
   end
 
@@ -196,7 +196,7 @@ class DiscussionTopic < ActiveRecord::Base
         topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
         topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
         topic.message = self.message
-        topic.title = "#{self.title} - #{group.name}"
+        topic.title = CanvasTextHelper.truncate_text("#{self.title} - #{group.name}", {:max_length => 250}) # because of course people do this
         topic.assignment_id = self.assignment_id
         topic.attachment_id = self.attachment_id
         topic.group_category_id = self.group_category_id
