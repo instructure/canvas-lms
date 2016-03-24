@@ -208,6 +208,8 @@ class Account < ActiveRecord::Base
   add_setting :trusted_referers, root_only: true
   add_setting :app_center_access_token
 
+  add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
+
   def use_new_styles_or_allow_global_includes?
     feature_enabled?(:use_new_styles) || allow_global_includes?
   end
@@ -931,6 +933,8 @@ class Account < ActiveRecord::Base
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
         given { |user|
+          next if permission == :read_sis && self.settings[:strict_sis_check]
+
           if user && (!details[:if] || send(details[:if]))
             shard.activate do
               role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
@@ -942,6 +946,19 @@ class Account < ActiveRecord::Base
         can permission
       end
     end
+
+    given { |user|
+      details = RoleOverride.permissions[:read_sis]
+      if self.settings[:strict_sis_check] && user && (!details[:if] || send(details[:if]))
+        # because apparently some people panic if a student *who is also a teacher* can see sis ids
+        shard.activate do
+          role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
+            where("enrollments.workflow_state IN ('active', 'completed') AND user_id=?", user).distinct.pluck(:role_id)
+          role_ids.any? && role_ids.all?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, :read_sis, role)[:enabled] }
+        end
+      end
+    }
+    can :read_sis
 
     given { |user| !self.account_users_for(user).empty? }
     can :read and can :manage and can :update and can :delete and can :read_outcomes
