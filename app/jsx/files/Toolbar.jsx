@@ -1,14 +1,29 @@
 define([
+  'jquery',
   'i18n!react_files',
   'react',
+  'page',
   'compiled/react_files/components/Toolbar',
+  'compiled/react_files/modules/FocusStore',
   'jsx/files/utils/openMoveDialog',
   'compiled/react_files/utils/deleteStuff',
   'jsx/files/UploadButton',
   'classnames',
   'compiled/fn/preventDefault',
   'compiled/models/Folder'
-], function (I18n, React, Toolbar, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
+], function ($, I18n, React, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
+
+  Toolbar.openPreview = function () {
+    FocusStore.setItemToFocus(this.refs.previewLink.getDOMNode());
+    const queryString  = $.param(this.props.getPreviewQuery());
+    page(`${this.props.getPreviewRoute()}?${queryString}`);
+  };
+
+  Toolbar.onSubmitSearch = function (event) {
+    event.preventDefault();
+    const searchTerm = this.refs.searchTerm.getDOMNode().value;
+    page(`/search?search_term=${searchTerm}`);
+  };
 
   Toolbar.renderUploadAddFolderButtons = function () {
     var phoneHiddenSet = classnames({
@@ -204,7 +219,7 @@ define([
             type= 'search'
             ref='searchTerm'
             className='ic-Input'
-            defaultValue= {this.getQuery().search_term}
+            defaultValue= {this.props.query.search_term}
           />
           <button
             className='Button'

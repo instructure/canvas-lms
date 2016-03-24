@@ -29,6 +29,7 @@ define [], ()->
     XscrollPosition = window.scrollX
 
     # Thrash the DOM for the node we've been given.
+    node.style = node.style || {}
     node.style.display = 'none'
     node.offsetHeight
     node.style.display = ''

@@ -2,12 +2,13 @@ define [
   'jquery'
   'i18n!folder_tree'
   'react'
-  'react-router'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
+  'compiled/react_files/modules/filesEnv',
+  'page',
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
+], ($, I18n, React, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
 
   FolderTree =
     displayName: 'FolderTree'
@@ -15,8 +16,6 @@ define [
     propTypes:
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
-
-    mixins: [Router.Navigation, Router.State]
 
     componentDidMount: ->
       rootFoldersFinder = new RootFoldersFinder({
@@ -57,12 +56,12 @@ define [
         $.screenReaderFlashMessage message
       else
         $.screenReaderFlashMessageExclusive I18n.t('File list updated')
-        @transitionTo (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+        page("#{filesEnv.baseUrl}/folder/#{folder.urlPath()}");
 
 
 
     hrefFor: (folder) ->
-      @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
+      # @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
 
 

@@ -47,8 +47,6 @@ define [
       areAllItemsSelected: React.PropTypes.func.isRequired
       splat: React.PropTypes.string
 
-    mixins: [ReactRouter.State]
-
     getInitialState: ->
       return {
         hideToggleAll: true

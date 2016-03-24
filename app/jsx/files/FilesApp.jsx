@@ -1,7 +1,8 @@
 define([
+  'jquery',
   'react',
-  'react-router',
   'react-modal',
+  'page',
   'compiled/react_files/components/FilesApp',
   'compiled/react_files/modules/filesEnv',
   'i18n!react_files',
@@ -9,14 +10,12 @@ define([
   'jsx/files/FolderTree',
   'jsx/files/FilesUsage',
   'jsx/files/Toolbar'
-], function (React, ReactRouter, ReactModal, FilesApp, filesEnv, I18n, Breadcrumbs, FolderTree, FilesUsage, Toolbar) {
-
-  var RouteHandler = ReactRouter.RouteHandler;
+], function ($, React, ReactModal, page, FilesApp, filesEnv, I18n, Breadcrumbs, FolderTree, FilesUsage, Toolbar) {
 
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -27,6 +26,15 @@ define([
       border: 'none',
       padding: '0'
     }
+  };
+
+  FilesApp.previewItem = function (item) {
+    this.clearSelectedItems(() => {
+      this.toggleItemSelected(item, null, () => {
+        const queryString  = $.param(this.getPreviewQuery());
+        page(`${this.getPreviewRoute()}?${queryString}`);
+      })
+    });
   };
 
   FilesApp.render = function () {
@@ -73,6 +81,8 @@ define([
               <Breadcrumbs
                 rootTillCurrentFolder={this.state.rootTillCurrentFolder}
                 showingSearchResults={this.state.showingSearchResults}
+                query={this.props.query}
+                contextAssetString={this.props.contextAssetString}
               />
             </div>
           </div>
@@ -82,11 +92,13 @@ define([
           <Breadcrumbs
             rootTillCurrentFolder={this.state.rootTillCurrentFolder}
             showingSearchResults={this.state.showingSearchResults}
+            query={this.props.query}
+            contextAssetString={this.props.contextAssetString}
           />
         )}
         <Toolbar
           currentFolder={this.state.currentFolder}
-          query={this.getQuery()}
+          query={this.props.query}
           selectedItems={this.state.selectedItems}
           clearSelectedItems={this.clearSelectedItems}
           onMove={this.onMove}
@@ -127,35 +139,37 @@ define([
             role='region'
             aria-label={I18n.t('File List')}
           >
-            <RouteHandler
-              key={this.state.key}
-              pathname={this.state.pathname}
-              query={this.getQuery()}
-              onResolvePath={this.onResolvePath}
-              currentFolder={this.state.currentFolder}
-              contextType={contextType}
-              contextId={contextId}
-              selectedItems={this.state.selectedItems}
-              toggleItemSelected={this.toggleItemSelected}
-              toggleAllSelected={this.toggleAllSelected}
-              areAllItemsSelected={this.areAllItemsSelected}
-              userCanManageFilesForContext={userCanManageFilesForContext}
-              usageRightsRequiredForContext={usageRightsRequiredForContext}
-              externalToolsForContext={externalToolsForContext}
-              previewItem={this.previewItem}
-              onMove={this.onMove}
-              modalOptions={{
+            {React.cloneElement(this.props.children, {
+              key: this.state.key,
+              pathname: this.props.pathname,
+              splat: this.props.splat,
+              query: this.props.query,
+              params: this.props.params,
+              onResolvePath: this.onResolvePath,
+              currentFolder: this.state.currentFolder,
+              contextType: contextType,
+              contextId: contextId,
+              selectedItems: this.state.selectedItems,
+              toggleItemSelected: this.toggleItemSelected,
+              toggleAllSelected: this.toggleAllSelected,
+              areAllItemsSelected: this.areAllItemsSelected,
+              userCanManageFilesForContext: userCanManageFilesForContext,
+              usageRightsRequiredForContext: usageRightsRequiredForContext,
+              externalToolsForContext: externalToolsForContext,
+              previewItem: this.previewItem,
+              onMove: this.onMove,
+              modalOptions: {
                 openModal: this.openModal,
                 closeModal: this.closeModal
-              }}
-              dndOptions={{
+              },
+              dndOptions: {
                 onItemDragStart: this.onItemDragStart,
                 onItemDragEnterOrOver: this.onItemDragEnterOrOver,
                 onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
                 onItemDrop: this.onItemDrop
-              }}
-              clearSelectedItems={this.clearSelectedItems}
-            />
+              },
+              clearSelectedItems: this.clearSelectedItems
+            })}
           </div>
         </div>
         <div className='ef-footer grid-row'>

@@ -15,14 +15,15 @@ define([
     /* Prepare and render the FilePreview if needed.
        As long as ?preview is present in the url.
     */
-    if (this.getQuery().preview != null){
+    if (this.props.query.preview != null) {
       return (
         <FilePreview
           isOpen={true}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           currentFolder={this.props.currentFolder}
-          params={this.getParams()}
-          query={this.getQuery()}
+          params={this.props.params}
+          query={this.props.query}
+          pathname={this.props.pathname}
         />
       );
     }
@@ -38,7 +39,7 @@ define([
     }
     else {
       return (
-        this.props.currentFolder.children(this.getQuery()).map((child) => {
+        this.props.currentFolder.children(this.props.query).map((child) => {
           return(
             <FolderChild
               key={child.cid}
@@ -81,7 +82,7 @@ define([
     }
 
     var folderOrRootFolder;
-    if (this.getParams().splat){
+    if (this.props.params.splat){
       folderOrRootFolder = 'folder';
     }else{
       folderOrRootFolder = 'rootFolder';
@@ -103,12 +104,12 @@ define([
         <ColumnHeaders
           ref='columnHeaders'
           to={folderOrRootFolder}
-          query={this.getQuery()}
-          params={this.getParams()}
+          query={this.props.query}
+          params={this.props.params}
           toggleAllSelected={this.props.toggleAllSelected}
           areAllItemsSelected={this.props.areAllItemsSelected}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-          splat={this.getParams().splat}
+          splat={this.props.params.splat}
         />
         { this.renderFolderChildOrEmptyContainer() }
         <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />

@@ -2,7 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
-  'react-router'
+  'page'
   'react-modal'
   '../modules/customPropTypes'
   'Backbone'
@@ -18,13 +18,13 @@ define [
   '../modules/FocusStore'
   'jsx/files/codeToRemoveLater'
   'compiled/jquery.rails_flash_notifications'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
+], ($, _, React, page, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
 
     displayName: 'FilePreview'
 
-    mixins: [React.addons.PureRenderMixin, ReactRouter.Navigation, ReactRouter.State]
+    mixins: [React.addons.PureRenderMixin]
 
     propTypes:
       currentFolder: customPropTypes.folder
@@ -58,8 +58,8 @@ define [
     getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
       initialItem = null
-      onlyIdsToPreview = @getQuery().only_preview?.split(',')
-      files = if !!@getQuery().search_term
+      onlyIdsToPreview = @props.query.only_preview?.split(',')
+      files = if !!@props.query.search_term
                 props.collection.models
               else
                 props.currentFolder.files.models
@@ -68,12 +68,12 @@ define [
                       return true unless onlyIdsToPreview
                       file.id in onlyIdsToPreview
 
-      visibleFile = @getQuery().preview and _.findWhere(files, {id: @getQuery().preview})
+      visibleFile = @props.query.preview and _.findWhere(files, {id: @props.query.preview})
 
       if !visibleFile
         responseDataRequested = ["enhanced_preview_url"]
         responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
-        new File({id: @getQuery().preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
+        new File({id: @props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
@@ -87,7 +87,7 @@ define [
       otherItems: items.otherItems
       currentFolder: props.currentFolder
       params: props.params
-      otherItemsString: (@getQuery().only_preview if @getQuery().only_preview)
+      otherItemsString: (@props.query.only_preview if @props.query.only_preview)
       otherItemsIsBackBoneCollection: items.otherItems instanceof Backbone.Collection
 
     setUpOtherItemsQuery: (otherItems) ->
@@ -96,47 +96,21 @@ define [
       ).join(',')
 
     getRouteIdentifier: ->
-      if @getQuery().search_term
-        'search'
-      else if @props.currentFolder?.urlPath()
-        'folder'
+      if @props.query.search_term
+        '/search'
       else
-        'rootFolder'
+        @props.pathname
 
     getNavigationParams: (opts = {id: null, except: []}) ->
       obj =
         preview: (opts.id if opts.id)
-        search_term: (@getQuery().search_term if @getQuery().search_term)
+        search_term: (@props.query.search_term if @props.query.search_term)
         only_preview: (@state.otherItemsString if @state.otherItemsString)
 
       _.each obj, (v, k) ->
         delete obj[k] if not v or (opts.except?.length and (opts.except is k or k in opts.except))
 
       obj
-
-
-    handleKeyboardNavigation: (event) ->
-      return null unless (event.keyCode is $.ui.keyCode.LEFT or event.keyCode is $.ui.keyCode.RIGHT)
-      # left arrow
-      if (event.keyCode is $.ui.keyCode.LEFT)
-        nextItem = collectionHandler.getPreviousInRelationTo(@state.otherItems, @state.displayedItem)
-
-      # right arrow
-      if (event.keyCode is $.ui.keyCode.RIGHT)
-        nextItem = collectionHandler.getNextInRelationTo(@state.otherItems, @state.displayedItem)
-
-      @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(id: nextItem.id))
-
-    closeModal: ->
-
-      # TODO Remove this jQuery line once react modal is upgraded. It should clean
-      # itself up after unmounting but it doesn't so using this quick fix for now
-      # until everything is upgraded.
-      $('#application').removeAttr('aria-hidden')
-      ############## kill me #####################
-
-      @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(except: 'only_preview'))
-      FocusStore.setFocusToItem()
 
     toggle: (key) ->
       newState = {}
