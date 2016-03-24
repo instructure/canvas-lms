@@ -846,7 +846,7 @@ CanvasRails::Application.routes.draw do
 
   post 'selection_test' => 'external_content#selection_test'
 
-  resources :quiz_submissions do
+  scope '/quizzes/quiz_submissions/:quiz_submission_id', as: 'quiz_submission' do
     concerns :files
   end
 
