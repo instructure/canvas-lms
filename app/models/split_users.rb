@@ -116,6 +116,7 @@ class SplitUsers
 
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
       AccountUser.where(id: account_users_ids).update_all(user_id: user)
+      restore_worklow_states_from_records(records)
     end
 
     def move_user_observers(source_user, user, records)
@@ -167,6 +168,15 @@ class SplitUsers
                   (update[:foreign_key] || :user_id) => source_user_id).
             update_all((update[:foreign_key] || :user_id) => target_user_id)
         end
+      end
+    end
+
+    def restore_worklow_states_from_records(records)
+      records.each do |r|
+        c = r.context
+        next unless c.class.columns_hash.key?('workflow_state')
+        c.workflow_state = r.previous_workflow_state
+        c.save! if c.changed?
       end
     end
   end

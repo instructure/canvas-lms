@@ -28,7 +28,7 @@ describe SplitUsers do
     describe 'with merge data' do
 
       it 'should split multiple users if no merge_data is specified' do
-        enrollment1 = course1.enroll_user(user1)
+        enrollment1 = course1.enroll_student(user1, enrollment_state: 'active')
         enrollment2 = course1.enroll_student(user2, enrollment_state: 'active')
         enrollment3 = course2.enroll_student(user1, enrollment_state: 'active')
         enrollment4 = course3.enroll_teacher(user1)
@@ -44,6 +44,7 @@ describe SplitUsers do
         expect(user2).not_to be_deleted
         expect(user3).not_to be_deleted
         expect(enrollment1.reload.user).to eq user1
+        expect(enrollment1.workflow_state).to eq 'active'
         expect(enrollment2.reload.user).to eq user2
         expect(enrollment3.reload.user).to eq user1
         expect(enrollment4.reload.user).to eq user1
@@ -90,6 +91,11 @@ describe SplitUsers do
         expect(user2.user_observees.count).to eq 1
         expect(user1.observers).to eq [observer1]
         expect(user2.observers).to eq [observer1]
+
+        expect(user1.user_observees.first.workflow_state).to eq 'active'
+        expect(user2.user_observees.first.workflow_state).to eq 'active'
+        expect(user1.user_observers.first.workflow_state).to eq 'active'
+        expect(user2.user_observers.first.workflow_state).to eq 'active'
       end
 
       it 'should only split users from merge_data when specified' do
