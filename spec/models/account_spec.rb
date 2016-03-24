@@ -927,6 +927,33 @@ describe Account do
       expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
     end
 
+    it "should be able to disable :read_sis for teacher-students if the account so desires" do
+      user_with_pseudonym(:active_all => 1)
+      a = Account.default
+
+      course1 = a.courses.create!
+      course1.enroll_teacher(@user).accept!
+      course2 = a.courses.create!
+      course2.offer!
+      course2.enroll_student(@user).accept!
+
+      expect(a.grants_right?(@user, :read_sis)).to be_truthy
+
+      AdheresToPolicy::Cache.clear
+      RoleOverride.clear_cached_contexts
+
+      a.settings[:strict_sis_check] = true
+      a.save!
+      expect(a.grants_right?(@user, :read_sis)).to be_falsey
+
+      @user.student_enrollments.each(&:destroy!)
+
+      AdheresToPolicy::Cache.clear
+      RoleOverride.clear_cached_contexts
+
+      expect(a.grants_right?(@user, :read_sis)).to be_truthy
+    end
+
     it "should not break trying to check :read_sis for sub-account custom teachers" do
       user_with_pseudonym(:active_all => 1)
       sub_account = Account.default.sub_accounts.create!
