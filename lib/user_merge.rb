@@ -215,17 +215,7 @@ class UserMerge
       end
 
       unless Shard.current != target_user.shard
-        # delete duplicate or invalid observers/observees, move the rest
-        from_user.user_observees.where(:user_id => target_user.user_observees.map(&:user_id)).delete_all
-        from_user.user_observees.where(user_id: target_user).delete_all
-        target_user.user_observees.where(user_id: from_user).delete_all
-        from_user.user_observees.update_all(:observer_id => target_user)
-        xor_observer_ids = (Set.new(from_user.user_observers.map(&:observer_id)) ^ target_user.user_observers.map(&:observer_id)).to_a
-        from_user.user_observers.where(:observer_id => target_user.user_observers.map(&:observer_id)).delete_all
-        from_user.user_observers.update_all(:user_id => target_user)
-        # for any observers not already watching both users, make sure they have
-        # any missing observer enrollments added
-        target_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
+        move_observees(target_user, user_merge_data)
       end
 
       Enrollment.send_later(:recompute_final_scores, target_user.id)
@@ -235,6 +225,24 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+  end
+
+  def move_observees(target_user, user_merge_data)
+    # record all the records before destroying them
+    user_merge_data.add_more_data(from_user.user_observees)
+    user_merge_data.add_more_data(from_user.user_observers)
+    # delete duplicate or invalid observers/observees, move the rest
+    from_user.user_observees.where(user_id: target_user.user_observees.map(&:user_id)).destroy_all
+    from_user.user_observees.where(user_id: target_user).destroy_all
+    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user))
+    target_user.user_observees.where(user_id: from_user).destroy_all
+    from_user.user_observees.active.update_all(observer_id: target_user)
+    xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).uniq.pluck(:observer_id)
+    from_user.user_observers.where(observer_id: target_user.user_observers.map(&:observer_id)).destroy_all
+    from_user.user_observers.active.update_all(user_id: target_user)
+    # for any observers not already watching both users, make sure they have
+    # any missing observer enrollments added
+    target_user.user_observers.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
   end
 
   def destroy_conflicting_module_progressions(from_user, target_user)

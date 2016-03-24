@@ -335,8 +335,11 @@ describe UserMerge do
       user2.observers << observer2
 
       UserMerge.from(user1).into(user2)
+      data = UserMergeData.where(user_id: user2).first
+      expect(data.user_merge_data_records.where(context_type: 'UserObserver').count).to eq 2
       user1.reload
-      expect(user1.observers).to be_empty
+      expect(user1.observers.active_user_observers).to be_empty
+      expect(user1.user_observers.first.workflow_state).to eq 'deleted'
       user2.reload
       expect(user2.observers.sort_by(&:id)).to eql [observer1, observer2]
     end
@@ -349,7 +352,7 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       user1.reload
-      expect(user1.observed_users).to be_empty
+      expect(user1.observed_users.active_user_observers).to be_empty
       user2.reload
       expect(user2.observed_users.sort_by(&:id)).to eql [student1, student2]
     end
