@@ -61,11 +61,15 @@ class CalendarEvent < ActiveRecord::Base
   after_save :sync_parent_event
   after_update :sync_child_events
 
-  before_update :sync_google_calendar
   before_save :sync_google_calendar
 
   def kill_google_calendar
     return if google_calendar_id.nil? || google_calendar_id.empty?
+
+    BZDebug.log("Kill: " + self.id.to_s)
+    BZDebug.log(self.google_calendar_id)
+
+    @deleted_on_gcal = true
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
@@ -86,9 +90,16 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def sync_google_calendar
+    # If we already deleted it on gcal (through a destroy call below), it will
+    # try to save again in Rails which triggers this function. We do NOT want to
+    # resync because that would recreate it.
+    return if @deleted_on_gcal
     # Skip syncing when it has children because parent events are dummies just to hold it
     return if @child_event_data || (child_events && child_events.count > 0)
     obj = {}
+
+    BZDebug.log("Sync: " + self.id.to_s)
+    BZDebug.log(self.google_calendar_id)
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 

@@ -19,6 +19,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
+require 'bz_debug'
+
 class ApplicationController < ActionController::Base
   def self.promote_view_path(path)
     self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
@@ -1027,6 +1029,13 @@ class ApplicationController < ActionController::Base
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
       message << "  " << exception.backtrace.join("\n  ")
       logger.fatal("#{message}\n\n")
+
+      # I want just a fraction of the info printed to my custom debug
+      # because I typically only care about our own modifications
+      BZDebug.log("#{exception.class} (#{exception.message}):")
+      BZDebug.log("  " + exception.backtrace[0])
+      BZDebug.log("  " + exception.backtrace[1])
+      BZDebug.log("  " + exception.backtrace[2])
     end
 
     if config.consider_all_requests_local
