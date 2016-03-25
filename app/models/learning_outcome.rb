@@ -293,6 +293,21 @@ class LearningOutcome < ActiveRecord::Base
     @tied_context = context
   end
 
+  def mastery_points
+    return unless self.rubric_criterion
+    self.data[:rubric_criterion][:mastery_points]
+  end
+
+  def points_possible
+    return unless self.rubric_criterion
+    self.data[:rubric_criterion][:points_possible]
+  end
+
+  def mastery_percent
+    return unless mastery_points && points_possible
+    (mastery_points / points_possible).round(2)
+  end
+
   def artifacts_count_for_tied_context
     codes = [@tied_context.asset_string]
     if @tied_context.is_a?(Account)

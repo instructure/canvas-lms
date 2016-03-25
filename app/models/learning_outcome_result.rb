@@ -52,10 +52,28 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def calculate_percent!
-    if self.score && self.possible
+    scale_data = scale_params
+    if needs_scale?(scale_data) && self.score && self.possible
+      self.percent = (calculate_by_scale(scale_data)).round(4)
+    elsif self.score && self.possible
       self.percent = self.score.to_f / self.possible.to_f
     end
     self.percent = nil if self.percent && !self.percent.to_f.finite?
+  end
+
+  def calculate_by_scale(scale_data)
+    scale_percent = scale_data[:scale_percent]
+    alignment_mastery = scale_data[:alignment_mastery]
+    scale_points = (self.possible / scale_percent) - self.possible
+    scale_cutoff = self.possible - (self.possible * alignment_mastery)
+    percent_to_scale = (self.score + scale_cutoff) - self.possible
+    if percent_to_scale > 0
+      score_adjustment = (percent_to_scale / scale_cutoff) * scale_points
+      scaled_score = self.score + score_adjustment
+      (scaled_score / self.possible) * scale_percent
+    else
+      (self.score / self.possible) * scale_percent
+    end
   end
 
   def assignment
@@ -89,6 +107,28 @@ class LearningOutcomeResult < ActiveRecord::Base
     else
       save
     end
+  end
+
+  def scale_params
+    parent_mastery = precise_mastery_percent
+    alignment_mastery = self.alignment.mastery_score
+    if parent_mastery && alignment_mastery
+      { scale_percent: parent_mastery / alignment_mastery,
+        alignment_mastery: alignment_mastery
+      }
+    end
+  end
+
+  def precise_mastery_percent
+    # the outcome's mastery percent is rounded to 2 places. This is normally OK
+    # but for scaling it's too imprecise and can lead to inaccurate calculations
+    parent_outcome = self.learning_outcome
+    return unless parent_outcome.try(:mastery_points)
+    parent_outcome.mastery_points / parent_outcome.points_possible
+  end
+
+  def needs_scale?(scale_data)
+    scale_data && scale_data[:scale_percent] != 1.0
   end
 
   def submitted_or_assessed_at
