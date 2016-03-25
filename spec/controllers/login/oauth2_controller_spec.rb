@@ -94,6 +94,19 @@ describe Login::Oauth2Controller do
       expect(flash[:delegated_message]).to_not be_blank
     end
 
+    it "redirects to login if no user information returned" do
+      aac.any_instantiation.expects(:get_token).returns('token')
+      aac.any_instantiation.expects(:unique_id).with('token').returns(nil)
+
+      session[:oauth2_nonce] = 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+
+      get :create, state: jwt
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to_not be_blank
+      expect(flash[:delegated_message]).to match(/no unique ID/)
+    end
+
     it "(safely) displays an error message from the server" do
       get :create, error_description: 'failed<script></script>'
       expect(response).to redirect_to(login_url)
