@@ -935,7 +935,7 @@ DEPENDENCIES
   broadcast_policy!
   builder (= 3.0.0)
   bullet_instructure (= 4.14.7)
-  bundler (>= 1.7.10, <= 1.9.6)
+  bundler (>= 1.7.10, <= 1.11.2)
   byebug (= 4.0.5)
   canvas-jobs (= 0.9.12)
   canvas_breach_mitigation!

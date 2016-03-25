@@ -102,6 +102,7 @@ define [
       @reloadView.pollForChanges()
 
       $.publish('userContent/change')
+      bzRetainedInfoSetup()
 
     deleteWikiPage: (ev) ->
       ev?.preventDefault()

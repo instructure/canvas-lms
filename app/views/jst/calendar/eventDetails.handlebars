@@ -29,11 +29,19 @@
         </tr>
       {{/if}}
       {{#if location_address}}
-              <tr>
-                <th scope="row">{{#t "location_address"}}Address{{/t}}</th>
-                <td>{{location_address}}</td>
-              </tr>
-            {{/if}}
+        <tr>
+          <th scope="row">{{#t "location_address"}}Address{{/t}}</th>
+          <td>{{location_address}}</td>
+        </tr>
+      {{/if}}
+      {{#if google_calendar_id}}
+        <tr>
+          <th scope="row">RSVPs</th>
+          <td><div class="bz-rsvps">
+          <img src='/images/ajax-loader-black-on-white.gif' class='loading' />
+          </div></td>
+        </tr>
+      {{/if}}
       {{#if description}}
         <tr>
           <th scope="row">{{#t "details"}}Details{{/t}}</th>

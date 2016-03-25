@@ -35,7 +35,7 @@ class CalendarEvent < ActiveRecord::Base
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :location_name, :location_address, :start_at, :end_at, :context_id, :context_type, :workflow_state, :created_at, :updated_at,
     :user_id, :all_day, :all_day_date, :deleted_at, :cloned_item_id, :context_code, :time_zone_edited, :parent_calendar_event_id, :effective_context_code,
-    :participants_per_appointment, :override_participants_per_appointment
+    :participants_per_appointment, :override_participants_per_appointment, :google_calendar_id
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :user, :child_events]
@@ -60,6 +60,168 @@ class CalendarEvent < ActiveRecord::Base
   after_save :replace_child_events
   after_save :sync_parent_event
   after_update :sync_child_events
+
+  before_save :sync_google_calendar
+
+  def kill_google_calendar
+    return if google_calendar_id.nil? || google_calendar_id.empty?
+
+    BZDebug.log("Kill: " + self.id.to_s)
+    BZDebug.log(self.google_calendar_id)
+
+    @deleted_on_gcal = true
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :sendNotifications => true,
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.delete,
+      :parameters => params)
+  end
+
+  def sync_google_calendar
+    # If we already deleted it on gcal (through a destroy call below), it will
+    # try to save again in Rails which triggers this function. We do NOT want to
+    # resync because that would recreate it.
+    return if @deleted_on_gcal
+    # Skip syncing when it has children because parent events are dummies just to hold it
+    return if @child_event_data || (child_events && child_events.count > 0)
+    obj = {}
+
+    BZDebug.log("Sync: " + self.id.to_s)
+    BZDebug.log(self.google_calendar_id)
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    event = {
+      'summary' => title,
+      'organizer' => {
+        'displayName' => 'Braven Portal'
+      },
+      'start' => {
+        'dateTime' => start_at.utc_datetime,
+        'timeZone' => 'Etc/GMT',
+      },
+      'end' => {
+        'dateTime' => end_at.utc_datetime,
+        'timeZone' => 'Etc/GMT',
+      }
+    }
+
+    # Need to fetch existing attendee status (if available)
+    # to the RSVP is unmodified across updates
+    event['attendees'] = get_gcal_rsvp_status
+
+    # If attendees are already there, we do not need
+    # to rebuild that list
+    unless event['attendees'].length > 0
+
+      if context_type == 'CourseSection'
+        CourseSection.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        CourseSection.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+      end
+
+      if context_type == 'Course'
+        Course.find(context_id).students.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+        Course.find(context_id).tas.active.all.each do |user|
+          next if !BeyondZConfiguration.safe_to_email? user.email
+          event['attendees'] << { email: user.email }
+        end
+      end
+
+    end
+
+    # note: we can set event.reminder_overrides[].minutes to change the time, but I'm leaving default for now
+
+  #reminders: {
+    #use_default: false,
+    #overrides: [
+      #{method' => 'email', 'minutes: 24 * 60},
+      #{method' => 'popup', 'minutes: 10},
+    #],
+  #},
+
+
+    params = {
+      :calendarId => 'primary',
+      :sendNotifications => true
+    }
+
+    if google_calendar_id && !google_calendar_id.empty?
+      params[:eventId] = google_calendar_id
+    end
+
+    results = client.execute!(
+      :api_method => (!google_calendar_id.nil? && !google_calendar_id.empty?) ? calendar_api.events.update : calendar_api.events.insert,
+      :parameters => params,
+      :body_object => event)
+
+    event = results.data
+
+    if (google_calendar_id.nil? || google_calendar_id.empty?) && location_name.empty?
+      self.location_name = event.hangout_link
+    end
+
+    if location_name == '<Google Hangout>'
+      self.location_name = event.hangout_link
+    end
+
+    # We don't want to reset the id on an edit to ensure it
+    # stays consistent
+    if google_calendar_id.nil? || google_calendar_id.empty?
+      self.google_calendar_id = event.id
+    end
+  end
+
+  def get_gcal_rsvp_status
+    return [] if !google_calendar_id || google_calendar_id.empty?
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.get,
+      :parameters => params)
+
+    event = results.data
+
+    # array of json objects with email, displayName, responseStatus
+    # (and other things we don't really care about)
+    return event.attendees
+  end
 
   # when creating/updating a calendar_event, you can give it a list of child
   # events. these will update/replace any existing child events. the format is:
@@ -311,6 +473,7 @@ class CalendarEvent < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy(update_context_or_parent=true)
     transaction do
+      kill_google_calendar
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!

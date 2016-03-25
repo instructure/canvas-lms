@@ -8,7 +8,32 @@ require 'google/api_client/auth/storages/file_store'
 class BzController < ApplicationController
 
   before_filter :require_user, :only => [:last_user_url]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url]
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
+
+  def user_retained_data
+    result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
+    data = ''
+    unless result.empty?
+      data = result.first.value
+    end
+    render :json => data
+  end
+
+  def set_user_retained_data
+    result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
+    data = nil
+    if result.empty?
+      data = RetainedData.new()
+      data.user_id = @current_user.id
+      data.name = params[:name]
+    else
+      data = result.first
+    end
+
+    data.value = params[:value]
+    data.save
+    render :nothing => true
+  end
 
   def last_user_url
     @current_user.last_url = params[:last_url]
@@ -16,6 +41,31 @@ class BzController < ApplicationController
     @current_user.save
 
     render :nothing => true
+  end
+
+  def event_rsvps
+    result = []
+    CalendarEvent.find(params[:id]).get_gcal_rsvp_status.each do |attendee|
+      obj = {}
+      # Going to look up unconfirmed emails too because the imported emails might
+      # not be formally confirmed in canvas while still being good for us (we confirmed
+      # via the join server already)
+      cc = CommunicationChannel.where(:path => attendee["email"], :path_type => 'email', :workflow_state => ['active', 'unconfirmed'])
+      next if cc.empty?
+      canvas_user = User.find(cc.first.user_id)
+      obj['user_link'] = user_path(canvas_user)
+      obj['user_name'] = canvas_user.name
+      obj['user_status'] = attendee["responseStatus"]
+      obj['user_status_text'] = case attendee["responseStatus"]
+       when 'needsAction'
+         'Not answered'
+       else
+         attendee["responseStatus"]
+       end
+      result << obj
+    end
+
+    render :json => result
   end
 
   def video_link
@@ -49,6 +99,7 @@ class BzController < ApplicationController
     event = results.data
 
     obj['link'] = event.hangout_link
+    obj['gcal_id'] = event.id
     render :json => obj
   end
 

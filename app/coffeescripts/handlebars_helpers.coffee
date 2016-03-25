@@ -29,10 +29,30 @@ define [
         options[key] = this[key] for key in this
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
+    bz_checked_if_ghang_link : (str) ->
+      if typeof str == "undefined"
+        return "checked"
+      if str == "" || str.match(/\/hangouts\//)
+        return "checked"
+      else
+        return ""
+
+    bz_checked_if_not_ghang_link : (str) ->
+      if typeof str == "undefined"
+        return ""
+      if str != "" && !str.match(/\/hangouts\//)
+        return "checked"
+      else
+        return ""
+
+
     bz_linkify_text : (str) ->
       if str.match(/^http[^ ]+$/)
         thing = htmlEscape(str)
-        return new Handlebars.SafeString '<a target="_BLANK" href="'+thing+'">' + thing + '</a>'
+        text = thing
+        if(text.match(/\/hangouts\//))
+          text = 'Join video call'
+        return new Handlebars.SafeString '<a target="_BLANK" href="'+thing+'">' + text + '</a>'
       return str
 
     __i18nliner_escape: (val) ->
@@ -133,6 +153,19 @@ define [
     tTimeToString : (date = '', i18n_format) ->
       return '' unless date
       I18n.l "time.formats.#{i18n_format}", date
+
+    # convert a date to a string, using the given i18n format in the date.formats namespace
+    # Adjusts according to the user's Canvas setting for timezone
+    tDateToStringTZAdjusted : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "date.formats.#{i18n_format}", new Date(date.getTime() + ((date.getTimezoneOffset()*60 - -ENV['TIMEZONE_OFFSET'])*1000))
+
+    # convert a date to a time string, using the given i18n format in the time.formats namespace
+    # Adjusts according to the user's Canvas setting for timezone
+    tTimeToStringTZAdjusted : (date = '', i18n_format) ->
+      return '' unless date
+      I18n.l "time.formats.#{i18n_format}", new Date(date.getTime() + ((date.getTimezoneOffset()*60 - -ENV['TIMEZONE_OFFSET'])*1000))
+
 
     tTimeHours : (date = '') ->
       if date.getMinutes() == 0 and date.getSeconds() == 0

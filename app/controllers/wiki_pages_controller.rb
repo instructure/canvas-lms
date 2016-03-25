@@ -105,7 +105,24 @@ class WikiPagesController < ApplicationController
       # This next bit is to set the module listing into the javascript
       # data so we can use it to build tables of contents without needing
       # additional ajax queries to get the available modules
-      if params[:module_item_id]
+      module_item_id = params[:module_item_id]
+
+      # If the item ID isn't already on the url, we need to look it up from the tags
+      # to avoid the TOC from breaking on some links (while working if you hit next then prev!)
+      if !module_item_id
+        module_item_id = ContentTag.where(
+          :content_type => 'WikiPage',
+          :content_id => @page.id,
+          :context_type => 'Course',
+          :context_id => @context.id)
+        if !module_item_id.empty?
+          module_item_id = module_item_id.first.id
+        else
+          module_item_id = nil
+        end
+      end
+
+      if module_item_id
         done = false # Ruby doesn't have `break outer_loop;` so i'll use a flag
         # Gotta loop through them all and find the module that we are actually
         # currently in, so the javascript will have the right context for its
@@ -116,7 +133,7 @@ class WikiPagesController < ApplicationController
             # if the searched module includes the current item, it is usable to us!
             # now, the script will use this data to generate a table of contents of
             # the surrounding items.
-            if item.id.to_i == params[:module_item_id].to_i
+            if item.id.to_i == module_item_id.to_i
               js_data[:module_listing_data] = possible_items
               done = true
               break

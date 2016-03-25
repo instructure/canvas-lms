@@ -19,6 +19,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
+require 'bz_debug'
+
 class ApplicationController < ActionController::Base
   def self.promote_view_path(path)
     self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
@@ -133,7 +135,7 @@ class ApplicationController < ActionController::Base
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
-    @js_env[:TIMEZONE_OFFSET] = Time.zone.utc_offset if !@js_env[:TIMEZONE_OFFSET]
+    @js_env[:TIMEZONE_OFFSET] = Time.zone.now.utc_offset if !@js_env[:TIMEZONE_OFFSET]
     @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
     @js_env[:TOURS] = tours_to_run
@@ -1027,6 +1029,13 @@ class ApplicationController < ActionController::Base
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
       message << "  " << exception.backtrace.join("\n  ")
       logger.fatal("#{message}\n\n")
+
+      # I want just a fraction of the info printed to my custom debug
+      # because I typically only care about our own modifications
+      BZDebug.log("#{exception.class} (#{exception.message}):")
+      BZDebug.log("  " + exception.backtrace[0])
+      BZDebug.log("  " + exception.backtrace[1])
+      BZDebug.log("  " + exception.backtrace[2])
     end
 
     if config.consider_all_requests_local

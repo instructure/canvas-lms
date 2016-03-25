@@ -23,5 +23,27 @@
 
     <div class="description user_content"><%= calendar_event && calendar_event.description && !calendar_event.description.empty? ? user_content(calendar_event.description) : t(:no_content, "No Content") %></div>
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
+
+    <% rsvps = calendar_event.get_gcal_rsvp_status %>
+    <% unless rsvps.empty? %>
+    <dl class="bz-rsvps">
+    <% rsvps.each do |attendee| %>
+      <%
+        cc = CommunicationChannel.where(:path => attendee["email"])
+        next if cc.empty?
+        canvas_user = User.find(cc.first.user_id)
+      %>
+        <dt data-response-status="<%= attendee["responseStatus"] %>" ><%= link_to canvas_user.name, user_path(canvas_user) %></dt>
+        <dd>
+          <% case attendee["responseStatus"] %>
+          <% when 'needsAction' %>
+            Not answered
+          <% else %>
+            <%= attendee["responseStatus"] %>
+          <% end %>
+        </dd>
+    <% end %>
+    </dl>
+    <% end %>
   </div>
 </div>
