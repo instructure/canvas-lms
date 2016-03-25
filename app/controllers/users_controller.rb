@@ -1803,7 +1803,9 @@ class UsersController < ApplicationController
   # @API Merge user into another user
   #
   # Merge a user into another user.
-  # To merge users, the caller must have permissions to manage both users.
+  # To merge users, the caller must have permissions to manage both users. This
+  # should be considered irreversible. This will delete the user and move all
+  # the data into the destination user.
   #
   # When finding users by SIS ids in different accounts the
   # destination_account_id is required.
@@ -1842,6 +1844,39 @@ class UsersController < ApplicationController
                                   %w{locale},
                                   destination_account))
       end
+    end
+  end
+
+  # @API Split merged users into separate users
+  #
+  # Merged users cannot be fully restored to their previous state, but this will
+  # attempt to split as much as possible to the previous state.
+  # To split a merged user, the caller must have permissions to manage all of
+  # the users logins. If there are multiple users that have been merged into one
+  # user it will split each merge into a separate user.
+  # A split can only happen within 90 days of a user merge. A user merge deletes
+  # the previous user and may be permanently deleted. In this scenario we create
+  # a new user object and proceed to move as much as possible to the new user.
+  # The user object will not have preserved the name or settings from the
+  # previous user. Some items may have been deleted during a user_merge that
+  # cannot be restored, and/or the data has become stale because of other
+  # changes to the objects since the time of the user_merge.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/split \
+  #          -X POST \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [User]
+  def split
+    user = api_find(User, params[:id])
+    unless UserMergeData.active.where(user_id: user).where('created_at > ?', 90.days.ago).exists?
+      return render json: {message: t('Nothing to split off of this user')}, status: :bad_request
+    end
+
+    if authorized_action(user, @current_user, :merge)
+      users = SplitUsers.split_db_users(user)
+      render :json => users.map { |u| user_json(u, @current_user, session) }
     end
   end
 

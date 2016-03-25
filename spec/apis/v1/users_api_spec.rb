@@ -1352,7 +1352,7 @@ describe "Users API", type: :request do
     end
   end
 
-  describe "user merge" do
+  describe "user merge and split" do
     before :once do
       @account = Account.default
       @user1 = user_with_managed_pseudonym(
@@ -1366,17 +1366,23 @@ describe "Users API", type: :request do
       @user = account_admin_user(account: @account)
     end
 
-    it "should merge users" do
-      json = api_call(
+    it "should merge and split users" do
+      api_call(
         :put, "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: @user2.to_param, destination_user_id: @user1.to_param }
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: @user2.to_param, destination_user_id: @user1.to_param}
       )
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user1.id
       expect(@user2.pseudonyms).to be_empty
+      api_call(
+        :post, "/api/v1/users/#{@user1.id}/split/",
+        {controller: 'users', action: 'split', format: 'json', id: @user1.to_param}
+      )
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_01').first.user_id).to eq @user1.id
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
-    it "should merge users cross accounts" do
+    it "should merge and split users cross accounts" do
       account = Account.create(name: 'new account')
       @user1.pseudonym.account_id = account.id
       @user1.pseudonym.save!
@@ -1385,14 +1391,20 @@ describe "Users API", type: :request do
       api_call(
         :put,
         "/api/v1/users/sis_user_id:user_sis_id_02/merge_into/accounts/#{account.id}/users/sis_user_id:user_sis_id_01",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: 'sis_user_id:user_sis_id_02',
-          destination_user_id: 'sis_user_id:user_sis_id_01',
-          destination_account_id: account.to_param
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: 'sis_user_id:user_sis_id_02',
+         destination_user_id: 'sis_user_id:user_sis_id_01',
+         destination_account_id: account.to_param
         }
       )
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user1.id
       expect(@user2.pseudonyms).to be_empty
+      api_call(
+        :post, "/api/v1/users/#{@user1.id}/split/",
+        {controller: 'users', action: 'split', format: 'json', id: @user1.to_param}
+      )
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_01').first.user_id).to eq @user1.id
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
     it "should fail to merge users cross accounts without permissions" do
@@ -1403,10 +1415,16 @@ describe "Users API", type: :request do
       raw_api_call(
         :put,
         "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: @user2.to_param, destination_user_id: @user1.to_param}
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: @user2.to_param, destination_user_id: @user1.to_param}
       )
       assert_status(401)
+    end
+
+    it "should fail to split users that have not been merged" do
+      raw_api_call(:post, "/api/v1/users/#{@user2.id}/split/",
+                   {controller: 'users', action: 'split', format: 'json', id: @user2.to_param})
+      assert_status(400)
     end
   end
 
