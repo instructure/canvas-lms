@@ -30,7 +30,28 @@ describe ContentMigration do
       expect(topic.attributes.slice(*attrs)).to eq new_topic.attributes.slice(*attrs)
 
       expect(new_topic.last_reply_at).to be_nil
+      expect(new_topic.allow_rating).to eq false
       expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
+    end
+
+    it "copies rating settings" do
+      topic1 = @copy_from.discussion_topics.create!(:title => "blah", :message => "srsly",
+                                                    :allow_rating => true, :only_graders_can_rate => true,
+                                                    :sort_by_rating => false)
+      topic2 = @copy_from.discussion_topics.create!(:title => "bleh", :message => "srsly",
+                                                    :allow_rating => true, :only_graders_can_rate => false,
+                                                    :sort_by_rating => true)
+      run_course_copy
+
+      new_topic1 = @copy_to.discussion_topics.where(migration_id: mig_id(topic1)).first
+      expect(new_topic1.allow_rating).to eq true
+      expect(new_topic1.only_graders_can_rate).to eq true
+      expect(new_topic1.sort_by_rating).to eq false
+
+      new_topic2 = @copy_to.discussion_topics.where(migration_id: mig_id(topic2)).first
+      expect(new_topic2.allow_rating).to eq true
+      expect(new_topic2.only_graders_can_rate).to eq false
+      expect(new_topic2.sort_by_rating).to eq true
     end
 
     it "should copy group setting" do
