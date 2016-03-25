@@ -78,7 +78,7 @@ class SplitUsers
       users = split_users(user, merge_data)
     else
       users = []
-      UserMergeData.active.where(user_id: user).find_each do |data|
+      UserMergeData.active.splitable.where(user_id: user).find_each do |data|
         splitters = split_users(user, data)
         users = splitters | users
       end
