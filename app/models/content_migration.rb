@@ -677,6 +677,8 @@ class ContentMigration < ActiveRecord::Base
     case key
     when 'quizzes'
       'quizzes:quiz'
+    when 'announcements'
+      'discussion_topic'
     else
       key.singularize
     end
