@@ -2,7 +2,12 @@
   css_bundle :otp_login
   js_bundle :otp_login
   @headers = false
-  @body_classes << "modal body--login-confirmation"
+  if use_new_styles?
+    @body_classes << "full-width modal body--login-confirmation"
+  else
+    @body_classes << "modal body--login-confirmation"
+  end
+
   content_for :page_title, t(:page_title, "Multi-factor Authentication")
 %>
 

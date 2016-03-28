@@ -2,7 +2,11 @@
   css_bundle :login_confirm
   js_bundle :registration_confirmation
   @headers = false
-  @body_classes << "modal body--login-confirmation"
+  if use_new_styles?
+    @body_classes << "full-width modal body--login-confirmation"
+  else
+    @body_classes << "modal body--login-confirmation"
+  end
   content_for :page_title, t(:page_title, "Register %{email}", :email => @communication_channel.path)
 %>
 
