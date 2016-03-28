@@ -124,7 +124,8 @@ describe "gradebook2 - post grades to SIS" do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       expect(ff('li.external-tools-dialog').count).to eq(10)
-      f('button#post_grades').click
+      keep_trying_until { f('#post_grades .icon-mini-arrow-down').displayed? }
+      move_to_click('button#post_grades')
       wait_for_ajaximations
       ff('li.external-tools-dialog > a').first.click
       wait_for_ajaximations
@@ -175,13 +176,17 @@ describe "gradebook2 - post grades to SIS" do
       expect(f('li.post-grades-placeholder > a')).to be_present
       expect(f('li.external-tools-dialog')).to be_present
 
-      f('button#post_grades').click
+      keep_trying_until { f('#post_grades .icon-mini-arrow-down').displayed? }
+      move_to_click('button#post_grades')
       wait_for_ajaximations
       f('li.post-grades-placeholder > a').click
       wait_for_ajaximations
       expect(f('.post-grades-dialog')).to be_displayed
+      # close post grade dialog
+      fj('.ui-icon-closethick:visible').click
 
-      f('button#post_grades').click
+      keep_trying_until { f('#post_grades .icon-mini-arrow-down').displayed? }
+      move_to_click('button#post_grades')
       wait_for_ajaximations
       ff('li.external-tools-dialog > a').first.click
       wait_for_ajaximations
