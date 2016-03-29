@@ -358,10 +358,8 @@ describe 'Speedgrader' do
   end
 
   it 'updates scores', priority: "1", test_id: 164021 do
-    skip "Skipped because this spec fails if not run in foreground\nThis is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-
     init_course_with_students
-    quiz = seed_quiz 10
+    quiz = seed_quiz_with_submission(10)
 
     @teacher.preferences[:enable_speedgrader_grade_by_question] = true
     @teacher.save!
@@ -369,20 +367,17 @@ describe 'Speedgrader' do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
 
     driver.switch_to.frame f('#speedgrader_iframe')
-      list = ff('#questions .user_points input')
-      [9, 17, 25].each do |index|
-        driver.execute_script("$('#questions .user_points input').focus()")
-        replace_content list[index], "1\t"
-      end
-      expect(f('#after_fudge_points_total').text).to eq '3'
-
-    # For whatever reason, this spec fails occasionally.
-    # Expected "3"
-    # Got "2"
-
-    replace_content f('#fudge_points_entry'), "7\t"
+    list = ff('#questions .user_points input')
+    [9, 17, 25].each do |index|
+      driver.execute_script("$('#questions .user_points input').focus()")
+      replace_content list[index], "1", :tab_out => true
+    end
     expect_new_page_load {f('button.update-scores').click}
-    expect(f('#after_fudge_points_total').text). to eq '10'
+    expect(f('#after_fudge_points_total').text).to eq '3'
+
+    replace_content f('#fudge_points_entry'), "7", :tab_out => true
+    expect_new_page_load {f('button.update-scores').click}
+    expect(f('#after_fudge_points_total').text).to eq '10'
   end
 
   context 'Student drop-down' do
@@ -500,7 +495,7 @@ describe 'Speedgrader' do
 
       shortcut_modal = f('#keyboard_navigation')
       f('#keyboard-shortcut-info-icon').click
-      
+
       expect(shortcut_modal).to be_displayed
     end
   end

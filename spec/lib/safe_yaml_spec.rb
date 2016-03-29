@@ -168,4 +168,8 @@ YAML
     yaml = Psych.dump(obj)
     expect(YAML.load(yaml)).to eq obj
   end
+
+  it "should dump whole floats correctly" do
+    expect(YAML.dump(1.0)).to include("1.0")
+  end
 end
