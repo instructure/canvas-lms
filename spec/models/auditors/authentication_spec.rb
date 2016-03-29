@@ -58,6 +58,13 @@ describe Auditors::Authentication do
     it "should set request_id" do
       expect(@event.request_id).to eq request_id.to_s
     end
+
+    it "doesn't record an error when not configured" do
+      Auditors::Authentication::Stream.stubs(:database).returns(nil)
+      Canvas::Cassandra::DatabaseBuilder.expects(:configured?).with(:auditors).once.returns(false)
+      Canvas::EventStreamLogger.expects(:error).never
+      Auditors::Authentication.record(@pseudonym, 'login')
+    end
   end
 
   context "with a second account (same user)" do
