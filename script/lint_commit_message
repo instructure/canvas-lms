@@ -101,8 +101,10 @@ if File.exists?(user_config_file)
   exit if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
 end
 
+gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
+
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
-if issue_ids.empty?
+if issue_ids.empty? && !gh_issue
   parts = commit_message.split(/([A-Z]+-[0-9]+)/)
   if parts.size > 1
     jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
