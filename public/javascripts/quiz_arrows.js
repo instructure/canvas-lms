@@ -16,9 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// xsslint jqueryObject.identifier /Tpl$/
+// xsslint jqueryObject.property /Tpl$/
 
-define(['i18n!quizzes.show', 'jquery', 'str/htmlEscape'], function(I18n, $, htmlEscape) {
+define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
+  var idGenerator = 0;
+
   // Create and append right/wrong arrows to all appropriate
   // answers on a quiz results page.
   function QuizArrowApplicator() {
@@ -43,7 +45,6 @@ define(['i18n!quizzes.show', 'jquery', 'str/htmlEscape'], function(I18n, $, html
     this.creditPartialTpl = $('<span />', { 'class': 'answer_arrow incorrect' });
     this.creditNoneTpl    = $('<span />', { 'class': 'answer_arrow incorrect' });
     this.surveyAnswerTpl  = $('<span />', { 'class': 'answer_arrow info' });
-    this.idGenerator      = 0;
   }
 
   QuizArrowApplicator.prototype.applyCSS = function() {
@@ -64,22 +65,22 @@ define(['i18n!quizzes.show', 'jquery', 'str/htmlEscape'], function(I18n, $, html
     this.creditPartialTpl.text(I18n.t('answers.partial', 'Partial'));
     this.creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'));
 
-    this.rightAnswers.prepend(htmlEscape(this.rightTpl));
-    this.wrongAnswers.prepend(htmlEscape(this.wrongTpl));
-    this.correctAnswers.prepend(htmlEscape(this.correctTpl));
-    this.editableMatches.parent().before(htmlEscape(this.correctTpl));
-    this.readOnlyMatches.prepend(htmlEscape(this.correctTpl));
-    this.shortAnswers.prepend(htmlEscape(this.shortTpl));
-    this.creditPartial.prepend(htmlEscape(this.creditPartialTpl));
-    this.creditFull.prepend(htmlEscape(this.creditFullTpl));
-    this.creditNone.prepend(htmlEscape(this.creditNoneTpl));
+    this.rightAnswers.prepend(this.rightTpl);
+    this.wrongAnswers.prepend(this.wrongTpl);
+    this.correctAnswers.prepend(this.correctTpl);
+    this.editableMatches.parent().before(this.correctTpl);
+    this.readOnlyMatches.prepend(this.correctTpl);
+    this.shortAnswers.prepend(this.shortTpl);
+    this.creditPartial.prepend(this.creditPartialTpl);
+    this.creditFull.prepend(this.creditFullTpl);
+    this.creditNone.prepend(this.creditNoneTpl);
   }
 
   QuizArrowApplicator.prototype.applyAnsweredAndUnansweredArrows = function() {
     this.unansweredTpl.text(I18n.t('answers.unanswered', 'Unanswered'));
     this.surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'));
-    this.unansweredQ.prepend(htmlEscape(this.unansweredTpl));
-    this.surveyAnswers.prepend(htmlEscape(this.surveyAnswerTpl));
+    this.unansweredQ.prepend(this.unansweredTpl);
+    this.surveyAnswers.prepend(this.surveyAnswerTpl);
   }
 
   QuizArrowApplicator.prototype.makeArrowsAccessible = function() {
