@@ -33,6 +33,7 @@ describe "context modules" do
       modules[0].add_item({id: @assignment2.id, type: 'assignment'})
       get "/courses/#{@course.id}/modules"
       ff(".icon-mini-arrow-down")[1].click
+      wait_for_ajaximations
     end
 
     it "should show all module items", priority: "1", test_id: 126743 do

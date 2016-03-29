@@ -130,7 +130,7 @@ describe 'quizzes question creation' do
       submit_form(question)
       wait_for_ajax_requests
 
-      f('#show_question_details').click
+      move_to_click('#show_question_details')
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")
       expect(finished_question).to be_displayed
       expect(finished_question.find_elements(:css, '.answer.correct_answer').length).to eq 2
