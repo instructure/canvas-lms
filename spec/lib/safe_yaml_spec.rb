@@ -172,4 +172,9 @@ YAML
   it "should dump whole floats correctly" do
     expect(YAML.dump(1.0)).to include("1.0")
   end
+
+  it "should dump freaky floaty-looking strings" do
+    str = "1.E+01"
+    expect(YAML.load(YAML.dump(str))).to eq str
+  end
 end
