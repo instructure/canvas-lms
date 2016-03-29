@@ -73,7 +73,7 @@ describe Api do
     it 'should find record from other root account explicitly' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything).
+      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
           returns(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
@@ -333,7 +333,8 @@ describe Api do
       pluck_result = ["thing2", "thing3"]
       relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
@@ -343,7 +344,8 @@ describe Api do
       pluck_result = ["thing2", "thing3"]
       relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"other-lookup" => ["thing2", "thing3"]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
@@ -351,7 +353,8 @@ describe Api do
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"]})
       Api.expects(:relation_for_sis_mapping_and_columns).never
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
@@ -361,7 +364,8 @@ describe Api do
       object1 = mock()
       object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq []
     end
