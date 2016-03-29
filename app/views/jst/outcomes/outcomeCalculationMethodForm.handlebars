@@ -1,0 +1,26 @@
+<div class="content-box border border-trbl border-round">
+  <div class="grid-row">
+    <div id="calculation_int_left_side" style="{{ hiddenUnlessExists calculation_int }}"
+      class="col-xs-4 border border-r">
+      <div>
+        <label for="calculation_int" id="calculation_int_label">
+          {{ calculationIntLabel }}
+        </label>
+        {{#ifIncludes writeStates state }}
+          <input type="text" name="calculation_int" class="outcomes_narrow_text_input" id="calculation_int" value="{{calculation_int}}" />
+        {{ else }}
+          <span id="calculation_int">{{calculation_int}}</span>
+        {{/ifIncludes}}
+      </div>
+      <div>
+        <span class="outcomes-calculation-int-italics">
+          {{ calculationIntDescription }}
+        </span>
+      </div>
+    </div>
+    <div class="col-xs-{{#ifExists calculation_int}}8{{ else }}12{{/ifExists}}">
+      {{> outcomes/calculationMethodExample }}
+    </div>
+  </div>
+</div>
+

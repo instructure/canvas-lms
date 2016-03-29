@@ -12,7 +12,7 @@ define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (U
     ]
 
     html_url: ->
-      @get('enrollments')[0].html_url
+      @get('enrollments')[0]?.html_url
 
     sections: ->
       return [] unless @collection?.sections?

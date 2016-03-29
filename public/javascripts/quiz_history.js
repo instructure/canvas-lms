@@ -168,7 +168,7 @@ define([
       var $total = $("#after_fudge_points_total");
       var total = 0;
       $(".display_question .user_points:visible").each(function() {
-        var points = parseFloat($(this).find(":text:first").val(), 10) || 0;
+        var points = parseFloat($(this).find("input[type=number]").val(), 10) || 0;
         points = Math.round(points * 100.0) / 100.0;
         total = total + points;
       });
@@ -397,7 +397,7 @@ define([
       gradingForm.setInitialSnapshot(data);
     }
 
-    $(".question_holder .user_points :text,.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
+    $(".question_holder .user_points input[type=number],.question_holder .question_neutral_comment .question_comment_text textarea").change(function() {
       var $question = $(this).parents(".display_question");
       var questionId = $question.attr('id');
       gradingForm.updateSnapshotFor($question);

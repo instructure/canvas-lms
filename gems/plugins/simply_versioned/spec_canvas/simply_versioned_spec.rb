@@ -1,19 +1,23 @@
 require File.expand_path(File.dirname(__FILE__)+'/../../../../spec/apis/api_spec_helper')
 
-class Woozel < ActiveRecord::Base
-  simply_versioned :explicit => true
-end
-
-Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-
 describe 'simply_versioned' do
-  before do
+  before :all do
+    class Woozel < ActiveRecord::Base
+      simply_versioned :explicit => true
+    end
+    Woozel.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+
     Woozel.connection.create_table :woozels, :force => true do |t|
       t.string :name
     end
   end
-  after do
+
+  after :all do
     Woozel.connection.drop_table :woozels
+    Woozel.remove_connection
+    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(Woozel)
+    Object.send(:remove_const, :Woozel)
+    GC.start
   end
 
   describe "explicit versions" do
@@ -72,7 +76,7 @@ describe 'simply_versioned' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
-      all = woozel.versions.all
+      all = woozel.versions.to_a
       Woozel.connection.expects(:select_all).never
       all.each do |version|
         expect(version.versionable).to eq woozel
@@ -136,42 +140,15 @@ describe 'simply_versioned' do
         woozel.simply_versioned_options[:on_load] = on_load
         woozel.reload
       end
+
+      after do
+        woozel.simply_versioned_options[:on_load] = nil
+      end
+
       it "can modify a version after loading" do
         expect(YAML::load(woozel.current_version.yaml)['name']).to eq 'test'
         expect(woozel.current_version.model.name).to eq 'test override'
       end
     end
   end
-  
-  # INSTRUCTURE: shim for quizzes namespacing
-  describe '.versionable_type' do
-    it 'returns the correct representation of a quiz submission' do
-      submission = quiz_model.quiz_submissions.create
-      submission.with_versioning(explicit: true, &:save!)
-      version = Version.where(:versionable_id => submission.id, :versionable_type => 'Quizzes::QuizSubmission').first
-      expect(version).not_to be_nil
-
-      Version.where(id: version).update_all(versionable_type: 'QuizSubmission')
-      expect(Version.find(version.id).versionable_type).to eq 'Quizzes::QuizSubmission'
-    end
-
-    it 'returns the correct representation of a quiz' do
-      quiz = quiz_model
-      quiz.with_versioning(explicit: true, &:save!)
-      version = Version.where(:versionable_id => quiz.id, :versionable_type => 'Quizzes::Quiz').first
-
-      version.versionable_type = 'Quiz'
-      version.send(:save_without_callbacks)
-      expect(Version.find(version.id).versionable_type).to eq 'Quizzes::Quiz'
-    end
-
-    it 'returns the versionable type attribute if not a quiz' do
-      assignment = assignment_model
-      assignment.with_versioning(explicit: true, &:save!)
-      assignment.versions.each do |version|
-        expect(version.versionable_type).to eq 'Assignment'
-      end
-    end
-  end
-
 end

@@ -54,6 +54,7 @@ describe "differentiated_assignments" do
     override_student = ao.assignment_override_students.build
     override_student.user = @user
     override_student.save!
+    quiz.reload
     @user
   end
 
@@ -81,6 +82,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     block.call(ao)
     ao.save!
+    quiz.reload
   end
 
   def give_section_foo_due_date(quiz)
@@ -91,14 +93,14 @@ describe "differentiated_assignments" do
   end
 
   def ensure_user_does_not_see_quiz
-    visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
+    visible_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
+    expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
     expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).not_to include(@quiz.id)
   end
 
   def ensure_user_sees_quiz
-    visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
+    visible_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
+    expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
     expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@quiz.id)
   end
 
@@ -141,7 +143,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
-    context "quiz only visibile to overrides" do
+    context "quiz only visible to overrides" do
       before do
         quiz_with_true_only_visible_to_overrides
         give_section_foo_due_date(@quiz)
@@ -170,7 +172,7 @@ describe "differentiated_assignments" do
 
         it "should not return a visibility if ADHOC override is deleted" do
           student_in_course_with_adhoc_override(@quiz)
-          @quiz.assignment_overrides.all.each(&:destroy)
+          @quiz.assignment_overrides.to_a.each(&:destroy)
           ensure_user_does_not_see_quiz
         end
       end
@@ -179,7 +181,7 @@ describe "differentiated_assignments" do
         before{enroller_user_in_section(@section_foo)}
         it "should keep the quiz visible if there is a grade" do
           @quiz.assignment.grade_student(@user, {grade: 10})
-          @user.enrollments.each(&:destroy!)
+          @user.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @user})
           ensure_user_sees_quiz
         end
@@ -188,14 +190,14 @@ describe "differentiated_assignments" do
           @quiz.assignment.grade_student(@user, {grade: 10})
           @quiz.assignment.submissions.last.update_attribute("score", nil)
           @quiz.assignment.submissions.last.update_attribute("grade", 10)
-          @user.enrollments.each(&:destroy!)
+          @user.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @user})
           ensure_user_does_not_see_quiz
         end
 
         it "should keep the quiz visible if the grade is zero" do
           @quiz.assignment.grade_student(@user, {grade: 0})
-          @user.enrollments.each(&:destroy!)
+          @user.enrollments.each(&:destroy_permanently!)
           enroller_user_in_section(@section_bar, {user: @user})
           ensure_user_sees_quiz
         end
@@ -214,12 +216,12 @@ describe "differentiated_assignments" do
         it "should update when enrollments change" do
           ensure_user_sees_quiz
           enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
-          enrollments.each(&:destroy!)
+          enrollments.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz
         end
         it "should update when the override is deleted" do
           ensure_user_sees_quiz
-          @quiz.assignment_overrides.all.each(&:destroy!)
+          @quiz.assignment_overrides.to_a.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz
         end
       end

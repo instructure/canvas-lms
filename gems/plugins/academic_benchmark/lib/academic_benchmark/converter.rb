@@ -22,14 +22,10 @@ module AcademicBenchmark
 
       if @archive_file
         convert_file
-      elsif @settings[:authorities] || @settings[:guids] || @settings[:refresh_all_standards]
-        if @api_key
-          if @settings[:refresh_all_standards]
-            refresh_all_outcomes
-          else
-            convert_authorities(@settings[:authorities]) if @settings[:authorities]
-            convert_guids(@settings[:guids]) if @settings[:guids]
-          end
+      elsif @settings[:authorities] || @settings[:guids]
+        if @api_key && !@api_key.empty?
+          convert_authorities(@settings[:authorities]) if @settings[:authorities]
+          convert_guids(@settings[:guids]) if @settings[:guids]
         else
           raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_api_key', "An API key is required to use Academic Benchmarks"))
         end
@@ -55,8 +51,14 @@ module AcademicBenchmark
     def convert_file
       data = @api.parse_ab_data(@archive_file.read)
       process_json_data(data)
-    rescue APIError
-      add_warning(I18n.t("academic_benchmark.bad_ab_file", "The provided Academic Benchmark file has an error."), $!)
+    rescue APIError => e
+      add_error(
+        I18n.t("The provided Academic Benchmark file has an error"),
+        {
+          exception: e,
+          error_message: e.message
+        }
+      )
     end
 
     def convert_authorities(authorities=[])
@@ -74,8 +76,17 @@ module AcademicBenchmark
     def refresh_outcomes(opts)
       res = build_full_auth_hash(opts)
       process_json_data(res)
-    rescue EOFError, APIError
-      add_warning(I18n.t("academic_benchmark.api_error", "Couldn't update standards for authority %{auth}.", :auth => opts[:authority] || opts[:guid]), $!)
+    rescue EOFError, APIError => e
+      add_error(
+        I18n.t(
+          "Couldn't update standards for authority %{auth}",
+          :auth => opts[:authority] || opts[:guid]
+        ),
+        {
+          exception: e,
+          error_message: e.message
+        }
+      )
     end
 
     # get a shallow tree for the authority then process the leaves
@@ -113,29 +124,15 @@ module AcademicBenchmark
       data
     end
 
-    # Get list of all authorities available for this api key and refresh them
-    def refresh_all_outcomes
-      auths = @api.list_available_authorities
-      auth_count = auths.length
-      set_progress(2)
-      auths.each_with_index do |auth, i|
-        next unless auth["type"] == "authority"
-
-        refresh_outcomes(:guid => auth["guid"])
-        set_progress((i/auth_count.to_f) * 90)
-      end
-
-      set_progress(95)
-    rescue APIError
-      add_warning(I18n.t("academic_benchmark.bad_response_all", "Couldn't update the standards."), $!)
-    end
-
     def process_json_data(data)
       if data = find_by_prop(data, "type", "authority")
         outcomes = Standard.new(data).build_outcomes
         @course[:learning_outcomes] << outcomes
       else
-        add_warning(I18n.t("academic_benchmark.no_authority", "Couldn't find an authority to update"))
+        err_msg = I18n.t("Couldn't find an authority to update")
+        add_error(
+          err_msg, { exception: nil, error_message: err_msg }
+        )
       end
     end
 

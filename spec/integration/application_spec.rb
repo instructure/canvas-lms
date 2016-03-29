@@ -27,6 +27,11 @@ describe "site-wide" do
     consider_all_requests_local(true)
   end
 
+  let(:x_frame_options) { 'X-Frame-Options' }
+  let(:x_canvas_meta) { 'X-Canvas-Meta' }
+  let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
+  let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
+
   it "should render 404 when user isn't logged in" do
     Setting.set 'show_feedback_link', 'true'
     get "/dashbo"
@@ -35,7 +40,8 @@ describe "site-wide" do
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    expect(response['x-ua-compatible']).to eq "IE=Edge,chrome=1"
+    key = 'X-UA-Compatible'
+    expect(response[key]).to eq "IE=Edge,chrome=1"
   end
 
   it "should set no-cache headers for html requests" do
@@ -53,7 +59,7 @@ describe "site-wide" do
   it "should set the x-frame-options http header" do
     get "/login"
     expect(assigns[:files_domain]).to be_falsey
-    expect(response['x-frame-options']).to eq "SAMEORIGIN"
+    expect(response[x_frame_options]).to eq "SAMEORIGIN"
   end
 
   it "should not set x-frame-options when on a files domain" do
@@ -61,7 +67,24 @@ describe "site-wide" do
     attachment_model(:context => @user)
     FilesController.any_instance.expects(:files_domain?).returns(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
-    expect(response['x-frame-options']).to be_nil
+    expect(response[x_frame_options]).to be_nil
+  end
+
+  context "x-canvas-meta header" do
+    it "should set action information in API requests" do
+      course_with_teacher_logged_in
+      get "/api/v1/courses/#{@course.id}"
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+    end
+
+    it "should set page view information in user requests" do
+      course_with_teacher_logged_in
+      Setting.set('enable_page_views', 'db')
+      get "/courses/#{@course.id}"
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+      expect(response[x_canvas_meta]).to match(%r{t=Course;})
+      expect(response[x_canvas_meta]).to match(%r{x=5;})
+    end
   end
 
   context "user headers" do
@@ -81,23 +104,23 @@ describe "site-wide" do
 
     it "should not set the logged in user headers when no one is logged in" do
       get "/"
-      expect(response['x-canvas-user-id']).to be_nil
-      expect(response['x-canvas-real-user-id']).to be_nil
+      expect(response[x_canvas_user_id]).to be_nil
+      expect(response[x_canvas_real_user_id]).to be_nil
     end
 
     it "should set them when a user is logged in" do
       user_session(@student, @student_pseudonym)
       get "/"
-      expect(response['x-canvas-user-id']).to eq @student.global_id.to_s
-      expect(response['x-canvas-real-user-id']).to be_nil
+      expect(response[x_canvas_user_id]).to eq @student.global_id.to_s
+      expect(response[x_canvas_real_user_id]).to be_nil
     end
 
     it "should set them when masquerading" do
       user_session(@admin, @admin.pseudonyms.first)
       post "/users/#{@student.id}/masquerade"
       get "/"
-      expect(response['x-canvas-user-id']).to eq @student.global_id.to_s
-      expect(response['x-canvas-real-user-id']).to eq @admin.global_id.to_s
+      expect(response[x_canvas_user_id]).to eq @student.global_id.to_s
+      expect(response[x_canvas_real_user_id]).to eq @admin.global_id.to_s
     end
   end
 
@@ -121,8 +144,8 @@ describe "site-wide" do
     end
   end
 
-  it "should use the real user's timezone and locale setting when masquerading" do
-    @fake_user = user_with_pseudonym(:active_all => true)
+  it "should use the real user's timezone and locale setting when masquerading as a fake student" do
+    @fake_user = course(:active_all => true).student_view_student
 
     user_with_pseudonym(:active_all => true)
     account_admin_user(:user => @user)
@@ -133,6 +156,24 @@ describe "site-wide" do
     user_session(@user)
 
     post "/users/#{@fake_user.id}/masquerade"
+    get "/"
+
+    expect(assigns[:real_current_user]).to eq @user
+    expect(Time.zone.name).to eq "Hawaii"
+    expect(I18n.locale).to eq :es
+  end
+
+  it "should use the masqueree's timezone and locale setting when masquerading" do
+    @other_user = user_with_pseudonym(:active_all => true)
+    @other_user.time_zone = "Hawaii"
+    @other_user.locale = "es"
+    @other_user.save!
+
+    user_with_pseudonym(:active_all => true)
+    account_admin_user(:user => @user)
+    user_session(@user)
+
+    post "/users/#{@other_user.id}/masquerade"
     get "/"
 
     expect(assigns[:real_current_user]).to eq @user

@@ -24,7 +24,7 @@ module Canvas::Migration::Helpers
     end
 
     def valid_type?(type=nil)
-      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type}
+      type.nil? || SELECTIVE_CONTENT_TYPES.any?{|t|t[0] == type} || type.start_with?("submodules_")
     end
 
     def get_content_list(type=nil, source=nil)
@@ -71,16 +71,20 @@ module Canvas::Migration::Helpers
 
       content_list = []
       if type
-        if course_data[type]
+        if match_data = type.match(/submodules_(.*)/)
+          (submodule_data(course_data['context_modules'], match_data[1]) || []).each do |item|
+            content_list << item_hash('context_modules', item)
+          end
+        elsif course_data[type]
           case type
-            when 'assignments'
-              assignment_data(content_list, course_data)
-            when 'attachments'
-              attachment_data(content_list, course_data)
-            else
-              course_data[type].each do |item|
-                content_list << item_hash(type, item)
-              end
+          when 'assignments'
+            assignment_data(content_list, course_data)
+          when 'attachments'
+            attachment_data(content_list, course_data)
+          else
+            course_data[type].each do |item|
+              content_list << item_hash(type, item)
+            end
           end
         end
       else
@@ -150,10 +154,11 @@ module Canvas::Migration::Helpers
               title: item['title'],
               migration_id: item['migration_id']
       }
-      if type == 'attachments'
+      case type
+      when 'attachments'
         hash[:path] = item['path_name']
         hash[:title] = item['file_name']
-      elsif type == 'assessment_question_banks'
+      when 'assessment_question_banks'
         if hash[:title].blank? && @migration && @migration.context.respond_to?(:assessment_question_banks)
           if hash[:migration_id] && bank = @migration.context.assessment_question_banks.where(migration_id: hash[:migration_id]).first
             hash[:title] = bank.title
@@ -163,8 +168,13 @@ module Canvas::Migration::Helpers
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
           hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank')
         end
+      when 'context_modules'
+        hash[:item_count] = item['item_count']
+        if item['submodules']
+          hash[:submodule_count] = item['submodules'].count
+          add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
+        end
       end
-
       hash = add_linked_resource(type, item, hash)
       hash
     end
@@ -200,12 +210,12 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:includes).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:preload).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
               if source.respond_to?(type)
-                scope = source.send(type).select(:id).except(:includes)
+                scope = source.send(type).select(:id).except(:preload)
                 # We only need the id and name, so don't fetch everything from DB
 
                 scope = scope.select(:assignment_id) if type == 'quizzes'
@@ -242,7 +252,7 @@ module Canvas::Migration::Helpers
             elsif type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              scope = source.send(type).except(:includes)
+              scope = source.send(type).except(:preload)
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
               elsif scope.klass.respond_to?(:active)
@@ -316,7 +326,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_assignment_data(content_list, source_course)
-      source_course.assignment_groups.active.includes(:assignments).select("id, name").each do |group|
+      source_course.assignment_groups.active.preload(:assignments).select("id, name").each do |group|
         item = course_item_hash('assignment_groups', group)
         content_list << item
         group.assignments.active.select(:id).select(:title).each do |asmnt|
@@ -327,7 +337,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_attachments_data(content_list, source_course)
-      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').includes(:active_file_attachments), &:full_name).each do |folder|
+      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').preload(:active_file_attachments), &:full_name).each do |folder|
         next if folder.active_file_attachments.length == 0
 
         item = course_item_hash('folders', folder)
@@ -336,6 +346,19 @@ module Canvas::Migration::Helpers
         folder.active_file_attachments.each do |att|
           item[:sub_items] << course_item_hash('attachments', att)
         end
+      end
+    end
+
+    def submodule_data(modules, parent_mig_id)
+      if mod = modules.detect{|m| m['migration_id'] == parent_mig_id}
+        mod['submodules']
+      else
+        modules.each do |mod|
+          if mod['submodules'] && (sm_data = submodule_data(mod['submodules'], parent_mig_id))
+            return sm_data
+          end
+        end
+        nil
       end
     end
 

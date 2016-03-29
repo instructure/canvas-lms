@@ -556,6 +556,9 @@ describe SisImportsApiController, type: :request do
           "diffed_against_import_id" => nil,
       }]
     })
+
+    links = Api.parse_pagination_links(response.headers['Link'])
+    expect(links.first[:uri].path).to eq api_v1_account_sis_imports_path
   end
 
   it "should filter sis imports by date if requested" do
@@ -580,5 +583,28 @@ describe SisImportsApiController, type: :request do
                     { :controller => 'sis_imports_api', :action => 'index',
                       :format => 'json', :account_id => @account.id.to_s })
     assert_status(200)
+  end
+
+  it "should error on non-root account" do
+    subaccount = @account.sub_accounts.create!
+    json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => subaccount.id.to_s },
+                    {},
+                    {},
+                    expected_status: 400)
+    expect(json['errors'].first).to eq "SIS imports can only be executed on root accounts"
+  end
+
+  it "should error on non-enabled root account" do
+    @account.allow_sis_import = false
+    @account.save
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { :controller => 'sis_imports_api', :action => 'index',
+                      :format => 'json', :account_id => @account.id.to_s },
+                    {},
+                    {},
+                    expected_status: 403)
+    expect(json['errors'].first).to eq "SIS imports are not enabled for this account"
   end
 end

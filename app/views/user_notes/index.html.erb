@@ -2,7 +2,7 @@
    add_crumb(@user.name, user_path(@user) )
    add_crumb t('crumbs.faculty_journal', "Faculty Journal")
    js_bundle :user_notes
-   jammit_css :user_notes
+   css_bundle :user_notes
 %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
@@ -30,9 +30,9 @@
       </tr>
       <tr>
         <td colspan="2">
-          <div class="button-container clearfix">
-            <button type="submit" class="pull-right btn btn-primary send_button" style="margin-left: 3px;"><%= t 'buttons.create', "Create Entry" %></button>
-            <button type="button" class="pull-right cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
+          <div class="button-container clearfix pull-right">
+            <button type="button" class="cancel_button btn button-secondary"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="submit" class="btn btn-primary send_button"><%= t 'buttons.create', "Create Entry" %></button>
           </div>
         </td>
       </tr>

@@ -100,7 +100,7 @@ define(function(require) {
           disabled={!this.props.generatable}
           onClick={this.generate}
           onKeyPress={this.generateAndFocusContent}
-          className="btn btn-link generate-report">
+          className="btn generate-report">
             <ScreenReaderContent children={srLabel} />
             <SightedUserContent>
               <i className="icon-analytics" /> {this.props.readableType}
@@ -113,7 +113,7 @@ define(function(require) {
       var srLabel = Descriptor.getInteractionLabel(this.props);
 
       return(
-        <a href={this.props.file.url} className="btn btn-link download-report">
+        <a href={this.props.file.url} className="btn download-report">
           <ScreenReaderContent children={srLabel} />
 
           <SightedUserContent>

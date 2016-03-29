@@ -19,7 +19,7 @@ module KalturaHelper
 
   def append_sis_data(js_hash)
     if CanvasKaltura::ClientV3.config && CanvasKaltura::ClientV3.config['kaltura_sis'].present? && CanvasKaltura::ClientV3.config['kaltura_sis'] == "1" && @current_user
-      pseudonym = @context ? @current_user.sis_pseudonym_for(@context) : @current_user.primary_pseudonym
+      pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
       js_hash[:SIS_SOURCE_ID] = @context.sis_source_id if (@context && @context.sis_source_id)
       js_hash[:SIS_USER_ID] = pseudonym.sis_user_id if (pseudonym && pseudonym.sis_user_id)
     end

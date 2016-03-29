@@ -57,4 +57,18 @@ describe AdheresToPolicy::Policy, "set_policy" do
       expect(example_class.policy.available_rights.to_a.sort).to eq [:read, :write].sort
     end
   end
+
+  describe '#add_rights' do
+    it 'should add rights to parents' do
+      right = mock
+      condition = mock
+      parent = AdheresToPolicy::Policy.new(nil, nil)
+      policy = AdheresToPolicy::Policy.new(parent, nil)
+
+      policy.add_rights([right], condition)
+
+      expect(policy.available_rights).to eq(Set.new([right]))
+      expect(parent.available_rights).to eq(Set.new([right]))
+    end
+  end
 end

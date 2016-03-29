@@ -50,7 +50,7 @@
                count: (submission && submission.extra_time) || '0',
                wrapper: {
                  '*' => submission ? %{<a class="student_name" href="#{context_url(@context, :context_quiz_history_url, @quiz.id, :quiz_submission_id => submission.id)}">\\1</a>} : '\1',
-                 '**' => %{<div class='extra_time_allowed' style="#{hidden unless submission && submission.extra_time && submission.extra_time == "0"}">\\1</div>}
+                 '**' => %{<div class='extra_time_allowed' style="#{hidden unless submission && submission.extra_time && submission.extra_time != "0"}">\\1</div>}
                },
              })
           %>
@@ -125,7 +125,7 @@
 
     <select name="time_type">
       <option value="extend_from_now"><%= t(:end_quiz_reference_time_now, "now") %></option>
-      <option value="extend_from_end_at"><% t(:end_quiz_reference_time_current_end, "the current end time") %></option>
+      <option value="extend_from_end_at"><%= t(:end_quiz_reference_time_current_end, "the current end time") %></option>
     </select>
 
     <p class="note">
@@ -161,7 +161,7 @@
       <div class="field extra_time">
         <label for="extra_time">
           <%= t('extra_time_on_every_attempt', 'Extra time on every attempt:') %>
-          <em class="note"><%= t(:global_extra_attempt_time, "everyone already gets %{count} minute", :count => @quiz.time_limit) %></em>
+          <em class="note"><%= t(:global_extra_attempt_time, "everyone already gets %{count} minutes", :count => @quiz.time_limit) %></em>
         </label>
         <span class="input">
           <input id="extension_extra_time" type="text" name="extra_time" title="<%= t('titles.extra_quiz_minutes', "additional minutes on each attempt") %>"/>
@@ -224,9 +224,9 @@
   <% last_updated_at = @submissions.empty? ? nil : (@submissions.map(&:updated_at).max - 5.minutes).in_time_zone.iso8601 %>
   <span class="last_updated_at"><%= last_updated_at %></span>
   <a href="<%= context_url(@context, :context_quiz_extensions_url, @quiz.id, "{{ user_id }}") %>" class="extension_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_index_url) %>" class="outstanding_index_url">&nbsp;</a>
-  <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_grade_url) %>" class="outstanding_grade_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_index_url, @quiz) %>" class="outstanding_index_url">&nbsp;</a>
+  <a href="<%= context_url(@context, :api_v1_outstanding_quiz_submission_grade_url, @quiz) %>" class="outstanding_grade_url">&nbsp;</a>
 </div>
 
 <% js_bundle :moderate_quiz %>
-<% jammit_css :moderate_quiz %>
+<% css_bundle :moderate_quiz %>

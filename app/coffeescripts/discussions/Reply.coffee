@@ -10,6 +10,7 @@ define [
   'compiled/views/editor/KeyboardShortcuts'
   'str/stripTags'
   'tinymce.editor_box'
+  'jquery.instructure_forms'
 ], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
 
   class Reply
@@ -126,16 +127,22 @@ define [
     # Callback when the model is succesfully saved
     #
     # @api private
-    onPostReplySuccess: (entry) =>
-      @view.model.set 'notification', ''
-      @trigger 'save', entry
+    onPostReplySuccess: (entry, response) =>
+      if response.errors
+        @hideNotification()
+        @textArea.val entry.get('message')
+        @edit()
+        @form.formErrors(response)
+      else
+        @view.model.set 'notification', ''
+        @trigger 'save', entry
 
     ##
     # Callback when the model fails to save
     #
     # @api private
     onPostReplyError: (entry) =>
-      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'error_saving_reply', "*An error occured*, please post your reply again later", wrapper: '<strong>$1</strong>'}</div>"
+      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t "*An error occurred*, please post your reply again later", wrapper: '<strong>$1</strong>'}</div>"
       @textArea.val entry.get('message')
       @edit()
 

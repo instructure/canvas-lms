@@ -1,13 +1,12 @@
 define [
   'i18n!react_files'
   'react'
-  '../components/DragFeedback'
+  'jsx/files/DragFeedback'
   '../utils/moveStuff'
   'compiled/models/Folder'
   'jquery'
   'underscore'
-], (I18n, React, DragFeedbackComponent, moveStuff, Folder, $, _) ->
-  DragFeedback = React.createFactory DragFeedbackComponent
+], (I18n, React, DragFeedback, moveStuff, Folder, $, _) ->
 
   dndMixin =
 
@@ -15,7 +14,8 @@ define [
 
     renderDragFeedback: ({pageX, pageY}) ->
       @dragHolder ||= $('<div>').appendTo(document.body)
-      React.render(DragFeedback({
+      # This should be in JSX, but /o\
+      React.render(React.createElement(DragFeedback, {
         pageX: pageX
         pageY: pageY
         itemsToDrag: @itemsToDrag()

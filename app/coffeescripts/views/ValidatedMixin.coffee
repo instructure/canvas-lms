@@ -75,7 +75,22 @@ define [
         $input = @findField fieldName
         # check for a translations option first, fall back to just displaying otherwise
         html = (htmlEscape(@translations?[message] or message) for {message} in field).join('</p><p>')
+        errorDescription = @findOrCreateDescription($input)
+        errorDescription.text($.raw("#{html}"))
+        $input.attr('aria-describedby', errorDescription.attr('id'))
         $input.errorBox $.raw("<div>#{html}</div>")
         field.$input = $input
         field.$errorBox = $input.data 'associated_error_box'
 
+    findOrCreateDescription: ($input) ->
+      id = $input.attr('id')
+      existingDescription = $("##{id}_sr_description")
+      if existingDescription.length > 0
+        return existingDescription
+      else
+        newDescripton = $('<div>').attr({
+          id: "##{id}_sr_description"
+          class: "screenreader-only"
+        })
+        newDescripton.insertBefore($input)
+        newDescripton

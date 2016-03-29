@@ -206,6 +206,37 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should be able to extract text and html bodies from no_image.eml" do
       message = test_message('no_image.eml')
     end
+
+    it "assumes text/plain when no content-type header is present" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type nil
+          body "hello" }, '')
+
+      message_handler.body.should == "hello"
+      message_handler.html_body.should == "hello"
+    end
+
+    context "reporting stats" do
+      let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
+
+      it "increments the processed count" do
+        CanvasStatsd::Statsd.expects(:increment).with("incoming_mail_processor.incoming_message_processed.").once
+        IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+      end
+
+      it "reports the age based on the date header" do
+        Timecop.freeze do
+          message.date = 10.minutes.ago
+          CanvasStatsd::Statsd.expects(:timing).once.with("incoming_mail_processor.message_age.", 10*60*1000)
+          IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+        end
+      end
+
+      it "does not report the age if there is no date header" do
+        CanvasStatsd::Statsd.expects(:timing).never
+        IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+      end
+    end
   end
 
   describe "#process" do
@@ -319,6 +350,31 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       @mock_mailbox.expects(:each_message).with({stride: 3, offset: 2})
       @mock_mailbox.expects(:disconnect)
       imp.process(worker_id: 2)
+    end
+
+    it "only processes a single account if asked to do so" do
+      IncomingMessageProcessor.configure({
+        'imap' => {
+          'server' => "fake",
+          'username' => 'should_be_overridden@fake.fake',
+          'accounts' => [
+            { 'username' => 'user1@fake.fake', 'password' => 'pass1' },
+            { 'username' => 'user2@fake.fake', 'password' => 'pass2' },
+            { 'username' => 'user3@fake.fake', 'password' => 'pass3' },
+          ],
+        },
+      })
+
+      imp = IncomingMessageProcessor
+      imp.expects(:create_mailbox).returns(@mock_mailbox).with do |account|
+        account.config[:username] == 'user2@fake.fake'
+      end
+
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message)
+      @mock_mailbox.expects(:disconnect)
+
+      IncomingMessageProcessor.new(message_handler, error_reporter).process(:mailbox_account_address => 'user2@fake.fake')
     end
 
     describe "message processing" do

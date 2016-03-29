@@ -42,7 +42,7 @@ describe "External Tools" do
       expect(form.at_css('input#launch_presentation_locale')['value']).to eq 'en'
       expect(form.at_css('input#oauth_callback')['value']).to eq 'about:blank'
       expect(form.at_css('input#oauth_signature_method')['value']).to eq 'HMAC-SHA1'
-      expect(form.at_css('input#launch_presentation_return_url')['value']).to eq "/courses/#{@course.id}/external_content/success/external_tool_redirect"
+      expect(form.at_css('input#launch_presentation_return_url')['value']).to eq "http://www.example.com/courses/#{@course.id}/external_content/success/external_tool_redirect"
       expect(form.at_css('input#lti_message_type')['value']).to eq "basic-lti-launch-request"
       expect(form.at_css('input#lti_version')['value']).to eq "LTI-1p0"
       expect(form.at_css('input#oauth_version')['value']).to eq "1.0"

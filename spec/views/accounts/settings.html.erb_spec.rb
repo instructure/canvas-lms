@@ -76,7 +76,8 @@ describe "accounts/settings.html.erb" do
     end
 
     it "should show warning dialog when a delegated auth config is around" do
-      @account.account_authorization_configs.create!(:auth_type => 'cas')
+      @account.authentication_providers.create!(:auth_type => 'cas')
+      @account.authentication_providers.first.move_to_bottom
       render
       expect(response).to have_tag("input#account_settings_open_registration")
       expect(response).to have_tag("div#open_registration_delegated_warning_dialog")

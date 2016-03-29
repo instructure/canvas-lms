@@ -136,6 +136,7 @@ describe PseudonymsController, type: :request do
         })
         expect(json).to eq({
           'account_id'  => @account.id,
+          "authentication_provider_id" => nil,
           'id'          => json['id'],
           'sis_user_id' => '12345',
           'unique_id'   => 'test@example.com',
@@ -175,6 +176,19 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options)
         expect(response.code).to eql '400'
       end
+
+      it "returns 401 when trying to set a password on a non-Canvas login" do
+        @account.authentication_providers.create!(auth_type: 'cas')
+        raw_api_call(:post, @path, @path_options, {
+          user: { id: @student.id },
+          login: {
+            password: 'abc123',
+            unique_id: 'student@example.com',
+            authentication_provider_id: 'cas'
+          }
+        })
+        expect(response.code).to eql '400'
+      end
     end
 
     context "an unauthorized user" do
@@ -209,7 +223,7 @@ describe PseudonymsController, type: :request do
       @admin.pseudonyms.create!(:unique_id => 'admin@example.com')
       @teacher.pseudonyms.create!(:unique_id => 'teacher@example.com')
       @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
-      @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :action => 'update', :account_id => @account.id.to_param, :id => @student.pseudonym.id.to_param }
+      @path_options = { :controller => 'pseudonyms', :format => 'json', :action => 'update', :account_id => @account.id.to_param, :id => @student.pseudonym.id.to_param }
       a = Account.find(Account.default)
       a.settings[:admins_can_change_passwords] = true
       a.save!
@@ -226,6 +240,7 @@ describe PseudonymsController, type: :request do
         })
         expect(json).to eq({
           'account_id' => @student.pseudonym.account_id,
+          "authentication_provider_id" => nil,
           'id' => @student.pseudonym.id,
           'sis_user_id' => 'new-12345',
           'unique_id' => 'student+new@example.com',
@@ -313,6 +328,7 @@ describe PseudonymsController, type: :request do
           'unique_id' => 'student@example.com',
           'sis_user_id' => nil,
           'account_id' => Account.default.id,
+          "authentication_provider_id" => nil,
           'id' => pseudonym.id,
           'user_id' => @student.id
         })

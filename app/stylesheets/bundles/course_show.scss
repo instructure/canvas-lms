@@ -1,3 +1,5 @@
+@import "base/_environment.scss";
+
 #edit_course_home_content_form div.form_group {
   padding-top: 2px;
   padding-left: 10px;
@@ -15,4 +17,9 @@
   display: block;
   line-height: 1.5em;
   padding-left:5px;
+}
+
+#course_status h3 {
+  @include fontSize(17.5px);
+  line-height: 20px;
 }

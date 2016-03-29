@@ -56,14 +56,6 @@
             </div>
           </td>
         <% end %>
-        <td class="assignment">
-          <div class="assignment_content">
-            <div class="title">
-              &nbsp;<br/>
-              <a href="#" class="add add_assignment_link"><%= t('links.add_column', "Add Column") %></a>
-            </div>
-          </div>
-        </td>
       </tr>
       <% @students.each do |student| %>
         <tr>
@@ -86,41 +78,6 @@
     </table>
   </div>
   <div style="display: none;">
-    <div id="new_assignment_dialog">
-      <h3><%= t('headers.new_column', "New Attendance Column") %></h3>
-      <%= form_for :assignment, :url => context_url(@context, :context_assignments_url), :html => {:id => "add_assignment_form"} do |f| %>
-      <%= f.hidden_field :submission_types, :value => "attendance" %>
-      <table class="formtable">
-        <tr>
-          <td style="vertical-align: top;"><%= f.blabel :due_at, :date, :en => "Date" %></td>
-          <td><%= f.text_field :due_at, :class => "datetime_field", :style => "width: 120px;" %></td>
-        </tr>
-        <tr>
-          <td><%= f.blabel :title, :en => "Title" %></td>
-          <td><%= f.text_field :title, :class => "title" %></td>
-        </tr>
-        <tr>
-          <td><%= f.blabel :points_possible, :possible, :en => "Possible" %></td>
-          <td><%= f.text_field :points_possible, :style => "width: 30px;", :class => "points_possible" %> <%= t(:points_abbrev, "pts") %></td>
-        </tr>
-        <tr>
-          <td><%= f.label :assignment_group_id, :group, :en => "Group" %></td>
-          <td>
-            <%= f.select :assignment_group_id, (@context.assignment_groups.active.map {|g| [g.name, g.id]} << [t(:new_group, "New Group"), "new"]), {:selected => @default_group_id}, :class => "assignment_group_select" %>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <div class="button-container">
-              <button type="submit" class="btn submit_button"><%= t('buttons.add_assignment', "Add Assignment") %></button>
-              <button type="button" class="btn btn button-secondary cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-            </div>
-          </td>
-        </tr>
-      </table>
-      <% end %>
-    </div>
-    <%= render :partial => "shared/add_assignment_group" %>
     <div id="attendance_how_to_dialog">
       <h3><%= t('headers.mark_attendance', "Mark Attendance") %></h3>
       <p><%= t(:mark_attendance_info, <<-DETAILS,
@@ -145,6 +102,6 @@
     <a href="<%= context_url(@context, :context_assignment_url, "{{ assignment_id }}") %>" class="set_default_grade_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_gradebook_url) %>" class="gradebook_url">&nbsp;</a>
   </div>
-  <% jammit_css :datagrid, :attendance %>
+  <% css_bundle :datagrid, :attendance %>
   <% js_bundle :datagrid, :attendance %>
 <% end %>

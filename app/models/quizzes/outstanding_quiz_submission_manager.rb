@@ -33,11 +33,11 @@ module Quizzes
 
     def self.grade_by_course(course)
       Quizzes::QuizSubmission.where('quizzes.context_id =?', course.id)
-        .includes(:quiz)
+        .eager_load(:quiz)
         .needs_grading
         .each do |quiz_submission|
           Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-            finished_at: quiz_submission.end_at
+            finished_at: quiz_submission.finished_at_fallback
           })
         end
     end
@@ -46,7 +46,7 @@ module Quizzes
       quiz_submissions = @quiz.quiz_submissions.where(id: quiz_submission_ids)
       quiz_submissions.select(&:needs_grading?).each do |quiz_submission|
         Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-          finished_at: quiz_submission.end_at
+          finished_at: quiz_submission.finished_at_fallback
         })
       end
     end
@@ -54,9 +54,7 @@ module Quizzes
     def find_by_quiz
       # Find these in batches, so as to reduce the memory load
       outstanding_qs = []
-      outstanding_qs = Quizzes::QuizSubmission.where("quiz_id = ?", @quiz.id)
-        .needs_grading
-        .includes(:user)
+      outstanding_qs = Quizzes::QuizSubmission.where("quiz_id = ?", @quiz.id).preload(:user).needs_grading
       outstanding_qs
     end
   end

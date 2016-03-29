@@ -15,6 +15,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency 'importers'
+
 module Importers
   class AttachmentImporter < Importer
 
@@ -57,7 +59,7 @@ module Importers
 
     private
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil, created_usage_rights_map={})
+    def self.import_from_migration(hash, context, migration, item=nil, created_usage_rights_map={})
       return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
       item ||= Attachment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Attachment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first # if hash[:migration_id]
@@ -66,12 +68,14 @@ module Importers
         item.context = context
         item.migration_id = hash[:migration_id]
         item.locked = true if hash[:locked]
+        item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
+        item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
         item.file_state = 'hidden' if hash[:hidden]
         item.display_name = hash[:display_name] if hash[:display_name]
         item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]
         item.set_publish_state_for_usage_rights unless hash[:locked]
         item.save_without_broadcasting!
-        migration.add_imported_item(item) if migration
+        migration.add_imported_item(item)
       end
       item
     end

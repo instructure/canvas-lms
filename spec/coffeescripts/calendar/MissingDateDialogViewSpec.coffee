@@ -12,9 +12,10 @@ define [
           $('input[name=date]').each ->
             invalidFields.push($(this)) if $(this).val() == ''
           if invalidFields.length > 0 then invalidFields else true
-        success: sinon.spy()
+        success: @spy()
 
     teardown: ->
+      @dialog.cancel({})
       $('input[name=date]').remove()
       $('label[for=date]').remove()
       $('.ui-dialog').remove()

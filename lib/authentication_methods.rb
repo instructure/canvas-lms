@@ -64,6 +64,35 @@ module AuthenticationMethods
     request.session[:user_id]
   end
 
+  def load_pseudonym_from_jwt
+    return unless api_request?
+    token_string = AuthenticationMethods.access_token(request)
+    return unless token_string.present?
+    begin
+      services_jwt = Canvas::Security::ServicesJwt.new(token_string)
+      @current_user = User.find(services_jwt.user_global_id)
+      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+      unless @current_user && @current_pseudonym
+        raise AccessTokenError
+      end
+      @authenticated_with_jwt = true
+    rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
+           Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
+           Canvas::Security::InvalidToken,       # Looks like garbage
+           Canvas::DynamicSettings::ConsulError  # no config present for talking to consul
+      # these will happen for some configurations (no consul)
+      # and for some normal use cases (old token, access token),
+      # so we can return and move on
+      return
+    rescue  Faraday::ConnectionFailed,            # consul config present, but couldn't connect
+            Faraday::ClientError,                 # connetion established, but something went wrong
+            Diplomat::KeyNotFound => exception    # talked to consul, but data missing
+      # these are indications of infrastructure of data problems
+      # so we should log them for resolution, but recover gracefully
+      Canvas::Errors.capture_exception(:jwt_check, exception)
+    end
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? || (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy')
 
@@ -74,32 +103,34 @@ module AuthenticationMethods
       if !@access_token
         raise AccessTokenError
       end
+
+      if !@access_token.authorized_for_account?(@domain_root_account)
+        raise AccessTokenError
+      end
+
       @current_user = @access_token.user
       @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
       @access_token.used!
 
       RequestContextGenerator.add_meta_header('at', @access_token.global_id)
-      RequestContextGenerator.add_meta_header('dk', @access_token.developer_key.global_id) if @access_token.developer_key
+      RequestContextGenerator.add_meta_header('dk', @access_token.global_developer_key_id) if @access_token.developer_key_id
     end
   end
-
-  def masked_authenticity_token
-    session_options = CanvasRails::Application.config.session_options
-    options = session_options.slice(:domain, :secure)
-    options[:httponly] = HostUrl.is_file_host?(request.host_with_port)
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies, options)
-  end
-  private :masked_authenticity_token
 
   def load_user
     @current_user = @current_pseudonym = nil
 
     masked_authenticity_token # ensure that the cookie is set
 
-    load_pseudonym_from_access_token
+    load_pseudonym_from_jwt
+
+    unless @current_pseudonym.present?
+      load_pseudonym_from_access_token
+    end
 
     if !@current_pseudonym
       if @policy_pseudonym_id
@@ -146,14 +177,6 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
-
-      if api_request?
-        request.get? ||
-          !allow_forgery_protection ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token']) ||
-          raise(AccessTokenError)
-      end
     end
 
     if @current_user && @current_user.unavailable?
@@ -235,7 +258,7 @@ module AuthenticationMethods
     return nil if url.blank?
     begin
       uri = URI.parse(url)
-    rescue URI::InvalidURIError
+    rescue URI::Error
       return nil
     end
     return nil unless uri.path[0] == '/'
@@ -268,10 +291,12 @@ module AuthenticationMethods
   end
 
   def redirect_to_login
+    return unless fix_ms_office_redirects
     respond_to do |format|
       format.html {
         store_location
         flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
+# <<<<<<< HEAD
         opts = {}
         if params[:canvas_login]
           opts[:canvas_login] = 1
@@ -291,6 +316,9 @@ module AuthenticationMethods
           # for the user to experience
           redirect_to delegated_auth_redirect_uri(url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id))))
         end
+# =======
+        redirect_to login_url(params.slice(:canvas_login, :authentication_provider))
+# >>>>>>> 872f9b2ed3bc532908b77bdbf231e83979896e9f
       }
       format.json { render_json_unauthorized }
     end
@@ -332,4 +360,5 @@ module AuthenticationMethods
   def delegated_auth_redirect_uri(uri)
     uri
   end
+
 end

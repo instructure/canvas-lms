@@ -231,7 +231,7 @@ module AdheresToPolicy
         # Loop through all the conditions until we find the first one that
         # grants us the sought_right.
         conditions.any? do |condition|
-          if check_condition?(condition.given, user, session)
+          if condition.applies?(self, user, session)
 
             # Since the condition is true we can loop through all the rights
             # that belong to it and cache them.  This will short circut the above
@@ -278,33 +278,6 @@ module AdheresToPolicy
       ['permissions', self, user, permissions_key, right].compact.
         map{ |element| ActiveSupport::Cache.expand_cache_key(element) }.
         to_param
-    end
-
-    # Internal: Checks the users condition state.
-    #
-    # condition - The condition/policy block to call which determines the users
-    #             state.  This is a callable proc with either a single argument
-    #             of a user or two arguments, a user and session.
-    # user      - The user passed to the condition to determine if they pass the
-    #             condition.
-    # session   - The session passed to the condition to determine if the user
-    #             passes the condition.
-    #
-    # Examples
-    #
-    #   check_condition?({ |user| true }, user)
-    #   # => true
-    #
-    #   check_condition?({ |user, session| false }, user, session)
-    #   # => false
-    #
-    # Returns true or false on whether the user passes the condition.
-    def check_condition?(condition, user, session)
-      if condition.arity == 1
-        instance_exec(user, &condition)
-      elsif condition.arity == 2
-        instance_exec(user, session, &condition)
-      end
     end
   end
 end

@@ -115,4 +115,45 @@ describe SubAccountsController do
       expect(@accounts[sub_account_2.id][:sub_account_ids]).to eq []
     end
   end
+
+  describe "DELETE 'destroy'" do
+    before(:once) do
+      @root_account = Account.create(name: 'new account')
+      account_admin_user(active_all: true, account: @root_account)
+      @sub_account = @root_account.sub_accounts.create!
+    end
+
+    it "should delete a sub-account" do
+      user_session(@user)
+      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      expect(response.status).to eq(200)
+      expect(@sub_account.reload).to be_deleted
+    end
+
+    it "should delete a sub-account that contains a deleted course" do
+      @sub_account.courses.create!
+      @sub_account.courses.first.destroy
+      user_session(@user)
+      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      expect(response.status).to eq(200)
+      expect(@sub_account.reload).to be_deleted
+    end
+
+    it "should not delete a sub-account that contains a course" do
+      @sub_account.courses.create!
+      user_session(@user)
+      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      expect(response.status).to eq(409)
+      expect(@sub_account.reload).not_to be_deleted
+    end
+
+    it "should not delete a sub-account that contains a sub-account that contains a course" do
+      @sub_sub_account = @sub_account.sub_accounts.create!
+      @sub_sub_account.courses.create!
+      user_session(@user)
+      delete 'destroy', :account_id => @root_account, :id => @sub_account
+      expect(response.status).to eq(409)
+      expect(@sub_account.reload).not_to be_deleted
+    end
+  end
 end

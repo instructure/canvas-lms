@@ -64,7 +64,7 @@ class ChoiceInteraction < AssessmentItemConverter
     @question[:answers].each do |ans|
       correct_answers += 1 if ans[:weight] and ans[:weight] > 0
     end
-    
+
     # If the question is worth zero points its correct answer's weight might
     # be zero even though it's correct. The convention is that the score is set
     # instead of added to. So set that answer to correct in that case.
@@ -93,7 +93,7 @@ class ChoiceInteraction < AssessmentItemConverter
         answer[:weight] = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
         answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
-        
+
         if feedback = choice.at_css('feedbackInline')
           # weird Angel feedback
           answer[:text] = choice.children.first.text.strip
@@ -109,7 +109,7 @@ class ChoiceInteraction < AssessmentItemConverter
             end
           end
         end
-        
+
         if answer[:text] == ""
           if answer[:migration_id] =~ /true|false/i
             answer[:text] = clear_html(answer[:migration_id])
@@ -193,14 +193,19 @@ class ChoiceInteraction < AssessmentItemConverter
             if answer
               answer[:weight] = get_response_weight(r_if)
               answer[:feedback_id] ||= get_feedback_id(r_if)
-              
+
               #flag whether this answer was set or added to
               if @use_set_var_set_as_correct
                 if answer[:weight] == 0 && r_if.at_css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
                   answer[:zero_weight_set_not_summed] = true
                 end
               end
-              
+            end
+          end
+          unless @question[:points_possible]
+            que_scores = cond.css('setOutcomeValue[identifier=QUE_SCORE] > baseValue[baseType]')
+            if que_scores.any?
+              @question[:points_possible] = que_scores.map{|q| q.text.to_i }.max
             end
           end
         end
@@ -220,7 +225,7 @@ class ChoiceInteraction < AssessmentItemConverter
   # parses the wight of a response to determine whether it is a correct response
   def get_response_weight(cond)
     weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-    
+
     if sum = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')
       #it'll only be true if the score is a sum > 0
       weight = get_base_value(sum)
@@ -254,7 +259,7 @@ class ChoiceInteraction < AssessmentItemConverter
     else
       @log.warn "The type of the weight value was not recognized, defaulting to: #{AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT}"
     end
-    
+
     weight
   end
 

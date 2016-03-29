@@ -55,7 +55,7 @@
 #    }
 #
 class GradingPeriodsController < ApplicationController
-  include Filters::GradingPeriods
+  include ::Filters::GradingPeriods
 
   before_filter :require_user
   before_filter :get_context
@@ -91,8 +91,7 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    params_id = params[:id].to_i
-    grading_period = GradingPeriod.context_find(context: @context, id: params_id)
+    grading_period = GradingPeriod.context_find(@context, params[:id])
     fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
 
     if authorized_action(grading_period, @current_user, :read)
@@ -120,16 +119,12 @@ class GradingPeriodsController < ApplicationController
   #
   def create
     grading_period_params = params[:grading_periods].first
-    # grabbing the first grading_period_group for now, until
-    # we decide to allow for multiple grading_period_groups later
-    grading_period_group = @context.grading_period_groups.active.first_or_create
-    # another inheritance check here?
-    @grading_period = grading_period_group.grading_periods.new(grading_period_params)
-    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
-      if @grading_period.save
-        render json: serialize_json_api(@grading_period)
+    grading_period = context_grading_period_group.grading_periods.build(grading_period_params)
+    if grading_period && authorized_action(grading_period, @current_user, :manage)
+      if grading_period.save
+        render json: serialize_json_api(grading_period)
       else
-        render json: @grading_period.errors, status: :bad_request
+        render json: grading_period.errors, status: :bad_request
       end
     end
   end
@@ -153,14 +148,14 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def update
-    @grading_period = GradingPeriod.active.find(params[:id])
+    grading_period = GradingPeriod.active.find(params[:id])
     grading_period_params = params[:grading_periods][0]
 
-    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
-      if @grading_period.update_attributes(grading_period_params)
-        render json: serialize_json_api(@grading_period)
+    if grading_period && authorized_action(grading_period, @current_user, :manage)
+      if grading_period.update_attributes(grading_period_params)
+        render json: serialize_json_api(grading_period)
       else
-        render json: @grading_period.errors, status: :bad_request
+        render json: grading_period.errors, status: :bad_request
       end
     end
   end
@@ -170,15 +165,68 @@ class GradingPeriodsController < ApplicationController
   #
   # <b>204 No Content</b> response code is returned if the deletion was successful.
   def destroy
-    @grading_period = GradingPeriod.active.find(params[:id])
+    grading_period = GradingPeriod.active.find(params[:id])
 
-    if @grading_period && authorized_action(@grading_period, @current_user, :manage)
-      @grading_period.destroy
+    if grading_period && authorized_action(grading_period, @current_user, :manage)
+      grading_period.destroy
       head :no_content
     end
   end
 
+  def batch_update
+    periods = find_or_build_periods_with_params(params[:grading_periods])
+    @context.grading_periods.transaction do
+      periods.each { |period| authorized_action(period, @current_user, :manage) }
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
+
+      if errors.present?
+        render json: {errors: errors}, status: :bad_reqeust
+      else
+        periods.each(&:save!)
+        paginated_periods, meta = paginate_for(periods)
+        render json: serialize_json_api(paginated_periods, meta)
+      end
+    end
+  end
+
   private
+
+  # model level validations
+  def validation_errors(periods)
+    periods.select(&:invalid?).map(&:errors)
+  end
+
+  # validate no overlapping check on newly built collection
+  def no_overlapping_for_new_periods_validation_errors(periods)
+    sorted_periods = periods.sort_by(&:start_date)
+    sorted_periods.each_cons(2) do |first_period, second_period|
+      # skip not_overlapping model validation in model level
+      first_period.skip_not_overlapping_validator
+      second_period.skip_not_overlapping_validator
+      if second_period.start_date < first_period.end_date
+        second_period.errors.add(:start_date, 'Start Date overlaps with another period')
+      end
+    end
+    sorted_periods.select { |period| period.errors.present? }.map(&:errors)
+  end
+
+  def find_or_build_periods_with_params(periods_params)
+    periods_params.map do |period_params|
+      if (period = @context.grading_periods.active.where(id: period_params[:id]).first)
+        period.assign_attributes(period_params.except(:id))
+        period
+      else
+        context_grading_period_group
+          .grading_periods
+          .build(period_params.except(:id))
+      end
+    end
+  end
+
+  def context_grading_period_group
+    @context.grading_period_groups.active.first_or_create
+  end
 
   def paginate_for(grading_periods)
     paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))

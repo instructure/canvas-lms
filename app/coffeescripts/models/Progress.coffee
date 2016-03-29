@@ -27,6 +27,9 @@ define ['Backbone', 'jquery'], ({Model}, $) ->
     isPolling: ->
       @get('workflow_state') in @pollStates
 
+    isSuccess: ->
+      @get('workflow_state') is 'completed'
+
     initialize: ->
       @pollDfd = new $.Deferred
       @on 'change:url', => @poll() if @isPolling()
@@ -58,5 +61,5 @@ define ['Backbone', 'jquery'], ({Model}, $) ->
       if @isPolling()
         @timeout = setTimeout(@poll, @get('timeout'))
       else
-        @pollDfd.resolve(response)
+        @pollDfd[if @isSuccess() then 'resolve' else 'reject'](response)
         @trigger 'complete'

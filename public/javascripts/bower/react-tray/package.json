@@ -1,0 +1,52 @@
+{
+  "name": "react-tray",
+  "version": "0.1.2",
+  "description": "An accessible tray component useful for navigation menus",
+  "main": "lib/main.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/rackt test --ci --browsers Firefox",
+    "start": "node_modules/.bin/rackt dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/instructure-react/react-tray.git"
+  },
+  "keywords": [
+    "react",
+    "tray",
+    "react-component"
+  ],
+  "author": "Matt Zabriskie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/instructure-react/react-tray/issues"
+  },
+  "homepage": "https://github.com/instructure-react/react-tray",
+  "dependencies": {
+    "react": "^0.13.1"
+  },
+  "devDependencies": {
+    "browserify": "^10.1.3",
+    "browserify-shim": "^3.8.6",
+    "envify": "^3.4.0",
+    "jsx-loader": "^0.13.1",
+    "karma": "^0.12.31",
+    "karma-browserify": "^4.1.2",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-mocha": "^0.1.10",
+    "mocha": "^2.2.4",
+    "rackt-cli": "^0.1.2",
+    "reactify": "^1.1.0"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  },
+  "browserify-shim": {
+    "react": "global:React"
+  }
+}

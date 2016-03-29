@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module ManageGroupsCommon
   def add_category(course, name, opts={})
     keep_trying_until do
       f(".add_category_link").click
@@ -121,3 +122,4 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     fj("#{group_selector} .toggle-group").click
     wait_for_ajax_requests
   end
+end

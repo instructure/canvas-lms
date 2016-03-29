@@ -20,6 +20,8 @@ module Canvas
       private
       def extras_hash
         {
+          id: @job.id,
+          source: @job.source,
           attempts: @job.attempts,
           strand: @job.strand,
           priority: @job.priority,

@@ -67,7 +67,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def user_severity
-      self.data.is_a?(Hash) ? self.data['user_perceived_severity'] : ''
+      (self.data.is_a?(Hash) && self.data['user_perceived_severity']) || ''
     end
 
     def user_roles
@@ -90,7 +90,7 @@ module Canvas::Plugins::TicketingSystem
             become_user_uri.query = (Hash[*(become_user_uri.query || '').
                             split('&').map {|part| part.split('=') }.flatten]).
                             merge({'become_user_id' => user_id}).to_query
-          rescue URI::InvalidURIError => e
+          rescue URI::Error => e
             become_user_uri = "unable to parse uri: #{url}"
           end
           become_user_uri.to_s

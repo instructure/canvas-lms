@@ -22,7 +22,7 @@ class PseudonymsController < ApplicationController
   before_filter :get_context, :only => [:index, :create]
   before_filter :require_user, :only => [:create, :show, :edit, :update]
   before_filter :reject_student_view_student, :only => [:create, :show, :edit, :update]
-  protect_from_forgery :except => [:registration_confirmation, :change_password, :forgot_password]
+  protect_from_forgery :except => [:registration_confirmation, :change_password, :forgot_password], with: :exception
 
   include Api::V1::Pseudonym
 
@@ -34,10 +34,22 @@ class PseudonymsController < ApplicationController
   # @response_field sis_user_id The login's unique SIS id.
   # @response_field unique_id The unique ID for the login.
   # @response_field user_id The unique ID of the login's user.
+  # @response_field authentication_provider_id The ID of the authentication
+  #                 provider that this login is associated with
+  # @response_field authentication_provider_type The type of the authentication
+  #                 provider that this login is associated with
   #
   # @example_response
   #   [
-  #      { "account_id": 1, "id" 2, "sis_user_id": null, "unique_id": "belieber@example.com", "user_id": 2 }
+  #     {
+  #       "account_id": 1,
+  #       "id" 2,
+  #       "sis_user_id": null,
+  #       "unique_id": "belieber@example.com",
+  #       "user_id": 2,
+  #       "authentication_provider_id": 1,
+  #       "authentication_provider_type": "facebook"
+  #     }
   #   ]
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
@@ -61,9 +73,9 @@ class PseudonymsController < ApplicationController
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
     @ccs = []
     if email.present?
-      @ccs = CommunicationChannel.email.by_path(email).active.all
+      @ccs = CommunicationChannel.email.by_path(email).active.to_a
       if @ccs.empty?
-        @ccs += CommunicationChannel.email.by_path(email).all
+        @ccs += CommunicationChannel.email.by_path(email).to_a
       end
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
@@ -79,7 +91,7 @@ class PseudonymsController < ApplicationController
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.password_authentication?) }
+        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.canvas_authentication?) }
       end
     end
     respond_to do |format|
@@ -107,7 +119,7 @@ class PseudonymsController < ApplicationController
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
     else
-      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.password_authentication? }
+      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
              :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
     end
@@ -167,6 +179,29 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
+  #
+  # @argument login[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
+  #
+  # @argument login[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider).
+  #
+  # @example_request
+  #
+  #   #create a facebook login for user with ID 123
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/logins' \
+  #        -F 'user[id]=123' \
+  #        -F 'login[unique_id]=112233445566' \
+  #        -F 'login[authentication_provider_id]=facebook' \
+  #        -H 'Authorization: Bearer <token>'
   def create
     return unless get_user
 
@@ -184,6 +219,7 @@ class PseudonymsController < ApplicationController
 
     @pseudonym = @account.pseudonyms.build(user: @user)
     return unless authorized_action(@pseudonym, @current_user, :create)
+    return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
@@ -231,6 +267,12 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
+  #
+  # @argument login[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
+
   def update
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
@@ -304,39 +346,70 @@ class PseudonymsController < ApplicationController
     end
   end
 
+  def find_authentication_provider
+    return true unless params[:pseudonym][:authentication_provider_id]
+    params[:pseudonym][:authentication_provider] = @domain_root_account.
+      authentication_providers.active.
+      find(params[:pseudonym][:authentication_provider_id])
+  end
+
   def update_pseudonym_from_params
     # you have to at least attempt something recognized...
-    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id).blank?
+    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider, :integration_id).blank?
       render json: nil, status: :bad_request
       return false
     end
 
-    # perform the updates they have permission for. silently ignore
-    # unrecognized fields or fields they don't have permission to. note: make
-    # sure sis_user_id is updated (if happening) before password, since it may
-    # affect the :change_password permissions
-    update = false
+    # perform updates (if they have permission
+    # to make them). silently ignore unrecognized fields.
+    # note: make sure sis_user_id is updated (if happening)
+    # before password, since it may affect the :change_password permissions
 
-    if params[:pseudonym].has_key?(:unique_id) && @pseudonym.grants_right?(@current_user, :update)
+    has_right_if_requests_change(:unique_id, :update) do
       @pseudonym.unique_id = params[:pseudonym][:unique_id]
-      updated = true
-    end
+    end or return false
 
-    if params[:pseudonym].has_key?(:sis_user_id) && @pseudonym.grants_right?(@current_user, :manage_sis)
+    has_right_if_requests_change(:authentication_provider, :update) do
+      @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
+    end or return false
+
+    has_right_if_requests_change(:sis_user_id, :manage_sis) do
       # convert "" -> nil for sis_user_id
       @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
-      updated = true
+    end or return false
+
+    has_right_if_requests_change(:integration_id, :manage_sis) do
+      # convert "" -> nil for integration_id
+      @pseudonym.integration_id = params[:pseudonym][:integration_id].presence
+    end or return false
+
+    # give a 400 instead of a 401 if it doesn't make sense to change the password
+    if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
+      @pseudonym.errors.add(:password, 'password can only be set for Canvas authentication')
+      respond_to do |format|
+        format.html { render(params[:action] == 'edit' ? :edit : :new) }
+        format.json { render json: @pseudonym.errors, status: :bad_request }
+      end
+      return false
     end
 
-    if params[:pseudonym].has_key?(:password) && @pseudonym.grants_right?(@current_user, :change_password)
+    has_right_if_requests_change(:password, :change_password) do
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-      updated = true
-    end
+    end or return false
+  end
 
-    # if we didn't actually update anything, it's because of permissions (we
-    # already checked for nothing attempted), so 401
-    render_unauthorized_action unless updated
-    return updated
+  private
+
+  def has_right_if_requests_change(key, right)
+    return true unless params[:pseudonym].key?(key.to_sym)
+
+    if @pseudonym.grants_right?(@current_user, right.to_sym)
+      yield
+      true
+    else
+      render_unauthorized_action
+      false
+    end
   end
 end

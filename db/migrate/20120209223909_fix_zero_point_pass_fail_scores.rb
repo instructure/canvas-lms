@@ -1,4 +1,6 @@
 class FixZeroPointPassFailScores < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     # a bug allowed a few submissions to have their grade set to pass/fail,
     # rather than complete/incomplete. pass/fail is allowed in the api, but was

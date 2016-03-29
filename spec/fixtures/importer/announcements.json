@@ -1,0 +1,93 @@
+{
+    "announcements":
+            [
+                {
+                    "text":"You are fired.",
+                    "announcement_id":"4488523052421",
+                    "start_date":"1265753820000",
+                    "title":"Test Announcement",
+                    "text_in_html":false,
+                    "migration_id":"4488523052421"
+                },
+                {
+                    "text":"Just for you.",
+                    "announcement_id":"4499191915421",
+                    "start_date":"1267024440000",
+                    "title":"Another fun announcement",
+                    "text_in_html":false,
+                    "migration_id":"4499191915421"
+                },
+                {
+                    "text":"third",
+                    "announcement_id":"4499239456421",
+                    "start_date":"1267456920000",
+                    "title":"Announcement 3",
+                    "text_in_html":false,
+                    "migration_id":"4499239456421"
+                },
+                {
+                    "text":"fourth",
+                    "announcement_id":"4499239482421",
+                    "start_date":"1267629780000",
+                    "title":"Announcement 4",
+                    "text_in_html":false,
+                    "migration_id":"4499239482421"
+                },
+                {
+                    "text":"fifth",
+                    "announcement_id":"4499239494421",
+                    "start_date":"1267456980000",
+                    "title":"Announcement 5",
+                    "text_in_html":false,
+                    "migration_id":"4499239494421"
+                },
+                {
+                    "text":"sixth",
+                    "announcement_id":"4499239504421",
+                    "start_date":"1265901840000",
+                    "title":"Announcement 6",
+                    "text_in_html":false,
+                    "migration_id":"4499239504421"
+                },
+                {
+                    "text":"seventh",
+                    "announcement_id":"4499239519421",
+                    "start_date":"1265901840000",
+                    "title":"Announcement 7",
+                    "text_in_html":false,
+                    "migration_id":"4499239519421"
+                },
+                {
+                    "text":"eighth is hard to spell...",
+                    "announcement_id":"4499239538421",
+                    "start_date":"1267716240000",
+                    "title":"Announcement 8",
+                    "text_in_html":false,
+                    "migration_id":"4499239538421"
+                },
+                {
+                    "text":"ninth",
+                    "announcement_id":"4499239587421",
+                    "start_date":"1267025100000",
+                    "title":"Announcement 9",
+                    "text_in_html":false,
+                    "migration_id":"4499239587421"
+                },
+                {
+                    "text":"Oh happy day.",
+                    "announcement_id":"4499239608421",
+                    "start_date":"1265901900000",
+                    "title":"Announcement 10",
+                    "text_in_html":false,
+                    "migration_id":"4499239608421"
+                },
+                {
+                    "text":"Elf",
+                    "announcement_id":"4499239658421",
+                    "start_date":"1265901900000",
+                    "title":"Announcement 11",
+                    "text_in_html":false,
+                    "migration_id":"4499239658421"
+                }
+            ]
+}

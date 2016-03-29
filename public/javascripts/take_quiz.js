@@ -78,7 +78,7 @@ define([
       finalSubmitButtonClicked: false,
       clockInterval: 500,
       backupsDisabled: document.location.search.search(/backup=false/) > -1,
-      updateSubmission: function(repeat, beforeLeave, autoInterval) {
+      updateSubmission: function(repeat, beforeLeave, autoInterval, windowUnload) {
         /**
          * Transient: CNVS-9844
          * Disable auto-backups if backup=true was passed as a query parameter.
@@ -94,7 +94,7 @@ define([
         if((now - quizSubmission.lastSubmissionUpdate) < 1000 && !autoInterval) {
           return;
         }
-        if(quizSubmission.currentlyBackingUp) { return; }
+        if(quizSubmission.currentlyBackingUp && !windowUnload) { return; }
 
         quizSubmission.currentlyBackingUp = true;
         quizSubmission.lastSubmissionUpdate = new Date();
@@ -108,6 +108,7 @@ define([
         $lastSaved.text(I18n.t('saving', 'Saving...'));
         var url = $(".backup_quiz_submission_url").attr('href');
         // If called before leaving the page (ie. onbeforeunload), we can't use any async or FF will kill the PUT request.
+        data.leaving = !!windowUnload && !this.oneAtATime;
         if (beforeLeave){
           $.flashMessage(I18n.t('saving', 'Saving...'));
           $.ajax({
@@ -167,7 +168,6 @@ define([
               },
               // Error callback
               function(resp, ec) {
-                var current_user_id = $("#identity .user_id").text() || "none";
                 quizSubmission.currentlyBackingUp = false;
 
                 // has the user logged out?
@@ -177,6 +177,7 @@ define([
                 }
                 else {
                   // Connectivity lost?
+                  var current_user_id = window.ENV.current_user_id || "none";
                   $.ajaxJSON(
                       location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
                       'GET', {},
@@ -225,7 +226,7 @@ define([
           }
         }
 
-        if(quizSubmission.isTimeUp(currentTimeLeft)) {
+        if(quizSubmission.isTimeUp(currentTimeLeft) && !ENV.IS_PREVIEW) {
           quizSubmission.showTimeUpDialog(now);
         } else if(currentTimeToDueDate != null && currentTimeLeft > currentTimeToDueDate) {
           quizSubmission.showDueDateWarnings(currentTimeToDueDate);
@@ -402,7 +403,7 @@ define([
 
       window.onbeforeunload = function(e) {
         if (!quizSubmission.navigatingToRelogin) {
-          quizSubmission.updateSubmission(false, true);
+          quizSubmission.updateSubmission(false, true, false, true);
           if(!quizSubmission.submitting && !quizSubmission.alreadyAcceptedNavigatingAway && !unloadWarned) {
             setTimeout(function() { unloadWarned = false; }, 0);
             unloadWarned = true;
@@ -495,6 +496,10 @@ define([
         if ($this.hasClass('numerical_question_input')) {
           var val = parseFloat($this.val().replace(/,/g, ''));
           $this.val(isNaN(val) ? "" : val.toFixed(4));
+        }
+        if ($this.hasClass('precision_question_input')) {
+          var val = parseFloat($this.val().replace(/,/g, ''));
+          $this.val(isNaN(val) ? "" : val.toPrecision(16).replace(/\.?0+(e.*)?$/,"$1"));
         }
         if (update !== false) {
           quizSubmission.updateSubmission();
@@ -756,10 +761,15 @@ define([
         $timer.text($timeRunningTimeRemaining.text());
       }
     });
-    if(location.href.indexOf("preview=1") == -1){
+    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
       QuizLogAuditing.start();
+      QuizLogAuditingEventDumper(false);
     }
-    QuizLogAuditingEventDumper(false);
+  });
+
+  $( document ).ready(function() {
+    $('.loaded').show();
+    $('.loading').hide();
   });
 
   $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);

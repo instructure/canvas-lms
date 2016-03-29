@@ -20,12 +20,11 @@ define [
   test 'hits the preflight and then does a saveFrd', ->
     server.respondWith("POST", "/preflight", [200, {"Content-Type": "application/json"}, '{"upload_params": {}, "file_param": "file", "upload_url": "/upload"}'])
     # can't fake the upload with the server, since it's a hidden iframe post, not XHR
-    stub = sinon.stub Model.prototype, 'save'
+    stub = @stub Model.prototype, 'save'
     model.save()
     ok !stub.called
     server.respond()
     ok stub.called
-    stub.restore()
 
   test 'returns a useful deferred', ->
     server.respondWith("POST", "/preflight", [500, {}, ""])
@@ -39,8 +38,7 @@ define [
     server.respondWith("POST", "/preflight", [200, {"Content-Type": "application/json"}, '{"attachments": [{"upload_url": "/upload", "upload_params": {"Policy": "TEST"}, "file_param": "file"}]}'])
 
     # can't fake the upload with the server, since it's a hidden iframe post, not XHR
-    stub = sinon.stub Model.prototype, 'save'
+    @stub Model.prototype, 'save'
     model.save()
     server.respond()
     strictEqual model.get("Policy"), "TEST"
-    stub.restore()

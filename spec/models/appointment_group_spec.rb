@@ -326,6 +326,11 @@ describe AppointmentGroup do
       @course3.destroy
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
     end
+
+    it "should ignore concluded courses when performing permissions checks" do
+      @course3.complete!
+      expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
+    end
   end
 
   context "notifications" do
@@ -345,25 +350,30 @@ describe AppointmentGroup do
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
     end
 
-    it "should notify all participants when publishing" do
+    it "should notify all participants when publishing", priority: "1", test_id: 186566 do
       @ag.publish!
       expect(@ag.messages_sent).to be_include("Appointment Group Published")
       expect(@ag.messages_sent["Appointment Group Published"].map(&:user_id).sort.uniq).to eql [@student.id]
     end
 
-    it "should notify all participants when adding appointments" do
+    it "should notify all participants when adding appointments", priority: "1", test_id: 193138 do
       @ag.publish!
       @ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
       expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id]
     end
 
-    it "should notify all participants when deleting" do
+    it "should notify all participants when deleting", priority: "1", test_id: 193137 do
       @ag.publish!
       @ag.cancel_reason = "just because"
       @ag.destroy
       expect(@ag.messages_sent).to be_include("Appointment Group Deleted")
       expect(@ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq).to eql [@student.id]
+    end
+
+    it "should not notify participants when unpublished" do
+      @ag.destroy
+      expect(@ag.messages_sent).to be_empty
     end
 
     it "should not notify participants in an unpublished course" do

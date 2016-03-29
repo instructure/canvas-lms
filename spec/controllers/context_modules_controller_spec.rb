@@ -29,7 +29,7 @@ describe ContextModulesController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>10,'hidden'=>true}])
@@ -37,7 +37,7 @@ describe ContextModulesController do
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       get 'index', :course_id => @course.id
@@ -128,7 +128,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
     end
   end
-  
+
   describe "GET 'item_redirect'" do
     before :once do
       course_with_teacher(active_all: true)
@@ -141,7 +141,7 @@ describe ContextModulesController do
       assignment1 = ag.assignments.create!(:context => @course)
 
       assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
-      
+
       get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
       assert_unauthorized
     end
@@ -156,6 +156,23 @@ describe ContextModulesController do
       assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
 
       assignmentTag1.unpublish
+
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      expect(response).to be_redirect
+      expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
+    end
+
+    it "should still redirect for unpublished modules if teacher and course is concluded" do
+      user_session(@teacher)
+
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+
+      assignmentTag1.unpublish
+      @course.complete!
 
       get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
       expect(response).to be_redirect
@@ -234,37 +251,37 @@ describe ContextModulesController do
         expect(assigns[:tool]).to eq nil
       end
     end
-    
+
     it "should redirect to an assignment page" do
       user_session(@student)
-      
+
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
       assignment1 = ag.assignments.create!(:context => @course)
 
       assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
-      
+
       get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
       expect(response).to be_redirect
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
-    
+
     it "should redirect to a discussion page" do
       user_session(@student)
-      
+
       @module = @course.context_modules.create!
       topic = @course.discussion_topics.create!
 
       topicTag = @module.add_item :type => 'discussion_topic', :id => topic.id
-      
+
       get 'item_redirect', :course_id => @course.id, :id => topicTag.id
       expect(response).to be_redirect
       expect(response).to redirect_to course_discussion_topic_url(@course, topic, :module_item_id => topicTag.id)
     end
-    
+
     it "should redirect to a quiz page" do
       user_session(@student)
-      
+
       @module = @course.context_modules.create!
       quiz = @course.quizzes.create!
       quiz.publish!
@@ -315,7 +332,7 @@ describe ContextModulesController do
     end
 
   end
-  
+
   describe "POST 'reorder_items'" do
     def make_content_tag(assignment, course, mod)
       ct = ContentTag.new
@@ -383,6 +400,29 @@ describe ContextModulesController do
       order = tags.reverse.map(&:id)
       post 'reorder_items', :course_id => @course.id, :context_module_id => mod.id, :order => order.join(",")
       expect(mod.reload.content_tags.map(&:id)).to eq order
+    end
+  end
+
+  describe "POST 'add_item'" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      @module = @course.context_modules.create!
+    end
+
+    it "should set position" do
+      user_session @teacher
+      @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 1)
+      post 'add_item', :course_id => @course.id, :context_module_id => @module.id, :item =>
+                         { :type => 'context_module_sub_header', :title => 'bar!', :position => 3 }
+      expect(@module.content_tags.map {|tag| [tag.title, tag.position]}).to match_array([['foo!', 1], ['bar!', 3]])
+    end
+
+    it "shouldn't duplicate an existing position" do
+      user_session @teacher
+      @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 3)
+      post 'add_item', :course_id => @course.id, :context_module_id => @module.id, :item =>
+                       { :type => 'context_module_sub_header', :title => 'bar!', :position => 3 }
+      expect(@module.content_tags.map {|tag| [tag.title, tag.position]}).to match_array([['foo!', 3], ['bar!', 4]])
     end
   end
 
@@ -475,15 +515,40 @@ describe ContextModulesController do
       expect(json['current_item']['content_tag']['content_type']).to eq 'Quizzes::Quiz'
     end
   end
-  
+
   describe "GET progressions" do
+    context "unauthenticated user in public course" do
+      before(:once) do
+        course(:is_public => true, :active_all => true)
+        @user = nil
+        @mod1 = @course.context_modules.create!(:name => 'unlocked')
+        @mod2 = @course.context_modules.create!(:name => 'locked', :unlock_at => 1.week.from_now)
+      end
+
+      it "returns 'locked' progressions for modules locked by date" do
+        get 'progressions', :course_id => @course.id, :format => 'json'
+        json = JSON.parse response.body.gsub("while(1);",'')
+        expect(json).to match_array(
+                [{"context_module_progression"=>
+                   {"context_module_id"=>@mod1.id,
+                    "workflow_state"=>"unlocked",
+                    "requirements_met"=>[],
+                    "incomplete_requirements"=>[]}},
+                 {"context_module_progression"=>
+                   {"context_module_id"=>@mod2.id,
+                    "workflow_state"=>"locked",
+                    "requirements_met"=>[],
+                    "incomplete_requirements"=>[]}}])
+      end
+    end
+
     before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @module = @course.context_modules.create!(:name => "first module")
       @module.publish
       @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
-      
+
       @tag = @module.add_item(:id => @wiki.id, :type => 'wiki_page')
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
     end
@@ -491,34 +556,34 @@ describe ContextModulesController do
     before :each do
       @progression = @module.update_for(@student, :read, @tag)
     end
-    
+
     it "should return all student progressions to teacher" do
       user_session(@teacher)
       get 'progressions', :course_id => @course.id, :format => "json"
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json.length).to eq 1
     end
-    
+
     it "should return a single student progression" do
       user_session(@student)
       get 'progressions', :course_id => @course.id, :format => "json"
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json.length).to eq 1
     end
-    
+
     context "with large_roster" do
       before :once do
         @course.large_roster = true
         @course.save!
       end
-      
+
       it "should return a single student progression" do
         user_session(@student)
         get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         expect(json.length).to eq 1
       end
-      
+
       it "should not return any student progressions to teacher" do
         user_session(@teacher)
         get 'progressions', :course_id => @course.id, :format => "json"
@@ -544,6 +609,43 @@ describe ContextModulesController do
         json = JSON.parse response.body.gsub("while(1);",'')
         expect(json[@tag.id.to_s]["points_possible"].to_i).to eql 456
       end
+    end
+
+    it "should not cache 'past_due'" do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @assign = @course.assignments.create!(:title => "sad", :due_at => 1.week.from_now, :submission_types => 'online_text_entry')
+      @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+
+      enable_cache do
+        get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+        json = JSON.parse response.body.gsub("while(1);",'')
+        expect(json[@tag.id.to_s]["past_due"]).to be_nil
+
+        Timecop.freeze(2.weeks.from_now) do
+          get 'content_tag_assignment_data', course_id: @course.id, format: 'json'
+          json = JSON.parse response.body.gsub("while(1);",'')
+          expect(json[@tag.id.to_s]["past_due"]).to be_truthy
+        end
+      end
+    end
+
+    it "should return multiple due date info for survey quizzes" do
+      course_with_teacher_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.from_now, :quiz_type => "survey")
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      new_section = @course.course_sections.create!(:name => 'New Section')
+      override = @quiz.assignment_overrides.build
+      override.set = new_section
+      override.due_at = 1.day.from_now
+      override.due_at_overridden = true
+      override.save!
+
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
     end
   end
 

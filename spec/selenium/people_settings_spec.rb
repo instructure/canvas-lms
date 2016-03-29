@@ -1,7 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course people" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+
+  before(:all) do
+    # in the people table, the kyle menu can be off the screen
+    # and uninteractable if the window is too small
+    driver.manage.window.maximize
+  end
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -114,6 +120,7 @@ describe "course people" do
     end
 
     it "should add a user to a second (active) section in a concluded course" do
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -150,13 +157,40 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = f("#ui-id-4")
+      links = ff(".admin-links li a")
+      link = links.detect{|link| link.text.include?("User Details")}
       href = link['href']
       link.click
       wait_for_ajaximations
       wait_for_ajax_requests
       # expect
       expect(driver.current_url).to include(href)
+    end
+
+    it "should be able to deactivate and reactivate users" do
+      username = "user@example.com"
+      student_in_course(:name => username, :active_all => true)
+
+      go_to_people_page
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="deactivateUser"]', cog)
+      expect(link).to include_text("Deactivate User")
+      link.click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      expect(f("#user_#{@student.id} span.label")).to include_text("inactive")
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'inactive'
+
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="reactivateUser"]', cog)
+      expect(link).to include_text("Re-activate User")
+      link.click
+      wait_for_ajaximations
+      expect(f("#user_#{@student.id} span.label")).to be_nil
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'active'
     end
 
     def use_link_dialog(observer, role = nil)
@@ -309,20 +343,6 @@ describe "course people" do
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
-        end
-
-        if base_type == 'teacher' || base_type == 'ta'
-          it "should show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).to be_displayed
-          end
-        else
-          it "should not show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).not_to be_displayed
-          end
         end
       end
     end

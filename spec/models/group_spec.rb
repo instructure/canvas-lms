@@ -178,7 +178,7 @@ describe Group do
   end
 
   it "should grant manage permissions for associated objects to group managers" do
-    e = course_with_teacher
+    e = course_with_teacher(active_course: true)
     course = e.context
     teacher = e.user
     group = course.groups.create
@@ -191,7 +191,7 @@ describe Group do
   end
 
   it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
-    course_with_teacher
+    course_with_teacher(active_course: true)
     student_in_course
     group = @course.groups.create
 
@@ -200,7 +200,7 @@ describe Group do
   end
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
-    course_with_teacher
+    course_with_teacher(active_course: true)
     student_in_course
 
     # default join_level == 'invitation_only' and default category is not self-signup
@@ -533,7 +533,7 @@ describe Group do
 
   context "tabs_available" do
     before :once do
-      course_with_teacher
+      course_with_teacher(active_course: true)
       @teacher = @user
       @group = group(:group_context => @course)
       @group.users << @student = student_in_course(:course => @course).user
@@ -600,6 +600,7 @@ describe Group do
         # should reload
         account.default_group_storage_quota = 20.megabytes
         account.save!
+        @group = Group.find(@group)
 
         expect(@group.quota).to eq 20.megabytes
       end
@@ -666,6 +667,26 @@ describe Group do
     it "returns false if an unsaved user is given" do
       @user = User.new
       expect(@group.includes_user?(@user)).to be_falsey
+    end
+  end
+
+  describe '#favorite_for_user?' do
+    before :each do
+      context = course_model
+      @group_fave = Group.create!(:name=>"group1", :context=>context)
+      @group_not_fave = Group.create!(:name=>"group2", :context=>context)
+      @group_fave.add_user(@user)
+      @group_not_fave.add_user(@user)
+      @user.favorites.build(:context => @group_fave)
+      @user.save
+    end
+
+    it "should return true if a user has a course set as a favorite" do
+      expect(@group_fave.favorite_for_user?(@user)).to eql(true)
+    end
+
+    it "should return false if a user has not set a group to be a favorite" do
+      expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
     end
   end
 end

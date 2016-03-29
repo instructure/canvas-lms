@@ -78,27 +78,59 @@ describe MediaObject do
   describe ".ensure_media_object" do
     it "should not create if the media object exists already" do
       MediaObject.create!(:context => user, :media_id => "test")
-      expect {
-        MediaObject.ensure_media_object("test", {})
-      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
+      MediaObject.expects(:create!).never
+      MediaObject.ensure_media_object("test", {})
     end
 
     it "should not create if the media id doesn't exist in kaltura" do
       MediaObject.expects(:media_id_exists?).with("test").returns(false)
-      expect {
-        MediaObject.ensure_media_object("test", {})
-        run_jobs
-      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
+      MediaObject.expects(:create!).never
+      MediaObject.ensure_media_object("test", {})
+      run_jobs
     end
 
     it "should create the media object" do
       MediaObject.expects(:media_id_exists?).with("test").returns(true)
-      expect {
-        MediaObject.ensure_media_object("test", { :context => user })
-        run_jobs
-      }.to change { Delayed::Job.jobs_count(:future) }.by(1)
+      MediaObject.ensure_media_object("test", { :context => user })
+      run_jobs
       obj = MediaObject.by_media_id("test").first
       expect(obj.context).to eq @user
+    end
+  end
+
+  describe '#transcoded_details' do
+    it 'returns the mp3 info' do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      expect(mo.transcoded_details).to be_nil
+      mo.data = { extensions: { mov: { id: "t-xxx" } } }
+      expect(mo.transcoded_details).to be_nil
+      mo.data = { extensions: { mp3: { id: "t-yyy" } } }
+      expect(mo.transcoded_details).to eq(id: "t-yyy")
+    end
+
+    it 'returns the mp4 info' do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo.data = { extensions: { mp4: { id: "t-yyy" } } }
+      expect(mo.transcoded_details).to eq(id: "t-yyy")
+    end
+  end
+
+  describe '#retrieve_details_ensure_codecs' do
+    it "retries later when the transcode isn't available" do
+      Timecop.freeze do
+        mo = MediaObject.create!(:context => user, :media_id => "test")
+        mo.expects(:retrieve_details)
+        mo.expects(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        mo.retrieve_details_ensure_codecs(1)
+      end
+    end
+
+    it "verifies existence of the transcoded details" do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo.data = { extensions: { mp4: { id: "t-yyy" } } }
+      mo.expects(:retrieve_details)
+      mo.expects(:send_at).never
+      mo.retrieve_details_ensure_codecs(1)
     end
   end
 

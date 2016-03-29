@@ -1,6 +1,7 @@
 require [
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/groups/StudentView',
 ], (React, StudentView) ->
 
-  React.renderComponent(StudentView, document.getElementById('content'))
+  # SView = React.createElement(StudentView);
+  React.render(StudentView, document.getElementById('content'))

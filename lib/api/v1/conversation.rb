@@ -46,7 +46,7 @@ module Api::V1::Conversation
     unless interleave_submissions
       result['message_count'] = result[:submissions] ?
         result['message_count'] - result[:submissions].size :
-        conversation.messages.human.where(:asset_id => nil).count
+        conversation.messages.human.where(:asset_id => nil).count(:all)
     end
     result[:audience] = audience.map(&:id)
     result[:audience].map!(&:to_s) if stringify_json_ids?
@@ -73,6 +73,8 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
+    ActiveRecord::Associations::Preloader.new.preload(recipients.select{|r| r.is_a?(MessageableUser)},
+      {:pseudonym => :account}) # for avatar_url
     recipients.map do |recipient|
       if recipient.is_a?(MessageableUser)
         conversation_user_json(recipient, current_user, session,
@@ -90,6 +92,9 @@ module Api::V1::Conversation
       :include_participant_avatars => true,
       :include_participant_contexts => true
     }.merge(options)
+    if options[:include_participant_avatars]
+      ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
+    end
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
 

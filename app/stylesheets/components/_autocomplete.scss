@@ -130,7 +130,7 @@ ul[class*=ac-] {
 
   i:before {
     color: #999;
-    font-size: 20px;
+    @include fontSize(20px);
   }
 
   &:hover, &:focus {
@@ -184,7 +184,7 @@ ul[class*=ac-] {
 	a, a i:before {
 		color: #fff;
     cursor: pointer;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
     text-shadow: 1px 1px 0 rgba(0, 0, 0, .4);
 	}
 }
@@ -195,7 +195,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
     background: $ic-brand-primary;
     border-radius: 10px;
     padding: 2px;
-    font-size: 9px;
+    @include fontSize(9px);
     line-height: 9px;
     top: 0;
     text-shadow: none;
@@ -234,7 +234,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
   border-radius: 10px;
   box-sizing: border-box;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   max-height: 250px;
   min-height: 50px;
   left: 0;

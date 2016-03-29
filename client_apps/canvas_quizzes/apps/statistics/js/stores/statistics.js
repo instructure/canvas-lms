@@ -1,10 +1,10 @@
 define(function(require) {
   var Store = require('canvas_quizzes/core/store');
+  var Dispatcher = require('../core/dispatcher');
   var config = require('../config');
   var QuizStats = require('../collections/quiz_statistics');
   var populateCollection = require('./common/populate_collection');
   var quizStats = new QuizStats([]);
-  var expanded = [];
 
   /**
    * @class Statistics.Stores.Statistics
@@ -14,7 +14,7 @@ define(function(require) {
     getInitialState: function() {
       return {
         loading: false,
-        stats_can_load: true
+        stats_can_load: true,
       };
     },
 
@@ -65,23 +65,10 @@ define(function(require) {
 
       if (quizStats.length) {
         props = quizStats.first().toJSON();
-        props.expanded = expanded;
-        props.expandingAll = this.isExpandingAll();
+        // props.expandingAll = this.isExpandingAll();
       }
 
       return props;
-    },
-
-    getExpandedSet: function() {
-      return expanded;
-    },
-
-    isExpandingAll: function() {
-      if (quizStats.length) {
-        return expanded.length === quizStats.first().get('questionStatistics').length;
-      }
-
-      return false;
     },
 
     isLoading: function() {
@@ -107,47 +94,29 @@ define(function(require) {
       }
     },
 
-    actions: {
-      expandQuestion: function(questionId, onChange) {
-        if (expanded.indexOf(questionId) === -1) {
-          expanded.push(questionId);
-          onChange();
-        }
-      },
-
-      collapseQuestion: function(questionId, onChange) {
-        var index = expanded.indexOf(questionId);
-        if (index !== -1) {
-          expanded.splice(index, 1);
-          onChange();
-        }
-      },
-
-      expandAll: function(_payload, onChange) {
-        if (quizStats.length) {
-          expanded = quizStats.first().toJSON().questionStatistics.map(function(question) {
-            return question.id;
-          });
-
-          onChange();
-        }
-      },
-
-      collapseAll: function(_payload, onChange) {
-        if (expanded.length) {
-          expanded = [];
-          onChange();
-        }
+    filterForSection: function(sectionId) {
+      if(sectionId == 'all') {
+        quizStats.url = config.quizStatisticsUrl;
+      } else {
+        quizStats.url = config.quizStatisticsUrl + '?section_ids=' + sectionId;
       }
+
+      config.section_ids = sectionId;
+      this.setState({ loading: true });
+
+      return quizStats.fetch({
+        success: this.checkForStatsNoLoad.bind(this),
+      }).then(function onLoad(payload) {
+        this.populate(payload);
+        this.setState({ loading: false });
+      }.bind(this));
     },
 
     __reset__: function() {
       quizStats.reset();
-      expandingAll = false;
-      expanded = [];
       return Store.prototype.__reset__.call(this);
     }
-  });
+  }, Dispatcher);
 
   return store;
 });

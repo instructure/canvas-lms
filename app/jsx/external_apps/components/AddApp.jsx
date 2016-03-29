@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!external_tools',
   'underscore',
@@ -11,6 +9,22 @@ define([
   'jquery.disableWhileLoading',
   'compiled/jquery.rails_flash_notifications'
 ], function(I18n, _, $, React, Modal, ConfigOptionField, ExternalTool) {
+
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
 
   return React.createClass({
     displayName: 'AddApp',
@@ -154,9 +168,10 @@ define([
       newTool.set('config_url', this.configUrl());
       newTool.set('config_type', 'by_url');
       newTool.set('name', this.state.fields.name.value);
+      newTool.set('app_center_id', this.props.app.short_name);
 
       $(e.target).attr('disabled', 'disabled');
-      
+
       newTool.save();
     },
 
@@ -206,11 +221,12 @@ define([
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
             isOpen={this.state.modalIsOpen}
+            style={modalOverrides}
             onRequestClose={this.closeModal}>
 
             <div className="ReactModal__Layout">
 
-              <div className="ReactModal__InnerSection ReactModal__Header">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Add App')}</h4>
                 </div>
@@ -222,14 +238,14 @@ define([
                 </div>
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Body">
+              <div className="ReactModal__Body">
                 {this.errorMessage()}
                 <form role="form">
                   {this.configOptions()}
                 </form>
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Footer">
+              <div className="ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
                   <button type="button" ref="addButton" className="btn btn-primary" onClick={this.submit}>{I18n.t('Add App')}</button>

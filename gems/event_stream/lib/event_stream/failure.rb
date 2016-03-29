@@ -16,11 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path("../../../../../config/canvas_rails4", __FILE__)
-
-unless CANVAS_RAILS3
-  require 'protected_attributes'
-end
+require 'protected_attributes'
 
 class EventStream::Failure < ActiveRecord::Base
   self.table_name = :event_stream_failures

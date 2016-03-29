@@ -162,10 +162,12 @@ class CanvasUnzip
     end
 
     def name
-      if type == :zip
-        entry.name
+      @name ||= if type == :zip
+        # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
+        normalize_name(entry.name, 'cp437')
       elsif type == :tar
-        entry.full_name.sub(/^\.\//, '')
+        # there is no standard. this seems like a reasonable fallback to me
+        normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
       end
     end
 
@@ -205,6 +207,13 @@ class CanvasUnzip
           end
         end
       end
+    end
+
+    # forces name to UTF-8, converting from fallback_encoding if it isn't UTF-8 to begin with
+    def normalize_name(name, fallback_encoding)
+      utf8_name = name.force_encoding('utf-8')
+      utf8_name = name.force_encoding(fallback_encoding).encode('utf-8') unless utf8_name.valid_encoding?
+      utf8_name
     end
   end
 end

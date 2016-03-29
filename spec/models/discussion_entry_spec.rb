@@ -19,9 +19,33 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
+  let(:topic) { @course.discussion_topics.create! }
+
+  describe 'callback lifecycle' do
+    before(:once) do
+      course_with_teacher(:active_all => true)
+    end
+
+    let(:entry) do
+      topic.discussion_entries.create!(user: @teacher)
+    end
+
+    it "should subscribe the author on create" do
+      discussion_topic_participant = topic.discussion_topic_participants.create!(user: @teacher, subscribed: false)
+      entry
+      expect(discussion_topic_participant.reload.subscribed).to be_truthy
+    end
+
+    it "should not subscribe the author on create outside of the #subscribe_author method" do
+      discussion_topic_participant = topic.discussion_topic_participants.create!(user: @teacher, subscribed: false)
+      DiscussionEntry.any_instance.stubs(subscribe_author: true)
+      entry
+      expect(discussion_topic_participant.reload.subscribed).to be_falsey
+    end
+  end
 
   it "should not be marked as deleted when parent is deleted" do
-    topic = course.discussion_topics.create!
+    course_with_teacher(:active_all => true)
     entry = topic.discussion_entries.create!
 
     sub_entry = topic.discussion_entries.build
@@ -37,7 +61,6 @@ describe DiscussionEntry do
 
   it "should preserve parent_id if valid" do
     course
-    topic = @course.discussion_topics.create!
     entry = topic.discussion_entries.create!
     sub_entry = topic.discussion_entries.build
     sub_entry.parent_id = entry.id
@@ -48,11 +71,23 @@ describe DiscussionEntry do
 
   it "should santize message" do
     course_model
-    topic = @course.discussion_topics.create!
     topic.discussion_entries.create!
     topic.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
     topic.save!
     expect(topic.message).to eql("<a href=\"#\">only this should stay</a>")
+  end
+
+  it 'does not allow viewing when in an announcement without :read_announcements' do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+    # because :post_to_forum implies :read in about half of discussions, and this is one such place
+    @course.account.role_overrides.create!(permission: 'post_to_forum', role: student_role, enabled: false)
+
+    topic = @course.announcements.create!(:user => @teacher, :message => "announcement text")
+    entry = topic.discussion_entries.create!(user: @teacher, message: 'reply text')
+
+    expect(entry.grants_right?(@student, :read)).to be(false)
   end
 
   context "entry notifications" do

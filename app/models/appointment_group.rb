@@ -21,22 +21,14 @@ class AppointmentGroup < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  has_many :appointments, opts = {:class_name => 'CalendarEvent', :as => :context, :order => :start_at, :include => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :context }
+  has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context }
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, '_appointments_appointments_participants_join.'))
-  has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
+  has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants_join.workflow_state <> 'deleted'") }, opts
+  has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
-  has_many :appointment_group_sub_contexts, :include => :sub_context
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :location_name, :location_address, :context_id, :context_type, :context_code, :sub_context_id, :sub_context_type,
-    :sub_context_code, :workflow_state, :created_at, :updated_at, :start_at, :end_at, :participants_per_appointment, :max_appointments_per_participant,
-    :min_appointments_per_participant, :participant_visibility
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:appointments, :appointment_participants, :appointment_group_contexts, :appointment_group_sub_contexts]
+  has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
 
   def context
     appointment_group_contexts.first.context
@@ -47,7 +39,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def active_contexts
-    contexts.reject { |context| context.workflow_state == 'deleted' }
+    contexts.reject { |context| context.workflow_state == 'deleted' || context.concluded? }
   end
 
   def sub_contexts
@@ -190,9 +182,9 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:primary] &= restrict_to_codes
     end
     uniq.
-        joins("JOIN appointment_group_contexts agc " \
+        joins("JOIN #{AppointmentGroupContext.quoted_table_name} agc " \
               "ON appointment_groups.id = agc.appointment_group_id " \
-              "LEFT JOIN appointment_group_sub_contexts sc " \
+              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
         where(<<-COND, codes[:primary], codes[:secondary])
         workflow_state = 'active'
@@ -214,9 +206,9 @@ class AppointmentGroup < ActiveRecord::Base
       codes[:limited] &= restrict_to_codes
     end
     uniq.
-        joins("JOIN appointment_group_contexts agc " \
+        joins("JOIN #{AppointmentGroupContext.quoted_table_name} agc " \
               "ON appointment_groups.id = agc.appointment_group_id " \
-              "LEFT JOIN appointment_group_sub_contexts sc " \
+              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
         where(<<-COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
@@ -271,7 +263,7 @@ class AppointmentGroup < ActiveRecord::Base
 
     dispatch :appointment_group_deleted
     to       { possible_users }
-    whenever { contexts.any?(&:available?) && deleted? && workflow_state_changed? }
+    whenever { contexts.any?(&:available?) && changed_state(:deleted, :active) }
     data     { {:cancel_reason => @cancel_reason} }
   end
 
@@ -358,7 +350,7 @@ class AppointmentGroup < ActiveRecord::Base
           group_categories = sub_contexts.find_all{|sc| sc.instance_of? GroupCategory }
           raise %Q{inconsistent appointment group: #{self.id} #{group_categories}} if group_categories.length > 1
           group_category_id = group_categories.first.id
-          user.groups.detect{ |g| g.group_category_id == group_category_id }
+          user.current_groups.detect{ |g| g.group_category_id == group_category_id }
         end
       participant if participant && eligible_participant?(participant)
     end
@@ -451,7 +443,7 @@ class AppointmentGroup < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
       self.workflow_state = 'deleted'
@@ -466,7 +458,7 @@ class AppointmentGroup < ActiveRecord::Base
     @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
       course_ids = appointment_group_contexts.select{|agc| context_codes.include? agc.context_code }.map(&:context_id)
-      Course.where(:id => course_ids).all
+      Course.where(:id => course_ids).to_a
     end
   end
 

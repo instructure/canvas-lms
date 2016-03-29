@@ -1,25 +1,90 @@
 module Assignments
   class NeedsGradingCountQuery
-    attr_reader :assignment, :user
 
-    def initialize(_assignment, _user)
+    # holds values so we don't have to recompute them over and over again
+    class CourseProxy
+      attr_reader :course, :user
+
+      def initialize(_course, _user)
+        @course = _course
+        @user = _user
+      end
+
+      def da_enabled?
+        @da_enabled ||= course.feature_enabled?(:differentiated_assignments)
+      end
+
+      def section_visibilities
+        @section_visibilities ||= course.section_visibilities_for(user)
+      end
+
+      def visibility_level
+        @visibility_level ||= course.enrollment_visibility_level_for(user, section_visibilities)
+      end
+
+      def visible_section_ids
+        @visible_section_ids ||= section_visibilities.map{|v| v[:course_section_id]}
+      end
+    end
+
+    attr_reader :assignment, :user, :course_proxy
+
+    delegate :course, :da_enabled?, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
+
+    def initialize(_assignment, _user, _course_proxy=nil)
       @assignment = _assignment
       @user = _user
+      @course_proxy = _course_proxy || CourseProxy.new(@assignment.context, @user)
     end
 
     def count
       assignment.shard.activate do
         # the needs_grading_count trigger should change assignment.updated_at, invalidating the cache
         Rails.cache.fetch(['assignment_user_grading_count', assignment, user].cache_key) do
-          case visibility_level
-          when :full, :limited
-            da_enabled? ? manual_count : assignment.needs_grading_count
-          when :sections
-            section_filtered_submissions.count(:id, distinct: true)
+          if assignment.moderated_grading? && !assignment.grades_published?
+            needs_moderated_grading_count
           else
-            0
+            case visibility_level
+            when :full, :limited
+              da_enabled? ? manual_count : assignment.needs_grading_count
+            when :sections
+              section_filtered_submissions.count(:id, distinct: true)
+            else
+              0
+            end
           end
         end
+      end
+    end
+
+    def needs_moderated_grading_count
+      level = visibility_level
+      return 0 unless [:full, :limited, :sections].include?(level)
+
+      # ignore submissions this user has graded
+      graded_sub_ids = assignment.submissions.joins(:provisional_grades).
+        where("moderated_grading_provisional_grades.final = ?", false).
+        where("moderated_grading_provisional_grades.scorer_id = ?", user.id).
+        where("moderated_grading_provisional_grades.score IS NOT NULL").pluck(:id)
+
+      moderation_set_student_ids = assignment.moderated_grading_selections.pluck(:student_id)
+
+      # ignore submissions that don't need any more provisional grades
+      pg_scope = assignment.submissions.joins(:provisional_grades).
+        where("moderated_grading_provisional_grades.final = ?", false).
+        where("moderated_grading_provisional_grades.scorer_id <> ?", user.id).
+        group("submissions.id", "submissions.user_id")
+      pg_scope = pg_scope.where("submissions.id NOT IN (?)", graded_sub_ids) if graded_sub_ids.any?
+      pg_scope.count.each do |key, count|
+        sub_id, user_id = key
+        graded_sub_ids << sub_id if count >= (moderation_set_student_ids.include?(user_id) ? 2 : 1)
+      end
+
+      scope = (level == :sections) ? section_filtered_submissions : all_submissions
+      if graded_sub_ids.any?
+        scope.where("submissions.id NOT IN (?)", graded_sub_ids).count(:id, distinct: true)
+      else
+        scope.count(:id, distinct: true)
       end
     end
 
@@ -67,34 +132,14 @@ module Assignments
 
       if da_enabled?
         string += <<-SQL
-          AND EXISTS (SELECT * FROM assignment_student_visibilities asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
+          AND EXISTS (SELECT * FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
         SQL
       end
       joined_submissions.where(string, assignment, course)
     end
 
     def joined_submissions
-      assignment.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id")
-    end
-
-    def visible_section_ids
-      section_visibilities.map{|v| v[:course_section_id]}
-    end
-
-    def visibility_level
-      course.enrollment_visibility_level_for(user, section_visibilities)
-    end
-
-    def section_visibilities
-      course.section_visibilities_for(user)
-    end
-
-    def course
-      assignment.context
-    end
-
-    def da_enabled?
-      course.feature_enabled?(:differentiated_assignments)
+      assignment.submissions.joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = submissions.user_id")
     end
   end
 end

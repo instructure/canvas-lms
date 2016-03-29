@@ -609,8 +609,13 @@ define([
       if(limitToOneRubric && $("#rubrics .rubric:visible").length > 0) { return; }
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
-      $rubric.find(":text:first").focus().select();
-        $(".add_rubric_link").hide();
+      $(".add_rubric_link").hide();
+      var $target = $rubric.find('.find_rubric_link:visible:first');
+      if ($target.length > 0) {
+        $target.focus();
+      } else {
+        $rubric.find(":text:first").focus().select();
+      }
     });
 
     $("#rubric_dialog")
@@ -745,9 +750,11 @@ define([
           var assignmentPoints = parseFloat($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
+            var pointRatio = assignmentPoints === 0 ? rubricPoints : rubricPoints / assignmentPoints;
             var $confirmDialog = $(changePointsPossibleToMatchRubricDialog({
               assignmentPoints: assignmentPoints,
-              rubricPoints: rubricPoints
+              rubricPoints: rubricPoints,
+              pointRatio: pointRatio
             }));
             var closeDialog = function(skip){
               forceSubmit = true;
@@ -766,7 +773,7 @@ define([
                   click: function() { closeDialog(true); }
                 }
               ],
-              width: 320,
+              width: 400,
               resizable: false,
               close: $confirmDialog.remove
             });
@@ -920,7 +927,7 @@ define([
     }).delegate('.rating', 'mouseout', function(event) {
       $(this).data('hover_offset', null).data('hover_width', null);
     }).delegate('.delete_rating_link', 'click', function(event) {
-      var $target = $(this).closest('tr');
+      var $target = $(this).closest('td').next().find('.edit_rating_link');
       event.preventDefault();
       rubricEditing.hideCriterionAdd($(this).parents(".rubric"));
       $(this).parents(".rating").fadeOut(function() {
@@ -941,7 +948,6 @@ define([
     $(".criterion_points").keydown(function(event) {
       if(event.keyCode == 13) {
         rubricEditing.updateCriterionPoints($(this).parents(".criterion"));
-        $(this).blur();
       }
     }).blur(function(event) {
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"));
@@ -1007,4 +1013,3 @@ define([
 
   return rubricEditing;
 });
-

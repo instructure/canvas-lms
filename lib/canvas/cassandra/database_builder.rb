@@ -38,8 +38,12 @@ module Canvas
         end
       end
 
+      def self.configs
+        ConfigFile.load('cassandra') || {}
+      end
+
       def self.config_names
-        ConfigFile.load('cassandra').try(:keys) || []
+        configs.keys
       end
 
       def self.read_consistency_setting(database_name = nil)

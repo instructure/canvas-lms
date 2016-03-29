@@ -1,5 +1,6 @@
-<% 
-  enrollment = pending_enrollment 
+<%
+  pending_enrollment ||= nil
+  enrollment = pending_enrollment
    title_message = t :student_title, "Invited as a student, click to see the Course"
   case enrollment.type
   when 'TeacherEnrollment'

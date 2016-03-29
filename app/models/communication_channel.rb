@@ -23,19 +23,15 @@ class CommunicationChannel < ActiveRecord::Base
 
   attr_accessible :user, :path, :path_type, :build_pseudonym_on_confirm, :pseudonym
 
+  serialize :last_bounce_details
+  serialize :last_transient_bounce_details
+
   belongs_to :pseudonym
   has_many :pseudonyms
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
   has_many :delayed_messages, :dependent => :destroy
   has_many :messages
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :path, :path_type, :position, :user_id, :pseudonym_id, :bounce_count, :workflow_state, :confirmation_code,
-    :created_at, :updated_at, :build_pseudonym_on_confirm
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user]
 
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
@@ -58,7 +54,45 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_PUSH     = 'push'
   TYPE_YO       = 'yo'
 
-  RETIRE_THRESHOLD = 3
+  RETIRE_THRESHOLD = 1
+
+  # TODO: Will need to be internationalized. Also, do we want to allow this to be specified in a config file?
+  def self.country_codes
+    # [country code, name, true if email should be used instead of Twilio]
+    @country_codes ||= [
+      ['54', 'Argentina', false],
+      ['61', 'Australia', false],
+      ['32', 'Belgium', false],
+      ['55', 'Brazil', false],
+      ['1', 'Canada', false],
+      ['56', 'Chile', false],
+      ['57', 'Colombia', false],
+      ['45', 'Denmark', false],
+      ['358', 'Finland', false],
+      ['49', 'Germany', false],
+      ['504', 'Honduras', false],
+      ['852', 'Hong Kong', false],
+      ['353', 'Ireland', false],
+      ['352', 'Luxembourg', false],
+      ['60', 'Malaysia', false],
+      ['52', 'Mexico', false],
+      ['31', 'Netherlands', false],
+      ['64', 'New Zealand', false],
+      ['47', 'Norway', false],
+      ['507', 'Panama', false],
+      ['51', 'Peru', false],
+      ['63', 'Philippines', false],
+      ['974', 'Qatar', false],
+      ['966', 'Saudi Arabia', false],
+      ['65', 'Singapore', false],
+      ['34', 'Spain', false],
+      ['46', 'Sweden', false],
+      ['41', 'Switzerland', false],
+      ['971', 'United Arab Emirates', false],
+      ['44', 'United Kingdom', false],
+      ['1', 'United States', true]
+    ]
+  end
 
   def self.sms_carriers
     @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
@@ -76,6 +110,15 @@ class CommunicationChannel < ActiveRecord::Base
           'Virgin Mobile' => 'vmobl.com' }), &:first)
   end
 
+  set_policy do
+    given { |user| self.user.grants_right?(user, :manage_user_details) }
+    can :force_confirm
+
+    given { |user| Account.site_admin.grants_right?(user, :read_messages) }
+    can :reset_bounce_count
+    can :read_bounce_details
+  end
+
   def pseudonym
     user.pseudonyms.where(:unique_id => path).first if user
   end
@@ -91,14 +134,14 @@ class CommunicationChannel < ActiveRecord::Base
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
-      (record.workflow_state == 'active' || 
+      (record.workflow_state == 'active' ||
         (record.workflow_state == 'unconfirmed' and (self.user.pre_registered? || self.user.creation_pending?))) and
       self.path_type == TYPE_EMAIL
     }
 
     p.dispatch :confirm_email_communication_channel
     p.to { self }
-    p.whenever { |record| 
+    p.whenever { |record|
       @send_confirmation and
       record.workflow_state == 'unconfirmed' and self.user.registered? and
       self.path_type == TYPE_EMAIL
@@ -178,14 +221,14 @@ class CommunicationChannel < ActiveRecord::Base
       self.path
     end
   end
-  
+
   def forgot_password!
     @request_password = true
     set_confirmation_code(true)
     self.save!
     @request_password = false
   end
-  
+
   def send_confirmation!(root_account)
     @send_confirmation = true
     @root_account = root_account
@@ -193,7 +236,7 @@ class CommunicationChannel < ActiveRecord::Base
     @root_account = nil
     @send_confirmation = false
   end
-  
+
   def send_merge_notification!
     @send_merge_notification = true
     self.save!
@@ -201,7 +244,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_otp!(code)
-    m = self.messages.scoped.new
+    m = self.messages.temp_record
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
     Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
@@ -210,7 +253,7 @@ class CommunicationChannel < ActiveRecord::Base
   # If you are creating a new communication_channel, do nothing, this just
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
-  # confirmation code in place. 
+  # confirmation code in place.
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
@@ -220,15 +263,15 @@ class CommunicationChannel < ActiveRecord::Base
     end
     true
   end
-  
+
   scope :for, lambda { |context|
     case context
     when User
       where(:user_id => context)
     when Notification
-      includes(:notification_policies).where(:notification_policies => { :notification_id => context })
+      eager_load(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
-      scoped
+      all
     end
   }
 
@@ -266,19 +309,18 @@ class CommunicationChannel < ActiveRecord::Base
     rank_order << TYPE_TWITTER if twitter_service
     rank_order << TYPE_YO unless user.user_services.for_service(CommunicationChannel::TYPE_YO).empty?
     self.unretired.where('communication_channels.path_type IN (?)', rank_order).
-      order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").
-      all
+      order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").to_a
   end
 
-  scope :include_policies, -> { includes(:notification_policies) }
+  scope :include_policies, -> { preload(:notification_policies) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
   scope :of_type, lambda { |type| where(:path_type => type) }
-  
+
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true
   end
-  
+
   def move_to_user(user, migrate=true)
     return unless user
     if self.pseudonym && self.pseudonym.unique_id == self.path
@@ -289,11 +331,11 @@ class CommunicationChannel < ActiveRecord::Base
       self.save!
       if old_user_id
         Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
-        User.where(:id => [old_user_id, user]).update_all(:updated_at => Time.now.utc)
+        User.where(:id => [old_user_id, user]).touch_all
       end
     end
   end
-  
+
   def consider_building_pseudonym
     if self.build_pseudonym_on_confirm && self.active?
       self.build_pseudonym_on_confirm = false
@@ -307,13 +349,13 @@ class CommunicationChannel < ActiveRecord::Base
     end
     true
   end
-  
-  alias_method :destroy!, :destroy
+
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'retired'
     self.save
   end
-  
+
   workflow do
     state :unconfirmed do
       event :confirm, :transitions_to => :active do
@@ -321,13 +363,16 @@ class CommunicationChannel < ActiveRecord::Base
       end
       event :retire, :transitions_to => :retired
     end
-    
+
     state :active do
       event :retire, :transitions_to => :retired
     end
-    
+
     state :retired do
-      event :re_activate, :transitions_to => :active
+      event :re_activate, :transitions_to => :active do
+        # Reset bounce count when we're being reactivated
+        reset_bounce_count!
+      end
     end
   end
 
@@ -338,7 +383,7 @@ class CommunicationChannel < ActiveRecord::Base
     true
   end
   protected :assert_path_type
-    
+
   def self.serialization_excludes; [:confirmation_code]; end
 
   def self.associated_shards(path)
@@ -346,13 +391,14 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def merge_candidates(break_on_first_found = false)
+    return [] if path_type == 'push'
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
       scope = scope.shard(Shard.current)
-      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
+      scope.where("user_id<>?", self.user_id).preload(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
         end
@@ -376,6 +422,11 @@ class CommunicationChannel < ActiveRecord::Base
     old_bounce_count >= RETIRE_THRESHOLD
   end
 
+  def reset_bounce_count!
+    self.bounce_count = 0
+    self.save!
+  end
+
   def was_retired?
     old_workflow_state = self.previous_changes[:workflow_state].try(:first)
     old_workflow_state ||= self.workflow_state
@@ -393,12 +444,32 @@ class CommunicationChannel < ActiveRecord::Base
   end
   private :check_if_bouncing_changed
 
-  def self.bounce_for_path(path)
+  def self.bounce_for_path(path:, timestamp:, details:, permanent_bounce:, suppression_bounce:)
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
       CommunicationChannel.unretired.email.by_path(path).each do |channel|
-        channel.update_attribute(:bounce_count, channel.bounce_count + 1)
+        channel.bounce_count = channel.bounce_count + 1 if permanent_bounce
+
+        if suppression_bounce
+          channel.last_suppression_bounce_at = timestamp
+        elsif permanent_bounce
+          channel.last_bounce_at = timestamp
+          channel.last_bounce_details = details
+        else
+          channel.last_transient_bounce_at = timestamp
+          channel.last_transient_bounce_details = details
+        end
+
+        channel.save!
       end
     end
+  end
+
+  def last_bounce_summary
+    last_bounce_details.try(:[], 'bouncedRecipients').try(:[], 0).try(:[], 'diagnosticCode')
+  end
+
+  def last_transient_bounce_summary
+    last_transient_bounce_details.try(:[], 'bouncedRecipients').try(:[], 0).try(:[], 'diagnosticCode')
   end
 
   def self.find_by_confirmation_code(code)

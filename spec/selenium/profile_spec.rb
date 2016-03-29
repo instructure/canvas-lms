@@ -2,7 +2,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def click_edit
     f('.edit_settings_link').click
@@ -14,7 +14,7 @@ describe "profile" do
   def add_skype_service
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
-    skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
+    skype_dialog.find_element(:id, 'skype_user_service_user_name').send_keys("jakesorce")
     submit_dialog(skype_dialog, '.btn')
     wait_for_ajaximations
     expect(f('#registered_services')).to include_text("Skype")
@@ -80,6 +80,7 @@ describe "profile" do
     end
 
     it "should add a new email address on profile settings page" do
+      @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
 
@@ -87,12 +88,14 @@ describe "profile" do
       add_email_link
 
       f('#communication_channels a[href="#register_sms_number"]').click
+
+      click_option('#communication_channel_sms_country', 'United States (+1)')
       replace_content(f('#register_sms_number #communication_channel_sms_email'), 'test@example.com')
       expect(f('#register_sms_number button[type="submit"]')).to be_displayed
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")
       test_email = 'nobody+1234@example.com'
-      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
+      form.find_element(:id, 'communication_channel_email').send_keys(test_email)
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
@@ -120,7 +123,7 @@ describe "profile" do
       new_user_name = 'new user name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
+      replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
       keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
@@ -130,7 +133,7 @@ describe "profile" do
       new_display_name = 'test name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_short_name').send_keys(new_display_name)
+      replace_content(edit_form.find_element(:id, 'user_short_name'), new_display_name)
       submit_form(edit_form)
       wait_for_ajaximations
       refresh_page
@@ -159,9 +162,11 @@ describe "profile" do
     end
 
     it "should add another contact method - sms" do
+      @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
       get "/profile/settings"
       f('.add_contact_link').click
+      click_option('#communication_channel_sms_country', 'United States (+1)')
       register_form = f('#register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
@@ -191,15 +196,17 @@ describe "profile" do
     it "should toggle service visibility" do
       get "/profile/settings"
       add_skype_service
-      initial_state = @user.show_user_services
-
-      f('#show_user_services').click
+      selector = "#show_user_services"
+      expect(f(selector).selected?).to be_truthy
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).not_to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_falsey
 
-      f('#show_user_services').click
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_truthy
     end
 
     it "should generate a new access token" do
@@ -232,6 +239,18 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(f('#access_tokens')).not_to be_displayed
+      check_element_has_focus f(".add_access_token_link")
+    end
+
+    it "should set focus to the previous access token when deleting and multiple exist" do
+      @token1 = @user.access_tokens.create! purpose: 'token_one'
+      @token2 = @user.access_tokens.create! purpose: 'token_two'
+      get "/profile/settings"
+      fj(".delete_key_link[rel$=#{@token2.id}]").click
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      check_element_has_focus fj(".delete_key_link[rel$=#{@token1.id}]")
     end
   end
 
@@ -254,6 +273,15 @@ describe "profile" do
   describe "profile pictures local tests" do
     before do
       local_storage!
+    end
+
+    it "should save admin profile pics setting", priority: "1", test_id: 68933 do
+      site_admin_logged_in
+      get "/accounts/#{Account.default.id}/settings"
+      f('#account_services_avatars').click
+      f('.btn.btn-primary[type="submit"]').click
+      wait_for_ajaximations
+      expect(is_checked('#account_services_avatars')).to be_truthy
     end
 
     it "should successfully upload profile pictures" do
@@ -399,4 +427,3 @@ describe "profile" do
     end
   end
 end
-

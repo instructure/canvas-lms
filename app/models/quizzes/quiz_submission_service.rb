@@ -272,21 +272,26 @@ class Quizzes::QuizSubmissionService
   # @throw RequestError(403) if the access code is invalid
   # @throw RequestError(403) if the IP address isn't covered
   def assert_takeability!(quiz, participant = self.participant)
-    if quiz.locked?
-      reject! 'quiz is locked', 400
-    end
-
     # [Transient:CNVS-10224] - support for CGB-OQAAT quizzes
     if quiz.cant_go_back
       reject! 'that type of quizzes is not supported yet', 501
     end
 
-    if quiz.access_code.present? && quiz.access_code != participant.access_code
-      reject! 'invalid access code', 403
-    end
+    can_take = Quizzes::QuizEligibility.new(course: quiz.context,
+                                            quiz: quiz,
+                                            user: participant.user,
+                                            remote_ip: participant.ip_address,
+                                            access_code: participant.access_code)
 
-    if quiz.ip_filter && !quiz.valid_ip?(participant.ip_address)
-      reject! 'IP address denied', 403
+
+    unless can_take.eligible?
+      reason = can_take.declined_reason_renders
+      if reason == :access_code
+        reject! 'invalid access code', 403
+      elsif reason == :invalid_ip
+        reject! 'IP address denied', 403
+      end
+      reject! 'quiz is locked', 400
     end
   end
 

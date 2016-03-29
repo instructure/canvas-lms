@@ -73,7 +73,7 @@
             <input id="assignment_peer_reviews_assign_at"
               name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
               class="date_field datetime_field hasDatePicker"
-              value="{{datetimeFormatted peerReviewsAssignAt false}}"
+              value="{{datetimeFormatted peerReviewsAssignAt}}"
               type="text"
               aria-labelledby="assign_peer_review_at_accessible_label"
               aria-describedby="peer_reviews_assign_at_explanation"
@@ -89,25 +89,27 @@
         </div>
       </div>
 
-      <div class="nested">
-        <div class="subtitle">
-          <strong>
-            {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
-          </strong>
-        </div>
+      {{#unless hideAnonymousPeerReview}}
+        <div class="nested">
+          <div class="subtitle">
+            <strong>
+              {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
+            </strong>
+          </div>
 
-        <label class="checkbox" for="anonymous_peer_reviews">
-          {{checkbox "anonymous_peer_reviews"
-          checked=anonymousPeerReviews
-          id="anonymous_peer_reviews"
-          aria-controls="anonymous_peer_reviews"
-          prefix=prefix
-          disabled=peerReviewsFrozen}}
-          {{#t "labels.anonymous_peer_reviews"}}
-            Peer Reviews Appear Anonymously
-          {{/t}}
-        </label>
-      </div>
+          <label class="checkbox" for="anonymous_peer_reviews">
+            {{checkbox "anonymous_peer_reviews"
+            checked=anonymousPeerReviews
+            id="anonymous_peer_reviews"
+            aria-controls="anonymous_peer_reviews"
+            prefix=prefix
+            disabled=peerReviewsFrozen}}
+            {{#t "labels.anonymous_peer_reviews"}}
+              Peer Reviews Appear Anonymously
+            {{/t}}
+          </label>
+        </div>
+      {{/unless}}
     </div>
   </div>
 </div>

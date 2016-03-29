@@ -14,7 +14,7 @@ define [
     sourceDiv = $('<div></div>')
     targetDiv = $('<div></div>')
 
-    targetDivSpy = sinon.spy()
+    targetDivSpy = @spy()
     targetDiv.on 'click', targetDivSpy
     sourceDiv.redirectClickTo(targetDiv)
 

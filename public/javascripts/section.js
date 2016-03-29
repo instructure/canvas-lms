@@ -23,22 +23,16 @@ define([
         currentEnrollmentList   = new PaginatedList($('#current-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           template: enrollmentTemplate,
-          url: '/api/v1/sections/' + section_id + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
         }),
         completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           requestParams: { state: 'completed', page: 1, per_page: 25 },
           template: enrollmentTemplate,
-          url: '/api/v1/sections/' + section_id + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
         });
 
     $edit_section_form.formSubmit({
-      processData: function(data) {
-          var start_at = $.datetime.parse(data['course_section[start_at]']);
-          var end_at = $.datetime.parse(data['course_section[end_at]']);
-          data['course_section[start_at]'] = start_at ? $.unfudgeDateForProfileTimezone(start_at).toISOString() : "";
-          data['course_section[end_at]'] = end_at ? $.unfudgeDateForProfileTimezone(end_at).toISOString() : "";
-      },
       beforeSubmit: function(data) {
         $edit_section_form.hide();
         $edit_section_form.find(".name").text(data['course_section[name]']).show();

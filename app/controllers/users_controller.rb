@@ -98,6 +98,11 @@ require 'atom'
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
 #           "type": "string"
 #         },
+#         "integration_id": {
+#           "description": "The integration_id associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
+#           "example": "ABC59802",
+#           "type": "string"
+#         },
 #         "login_id": {
 #           "description": "The unique login id for the user.  This is what the user uses to log in to Canvas.",
 #           "example": "sheldon@caltech.example.com",
@@ -147,24 +152,30 @@ require 'atom'
 class UsersController < ApplicationController
   include Delicious
   include SearchHelper
+  include SectionTabHelper
   include I18nUtilities
   include CustomColorHelper
 
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
+    :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
     :dashboard_sidebar, :settings, :all_menu_courses]
   before_filter :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service,
     :create_user_service, :merge, :user_dashboard, :masquerade]
-  before_filter :require_self_registration, :only => [:new, :create]
+  skip_before_filter :load_user, :only => [:create_self_registered_user]
+  before_filter :require_self_registration, :only => [:new, :create, :create_self_registered_user]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
-    if authorized_action(@user, @current_user, :read)
-      current_active_enrollments = @user.enrollments.current.includes(:course).shard(@user).to_a
+    if authorized_action(@user, @current_user, :read_grades)
+      crumb_url = polymorphic_url([@current_user]) if @user.grants_right?(@current_user, session, :view_statistics)
+      add_crumb(@current_user.short_name, crumb_url)
+      add_crumb(t('crumbs.grades', 'Grades'), grades_path)
+
+      current_active_enrollments = @user.enrollments.current.preload(:course).shard(@user).to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -173,8 +184,32 @@ class UsersController < ApplicationController
         return
       end
 
-      ActiveRecord::Associations::Preloader.new(@observed_enrollments, :course).run
+      @grading_periods = collected_grading_periods_for_presenter(
+        @presenter, params[:course_id], params[:grading_period_id])
+      @grades = grades_for_presenter(@presenter, @grading_periods)
+      js_env :grades_for_student_url => grades_for_student_url
+
+      ActiveRecord::Associations::Preloader.new.preload(@observed_enrollments, :course)
     end
+  end
+
+  def grades_for_student
+    enrollment = Enrollment.active.find(params[:enrollment_id])
+    return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
+
+    course = enrollment.course
+    grading_period_id = params[:grading_period_id].to_i
+    grading_period = GradingPeriod.context_find(course, grading_period_id)
+    grading_periods = {
+      course.id => {
+        :periods => [grading_period],
+        :selected_period_id => grading_period_id
+      }
+    }
+    calculator = grade_calculator([enrollment.user_id], course, grading_periods)
+    totals = calculator.compute_scores.first.first.first
+    totals[:hide_final_grades] = course.hide_final_grades?
+    render json: totals
   end
 
   def oauth
@@ -183,25 +218,11 @@ class UsersController < ApplicationController
       return redirect_to(user_profile_url(@current_user))
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
-    if params[:service] == "google_docs"
-      request_token = GoogleDocs::Connection.request_token(oauth_success_url(:service => 'google_docs'))
-      OauthRequest.create(
-        :service => 'google_docs',
-        :token => request_token.token,
-        :secret => request_token.secret,
-        :user_secret => CanvasSlug.generate(nil, 16),
-        :return_url => return_to_url,
-        :user => @real_current_user || @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-      redirect_to request_token.authorize_url
-    elsif params[:service] == "google_drive"
+    if params[:service] == "google_drive"
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
-      doc_service = @current_user.user_services.where(service: "google_docs").first
-      user_name = doc_service.service_user_name if doc_service
-      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state, user_name)
+      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
@@ -245,7 +266,12 @@ class UsersController < ApplicationController
         client = google_drive_client
         client.authorization.code = params[:code]
         client.authorization.fetch_access_token!
-        drive = client.discovered_api('drive', 'v2')
+
+        # we should look into consolidating this and connection.rb
+        drive = Rails.cache.fetch(['google_drive_v2'].cache_key) do
+          client.discovered_api('drive', 'v2')
+        end
+
         result = client.execute!(:api_method => drive.about.get)
 
         if result.status == 200
@@ -275,10 +301,12 @@ class UsersController < ApplicationController
 
         flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
         return redirect_to(json['return_to_url'])
-      rescue => e
+      rescue Google::APIClient::ClientError => e
         Canvas::Errors.capture_exception(:oauth, e)
-        flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
+
+        flash[:error] = e.to_s
       end
+      return redirect_to(user_profile_url(@current_user))
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -288,32 +316,7 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "google_docs"
-        begin
-          access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)
-          service_user_id, service_user_name = google_docs.get_service_user_info access_token
-          if oauth_request.user
-            UserService.register(
-              :service => "google_docs",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "google.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name
-            )
-            oauth_request.destroy
-          else
-            session[:oauth_gdocs_access_token_token] = access_token.token
-            session[:oauth_gdocs_access_token_secret] = access_token.secret
-          end
-
-          flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
-        end
-      elsif params[:service] == "linked_in"
+     if params[:service] == "linked_in"
         begin
           linkedin_connection = LinkedIn::Connection.new
           token = session.delete(:oauth_linked_in_request_token_token)
@@ -411,16 +414,19 @@ class UsersController < ApplicationController
 
         if api_request?
           search_term = params[:search_term].presence
-
+          page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
+            page_opts[:total_entries] = nil # doesn't calculate a total count
           else
             users = UserSearch.scope_for(@context, @current_user)
           end
 
-          users = Api.paginate(users, self, api_v1_account_users_url)
-          user_json_preloads(users)
-          return render :json => users.map { |u| user_json(u, @current_user, session) }
+          includes = (params[:include] || []) & %w{avatar_url email last_login}
+          users = users.with_last_login if includes.include?('last_login')
+          users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
+          user_json_preloads(users, includes.include?('email'))
+          return render :json => users.map { |u| user_json(u, @current_user, session, includes)}
         else
           @users ||= []
           @users = @users.paginate(:page => params[:page])
@@ -467,6 +473,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    session.delete(:parent_registration) if session[:parent_registration]
     check_incomplete_registration
     get_context
 
@@ -479,10 +486,16 @@ class UsersController < ApplicationController
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
-    js_env :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url
+    js_env({
+      :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
+      :PREFERENCES => {
+        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :custom_colors => @current_user.custom_colors
+      }
+    })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select { |e| e.invited? }
+    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
@@ -494,12 +507,12 @@ class UsersController < ApplicationController
   end
 
   def cached_submissions(user, upcoming_events)
-    Rails.cache.fetch(['cached_user_submissions', user].cache_key,
+    Rails.cache.fetch(['cached_user_submissions2', user].cache_key,
       :expires_in => 3.minutes) do
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.
-          select([:id, :assignment_id, :score, :workflow_state]).
+          select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
     end
@@ -520,7 +533,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       prepare_current_user_dashboard_items
 
-      if @show_recent_feedback = (@current_user.student_enrollments.active.present?)
+      if @show_recent_feedback = (@current_user.student_enrollments.active.exists?)
         @recent_feedback = (@current_user && @current_user.recent_feedback) || []
       end
     end
@@ -528,10 +541,11 @@ class UsersController < ApplicationController
     render :layout => false
   end
 
-  def toggle_dashboard
-    @current_user.preferences[:new_dashboard] = !@current_user.preferences[:new_dashboard]
+  def toggle_recent_activity_dashboard
+    @current_user.preferences[:recent_activity_dashboard] =
+      !@current_user.preferences[:recent_activity_dashboard]
     @current_user.save!
-    render :json => {}
+    render json: {}
   end
 
   include Api::V1::StreamItem
@@ -826,8 +840,30 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API List Missing Submissions
+  # returns past-due assignments for which the student does not have a submission.
+  # The user sending the request must either be an admin or a parent observer using the parent app
+  #
+  # @argument user_id
+  #   the student's ID
+  #
+  # @returns [Assignment]
+  def missing_submissions
+    user = api_find(User, params[:user_id])
+    return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
+
+    assignments = []
+    Shackles.activate(:slave) do
+      preloaded_submitted_assignment_ids = user.submissions.pluck(:assignment_id)
+      assignments = user.assignments_needing_submitting due_before: Time.zone.now
+      assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
+    end
+
+    render json: assignments.map {|as| assignment_json(as, user, session) }
+  end
+
   def ignore_item
-    unless %w[grading submitting reviewing].include?(params[:purpose])
+    unless %w[grading submitting reviewing moderation].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
     end
     @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment', 'AssessmentRequest']),
@@ -904,8 +940,8 @@ class UsersController < ApplicationController
 
   def delete_user_service
     deleted = @current_user.user_services.find(params[:id]).destroy
-    if deleted.service == "google_docs"
-      Rails.cache.delete(['google_docs_tokens', @current_user].cache_key)
+    if deleted.service == "google_drive"
+      Rails.cache.delete(['google_drive_tokens', @current_user].cache_key)
     end
     render :json => {:deleted => true}
   end
@@ -959,15 +995,19 @@ class UsersController < ApplicationController
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
-    if authorized_action(@user, @current_user, :view_statistics)
+    if authorized_action(@user, @current_user, :read_full_profile)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
-      @group_memberships = @user.current_group_memberships.includes(:group)
+      @group_memberships = @user.current_group_memberships
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
-      @enrollments = @user.enrollments.with_each_shard { |scope| scope.where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section) }
+      @enrollments = @user.enrollments.
+        shard(@user).
+        where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
+        eager_load(:course).
+        preload(:associated_user, :course_section, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
       # restrict view for other users
       if @user != @current_user
@@ -1006,7 +1046,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def api_show
-    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
+    @user = params[:id] && params[:id] != 'self' ? api_find(User, params[:id]) : @current_user
     if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
       render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
     else
@@ -1038,12 +1078,12 @@ class UsersController < ApplicationController
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
-    @lti_launch.link_text = @tool.label_for(:user_navigation)
+    @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
 
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
-    render ExternalToolsController.display_template('default')
+    render Lti::AppUtil.display_template
   end
 
   def new
@@ -1092,6 +1132,17 @@ class UsersController < ApplicationController
   #   self-registration and this canvas instance requires users to accept
   #   the terms (on by default).
   #
+  #   If this is true, it will mark the user as having accepted the terms of use.
+  #
+  # @argument user[skip_registration] [Boolean]
+  #   Automatically mark the user as registered.
+  #
+  #   If this is true, it is recommended to set <tt>"pseudonym[send_confirmation]"</tt> to true as well.
+  #   Otherwise, the user will not receive any messages about their account creation.
+  #
+  #   The users communication channel confirmation can be skipped by setting
+  #   <tt>"communication_channel[skip_confirmation]"</tt> to true as well.
+  #
   # @argument pseudonym[unique_id] [Required, String]
   #   User's login ID. If this is a self-registration, it must be a valid
   #   email address.
@@ -1102,6 +1153,11 @@ class UsersController < ApplicationController
   # @argument pseudonym[sis_user_id] [String]
   #   SIS ID for the user's account. To set this parameter, the caller must be
   #   able to manage SIS permissions.
+  #
+  # @argument pseudonym[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
   #
   # @argument pseudonym[send_confirmation] [Boolean]
   #   Send user notification of account creation if true.
@@ -1114,6 +1170,15 @@ class UsersController < ApplicationController
   #   a password, and letting them in.  Will only be executed on
   #   if the user does not need admin approval.
   #   Defaults to false unless explicitly provided.
+  #
+  # @argument pseudonym[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider).
   #
   # @argument communication_channel[type] [String]
   #   The communication channel type, e.g. 'email' or 'sms'.
@@ -1131,6 +1196,9 @@ class UsersController < ApplicationController
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
+  #   If this is true, it is recommended to set <tt>"pseudonym[send_confirmation]"</tt> to true as well.
+  #   Otherwise, the user will not receive any messages about their account creation.
+  #
   # @argument force_validations [Boolean]
   #   If true, validations are performed on the newly created user (and their associated pseudonym)
   #   even if the request is made by a privileged user like an admin. When set to false,
@@ -1145,175 +1213,51 @@ class UsersController < ApplicationController
   #
   # @returns User
   def create
-    run_login_hooks
-    # Look for an incomplete registration with this pseudonym
+    create_user
+  end
 
-    sis_user_id = nil
-    if @context.grants_right?(@current_user, session, :manage_sis)
-      sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    end
-
-    @pseudonym = nil
-    @user = nil
-    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
-      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
-      if @pseudonym
-        @pseudonym.workflow_state = 'active'
-        @pseudonym.save!
-        @user = @pseudonym.user
-        @user.workflow_state = 'registered'
-        @user.update_account_associations
-      end
-    end
-
-    if @pseudonym.nil?
-      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
-      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
-      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
-    end
-
-    @user ||= @pseudonym && @pseudonym.user
-    @user ||= User.new
-
-    force_validations = value_to_boolean(params[:force_validations])
-    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
-    self_enrollment = params[:self_enrollment].present?
-    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
-    require_password = self_enrollment && allow_non_email_pseudonyms
-    allow_password = require_password || manage_user_logins
-
-    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
-
-    includes = %w{locale}
-
-    if cc_params = params[:communication_channel]
-      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
-      cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
-
-      can_manage_students = [Account.site_admin, @context].any? do |role|
-        role.grants_right?(@current_user, :manage_students)
-      end
-
-      if can_manage_students
-        skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
-      end
-
-      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
-        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
-      end
-
-    else
-      cc_type = CommunicationChannel::TYPE_EMAIL
-      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
-    end
-
-    if params[:user]
-      if self_enrollment && params[:user][:self_enrollment_code]
-        params[:user][:self_enrollment_code].strip!
-      else
-        params[:user].delete(:self_enrollment_code)
-      end
-      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
-          params[:user][:birthdate] !~ Api::DATE_REGEX
-        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
-          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
-      end
-
-      @user.attributes = params[:user]
-    end
-    @user.name ||= params[:pseudonym][:unique_id]
-    unless @user.registered?
-      @user.workflow_state = if require_password || skip_confirmation
-        # no email confirmation required (self_enrollment_code and password
-        # validations will ensure everything is legit)
-        'registered'
-      elsif notify_policy.is_self_registration? && @user.registration_approval_required?
-        'pending_approval'
-      else
-        'pre_registered'
-      end
-    end
-    if force_validations || !manage_user_logins
-      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
-      @user.require_presence_of_name = true
-      @user.require_self_enrollment_code = self_enrollment
-      @user.validation_root_account = @domain_root_account
-    end
-
-    @invalid_observee_creds = nil
-    if @user.initial_enrollment_type == 'observer'
-      # TODO: SAML/CAS support
-      if observee_pseudonym = Pseudonym.authenticate(params[:observee] || {},
-          [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-        @observee = observee_pseudonym.user
-      else
-        @invalid_observee_creds = Pseudonym.new
-        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
-      end
-    end
-
-    @pseudonym ||= @user.pseudonyms.build(:account => @context)
-    @pseudonym.account.email_pseudonyms = !allow_non_email_pseudonyms
-    @pseudonym.require_password = require_password
-    # pre-populate the reverse association
-    @pseudonym.user = @user
-    # don't require password_confirmation on api calls
-    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
-    # don't allow password setting for new users that are not self-enrolling
-    # in a course (they need to go the email route)
-    unless allow_password
-      params[:pseudonym].delete(:password)
-      params[:pseudonym].delete(:password_confirmation)
-    end
-    @pseudonym.attributes = params[:pseudonym]
-    @pseudonym.sis_user_id = sis_user_id
-
-    @pseudonym.account = @context
-    @pseudonym.workflow_state = 'active'
-    @cc =
-      @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
-      @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
-    @cc.user = @user
-    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-
-    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
-      # saving the user takes care of the @pseudonym and @cc, so we can't call
-      # save_without_session_maintenance directly. we don't want to auto-log-in
-      # unless the user is registered/pre_registered (if the latter, he still
-      # needs to confirm his email and set a password, otherwise he can't get
-      # back in once his session expires)
-      if !@current_user # automagically logged in
-        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
-      else
-        @pseudonym.send(:skip_session_maintenance=, true)
-      end
-      @user.save!
-      if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
-      end
-
-      if notify_policy.is_self_registration?
-        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
-        @user.new_registration(registration_params)
-      end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
-
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
-      if api_request?
-        render(:json => user_json(@user, @current_user, session, includes))
-      else
-        render(:json => data)
-      end
-    else
-      errors = {
-        :errors => {
-          :user => @user.errors.as_json[:errors],
-          :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
-        }
-      }
-      render :json => errors, :status => :bad_request
-    end
+  # @API Self register a user
+  # Self register and return a new user and pseudonym for an account.
+  #
+  # If self-registration is enabled on the account, you can use this
+  # endpoint to self register new users.
+  #
+  # @argument user[name] [Required, String]
+  #   The full name of the user. This name will be used by teacher for grading.
+  #
+  #
+  # @argument user[short_name] [String]
+  #   User's name as it will be displayed in discussions, messages, and comments.
+  #
+  # @argument user[sortable_name] [String]
+  #   User's name as used to sort alphabetically in lists.
+  #
+  # @argument user[time_zone] [String]
+  #   The time zone for the user. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
+  # @argument user[locale] [String]
+  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #
+  # @argument user[birthdate] [Date]
+  #   The user's birth date.
+  #
+  # @argument user[terms_of_use] [Required, Boolean]
+  #   Whether the user accepts the terms of use.
+  #
+  # @argument pseudonym[unique_id] [Required, String]
+  #   User's login ID. Must be a valid email address.
+  #
+  # @argument communication_channel[type] [String]
+  #   The communication channel type, e.g. 'email' or 'sms'.
+  #
+  # @argument communication_channel[address] [String]
+  #   The communication channel address, e.g. the user's email address.
+  #
+  # @returns User
+  def create_self_registered_user
+    create_user
   end
 
   # @API Update user settings.
@@ -1415,7 +1359,9 @@ class UsersController < ApplicationController
   # 'course_42'
   #
   # @argument hexcode [String]
-  #   The hexcode of the color to set for the context.
+  #   The hexcode of the color to set for the context, if you choose to pass the
+  #   hexcode as a query parameter rather than in the request body you should
+  #   NOT include the '#' unless you escape it first.
   #
   # @example_request
   #
@@ -1479,6 +1425,9 @@ class UsersController < ApplicationController
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
+  # @argument user[email] [String]
+  #   The default email address of the user.
+  #
   # @argument user[locale] [String]
   #   The user's preferred language as a two-letter ISO 639-1 code.
   #
@@ -1518,9 +1467,12 @@ class UsersController < ApplicationController
       @default_pseudonym.move_to_top
     end
 
+    update_email = @user.grants_right?(@current_user, :manage_user_details) && params[:user][:email]
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
+    managed_attributes << :email if update_email
+
     if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
@@ -1545,7 +1497,7 @@ class UsersController < ApplicationController
 
     user_params = params[:user].slice(*managed_attributes)
 
-    if user_params == params[:user]
+    if managed_attributes.any? && user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
@@ -1568,15 +1520,17 @@ class UsersController < ApplicationController
 
       respond_to do |format|
         if @user.update_attributes(user_params)
-          if admin_avatar_update
-            @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved')
-            @user.save
-          end
+          @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
+          @user.email = user_params[:email] if update_email
+          @user.save if admin_avatar_update || update_email
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
+          unless params[:redirect_to_previous].blank?
+            return redirect_to :back
+          end
           format.html { redirect_to user_url(@user) }
           format.json {
-            render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
+            render :json => user_json(@user, @current_user, session, %w{locale avatar_url email},
               @current_user.pseudonym.account) }
         else
           format.html { render :edit }
@@ -1770,28 +1724,11 @@ class UsersController < ApplicationController
     end
   end
 
-  def require_self_registration
-    get_context
-    @context = @domain_root_account || Account.default unless @context.is_a?(Account)
-    @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
-        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
-      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
-      respond_to do |format|
-        format.html { redirect_to root_url }
-        format.json { render :json => {}, :status => 403 }
-      end
-      return false
-    end
-  end
-
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
       map_courses_for_menu(@current_user.courses_with_primary_enrollment)
     }
   end
-
-  protected :require_self_registration
 
   def teacher_activity
     @teacher = User.find(params[:user_id])
@@ -1800,11 +1737,11 @@ class UsersController < ApplicationController
 
       if params[:student_id]
         student = User.find(params[:student_id])
-        enrollments = student.student_enrollments.active.includes(:course).with_each_shard
+        enrollments = student.student_enrollments.active.preload(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
-                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
-                           enrollment.course.grants_right?(@current_user, :read_reports)
+                           enrollment.course.grants_right?(@current_user, :read_reports) &&
+                           enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
@@ -1823,7 +1760,8 @@ class UsersController < ApplicationController
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
           Enrollment.recompute_final_score_if_stale(course)
-          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, :include_priors => true))
+          enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
+          @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
       end
 
@@ -1919,7 +1857,7 @@ class UsersController < ApplicationController
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
-        joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
+        joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").
         where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
     last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
@@ -1930,11 +1868,11 @@ class UsersController < ApplicationController
 
     # find all ungraded submissions in one query
     ungraded_submissions = course.submissions.
-        includes(:assignment).
+        preload(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
-        order(:submitted_at).
-        all
+        order(:submitted_at).to_a
+
 
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]
@@ -1956,5 +1894,314 @@ class UsersController < ApplicationController
 
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
+  end
+
+  protected
+
+  def require_self_registration
+    get_context
+    @context = @domain_root_account || Account.default unless @context.is_a?(Account)
+    @context = @context.root_account
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
+        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
+      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
+      respond_to do |format|
+        format.html { redirect_to root_url }
+        format.json { render :json => {}, :status => 403 }
+      end
+      return false
+    end
+  end
+
+  private
+
+  def authenticate_observee
+    Pseudonym.authenticate(params[:observee] || {},
+                           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+  end
+
+  def grades_for_presenter(presenter, grading_periods)
+    grades = {
+      student_enrollments: {},
+      observed_enrollments: {}
+    }
+    grouped_observed_enrollments =
+      presenter.observed_enrollments.group_by { |enrollment| enrollment[:course_id] }
+
+    grouped_observed_enrollments.each do |course_id, enrollments|
+      grades[:observed_enrollments][course_id] = {}
+
+      if grading_periods[course_id].present?
+        user_ids = enrollments.map(&:user_id)
+        course = enrollments.first.course
+        grades[:observed_enrollments][course_id] = grades_from_grade_calculator(user_ids, course, grading_periods)
+      else
+        grades[:observed_enrollments][course_id] = grades_from_enrollments(enrollments)
+      end
+    end
+
+    presenter.student_enrollments.each do |enrollment_course_pair|
+      course = enrollment_course_pair.first
+      enrollment = enrollment_course_pair.second
+
+      if grading_periods[course.id].present?
+        computed_score = grades_from_grade_calculator([enrollment.user_id], course, grading_periods)[enrollment.user_id]
+        grades[:student_enrollments][course.id] = computed_score
+      else
+        computed_score = enrollment.computed_current_score
+        grades[:student_enrollments][course.id] = computed_score
+      end
+    end
+    grades
+  end
+
+  def grades_from_grade_calculator(user_ids, course, grading_periods)
+    calculator = grade_calculator(user_ids, course, grading_periods)
+    grades = {}
+    calculator.compute_scores.each_with_index do |score, index|
+     computed_score = score.first.first[:grade]
+     user_id = user_ids[index]
+     grades[user_id] = computed_score
+    end
+    grades
+  end
+
+  def grades_from_enrollments(enrollments)
+    grades = {}
+    enrollments.each do |enrollment|
+      computed_score = enrollment.computed_current_score
+      grades[enrollment.user_id] = computed_score
+    end
+    grades
+  end
+
+  def collected_grading_periods_for_presenter(presenter, course_id, grading_period_id)
+    observer_courses = presenter.observed_enrollments.map(&:course)
+    student_courses = presenter.student_enrollments.map(&:first)
+    teacher_courses = presenter.teacher_enrollments.map(&:course)
+    courses = observer_courses | student_courses | teacher_courses
+    grading_periods = {}
+
+    courses.each do |course|
+      next unless course.feature_enabled?(:multiple_grading_periods)
+
+      course_periods = GradingPeriod.for(course)
+      grading_period_specified = grading_period_id &&
+        course_id && course_id.to_i == course.id
+
+      selected_period_id = if grading_period_specified
+        grading_period_id.to_i
+      else
+        current_period = course_periods.find(&:current?)
+        current_period ? current_period.id : 0
+      end
+
+      grading_periods[course.id] = {
+        periods: course_periods,
+        selected_period_id: selected_period_id
+      }
+    end
+    grading_periods
+  end
+
+  def grade_calculator(user_ids, course, grading_periods)
+    if course.feature_enabled?(:multiple_grading_periods) &&
+      grading_periods[course.id][:selected_period_id] != 0
+
+      grading_period = grading_periods[course.id][:periods].find do |period|
+        period.id == grading_periods[course.id][:selected_period_id]
+      end
+      GradeCalculator.new(user_ids, course, grading_period: grading_period)
+    else
+      GradeCalculator.new(user_ids, course)
+    end
+  end
+
+  def create_user
+    run_login_hooks
+    # Look for an incomplete registration with this pseudonym
+
+    sis_user_id = nil
+    integration_id = nil
+    params[:pseudonym] ||= {}
+
+    if @context.grants_right?(@current_user, session, :manage_sis)
+      sis_user_id = params[:pseudonym].delete(:sis_user_id)
+      integration_id = params[:pseudonym].delete(:integration_id)
+    end
+
+    @pseudonym = nil
+    @user = nil
+    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
+      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
+      if @pseudonym
+        @pseudonym.workflow_state = 'active'
+        @pseudonym.save!
+        @user = @pseudonym.user
+        @user.workflow_state = 'registered'
+        @user.update_account_associations
+      end
+    end
+
+    if @pseudonym.nil?
+      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
+      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+    end
+
+    @user ||= @pseudonym && @pseudonym.user
+    @user ||= User.new
+
+    force_validations = value_to_boolean(params[:force_validations])
+    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
+    self_enrollment = params[:self_enrollment].present?
+    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    require_password = self_enrollment && allow_non_email_pseudonyms
+    allow_password = require_password || manage_user_logins
+
+    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
+
+    includes = %w{locale}
+
+    cc_params = params[:communication_channel]
+
+    if cc_params
+      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
+      cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
+
+      can_manage_students = [Account.site_admin, @context].any? do |role|
+        role.grants_right?(@current_user, :manage_students)
+      end
+
+      if can_manage_students
+        skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
+      end
+
+      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
+        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
+      end
+
+    else
+      cc_type = CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+    end
+
+    if params[:user]
+      if self_enrollment && params[:user][:self_enrollment_code]
+        params[:user][:self_enrollment_code].strip!
+      else
+        params[:user].delete(:self_enrollment_code)
+      end
+      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+                                                            'Invalid date or invalid datetime for birthdate')}}, :status => 400)
+      end
+
+      @user.attributes = params[:user]
+      accepted_terms = params[:user].delete(:terms_of_use)
+      @user.accept_terms if value_to_boolean(accepted_terms)
+      includes << "terms_of_use" unless accepted_terms.nil?
+    end
+    @user.name ||= params[:pseudonym][:unique_id]
+    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
+    unless @user.registered?
+      @user.workflow_state = if require_password || skip_registration
+                               # no email confirmation required (self_enrollment_code and password
+                               # validations will ensure everything is legit)
+                               'registered'
+                             elsif notify_policy.is_self_registration? && @user.registration_approval_required?
+                               'pending_approval'
+                             else
+                               'pre_registered'
+                             end
+    end
+    if force_validations || !manage_user_logins
+      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
+      @user.require_presence_of_name = true
+      @user.require_self_enrollment_code = self_enrollment
+      @user.validation_root_account = @domain_root_account
+    end
+
+    @invalid_observee_creds = nil
+    if @user.initial_enrollment_type == 'observer'
+      if (observee_pseudonym = authenticate_observee)
+        @observee = observee_pseudonym.user
+      else
+        @invalid_observee_creds = Pseudonym.new
+        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
+      end
+    end
+
+    @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.account.email_pseudonyms = !allow_non_email_pseudonyms
+    @pseudonym.require_password = require_password
+    # pre-populate the reverse association
+    @pseudonym.user = @user
+    # don't require password_confirmation on api calls
+    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    # don't allow password setting for new users that are not self-enrolling
+    # in a course (they need to go the email route)
+    unless allow_password
+      params[:pseudonym].delete(:password)
+      params[:pseudonym].delete(:password_confirmation)
+    end
+    if params[:pseudonym][:authentication_provider_id]
+      @pseudonym.authentication_provider = @context.
+          authentication_providers.active.
+          find(params[:pseudonym][:authentication_provider_id])
+    end
+    @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.sis_user_id = sis_user_id
+    @pseudonym.integration_id = integration_id
+
+    @pseudonym.account = @context
+    @pseudonym.workflow_state = 'active'
+    if cc_addr.present?
+      @cc =
+        @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
+            @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
+      @cc.user = @user
+      @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    end
+
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
+      # saving the user takes care of the @pseudonym and @cc, so we can't call
+      # save_without_session_maintenance directly. we don't want to auto-log-in
+      # unless the user is registered/pre_registered (if the latter, he still
+      # needs to confirm his email and set a password, otherwise he can't get
+      # back in once his session expires)
+      if !@current_user # automagically logged in
+        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
+      else
+        @pseudonym.send(:skip_session_maintenance=, true)
+      end
+      @user.save!
+      if @observee && !@user.user_observees.where(user_id: @observee).exists?
+        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
+      end
+
+      if notify_policy.is_self_registration?
+        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
+        @user.new_registration(registration_params)
+      end
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
+
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
+      if api_request?
+        render(:json => user_json(@user, @current_user, session, includes))
+      else
+        render(:json => data)
+      end
+    else
+      errors = {
+          :errors => {
+              :user => @user.errors.as_json[:errors],
+              :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
+              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
+          }
+      }
+      render :json => errors, :status => :bad_request
+    end
   end
 end

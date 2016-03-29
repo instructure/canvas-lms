@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'jquery',
   'i18n!external_tools',

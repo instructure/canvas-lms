@@ -1,7 +1,7 @@
 // Shared between:
 // - assignments/new_assignments.scss
 .move-select-header {
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   color: #222;
   padding-bottom: 15px;
   margin-top: 0;

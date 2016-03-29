@@ -258,6 +258,12 @@ describe Quizzes::SubmissionGrader do
       expect(Quizzes::SubmissionGrader.score_question(qd, { "question_1" => "-4.05" })).to eq({
         :question_id => 1, :correct => true, :points => 26.2, :text => "-4.05", :answer_id => 5450 })
 
+      expect(Quizzes::SubmissionGrader.score_question(qd, { "question_1" => "1.234567890123456e+21" })).to eq({
+        :question_id => 1, :correct => true, :points => 26.2, :answer_id => 123, :text => "1.234567890123456e+21"})
+
+      expect(Quizzes::SubmissionGrader.score_question(qd, { "question_1" => "1.234567890123456e-21" })).to eq({
+        :question_id => 1, :correct => false, :points => 0, :text => "1.234567890123456e-21" })
+
       expect(Quizzes::SubmissionGrader.score_question(qd, { "question_1" => "" })).to eq({
         :question_id => 1, :correct => false, :points => 0, :text => "" })
 

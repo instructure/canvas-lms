@@ -77,7 +77,7 @@
   ul > li > a,
   ul > li > span {
     padding: $paddingLarge;
-    font-size: $fontSizeLarge;
+    @include fontSize($fontSizeLarge);
   }
   ul > li:first-child > a,
   ul > li:first-child > span {
@@ -107,7 +107,7 @@
   ul > li > a,
   ul > li > span {
     padding: $paddingSmall;
-    font-size: $fontSizeSmall;
+    @include fontSize($fontSizeSmall);
   }
 }
 // Mini
@@ -115,6 +115,6 @@
   ul > li > a,
   ul > li > span {
     padding: $paddingMini;
-    font-size: $fontSizeMini;
+    @include fontSize($fontSizeMini);
   }
 }

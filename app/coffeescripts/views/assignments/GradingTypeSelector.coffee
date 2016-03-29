@@ -42,6 +42,7 @@ define [
       @trigger 'change:gradingType', gradingType
 
     showGpaDialog: (ev) =>
+      ev.preventDefault()
       $("#gpa-scale-dialog").dialog(
         title: I18n.t('titles.gpa_scale_explainer', "What is GPA Scale Grading?"),
         text: I18n.t('gpa_scale_explainer', "What is GPA Scale Grading?"),
@@ -52,6 +53,8 @@ define [
 
     showGradingSchemeDialog: (ev) =>
       # TODO: clean up. slightly dependent on grading_standards.js
+      # NOTE grading_standards.js is loaded in a course settings
+      # context while this coffeescript appears not to be.
       ev.preventDefault()
       $("#edit_letter_grades_form").dialog(
         title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),

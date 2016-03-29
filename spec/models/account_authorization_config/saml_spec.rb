@@ -34,7 +34,7 @@ describe AccountAuthorizationConfig::SAML do
                               }
                           })
 
-    s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
+    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
 
     expect(s.encryption_configured?).to be_truthy
   end
@@ -45,7 +45,7 @@ describe AccountAuthorizationConfig::SAML do
                               :tech_contact_email => 'admindude@example.com',
                           })
 
-    s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
+    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
 
     expect(s.tech_contact_name).to eq 'Admin Dude'
     expect(s.tech_contact_email).to eq 'admindude@example.com'
@@ -63,7 +63,7 @@ describe AccountAuthorizationConfig::SAML do
                               }
                           })
 
-    s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
+    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
 
     expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
   end
@@ -82,29 +82,32 @@ describe AccountAuthorizationConfig::SAML do
                               }
                           })
 
-    s = @account.account_authorization_configs.build(:auth_type => 'saml').saml_settings
+    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
 
     expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
   end
 
   it "should set the entity_id with the current domain" do
     HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
-    @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(:auth_type => "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
   end
 
   it "should not overwrite a specific entity_id" do
-    @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :entity_id => "http://wtb.instructure.com/saml2")
+    @aac = @account.authentication_providers.create!(
+      auth_type: "saml",
+      entity_id: "http://wtb.instructure.com/saml2"
+    )
     expect(@aac.entity_id).to eq "http://wtb.instructure.com/saml2"
   end
 
   it "should set requested_authn_context to nil if empty string" do
-    @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "")
+    @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "")
     expect(@aac.requested_authn_context).to eq nil
   end
 
   it "should allow requested_authn_context to be set to anything" do
-    @aac = @account.account_authorization_configs.create!(:auth_type => "saml", :requested_authn_context => "anything")
+    @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "anything")
     expect(@aac.requested_authn_context).to eq "anything"
   end
 end

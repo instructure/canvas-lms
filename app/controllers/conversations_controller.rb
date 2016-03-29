@@ -248,6 +248,7 @@ class ConversationsController < ApplicationController
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+        :CAN_MESSAGE_ACCOUNT_CONTEXT => valid_account_context?(@domain_root_account),
         :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
       }
 
@@ -258,7 +259,7 @@ class ConversationsController < ApplicationController
 
       if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT]
         course_note_permissions = {}
-        @current_user.enrollments.active.of_instructor_type.includes(:course).each do |enrollment|
+        @current_user.enrollments.active.of_instructor_type.preload(:course).each do |enrollment|
           course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
         end
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
@@ -373,7 +374,7 @@ class ConversationsController < ApplicationController
       end
 
       # reload and preload stuff
-      conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      conversations = ConversationParticipant.where(:id => batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(conversations)
@@ -529,7 +530,7 @@ class ConversationsController < ApplicationController
     messages = nil
     Shackles.activate(:slave) do
       messages = @conversation.messages
-      ActiveRecord::Associations::Preloader.new(messages, :asset).run
+      ActiveRecord::Associations::Preloader.new.preload(messages, :asset)
     end
 
     render :json => conversation_json(@conversation,
@@ -633,7 +634,7 @@ class ConversationsController < ApplicationController
   #       -X DELETE \
   #       -H 'Authorization: Bearer <token>'
   def delete_for_all
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+    return unless authorized_action(Account.site_admin, @current_user, :manage_students)
 
     Conversation.find(params[:id]).delete_for_all
 
@@ -985,7 +986,7 @@ class ConversationsController < ApplicationController
     conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
-        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
+        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).to_a
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if !multiple
@@ -996,17 +997,33 @@ class ConversationsController < ApplicationController
   end
 
   def normalize_recipients
-    if params[:recipients]
-      recipient_ids = params[:recipients]
-      if recipient_ids.is_a?(String)
-        params[:recipients] = recipient_ids = recipient_ids.split(/,/)
-      end
-      @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
-      MessageableUser.context_recipients(recipient_ids).map do |context|
-        @recipients.concat @current_user.messageable_users_in_context(context)
-      end
-      @recipients = @recipients.uniq(&:id)
+    return unless params[:recipients]
+    unless params[:recipients].is_a? Array
+      params[:recipients] = params[:recipients].split ","
     end
+
+    recipient_ids = MessageableUser.individual_recipients(params[:recipients])
+    contexts      = MessageableUser.context_recipients(params[:recipients])
+
+    if params[:context_code] =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
+      is_admin = Context.
+        find_by_asset_string(params[:context_code]).
+        grants_right?(@current_user, :read_as_admin)
+      @recipients = @current_user.
+        messageable_user_calculator.
+        messageable_users_in_context(
+          params[:context_code],
+          admin_context: is_admin
+        ).select { |user| recipient_ids.include? user.id }
+    else
+      @recipients = @current_user.load_messageable_users(recipient_ids, conversation_id: params[:from_conversation_id])
+    end
+
+    contexts.map do |context|
+      @recipients.concat @current_user.messageable_users_in_context(context)
+    end
+
+    @recipients.uniq!(&:id)
   end
 
   def infer_tags

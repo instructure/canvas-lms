@@ -185,6 +185,7 @@ define [
       @$el.dialog(opts)
       @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
+      $('.ui-resizable-handle').attr('aria-hidden', true)
 
     setDimensions: (width, height) ->
       width = if width? then width else @options.width

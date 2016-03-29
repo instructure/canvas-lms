@@ -99,7 +99,7 @@
   font-family: $monoFontFamily;
 }
 @mixin font-shorthand($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
-  font-size: $size;
+  @include fontSize($size);
   font-weight: $weight;
   line-height: $lineHeight;
 }
@@ -197,7 +197,7 @@
 }
 
 // Drop shadows
-@mixin box-shadow($shadow...) { 
+@mixin box-shadow($shadow...) {
   box-shadow: $shadow;
 }
 
@@ -269,14 +269,8 @@
 // -------------------------
 // Dividers (basically an hr) within dropdowns and nav lists
 @mixin nav-divider($top: #e5e5e5, $bottom: $white) {
-  // IE7 needs a set width since we gave a height. Restricting just
-  // to IE7 to keep the 1px left/right space in other browsers.
-  // It is unclear where IE is getting the extra space that we need
-  // to negative-margin away, but so it goes.
-  *width: 100%;
   height: 1px;
   margin: (($baseLineHeight / 2) - 1) 1px; // 8px 1px
-  *margin: -5px 0 5px;
   overflow: hidden;
   background-color: $top;
   border-bottom: 1px solid $bottom;
@@ -315,10 +309,10 @@
 
 @mixin button-focus-light {
   @if $use_high_contrast { box-shadow: inset 0 0 0 2px lighten($ic-link-color, 4%); }
-  @else { box-shadow: inset 0 0 0 1px lighten($ic-link-color, 4%); } 
+  @else { box-shadow: inset 0 0 0 1px lighten($ic-link-color, 4%); }
 }
 
-@mixin button-focus-dark { 
+@mixin button-focus-dark {
   @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
   @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
 }
@@ -333,7 +327,6 @@
   &:hover, &:active, &.active, &.disabled, &[disabled] {
     color: $textColor;
     background-color: $endColor;
-    *background-color: darken($endColor, 5%);
   }
 
   &:focus {
@@ -341,13 +334,6 @@
     background: $endColor;
     text-decoration: none;
   }
-
-  // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
-  &:active,
-  &.active {
-    background-color: darken($endColor, 10%) \9;
-  }
-
 }
 
 // Updated replacement mixin for buttonBackground ^^
@@ -357,16 +343,27 @@
   border: 1px solid darken($button-color, 15%);
   &:focus { color: $text-color; }
   &:hover {
-    background: darken($button-color, 5%);
-    color: $text-color;
-    
+    @if $use_high_contrast {
+      background: darken($ic-color-dark, 20%);
+      color: $ic-color-light;
+    }
+    @else  {
+      background: darken($button-color, 5%);
+      color: $text-color;
+    }
+
     // handle jquery UI ui-button conflicts
     &.ui-state-hover {
-      background: darken($button-color, 6%);
-      color: $text-color;
-      border-color: darken($button-color, 15%);
-    } 
-  
+      @if $use_high_contrast {
+        background: darken($ic-color-dark, 20%);
+        color: $ic-color-light;
+      }
+      @else {
+        background: darken($button-color, 6%);
+        color: $text-color;
+        border-color: darken($button-color, 15%);
+      }
+    }
   }
 
   @if lightness($button-color) > lightness($text-color) {
@@ -378,10 +375,10 @@
     }
     &:focus { @include button-focus-light; }
     // handle jquery UI ui-button states
-    &.ui-state-focus.ui-state-active { 
-      &:focus { @include button-focus-dark; } 
+    &.ui-state-focus.ui-state-active {
+      &:focus { @include button-focus-dark; }
     }
-    &:active { background: darken($button-color, 8%); } 
+    &:active { background: darken($button-color, 8%); }
   }
 
   @else {
@@ -391,7 +388,7 @@
       box-shadow: none;
     }
   }
-  
+
 }
 
 
@@ -482,7 +479,6 @@
       @include box-sizing(border-box);
       float: left;
       margin-left: $fluidGridGutterWidth;
-      *margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
     }
     [class*="span"]:first-child {
       margin-left: 0;
@@ -516,17 +512,14 @@
 
 @mixin grid-fluid-span($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
   width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1));
-  *width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%);
 }
 
 @mixin grid-fluid-offset($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
   margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth * 2);
-  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + ($fluidGridGutterWidth * 2) - (.5 / $gridRowWidth * 100px * 1%);
 }
 
 @mixin grid-fluid-offset-first-child($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
   margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth);
-  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
 }
 
 

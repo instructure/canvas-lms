@@ -75,6 +75,7 @@ define [
         url: url
 
     delete: =>
+      $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'));
       @$el.slideUp(=> @$el.remove())
       @trigger('delete', this)
       otherDeleteLinks = $('.delete_collaboration_link').toArray()

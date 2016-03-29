@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "Alerts" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     @context = Account.default
@@ -15,16 +15,16 @@ describe "Alerts" do
     get "/accounts/#{@context.id}/settings"
     expect(@alerts.length).to eq 0
 
-    f('#tab-alerts-link').click
+    find('#tab-alerts-link').click
     wait_for_ajaximations
-    f('.add_alert_link').click
+    find('.add_alert_link').click
     wait_for_ajaximations
-    alert = f('.alert.new')
-    (add_criterion = alert.find_element(:css, '.add_criterion_link')).click
+    alert = find('.alert.new')
+    (add_criterion = alert.find('.add_criterion_link')).click
     wait_for_ajaximations
-    alert.find_element(:css, '.add_recipient_link').click
+    alert.find('.add_recipient_link').click
     wait_for_ajaximations
-    (submit = alert.find_element(:css, '.submit_button')).click
+    (submit = alert.find('.submit_button')).click
     wait_for_ajaximations
     keep_trying_until do
       @alerts.reload
@@ -33,7 +33,7 @@ describe "Alerts" do
 
     expect(@alerts.first.criteria.length).to eq 1
 
-    (edit = alert.find_element(:css, '.edit_link')).click
+    (edit = alert.find('.edit_link')).click
     add_criterion.click
     wait_for_ajaximations
     submit.click
@@ -49,7 +49,7 @@ describe "Alerts" do
 
     wait_for_ajaximations
     edit.click
-    alert.find_element(:css, '.criteria .delete_item_link').click
+    alert.find('.criteria .delete_item_link').click
     wait_for_ajaximations
     keep_trying_until { ffj('.alert .criteria li').length == 1 }
     submit.click
@@ -64,10 +64,10 @@ describe "Alerts" do
     expect(@alerts.length).to eq 1
 
     wait_for_ajaximations
-    alert.find_element(:css, '.delete_link').click
+    alert.find('.delete_link').click
 
     wait_for_ajaximations
-    expect(f('.alert')).not_to be_displayed
+    expect(find('.alert')).not_to be_displayed
 
     keep_trying_until do
       @alerts.reload
@@ -79,9 +79,9 @@ describe "Alerts" do
     alert = @alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     get "/accounts/#{@context.id}/settings"
 
-    f('#tab-alerts-link').click
+    find('#tab-alerts-link').click
     wait_for_ajaximations
-    f("#edit_alert_#{alert.id} .delete_link").click
+    find("#edit_alert_#{alert.id} .delete_link").click
     wait_for_ajaximations
     keep_trying_until { fj("#edit_alert_#{alert.id}").blank? }
 
@@ -92,13 +92,13 @@ describe "Alerts" do
   it "should remove non-created alerts by clicking delete link" do
     get "/accounts/#{@context.id}/settings"
 
-    f('#tab-alerts-link').click
+    find('#tab-alerts-link').click
     wait_for_ajaximations
-    f('.add_alert_link').click
+    find('.add_alert_link').click
     wait_for_ajaximations
-    f('.alert.new .delete_link').click
+    find('.alert.new .delete_link').click
     wait_for_ajaximations
-    keep_trying_until { expect(ff(".alert.new")).to be_empty }
+    keep_trying_until { expect(find_all(".alert.new")).to be_empty }
 
     expect(@alerts).to be_empty
   end
@@ -106,11 +106,11 @@ describe "Alerts" do
   it "should remove non-created alerts by clicking cancel button" do
     get "/accounts/#{@context.id}/settings"
 
-    f('#tab-alerts-link').click
+    find('#tab-alerts-link').click
     wait_for_ajaximations
-    f('.add_alert_link').click
+    find('.add_alert_link').click
     wait_for_ajaximations
-    f('.alert.new .cancel_button').click
+    find('.alert.new .cancel_button').click
     wait_for_ajaximations
     keep_trying_until { expect(ffj(".alert.new")).to be_empty }
     expect(@alerts).to be_empty
@@ -118,12 +118,12 @@ describe "Alerts" do
 
   it "should validate the form" do
     get "/accounts/#{@context.id}/settings"
-    f('#tab-alerts-link').click
+    find('#tab-alerts-link').click
     wait_for_ajaximations
-    f('.add_alert_link').click
+    find('.add_alert_link').click
     wait_for_ajaximations
-    alert = f('.alert.new')
-    alert.find_element(:css, 'input[name="repetition"][value="value"]').click
+    alert = find('.alert.new')
+    alert.find('input[name="repetition"][value="value"]').click
     sleep 2 #need to wait for javascript to process
     wait_for_ajaximations
     keep_trying_until do
@@ -133,16 +133,16 @@ describe "Alerts" do
     end
 
     # clicking "do not repeat" should remove the number of days error
-    alert.find_element(:css, 'input[name="repetition"][value="none"]').click
+    alert.find('input[name="repetition"][value="none"]').click
     wait_for_ajaximations
     keep_trying_until { ffj('.error_box').length == 3 }
 
     # adding recipient and criterion make the errors go away
-    alert.find_element(:css, '.add_recipient_link').click
-    alert.find_element(:css, '.add_criterion_link').click
+    alert.find('.add_recipient_link').click
+    alert.find('.add_criterion_link').click
     keep_trying_until { ffj('.error_box').length == 1 }
 
-    alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
+    alert.find('.criteria input[type="text"]').send_keys("abc")
     submit_form('#new_alert')
     keep_trying_until { ffj('.error_box').length == 2 }
   end
@@ -151,48 +151,48 @@ describe "Alerts" do
     it "should hide the add link when all recipients are added" do
       get "/accounts/#{@context.id}/settings"
 
-      f('#tab-alerts-link').click
+      find('#tab-alerts-link').click
       wait_for_ajaximations
-      f('.add_alert_link').click
+      find('.add_alert_link').click
       wait_for_ajaximations
-      alert = f('.alert.new')
-      link = alert.find_element(:css, '.add_recipient_link')
+      alert = find('.alert.new')
+      link = alert.find('.add_recipient_link')
 
       keep_trying_until { ffj('.alert.new .add_recipients_line select option').length > 1 }
-      for i in 1..alert.find_elements(:css, '.add_recipients_line select option').length do
+      alert.find_all('.add_recipients_line select option').each do
         link.click
         wait_for_ajaximations
       end
-      expect(f('.alert.new .add_recipient_link')).not_to be_displayed
+      expect(find('.alert.new .add_recipient_link')).not_to be_displayed
     end
 
     it "should not show the add link when all recipients are already there" do
       alert = @alerts.create!(:recipients => [:student, :teachers, {:role_id => admin_role.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
       get "/accounts/#{@context.id}/settings"
 
-      f('#tab-alerts-link').click
+      find('#tab-alerts-link').click
       wait_for_ajaximations
-      alertElement = f("#edit_alert_#{alert.id}")
-      alertElement.find_element(:css, ".edit_link").click
+      alertElement = find("#edit_alert_#{alert.id}")
+      alertElement.find(".edit_link").click
       wait_for_ajaximations
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link:visible")).to be_blank
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
-      alertElement.find_element(:css, '.recipients .delete_item_link').click
+      alertElement.find('.recipients .delete_item_link').click
       wait_for_ajaximations
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 1
-      keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 2 }
+      expect(alertElement.find_all('.add_recipients_line select option').length).to eq 1
+      keep_trying_until { alertElement.find_all('.recipients li').length == 2 }
 
       # Do it again, with the same results
-      alertElement.find_element(:css, '.recipients .delete_item_link').click
+      alertElement.find('.recipients .delete_item_link').click
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 2
-      keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 1 }
+      expect(alertElement.find_all('.add_recipients_line select option').length).to eq 2
+      keep_trying_until { alertElement.find_all('.recipients li').length == 1 }
 
       # Clicking cancel should restore the LIs
-      alertElement.find_element(:css, '.cancel_button').click
-      expect(alertElement.find_elements(:css, '.recipients li').length).to eq 3
+      alertElement.find('.cancel_button').click
+      expect(alertElement.find_all('.recipients li').length).to eq 3
     end
 
     it "should work with custom roles" do
@@ -202,18 +202,18 @@ describe "Alerts" do
       alert = @alerts.create!(:recipients => [{:role_id => role1.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
       get "/accounts/#{@context.id}/settings"
 
-      f('#tab-alerts-link').click
+      find('#tab-alerts-link').click
       wait_for_ajaximations
-      alertElement = f("#edit_alert_#{alert.id}")
-      alertElement.find_element(:css, ".edit_link").click
+      alertElement = find("#edit_alert_#{alert.id}")
+      alertElement.find(".edit_link").click
       wait_for_ajaximations
 
-      recipients = ff("#edit_alert_#{alert.id} .recipients li")
+      recipients = find_all("#edit_alert_#{alert.id} .recipients li")
       expect(recipients.count).to eq 1
       expect(recipients.first.text).to match_ignoring_whitespace(role1.name)
-      expect(f("#edit_alert_#{alert.id} .recipients li input")["value"].to_s).to eq role1.id.to_s
+      expect(find("#edit_alert_#{alert.id} .recipients li input")["value"].to_s).to eq role1.id.to_s
 
-      set_value(f("#edit_alert_#{alert.id} .add_recipients_line select"), role2.id.to_s)
+      set_value(find("#edit_alert_#{alert.id} .add_recipients_line select"), role2.id.to_s)
       fj("#edit_alert_#{alert.id} .add_recipient_link").click
 
       submit_form("#edit_alert_#{alert.id}")

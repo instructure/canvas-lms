@@ -42,7 +42,7 @@
 }
 
 .ic-AttemptController__Attempt--is-active {
-  $bg: $ic-brand-secondary;
+  $bg: $ic-color-dark;
   background: $bg;
   box-shadow: 0 0 0 1px $bg;
   margin-right: 1px;

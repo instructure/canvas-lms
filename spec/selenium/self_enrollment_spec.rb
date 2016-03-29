@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "self enrollment" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "in a full course" do
     it "should not be allowed" do
@@ -17,7 +17,8 @@ describe "self enrollment" do
 
   shared_examples_for "open registration" do
     before do
-      Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true, :self_registration => true)
+      Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
       course(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)

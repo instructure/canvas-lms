@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
 
 describe "add content box" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include EportfoliosCommon
 
   before(:each) do
     course_with_student_logged_in
@@ -31,7 +32,7 @@ describe "add content box" do
   end
 
   it "should add a user file" do
-    keep_trying_until { expect(f('.add_file_link')).to be_displayed } 
+    keep_trying_until { expect(f('.add_file_link')).to be_displayed }
     f('.add_file_link').click
     wait_for_ajaximations
     fj('.file_list:visible .sign:visible').click
@@ -57,7 +58,7 @@ describe "add content box" do
       @html_content="<b>student</b>"
       f(".add_html_link").click
       wait_for_ajaximations
-      f("#edit_page_section_1").send_keys(@html_content)
+      f("#edit_page_section_0").send_keys(@html_content)
     end
 
     def add_html
@@ -98,13 +99,13 @@ describe "add content box" do
     it "should delete the html content" do
       add_html
       f("#right-side .edit_content_link").click
-      hover_and_click("#page_section_1 .delete_page_section_link")
+      hover_and_click("#page_section_0 .delete_page_section_link")
       accept_alert
       wait_for_ajaximations
       submit_form(".form_content")
       wait_for_ajaximations
       expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
-      expect(f("#edit_page_section_1")).to be_nil
+      expect(f("#edit_page_section_0")).to be_nil
     end
 
     it "should delete html comment" do

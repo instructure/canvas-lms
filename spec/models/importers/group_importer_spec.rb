@@ -25,14 +25,15 @@ describe "Importing Groups" do
       it "should import from #{system}" do
         data = get_import_data(system, 'group')
         context = get_import_context(system)
+        migration = context.content_migrations.create!
 
         data[:groups_to_import] = {}
-        expect(Importers::GroupImporter.import_from_migration(data, context)).to be_nil
+        expect(Importers::GroupImporter.import_from_migration(data, context, migration)).to be_nil
         expect(context.groups.count).to eq 0
 
         data[:groups_to_import][data[:migration_id]] = true
-        Importers::GroupImporter.import_from_migration(data, context)
-        Importers::GroupImporter.import_from_migration(data, context)
+        Importers::GroupImporter.import_from_migration(data, context, migration)
+        Importers::GroupImporter.import_from_migration(data, context, migration)
         expect(context.groups.count).to eq 1
         g = Group.where(migration_id: data[:migration_id]).first
 
@@ -44,8 +45,9 @@ describe "Importing Groups" do
   it "should attach to a discussion" do
     data = get_import_data('bb8', 'group')
     context = get_import_context('bb8')
+    migration = context.content_migrations.create!
 
-    Importers::GroupImporter.import_from_migration(data, context)
+    Importers::GroupImporter.import_from_migration(data, context, migration)
     expect(context.groups.count).to eq 1
 
     category = get_import_data('bb8', 'group_discussion')
@@ -54,7 +56,7 @@ describe "Importing Groups" do
       topic['group_id'] = category['group_id']
       group = Group.where(context_id: context, context_type: context.class.to_s, migration_id: topic['group_id']).first
       if group
-        Importers::DiscussionTopicImporter.import_from_migration(topic, group)
+        Importers::DiscussionTopicImporter.import_from_migration(topic, group, migration)
       end
     end
 
@@ -64,15 +66,17 @@ describe "Importing Groups" do
 
   it "should respect group_category from the hash" do
     course_with_teacher
+    migration = @course.content_migrations.create!
     group = @course.groups.build
-    Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, nil, group)
+    Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, migration, group)
     expect(group.group_category.name).to eq "random category"
   end
 
   it "should default group_category to imported if not in the hash" do
     course_with_teacher
+    migration = @course.content_migrations.create!
     group = @course.groups.build
-    Importers::GroupImporter.import_from_migration({}, @course, nil, group)
+    Importers::GroupImporter.import_from_migration({}, @course, migration, group)
     expect(group.group_category).to eq GroupCategory.imported_for(@course)
   end
 end

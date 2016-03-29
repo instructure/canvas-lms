@@ -25,13 +25,11 @@ define [
 
   test "it should inject styleSheets", 1, ->
     whnd = popup.exec()
-
-    strictEqual $(whnd.document).find("link[href]").length,
-      $(root.document).find("link[href]").length
+    strictEqual $(whnd.document).find("link[href]").length,$("link").length
 
   test "it should trigger the @open and @close events", ->
-    onOpen = sinon.spy()
-    onClose = sinon.spy()
+    onOpen = @spy()
+    onClose = @spy()
 
     popup.on "open", onOpen
     popup.on "close", onClose
@@ -43,7 +41,7 @@ define [
     ok onClose.called, "@close handler gets called"
 
   test "it should close after a successful login", 1, ->
-    onClose = sinon.spy()
+    onClose = @spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 200, {}, "OK" ]
@@ -57,7 +55,7 @@ define [
     whnd = popup.exec()
 
   test "it should trigger the @login_success event", 1, ->
-    onSuccess = sinon.spy()
+    onSuccess = @spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 200, {}, "OK" ]
@@ -71,7 +69,7 @@ define [
     whnd = popup.exec()
 
   test "it should trigger the @login_failure event", 1, ->
-    onFailure = sinon.spy()
+    onFailure = @spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 401, {}, "Bad Request" ]
@@ -86,13 +84,13 @@ define [
 
   asyncTest "it should pop back in if student closes it", 5, ->
     latestWindow = undefined
-    onFailure = sinon.spy()
-    onOpen = sinon.spy()
-    onClose = sinon.spy()
+    onFailure = @spy()
+    onOpen = @spy()
+    onClose = @spy()
     originalOpen = window.open
 
     # needed for proper cleanup of windows
-    openStub = sinon.stub window, "open", ->
+    openStub = @stub window, "open", ->
       latestWindow = originalOpen.apply(this, arguments)
 
     server = sinon.fakeServer.create()
@@ -122,7 +120,6 @@ define [
           popup.off "close.sticky"
           latestWindow.close()
           ok onClose.calledTwice, "popup closed for good"
-          openStub.restore()
 
     whnd = popup.exec()
     ok onOpen.called, "popup opened"

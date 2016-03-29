@@ -87,6 +87,18 @@ describe IncomingMailProcessor::ImapMailbox do
     end
   end
 
+  describe '#unprocessed_message_count' do
+    it 'returns zero if there are no messages' do
+      @imap_mock.expects(:search).with(["X-GM-RAW", "label:unread"]).once.returns([])
+      @mailbox.unprocessed_message_count.should eql 0
+    end
+
+    it 'returns the number of messages if there are any' do
+      @imap_mock.expects(:search).with(["X-GM-RAW", "label:unread"]).once.returns([1,2,3,58,42])
+      @mailbox.unprocessed_message_count.should eql 5
+    end
+  end
+
   context "connected" do
     before do
       @mailbox.connect

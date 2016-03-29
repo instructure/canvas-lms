@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <%= style %>
+</head>
+  <body>
+    <h1 id="<%="#{title}_TOC"%>"><%="#{title}"%></h1>
+    <ol>
+    <% content.each do |item| %>
+      <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+    <% end %>
+    </ol>
+    <hr/>
+    <a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a>
+    <div style="page-break-before:always;"></div>
+    <% content.each do |item| %>
+      <%=build(item)%>
+      <hr/>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%= I18n.t("Back to %{ref_title}", {ref_title: title}) %></a></p>
+      <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
+      <div style="page-break-before:always;"></div>
+    <% end %>
+  </body>
+</html>

@@ -41,6 +41,7 @@
           {{checkbox "acceptsOnlineTextEntries"
             id="assignment_text_entry"
             name="online_submission_types[online_text_entry]"
+            aria-label=(t "Online Submission Type - Text Entry")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
@@ -49,6 +50,7 @@
           {{checkbox "acceptsOnlineURL"
             id="assignment_online_url"
             name="online_submission_types[online_url]"
+            aria-label=(t "Online Submission Type - Website URL")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
@@ -57,6 +59,7 @@
             {{checkbox "acceptsMediaRecording"
               id="assignment_media_recording"
               name="online_submission_types[media_recording]"
+              aria-label=(t "Online Submission Type - Media Recordings")
               disabled=submissionTypesFrozen}}
             {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
           </label>
@@ -66,6 +69,7 @@
             id="assignment_online_upload"
             name="online_submission_types[online_upload]"
             aria-controls="restrict_file_extensions_container"
+            aria-label=(t "Online Submission Type - File Uploads")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_file_uploads"}}File Uploads{{/t}}
         </label>
@@ -81,6 +85,7 @@
               id="assignment_restrict_file_extensions"
               name="restrict_file_extensions"
               aria-controls="allowed_extensions_container"
+              aria-label=(t "Online Submission Type - File Uploads - Restrict Upload File Types")
               disabled=submissionTypesFrozen}}
             {{#t "labels.restrict_file_extensions"}}
               Restrict Upload File Types
@@ -101,9 +106,10 @@
               type="text"
               maxlength="254"
               placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
+              aria-labelledby="explanation_nest"
               value="{{join allowedExtensions ","}}"
               {{disabledIfIncludes frozenAttributes "submission_types"}}/>
-            <div class="explanation nest">
+            <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
                 Enter a list of accepted extensions, for example: doc,xls,txt
               {{/t}}
@@ -140,27 +146,36 @@
             {{#t 'external_tool_options'}}External Tool Options{{/t}}
           </strong>
         </div>
-        <label for="assignment_external_tool_tag_attributes_url">
-          {{#t "label.external_tool_url"}}External Tool URL{{/t}}
-        </label>
-        <button class="screenreader-only" id="assignment_external_tool_tag_attributes_url_screenreader_button" type="button">
-          Open External Tool Url Options
-        </button>
-        <div class="nested">
-          <input id="assignment_external_tool_tag_attributes_url"
-            name="external_tool_tag_attributes[url]"
-            type="text"
-            value="{{externalToolUrl}}"
-            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
-        </div>
+        <div class="pad-box-mini">
+          <div class="ic-Form-control">
+            <label class="ic-Label" for="assignment_external_tool_tag_attributes_url">
+              {{#t}}Enter or find an External Tool URL{{/t}}
+            </label>
+            <div class="ic-Input-group">
+              <div class="ic-Input-group__add-on" aria-hidden="true">
+                <i class="icon-link"></i>
+              </div>
+              <input id="assignment_external_tool_tag_attributes_url"
+                class="ic-Input"
+                name="external_tool_tag_attributes[url]"
+                type="url"
+                value="{{externalToolUrl}}"
+                placeholder="http://www.example.com/launch"
+                {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+              <button class="Button" id="assignment_external_tool_tag_attributes_url_find" type="button">
+                {{#t}}Find{{/t}}
+              </button>
+            </div>
+          </div>
           <input id="assignment_external_tool_tag_attributes_content_type"
                  name="external_tool_tag_attributes[content_type]"
                  type="text"
                  style="display: none"/>
-        <input id="assignment_external_tool_tag_attributes_content_id"
-               name="external_tool_tag_attributes[content_id]"
-               type="text"
-               style="display: none"/>
+          <input id="assignment_external_tool_tag_attributes_content_id"
+                 name="external_tool_tag_attributes[content_id]"
+                 type="text"
+                 style="display: none"/>
+        </div>
         <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
           {{checkbox "externalToolNewTab"
             id="assignment_external_tool_tag_attributes_new_tab"

@@ -1,3 +1,4 @@
+@import "base/environment";
 @import "components/ui.selectmenu";
 
 $border: #C1C7CF;
@@ -8,7 +9,7 @@ $discussion-dark-text: $ic-color-dark;
   body.with-right-side.with-left-side {
     // toolbar needs it to be this wide
     min-width: 1110px;
-  }  
+  }
 }
 
 .hidden {
@@ -42,7 +43,7 @@ $discussion-dark-text: $ic-color-dark;
   padding: 0;
 
   .entry {
-    
+
     @if $use_new_styles {
       background: $ic-color-light;
       border: 1px solid $ic-border-light;
@@ -130,7 +131,7 @@ $discussion-dark-text: $ic-color-dark;
 .discussion-section {
   padding: 4px 10px 3px 10px;
   @if $use_new_styles == false {
-    a { color: #396eb2; }
+    a { color: $ic-brand-primary; }
   }
 }
 
@@ -174,27 +175,27 @@ $discussion-dark-text: $ic-color-dark;
 
 .topic {
   h1.discussion-title {
-    font-size: 19px;
+    @include fontSize(19px);
     font-weight: normal;
     line-height: 30px;
   }
   h2.discussion-title {
-    font-size: 16px;
+    @include fontSize(16px);
   }
   .discussion-title {
-    font-size: 19px;
+    @include fontSize(19px);
   }
 }
 
 .discussion-title {
-  font-size: 13px;
+  @include fontSize(13px);
   font-weight: bold;
   line-height: 23px;
   margin: 0;
 }
 
 .discussion-subtitle {
-  font-size: 11px;
+  @include fontSize(11px);
   margin: 0;
 }
 
@@ -203,7 +204,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-pubdate {
-  font-size: 11px;
+  @include fontSize(11px);
   color: $discussion-dark-text;
   line-height: 23px;
 }
@@ -211,23 +212,24 @@ $discussion-dark-text: $ic-color-dark;
 .discussion-assignment-section {
   .row-fluid [class*="span"] {
     min-height: 0;
-  }  
+  }
   .discussion-title {
     font-size: 14px !important;
+    font-size: 0.875rem !important;
   }
 }
 
 
 .discussion-fyi {
   font-style: italic;
-  font-size: 12px;
-  color: $discussion-dark-text;
+  @include fontSize(12px);
+  color: darken($ic-color-neutral, 45);
 }
 
 .discussion-read-state-btn {
   position: absolute;
   top: 4px;
-  
+
   bottom: 0;
   width: 10px;
   height: 10px;
@@ -243,13 +245,12 @@ $discussion-dark-text: $ic-color-dark;
   border-radius: 5px;
   width: 10px;
   height: 10px;
-  background: #46aaf9;
-  @if $use_new_styles == false { background: linear-gradient(to bottom, #73d6fc, #2489f7); }
+  background: $ic-brand-primary;
 }
 
 .read .discussion-read-state {
   background: #fff;
-  border: 1px solid #8c8d8d;
+  border: 1px solid $ic-color-dark;
 }
 
 .discussion-read-state-btn {
@@ -257,12 +258,10 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-reply-action, .discussion-rate-action {
-  @if $use_high_contrast { color: #666; }
-  @else {
-    text-decoration: none;
-    @if $use_new_styles == false { color: #888; }
-  }
-  
+
+  color: $ic-color-dark;
+  text-decoration: none;
+
   &:hover, &:focus {
     text-decoration: none;
     color: #444;
@@ -282,7 +281,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-rating {
   @if $use_high_contrast { color: #666; }
-  @else {color: #888;}
+  @else {color: $ic-color-dark;}
 }
 
 .entry, .discussion_entry {
@@ -364,7 +363,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .entry {
   .cancel_button {
-    font-size: 11px;
+  @include fontSize(11px);
   }
 }
 
@@ -415,7 +414,7 @@ $discussion-dark-text: $ic-color-dark;
     min-height: 0;
   }
   .discussion-title {
-    font-size: 12px;
+    @include fontSize(12px);
     font-style: italic;
   }
 }
@@ -430,7 +429,7 @@ $discussion-dark-text: $ic-color-dark;
   border-top: 1px solid $border;
   background: white;
   padding: 10px 10px 13px 10px;
-  font-size: 10px;
+  @include fontSize(10px);
   font-weight: bold;
   @include clearfix;
   a {
@@ -468,7 +467,7 @@ $discussion-dark-text: $ic-color-dark;
 .entry-controls {
   overflow: auto;
   padding: 10px;
-  font-size: 12px;
+  @include fontSize(12px);
 
   .new-and-total-badge {
     float: left;
@@ -488,7 +487,7 @@ $discussion-dark-text: $ic-color-dark;
     }
     @else {
       padding: 10px;
-      background: white;  
+      background: white;
     }
   }
 }
@@ -499,7 +498,7 @@ $discussion-dark-text: $ic-color-dark;
 
 @if $use_new_styles == false {
   #content { padding: 0; }
-  #main { background: #E8ECEF; }
+  #main { background: #fff; }
 }
 
 .discussion_subentries {
@@ -509,7 +508,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-page-nav {
   ul {
-    font-size: 12px;
+    @include fontSize(12px);
     margin: 0;
     padding-bottom: 20px;
     list-style: none;
@@ -532,7 +531,7 @@ $discussion-dark-text: $ic-color-dark;
 .new-and-total-badge {
   .new-items, .total-items {
     font-weight: normal;
-    font-size: 10px;
+    @include fontSize(10px);
   }
 }
 
@@ -551,8 +550,8 @@ $discussion-dark-text: $ic-color-dark;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
-  @if $use_high_contrast { color: #666; }
-  @else {   
+  @if $use_high_contrast { color: $ic-color-dark; }
+  @else {
     @if $use_new_styles == false { color: #888; }
   }
   @if $use_new_styles {
@@ -561,7 +560,7 @@ $discussion-dark-text: $ic-color-dark;
   }
   @else {
     padding: 3px 10px;
-    font-size: 11px;
+    @include fontSize(11px);
   }
   &:hover, &:focus {
     color: #444;
@@ -595,6 +594,11 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
+.accessibility-warning {
+  @include accessibility-prompt;
+  @include fontSize(14px);
+}
+
 .collapsable:hover, .collapsable:focus {
   cursor: pointer;
   &:before {
@@ -611,17 +615,10 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
-#collapse-discussion {
-  &:focus {
-    display: block;
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 50%;
-    height: 0px;
-    width: 0px;
-  }
+.collapse-discussion {
+  display: block;
 }
+
 .collapsed .collapsable:hover {
   border-color: white;
 }
@@ -633,6 +630,23 @@ $discussion-dark-text: $ic-color-dark;
 
 .bootstrap-form {
   margin: 0;
+}
+
+#discussion-managebar {
+  div.form-inline {
+    display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
+  #keyboard-shortcut-modal-info {
+    padding: 4px 0px 3px 0px;
+
+    .accessibility-warning {
+      display: none;
+    }
+  }
 }
 
 .headerBar {
@@ -664,12 +678,6 @@ $discussion-dark-text: $ic-color-dark;
     @if $use_new_styles {
       + .discussion-entry-reply-area { margin-top: -1px; }
     }
-    @else {
-      .headerBar {
-        background: #e3e7ec;
-        border-top: solid 1px $border;  
-      }
-    }
   }
   .admin-links {
     text-align: left;
@@ -689,8 +697,9 @@ $discussion-dark-text: $ic-color-dark;
       border: 1px solid $ic-border-light;
     }
     @else {
+      background: #fff;
+      border-bottom: 1px solid $ic-color-neutral;
       padding: 10px 10px 6px 14px;
-      border-bottom: solid 1px $border;  
     }
   }
   .headerBar:after {

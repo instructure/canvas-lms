@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require 'nokogiri'
 
 describe "content exports" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -22,12 +22,12 @@ describe "content exports" do
       expect(url).to match(%r{/files/\d+/download\?verifier=})
     end
 
-    it "should allow course export downloads" do
+    it "should allow course export downloads", priority: "1", test_id: 126678 do
       run_export
       expect(@export.export_type).to eq 'common_cartridge'
     end
 
-    it "should allow qti export downloads" do
+    it "should allow qti export downloads", priority: "1", test_id: 126680 do
       run_export do
         f("input[value=qti]").click
       end

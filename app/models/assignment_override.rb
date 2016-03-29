@@ -23,12 +23,6 @@ class AssignmentOverride < ActiveRecord::Base
   simply_versioned :keep => 10
 
   attr_accessible
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :created_at, :updated_at, :assignment_id, :assignment_version, :set_type, :set_id, :title, :workflow_state, :due_at_overridden, :due_at, :all_day,
-    :all_day_date, :unlock_at_overridden, :unlock_at, :lock_at_overridden, :lock_at, :quiz_id, :quiz_version
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:assignment, :quiz, :assignment_override_students]
 
   attr_accessor :dont_touch_assignment
 
@@ -49,13 +43,15 @@ class AssignmentOverride < ActiveRecord::Base
     :if => lambda{ |override| override.assignment? && override.active? && concrete_set.call(override) }
   validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
     :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
+
   validate :if => concrete_set do |record|
     if record.set && record.assignment && record.active?
       case record.set
       when CourseSection
         record.errors.add :set, "not from assignment's course" unless record.set.course_id == record.assignment.context_id
       when Group
-        record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == record.assignment.group_category_id
+        valid_group_category_id = record.assignment.group_category_id || record.assignment.discussion_topic.try(:group_category_id)
+        record.errors.add :set, "not from assignment's group category" unless record.set.group_category_id == valid_group_category_id
       end
     end
   end
@@ -74,6 +70,12 @@ class AssignmentOverride < ActiveRecord::Base
 
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
+
+  def set_not_empty?
+    overridable = assignment? ? assignment : quiz
+    ['CourseSection', 'Group'].include?(self.set_type) ||
+    set.any? && overridable.context.current_enrollments.where(user_id: set).exists?
+  end
 
   def update_cached_due_dates
     return unless assignment?
@@ -99,7 +101,7 @@ class AssignmentOverride < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
       self.assignment_override_students.destroy_all
@@ -134,14 +136,13 @@ class AssignmentOverride < ActiveRecord::Base
     read_attribute(:set_id)
   end
 
-  def set_with_adhoc
+  def set
     if self.set_type == 'ADHOC'
-      assignment_override_students.includes(:user).map(&:user)
+      assignment_override_students.preload(:user).map(&:user)
     else
-      set_without_adhoc
+      super
     end
   end
-  alias_method_chain :set, :adhoc
 
   def set_id=(id)
     if self.set_type == 'ADHOC'
@@ -170,7 +171,7 @@ class AssignmentOverride < ActiveRecord::Base
       true
     end
 
-    scope "overriding_#{field}", where("#{field}_overridden" => true)
+    scope "overriding_#{field}", -> { where("#{field}_overridden" => true) }
   end
 
   override :due_at
@@ -241,27 +242,29 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_title_if_needed
-    return if self.workflow_state == "deleted"
-
     if set_type != 'ADHOC' && set
       self.title = set.name
     elsif set_type == 'ADHOC' && set.any?
       self.title ||= title_from_students(set)
+    else
+      self.title ||= "No Title"
     end
   end
 
   def title_from_students(students)
-    sorted_students = (students || []).sort_by(&:name)
-    if sorted_students.count > 3
-      others_count = sorted_students.count - 2
-      first_two_students = sorted_students[0..1].map(&:name).join(", ")
-      I18n.t(
-        '%{first_two_students}, and %{others_count} others',
-        {first_two_students: first_two_students, others_count: others_count}
-      )
-    elsif sorted_students.any?
-      sorted_students.map(&:name).to_sentence
-    end
+    return t("No Students") if students.blank?
+    t(:student_count,
+      {
+        one: '%{count} student',
+        other: '%{count} students'
+      },
+      count: students.count
+     )
+  end
+
+  def destroy_if_empty_set
+    return unless set_type == 'ADHOC'
+    self.destroy if set.empty?
   end
 
   has_a_broadcast_policy

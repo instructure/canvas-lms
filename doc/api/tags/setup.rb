@@ -35,7 +35,9 @@ def response_field
 end
 
 def argument
-  generic_tag :argument, :no_types => false, :label => "Request Parameters"
+  return unless object.has_tag?(:argument)
+  @request_parameters = object.tags(:argument).map { |t| ArgumentView.new(t.text) }
+  erb('request_parameters')
 end
 
 def returns
@@ -64,4 +66,3 @@ def generic_tag(name, opts = {})
   @no_names, @no_types = nil, nil
   out
 end
-

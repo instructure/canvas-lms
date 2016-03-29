@@ -319,7 +319,7 @@ describe ContentMigration do
       group3.assessment_question_bank = bank3
       group3.save
 
-      run_course_copy(["User didn't have permission to reference question bank in quiz group Question Group"])
+      run_course_copy(["User didn't have permission to reference question bank in quiz group #{group3.name}"])
 
       q = @copy_to.quizzes.where(migration_id: mig_id(q1)).first
       expect(q).not_to be_nil
@@ -380,6 +380,7 @@ describe ContentMigration do
       quiz.quiz_type = 'practice_quiz'
       quiz.save!
 
+      asmnt.reload
       asmnt.workflow_state = 'deleted'
       asmnt.save!
 
@@ -726,7 +727,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       quiz = @copy_from.quizzes.create!(:title => "ruhroh")
 
-      group1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 1, :question_points => 5.0)
+      group1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 2, :question_points => 5.0)
       group1.assessment_question_bank = bank1
       group1.save
       group2 = quiz.quiz_groups.create!(:name => "group2", :pick_count => 1, :question_points => 2.0)
@@ -747,6 +748,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       group2_copy = quiz_copy.quiz_groups.where(:migration_id => mig_id(group2)).first
 
       expect(group1_copy.assessment_question_bank_id).to eq bank1_copy.id
+      expect(group1_copy.pick_count).to eq group1.pick_count
+      expect(group1_copy.name).to eq group1.name
       expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
 
@@ -837,6 +840,87 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(quiz_to).to be_published
       expect(quiz_to.assignment).to eq a_to
       expect(a_to).to be_published
+    end
+
+    it "should correctly copy links to quizzes inside assessment questions" do
+      link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
+
+      html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question',
+        'question_text' => (html % [@copy_from.id, link_quiz.id])}
+      aq = bank.assessment_questions.create!(:question_data => data)
+
+      other_quiz = @copy_from.quizzes.create!(:title => "other quiz")
+      qq = other_quiz.quiz_questions.create!(:question_data => data)
+      other_quiz.generate_quiz_data
+      other_quiz.published_at = Time.now
+      other_quiz.workflow_state = 'available'
+      other_quiz.save!
+
+      run_course_copy
+
+      link_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(link_quiz)).first
+      expected_html = (html % [@copy_to.id, link_quiz2.id])
+
+      other_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(other_quiz)).first
+      aq2 = @copy_to.assessment_questions.where(migration_id: mig_id(aq)).first
+      qq2 = other_quiz2.quiz_questions.first
+
+      expect(aq2.question_data['question_text']).to eq expected_html
+      expect(qq2.question_data['question_text']).to eq expected_html
+      expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
+    end
+
+    it "should correctly copy links to quizzes inside standalone quiz questions" do
+      # i.e. quiz questions imported independently from their original assessment question
+      link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
+
+      html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question',
+        'question_text' => (html % [@copy_from.id, link_quiz.id])}
+      aq = bank.assessment_questions.create!(:question_data => data)
+
+      other_quiz = @copy_from.quizzes.create!(:title => "other quiz")
+      qq = other_quiz.quiz_questions.create!(:question_data => data)
+      other_quiz.generate_quiz_data
+      other_quiz.published_at = Time.now
+      other_quiz.workflow_state = 'available'
+      other_quiz.save!
+
+      @cm.copy_options = {
+        :quizzes => {mig_id(link_quiz) => "1", mig_id(other_quiz) => "1"}
+      }
+      run_course_copy
+
+      link_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(link_quiz)).first
+      expected_html = (html % [@copy_to.id, link_quiz2.id])
+
+      other_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(other_quiz)).first
+      qq2 = other_quiz2.quiz_questions.first
+
+      expect(qq2.question_data['question_text']).to eq expected_html
+      expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
+    end
+
+    it "should properly copy escaped brackets in html comments" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      text = "&lt;braaackets&gt;"
+      q = bank1.assessment_questions.create!(:question_data => {
+          "question_type" => "multiple_choice_question", 'name' => 'test question',
+          'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100, "comments_html" => text},
+            {'id' => 2, "text" => "inorrect", "weight" => 0}],
+          "correct_comments_html" => text
+        })
+
+      run_course_copy
+
+      q2 = @copy_to.assessment_questions.first
+      expect(q2.question_data['correct_comments_html']).to eq text
+      expect(q2.question_data['answers'].first['comments_html']).to eq text
     end
   end
 end

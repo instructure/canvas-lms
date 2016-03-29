@@ -1,0 +1,19 @@
+.post-to-sis-status {
+  transition: none;
+  padding-left: 9px;
+  margin-right: 18px;
+  vertical-align: text-top;
+  line-height: 17px;
+  cursor: pointer;
+
+  &.enabled {
+    font-weight: bold;
+    @if $use_high_contrast { color: darken($ic-color-success, 4%); }
+    @else { color: $ic-color-success; }
+  }
+
+  &.disabled {
+    font-weight: normal;
+    color: $ic-color-icon-disabled;
+  }
+}

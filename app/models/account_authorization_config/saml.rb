@@ -18,7 +18,7 @@
 
 class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.sti_name
-    'saml'
+    'saml'.freeze
   end
 
   def self.enabled?
@@ -33,17 +33,27 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.recognized_params
-    [ :auth_type, :log_in_url, :log_out_url, :requested_authn_context,
-      :certificate_fingerprint, :identifier_format,
-      :login_attribute, :idp_entity_id, :position, :unknown_user_url ]
+    [ :log_in_url,
+      :log_out_url,
+      :requested_authn_context,
+      :certificate_fingerprint,
+      :identifier_format,
+      :login_attribute,
+      :idp_entity_id,
+      :parent_registration,
+      :jit_provisioning ].freeze
   end
 
   def self.deprecated_params
-    [:change_password_url, :login_handle_name]
+    [:change_password_url, :login_handle_name, :unknown_user_url].freeze
   end
 
   before_validation :set_saml_defaults
   validates_presence_of :entity_id
+
+  def auth_provider_filter
+    [nil, self]
+  end
 
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
@@ -103,11 +113,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
 
-    if account.saml_authentication?
-      settings.issuer = account.account_authorization_config.entity_id
-    else
-      settings.issuer = saml_default_entity_id_for_account(account)
-    end
+    settings.issuer = account.authentication_providers.active.where(auth_type: 'saml').first.try(:entity_id)
+    settings.issuer ||= saml_default_entity_id_for_account(account)
 
     encryption = app_config[:encryption]
     if encryption.is_a?(Hash)
@@ -130,14 +137,6 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     end
 
     path.exist? ? path.to_s : nil
-  end
-
-  def email_identifier?
-    if self.saml_authentication?
-      return self.identifier_format == Onelogin::Saml::NameIdentifiers::EMAIL
-    end
-
-    false
   end
 
   def debugging?

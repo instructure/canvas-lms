@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "outcome gradebook" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include Gradebook2Common
 
   context "as a teacher" do
     before(:each) do

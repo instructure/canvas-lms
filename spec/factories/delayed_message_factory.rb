@@ -24,7 +24,7 @@ def delayed_message_valid_attributes(opts={})
   opts[:notification] ||= @notification
   opts[:notification] ||= notification_model
   user = opts[:user] || @user || User.create!
-  cc = opts.delete(:cc) || user.communication_channels.first || user.communication_channels.create!(:path => "delayed_message@example.com")
+  cc = opts.delete(:cc) || user.communication_channels.first || user.communication_channels.create!(:path => "delayed_message@example.com").tap(&:confirm!)
   np = cc.notification_policies.where(:notification_id => opts[:notification].id, :frequency => Notification::FREQ_IMMEDIATELY).first_or_create!
   {
     :notification_id => opts[:notification].id,

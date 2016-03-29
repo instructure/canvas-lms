@@ -4,6 +4,7 @@
     <%= hidden_field_tag :group_conversation, "true" %>
     <%= hidden_field_tag :bulk_message, "true" %>
     <%= hidden_field_tag :context_code, "" %>
+    <%= hidden_field_tag :mode, "async" %>
     <h2><%= t('message_students_who', 'Message students who...') %></h2>
     <div style="margin-bottom: 15px;">
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>
@@ -12,12 +13,18 @@
       <select class="message_types" aria-label="<%= t(:message_type, "Message Type") %>">
       </select>
       <span class="cutoff_holder">
-        <input type="text" class="cutoff_score" style="width: 35px;"/>
-        <span class="out_of"> <%= t('out_of_points', 'out of %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe) %></span>
+        <input type="text" class="cutoff_score" style="width: 35px;" aria-label="<%= t("cutoff score") %>"/>
+        <span class="out_of">
+          <%= t('out_of_points', 'out of %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe) %>
+        </span>
       </span>
     </div>
     <ul class="student_list">
-      <li class="student blank" style="display: none;"><span class="name">&nbsp;</span><span class="score">&nbsp;</span></li>
+      <li class="student blank" style="display: none;">
+        <span class="name">&nbsp;</span>
+        <span class="score">&nbsp;</span>
+        <button class="remove-button Button Button--icon-action"><i class="icon-x"></i></button>
+      </li>
     </ul>
     <div class="clear"></div>
     <table class="formtable" style="width: 100%;">
@@ -35,8 +42,8 @@
       </tr>
     </table>
     <div class="button-container">
-      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-      <button type="submit" class="btn btn-primary send_button"><%= t('buttons.send_message', 'Send Message') %></button>
+      <button class="Button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="Button Button--primary send_button"><%= t('buttons.send_message', 'Send Message') %></button>
     </div>
   <% end %>
 </div>

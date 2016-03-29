@@ -26,8 +26,8 @@ describe 'DataFixup::ResanitizeAssignmentsAllowedExtensions' do
     a2 = Assignment.create!(context: @course, title: 'hi2')
     a3 = Assignment.create!(context: @course, title: 'hi3')
 
-    Assignment.where(id: a2.id).update_all(allowed_extensions: ['doc', 'xsl'].to_yaml)
-    Assignment.where(id: a3.id).update_all(allowed_extensions: ['.DOC', ' .XSL'].to_yaml)
+    ActiveRecord::Base.connection.execute("UPDATE #{Assignment.quoted_table_name} SET allowed_extensions = '#{['doc', 'xsl'].to_yaml}' WHERE id = #{a2.id}")
+    ActiveRecord::Base.connection.execute("UPDATE #{Assignment.quoted_table_name} SET allowed_extensions = '#{['.DOC', ' .XSL'].to_yaml}' WHERE id = #{a3.id}")
 
     DataFixup::ResanitizeAssignmentsAllowedExtensions.run
 

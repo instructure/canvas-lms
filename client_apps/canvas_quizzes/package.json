@@ -3,12 +3,23 @@
   "title": "Canvas Quizzes",
   "description": "Quiz apps for Canvas, the LMS by Instructure.",
   "version": "1.0.0",
-  "author": {
-    "name": "Ahmad Amireh",
-    "email": "ahmad@instructure.com",
-    "url": "http://www.instructure.com"
-  },
+  "contributors": [
+    {
+      "name": "Ahmad Amireh",
+      "email": "ahmad@instructure.com",
+      "url": "http://www.instructure.com"
+    },
+    {
+      "name": "Ryan Taylor",
+      "email": "rtaylor@instructure.com",
+      "url": "http://www.instructure.com"
+    }
+  ],
   "licenses": [],
+  "repository" :{
+    "type" : "git",
+    "url" : "https://github.com/instructure/canvas-lms.git"
+  },
   "keywords": [
     "canvas",
     "lms"

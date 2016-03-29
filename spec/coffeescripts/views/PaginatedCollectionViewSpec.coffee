@@ -1,10 +1,11 @@
 define [
   'jquery'
+  'Backbone'
   'compiled/collections/PaginatedCollection'
   'compiled/views/PaginatedCollectionView'
   'helpers/getFakePage'
   'helpers/fakeENV'
-], ($, PaginatedCollection, PaginatedCollectionView, fakePage, fakeENV) ->
+], ($, Backbone, PaginatedCollection, PaginatedCollectionView, fakePage, fakeENV) ->
 
   server = null
   clock = null
@@ -90,8 +91,8 @@ define [
     assertItemRendered '4'
 
   test 'doesn\'t fetch if already fetching', ->
-    sinon.spy collection, 'fetch'
-    sinon.spy view, 'hideLoadingIndicator'
+    @spy collection, 'fetch'
+    @spy view, 'hideLoadingIndicator'
     collection.fetch()
     view.checkScroll()
     ok collection.fetch.calledOnce, 'fetch called once'
@@ -154,4 +155,3 @@ define [
     # ".pagination:#{view.cid}" events are all wipe out on last fetch, so the
     # assertion at the beginning of the test in the handler shouldn't fire
     fixtures.trigger fakeEvent
-

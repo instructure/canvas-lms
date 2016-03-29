@@ -15,6 +15,13 @@ describe ContentMigration do
                                        :lock_at => @old_start + 3.days,
                                        :peer_reviews_due_at => @old_start + 4.days
         )
+
+        att = Attachment.create!(:context => @copy_from, :filename => 'hi.txt',
+          :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(@copy_from))
+        att.unlock_at = @old_start + 2.days
+        att.lock_at = @old_start + 3.days
+        att.save!
+
         @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                    :unlock_at => @old_start + 1.days,
                                    :lock_at => @old_start + 5.days,
@@ -35,6 +42,11 @@ describe ContentMigration do
         cm.start_at = @old_start + 2.day
         cm.end_at = @old_start + 3.days
         cm.save!
+
+        cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
+        cm2.start_at = @old_start + 2.day
+        cm2.end_at = @old_start + 3.days
+        cm2.save!
       end
 
       it "should shift dates" do
@@ -58,6 +70,10 @@ describe ContentMigration do
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
 
+        new_att = @copy_to.attachments.first
+        expect(new_att.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_att.lock_at.to_i).to eq (@new_start + 3.day).to_i
+
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at.to_i).to  eq (@new_start + 4.day).to_i
         expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
@@ -80,6 +96,11 @@ describe ContentMigration do
         expect(new_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
         expect(new_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
         expect(new_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
+
+        newer_mod = @copy_to.context_modules.last
+        expect(newer_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(newer_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(newer_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
       end
 
       it "should remove dates" do
@@ -99,6 +120,10 @@ describe ContentMigration do
         expect(new_asmnt.lock_at).to be_nil
         expect(new_asmnt.peer_reviews_due_at).to be_nil
 
+        new_att = @copy_to.attachments.first
+        expect(new_att.unlock_at).to be_nil
+        expect(new_att.lock_at).to be_nil
+
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at).to be_nil
         expect(new_quiz.unlock_at).to be_nil
@@ -108,6 +133,8 @@ describe ContentMigration do
 
         new_disc = @copy_to.discussion_topics.first
         expect(new_disc.delayed_post_at).to be_nil
+        expect(new_disc.lock_at).to be_nil
+        expect(new_disc.locked).to be_falsey
 
         new_ann = @copy_to.announcements.first
         expect(new_ann.delayed_post_at).to be_nil
@@ -120,6 +147,11 @@ describe ContentMigration do
         expect(new_mod.unlock_at).to be_nil
         expect(new_mod.start_at).to be_nil
         expect(new_mod.end_at).to be_nil
+
+        newer_mod = @copy_to.context_modules.last
+        expect(newer_mod.unlock_at).to be_nil
+        expect(newer_mod.start_at).to be_nil
+        expect(newer_mod.end_at).to be_nil
       end
 
       it "should not create broken assignments from unpublished quizzes" do
@@ -331,5 +363,60 @@ describe ContentMigration do
       expect(cal_2.start_at.utc).to eq cal.start_at.utc
     end
 
+    it "should not clear destination course dates" do
+      start_at = 1.day.ago
+      conclude_at = 2.days.from_now
+      @copy_to.start_at = start_at
+      @copy_to.conclude_at = conclude_at
+      @copy_to.save!
+      options = {
+        :everything => true,
+        :remove_dates => true,
+      }
+      @cm.copy_options = options
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      expect(@copy_to.start_at).to eq start_at
+      expect(@copy_to.conclude_at).to eq conclude_at
+    end
+
+    it "should not break link resolution in quiz_data" do
+      topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<p>some text</p>")
+
+      html = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question', 'question_text' => html}
+      aq = bank.assessment_questions.create!(:question_data => data)
+
+      quiz = @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00")
+      qq = quiz.quiz_questions.create!(:question_data => data)
+      quiz.generate_quiz_data
+      quiz.published_at = Time.now
+      quiz.workflow_state = 'available'
+      quiz.save!
+
+      options = {
+        :everything => true,
+        :shift_dates => true,
+        :old_start_date => 'Jul 1, 2012',
+        :old_end_date => 'Jul 11, 2012',
+        :new_start_date => 'Aug 5, 2012',
+        :new_end_date => 'Aug 15, 2012'
+      }
+      @cm.copy_options = options
+      @cm.save!
+
+      run_course_copy
+
+      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      data = quiz_to.quiz_data.to_yaml
+      expect(data).to_not include("LINK.PLACEHOLDER")
+      expect(data).to include("courses/#{@copy_to.id}/discussion_topics/#{topic_to.id}")
+    end
   end
 end

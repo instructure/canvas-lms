@@ -26,12 +26,7 @@ module AccountReports
     def initialize(account_report)
       @account_report = account_report
       extra_text_term(@account_report)
-
-      if @account_report.has_parameter? "include_deleted"
-        @include_deleted = @account_report.parameters["include_deleted"]
-        add_extra_text(I18n.t('account_reports.grades.deleted',
-                              'Include Deleted Objects: true;'))
-      end
+      include_deleted_objects
 
       if @account_report.has_parameter? "limiting_period"
         add_extra_text(I18n.t('account_reports.grades.limited',
@@ -60,7 +55,7 @@ module AccountReports
     # - enrollment status
 
     def grade_export()
-      students = root_account.pseudonyms.except(:includes).
+      students = root_account.pseudonyms.except(:preload).
         select("pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
                 pseudonyms.sis_user_id, c.name AS course_name,
                 c.sis_source_id AS course_sis_id, s.name AS section_name,
@@ -72,12 +67,12 @@ module AccountReports
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
                 WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
         order("t.id, c.id, e.id").
-        joins("INNER JOIN users u ON pseudonyms.user_id = u.id
-               INNER JOIN enrollments e ON pseudonyms.user_id = e.user_id
+        joins("INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
+               INNER JOIN #{Enrollment.quoted_table_name} e ON pseudonyms.user_id = e.user_id
                  AND e.type = 'StudentEnrollment'
-               INNER JOIN courses c ON c.id = e.course_id
-               INNER JOIN enrollment_terms t ON c.enrollment_term_id = t.id
-               INNER JOIN course_sections s ON e.course_section_id = s.id")
+               INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
+               INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
+               INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id")
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")

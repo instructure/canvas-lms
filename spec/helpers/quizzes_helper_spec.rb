@@ -196,7 +196,7 @@ describe QuizzesHelper do
     it 'should sanitize user input' do
       malicious_answer_list = [{
         blank_id: 'color',
-        answer: %q|'><script>alert('ha!')</script><img|
+        answer: %q|><script>alert()</script><img|
       }]
 
       html = fill_in_multiple_blanks_question(
@@ -205,7 +205,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
       expect(html).to be_html_safe
     end
 
@@ -253,17 +253,41 @@ describe QuizzesHelper do
     end
 
     it "should select the user's answer" do
-      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'},
-                                         answer_list: ['val'])
+      html = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: true
+      })
       expect(html).to eq 'some <select class="question_input" name="question_4"><option value="val" selected>val</option></select>'
       expect(html).to be_html_safe
     end
 
     it "should not blow up if the user's answer isn't there" do
-      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'},
-                                         answer_list: ['val'])
+      html = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: true
+      })
       expect(html).to eq 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
       expect(html).to be_html_safe
+    end
+
+    it "should disable select boxes that are not editable" do
+      html_string = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: false
+      })
+      html = Nokogiri::HTML.fragment(html_string)
+      span_html = html.css('span').first
+      expect(span_html).not_to be_nil
+      expect(html_string).to be_html_safe
     end
   end
 
@@ -398,8 +422,9 @@ describe QuizzesHelper do
       quiz = stub({
         show_correct_answers_last_attempt: true,
       })
+      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz)
+      message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /last attempt/
     end
     it 'should provide a useful message when "no"' do
@@ -409,8 +434,9 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
+      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz)
+      message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /are hidden/
     end
 
@@ -421,8 +447,9 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
+      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz)
+      message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to eq nil
     end
 
@@ -433,8 +460,9 @@ describe QuizzesHelper do
         show_correct_answers_at: 1.day.from_now,
         hide_correct_answers_at: nil
       })
+      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz)
+      message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /will be available/
     end
 
@@ -445,8 +473,9 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: 1.day.from_now
       })
+      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz)
+      message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /are available until/
     end
   end
@@ -468,10 +497,10 @@ describe QuizzesHelper do
       end
     end
 
-    it "returns -- if quiz is practice quiz or assignment" do
+    it "returns empty if quiz is practice quiz or assignment" do
       ['assignment', 'practice_quiz'].each do |quiz_type|
         @quiz.expects(:quiz_type).returns quiz_type
-        expect(point_value_for_input(user_answer, question)).to eq "--"
+        expect(point_value_for_input(user_answer, question)).to eq ""
       end
     end
 

@@ -3,7 +3,7 @@
 
 .accessibility-warning {
   @include accessibility-prompt;
-  font-size: 12px;
+  @include fontSize(12px);
   position: absolute;
   left: 0px;
   top: -16px;
@@ -78,7 +78,7 @@
 
 .drop_rules_section {
   margin-bottom: 0;
-  font-size: 14px;
+  @include fontSize(14px);
   line-height: 20px;
   border-bottom: 0;
   font-weight: bold;

@@ -41,10 +41,10 @@ class NotificationPolicy < ActiveRecord::Base
     when Notification
       where(:notification_id => context)
     else
-      scoped
+      all
     end
   }
-  
+
   # TODO: the scope name should be self-explanatory... change this to
   # by_frequency or something This is for choosing a policy by frequency
   scope :by, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
@@ -75,15 +75,16 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.all.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
+      notifications = Notification.all_cached.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
       frequency = params[:frequency]
+      cc = user.communication_channels.find(params[:channel_id])
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
       # entry. If other than that, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
           scope = user.notification_policies.
-              where(communication_channel_id: params[:channel_id], notification_id: notification_id)
+              where(communication_channel_id: cc, notification_id: notification_id)
           p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
@@ -115,7 +116,16 @@ class NotificationPolicy < ActiveRecord::Base
     end
     # Load and return user's policies after defaults may or may not have been set.
     # TODO: Don't load policies for retired channels
-    NotificationPolicy.includes(:notification).for(user)
+    NotificationPolicy.preload(:notification).for(user)
+  end
+
+  # Updates notification policies for a given category in a given communication channel
+  def self.find_or_update_for_category(communication_channel, category, frequency = nil)
+    notifs = Notification.where("category = ?", category)
+    raise ActiveRecord::RecordNotFound unless notifs.exists?
+    notifs.map do |notif|
+      NotificationPolicy.find_or_update_for(communication_channel, notif.name, frequency)
+    end
   end
 
   # Finds the current policy for a given communication channel, or creates it (with default)
@@ -151,7 +161,7 @@ class NotificationPolicy < ActiveRecord::Base
     frequencies = Hash[frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }]
     communication_channel.shard.activate do
       policies = communication_channel.notification_policies.to_a
-      Notification.all.each do |notification|
+      Notification.all_cached.each do |notification|
         policy = policies.find { |p| p.notification_id == notification.id }
         if policy
           if frequencies[notification]

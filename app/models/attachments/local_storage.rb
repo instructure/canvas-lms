@@ -15,6 +15,7 @@ class Attachments::LocalStorage
   end
 
   def change_namespace(old_full_filename)
+    return if old_full_filename == attachment.full_filename
     FileUtils.mv old_full_filename, attachment.full_filename
   end
 

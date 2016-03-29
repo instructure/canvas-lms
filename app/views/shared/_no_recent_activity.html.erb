@@ -1,23 +1,25 @@
 <% if !show_welcome_message? %>
-<div class="no-recent-messages global-message image-block">
-  <div class="image-block-image">
-    <i class="information-icon"></i>
-    <span class="hidden-inline-text">
+<div class="ic-notification">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-info"></i>
+    <span class="screenreader-only">
       <%= accessible_message_icon_text("information") %>
     </span>
   </div>
-  <div class="image-block-content">
-    <div class="title">
-      <%= t('no_recent_messages', 'No Recent Messages') %>
-    </div>
-    <div class="message">
-      <p><%= t 'empty_stream_message', <<-BODY
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <div class="ic-notification__title no_recent_messages">
+        <%= t('no_recent_messages', 'No Recent Messages') %>
+      </div>
+      <span class="notification_message">
+      <%= t 'empty_stream_message', <<-BODY
       You don't have any messages to show in your stream yet.  Once you
       begin participating in your courses you'll see this stream fill up
       with messages from discussions, grading updates, private messages between
       you and other users, etc.
       BODY
-      %></p>
+      %>
+      </span>
     </div>
   </div>
 </div>

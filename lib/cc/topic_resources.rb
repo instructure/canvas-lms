@@ -17,16 +17,17 @@
 #
 module CC
   module TopicResources
-    
+
     def add_topics
-      @course.discussion_topics.active.each do |topic|
+      scope = @course.discussion_topics.active
+      DiscussionTopic::ScopedToUser.new(@course, @user, scope).scope.each do |topic|
         if topic.is_announcement
           next unless export_object?(topic, 'announcements')
         else
           next unless export_object?(topic) || export_object?(topic.assignment)
         end
 
-        title = topic.title rescue I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
+        title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 
         if topic.assignment && !topic.assignment.can_copy?(@user)
           add_error(I18n.t('course_exports.errors.topic_is_locked', "The topic \"%{title}\" could not be copied because it is locked.", :title => title))
@@ -96,7 +97,7 @@ module CC
       doc.text(html, :texttype=>'text/html')
       if topic.attachment
         doc.attachments do |atts|
-          folder = topic.attachment.folder.full_name.gsub("course files", CCHelper::WEB_CONTENT_TOKEN)
+          folder = topic.attachment.folder.full_name.sub("course files", CCHelper::WEB_CONTENT_TOKEN)
           path = "#{folder}/#{topic.attachment.unencoded_filename}"
           atts.attachment(:href=>path)
         end
@@ -120,7 +121,9 @@ module CC
       doc.discussion_type topic.discussion_type
       doc.pinned 'true' if topic.pinned
       doc.require_initial_post 'true' if topic.require_initial_post
+      doc.has_group_category topic.has_group_category?
       doc.workflow_state topic.workflow_state
+      doc.module_locked topic.locked_by_module_item?(@user, true).present?
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|

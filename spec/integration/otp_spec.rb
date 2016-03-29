@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'rotp'
 
 describe "one time passwords" do
   before do
@@ -39,6 +40,13 @@ describe "one time passwords" do
       follow_redirect!
       expect(response).to redirect_to canvas_login_url
       follow_redirect!
+      expect(response).to be_success
+    end
+
+    it "should not destroy your session when someone does an XHR accidentally" do
+      xhr :get, '/api/v1/conversations/unread_count'
+      expect(response.status).to eq 403
+      get otp_login_url
       expect(response).to be_success
     end
   end

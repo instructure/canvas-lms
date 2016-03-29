@@ -19,12 +19,13 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.render(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -41,20 +42,20 @@ define [
   test 'renders the correct id name', ->
     deepEqual @gradingStandard.renderIdNames(), "grading_standard_1"
 
-  test 'renders the edit link', ->
-    ok @gradingStandard.refs.editLink
+  test 'renders the edit button', ->
+    ok @gradingStandard.refs.editButton
 
-  test 'calls onSetEditingStatus when edit link is clicked', ->
-    setEditingStatus = sinon.spy(@gradingStandard.props, 'onSetEditingStatus')
-    Simulate.click(@gradingStandard.refs.editLink.getDOMNode())
+  test 'calls onSetEditingStatus when edit button is clicked', ->
+    setEditingStatus = @spy(@gradingStandard.props, 'onSetEditingStatus')
+    Simulate.click(@gradingStandard.refs.editButton.getDOMNode())
     ok setEditingStatus.calledOnce
 
-  test 'renders the delete link', ->
-    ok @gradingStandard.refs.deleteLink
+  test 'renders the delete button', ->
+    ok @gradingStandard.refs.deleteButton
 
-  test 'calls onDeleteGradingStandard when delete link is clicked', ->
-    deleteGradingStandard = sinon.spy(@gradingStandard.props, 'onDeleteGradingStandard')
-    Simulate.click(@gradingStandard.refs.deleteLink.getDOMNode())
+  test 'calls onDeleteGradingStandard when delete button is clicked', ->
+    deleteGradingStandard = @spy(@gradingStandard.props, 'onDeleteGradingStandard')
+    Simulate.click(@gradingStandard.refs.deleteButton.getDOMNode())
     ok deleteGradingStandard.calledOnce
 
   test 'does not show a message about not being able to manage', ->
@@ -80,12 +81,13 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -94,8 +96,8 @@ define [
   test 'displays a cannot manage message', ->
     ok @gradingStandard.refs.cannotManageMessage
 
-  test 'disables edit and delete links', ->
-    ok @gradingStandard.refs.disabledLinks
+  test 'disables edit and delete buttons', ->
+    ok @gradingStandard.refs.disabledButtons
 
   module "GradingStandard being edited",
     setup: ->
@@ -110,21 +112,22 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
-        onSaveGradingStandard: ->
+        onSaveGradingStandard: sinon.spy()
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
 
-  test 'does not render the edit link', ->
-    deepEqual @gradingStandard.refs.editLink, undefined
+  test 'does not render the edit button', ->
+    deepEqual @gradingStandard.refs.editButton, undefined
 
-  test 'does not render the delete link', ->
-    deepEqual @gradingStandard.refs.deleteLink, undefined
+  test 'does not render the delete button', ->
+    deepEqual @gradingStandard.refs.deleteButton, undefined
 
   test 'renders the save button', ->
     ok @gradingStandard.refs.saveButton
@@ -136,9 +139,8 @@ define [
     deepEqual @gradingStandard.rowDataIsValid(), true
 
   test 'calls onSaveGradingStandard save button is clicked', ->
-    saveGradingStandard = sinon.spy(@gradingStandard.props, 'onSaveGradingStandard')
     Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
-    ok saveGradingStandard.calledOnce
+    ok @gradingStandard.props.onSaveGradingStandard.calledOnce
 
   test 'sets the state to saving when the save button is clicked', ->
     deepEqual @gradingStandard.state.saving, false
@@ -149,7 +151,7 @@ define [
     ok @gradingStandard.refs.cancelButton
 
   test 'calls onSetEditingStatus when the cancel button is clicked', ->
-    setEditingStatus = sinon.spy(@gradingStandard.props, 'onSetEditingStatus')
+    setEditingStatus = @spy(@gradingStandard.props, 'onSetEditingStatus')
     Simulate.click(@gradingStandard.refs.cancelButton.getDOMNode())
     ok setEditingStatus.calledOnce
 
@@ -194,12 +196,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -230,12 +233,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -266,12 +270,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -302,12 +307,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -323,7 +329,7 @@ define [
   test 'shows a messsage describing why the input is invalid', ->
     Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
     deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
-      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."  
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
 
   module "GradingStandard being edited with values that round to the same number",
     setup: ->
@@ -338,12 +344,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -374,12 +381,13 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)

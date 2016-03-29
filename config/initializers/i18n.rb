@@ -8,13 +8,36 @@ else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
-I18n.backend = I18nema::Backend.new
-I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
-I18n.backend.init_translations
+Rails.application.config.i18n.backend = I18nema::Backend.new
+Rails.application.config.i18n.enforce_available_locales = true
+Rails.application.config.i18n.fallbacks = true
 
-I18n.enforce_available_locales = true
+module CalculateDeprecatedFallbacks
+  def reload!
+    super
+    I18n.available_locales.each do |locale|
+      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+        I18n.fallbacks[locale] = I18n.fallbacks[deprecated_for.to_sym]
+      end
+    end
+  end
+end
+I18n.singleton_class.prepend CalculateDeprecatedFallbacks
 
 I18nliner.infer_interpolation_values = false
+
+module I18nliner
+  module RehashArrays
+    def infer_pluralization_hash(default, *args)
+      if default.is_a?(Array) && default.all?{|a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol)}
+        # this was a pluralization hash but rails 4 made it an array in the view helpers
+        return Hash[default]
+      end
+      super
+    end
+  end
+  CallHelpers.extend(RehashArrays)
+end
 
 if ENV['LOLCALIZE']
   require 'i18n_tasks'
@@ -25,9 +48,9 @@ module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
       text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s =~ /\A#/
-      text_or_key = t(text_or_key, default_value, *args)
+      text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
     end
-    t("#before_label_wrapper", "%{text}:", :text => text_or_key)
+    I18n.t("#before_label_wrapper", "%{text}:", :text => text_or_key)
   end
 
   def _label_symbol_translation(method, text, options)
@@ -66,7 +89,6 @@ ActionView::Helpers::FormHelper.module_eval do
   alias_method_chain :label, :symbol_translation
 end
 
-ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
 ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
 ActionView::Helpers::FormTagHelper.class_eval do
   def label_tag_with_symbol_translation(method, text = nil, options = {})

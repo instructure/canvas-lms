@@ -66,6 +66,10 @@ module IncomingMailProcessor
       # pop can't do this -- just delete the message
       delete_message(pop_message)
     end
-  end
 
+    def unprocessed_message_count
+      # not implemented, and used only for performance monitoring.
+      nil
+    end
+  end
 end

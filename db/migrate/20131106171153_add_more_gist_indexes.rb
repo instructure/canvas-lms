@@ -3,12 +3,12 @@ class AddMoreGistIndexes < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
-    if is_postgres? && has_postgres_proc?('show_trgm')
+    if is_postgres? && (schema = connection.extension_installed?(:pg_trgm))
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE INDEX#{concurrently} index_trgm_users_short_name ON users USING gist(LOWER(short_name) gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_name ON courses USING gist(LOWER(name) gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_course_code ON courses USING gist(LOWER(course_code) gist_trgm_ops)")
-      execute("CREATE INDEX#{concurrently} index_trgm_courses_sis_source_id ON courses USING gist(LOWER(sis_source_id) gist_trgm_ops)")
+      execute("CREATE INDEX#{concurrently} index_trgm_users_short_name ON #{User.quoted_table_name} USING gist(LOWER(short_name) #{schema}.gist_trgm_ops)")
+      execute("CREATE INDEX#{concurrently} index_trgm_courses_name ON #{Course.quoted_table_name} USING gist(LOWER(name) #{schema}.gist_trgm_ops)")
+      execute("CREATE INDEX#{concurrently} index_trgm_courses_course_code ON #{Course.quoted_table_name} USING gist(LOWER(course_code) #{schema}.gist_trgm_ops)")
+      execute("CREATE INDEX#{concurrently} index_trgm_courses_sis_source_id ON #{Course.quoted_table_name} USING gist(LOWER(sis_source_id) #{schema}.gist_trgm_ops)")
     end
   end
 

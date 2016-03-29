@@ -46,9 +46,8 @@
 #         },
 #         "icon": {
 #           "description": "The icon to display with the message.  Defaults to warning.",
-#           "example": "[\"information\"]",
-#           "type": "array",
-#           "items": {"type": "string"},
+#           "example": "information",
+#           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "warning",
@@ -61,13 +60,13 @@
 #         },
 #         "roles": {
 #           "description": "(Deprecated) The roles to send the notification to.  If roles is not passed it defaults to all roles",
-#           "example": "[\"StudentEnrollment\"]",
+#           "example": ["StudentEnrollment"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
 #         "role_ids": {
 #           "description": "The roles to send the notification to.  If roles is not passed it defaults to all roles",
-#           "example": "[1]",
+#           "example": [1],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         }

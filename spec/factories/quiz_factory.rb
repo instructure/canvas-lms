@@ -20,7 +20,7 @@
 def quiz_model(opts={})
   @context ||= opts.delete(:course) || course_model(:reusable => true)
   @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
-  @quiz.published_at = Time.now
+  @quiz.published_at = Time.zone.now
   @quiz.workflow_state = 'available'
   @quiz.save!
   @quiz
@@ -40,9 +40,9 @@ def quiz_with_submission(complete_quiz = true)
   @course.enroll_student(@student).accept
   @quiz = @course.quizzes.create
   @quiz.workflow_state = "available"
-  @quiz.quiz_data = test_data
+  @quiz.quiz_questions.create!({ question_data: test_data.first })
   @quiz.save!
-  @quiz
+
   @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
   @qsub.quiz_data = test_data
   @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
@@ -152,7 +152,8 @@ def numerical_question_data
     {"exact"=>4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>9222},
     {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>997},
     {"comments"=>"", "numerical_answer_type"=>"range_answer", "weight"=>100, "text"=>"", "id"=>9370, "end"=>4.1, "start"=>3.9},
-    {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0.1, "weight"=>100, "text"=>"", "id"=>5450}
+    {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0.1, "weight"=>100, "text"=>"", "id"=>5450},
+    {"numerical_answer_type"=>"precision_answer", "approximate"=>"1.23456e+21", "precision"=>"6", "comments"=>"", "weight"=>100, "text"=>"", "id"=>123}
   ], "question_text"=>"<p>abs(x) = 4</p>", "id" => 1}.with_indifferent_access
 end
 
@@ -234,4 +235,57 @@ def fill_in_multiple_blanks_question_one_blank_data
     { :text => "stupid", :weight => 100, :id => 1234, :blank_id => "myblank" },
     { :text => "dumb", :weight => 100, :id => 1235, :blank_id => "myblank" },
   ], :question_text => "<p>there's no such thing as a [myblank] question</p>" }.with_indifferent_access
+end
+
+def assignment_quiz(questions, opts={})
+  course = opts[:course] || course(:active_course => true)
+  user = opts[:user] || user(:active_user => true)
+  course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
+  @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
+  @assignment.workflow_state = "published"
+  @assignment.submission_types = "online_quiz"
+  @assignment.save
+  @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
+  @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+  @quiz.generate_quiz_data
+  @quiz.due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
+  @quiz.published_at = Time.zone.now
+  @quiz.workflow_state = "available"
+  @quiz.save!
+  @quiz
+end
+
+# The block should return the submission_data. A block is used so
+# that we have access to the @questions variable that is created
+# in this method
+def quiz_with_graded_submission(questions, opts={}, &block)
+  assignment_quiz(questions, opts)
+  @quiz_submission = @quiz.generate_submission(@user)
+  @quiz_submission.mark_completed
+  @quiz_submission.submission_data = yield if block_given?
+  Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+end
+
+def survey_with_submission(questions, &block)
+  course_with_student(:active_all => true)
+  @assignment = @course.assignments.create(:title => "Test Assignment")
+  @assignment.workflow_state = "published"
+  @assignment.submission_types = "online_quiz"
+  @assignment.save
+  @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
+  @quiz.anonymous_submissions = true
+  @quiz.quiz_type = "graded_survey"
+  @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+  @quiz.generate_quiz_data
+  @quiz.save!
+  @quiz_submission = @quiz.generate_submission(@user)
+  @quiz_submission.mark_completed
+  @quiz_submission.submission_data = yield if block_given?
+end
+
+def course_quiz(active=false)
+  @quiz = @course.quizzes.create
+  @quiz.workflow_state = "available" if active
+  @quiz.save!
+  @quiz
 end

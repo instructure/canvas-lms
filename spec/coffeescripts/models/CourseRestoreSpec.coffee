@@ -29,7 +29,7 @@ define [
     user_id: 51
     workflow_state: "queued"
 
-  courseJSON = 
+  courseJSON =
     account_id: 6
     course_code: "Super"
     default_view: "feed"
@@ -43,28 +43,28 @@ define [
     workflow_state: "deleted"
 
   module 'CourseRestore',
-    setup: -> 
+    setup: ->
       @account_id = 4
       @course_id = 42
       @courseRestore = new CourseRestoreModel account_id: @account_id
       @server = sinon.fakeServer.create()
       @clock = sinon.useFakeTimers()
 
-    teardown: -> 
+    teardown: ->
       @server.restore()
       @clock.restore()
       @acocunt_id = null
 
   # Describes searching for a course by ID 
-  test "triggers 'searching' when search is called", -> 
-    callback = sinon.spy()
+  test "triggers 'searching' when search is called", ->
+    callback = @spy()
 
     @courseRestore.on 'searching', callback
     @courseRestore.search(@account_id)
 
     ok callback.called, "Searching event is called when searching"
 
-  test "populates CourseRestore model with response, keeping its original account_id", -> 
+  test "populates CourseRestore model with response, keeping its original account_id", ->
     @courseRestore.search(@course_id)
 
     @server.respond 'GET', @courseRestore.searchUrl(), [200, {
@@ -75,13 +75,13 @@ define [
     equal @courseRestore.get('id'), courseJSON.id, "course id was updated"
 
   # Describes storing a course from its previous deleted state
-  test "responds with a deffered object", -> 
+  test "responds with a deffered object", ->
     dfd = @courseRestore.restore()
     ok $.isFunction dfd.done, "This is a deffered object"
 
   # a restored course should be populated with a deleted course with an after a search 
   # was made.
-  test "restores a course after search finds a deleted course", 2, -> 
+  test "restores a course after search finds a deleted course", 2, ->
     @courseRestore.search(@course_id)
     @server.respond 'GET', @courseRestore.searchUrl(), [200, {
       'Content-Type': 'application/json'

@@ -1,3 +1,4 @@
+<% page_section_static ||= nil %>
 <% page_section = page_section_static || nil %>
 <div class="section <%= "read_only" if (page_section && (page_section["attachment_id"] || page_section["submission_id"])) %>" id="page_section_<%= idx %>">
   <% if page_section %>
@@ -6,11 +7,11 @@
         <%= raw(page_section["content"]) || t('rich_text.default_content', "Nothing Entered Yet") %>
       <% elsif page_section["section_type"] == "attachment" %>
         <div style="text-align: center;" class="attachment">
-          <% attachment = @static_attachments.find{|a| a.uuid == page_section["attachment_id"]} %>
+          <% attachment = @static_attachments.find{|a| a.id == page_section["attachment_id"]} %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
-            <a href="<%= attachment.filename %>"><img src="<%= attachment.filename %>" alt="<%= attachment.filename %>"/></a>
+            <a href="<%= attachment.unencoded_filename %>"><img src="<%= attachment.unencoded_filename %>" alt="<%= attachment.unencoded_filename %>"/></a>
           <% elsif attachment %>
-            <a href="<%= attachment.filename %>">
+            <a href="<%= attachment.unencoded_filename %>">
               <%= t('links.download_attachment', "Click here to Download *%{attachment}*",
                     :attachment => attachment.display_name,
                     :wrapper => '<span class="filename">\1</span>') %>
@@ -32,9 +33,9 @@
           <% elsif submission.submission_type = 'online_upload' %>
             <ul>
             <% submission.attachments.each do |a| %>
-              <% attachment = @static_attachments.find{|att| att.attachment.id == a.id } %>
+              <% attachment = @static_attachments.find{|att| att.id == a.id } %>
               <% if attachment %>
-                <li><a href="<%= attachment.filename %>">
+                <li><a href="<%= attachment.unencoded_filename %>">
                   <%= t('links.download_attachment', "Click here to Download *%{attachment}*",
                         :attachment => a.display_name,
                         :wrapper => '<span class="filename">\1</span>') %>

@@ -68,17 +68,17 @@ class CountsReport
           else
             timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
             enrollment_scope = Enrollment.active.not_fake.
-              joins("INNER JOIN pseudonyms ON enrollments.user_id=pseudonyms.user_id").
+              joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id").
               where(pseudonyms: { workflow_state: 'active'}).
-              where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.ago)
+              where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.seconds.ago)
 
             data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').count(:user_id, :distinct => true)
             data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').count(:user_id, :distinct => true)
             data[:users] = enrollment_scope.count(:user_id, :distinct => true)
 
             # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
-            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
-            data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
+            data[:files], data[:files_size] = Attachment.connection.select_rows("SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE namespace IN ('account_%s','account_%s') AND root_attachment_id IS NULL AND file_state != 'deleted'" % [account.local_id, account.global_id]).first.map(&:to_i)
+            data[:media_files], data[:media_files_size] = MediaObject.connection.select_rows("SELECT COUNT(id), SUM(total_size) FROM #{MediaObject.quoted_table_name} WHERE root_account_id='%s' AND attachment_id IS NULL AND workflow_state != 'deleted'" % [account.id]).first.map(&:to_i)
             data[:media_files_size] *= 1000
           end
 
@@ -117,7 +117,7 @@ class CountsReport
     else
       progressive = start_progressive_hash.with_indifferent_access
     end
-    
+
     progressive[:generated_at] = @timestamp
     create_progressive_hashes(progressive[:totals], @overview[:totals])
     ExternalStatuses.possible_external_statuses.each do |status|
@@ -151,28 +151,28 @@ class CountsReport
     copy_counts(year, totals)
     cumulative[:yearly].pop if cumulative[:yearly].last and cumulative[:yearly].last[:year] == year[:year]
     cumulative[:yearly] << year
-    
+
     month = {:year=>@yesterday.year, :month=>@yesterday.month}
     copy_counts(month, totals)
     if cumulative[:monthly].last and cumulative[:monthly].last[:year] == month[:year] and cumulative[:monthly].last[:month] == month[:month]
-      cumulative[:monthly].pop 
+      cumulative[:monthly].pop
     end
     cumulative[:monthly] << month
     while cumulative[:monthly].length > MONTHS_TO_KEEP
       cumulative[:monthly].shift
     end
-    
+
     week = {:year=>@yesterday.year, :month=>@yesterday.month, :week=>@week}
     copy_counts(week, totals)
     if cumulative[:weekly].last and cumulative[:weekly].last[:year] == week[:year] and cumulative[:weekly].last[:week] == week[:week]
-      cumulative[:weekly].pop 
+      cumulative[:weekly].pop
     end
     cumulative[:weekly] << week
     while cumulative[:weekly].length > WEEKS_TO_KEEP
       cumulative[:weekly].shift
     end
   end
-  
+
   def copy_counts(to, from)
     to[:institutions] = from[:institutions]
     to[:courses] = from[:courses]

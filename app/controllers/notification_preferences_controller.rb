@@ -68,6 +68,14 @@ class NotificationPreferencesController < ApplicationController
     render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
   end
 
+  # @API List of preference categories
+  # Fetch all notification preference categories for the given communication channel
+  # @returns []
+  def category_index
+    policies = NotificationPolicy.find_all_for(@cc)
+    render json: { categories: policies.map { |p| p.notification.try(:category_slug) }.compact.uniq }
+  end
+
   # @API Get a preference
   # Fetch the preference for the given notification for the given communicaiton channel
   # @returns NotificationPreference
@@ -80,9 +88,19 @@ class NotificationPreferencesController < ApplicationController
   # @argument notification_preferences[frequency] [Required] The desired frequency for this notification
   def update
     return render_unauthorized_action unless @user == @current_user
-    # support both JSON API style (notification preferences is an array) and Canvas API style (it's a hash)
-    preference = params[:notification_preferences].is_a?(Array) ? params[:notification_preferences].first : params[:notification_preferences]
+    preference = notification_preferences_param
     render json: { notification_preferences: [notification_policy_json(NotificationPolicy.find_or_update_for(@cc, params[:notification], preference[:frequency]), @current_user, session)] }
+  end
+
+  # @API Update preferences by category
+  # Change the preferences for multiple notifications based on the category for a single communication channel
+  # @argument category [String] The name of the category. Must be parameterized (e.g. The category "Course Content" should be "course_content")
+  # @argument notification_preferences[frequency] [Required] The desired frequency for each notification in the category
+  def update_preferences_by_category
+    return render_unauthorized_action unless @user == @current_user
+    preference = notification_preferences_param
+    policies = NotificationPolicy.find_or_update_for_category(@cc, params[:category].titleize, preference[:frequency])
+    render json: { notification_preferences: policies.map{ |p| notification_policy_json(p, @current_user, session) } }
   end
 
   # @API Update multiple preferences
@@ -102,6 +120,12 @@ class NotificationPreferencesController < ApplicationController
   def convert_hash_to_jsonapi_array(hash, key = :id)
     return hash if hash.is_a?(Array)
     hash.map { |k, v| { key => k }.reverse_merge!(v).with_indifferent_access }
+  end
+
+  def notification_preferences_param
+    # support both JSON API style (notification preferences is an array) and Canvas API style (it's a hash)
+    notif_pref = params[:notification_preferences]
+    notif_pref.is_a?(Array) ? notif_pref.first : notif_pref
   end
 
   def get_cc

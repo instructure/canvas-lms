@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'Backbone'
   'i18n!external_tools'
   'str/htmlEscape'
   'jst/ExternalTools/IndexView'
@@ -7,7 +8,7 @@ define [
   'compiled/views/ExternalTools/EditView'
   'compiled/views/ExternalTools/AppFullView'
   'compiled/models/ExternalTool'
-], ($, I18n, htmlEscape, template, AddAppView, EditView, AppFullView, ExternalTool) ->
+], ($, Backbone, I18n, htmlEscape, template, AddAppView, EditView, AppFullView, ExternalTool) ->
 
   class IndexView extends Backbone.View
 

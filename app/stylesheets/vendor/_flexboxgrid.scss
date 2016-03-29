@@ -167,7 +167,7 @@ Because it is, and you can use flexbox.
 
 @import "base/environment";
 
-$c-grid-sp: 16px;
+$c-grid-sp: $ic-sp;
 $c-grid-columns: 12;
 
 @mixin grid-for-size($size) {

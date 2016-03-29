@@ -18,7 +18,7 @@
   [role=treeitem][aria-selected="true"] {
     border: 1px dashed black;
   }
-  font-size: 11px;
+  @include fontSize(11px);
   > .wiki-sidebar-header {
     font-size: 1.3em;
     margin-bottom: 0.3em;

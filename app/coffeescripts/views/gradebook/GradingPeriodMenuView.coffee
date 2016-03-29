@@ -1,4 +1,6 @@
 define [
+  'jsx/gradebook/grid/actions/gradingPeriodsActions'
+  'compiled/userSettings'
   'i18n!gradebook2'
   'jquery'
   'underscore'
@@ -6,7 +8,7 @@ define [
   'jst/gradebook2/grading_period_to_show_menu'
    'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, _, {View}, template) ->
+], (GradingPeriodsActions, userSettings, I18n, $, _, {View}, template) ->
 
   class GradingPeriodMenuView extends View
 
@@ -42,9 +44,14 @@ define [
       )
 
     onGradingPeriodChange: (period) =>
+      GradingPeriodsActions.select({ id: period }) if ENV.GRADEBOOK_OPTIONS.gradebook_performance_enabled
       @currentGradingPeriod = period
       @updateGradingPeriods()
+      @storePeriodSetting period
       @render()
+
+    storePeriodSetting: (period) ->
+      userSettings.contextSet('gradebook_current_grading_period', period)
 
     updateGradingPeriods: ->
       _.map(@periods, (period) =>

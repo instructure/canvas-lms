@@ -6,9 +6,15 @@ require [
   'compiled/views/PublishButtonView',
   'compiled/views/assignments/SpeedgraderLinkView',
   'compiled/util/vddTooltip',
+  'compiled/util/markAsDone'
   'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone) ->
+
+  $ ->
+    $('#content').on('click', '#mark-as-done-checkbox', ->
+      MarkAsDone.toggle(this)
+    )
 
   $ ->
     $el = $('#assignment_publish_button')
@@ -21,7 +27,14 @@ require [
 
       new SpeedgraderLinkView(model: model, el: '#assignment-speedgrader-link')
         .render()
-      new PublishButtonView(model: model, el: $el).render()
+      pbv = new PublishButtonView(model: model, el: $el)
+      pbv.render()
+
+      pbv.on 'publish', ->
+        $('#moderated_grading_button').show()
+
+      pbv.on 'unpublish', ->
+        $('#moderated_grading_button').hide()
 
     # Add module sequence footer
     $('#sequence_footer').moduleSequenceFooter(

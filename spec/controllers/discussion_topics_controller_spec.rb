@@ -1,4 +1,4 @@
-#
+
 # Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DiscussionTopicsController do
   before :once do
@@ -57,6 +58,12 @@ describe DiscussionTopicsController do
       @course.claim
       user_session(@student)
       get 'index', :course_id => @course.id
+      assert_unauthorized
+    end
+
+    it 'does not show announcements without :read_announcements' do
+      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      get 'index', course_id: @course.id
       assert_unauthorized
     end
 
@@ -111,6 +118,24 @@ describe DiscussionTopicsController do
       end
     end
 
+    context "cross-sharding" do
+      specs_require_sharding
+
+      it 'returns the topic across shards' do
+        @topic = @course.discussion_topics.create!(title: 'student topic', message: 'Hello', user: @student)
+        user_session(@student)
+        @shard1.activate do
+          get 'index', { format: :json, course_id: @course.id }
+          expect(assigns[:topics]).to include(@topic)
+        end
+
+        @shard2.activate do
+          get 'index', { format: :json, course_id: @course.id }
+          expect(assigns[:topics]).to include(@topic)
+        end
+      end
+    end
+
     it "should return non-graded group discussions properly" do
       @course.account.role_overrides.create!(
         role: student_role,
@@ -148,14 +173,14 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    it "should work for announcements in a public course" do
+    it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
         :title => "some announcement",
         :message => "some message"
       )
       get 'show', :course_id => @course.id, :id => @announcement.id
-      expect(response).to be_success
+      expect(response).to_not be_success
     end
 
     it "should not display announcements in private courses to users who aren't logged in" do
@@ -250,7 +275,7 @@ describe DiscussionTopicsController do
       expect(@topic.reload.read_state(@student)).to eq 'read'
     end
 
-    it "should not mark as read if locked" do
+    it "should not mark as read if not visible" do
       user_session(@student)
       course_topic(:skip_set_user => true)
       mod = @course.context_modules.create! name: 'no soup for you', unlock_at: 1.year.from_now
@@ -259,6 +284,20 @@ describe DiscussionTopicsController do
       expect(@topic.read_state(@student)).to eq 'unread'
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(@topic.reload.read_state(@student)).to eq 'unread'
+    end
+
+    it "should mark as read if visible but locked" do
+      user_session(@student)
+      course_topic(:skip_set_user => true)
+      @announcement = @course.announcements.create!(
+        :title => "some announcement",
+        :message => "some message",
+        :unlock_at => 1.week.ago,
+        :lock_at => 1.day.ago
+      )
+      expect(@announcement.read_state(@student)).to eq 'unread'
+      get 'show', :course_id => @course.id, :id => @announcement.id
+      expect(@announcement.reload.read_state(@student)).to eq 'read'
     end
 
     it "should allow concluded teachers to see discussions" do
@@ -522,6 +561,43 @@ describe DiscussionTopicsController do
       expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
+    it 'does not dispatch new topic notification when hidden by selective release' do
+      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      @student.communication_channels.create!(path: 'student@example.com') {|cc| cc.workflow_state = 'active'}
+      @course.enable_feature!(:differentiated_assignments)
+      new_section = @course.course_sections.create!
+      obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{course_section_id: new_section.id}]))
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(topic).to be_published
+      expect(topic.assignment).to be_published
+      expect(@student.email_channel.messages).to be_empty
+      expect(@student.recent_stream_items.map {|item| item.data}).not_to include topic
+    end
+
+    it 'dispatches an assignment stream item with the correct title' do
+      notification = Notification.create(:name => "Assignment Created")
+      obj_params = topic_params(@course).
+        merge(assignment_params(@course)).
+        merge({published: true})
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      si = @student.recent_stream_items.detect do |item|
+        item.data['notification_id'] == notification.id
+      end
+      expect(si.data['subject']).to eq "Assignment Created - #{obj_params[:title]}, #{@course.name}"
+    end
+
+    it 'does not allow for anonymous peer review assignment' do
+      obj_params = topic_params(@course).merge(assignment_params(@course))
+      obj_params[:assignment][:anonymous_peer_reviews] = true
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      expect(json['assignment']['anonymous_peer_reviews']).to be_falsey
+    end
   end
 
   describe "PUT: update" do

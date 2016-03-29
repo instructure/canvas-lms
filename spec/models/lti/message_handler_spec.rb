@@ -108,14 +108,11 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
-        rh2.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
-        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh3.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
+        @mh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
+        @mh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
       end
-
-
 
       it 'filters on one placement type' do
         handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION)
@@ -125,7 +122,7 @@ module Lti
       end
 
       it 'filters on multiple placement types' do
-        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION, ResourcePlacement::RESOURCE_SELECTION)
+        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION, ResourcePlacement::COURSE_NAVIGATION)
         expect(handlers.count).to eq 3
         expect(handlers).to include(@mh1)
         expect(handlers).to include(@mh2)
@@ -145,14 +142,14 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
-        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+        @mh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
+        @mh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
       end
 
       it 'converts a message handler into json tab' do
-        @tp.bindings.create(context: account)
+        @tp.bindings.create!(context: account)
 
         tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
         expect(tabs.count).to eq 2

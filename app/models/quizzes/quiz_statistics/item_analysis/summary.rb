@@ -22,15 +22,20 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
 
   def_delegators :sorted_items, :size, :length, :each
 
-  def initialize(quiz, options = {})
+  def initialize(quiz, options = {}, param_options = {})
     @quiz = quiz
     @items = {}
-    @attempts = quiz.quiz_submissions.for_students(quiz).map { |qs| qs.submitted_attempts.first }.compact
+    attempts_query = quiz.quiz_submissions.for_students(quiz)
+    if param_options[:section_ids].present?
+      user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids], course_id: quiz.context).uniq.pluck(:user_id)
+      attempts_query = attempts_query.where(user_id: user_ids)
+    end
+    @attempts = attempts_query.map { |qs| qs.submitted_attempts.first }.compact
     @options = options
     @options[:buckets] ||= [
-      [:bottom, 0.27],
-      [:middle, 0.73],
-      [:top, 1]
+      [:top, 0.73],
+      [:middle, 0.27],
+      [:bottom, 0]
     ]
 
     aggregate_data
@@ -57,16 +62,23 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   end
 
   # group the student ids into buckets according to score (e.g. bottom
-  # 27%, middle 46%, top 27%)
+  # 27%, middle 46%, top 27%); ties put both users in a higher bucket
   def buckets
     @buckets ||= begin
-                   buckets = @options[:buckets]
-                   ranked_respondent_ids = @respondent_scores.sort_by(&:last).map(&:first)
-                   Hash[buckets.each_with_index.map { |(name, cutoff), i|
-                     floor = i > 0 ? (buckets[i - 1][1] * ranked_respondent_ids.length).round : 0
-                     ceiling = (cutoff * ranked_respondent_ids.length).round
-                     [name, ranked_respondent_ids[floor...ceiling]]
-                   }]
+                   bucket_defs = @options[:buckets]
+                   ranked_respondent_ids = @respondent_scores.sort_by(&:last)
+                   previous_floor = ranked_respondent_ids.length
+                   buckets = {}
+                   bucket_defs.each do |(name, cutoff)|
+                     floor = (cutoff * ranked_respondent_ids.length).round
+                     floor_score = ranked_respondent_ids[floor].try(:last)
+                     # include all tied users in this bucket
+                     floor -= 1 while floor > 0 && ranked_respondent_ids[floor - 1].last == floor_score
+
+                     buckets[name] = ranked_respondent_ids[floor...previous_floor].map(&:first)
+                     previous_floor = floor
+                   end
+                   buckets
                  end
   end
 
@@ -96,10 +108,12 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
 
   def alpha
     @alpha ||= begin
-                 if variance != 0
-                   items = @items.values
+                 items = @items.values
+                 size = items.size
+
+                 if size > 1 && variance != 0
                    variance_sum = items.map(&:variance).sum
-                   items.size / (items.size - 1.0) * (1 - variance_sum / variance)
+                   size / (size - 1.0) * (1 - variance_sum / variance)
                  else
                    nil
                  end

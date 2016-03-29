@@ -114,6 +114,7 @@ module AccountReports
       attachment = account_report.account.attachments.create!(
         :uploaded_data => Rack::Test::UploadedFile.new(filepath, filetype, true),
         :display_name => filename,
+        :filename => filename,
         :user => account_report.user
       )
     end
@@ -134,7 +135,7 @@ module AccountReports
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.now
     account_report.save
-    notification.create_message(account_report, [account_report.user])
+    notification.create_message(account_report, [account_report.user]) if notification
     message
   end
 

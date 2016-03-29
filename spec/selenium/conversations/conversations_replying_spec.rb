@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 
 describe "conversations new" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include ConversationsCommon
 
   before do
     conversation_setup
@@ -22,8 +23,8 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
-    it "should maintain context and subject" do
-      get_conversations
+    it "should maintain context and subject", priority: "1", test_id: 138696 do
+      conversations
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
@@ -36,8 +37,8 @@ describe "conversations new" do
       expect(fj('.message_subject_ro').text).to eq @convo.subject
     end
 
-    it "should address replies to the most recent author by default" do
-      get_conversations
+    it "should address replies to the most recent author by default", priority: "2", test_id: 197538 do
+      conversations
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
@@ -45,13 +46,13 @@ describe "conversations new" do
       expect(fj('input[name="recipients[]"]')).to have_value(@s2.id.to_s)
     end
 
-    it "should add new messages to the conversation" do
-      get_conversations
+    it "should add new messages to the conversation", priority: "1", test_id: 197537 do
+      conversations
       initial_message_count = @convo.conversation_messages.length
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      set_message_body('Read chapters five and six.')
+      write_message_body('Read chapters five and six.')
       click_send
       wait_for_ajaximations
       expect(ffj('.message-item-view').length).to eq initial_message_count + 1
@@ -61,7 +62,7 @@ describe "conversations new" do
 
     it "should not allow adding recipients to private messages" do
       @convo.update_attribute(:private_hash, '12345')
-      get_conversations
+      conversations
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click

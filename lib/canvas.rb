@@ -1,17 +1,17 @@
+require_dependency 'canvas/draft_state_validations'
+
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
   # assignment. The default, and Rails' normal behavior, is to just :log. Set
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
 
-  # defines extensions that could possibly be used, so that specs can move them to the
-  # correct schemas for sharding
-  mattr_accessor :possible_postgres_extensions
-  self.possible_postgres_extensions = [:pg_collkey, :pg_trgm]
-
   def self.active_record_foreign_key_check(name, type, options)
     if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
-      raise ArgumentError, "All foreign keys need to be 8-byte integers. #{name} looks like a foreign key to me, please add this option: `:limit => 8`"
+      raise ArgumentError, <<-EOS
+        All foreign keys need to be at least 8-byte integers. #{name}
+        looks like a foreign key, please add this option: `:limit => 8`
+      EOS
     end
   end
 
@@ -54,12 +54,21 @@ module Canvas
 
       # sanity check the file
       unless configs.is_a?(Hash)
-        raise "Invalid config/cache_store.yml: Root is not a hash. See comments in config/cache_store.yml.example"
+        raise <<-EOS
+          Invalid config/cache_store.yml: Root is not a hash. See comments in
+          config/cache_store.yml.example
+        EOS
       end
 
       non_hashes = configs.keys.select { |k| !configs[k].is_a?(Hash) }
       non_hashes.reject! { |k| configs[k].is_a?(String) && configs[configs[k]].is_a?(Hash) }
-      raise "Invalid config/cache_store.yml: Some keys are not hashes: #{non_hashes.join(', ')}. See comments in config/cache_store.yml.example" unless non_hashes.empty?
+      unless non_hashes.empty?
+        raise <<-EOS
+          Invalid config/cache_store.yml: Some keys are not hashes:
+          #{non_hashes.join(', ')}. See comments in
+          config/cache_store.yml.example
+        EOS
+      end
 
       configs.each do |env, config|
         if config.is_a?(String)
@@ -153,6 +162,15 @@ module Canvas
     end
   end
 
+  def self.installation_uuid
+    installation_uuid = Setting.get("installation_uuid", "")
+    if installation_uuid == ""
+      installation_uuid = SecureRandom.uuid
+      Setting.set("installation_uuid", installation_uuid)
+    end
+    installation_uuid
+  end
+
   def self.timeout_protection_error_ttl(service_name)
     (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
   end
@@ -188,16 +206,14 @@ module Canvas
     return nil
   end
 
-  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl)
+  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl, &block)
     error_count = redis.get(redis_key)
     if error_count.to_i >= cutoff
       raise TimeoutCutoff.new(error_count)
     end
 
     begin
-      Timeout.timeout(timeout) do
-        yield
-      end
+      Timeout.timeout(timeout, &block)
     rescue Timeout::Error => e
       redis.incrby(redis_key, 1)
       redis.expire(redis_key, error_ttl)

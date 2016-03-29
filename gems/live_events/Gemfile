@@ -4,4 +4,4 @@ gem 'aws-sdk'
 
 gemspec
 
-gem 'canvas_statsd', path: '../canvas_statsd'
+gem 'canvas_statsd', '1.0.0'

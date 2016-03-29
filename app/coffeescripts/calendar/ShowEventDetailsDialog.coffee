@@ -82,14 +82,20 @@ define [
       $.publish "CommonEvent/eventSaved", @event
 
     reserveEvent: (params={}) =>
+      params['comments'] = $('#appointment-comment').val()
       $.publish "CommonEvent/eventSaving", @event
       $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB, @reserveErrorCB
 
     unreserveEvent: =>
-      for e in @event.childEvents
-        if e.object?.own_reservation
-          @deleteEvent(e, dialogTitle: I18n.t('confirm_unreserve', "Confirm Reservation Removal"), message: I18n.t('prompts.unreserve_event', "Are you sure you want to delete your reservation to this event?"))
-          return
+      if @event.object?.parent_event_id && @event.object?.appointment_group_id
+        events = [@event]
+      else
+        events = @event.childEvents.filter (e) ->
+          e.object?.own_reservation
+
+      for e in events
+        @deleteEvent(e, dialogTitle: I18n.t('confirm_unreserve', "Confirm Reservation Removal"), message: I18n.t('prompts.unreserve_event', "Are you sure you want to delete your reservation to this event?"))
+        return
 
     cancelAppointment: ($appt) =>
       url = $appt.data('url')
@@ -129,7 +135,7 @@ define [
         params.can_reserve = false
 
       if @event.object?.child_events
-        if @event.object.reserved
+        if @event.object.reserved || (@event.object.parent_event_id && @event.object.appointment_group_id)
           params.can_unreserve = true
           params.can_reserve = false
 
@@ -138,6 +144,7 @@ define [
             id: e.user?.id or e.group.id
             name: e.user?.short_name or e.group.name
             event_url: e.url
+            comments: e.comments
           (params.reservations ?= []).push reservation
           if e.user
             (params.reserved_users ?= []).push reservation
@@ -153,6 +160,7 @@ define [
       if @event.object?.google_calendar_id
         params.google_calendar_id = @event.object.google_calendar_id
 
+      params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))

@@ -1,8 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 
 describe "conversations new" do
-  include_examples "in-process server selenium tests"
-  
+  include_context "in-process server selenium tests"
+  include ConversationsCommon
+
   before do
     conversation_setup
     @s1 = user(name: "first student")
@@ -11,7 +12,7 @@ describe "conversations new" do
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
     @group.users = [@s1, @s2]
-  end 
+  end
 
   context 'submission comment stream items' do
     before do
@@ -36,21 +37,21 @@ describe "conversations new" do
     end
 
     describe 'view filter' do
-      it 'shows submission comments' do
-        get_conversations
+      it 'shows submission comments', priority: "2", test_id: 197517 do
+        conversations
         select_view('submission_comments')
         expect(conversation_elements.size).to eq 2
       end
 
-      it 'filters by course' do
-        get_conversations
+      it 'filters by course', priority: "2", test_id: 197518 do
+        conversations
         select_view('submission_comments')
         select_course(@course1.id)
         expect(conversation_elements.size).to eq 1
       end
 
-      it 'filters by submitter' do
-        get_conversations
+      it 'filters by submitter', priority: "2", test_id: 197519 do
+        conversations
         select_view('submission_comments')
         name = @s2.name
         f('[role=main] header [role=search] input').send_keys(name)
@@ -59,8 +60,8 @@ describe "conversations new" do
       end
     end
 
-    it 'adds new messages to the view' do
-      get_conversations
+    it 'adds new messages to the view', priority: "2", test_id: 197520 do
+      conversations
       select_view('submission_comments')
       initial_message_count = @submission.submission_comments.count
       conversation_elements[0].click
@@ -73,18 +74,18 @@ describe "conversations new" do
       expect(@submission.reload.submission_comments.count).to eq (initial_message_count + 1)
     end
 
-    it 'marks unread on click' do
+    it 'marks unread on click', priority: "2", test_id: 197521 do
       expect(@submission.read?(@teacher)).to be_falsey
-      get_conversations
+      conversations
       select_view('submission_comments')
       conversation_elements[0].click
       wait_for_ajaximations
       expect(@submission.read?(@teacher)).to be_truthy
     end
 
-    it 'marks an read/unread' do
+    it 'marks an read/unread', priority: "2", test_id: 197522 do
       expect(@submission.read?(@teacher)).to be_falsey
-      get_conversations
+      conversations
       select_view('submission_comments')
       toggle = fj('.read-state', conversation_elements[0])
       toggle.click

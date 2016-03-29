@@ -21,8 +21,14 @@ describe AcademicBenchmark::Converter do
     @d_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'd_levels_3.json')
     @j_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'j_levels_3.json')
     @authority_list = File.join(File.dirname(__FILE__) + '/fixtures', 'auth_list.json')
+    @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list.json')
     File.open(@level_0_browse, 'r') do |file|
-      @att = Attachment.create!(:filename => 'standards.json', :display_name => 'standards.json', :uploaded_data => file, :context => @cm)
+      @att = Attachment.create!(
+        :filename => 'standards.json',
+        :display_name => 'standards.json',
+        :uploaded_data => file,
+        :context => @cm
+      )
     end
     @cm.attachment = @att
     @cm.save!
@@ -92,6 +98,20 @@ describe AcademicBenchmark::Converter do
     expect(m.short_description).to eq "1.DD.1"
     expect(m.description).to eq "And something else"
     expect(m.title).to eq "1.DD.1"
+  end
+
+  def check_for_parent_num_duplication(outcome)
+    parent = outcome.instance_variable_get('@parent')
+    if outcome.num && parent && parent.is_standard? && parent.title && outcome.num.include?(parent.title)
+      outcome.title == "#{parent.title}.#{outcome.num}"
+    else
+      false
+    end
+  end
+
+  def check_built_outcome(outcome)
+    expect(check_for_parent_num_duplication(outcome)).to be_falsey
+    outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
   it "should successfully import the standards" do
@@ -164,6 +184,17 @@ describe AcademicBenchmark::Converter do
       expect(@cm.workflow_state).to eq 'failed'
     end
 
+    it "should fail with an empty string API key" do
+      @plugin.settings['api_key'] = ""
+      @cm.export_content
+      run_jobs
+      @cm.reload
+
+      expect(@cm.migration_issues.count).to eq 1
+      expect(@cm.migration_issues.first.description).to eq "An API key is required to use Academic Benchmarks"
+      expect(@cm.workflow_state).to eq 'failed'
+    end
+
     it "should use the API to get the set data with an authority short code" do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
@@ -204,33 +235,23 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      er = ErrorReport.last
-      expect(@cm.old_warnings_format).to eq [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
       expect(@cm.migration_settings[:last_error]).to be_nil
       expect(@cm.workflow_state).to eq 'imported'
     end
-
-    it "should pull down the list of available authorities" do
-      @cm.migration_settings[:authorities] = nil
-      @cm.migration_settings[:refresh_all_standards] = true
-      @cm.save!
-
-      response = Object.new
-      response.stubs(:body).returns(File.read(@authority_list))
-      response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&levels=2").returns(response)
-
-      ["CCC", "BBB", "AAA", "111", "222"].each do |guid|
-        response2 = Object.new
-        response2.stubs(:body).returns(File.read(@level_0_browse))
-        response2.stubs(:code).returns("200")
-        AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=%s&levels=3" % guid).returns(response2)
-      end
-
-      run_and_check
-      verify_full_import
-    end
-
   end
 
+  # This test came about because the titles being generated for
+  # Florida outcomes were long and out of control.  They were looking
+  # like this:
+  #
+  #    LAFS.1.L.LAFS.1.L.1.LAFS.1.L.1.1.a
+  #
+  # instead of this:
+  #
+  #    LAFS.1.L.1.1.a instead of LAFS.1.L.LAFS.1.L.1.LAFS.1.L.1.1.a
+  #
+  it "doesn't duplicate the base numbers when building a title" do
+    json_data = JSON.parse(File.read(@florida_auth_list))
+    check_built_outcome(AcademicBenchmark::Standard.new(json_data))
+  end
 end

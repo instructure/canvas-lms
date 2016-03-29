@@ -21,7 +21,7 @@ module AttachmentHelper
   def doc_preview_attributes(attachment, attrs={})
     if attachment.crocodoc_available?
       begin
-        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user)
+        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, attrs[:crocodoc_ids])
       rescue => e
         Canvas::Errors.capture_exception(:crocodoc, e)
       end
@@ -38,7 +38,9 @@ module AttachmentHelper
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
     end
-    attrs.inject("") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
+    attrs.map { |attr,val|
+      %|data-#{attr}="#{ERB::Util.html_escape(val)}"|
+    }.join(" ").html_safe
   end
 
   def media_preview_attributes(attachment, attrs={})

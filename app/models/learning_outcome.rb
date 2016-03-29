@@ -24,11 +24,9 @@ class LearningOutcome < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   has_many :learning_outcome_results
-  has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
+  has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: 'ContentTag'
 
-  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
-  EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
-  serialize :data
+  serialize_utf8_safe :data
 
   before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
@@ -38,25 +36,26 @@ class LearningOutcome < ActiveRecord::Base
     'n_mastery'        => "n Number of Times",
     'highest'          => "Highest Score",
     'latest'           => "Most Recent Score",
-  }
+  }.freeze
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
-    "n_mastery" => (2..5),
-    "highest" => [],
-    "latest" => [],
-  }
+    "n_mastery" => (1..5),
+    "highest" => [].freeze,
+    "latest" => [].freeze,
+  }.freeze
 
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :short_description, :maximum => maximum_string_length
-  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS.keys,
-    :message => t(
+  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :short_description, length: { maximum: maximum_string_length }
+  validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
+    message: t(
       "calculation_method must be one of the following: %{calc_methods}",
       :calc_methods => CALCULATION_METHODS.keys.to_s
     )
-  validates_presence_of :short_description, :workflow_state
+  }
+  validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
-  validate :calculation_changes_after_asessing, if: :assessed?
-  validate :validate_calculation_int, unless: :assessed?
+  validate :validate_calculation_int
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -85,21 +84,6 @@ class LearningOutcome < ActiveRecord::Base
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
       self.calculation_int = default_calculation_int
-    end
-  end
-
-  def calculation_changes_after_asessing
-    # if we've been used to assess a student, refuse to accept any changes to our calculation options
-    if calculation_method_changed?
-      errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. The calculation method is locked",
-      ))
-    end
-
-    if calculation_int_changed?
-      errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. The calculation value is locked"
-      ))
     end
   end
 
@@ -275,7 +259,7 @@ class LearningOutcome < ActiveRecord::Base
     self.data[:rubric_criterion] = criterion
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     # delete any remaining links to the outcome. in case of UI, this was
     # triggered by ContentTag#destroy and the checks have already run, we don't
@@ -294,8 +278,16 @@ class LearningOutcome < ActiveRecord::Base
     save!
   end
 
-  def assessed?
-    learning_outcome_results.exists?
+  def assessed?(course = nil)
+    if course
+      self.learning_outcome_results.where(context_id: course, context_type: "Course").exists?
+    else
+      if learning_outcome_results.loaded?
+        learning_outcome_results.any?
+      else
+        learning_outcome_results.exists?
+      end
+    end
   end
 
   def tie_to(context)
@@ -323,13 +315,16 @@ class LearningOutcome < ActiveRecord::Base
     LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
 
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :active, -> { where("learning_outcomes.workflow_state<>'deleted'") }
-  scope :has_result_for, lambda { |user|
-    joins(:learning_outcome_results).
-        where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
-        order(best_unicode_collation_key('short_description'))
-  }
+  scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
+  scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
+  scope(:has_result_for_user,
+    lambda do |user|
+      joins(:learning_outcome_results)
+        .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
+               "AND learning_outcome_results.user_id=?", user)
+        .order(best_unicode_collation_key('short_description'))
+    end
+  )
 
   scope :global, -> { where(:context_id => nil) }
 end

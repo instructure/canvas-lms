@@ -1,7 +1,8 @@
 define [
   'Backbone'
   'underscore'
-], (Backbone, _) ->
+  'compiled/str/splitAssetString'
+], (Backbone, _, splitAssetString) ->
 
   # this is an abstract base class that both File and Folder inherit from.
   # they share a little bit of functionality
@@ -15,15 +16,19 @@ define [
       @get('display_name') or @get('name')
 
     destinationIsSameContext: (destination) ->
-      parentFolder = @collection?.parentFolder
-
       # Verifies that the parent folder of the item being moved
       # belongs to the same context as the destination.
       # If the destination is different, the item is copied/duplicated
       # instead of moved.
-      parentFolder &&
-        parentFolder.attributes.context_type is destination.attributes.context_type &&
-        parentFolder.attributes.context_id.toString() is destination.attributes.context_id.toString()
+      [contextType, contextId] = if assetString = @get("context_asset_string")
+        splitAssetString(assetString, false)
+      else
+        [@collection.parentFolder?.get("context_type"), @collection.parentFolder?.get("context_id")?.toString()]
+
+
+      contextType and contextId and
+      contextType.toLowerCase() is destination.get("context_type").toLowerCase() and
+      contextId is destination.get("context_id")?.toString()
 
     moveTo: (newFolder, options = {}) ->
       if @destinationIsSameContext(newFolder)

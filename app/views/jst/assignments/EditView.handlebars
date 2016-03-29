@@ -6,10 +6,10 @@
 
 <div class="control-group">
   <div>
+    <label for="assignment_name" class="screenreader-only">{{#t}}Assignment Name{{/t}}</label>
     <input id="assignment_name"
       name="name"
       placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
-      aria-label="{{#t "assignment_name"}}Assignment Name{{/t}}"
       value="{{name}}"
       type="text"
       maxlength="254"
@@ -73,21 +73,6 @@
 
 <div id="grading_type_selector"></div>
 
-{{#if postToSISEnabled}}
-<div class="form-column-left">{{#t}}Post Grades to SIS{{/t}}</div>
-<div class="form-column-right">
-  <fieldset>
-    <label class="checkbox">
-      {{checkbox "postToSIS"
-      id="assignment_post_to_sis"
-      name="post_to_sis"
-      }}
-      {{#t "post_to_sis"}}Include this assignment's grades when posting to your school's Student Information System{{/t}}
-    </label>
-  </fieldset>
-</div>
-{{/if}}
-
 <div id="graded_assignment_fields"
   aria-expanded="{{not isNotGraded}}"
   style="{{hiddenIf isNotGraded}}">
@@ -107,6 +92,34 @@
       style="{{hiddenIf isExternalTool}}">
     </fieldset>
   {{/unless}}
+
+  {{#if postToSISEnabled}}
+    <fieldset>
+      <div class="form-column-left">{{#t}}Post Grades to SIS{{/t}}</div>
+        <div class="form-column-right" style="margin-top: 14px;">
+          <label class="checkbox">
+            {{checkbox "postToSIS"
+              id="assignment_post_to_sis"
+              name="post_to_sis"
+            }}
+            {{#t "post_to_sis"}}Include this assignment's grades when posting to your school's Student Information System{{/t}}
+          </label>
+      </div>
+    </fieldset>
+  {{/if}}
+
+  <fieldset>
+    <div class="form-column-left">{{#t}}Moderated Grading{{/t}}</div>
+    <div class="form-column-right" style="margin-top: 14px;">
+      <label class="checkbox">
+        {{checkbox "moderatedGrading"
+          id="assignment_moderated_grading"
+          name="moderated_grading"
+        }}
+        {{#t}}Allow a moderator to review multiple independent grades for selected submissions{{/t}}
+      </label>
+    </div>
+  </fieldset>
 
 </div>
 

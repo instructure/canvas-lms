@@ -12,7 +12,8 @@ define [
       props =
         display: true
 
-      @DueDateAddRowButton = React.render(DueDateAddRowButton(props), $('<div>').appendTo('body')[0])
+      DueDateAddRowButtonElement = React.createElement(DueDateAddRowButton, props)
+      @DueDateAddRowButton = React.render(DueDateAddRowButtonElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@DueDateAddRowButton.getDOMNode().parentNode)
@@ -27,10 +28,12 @@ define [
       props =
         display: false
 
-      @DueDateAddRowButton = React.render(DueDateAddRowButton(props), $('<div>').appendTo('body')[0])
+      DueDateAddRowButtonElement = React.createElement(DueDateAddRowButton, props)
+      @DueDateAddRowButton = React.render(DueDateAddRowButtonElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@DueDateAddRowButton.getDOMNode()?.parentNode)
+      if @DueDateAddRowButton.getDOMNode()
+        React.unmountComponentAtNode(@DueDateAddRowButton.getDOMNode().parentNode)
 
   test 'does not render a button', ->
     ok @DueDateAddRowButton.isMounted()

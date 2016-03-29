@@ -89,7 +89,7 @@ describe "assignments" do
     end
 
     it "should show 'Everyone' when there are no overrides" do
-      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
       expect(doc.css(".assignment_dates").text).to include "Everyone"
@@ -100,7 +100,7 @@ describe "assignments" do
       due_at1 = 3.days.from_now
       create_assignment_section_override(@cs1, due_at1)
 
-      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
       expect(doc.css(".assignment_dates").text).to include "Everyone else"
@@ -111,7 +111,7 @@ describe "assignments" do
       create_assignment_section_override(@cs1, due_at1)
       create_assignment_section_override(@cs2, due_at2)
 
-      get "courses/#{@course.id}/assignments/#{@assignment.id}"
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML(response.body)
       expect(doc.css(".assignment_dates").text).not_to include "Everyone"

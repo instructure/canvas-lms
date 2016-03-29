@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class Canvas::Migration::Worker::ZipFileWorker < Struct.new(:migration_id)
+class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
   def perform(cm=nil)
     cm ||= ContentMigration.find migration_id
 

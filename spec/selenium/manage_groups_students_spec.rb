@@ -2,9 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common
 require 'thread'
 
 describe "manage groups students" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include ManageGroupsCommon
 
-  before (:each) do
+  before(:each) do
     skip
 		#course_with_teacher_logged_in
     #Account.default.settings[:enable_manage_groups2] = false
@@ -279,7 +280,7 @@ describe "manage groups students" do
       confirm_dialog.accept
       expect(ff(".left_side .group")).to be_empty
       wait_for_ajaximations
-      expect(@course.group_categories.all.count).to eq 0
+      expect(@course.group_categories.count).to eq 0
     end
 
     it "should edit an individual group" do

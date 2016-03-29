@@ -101,13 +101,26 @@ describe "Folders API", type: :request do
   end
 
   describe "#show" do
-    it "should have the file and folder counts" do
-      @root.sub_folders.create!(:name => "folder1", :context => @course)
-      @root.sub_folders.create!(:name => "folder2", :context => @course)
-      Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
-      json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
-      expect(json['files_count']).to eq 1
-      expect(json['folders_count']).to eq 2
+    describe "file and folder counts" do
+      before(:once) do
+        @root.sub_folders.create!(:name => "folder1", :context => @course)
+        @root.sub_folders.create!(:name => "folder2", :context => @course, :workflow_state => 'hidden')
+        Attachment.create!(:filename => 'test1.txt', :display_name => "test1.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+        Attachment.create!(:filename => 'test2.txt', :display_name => "test2.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course).update_attribute(:file_state, 'hidden')
+      end
+
+      it "should count hidden items for teachers" do
+        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
+        expect(json['files_count']).to eq 2
+        expect(json['folders_count']).to eq 2
+      end
+
+      it "should not count hidden items for students" do
+        student_in_course :active_all => true
+        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
+        expect(json['files_count']).to eq 1
+        expect(json['folders_count']).to eq 1
+      end
     end
 
     it "should have url to list file and folder listings" do
@@ -341,6 +354,14 @@ describe "Folders API", type: :request do
                @folders_path_options.merge(:course_id => @course.id.to_param),
                { :name => "sub1"}, {}, :expected_status => 401)
     end
+
+    it "should error if the name is too long" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/folders",
+               @folders_path_options.merge(:course_id => @course.id.to_param),
+               { :name => "X" * 256 },
+               {},
+               :expected_status => 400)
+    end
   end
 
   describe "#update" do
@@ -521,7 +542,7 @@ describe "Folders API", type: :request do
 
       copy = Folder.find(json['id'])
       expect(copy.parent_folder).to eq(@dest_folder)
-      contents = copy.active_file_attachments.all
+      contents = copy.active_file_attachments.to_a
       expect(contents.size).to eq 1
       expect(contents.first.root_attachment).to eq @file
     end
@@ -613,6 +634,8 @@ describe "Folders API", type: :request do
 
     it "should omit verifier in-app" do
       FoldersController.any_instance.stubs(:in_app?).returns(true)
+      FoldersController.any_instance.stubs(:verified_request?).returns(true)
+
       @dest_context.enroll_teacher @user, enrollment_state: 'active'
       json = api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
                       @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))

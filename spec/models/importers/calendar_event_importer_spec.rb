@@ -23,6 +23,8 @@ describe Importers::CalendarEventImporter do
 
   let_once(:migration_course) { course(active_all: true) }
 
+  let(:migration) { migration_course.content_migrations.create! }
+
   let(:migration_assignment) do
     assignment = migration_course.assignments.build(title: 'migration assignment')
     assignment.workflow_state = 'active'
@@ -80,7 +82,7 @@ describe Importers::CalendarEventImporter do
         attachment_type: 'external_url',
         attachment_value: 'http://example.com'
       }
-      Importers::CalendarEventImporter.import_from_migration(hash, migration_course, nil, event)
+      Importers::CalendarEventImporter.import_from_migration(hash, migration_course, migration, event)
       expect(event).not_to be_new_record
       expect(event.imported).to be_truthy
       expect(event.migration_id).to eq '42'
@@ -143,14 +145,15 @@ describe Importers::CalendarEventImporter do
       it "should import calendar events for #{system}" do
         data = get_import_data(system, 'calendar_event')
         context = get_import_context(system)
+        migration = context.content_migrations.create!
 
         data[:events_to_import] = {}
-        expect(Importers::CalendarEventImporter.import_from_migration(data, context)).to be_nil
+        expect(Importers::CalendarEventImporter.import_from_migration(data, context, migration)).to be_nil
         expect(context.calendar_events.count).to eq 0
 
         data[:events_to_import][data[:migration_id]] = true
-        Importers::CalendarEventImporter.import_from_migration(data, context)
-        Importers::CalendarEventImporter.import_from_migration(data, context)
+        Importers::CalendarEventImporter.import_from_migration(data, context, migration)
+        Importers::CalendarEventImporter.import_from_migration(data, context, migration)
         expect(context.calendar_events.count).to eq 1
 
         event = CalendarEvent.where(migration_id: data[:migration_id]).first

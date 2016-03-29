@@ -41,6 +41,7 @@ define [
       @itemViewOptions.indexView = @
       @itemViewOptions.collection = @collection
       @itemViewOptions.WIKI_RIGHTS = @WIKI_RIGHTS
+      @focusAfterRenderSelector = null
 
       @contextAssetString = options?.contextAssetString
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
@@ -61,6 +62,11 @@ define [
       super
       @$noPages.redirectClickTo(@$noPagesLink)
       @renderSortHeaders()
+      if @focusAfterRenderSelector
+        # We do a setTimeout here just to force it to the next tick.
+        setTimeout =>
+          $(@focusAfterRenderSelector).focus()
+        , 1
 
     sort: (event = {}) ->
       event.preventDefault()

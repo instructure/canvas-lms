@@ -17,7 +17,7 @@ $page-dark: #ebeff2;
   @else {
     color: #585e63;
     padding-bottom: 5px;
-    padding-top: 6px;  
+    padding-top: 6px;
   }
 }
 
@@ -26,10 +26,10 @@ $page-dark: #ebeff2;
     margin: 0;
   }
   @else {
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     margin: $header-child-margin;
   }
-}  
+}
 
 
 /* page overrides */
@@ -37,25 +37,12 @@ $page-dark: #ebeff2;
   border-bottom: 0;
 }
 
-#change_gradebook_version_link_holder a {
-  background: none;
-  border: none;
-  color: $ic-link-color !important;
-  font-size: 12px;
-  font-family: inherit;
-  text-shadow: none;
-
-  &:hover {
-    box-shadow: none;
-  }
-}
-
 /* checkbox view */
 .checkbox-view {
   border: 1px solid transparent;
   cursor: pointer;
   display: block;
-  font-size: 16px;
+  @include fontSize($ic-font-size--medium);
   padding: 8px;
 
   &:hover, &:focus {
@@ -169,7 +156,7 @@ $page-dark: #ebeff2;
 
     a {
       color: $font-color;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
     }
   }
 
@@ -179,31 +166,43 @@ $page-dark: #ebeff2;
 }
 
 .gradebook-header {
-  
+  display: flex;
+  align-items: right;
   @if $use_new_styles {
     @include clearfix;
-    padding: $ic-sp 0 $ic-sp/2;
+    padding-top: $ic-sp;
     + .assignment-gradebook-container {
       #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
     }
     .gradebook-navigation { margin-top: 3px; }
   }
-  
-  .section-button-placeholder {
-    position: relative;
-    float: right;
+
+  .header-buttons {
+    flex: 1;
+    text-align: right;
+    margin-bottom: $ic-sp;
     @if $use_new_styles == false {
-      margin: $header-child-margin;
+      margin-right: $ic-sp;
       top: 1px;
-      .section-select-button { padding: 3px 12px 3px 12px; }
     }
-    
+    .individual-view-button {
+      @if $use_new_styles == false {
+        padding: $ic-sp/4 $ic-sp;
+      }
+    }
+    .post-grades-button-placeholder {
+      display: inline-block;
+      @if $use_new_styles == false {
+        button#post-grades-button, button#post_grades, button.external-tools-dialog { padding: $ic-sp/4 $ic-sp; }
+      }
+    }
+    .section-button-placeholder {
+      display: inline-block;
+      @if $use_new_styles == false {
+        .section-select-button { padding: $ic-sp/4 $ic-sp; }
+      }
+    }
   }
-
-}
-
-.gradebook-navigation {
-  display: inline-block;
 }
 
 /* slickgrid */
@@ -264,7 +263,7 @@ $page-dark: #ebeff2;
   }
 
   .slick-header-column {
-    font-size: 13px;
+    @include fontSize(13px);
 
     .slick-column-name {
       color: $header-font-color;
@@ -300,7 +299,7 @@ $page-dark: #ebeff2;
     &.average-filter {
       background: transparent;
       border: none;
-      font-size: 15px;
+      @include fontSize(15px);
       font-weight: 500;
       line-height: 39px;
       min-height: 40px;
@@ -322,7 +321,7 @@ $page-dark: #ebeff2;
       border-left: none;
       border-bottom-color: $border-light;
       border-right-color: $border-light;
-      font-size: 15px;
+      @include fontSize(15px);
       height: 37px;
       line-height: 37px;
       padding: 0;
@@ -334,7 +333,7 @@ $page-dark: #ebeff2;
   }
 
   .outcome-student-cell.slick-cell {
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     line-height: 21px;
     .student-section {
       color: $font-color;
@@ -357,7 +356,8 @@ $page-dark: #ebeff2;
 }
 
 .outcome-cell-wrapper {
-  text-align: center;
+  text-align: right;
+  padding-right: 10px;
 }
 
 .outcome-score {

@@ -45,6 +45,7 @@ class BigBlueButtonConference < WebConference
       settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
     settings[:record] &&= config[:recording_enabled]
+    current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
     send_request(:create, {
       :meetingID => conference_key,
       :name => title,
@@ -54,18 +55,18 @@ class BigBlueButtonConference < WebConference
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
       :welcome => settings[:record] ? t("This conference may be recorded.") : "",
-      "meta_canvas-recording-ready-url" => recording_ready_url
+      "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
     }) or return nil
     @conference_active = true
     save
     conference_key
   end
 
-  def recording_ready_url
+  def recording_ready_url(current_host = nil)
     polymorphic_url([:api_v1, context, :conferences, :recording_ready],
                     conference_id: self.id,
                     protocol: HostUrl.protocol,
-                    host: HostUrl.context_host(self))
+                    host: HostUrl.context_host(context, current_host))
   end
 
   def conference_status

@@ -69,12 +69,42 @@ describe Attachment do
     Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
   end
 
+  def configure_canvadocs(opts = {})
+    ps = PluginSetting.where(name: "canvadocs").first_or_create
+    ps.update_attribute :settings, {
+      "api_key" => "blahblahblahblahblah",
+      "base_url" => "http://example.com",
+      "annotations_supported" => true
+    }.merge(opts)
+  end
+
   context "crocodoc" do
+    include HmacHelper
+    let_once(:user) { user_model }
+    let_once(:course) { course_model }
+    let_once(:student) do
+      course.enroll_student(user_model).accept
+      @user
+    end
     before { configure_crocodoc }
 
     it "crocodocable?" do
       crocodocable_attachment_model
       expect(@attachment).to be_crocodocable
+    end
+
+    it "should include a whitelist of crocodoc_ids in the url blob" do
+      crocodocable_attachment_model
+      crocodoc_ids = [user.crocodoc_id!, student.crocodoc_id!]
+      @attachment.submit_to_crocodoc
+
+      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, crocodoc_ids).sub(/^.*\?{1}/, ""))
+      blob = extract_blob(url["hmac"], url["blob"],
+                          "user_id" => user.id,
+                          "type" => "crocodoc")
+
+      expect(blob["crocodoc_ids"]).to be_present
+      expect(blob["crocodoc_ids"]).to eq(crocodoc_ids & blob["crocodoc_ids"])
     end
 
     it "should submit to crocodoc" do
@@ -127,13 +157,17 @@ describe Attachment do
 
   context "canvadocs" do
     before :once do
-      PluginSetting.create! :name => 'canvadocs',
-        :settings => {"api_key" => "blahblahblahblahblah",
-                      "base_url" => "http://example.com"}
+      configure_canvadocs
     end
 
     before :each do
       Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
+    end
+
+    it "should treat text files equally" do
+      a = attachment_model(:content_type => 'text/x-ruby-script')
+      Canvadoc.stubs(:mime_types).returns(['text/plain'])
+      expect(a.canvadocable?).to be_truthy
     end
 
     describe "submit_to_canvadocs" do
@@ -162,8 +196,16 @@ describe Attachment do
         }
       end
 
-      it "prefers crocodoc when annotation is requested" do
+      it "sends annotatable documents to canvadocs if supported" do
         configure_crocodoc
+        a = crocodocable_attachment_model
+        a.submit_to_canvadocs 1, wants_annotation: true
+        expect(a.canvadoc).not_to be_nil
+      end
+
+      it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
+        configure_crocodoc
+        configure_canvadocs "annotations_supported" => false
         Setting.set('canvadoc_mime_types',
                     (Canvadoc.mime_types << "application/blah").to_json)
 
@@ -262,7 +304,7 @@ describe Attachment do
 
       it "should delay upload until the #save transaction is committed" do
         @attachment.uploaded_data = default_uploaded_data
-        @attachment.connection.expects(:after_transaction_commit).once
+        Attachment.connection.expects(:after_transaction_commit).once
         @attachment.expects(:touch_context_if_appropriate).never
         @attachment.expects(:ensure_media_object).never
         @attachment.save
@@ -370,7 +412,7 @@ describe Attachment do
       a.destroy
       expect(a).not_to be_frozen
       expect(a).to be_deleted
-      a.destroy!
+      a.destroy_permanently!
       expect(a).to be_frozen
     end
 
@@ -405,13 +447,13 @@ describe Attachment do
     end
   end
 
-  context "destroy!" do
+  context "destroy_permanently!" do
     it "should not delete the s3 object, even here" do
       s3_storage!
       a = attachment_model
       s3object = a.s3object
       s3object.expects(:delete).never
-      a.destroy!
+      a.destroy_permanently!
     end
   end
 
@@ -450,6 +492,13 @@ describe Attachment do
       expect(a.filename.length).to eql(252)
       expect(a.unencoded_filename).to be_valid_encoding
       expect(a.unencoded_filename).to eql("\u2603" * 28)
+    end
+
+    it "should truncate thumbnail names" do
+      a = attachment_model(:filename => "#{"a" * 251}.png")
+      thumbname = a.thumbnail_name_for("thumb")
+      expect(thumbname.length).to eq 255
+      expect(thumbname).to eq "#{"a" * 245}_thumb.png"
     end
 
     it "should not double-escape a root attachment's filename" do
@@ -589,31 +638,47 @@ describe Attachment do
       a = attachment
       expect(a.grants_right?(nil, :read)).to eql(false)
       expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
-      expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
+      mock_session = {
+        'file_access_user_id' => student.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
     it "should correctly deny user access based on 'file_access_user_id'" do
       a = attachment_model(context: user)
       other_user = user_model
-      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+      mock_session = {
+        'file_access_user_id' => other_user.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
     end
 
     it "should allow user access to anyone if the course is public to auth users (with 'file_access_user_id' and 'file_access_expiration' in the session)" do
-      a = attachment_model(context: course)
+      mock_session = {
+        'file_access_user_id' => user.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
 
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+      a = attachment_model(context: course)
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
 
       course.is_public_to_auth_users = true
       course.save!
       a.reload
+      AdheresToPolicy::Cache.clear
 
       expect(a.grants_right?(nil, :read)).to eql(false)
       expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
     it "should not allow user access based on incorrect 'file_access_user_id' in the session" do
@@ -1044,9 +1109,7 @@ describe Attachment do
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       expect(@attachment.need_notify).to be_truthy
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1059,9 +1122,7 @@ describe Attachment do
       att3 = attachment_model(:uploaded_data => stub_file_data('file3.txt', nil, 'text/html'), :content_type => 'text/html')
       [att1, att2, att3].each {|att| expect(att.need_notify).to be_truthy}
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).not_to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New Files Added').first).not_to be_nil
@@ -1079,15 +1140,11 @@ describe Attachment do
       att3 = attachment_model(:uploaded_data => stub_file_data('file3.txt', nil, 'text/html'), :content_type => 'text/html')
       [att1, att2, att3].each {|att| expect(att.need_notify).to be_truthy}
 
-      new_time = Time.now + 2.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(2.minutes.from_now) { Attachment.do_notifications }
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
 
-      new_time = Time.now + 4.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(6.minutes.from_now) { Attachment.do_notifications }
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).not_to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New Files Added').first).not_to be_nil
     end
@@ -1096,9 +1153,7 @@ describe Attachment do
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       expect(@attachment.need_notify).to be_truthy
 
-      new_time = Time.now + 1.week
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(1.week.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).to be_falsey
@@ -1138,9 +1193,7 @@ describe Attachment do
       @attachment.folder.locked = true
       @attachment.folder.save!
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1159,9 +1212,7 @@ describe Attachment do
       @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
       @course.save!
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1175,9 +1226,15 @@ describe Attachment do
 
       Attachment.where(:id => @attachment).update_all(:need_notify => true)
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+    end
+
+    it "doesn't send notifications for a concluded course" do
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      @course.soft_conclude!
+      @course.save!
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
     end
   end
 
@@ -1188,6 +1245,46 @@ describe Attachment do
       quota = Attachment.get_quota(@course)
       expect(quota[:quota_used]).to eq Attachment.minimum_size_for_quota
     end
+
+    it "should not count attachments a student has used for submissions towards the quota" do
+      course_with_student(:active_all => true)
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+
+      @assignment = @course.assignments.create!
+      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "otherfile.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+    end
+
+    it "should not count attachments a student has used for graded discussion replies towards the quota" do
+      course_with_student(:active_all => true)
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+
+      assignment = @course.assignments.create!(:title => "asmt")
+      topic = @course.discussion_topics.create!(:title => 'topic', :assignment => assignment)
+      entry = topic.reply_from(:user => @student, :text => "entry")
+      entry.attachment = @attachment
+      entry.save!
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "otherfile.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+    end
+
   end
 
   context "#open" do
@@ -1321,20 +1418,6 @@ describe Attachment do
     end
   end
 
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz statistics relation' do
-      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
-      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
-      attachment.context = stats
-      attachment.save
-      expect(attachment.context_type).to eq "Quizzes::QuizStatistics"
-
-      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
-
-      expect(Attachment.find(attachment.id).context_type).to eq 'Quizzes::QuizStatistics'
-    end
-  end
-
   describe ".clone_url_as_attachment" do
     it "should reject invalid urls" do
       expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
@@ -1388,5 +1471,55 @@ describe Attachment do
     mod = @course.context_modules.create!(:name => "some module")
     tag1 = mod.add_item(:id => att.id, :type => 'attachment')
     expect(tag1).not_to be_nil
+  end
+
+  it "should unlock files at the right time even if they're accessed shortly before" do
+    enable_cache do
+      course_with_student :active_all => true
+      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now
+      expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
+      Timecop.freeze(@attachment.unlock_at + 1.second) do
+        run_jobs
+        expect(Attachment.find(@attachment).grants_right?(@student, :download)).to eq true
+      end
+    end
+  end
+
+  it "should not be locked_for soft-concluded admin users" do
+    term = Account.default.enrollment_terms.create!
+    term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+    course_with_teacher(:active_all => true)
+    @course.enrollment_term = term
+    @course.save!
+
+    attachment_model uploaded_data: default_uploaded_data
+    @attachment.update_attribute(:locked, true)
+    @attachment.reload
+    expect(@attachment.locked_for?(@teacher, :check_policies => true)).to be_falsey
+  end
+
+  describe 'local storage' do
+    it 'should properly sanitie a filename containing a slash' do
+      local_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100___ENGL_200.csv')
+    end
+
+    it 'should still properly escape the same filename on s3' do
+      s3_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100_%2F_ENGL_200.csv')
+    end
+  end
+
+  describe "preview_params" do
+    it "includes crocodoc_ids only when a whitelist is given" do
+      course :active_all => true
+      att = attachment_model
+      expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
+      expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
+    end
   end
 end

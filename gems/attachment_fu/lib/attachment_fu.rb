@@ -172,36 +172,7 @@ module AttachmentFu # :nodoc:
       base.after_save :after_process_attachment
       base.after_destroy :destroy_file
       base.after_validation :process_attachment
-      base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
-      base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
-    end
-
-    unless defined?(::ActiveSupport::Callbacks)
-      # Callback after an attachment has been saved either to the file system or the DB.
-      # Only called if the file has been changed, not necessarily if the record is updated.
-      #
-      #   class Foo < ActiveRecord::Base
-      #     acts_as_attachment
-      #     after_attachment_saved do |record|
-      #       ...
-      #     end
-      #   end
-      def after_attachment_saved(&block)
-        write_inheritable_array(:after_attachment_saved, [block])
-      end
-
-      # Callback before a thumbnail is saved.  Use this to pass any necessary extra attributes that may be required.
-      #
-      #   class Foo < ActiveRecord::Base
-      #     acts_as_attachment
-      #     before_thumbnail_saved do |thumbnail|
-      #       record = thumbnail.parent
-      #       ...
-      #     end
-      #   end
-      def before_thumbnail_saved(&block)
-        write_inheritable_array(:before_thumbnail_saved, [block])
-      end
+      base.define_model_callbacks :save_and_attachment_processing, only: [:after]
     end
 
     # Get the thumbnail class, which is the current attachment class by default.
@@ -256,7 +227,11 @@ module AttachmentFu # :nodoc:
       end
       # ImageScience doesn't create gif thumbnails, only pngs
       ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
-      "#{basename}_#{thumbnail}#{ext}"
+      name = "#{basename}_#{thumbnail}#{ext}"
+      if name.length > 255
+        name = "#{basename[0..(254 - name.length)]}_#{thumbnail}#{ext}"
+      end
+      name
     end
 
     # Creates or updates the thumbnail for the current attachment.
@@ -269,7 +244,10 @@ module AttachmentFu # :nodoc:
           :temp_path                => temp_file,
           :thumbnail_resize_options => size
         }
-        thumb.save!
+        if thumb.valid?
+          thumb.process_attachment
+          thumb.save!
+        end
       end
     end
 
@@ -286,7 +264,7 @@ module AttachmentFu # :nodoc:
       ensure
         tmp.unlink if tmp
       end
-      
+
       res
     end
 
@@ -365,7 +343,7 @@ module AttachmentFu # :nodoc:
             io = File.open(self.temp_path, 'rb')
           end
           io.rewind
-          io.each_line do |line| 
+          io.each_line do |line|
             digest.update(line)
             read_bytes = true
           end
@@ -398,6 +376,7 @@ module AttachmentFu # :nodoc:
       self.shard.activate do
         if self.md5.present? && ns = self.infer_namespace
           scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("filename IS NOT NULL")
           scope = scope.where("id<>?", self) unless new_record?
           scope.detect { |a| a.store.exists? }
         end
@@ -417,7 +396,7 @@ module AttachmentFu # :nodoc:
         'unknown/unknown'
       end
     end
-    
+
     # Gets the latest temp path from the collection of temp paths.  While working with an attachment,
     # multiple Tempfile objects may be created for various processing purposes (resizing, for example).
     # An array of all the tempfile objects is stored so that the Tempfile instance is held on to until
@@ -478,7 +457,7 @@ module AttachmentFu # :nodoc:
     protected
       # Generates a unique filename for a Tempfile.
       def random_tempfile_filename
-        "#{rand Time.now.to_i}#{filename || 'attachment'}"
+        "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
       end
 
       def sanitize_filename(filename)
@@ -515,7 +494,8 @@ module AttachmentFu # :nodoc:
       # Stub for a #process_attachment method in a processor
       def process_attachment
         @saved_attachment = save_attachment?
-        callback :before_attachment_saved if @saved_attachment
+        run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
+        @saved_attachment
       end
 
       # Cleans up after processing.  Thumbnails are created, the attachment is stored to the backend, and the temp_paths are cleared.
@@ -545,17 +525,17 @@ module AttachmentFu # :nodoc:
             save_to_storage
             @temp_paths.clear
             @saved_attachment = nil
-            callback :after_attachment_saved
-            callback :after_save_and_attachment_processing
+            run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
+            run_callbacks(:save_and_attachment_processing)
           end
 
-          if connection.open_transactions == 1
-            connection.after_transaction_commit(&save_and_callbacks)
+          if self.class.connection.open_transactions == 1
+            self.class.connection.after_transaction_commit(&save_and_callbacks)
           else
             save_and_callbacks.call()
           end
         else
-          callback :after_save_and_attachment_processing
+          run_callbacks(:save_and_attachment_processing)
         end
       end
 
@@ -566,24 +546,6 @@ module AttachmentFu # :nodoc:
         elsif thumbnail_resize_options # thumbnail
           resize_image(img, thumbnail_resize_options)
         end
-      end
-
-      # callback is not defined in Rails 3
-      def callback(method)
-        runner_method = "_run_#{method}_callbacks"
-        unless self.respond_to?(runner_method, true)
-          chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
-
-          kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
-          chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
-
-          str = chain.compile
-          class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
-            def #{runner_method}() #{str} end
-            protected :#{runner_method}
-          RUBY_EVAL
-        end
-        self.send(runner_method)
       end
 
       # Removes the thumbnails for the attachment, if it has any

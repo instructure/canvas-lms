@@ -1,3 +1,5 @@
+@import 'base/environment';
+
 .submission_details_dialog {
   .more-details-link {
     font-size: 1.2em;
@@ -6,7 +8,7 @@
   h1, .h1 {
     margin: 20px 0 0;
     padding: 0 12px;
-    font-size: 23px;
+    @include fontSize(23px);
   }
   .submission-details {
     padding: 10px;
@@ -15,7 +17,7 @@
       border-bottom: 1px solid #bbb;
     }
     h2, h2 select, .h2, .h2 select {
-      font-size: 15px;
+      @include fontSize(15px);
     }
   }
   .submission_detail {
@@ -28,10 +30,10 @@
   .submisison-attachment {
     padding: 3px 0;
     a {
-      font-size: 11px;
+      @include fontSize(11px);
     }
     a.turnitin_similarity_score {
-      font-size: 10px;
+      @include fontSize(10px);
     }
   }
   .submission_details_comments {
@@ -60,7 +62,7 @@
     time {
       float: right;
       color: #777;
-      font-size: 11px;
+      @include fontSize(11px);
     }
     address {
       font-style: normal;

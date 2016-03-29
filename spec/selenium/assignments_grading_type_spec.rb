@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "assignments" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include AssignmentsCommon
 
   def point_validation
     assignment_name = 'first test assignment'
@@ -23,7 +24,7 @@ describe "assignments" do
   end
 
   %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
-    it "should create assignment with #{grading_option} grading option" do
+    it "should create assignment with #{grading_option} grading option", priority: "2", test_id: 209976 do
       assignment_title = 'grading options assignment'
       manually_create_assignment(assignment_title)
       wait_for_ajaximations
@@ -40,42 +41,42 @@ describe "assignments" do
     end
   end
 
-  it "should validate points for percentage grading (!= '')" do
+  it "should validate points for percentage grading (!= '')", priority: "2", test_id: 209980 do
     point_validation {
       click_option('#assignment_grading_type', 'Percentage')
       replace_content f('#assignment_points_possible'), ('')
     }
   end
 
-  it "should validate points for percentage grading (digits only)" do
+  it "should validate points for percentage grading (digits only)", priority: "2", test_id: 209984  do
     point_validation {
       click_option('#assignment_grading_type', 'Percentage')
       replace_content f('#assignment_points_possible'), ('taco')
     }
   end
 
-  it "should validate points for letter grading (!= '')" do
+  it "should validate points for letter grading (!= '')", priority: "2", test_id:209985 do
     point_validation {
       click_option('#assignment_grading_type', 'Letter Grade')
       replace_content f('#assignment_points_possible'), ('')
     }
   end
 
-  it "should validate points for letter grading (digits only)" do
+  it "should validate points for letter grading (digits only)", priority: "2", test_id: 209986 do
     point_validation {
       click_option('#assignment_grading_type', 'Letter Grade')
       replace_content f('#assignment_points_possible'), ('taco')
     }
   end
 
-  it "should validate points for GPA scale grading (!= '')" do
+  it "should validate points for GPA scale grading (!= '')", priority: "2", test_id: 209988 do
     point_validation {
       click_option('#assignment_grading_type', 'GPA Scale')
       replace_content f('#assignment_points_possible'), ('')
     }
   end
 
-  it "should validate points for GPA scale grading (digits only)" do
+  it "should validate points for GPA scale grading (digits only)", priority: "2", test_id: 209980 do
     point_validation {
       click_option('#assignment_grading_type', 'GPA Scale')
       replace_content f('#assignment_points_possible'), ('taco')

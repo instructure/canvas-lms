@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'i18n!modules',
@@ -37,7 +35,7 @@ define([
                     onClick={this.onClickRow.bind(this, a.id)}
                   >
                     <td>{a.name}</td>
-                    <td>{a.due_at.toString($.datetime.defaultFormat)}</td>
+                    <td>{I18n.l('#date.formats.full', a.due_at)}</td>
                     <td>{a.needs_grading_count}</td>
                   </tr>
                 )

@@ -2,9 +2,22 @@
   <div class="event-details-content">
     <table class="formtable" style="width: 100%;">
       <tr>
-        <td>{{#t "due"}}Due:{{/t}}</td>
         <td>
-          <input class="datetime_field" id="assignment_override_due_at" name="assignment_override[due_at]" size="30" style="width: 150px;" type="text" aria-label="{{#t}}Due on Date:{{/t}}"/>
+          {{#t "due"}}Due:{{/t}}
+          <label class="screenreader-only" id="calendar_assignment_override_due_date_accessible_label">
+            {{#t}}Due on date{{/t}}
+            {{datepickerScreenreaderPrompt}}
+          </label>
+        </td>
+        <td>
+          <input class="datetime_field"
+                 id="assignment_override_due_at"
+                 name="assignment_override[due_at]"
+                 size="30"
+                 style="width: 150px;"
+                 type="text"
+                 aria-labelledby="calendar_assignment_override_due_date_accessible_label"
+                 data-tooltip title="{{accessibleDateFormat}}"/>
         </td>
       </tr>
       <tr class="context_select">

@@ -205,6 +205,7 @@ describe Lti::LtiOutboundAdapter do
   describe "#generate_post_payload_for_assignment" do
     let(:outcome_service_url) { '/outcome/service' }
     let(:legacy_outcome_service_url) { '/legacy/service' }
+    let(:lti_turnitin_outcomes_placement_url) { 'turnitin/outcomes/placement' }
     let(:tool_launch) { stub('tool launch', generate: {}) }
 
     before(:each) do
@@ -214,9 +215,9 @@ describe Lti::LtiOutboundAdapter do
     it "creates an lti_assignment" do
       adapter.prepare_tool_launch(return_url, variable_expander)
 
-      tool_launch.expects(:for_assignment!).with(lti_assignment, outcome_service_url, legacy_outcome_service_url)
+      tool_launch.expects(:for_assignment!).with(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
 
-      adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
+      adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
     end
 
     it "generates the correct source_id for the assignment" do
@@ -230,12 +231,12 @@ describe Lti::LtiOutboundAdapter do
 
       Lti::LtiAssignmentCreator.expects(:new).with(assignment, source_id).returns(assignment_creator)
 
-      adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
+      adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
       expect {
-        adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
+        adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
     end
 
@@ -260,16 +261,21 @@ describe Lti::LtiOutboundAdapter do
   end
 
   describe ".consumer_instance_class" do
+    around do |example|
+      orig_class = Lti::LtiOutboundAdapter.consumer_instance_class
+      example.run
+      Lti::LtiOutboundAdapter.consumer_instance_class = orig_class
+    end
+
     it "returns the custom instance class if defined" do
       some_class = Class.new
       Lti::LtiOutboundAdapter.consumer_instance_class = some_class
 
       expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq some_class
-
-      Lti::LtiOutboundAdapter.consumer_instance_class = nil
     end
 
     it "returns the LtiOutbound::LTIConsumerInstance if none defined" do
+      Lti::LtiOutboundAdapter.consumer_instance_class = nil
       expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq LtiOutbound::LTIConsumerInstance
     end
   end

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'compiled/models/AssignmentOverride'
@@ -14,9 +12,15 @@ define([
     handleTokenAdd(newToken, overridesFromRow, rowKey, dates){
       this.setOverrideInitializer(rowKey, dates)
 
-      return newToken.course_section_id ?
-        this.handleSectionTokenAdd(newToken, overridesFromRow) :
-        this.handleStudentTokenAdd(newToken, overridesFromRow)
+      if(newToken.course_section_id) {
+        return this.handleSectionTokenAdd(newToken, overridesFromRow)
+      }
+      else if (newToken.group_id) {
+        return this.handleGroupTokenAdd(newToken, overridesFromRow)
+      }
+      else {
+        return this.handleStudentTokenAdd(newToken, overridesFromRow)
+      }
     },
 
     // -- Adding Sections --
@@ -24,6 +28,17 @@ define([
     handleSectionTokenAdd(token, overridesFromRow) {
       var newOverride = this.newOverrideForRow({
         course_section_id: token.course_section_id,
+        title: token.name
+      })
+
+      return _.union(overridesFromRow, [newOverride])
+    },
+
+    // -- Adding Groups --
+
+    handleGroupTokenAdd(token, overridesFromRow){
+      var newOverride = this.newOverrideForRow({
+        group_id: token.group_id,
         title: token.name
       })
 
@@ -61,14 +76,28 @@ define([
     // -------------------
 
     handleTokenRemove(tokenToRemove, overridesFromRow){
-      return tokenToRemove.course_section_id ?
-        this.handleSectionTokenRemove(tokenToRemove, overridesFromRow) :
-        this.handleStudentTokenRemove(tokenToRemove, overridesFromRow)
+      if(tokenToRemove.course_section_id) {
+        return this.handleSectionTokenRemove(tokenToRemove, overridesFromRow)
+      }
+      else if (tokenToRemove.group_id) {
+        return this.handleGroupTokenRemove(tokenToRemove, overridesFromRow)
+      }
+      else {
+        return this.handleStudentTokenRemove(tokenToRemove, overridesFromRow)
+      }
     },
 
     handleSectionTokenRemove(tokenToRemove, overridesFromRow){
+      return this.removeForType("course_section_id", tokenToRemove, overridesFromRow)
+    },
+
+    handleGroupTokenRemove(tokenToRemove, overridesFromRow){
+      return this.removeForType("group_id", tokenToRemove, overridesFromRow)
+    },
+
+    removeForType(selector, tokenToRemove, overridesFromRow){
       var overrideToRemove = _.find(overridesFromRow, function(override){
-        return override.get("course_section_id") == tokenToRemove.course_section_id
+        return override.get(selector) == tokenToRemove[selector]
       })
 
       return _.difference(overridesFromRow, [overrideToRemove])
@@ -104,7 +133,7 @@ define([
       }
 
       this.newOverrideForRow = function(attributes){
-        all_attrs = _.extend(date_attrs, attributes)
+        let all_attrs = _.extend(date_attrs, attributes)
         return new AssignmentOverride(all_attrs)
       }
     },

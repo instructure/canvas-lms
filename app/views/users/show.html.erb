@@ -33,8 +33,7 @@
 </style>
 <% end %>
 
-<% jammit_css :roster_user %>
-<% jammit_css :context_list %>
+<% css_bundle :roster_user, :context_list %>
 
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>
@@ -95,7 +94,7 @@
   </fieldset>
   </div>
 
-  <% if page_views_enabled? %>
+  <% if can_do(@user, @current_user, :view_statistics) && page_views_enabled? %>
     <h3>
       <%= t('page_views', 'Page Views') %>
     </h3>

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'jquery',
   'underscore',
@@ -18,10 +16,6 @@ define([
           assignments: assignments,
           pleaseShowNeedsGradingPage: false
         })
-      },
-
-      isEnabled () {
-        return this.getState().selected.sis_id
       },
 
       hasAssignments () {

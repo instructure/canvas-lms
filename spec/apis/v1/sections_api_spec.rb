@@ -144,7 +144,10 @@ describe SectionsController, type: :request do
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
-          'end_at' => nil
+          'end_at' => nil,
+          'integration_id' => nil,
+          'sis_course_id' => nil,
+          'sis_section_id' => nil
         })
       end
 
@@ -157,7 +160,10 @@ describe SectionsController, type: :request do
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
-          'end_at' => nil
+          'end_at' => nil,
+          'integration_id' => nil,
+          'sis_course_id' => nil,
+          'sis_section_id' => 'my_section'
         })
       end
 
@@ -183,7 +189,10 @@ describe SectionsController, type: :request do
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
-          'end_at' => nil
+          'end_at' => nil,
+          'integration_id' => nil,
+          'sis_course_id' => nil,
+          'sis_section_id' => nil
         })
       end
 
@@ -196,7 +205,10 @@ describe SectionsController, type: :request do
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
-          'end_at' => nil
+          'end_at' => nil,
+          'integration_id' => nil,
+          'sis_course_id' => nil,
+          'sis_section_id' => 'my_section'
         })
       end
 
@@ -209,7 +221,10 @@ describe SectionsController, type: :request do
             'course_id' => @course.id,
             'nonxlist_course_id' => nil,
             'start_at' => nil,
-            'end_at' => nil
+            'end_at' => nil,
+            'integration_id' => 'my_section',
+            'sis_course_id' => nil,
+            'sis_section_id' => nil
         })
       end
 

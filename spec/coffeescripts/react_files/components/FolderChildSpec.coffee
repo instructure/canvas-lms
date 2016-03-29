@@ -1,10 +1,11 @@
 define [
+  '../mockFilesENV'
   'react'
   'jquery'
   'compiled/react_files/components/FolderChild'
   'compiled/models/Folder'
   'compiled/react_files/routes'
-], (React, $, FolderChild, Folder, routes) ->
+], (mockFilesENV, React, $, FolderChild, Folder, routes) ->
 
   # Simulate = React.addons.TestUtils.Simulate
 
@@ -44,11 +45,10 @@ define [
   #   equal input, document.activeElement, 'input is focused automatically'
 
   #   input.value = 'testing 123'
-  #   ajaxSpy = sinon.spy($, 'ajax')
+  #   ajaxSpy = @spy($, 'ajax')
   #   Simulate.submit(input.form)
   #   ok ajaxSpy.calledWithMatch({
   #     url: TEST_FOLDERS_COLLECTION_URL
   #     type: 'POST'
   #     data: '{"name":"testing 123"}'
   #   }), 'sends POST to create folder'
-  #   ajaxSpy.restore()

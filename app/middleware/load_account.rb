@@ -15,12 +15,12 @@ class LoadAccount
   def self.default_domain_root_account; Account.default; end
 
   def clear_caches
-    Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
+    ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
   end
 
   def self.clear_shard_cache
-    @timed_cache ||= TimedCache.new(-> { Setting.get('shard_cache_time', 60.seconds).to_i.ago }) do
+    @timed_cache ||= TimedCache.new(-> { Setting.get('shard_cache_time', 60).to_i.seconds.ago }) do
       Shard.clear_cache
     end
     @timed_cache.clear

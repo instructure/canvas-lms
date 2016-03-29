@@ -82,15 +82,21 @@ describe ActiveRecord::Base do
       @e6 = @c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
+    it "should raise an error when not in a transaction" do
+      expect { User.find_in_batches_with_temp_table }.to raise_error
+    end
+
     it "should find all enrollments from course join in batches" do
       e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
       batch_size = 2
       es = []
-      e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
-        expect(batch.size).to eq batch_size
-        batch.each do |r|
-          es << r["e_id"].to_i
+      Course.transaction do
+        e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
+          expect(batch.size).to eq batch_size
+          batch.each do |r|
+            es << r["e_id"].to_i
+          end
         end
       end
       expect(es.length).to eq 6
@@ -100,26 +106,41 @@ describe ActiveRecord::Base do
     it "should pluck" do
       scope = Course.where(id: [@c1, @c2])
       cs = []
-      scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
-        cs.concat(batch)
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
+          cs.concat(batch)
+        end
       end
       expect(cs.sort).to eq [@c1.id, @c2.id].sort
+    end
+
+    it "should multi-column pluck" do
+      scope = Course.where(id: [@c1, @c2])
+      cs = []
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
+          cs.concat(batch)
+        end
+      end
+      expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
     end
 
     it "should pluck with join" do
       scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
       es = []
-      scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
-        es.concat(batch)
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
+          es.concat(batch)
+        end
       end
       expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
     end
 
-    it "should honor includes when using a cursor" do
+    it "should honor preload when using a cursor" do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.default.courses.create!
       Account.transaction do
-        Account.where(:id => Account.default).includes(:courses).find_each do |a|
+        Account.where(:id => Account.default).preload(:courses).find_each do |a|
           expect(a.courses.loaded?).to be_truthy
         end
       end
@@ -129,14 +150,16 @@ describe ActiveRecord::Base do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.transaction do
         Account.expects(:find_in_batches_with_cursor).never
-        Account.where(:id => Account.default).includes(:courses).find_each(start: 0) do |a|
-          expect(a.courses.loaded?).to be_truthy
+        Account.where(:id => Account.default).find_each(start: 0) do
         end
       end
     end
 
     it "should raise an error when start is used with group" do
-      expect { Account.group(:id).find_each(start: 0) }.to raise_error(ArgumentError)
+      expect {
+        Account.group(:id).find_each(start: 0) do
+        end
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -194,8 +217,8 @@ describe ActiveRecord::Base do
   it "should have a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
     expect {
-      User.find_by_sql "SELECT id, name FROM users GROUP BY #{conn.group_by('id', 'name')}"
-      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
+      User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by('id', 'name')}"
+      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by('id', 'name')}"
     }.not_to raise_error
   end
 
@@ -236,7 +259,7 @@ describe ActiveRecord::Base do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.to raise_error # we don't catch the error the last time 
+      }.to raise_error # we don't catch the error the last time
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
@@ -286,12 +309,13 @@ describe ActiveRecord::Base do
       User.create
       User.cache do
         User.first
+
         User.connection.expects(:select).never
         User.first
         User.connection.unstub(:select)
 
         User.create!
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -307,72 +331,8 @@ describe ActiveRecord::Base do
         u2 = User.new
         u2.id = u.id
         expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
-      end
-    end
-  end
-
-  context "add_polymorphs" do
-    class OtherPolymorphyThing; end
-    before :all do
-      # it already has :submission
-      ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
-    end
-    
-    before :once do
-      @conversation = Conversation.create
-      @user = user_model
-      @assignment = assignment_model
-    end
-
-    context "getter" do
-      it "should return the polymorph" do
-        sub = @user.submissions.create!(:assignment => @assignment)
-        m = @conversation.conversation_messages.build
-        m.asset = sub
-
-        expect(m.submission).to be_an_instance_of(Submission)
-      end
-
-      it "should not return the polymorph if the type is wrong" do
-        m = @conversation.conversation_messages.build
-        m.asset = @user.submissions.create!(:assignment => @assignment)
-
-        expect(m.other_polymorphy_thing).to be_nil
-      end
-    end
-
-    context "setter" do
-      it "should set the underlying association" do
-        m = @conversation.conversation_messages.build
-        s = @user.submissions.create!(:assignment => @assignment)
-        m.submission = s
-        
-        expect(m.asset_type).to eql 'Submission'
-        expect(m.asset_id).to eql s.id
-        expect(m.asset).to eql s
-        expect(m.submission).to eql s
-        
-        m.submission = nil
-
-        expect(m.asset_type).to be_nil
-        expect(m.asset_id).to be_nil
-        expect(m.asset).to be_nil
-        expect(m.submission).to be_nil
-      end
-
-      it "should not change the underlying association if it's another object and we're setting nil" do
-        m = @conversation.conversation_messages.build
-        s =  @user.submissions.create!(:assignment => @assignment)
-        m.submission = s
-        m.other_polymorphy_thing = nil
-
-        expect(m.asset_type).to eql 'Submission'
-        expect(m.asset_id).to eql s.id
-        expect(m.asset).to eql s
-        expect(m.submission).to eql s
-        expect(m.other_polymorphy_thing).to be_nil
       end
     end
   end
@@ -393,7 +353,7 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "distinct" do
+  context "distinct_values" do
     before :once do
       User.create()
       User.create()
@@ -403,11 +363,11 @@ describe ActiveRecord::Base do
     end
 
     it "should return distinct values" do
-      expect(User.distinct(:locale)).to eql ["en", "es"]
+      expect(User.distinct_values(:locale)).to eql ["en", "es"]
     end
 
     it "should return distinct values with nil" do
-      expect(User.distinct(:locale, :include_nil => true)).to eql [nil, "en", "es"]
+      expect(User.distinct_values(:locale, include_nil: true)).to eql [nil, "en", "es"]
     end
   end
 
@@ -505,6 +465,26 @@ describe ActiveRecord::Base do
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
     end
+
+    # in rails 4, the where conditions use bind values for association scopes
+    it "should do an update all with a join on associations" do
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'b'}).update_all(:unique_id => 'pa3')
+      expect(@p1.reload.unique_id).to_not eq 'pa3'
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
+      expect(@p1.reload.unique_id).to eq 'pa3'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+    end
+
+    it "should do a delete all with a join on associations" do
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'b'}).delete_all
+      expect(@u1.reload).not_to be_deleted
+      expect(@p1.reload.unique_id).to eq 'pa'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'a'}).delete_all
+      expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(@u1.reload).not_to be_deleted
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+    end
   end
 
   describe "delete_all with_limit" do
@@ -512,9 +492,20 @@ describe ActiveRecord::Base do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
       p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
-      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).delete_all
+      u.pseudonyms.reorder("unique_id DESC").limit(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does offset too" do
+      u = User.create!
+      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
+      p3 = u.pseudonyms.create!(unique_id: 'c', account: Account.default)
+      u.pseudonyms.reorder("unique_id DESC").limit(1).offset(1).delete_all
+      p1.reload
+      expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      p3.reload
     end
   end
 
@@ -533,7 +524,7 @@ describe ActiveRecord::Base do
 
   describe ".polymorphic_where" do
     it "should work" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
@@ -541,7 +532,7 @@ describe ActiveRecord::Base do
     end
 
     it "should work with NULLs" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
@@ -590,10 +581,84 @@ describe ActiveRecord::Base do
   end
 
   describe "callbacks" do
+    before do
+      class MockAccount < Account
+        include RSpec::Matchers
+        before_save do
+          expect(Account.all.to_sql).not_to match /callbacks something/
+          expect(MockAccount.all.to_sql).not_to match /callbacks something/
+          true
+        end
+      end
+    end
+
+    after do
+      Object.send(:remove_const, :MockAccount)
+    end
+
     it "should use default scope" do
-      Account.send(:include, RSpec::Matchers)
-      Account.before_save { expect(Account.scoped.to_sql).not_to match /callbacks something/; true }
-      Account.where(name: 'callbacks something').create!
+      MockAccount.where(name: 'callbacks something').create!
+    end
+  end
+
+  describe "not_recently_touched" do
+    it "should work with joins" do
+      Setting.set('touch_personal_space', '1')
+      group_model
+      expect(@group.users.not_recently_touched.to_a).to be_empty
+    end
+  end
+
+  context "polymorphic associations" do
+    it "allows joins to specific classes" do
+      # no error
+      sql = StreamItem.joins(:discussion_topic).to_sql
+      # and the sql
+      expect(sql).to include('asset_type')
+      expect(sql).to include('DiscussionTopic')
+    end
+
+    it "validates the type field" do
+      si = StreamItem.new
+      si.asset_type = 'Submission'
+      si.data = {}
+      expect(si.valid?).to eq true
+
+      si.context_type = 'User'
+      expect(si.valid?).to eq false
+    end
+
+    it "doesn't allow mismatched assignment" do
+      si = StreamItem.new
+      expect { si.discussion_topic = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
+      expect { si.asset = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
+      si.asset = DiscussionTopic.new
+      si.asset = nil
+    end
+
+    it "has the same backing store for both generic and specific accessors" do
+      si = StreamItem.new
+      dt = DiscussionTopic.new
+      si.discussion_topic = dt
+      expect(si.asset_type).to eq 'DiscussionTopic'
+      expect(si.asset_id).to eq dt.id
+      expect(si.asset.object_id).to eq si.discussion_topic.object_id
+    end
+
+    it "returns nil for the specific type if it's not that type" do
+      si = StreamItem.new
+      si.discussion_topic = DiscussionTopic.new
+      expect(si.conversation).to eq nil
+    end
+
+    it "doesn't ignores specific type if we're setting nil" do
+      si = StreamItem.new
+      dt = DiscussionTopic.new
+      si.discussion_topic = dt
+      si.conversation = nil
+      expect(si.asset).to eq dt
+      si.discussion_topic = nil
+      expect(si.asset).to eq nil
     end
   end
 end

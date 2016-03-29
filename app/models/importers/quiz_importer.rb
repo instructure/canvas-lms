@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require_dependency 'importers'
 
 module Importers
   class QuizImporter < Importer
@@ -160,7 +161,7 @@ module Importers
 
     # Import a quiz from a hash.
     # It assumes that all the referenced questions are already in the database
-    def self.import_from_migration(hash, context, migration=nil, question_data=nil, item=nil, allow_update = false)
+    def self.import_from_migration(hash, context, migration, question_data=nil, item=nil, allow_update = false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
@@ -184,10 +185,7 @@ module Importers
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
 
       missing_links = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
-        missing_links << link if warn == :missing_link
-      end
-
+      item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
 
       %w[
         migration_id
@@ -219,14 +217,6 @@ module Importers
 
       item.saved_by = :migration
       item.save!
-
-      if migration
-        migration.add_missing_content_links(
-          :class => item.class.to_s,
-          :id => item.id, :missing_links => missing_links,
-          :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
-        )
-      end
 
       if question_data
         question_data[:qq_ids] ||= {}
@@ -295,7 +285,7 @@ module Importers
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
 
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item.saved_by = nil
       item
     end

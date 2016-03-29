@@ -38,7 +38,16 @@ describe UsersController do
      tool.resource_selection = {
          :url => "http://#{HostUrl.default_host}/selection_test",
          :selection_width => 400,
-         :selection_height => 400}
+         :selection_height => 400
+     }
+     user_navigation = {
+         :text => 'example',
+         :labels => {
+             'en' => 'English Label',
+             'sp' => 'Spanish Label'
+         }
+     }
+     tool.settings[:user_navigation] = user_navigation
      tool.save!
      tool
    end
@@ -68,6 +77,15 @@ describe UsersController do
 
      get :external_tool, {id:tool.id, user_id:u.id}
      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
+   end
+
+   it "uses localized labels" do
+     u = user(:active_all => true)
+     account.account_users.create!(user: u)
+     user_session(@user)
+
+     get :external_tool, {id:tool.id, user_id:u.id}
+     expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
    end
  end
 
@@ -227,7 +245,7 @@ describe UsersController do
     expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
   end
 
-  context "GET 'delete'" do
+  describe "GET 'delete'" do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
@@ -281,7 +299,7 @@ describe UsersController do
     end
   end
 
-  context "POST 'destroy'" do
+  describe "POST 'destroy'" do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
@@ -385,7 +403,7 @@ describe UsersController do
     end
   end
 
-  context "POST 'create'" do
+  describe "POST 'create'" do
     it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
       expect(response).not_to be_success
@@ -393,16 +411,12 @@ describe UsersController do
 
     context 'self registration' do
       before :each do
-        a = Account.default
-        a.settings = { :self_registration => true }
-        a.save!
+        Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
       end
 
       context 'self registration for observers only' do
         before :each do
-          a = Account.default
-          a.settings[:self_registration_type] = 'observer'
-          a.save!
+          Account.default.canvas_authentication_provider.update_attribute(:self_registration, 'observer')
         end
 
         it "should not allow teachers to self register" do
@@ -450,10 +464,37 @@ describe UsersController do
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
         expect(p.user.associated_accounts).to eq [Account.default]
+        expect(p.user.preferences[:accepted_terms]).to be_truthy
+      end
+
+      it "should mark user as having accepted the terms of use if specified" do
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
+        json = JSON.parse(response.body)
+        accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
+        expect(response).to be_success
+        expect(accepted_terms).to be_present
+        expect(Time.parse(accepted_terms)).to be_within(1.minute).of(Time.now.utc)
+      end
+
+      it "should create a registered user if the skip_registration flag is passed in" do
+        post('create', {
+          :pseudonym => { :unique_id => 'jacob@instructure.com'},
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :skip_registration => '1' }
+        })
+        expect(response).to be_success
+
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
+        expect(p).to be_active
+        expect(p.user).to be_registered
+        expect(p.user.name).to eq 'Jacob Fugal'
+        expect(p.user.communication_channels.length).to eq 1
+        expect(p.user.communication_channels.first).to be_unconfirmed
+        expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
+        expect(p.user.associated_accounts).to eq [Account.default]
       end
 
       it "should complain about conflicting unique_ids" do
-        u = User.create! { |u| u.workflow_state = 'registered' }
+        u = User.create! { |user| user.workflow_state = 'registered' }
         p = u.pseudonyms.create!(:unique_id => 'jacob@instructure.com')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         assert_status(400)
@@ -507,8 +548,17 @@ describe UsersController do
         expect(json["errors"]["user"]["terms_of_use"]).to be_present
       end
 
-      it "should not validate acceptance of the terms if not required" do
+      it "should not validate acceptance of the terms if not required by system" do
         Setting.set('terms_required', 'false')
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
+        expect(response).to be_success
+      end
+
+      it "should not validate acceptance of the terms if not required by account" do
+        default_account = Account.default
+        default_account.settings[:account_terms_required] = false
+        default_account.save!
+
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         expect(response).to be_success
       end
@@ -623,12 +673,13 @@ describe UsersController do
         end
 
         it "should create users with non-email pseudonyms" do
-          post 'create', :format => 'json', :account_id => account.id, :pseudonym => { :unique_id => 'jacob', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' }
+          post 'create', format: 'json', account_id: account.id, pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', integration_id: 'abc', path: '' }, user: { name: 'Jacob Fugal' }
           expect(response).to be_success
           p = Pseudonym.where(unique_id: 'jacob').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
           expect(p.sis_user_id).to eq 'testsisid'
+          expect(p.integration_id).to eq 'abc'
           expect(p.user).to be_pre_registered
         end
 
@@ -658,6 +709,16 @@ describe UsersController do
           expect(u.pseudonym).not_to be_password_auto_generated
         end
 
+        it "should not throw a 500 error without user params'" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, account_id: account.id
+          expect(response).to be_success
+        end
+
+        it "should not throw a 500 error without pseudonym params'" do
+          post 'create', :user => { :name => 'Jacob Fugal' }, account_id: account.id
+          assert_status(400)
+          expect(response).not_to be_success
+        end
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
@@ -707,9 +768,282 @@ describe UsersController do
     end
   end
 
-  context "GET 'grades'" do
+  describe "GET 'grades_for_student'" do
+    let(:test_course) do
+      test_course = course(active_all: true)
+      test_course.root_account.enable_feature!(:multiple_grading_periods)
+      test_course
+    end
+    let(:student) { user(active_all: true) }
+    let!(:student_enrollment) do
+      course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
+    end
+    let(:grading_period_group) { test_course.grading_period_groups.create! }
+    let(:grading_period) do
+      grading_period_group.grading_periods.create!(
+        title: "Some Semester",
+        start_date: 3.months.ago,
+        end_date: 2.months.from_now)
+    end
+    let!(:assignment1) do
+      assignment = assignment_model(course: test_course, due_at: Time.zone.now, points_possible: 10)
+      assignment.grade_student(student, grade: '40%')
+    end
 
-    it "should not include designers in the teacher enrollments" do
+    let!(:assignment2) do
+      assignment = assignment_model(course: test_course, due_at: 3.months.from_now, points_possible: 100)
+      assignment.grade_student(student, grade: '100%')
+    end
+
+    context "as a student" do
+      it "returns the grade and the total for the student, filtered by the grading period" do
+        user_session(student)
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+
+        grading_period.end_date = 4.months.from_now
+        grading_period.save!
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "does not filter the grades by a grading period if " \
+      "'All Grading Periods' is selected" do
+        all_grading_periods_id = 0
+        user_session(student)
+        get('grades_for_student', grading_period_id: all_grading_periods_id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "returns unauthorized if a student is trying to get grades for " \
+      "another student (and is not observing that student)" do
+        snooping_student = user(active_all: true)
+        course_with_user('StudentEnrollment', course: test_course, user: snooping_student, active_all: true)
+        user_session(snooping_student)
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to_not be_ok
+      end
+    end
+
+    context "as an observer" do
+      let(:observer) { user_with_pseudonym(active_all: true) }
+
+      it "returns the grade and the total for a student, filtered by grading period" do
+        student.observers << observer
+        user_session(observer)
+        get('grades_for_student', enrollment_id: student_enrollment.id,
+          grading_period_id: grading_period.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+
+        grading_period.end_date = 4.months.from_now
+        grading_period.save!
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "does not filter the grades by a grading period if " \
+      "'All Grading Periods' is selected" do
+        student.observers << observer
+        all_grading_periods_id = 0
+        user_session(observer)
+        get('grades_for_student', grading_period_id: all_grading_periods_id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "returns unauthorized if the student is not an observee of the observer" do
+        user_session(observer)
+        get('grades_for_student', enrollment_id: student_enrollment.id,
+          grading_period_id: grading_period.id)
+
+        expect(response).to_not be_ok
+      end
+    end
+  end
+
+  describe "GET 'grades'" do
+    context "grading periods" do
+      let(:test_course) { course(active_all: true) }
+      let(:student1) { user(active_all: true) }
+      let(:student2) { user(active_all: true) }
+      let(:grading_period_group) { test_course.grading_period_groups.create! }
+      let!(:grading_period) do
+        grading_period_group.grading_periods.create!(
+          title: "Some Semester",
+          start_date: 3.months.ago,
+          end_date: 2.months.from_now)
+      end
+      context "as an observer" do
+        let(:observer) do
+          observer = user_with_pseudonym(active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student2, active_all: true)
+          student1.observers << observer
+          student2.observers << observer
+          observer
+        end
+
+        context "with Multiple Grading periods disabled" do
+          it "returns grades of observees" do
+            user_session(observer)
+            get 'grades'
+
+            grades = assigns[:grades][:observed_enrollments][test_course.id]
+            expect(grades.length).to eq 2
+            expect(grades.key?(student1.id)).to eq true
+            expect(grades.key?(student2.id)).to eq true
+          end
+
+          it "returns an empty hash for grading periods" do
+            user_session(observer)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods]
+            expect(grading_periods).to be_empty
+          end
+        end
+
+        context "with Multiple Grading Periods enabled" do
+          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+
+          it "returns the grading periods" do
+            user_session(observer)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods][test_course.id][:periods]
+            expect(grading_periods).to include grading_period
+          end
+
+          context "selected_period_id" do
+            it "returns the id of a current grading period, if one " \
+            "exists and no grading period parameter is passed in" do
+              user_session(observer)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq grading_period.id
+            end
+
+            it "returns 0 (signifying 'All Grading Periods') if no current " \
+            "grading period exists and no grading period parameter is passed in" do
+              grading_period.start_date = 1.month.from_now
+              grading_period.save!
+              user_session(observer)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grading_period_id passed in, if one is provided along with a course_id" do
+              user_session(observer)
+              get 'grades', course_id: test_course.id, grading_period_id: 2939
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 2939
+            end
+          end
+        end
+      end
+
+      context "as a student" do
+        let(:another_test_course) { course(active_all: true) }
+        let(:test_student) do
+          student = user(active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
+          course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
+          student
+        end
+        context "with Multiple Grading periods disabled" do
+          it "returns grades" do
+            user_session(test_student)
+            get 'grades'
+
+            grades = assigns[:grades][:student_enrollments]
+
+            expect(grades.length).to eq 2
+            expect(grades.key?(test_course.id)).to eq true
+            expect(grades.key?(another_test_course.id)).to eq true
+          end
+
+          it "returns an empty hash for grading periods" do
+            user_session(test_student)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods]
+            expect(grading_periods).to be_empty
+          end
+        end
+
+        context "with Multiple Grading Periods enabled" do
+          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+
+          it "returns the grading periods" do
+            user_session(test_student)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods][test_course.id][:periods]
+            expect(grading_periods).to include grading_period
+          end
+
+          context "selected_period_id" do
+            it "returns the id of a current grading period, if one " \
+            "exists and no grading period parameter is passed in" do
+              user_session(test_student)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq grading_period.id
+            end
+
+            it "returns 0 (signifying 'All Grading Periods') if no current " \
+            "grading period exists and no grading period parameter is passed in" do
+              grading_period.start_date = 1.month.from_now
+              grading_period.save!
+              user_session(test_student)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grading_period_id passed in, if one is provided along with a course_id" do
+              user_session(test_student)
+              get 'grades', course_id: test_course.id, grading_period_id: 2939
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 2939
+            end
+          end
+        end
+      end
+    end
+
+    it "does not include designers in the teacher enrollments" do
       # teacher needs to be in two courses to get to the point where teacher
       # enrollments are queried
       @course1 = course(:active_all => true)
@@ -731,11 +1065,11 @@ describe UsersController do
       expect(teachers).not_to be_include(@designer)
     end
 
-    it "should not redirect to an observer enrollment with no observee" do
+    it "does not redirect to an observer enrollment with no observee" do
       @course1 = course(:active_all => true)
       @course2 = course(:active_all => true)
       @user = user(:active_all => true)
-      @course1.enroll_user(@user, 'ObserverEnrollment').accept!
+      @course1.enroll_user(@user, 'ObserverEnrollment')
       @course2.enroll_student(@user).accept!
 
       user_session(@user)
@@ -743,7 +1077,7 @@ describe UsersController do
       expect(response).to redirect_to course_grades_url(@course2)
     end
 
-    it "should not include student view students in the grade average calculation" do
+    it "does not include student view students in the grade average calculation" do
       course_with_teacher_logged_in(:active_all => true)
       course_with_teacher(:active_all => true, :user => @teacher)
       @s1 = student_in_course(:active_user => true).user
@@ -955,6 +1289,17 @@ describe UsersController do
     end
   end
 
+  describe "PUT 'update'" do
+    it "does not leak information about arbitrary users" do
+      other_user = User.create! :name => 'secret'
+      user_with_pseudonym
+      user_session(@user)
+      put 'update', :id => other_user.id, :format => 'json'
+      expect(response.body).not_to include 'secret'
+      expect(response.status).to eq 401
+    end
+  end
+
   describe "POST 'masquerade'" do
     specs_require_sharding
 
@@ -1005,26 +1350,6 @@ describe UsersController do
 
         expect(admin.associated_shards(:shadow)).not_to be_include(@shard1)
       end
-    end
-  end
-
-  describe "oauth_success" do
-    it "should use the access token to get user info" do
-
-      user_with_pseudonym
-      admin = @user
-      user_session(admin)
-
-      mock_oauth_request = stub(token: 'token', secret: 'secret', original_host_with_port: 'test.host', user: @user, return_url: '/')
-      OauthRequest.expects(:where).with(token: 'token', service: 'google_docs').returns(stub(first: mock_oauth_request))
-
-      mock_access_token = stub(token: '123', secret: 'abc')
-      GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
-      mock_google_docs = stub()
-      GoogleDocs::Connection.expects(:new).with('token', 'secret').returns(mock_google_docs)
-      mock_google_docs.expects(:get_service_user_info).with(mock_access_token)
-
-      get 'oauth_success', {oauth_token: 'token', service: 'google_docs', oauth_verifier: 'oauth_verifier'}, {host_with_port: 'test.host'}
     end
   end
 
@@ -1092,9 +1417,7 @@ describe UsersController do
 
   describe "login hooks" do
     before :each do
-      a = Account.default
-      a.settings = { :self_registration => true }
-      a.save!
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
     it "should hook on new" do
@@ -1117,7 +1440,23 @@ describe UsersController do
 
       get 'teacher_activity', user_id: @teacher.id, course_id: @course.id
 
-      expect(assigns[:courses][@course][0]['last_interaction']).not_to be_nil
+      expect(assigns[:courses][@course][0][:last_interaction]).not_to be_nil
+    end
+  end
+
+  describe '#toggle_recent_activity_dashboard' do
+    it 'updates user preference based on value provided' do
+      course
+      user(active_all: true)
+      user_session(@user)
+
+      expect(@user.preferences[:recent_activity_dashboard]).to be_falsy
+
+      post :toggle_recent_activity_dashboard
+
+      expect(@user.reload.preferences[:recent_activity_dashboard]).to be_truthy
+      expect(response).to be_success
+      expect(JSON.parse(response.body)).to be_empty
     end
   end
 end

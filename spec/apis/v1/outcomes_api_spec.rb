@@ -647,7 +647,7 @@ describe "Outcomes API", type: :request do
 
     describe "update" do
       context "mastery calculations" do
-        context "not allow updating calculation options after being used for assessing" do
+        context "not allow updating the outcome after being used for assessing" do
           before :each do
             expect(@outcome).not_to be_assessed
 
@@ -666,6 +666,31 @@ describe "Outcomes API", type: :request do
             # the things our tests expect to be true
             expect(@outcome.calculation_method).to eq('decaying_average')
             expect(@outcome.calculation_int).to eq(62)
+          end
+
+          let(:update_outcome_api) do
+            ->(attrs) do
+              api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                     { :controller => 'outcomes_api',
+                       :action => 'update',
+                       :id => @outcome.id.to_s,
+                       :format => 'json' },
+                     attrs, {},
+                     { :expected_status => 400 })
+            end
+          end
+
+          let(:update_hash) do
+            {
+              title: "Here I am",
+              display_name: "Rock you like a hurricane",
+              description: "Winds of Change",
+              vendor_guid: "Eye of the Tiger",
+              calculation_method: "n_mastery",
+              calculation_int: "2",
+              mastery_points: "4",
+              ratings: "none",
+            }
           end
 
           it "should not allow updating calculation method after being used for assessing" do
@@ -712,34 +737,49 @@ describe "Outcomes API", type: :request do
             expect(@outcome.calculation_int).to eq(62)
           end
 
-          it "should return a sensible error message for updating an assessed outcome" do
-            expect(@outcome).to be_assessed
-            expect(@outcome.calculation_method).to eq('decaying_average')
-            expect(@outcome.calculation_int).to eq(62)
+          %w[null not_null].each do |context_type|
+            context "rejecting parameters with #{context_type} data" do
+              def setup_for_context_type(ct)
+                case ct
+                when "null"
+                  @outcome.data = nil
+                when "not_null"
+                  @outcome.rubric_criterion = {
+                    description: "Thoughtful description",
+                    mastery_points: 5,
+                    ratings: [
+                      {
+                        description: "Strong work",
+                        points: 5
+                      },
+                      {
+                        description: "Weak sauce",
+                        points: 1
+                      }
+                    ],
+                  }
+                end
+                @outcome.save!
+              end
 
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                     { :controller => 'outcomes_api',
-                       :action => 'update',
-                       :id => @outcome.id.to_s,
-                       :format => 'json' },
-                     { :title => "New Title",
-                       :description => "New Description",
-                       :vendor_guid => "vendorguid9000",
-                       :calculation_method => 'n_mastery',
-                       :calculation_int => "5" },
-                     {},
-                     { :expected_status => 400 })
+              before :each do
+                setup_for_context_type(context_type)
+              end
 
-            @outcome.reload
-            expect(json).not_to eq(outcome_json) # it should be filled with an error
-            expect(@outcome.calculation_method).to eq('decaying_average')
-            expect(@outcome.calculation_int).to eq(62)
-            expect(json["errors"]).not_to be_nil
-            expect(json["errors"]["calculation_method"]).not_to be_nil
-            expect(json["errors"]["calculation_int"]).not_to be_nil
-            expect(json["errors"].except("calculation_method", "calculation_int")).to be_empty
-            expect(json["errors"]["calculation_method"][0]["message"]).to include("outcome has been used to assess a student")
-            expect(json["errors"]["calculation_int"][0]["message"]).to include("outcome has been used to assess a student")
+              it "rejects all parameters changed after being used for assessing" do
+                json = update_outcome_api.call(update_hash)
+                expect(json["errors"]).not_to be_nil
+                expect(json["errors"]).to match(/outcome.*assess/)
+              end
+
+              %w[title display_name description vendor_guid calculation_method calculation_int mastery_points ratings].each do |attr|
+                it "rejects a change to #{attr} after being used to assess a student" do
+                  json = update_outcome_api.call({ attr => "Test value" })
+                  expect(json["errors"]).not_to be_nil
+                  expect(json["errors"]).to match(/outcome.*assess/)
+                end
+              end
+            end
           end
         end
       end

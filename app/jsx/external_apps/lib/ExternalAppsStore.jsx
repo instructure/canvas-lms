@@ -1,5 +1,3 @@
-/** @jsx */
-
 define([
   'i18n!external_tools',
   'jquery',
@@ -56,7 +54,7 @@ define([
 
   store.fetchWithDetails = function(tool) {
     if (tool.app_type === 'ContextExternalTool') {
-      return $.getJSON('/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id);
+      return $.getJSON('/api/v1/' + tool.context.toLowerCase() + 's/' + tool.context_id + '/external_tools/' + tool.app_id);
     } else {
       // DOES NOT EXIST YET
       return $.getJSON('/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id);
@@ -107,6 +105,37 @@ define([
       error: this._deleteErrorHandler.bind(this)
     });
   };
+
+  function handleToolUpdate (tool, dismiss=false) {
+    if (tool.app_type === 'ContextExternalTool') {
+      // we dont support LTI 1
+      return;
+    }
+
+    var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id + '/update',
+        errorHandler = dismiss ? this._dismissUpdateErrorHandler : this._acceptUpdateErrorHandler;
+    tool.has_update = false;
+    this.setState({ externalTools: sort(this.getState().externalTools) });
+
+    $.ajax({
+      url: url,
+      type: dismiss ? 'DELETE' : 'PUT',
+      success: this._genericSuccessHandler.bind(this),
+      error: errorHandler.bind(this)
+    });
+  }
+
+  store.acceptUpdate = function(tool) {
+    handleToolUpdate.call(this, tool);
+  };
+
+  store.dismissUpdate = function(tool) {
+    handleToolUpdate.call(this, tool, true);
+  };
+
+  store.triggerUpdate = function () {
+    this.setState({ externalTools: sort(this.getState().externalTools) });
+  }
 
   store.activate = function(tool, success, error) {
     var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
@@ -220,12 +249,22 @@ define([
     });
   };
 
-  store._deleteSuccessHandler = function() {
+  store._genericSuccessHandler = store._deleteSuccessHandler = function() {
     // noop
   };
 
   store._deleteErrorHandler = function() {
     $.flashError(I18n.t('Unable to remove app'));
+    this.fetch({ force: true });
+  };
+
+  store._acceptUpdateErrorHandler = function() {
+    $.flashError(I18n.t('Unable to accept update'));
+    this.fetch({ force: true });
+  };
+
+  store._dismissUpdateErrorHandler = function() {
+    $.flashError(I18n.t('Unable to dismiss update'));
     this.fetch({ force: true });
   };
 

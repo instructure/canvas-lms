@@ -93,13 +93,12 @@ class SubmissionsController < ApplicationController
 
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    if authorized_action(@assignment, @current_user, :grade)
-      if params[:zip]
-        generate_submission_zip(@assignment, @context)
-      else
-        respond_to do |format|
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-        end
+    return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)
+    if params[:zip]
+      generate_submission_zip(@assignment, @context)
+    else
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
       end
     end
   end
@@ -112,7 +111,7 @@ class SubmissionsController < ApplicationController
       id = @current_user.try(:id)
     end
     @user = @context.all_students.find(params[:id]) rescue nil
-    if !@user
+    unless @user
       flash[:error] = t('errors.student_not_enrolled', "The specified user is not a student in this course")
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
@@ -127,6 +126,9 @@ class SubmissionsController < ApplicationController
 
     @submission = @assignment.submissions.where(user_id: @user).first
     @submission ||= @assignment.submissions.build(:user => @user)
+    if @assignment.moderated_grading?
+      @crocodoc_ids = @submission.crocodoc_whitelist
+    end
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
     # can't just check the permission, because peer reviewiers can never read the grade
@@ -169,7 +171,7 @@ class SubmissionsController < ApplicationController
           end
         elsif params[:download]
           if params[:comment_id]
-            @attachment = @submission.submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
+            @attachment = @submission.all_submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
           else
             @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
             prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
@@ -194,7 +196,7 @@ class SubmissionsController < ApplicationController
           @submission.limit_comments(@current_user, session)
           format.html
         end
-        if !json_handled
+        unless json_handled
           format.json {
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
@@ -493,10 +495,9 @@ class SubmissionsController < ApplicationController
 
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = google_service_connection
-
     # since google drive can have many different export types, we need to send along our preferred extensions
-    document_response, display_name, file_extension = google_docs.download(document_id, @assignment.allowed_extensions)
+    document_response, display_name, file_extension, content_type = google_drive_connection.download(document_id,
+                                                                                         @assignment.allowed_extensions)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
@@ -523,7 +524,7 @@ class SubmissionsController < ApplicationController
       end
 
       @attachment = @assignment.attachments.new(
-        uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
+        uploaded_data: Rack::Test::UploadedFile.new(path, content_type, true),
         display_name: display_name, user: @current_user
       )
       @attachment.save!
@@ -539,7 +540,11 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
+      if (report_url = @submission.turnitin_data[@asset_string] && @submission.turnitin_data[@asset_string][:report_url])
+        url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+      else
+        url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
+      end
       if url
         redirect_to url
       else
@@ -570,6 +575,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
     @submission = @assignment.find_or_create_submission(@user)
+    provisional = @assignment.moderated_grading? && params[:submission][:provisional]
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
@@ -598,7 +604,9 @@ class SubmissionsController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && admin_in_context
+          :hidden => @assignment.muted? && admin_in_context,
+          :provisional => provisional,
+          :final => params[:submission][:final]
         }
       end
       begin
@@ -609,8 +617,13 @@ class SubmissionsController < ApplicationController
       end
       respond_to do |format|
         if @submissions
-          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit) }
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
+          is_final = provisional && params[:submission][:final] && @context.grants_right?(@current_user, :moderate_grades)
+          @submissions.each do |s|
+            s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit)
+            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user, final: is_final)) if provisional
+          end
+
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
 
           format.html { redirect_to course_assignment_url(@context, @assignment) }
@@ -620,6 +633,7 @@ class SubmissionsController < ApplicationController
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
+          json_args[:methods] << :provisional_grade_id if provisional
           format.json {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }

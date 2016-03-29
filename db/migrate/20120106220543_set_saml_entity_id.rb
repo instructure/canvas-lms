@@ -1,4 +1,6 @@
 class SetSamlEntityId < ActiveRecord::Migration
+  tag :predeploy
+
 
   # Sets all existing SAML configs to be what is currently in the config so they won't break
   # If there is no config use the host of the account

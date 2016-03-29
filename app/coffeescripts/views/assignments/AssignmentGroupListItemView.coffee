@@ -3,6 +3,7 @@ define [
   'jquery'
   'underscore'
   'compiled/class/cache'
+  'compiled/util/hasLocalStorage'
   'compiled/views/DraggableCollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
@@ -12,7 +13,7 @@ define [
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, $, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
+], (I18n, $, _, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin
@@ -129,7 +130,7 @@ define [
 
     initCache: ->
       $.extend true, @, Cache
-      @cache.use('localStorage')
+      @cache.use('localStorage') if hasLocalStorage
       key = @cacheKey()
       if !@cache.get(key)?
         @cache.set(key, true)
@@ -204,19 +205,21 @@ define [
 
       results
 
-    search: (regex) ->
+    search: (regex, gradingPeriod) ->
       @resetBorders()
+      assignmentCount = @collection.reduce( (count, as) =>
+        count++ if as.search(regex, gradingPeriod)
+        count
+      , 0)
 
-      atleastone = false
-      @collection.each (as) =>
-        atleastone = true if as.search(regex)
+      atleastone = assignmentCount > 0
       if atleastone
         @show()
         @expand(false)
         @borderFix()
       else
         @hide()
-      atleastone
+      assignmentCount
 
     endSearch: ->
       @resetBorders()
@@ -280,7 +283,6 @@ define [
 
     showAccessibilityWarning: (ev) =>
       @$accessibilityWarning.removeClass('screenreader-only')
-      @$accessibilityWarning.focus()
 
     hideAccessibilityWarning: (ev) =>
       @$accessibilityWarning.addClass('screenreader-only')

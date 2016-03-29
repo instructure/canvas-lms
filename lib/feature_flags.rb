@@ -60,7 +60,7 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag', self.class.name, self.global_id, feature.to_s].cache_key
+    ['feature_flag2', self.class.name, self.global_id, feature.to_s].cache_key
   end
 
   # return the feature flag for the given feature that is defined on this object, if any.
@@ -68,9 +68,8 @@ module FeatureFlags
   def feature_flag(feature)
     self.shard.activate do
       result = MultiCache.fetch(feature_flag_cache_key(feature)) do
-        self.feature_flags.where(feature: feature.to_s).first || :nil
+        self.feature_flags.where(feature: feature.to_s).first
       end
-      result = nil if result == :nil
       result
     end
   end
@@ -79,12 +78,13 @@ module FeatureFlags
   # starting with site admin
   def feature_flag_account_ids
     Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
-      parent = if self.is_a?(Course)
-                 self.account
-               elsif self.is_a?(Account)
-                 self.parent_account
-               end
-      (parent ? parent.account_chain(include_site_admin: true).reverse : [Account.site_admin]).map(&:global_id)
+      if is_a?(User)
+        chain = [Account.site_admin]
+      else
+        chain = account_chain(include_site_admin: true)
+        chain.shift if is_a?(Account)
+      end
+      chain.reverse.map(&:global_id)
     end
   end
 

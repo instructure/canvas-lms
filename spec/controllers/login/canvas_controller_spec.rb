@@ -17,6 +17,7 @@
 #
 
 require_relative '../../sharding_spec_helper'
+require 'rotp'
 
 describe Login::CanvasController do
   before :once do
@@ -121,11 +122,11 @@ describe Login::CanvasController do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)
       @pseudonym.update_attribute(:sis_user_id, '12345')
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.
           with('username', 'password').
           returns([{ 'uid' => ['12345'] }])
-      Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       expect(response).to be_redirect
@@ -135,11 +136,35 @@ describe Login::CanvasController do
 
     it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       assert_status(400)
       expect(response).to render_template(:new)
+    end
+
+    it "doesn't query the server at all if the enabled features don't require it, and there is no matching login" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      ap.any_instantiation.expects(:ldap_bind_result).never
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      assert_status(400)
+      expect(response).to render_template(:new)
+    end
+
+    it "provisions automatically when enabled" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap', jit_provisioning: true)
+      ap.any_instantiation.expects(:ldap_bind_result).once.
+          with('username', 'password').
+          returns([{ 'uid' => ['12345'] }])
+      unique_id = 'username'
+      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+
+      p = Account.default.pseudonyms.active.by_unique_id(unique_id).first!
+      expect(p.authentication_provider).to eq ap
     end
   end
 

@@ -24,12 +24,15 @@ module SIS
     def process(messages, updates_every)
       start = Time.now
       i = Work.new(@batch, @root_account, @logger, updates_every, messages)
-      Enrollment.suspend_callbacks(:belongs_to_touch_after_save_or_destroy_for_course, :update_cached_due_dates) do
-        User.skip_updating_account_associations do
-          Enrollment.process_as_sis(@sis_options) do
-            yield i
-            while i.any_left_to_process?
-              i.process_batch
+
+      Enrollment.skip_touch_callbacks(:course) do
+        Enrollment.suspend_callbacks(:update_cached_due_dates) do
+          User.skip_updating_account_associations do
+            Enrollment.process_as_sis(@sis_options) do
+              yield i
+              while i.any_left_to_process?
+                i.process_batch
+              end
             end
           end
         end
@@ -41,7 +44,7 @@ module SIS
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
       i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Course.where(:id => batch).update_all(:updated_at => Time.now.utc)
+        Course.where(id: batch).touch_all
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
         batch.each do |course_id|
@@ -53,7 +56,7 @@ module SIS
       i.incrementally_update_account_associations
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
-        User.where(:id => batch).update_all(:updated_at => Time.now.utc)
+        User.where(id: batch).touch_all
       end
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
@@ -86,12 +89,34 @@ module SIS
         @success_count = 0
       end
 
-      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
-        raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
-        raise ImportError, "No user_id given for an enrollment" if user_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
+      # This method signature is deprecated:
+      # add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
+      # Pass a single instance of SIS::Models::Enrollment instead
+      def add_enrollment(*enrollment_data)
+        if enrollment_data.length == 1
+          enrollment = enrollment_data.first
+        else
+          enrollment = SIS::Models::Enrollment.new(
+              {
+                  course_id: enrollment_data[0],
+                  section_id: enrollment_data[1],
+                  user_id: enrollment_data[2],
+                  role: enrollment_data[3],
+                  status: enrollment_data[4],
+                  start_date: enrollment_data[5],
+                  end_date: enrollment_data[6],
+                  associated_user_id: enrollment_data[7],
+                  root_account_id: enrollment_data[8],
+                  role_id: enrollment_data[9]
+              }
+          )
+        end
 
-        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, role_id, status, start_date, end_date, associated_user_id, root_account_id]
+        raise ImportError, "No course_id or section_id given for an enrollment" unless enrollment.valid_context?
+        raise ImportError, "No user_id given for an enrollment" unless enrollment.valid_user?
+        raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
+
+        @enrollment_batch << enrollment
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -108,8 +133,9 @@ module SIS
           enrollment = nil
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
-            @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment
+            enrollment_array = enrollment.to_a
+            @logger.debug("Processing Enrollment #{enrollment_array.inspect}")
+            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment_array
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -127,10 +153,17 @@ module SIS
             else
               root_account = @root_account
             end
-            pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
+
+            if !enrollment.user_integration_id.blank?
+              pseudo = root_account.pseudonyms.where(integration_id: enrollment.user_integration_id).first
+            else
+              pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
+            end
 
             unless pseudo
-              @messages << "User #{user_id} didn't exist for user enrollment"
+              err = "User not found for enrollment "
+              err << "(User ID: #{user_id}, Course ID: #{course_id}, Section ID: #{section_id})"
+              @messages << err
               next
             end
 
@@ -144,8 +177,10 @@ module SIS
 
             @course ||= @root_account.all_courses.where(sis_source_id: course_id).first unless course_id.blank?
             @section ||= @root_account.course_sections.where(sis_source_id: section_id).first unless section_id.blank?
-            unless (@course || @section)
-              @messages << "Neither course #{course_id} nor section #{section_id} existed for user enrollment"
+            if @course.nil? && @section.nil?
+              message = "Neither course nor section existed for user enrollment "
+              message << "(Course ID: #{course_id}, Section ID: #{section_id}, User ID: #{user_id})"
+              @messages << message
               next
             end
 
@@ -244,6 +279,7 @@ module SIS
               enrollment.workflow_state = 'deleted'
             elsif status =~ /\Acompleted/i
               enrollment.workflow_state = 'completed'
+              enrollment.completed_at ||= Time.now
             elsif status =~ /\Ainactive/i
               enrollment.workflow_state = 'inactive'
             end

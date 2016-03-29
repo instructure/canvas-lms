@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,7 @@
 #
 
 begin
-  require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+  require 'byebug'
 rescue LoadError
 end
 
@@ -28,39 +28,65 @@ RSpec.configure do |c|
   c.color = true
 
   c.around(:each) do |example|
-    attempts = 0
-    begin
-      Timeout::timeout(180) {
-        example.run
-      }
-      if ENV['AUTORERUN']
-        e = @example.instance_variable_get('@exception')
-        if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
-          puts "FAILURE: #{@example.description} \n #{e}".red
-          puts "RETRYING: #{@example.description}".yellow
-          @example.instance_variable_set('@exception', nil)
-          redo
-        elsif e.nil? && attempts != 0
-          puts "SUCCESS: retry passed for \n #{@example.description}".green
-        end
-      end
-    end until true
+    Timeout::timeout(180) do
+      Rails.logger.info "STARTING SPEC #{example.full_description}"
+      example.run
+    end
   end
-end
-
-begin
-  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
-rescue LoadError;
 end
 
 ENV["RAILS_ENV"] = 'test'
 
+if ENV['COVERAGE'] == "1"
+  puts "Code Coverage enabled"
+  require 'coverage_tool'
+  CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
+end
+
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
+
+# ensure people aren't creating records outside the rspec lifecycle, e.g.
+# inside a describe/context block rather than a let/before/example
+require_relative 'support/blank_slate_protection'
+BlankSlateProtection.enable!
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+module RSpec::Core::Hooks
+class AfterContextHook < Hook
+  def run(example)
+    exception_class = if defined?(RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue)
+                        RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue
+                      else
+                        Exception
+                      end
+    example.instance_exec(example, &block)
+  rescue exception_class => e
+    # TODO: Come up with a better solution for this.
+    RSpec.configuration.reporter.message <<-EOS
+An error occurred in an `after(:context)` hook.
+  #{e.class}: #{e.message}
+  occurred at #{e.backtrace.join("\n")}
+    EOS
+  end
+end
+end
+
+Time.class_eval do
+  def compare_with_round(other)
+    other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
+    Time.at(self.to_i, self.usec).compare_without_round(other)
+  end
+  alias_method :compare_without_round, :<=>
+  alias_method :<=>, :compare_with_round
+end
+
+# temporary patch to keep things sane
+# TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
+ActiveSupport::Deprecation.silenced = true
 
 module RSpec::Rails
   module ViewExampleGroup
@@ -91,12 +117,17 @@ module RSpec::Rails
           attr_accessor :real_controller
 
           controller_class._helper_methods.each do |helper|
-            delegate helper, :to => :real_controller
+            class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def #{helper}(*args, &block)
+              real_controller.send(:#{helper}, *args, &block)
+            end
+            RUBY
           end
         end
 
         real_controller = controller_class.new
         real_controller.instance_variable_set(:@_request, @controller.request)
+        real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
         @controller.real_controller = real_controller
 
         # just calling "render 'path/to/view'" by default looks for a partial
@@ -111,39 +142,9 @@ module RSpec::Rails
     end
   end
 
-  module Matchers
-    class HaveTag
-      include ActionDispatch::Assertions::SelectorAssertions
-      include Test::Unit::Assertions
-
-      def initialize(expected)
-        @expected = expected
-      end
-
-      def matches?(html, &block)
-        @selected = [HTML::Document.new(html).root]
-        assert_select(*@expected, &block)
-        return !@failed
-      end
-
-      def assert(val, msg=nil)
-        unless !!val
-          @msg = msg
-          @failed = true
-        end
-      end
-
-      def failure_message
-        @msg
-      end
-
-      def failure_message_when_negated
-        @msg
-      end
-    end
-
-    def have_tag(*args)
-      HaveTag.new(args)
+  RSpec::Matchers.define :have_tag do |expected|
+    match do |actual|
+      !!Nokogiri::HTML(actual).at_css(expected)
     end
   end
 end
@@ -165,24 +166,16 @@ Mocha::ObjectMethods.instance_methods.each do |m|
   RUBY
 end
 
-Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
+Dir.glob(factories).each { |file| require file }
+
+examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
+Dir.glob(examples).each { |file| require file }
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
     skip ('PENDING: Bullet')
   end
-end
-
-def require_webmock
-  # pull in webmock for selected tests, but leave it disabled by default.
-  # funky require order is to skip typhoeus because of an incompatibility
-  # see: https://github.com/typhoeus/typhoeus/issues/196
-  require 'webmock/util/version_checker'
-  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
-  require 'webmock/http_lib_adapters/http_lib_adapter'
-  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
-  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
-  require 'webmock/rspec'
 end
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
@@ -224,13 +217,17 @@ def truncate_all_tables
   model_connections.each do |connection|
     if connection.adapter_name == "PostgreSQL"
       # use custom SQL to exclude tables from extensions
+      schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT tablename
-         FROM pg_tables
-         WHERE schemaname = ANY (current_schemas(false)) AND NOT tablename IN (
-           SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
-         )
+         SELECT relname
+         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+           AND relkind='r'
+           AND NOT EXISTS (
+             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
+           )
       SQL
+      table_names.delete('schema_migrations')
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       connection.tables.each { |model| truncate_table(model) }
@@ -325,17 +322,6 @@ module Helpers
   end
 end
 
-# Make sure extensions will work with dynamically created shards
-if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
-    ActiveRecord::Base.connection.schema_search_path == 'public'
-  Canvas.possible_postgres_extensions.each do |extension|
-    current_schema = ActiveRecord::Base.connection.select_value("SELECT nspname FROM pg_extension INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid WHERE extname='#{extension}'")
-    if current_schema && current_schema == 'public'
-      ActiveRecord::Base.connection.execute("ALTER EXTENSION #{extension} SET SCHEMA pg_catalog") rescue nil
-    end
-  end
-end
-
 RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -344,6 +330,8 @@ RSpec.configure do |config|
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
   config.infer_spec_type_from_file_location!
+
+  config.order = :random
 
   config.include Helpers
 
@@ -383,6 +371,11 @@ RSpec.configure do |config|
     Account.clear_special_account_cache!(true)
     Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
+    # silence migration specs
+    ActiveRecord::Migration.verbose = false
+
+    # allow tests to still run in non-DA state even though it's hard-coded on
+    Feature.definitions["differentiated_assignments"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
@@ -398,6 +391,7 @@ RSpec.configure do |config|
     Time.zone = 'UTC'
     LoadAccount.force_special_account_reload = true
     Account.clear_special_account_cache!(true)
+    PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
@@ -412,6 +406,39 @@ RSpec.configure do |config|
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
     $spec_api_tokens = {}
+  end
+
+  config.before :suite do
+    BlankSlateProtection.disable!
+
+    if ENV['TEST_ENV_NUMBER'].present?
+      Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
+    end
+
+    if ENV['COVERAGE'] == "1"
+      # do this in a hook so that results aren't clobbered under test-queue
+      # (it forks and changes the TEST_ENV_NUMBER)
+      SimpleCov.command_name("rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}")
+    end
+  end
+
+  # this runs on post-merge builds to capture dependencies of each spec;
+  # we then use that data to run just the bare minimum subset of selenium
+  # specs on the patchset builds
+  if ENV["SELINIMUM_CAPTURE"]
+    require "selinimum"
+
+    config.before :suite do
+      Selinimum::Capture.install!
+    end
+
+    config.before do |example|
+      Selinimum::Capture.current_example = example
+    end
+
+    config.after :suite do
+      Selinimum::Capture.report!(ENV["SELINIMUM_BATCH_NAME"])
+    end
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -434,295 +461,13 @@ RSpec.configure do |config|
     Canvas.redis_used = false
   end
 
-  def account_with_cas(opts={})
-    @account = opts[:account]
-    @account ||= Account.create!
-    config = AccountAuthorizationConfig::CAS.new
-    cas_url = opts[:cas_url] || "https://localhost/cas"
-    config.auth_type = "cas"
-    config.auth_base = cas_url
-    config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    @account.account_authorization_configs << config
-    @account
-  end
-
-  def account_with_saml(opts={})
-    @account = opts[:account]
-    @account ||= Account.create!
-    config = AccountAuthorizationConfig::SAML.new
-    config.auth_type = "saml"
-    config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-    config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
-    @account.account_authorization_configs << config
-    @account
-  end
-
-  def grading_periods(opts = {})
-    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-    ctx = opts[:context] || @course || course
-    count = opts[:count] || 2
-
-    gpg = ctx.grading_period_groups.create!
-    now = Time.zone.now
-    count.times.map { |n|
-      gpg.grading_periods.create! start_date: n.months.since(now),
-        end_date: (n+1).months.since(now),
-        weight: 1
-    }
-  end
-
-  def course(opts={})
-    account = opts[:account] || Account.default
-    account.shard.activate do
-      @course = Course.create!(:name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
-      @course.offer! if opts[:active_course] || opts[:active_all]
-      if opts[:active_all]
-        u = User.create!
-        u.register!
-        e = @course.enroll_teacher(u)
-        e.workflow_state = 'active'
-        e.save!
-        @teacher = u
-      end
-      if opts[:differentiated_assignments]
-        account.allow_feature!(:differentiated_assignments)
-        @course.enable_feature!(:differentiated_assignments)
-      end
-      create_grading_periods_for(@course, opts) if opts[:grading_periods]
-    end
-    @course
-  end
-
-  def create_grading_periods_for(context, opts={})
-    opts = { mgp_flag_enabled: true }.merge(opts)
-    context.root_account = Account.default if !context.root_account
-    context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
-    gp_group = context.grading_period_groups.create!
-    class_name = context.class.name.demodulize
-    periods = opts[:grading_periods] || [:current]
-    periods.each.with_index(1) do |timeframe, index|
-      cutoff_dates = {
-        current: { start_date: index.months.ago,
-                   end_date: index.months.from_now },
-        old:     { start_date: (index + 1).months.ago,
-                   end_date: index.months.ago },
-        future:  { start_date: index.months.from_now,
-                   end_date: (index + 1).months.from_now }
-      }
-      period_params = cutoff_dates[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
-      new_period = gp_group.grading_periods.create!(period_params)
-      new_period[:workflow_state] = 'active'
-      new_period.save!
-    end
-    gp_group.grading_periods
-  end
-
-  def account_with_role_changes(opts={})
-    account = opts[:account] || Account.default
-    if opts[:role_changes]
-      opts[:role_changes].each_pair do |permission, enabled|
-        role = opts[:role] || admin_role
-        if ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first
-          ro.update_attribute(:enabled, enabled)
-        else
-          account.role_overrides.create(:permission => permission.to_s, :enabled => enabled, :role => role)
-        end
-      end
-    end
-    RoleOverride.clear_cached_contexts
-  end
-
-  def account_admin_user_with_role_changes(opts={})
-    account_with_role_changes(opts)
-    account_admin_user(opts)
-  end
-
-  def account_admin_user(opts={})
-    opts = { active_user: true }.merge(opts)
-    account = opts[:account] || Account.default
-    create_grading_periods_for(account, opts) if opts[:grading_periods]
-    @user = opts[:user] || account.shard.activate { user(opts) }
-    @admin = @user
-
-    account.account_users.create!(:user => @user, :role => opts[:role])
-    @user
-  end
-
-  def site_admin_user(opts={})
-    account_admin_user(opts.merge(account: Account.site_admin))
-  end
-
-  def user(opts={})
-    @user = User.create!(opts.slice(:name, :short_name))
-    if opts[:active_user] || opts[:active_all]
-      @user.accept_terms
-      @user.register!
-    end
-    @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
-    @user
-  end
-
-  def user_with_pseudonym(opts={})
-    user(opts) unless opts[:user]
-    user = opts[:user] || @user
-    @pseudonym = pseudonym(user, opts)
-    user
-  end
-
-  def communication_channel(user, opts={})
-    username = opts[:username] || "nobody@example.com"
-    @cc = user.communication_channels.create!(:path_type => 'email', :path => username) do |cc|
-      cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
-      cc.workflow_state = opts[:cc_state] if opts[:cc_state]
-    end
-    @cc
-  end
-
-  def user_with_communication_channel(opts={})
-    user(opts) unless opts[:user]
-    user = opts[:user] || @user
-    @cc = communication_channel(user, opts)
-    user
-  end
-
-  def pseudonym(user, opts={})
-    @spec_pseudonym_count ||= 0
-    username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
-    opts[:username] ||= username
-    @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
-    password = opts[:password] || "asdfasdf"
-    password = nil if password == :autogenerate
-    account = opts[:account] || Account.default
-    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
-    @pseudonym.save_without_session_maintenance
-    @pseudonym.communication_channel = communication_channel(user, opts)
-    @pseudonym
-  end
-
-  def managed_pseudonym(user, opts={})
-    other_account = opts[:account] || account_with_saml
-    if other_account.password_authentication?
-      config = other_account.account_authorization_configs.build
-      config.auth_type = "saml"
-      config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
-      config.save!
-    end
-    opts[:account] = other_account
-    pseudonym(user, opts)
-    @pseudonym.sis_user_id = opts[:sis_user_id] || "U001"
-    @pseudonym.save!
-    @pseudonym
-  end
-
-  def user_with_managed_pseudonym(opts={})
-    user(opts) unless opts[:user]
-    user = opts[:user] || @user
-    managed_pseudonym(user, opts)
-    user
-  end
-
-  def course_with_user(enrollment_type, opts={})
-    @course = opts[:course] || course(opts)
-    @user = opts[:user] || @course.shard.activate { user(opts) }
-    @enrollment = @course.enroll_user(@user, enrollment_type, opts)
-    @user.save!
-    @enrollment.course = @course # set the reverse association
-    if opts[:active_enrollment] || opts[:active_all]
-      @enrollment.workflow_state = 'active'
-      @enrollment.save!
-    end
-    @course.reload
-    @enrollment
-  end
-
-  def course_with_student(opts={})
-    course_with_user('StudentEnrollment', opts)
-    @student = @user
-    @enrollment
-  end
-
-  def course_with_ta(opts={})
-    course_with_user("TaEnrollment", opts)
-    @ta = @user
-    @enrollment
-  end
-
-  def course_with_student_logged_in(opts={})
-    course_with_student(opts)
-    user_session(@user)
-  end
-
-  def student_in_course(opts={})
-    opts[:course] = @course if @course && !opts[:course]
-    course_with_student(opts)
-  end
-
-  def student_in_section(section, opts={})
-    student = opts.fetch(:user) { user }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
-    student.save!
-    enrollment.workflow_state = 'active'
-    enrollment.save!
-    student
-  end
-
-  def teacher_in_course(opts={})
-    opts[:course] = @course if @course && !opts[:course]
-    course_with_teacher(opts)
-  end
-
-  def course_with_teacher(opts={})
-    course_with_user('TeacherEnrollment', opts)
-    @teacher = @user
-    @enrollment
-  end
-
-  def course_with_designer(opts={})
-    course_with_user('DesignerEnrollment', opts)
-    @designer = @user
-    @enrollment
-  end
-
-  def course_with_teacher_logged_in(opts={})
-    course_with_teacher(opts)
-    user_session(@user)
-  end
-
-  def course_with_observer(opts={})
-    course_with_user('ObserverEnrollment', opts)
-    @observer = @user
-    @enrollment
-  end
-
-  def course_with_observer_logged_in(opts={})
-    course_with_observer(opts)
-    user_session(@user)
-  end
-
-  def course_with_student_submissions(opts={})
-    course_with_teacher_logged_in(opts)
-    student_in_course
-    @course.claim! if opts[:unpublished]
-    submission_count = opts[:submissions] || 1
-    submission_count.times do |s|
-      assignment = @course.assignments.create!(:title => "test #{s} assignment")
-      submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
-      submission.update_attributes!(score: '5') if opts[:submission_points]
-    end
-  end
-
-  def add_section(section_name)
-    @course_section = @course.course_sections.create!(:name => section_name)
-    @course.reload
-  end
-
-  def multiple_student_enrollment(user, section, opts={})
-    course = opts[:course] || @course || course(opts)
-    @enrollment = course.enroll_student(user,
-                                         :enrollment_state => "active",
-                                         :section => section,
-                                         :allow_multiple_enrollments => true)
-  end
+  #****************************************************************
+  # There used to be a lot of factory methods here!
+  # In an effort to move us toward a nicer test factory solution,
+  # all factories should now live in a separate file named to
+  # correspond with the model that should be built by the factory.
+  # Please see spec/factories for examples!
+  #****************************************************************
 
   def enter_student_view(opts={})
     course = opts[:course] || @course || course(opts)
@@ -731,313 +476,12 @@ RSpec.configure do |config|
     expect(session[:become_user_id]).to eq @fake_student.id.to_s
   end
 
-  def account_notification(opts={})
-    req_service = opts[:required_account_service] || nil
-    role_ids = opts[:role_ids] || []
-    message = opts[:message] || "hi there"
-    subj = opts[:subject] || "this is a subject"
-    @account = opts[:account] || Account.default
-    @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
-    @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
-    @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
-    @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
-    @announcement.save!
-    @announcement
-  end
-
-  VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
-
-  def group(opts={})
-    context = opts[:group_context] || opts[:context] || Account.default
-    @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
-  end
-
-  def group_with_user(opts={})
-    group(opts)
-    u = opts[:user] || user(opts)
-    workflow_state = opts[:active_all] ? 'accepted' : nil
-    @group.add_user(u, workflow_state, opts[:moderator])
-  end
-
-  def group_with_user_logged_in(opts={})
-    group_with_user(opts)
-    user_session(@user)
-  end
-
-  def group_category(opts = {})
-    context = opts[:context] || @course
-    @group_category = context.group_categories.create!(name: opts[:name] || 'foo')
-  end
-
-  def custom_role(base, name, opts={})
-    account = opts[:account] || @account
-    role = account.roles.where(name: name).first_or_initialize
-    role.base_role_type = base
-    role.save!
-    role
-  end
-
-  def custom_student_role(name, opts={})
-    custom_role('StudentEnrollment', name, opts)
-  end
-
-  def custom_teacher_role(name, opts={})
-    custom_role('TeacherEnrollment', name, opts)
-  end
-
-  def custom_ta_role(name, opts={})
-    custom_role('TaEnrollment', name, opts)
-  end
-
-  def custom_designer_role(name, opts={})
-    custom_role('DesignerEnrollment', name, opts)
-  end
-
-  def custom_observer_role(name, opts={})
-    custom_role('ObserverEnrollment', name, opts)
-  end
-
-  def custom_account_role(name, opts={})
-    custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
-  end
-
-  def student_role
-    Role.get_built_in_role("StudentEnrollment")
-  end
-
-  def teacher_role
-    Role.get_built_in_role("TeacherEnrollment")
-  end
-
-  def ta_role
-    Role.get_built_in_role("TaEnrollment")
-  end
-
-  def designer_role
-    Role.get_built_in_role("DesignerEnrollment")
-  end
-
-  def observer_role
-    Role.get_built_in_role("ObserverEnrollment")
-  end
-
-  def admin_role
-    Role.get_built_in_role("AccountAdmin")
-  end
-
-  def user_session(user, pseudonym=nil)
-    unless pseudonym
-      pseudonym = stub('Pseudonym', :record => user, :user_id => user.id, :user => user, :login_count => 1)
-      # at least one thing cares about the id of the pseudonym... using the
-      # object_id should make it unique (but obviously things will fail if
-      # it tries to load it from the db.)
-      pseudonym.stubs(:id).returns(pseudonym.object_id)
-      pseudonym.stubs(:unique_id).returns('unique_id')
-    end
-
-    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)
-
-    PseudonymSession.stubs(:find).returns(session)
-  end
-
-  def remove_user_session
-    PseudonymSession.unstub(:find)
-  end
-
   def login_as(username = "nobody@example.com", password = "asdfasdf")
     post_via_redirect "/login",
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
     expect(request.fullpath).to eq "/?login_success=1"
-  end
-
-  def assignment_quiz(questions, opts={})
-    course = opts[:course] || course(:active_course => true)
-    user = opts[:user] || user(:active_user => true)
-    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
-    @assignment = course.assignments.create(:title => "Test Assignment")
-    @assignment.workflow_state = "published"
-    @assignment.submission_types = "online_quiz"
-    @assignment.save
-    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
-    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
-    @quiz.generate_quiz_data
-    @quiz.published_at = Time.now
-    @quiz.workflow_state = "available"
-    @quiz.save!
-  end
-
-  # The block should return the submission_data. A block is used so
-  # that we have access to the @questions variable that is created
-  # in this method
-  def quiz_with_graded_submission(questions, opts={}, &block)
-    assignment_quiz(questions, opts)
-    @quiz_submission = @quiz.generate_submission(@user)
-    @quiz_submission.mark_completed
-    @quiz_submission.submission_data = yield if block_given?
-    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
-  end
-
-  def survey_with_submission(questions, &block)
-    course_with_student(:active_all => true)
-    @assignment = @course.assignments.create(:title => "Test Assignment")
-    @assignment.workflow_state = "published"
-    @assignment.submission_types = "online_quiz"
-    @assignment.save
-    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
-    @quiz.anonymous_submissions = true
-    @quiz.quiz_type = "graded_survey"
-    @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
-    @quiz.generate_quiz_data
-    @quiz.save!
-    @quiz_submission = @quiz.generate_submission(@user)
-    @quiz_submission.mark_completed
-    @quiz_submission.submission_data = yield if block_given?
-  end
-
-  def group_discussion_assignment
-    course = @course || course(:active_all => true)
-    group_category = course.group_categories.create!(:name => "category")
-    @group1 = course.groups.create!(:name => "group 1", :group_category => group_category)
-    @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
-
-    @topic = course.discussion_topics.build(:title => "topic")
-    @topic.group_category = group_category
-    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
-    @assignment.infer_times
-    @assignment.saved_by = :discussion_topic
-    @topic.assignment = @assignment
-    @topic.save!
-  end
-
-  def rubric_for_course
-    @rubric = Rubric.new(:title => 'My Rubric', :context => @course)
-    @rubric.data = [
-        {
-            :points => 3,
-            :description => "First row",
-            :long_description => "The first row in the rubric",
-            :id => 1,
-            :ratings => [
-                {
-                    :points => 3,
-                    :description => "Rockin'",
-                    :criterion_id => 1,
-                    :id => 2
-                },
-                {
-                    :points => 2,
-                    :description => "Rockin'",
-                    :criterion_id => 1,
-                    :id => 3
-                },
-                {
-                    :points => 0,
-                    :description => "Lame",
-                    :criterion_id => 1,
-                    :id => 4
-                }
-            ]
-        }
-    ]
-    @rubric.save!
-  end
-
-  def outcome_with_rubric(opts={})
-    @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(
-      :description => '<p>This is <b>awesome</b>.</p>',
-      :short_description => 'new outcome',
-      :calculation_method => 'highest'
-    )
-    @outcome_group.add_outcome(@outcome)
-    @outcome_group.save!
-
-    rubric_params = {
-        :title => 'My Rubric',
-        :hide_score_total => false,
-        :criteria => {
-            "0" => {
-                :points => 3,
-                :mastery_points => opts[:mastery_points] || 0,
-                :description => "Outcome row",
-                :long_description => @outcome.description,
-                :ratings => {
-                    "0" => {
-                        :points => 3,
-                        :description => "Rockin'",
-                    },
-                    "1" => {
-                        :points => 0,
-                        :description => "Lame",
-                    }
-                },
-                :learning_outcome_id => @outcome.id
-            },
-            "1" => {
-                :points => 5,
-                :description => "no outcome row",
-                :long_description => 'non outcome criterion',
-                :ratings => {
-                    "0" => {
-                        :points => 5,
-                        :description => "Amazing",
-                    },
-                    "1" => {
-                        :points => 3,
-                        :description => "not too bad",
-                    },
-                    "2" => {
-                        :points => 0,
-                        :description => "no bueno",
-                    }
-                }
-            }
-        }
-    }
-
-    @rubric = @course.rubrics.build
-    @rubric.update_criteria(rubric_params)
-    @rubric.reload
-  end
-
-  def grading_standard_for(context, opts={})
-    @standard = context.grading_standards.create!(
-        :title => opts[:title] || "My Grading Standard",
-        :standard_data => {
-            "scheme_0" => {:name => "A", :value => "0.9"},
-            "scheme_1" => {:name => "B", :value => "0.8"},
-            "scheme_2" => {:name => "C", :value => "0.7"}
-        })
-  end
-
-  def eportfolio(opts={})
-    user(opts) unless @user
-    @portfolio = @user.eportfolios.create!
-  end
-
-  def eportfolio_with_user(opts={})
-    user(opts)
-    eportfolio(opts)
-  end
-
-  def conversation(*users)
-    options = users.last.is_a?(Hash) ? users.pop : {}
-    @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users, options.delete(:private))
-    @message = @conversation.add_message('test')
-    @conversation.update_attributes(options)
-    @conversation.reload
-  end
-
-  def media_object(opts={})
-    mo = MediaObject.new
-    mo.media_id = opts[:media_id] || "1234"
-    mo.media_type = opts[:media_type] || "video"
-    mo.context = opts[:context] || @course
-    mo.user = opts[:user] || @user
-    mo.save!
-    mo
   end
 
   def assert_status(status=500)
@@ -1061,16 +505,36 @@ RSpec.configure do |config|
     expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
+  # Instead of directly comparing urls
+  # this will make sure urls match
+  # by parsing them, and comparing the results
+  # meaning these would match
+  #   http://test.dev/?foo=bar&other=1
+  #   http://test.dev/?other=1&foo=bar
+  def assert_url_parse_match(test_url, expected_url)
+    parsed_test = URI.parse(test_url)
+    parsed_expected = URI.parse(expected_url)
+
+    parsed_test_query = Rack::Utils.parse_nested_query(parsed_test.query)
+    parsed_expected_query = Rack::Utils.parse_nested_query(parsed_expected.query)
+
+    expect(parsed_test.scheme).to eq parsed_expected.scheme
+    expect(parsed_test.host).to eq parsed_expected.host
+    expect(parsed_test_query).to eq parsed_expected_query
+  end
+
+  def assert_hash_contains(test_hash, expected_hash)
+    expected_hash.each do |key, expected_value|
+      expect(test_hash[key]).to eq expected_value
+    end
+  end
+
   def fixture_file_upload(path, mime_type=nil, binary=false)
     Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
   end
 
   def default_uploaded_data
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
-  end
-
-  def valid_gradebook_csv_content
-    File.read(File.expand_path(File.join(File.dirname(__FILE__), %w(fixtures default_gradebook.csv))))
   end
 
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
@@ -1164,18 +628,6 @@ RSpec.configure do |config|
                                                  'kcw_ui_conf' => '1',
                                                  'upload_ui_conf' => '1'
                                              })
-  end
-
-  def attachment_obj_with_context(obj, opts={})
-    @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))
-    @attachment.context = obj
-    @attachment
-  end
-
-  def attachment_with_context(obj, opts={})
-    attachment_obj_with_context(obj, opts)
-    @attachment.save!
-    @attachment
   end
 
   def json_parse(json_string = response.body)
@@ -1326,6 +778,10 @@ RSpec.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
+  def content_type_key
+    'Content-Type'
+  end
+
   def force_string_encoding(str, encoding = "UTF-8")
     if str.respond_to?(:force_encoding)
       str.force_encoding(encoding)
@@ -1436,61 +892,8 @@ RSpec.configure do |config|
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
-  def create_attachment_for_file_upload_submission!(submission, opts={})
-    submission.attachments.create! opts.merge(
-                                       :filename => "doc.doc",
-                                       :display_name => "doc.doc", :user => @user,
-                                       :uploaded_data => dummy_io)
-  end
-
-  def course_quiz(active=false)
-    @quiz = @course.quizzes.create
-    @quiz.workflow_state = "available" if active
-    @quiz.save!
-    @quiz
-  end
-
-  def n_students_in_course(n, opts={})
-    opts.reverse_merge active_all: true
-    n.times.map { student_in_course(opts); @student }
-  end
-
   def consider_all_requests_local(value)
     Rails.application.config.consider_all_requests_local = value
-  end
-
-  def page_view_for(opts={})
-    @account = opts[:account] || Account.default
-    @context = opts[:context] || course(opts)
-
-    @request_id = opts[:request_id] || RequestContextGenerator.request_id
-    unless @request_id
-      @request_id = SecureRandom.uuid
-      RequestContextGenerator.stubs(:request_id => @request_id)
-    end
-
-    Setting.set('enable_page_views', 'db')
-
-    @page_view = PageView.new { |p|
-      p.assign_attributes({
-                              :id => @request_id,
-                              :url => "http://test.one/",
-                              :session_id => "phony",
-                              :context => @context,
-                              :controller => opts[:controller] || 'courses',
-                              :action => opts[:action] || 'show',
-                              :user_request => true,
-                              :render_time => 0.01,
-                              :user_agent => 'None',
-                              :account_id => @account.id,
-                              :request_id => request_id,
-                              :interaction_seconds => 5,
-                              :user => @user,
-                              :remote_ip => '192.168.0.42'
-                          }, :without_protection => true)
-    }
-    @page_view.save!
-    @page_view
   end
 
   # a fast way to create a record, especially if you don't need the actual
@@ -1513,66 +916,9 @@ RSpec.configure do |config|
       klass.connection.bulk_insert klass.table_name, records
       scope = klass.order("id DESC").limit(records.size)
       return_type == :record ?
-        scope.all.reverse :
+        scope.to_a.reverse :
         scope.pluck(:id).reverse
     end
-  end
-
-  # create a bunch of courses at once, optionally enrolling a user in them
-  # records can either be the number of records to create, or an array of
-  # hashes of attributes you want to insert
-  def create_courses(records, options = {})
-    account = options[:account] || Account.default
-    records = records.times.map{ {} } if records.is_a?(Fixnum)
-    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id).merge(record) }
-    course_data = create_records(Course, records, options[:return_type])
-    course_ids = options[:return_type] == :record ?
-      course_data.map(&:id) :
-      course_data
-
-    if options[:account_associations]
-      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0}})
-    end
-    if user = options[:enroll_user]
-      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
-      type = options[:enrollment_type] || "TeacherEnrollment"
-      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}})
-    end
-    course_data
-  end
-
-  def create_users(records, options = {})
-    records = records.times.map{ {} } if records.is_a?(Fixnum)
-    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
-    create_records(User, records, options[:return_type])
-  end
-
-  # create a bunch of users at once, and enroll them all in the same course
-  def create_users_in_course(course, records, options = {})
-    user_data = create_users(records, options)
-    create_enrollments(course, user_data, options)
-
-    user_data
-  end
-
-  def create_enrollments(course, users, options = {})
-    user_ids = users.first.is_a?(User) ?
-      users.map(&:id) :
-      users
-
-    if options[:account_associations]
-      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
-    end
-
-    section_id = options[:section_id] || course.default_section.id
-    type = options[:enrollment_type] || "StudentEnrollment"
-    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}}, options[:return_type])
-  end
-
-  def create_assignments(course_ids, count_per_course = 1, fields = {})
-    course_ids = Array(course_ids)
-    course_ids *= count_per_course
-    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", grading_type: "points", submission_types: "none", workflow_state: 'published'}.merge(fields)})
   end
 end
 

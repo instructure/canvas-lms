@@ -29,7 +29,7 @@ module CC::Importer::Standard
 
     MANIFEST_FILE = "imsmanifest.xml"
     SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
-    
+
     attr_accessor :resources
 
     # settings will use these keys: :course_name, :base_download_dir
@@ -92,7 +92,7 @@ module CC::Importer::Standard
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
     end
-    
+
     def get_canvas_att_replacement_url(path, resource_dir=nil)
       if path.start_with?('../')
         if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
@@ -132,7 +132,7 @@ module CC::Importer::Standard
       @file_path_migration_id[file[:path_name]] = file[:migration_id]
       add_file(file)
     end
-    
+
     FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
     def replace_urls(html, resource_dir=nil)
       return "" if html.blank?
@@ -156,7 +156,7 @@ module CC::Importer::Standard
                   end
                 end
               end
-            rescue URI::InvalidURIError
+            rescue URI::Error
               Rails.logger.warn "attempting to translate invalid url: #{val}"
             end
           end
@@ -182,6 +182,6 @@ module CC::Importer::Standard
 
       tools
     end
-    
+
   end
 end

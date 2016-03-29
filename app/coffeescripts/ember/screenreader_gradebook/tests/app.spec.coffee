@@ -6,10 +6,9 @@ define [
 
   App = null
 
-  fixtures.create()
-
   module 'screenreader_gradebook',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')

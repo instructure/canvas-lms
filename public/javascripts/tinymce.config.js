@@ -62,6 +62,8 @@ define([], function(){
       },
       language_load: false,
       relative_urls: false,
+      // we add the menubar for a11y purposes but then
+      // hide it with js for non screenreader users
       menubar: true,
       remove_script_host: true,
       resize: true,
@@ -94,7 +96,8 @@ define([], function(){
       extended_valid_elements: "*[*]",
       valid_children: "+body[style|script|svg|textarea]",
 
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
+      content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url,
+      non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
       browser_spellcheck: true
     };
   };

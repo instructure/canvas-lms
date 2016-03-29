@@ -119,7 +119,7 @@ module Quizzes::QuizQuestionLinkMigrator
   def self.migrate_file_links_in_question_data(question_data, context={})
     return unless question_data
     changed = false
-    question = context[:question] || Quizzes::QuizQuestion.includes(:quiz, :assessment_question).where(id: question_data[:id]).first
+    question = context[:question] || Quizzes::QuizQuestion.where(id: question_data[:id]).first
     return unless question
     quiz = context[:quiz] || question.quiz
     for_each_interesting_field(question_data) do |field|

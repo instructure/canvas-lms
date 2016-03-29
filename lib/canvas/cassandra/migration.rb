@@ -8,13 +8,13 @@ module Canvas
 
         def runnable?
           raise "cassandra_cluster is required to be defined" unless respond_to?(:cassandra_cluster) && cassandra_cluster.present?
-          Shard.current == Shard.birth && Canvas::Cassandra::DatabaseBuilder.configured?(cassandra_cluster)
+          Switchman::Shard.current == Switchman::Shard.birth && Canvas::Cassandra::DatabaseBuilder.configured?(cassandra_cluster)
         end
       end
 
       def self.included(migration)
         migration.tag :cassandra
-        migration.extend ClassMethods
+        migration.singleton_class.include(ClassMethods)
       end
     end
   end

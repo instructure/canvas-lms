@@ -32,11 +32,12 @@ class ContentMigration < ActiveRecord::Base
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
+  before_save :set_started_at_and_finished_at
   after_save :handle_import_in_progress_notice
   DATE_FORMAT = "%m/%d/%Y"
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
-  attr_accessor :imported_migration_items, :outcome_to_id_map
+  attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower
 
   workflow do
     state :created
@@ -61,6 +62,17 @@ class ContentMigration < ActiveRecord::Base
     can :manage_files and can :read
   end
 
+  def set_started_at_and_finished_at
+    if workflow_state_changed?
+      if pre_processing? || exporting? || importing?
+        self.started_at ||= Time.now.utc
+      end
+      if failed? || imported? || exported?
+        self.finished_at ||= Time.now.utc
+      end
+    end
+  end
+
   # the stream item context is decided by calling asset.context(user), i guess
   # to differentiate from the normal asset.context() call that may not give us
   # the context we want. in this case, they're one and the same.
@@ -74,7 +86,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_settings
-    read_attribute(:migration_settings) || write_attribute(:migration_settings,{}.with_indifferent_access)
+    read_or_initialize_attribute(:migration_settings, {}.with_indifferent_access)
   end
 
   def update_migration_settings(new_settings)
@@ -253,6 +265,7 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :failed
     job_progress.fail if job_progress && !skip_job_progress
     save
+    resolve_content_links! # don't leave placeholders
   end
 
   # deprecated warning format
@@ -303,7 +316,8 @@ class ContentMigration < ActiveRecord::Base
     set_default_settings
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
-      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
+      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
+                    :expires_at => Setting.get('content_migration_job_expiration_hours', '48').to_i.hours.from_now}
       if self.strand
         queue_opts[:strand] = self.strand
       else
@@ -314,7 +328,7 @@ class ContentMigration < ActiveRecord::Base
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
-        self.send_later_enqueue_args(:import_content, queue_opts)
+        self.send_later_enqueue_args(:import_content, queue_opts.merge(:on_permanent_failure => :fail_with_error!))
       else
         # find worker and queue for conversion
         begin
@@ -387,7 +401,7 @@ class ContentMigration < ActiveRecord::Base
   def import_everything?
     return true unless migration_settings[:migration_ids_to_import] && migration_settings[:migration_ids_to_import][:copy] && migration_settings[:migration_ids_to_import][:copy].length > 0
     return true if is_set?(to_import(:everything))
-    return true if copy_options && copy_options[:everything]
+    return true if copy_options && is_set?(copy_options[:everything])
     false
   end
 
@@ -588,27 +602,27 @@ class ContentMigration < ActiveRecord::Base
     ContentMigration.where(:id => self).update_all(:progress=>val)
   end
 
-  def add_missing_content_links(item)
-    @missing_content_links ||= {}
-    item[:field] ||= :text
-    key = "#{item[:class]}_#{item[:id]}_#{item[:field]}"
-    if item[:missing_links].present?
-      @missing_content_links[key] = item
-    else
-      @missing_content_links.delete(key)
-    end
+  def html_converter
+    @html_converter ||= ImportedHtmlConverter.new(self)
   end
 
-  def add_warnings_for_missing_content_links
-    return unless @missing_content_links
-    @missing_content_links.each_value do |item|
-      if item[:missing_links].any?
-        add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
-          {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
-            "The following references could not be resolved:") + " " + item[:missing_links].join(', '),
-            :fix_issue_html_url => item[:url]})
-      end
-    end
+  def convert_html(*args)
+    html_converter.convert(*args)
+  end
+
+  def convert_text(*args)
+    html_converter.convert_text(*args)
+  end
+
+  def resolve_content_links!
+    html_converter.resolve_content_links!
+  end
+
+  def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
+    add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",
+      {:error_message => "#{type} #{field} - " + t(:missing_content_links_message,
+        "The following references could not be resolved:") + " " + missing_links.join(', '),
+        :fix_issue_html_url => fix_issue_url})
   end
 
   UPLOAD_TIMEOUT = 1.hour
@@ -700,17 +714,31 @@ class ContentMigration < ActiveRecord::Base
 
   def imported_migration_items
     @imported_migration_items_hash ||= {}
-    @imported_migration_items_hash.values.flatten
+    @imported_migration_items_hash.values.map(&:values).flatten
+  end
+
+  def imported_migration_items_hash(klass)
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash[klass.name] ||= {}
   end
 
   def imported_migration_items_by_class(klass)
-    @imported_migration_items_hash ||= {}
-    @imported_migration_items_hash[klass.name] ||= []
+    imported_migration_items_hash(klass).values
+  end
+
+  def find_imported_migration_item(klass, migration_id)
+    imported_migration_items_hash(klass)[migration_id]
   end
 
   def add_imported_item(item)
-    arr = imported_migration_items_by_class(item.class)
-    arr << item unless arr.include?(item)
+    imported_migration_items_hash(item.class)[item.migration_id] = item
+  end
+
+  def add_attachment_path(path, migration_id)
+    self.attachment_path_id_lookup ||= {}
+    self.attachment_path_id_lookup_lower ||= {}
+    self.attachment_path_id_lookup[path] = migration_id
+    self.attachment_path_id_lookup_lower[path.downcase] = migration_id
   end
 
   def add_external_tool_translation(migration_id, target_tool, custom_fields)

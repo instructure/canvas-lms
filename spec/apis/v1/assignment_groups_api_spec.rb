@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-def set_up_groups
+def setup_groups
   @group1 = @course.assignment_groups.create!(:name => 'group1')
   @group1.update_attribute(:position, 10)
   @group1.update_attribute(:group_weight, 40)
@@ -27,22 +27,32 @@ def set_up_groups
   @group2.update_attribute(:group_weight, 60)
 end
 
-def set_up_four_assignments(assignment_opts = {})
+def setup_four_assignments(assignment_opts = {})
   @a1 = @course.assignments.create!({:title => "test1", :assignment_group => @group1, :points_possible => 10, :description => 'Assignment 1'}.merge(assignment_opts))
   @a2 = @course.assignments.create!({:title => "test2", :assignment_group => @group1, :points_possible => 12, :description => 'Assignment 2'}.merge(assignment_opts))
   @a3 = @course.assignments.create!({:title => "test3", :assignment_group => @group2, :points_possible => 8, :description => 'Assignment 3'}.merge(assignment_opts))
   @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9, :description => 'Assignment 4'}.merge(assignment_opts))
 end
 
-def set_up_multiple_grading_periods
+def setup_multiple_grading_periods
   @course.account.enable_feature!(:multiple_grading_periods)
-  set_up_groups
+  setup_groups
   @group1_assignment_today = @course.assignments.create!(:assignment_group => @group1, :due_at => Time.now)
   @group1_assignment_future = @course.assignments.create!(:assignment_group => @group1, :due_at => 3.months.from_now)
   @group2_assignment_today = @course.assignments.create!(:assignment_group => @group2, :due_at => Time.now)
   gpg = @course.grading_period_groups.create!
-  @gp_current = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 1.month.ago, end_date: 1.month.from_now)
-  @gp_future = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.months.from_now, end_date: 4.months.from_now)
+  @gp_current = gpg.grading_periods.create!(
+    title: 'current',
+    weight: 50,
+    start_date: 1.month.ago,
+    end_date: 1.month.from_now
+  )
+  @gp_future = gpg.grading_periods.create!(
+    title: 'future',
+    weight: 50,
+    start_date: 2.months.from_now,
+    end_date: 4.months.from_now
+  )
 end
 
 describe AssignmentGroupsController, type: :request do
@@ -53,7 +63,7 @@ describe AssignmentGroupsController, type: :request do
     course_with_teacher(:active_all => true)
   end
 
-  it "should sort the returned list of assignment groups" do
+  it "sorts the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
     group1 = @course.assignment_groups.create!(:name => 'group1')
@@ -94,8 +104,8 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should include full assignment jsonification when specified" do
-    set_up_groups
-    set_up_four_assignments
+    setup_groups
+    setup_four_assignments
 
     rubric_model(:user => @user, :context => @course, :points_possible => 12,
                                      :data => larger_rubric_data)
@@ -150,8 +160,8 @@ describe AssignmentGroupsController, type: :request do
 
   context "excluded descriptions" do
     it "excludes the descriptions of assignments if the excluded_descriptions param is passed" do
-      set_up_groups
-      set_up_four_assignments
+      setup_groups
+      setup_four_assignments
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&exclude_descriptions=1",
@@ -169,8 +179,8 @@ describe AssignmentGroupsController, type: :request do
 
   context "differentiated assignments" do
     it "should only return visible assignments when differentiated assignments is on" do
-      set_up_groups
-      set_up_four_assignments(only_visible_to_overrides: true)
+      setup_groups
+      setup_four_assignments(only_visible_to_overrides: true)
       @user.enrollments.each(&:delete)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
@@ -206,8 +216,8 @@ describe AssignmentGroupsController, type: :request do
     end
 
     it "should allow designers to see unpublished assignments" do
-      set_up_groups
-      set_up_four_assignments(only_visible_to_overrides: true)
+      setup_groups
+      setup_four_assignments(only_visible_to_overrides: true)
       course_with_designer(course: @course)
       [@a1,@a3].each(&:unpublish)
       [:enable_feature!, :disable_feature!].each do |feature_toggle|
@@ -245,26 +255,48 @@ describe AssignmentGroupsController, type: :request do
 
   context "multiple grading periods" do
     before :once do
-      set_up_multiple_grading_periods
-
-      @api_settings = { :controller => 'assignment_groups',
-                        :action => 'index',
-                        :format => 'json',
-                        :course_id => @course.id.to_s,
-                        :grading_period_id => @gp_future.id.to_s,
-                        :include => ['assignments'] }
-      @api_path = "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&grading_period_id=#{@gp_future.id}"
+      setup_multiple_grading_periods
     end
 
-    it "should only return assignments within the grading period" do
-      json = api_call(:get, @api_path, @api_settings)
-      expect(json[1]['assignments'].length).to eq 1
+    describe "#index" do
+      let(:api_path) { "api/v1/courses/#{@course.id}/assignment_groups" }
+      let(:api_settings) do
+        {
+          controller: 'assignment_groups', action: 'index', format: 'json',
+          course_id: @course.id.to_s, grading_period_id: @gp_future.id.to_s,
+          include: ['assignments']
+        }
+      end
+
+      it "should only return assignments within the grading period" do
+        json = api_call(:get, api_path, api_settings)
+        expect(json[1]['assignments'].length).to eq 1
+      end
+
+      it "should not return assignments outside the grading period" do
+        json = api_call(:get, api_path, api_settings)
+        expect(json[0]['assignments'].length).to eq 0
+      end
     end
 
-    it "should not return assignments outside the grading period" do
-      json = api_call(:get, @api_path, @api_settings)
-      expect(json[0]['assignments'].length).to eq 0
+    describe "#show" do
+      it "should only return assignments and submissions within the grading period" do
+        student = User.create!
+        @course.enroll_student(student)
+        api_path = "api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
+        api_settings = {
+          controller: 'assignment_groups_api', action: 'show', format: 'json',
+          course_id: @course.id, grading_period_id: @gp_future.id,
+          assignment_group_id: @group1.id, include: ['assignments', 'submission']
+        }
+        @group1_assignment_future.grade_student(student, grade: 10)
+        @group1_assignment_today.grade_student(student, grade: 8)
+        json = api_call_as_user(student, :get, api_path, api_settings)
+        expect(json["assignments"].length).to eq(1)
+        expect(json["assignments"].first["submission"]).to be_present
+      end
     end
+
   end
 
   it "should include module_ids when requested" do
@@ -467,21 +499,51 @@ describe AssignmentGroupsApiController, type: :request do
       assert_status(404)
     end
 
-    it 'should include assignments' do
-      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
-        :controller => 'assignment_groups_api',
-        :action => 'show',
-        :format => 'json',
-        :course_id => @course.id.to_s,
-        :assignment_group_id => @group.id.to_s,
-        :include => ['assignments'])
+    context 'with assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!({
+          title: "test",
+          assignment_group: @group,
+          points_possible: 10
+        })
+      end
 
-      expect(json['assignments']).not_to be_empty
+      it 'should include assignments' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s,
+          :include => ['assignments'])
+
+        expect(json['assignments']).not_to be_empty
+      end
+
+      it 'should include submission when flag is present' do
+        student_in_course(active_all: true)
+        @submission = bare_submission_model(@assignment, @student, {
+          score: '25',
+          grade: '25',
+          submitted_at: Time.zone.now
+        })
+
+        json = api_call_as_user(@student, :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments&include[]=submission",
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s,
+          :include => ['assignments', 'submission'])
+
+        expect(json['assignments'][0]['submission']).to be_present
+        expect(json['assignments'][0]['submission']['id']).to eq @submission.id
+      end
     end
 
     it 'should only return assignments in the given grading period with MGP on' do
-      set_up_multiple_grading_periods
+      setup_multiple_grading_periods
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments&grading_period_id=#{@gp_future.id}",
         :controller => 'assignment_groups_api',
@@ -496,7 +558,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it 'should not return an error when Multiple Grading Periods is turned on and no grading_period_id is passed in' do
-      set_up_multiple_grading_periods
+      setup_multiple_grading_periods
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments",
         :controller => 'assignment_groups_api',

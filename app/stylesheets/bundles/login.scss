@@ -1,3 +1,14 @@
 @import "base/environment";
-@import "pages/shared/registration_dialog.scss";
-@import "pages/shared/login.scss";
+@import "pages/login/registration_dialog.scss";
+@if $use_new_styles {
+  @import "pages/login/ic-login.scss";
+}
+@else {
+  @import "pages/login/login_legacy.scss";
+}
+@import "pages/login/ic-login-sso.scss";
+
+
+
+
+

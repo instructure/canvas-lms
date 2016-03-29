@@ -13,12 +13,12 @@ class FixDuplicateCommunicationChannels < ActiveRecord::Migration
       DelayedMessage.where(communication_channel_id: all).delete_all
       # it has a dependent: :destroy, but that does them one by one, which could take forever
       NotificationPolicy.where(communication_channel_id: all).delete_all
-      all.each(&:destroy!)
+      all.each(&:destroy_permanently!)
     end
 
     if connection.adapter_name == 'PostgreSQL'
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE UNIQUE INDEX#{concurrently} index_communication_channels_on_user_id_and_path_and_path_type ON communication_channels (user_id, LOWER(path), path_type)")
+      execute("CREATE UNIQUE INDEX#{concurrently} index_communication_channels_on_user_id_and_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (user_id, LOWER(path), path_type)")
     else
       add_index :communication_channels, [:user_id, :path, :path_type], unique: true
     end

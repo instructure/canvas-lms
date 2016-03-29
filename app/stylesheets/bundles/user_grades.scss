@@ -14,13 +14,12 @@
   .course {
     font-size: 1.2em;
     padding: 6px 50px 6px 5px;
-    vertical-align: top;
   }
   .percent {
-    text-align: right;
+    text-align: center;
     font-size: 1.2em;
     font-weight: bold;
-    padding-right: 5px;
+    min-width: 73px;
   }
   .report {
     padding: 12px;

@@ -6,7 +6,11 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/DialogBaseView'
   'jst/tinymce/InsertUpdateImageView'
-], (I18n, $, _, h, preventDefault, DialogBaseView, template) ->
+  'jsx/shared/rce/callOnRCE'
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootFoldersFinder'
+  'compiled/views/FindFlickrImageView'
+], (I18n, $, _, h, preventDefault, DialogBaseView, template, callOnRCE, TreeBrowserView, RootFoldersFinder, FindFlickrImageView) ->
 
   class InsertUpdateImageView extends DialogBaseView
 
@@ -23,6 +27,9 @@ define [
     dialogOptions:
       width: 625
       title: I18n.t 'titles.insert_edit_image', 'Insert / Edit Image'
+
+    toJSON: () ->
+      {show_quiz_warning: ENV.SHOW_QUIZ_ALT_TEXT_WARNING}
 
     initialize: (@editor, selectedNode) ->
       @$editor = $("##{@editor.id}")
@@ -51,21 +58,16 @@ define [
       switch ui.panel.id
         when 'tabUploaded'
           loadTab (done) =>
-            require [
-              'compiled/views/TreeBrowserView'
-              'compiled/views/RootFoldersFinder'
-            ], (TreeBrowserView, RootFoldersFinder) =>
-              rootFoldersFinder = new RootFoldersFinder({
-                contentTypes: 'image',
-                useVerifiers: true
-              })
-              new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
-              done()
+            rootFoldersFinder = new RootFoldersFinder({
+              contentTypes: 'image',
+              useVerifiers: true
+            })
+            new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
+            done()
         when 'tabFlickr'
           loadTab (done) =>
-            require ['compiled/views/FindFlickrImageView'], (FindFlickrImageView) =>
-              new FindFlickrImageView().render().$el.appendTo(ui.panel)
-              done()
+            new FindFlickrImageView().render().$el.appendTo(ui.panel)
+            done()
 
     setAspectRatio: ->
       width = Number @$("[name='image[width]']").val()
@@ -122,11 +124,12 @@ define [
       @setSelectedImage
         src: $a.attr('data-fullsize')
         alt: $a.attr('title')
+      @$("[name='image[alt]']").focus()
 
     onFileLinkDblclick: (event) =>
       # click event is handled on the first click
       @update()
-        
+
     onImageUrlChange: (event) ->
       @flickr_link = null
       @setSelectedImage src: $(event.currentTarget).val()
@@ -136,9 +139,9 @@ define [
       if @flickr_link
         imgHtml = "<a href='#{h @flickr_link}'>#{imgHtml}</a>"
       imgHtml
-        
+
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)
-      @$editor.editorBox 'insert_code', @generateImageHtml()
+      callOnRCE(@$editor, 'insert_code', @generateImageHtml())
       @editor.focus()
       @close()

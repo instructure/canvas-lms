@@ -389,7 +389,7 @@ define [
       @resultView.$('.collectionViewItems').empty()
       @resultView.render()
       $el = @$resultList.find('li:first').addClass('selected')
-      @selectedModel = @_getModel($el.data('id'))
+      @selectedModel = @_getModel($el.attr('data-id'))
       @$input.attr('aria-activedescendant', $el.attr('id'))
 
     # Internal: Fetch and display autocomplete results from the server.
@@ -526,7 +526,7 @@ define [
       return unless e.button == 0
       e.preventDefault() && e.stopPropagation()
       $target = $(e.currentTarget)
-      @selectedModel = @resultCollection.get($target.data('id'))
+      @selectedModel = @resultCollection.get($target.attr('data-id'))
       @_activateSelected(e.metaKey or e.ctrlKey)
 
     # Internal: Clear the current token.
@@ -658,7 +658,7 @@ define [
     # Returns nothing.
     setContext: (context, disable = false) ->
       context = null unless context.id
-      if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
+      if disable and !ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT and !@disabled
         @disable(!context)
       return if context?.id == @currentContext?.id
       @currentContext     = context

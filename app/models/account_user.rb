@@ -33,10 +33,6 @@ class AccountUser < ActiveRecord::Base
 
   validate :valid_role?
 
-  EXPORTABLE_ATTRIBUTES = [:id, :account_id, :user_id, :role_id, :created_at, :updated_at]
-
-  EXPORTABLE_ASSOCIATIONS = [:account, :user]
-
   validates_presence_of :account_id, :user_id, :role_id
 
   alias_method :context, :account

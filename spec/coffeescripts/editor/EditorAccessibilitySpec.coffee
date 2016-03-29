@@ -10,7 +10,6 @@ define [
   activeEditorNodes = null
 
   module "EditorAccessibility",
-
     setup: ->
       textarea = $("<textarea id='42' data-rich_text='true'></textarea>")
       fixtures.append(textarea)
@@ -56,3 +55,7 @@ define [
 
     tinymce.activeEditor.fire("keydown", event)
     equal($menu.is(":visible"), true)
+
+  test "accessiblize() gives an aria-label to the role=application div", ->
+    acc.accessiblize()
+    ok $(acc.$el).attr('aria-label'), "aria-label has a value"

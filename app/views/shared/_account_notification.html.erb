@@ -1,22 +1,30 @@
 <%
-  notification = account_notification
+   account_notification ||= nil
+   notification = account_notification
 %>
-<div class="global-message image-block">
-  <div class="image-block-image">
-    <i class="<%=  notification_icon_classname(notification)  %>"></i>
-    <span class="hidden-inline-text">
+<div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(notification) %> account_notification">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="<%= notification_icon_classname(notification) %>"></i>
+    <span class="screenreader-only">
       <%= accessible_message_icon_text(notification_icon_type(notification)) %>
     </span>
   </div>
-  <div class="image-block-content">
-    <a class="close" href="#" data-url="<%= dashboard_close_notification_path(notification.id) %>" data-remove=".global-message" title="<%= t :close, 'close' %>" aria-label="<%= t :close, 'close' %>" role="button">×</a>
-    <div class="title">
-      <%= notification.subject %>
-    </div>
-    <div class="message user_content">
-      <% # I don't see a problem with using gsub given that there are only potential substituations%>
-      <% #    but if you found this comment while looking to add a third, it might be time to consider being smarter about this :p %>
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <h4 class="ic-notification__title">
+        <%= notification.subject %>
+      </h4>
+      <% # I don't see a problem with using gsub given that there are only potential substitutions %>
+      <% # but if you found this comment while looking to add a third, it might be time to consider being smarter about this :p %>
+      <span class="notification_message">
       <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port).gsub(/(({{)|(%7B%7B))CANVAS_USER_ID((}})|(%7D%7D))/,@current_user.global_id.to_s)) unless notification.message.nil? %>
+      </span>
+    </div>
+    <div class="ic-notification__actions">
+      <a href="#" class="Button Button--icon-action" data-url="<%= dashboard_close_notification_path(notification.id) %>" data-remove=".ic-notification" title="<%= t :close, 'close' %>" role="button">
+        <i class="icon-x"></i>
+        <span class="screenreader-only"><%= t :close, 'close' %></span>
+      </a>
     </div>
   </div>
 </div>

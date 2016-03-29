@@ -28,7 +28,7 @@ describe Quizzes::QuizUserFinder do
     @unsubmitted_student = @student
     sub = @quiz.generate_submission(@submitted_student)
     sub.mark_completed
-    sub.grade_submission
+    Quizzes::SubmissionGrader.new(sub).grade_submission
     @finder = Quizzes::QuizUserFinder.new(@quiz, @teacher)
   end
 
@@ -50,7 +50,7 @@ describe Quizzes::QuizUserFinder do
 
   it "doesn't find submissions from teachers for preview submissions" do
     sub = @quiz.generate_submission(@teacher, preview=true)
-    sub.grade_submission
+    Quizzes::SubmissionGrader.new(sub).grade_submission
     sub.save!
     expect(@finder.submitted_students).not_to include @teacher
     expect(@finder.unsubmitted_students).not_to include @teacher

@@ -21,19 +21,12 @@ class SisBatch < ActiveRecord::Base
   belongs_to :account
   serialize :data
   serialize :options
-  serialize :processing_errors, Array
-  serialize :processing_warnings, Array
+  serialize_utf8_safe :processing_errors, Array
+  serialize_utf8_safe :processing_warnings, Array
   belongs_to :attachment
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :account_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
-    :processing_warnings, :batch_mode, :options, :user_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:account, :attachment, :user]
 
   before_save :limit_size_of_messages
 
@@ -136,11 +129,18 @@ class SisBatch < ActiveRecord::Base
   end
 
   class Work < Delayed::PerformableMethod
-    def on_permanent_failure(error)
+    def on_permanent_failure(_error)
       account = args.first
       account.sis_batches.importing.each do |batch|
         batch.finish(false)
       end
+
+      job_args = {
+        singleton: "account:update_account_associations:#{Shard.birth.activate{ account.id }}",
+        priority: Delayed::LOW_PRIORITY,
+        max_attempts: 1,
+      }
+      account.send_later_enqueue_args(:update_account_associations, job_args)
     end
   end
 
@@ -248,12 +248,12 @@ class SisBatch < ActiveRecord::Base
     if import_finished
       remove_previous_imports if self.batch_mode?
       self.workflow_state = :imported
-      self.progress = 100
       self.workflow_state = :imported_with_messages if messages?
     else
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
+    self.progress = 100
     self.ended_at = Time.now.utc
     self.save
   end
@@ -276,7 +276,7 @@ class SisBatch < ActiveRecord::Base
     if data[:supplied_batches].include?(:section)
       # delete sections who weren't in this batch, whose course was in the selected term
       scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
-      scope = scope.joins("INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
+      scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
       scope = scope.where(:courses => { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |section|
         section.destroy

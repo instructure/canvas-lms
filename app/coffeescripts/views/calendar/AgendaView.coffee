@@ -1,13 +1,17 @@
 define [
   'i18n!calendar'
   'jquery'
+  'moment'
+  'timezone_core'
+  'compiled/util/fcUtil'
+  'compiled/calendar/CalendarEventFilter'
   'underscore'
   'Backbone'
   'compiled/collections/CalendarEventCollection'
   'compiled/calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
+], (I18n, $, moment, tz, fcUtil, calendarEventFilter, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 
   class AgendaView extends Backbone.View
 
@@ -35,28 +39,27 @@ define [
     constructor: ->
       super
       @dataSource = @options.dataSource
+      @viewingGroup = null
 
       $.subscribe
         "CommonEvent/eventDeleted" : @refetch
         "CommonEvent/eventSaved" : @refetch
         "CalendarHeader/createNewEvent" : @handleNewEvent
 
-    fetch: (contexts, start = new Date) ->
+    hide: ->
+      @$el.removeClass('active')
+
+    fetch: (contexts, start) ->
       @$el.empty()
       @$el.addClass('active')
 
       @contexts = contexts
+      @startDate = fcUtil.clone(start).stripTime()
 
-      start.setHours(0)
-      start.setMinutes(0)
-      start.setSeconds(0)
-
-      @startDate = start
-
-      @_fetch(start, @handleEvents)
+      @_fetch(@startDate, @handleEvents)
 
     _fetch: (start, callback) ->
-      end = new Date(3000, 1, 1)
+      end = fcUtil.clone(start).year(3000)
       @lastRequestID = $.guid++
       @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
 
@@ -72,7 +75,7 @@ define [
 
     appendEvents: (events) =>
       @nextPageDate = events.nextPageDate
-      @collection.push.apply(@collection, events)
+      @collection.push.apply(@collection, calendarEventFilter(@viewingGroup, events))
       @collection = _.sortBy(@collection, 'originalStart')
       @render()
 
@@ -157,8 +160,8 @@ define [
     #
     # Returns the formatted String
     formattedDayString: (event) =>
-      I18n.l('#date.formats.short_with_weekday', event.originalStart)
-    
+      tz.format(fcUtil.unwrap(event.originalStart), 'date.formats.short_with_weekday')
+
     # Internal: returns the 'start' of the event formatted for the template
     # Shown to screen reader users, so they hear real month and day names, and
     # not letters like "D E C" or "W E D", or words like "dec" (read "deck")
@@ -167,8 +170,7 @@ define [
     #
     # Returns the formatted String
     formattedLongDayString: (event) =>
-      I18n.l '#date.formats.long_with_weekday', event.originalStart
-      
+      tz.format(fcUtil.unwrap(event.originalStart), 'date.formats.long_with_weekday')
 
     # Internal: change a box of events into an output hash for toJSON
     #
@@ -176,13 +178,13 @@ define [
     #
     # Returns an Object with 'date' and 'events' keys.
     eventBoxToHash: (events) =>
-      now = $.fudgeDateForProfileTimezone(new Date)
+      now = fcUtil.now()
       event = _.first(events)
       start = event.originalStart
       isToday =
-        now.getDate() == start.getDate() &&
-        now.getMonth() == start.getMonth() &&
-        now.getFullYear() == start.getFullYear()
+        now.date() == start.date() &&
+        now.month() == start.month() &&
+        now.year() == start.year()
       date: @formattedDayString(event)
       accessibleDate: @formattedLongDayString(event)
       isToday: isToday
@@ -197,6 +199,7 @@ define [
       days: _.map(boxedEvents, @eventBoxToHash)
       meta:
         hasMore: !!@nextPageDate
+        displayAppointmentEvents: @viewingGroup
 
     # Public: Creates the json for the template.
     #

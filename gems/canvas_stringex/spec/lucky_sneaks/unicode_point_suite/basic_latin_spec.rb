@@ -1,6 +1,6 @@
 require "spec_helper"
 
-require File.join(File.dirname(__FILE__), "codepoint_test_helper")
+require_relative "codepoint_test_helper"
 include CodepointTestHelper
 
 describe "BasicLatin" do

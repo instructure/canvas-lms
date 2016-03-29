@@ -32,10 +32,8 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
     "quiz-item-analysis-#{Time.now.to_i}.csv"
   end
 
-  MIN_STATS_FOR_ALPHA = 15
-
-  def generate(legacy=true)
-    stats = summary_stats_for_quiz
+  def generate(_legacy=true, options ={})
+    stats = summary_stats_for_quiz(options)
     stats.map do |item|
       question_item_analysis = {
         question_id: item.question[:id],
@@ -53,7 +51,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
         variance: item.variance,
         stdev: item.standard_deviation,
         difficulty_index: item.difficulty_index,
-        alpha: stats.size > MIN_STATS_FOR_ALPHA ? stats.alpha : nil,
+        alpha: stats.alpha,
         point_biserials: []
       }
 
@@ -121,7 +119,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
           item.variance,
           item.standard_deviation,
           item.difficulty_index,
-          stats.size > MIN_STATS_FOR_ALPHA && stats.alpha ? stats.alpha : "N/A"
+          stats.alpha || "N/A"
         ]
         point_biserial_max_count.times do |n|
           row << item.point_biserials[n]
@@ -133,7 +131,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
 
   private
 
-  def summary_stats_for_quiz
-    @summary_stats ||= Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz)
+  def summary_stats_for_quiz(options = {})
+    @summary_stats ||= Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz, {}, options)
   end
 end

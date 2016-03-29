@@ -63,7 +63,7 @@
 #         },
 #         "grading_scheme": {
 #           "description": "A list of GradingSchemeEntry that make up the Grading Standard as an array of values with the scheme name and value",
-#           "example": "[{\"name\":\"A\", \"value\":0.9}, {\"name\":\"B\", \"value\":0.8}, {\"name\":\"C\", \"value\":0.7}, {\"name\":\"D\", \"value\":0.6}]",
+#           "example": [{"name":"A", "value":0.9}, {"name":"B", "value":0.8}, {"name":"C", "value":0.7}, {"name":"D", "value":0.6}],
 #           "type": "array",
 #           "items": {"$ref": "GradingSchemeEntry"}
 #         }
@@ -142,6 +142,24 @@ class GradingStandardsApiController < ApplicationController
           format.json{ render :json => @standard.errors.to_json, :status => :bad_request }
         end
       end
+    end
+  end
+
+  # @API List the grading standards available in a context.
+  #
+  # Returns the list of grading standards in the given context that are visible to user.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/grading_standards \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Grading Standard]
+  def context_index
+    if authorized_action(@context, @current_user, :read)
+      grading_standards_json = @context.grading_standards.map do |g|
+        grading_standard_json(g, @current_user, session)
+      end
+      render json: grading_standards_json
     end
   end
 

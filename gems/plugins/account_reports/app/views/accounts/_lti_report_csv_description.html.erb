@@ -1,0 +1,47 @@
+<p><%= t('account_reports.default.lti_reports.text',
+         %{This report provides an export of data that shows LTI (Learning Tool Interoperability) usage information.}) %></p>
+
+<h3><%= t('#account_reports.default.description.header', %{Example}) %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t('Configuration Location') %></th>
+    <th><%= t('Associated Account/Course ID') %></th>
+    <th><%= t('Associated Account Name') %></th>
+    <th><%= t('Associated Course Name') %></th>
+    <th><%= t('Tool Name') %></th>
+    <th><%= t('Tool Type') %></th>
+    <th><%= t('Tool Created At') %></th>
+    <th><%= t('Tool Privacy Level') %></th>
+    <th><%= t('Launch URL') %></th>
+    <th><%= t('Custom Fields') %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Account</td>
+    <td>1</td>
+    <td>Test Account</td>
+    <td></td>
+    <td>Example Tool Name</td>
+    <td>Example Tool</td>
+    <td>2014-10-24 20:34:53 UTC</td>
+    <td>anonymous</td>
+    <td>https://www.edu-apps.org/lti_public_resources/?tool_id=vimeo</td>
+    <td>{"canvas_account_id"=>"$Canvas.account.id"}</td>
+  </tr>
+  <tr>
+    <td>Course</td>
+    <td>2</td>
+    <td></td>
+    <td>Test Course</td>
+    <td>Example Tool Name</td>
+    <td>Example Tool</td>
+    <td>2015-12-29 20:53:00 UTC</td>
+    <td>public</td>
+    <td>https://www.edu-apps.org/lti_public_resources/?tool_id=youtube</td>
+    <td>{"canvas_course_id"=>"$Canvas.course.id"}</td>
+  </tr>
+  </tbody>
+</table>

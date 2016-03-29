@@ -27,8 +27,8 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Returns the assignment group with the given id.
   #
-  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"]
-  #   Associations to include with the group. "discussion_topic" and "assignment_visibility"
+  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"|"submission"]
+  #   Associations to include with the group. "discussion_topic" and "assignment_visibility" and "submission"
   #   are only valid if "assignments" is also included. The "assignment_visibility" option additionally
   #   requires that the Differentiated Assignments course feature be turned on.
   #
@@ -46,13 +46,17 @@ class AssignmentGroupsApiController < ApplicationController
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       assignments = @assignment_group.visible_assignments(@current_user)
       if params[:grading_period_id].present? && multiple_grading_periods?
-        assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignments)
+        assignments = GradingPeriod.context_find(@context, params[:grading_period_id]).assignments(assignments)
+      end
+      if assignments.any? && includes.include?('submission')
+        submissions = submissions_hash(['submission'], assignments)
       end
       includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
         stringify_json_ids: stringify_json_ids?,
         override_dates: override_dates,
-        assignments: assignments
+        assignments: assignments,
+        submissions: submissions
       })
     end
   end
@@ -76,7 +80,7 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # @returns AssignmentGroup
   def create
-    @assignment_group = @context.assignment_groups.scoped.new
+    @assignment_group = @context.assignment_groups.temp_record
     if authorized_action(@assignment_group, @current_user, :create)
       process_assignment_group
     end

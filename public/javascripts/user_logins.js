@@ -62,7 +62,8 @@ $(document).ready(function() {
       $("#login_information .login .delete_pseudonym_link").show();
 			$.flashMessage(I18n.t('save_succeeded', 'Save successful'));
     },
-    error: function(errors) {
+    error: function(errors, jqXHR, response) {
+      if (response.status === 401) return $.flashError(I18n.t('error.unauthorized', "You do not have sufficient privileges to make the change requested"));
       var accountId = $(this).find(".account_id select").val();
       var policy = ENV.PASSWORD_POLICIES && ENV.PASSWORD_POLICIES[accountId] || ENV.PASSWORD_POLICY;
       errors = Pseudonym.prototype.normalizeErrors(errors, policy);
@@ -89,6 +90,8 @@ $(document).ready(function() {
     $form.fillFormData(data, {object_name: 'pseudonym'});
     if( data.can_edit_sis_user_id == 'true' ){
       $sis_row.show();
+    } else {
+      $sis_row.remove();
     }
     var passwordable = $(this).parents(".links").hasClass('passwordable');
     var delegated = passwordable && $(this).parents(".links").hasClass('delegated-auth');

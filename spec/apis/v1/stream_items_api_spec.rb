@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe UsersController, type: :request do
   include Api
@@ -54,6 +55,7 @@ describe UsersController, type: :request do
     @context = @course
     discussion_topic_model
     discussion_topic_model(:user => @user)
+    announcement_model
     conversation(User.create, @user)
     Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
     Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
@@ -61,10 +63,65 @@ describe UsersController, type: :request do
     @assignment.update_attribute(:due_at, 1.week.from_now)
     json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
                     { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
-    expect(json).to eq [{"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+
+    expect(json).to eq [
+                    {"type" => "Announcement", "count" => 1, "unread_count" => 1, "notification_category" => nil},
+                    {"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
                     {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
                     {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
                    ]
+  end
+
+  context "cross-shard activity stream summary" do
+    specs_require_sharding
+    it "should return the activity stream summary with cross-shard items" do
+      @student = user(:active_all => true)
+      @shard1.activate do
+        @account = Account.create!
+        course(:active_all => true, :account => @account)
+        @course.enroll_student(@student).accept!
+        @context = @course
+        discussion_topic_model
+        discussion_topic_model(:user => @user)
+        announcement_model
+        conversation(User.create, @user)
+        Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+        Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+        assignment_model(:course => @course)
+        @assignment.update_attribute(:due_at, 1.week.from_now)
+        @assignment.update_attribute(:due_at, 2.weeks.from_now)
+        # manually set the pre-datafixup state for one of them
+        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item)).
+          limit(1).update_all(:notification_category => nil)
+      end
+      json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+        { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+
+      expect(json).to eq [
+            {"type" => "Announcement", "count" => 1, "unread_count" => 1, "notification_category" => nil},
+            {"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+            {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
+            {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+          ]
+    end
+  end
+
+  it "should still return notification_category in the the activity stream summary if not set (yet)" do
+    # TODO: can remove this spec as well as the code in lib/api/v1/stream_item once the datafixup has been run
+    @context = @course
+    Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    assignment_model(:course => @course)
+    @assignment.update_attribute(:due_at, 1.week.from_now)
+    @assignment.update_attribute(:due_at, 2.weeks.from_now)
+    # manually set the pre-datafixup state for one of them
+    StreamItem.where(:id => @user.visible_stream_item_instances.first.stream_item).update_all(:notification_category => nil)
+    json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+      { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+
+    expect(json).to eq [
+          {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+        ]
   end
 
   it "should format DiscussionTopic" do
@@ -281,6 +338,7 @@ describe UsersController, type: :request do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => '12',
+      'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => @sub.graded_at.as_json,
       'score' => 12,
@@ -292,7 +350,7 @@ describe UsersController, type: :request do
       'attempt' => nil,
       'body' => nil,
       'grade_matches_current_submission' => true,
-      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1",
+      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1&version=1",
       'submission_type' => nil,
       'submitted_at' => nil,
       'url' => nil,
@@ -333,6 +391,7 @@ describe UsersController, type: :request do
         'account_id' => @course.account_id,
         'enrollment_term_id' => @course.enrollment_term_id,
         'start_at' => @course.start_at.as_json,
+        'grading_standard_id'=>nil,
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
@@ -344,7 +403,8 @@ describe UsersController, type: :request do
         'is_public' => @course.is_public,
         'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
-        'apply_assignment_group_weights' => false
+        'apply_assignment_group_weights' => false,
+        'restrict_enrollments_to_course_dates' => false
       },
 
       'user' => {
@@ -386,6 +446,7 @@ describe UsersController, type: :request do
       'created_at' => StreamItem.last.created_at.as_json,
       'updated_at' => StreamItem.last.updated_at.as_json,
       'grade' => nil,
+      'excused' => nil,
       'grader_id' => nil,
       'graded_at' => nil,
       'score' => nil,
@@ -397,7 +458,7 @@ describe UsersController, type: :request do
       'attempt' => nil,
       'body' => nil,
       'grade_matches_current_submission' => nil,
-      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1",
+      'preview_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}?preview=1&version=1",
       'submission_type' => nil,
       'submitted_at' => nil,
       'url' => nil,
@@ -438,6 +499,7 @@ describe UsersController, type: :request do
         'account_id' => @course.account_id,
         'enrollment_term_id' => @course.enrollment_term_id,
         'start_at' => @course.start_at.as_json,
+        'grading_standard_id'=>nil,
         'id' => @course.id,
         'course_code' => @course.course_code,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course.uuid}.ics" },
@@ -449,7 +511,8 @@ describe UsersController, type: :request do
         'is_public' => @course.is_public,
         'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
-        'apply_assignment_group_weights' => false
+        'apply_assignment_group_weights' => false,
+        'restrict_enrollments_to_course_dates' => false
       },
 
       'user' => {

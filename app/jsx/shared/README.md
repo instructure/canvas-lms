@@ -13,5 +13,7 @@ These modules are potentially shared but only used in one feature.  If
 you can use one of them in your feature, please move it into this
 directory and update the require paths in the other feature.
 
-- path/to/file.js
-
+- app/jsx/theme_editor/RangeInput.jsx
+- app/jsx/account_course_user_search/IcCheckbox.jsx
+- app/jsx/account_course_user_search/IcInput.jsx
+- app/jsx/account_course_user_search/IcSelect.jsx

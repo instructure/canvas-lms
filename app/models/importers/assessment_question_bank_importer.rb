@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class AssessmentQuestionBankImporter < Importer
 

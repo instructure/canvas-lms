@@ -21,6 +21,18 @@ define [
       else
         null
 
+      isInPastGradingPeriodAndNotAdmin = ((assignment) ->
+        return false unless ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+        return false unless ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past
+
+        return false unless ENV.current_user_roles
+        return false unless typeof ENV.current_user_roles.find == 'function'
+        return false if ENV.current_user_roles.find (elem) -> elem == 'admin'
+
+        latest_end_date = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
+        assignment.due_at <= latest_end_date
+      )(@assignment)
+
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
         label: "student_grading_#{@assignment.id}"
@@ -29,8 +41,10 @@ define [
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+        shouldShowExcusedOption: true
+        isInPastGradingPeriodAndNotAdmin: isInPastGradingPeriodAndNotAdmin
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-
+      @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
       @$el.html(submissionDetailsDialog(@submission))
 
@@ -44,7 +58,10 @@ define [
           $(this).showIf(index == event.currentTarget.selectedIndex)
       .delegate '.submission_details_grade_form', 'submit', (event) =>
         event.preventDefault()
-        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+        formData = $(event.currentTarget).getFormData()
+        if formData["submission[posted_grade]"].toUpperCase() == "EX"
+          formData = {"submission[excuse]": true}
+        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
           $.publish 'submissions_updated', [@submission.all_submissions]
           setTimeout =>
@@ -81,12 +98,10 @@ define [
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
+      @submission.grade = "EX" if @submission.excused
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
 
-    @cachedDialogs: {}
-
     @open: (assignment, student, options) ->
-      (SubmissionDetailsDialog.cachedDialogs["#{assignment.id}-#{student.id}"] ||= new SubmissionDetailsDialog(assignment, student, options)).open()
-
+      new SubmissionDetailsDialog(assignment, student, options, ENV).open()

@@ -15,19 +15,22 @@
           <br />
         <% end %>
         <% if @query.present? %><input name="course[name]" type="hidden" value="<%= @query %>" /><% end %>
+        <input name="focus" type="hidden" value="filter_button"/>
         <input name="hide_enrollmentless_courses" type="hidden" value="0" />
         <input id="enroll_filter_checkbox" name="hide_enrollmentless_courses" type="checkbox" value="1" <% if params[:hide_enrollmentless_courses] == "1" %>checked="checked"<% end %>/>
         <label for="enroll_filter_checkbox"><%= t(:hide_enrollmentless_courses, "Hide enrollmentless courses") %></label>
         <br />
-        <button class='btn filter_button'><%= t("#buttons.filter", "Filter") %></button>
+        <button id='filter_button' class='btn filter_button'><%= t("#buttons.filter", "Filter") %></button>
       </form>
     </div>
 
     <% if @associated_courses_count > 0 %>
+      <% js_bundle :account_search %>
       <h2 id="course_name_label"><%= t(:filter_label, "Find a Course") %></h2>
       <div class="rs-margin-lr rs-margin-bottom">
-        <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "ic-Form-control", :method => :get} do |f| -%>
+        <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "ic-Form-control account_search_form", :method => :get} do |f| -%>
           <div class="ic-Input-group">
+            <input name="focus" type="hidden" value="course_name"/>
             <input id="course_name"
                    type="text"
                    name="course[name]"
@@ -44,6 +47,7 @@
   <% end %>
 <% end %>
 <% js_bundle :account_show %>
+<% js_bundle :focus_helper %>
 
 <%= render :partial => 'shared/accounts_right_side_shared' %>
 <%= render :partial => 'add_course_or_user' %>

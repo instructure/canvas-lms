@@ -1,26 +1,27 @@
+<% dashboard_invitation ||= nil %>
 <% invitation = dashboard_invitation %>
-<div class="global-message image-block">
-  <div class="image-block-image">
-    <i class="icon-invitation is-invitation-icon"></i>
-    <span class="hidden-inline-text">
+<div class="ic-notification ic-notification--success">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-invitation"></i>
+    <span class="screenreader-only">
       <%= accessible_message_icon_text("invitation") %>
     </span>
   </div>
-  <div class="image-block-content">
-    <div class="message">
-      <p><%=
+  <div class="ic-notification__content">
+    <div class="ic-notification__message notification_message">
+      <%=
         mt(:invitation_text, "You have been invited to join [%{course}](%{link_to_course}) as %{enrollment_type_with_indefinite_article}", {
           :course => invitation.long_name,
           :link_to_course => course_path(invitation.course_id, :invitation => invitation.uuid),
           :enrollment_type_with_indefinite_article => Enrollment.type_with_indefinite_article(invitation.type).downcase
         })
-        %></p>
+      %>
     </div>
-    <div class="buttons">
+    <div class="ic-notification__actions">
       <%= form_tag course_enrollment_invitation_path(invitation.course_id) do %>
         <input type="hidden" name="invitation" value="<%= invitation.uuid %>" />
-        <button type="submit" name="reject" class="btn btn-small"><%= t('buttons.decline', 'Decline') %></button>
-        <button type="submit" name="accept" class="btn btn-small btn-primary"><%= t('buttons.accept', 'Accept') %></button>
+        <button type="submit" name="reject" class="Button Button--small"><%= t('buttons.decline', 'Decline') %></button>
+        <button type="submit" name="accept" class="Button Button--small Button--success"><%= t('buttons.accept', 'Accept') %></button>
       <% end %>
     </div>
   </div>

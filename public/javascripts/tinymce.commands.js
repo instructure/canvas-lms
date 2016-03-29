@@ -2,6 +2,9 @@ define([
   "compiled/editor/stocktiny"
 ], function(tinymce){
 
+  var openTag = /</;
+  var isLink = /^<a [^>]+>[^<]+<\/a>$/;
+
   /**
    * @exports
    * A series of functions that wrap conditionals
@@ -40,9 +43,36 @@ define([
     },
 
     isOnlyText: function(maybeHtml){
-      return !(/</.test(maybeHtml) &&
-              (!/^<a [^>]+>[^<]+<\/a>$/.test(maybeHtml) ||
+      return !(openTag.test(maybeHtml) &&
+              (!isLink.test(maybeHtml) ||
               maybeHtml.indexOf('href=') == -1));
+    },
+
+    isLinkInsideTD: function(editor){
+        return (
+          editor.selection.dom.getParent(editor.selection.getNode(), 'td') &&
+          editor.selection.dom.getParent(editor.selection.getNode(), 'a') &&
+          editor.selection.getNode().tagName !== "TD"
+        );
+    },
+
+    /**
+     * Determines how to build an html link inside of a td tag. If the selection is a link
+     * then it creates a new tag with the same attributes. If the selection is not a link then
+     * it grabs whatever the selection is and generates a link with the html as its contents.
+     * @param {Editor} tinymce editor
+     * @param {String} content the text of the link inside the a tag,
+     *   often passed in as the previously selected text prior to trying to
+     *   create a link
+     * @param {Hash} linkAttrs other attributes for the link (class, target, etc)
+     */
+    buildHtmlLink: function(editor, content, linkAttrs){
+      if (editor.selection.getNode().tagName === "A") {
+        return editor.dom.create("a", linkAttrs, content);
+      } else // selection as surrounding html tags
+      {
+        return editor.dom.create("a", linkAttrs, editor.selection.getNode());
+      }
     },
 
     /**
@@ -56,11 +86,23 @@ define([
      *   often passed in as the previously selected text prior to trying to
      *   create a link
      * @param {Hash} linkAttrs other attributes for the link (class, target, etc)
+     *
+     * @returns {DOM Node} returns a raw dom node
      */
     insertLink: function(id, content, linkAttrs){
       var editor = tinymce.get(id);
       editor.focus();
-      if (EditorCommands.isOnlyText(content)) {
+
+      // This is this odd edge case where if you have a link inside of a table and try to change it, tinymce will strip out all
+      // of the surrounding tags like spans and divs. This makes sure surrounding tags/classess are maintained.
+      
+      if (EditorCommands.isOnlyText(content) && EditorCommands.isLinkInsideTD(editor)){
+        var linkHTML = EditorCommands.buildHtmlLink(editor, content, linkAttrs);
+        var linkToReplace = editor.selection.getNode();
+        var linkParent = linkToReplace.parentNode;
+
+        linkParent.replaceChild(linkHTML, linkToReplace);
+      } else if (EditorCommands.isOnlyText(content)) {
         var linkContent = editor.dom.encode(content);
         var linkHtml = editor.dom.createHTML("a", linkAttrs, linkContent);
         editor.insertContent(linkHtml);

@@ -30,160 +30,175 @@ define([
 ], function(I18n, $, _, htmlEscape, waitForProcessing, processGradebookUpload, SlickGrid) {
 
   var GradebookUploader = {
-    createGeneralFormatter: function (attribute) {
-      return function (row, cell, value) {
+    createGeneralFormatter: function(attribute) {
+      return function(row, cell, value) {
         return value ? value[attribute] : "";
       }
     },
 
-    init:function(uploadedGradebook){
-      var gradebookGrid,
-          $gradebook_grid = $("#gradebook_grid"),
-          $gradebook_grid_header = $("#gradebook_grid_header"),
-          rowsToHighlight = [],
-          self = this;
+      init: function(uploadedGradebook) {
+        var gradebookGrid,
+            $gradebook_grid = $("#gradebook_grid"),
+            $gradebook_grid_header = $("#gradebook_grid_header"),
+            rowsToHighlight = [],
+            self = this;
 
-      var gridData = {
-        columns: [
-          {
-            id:"student",
-            name:I18n.t('student', "Student"),
-            field:"student",
-            width:250,
-            cssClass:"cell-title",
-            formatter: self.createGeneralFormatter('name')
-          }
-        ],
-        options: {
-          enableAddRow: false,
-          editable: true,
-          enableColumnReorder: false,
-          asyncEditorLoading: true,
-          rowHeight: 30
-        },
-        data: []
-      };
-
-      var labelData = {
-        columns: [{
-          id: 'assignmentGrouping',
-          name: '',
-          field: 'assignmentGrouping',
-          width: 250
-        }],
-        options: {
-          enableAddRow: false,
-          enableColumnReorder: false,
-          asyncEditorLoading: false
-        },
-        data: []
-      };
-
-      delete uploadedGradebook.missing_objects;
-      delete uploadedGradebook.original_submissions;
-
-      $.each(uploadedGradebook.assignments, function(){
-        var newGrade = {
-          id: this.id,
-          name: htmlEscape(I18n.t('To')),
-          field: this.id,
-          width: 125,
-          editor: Slick.Editors.UploadGradeCellEditor,
-          formatter: self.createGeneralFormatter('grade'),
-          active: true,
-          previous_id: this.previous_id,
-          cssClass: "new-grade"
+        var gridData = {
+          columns: [
+            {
+              id:"student",
+              name:I18n.t('student', "Student"),
+              field:"student",
+              width:250,
+              cssClass:"cell-title",
+              formatter: self.createGeneralFormatter('name')
+            }
+          ],
+          options: {
+            enableAddRow: false,
+            editable: true,
+            enableColumnReorder: false,
+            asyncEditorLoading: true,
+            rowHeight: 30
+          },
+          data: []
         };
 
-        var conflictingGrade = {
-          id: this.id + "_conflicting",
-          width: 125,
-          formatter: self.createGeneralFormatter('original_grade'),
-          field: this.id + "_conflicting",
-          name: htmlEscape(I18n.t('From')),
-          cssClass: 'conflicting-grade'
+        var labelData = {
+          columns: [{
+            id: 'assignmentGrouping',
+            name: '',
+            field: 'assignmentGrouping',
+            width: 250
+          }],
+          options: {
+            enableAddRow: false,
+            enableColumnReorder: false,
+            asyncEditorLoading: false
+          },
+          data: []
         };
 
-        var assignmentHeaderColumn = {
-          id: this.id,
-          width: 250,
-          name: htmlEscape(this.title),
-          headerCssClass: "assignment"
-        };
+        delete uploadedGradebook.missing_objects;
+        delete uploadedGradebook.original_submissions;
 
-        labelData.columns.push(assignmentHeaderColumn);
-        gridData.columns.push(conflictingGrade);
-        gridData.columns.push(newGrade);
-      });
+        $.each(uploadedGradebook.assignments, function(){
+          var newGrade = {
+            id: this.id,
+            name: htmlEscape(I18n.t('To')),
+            field: this.id,
+            width: 125,
+            editor: Slick.Editors.UploadGradeCellEditor,
+            formatter: self.createGeneralFormatter('grade'),
+            active: true,
+            previous_id: this.previous_id,
+            cssClass: "new-grade"
+          };
 
-      $.each(uploadedGradebook.students, function(index){
-        var row = {
-          student   : this,
-          id        : this.id
-        };
-        $.each(this.submissions, function(){
-          var originalGrade = parseInt(this.original_grade);
-              updatedGrade  = parseInt(this.grade),
-              updateWillRemoveGrade = !isNaN(originalGrade) && isNaN(updatedGrade);
+          var conflictingGrade = {
+            id: this.id + "_conflicting",
+            width: 125,
+            formatter: self.createGeneralFormatter('original_grade'),
+            field: this.id + "_conflicting",
+            name: htmlEscape(I18n.t('From')),
+            cssClass: 'conflicting-grade'
+          };
 
-          if (originalGrade > updatedGrade || updateWillRemoveGrade) {
-            rowsToHighlight.push({rowIndex: index, id: this.assignment_id});
-          }
+          var assignmentHeaderColumn = {
+            id: this.id,
+            width: 250,
+            name: htmlEscape(this.title),
+            headerCssClass: "assignment"
+          };
 
-          row['assignmentId'] = this.assignment_id;
-          row[this.assignment_id] = this;
-          row[this.assignment_id + "_conflicting"] = this;
+          labelData.columns.push(assignmentHeaderColumn);
+          gridData.columns.push(conflictingGrade);
+          gridData.columns.push(newGrade);
         });
-        gridData.data.push(row);
-        row.active = true;
-      });
 
-      // if there are still assignments with changes detected.
-      if (gridData.columns.length > 1) {
-        if (uploadedGradebook.unchanged_assignments) {
-          $("#assignments_without_changes_alert").show();
+        $.each(uploadedGradebook.students, function(index){
+          var row = {
+            student   : this,
+            id        : this.id
+          };
+          $.each(this.submissions, function(){
+            var originalGrade = parseInt(this.original_grade);
+                updatedGrade  = parseInt(this.grade),
+                updateWillRemoveGrade = !isNaN(originalGrade) && isNaN(updatedGrade);
+
+            if ( (originalGrade > updatedGrade || updateWillRemoveGrade) &&
+                 ((this.grade || "").toUpperCase() !== "EX") ) {
+              rowsToHighlight.push({rowIndex: index, id: this.assignment_id});
+            }
+
+            row['assignmentId'] = this.assignment_id;
+            row[this.assignment_id] = this;
+            row[this.assignment_id + "_conflicting"] = this;
+          });
+          gridData.data.push(row);
+          row.active = true;
+        });
+
+        // if there are still assignments with changes detected.
+        if (gridData.columns.length > 1) {
+          if (uploadedGradebook.unchanged_assignments) {
+            $("#assignments_without_changes_alert").show();
+          }
+
+          var $gradebookGridForm = $("#gradebook_grid_form");
+          $gradebookGridForm.submit(function(e){
+            e.preventDefault();
+            $gradebookGridForm.disableWhileLoading(
+              processGradebookUpload(uploadedGradebook)
+            );
+          }).show();
+
+          $(window).resize(function(){
+            $gradebook_grid.height( $(window).height() - $gradebook_grid.offset().top - 150 );
+            var width = ((gridData.columns.length - 1) * 125) + 250;
+            $gradebook_grid.parent().width(width);
+          }).triggerHandler("resize");
+
+          gradebookGrid = new Slick.Grid($gradebook_grid, gridData.data, gridData.columns, gridData.options);
+          new Slick.Grid($gradebook_grid_header, labelData.data, labelData.columns, labelData.options);
+          gradebookGrid.onColumnHeaderClick = function(columnDef) { /*do nothing*/};
+
+          var gradeReviewRow = {};
+
+          for(var i = 0; i < rowsToHighlight.length; i++) {
+            var id = rowsToHighlight[i].id,
+                rowIndex = rowsToHighlight[i].rowIndex,
+                rowIndex= rowsToHighlight[i].rowIndex,
+                conflictingId = id + "_conflicting";
+
+            gradeReviewRow[rowIndex] = gradeReviewRow[rowIndex] || {};
+            gradeReviewRow[rowIndex][id] = 'right-highlight';
+            gradeReviewRow[rowIndex][conflictingId] = 'left-highlight';
+            gradebookGrid.invalidateRow(rowIndex);
+          }
+
+          gradebookGrid.setCellCssStyles("highlight-grade-change", gradeReviewRow);
+          gradebookGrid.render();
         }
-        var $gradebookGridForm = $("#gradebook_grid_form");
-        $gradebookGridForm.submit(function(e){
-          e.preventDefault();
-          $gradebookGridForm.disableWhileLoading(
-            processGradebookUpload(uploadedGradebook)
-          );
-        }).show();
-
-        $(window).resize(function(){
-          $gradebook_grid.height( $(window).height() - $gradebook_grid.offset().top - 150 );
-          var width = ((gridData.columns.length - 1) * 125) + 250;
-          $gradebook_grid.parent().width(width);
-        }).triggerHandler("resize");
-
-        gradebookGrid = new Slick.Grid($gradebook_grid, gridData.data, gridData.columns, gridData.options);
-        new Slick.Grid($gradebook_grid_header, labelData.data, labelData.columns, labelData.options);
-        gradebookGrid.onColumnHeaderClick = function(columnDef) { /*do nothing*/};
-
-        var gradeReviewRow = {};
-
-        for(var i = 0; i < rowsToHighlight.length; i++) {
-          var id = rowsToHighlight[i].id,
-              rowIndex = rowsToHighlight[i].rowIndex,
-              rowIndex= rowsToHighlight[i].rowIndex,
-              conflictingId = id + "_conflicting";
-
-          gradeReviewRow[rowIndex] = gradeReviewRow[rowIndex] || {};
-          gradeReviewRow[rowIndex][id] = 'right-highlight';
-          gradeReviewRow[rowIndex][conflictingId] = 'left-highlight';
-          gradebookGrid.invalidateRow(rowIndex);
+        else {
+          $("#no_changes_detected").show();
         }
 
-        gradebookGrid.setCellCssStyles("highlight-grade-change", gradeReviewRow);
-        gradebookGrid.render();
-      }
-      else {
-        $("#no_changes_detected").show();
-      }
+        if ( uploadedGradebook.assignments_outside_current_periods.length > 0 ) {
+          var $assignment_list = $("<ul></ul>");
+          var assignments     = uploadedGradebook.assignments_outside_current_periods;
+
+          _.each(assignments, function(assignment) {
+            var $li = $("<li></li>");
+            $li.text(assignment.title);
+            $assignment_list.append($li);
+          });
+          $("#assignments_outside_current_periods").removeClass("hidden");
+          $("#assignments_outside_current_periods").append($assignment_list);
+        }
     },
 
-    handleThingsNeedingToBeResolved: function(){
+    handleThingsNeedingToBeResolved: function() {
       var processingDfd = waitForProcessing(ENV.progress);
       processingDfd.fail(function(msg) {
         alert(msg);

@@ -8,15 +8,14 @@ define [
 
   module 'DueDateRemoveRowLink',
     setup: ->
-      @sandbox = sinon.sandbox.create()
       props =
         handleClick: ->
 
-      @handleClick = @sandbox.stub(props, 'handleClick')
-      @DueDateRemoveRowLink = React.render(DueDateRemoveRowLink(props), $('<div>').appendTo('body')[0])
+      @handleClick = @stub(props, 'handleClick')
+      DueDateRemoveRowLinkElement = React.createElement(DueDateRemoveRowLink, props)
+      @DueDateRemoveRowLink = React.render(DueDateRemoveRowLinkElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
-      @sandbox.restore()
       React.unmountComponentAtNode(@DueDateRemoveRowLink.getDOMNode().parentNode)
 
   test 'renders', ->

@@ -16,11 +16,19 @@ define [
     key.created = $.datetimeString(key.created_at)
     key.last_auth = $.datetimeString(key.last_auth_at)
     key.last_access = $.datetimeString(key.last_access_at)
+    key.inactive = key.workflow_state == 'inactive'
     $key = $(developer_key(key));
     $key.data('key', key)
-    
+
   buildForm = (key, $orig) ->
-    $form = $(developerKeyFormTemplate(key || {}))
+    key = key || {}
+
+    if !key.id && isAccountAdminLevel()
+      key._formAction = accountEndpoint()
+    else
+      key._formAction = siteAdminEndpoint()
+
+    $form = $(developerKeyFormTemplate(key))
     $form.formSubmit({
       beforeSubmit: ->
         $("#edit_dialog button.submit").text(I18n.t('button.saving', "Saving Key..."))
@@ -36,14 +44,38 @@ define [
         $("#edit_dialog button.submit").text(I18n.t('button.saving_failed', "Saving Key Failed"))
     })
     return $form
+
+  sendEvent = (event, $orig) ->
+    $.ajaxJSON(siteAdminEndpoint() + '/' + $orig.data('key').id, 'PUT', { developer_key: { event: event }},
+      (data) ->
+        $key = buildKey(data)
+        $orig.after($key).remove()
+    )
+
+  siteAdminEndpoint = ->
+    return '/api/v1/developer_keys'
+
+  accountEndpoint = ->
+    return "/api/v1/accounts/self/developer_keys"
+
+  isAccountAdminLevel = ->
+    return window.location.pathname.indexOf('/accounts') == 0
+
+  apiEndpoint = ->
+    if isAccountAdminLevel()
+      return accountEndpoint()
+
+    return siteAdminEndpoint()
+
+
   nextPage = ->
     $("#loading").attr('class', 'loading')
     page++
-    req = $.ajaxJSON('/api/v1/developer_keys?page=' + page, 'GET', {}, (data) ->
+    req = $.ajaxJSON(apiEndpoint() + '?page=' + page, 'GET', {}, (data) ->
       for key in data
         $key = buildKey(key)
         $("#keys tbody").append($key)
-      if req.getAllResponseHeaders().match /rel="next"/ 
+      if req.getAllResponseHeaders().match /rel="next"/
         if page > 1
           nextPage()
         else
@@ -66,6 +98,12 @@ define [
     key = $key.data('key')
     $form = buildForm(key, $key)
     $("#edit_dialog").empty().append($form).dialog('open')
+  ).on('click', '.deactivate_link', preventDefault ->
+    $key = $(this).closest(".key")
+    sendEvent('deactivate', $key)
+  ).on('click', '.activate_link', preventDefault ->
+    $key = $(this).closest(".key")
+    sendEvent('activate', $key)
   )
   $(".add_key").click((event) ->
     event.preventDefault()

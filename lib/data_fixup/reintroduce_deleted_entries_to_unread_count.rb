@@ -1,7 +1,7 @@
 module DataFixup::ReintroduceDeletedEntriesToUnreadCount
   def self.run
     # Recalculate counts to include deleted entries
-    DiscussionTopicParticipant.includes(:discussion_topic, :user).find_each do |participant|
+    DiscussionTopicParticipant.preload(:discussion_topic, :user).find_each do |participant|
       # since the previous code treated all deleted discussion entries as
       # hidden and not included in unread counts, we're going to update all
       # pre-existing deleted entries to be marked as read for all users

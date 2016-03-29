@@ -56,12 +56,22 @@ describe Api::V1::User do
 
   context 'user_json' do
     it 'should support optionally providing the avatar if avatars are enabled' do
+      @student.account.set_service_availability(:avatars, false)
+      @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
-      @test_api.services_enabled = [:avatars]
+      @student.account.set_service_availability(:avatars, true)
+      @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url")).to be_falsey
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"]).to match(
         %r{^https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(@student.email)}.*#{CGI.escape("/images/messages/avatar-50.png")}}
       )
+    end
+
+    it 'should support optionally including group_ids' do
+      @group = @course.groups.create!(:name => "My Group")
+      @group.add_user(@student, 'accepted', true)
+      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
     end
 
     it 'should use the correct SIS pseudonym' do
@@ -72,7 +82,6 @@ describe Api::V1::User do
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',
-          'sis_user_id' => 'xyz',
           'sis_import_id' => nil,
           'id' => @user.id,
           'short_name' => 'User',
@@ -94,7 +103,6 @@ describe Api::V1::User do
       expect(@test_api.user_json(@user, @admin, {}, [], Account.default)).to eq({
           'name' => 'User',
           'sortable_name' => 'User',
-          'sis_user_id' => 'xyz',
           'sis_import_id' => sis_batch.id,
           'id' => @user.id,
           'short_name' => 'User',
@@ -181,7 +189,6 @@ describe Api::V1::User do
         @test_api.user_json(@student, @admin, {}, [])
       end).to eq({ "name"=>"Student",
                       "sortable_name"=>"Student",
-                      "sis_user_id"=>"sis-user-id",
                       "id"=>@student.id,
                       "short_name"=>"Student",
                       "sis_user_id"=>"sis-user-id",
@@ -368,7 +375,6 @@ describe "Users API", type: :request do
       expect(json).to eq({
          'name' => @other_user.name,
          'sortable_name' => @other_user.sortable_name,
-         'sis_user_id' => @other_user.pseudonym.sis_user_id,
          'sis_import_id' => nil,
          'id' => @other_user.id,
          'short_name' => @other_user.short_name,
@@ -425,7 +431,6 @@ describe "Users API", type: :request do
         expect(json).to eq [{
           'name' => user.name,
           'sortable_name' => user.sortable_name,
-          'sis_user_id' => user.pseudonym.sis_user_id,
           'sis_import_id' => nil,
           'id' => user.id,
           'short_name' => user.short_name,
@@ -682,6 +687,38 @@ describe "Users API", type: :request do
       it "should allow site admins to create users and auto-validate communication channel" do
         create_user_skip_cc_confirm(@site_admin)
       end
+
+      it "respects authentication_provider_id" do
+        ap = Account.site_admin.authentication_providers.create!(auth_type: 'facebook')
+        api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/users",
+                 {controller: 'users', action: 'create', format: 'json', account_id: Account.site_admin.id.to_s},
+                 {
+                     user: {
+                         name: "Test User",
+                         short_name: "Test",
+                         sortable_name: "User, T.",
+                         time_zone: "Mountain Time (US & Canada)",
+                         locale: 'en'
+                     },
+                     pseudonym: {
+                         unique_id: "test@example.com",
+                         password: "password123",
+                         sis_user_id: "12345",
+                         send_confirmation: 0,
+                         authentication_provider_id: 'facebook'
+                     },
+                     communication_channel: {
+                         type: "sms",
+                         address: '8018888888',
+                         skip_confirmation: 1
+                     }
+                 }
+                )
+        users = User.where(name: "Test User").to_a
+        expect(users.length).to eql 1
+        user = users.first
+        expect(user.pseudonyms.first.authentication_provider).to eq ap
+      end
     end
 
     context 'as an account admin' do
@@ -707,7 +744,7 @@ describe "Users API", type: :request do
       end
 
       it "should require an email pseudonym" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -720,7 +757,7 @@ describe "Users API", type: :request do
       end
 
       it "should require acceptance of the terms" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -733,7 +770,7 @@ describe "Users API", type: :request do
       end
 
       it "should let you create a user if you pass all the validations" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -805,6 +842,107 @@ describe "Users API", type: :request do
       expect(email.path).to eq "test@example.com"
       expect(email.path_type).to eq 'email'
     end
+
+    context "as an anonymous user" do
+      before :each do
+        user(active_all: true)
+        @user = nil
+      end
+
+      it "should not let you create a user if self_registration is off" do
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User" },
+                         :pseudonym => { :unique_id => "test@example.com" }
+                     }
+                    )
+        assert_status(403)
+      end
+
+      it "should require an email pseudonym" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User", :terms_of_use => "1" },
+                         :pseudonym => { :unique_id => "invalid" }
+                     }
+                    )
+        assert_status(400)
+      end
+
+      it "should require acceptance of the terms" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User" },
+                         :pseudonym => { :unique_id => "test@example.com" }
+                     }
+                    )
+        assert_status(400)
+      end
+
+      it "should let you create a user if you pass all the validations" do
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+        json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                        { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                        {
+                            :user      => { :name => "Test User", :terms_of_use => "1" },
+                            :pseudonym => { :unique_id => "test@example.com" }
+                        }
+                       )
+        expect(json['name']).to eq 'Test User'
+      end
+    end
+
+    it "should return a 400 error if the request doesn't include a unique id" do
+      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                   { :controller => 'users',
+                     :action => 'create_self_registered_user',
+                     :format => 'json',
+                     :account_id => @admin.account.id.to_s
+                   },
+                   {
+                       :user      => { :name => "Test User", :terms_of_use => "1"  },
+                       :pseudonym => { :password => "password123" }
+                   }
+                  )
+      assert_status(400)
+      errors = JSON.parse(response.body)['errors']
+      expect(errors['pseudonym']).to be_present
+      expect(errors['pseudonym']['unique_id']).to be_present
+    end
+
+    it "should set user's email address via communication_channel[address]" do
+      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+               { :controller => 'users',
+                 :action => 'create_self_registered_user',
+                 :format => 'json',
+                 :account_id => @admin.account.id.to_s
+               },
+               {
+                   :user      => { :name => "Test User", :terms_of_use => "1" },
+                   :pseudonym => {
+                       :unique_id         => "test@test.com",
+                       :password          => "password123"
+                   },
+                   :communication_channel => {
+                       :address           => "test@example.com"
+                   }
+               }
+              )
+      expect(response).to be_success
+      users = User.where(name: "Test User").to_a
+      expect(users.size).to eq 1
+      expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
+      email = users.first.communication_channels.email.first
+      expect(email.path).to eq "test@example.com"
+      expect(email.path_type).to eq 'email'
+    end
   end
 
   describe "user account updates" do
@@ -845,6 +983,7 @@ describe "Users API", type: :request do
           'short_name' => 'Tobias',
           'integration_id' => nil,
           'login_id' => 'student@example.com',
+          'email' => 'student@example.com',
           'sis_login_id' => 'student@example.com',
           'locale' => 'en'
         })
@@ -1123,9 +1262,11 @@ describe "Users API", type: :request do
 
     context "a user with permissions" do
       it "should be able to delete a user" do
-        json = api_call(:delete, @path, @path_options)
-        expect(@student.associated_accounts).not_to include(Account.default)
-        expect(json.to_json).to eq @student.reload.to_json
+        Timecop.freeze do
+          json = api_call(:delete, @path, @path_options)
+          expect(@student.associated_accounts).not_to include(Account.default)
+          expect(json.to_json).to eq @student.reload.to_json
+        end
       end
 
       it "should be able to delete a user by SIS ID" do
@@ -1140,10 +1281,12 @@ describe "Users API", type: :request do
       end
 
       it 'should be able to delete itself' do
-        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
-        json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
-        expect(@user.associated_accounts).not_to include(Account.default)
-        expect(json.to_json).to eq @user.reload.to_json
+        Timecop.freeze do
+          path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
+          json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
+          expect(@user.associated_accounts).not_to include(Account.default)
+          expect(json.to_json).to eq @user.reload.to_json
+        end
       end
     end
 
@@ -1383,6 +1526,33 @@ describe "Users API", type: :request do
         )
         expect(json['hexcode']).to eq '#ababab'
       end
+    end
+  end
+
+  describe 'missing submissions' do
+    before :once do
+      course_with_student(active_all: true)
+      @observer = user(active_all: true, active_state: 'active')
+      @observer.user_observees.create do |uo|
+        uo.user_id = @student.id
+      end
+      @user = @observer
+      2.times do
+        @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+      end
+      @path = "/api/v1/users/#{@student.id}/missing_submissions"
+      @params = {controller: "users", action: "missing_submissions", user_id: @student.id, format: "json"}
+    end
+
+    it "should return unsubmitted assignments due in the past" do
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eql 2
+    end
+
+    it "should not return submitted assignments due in the past" do
+      @course.assignments.first.submit_homework @student, :submission_type => "online_text_entry"
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eql 1
     end
   end
 end

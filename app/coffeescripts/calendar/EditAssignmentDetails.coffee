@@ -1,5 +1,7 @@
 define [
   'jquery'
+  'timezone'
+  'compiled/util/fcUtil'
   'compiled/calendar/commonEventFactory'
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
@@ -7,7 +9,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
+], ($, tz, fcUtil, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -85,15 +87,14 @@ define [
       @$form.find(".more_options_link").attr('href', moreOptionsUrl)
 
     setupTimeAndDatePickers: () =>
-      @$form.find(".datetime_field").datetime_field()
-
-      startDate = @event.startDate()
-      endDate = @event.endDate()
-
+      $field = @$form.find(".datetime_field")
+      $field.datetime_field()
+      widget = $field.data('instance')
+      startDate = fcUtil.unwrap(@event.startDate())
       if @event.allDay
-        @$form.find(".datetime_field").val(startDate.toString('MMM d, yyyy')).change()
+        widget.setDate(startDate)
       else if startDate
-        @$form.find(".datetime_field").val(startDate.toString('MMM d, yyyy h:mmtt')).change()
+        widget.setDatetime(startDate)
 
     formSubmit: (e) =>
       e.preventDefault()
@@ -101,16 +102,12 @@ define [
       if form['assignment[due_at]']? then @submitAssignment(form) else @submitOverride(form)
 
     submitAssignment: (form) ->
-      dueAtString = form['assignment[due_at]']
+      $due_at = @$form.find("#assignment_due_at")
 
-      if dueAtString == ''
-        dueAt = null
-      else
-        dueAt = @$form.find("#assignment_due_at").data('date')
       params = {
         'assignment[name]': @$form.find("#assignment_title").val()
         'assignment[published]': @$form.find("#assignment_published").val() if @$form.find("#assignment_published").is(':checked')
-        'assignment[due_at]': if dueAt then $.unfudgeDateForProfileTimezone(dueAt).toISOString() else ''
+        'assignment[due_at]': $due_at.data('iso8601')
         'assignment[assignment_group_id]': @$form.find(".assignment_group").val()
       }
 
@@ -118,21 +115,20 @@ define [
         objectData =
           assignment:
             title: params['assignment[name]']
-            due_at: if dueAt then dueAt.toISOString() else null
+            due_at: params['assignment[due_at]']
             context_code: @$form.find(".context_id").val()
         newEvent = commonEventFactory(objectData, @event.possibleContexts())
         newEvent.save(params)
       else
         @event.title = params['assignment[name]']
-        @event.start = dueAt
+        @event.start = $due_at.data('date') # fudged
         @event.save(params)
 
       @closeCB()
 
     submitOverride: (form) ->
-      dueAt  = form['assignment_override[due_at]']
-      dueAt  = if dueAt is '' then null else @$form.find('#assignment_override_due_at').data('date')
-      params = 'assignment_override[due_at]': if dueAt then $.unfudgeDateForProfileTimezone(dueAt).toISOString() else ''
-      @event.start = dueAt
+      $due_at = @$form.find('#assignment_override_due_at')
+      params = 'assignment_override[due_at]': $due_at.data('iso8601')
+      @event.start = $due_at.data('date') # fudged
       @event.save(params)
       @closeCB()

@@ -40,7 +40,7 @@
 #         },
 #         "assignments": {
 #           "description": "the assignment groups for all submissions in this response that were graded by this user.  The details are not nested inside here, but the fact that an assignment is present here means that the grader did grade submissions for this assignment on the contextual date. You can use the id of a grader and of an assignment to make another API call to find all submissions for a grader/assignment combination on a given date.",
-#           "example": "[]",
+#           "example": [1,2,3],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         }
@@ -199,9 +199,8 @@
 #         },
 #         "versions": {
 #           "description": "an array of all the versions of this submission",
-#           "example": "[]",
 #           "type": "array",
-#           "items": {"type": "integer"}
+#           "items": {"$ref": "SubmissionVersion"}
 #         }
 #       }
 #     }
@@ -305,10 +304,9 @@
     # paginate the indexed scope and then convert to actual Version records
     path = api_v1_gradebook_history_feed_url(@context, params)
     indexed_versions = Api.paginate(indexed_versions, self, path)
-    ActiveRecord::Associations::Preloader.new(indexed_versions, :version).run
-    versions = indexed_versions.map(&:version)
+    ActiveRecord::Associations::Preloader.new.preload(indexed_versions, :version)
+    versions = indexed_versions.map(&:version).compact
 
-    # render them
     render :json => versions_json(@context, versions, api_context(nil), :assignment => assignment, :student => student)
   end
 

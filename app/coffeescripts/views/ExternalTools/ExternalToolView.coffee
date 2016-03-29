@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'Backbone'
   'jst/ExternalTools/ExternalToolView'
   'i18n!external_tools'
-], ($, template, I18n) ->
+], ($, Backbone, template, I18n) ->
 
   class ExternalToolView extends Backbone.View
 
@@ -32,6 +33,7 @@ define [
         {extension_type: 'quiz_menu', text: I18n.t 'quiz_menu_configured', 'Quiz menu configured'}
         {extension_type: 'file_menu', text: I18n.t 'file_menu_configured', 'File menu configured'}
         {extension_type: 'wiki_page_menu', text: I18n.t 'wiki_page_menu_configured', 'Wiki page menu configured'}
+        {extension_type: 'post_grades', text: I18n.t 'Post Grades'}
       ]
 
       json = super

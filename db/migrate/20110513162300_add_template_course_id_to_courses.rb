@@ -1,4 +1,6 @@
 class AddTemplateCourseIdToCourses < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :courses, :template_course_id, :integer, :limit => 8
     add_index :courses, [:template_course_id]

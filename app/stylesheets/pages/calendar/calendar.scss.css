@@ -14,7 +14,7 @@
   display: none;
   position: relative;
   z-index: 100;
-  font-size: 10px;
+  @include fontSize(10px);
   padding: 1.5px 5px;
   margin-right: -3px;
 }
@@ -74,7 +74,6 @@ td.calendar_day_holder.drop_target .calendar_day, .calendar_undated.drop_target 
 .month_title {
 	text-align: center;
 	font-size: 1.2em;
-	font-size: 23px;
 	font-family: georgia, serif;
 }
 .month_title img{

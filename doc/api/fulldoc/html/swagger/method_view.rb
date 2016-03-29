@@ -59,7 +59,7 @@ class MethodView < HashView
   end
 
   def raw_routes
-    ApiRouteSet::V1.api_methods_for_controller_and_action(controller, action)
+    ApiRouteSet.api_methods_for_controller_and_action(controller, action)
   end
 
   def routes

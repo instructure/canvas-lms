@@ -179,7 +179,6 @@ describe GroupCategory do
       group2 = category.groups.create(:context => course)
       course.reload
       expect(course.groups.active.count).to eq 2
-
       category.destroy
       course.reload
       expect(course.groups.active.count).to eq 0

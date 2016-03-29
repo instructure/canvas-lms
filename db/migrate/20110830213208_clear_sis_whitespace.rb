@@ -1,8 +1,10 @@
 class ClearSisWhitespace < ActiveRecord::Migration
+  tag :predeploy
+
   
   def self.clear(table, *cols)
     cols = cols.map{|col|" #{col} = TRIM(#{col})"}.join(',')
-    execute("UPDATE #{table} SET #{cols}")
+    update("UPDATE #{connection.quote_table_name(table)} SET #{cols}")
   end
   
   def self.up

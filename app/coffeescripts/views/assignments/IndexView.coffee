@@ -8,7 +8,9 @@ define [
   'jst/assignments/IndexView'
   'jst/assignments/NoAssignmentsSearch'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin) ->
+  'compiled/userSettings'
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin, userSettings) ->
 
   class IndexView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -23,6 +25,7 @@ define [
 
     events:
       'keyup #search_term': 'search'
+      'change #grading_period_selector': 'filterResults'
 
     els:
       '#addGroup': '$addGroupButton'
@@ -56,6 +59,8 @@ define [
       @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
       window.onkeydown = @focusOnAssignments
 
+      @selectGradingPeriod()
+
     enableSearch: ->
       @$('#search_term').prop 'disabled', false
 
@@ -69,7 +74,12 @@ define [
 
     filterResults: =>
       term = $('#search_term').val()
-      if term == ""
+      gradingPeriod = null
+      if ENV.MULTIPLE_GRADING_PERIODS_ENABLED
+        gradingPeriodIndex = $("#grading_period_selector").val()
+        gradingPeriod = ENV.active_grading_periods[parseInt(gradingPeriodIndex)] if gradingPeriodIndex != "all"
+        @saveSelectedGradingPeriod(gradingPeriod)
+      if term == "" && _.isNull(gradingPeriod)
         #show all
         @collection.each (group) =>
           group.groupView.endSearch()
@@ -81,9 +91,13 @@ define [
       else
         regex = new RegExp(@cleanSearchTerm(term), 'ig')
         #search
-        atleastoneGroup = false
-        @collection.each (group) =>
-          atleastoneGroup = true if group.groupView.search(regex)
+        matchingAssignmentCount = @collection.reduce( (runningTotal, group) ->
+          additionalCount = group.groupView.search(regex, gradingPeriod)
+          runningTotal + additionalCount
+        , 0)
+
+        atleastoneGroup = matchingAssignmentCount > 0
+        @alertForMatchingGroups(matchingAssignmentCount)
 
         #add noAssignments placeholder
         if !atleastoneGroup
@@ -100,6 +114,15 @@ define [
             @noAssignments.remove()
             @noAssignments = null
 
+    alertForMatchingGroups: (numAssignments) ->
+      msg = I18n.t({
+          one: "1 assignment found."
+          other: "%{count} assignments found."
+          zero: "No matching assignments found."
+        }, count: numAssignments
+      )
+      $.screenReaderFlashMessageExclusive(msg)
+
     cleanSearchTerm: (text) ->
       text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
 
@@ -113,9 +136,20 @@ define [
 
     ensureContentStyle: ->
       # when loaded from homepage, need to change content style
-      if window.location.href.indexOf('assignments') == -1
+      if !@canManage() && window.location.href.indexOf('assignments') == -1
         $("#content").css("padding", "0em")
 
     filterKeyBindings: =>
       @keyBindings = @keyBindings.filter (binding) ->
         ! _.contains([69,68,65], binding.keyCode)
+
+    selectGradingPeriod: ->
+      gradingPeriodId = userSettings.contextGet('assignments_current_grading_period')
+      unless _.isNull(gradingPeriodId)
+        for i of ENV.active_grading_periods
+          if ENV.active_grading_periods[i].id == gradingPeriodId
+            $("#grading_period_selector").val(i)
+            break
+
+    saveSelectedGradingPeriod: (gradingPeriod) ->
+      userSettings.contextSet('assignments_current_grading_period', gradingPeriod && gradingPeriod.id)

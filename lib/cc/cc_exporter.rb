@@ -22,7 +22,7 @@ module CC
     include TextHelper
 
     ZIP_DIR = 'zip_dir'
-    
+
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy
     delegate :add_error, :add_item_to_export, :to => :@content_export, :allow_nil => true
 
@@ -61,7 +61,7 @@ module CC
         @manifest.close
         copy_all_to_zip
         @zip_file.close
-        
+
         if @content_export && File.exist?(@zip_path)
           att = Attachment.new
           att.context = @content_export
@@ -88,15 +88,15 @@ module CC
     def referenced_files
       @manifest ? @manifest.referenced_files : {}
     end
-    
+
     def set_progress(progress)
-      @content_export.fast_update_progress(progress) if @content_export  
+      @content_export.fast_update_progress(progress) if @content_export
     end
-    
+
     def errors
       @content_export ? @content_export.error_messages : []
     end
-    
+
     def export_id
       @content_export ? @content_export.id : nil
     end
@@ -108,9 +108,13 @@ module CC
     def export_symbol?(obj)
       @content_export ? @content_export.export_symbol?(obj) : true
     end
-    
+
+    def epub_export?
+      @content_export ? @content_export.epub_export.present? : nil
+    end
+
     private
-    
+
     def copy_all_to_zip
       Dir["#{@export_dir}/**/**"].each do |file|
         file_path = file.sub(@export_dir+'/', '')

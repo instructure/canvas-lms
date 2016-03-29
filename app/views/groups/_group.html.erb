@@ -1,3 +1,4 @@
+<% group ||= nil %>
 <% in_categories ||= [] %>
 <% in_group ||= false %>
 <li id="group_<%= group ? group.id : 'blank' %>" class="group <%= 'teacher_group' if group && @context.is_a?(Course) && !group.student_organized? %>" style="<%= hidden unless group %>">

@@ -30,14 +30,15 @@ describe Importers::DiscussionTopicImporter do
         data = data.with_indifferent_access
 
         context = get_import_context(system)
+        migration = context.content_migrations.create!
 
         data[:topics_to_import] = {}
-        expect(Importers::DiscussionTopicImporter.import_from_migration(data, context)).to be_nil
+        expect(Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)).to be_nil
         expect(context.discussion_topics.count).to eq 0
 
         data[:topics_to_import][data[:migration_id]] = true
-        Importers::DiscussionTopicImporter.import_from_migration(data, context)
-        Importers::DiscussionTopicImporter.import_from_migration(data, context)
+        Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
+        Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
         expect(context.discussion_topics.count).to eq 1
 
         topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
@@ -62,13 +63,14 @@ describe Importers::DiscussionTopicImporter do
         it "should import assignments for #{system}" do
           data = get_import_data(system, 'announcements')
           context = get_import_context(system)
+          migration = context.content_migrations.create!
           data[:topics_to_import] = {}
-          expect(Importers::DiscussionTopicImporter.import_from_migration(data, context)).to be_nil
+          expect(Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)).to be_nil
           expect(context.discussion_topics.count).to eq 0
 
           data[:topics_to_import][data[:migration_id]] = true
-          Importers::DiscussionTopicImporter.import_from_migration(data, context)
-          Importers::DiscussionTopicImporter.import_from_migration(data, context)
+          Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
+          Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
           expect(context.discussion_topics.count).to eq 1
 
           topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
@@ -82,12 +84,13 @@ describe Importers::DiscussionTopicImporter do
   it "should not attach files when no attachment_migration_id is specified" do
     data = get_import_data('bb8', 'discussion_topic').first.with_indifferent_access
     context = get_import_context('bb8')
+    migration = context.content_migrations.create!
 
     data[:attachment_migration_id] = nil
     attachment_model(:context => context) # create a file with no migration id
 
     data[:topics_to_import] = {data[:migration_id] => true}
-    Importers::DiscussionTopicImporter.import_from_migration(data, context)
+    Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
 
     topic = DiscussionTopic.where(migration_id: data[:migration_id]).first
     expect(topic.attachment).to be_nil

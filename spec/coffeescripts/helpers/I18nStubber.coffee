@@ -14,6 +14,11 @@ define ['i18nObj'], (I18n) ->
       I18n.locale = locale
       I18n.translations = translations
 
+    clear: ()->
+      while(frames.length > 0)
+        this.popFrame()
+
+
     stub: (locale, translations) ->
       throw 'I18nStubber: stub without a stored frame' unless frames.length
       scope = I18n.translations

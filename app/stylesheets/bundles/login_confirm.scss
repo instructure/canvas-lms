@@ -1,0 +1,12 @@
+@import "base/environment";
+@import "pages/login/registration_dialog.scss";
+@import "pages/login/ic-login-sso.scss";
+
+// If new UI, then import the new UI login styles/vars
+@if $use_new_styles {
+  @import "pages/login/ic-login.scss";
+}
+// If legacy UI, then load the existing styles for the confirmation/disambiguation box
+@else {
+  @import "pages/login/login_legacy.scss";
+}

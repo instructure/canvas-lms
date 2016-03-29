@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course catalog" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def catalog_url
     "/search/all_courses"
@@ -37,6 +37,12 @@ describe "course catalog" do
   end
 
   it "should list indexed courses" do
+    courses = course_elements
+    expect(courses.size).to eql 1
+  end
+
+  it "should work without course catalog" do
+    Account.default.disable_feature!(:course_catalog)
     courses = course_elements
     expect(courses.size).to eql 1
   end

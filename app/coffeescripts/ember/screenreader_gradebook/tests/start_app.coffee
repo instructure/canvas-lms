@@ -1,4 +1,4 @@
-define ['../main'], (Application) ->
+define ['../main', 'ember'], (Application, Ember) ->
   startApp = () ->
     App = null
     Ember.run.join ->
@@ -14,5 +14,3 @@ define ['../main'], (Application) ->
       App.injectTestHelpers()
     window.App = App
     App
-
-

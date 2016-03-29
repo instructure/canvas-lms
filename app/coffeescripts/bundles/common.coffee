@@ -1,5 +1,6 @@
 require [
   'jquery'
+  'underscore'
 
   # true modules that we manage in this file
   'Backbone'
@@ -27,6 +28,7 @@ require [
   'compiled/behaviors/tooltip'
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
+  'LtiThumbnailLauncher'
 
   # other stuff several bundles use
   'media_comments'
@@ -34,6 +36,7 @@ require [
   'jqueryui/progressbar'
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
+  'moment'
 
   # random modules required by the js_blocks, put them all in here
   # so RequireJS doesn't try to load them before common is loaded
@@ -45,7 +48,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, Backbone, helpDialog, tours) ->
+], ($, _, Backbone, helpDialog, tours) ->
   helpDialog.initTriggers()
   tours.init()
 
@@ -57,6 +60,42 @@ require [
   $logo = $('#header-logo')
   if $logo.length > 0 and $logo.css('background-image').match(/\/canvas\/header_canvas_logo\.png/)
     $logo.addClass('original')
+
+  # new styles only - show and hide the courses vertical menu when the user clicks the hamburger button
+  # This was in the courses bundle, but it sometimes needs to work in places that don't
+  # load that bundle.
+  #
+  WIDE_BREAKPOINT = 1200
+
+  setMenuItemTabIndex = ($menuElement) ->
+    # in testing this, it seems that $(document).width() returns 15px less than what it should.
+    if ($('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15)
+      $menuElement.attr('tabIndex', 0)
+    else
+      $menuElement.attr('tabIndex', -1)
+
+  $(document).ready( ->
+    return unless window.ENV.use_new_styles?
+
+    $('#section-tabs li a').each((index, element) ->
+      setMenuItemTabIndex($(element))
+    )
+  )
+
+  if window.ENV.use_new_styles?
+    $("body").on('click', '#courseMenuToggle', ->
+      $("body").toggleClass("course-menu-expanded")
+      $('#section-tabs li a').each((index, element) ->
+        setMenuItemTabIndex($(element))
+      )
+    )
+
+    $(window).on('resize', _.debounce( ->
+      $('#section-tabs li a').each((index, element) ->
+        setMenuItemTabIndex($(element))
+      )
+    , 50)
+    )
 
   ##
   # Backbone routes

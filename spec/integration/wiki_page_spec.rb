@@ -111,5 +111,16 @@ describe WikiPagesController do
 
   end
 
+  describe "wiki_sidebar" do
+
+    it "should load as many pages as the setting allows" do
+      Setting.get('wiki_sidebar_item_limit', 3)
+      4.times{ |i| @course.wiki.wiki_pages.create!(:title => "Page #{i}") }
+      get "/courses/#{@course.id}/pages/page-1/edit"
+      doc = Nokogiri::HTML(response.body)
+
+      expect(doc.css('#pages_accordion #pages_tab_panel li a').count).to eql(3)
+    end
+  end
 end
 

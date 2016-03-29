@@ -22,7 +22,7 @@ class ContextController < ApplicationController
   before_filter :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
   before_filter :require_user, :only => [:inbox, :report_avatar_image]
   before_filter :reject_student_view_student, :only => [:inbox]
-  protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
+  protect_from_forgery :except => [:kaltura_notifications, :object_snippet], with: :exception
 
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])
@@ -205,6 +205,7 @@ class ContextController < ApplicationController
         :CONTEXTS => @contexts,
         :resend_invitations_url => course_re_send_invitations_url(@context),
         :permissions => {
+          :read_sis => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
           :add_users => manage_students || manage_admins,
@@ -272,7 +273,8 @@ class ContextController < ApplicationController
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
-      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent
+      contexts = [@context] + @user.group_memberships_for(@context).to_a
+      @accesses = AssetUserAccess.for_user(@user).polymorphic_where(:context => contexts).most_recent
       respond_to do |format|
         format.html do
           @accesses = @accesses.paginate(page: params[:page], per_page: 50)
@@ -302,11 +304,15 @@ class ContextController < ApplicationController
       end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
-        @membership = @context.enrollments.where(user_id: user_id).first
-        log_asset_access(@membership, "roster", "roster")
+        scope = @context.enrollments.where(user_id: user_id)
+        scope = @context.grants_right?(@current_user, session, :read_as_admin) ? scope.active : scope.active_or_pending
+        @membership = scope.first
+
+        log_asset_access(@membership, "roster", "roster") if @membership
       elsif @context.is_a?(Group)
-        @membership = @context.group_memberships.where(user_id: user_id).first
+        @membership = @context.group_memberships.active.where(user_id: user_id).first
       end
+
       @user = @membership.user rescue nil
       if !@user
         if @context.is_a?(Course)
@@ -343,17 +349,24 @@ class ContextController < ApplicationController
     end
   end
 
+  WORKFLOW_TYPES = [
+    :all_discussion_topics, :assignments, :assignment_groups,
+    :enrollments, :rubrics, :collaborations, :quizzes, :context_modules
+  ].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [
+    :wiki_pages, :attachments
+  ].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = [:all_discussion_topics, :assignments, :assignment_groups, :enrollments,
-                     :rubrics, :collaborations, :quizzes, :context_modules].map {|assoc| @context.send(assoc) if @context.respond_to?(assoc)}.compact
+      @item_types = WORKFLOW_TYPES.select { |type| @context.reflections.key?(type) }.
+          map { |type| @context.association(type).reader }
 
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
       @deleted_items = []
       @item_types.each do |scope|
-        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).all
+        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
       end
-      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).all
+      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
@@ -366,7 +379,9 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
-      @item = scope.send(type.pluralize).find(id)
+      type = type.pluralize.to_sym
+      raise "invalid type" unless ITEM_TYPES.include?(type) && scope.reflections.key?(type)
+      @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item
     end

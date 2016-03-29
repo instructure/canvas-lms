@@ -20,4 +20,10 @@ module Login::CanvasHelper
   def session_timeout_enabled?
     PluginSetting.settings_for_plugin 'sessions'
   end
+
+  def reg_link_data(auth_type)
+    template = auth_type.present? ? "#{auth_type.downcase}Dialog" : "parentDialog"
+    path = auth_type.present? ? external_auth_validation_path : users_path
+    {template: template, path: path}
+  end
 end

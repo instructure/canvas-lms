@@ -29,21 +29,14 @@ class Collaboration < ActiveRecord::Base
   has_many :collaborators, :dependent => :destroy
   has_many :users, :through => :collaborators
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :collaboration_type, :document_id, :user_id, :context_id, :context_type, :url, :uuid, :data,
-    :created_at, :updated_at, :description, :title, :workflow_state, :deleted_at, :context_code, :type
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :user, :collaborators, :users]
-
   before_destroy { |record| Collaborator.where(:collaboration_id => record).destroy_all }
 
-  before_save :generate_document
   before_save :assign_uuid
   before_save :set_context_code
 
   after_save :include_author_as_collaborator
   after_save :touch_context
+  after_commit :generate_document, on: :create
 
   TITLE_MAX_LENGTH = 255
   validates_presence_of :title, :workflow_state
@@ -52,7 +45,7 @@ class Collaboration < ActiveRecord::Base
 
   serialize :data
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
 
   workflow do
     state :active
@@ -65,11 +58,12 @@ class Collaboration < ActiveRecord::Base
 
   set_policy do
     given { |user|
+      user &&
       !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||
          Collaborator.
-             joins('INNER JOIN group_memberships ON collaborators.group_id = group_memberships.group_id').
+             joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id").
              where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
                             collaborators.collaboration_id = ?', user, self).exists?)
@@ -156,7 +150,17 @@ class Collaboration < ActiveRecord::Base
   # Returns an array of type hashes w/ 'name' and 'type' keys.
   def self.collaboration_types
     Canvas::Plugin.all_for_tag(:collaborations).select(&:enabled?).map do |plugin|
-      HashWithIndifferentAccess.new({ 'name' => plugin.name, 'type' => plugin.id })
+      # google_drive is really a google_docs_collaboration
+      # eventually this will go away. baby steps...
+      if plugin.id == 'google_drive'
+        type = 'google_docs'
+        name = 'Google Docs'
+      else
+        type = plugin.id
+        name = plugin.name
+      end
+
+      HashWithIndifferentAccess.new({ 'name' => name, 'type' => type })
     end
   end
 
@@ -225,7 +229,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a title string.
   def title
-    read_attribute(:title) || self.parse_data.title
+    read_attribute(:title) || self.parse_data["title"]
   rescue NoMethodError
     t('#collaboration.default_title', 'Unnamed Collaboration')
   end
@@ -234,8 +238,11 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def generate_document
+    return if @generated
+    @generated = true
     assign_uuid
     initialize_document
+    save!
   end
 
   # Public: Determine if a given user can access this collaboration.
@@ -260,7 +267,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def update_members(users = [], group_ids = [])
-    save if new_record?
+    save! if new_record?
     generate_document
     users << user if user.present? && !users.include?(user)
     update_user_collaborators(users)
@@ -269,7 +276,7 @@ class Collaboration < ActiveRecord::Base
       group_users_to_add = User.
           uniq.
           joins(:group_memberships).
-          where('group_memberships.group_id' => group_ids).all
+          where('group_memberships.group_id' => group_ids).to_a
       add_users_to_document((users + group_users_to_add).uniq)
     end
   end
@@ -333,11 +340,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def remove_groups_from_collaborators(group_ids)
-    if group_ids.empty?
-      collaborators.scoped.where("group_id IS NOT NULL").delete_all
-    else
-      collaborators.scoped.where("group_id NOT IN (?)", group_ids).delete_all
-    end
+    collaborators.where.not(group_id: group_ids.presence).delete_all
   end
   protected :remove_groups_from_collaborators
 
@@ -347,11 +350,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def remove_users_from_collaborators(users)
-    if users.empty?
-      collaborators.scoped.where("user_id IS NOT NULL").delete_all
-    else
-      collaborators.scoped.where("user_id NOT IN (?)", users).delete_all
-    end
+    collaborators.where.not(user_id: users.presence).delete_all
   end
   protected :remove_users_from_collaborators
 

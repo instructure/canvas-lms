@@ -5,13 +5,13 @@
       <span class="name"><%= term.name rescue nbsp %></span>
     </div>
     <div class="show_term" style="font-size: 0.8em;">
-      <% if term && (term.sis_source_id && can_do(term.root_account, @current_user, :read_sis) || can_do(term.root_account, @current_user, :manage_sis)) %>
+      <% if term && (term.sis_source_id && can_do(@root_account, @current_user, :read_sis) || can_do(@root_account, @current_user, :manage_sis)) %>
         <div style="font-size: 0.8em;">
           <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term.sis_source_id %></span>
         </div>
       <% end %>
-      <%= term && t(:course_count, "Course", :count => term.courses.active.count) %><br/>
-      <%= term && t(:user_count, "User", :count => term.users_count) %>
+      <%= term && t(:course_count, "Course", :count => @course_counts_by_term[term.id] || 0) %><br/>
+      <%= term && t(:user_count, "User", :count => @user_counts_by_term[term.id.to_s] || 0) %>
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
         <div class="control-group edit_term">
@@ -45,7 +45,11 @@
                                                         :end_tooltip => t('titles.term_ends', "Term ends"), :whenever => [true, true] } %>
       </tr>
     <% types.each do |type| %>
-      <% override = term.enrollment_dates_overrides.where(context_type: @context.class.to_s, context_id: @context, enrollment_type: type.to_s).first if term %>
+      <% override = term.enrollment_dates_overrides.detect{|edo|
+           edo.context_type == @context.class.to_s &&
+             edo.context_id == @context.id &&
+             edo.enrollment_type == type.to_s
+         } if term %>
       <% override ||= EnrollmentDatesOverride.new %>
       <% type_string = type.to_s.underscore %>
       <% start_whenever = true %>
@@ -83,7 +87,7 @@
   </td>
   <td class="links">
     <a href="#" class="edit_term_link no-hover"><i class="icon-edit standalone-icon"></i></a>
-    <% if term && term.courses.active.exists? %>
+    <% if term && @course_counts_by_term[term.id].to_i > 0 %>
       <a href="#" class="cant_delete_term_link no-hover"><i class="icon-end standalone-icon"></i></a>
     <% elsif term != @context.default_enrollment_term %>
       <a href="#" class="delete_term_link no-hover"><i class="icon-trash standalone-icon"></i></a>

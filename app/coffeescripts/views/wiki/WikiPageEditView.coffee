@@ -77,7 +77,10 @@ define [
       json
 
     onUnload: (ev) =>
-      if this && @checkUnsavedOnLeave && @hasUnsavedChanges()
+      # don't open the "are you sure" dialog unless we're still rendered in the page
+      # so that, for example, our specs that don't clean up after themselves don't
+      # fire this unintentionally
+      if this && @checkUnsavedOnLeave && @hasUnsavedChanges() && document.body.contains(@el)
         warning = @unsavedWarning()
         (ev || window.event).returnValue = warning
         return warning
@@ -91,8 +94,7 @@ define [
       @initWikiSidebar()
 
       @checkUnsavedOnLeave = true
-      view = this
-      window.addEventListener 'beforeunload', @onUnload
+      $(window).on 'beforeunload', @onUnload
 
       unless @firstRender
         @firstRender = true
@@ -102,6 +104,7 @@ define [
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
         model: @model
+        interval: 60000
         reloadMessage: I18n.t 'reload_editing_page', 'This page has changed since you started editing it. *Reloading* will lose all of your changes.', wrapper: '<a class="reload" href="#">$1</a>'
         warning: true
       @reloadView.on 'changed', =>
@@ -135,7 +138,7 @@ define [
 
     # Validate they entered in a title.
     # @api ValidatedFormView override
-    validateFormData: (data) -> 
+    validateFormData: (data) ->
       errors = {}
 
       if data.title == ''

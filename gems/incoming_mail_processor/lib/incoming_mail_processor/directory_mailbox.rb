@@ -65,6 +65,11 @@ module IncomingMailProcessor
       move_file(folder, filename, target_folder)
     end
 
+    def unprocessed_message_count
+      # not implemented, and used only for performance monitoring.
+      nil
+    end
+
   private
     def folder_exists?(folder, subfolder = nil)
       to_check = subfolder ? File.join(folder, subfolder) : folder

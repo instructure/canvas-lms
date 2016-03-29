@@ -1,4 +1,3 @@
-<% request = peer_review_assignment || nil %>
 <li class="peer_review <%= request.try_rescue(:workflow_state) || 'assigned' %>" id="review_request_<%= request ? request.id : 'blank' %>" style="<%= hidden unless request %>">
   <span style="float: left;">
     <%= image_tag "pass.png", :alt => "finished", :title => "Finished" if request && request.completed? %>

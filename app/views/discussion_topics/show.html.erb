@@ -30,7 +30,7 @@
 <% end %>
 <%
   js_bundle :discussion
-  jammit_css :tinymce, :discussions, :learning_outcomes
+  css_bundle :tinymce, :discussions, :learning_outcomes
 %>
 
 <% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
@@ -53,7 +53,15 @@
 <% else %>
   <div id="discussion-managebar" class="toolbarView">
     <div class="headerBar">
-      <div class="row-fluid form-inline" style="overflow: visible;">
+      <div class="form-inline" style="overflow: visible;">
+        <div id="keyboard-shortcut-modal-info" tabindex="0">
+          <span aria-hidden="true" class="accessibility-warning">
+            <%= t 'Press the comma key or shift + ? to see a list of keyboard shortcuts' %>
+          </span>
+          <span class="screenreader-only">
+            <%= t 'Press the comma key or shift + question mark to see a list of keyboard shortcuts' %>
+          </span>
+        </div>
         <div class="pull-right">
           <% if !@topic.is_announcement && can_do(@context, @current_user, :moderate_forum) %>
             <button
@@ -91,7 +99,7 @@
                   <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
                 <% end %>
 
-                <% if can_do(@topic, @current_user, :delete) %>
+                <% if can_do(@topic, @current_user, :delete)%>
                   <li><a href="<%= context_url(@context, :context_discussion_topic_url, @topic.id) %>" class="delete_discussion" data-method="delete" rel="nofollow" data-confirm="<%= t :confirm_delete_discussion, 'Are you sure you want to delete this discussion?' %>"><i class="icon-trash"></i> <%= t :delete, 'Delete' %></a></li>
                 <% end %>
 
@@ -141,14 +149,7 @@
                 <% end %>
 
                 <% if can_do(@context, @current_user, :manage_content) %>
-                  <% (@discussion_topic_menu_tools || []).each do |tool_hash| %>
-                    <li>
-                      <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&discussion_topics[]=<%= @topic.id %>" tabindex="-1" role="menuitem">
-                        <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
-                        <%= tool_hash[:title] %>
-                      </a>
-                    </li>
-                  <% end %>
+                  <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
               </ul>
             </div>
@@ -174,7 +175,7 @@
           <% end %>
         <% end %>
         <% if @topic.for_group_discussion? %>
-          <%= render :partial => 'group_discussion' %>
+          <%= render :partial => 'group_discussion', :locals => {show_da_note: (@topic.for_assignment? && @topic.assignment.only_visible_to_overrides)} %>
         <% end %>
         <header class="discussion-section clearfix">
           <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>
@@ -265,11 +266,12 @@
                 size             = 50
               >
 
+              <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
               <input
                 type    = "checkbox"
                 id      = "onlyUnread"
-                aria-label = "<%= t("filter replies by unread") %>"
-              ><label aria-hidden="true" for="onlyUnread"><%= t('unread', 'Unread') %></label>
+                aria-labelledby="onlyUnreadAccessibleLabel"/>
+              <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
@@ -278,18 +280,17 @@
               <button id="expandAll" class="btn disableWhileFiltering" title="<%= t('expand_replies', 'Expand replies') %>" aria-label="<%= t('expand_replies', 'Expand replies') %>">
                 <%= image_tag 'discussions/expand_icon.png', :alt => t('expand_replies', 'Expand replies') %>
               </button>
-
             </div>
 
             <div class="span3 right-align">
-              <a role="button" href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+              <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
                  role="button"
                  aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
                 <i class='icon-discussion-check' aria-hidden="hidden"></i>
                 <%= t(:topic_subscribe, 'Subscribe') %>
               </a>
-              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom" role="button"
+              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
                  role="button"
                  aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
@@ -326,38 +327,5 @@
     </div>
   <% end %>
 
-  <% content_for :keyboard_navigation do %>
-    <ul class="navigation_list" tabindex="-1">
-      <li>
-        <span class="keycode">j</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :next_message, "Next Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">k</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :previous_message, "Previous Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">e</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :edit_current_message, "Edit Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">d</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :delete_current_message, "Delete Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">r</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :reply_to_message, "Reply to Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">n</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :reply_to_topic, "Reply to Topic" %></span>
-      </li>
-    </ul>
-  <% end %>
+  <div id="keyboard-shortcut-modal"></div>
 <% end %>

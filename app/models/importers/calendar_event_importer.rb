@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_dependency 'importers'
+
 module Importers
   class CalendarEventImporter < Importer
 
@@ -34,7 +36,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
       item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
@@ -44,10 +46,8 @@ module Importers
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title] || hash[:name]
-      missing_links = []
-      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration) do |warn, link|
-        missing_links << link if warn == :missing_link
-      end
+
+      item.description = migration.convert_html(hash[:description] || "", :calendar_event, hash[:migration_id], :description)
       item.description += import_migration_attachment_suffix(hash, context)
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at] || hash[:end_date])
@@ -55,12 +55,7 @@ module Importers
       item.imported = true
 
       item.save_without_broadcasting!
-      if migration
-        migration.add_missing_content_links(:class => item.class.to_s,
-          :id => item.id, :missing_links => missing_links,
-          :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
-      end
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       if hash[:all_day]
         item.all_day = hash[:all_day]
         item.save

@@ -76,22 +76,24 @@ class AdminsController < ApplicationController
     require_role
     admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
 
-    if authorized_action(admin, @current_user, :create)
-      if admin.new_record?
-        if admin.save
-          if !(params[:send_confirmation] == '0')
-            if user.registered?
-              admin.account_user_notification!
-            else
-              admin.account_user_registration!
-            end
+    return unless authorized_action(admin, @current_user, :create)
+
+    if admin.new_record?
+      if admin.save
+        # if they don't provide it, or they explicitly want it
+        if params[:send_confirmation].nil? ||
+          Canvas::Plugin.value_to_boolean(params[:send_confirmation])
+          if user.registered?
+            admin.account_user_notification!
+          else
+            admin.account_user_registration!
           end
-        else
-          return render :json => admin.errors, :status => :bad_request
         end
+      else
+        return render :json => admin.errors, :status => :bad_request
       end
-      render :json => admin_json(admin, @current_user, session)
     end
+    render :json => admin_json(admin, @current_user, session)
   end
   
   # @API Remove account admin

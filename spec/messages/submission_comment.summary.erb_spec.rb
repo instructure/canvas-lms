@@ -20,13 +20,26 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'submission_comment.summary' do
-  it "should render" do
+
+  before :each do
     submission_model
     @object = @submission.add_comment(:comment => "new comment")
     expect(@object.submission).not_to be_nil
     expect(@object.submission.assignment).not_to be_nil
     expect(@object.submission.assignment.context).not_to be_nil
     expect(@object.submission.user).not_to be_nil
-    generate_message(:submission_comment, :summary, @object)
   end
+
+  it "should render" do
+    message = generate_message(:submission_comment, :summary, @object)
+    expect(message.body).to_not include('Anonymous User')
+  end
+
+  it 'should show anonymous when anonymous peer review enabled' do
+    @submission.assignment.update_attribute(:anonymous_peer_reviews, true)
+    @object.reload
+    message = generate_message(:submission_comment, :summary, @object)
+    expect(message.body).to include('Anonymous User')
+  end
+
 end

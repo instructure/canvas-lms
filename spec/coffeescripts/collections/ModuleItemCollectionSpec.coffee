@@ -1,7 +1,7 @@
 define [
   'compiled/collections/ModuleItemCollection'
 ], (ModuleItemCollection) ->
-  module 'ModuleItemCollection',
+  module 'ModuleItemCollection'
 
   test "generates the correct fetch url", ->
     course_id = 5

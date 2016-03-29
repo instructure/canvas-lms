@@ -3,7 +3,7 @@ define [
   'Backbone'
 ], (_, Backbone) ->
 
-  pageReloadOptions = ['reloadMessage', 'warning']
+  pageReloadOptions = ['reloadMessage', 'warning', 'interval']
 
   class WikiPageReloadView extends Backbone.View
     setViewProperties: false
@@ -32,8 +32,9 @@ define [
           latestRevision.fetch(data: {summary: false}).done ->
             view.render()
             view.trigger('changed')
+            view.stopPolling()
 
-        latestRevision.pollForChanges()
+        latestRevision.pollForChanges(@interval)
 
     stopPolling: ->
       @latestRevision?.stopPolling()
@@ -42,3 +43,4 @@ define [
       ev?.preventDefault()
       @model.set(_.pick(@latestRevision.attributes, @options.modelAttributes))
       @trigger('reload')
+      @latestRevision.startPolling()

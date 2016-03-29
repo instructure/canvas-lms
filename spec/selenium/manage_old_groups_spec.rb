@@ -1,16 +1,19 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
+require_relative 'helpers/groups_common'
+require_relative 'helpers/manage_groups_common'
 require 'thread'
 
 describe "manage groups" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include GroupsCommon
+  include ManageGroupsCommon
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
   end
 
   # TODO: Remove this whole section after new UI becomes default
   context "with old UI" do
-    before :each do
+    before(:each) do
       #TODO: Remove this setting once made the default behavior
       account = Account.default
       account.settings[:enable_manage_groups2] = false

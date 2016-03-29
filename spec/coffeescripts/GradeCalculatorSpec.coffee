@@ -77,6 +77,18 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     assertGrade result, 'current', 10, 0
     assertDropped result.group_sums[0]['current'].submissions, [0,0], [5,0], [20,0]
 
+  test "returns 0 points possible for current with no submissions and precent scoring", ->
+    @submissions = []
+    @setup_grades @group, [[null, 5], [null, 5], [null, 5]]
+    result = GradeCalculator.calculate @submissions, [@group], 'percent'
+    assertGrade result, 'current', null, 0
+
+  test "returns 100 points possible for final with no submissions and precent scoring", ->
+    @submissions = []
+    @setup_grades @group, [[null, 5], [null, 5], [null, 5]]
+    result = GradeCalculator.calculate @submissions, [@group], 'percent'
+    assertGrade result, 'final', null, 100
+
   test "no drop rules", ->
     @group.rules = {}
 
@@ -237,8 +249,8 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     @setup_grades @group4, [[10, 0], [5, 0]]
 
     result = GradeCalculator.calculate @submissions, groups, 'percent'
-    assertGrade result, 'current', 76.7, 100
-    assertGrade result, 'final', 76.7, 100
+    assertGrade result, 'current', 76.67, 100
+    assertGrade result, 'final', 76.67, 100
 
     result = GradeCalculator.calculate @submissions, groups, 'equal'
     assertGrade result, 'current', 29, 20
@@ -266,3 +278,14 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
 
     result = GradeCalculator.create_group_sum @group, @submissions, true
     equal result.submissions.length, 1
+
+  test "excused assignments", ->
+    @submissions = []
+    @group.rules = {}
+    @setup_grades @group, [[10, 10], [0, 90]]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'final', 10, 100
+
+    @submissions[1].excused = 1
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'final', 10, 10

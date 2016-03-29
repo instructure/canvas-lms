@@ -33,15 +33,15 @@ end
 Feature.register('differentiated_assignments' =>
   {
     display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },
-    description:  -> { I18n.t('differentiated_assignments_description', <<-END) },
-Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
+    description:  -> { I18n.t('features.differentiated_assignments_description', <<-END) },
+Differentiated Assignments is a feature that enables choosing which section(s) or individual student(s) an assignment applies to.
 Sections that are not given an assignment will not see it in their course content and their final grade will be
 calculated without those points.
 END
     applies_to: 'Course',
-    state: 'allowed',
+    state: 'on',
     root_opt_in: true,
-    beta: true,
+    beta: false,
     development: false,
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'

@@ -54,5 +54,28 @@ describe LiveEventsObserver do
     Canvas::LiveEvents.expects(:discussion_topic_created).once
     c.discussion_topics.create!(:message => 'test')
   end
+
+  it "should post an event when an assignment is created" do
+    Canvas::LiveEvents.expects(:assignment_created).once
+    assignment_model
+  end
+
+  it "should post an event when an assignment is updated" do
+    Canvas::LiveEvents.expects(:assignment_updated).once
+    a = assignment_model
+    a.title="dirty"
+    a.save
+  end
+
+  it "should post an event when a submission is created" do
+    Canvas::LiveEvents.expects(:submission_created).once
+    submission_model
+  end
+
+  it "should post an event when a submission is updated" do
+    Canvas::LiveEvents.expects(:submission_updated).once
+    s = submission_model
+    s.touch
+  end
 end
 

@@ -33,17 +33,17 @@ describe 'CrocodocDocument' do
     before :once do
       teacher_in_course(:active_all => true)
       student_in_course
+      ta_in_course
       @submitter = @student
       student_in_course
       @other_student = @student
-      submission_model :course => @course, :user => @submitter
-    end
 
-    before :each do
-      attachment = attachment_model(:context => @submitter)
-      attachment.associate_with(@submission)
-      attachment.save!
-      @crocodoc = attachment.create_crocodoc_document
+      @assignment = @course.assignments.create! name: "a1"
+      @submission = @assignment.submit_homework @submitter,
+        submission_type: "online_upload",
+        attachments: [crocodocable_attachment_model(context: @submitter)]
+
+      @crocodoc = @submission.crocodoc_documents.first
     end
 
     it "should let the teacher view all annotations" do
@@ -51,6 +51,22 @@ describe 'CrocodocDocument' do
         :filter => 'all',
         :admin => true,
         :editable => true,
+      })
+    end
+
+    it "should only include ids specified in the whitelist" do
+      expect(@crocodoc.permissions_for_user(@teacher, [@teacher.crocodoc_id!, @submitter.crocodoc_id!])).to eq({
+        :filter => "#{@teacher.crocodoc_id!},#{@submitter.crocodoc_id!}",
+        :admin => true,
+        :editable => true,
+      })
+    end
+
+    it "should set :admin and :editable to false if the calling user isn't whitelisted" do
+      expect(@crocodoc.permissions_for_user(@submitter, [@teacher.crocodoc_id!])).to eq({
+        :filter => "#{@teacher.crocodoc_id!}",
+        :admin => false,
+        :editable => false,
       })
     end
 
@@ -87,6 +103,33 @@ describe 'CrocodocDocument' do
         :admin => false,
         :editable => false,
       })
+    end
+
+    it "should not allow annotations if anonymous_peer_reviews" do
+      @submission.assignment.update_attributes anonymous_peer_reviews: true,
+                                               peer_reviews: true
+      expect(@crocodoc.permissions_for_user(@student)).to eq({
+        :filter => 'none',
+        :admin => false,
+        :editable => false,
+      })
+    end
+
+    it "returns permissions for older submission versions" do
+      submission2 = @assignment.submit_homework @submitter,
+        submission_type: "online_upload",
+        attachments: [crocodocable_attachment_model(context: @submitter)]
+
+      # the submission is now tied to crocodoc documents for all versions
+      expect(submission2.crocodoc_documents.size).to eql 2
+
+      submission2.crocodoc_documents.each { |cd|
+        expect(cd.permissions_for_user(@submitter)).to eq({
+          filter: 'all',
+          admin: false,
+          editable: true,
+        })
+      }
     end
   end
 

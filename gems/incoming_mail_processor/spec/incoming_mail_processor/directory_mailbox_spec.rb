@@ -89,6 +89,12 @@ describe IncomingMailProcessor::DirectoryMailbox do
     end
   end
 
+  describe '#unprocessed_message_count' do
+    it "should return nil" do
+      @mailbox.unprocessed_message_count.should be_nil
+    end
+  end
+
   context "with simple foo file" do
 
     before do

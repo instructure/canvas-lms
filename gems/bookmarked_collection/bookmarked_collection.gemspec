@@ -14,9 +14,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "folio-pagination", "0.0.7"
-  spec.add_dependency "will_paginate", "3.0.4"
-  spec.add_dependency "rails", ">= 3.2", "< 4.2"
+  spec.add_dependency "folio-pagination", "0.0.11"
+  spec.add_dependency "will_paginate", "3.0.7"
+  spec.add_dependency "rails", ">= 3.2", "< 4.3"
 
   spec.add_dependency "paginated_collection"
   spec.add_dependency "json_token"

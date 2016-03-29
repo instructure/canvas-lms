@@ -5,7 +5,7 @@ module Account::Settings
         opts[:hash] = true
         opts[:values] = [:value, :locked]
 
-        self.class_eval "def #{setting}; calculate_inherited_setting(:#{setting}); end"
+        self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end"
       elsif (opts && opts[:boolean] && opts.has_key?(:default))
         if opts[:default]
           # if the default is true, we want a nil result to evaluate to true.
@@ -19,12 +19,24 @@ module Account::Settings
       end
       self.account_settings_options[setting.to_sym] = opts || {}
     end
+
+    def inheritable_settings
+      self.account_settings_options.select{|k, v| v[:inheritable]}.keys
+    end
   end
 
   def self.included(klass)
     klass.extend(ClassMethods)
     klass.send(:cattr_accessor, :account_settings_options)
     klass.account_settings_options ||= {}
+  end
+
+  def cached_inherited_setting(setting)
+    self.shard.activate do
+      Rails.cache.fetch([setting, self.global_id].cache_key) do
+        calculate_inherited_setting(setting)
+      end
+    end
   end
 
   # should continue down the account chain until it reaches a locked value

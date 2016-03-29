@@ -12,7 +12,7 @@ define [
     courseFindSelectView.courses = [course]
     courseFindSelectView.render()
 
-    sinonSpy = sinon.spy(courseFindSelectView, 'trigger')
+    sinonSpy = @spy(courseFindSelectView, 'trigger')
     courseFindSelectView.setSourceCourseId 42
 
     ok sinonSpy.calledWith('course_changed', course), "Triggered course_changed with a course"

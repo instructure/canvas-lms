@@ -1,5 +1,9 @@
 class AddThumbnailUuid < ActiveRecord::Migration
-  class Thumbnail < ActiveRecord::Base; end
+  tag :predeploy
+
+  class Thumbnail < ActiveRecord::Base
+    strong_params
+  end
 
   def self.up
     add_column :thumbnails, :uuid, :string

@@ -147,10 +147,13 @@ describe "Canvas::Redis" do
         expect(client.nodes.last.id).to eq 'redis://nonexistent:1234/0'
         client.nodes.last.client.expects(:ensure_connected).raises(Redis::TimeoutError).once
 
-        cache.write('1', true)
-        cache.write(key2, true)
+        cache.write('1', true, :use_new_rails => false)
+        cache.write(key2, true, :use_new_rails => false)
         # one returned nil, one returned true; we don't know which one which key ended up on
-        expect([cache.fetch('1'), cache.fetch(key2)].compact).to eq [true]
+        expect([
+          cache.fetch('1', :use_new_rails => false),
+          cache.fetch(key2, :use_new_rails => false)
+        ].compact).to eq [true]
       end
 
       it "should not fail raw redis commands" do

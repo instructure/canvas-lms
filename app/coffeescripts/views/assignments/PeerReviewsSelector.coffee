@@ -36,6 +36,7 @@ define [
 
     @optionProperty 'parentModel'
     @optionProperty 'nested'
+    @optionProperty 'hideAnonymousPeerReview'
 
     handlePeerReviewsChange: =>
       @$peerReviewsDetails.toggleAccessibly @$peerReviews.prop('checked')
@@ -58,3 +59,4 @@ define [
       peerReviewsFrozen: _.include(frozenAttributes, 'peer_reviews')
       nested: @nested
       prefix: 'assignment' if @nested
+      hideAnonymousPeerReview: @hideAnonymousPeerReview

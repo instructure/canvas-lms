@@ -55,7 +55,7 @@ describe SIS::CSV::GroupMembershipImporter do
       "group_id,user_id,status",
       "G001,U001,accepted",
       "G001,U003,deleted")
-    ms = GroupMembership.order(:id).all
+    ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
     expect(ms.map(&:workflow_state)).to eq %w(accepted deleted)
@@ -64,7 +64,7 @@ describe SIS::CSV::GroupMembershipImporter do
       "group_id,user_id,status",
       "G001,U001,deleted",
       "G001,U003,deleted")
-    ms = GroupMembership.order(:id).all
+    ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
     expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)

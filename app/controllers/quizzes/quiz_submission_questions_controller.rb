@@ -50,7 +50,7 @@
 #
 class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
-  include Filters::QuizSubmissions
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
   before_filter :require_question, only: [ :show, :flag, :unflag ]
@@ -76,15 +76,19 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
     reject! 'Cannot receive one question at a time questions in the API', 401 if @quiz.one_question_at_a_time && censored?
 
-    if authorized_action(@quiz_submission, @current_user, :read)
+    if @quiz_submission.completed? && !@quiz_submission.results_visible_for_user?(@current_user)
+      reject! "Cannot view questions due to quiz settings", 401
+    end
 
-      render json: quiz_submission_questions_json(@quiz.active_quiz_questions.all,
+    if authorized_action(@quiz_submission, @current_user, :read)
+      render json: quiz_submission_questions_json(@quiz_submission.quiz_questions,
         @quiz_submission,
         {
           user: @current_user,
           session: session,
           includes: extract_includes,
-          censored: censored?
+          censored: censored?,
+          shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
         })
     end
   end
@@ -155,7 +159,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
     @service.update_question(record, @quiz_submission, params[:attempt])
 
-    render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload)
+    render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload, censored: true)
   end
 
   # @API Flagging a question.

@@ -52,6 +52,16 @@ describe Folder do
     expect(great_grandchild.full_name).to eql("course files/grandchild/great_grandchild")
   end
 
+  it "should trim trailing whitespaces from folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "space cadet            ")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/space cadet")
+  end
+
   it "should add an iterator to duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
@@ -305,6 +315,29 @@ describe Folder do
         expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
         expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
       end
+    end
+  end
+
+  describe ".from_context_or_id" do
+    it "delegate to root_folders when context is provided" do
+      folder = Folder.root_folders(@course).first
+      expect(Folder.from_context_or_id(@course, nil)).to eq(folder)
+    end
+
+    it "should find by id when context is not provided and id is" do
+      Folder.root_folders(@course).first
+      account_model
+      folder_model(context: @account)
+      expect(Folder.root_folders(@course).first).not_to eq(@folder),
+        'precondition'
+      expect(Folder.from_context_or_id(nil, @folder.id)).to eq(@folder)
+    end
+
+    it "should raise ActiveRecord::RecordNotFound when no record is found" do
+      expect(Folder.where(id: 1)).to be_empty, 'precondition'
+      expect {
+        Folder.from_context_or_id(nil, 1)
+      }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

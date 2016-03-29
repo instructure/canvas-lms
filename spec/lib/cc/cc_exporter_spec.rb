@@ -1,8 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 require 'nokogiri'
+require 'webmock'
+WebMock.allow_net_connect!
 
 describe "Common Cartridge exporting" do
+
   it "should collect errors and finish running" do
     course = course_model
     user = user_model
@@ -12,9 +15,9 @@ describe "Common Cartridge exporting" do
     content_export.context = course
     content_export.user = user
     content_export.save!
-    
+
     content_export.export_without_send_later
-    
+
     expect(content_export.error_messages.length).to eq 1
     error = content_export.error_messages.first
     expect(error.first).to eq "Failed to export wiki pages"
@@ -24,9 +27,11 @@ describe "Common Cartridge exporting" do
   end
 
   context "creating .zip exports" do
+    include WebMock::API
 
     before do
       course_with_teacher
+      @course.offer!
       @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
       @ce.user = @user
@@ -248,19 +253,23 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
       qq = @q1.quiz_questions.create!
-      data = {:correct_comments => "",
-                          :question_type => "multiple_choice_question",
-                          :question_bank_name => "Quiz",
-                          :assessment_question_id => "9270",
-                          :migration_id => "QUE_1014",
-                          :incorrect_comments => "",
-                          :question_name => "test fun",
-                          :name => "test fun",
-                          :points_possible => 1,
-                          :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
-                          :answers =>
-                                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
-                                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      data = {
+        :correct_comments => "",
+        :question_type => "multiple_choice_question",
+        :question_bank_name => "Quiz",
+        :assessment_question_id => "9270",
+        :migration_id => "QUE_1014",
+        :incorrect_comments => "",
+        :question_name => "test fun",
+        :name => "test fun",
+        :points_possible => 1,
+        :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+        :answers => [{
+          :migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080
+        }, {
+          :migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279
+        }]
+      }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
 
@@ -393,7 +402,7 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css('resource[href="course_settings/syllabus.html"]')).to be_nil
     end
 
-    it "should export syllabus when selected" do 
+    it "should export syllabus when selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
       @ce.selected_content = {
@@ -422,7 +431,7 @@ describe "Common Cartridge exporting" do
       stub_kaltura
       CanvasKaltura::ClientV3.any_instance.stubs(:startSession)
       CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns('http://www.example.com/blah.flv')
-      stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: Tempfile.new('blah.flv'), status: 200)
+      stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: "", status: 200)
       CC::CCHelper.stubs(:media_object_info).returns({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
@@ -533,6 +542,118 @@ describe "Common Cartridge exporting" do
       node3 = @manifest_doc.at_css('resource[href$="third.jpg"] lom|rights')
       expect(node3.at_css('lom|copyrightAndOtherRestrictions > lom|value').text).to eq('yes')
       expect(node3.at_css('lom|description > lom|string').text).to eq('(C) 2014 Corellian Engineering Corporation\nCC Attribution')
+    end
+
+    context "considering rights of provided user" do
+      before do
+        @ag = @course.assignment_groups.create!(:name => 'group1')
+        @published = @course.assignments.create!({
+          :title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag
+        })
+        @unpublished = @course.assignments.create!({
+          :title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag
+        })
+        @unpublished.unpublish
+        @ce.save!
+      end
+
+      it "should show unpublished assignmnets for a teacher" do
+        run_export
+
+        check_resource_node(@published, CC::CCHelper::LOR)
+        check_resource_node(@unpublished, CC::CCHelper::LOR)
+      end
+
+      it "should not show unpublished assignments for a student" do
+        student_in_course(active_all: true, user_name: "a student")
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        check_resource_node(@published, CC::CCHelper::LOR)
+        check_resource_node(@unpublished, CC::CCHelper::LOR, false)
+      end
+
+      it "should always use relevant migration ids in anchor tags when exporting for ePub" do
+        cm1 = @course.context_modules.create!(name: "unlocked module")
+        cm1.publish
+        cm2 = @course.context_modules.create!({
+          name: "locked module",
+          prerequisites: [{:id=>cm1.id, :type=>"context_module", :name=>cm1.name}]
+        })
+        cm2.publish
+        cm1link = %{<a href="/courses/#{@course.id}/modules/#{cm1.id}">Mod 1</a>}
+        cm2link = %{<a href="/courses/#{@course.id}/modules/#{cm2.id}">Mod 2</a>}
+        assignment = @course.assignments.create!({
+          title: 'Assignment 1',
+          description: "go to module 1 at #{cm1link} and module 2 at #{cm2link}"
+        })
+        cm1.completion_requirements = [{:id=>assignment.id, :type=>"must_mark_done"}]
+        cm1.save!
+
+        student_in_course(active_all: true, user_name: "a student")
+        @ce.epub_export = EpubExport.create!({course: @course})
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        assignment_html = @manifest_doc.at_css("file[href$='#{mig_id(assignment)}/assignment-1.html']")
+        html_content = @zip_file.read(assignment_html["href"])
+
+        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm1)}/)).not_to be_nil
+        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm2)}/)).not_to be_nil
+
+      end
+    end
+
+    context 'attachment permissions' do
+      before do
+        folder = Folder.root_folders(@course).first
+        @visible = Attachment.create!({
+          :uploaded_data => stub_png_data('visible.png'),
+          :folder => folder,
+          :context => @course
+        })
+        @hidden = Attachment.create!({
+          :uploaded_data => stub_png_data('hidden.png'),
+          :folder => folder,
+          :context => @course,
+          :hidden => true
+        })
+        @locked = Attachment.create!({
+          :uploaded_data => stub_png_data('locked.png'),
+          :folder => folder,
+          :context => @course,
+          :locked => true
+        })
+        @ce.selected_content = {
+          all_attachments: "1"
+        }
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+      end
+
+      it "should include all files for teacher" do
+        run_export
+
+        check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@locked, CC::CCHelper::WEBCONTENT)
+      end
+
+      it "should not include hidden or locked attachments for student" do
+        student_in_course(active_all: true, user_name: "a student", course: @course)
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
+        check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
+      end
     end
   end
 end

@@ -30,6 +30,10 @@ describe "/gradebooks/gradebook2" do
     assigns[:submissions] = []
     assigns[:gradebook_upload] = ''
     assigns[:body_classes] = []
+    assigns[:post_grades_tools] = []
+    if course_allows && permissions_allow
+      assigns[:post_grades_tools] = [{type: :post_grades}]
+    end
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
     render "/gradebooks/gradebook2"
@@ -63,6 +67,7 @@ describe "/gradebooks/gradebook2" do
       assigns[:submissions] = []
       assigns[:gradebook_upload] = ''
       assigns[:body_classes] = []
+      assigns[:post_grades_tools] = []
     end
 
     it "should allow uploading scores for courses" do
@@ -80,6 +85,5 @@ describe "/gradebooks/gradebook2" do
       expect(response.body).not_to match /Import/
     end
   end
-
 
 end

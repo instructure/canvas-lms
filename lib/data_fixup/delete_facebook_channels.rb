@@ -22,7 +22,7 @@ module DataFixup::DeleteFacebookChannels
     # services are indexed by user_id, but aren't indexed by service.
     # so, use the channels to find users to find services
     CommunicationChannel.where(path_type: 'facebook').find_each do |cc|
-      cc.destroy!
+      cc.destroy_permanently!
       UserService.where(user_id: cc.user_id, service: 'facebook').delete_all
     end
   end

@@ -17,30 +17,13 @@
 #
 
 module DashboardHelper
-  def accessible_message_icon_text(icon)
-    case icon
-    when "warning"
-      I18n.t('#global_message_icons.warning', "warning")
-    when "error"
-      I18n.t('#global_message_icons.error', "error")
-    when "information"
-      I18n.t('#global_message_icons.information', "information")
-    when "question"
-      I18n.t('#global_message_icons.question', "question")
-    when "calendar"
-      I18n.t('#global_message_icons.calendar', "calendar")
-    when "announcement"
-      I18n.t('#global_message_icons.announcement', "announcement")
-    when "invitation"
-      I18n.t('#global_message_icons.invitation', "invitation")
-    else
-      raise "Unknown dashboard message icon type"
-    end
+  def show_recent_activity?
+    @current_user.preferences[:recent_activity_dashboard].present?
   end
 
   def show_welcome_message?
     @current_user.present? &&
-      @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select(&:active?).empty?
+      @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).select(&:active?).empty?
   end
 
   def welcome_message
@@ -138,19 +121,18 @@ module DashboardHelper
     end
   end
 
-  def todo_ignore_api_url(activity_type, item, force_permanent = false)
-    activity_symbol = activity_type.to_sym
+  def todo_ignore_dropdown_type?(activity_type)
+    [:grading, :moderation].include?(activity_type.to_sym)
+  end
 
-    permanent = (activity_symbol != :grading || force_permanent) ? 1 : nil
+  def todo_ignore_api_url(activity_type, item, force_permanent = false)
+    permanent = (!todo_ignore_dropdown_type?(activity_type) || force_permanent) ? 1 : nil
 
     api_v1_users_todo_ignore_url(item.asset_string, activity_type, { permanent: permanent })
   end
 
   def todo_link_classes(activity_type)
-    activity_symbol = activity_type.to_sym
-
-    (activity_symbol == :grading) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
-
+    todo_ignore_dropdown_type?(activity_type) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
   end
 
 end

@@ -28,7 +28,6 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     question_text
     position
   ].map(&:to_sym).freeze
-
   include HtmlTextHelper
 
   def readable_type
@@ -53,8 +52,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   :submission_correct_count_average=>1,
   #   :questions=>
   #     [output of stats_for_question for every question in submission_data]
-  def generate(legacy=true)
-    submissions = submissions_for_statistics
+  def generate(legacy=true, options = {})
+    submissions = submissions_for_statistics(options)
     # questions: questions from quiz#quiz_data
     #{1022=>
     # {"id"=>1022,
@@ -135,7 +134,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     submissions.each do |s|
       s.submission_data.each do |a|
         q_id = a[:question_id]
-        a[:user_id] = s.user_id || s.temporary_user_code
+        unless quiz.anonymous_survey?
+          a[:user_id] = s.user_id || s.temporary_user_code
+          a[:user_name] = s.user.name
+        end
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a
       end
@@ -152,6 +154,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
         stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
+        stat[:answers].each{|a| a.delete(:user_names)} if stat[:answers] && anonymous?
         stats[:questions] << ['question', stat]
       end
     end
@@ -228,7 +231,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           if submission.user
             row << submission.user.name
             row << submission.user_id
-            pseudonym = submission.user.sis_pseudonym_for(quiz.context.account, include_root_accounts)
+            pseudonym = SisPseudonym.for(submission.user, quiz.context.account, include_root_accounts)
             row << pseudonym.try(:sis_user_id)
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
           else
@@ -296,7 +299,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           else
             row << ((answer_item && answer_item[:text]) || '')
           end
-          row.push(strip_tags(row.pop.to_s))
+          row.push(html_to_text(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
         row << submission.submission_data.select { |a| a[:correct] }.length
@@ -310,10 +313,16 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   private
 
-  def submissions_for_statistics
+  def submissions_for_statistics(param_options = {})
     Shackles.activate(:slave) do
       scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
+
+      if param_options[:section_ids].present?
+        user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids]).pluck(:user_id)
+        scope = scope.where(user_id: user_ids)
+        logged_out = logged_out.where(user_id: user_ids)
+      end
 
       all_submissions = []
       all_submissions = prep_submissions scope
@@ -322,7 +331,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    subs = submissions.includes(:versions).map do |qs|
+    subs = submissions.preload(:versions).map do |qs|
       includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
     subs = subs.flatten.compact.select do |s|

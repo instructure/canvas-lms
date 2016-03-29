@@ -1,6 +1,7 @@
 define [
   'underscore'
-], (_) ->
+  'compiled/util/round'
+], (_, round) ->
 
   partition = (list, f) ->
     trueList  = []
@@ -10,7 +11,7 @@ define [
     [trueList, falseList]
 
   class GradeCalculator
-    # each submission needs fields: score, points_possible, assignment_id, assignment_group_id
+    # each submission needs fields: score, points_possible, assignment_id, assignment_group_id, excused
     #   to represent assignments that the student hasn't submitted, pass a
     #   submission with score == null
     #
@@ -34,20 +35,14 @@ define [
       result
 
     @create_group_sum: (group, submissions, ignoreUngraded) ->
-      arrayToObj = (arr, property) ->
-        obj = {}
-        for e in arr
-          obj[e[property]] = e
-        obj
-
       # remove assignments without visibility from gradeableAssignments
-      hidden_assignment_ids = _.chain(submissions).
-                                filter( (s)-> s.hidden).
-                                map( (s)-> s.assignment_id).value()
+      hiddenAssignments = _.chain(submissions).
+                            filter('hidden').
+                            indexBy('assignment_id').value()
 
-      gradeableAssignments = _(group.assignments).filter (a) ->
-        not _.isEqual(a.submission_types, ['not_graded']) and not _(hidden_assignment_ids).contains(a.id)
-      assignments = arrayToObj gradeableAssignments, "id"
+      gradeableAssignments = _(group.assignments).reject (a) ->
+        hiddenAssignments[a.id] || _.isEqual(a.submission_types, ['not_graded'])
+      assignments = _.indexBy gradeableAssignments, "id"
 
       # filter out submissions from other assignment groups
       submissions = _(submissions).filter (s) -> assignments[s.assignment_id]?
@@ -62,7 +57,10 @@ define [
           s = assignment_id: assignmentId, score: null
         submissions.push dummySubmissions...
 
-      submissionsByAssignment = arrayToObj submissions, "assignment_id"
+      # filter out excused assignments
+      submissions = _(submissions).filter (s) -> not s.excused
+
+      submissionsByAssignment = _.indexBy submissions, "assignment_id"
 
       submissionData = _(submissions).map (s) =>
         sub =
@@ -105,7 +103,7 @@ define [
     # This approach is based on the algorithm described in "Dropping Lowest
     # Grades" by Daniel Kane and Jonathan Kane.  Please see that paper for
     # a full explanation of the math.
-    # (http://web.mit.edu/dankane/www/droplowest.pdf)
+    # (http://cseweb.ucsd.edu/~dakane/droplowest.pdf)
     @dropAssignments: (submissions, rules) ->
       rules or= {}
       dropLowest   = rules.drop_lowest  || 0
@@ -126,10 +124,6 @@ define [
       keepHighest = submissions.length - dropLowest
       keepLowest  = keepHighest - dropHighest
 
-      # make sure we drop the same submission regardless of order
-      submissions.sort (a, b) ->
-        a.submission.assignment_id - b.submission.assignment_id
-
       hasPointed = (s.total for s in submissions when s.total > 0).length > 0
       kept = if hasPointed
         @dropPointed submissions, cantDrop, keepHighest, keepLowest
@@ -144,7 +138,11 @@ define [
       kept
 
     @dropUnpointed: (submissions, keepHighest, keepLowest) ->
-      sortedSubmissions = submissions.sort (a,b) -> a.score - b.score
+      sortedSubmissions = submissions.sort @stableSubmissionSort(
+        (a,b) -> a.score - b.score,
+        (s) -> s.submission.assignment_id
+      )
+
       _.chain(sortedSubmissions).last(keepHighest).first(keepLowest).value()
 
     @dropPointed: (submissions, cantDrop, keepHighest, keepLowest) ->
@@ -192,8 +190,14 @@ define [
 
         kept
 
-      kept = keepHelper(submissions, keepHighest, ([a,xx], [b,yy]) -> b - a)
-      kept = keepHelper(kept, keepLowest, ([a,xx], [b,yy]) -> a - b)
+      kept = keepHelper(submissions, keepHighest, @stableSubmissionSort(
+        ([a,xx], [b,yy]) -> b - a,
+        ([_score,s]) -> s.submission.assignment_id
+      ))
+      kept = keepHelper(kept, keepLowest, @stableSubmissionSort(
+        ([a,xx], [b,yy]) -> a - b,
+        ([_score,s]) -> s.submission.assignment_id
+      ))
 
     @estimateQHigh: (pointed, unpointed, grades) ->
       if unpointed.length > 0
@@ -207,6 +211,16 @@ define [
         maxScore / pointsPossible
       else
         qHigh = grades[grades.length - 1]
+
+    # v8's sort is not stable, this function ensures that the same submission
+    # will be dropped regardless of browser
+    @stableSubmissionSort: (sortFn, getAssignmentIdFn) ->
+      (a, b) ->
+        ret = sortFn(a, b)
+        if ret == 0
+          getAssignmentIdFn(a) - getAssignmentIdFn(b)
+        else
+          ret
 
     @calculate_total: (groupSums, ignoreUngraded, weightingScheme) ->
 
@@ -226,9 +240,14 @@ define [
           finalGrade = null
         else if fullWeight < 100
           finalGrade *= 100 / fullWeight
-        ret =
-          score: finalGrade && Math.round(finalGrade * 10) / 10
-          possible: 100
+
+        submissionCount = _.reduce relevantGroupSums, (count, gs) ->
+          count + gs.submission_count
+        , 0
+        possible = if submissionCount > 0 || !ignoreUngraded then 100 else 0
+        score = finalGrade && round(finalGrade, round.DEFAULT)
+        score = null if isNaN(score)
+        ret = { score: score, possible: possible }
       else
         [score, possible] = _.reduce groupSums
         , ([m,n],{score,possible}) ->

@@ -132,11 +132,13 @@ describe AccountsController do
     end
 
     it "should remove users with managed passwords with json" do
-      user_with_managed_pseudonym :account => @account, :name => "John Doe"
-      post 'remove_user', :account_id => @account.id, :user_id => @user.id, :format => "json"
-      expect(flash[:notice]).to match /successfully deleted/
-      expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
-      expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
+      Timecop.freeze do
+        user_with_managed_pseudonym :account => @account, :name => "John Doe"
+        post 'remove_user', :account_id => @account.id, :user_id => @user.id, :format => "json"
+        expect(flash[:notice]).to match /successfully deleted/
+        expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
+        expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
+      end
     end
   end
 
@@ -540,9 +542,9 @@ describe AccountsController do
         expect(response).to be_success
 
         external_integration_keys = assigns[:external_integration_keys]
-        expect(external_integration_keys.keys).to include('external_key0')
-        expect(external_integration_keys.keys).to include('external_key1')
-        expect(external_integration_keys.keys).to include('external_key2')
+        expect(external_integration_keys.key?(:external_key0)).to be_truthy
+        expect(external_integration_keys.key?(:external_key1)).to be_truthy
+        expect(external_integration_keys.key?(:external_key2)).to be_truthy
         expect(external_integration_keys[:external_key0]).to eq @eik
       end
 
@@ -582,6 +584,51 @@ describe AccountsController do
         } }
         expect(@account.external_integration_keys.count).to eq 0
       end
+    end
+  end
+
+  def admin_logged_in(account)
+    user_session(user)
+    Account.site_admin.account_users.create!(user: @user)
+    account_with_admin_logged_in(account: account)
+  end
+
+  describe "#account_courses" do
+    before do
+      @account = Account.create!
+      @c1 = course(account: @account, name: "foo")
+      @c2 = course(account: @account, name: "bar")
+    end
+
+    it "should not allow get a list of courses with no permissions" do
+      role = custom_account_role 'non_course_reader', account: @account
+      u = User.create(name: 'billy bob')
+      user_session(u)
+      @account.role_overrides.create! permission: 'read_course_list',
+                                      enabled: false, role: role
+      @account.account_users.create!(user: u, role: role)
+      get 'courses_api', account_id: @account.id
+      assert_unauthorized
+    end
+
+    it "should get a list of courses" do
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id
+
+      expect(response).to be_success
+      expect(response.body).to match(/#{@c1.id}/)
+      expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "should properly remove sections from includes" do
+      @s1 = @course.course_sections.create!
+      @course.enroll_student(user(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :include => [:sections]
+
+      expect(response).to be_success
+      expect(response.body).not_to match(/sections/)
     end
   end
 end

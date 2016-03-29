@@ -5,7 +5,7 @@ class AddForeignKeys4 < ActiveRecord::Migration
   def self.up
     add_foreign_key_if_not_exists :discussion_topic_participants, :discussion_topics, :delay_validation => true
     add_foreign_key_if_not_exists :discussion_topics, :assignments, :delay_validation => true
-    DiscussionTopic.where("NOT EXISTS (SELECT 1 FROM attachments WHERE attachment_id=attachments.id)").update_all(attachment_id: nil)
+    DiscussionTopic.where("NOT EXISTS (?)", Attachment.where("attachment_id=attachments.id")).update_all(attachment_id: nil)
     add_foreign_key_if_not_exists :discussion_topics, :attachments, :delay_validation => true
     add_foreign_key_if_not_exists :discussion_topics, :cloned_items, :delay_validation => true
     add_foreign_key_if_not_exists :discussion_topics, :assignments, :column => :old_assignment_id, :delay_validation => true

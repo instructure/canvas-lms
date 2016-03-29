@@ -1,8 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin settings tab" do
-  include_examples "in-process server selenium tests"
-  before (:each) do
+  include_context "in-process server selenium tests"
+  before :each do
     course_with_admin_logged_in
     get "/accounts/#{Account.default.id}/settings"
   end
@@ -10,7 +10,10 @@ describe "admin settings tab" do
   def get_default_services
     default_services = []
     service_hash = Account.default.allowed_services_hash
-    service_hash.each { |k, v| default_services.push k if  v[:expose_to_ui] }
+    service_hash.each do |k, v|
+      default_services.push k if v[:expose_to_ui] &&
+        (!v[:expose_to_ui_proc] || v[:expose_to_ui_proc].call(@user, Account.default))
+    end
     default_services
   end
 
@@ -77,6 +80,12 @@ describe "admin settings tab" do
   def click_submit
     submit_form("#account_settings")
     wait_for_ajax_requests
+  end
+
+  def go_to_feature_options(account_id)
+    get "/accounts/#{account_id}/settings"
+    f("#tab-features-link").click
+    wait_for_ajaximations
   end
 
   context "account settings" do
@@ -473,9 +482,34 @@ describe "admin settings tab" do
     get "/accounts/#{Account.site_admin.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations
-    
+
     Feature.applicable_features(Account.site_admin).each do |feature|
       expect(f(".feature.#{feature.feature}")).to be_displayed
     end
+  end
+
+  it "should test SIS Agent Token Authentication", priority: "2", test_id: 132577 do
+    course_with_admin_logged_in(:account => Account.site_admin)
+    sis_token = "canvas"
+    go_to_feature_options(Account.site_admin.id)
+    f("#ff_allowed_post_grades").click
+    go_to_feature_options(Account.default.id)
+    f("#ff_allowed_post_grades").click
+    f("#tab-settings-link").click
+    # SIS Agent Token Authentication will not appear without refresh
+    refresh_page
+    expect(f("#add_sis_app_token")).to be_displayed
+    expect(f("#account_settings_sis_app_token")).to be_displayed
+    f("#account_settings_sis_app_token").send_keys(sis_token)
+    f(".btn-primary").click
+    keep_trying_until{
+      expect(f("#account_settings_sis_app_token").attribute("value")).to eq sis_token
+    }
+    go_to_feature_options(Account.default.id)
+    f("#ff_off_post_grades").click
+    f('#tab-settings-link').click
+    refresh_page
+    sis_token_element = f("#account_settings_sis_app_token")
+    expect(@sis_token_element).to be_nil
   end
 end

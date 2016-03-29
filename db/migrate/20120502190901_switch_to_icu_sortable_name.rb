@@ -10,7 +10,7 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
       # postgres
       connection.transaction(:requires_new => true) do
         begin
-          execute("CREATE EXTENSION IF NOT EXISTS pg_collkey")
+          execute("CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA #{connection.shard.name}")
         rescue ActiveRecord::StatementInvalid
           raise ActiveRecord::Rollback
         end
@@ -18,10 +18,10 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
 
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
       remove_index :users, :sortable_name
-      if connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i != 0
-        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (collkey(sortable_name, 'root', true, 2, true))")
+      if collkey = connection.extension_installed?(:pg_collkey)
+        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', true, 2, true))")
       else
-        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (CAST(LOWER(sortable_name) AS bytea))")
+        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (CAST(LOWER(sortable_name) AS bytea))")
       end
     end
   end
@@ -30,7 +30,7 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
     if connection.adapter_name == 'PostgreSQL'
       remove_index :users, :sortable_name
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (LOWER(sortable_name))")
+      execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (LOWER(sortable_name))")
     end
   end
 end

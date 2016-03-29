@@ -25,9 +25,6 @@ class GroupMembership < ActiveRecord::Base
 
   attr_accessible :group, :user, :workflow_state, :moderator
 
-  EXPORTABLE_ATTRIBUTES = [:id, :group_id, :workflow_state, :created_at, :updated_at, :user_id, :uuid, :sis_batch_id, :moderator]
-  EXPORTABLE_ASSOCIATIONS = [:group, :user]
-
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
@@ -47,7 +44,7 @@ class GroupMembership < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  scope :include_user, -> { includes(:user) }
+  scope :include_user, -> { preload(:user) }
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(:moderator => true) }
@@ -162,7 +159,7 @@ class GroupMembership < ActiveRecord::Base
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
-    Group.where(:id => groups_to_touch).update_all(:updated_at => Time.now.utc)
+    Group.where(:id => groups_to_touch).touch_all
   end
   protected :touch_groups
 
@@ -191,7 +188,7 @@ class GroupMembership < ActiveRecord::Base
     Rails.cache.delete(self.user.group_membership_key)
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.save!

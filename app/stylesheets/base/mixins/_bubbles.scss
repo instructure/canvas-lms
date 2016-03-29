@@ -32,6 +32,14 @@
   border-radius: 10px;
   cursor: default;
   position: relative;
+  &.cannot_remove, &.cannot_remove:hover {
+    background-color: $gray-light;
+    border-color: $gray-lighter;
+    div {
+      background-color: $gray-lighter;
+      color: $gray;
+    }
+  }
   &:hover {
     div {
       background-color: #bccef4;
@@ -41,14 +49,4 @@
       background-position: 1px center;
     }
   }
-}
-
-@mixin count-bubble {
-  border-radius: 30px;
-  background-color: $ic-brand-primary;
-  padding: 0 8px;
-  font-size: 9px;
-  color: #fff;
-  background-color: $ic-brand-primary;
-  padding: 1px 6px;
 }

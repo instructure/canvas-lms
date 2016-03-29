@@ -1,4 +1,6 @@
 class AcceptPendingGroupMemberships < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     GroupMembership.where(:workflow_state => 'invited').update_all(:workflow_state => 'accepted')
     GroupMembership.where(:workflow_state => 'requested').update_all(:workflow_state => 'accepted')

@@ -25,13 +25,14 @@ describe "Importing modules" do
       it "should import from #{system}" do
         data = get_import_data(system, 'module')
         context = get_import_context(system)
+        migration = context.content_migrations.create!
         data[:modules_to_import] = {}
-        expect(Importers::ContextModuleImporter.import_from_migration(data, context)).to be_nil
+        expect(Importers::ContextModuleImporter.import_from_migration(data, context, migration)).to be_nil
         expect(context.context_modules.count).to eq 0
 
         data[:modules_to_import][data[:migration_id]] = true
-        Importers::ContextModuleImporter.import_from_migration(data, context)
-        Importers::ContextModuleImporter.import_from_migration(data, context)
+        Importers::ContextModuleImporter.import_from_migration(data, context, migration)
+        Importers::ContextModuleImporter.import_from_migration(data, context, migration)
         expect(context.context_modules.count).to eq 1
 
         mod = ContextModule.where(migration_id: data[:migration_id]).first
@@ -40,30 +41,32 @@ describe "Importing modules" do
       end
     end
   end
-  
+
   it "should link to url objects" do
     data = get_import_data('vista', 'module')
     context = get_import_context('vista')
+    migration = context.content_migrations.create!
     context.external_url_hash = {}
 
-    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context, migration)
     expect(topic.content_tags.count).to eq 2
   end
-  
+
   it "should link to objects on the second pass" do
     data = get_import_data('bb8', 'module')
     context = get_import_context('bb8')
+    migration = context.content_migrations.create!
     context.external_url_hash = {}
 
 
-    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context, migration)
     expect(topic.content_tags.count).to eq 0
 
     ass = get_import_data('bb8', 'assignment')
-    Importers::AssignmentImporter.import_from_migration(ass, context)
+    Importers::AssignmentImporter.import_from_migration(ass, context, migration)
     expect(context.assignments.count).to eq 1
-    
-    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
+
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context, migration)
     expect(topic.content_tags.count).to eq 1
   end
 
@@ -141,7 +144,7 @@ describe "Importing modules" do
     context = get_import_context
     migration = @course.content_migrations.create!
     migration.migration_settings[:migration_ids_to_import] = {:copy => {:context_modules => {'i2ef97656ba4eb818e23343af83e5a1c2' => '1'}}}
-    Importers::ContextModuleImporter.select_linked_module_items(data, migration)
+    Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
     expect(migration.import_object?('assignments', 'i5081fa7128437fc599f6ca652214111e')).to be_truthy
     expect(migration.import_object?('assignments', 'i852f8d38d28428ad2b3530e4f9017cff')).to be_falsy
     expect(migration.import_object?('quizzes', 'i0f944b0a62b3f92d42260381c2c8906d')).to be_truthy

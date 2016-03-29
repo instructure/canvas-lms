@@ -2,8 +2,14 @@ require [
   'jquery'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageView'
+  'compiled/util/markAsDone'
   'compiled/jquery/ModuleSequenceFooter'
-], ($, WikiPage, WikiPageView) ->
+], ($, WikiPage, WikiPageView, MarkAsDone) ->
+
+  $ ->
+    $('#content').on('click', '#mark-as-done-checkbox', ->
+      MarkAsDone.toggle(this)
+    )
 
   $('body').addClass('show')
 
@@ -21,5 +27,6 @@ require [
     course_id: ENV.COURSE_ID
     course_home: ENV.COURSE_HOME
     course_title: ENV.COURSE_TITLE
+    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK
 
   wikiPageView.render()

@@ -30,12 +30,6 @@ class PageView < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User', 'UserProfile']
 
-  EXPORTABLE_ATTRIBUTES = [
-    :request_id, :session_id, :user_id, :url, :context_id, :context_type, :asset_id, :asset_type, :controller, :action, :interaction_seconds, :created_at, :updated_at,
-    :user_request, :render_time, :user_agent, :asset_user_access_id, :participated, :summarized, :account_id, :real_user_id, :http_method, :remote_ip
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :account, :real_user, :asset_user_access, :context]
   attr_accessor :generated_by_hand
   attr_accessor :is_update
 
@@ -84,6 +78,24 @@ class PageView < ActiveRecord::Base
     end
   end
 
+  def token
+    Canvas::Security.create_jwt({
+      i: request_id,
+      u: Shard.global_id_for(user_id),
+      c: created_at.try(:utc).try(:iso8601, 2)
+    })
+  end
+
+  def self.decode_token(token)
+    data = Canvas::Security.decode_jwt(token)
+    return nil unless data
+    return {
+      request_id: data[:i],
+      user_id: data[:u],
+      created_at: data[:c]
+    }
+  end
+
   def url
     url = read_attribute(:url)
     url && LoggingFilter.filter_uri(url)
@@ -127,7 +139,15 @@ class PageView < ActiveRecord::Base
   end
 
   def self.cassandra?
-    self.page_view_method == :cassandra
+    page_view_method == :cassandra
+  end
+
+  def self.pv4?
+    page_view_method == :pv4 || Setting.get('read_from_pv4', 'false') == 'true'
+  end
+
+  def self.global_storage_namespace?
+    cassandra? || pv4?
   end
 
   EventStream = EventStream::Stream.new do
@@ -148,11 +168,16 @@ class PageView < ActiveRecord::Base
       entry_proc lambda{ |page_view| page_view.user }
       key_proc lambda{ |user| user.global_asset_string }
     end
+
+    self.raise_on_error = Rails.env.test?
+
+    on_error do |operation, record, exception|
+      Canvas::EventStreamLogger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
+    end
   end
 
-  def self.find(ids, options={})
+  def self.find(ids)
     return super unless PageView.cassandra?
-    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
 
     case ids
     when Array
@@ -174,7 +199,8 @@ class PageView < ActiveRecord::Base
 
   def self.from_attributes(attrs, new_record=false)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    shard = PageView.cassandra? ? Shard.birth : Shard.current
+    attrs = attrs.slice(*@blank_template.keys)
+    shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
         new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
@@ -226,7 +252,7 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def create
+  def _create_record(*args)
     return super unless PageView.cassandra?
     self.created_at ||= Time.zone.now
     user.shard.activate do
@@ -238,7 +264,7 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def update
+  def _update_record(*args)
     return super unless PageView.cassandra?
     user.shard.activate do
       run_callbacks(:update) do
@@ -251,12 +277,30 @@ class PageView < ActiveRecord::Base
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
 
+  def self.pv4_client
+    @pv4_client ||= begin
+      config = ConfigFile.load('pv4')
+      raise "Page Views v4 not configured!" unless config
+      Pv4Client.new(config['uri'], config['access_token'])
+    end
+  end
+
+  def self.reset_pv4_client
+    @pv4_client = nil
+  end
+
+  Canvas::Reloader.on_reload do
+    reset_pv4_client
+  end
+
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options={})
     user.shard.activate do
-      if PageView.cassandra?
+      if PageView.pv4?
+        pv4_client.for_user(user.global_id, **options)
+      elsif PageView.cassandra?
         PageView::EventStream.for_user(user, options)
       else
         scope = self.where(:user_id => user).order('created_at desc')
@@ -298,6 +342,27 @@ class PageView < ActiveRecord::Base
     # round down to the last 5 minute mark -- so 03:43:28 turns into 03:40:00
     utc = utc - ((utc.min % 5) * 60) - utc.sec
     "active_users:#{utc.as_json}"
+  end
+
+  # this is not intended to be called often; only from console as a debugging measure
+  def self.active_user_counts_by_shard(time = Time.now)
+    members = Set.new
+    time = time..time unless time.is_a?(Range)
+    bucket_time = time.begin
+    while (time.cover?(bucket_time))
+      bucket = user_count_bucket_for_time(bucket_time)
+      members.merge(Canvas.redis.smembers(bucket))
+      bucket_time += 5.minutes
+    end
+
+    result = {}
+    members.each do |uid|
+      shard = Shard.shard_for(uid)
+      next unless shard
+      result[shard.id] ||= 0
+      result[shard.id] += 1
+    end
+    result
   end
 
   def store_page_view_to_user_counts

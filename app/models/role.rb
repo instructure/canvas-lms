@@ -46,9 +46,6 @@ class Role < ActiveRecord::Base
   belongs_to :root_account, :class_name => 'Account'
   attr_accessible :name
 
-  EXPORTABLE_ATTRIBUTES = [:id, :name, :base_role_type, :account_id, :workflow_state, :created_at, :updated_at, :deleted_at, :root_account_id]
-  EXPORTABLE_ASSOCIATIONS = [:account, :root_account]
-
   before_validation :infer_root_account_id, :if => :belongs_to_account?
 
   validate :ensure_unique_name_for_account, :if => :belongs_to_account?
@@ -203,7 +200,7 @@ class Role < ActiveRecord::Base
     end
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc

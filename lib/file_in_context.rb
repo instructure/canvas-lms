@@ -25,14 +25,14 @@ class FileInContext
     def queue_files_to_delete(queue=true)
       @queue_files_to_delete = queue
     end
-    
+
     def destroy_queued_files
       if @queued_files && !@queued_files.empty?
         Attachment.send_later_if_production(:destroy_files, @queued_files.map(&:id))
         @queued_files.clear
       end
     end
-    
+
     def destroy_files(files)
       if @queue_files_to_delete
         @queued_files ||= []
@@ -41,12 +41,12 @@ class FileInContext
         files.each{ |f| f.destroy }
       end
     end
-    
+
     def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
       display_name ||= File.split(filename).last
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
-      @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
+      @attachment = context.attachments.new(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.filename = explicit_filename if explicit_filename
       @attachment.context = context
       @attachment.set_publish_state_for_usage_rights
@@ -58,6 +58,6 @@ class FileInContext
     ensure
       uploaded_data.close if uploaded_data
     end
-    
+
   end
 end

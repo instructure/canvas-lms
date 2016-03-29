@@ -1,5 +1,5 @@
 <%
-  jammit_css :quizzes, :tinymce
+  css_bundle :quizzes, :tinymce
   js_bundle :quizzes_bundle
   js_env :QUIZZES => {:QUIZ => true}
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))
@@ -106,8 +106,8 @@
 
   <div id="quiz_tabs">
     <ul>
-      <li><a href="#options_tab">Settings</a></li>
-      <li><a href="#questions_tab">Questions</a></li>
+      <li><a href="#options_tab"><%= t('Settings') %></a></li>
+      <li><a href="#questions_tab"><%= t('Questions') %></a></li>
     </ul>
 
     <div id="options_tab">
@@ -161,9 +161,9 @@
               <div class="controls">
                 <p class="option-caption"><strong>Options</strong></p>
 
-                <% if @context.feature_enabled?(:post_grades) %>
+                <% if Assignment.sis_grade_export_enabled?(@context) %>
                   <label class="checkbox" id=post_to_sis_option>
-                    <%= check_box :assignment, :post_to_sis %>
+                    <%= check_box :assignment, :post_to_sis, :checked => @quiz.assignment ? @quiz.assignment.post_to_sis : @context.account.sis_default_grade_export[:value] %>
                     <%= t(:post_to_sis, "Post Grades to SIS") %>
                   </label>
                 <% end %>
@@ -416,7 +416,7 @@
           <i class="icon-add"><span class="screenreader-only"><%= new_question_group_title %></span></i>
           <%= new_question_group_title %>
         </a>
-        <% if feature_enabled?(:question_banks) %>
+        <% if feature_enabled?(:question_banks) && @context.grants_right?(@current_user, :read_question_banks) %>
           <% find_questions_title = t('links.find_questions', "Find Questions") %>
           <a href="#" class="find_question_link btn">
             <i class="icon-search"><span class="screenreader-only"><%= find_questions_title %></span></i>
@@ -438,7 +438,7 @@
         </label>
       </div>
       <div class="span6">
-        <%= link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :id => 'cancel_button' do %>
+        <%= link_to context_url(@context, :context_quiz_url, @quiz), :role => 'button', :class => 'btn', :id => 'cancel_button' do %>
           <%= t('links.cancel', "Cancel") %>
         <% end %>
         <% unless @quiz.published %>

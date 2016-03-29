@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <%= join_title t(:page_title, "User Settings"), @user.name %>
+  <%= join_title t("User Settings"), @user.name %>
 <% end %>
 
 <% content_for :right_side do %>
@@ -8,7 +8,7 @@
   <div class="rs-margin-lr">
     <hr />
     <a href="#" class="edit_settings_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t('links.edit_settings', "Edit Settings") %></a>
-    <% mfa_settings = @user.mfa_settings %>
+    <% mfa_settings = @user.mfa_settings(pseudonym_hint: @current_pseudonym) %>
     <% if mfa_settings != :disabled %>
       <a href="<%= otp_login_path %>" class="btn button-sidebar-wide"><%= image_tag "lock.png" %> <%= @user.otp_secret_key ? t('links.reconfigure_mfa', "Reconfigure Multi-Factor Authentication") : t('links.configure_mfa', "Set Up Multi-Factor Authentication") %></a>
     <% end %>
@@ -16,6 +16,11 @@
       <a href="<%= disable_mfa_path('self') %>" class="btn button-sidebar-wide" id="disable_mfa_link"><%= image_tag "unlock.png" %> <%= t('links.disable_mfa', "Disable Multi-Factor Authentication") %></a>
     <% end %>
     <a href="<%= dashboard_content_exports_path %>" class="btn button-sidebar-wide"><i class="icon-download"></i> <%= t("Download Submissions") %></a>
+    <% if @current_user.account.feature_allowed?(:epub_export)%>
+        <%= link_to  epub_exports_path, class: 'btn button-sidebar-wide' do %>
+          <i class="icon-download" aria-hidden='true'></i> <%= t("Download Course Content") %>
+        <% end %>
+    <% end %>
     <% if show_request_delete_account %>
        <a href="<%= request_delete_account_link %>" class="btn button-sidebar-wide"> <%= t('Delete My Account') %></a>
     <% end %>
@@ -23,40 +28,44 @@
   <% end %>
 <% end %>
 
-<% js_env :folder_id => @user.profile_pics_folder.id,
-          :PASSWORD_POLICY => @domain_root_account.password_policy,
-          :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
-          :PROFILE => @user_data
+<% js_env folder_id: @user.profile_pics_folder.id,
+          PASSWORD_POLICY: @domain_root_account.password_policy,
+          PASSWORD_POLICIES: Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
+          PROFILE: @user_data,
+          INTERNATIONAL_SMS_ENABLED: @user.account.feature_enabled?(:international_sms)
 %>
 <% js_bundle :profile %>
-<% jammit_css :profile_edit %>
+<% css_bundle :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
   <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
 <% end %>
-<h1 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h1>
+<h1 style="padding-top: 0.3em;"><%= t("%{user}'s Settings", :user => @user.short_name) %></h1>
 <div class="clear"></div>
 <%= form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">
   <tr>
     <% editable_name = @user.user_can_edit_name? %>
     <td><%= f.blabel :name, :en => "Full Name" %></td>
-    <td><span class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
-      <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
+    <td><span <% unless editable_name %>id="name"<% end %>
+              class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
+      <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_name" if editable_name %>
+      <span id="hints_name" class="edit_or_show_data data_description"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
   </tr>
   <tr>
     <td><%= f.blabel :short_name, :en => "Display Name" %></td>
-    <td><span class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
-      <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
+    <td><span <% unless editable_name %>id="short_name"<% end %>
+              class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
+      <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_short_name" if editable_name %>
+      <span id="hints_short_name" class="edit_or_show_data data_description"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>
   <tr>
     <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
-    <td><span class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
-      <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30  if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
+    <td><span <% unless editable_name %>id="sortable_name"<% end %>
+              class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
+      <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_sortable_name" if editable_name %>
+      <span id="hints_sortable_name" class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
@@ -77,11 +86,11 @@
   <tr>
     <td><%= f.blabel :locale, :en => "Language" %></td>
     <td>
-      <% no_language = t(:no_language_preference, "System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
+      <% no_language = t("System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
       <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
-      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale'} %>
+      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale', "aria-describedby" => "#hints_language"} %>
       <%= render :partial => 'shared/locale_warning' %>
-      <span style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
+      <span id="hints_language" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
       </span>
     </td>
   </tr>
@@ -188,11 +197,11 @@
 </div>
 </div>
 
-<% if @user.associated_root_accounts.with_each_shard.any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
+<% if @user.associated_root_accounts.shard(@user).any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
 <h2><%= t('headers.inbox_opt_out', "Conversations Inbox Opt-out" ) %></h2>
 <p>
-  <input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>
-  <label for="disable_inbox"><%= t('labels.disable_inbox', "Disable the Conversation's Inbox unread messages badge and send all conversation messages and notifications via email, ASAP.") %></label>
+  <label for="disable_inbox"><input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>
+  <%= t('labels.disable_inbox', "Disable the Conversation's Inbox unread messages badge and send all conversation messages and notifications via email, ASAP.") %></label>
 </p>
 <% end %>
 
@@ -224,6 +233,9 @@ TEXT
               <% if service.has_profile_link? %>
                 <a href="<%= service.service_user_link %>">
                   <%= t('links.view_your_profile', "view your profile") %>
+                  <% if service.has_readable_user_name? %>
+                      <span><%= service.service_user_name %></span>
+                  <% end %>
                 </a>
               <% elsif service.has_readable_user_name? %>
                 <span><%= service.service_user_name %></span>
@@ -247,26 +259,8 @@ TEXT
     <%= before_label(:other_services, "Click any service below to register") %>
     <% services = @user.user_services.map{|s| s.service} %>
     <ul id="unregistered_services" class="unstyled_list">
-      <li id="unregistered_service_google_docs" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_docs) || services.include?("google_docs") %>">
-        <a href="#" class="btn btn-small"><%= image_tag "google_docs_icon.png" %> <%= t('links.google_docs', "Google Docs") %></a>
-        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_docs', "Authorize Google Docs") %>" id="unregistered_service_google_docs_dialog">
-          <div>
-            <%= image_tag "google_docs.png", :style => "float: left; padding-right: 5px;" %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.google_docs_access', "Google Docs Access") %></div>
-            <%= t(:google_docs_description, <<-TEXT)
-            Once you authorize us to see your Google Docs you'll be able to submit your assignments
-            directly from Google Docs, and create and share documents with members of your classes.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; margin-top: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => "google_docs", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_google_docs', "Authorize Google Docs Access") %></a>
-          </div>
-        </div>
-      </li>
 
-      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_enabled?(:google_drive) || !feature_and_service_enabled?(:google_docs) || services.include?("google_drive") %>">
+      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png" %> <%= t('links.google_drive', "Google Drive") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_drive', "Authorize Google Drive") %>" id="unregistered_service_google_drive_dialog">
           <div>
@@ -301,7 +295,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "skype" do |f| %>
             <%= f.hidden_field :service, :value => "skype" %>
             <table class="formtable">
               <tr>
@@ -381,7 +375,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "yo" do |f| %>
             <%= f.hidden_field :service, :value => "yo" %>
             <table class="formtable">
               <tr>
@@ -412,7 +406,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "delicious" do |f| %>
             <%= f.hidden_field :service, :value => "delicious" %>
             <table class="formtable">
               <tr>
@@ -447,7 +441,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "diigo" do |f| %>
             <%= f.hidden_field :service, :value => "diigo" %>
             <table class="formtable">
               <tr>
@@ -509,7 +503,7 @@ TEXT
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
-    <p><%= t(:access_token_description, <<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
+    <p><%= t(<<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
       on your behalf.  You can also generate access tokens and *use the Canvas
       Open API* to come up with your own integrations.
@@ -575,10 +569,25 @@ TEXT
           <td><%= f.text_field :purpose %></td>
         </tr>
         <tr>
-          <td><%= f.blabel :expires_at, :en => "Expires" %></td>
           <td>
-            <div><%= f.text_field :expires_at, :class => "expires_field datetime_field", :style => "width: 120px;", :"aria-label" => t("Expires on Date") %></div>
-            <div style="font-size: 0.8em;" class="hint"><%= t('hints.expires_at', "leave blank for no expiration") %></div>
+            <%= f.blabel :expires_at, en: "Expires" %>
+            <label class="screenreader-only" id="token_expires_at_accessible_label">
+              <%= t("Access token is valid until") %>
+              <%= datepicker_screenreader_prompt %>
+            </label>
+          </td>
+          <td>
+            <div>
+              <%= f.text_field :expires_at,
+                               class: "expires_field datetime_field",
+                               style: "width: 120px;",
+                               "aria-labelledby" => "token_expires_at_accessible_label",
+                               "data-tooltip" => "{\"position\":\"top\",\"force_position\":\"true\"}",
+                               title: accessible_date_format %>
+            </div>
+            <div style="font-size: 0.8em;" class="hint">
+              <%= t('hints.expires_at', "leave blank for no expiration") %>
+            </div>
           </td>
         </tr>
           <td colspan="2">
@@ -618,7 +627,7 @@ TEXT
 </div>
 <% else %>
   <p class="alert alert-info">
-    <%= t "confirm_email_instructions", <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+    <%= t <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
       Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
       If you don't see it, *click to re-send the email*, and make sure to check your spam box.
     TEXT

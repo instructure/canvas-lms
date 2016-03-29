@@ -1,4 +1,6 @@
 class Conversations < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table "conversations" do |t|
       t.string "private_hash" # for quick lookups so we know whether or not we need to create a new one

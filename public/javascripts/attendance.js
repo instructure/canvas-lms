@@ -125,71 +125,8 @@ define([
       });
     }
   };
-  var attachAddAssignmentGroup;
   $(document).ready(function() {
-    var $blank = $(".blank_attendance:first");
-    var $pass = $(".pass_attendance:first");
-    var $fail = $(".fail_attendance:first");
     var errorCount = 0;
-    if(attachAddAssignmentGroup) {
-      attachAddAssignmentGroup($("#new_assignment_dialog select.assignment_group_select"));
-    }
-    $(".add_assignment_link").click(function(event) {
-      event.preventDefault();
-      $("#new_assignment_dialog :text:not(.points_possible)").each(function() {
-        $(this).val("");
-      });
-      $("#new_assignment_dialog").dialog({
-        title: I18n.t('titles.new_attendance_column', "New Attendance Column")
-      });
-    });
-    $("#new_assignment_dialog .cancel_button").click(function(event) {
-      $("#new_assignment_dialog").dialog('close');
-    });
-    $("#add_assignment_form").formSubmit({
-      beforeSubmit: function(data) {
-        $(this).find(".submit_button").text(I18n.t('status.adding_assignment', "Adding Assignment..."));
-        $(this).find("button").attr('disabled', true);
-      },
-      success: function(data) {
-        $(this).find(".submit_button").text(I18n.t('status.added_assignment', "Added Assignment"));
-        $(this).find("button").attr('disabled', false);
-        var assignment = data.assignment;
-        location.href = "#assignment_" + assignment.id;
-        location.reload();
-      },
-      error: function(data) {
-        $(this).formErrors(data);
-        $(this).find(".submit_button").text(I18n.t('errors.could_not_add_assignment', "Add Assignment Failed"));
-        $(this).find("button").attr('disabled', false);
-      }
-    });
-    $("#new_assignment_dialog .title").change(function() {
-      var val = $(this).val();
-      if (val && val != defaultTitle()) {
-        $(this).attr('edited', true);
-      } else {
-        $(this).removeAttr('edited');
-      }
-    });
-    function defaultTitle() {
-      var date = $("#new_assignment_dialog .datetime_field").data('date');
-      if (date) {
-        return I18n.t('default_attendance_title', 'Attendance %{date}', {date: I18n.l('#date.formats.default', date)});
-      } else {
-        return '';
-      }
-    }
-    $("#new_assignment_dialog .datetime_field").change(function() {
-      var val = $("#new_assignment_dialog .title").val();
-      var titleEdited = $("#new_assignment_dialog .title").attr('edited');
-      if(!val || !titleEdited) {
-        var date = $(this).data('date');
-        if(date) {
-          $("#new_assignment_dialog .title").val(defaultTitle());
-        }
-      }
-    });
     $(".datetime_field").datetime_field();
     $(".help_link").click(function(event) {
       event.preventDefault();

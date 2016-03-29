@@ -40,7 +40,7 @@ describe UserObserver do
     enrollments = observer.observer_enrollments.sort_by(&:course_id)
     expect(enrollments.size).to eql 2
     expect(enrollments.map(&:course_id)).to eql [c1.id, c2.id]
-    expect(enrollments.map(&:workflow_state)).to eql ["invited", "active"]
+    expect(enrollments.map(&:workflow_state)).to eql ["active", "active"]
   end
 
   it "should not enroll the observer in institutions where they lack a login" do
@@ -84,7 +84,7 @@ describe UserObserver do
       expect {
         @course.enroll_student student, role: @custom_student_role
       }.not_to raise_error
-      expect(@observer_enrollment.reload).to be_invited
+      expect(@observer_enrollment.reload).to be_active
     end
   end
 end

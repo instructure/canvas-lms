@@ -23,12 +23,12 @@ class QuestionBanksController < ApplicationController
   include Api::V1::Outcome
 
   def index
-    if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-      @question_banks = @context.assessment_question_banks.active.except(:includes).all
+    if @context == @current_user || authorized_action(@context, @current_user, :read_question_banks)
+      @question_banks = @context.assessment_question_banks.active.except(:preload).to_a
       if params[:include_bookmarked] == '1'
         @question_banks += @current_user.assessment_question_banks.active
       end
-      if params[:inherited] == '1' && @context != @current_user && @context.grants_right?(@current_user, :read_question_banks)
+      if params[:inherited] == '1' && @context != @current_user
         @question_banks += @context.inherited_assessment_question_banks.active
       end
       @question_banks = @question_banks.select{|b| b.grants_right?(@current_user, :manage) } if params[:managed] == '1'
@@ -43,7 +43,7 @@ class QuestionBanksController < ApplicationController
   def questions
     find_bank(params[:question_bank_id], params[:inherited] == '1') do
       @questions = @bank.assessment_questions.active
-      url = polymorphic_url([@context, :question_bank_questions])
+      url = polymorphic_url([@context, :question_bank_questions], :question_bank_id => @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
       render :json => {:pages => @questions.total_pages, :questions => @questions}
     end
@@ -59,7 +59,10 @@ class QuestionBanksController < ApplicationController
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
-    js_env :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+    js_env({
+      :CONTEXT_URL_ROOT => polymorphic_path([@context]),
+      :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+    })
 
     add_crumb(@bank.title)
     if authorized_action(@bank, @current_user, :read)
@@ -82,8 +85,8 @@ class QuestionBanksController < ApplicationController
         connection = @questions.connection
         attributes = attributes.map { |attr| connection.quote_column_name(attr) }
         now = connection.quote(Time.now.utc)
-        connection.execute(
-            "INSERT INTO assessment_questions (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
+        connection.insert(
+            "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
             @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql)
       else
         @questions.update_all(:assessment_question_bank_id => @new_bank)
@@ -96,7 +99,7 @@ class QuestionBanksController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.assessment_question_banks.scoped.new, @current_user, :create)
+    if authorized_action(@context.assessment_question_banks.temp_record, @current_user, :create)
       @bank = @context.assessment_question_banks.build(params[:assessment_question_bank])
       respond_to do |format|
         if @bank.save

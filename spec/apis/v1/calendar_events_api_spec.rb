@@ -26,13 +26,14 @@ describe CalendarEventsApiController, type: :request do
 
   context 'events' do
     expected_fields = [
-      'all_day', 'all_day_date', 'child_events', 'child_events_count',
-      'context_code', 'created_at', 'description', 'end_at', 'hidden', 'html_url',
+      'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
+      'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
-      'title', 'updated_at', 'url', 'workflow_state'
+      'title', 'type', 'updated_at', 'url', 'workflow_state'
     ]
     expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'reserve_url', 'effective_context_code']).sort
     expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'effective_context_code']).sort
+    expected_reserved_fields = (expected_slot_fields + ['reserved', 'reserve_comments']).sort
     expected_reservation_fields = expected_reservation_event_fields - ['child_events']
 
     it 'should return events within the given date range' do
@@ -346,14 +347,14 @@ describe CalendarEventsApiController, type: :request do
           json.sort_by! { |e| e['id'] }
 
           ejson = json.first
-          expect(ejson.keys.sort).to eql((expected_slot_fields + ['reserved']).sort)
+          expect(ejson.keys.sort).to eql(expected_reserved_fields)
           expect(ejson['child_events']).to eq [] # not reserved, so no child events can be seen
           expect(ejson['reserve_url']).to match %r{calendar_events/#{event1.id}/reservations/#{@me.id}}
           expect(ejson['reserved']).to be_falsey
           expect(ejson['available_slots']).to eql 1
 
           ejson = json.last
-          expect(ejson.keys.sort).to eql((expected_slot_fields + ['reserved']).sort)
+          expect(ejson.keys.sort).to eql(expected_reserved_fields)
           expect(ejson['reserve_url']).to match %r{calendar_events/#{event2.id}/reservations/#{g.id}}
           expect(ejson['reserved']).to be_truthy
           expect(ejson['available_slots']).to eql 3
@@ -451,7 +452,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.size).to eql 2
           json.sort_by! { |e| e['id'] }
           json.each do |e|
-            expect(e.keys.sort).to eql((expected_slot_fields + ['reserved']).sort)
+            expect(e.keys.sort).to eql(expected_reserved_fields)
             expect(e['reserved']).to be_truthy
             expect(e['child_events_count']).to eql 2
             expect(e['child_events'].size).to eql 1 # can't see otherguy's stuff
@@ -545,6 +546,14 @@ describe CalendarEventsApiController, type: :request do
             expect(@ag1.reservations_for(@me).map(&:parent_calendar_event_id)).to eql [@event2.id]
           end
 
+          it "should should allow comments on the reservation" do
+            json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations?comments=these%20are%20my%20comments", {
+              :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :comments => 'these are my comments'})
+            expect(json.keys.sort).to eql(expected_reservation_event_fields)
+            expect(json['appointment_group_id']).to eql(@ag1.id)
+            expect(json['comments']).to eql "these are my comments"
+          end
+
           it "should not allow students to specify the participant" do
             raw_api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations/#{@other_guy.id}", {
               :controller => 'calendar_events_api', :action => 'reserve', :format => 'json', :id => @event1.id.to_s, :participant_id => @other_guy.id.to_s})
@@ -631,6 +640,40 @@ describe CalendarEventsApiController, type: :request do
       expect(json['title']).to eql 'ohai'
     end
 
+    it 'should create recurring events if options have been specified' do
+      start_at = Time.zone.now.utc.change(hour: 0, min: 1) # For pre-Normandy bug with all_day method in calendar_event.rb
+      end_at = Time.zone.now.utc.change(hour: 23)
+      json = api_call(:post, "/api/v1/calendar_events",
+                      {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
+                      {:calendar_event => {
+                          :context_code => @course.asset_string,
+                          :title => "ohai",
+                          :start_at => start_at.iso8601,
+                          :end_at => end_at.iso8601,
+                          :duplicate => {
+                              :count => "3",
+                              :interval => "1",
+                              :frequency => "weekly"
+                          }
+                       }
+                      })
+      assert_status(201)
+      expect(json.keys.sort).to eq expected_fields
+      expect(json['title']).to eq 'ohai'
+
+      duplicates = json['duplicates']
+      expect(duplicates.count).to eq 3
+
+      duplicates.to_a.each_with_index do |duplicate, i|
+        start_result = Time.iso8601(duplicate['calendar_event']['start_at'])
+        end_result = Time.iso8601(duplicate['calendar_event']['end_at'])
+        expect(duplicate['calendar_event']['title']).to eql 'ohai'
+        expect(start_result).to eq(start_at + (i + 1).weeks)
+        expect(end_result).to eq(end_at + (i + 1).weeks)
+      end
+
+    end
+
     it 'should process html content in description on create' do
       should_process_incoming_user_content(@course) do |content|
         json = api_call(:post, "/api/v1/calendar_events",
@@ -697,7 +740,7 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    it "should omit assignment description in ics" do
+    it "should omit assignment description in ics feed for a course" do
       HostUrl.stubs(:default_host).returns('www.example.com')
       assignment_model(description: "secret stuff here")
       get "/feeds/calendars/#{@course.feed_code}.ics"
@@ -775,7 +818,7 @@ describe CalendarEventsApiController, type: :request do
   context 'assignments' do
     expected_fields = [
       'all_day', 'all_day_date', 'assignment', 'context_code', 'created_at',
-      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'updated_at',
+      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'type', 'updated_at',
       'url', 'workflow_state'
     ]
 
@@ -1666,6 +1709,47 @@ describe CalendarEventsApiController, type: :request do
           end
         end
       end
+    end
+  end
+
+  context "user index" do
+    before :once do
+      @student = user(active_all: true, active_state: 'active')
+      @course.enroll_student(@student, enrollment_state: 'active')
+      @observer = user(active_all: true, active_state: 'active')
+      @course.enroll_user(
+        @observer,
+        'ObserverEnrollment',
+        enrollment_state: 'active',
+        associated_user_id: @student.id
+      )
+      @observer.user_observees.create do |uo|
+        uo.user_id = @student.id
+      end
+      @contexts = [@course.asset_string]
+      @ctx_str = @contexts.join("&context_codes[]=")
+      @me = @observer
+    end
+
+    it "should return observee's calendar events" do
+      3.times do |idx|
+        @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
+      end
+      json = api_call(:get,
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
+        controller: 'calendar_events_api', action: 'user_index', format: 'json',
+        context_codes: @contexts, all_events: true, user_id: @student.id})
+      expect(json.length).to eql 3
+    end
+
+    it "should return submissions with assignments" do
+      assg = @course.assignments.create(workflow_state: 'published', due_at: 3.days.from_now, submission_types: "online_text_entry")
+      assg.submit_homework @student, submission_type: "online_text_entry"
+      json = api_call(:get,
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&type=assignment&include[]=submission&context_codes[]=#{@ctx_str}", {
+        controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment', include: ['submission'],
+        context_codes: @contexts, all_events: true, user_id: @student.id})
+      expect(json.first['assignment']['submission']).not_to be_nil
     end
   end
 

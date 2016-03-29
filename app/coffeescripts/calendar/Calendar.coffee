@@ -2,12 +2,15 @@
 #  * Make assignments (due date) events non-resizable. Having an end date on them doesn't
 #    make sense.
 
-# requires jQuery, and vendor/fullcalendar
+# requires jQuery
 
 define [
   'i18n!calendar'
   'jquery'
   'underscore'
+  'timezone'
+  'moment'
+  'compiled/util/fcUtil'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
   'bower/color-slicer/dist/color-slicer'
@@ -20,15 +23,17 @@ define [
   'compiled/views/calendar/CalendarNavigator'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
+  'compiled/contextColorer'
   'compiled/util/deparam'
   'str/htmlEscape'
+  'compiled/calendar/CalendarEventFilter'
 
-  'vendor/fullcalendar'
+  'fullcalendar-with-lang-all'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam, htmlEscape) ->
+], (I18n, $, _, tz, moment, fcUtil, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape, calendarEventFilter) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -45,10 +50,14 @@ define [
 
       @el = $(selector).html calendarAppTemplate()
 
+      # In theory this is no longer necessary, but it performs some function that
+      # another file depends on or perhaps even this one. Whatever the dependency
+      # is it is not clear, without more research, what effect this has on the
+      # calendar system
       @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
       @schedulerNavigator.hide()
 
-      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
+      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource, calendar: this)
       @scheduler = new Scheduler(".scheduler-wrapper", this)
 
       fullCalendarParams = @initializeFullCalendarParams()
@@ -57,13 +66,8 @@ define [
       if not data.view_start and @options?.viewStart
         data.view_start = @options.viewStart
         @updateFragment data, replaceState: true
-      if data.view_start
-        date = $.fullCalendar.parseISO8601(data.view_start)
-      else
-        date = $.fudgeDateForProfileTimezone(new Date)
-      fullCalendarParams.year = date.getFullYear()
-      fullCalendarParams.month = date.getMonth()
-      fullCalendarParams.date = date.getDate()
+
+      fullCalendarParams.defaultDate = @getCurrentDate()
 
       @calendar = @el.find("div.calendar").fullCalendar fullCalendarParams
 
@@ -103,7 +107,7 @@ define [
         "CommonEvent/eventDeleted" : @eventDeleted
         "CommonEvent/eventSaving" : @eventSaving
         "CommonEvent/eventSaved" : @eventSaved
-        "CommonEvent/eventSaveError" : @eventSaveFailed
+        "CommonEvent/eventSaveFailed" : @eventSaveFailed
         "Calendar/visibleContextListChanged" : @visibleContextListChanged
         "EventDataSource/ajaxStarted" : @ajaxStarted
         "EventDataSource/ajaxEnded" : @ajaxEnded
@@ -115,7 +119,7 @@ define [
       @header.on('navigatePrev',  => @handleArrow('prev'))
       @header.on 'navigateToday', @today
       @header.on('navigateNext',  => @handleArrow('next'))
-      @header.on('navigateDate', @gotoDate)
+      @header.on('navigateDate', @navigateDate)
       @header.on('week', => @loadView('week'))
       @header.on('month', => @loadView('month'))
       @header.on('agenda', => @loadView('agenda'))
@@ -128,7 +132,7 @@ define [
       @schedulerNavigator.on('navigatePrev',  => @handleArrow('prev'))
       @schedulerNavigator.on('navigateToday', @today)
       @schedulerNavigator.on('navigateNext',  => @handleArrow('next'))
-      @schedulerNavigator.on('navigateDate', @gotoDate)
+      @schedulerNavigator.on('navigateDate', @navigateDate)
 
     connectAgendaEvents: ->
       @agenda.on('agendaDateRange', @renderDateRange)
@@ -137,14 +141,11 @@ define [
       _.defaults(
         header: false
         editable: true
-        columnFormat:
-          month: 'ddd'
-          week: 'ddd M/d'
         buttonText:
           today: I18n.t 'today', 'Today'
-        defaultEventMinutes: 60
-        slotMinutes: 30
-        firstHour: 7
+        defaultTimedEventDuration: '01:00:00'
+        slotDuration: '00:30:00'
+        scrollTime: '07:00:00'
         droppable: true
         dropAccept: '.undated_event'
         events: @getEvents
@@ -157,14 +158,11 @@ define [
         eventResizeStart: @eventResizeStart
         dayClick: @dayClick
         addEventClick: @addEventClick
-        titleFormat:
-          week: "MMM d[ yyyy]{ '–'[ MMM] d, yyyy}"
-        viewDisplay: @viewDisplay
+        viewRender: @viewRender
         windowResize: @windowResize
         drop: @drop
 
-        dragRevertDuration: { month: 0 }
-        dragHelper: { month: 'clone' }
+        dragRevertDuration: 0
         dragAppendTo: { month: '#calendar-drag-and-drop-container' }
         dragZIndex: { month: 350 }
         dragCursorAt: { month: {top: -5, left: -5} }
@@ -172,54 +170,10 @@ define [
         , calendarDefaults)
 
     today: =>
-      now = $.fudgeDateForProfileTimezone(new Date)
-      @gotoDate(now)
+      @gotoDate(fcUtil.now())
 
     # FullCalendar callbacks
-
-    getEvents: (start, end, cb) =>
-      # We want to filter events received from the datasource. It seems like you should be able
-      # to do this at render time as well, and return "false" in eventRender, but on the agenda
-      # view that still assumes that the item is taking up space even though it's not displayed.
-      filterEvents = (events) =>
-        # De-dupe, and remove any actual scheduled events (since we don't want to
-        # display that among the placeholders.)
-        eventIds = {}
-        return events unless events.length > 0
-        for idx in [events.length - 1..0] # CS doesn't have a way to iterate a list in reverse ?!
-          event = events[idx]
-
-          keep = true
-          # De-dupe
-          if eventIds[event.id]
-            keep = false
-          else if event.isAppointmentGroupEvent()
-            if !@displayAppointmentEvents
-              # Handle normal calendar view, not scheduler view
-              if !event.calendarEvent.reserve_url
-                # If there is not a reserve_url set, then it is an
-                # actual, scheduled event and not just a placeholder.
-                keep = true
-              else if event.calendarEvent.child_events_count > 0 && !event.calendarEvent.reserved && event.can_edit
-                # If this *is* a placeholder, and it has child events, and it's not reserved by me,
-                # that means people have signed up for it, so we want to display it if I am able to
-                #  manage it (as a teacher or TA might)
-                keep = true
-              else
-                keep = false
-            else
-              if @displayAppointmentEvents.id == event.calendarEvent?.appointment_group_id
-                # If this is an actual event for an appointment, don't show it
-                keep = !!event.calendarEvent.reserve_url
-              else
-                # If this is an appointment event for a different appointment group, and it's full, show it
-                keep = !event.calendarEvent.reserve_url
-
-          events.splice(idx, 1) unless keep
-          eventIds[event.id] = true
-
-        events
-
+    getEvents: (start, end, timezone, cb) =>
       @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
@@ -231,9 +185,9 @@ define [
               event.removeClass('current-appointment-group')
             for event in aEvents
               event.addClass('current-appointment-group')
-            cb(filterEvents(events.concat(aEvents)))
+            cb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
         else
-          cb(filterEvents(events))
+          cb(calendarEventFilter(@displayAppointmentEvents, events))
 
     # Close all event details popup on the page and have them cleaned up.
     closeEventPopups: ->
@@ -249,53 +203,44 @@ define [
 
     eventRender: (event, element, view) =>
       $element = $(element)
-      if event.isAppointmentGroupEvent() && @displayAppointmentEvents &&
-          @displayAppointmentEvents.id == event.calendarEvent.appointment_group_id
-        # We are in the scheduler view, and this event is part of the currently
-        # displayed appointment group. If it's a real event, and not a placeholder,
-        # we don't want to display it.
 
-        # If this is a time slot event, we don't actually want to display the title -
-        # just the reservation status.
-        status = "Available" # TODO: i18n
-        if event.calendarEvent.available_slots > 0
-          status = "#{event.calendarEvent.available_slots} Available"
-        if event.calendarEvent.available_slots == 0
-          status = "Filled" # TODO: i18n
-        if event.calendarEvent.reserved == true
-          status = "Reserved" # TODO: i18n
-        $element.find('.fc-event-title').text(status)
-
-      # TODO: i18n
-      timeString = if !event.endDate() || event.startDate().getTime() == event.endDate().getTime()
-          @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
+      startDate = event.startDate()
+      endDate = event.endDate()
+      timeString = if !endDate || +startDate == +endDate
+          startDate.locale(calendarDefaults.lang)
+          startDate.format("LT")
         else
-          @calendar.fullCalendar('formatDates', event.startDate(), event.endDate(), 'h:mmtt{ – h:mmtt}')
+          startDate.locale(calendarDefaults.lang)
+          endDate.locale(calendarDefaults.lang)
+          $.fullCalendar.formatRange(startDate, endDate, "LT")
+
       screenReaderTitleHint = if event.eventType.match(/assignment/)
           I18n.t('event_assignment_title', 'Assignment Title:')
         else
           I18n.t('event_event_title', 'Event Title:')
 
-      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
-      $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{htmlEscape I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
-      $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{htmlEscape screenReaderTitleHint} </span>"))
-      $element.find('.fc-event-title').toggleClass('calendar__event--completed', event.isCompleted())
-      element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
+      $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}"))
+      $element.find('.fc-content').prepend($("<span class='screenreader-only'>#{htmlEscape I18n.t('calendar_title', 'Calendar:')} #{htmlEscape(event.contextInfo.name)}</span>"))
+      $element.find('.fc-title').prepend($("<span class='screenreader-only'>#{htmlEscape screenReaderTitleHint} </span>"))
+      $element.find('.fc-title').toggleClass('calendar__event--completed', event.isCompleted())
+      element.find('.fc-content').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true
 
     eventAfterRender: (event, element, view) =>
+      @enableExternalDrags(element)
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
-        time = element.find('.fc-event-time')
+        time = element.find('.fc-time')
         html = time.html()
         # the time element also contains the title for calendar events
-        html = html.replace(/^\d+:\d+\w?/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
+        html = html?.replace(/^\d+:\d+\w?/, event.startDate().format('h:mmt'))
         time.html(html)
+        time.attr('data-start', event.startDate().format('h:mm'))
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
       if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
-        element.find('.fc-event-time').empty()
+        element.find('.fc-time').empty()
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -305,6 +250,7 @@ define [
           view
 
     eventDragStart: (event, jsEvent, ui, view) =>
+      $(".fc-highlight-skeleton").remove()
       @lastEventDragged = event
       @closeEventPopups()
 
@@ -312,34 +258,37 @@ define [
       @closeEventPopups()
 
     # event triggered by items being dropped from within the calendar
-    eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
-      @_eventDrop(event, minuteDelta, allDay, revertFunc)
+    eventDrop: (event, delta, revertFunc, jsEvent, ui, view) =>
+      minuteDelta = delta.asMinutes()
+      @_eventDrop(event, minuteDelta, event.allDay, revertFunc)
 
     _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
       if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
+      if event.midnightFudged
+        event.start = fcUtil.clone(event.originalStart).add(minuteDelta, 'minutes')
+
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
-        event.start.setMinutes(59)
+        event.start.minutes(59)
 
       # set event as an all day event if allDay
       if event.eventType == "calendar_event" && allDay
         event.allDay = true
 
       # if a short event gets dragged, we don't want to change its duration
-      if event.end && event.endDate()
-        originalDuration = event.endDate().getTime() - event.startDate().getTime()
-        event.end = new Date(event.start.getTime() + originalDuration)
 
-      event.saveDates null, revertFunc
+      if event.endDate() && event.end
+        originalDuration = event.endDate() - event.startDate()
+        event.end = fcUtil.clone(event.start).add(originalDuration, 'milliseconds')
+
+      event.saveDates(null, revertFunc)
       return true
 
-    eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
-      # assignments can't be resized
-      # if short events are being resized, assume the user knows what they're doing
-      event.saveDates null, revertFunc
+    eventResize: ( event, delta, revertFunc, jsEvent, ui, view ) =>
+      event.saveDates(null, revertFunc)
 
     addEventClick: (event, jsEvent, view) =>
       if @displayAppointmentEvents
@@ -361,7 +310,7 @@ define [
         $event.data('showEventDetailsDialog', detailsDialog)
         detailsDialog.show jsEvent
 
-    dayClick: (date, allDay, jsEvent, view) =>
+    dayClick: (date, jsEvent, view) =>
       if @displayAppointmentEvents
         # Don't allow new event creation while in scheduler mode
         return
@@ -370,9 +319,8 @@ define [
       allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
       activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
       event = commonEventFactory(null, activeContexts)
-      event.allDay = allDay
       event.date = date
-
+      event.allDay = not date.hasTime()
       (new EditEventDetailsDialog(event)).show()
 
     updateFragment: (opts) ->
@@ -389,40 +337,49 @@ define [
           delete data[k]
 
       if changed
-        fragment = "#" + $.param(data)
+        fragment = "#" + $.param(data, @)
         if replaceState || location.hash == ""
           history.replaceState(null, "", fragment)
         else
           location.href = fragment
 
-    viewDisplay: (view) =>
+    viewRender: (view) =>
       @setDateTitle(view.title)
       @drawNowLine()
 
+    enableExternalDrags: (eventEl) =>
+      $(eventEl).draggable({
+        zIndex: 999
+        revert: true
+        revertDuration: 0
+        refreshPositions: true
+        addClasses: false
+        appendTo: "calendar-drag-and-drop-container"
+        # clone doesn't seem to work :(
+        helper: "clone"
+      })
+
     isSameWeek: (date1, date2) ->
-      # Note that our date-js's getWeek is Monday-based.
-      sunday = new Date(date1.getTime())
-      sunday.setDate(sunday.getDate() - sunday.getDay())
-      weekStart = sunday.getTime()
-      weekEnd = weekStart + 7 * 24 * 3600 * 1000
-      weekStart <= date2 <= weekEnd
+      week1 = fcUtil.clone(date1).weekday(0).stripTime()
+      week2 = fcUtil.clone(date2).weekday(0).stripTime()
+      +week1 == +week2
 
     drawNowLine: =>
       return unless @currentView == 'week'
 
       if !@$nowLine
         @$nowLine = $('<div />', {'class': 'calendar-nowline'})
-      $('.fc-agenda-slots').parent().append(@$nowLine)
+      $('.fc-slats').append(@$nowLine)
 
-      now = $.fudgeDateForProfileTimezone(new Date)
-      midnight = new Date(now.getTime())
-      midnight.setHours(0, 0, 0)
-      seconds = (now.getTime() - midnight.getTime())/1000
-
+      now = fcUtil.now()
+      midnight = fcUtil.now()
+      midnight.hours(0)
+      midnight.seconds(0)
+      seconds = moment.duration(now.diff(midnight)).asSeconds()
       @$nowLine.toggle(@isSameWeek(@getCurrentDate(), now))
 
-      @$nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
-      secondHeight = $('.fc-agenda-slots').css('height').replace('px', '')/24/3600
+      @$nowLine.css('width', $('.fc-body .fc-widget-content:first').css('width'))
+      secondHeight = ($('.fc-time-grid')?.css('height')?.replace('px', '') || 0)/24/60/60
       @$nowLine.css('top', seconds*secondHeight + 'px')
 
     setDateTitle: (title) =>
@@ -430,7 +387,7 @@ define [
       @schedulerNavigator.setTitle(title)
 
     # event triggered by items being dropped from outside the calendar
-    drop: (date, allDay, jsEvent, ui) =>
+    drop: (date, jsEvent, ui) =>
       eventId    = $(ui.helper).data('event-id')
       event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
       return unless event
@@ -438,28 +395,28 @@ define [
       event.addClass 'event_pending'
       revertFunc = -> console.log("could not save date on undated event")
 
-      return unless @_eventDrop(event, 0, allDay, revertFunc)
+      return unless @_eventDrop(event, 0, false, revertFunc)
       @calendar.fullCalendar('renderEvent', event)
 
     # callback from minicalendar telling us an event from here was dragged there
     dropOnMiniCalendar: (date, allDay, jsEvent, ui) ->
       event = @lastEventDragged
       return unless event
-      originalStart = new Date(event.start.getTime())
-      originalEnd = new Date(event.end?.getTime())
+      originalStart = fcUtil.clone(event.start)
+      originalEnd = fcUtil.clone(event.end)
       @copyYMD(event.start, date)
       @copyYMD(event.end, date)
       @_eventDrop(event, 0, false, =>
         event.start = originalStart
         event.end = originalEnd
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
       )
 
     copyYMD: (target, source) ->
       return unless target
-      target.setFullYear(source.getFullYear())
-      target.setMonth(source.getMonth())
-      target.setDate(source.getDate())
+      target.year(source.year())
+      target.month(source.month())
+      target.date(source.date())
 
     # DOM callbacks
 
@@ -483,21 +440,31 @@ define [
 
     # Subscriptions
 
+    updateEvent: (event) =>
+      # fullcalendar.js expects the argument to updateEvent to be an instance
+      # of the event that it's manipulated into having _start and _end fields.
+      # the event passed in here isn't necessarily one of those, but may be our
+      # own management of the event instead. in lieu of figuring out how to get
+      # the right copy of the event here, the one we have is good enough as
+      # long as we put the expected fields in place
+      event._start ?= fcUtil.clone(event.start)
+      event._end ?= if event.end then fcUtil.clone(event.end) else null
+      @calendar.fullCalendar('updateEvent', event)
+
     eventDeleting: (event) =>
       event.addClass 'event_pending'
-      @calendar.fullCalendar('updateEvent', event)
+      @updateEvent(event)
 
     eventDeleted: (event) =>
       @calendar.fullCalendar('removeEvents', event.id)
 
     eventSaving: (event) =>
       return unless event.start # undated events can't be rendered
-
       event.addClass 'event_pending'
       if event.isNewEvent()
         @calendar.fullCalendar('renderEvent', event)
       else
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
@@ -508,11 +475,11 @@ define [
       # This is another reason to do a refetchEvents instead of just an update.
       delete event._id
       @calendar.fullCalendar('refetchEvents')
+      @reloadClick() if event?.object?.duplicates?.length > 0
       # We'd like to just add the event to the calendar rather than fetching,
       # but the save may be as a result of moving an event from being undated
       # to dated, and in that case we don't know whether to just update it or
       # add it. Some new state would need to be kept to track that.
-      # @calendar.fullCalendar('updateEvent', event)
       @closeEventPopups()
 
     eventSaveFailed: (event) =>
@@ -520,7 +487,7 @@ define [
       if event.isNewEvent()
         @calendar.fullCalendar('removeEvents', event.id)
       else
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
 
     # When an assignment event is updated, update its related overrides.
     updateOverrides: (event) =>
@@ -547,43 +514,53 @@ define [
 
     # Methods
 
-    gotoDate: (d) =>
-      @calendar.fullCalendar("gotoDate", d)
-      @agendaViewFetch(d) if @currentView == 'agenda'
-      @setCurrentDate(d)
+    # expects a fudged Moment object (use fcUtil
+    # before calling if you must coerce)
+    gotoDate: (date) =>
+      @calendar.fullCalendar("gotoDate", date)
+      @agendaViewFetch(date) if @currentView == 'agenda'
+      @setCurrentDate(date)
+      @drawNowLine()
+
+    navigateDate: (d) =>
+      date = fcUtil.wrap(d)
+      @gotoDate(date)
 
     handleArrow: (type) ->
       @calendar.fullCalendar(type)
       calendarDate = @calendar.fullCalendar('getDate')
-      now = $.fudgeDateForProfileTimezone(new Date)
+      now = fcUtil.now()
       if @currentView == 'month'
-        if calendarDate.getMonth() == now.getMonth() && calendarDate.getFullYear() == now.getFullYear()
+        if calendarDate.month() == now.month() && calendarDate.year() == now.year()
           start = now
         else
-          start = new Date(calendarDate.getTime())
-          start.setDate(1)
+          start = fcUtil.clone(calendarDate)
+          start.date(1)
       else
         if @isSameWeek(calendarDate, now)
           start = now
         else
-          start = new Date(calendarDate.getTime())
-          start.setDate(start.getDate() - start.getDay())
-      @setCurrentDate(start)
+          start = fcUtil.clone(calendarDate)
+          start.date(start.date() - start.day())
 
-    setCurrentDate: (d) ->
-      d.setHours(0, 0, 0, 0)
+      @setCurrentDate(start)
+      @drawNowLine()
+
+    # this expects a fudged moment object
+    # use fcUtil to coerce if needed
+    setCurrentDate: (date) ->
       @updateFragment
-        view_start: d.toISOString()
+        view_start: date.format('YYYY-MM-DD')
         replaceState: true
 
-      $.publish('Calendar/currentDate', d)
+      $.publish('Calendar/currentDate', date)
 
     getCurrentDate: () ->
       data = @dataFromDocumentHash()
       if data.view_start
-        $.fullCalendar.parseISO8601(data.view_start)
+        fcUtil.wrap(data.view_start)
       else
-        $.fudgeDateForProfileTimezone(new Date)
+        fcUtil.now()
 
     setCurrentView: (view) ->
       @updateFragment
@@ -611,8 +588,17 @@ define [
       @header.showNavigator()
       @header.showPrevNext()
       @header.hideAgendaRecommendation()
+
+      if view != 'scheduler'
+        @updateFragment appointment_group_id: null
+        @scheduler.viewingGroup = null
+        @agenda.viewingGroup = null
+
       if view != 'scheduler' and view != 'agenda'
-        @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
+        # rerender title so agenda title doesnt stay
+        viewObj = @calendar.fullCalendar('getView')
+        @viewRender(viewObj)
+
         @displayAppointmentEvents = null
         @scheduler.hide()
         @header.showAgendaRecommendation()
@@ -622,7 +608,6 @@ define [
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
         @calendar.fullCalendar('render')
       else if view == 'scheduler'
-        @calendar.addClass('scheduler-mode')
         @calendar.hide()
         @header.showSchedulerTitle()
         @schedulerNavigator.hide()
@@ -636,31 +621,34 @@ define [
       date = @getCurrentDate()
       @agendaViewFetch(date)
 
+    hideAgendaView: ->
+      @agenda.hide()
+
+    formatDate: (date, format) ->
+      tz.format(fcUtil.unwrap(date), format)
+
     agendaViewFetch: (start) ->
-      start.setHours(0)
-      start.setMinutes(0)
-      start.setSeconds(0)
-      @setDateTitle(I18n.l('#date.formats.medium', start))
+      @setDateTitle(@formatDate(start, 'date.formats.medium'))
       @agenda.fetch(@visibleContextList, start)
 
     renderDateRange: (start, end) =>
-      @setDateTitle(I18n.l('#date.formats.medium', start)+' – '+I18n.l('#date.formats.medium', end))
+      @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
       # for "load more" with voiceover, we want the alert to happen later so
       # the focus change doesn't interrupt it.
       window.setTimeout =>
         $.screenReaderFlashMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
-          start: I18n.l('#date.formats.long', start)
-          end:   I18n.l('#date.formats.long', end)
+          start: @formatDate(start, 'date.formats.long')
+          end:   @formatDate(end, 'date.formats.long')
         )
       , 500
 
-    showSchedulerSingle: ->
-      @calendar.show()
-      @calendar.fullCalendar('changeView', 'agendaWeek')
+    showSchedulerSingle: (group) ->
+      @agenda.viewingGroup = group
+      @loadAgendaView()
       @header.showDoneButton()
-      @schedulerNavigator.show()
 
     schedulerSingleDoneClick: =>
+      @agenda.viewingGroup = null
       @scheduler.doneClick()
       @header.showSchedulerTitle()
       @schedulerNavigator.hide()
@@ -677,19 +665,31 @@ define [
           '/api/v1/users/' + @options.userId + '/colors/'
           (data) =>
             customColors = data.custom_colors
-
             colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
+
+            newCustomColors = {}
             html = (for contextCode, index in @contextCodes
               # Use a custom color if found.
-              color = if customColors[contextCode] then customColors[contextCode] else colors[index]
+              if customColors[contextCode]
+                color = customColors[contextCode]
+              else
+                color = colors[index]
+                newCustomColors[contextCode] = color
+
               color = htmlEscape(color)
               contextCode = htmlEscape(contextCode)
-              ".group_#{contextCode}{
+              ".group_#{contextCode},
+               .group_#{contextCode}:hover,
+               .group_#{contextCode}:focus{
                  color: #{color};
                  border-color: #{color};
                  background-color: #{color};
-              }"
+              }
+
+              "
             ).join('')
+
+            ContextColorer.persistContextColors(newCustomColors, @options.userId)
 
             $styleContainer.html "<style>#{html}</style>"
       )

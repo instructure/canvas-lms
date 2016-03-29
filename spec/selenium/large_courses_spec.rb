@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "large courses", :priority => "2" do
-  include_examples "in-process server selenium tests"
+describe "large courses", priority: "2" do
+  include_context "in-process server selenium tests"
 
   def assignments_creation
     @course.require_assignment_group

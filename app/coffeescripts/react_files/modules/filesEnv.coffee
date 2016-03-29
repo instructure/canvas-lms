@@ -4,8 +4,11 @@ define [
 ], (Folder, splitAssetString) ->
 
   fileContexts = ENV.FILES_CONTEXTS or []
+  newFolderTree = ENV.NEW_FOLDER_TREE
+  newFolderTree = false if newFolderTree == undefined
 
   filesEnv =
+    newFolderTree: newFolderTree
     contexts: fileContexts
 
     contextsDictionary: fileContexts.reduce (dict, context)  ->
@@ -22,14 +25,15 @@ define [
     contextId: fileContexts[0]?.contextId
 
     rootFolders: fileContexts.map (contextData) ->
-      folder = new Folder({
-        'custom_name': contextData.name
-        'context_type': contextData.contextType.replace(/s$/, '') #singularize it
-        'context_id': contextData.contextId
-      })
-      folder.url = "/api/v1/#{contextData.contextType}/#{contextData.contextId}/folders/root"
-      folder.fetch()
-      folder
+      if ENV.current_user_id
+        folder = new Folder({
+          'custom_name': contextData.name
+          'context_type': contextData.contextType.replace(/s$/, '') #singularize it
+          'context_id': contextData.contextId
+        })
+        folder.url = "/api/v1/#{contextData.contextType}/#{contextData.contextId}/folders/root"
+        folder.fetch()
+        folder
 
   filesEnv.contextFor = (folderOrFile) ->
     if folderOrFile.collection?.parentFolder

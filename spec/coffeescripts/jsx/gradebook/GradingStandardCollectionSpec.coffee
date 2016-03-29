@@ -10,15 +10,10 @@ define [
 
   module 'GradingStandardCollection',
     setup: ->
-      # be very careful to clean up things you monkeypatch out
-      @fMessage = $.flashMessage
-      $.flashMessage = ->
-      @fError = $.flashError
-      $.flashError = ->
-      @wConfirm = window.confirm
-      window.confirm = ->
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
+      @stub(window, 'confirm', -> )
       @server = sinon.fakeServer.create()
-      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["admin", "teacher"]
       ENV.GRADING_STANDARDS_URL = "/courses/1/grading_standards"
       ENV.DEFAULT_GRADING_STANDARD_DATA = [
@@ -67,10 +62,11 @@ define [
           permissions:
             read: true
             manage: true
-      @server.respondWith "GET", ENV.GRADING_STANDARDS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
+      @server.respondWith "GET", ENV.GRADING_STANDARDS_URL + ".json", [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
       @server.respondWith "POST", ENV.GRADING_STANDARDS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdStandard]
       @server.respondWith "PUT", ENV.GRADING_STANDARDS_URL + "/1", [200, {"Content-Type":"application/json"}, JSON.stringify @updatedStandard]
-      @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollection())
+      GradingStandardCollectionElement = React.createElement(GradingStandardCollection)
+      @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollectionElement)
       @server.respond()
 
     teardown: ->
@@ -78,11 +74,7 @@ define [
       ENV.current_user_roles = null
       ENV.GRADING_STANDARDS_URL = null
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
-      @sandbox.restore()
 
   test 'gets the standards data from the grading standards controller, and multiplies data values by 100 (i.e. .20 becomes 20)', ->
     deepEqual @gradingStandardCollection.state.standards, @processedIndexData
@@ -105,7 +97,7 @@ define [
 
 
   test 'does not save the new standard on the backend when the add button is clicked', ->
-    saveGradingStandard = @sandbox.spy(@gradingStandardCollection, 'saveGradingStandard')
+    saveGradingStandard = @spy(@gradingStandardCollection, 'saveGradingStandard')
     Simulate.click(@gradingStandardCollection.refs.addButton.getDOMNode())
     ok saveGradingStandard.notCalled
 
@@ -225,7 +217,7 @@ define [
     ok @gradingStandardCollection.refs.noSchemesMessage
 
   test 'deleteGradingStandard calls confirmDelete', ->
-    confirmDelete = @sandbox.spy($.fn, "confirmDelete")
-    deleteLink = @gradingStandardCollection.refs.gradingStandard1.refs.deleteLink.getDOMNode()
-    Simulate.click(deleteLink)
+    confirmDelete = @spy($.fn, "confirmDelete")
+    deleteButton = @gradingStandardCollection.refs.gradingStandard1.refs.deleteButton.getDOMNode()
+    Simulate.click(deleteButton)
     ok confirmDelete.calledOnce

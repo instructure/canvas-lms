@@ -148,6 +148,30 @@ describe Course do
     it "should create a new instance given valid attributes" do
       course_model
     end
+
+    it "should require unique sis_source_id" do
+      other_course = course
+      other_course.sis_source_id = "sisid"
+      other_course.save!
+
+      new_course = course
+      new_course.sis_source_id = other_course.sis_source_id
+      expect(new_course).to_not be_valid
+      new_course.sis_source_id = nil
+      expect(new_course).to be_valid
+    end
+
+    it "should require unique integration_id" do
+      other_course = course
+      other_course.integration_id = "intid"
+      other_course.save!
+
+      new_course = course
+      new_course.integration_id = other_course.integration_id
+      expect(new_course).to_not be_valid
+      new_course.integration_id = nil
+      expect(new_course).to be_valid
+    end
   end
 
   it "should create a unique course." do
@@ -406,6 +430,14 @@ describe Course do
         expect(c.grants_right?(@student, :read_forum)).to be_truthy
       end
 
+      it "should not grant read_forum to date-completed student if disabled by role override" do
+        c.root_account.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+        c.offer!
+        make_date_completed
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@student, :read_forum)).to be_falsey
+      end
+
       it "should not grant read to completed students of an unpublished course" do
         expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'completed')
@@ -524,7 +556,7 @@ describe Course do
 
       @new_course = @course.reset_content
 
-      expect(@new_course.profile.data).to eq data
+      expect(@new_course.profile.data[:something]).to eq data[:something]
       expect(@new_course.profile.description).to eq description
     end
 
@@ -790,7 +822,7 @@ describe Course, "enroll" do
 
   it "should be able to enroll a designer" do
     @course.enroll_designer(@user)
-    @de = @course.designer_enrollments.first
+    @de = @course.enrollments.where(type: 'DesignerEnrollment').first
     expect(@de.user_id).to eql(@user.id)
     expect(@de.course_id).to eql(@course.id)
   end
@@ -799,9 +831,9 @@ describe Course, "enroll" do
   it "should scope correctly when including teachers from course" do
     account = @course.account
     @course.enroll_student(@user)
-    scope = account.associated_courses.active.select([:id, :name]).joins(:teachers).includes(:teachers).where(:enrollments => { :workflow_state => 'active' })
+    scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
-    expect(sql).to match(/enrollments.type = 'TeacherEnrollment'/)
+    expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
   end
 end
 
@@ -845,17 +877,21 @@ describe Course, "score_to_grade" do
 end
 
 describe Course, "gradebook_to_csv" do
+  before :once do
+    course_with_student active_all: true
+    teacher_in_course active_all: true
+  end
+
   it "should generate gradebook csv" do
-    course_with_student(:active_all => true)
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user, :grade => "10")
+    @assignment.grade_student(@student, :grade => "10")
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
     @course.recompute_student_scores
-    @user.reload
+    @student.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -868,8 +904,6 @@ describe Course, "gradebook_to_csv" do
   end
 
   it "should order assignments and groups by position" do
-    course_with_student(:active_all => true)
-
     @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
 
     now = Time.now
@@ -890,13 +924,13 @@ describe Course, "gradebook_to_csv" do
     @course.assignments.create!(:title => "Assignment 13", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 99", :position => 1, :assignment_group => @assignment_group_1, :submission_types => 'not_graded')
     @course.recompute_student_scores
-    @user.reload
+    @student.reload
     @course.reload
 
-    g1a1.grade_student(@user, grade: 10)
-    g2a1.grade_student(@user, grade: 5)
+    g1a1.grade_student(@student, grade: 10)
+    g2a1.grade_student(@student, grade: 5)
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -932,10 +966,10 @@ describe Course, "gradebook_to_csv" do
     @course.assignments.create!(:title => "Assignment 02", :due_at => nil, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
 
     @course.recompute_student_scores
-    @user.reload
+    @student.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     rows = CSV.parse(csv)
     assignments = rows[0].each_with_object([]) do |column, collection|
       collection << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
@@ -946,23 +980,50 @@ describe Course, "gradebook_to_csv" do
     expect(assignments).to eq ["Assignment 01", "Assignment 02"]
   end
 
-  it "should alphabetize by sortable name with the test student at the end" do
-    course
-    ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
-    test_student_enrollment = student_in_course(:name => "Test Student")
-    test_student_enrollment.type = "StudentViewEnrollment"
-    test_student_enrollment.save!
+  context "sort order" do
+    before :once do
+      course_with_teacher active_all: true
+      _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map { |name|
+        student_in_course(:name => name)
+        @student
+      }
+      zed.update_attribute :sortable_name, "aaaaaa zed"
 
-    csv = @course.gradebook_to_csv
-    rows = CSV.parse(csv)
-    expect([rows[2][0],
-     rows[3][0],
-     rows[4][0],
-     rows[5][0]]).to eq ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
+      test_student_enrollment = student_in_course(:name => "Test Student")
+      test_student_enrollment.type = "StudentViewEnrollment"
+      test_student_enrollment.save!
+    end
+
+    it "should alphabetize by sortable name with the test student at the end" do
+      csv = GradebookExporter.new(@course, @teacher).to_csv
+      rows = CSV.parse(csv)
+      expect([rows[2][0],
+       rows[3][0],
+       rows[4][0],
+       rows[5][0]]).to eq ["Zed Zed", "Aardvark Aardvark", "Ned Ned", "Test Student"]
+    end
+
+    it "can show students by sortable name" do
+      @course.enable_feature! :gradebook_list_students_by_sortable_name
+      csv = GradebookExporter.new(@course, @teacher).to_csv
+      rows = CSV.parse(csv)
+      expect([rows[2][0],
+       rows[3][0],
+       rows[4][0],
+       rows[5][0]]).to eq ["aaaaaa zed", "Aardvark, Aardvark", "Ned, Ned", "Student, Test"]
+    end
+  end
+
+  it "marks excused assignments" do
+    a = @course.assignments.create! name: "asdf", points_possible: 10
+    a.grade_student @student, excuse: true
+    csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
+    _name, _id, _section, _sis_login_id, score, _ = csv[-1]
+    expect(score).to eq "EX"
   end
 
   it "should include all section names in alphabetical order" do
-    course
+    course_with_teacher(active_all: true)
     sections = []
     students = []
     ['COMPSCI 123 LEC 001', 'COMPSCI 123 DIS 101', 'COMPSCI 123 DIS 102'].each do |section_name|
@@ -975,13 +1036,13 @@ describe Course, "gradebook_to_csv" do
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(5)
-    expect(rows[2][2]).to eq "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
-    expect(rows[3][2]).to eq "COMPSCI 123 LEC 001"
-    expect(rows[4][2]).to eq "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+    expect(rows[2][3]).to eq "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    expect(rows[3][3]).to eq "COMPSCI 123 LEC 001"
+    expect(rows[4][3]).to eq "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
   end
 
   it "should generate csv with final grade if enabled" do
@@ -990,14 +1051,14 @@ describe Course, "gradebook_to_csv" do
     @course.save!
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-    @assignment.grade_student(@user, :grade => "10")
+    @assignment.grade_student(@student, :grade => "10")
     @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
-    @assignment2.grade_student(@user, :grade => "8")
+    @assignment2.grade_student(@student, :grade => "8")
     @course.recompute_student_scores
-    @user.reload
+    @student.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -1034,7 +1095,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @course.reload
 
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to eq 5
@@ -1076,7 +1137,7 @@ describe Course, "gradebook_to_csv" do
     HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
     HostUrl.expects(:context_host).with(account2).returns('school2')
 
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to eq 5
@@ -1107,19 +1168,18 @@ describe Course, "gradebook_to_csv" do
     e = course_with_student active_all: true
     e.update_attribute :workflow_state, 'completed'
 
-    expect(@course.gradebook_to_csv).not_to include @student.name
-    expect(@course.gradebook_to_csv(include_priors: true)).to include @student.name
+    expect(GradebookExporter.new(@course, @teacher).to_csv).not_to include @student.name
+    expect(GradebookExporter.new(@course, @teacher, include_priors: true).to_csv).to include @student.name
   end
 
   context "accumulated points" do
     before :once do
-      student_in_course(:active_all => true)
       a = @course.assignments.create! :title => "Blah", :points_possible => 10
       a.grade_student @student, :grade => 8
     end
 
     it "includes points for unweighted courses" do
-      csv = CSV.parse(@course.gradebook_to_csv)
+      csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
       expect(csv[0][-8]).to eq "Assignments Current Points"
       expect(csv[0][-7]).to eq "Assignments Final Points"
       expect(csv[1][-8]).to eq "(read only)"
@@ -1136,7 +1196,7 @@ describe Course, "gradebook_to_csv" do
 
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
-      csv = CSV.parse(@course.gradebook_to_csv)
+      csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
       expect(csv[0][-8]).not_to eq "Assignments Current Points"
       expect(csv[0][-7]).not_to eq "Assignments Final Points"
       expect(csv[0][-4]).not_to eq "Current Points"
@@ -1154,7 +1214,7 @@ describe Course, "gradebook_to_csv" do
     @s2 = @course.course_sections.create!(:name => 'section2')
     StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
     @course.reload
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
     rows = CSV.parse(csv)
     expect(rows.length).to eq 4
   end
@@ -1180,7 +1240,7 @@ describe Course, "gradebook_to_csv" do
       @course.recompute_student_scores
       @course.reload
 
-      csv = @course.gradebook_to_csv(:include_sis_id => true)
+      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
       expect(rows.length).to eq 6
@@ -1208,6 +1268,7 @@ describe Course, "gradebook_to_csv" do
 
   it "should only include students from the appropriate section for a section limited teacher" do
     course(:active_all => 1)
+    teacher_in_course(active_all: true)
     @teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
     @section = @course.course_sections.create!(:name => 'section 2')
     @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
@@ -1215,7 +1276,7 @@ describe Course, "gradebook_to_csv" do
     @user2 = user_with_pseudonym(:active_all => true, :name => 'Jeremy', :username => 'jeremy@instructure.com')
     @course.enroll_student(@user2)
 
-    csv = @course.gradebook_to_csv(:user => @teacher)
+    csv = GradebookExporter.new(@course, @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     # two header rows, and one student row
@@ -1224,14 +1285,13 @@ describe Course, "gradebook_to_csv" do
   end
 
   it "shows gpa_scale grades instead of points" do
-    student_in_course(active_all: true)
     a = @course.assignments.create! grading_type: "gpa_scale",
       points_possible: 10,
       title: "blah"
     a.publish
     a.grade_student(@student, grade: "C")
-    rows = CSV.parse(@course.gradebook_to_csv)
-    expect(rows[2][3]).to eql "C"
+    rows = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
+    expect(rows[2][4]).to eql "C"
   end
 
   context "differentiated assignments" do
@@ -1260,17 +1320,17 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should insert N/A for non-visible assignments" do
-      csv = @course.gradebook_to_csv(:user => @teacher)
+      csv = GradebookExporter.new(@course, @teacher).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
-      expect(rows[2][3]).to eq "3"
-      expect(rows[2][4]).to eq "N/A"
+      expect(rows[2][4]).to eq "3"
+      expect(rows[2][5]).to eq "N/A"
 
-      expect(rows[3][3]).to eq "N/A"
-      expect(rows[3][4]).to eq "3"
+      expect(rows[3][4]).to eq "N/A"
+      expect(rows[3][5]).to eq "3"
 
-      expect(rows[4][3]).to eq "N/A"
       expect(rows[4][4]).to eq "N/A"
+      expect(rows[4][5]).to eq "N/A"
     end
   end
 end
@@ -1294,7 +1354,7 @@ describe Course, "update_account_associations" do
   it "should act like it's associated to its account and root account, even if associations are busted" do
     account1 = Account.default.sub_accounts.create!
     c = account1.courses.create!
-    c.course_account_associations.scoped.delete_all
+    c.course_account_associations.scope.delete_all
     expect(c.associated_accounts).to eq [account1, Account.default]
   end
 
@@ -3011,7 +3071,7 @@ describe Course, "conclusions" do
     expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({:read => true, :participate_as_student => false})
   end
 
-  context "appointment cancelation" do
+  context "appointment cancellation" do
     before :once do
       course_with_student(:active_all => true)
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
@@ -3101,7 +3161,7 @@ describe Course, "section_visibility" do
 
   it "should return a scope from sections_visible_to" do
     # can't use "should respond_to", because that delegates to the instantiated Array
-    expect{ @course.sections_visible_to(@teacher).scoped }.not_to raise_exception
+    expect{ @course.sections_visible_to(@teacher).all }.not_to raise_exception
   end
 
   context "full" do
@@ -3126,11 +3186,13 @@ describe Course, "section_visibility" do
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
-      expect(@course.enrollments_visible_to(@admin).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
 
     it "should return student view students to student view students" do
-      expect(@course.enrollments_visible_to(@course.student_view_student).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @course.student_view_student)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
   end
 
@@ -3144,7 +3206,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return non-limited admins from other sections" do
-      expect(@course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true)).to eq [@teacher]
+      expect(@course.apply_enrollment_visibility(@course.teachers, @ta)).to eq [@teacher]
     end
   end
 
@@ -3172,38 +3234,6 @@ describe Course, "section_visibility" do
                            :role => student_role, :enabled => false)
       expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true)).to eql :restricted
     end
-  end
-end
-
-describe Course, ".import_from_migration" do
-  before :once do
-    course_with_teacher
-  end
-
-  before :each do
-    attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
-  end
-
-  it "should know when it has open course imports" do
-    # no course imports
-    expect(@course).not_to have_open_course_imports
-
-    course2 = @course.account.courses.create!
-    # created course import
-    @course.course_imports.create!(source: course2, import_type: 'test')
-    expect(@course).to have_open_course_imports
-
-    # started course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'started')
-    expect(@course).to have_open_course_imports
-
-    # completed course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'completed')
-    expect(@course).not_to have_open_course_imports
-
-    # failed course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'failed')
-    expect(@course).not_to have_open_course_imports
   end
 end
 
@@ -3427,11 +3457,12 @@ describe Course do
     end
 
     it "should be preferred if delegated authentication is configured" do
-      account = Account.default
-      account.settings = { :open_registration => true }
-      account.account_authorization_configs.create!(:auth_type => 'cas')
+      account = Account.create!
+      account.settings[:open_registration] = true
       account.save!
-      course
+      account.authentication_providers.create!(:auth_type => 'cas')
+      account.authentication_providers.first.move_to_bottom
+      course(account: account)
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
       expect(@course.user_list_search_mode_for(user)).to eq :preferred
     end
@@ -3506,7 +3537,7 @@ describe Course do
 
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
-      expect{ @course.groups_visible_to(@user).scoped }.not_to raise_exception
+      expect{ @course.groups_visible_to(@user).all }.not_to raise_exception
     end
   end
 
@@ -3547,7 +3578,7 @@ describe Course do
 
       it 'can be read by a prior user' do
         user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
-        expect(@course.check_policy(user).sort).to eq [:read, :read_forum, :read_grades, :read_outcomes]
+        expect(@course.check_policy(user).sort).to eq [:read, :read_announcements, :read_forum, :read_grades, :read_outcomes]
       end
 
       it 'can have its forum read by an observer' do
@@ -3990,12 +4021,33 @@ describe Course do
       @course.enroll_student(user2).accept!
 
       dm_count = DelayedMessage.count
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 0
+      count1 = DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count
       Notification.create!(:name => 'Enrollment Invitation')
-      @course.re_send_invitations!
+      @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 1
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq count1 + 1
+    end
+
+    it "should respect section restrictions" do
+      course(:active_all => true)
+      section2 = @course.course_sections.create! :name => 'section2'
+      user1 = user_with_pseudonym(:active_all => true)
+      user2 = user_with_pseudonym(:active_all => true)
+      ta = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user1)
+      @course.enroll_student(user2, :section => section2)
+      @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
+
+      notification = Notification.where(:name => 'Enrollment Invitation').first_or_create!
+
+      count1 = user1.communication_channel.delayed_messages.where(notification_id: notification).count
+      count2 = user2.communication_channel.delayed_messages.where(notification_id: notification).count
+
+      @course.re_send_invitations!(ta)
+
+      expect(user1.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count1
+      expect(user2.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count2 + 1
     end
   end
 
@@ -4141,6 +4193,16 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect(@course.restrict_student_future_view?).to be_truthy
     end
   end
+
+  describe "notificiations" do
+    it "doesnt blow up when trying to send notifications just because there's no prior_version" do
+      course = course(account: Account.default, name: "SOME COURSE NAME")
+      course.prior_version=nil
+      course.stubs(just_created: false)
+      course.instance_variable_set(:@broadcasted, false)
+      expect { course.broadcast_notifications }.to_not raise_error
+    end
+  end
 end
 
 describe Course, 'invited_count_visible_to' do
@@ -4149,5 +4211,101 @@ describe Course, 'invited_count_visible_to' do
     student_in_course
     expect(@student.enrollments.where(course_id: @course).first).to be_creation_pending
     expect(@course.invited_count_visible_to(@teacher)).to eq(2)
+  end
+end
+
+describe Course, '#favorite_for_user?' do
+  before :once do
+    @courses = []
+    @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
+    @courses << course_with_student(:course_name => "Course 1", :user => @user, :active_all => true).course
+    @user.favorites.build(:context => @courses[0])
+    @user.save
+  end
+
+  it "should return true if a user has a course set as a favorite" do
+    expect(@courses[0].favorite_for_user?(@user)).to eql(true)
+  end
+
+  it "should return false if a user has not set a course to be a favorite" do
+    expect(@courses[1].favorite_for_user?(@user)).to eql(false)
+  end
+end
+
+describe Course, '#modules_visible_to' do
+  before :once do
+    course_with_teacher active_all: true
+    student_in_course active_enrollment: true
+    @course.context_modules.create!(name: 'published')
+    @course.context_modules.create!(name: 'unpublished').unpublish!
+  end
+
+  it "shows published modules to students" do
+    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w(published)
+  end
+
+  it "shows all modules to teachers" do
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+  end
+
+  it "shows all modules to teachers even when course is concluded" do
+    @course.complete!
+    expect(@course.grants_right?(@teacher, :manage_content)).to eq(false)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+  end
+end
+
+describe Course, '#module_items_visible_to' do
+  before :once do
+    course_with_teacher active_all: true
+    student_in_course active_enrollment: true
+    @module = @course.context_modules.create!
+    @module.add_item(type: 'sub_header', title: 'published').publish!
+    @module.add_item(type: 'sub_header', title: 'unpublished')
+  end
+
+  it "shows published items to students" do
+    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w(published)
+  end
+
+  it "shows all items to teachers" do
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+
+  it "shows all items to teachers even when course is concluded" do
+    @course.complete!
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+end
+
+describe Course, '#update_enrolled_users' do
+  it "should update user associations when deleted" do
+    course_with_student(:active_all => true)
+    expect(@user.associated_accounts).to be_present
+    @course.destroy
+    @user.reload
+    expect(@user.associated_accounts).to be_blank
+  end
+end
+
+describe Course, "#apply_nickname_for!" do
+  before(:once) do
+    @course = Course.create! :name => 'some terrible name'
+    @user = User.new
+    @user.course_nicknames[@course.id] = 'nickname'
+    @user.save!
+  end
+
+  it "sets name to user's nickname (non-persistently)" do
+    @course.apply_nickname_for!(@user)
+    expect(@course.name).to eq 'nickname'
+    @course.save!
+    expect(Course.find(@course).name).to eq 'some terrible name'
+  end
+
+  it "undoes the change with nil user" do
+    @course.apply_nickname_for!(@user)
+    @course.apply_nickname_for!(nil)
+    expect(@course.name).to eq 'some terrible name'
   end
 end

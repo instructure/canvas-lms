@@ -1,9 +1,10 @@
 define(function(require) {
   var Store = require('canvas_quizzes/core/store');
+  var Dispatcher = require('../core/dispatcher');
   var config = require('../config');
   var K = require('../constants');
   var QuizReports = require('../collections/quiz_reports');
-  var pollProgress = require('canvas_quizzes/services/poll_progress');
+  var pollProgress = require('../services/poll_progress');
   var populateCollection = require('./common/populate_collection');
   var quizReports = new QuizReports();
 
@@ -218,5 +219,6 @@ define(function(require) {
         generationRequests.splice(generationRequests.indexOf(request), 1);
       }
     }
-  });
+  }, Dispatcher);
+
 });

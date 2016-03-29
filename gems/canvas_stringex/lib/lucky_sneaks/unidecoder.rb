@@ -1,10 +1,10 @@
-require "yaml"
+require "json"
 
 module LuckySneaks
   module Unidecoder
-    # Contains Unicode codepoints, loading as needed from YAML files
+    # Contains Unicode codepoints, loading as needed from JSON files
     CODEPOINTS = Hash.new { |h, k|
-      h[k] = YAML::load_file(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.yml"))
+      h[k] = JSON.load(File.read(File.join(File.dirname(__FILE__), "unidecoder_data", "#{k}.json")))
     } unless defined?(CODEPOINTS)
   
     class << self
@@ -30,9 +30,9 @@ module LuckySneaks
       
       # Returns string indicating which file (and line) contains the
       # transliteration value for the character
-      def in_yaml_file(character)
+      def in_json_file(character)
         unpacked = character.unpack("U")[0]
-        "#{code_group(unpacked)}.yml (line #{grouped_point(unpacked) + 2})"
+        "#{code_group(unpacked)}.json (line #{grouped_point(unpacked) + 2})"
       end
     
     private

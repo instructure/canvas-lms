@@ -169,8 +169,8 @@ describe ProfileController do
 
       @user.reload
       expect(@user.profile.links.map { |l| [l.url, l.title] }).to eq [
-        %w(example.com Example.com),
-        %w(foo.com Foo)
+        %w(http://example.com Example.com),
+        %w(http://foo.com Foo)
       ]
     end
   end

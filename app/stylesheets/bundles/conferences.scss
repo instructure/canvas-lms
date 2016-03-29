@@ -54,11 +54,9 @@ header:not(.ic-app-header) {
   color: #434343;
 }
 
-.ig-list .ig-row .ellipses {
-  color: $ic-font-color--subdued;
-  // Fix for strange Firefox-only bug where white-space: no-wrap was blowing out the layout
-  // on conferences index page
-  body.ff & { @include firefox-white-space-bug-fix; }
+.ig-list .ig-row  {
+
+  .ellipses { color: $ic-font-color--subdued; }
 }
 
 #add_conference_form {

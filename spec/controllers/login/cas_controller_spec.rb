@@ -17,6 +17,7 @@
 #
 
 require_relative '../../spec_helper'
+require 'rotp'
 
 describe Login::CasController do
   def stubby(stub_response, use_mock = true)
@@ -50,7 +51,7 @@ describe Login::CasController do
     request_text.strip!
 
     session[:cas_session] = cas_ticket
-    session[:login_aac] = Account.default.account_authorization_configs.first
+    session[:login_aac] = Account.default.authentication_providers.first
     @pseudonym.claim_cas_ticket(cas_ticket)
 
     post :destroy, logoutRequest: request_text
@@ -145,9 +146,9 @@ describe Login::CasController do
 
     it "send to login page if unknoown_user_url is blank" do
       # Default to Login url with an empty string value
-      aac = account.account_authorization_configs.first
-      aac.unknown_user_url = ""
-      aac.save!
+      account.unknown_user_url = ''
+      account.save!
+
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
@@ -156,12 +157,24 @@ describe Login::CasController do
 
     it "uses the unknown_user_url from the aac" do
       unknown_user_url = "https://example.com/unknown_user"
-      aac = account.account_authorization_configs.first
-      aac.unknown_user_url = unknown_user_url
-      aac.save!
+      account.unknown_user_url = unknown_user_url
+      account.save!
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(unknown_user_url)
       expect(session[:cas_session]).to be_nil
+    end
+
+    it "provisions automatically when enabled" do
+      ap = account.authentication_providers.first
+      ap.update_attribute(:jit_provisioning, true)
+      unique_id = 'foo@example.com'
+
+      expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      get 'new', :ticket => 'ST-abcd'
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(session[:cas_session]).to eq 'ST-abcd'
+      p = account.pseudonyms.active.by_unique_id(unique_id).first!
+      expect(p.authentication_provider).to eq ap
     end
   end
 

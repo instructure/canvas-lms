@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class LearningOutcomeImporter < Importer
 
@@ -80,7 +82,7 @@ module Importers
 
         item.save!
 
-        migration.add_imported_item(item) if migration
+        migration.add_imported_item(item)
       else
         item = outcome
       end

@@ -1,4 +1,6 @@
 class CreateAppointmentGroupSubContexts < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :appointment_group_sub_contexts do |t|
       t.references :appointment_group, :limit => 8

@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 
 describe UserObserveesController, type: :request do
   let_once(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }
@@ -60,23 +61,30 @@ describe UserObserveesController, type: :request do
   let(:params) { { controller: 'user_observees', format: 'json' } }
 
   def index_call(opts={})
+    json = raw_index_call(opts)
+    return nil if opts[:expected_status]
+    json.map{|o| o['id'] }.sort
+  end
+  def raw_index_call(opts={})
     params[:user_id] = opts[:user_id] || parent.id
     if opts[:page]
       params.merge!(per_page: 1, page: opts[:page])
       page = "?per_page=1&page=#{opts[:page]}"
     end
 
+    if(opts[:avatars])
+      params.merge!(include: ["avatar_url"])
+    end
     json = api_call_as_user(
-      opts[:api_user] || allowed_admin,
-      :get,
-      "/api/v1/users/#{params[:user_id]}/observees#{page}",
-      params.merge(action: 'index'),
-      {},
-      {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+        opts[:api_user] || allowed_admin,
+        :get,
+        "/api/v1/users/#{params[:user_id]}/observees#{page}",
+        params.merge(action: 'index'),
+        {},
+        {},
+        { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
-    return nil if opts[:expected_status]
-    json.map{|o| o['id'] }.sort
+    json
   end
 
   def create_call(data, opts={})
@@ -147,6 +155,7 @@ describe UserObserveesController, type: :request do
   end
 
   context 'GET #index' do
+    specs_require_sharding
     it 'should list observees' do
       parent.observed_users << student
       expect(index_call).to eq [student.id]
@@ -182,6 +191,37 @@ describe UserObserveesController, type: :request do
 
     it 'should not allow unauthorized admins' do
       index_call(api_user: disallowed_admin, expected_status: 401)
+    end
+
+    it 'should return avatar if avatar service enabled on account' do
+      student.account.set_service_availability(:avatars, true)
+      student.account.save!
+      student.avatar_image_source = 'attachment'
+      student.avatar_image_url = "/relative/canvas/path"
+      student.save!
+      parent.observed_users << student
+      opts = {:avatars=>true}
+      json = raw_index_call(opts )
+      expect(json.map{|o| o['id'] }).to eq [student.id]
+      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
+    end
+
+    it 'should return avatar if avatar service enabled on account when called from shard with avatars disabled' do
+      @shard2.activate do
+        student= User.create
+        student.account.set_service_availability(:avatars, true)
+        student.account.save!
+        student.save!
+      end
+      student.avatar_image_source = 'attachment'
+      student.avatar_image_url = "/relative/canvas/path"
+      student.save!
+      parent.observed_users << student
+      parent.account.set_service_availability(:avatars, false)
+      opts = {:avatars=>true}
+      json = raw_index_call(opts )
+      expect(json.map{|o| o['id'] }).to eq [student.id]
+      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
     end
   end
 
@@ -232,7 +272,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      create_call({observee: observee}, domain_root_account: external_account, expected_status: 401)
+      create_call({observee: observee}, domain_root_account: external_account, expected_status: 422)
 
       expect(parent.reload.observed_users).to eq []
     end
@@ -359,15 +399,23 @@ describe UserObserveesController, type: :request do
   context 'DELETE #destroy' do
     it 'should remove an observee by id' do
       parent.observed_users << student
+      course.enroll_user(student)
+      observer_enrollment = parent.observer_enrollments.first
+
       expect(delete_call).to eq student.id
       expect(parent.reload.observed_users).to eq []
+      expect(observer_enrollment.reload).to be_deleted
     end
 
     it 'should remove an observee by id (for external accounts)' do
       external_parent.observed_users << external_student
+      course(:account => external_account).enroll_user(external_student)
+      observer_enrollment = external_parent.observer_enrollments.first
+
       json = delete_call(user_id: external_parent.id, observee_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq external_student.id
       expect(external_parent.reload.observed_users).to eq []
+      expect(observer_enrollment.reload).to be_deleted
     end
 
     it 'should not succeed if the observee is not found' do
@@ -400,4 +448,36 @@ describe UserObserveesController, type: :request do
       expect(parent.reload.observed_users).to eq [student]
     end
   end
+
+    context "Add observer by token" do
+      shared_examples "handle_observees_by_auth_token" do
+        it 'should add an observee, given a valid access token' do
+          expect(create_call({access_token: access_token_for_user(@token_student)})).to eq @token_student.id
+          expect(parent.reload.observed_users).to eq [@token_student]
+        end
+
+        it 'should not add an observee, given an invalid access token' do
+          create_call({access_token: "Not A Valid Token"}, expected_status: 422)
+          expect(parent.reload.observed_users).to eq []
+        end
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+        before :each do
+          @shard2.activate do
+            @token_student = user_with_pseudonym(name: "Sharded Student", active_all: true)
+          end
+        end
+        include_examples "handle_observees_by_auth_token"
+      end
+
+      context "without sharding" do
+        before :once do
+          @token_student = user_with_pseudonym(name: "Sameshard Student", active_all: true)
+        end
+        include_examples "handle_observees_by_auth_token"
+      end
+    end
+
 end

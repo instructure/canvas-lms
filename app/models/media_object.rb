@@ -27,14 +27,8 @@ class MediaObject < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :context_id, :context_type, :workflow_state, :user_type, :title, :user_entered_title, :media_id, :media_type, :duration, :max_size, :root_account_id,
-    :data, :created_at, :updated_at, :attachment_id, :total_size
-  ]
-  EXPORTABLE_ASSOCIATIONS = [:user, :context, :attachment, :root_account, :media_tracks]
-
   validates_presence_of :media_id, :workflow_state
-  has_many :media_tracks, :dependent => :destroy, :order => 'locale'
+  has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
@@ -196,7 +190,7 @@ class MediaObject < ActiveRecord::Base
 
   def retrieve_details_ensure_codecs(attempt=0)
     retrieve_details
-    if (!self.data || !self.data[:extensions] || !self.data[:extensions][:flv]) && self.created_at > 6.hours.ago
+    if !transcoded_details && self.created_at > 6.hours.ago
       if attempt < 10
         send_at((5 * attempt).minutes.from_now, :retrieve_details_ensure_codecs, attempt + 1)
       else
@@ -246,13 +240,17 @@ class MediaObject < ActiveRecord::Base
   end
 
   def podcast_format_details
-    data = self.data && self.data[:extensions] && self.data[:extensions][:mp3]
-    data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp4]
+    data = transcoded_details
     if !data
       self.retrieve_details
-      data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp3]
-      data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp4]
+      data = transcoded_details
     end
+    data
+  end
+
+  def transcoded_details
+    data = self.data && self.data[:extensions] && self.data[:extensions][:mp3]
+    data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp4]
     data
   end
 
@@ -264,7 +262,7 @@ class MediaObject < ActiveRecord::Base
     client.mediaDelete(self.media_id)
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.attachment.destroy if self.attachment
@@ -272,7 +270,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def data
-    self.read_attribute(:data) || self.write_attribute(:data, {})
+    self.read_or_initialize_attribute(:data, {})
   end
 
   def viewed!

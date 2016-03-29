@@ -8,21 +8,24 @@ define [
 
   {ContainerView, run} = Ember
 
-  fixtures.create()
-  mutedAssignment = fixtures.assignment_groups[0].assignments[1]
-  unmutedAssignment = fixtures.assignment_groups[0].assignments[0]
+
+  mutedAssignment = null
+  unmutedAssignment = null
 
   compareIdentity = (assignment, fixture) ->
     equal assignment.muted, fixture.muted, 'muted status'
     equal assignment.id, fixture.id, 'assignment id'
 
-
-  module 'screenreader_gradebook assignment_muter_component: setup',
+  module 'screenreader_gradebook assignment_muter_component',
     setup: ->
+      fixtures.create()
+      mutedAssignment = fixtures.assignment_groups[0].assignments[1]
+      unmutedAssignment = fixtures.assignment_groups[0].assignments[0]
       App = startApp()
       run =>
         @assignment = Ember.copy(mutedAssignment, true)
         @component = App.AssignmentMuterComponent.create(assignment: @assignment)
+        
     teardown: ->
       run =>
         @component.destroy()

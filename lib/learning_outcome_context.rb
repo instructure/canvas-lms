@@ -1,8 +1,8 @@
 module LearningOutcomeContext
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.has_many :linked_learning_outcomes, :through => :learning_outcome_links, :source => :learning_outcome_content, :conditions => "content_tags.content_type = 'LearningOutcome'"
-      klass.has_many :learning_outcome_links, :as => :context, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome_association', 'deleted']
+      klass.has_many :linked_learning_outcomes, -> { where(content_tags: { content_type: 'LearningOutcome' }) }, through: :learning_outcome_links, source: :learning_outcome_content
+      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, class_name: 'ContentTag'
       klass.has_many :created_learning_outcomes, :class_name => 'LearningOutcome', :as => :context
       klass.has_many :learning_outcome_groups, :as => :context
       klass.send :include, InstanceMethods

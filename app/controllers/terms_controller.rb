@@ -24,7 +24,11 @@ class TermsController < ApplicationController
   def index
     @root_account = @context.root_account
     @context.default_enrollment_term
-    @terms = @context.enrollment_terms.active.includes(:enrollment_dates_overrides).order("COALESCE(start_at, created_at) DESC").to_a
+    @terms = @context.enrollment_terms.active.
+      preload(:enrollment_dates_overrides).
+      order("COALESCE(start_at, created_at) DESC").to_a
+    @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
+    @user_counts_by_term = EnrollmentTerm.user_counts(@root_account, @terms)
   end
   
   # @API Create enrollment term
@@ -34,11 +38,11 @@ class TermsController < ApplicationController
   # @argument enrollment_term[name] [String]
   #   The name of the term.
   #
-  # @argument enrollment_term[start_at] [Timestamp]
+  # @argument enrollment_term[start_at] [DateTime]
   #   The day/time the term starts.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #
-  # @argument enrollment_term[end_at] [Timestamp]
+  # @argument enrollment_term[end_at] [DateTime]
   #   The day/time the term ends.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #
@@ -59,11 +63,11 @@ class TermsController < ApplicationController
   # @argument enrollment_term[name] [String]
   #   The name of the term.
   #
-  # @argument enrollment_term[start_at] [Timestamp]
+  # @argument enrollment_term[start_at] [DateTime]
   #   The day/time the term starts.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #
-  # @argument enrollment_term[end_at] [Timestamp]
+  # @argument enrollment_term[end_at] [DateTime]
   #   The day/time the term ends.
   #   Accepts times in ISO 8601 format, e.g. 2015-01-10T18:48:00Z.
   #

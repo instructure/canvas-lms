@@ -1,5 +1,9 @@
 require 'rack-mini-profiler'
 
+# only load the flamegraph gem and its dependencies if we use it, since it is
+# rare to use.
+autoload :Flamegraph, 'flamegraph'
+
 Permissions.register :app_profiling,
   :label => lambda { I18n.t('#role_override.permissions.app_profiling', "Application Profiling") },
   :account_only => :site_admin,
@@ -13,6 +17,7 @@ Rack::MiniProfiler.config.tap do |c|
   c.logger = Rails.logger
   c.skip_schema_queries =  !Rails.env.production?
   c.backtrace_includes =  [/^\/?(app|config|lib|test)/]
+  c.backtrace_remove = Rails.root.to_s + "/"
   c.authorization_mode = :whitelist
 
   if Canvas.redis_enabled?

@@ -4,7 +4,7 @@ define ->
     bytes = parseInt(value, 10)
     if bytes.toString() is 'NaN'
       return '--'
-    units = ['byte', 'bytes', 'KB', 'MB', 'GB']
+    units = ['byte', 'bytes', 'KB', 'MB', 'GB', 'TB']
 
     if bytes is 0
       resInt = resValue = 0

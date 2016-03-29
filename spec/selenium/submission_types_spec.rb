@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "assignments" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include AssignmentsCommon
 
   def click_away_accept_alert
     f('#section-tabs .home').click
@@ -16,7 +17,7 @@ describe "assignments" do
   end
 
   context "as a student" do
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
     end
 
@@ -78,5 +79,4 @@ describe "assignments" do
       expect(f('#tool_content')).to be_displayed
     end
   end
-
 end

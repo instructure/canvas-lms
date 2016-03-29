@@ -1,12 +1,14 @@
 define [
   'underscore'
+  'i18n!external_feeds'
   'compiled/views/ValidatedFormView'
   'compiled/models/ExternalFeed'
   'jst/ExternalFeeds/IndexView'
   'compiled/fn/preventDefault'
   'jquery'
   'jquery.toJSON'
-], (_, ValidatedFormView, ExternalFeed, template, preventDefault, $) ->
+  'compiled/jquery.rails_flash_notifications'
+], (_, I18n, ValidatedFormView, ExternalFeed, template, preventDefault, $) ->
 
   class IndexView extends ValidatedFormView
 
@@ -40,12 +42,14 @@ define [
 
     deleteFeed: preventDefault (event) ->
       id = @$(event.target).data('deleteFeedId')
-      @collection.get(id).destroy()
+      @collection.get(id).destroy success: ->
+        $.screenReaderFlashMessage(I18n.t('External feed was deleted'))
 
     getFormData: ->
       @$('#add_external_feed_form').toJSON()
 
     onSaveSuccess: =>
       super
+      $.screenReaderFlashMessage(I18n.t('External feed was added'))
       @collection.add(@model)
       @createPendingModel()

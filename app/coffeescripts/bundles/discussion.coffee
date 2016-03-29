@@ -8,15 +8,19 @@ require [
   'jquery'
   'underscore'
   'Backbone'
+  'react'
+  'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
   'compiled/models/Entry'
   'compiled/models/Topic'
   'compiled/models/SideCommentDiscussionTopic'
   'compiled/collections/EntryCollection'
+  'compiled/views/DiscussionTopic/DiscussionTopicToolbarView'
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
+  'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
-], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
+], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, React, DiscussionTopicKeyboardShortcutModal, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, DiscussionTopicToolbarView, TopicView, EntriesView) ->
 
   descendants = 5
   children    = 10
@@ -33,6 +37,13 @@ require [
   entries       = new EntryCollection null
 
   filterModel   = new DiscussionFilterState
+
+  discussionTopicToolbarView = new DiscussionTopicToolbarView(el: '#discussion-managebar')
+
+  React.render(
+    React.createElement(DiscussionTopicKeyboardShortcutModal),
+    document.getElementById('keyboard-shortcut-modal')
+  )
 
   topicView     = new TopicView
                     el: '#main'

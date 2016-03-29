@@ -1,4 +1,6 @@
 class DestroyExistingAnonymousFolderDownloads < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     # There was a bug allowing locked/hidden files to be downloaded in zip files for public
     # courses. This migration will delete those, so that no data leaks remain from the bug.

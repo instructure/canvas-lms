@@ -5,10 +5,10 @@ module DataFixup
       @new_roots = Set.new
       Shackles.activate(:slave) do
         scope = Attachment.
-          where('root_attachment_id IS NOT NULL AND
+          where("root_attachment_id IS NOT NULL AND
             NOT EXISTS (SELECT id
-                        FROM attachments ra
-                        WHERE ra.id = attachments.root_attachment_id)')
+                        FROM #{Attachment.quoted_table_name} ra
+                        WHERE ra.id = attachments.root_attachment_id)")
         create_users if scope.exists?
         scope.find_each(start: 0) do |a|
           next if @new_roots.include? a.root_attachment_id

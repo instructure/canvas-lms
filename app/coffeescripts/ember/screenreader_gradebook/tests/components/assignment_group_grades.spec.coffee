@@ -7,8 +7,6 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   originalWeightingScheme = null
   originalGradingStandard = null
   groupScores =
@@ -22,6 +20,7 @@ define [
 
   module 'assignment_group_grades_component',
     setup: ->
+      fixtures.create()
       App = startApp()
       @component = App.AssignmentGroupGradesComponent.create()
       @component.reopen
@@ -55,7 +54,7 @@ define [
     equal @component.get('points'), expected
 
   test 'percent', ->
-    expected = "8.5%"
+    expected = "8.51%"
     equal @component.get('percent'), expected
 
   test 'letterGrade', ->

@@ -9,6 +9,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
+  'compiled/jquery.rails_flash_notifications'
 ], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   SHORT_HEIGHT = 250
@@ -57,6 +58,12 @@ define [
 
         @render()
 
+      # we do this here because the re-render above causes the default focus
+      # from DialogFormView not to stick
+      setTimeout((=>
+        $.flashMessage(I18n.t("Assignment group was saved successfully"))
+        @focusReturnsTo()?.focus()
+      ), 0)
 
     getFormData: ->
       data = super
@@ -137,5 +144,6 @@ define [
         @setDimensions(this.defaults.width, SHORT_HEIGHT)
 
       super
+      @$el.find("input:first").focus()
       @checkGroupWeight()
       @getNeverDrops()

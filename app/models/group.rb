@@ -30,9 +30,9 @@ class Group < ActiveRecord::Base
   # use to skip queries in can_participate?, called by policy block
   attr_accessor :can_participate
 
-  has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
-  has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
-  has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
+  has_many :group_memberships, -> { where("group_memberships.workflow_state<>'deleted'") }, dependent: :destroy
+  has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
+  has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
@@ -40,26 +40,24 @@ class Group < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
   has_many :calendar_events, :as => :context, :dependent => :destroy
-  has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
-  has_many :active_discussion_topics, :as => :context, :class_name => 'DiscussionTopic', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user
-  has_many :all_discussion_topics, :as => :context, :class_name => "DiscussionTopic", :include => :user, :dependent => :destroy
-  has_many :discussion_entries, :through => :discussion_topics, :include => [:discussion_topic, :user], :dependent => :destroy
+  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, dependent: :destroy, as: :context
+  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
+  has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy
+  has_many :discussion_entries, -> { preload(:discussion_topic, :user) }, through: :discussion_topics, dependent: :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
-  has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
+  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, class_name: 'Announcement'
   has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
-  has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
+  has_many :active_images, -> { where("attachments.file_state<>'deleted' AND attachments.content_type LIKE 'image%'").order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
-  has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
   has_many :collaborators
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
   has_many :web_conferences, :as => :context, :dependent => :destroy
-  has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
+  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
@@ -67,17 +65,6 @@ class Group < ActiveRecord::Base
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :workflow_state, :created_at, :updated_at, :context_id, :context_type, :category, :max_membership, :hashtag, :show_public_context_messages, :is_public,
-    :account_id, :default_wiki_editing_roles, :wiki_id, :deleted_at, :join_level, :default_view, :storage_quota, :uuid, :root_account_id, :sis_source_id, :sis_batch_id,
-    :group_category_id, :description, :avatar_attachment_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :users, :group_memberships, :users, :context, :group_category, :account, :root_account, :calendar_events, :discussion_topics, :discussion_entries, :announcements,
-    :attachments, :folders, :collaborators, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
-  ]
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
@@ -122,9 +109,20 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
+  def participating_users_in_context(user_ids = nil)
+    users = participating_users(user_ids)
+    return users unless self.context.is_a? Course
+    context.participating_users(users.pluck(:id))
+  end
+
   def all_real_students
-    return self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id)) if self.context.respond_to? "all_real_students"
+    return self.context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if self.context.respond_to? "all_real_students"
     self.users
+  end
+
+  def all_real_student_enrollments
+    return self.context.all_real_student_enrollments.where(user_id: group_memberships.select(:user_id)) if self.context.respond_to? "all_real_student_enrollments"
+    self.group_memberships
   end
 
   def wiki_with_create
@@ -226,6 +224,14 @@ class Group < ActiveRecord::Base
       (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
+  def submission?
+    if context_type == 'Course'
+      assignments = Assignment.for_group_category(group_category_id).active
+      return Submission.where(group_id: id, assignment_id: assignments).exists?
+    end
+    false
+  end
+
   def short_name
     name
   end
@@ -238,7 +244,7 @@ class Group < ActiveRecord::Base
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
     sanitize_sql([<<-SQL, groups])
-      NOT EXISTS (SELECT * FROM group_memberships gm
+      NOT EXISTS (SELECT * FROM #{GroupMembership.quoted_table_name} gm
       WHERE gm.user_id = users.id AND
       gm.workflow_state != 'deleted' AND
       gm.group_id IN (?))
@@ -265,7 +271,7 @@ class Group < ActiveRecord::Base
     self.available? || self.closed?
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
@@ -331,7 +337,7 @@ class Group < ActiveRecord::Base
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
     user_ids = users.map(&:id)
-    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
     bulk_insert_group_memberships(users, options)
     all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
@@ -391,7 +397,7 @@ class Group < ActiveRecord::Base
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
-    self.group_category.groups.where("id<>?", self).all
+    self.group_category.groups.where("id<>?", self).to_a
   end
 
   def migrate_content_links(html, from_course)
@@ -450,81 +456,95 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
-    given { |user| user && self.has_member?(user) }
-    can :create_collaborations and
-    can :manage_calendar and
-    can :manage_content and
-    can :manage_files and
-    can :manage_wiki and
-    can :post_to_forum and
-    can :read and
-    can :read_forum and
-    can :read_roster and
-    can :send_messages and
-    can :send_messages_all and
-    can :view_unpublished_items
-
-    # if I am a member of this group and I can moderate_forum in the group's context
-    # (makes it so group members cant edit each other's discussion entries)
-    given { |user, session| user && self.has_member?(user) && (!self.context || self.context.grants_right?(user, session, :moderate_forum)) }
-    can :moderate_forum
-
-    given { |user| user && self.has_moderator?(user) }
-    can :delete and
-    can :manage and
-    can :manage_admin_users and
-    can :manage_students and
-    can :moderate_forum and
-    can :update
-
-    given { |user| user && self.leader == user }
-    can :update
-
-    given { |user| self.group_category.try(:communities?) }
-    can :create
-
-    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
-    can :participate_as_student
-
-    given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
-    can :create
-
-    given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    can :create and
-    can :create_collaborations and
-    can :delete and
-    can :manage and
-    can :manage_admin_users and
-    can :manage_content and
-    can :manage_files and
-    can :manage_students and
-    can :manage_wiki and
-    can :moderate_forum and
-    can :post_to_forum and
-    can :read and
-    can :read_forum and
-    can :read_roster and
-    can :send_messages and
-    can :send_messages_all and
-    can :update and
-    can :view_unpublished_items
-
-    given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
-    can :read and can :read_forum and can :read_roster
-
     # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) }
     can :participate
 
-    # Join is participate + the group being in a state that allows joining directly (free_association)
-    given { |user| user && can_participate?(user) && free_association?(user)}
-    can :join and can :read_roster
+    # Course-level groups don't grant any permissions besides :participate (because for a teacher to add a student to a
+    # group, the student must be able to :participate, and the teacher should be able to add students while the course
+    # is unpublished and therefore unreadable to said students) unless their containing context can be read by the user
+    # in question
+    given { |user, session| self.context.is_a?(Account) || self.context.grants_right?(user, session, :read) }
 
-    given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
-    can :leave
+    use_additional_policy do
+      given { |user| user && self.has_member?(user) }
+      can :create_collaborations and
+      can :manage_calendar and
+      can :manage_content and
+      can :manage_files and
+      can :manage_wiki and
+      can :post_to_forum and
+      can :read and
+      can :read_forum and
+      can :read_announcements and
+      can :read_roster and
+      can :send_messages and
+      can :send_messages_all and
+      can :view_unpublished_items
 
-    given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
-    can :create_conferences
+      # if I am a member of this group and I can moderate_forum in the group's context
+      # (makes it so group members cant edit each other's discussion entries)
+      given { |user, session| user && self.has_member?(user) && (!self.context || self.context.grants_right?(user, session, :moderate_forum)) }
+      can :moderate_forum
+
+      given { |user| user && self.has_moderator?(user) }
+      can :delete and
+      can :manage and
+      can :manage_admin_users and
+      can :manage_students and
+      can :moderate_forum and
+      can :update
+
+      given { |user| user && self.leader == user }
+      can :update
+
+      given { |user| self.group_category.try(:communities?) }
+      can :create
+
+      given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
+      can :participate_as_student
+
+      given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
+      can :create
+
+      given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
+      can :create and
+      can :create_collaborations and
+      can :delete and
+      can :manage and
+      can :manage_admin_users and
+      can :manage_calendar and
+      can :manage_content and
+      can :manage_files and
+      can :manage_students and
+      can :manage_wiki and
+      can :moderate_forum and
+      can :post_to_forum and
+      can :read and
+      can :read_forum and
+      can :read_announcements and
+      can :read_roster and
+      can :send_messages and
+      can :send_messages_all and
+      can :update and
+      can :view_unpublished_items
+
+      given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
+      can :read and can :read_forum and can :read_announcements and can :read_roster
+
+      # Join is participate + the group being in a state that allows joining directly (free_association)
+      given { |user| user && can_participate?(user) && free_association?(user)}
+      can :join and can :read_roster
+
+      given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
+      can :leave
+
+      given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
+      can :create_conferences
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
+      can :read_as_admin
+    end
   end
 
   def users_visible_to(user)
@@ -537,9 +557,9 @@ class Group < ActiveRecord::Base
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.except(:includes).where(:user_id => user.id).exists?
+      return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
     elsif self.context.is_a?(Account)
-      return self.context.user_account_associations.where(:user_id => user.id).exists?
+      return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
@@ -683,12 +703,20 @@ class Group < ActiveRecord::Base
     self.content_exports.where(user_id: user)
   end
 
-  def account_chain
+  def account_chain(include_site_admin: false)
     @account_chain ||= Account.account_chain(account_id)
-    @account_chain.dup
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def sortable_name
     name
+  end
+  ##
+  # Returns a boolean describing if the user passed in has marked this group
+  # as a favorite.
+  def favorite_for_user?(user)
+    user.favorites.where(:context_type => 'Group', :context_id => self).exists?
   end
 end

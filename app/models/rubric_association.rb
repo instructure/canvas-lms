@@ -32,12 +32,6 @@ class RubricAssociation < ActiveRecord::Base
   has_many :rubric_assessments, :dependent => :nullify
   has_many :assessment_requests, :dependent => :destroy
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :rubric_id, :association_id, :association_type, :use_for_grading, :created_at, :updated_at, :title, :description, :summary_data, :purpose,
-    :url, :context_id, :context_type, :hide_score_total, :bookmarked, :context_code
-  ]
-  EXPORTABLE_ASSOCIAIONS = [:rubric, :association_object, :context, :rubric_assessments, :assessment_requests]
-
   has_a_broadcast_policy
 
   validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
@@ -86,7 +80,7 @@ class RubricAssociation < ActiveRecord::Base
   scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
   scope :for_grading, -> { where(:purpose => 'grading') }
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :include_rubric, -> { includes(:rubric) }
+  scope :include_rubric, -> { preload(:rubric) }
   scope :before, lambda { |date| where("rubric_associations.created_at<?", date) }
 
   def assert_uniqueness
@@ -146,6 +140,9 @@ class RubricAssociation < ActiveRecord::Base
 
     given {|user, session| self.context.grants_right?(user, session, :participate_as_student) }
     can :submit
+
+    given {|user, session| self.context.grants_right?(user, session, :view_all_grades)}
+    can :view_rubric_assessments
   end
 
   def update_assignment_points
@@ -230,10 +227,19 @@ class RubricAssociation < ActiveRecord::Base
     raise "Artifact required for assessing" unless opts[:artifact]
     raise "Assessment type required for assessing" unless params[:assessment_type]
 
+    if opts[:artifact].is_a?(Quizzes::QuizSubmission)
+      opts[:artifact] = self.association_object.find_or_create_submission(opts[:artifact].user)
+    end
+
     if self.association_object.is_a?(Assignment) && !self.association_object.grade_group_students_individually
-      students_to_assess = self.association_object.group_students(opts[:artifact].user).last
-      artifacts_to_assess = students_to_assess.map do |student|
-        self.association_object.find_asset_for_assessment(self, student).first
+      group, students_to_assess = self.association_object.group_students(opts[:artifact].student)
+      if group
+        provisional_grader = opts[:artifact].is_a?(ModeratedGrading::ProvisionalGrade) && opts[:assessor]
+        artifacts_to_assess = students_to_assess.map do |student|
+          self.association_object.find_asset_for_assessment(self, student, :provisional_grader => provisional_grader).first
+        end
+      else
+        artifacts_to_assess = [opts[:artifact]]
       end
     else
       artifacts_to_assess = [opts[:artifact]]
@@ -295,12 +301,15 @@ class RubricAssociation < ActiveRecord::Base
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
-      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.user, :rubric => self.rubric, :assessment_type => params[:assessment_type])
+      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => self.rubric, :assessment_type => params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
-      assessment.comments = params[:comments] if params[:comments]
 
+      assessment.set_graded_anonymously if opts[:graded_anonymously]
       assessment.save
+      if artifact.is_a?(ModeratedGrading::ProvisionalGrade)
+        artifact.submission.touch
+      end
       assessment_to_return = assessment if assessment.artifact == opts[:artifact]
     end
     assessment_to_return

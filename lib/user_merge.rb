@@ -51,7 +51,7 @@ class UserMerge
       elsif source_cc.active?
         # active, unconfirmed*
         # active, retired
-        target_cc.destroy!
+        target_cc.destroy_permanently!
         if from_user.shard != target_user.shard
           User.clone_communication_channel(source_cc, target_user, max_position)
         end
@@ -61,7 +61,7 @@ class UserMerge
         to_retire = source_cc
       elsif source_cc.unconfirmed?
         # unconfirmed, retired
-        target_cc.destroy!
+        target_cc.destroy_permanently!
         if from_user.shard != target_user.shard
           User.clone_communication_channel(source_cc, target_user, max_position)
         end
@@ -158,7 +158,7 @@ class UserMerge
       # flagged as updated so the materialized views update
       begin
         entries = DiscussionEntry.where(user_id: from_user)
-        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).update_all(updated_at: Time.now.utc)
+        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).touch_all
         entries.update_all(user_id: target_user.id)
         DiscussionTopic.where(user_id: from_user).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       rescue => e
@@ -239,16 +239,16 @@ class UserMerge
     ContextModuleProgression.
       where("context_module_progressions.user_id = ?", from_user.id).
       where("EXISTS (SELECT *
-                     FROM context_module_progressions cmp2
+                     FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id
                        AND cmp2.user_id = ?)", target_user.id).find_each do |cmp|
 
       ContextModuleProgression.
         where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user]).
-        order("CASE WHEN workflow_state = 'Completed' THEN 0
-                    WHEN workflow_state = 'Started' THEN 1
-                    WHEN workflow_state = 'Unlocked' THEN 2
-                    WHEN workflow_state = 'Locked' THEN 3
+        order("CASE WHEN workflow_state = 'completed' THEN 0
+                    WHEN workflow_state = 'started' THEN 1
+                    WHEN workflow_state = 'unlocked' THEN 2
+                    WHEN workflow_state = 'locked' THEN 3
                 END DESC").first.destroy
     end
   end

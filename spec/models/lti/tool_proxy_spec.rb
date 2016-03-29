@@ -20,9 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 module Lti
   describe ToolProxy do
-    let (:account) { Account.create }
-    let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
-    let (:resource_handler) { ResourceHandler.new }
+    let(:account) { Account.create }
+    let(:product_family) do
+      ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
+    end
+    let(:resource_handler) { ResourceHandler.new }
 
     describe 'validations' do
 
@@ -81,7 +83,7 @@ module Lti
       it 'requires a product_family' do
         subject.product_family = nil
         subject.save
-        error = subject.errors.find {|e| e == [:product_family, "can't be blank"]}
+        expect(subject.errors[:product_family_id]).to include("can't be blank")
       end
 
       it 'requires a context' do
@@ -201,15 +203,66 @@ module Lti
 
     def create_tool_proxy(opts = {})
       default_opts = {
-        shared_secret: 'shared_secret',
-        guid: SecureRandom.uuid,
-        product_version: '1.0beta',
-        lti_version: 'LTI-2p0',
-        product_family: product_family,
-        workflow_state: 'active',
-        raw_data: 'some raw data'
+          shared_secret: 'shared_secret',
+          guid: SecureRandom.uuid,
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          workflow_state: 'active',
+          raw_data: 'some raw data'
       }
       ToolProxy.create(default_opts.merge(opts))
+    end
+
+    context "singleton message handlers" do
+
+      subject do
+        described_class.create!(
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          context: account,
+          workflow_state: 'active',
+          raw_data: 'some raw data'
+        )
+      end
+      let(:product_family) do
+        ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
+      end
+      let(:default_resource_handler) do
+        ResourceHandler.create!(
+          resource_type_code: 'instructure.com:default',
+          name: 'resource name',
+          tool_proxy: subject)
+      end
+      let(:reregistration_message_handler) do
+        MessageHandler.create!(
+          message_type: IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE,
+          launch_path: 'https://samplelaunch/rereg',
+          resource_handler: default_resource_handler
+        )
+      end
+
+      describe "#reregistration_handler" do
+
+        it "returns the reregistration handler" do
+          reregistration_message_handler
+          expect(subject.reregistration_message_handler).to eq reregistration_message_handler
+        end
+
+      end
+
+      describe "#default_resource_handler" do
+
+        it "returns the default resource handler" do
+          default_resource_handler
+          expect(subject.default_resource_handler).to eq default_resource_handler
+        end
+
+      end
+
     end
 
   end

@@ -21,6 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe "enrollment_date_restrictions" do
+  before do
+    Account.default.tap{|a| a.settings[:restrict_student_future_view] = {:value => true}}.save!
+  end
+
   it "should not list inactive enrollments in the menu" do
     @student = user_with_pseudonym
     @enrollment1 = course(:course_name => "Course 1", :active_all => 1)
@@ -126,6 +130,7 @@ describe "enrollment_date_restrictions" do
     expect(html.css('.course').length).to eq 2
 
     Account.default.account_users.create!(user: @user)
+    @user.reload
     get "/users/#{@user.id}"
     expect(response.body).to match /Inactive/
     expect(response.body).to match /Completed/

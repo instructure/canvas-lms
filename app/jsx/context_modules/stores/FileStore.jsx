@@ -1,5 +1,3 @@
-/** @jsx */
-
 define([
   './ObjectStore'
 ], function (ObjectStore) {

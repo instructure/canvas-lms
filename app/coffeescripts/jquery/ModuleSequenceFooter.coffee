@@ -63,6 +63,7 @@ define [
           items_current_position: @msfInstance.items_current_position
           items_count: @msfInstance.items_count
           items_percentage: @msfInstance.items_percentage
+          new_styles: window.ENV.use_new_styles
         )
         @show()
       else

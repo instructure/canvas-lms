@@ -108,6 +108,9 @@
       <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="automatic_peer_reviews" type="xs:boolean" minOccurs="0"/>
       <xs:element name="anonymous_peer_reviews" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="moderated_grading" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="has_group_category" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="group_category" type="xs:string" minOccurs="0"/>
       <xs:element name="grade_group_students_individually" type="xs:boolean" minOccurs="0"/>
       <xs:element name="external_tool_identifierref" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_external_identifier" type="xs:string" minOccurs="0"/>
@@ -145,6 +148,7 @@
         <xs:element name="external_feed_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
+        <xs:element name="has_group_category" type="xs:boolean" minOccurs="0"/>
         <xs:element name="discussion_type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -180,6 +184,7 @@
               <xs:element name="end_at" type="xs:dateTime" minOccurs="0"/>
               <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
               <xs:element name="require_sequential_progress" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="requirement_count" type="xs:integer" minOccurs="0"/>
 
               <xs:element name="prerequisites" minOccurs="0">
                 <xs:complexType>
@@ -597,6 +602,8 @@
                   <xs:all minOccurs="0">
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
                   </xs:all>
                   <xs:attribute name="path" type="xs:string" use="required"/>
                 </xs:complexType>
@@ -613,6 +620,8 @@
                     <xs:element name="display_name" type="xs:string" minOccurs="0"/>
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
                     <xs:element name="usage_rights" minOccurs="0" maxOccurs="1">
                       <xs:complexType>
                         <xs:attribute name="use_justification" type="xs:string" use="required">

@@ -99,6 +99,7 @@ class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :reject_student_view_student
   before_filter :get_context
+  before_filter :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
 
@@ -127,7 +128,7 @@ class AccountsController < ApplicationController
         else
           @accounts = []
         end
-        ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
+        ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
@@ -144,16 +145,17 @@ class AccountsController < ApplicationController
   # @returns [Account]
   def course_accounts
     if @current_user
-        course_accounts = BookmarkedCollection.wrap(Account::Bookmarker,
-          Account.where(:id => Account.joins(:courses => :enrollments).merge(
-            @current_user.enrollments.admin.except(:select)).
-            select("accounts.id").uniq.with_each_shard.map(&:id))
-        )
+      account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
+        Account.joins(:courses => :enrollments).merge(
+          @current_user.enrollments.admin.shard(@current_user).except(:select)
+        ).select("accounts.id").uniq.pluck(:id).map{|id| Shard.global_id_for(id)}
+      end
+      course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))
       @accounts = Api.paginate(course_accounts, self, api_v1_accounts_url)
     else
       @accounts = []
     end
-    ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
+    ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
     render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
   end
 
@@ -166,16 +168,39 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
+        return course_user_search if @account.feature_enabled?(:course_user_search)
+        if value_to_boolean(params[:theme_applied])
+          flash[:notice] = t("Your custom theme has been successfully applied.")
+        end
         return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
-        ActiveRecord::Associations::Preloader.new(@courses, :enrollment_term).run
+        ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
         build_course_stats
       end
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
                                                  !@account.grants_right?(@current_user, session, :manage)) }
     end
+  end
+
+  def course_user_search
+    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+
+    unless can_read_course_list || can_read_roster
+      return render_unauthorized_action
+    end
+
+    @permissions = {
+      theme_editor: use_new_styles? && can_do(@account, @current_user, :manage_account_settings) && @account.branding_allowed?,
+      can_read_course_list: can_read_course_list,
+      can_read_roster: can_read_roster,
+      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+      can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
+      analytics: @account.service_enabled?(:analytics)
+    }
+    render template: "accounts/course_user_search"
   end
 
   # @API Get the sub-accounts of an account
@@ -214,7 +239,7 @@ class AccountsController < ApplicationController
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              :total_entries => recursive ? nil : @accounts.count)
 
-    ActiveRecord::Associations::Preloader.new(@accounts, [:root_account, :parent_account]).run
+    ActiveRecord::Associations::Preloader.new.preload(@accounts, [:root_account, :parent_account])
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
@@ -227,6 +252,10 @@ class AccountsController < ApplicationController
   #   If true, include only courses with at least one enrollment.  If false,
   #   include only courses with no enrollments.  If not present, do not filter
   #   on course enrollment status.
+  #
+  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   If set, only return courses that have at least one user enrolled in
+  #   in the course with one of the specified enrollment types.
   #
   # @argument published [Boolean]
   #   If true, include only published courses.  If false, exclude published
@@ -259,12 +288,13 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
+  #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
   # @returns [Course]
   def courses_api
-    return unless authorized_action(@account, @current_user, :read)
+    return unless authorized_action(@account, @current_user, :read_course_list)
 
     params[:state] ||= %w{created claimed available completed}
     params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
@@ -279,6 +309,10 @@ class AccountsController < ApplicationController
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
       @courses = @courses.without_enrollments
+    end
+
+    if params[:enrollment_type].is_a?(Array)
+      @courses = @courses.with_enrollment_types(params[:enrollment_type])
     end
 
     if value_to_boolean(params[:completed])
@@ -315,17 +349,35 @@ class AccountsController < ApplicationController
 
         name = ActiveRecord::Base.wildcard('courses.name', search_term)
         code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
-        @courses = @courses.where("#{name} OR #{code}")
+
+        if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+          @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
+        else
+          @courses = @courses.where("#{name} OR #{code}")
+        end
+
       end
     end
 
     includes = Set.new(Array(params[:include]))
     # We only want to return the permissions for single courses and not lists of courses.
-    includes.delete 'permissions'
+    # sections, needs_grading_count, and total_score not valid as enrollments are needed
+    includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
+    page_opts = {}
+    page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-    ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account])
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+
+    if includes.include?("total_students")
+      student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
+        where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
+      @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+    end
+
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 
@@ -407,6 +459,12 @@ class AccountsController < ApplicationController
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
+  # @argument account[settings][restrict_student_past_view] [Boolean]
+  #   Restrict students from viewing courses after end date
+  #
+  # @argument account[settings][restrict_student_future_view] [Boolean]
+  #   Restrict students from viewing courses before start date
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \
   #     -X PUT \
@@ -448,21 +506,6 @@ class AccountsController < ApplicationController
           params[:account].delete :services
         end
         if @account.grants_right?(@current_user, :manage_site_settings)
-
-          # handle branding stuff
-          if @account.root_account? && params[:account][:settings]
-            (Account::BRANDING_SETTINGS - [:msapplication_tile_color]).each do |setting|
-              if params[:account][:settings]["#{setting}_remove"] == "1"
-                params[:account][:settings][setting] = nil
-              elsif params[:account][:settings][setting].present?
-                attachment = Attachment.create(uploaded_data: params[:account][:settings][setting], context: @account)
-                params[:account][:settings][setting] = attachment.authenticated_s3_url(:expires => 15.years)
-              end
-            end
-          end
-
-
-
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -485,7 +528,7 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          ([ :admins_can_change_passwords,
+          [ :admins_can_change_passwords,
             :admins_can_view_notifications,
             :enable_alerts,
             :enable_eportfolios,
@@ -493,7 +536,7 @@ class AccountsController < ApplicationController
             :show_scheduler,
             :global_includes,
             :gmail_domain
-          ] + Account::BRANDING_SETTINGS).each do |key|
+          ].each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end
@@ -521,6 +564,9 @@ class AccountsController < ApplicationController
           @account[:settings][:edit_institution_email] = value_to_boolean(can_edit_email)
         end
 
+        remove_ip_filters = params[:account].delete(:remove_ip_filters)
+        params[:account][:ip_filters] = [] if remove_ip_filters
+
         if @account.update_attributes(params[:account])
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }
@@ -541,7 +587,7 @@ class AccountsController < ApplicationController
         @last_reports = {}
         if AccountReport.connection.adapter_name == 'PostgreSQL'
           scope = @account.account_reports.select("DISTINCT ON (report_type) account_reports.*").order(:report_type)
-          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).includes(:attachment).index_by(&:report_type)
+          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).preload(:attachment).index_by(&:report_type)
           @last_reports = scope.last_of_type(@available_reports.keys, nil).index_by(&:report_type)
         else
           @available_reports.keys.each do |report|
@@ -552,7 +598,7 @@ class AccountsController < ApplicationController
       end
       load_course_right_side
       @account_users = @account.account_users
-      ActiveRecord::Associations::Preloader.new(@account_users, user: :communication_channels).run
+      ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
         order_hash[role.id] = idx
@@ -565,9 +611,9 @@ class AccountsController < ApplicationController
 
       @announcements = @account.announcements
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
+
       js_env({
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
-        ENABLE_LTI2: @account.root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}"
       })
@@ -728,12 +774,12 @@ class AccountsController < ApplicationController
 
   def avatars
     if authorized_action(@account, @current_user, :manage_admin_users)
-      @users = @account.all_users
+      @users = @account.all_users(nil)
       @avatar_counts = {
-        :all => @users.with_avatar_state('any').count,
-        :reported => @users.with_avatar_state('reported').count,
-        :re_reported => @users.with_avatar_state('re_reported').count,
-        :submitted => @users.with_avatar_state('submitted').count
+        :all => format_avatar_count(@users.with_avatar_state('any').count),
+        :reported => format_avatar_count(@users.with_avatar_state('reported').count),
+        :re_reported => format_avatar_count(@users.with_avatar_state('re_reported').count),
+        :submitted => format_avatar_count(@users.with_avatar_state('submitted').count)
       }
       if params[:avatar_state]
         @users = @users.with_avatar_state(params[:avatar_state])
@@ -747,7 +793,7 @@ class AccountsController < ApplicationController
           @avatar_state = 'reported'
         end
       end
-      @users = @users.paginate(:page => params[:page], :per_page => 100)
+      @users = Api.paginate(@users, self, account_avatars_url)
     end
   end
 
@@ -883,9 +929,9 @@ class AccountsController < ApplicationController
     end
   end
 
-  def process_external_integration_keys
+  def process_external_integration_keys(account = @account)
     if params_keys = params[:account][:external_integration_keys]
-      ExternalIntegrationKey.indexed_keys_for(@account).each do |key_type, key|
+      ExternalIntegrationKey.indexed_keys_for(account).each do |key_type, key|
         next unless params_keys.key?(key_type)
         next unless key.grants_right?(@current_user, :write)
         unless params_keys[key_type].blank?
@@ -896,5 +942,15 @@ class AccountsController < ApplicationController
         end
       end
     end
+  end
+
+  def format_avatar_count(count = 0)
+    count > 99 ? "99+" : count
+  end
+  private :format_avatar_count
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

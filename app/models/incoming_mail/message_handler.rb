@@ -26,31 +26,36 @@ module IncomingMail
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
-      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message, secure_id)
+      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message_id, secure_id)
 
+      from_channel = nil
       original_message.shard.activate do
-
         context = original_message.context
         user = original_message.user
         raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
-        context.reply_from({
+        from_channel = sent_from_channel(user, incoming_message)
+        raise IncomingMail::Errors::UnknownSender unless from_channel
+        Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
+          context.reply_from({
                                :purpose => 'general',
                                :user => user,
                                :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
                                :html => html_body,
                                :text => body
-                           })
+                             })
+          true
+        end
       end
     rescue IncomingMail::Errors::ReplyFrom => error
-      bounce_message(original_message, incoming_message, error, outgoing_from_address)
+      bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
     rescue IncomingMail::Errors::SilentIgnore
       #do nothing
     end
 
     private
 
-    def bounce_message(original_message, incoming_message, error, outgoing_from_address)
-      incoming_from = incoming_message.from.try(:first)
+    def bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
+      incoming_from = from_channel.try(:path) || incoming_message.from.try(:first)
       incoming_subject = incoming_message.subject
       return unless incoming_from
 
@@ -69,7 +74,7 @@ module IncomingMail
       outgoing_message_delivered = false
 
       original_message.shard.activate do
-        comch = CommunicationChannel.active.where(path: incoming_from, path_type: 'email').first
+        comch = from_channel || CommunicationChannel.active.email.by_path(incoming_from).first
         outgoing_message.communication_channel = comch
         outgoing_message.user = comch.try(:user)
         if outgoing_message.communication_channel
@@ -93,10 +98,26 @@ module IncomingMail
       ndr_subject = ""
       ndr_body = ""
       case error
+        when IncomingMail::Errors::ReplyToDeletedDiscussion
+          ndr_subject = I18n.t("Message Reply Failed: %{subject}", :subject => subject)
+          ndr_body = I18n.t(<<-BODY, :subject => subject).gsub(/^ +/, '')
+          The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+          Thank you,
+          Canvas Support
+          BODY
         when IncomingMail::Errors::ReplyToLockedTopic
           ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
           ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).gsub(/^ +/, '')
           The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+          Thank you,
+          Canvas Support
+          BODY
+        when IncomingMail::Errors::UnknownSender
+          ndr_subject = I18n.t("Message Reply Failed: %{subject}", :subject => subject)
+          ndr_body = I18n.t(<<-BODY, :subject => subject).gsub(/^ +/, '')
+          The message titled "%{subject}" could not be delivered.  The message was sent from an address that is not linked with your Canvas account.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
           Thank you,
           Canvas Support
@@ -114,12 +135,17 @@ module IncomingMail
       [ndr_subject, ndr_body]
     end
 
-    def valid_secure_id?(original_message, secure_id)
-      Canvas::Security.verify_hmac_sha1(secure_id, original_message.global_id.to_s)
+    def valid_secure_id?(original_message_id, secure_id)
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id)
     end
 
     def valid_user_and_context?(context, user)
       user && context && context.respond_to?(:reply_from)
+    end
+
+    def sent_from_channel(user, incoming_message)
+      from_addresses = ((incoming_message.from || []) + (incoming_message.reply_to || [])).uniq
+      user && from_addresses.lazy.map {|addr| user.communication_channels.active.email.by_path(addr).first}.first
     end
 
     # MOVE!
@@ -131,8 +157,8 @@ module IncomingMail
     end
 
     def parse_tag(tag)
-      match = tag.match /^(\h+)-(\d+)$/
-      return match[1], match[2].to_i if match
+      match = tag.match /^(\h+)-([0-9~]+)$/
+      return match[1], match[2] if match
     end
   end
 end

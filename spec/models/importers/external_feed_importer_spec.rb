@@ -23,13 +23,14 @@ describe Importers::ExternalFeedImporter do
   context ".import_from_migration" do
     it "creates a feed from the provided hash" do
       @course = course
+      migration = @course.content_migrations.create!
       data = {
         url: 'http://www.example.com/feed',
         title: 'test feed',
         verbosity: 'link_only',
         header_match: ''
       }
-      feed = Importers::ExternalFeedImporter.import_from_migration(data, @course)
+      feed = Importers::ExternalFeedImporter.import_from_migration(data, @course, migration)
       expect(feed.url).to eq data[:url]
       expect(feed.title).to eq data[:title]
       expect(feed.verbosity).to eq data[:verbosity]

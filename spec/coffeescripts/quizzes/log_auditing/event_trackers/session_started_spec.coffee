@@ -13,7 +13,7 @@ define [
 
   test 'capturing: it works', ->
     tracker = new Subject()
-    capture = sinon.stub()
+    capture = @stub()
     tracker.install(capture)
 
     ok capture.called, 'it records a single event on loading'

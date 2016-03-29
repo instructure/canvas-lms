@@ -15,9 +15,9 @@ module Importers
       attr_accessor :item_class
 
       # forward translations to CalendarEvent; they used to live there.
-      def translate(key, default, options = {})
+      def translate(*args)
         raise "Needs self.item_class to be set in #{self}" unless self.item_class
-        self.item_class.translate(key, default, options)
+        self.item_class.translate(*args)
       end
       alias :t :translate
 

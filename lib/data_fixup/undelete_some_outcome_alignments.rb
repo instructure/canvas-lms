@@ -9,7 +9,7 @@ module DataFixup::UndeleteSomeOutcomeAlignments
     # a Hash, it didn't have the comma in front of learning_outcome_id.  This
     # brings those content tags back.
     scope = ContentTag.joins("
-      INNER JOIN rubrics r
+      INNER JOIN #{Rubric.quoted_table_name} r
         ON content_tags.content_id = r.id
         AND content_tags.content_type = 'Rubric'
     ").select("content_tags.*")
@@ -31,15 +31,15 @@ module DataFixup::UndeleteSomeOutcomeAlignments
     # longer be aligned to assignments, so we need to bring those back as well.
     rubric_ids.each_slice(1000) do |rids|
       scope = ContentTag.joins("
-        INNER JOIN assignments a
+        INNER JOIN #{Assignment.quoted_table_name} a
           ON content_tags.content_id = a.id
           AND content_tags.content_type = 'Assignment'
-        INNER JOIN rubric_associations ra
+        INNER JOIN #{RubricAssociation.quoted_table_name} ra
           ON ra.association_id = a.id
           AND ra.association_type = 'Assignment'
-        INNER JOIN rubrics r
+        INNER JOIN #{Rubric.quoted_table_name} r
           ON ra.rubric_id = r.id
-        INNER JOIN content_tags ct2
+        INNER JOIN #{ContentTag.quoted_table_name} ct2
           ON ct2.content_id = r.id
           AND ct2.content_type = 'Rubric'
           AND ct2.tag_type = 'learning_outcome'

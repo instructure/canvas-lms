@@ -36,7 +36,7 @@ define [
 
   test 'capturing: it works', ->
     tracker = new Subject(frequency: 0)
-    capture = sinon.stub()
+    capture = @stub()
     tracker.install(capture)
 
     wh = $(window).height()

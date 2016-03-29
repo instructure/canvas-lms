@@ -2,10 +2,28 @@ require 'spec_helper'
 module Canvas
   describe Errors do
     before(:each) do
+      @old_registry = described_class.instance_variable_get(:@registry)
       described_class.clear_callback_registry!
     end
 
+    after(:each) do
+      described_class.instance_variable_set(:@registry, @old_registry)
+    end
+
     let(:error){ stub("Some Error") }
+
+    describe '.capture_exception' do
+      it 'tags with the exception type' do
+        exception = details = nil
+        Canvas::Errors.register!(:test_thing) do |e, d|
+          exception = e
+          details = d
+        end
+        Canvas::Errors.capture_exception(:core_meltdown, error)
+        expect(exception).to eq(error)
+        expect(details).to eq({tags: {type: 'core_meltdown'}})
+      end
+    end
 
     it 'fires callbacks when it handles an exception' do
       called_with = nil

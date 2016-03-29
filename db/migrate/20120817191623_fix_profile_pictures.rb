@@ -1,10 +1,6 @@
 class FixProfilePictures < ActiveRecord::Migration
   tag :postdeploy
 
-  class User < ActiveRecord::Base
-    attr_accessible :id
-  end
-
   def self.up
     # we don't support twitter or linked in profile pictures anymore, because
     # they are too small
