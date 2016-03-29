@@ -50,6 +50,48 @@ describe SplitUsers do
         expect(enrollment5.reload.user).to eq user3
       end
 
+      it 'should handle user_observers' do
+        observer1 = user_model
+        observer2 = user_model
+        user1.observers << observer1
+        user2.observers << observer2
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.observers).to eq [observer1]
+        expect(user2.observers).to eq [observer2]
+      end
+
+      it 'should handle user_observees' do
+        observee1 = user_model
+        observee2 = user_model
+        observee1.observers << user1
+        observee2.observers << user2
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees).to eq observee1.user_observers
+        expect(user2.user_observees).to eq observee2.user_observers
+      end
+
+      it 'should handle duplicate user_observers' do
+        observer1 = user_model
+        observee1 = user_model
+        observee1.observers << user1
+        observee1.observers << user2
+        user1.observers << observer1
+        user2.observers << observer1
+        UserMerge.from(user1).into(user2)
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees.count).to eq 1
+        expect(user2.user_observees.count).to eq 1
+        expect(user1.observers).to eq [observer1]
+        expect(user2.observers).to eq [observer1]
+      end
+
       it 'should only split users from merge_data when specified' do
         enrollment1 = course1.enroll_user(user1)
         enrollment2 = course1.enroll_student(user2, enrollment_state: 'active')

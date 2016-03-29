@@ -229,12 +229,13 @@ class UserMerge
 
   def move_observees(target_user, user_merge_data)
     # record all the records before destroying them
-    user_merge_data.add_more_data(from_user.user_observees)
+    # pass the from_user since user_id will be the observer
+    user_merge_data.add_more_data(from_user.user_observees, from_user)
     user_merge_data.add_more_data(from_user.user_observers)
     # delete duplicate or invalid observers/observees, move the rest
     from_user.user_observees.where(user_id: target_user.user_observees.map(&:user_id)).destroy_all
     from_user.user_observees.where(user_id: target_user).destroy_all
-    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user))
+    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), target_user)
     target_user.user_observees.where(user_id: from_user).destroy_all
     from_user.user_observees.active.update_all(observer_id: target_user)
     xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).uniq.pluck(:observer_id)
