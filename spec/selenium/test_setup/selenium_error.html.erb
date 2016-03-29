@@ -11,8 +11,8 @@
 
     <h2>Ruby Error</h2>
     <pre style="overflow:auto; max-height: 300px;">
-  <b><%= example.exception.class.name %> <%= example.exception.message %></b>
-  <%= example.exception.backtrace.join("\n") %>
+  <b><%= exception.class.name %> <%= exception.message %></b>
+  <%= exception.backtrace.join("\n") %>
     </pre>
 
     <% if js_errors.present? %>

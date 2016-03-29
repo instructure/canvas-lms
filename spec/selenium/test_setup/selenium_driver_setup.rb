@@ -206,11 +206,11 @@ module SeleniumDriverSetup
     "http://#{$app_host_and_port}"
   end
 
-  def self.note_recent_spec_run(example)
+  def self.note_recent_spec_run(example, exception)
     @recent_spec_runs ||= []
     @recent_spec_runs << {
       location: example.metadata[:location],
-      exception: example.exception,
+      exception: exception,
       pending: example.pending
     }
     @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
@@ -231,9 +231,9 @@ module SeleniumDriverSetup
     end
   end
 
-  def record_errors(example, log_messages)
+  def record_errors(example, exception, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
-    return unless js_errors.present? || example.exception
+    return unless js_errors.present? || exception
 
     # always send js errors to stdout, even if the spec passed. we have to
     # empty the JSErrorCollector anyway, so we might as well show it.
@@ -243,7 +243,7 @@ module SeleniumDriverSetup
       puts "  JS Error: #{error["errorMessage"]} (#{error["sourceName"]}:#{error["lineNumber"]})"
     end
 
-    return unless example.exception && ENV["CAPTURE_SCREENSHOTS"]
+    return unless exception && ENV["CAPTURE_SCREENSHOTS"]
 
     errors_path = Rails.root.join("log/seleniumfailures")
     FileUtils.mkdir_p(errors_path)
