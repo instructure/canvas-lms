@@ -54,6 +54,20 @@ module Services
         expect(env[:JWT]).to eql(jwt)
       end
 
+      it "includes a masquerading user if provided" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        masq_user = stub("masq_user", global_id: 'other global id')
+        domain = stub("domain")
+        jwt = stub("jwt")
+        Canvas::Security::ServicesJwt.stubs(:generate).
+          with(sub: user.global_id, domain: domain, masq_sub: masq_user.global_id).
+          returns(jwt)
+        env = described_class.env_for(root_account,
+          user: user, domain: domain, real_user: masq_user)
+        expect(env[:JWT]).to eql(jwt)
+      end
+
       context "with only lowest level flag on" do
         let(:root_account){ stub("root_account") }
 

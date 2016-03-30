@@ -62,6 +62,11 @@ module AuthenticationMethods
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
+      if services_jwt.masquerading_user_global_id
+        @real_current_user = User.find(services_jwt.masquerading_user_global_id)
+        @real_current_pseudonym = @real_current_user.find_pseudonym_for_account(@domain_root_account, true)
+        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+      end
       @authenticated_with_jwt = true
     rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
            Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so

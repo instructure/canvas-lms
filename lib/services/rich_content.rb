@@ -1,15 +1,13 @@
 module Services
   class RichContent
-    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil)
+    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil, real_user: nil)
       enabled = contextually_on(root_account, risk_level)
       env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
       if enabled
         env_hash = env_hash.merge(service_settings)
         if user && domain
-          env_hash[:JWT] = Canvas::Security::ServicesJwt.generate(
-            sub: user.global_id,
-            domain: domain
-          )
+          env_hash[:JWT] = Canvas::Security::ServicesJwt.
+            for_user(domain, user, real_user: real_user)
         end
       end
       env_hash
