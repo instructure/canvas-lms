@@ -18,6 +18,7 @@ describe 'Viewing graded quizzes' do
   end
 
   before(:once) do
+    skip_if_chrome('research - issue with click_questions_tab method ')
     course_with_teacher(active_all: 1)
     student_in_course(active_all: 1)
     quiz_create(course: @course, unlimited_attempts: true)
