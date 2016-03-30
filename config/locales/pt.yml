@@ -15327,6 +15327,7 @@ pt:
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Este item vai reaparecer quando existirem novas notas para moderar."
   this_login_is_for_provider_6f17462: "Este registo é para %{provider}"
   this_message_includes_media_comments_to_listen_or__5fc98641: "Esta mensagem inclui comentários em mídia. Para ouvir ou responder, clique neste link: %{link}."
+  this_module_is_locked_until_completing_all_of_the__ddf06070: "Este módulo está bloqueado até que sejam completados todos os requisitos para os seguintes módulos: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Este arquivo está bloqueado até %{datetime}."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "É provável que isto tenha acontecido por ter importado conteúdo da disciplina sem os ficheiros associados."
   this_name_appears_in_sorted_lists_dccbd84b: "Este nome aparece em listas ordenadas."
