@@ -201,10 +201,12 @@ module QuizzesCommon
   end
 
   def click_settings_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(0)').click
   end
 
   def click_questions_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(1)').click
   end
 
