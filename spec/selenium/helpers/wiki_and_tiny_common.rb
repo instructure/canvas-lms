@@ -23,6 +23,7 @@ module WikiAndTinyCommon
     name, path, data = get_file({:text => 'testfile1.txt', :image => 'graded.png'}[type])
 
     f("#{form} .file_name").send_keys(path)
+    wait_for_ajaximations
     f("#{form} button").click
     keep_trying_until { ffj("#{form}:visible").empty? }
   end

@@ -114,9 +114,10 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       expect(@image_list.find_elements(:css, '.img').length).to eq 2
 
       wiki_page_tools_upload_file('#sidebar_upload_file_form', :image)
-
+      wait_for_ajaximations
       expect(root_folders.first.find_elements(:css, '.file.image').length).to eq 3
       expect(@image_list.find_elements(:css, '.img').length).to eq 3
+      switch_editor_views(wiki_page_body)
       expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
     end
 

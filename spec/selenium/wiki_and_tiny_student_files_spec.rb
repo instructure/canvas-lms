@@ -68,7 +68,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 1
       expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
@@ -80,7 +80,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 1
       expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
@@ -95,7 +95,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      f('li.folder span').click
+      f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.file').count).to eq 1
       expect(f('li.folder li.file .name').text).to include_text("foo.txt")
@@ -111,7 +111,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       keep_trying_until do
-        f('li.folder span').click
+        f('li.folder span.plus').click
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 1
       end
