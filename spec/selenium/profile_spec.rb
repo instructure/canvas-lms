@@ -33,31 +33,13 @@ describe "profile" do
     end
   end
 
-  it "should give error - wrong old password" do
-    user_with_pseudonym({:active_user => true})
+  def log_in_to_settings
+    user_with_pseudonym({active_user: true})
     create_session(@pseudonym)
     get '/profile/settings'
-    wrong_old_password = 'wrongoldpassword'
-    new_password = 'newpassword'
-    edit_form = click_edit
-    edit_form.find_element(:id, 'change_password_checkbox').click
-    edit_form.find_element(:id, 'old_password').send_keys(wrong_old_password)
-    edit_form.find_element(:id, 'pseudonym_password').send_keys(new_password)
-    edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
-    submit_form(edit_form)
-    wait_for_ajaximations
-    # check to see if error box popped up
-    errorboxes = ff('.error_text')
-    expect(errorboxes.length).to be > 1
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
   end
 
-  it "should change the password" do
-    user_with_pseudonym({:active_user => true})
-    create_session(@pseudonym)
-    get '/profile/settings'
-    old_password = 'asdfasdf'
-    new_password = 'newpassword'
+  def change_password(old_password, new_password)
     edit_form = click_edit
     edit_form.find_element(:id, 'change_password_checkbox').click
     edit_form.find_element(:id, 'old_password').send_keys(old_password)
@@ -65,13 +47,41 @@ describe "profile" do
     edit_form.find_element(:id, 'pseudonym_password_confirmation').send_keys(new_password)
     submit_form(edit_form)
     wait_for_ajaximations
-    #login with new password
-    expect(@pseudonym.reload).to be_valid_password(new_password)
+  end
+
+  it "should give error - wrong old password" do
+    log_in_to_settings
+    change_password('wrongoldpassword', 'newpassword')
+    # check to see if error box popped up
+    errorboxes = ff('.error_text')
+    expect(errorboxes.length).to be > 1
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
+  end
+
+  it "should change the password" do
+    log_in_to_settings
+    change_password('asdfasdf', 'newpassword')
+    # login with new password
+    expect(@pseudonym.reload).to be_valid_password('newpassword')
+  end
+
+  it "rejects passwords longer than 255 characters", priority: "2", test_id: 840136 do
+    log_in_to_settings
+    change_password('asdfasdf', SecureRandom.hex(128))
+    errorboxes = ff('.error_text')
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Can't exceed 255 characters/ }).to be_truthy
+  end
+
+  it "rejects passwords shorter than 6 characters", priority: "2", test_id: 1055503 do
+    log_in_to_settings
+    change_password('asdfasdf', SecureRandom.hex(2))
+    errorboxes = ff('.error_text')
+    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 6 characters/ }).to be_truthy
   end
 
   context "non password tests" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
