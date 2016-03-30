@@ -511,8 +511,8 @@ describe "API Authentication", type: :request do
       course_with_teacher(user: user_obj)
     end
 
-    def wrapped_jwt_from_service
-      services_jwt = Canvas::Security::ServicesJwt.generate({sub: @user.global_id}, false)
+    def wrapped_jwt_from_service(payload={sub: @user.global_id})
+      services_jwt = Canvas::Security::ServicesJwt.generate(payload, false)
       payload = {
         iss: "some other service",
         user_token: services_jwt
@@ -527,6 +527,20 @@ describe "API Authentication", type: :request do
       }
       assert_status(200)
       expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "allows access for a JWT masquerading user" do
+      token = wrapped_jwt_from_service({
+        sub: @user.global_id,
+        masq_sub: User.first.global_id
+      })
+      get "/api/v1/courses", nil, {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+      expect(assigns['current_user']).to eq @user
+      expect(assigns['real_current_user']).to eq User.first
     end
 
     it "errors if the JWT is expired" do
