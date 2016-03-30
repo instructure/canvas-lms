@@ -373,6 +373,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     rce_js_env(:highrisk)
+    js_env(ConditionalRelease::Service.env_for(@context))
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]

@@ -1,4 +1,28 @@
 @import "base/environment";
+/* header */
+
+#edit_assignment_header-cr {
+  padding: 0;
+  border: none;
+}
+
+#edit-assignment-header-cr-tab-nav {
+  display: flex;
+  align-items: flex-end;
+}
+
+#edit-assignment-header-cr-spacer {
+  flex: 1;
+}
+
+#assignment-draft-state-cr {
+  padding: 0 12px 12px 0;
+}
+
+#assignment-gear-button-cr {
+  padding-bottom: 6px;
+}
+
 /* for labels */
 div.form-column-left {
   min-width: 145px;

@@ -20,9 +20,7 @@ module ConditionalRelease
   class ScoreRangeDefaultsController < ApplicationController
     def index
       get_context
-      enabled = @context.feature_enabled?(:conditional_release) &&
-        ConditionalRelease::Service.enabled?
-      unless enabled
+      unless ConditionalRelease::Service.enabled_in_context?(@context)
         return render template: 'shared/errors/404_message', status: :not_found
       end
 

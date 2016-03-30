@@ -33,10 +33,21 @@ describe ConditionalRelease::Service do
     clear_config
   end
 
-  it 'is disabled by default' do
+  it 'is not configured by default' do
     stub_config(nil)
-    expect(Service.enabled?).to be_falsy
+    expect(Service.configured?).to eq false
   end
+
+  it 'requires host to be configured' do
+    stub_config({enabled: true})
+    expect(Service.configured?).to eq false
+  end
+
+  it 'is configured when enabled with host' do
+    stub_config({enabled: true, host: 'foo'})
+    expect(Service.configured?).to eq true
+  end
+
 
   it 'has a default config' do
     stub_config(nil)
@@ -64,5 +75,29 @@ describe ConditionalRelease::Service do
       configure_defaults_app_path: 'some/path'
     })
     expect(Service.configure_defaults_url).to eq 'foo://bar/some/path'
+  end
+
+  it 'requires feature flag to be enabled' do
+    context = stub({feature_enabled?: true})
+    stub_config({enabled: true, host: 'foo'})
+    expect(Service.enabled_in_context?(context)).to eq true
+  end
+
+  it 'creates environment variables based on feature flag' do
+    context = stub({feature_enabled?: true})
+    stub_config({enabled: true, host: 'foo'})
+    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: true})
+  end
+
+  it 'creates no environment variables if feature flag is off' do
+    context = stub({feature_enabled?: false})
+    stub_config({enabled: true, host: 'foo'})
+    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: false})
+  end
+
+  it 'creates no environment variables if service is disabled' do
+    context = stub({feature_enabled?: true})
+    stub_config({enabled: false})
+    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: false})
   end
 end

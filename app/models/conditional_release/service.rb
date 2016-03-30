@@ -28,6 +28,10 @@ module ConditionalRelease
       edit_object_score_ranges_path: 'javascripts/edit_object_score_ranges.js',
     }.freeze
 
+    def self.env_for(context)
+      { CONDITIONAL_RELEASE_SERVICE_ENABLED: self.enabled_in_context?(context) }
+    end
+
     def self.reset_config_cache
       @config = nil
     end
@@ -36,8 +40,12 @@ module ConditionalRelease
       @config ||= DEFAULT_CONFIG.merge(config_file)
     end
 
-    def self.enabled?
-      config[:enabled] && config[:host]
+    def self.configured?
+      !!(config[:enabled] && config[:host])
+    end
+
+    def self.enabled_in_context?(context)
+      !!(configured? && context.feature_enabled?(:conditional_release))
     end
 
     def self.configure_defaults_url
@@ -64,15 +72,16 @@ module ConditionalRelease
       config[:edit_object_score_ranges_path]
     end
 
-    def self.config_file
-      ConfigFile.load('conditional_release').try(:symbolize_keys) || {}
-    end
-    private_class_method :config_file
+    class << self
+      private
+      def config_file
+        ConfigFile.load('conditional_release').try(:symbolize_keys) || {}
+      end
 
-    def self.build_url(path)
-      "#{protocol}://#{host}/#{path}"
+      def build_url(path)
+        "#{protocol}://#{host}/#{path}"
+      end
     end
-    private_class_method :build_url
   end
 
 end
