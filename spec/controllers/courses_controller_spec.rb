@@ -848,6 +848,25 @@ describe CoursesController do
         expect(@enrollment).to be_active
       end
 
+      it "should not error when previewing an unpublished course as an invited admin" do
+        @account = Account.create!
+        @account.settings[:allow_invitation_previews] = false
+        @account.save!
+
+        course(:account => @account)
+        user(:active_all => true)
+        enrollment = @course.enroll_teacher(@user, :enrollment_state => 'invited')
+        user_session(@user)
+
+        get 'show', :id => @course.id
+
+        expect(response).to be_success
+        expect(response).to render_template('show')
+        expect(assigns[:context_enrollment]).to eq enrollment
+        enrollment.reload
+        expect(enrollment).to be_invited
+      end
+
       it "should ignore invitations that have been accepted (not logged in)" do
         @enrollment.accept!
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
