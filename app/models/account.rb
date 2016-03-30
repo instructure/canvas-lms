@@ -1226,24 +1226,6 @@ class Account < ActiveRecord::Base
     end
   end
 
-  # this will take an account and make it a sub_account of
-  # itself.  Also updates all it's descendant accounts to point to
-  # the correct root account, and updates the pseudonyms to
-  # points to the new root account as well.
-  def consume_account(account)
-    account.all_accounts.each do |sub_account|
-      sub_account.root_account = self.root_account
-      sub_account.save!
-    end
-    account.parent_account = self
-    account.root_account = self.root_account
-    account.save!
-    account.pseudonyms.each do |pseudonym|
-      pseudonym.account = self.root_account
-      pseudonym.save!
-    end
-  end
-
   def course_count
     self.courses.active.count
   end
