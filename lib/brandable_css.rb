@@ -29,6 +29,7 @@ module BrandableCSS
     "ic-brand-global-nav-menu-item__text-color--active" => lambda { I18n.t("Nav Text Active") },
     "ic-brand-global-nav-avatar-border" => lambda { I18n.t("Nav Avatar Border") },
     "ic-brand-global-nav-menu-item__badge-bgd" => lambda { I18n.t("Nav Badge") },
+    "ic-brand-global-nav-menu-item__badge-text" => lambda { I18n.t("Nav Badge Text") },
     "ic-brand-global-nav-logo-bgd" => lambda { I18n.t("Nav Logo Background") },
     "ic-brand-header-image" => lambda { I18n.t("Nav Logo") },
     "ic-brand-watermark" => lambda { I18n.t("Watermark") },

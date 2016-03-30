@@ -7,6 +7,7 @@
   // ic-brand-global-nav-menu-item__text-color
   // ic-brand-global-nav-avatar-border
   // ic-brand-global-nav-menu-item__badge-bgd
+  // ic-brand-global-nav-menu-item__badge-text
   // ic-brand-global-nav-ic-icon-svg-fill--active
   // ic-brand-global-nav-logo-bgd
 
@@ -175,7 +176,7 @@
     position: absolute;
     top: -0.5em; right: 0;
     background: $ic-brand-global-nav-menu-item__badge-bgd;
-    color: $ic-brand-global-nav-menu-item__text-color;
+    color: $ic-brand-global-nav-menu-item__badge-text;
     @include primary-nav-badge-border($ic-brand-global-nav-bgd);
   }
 
