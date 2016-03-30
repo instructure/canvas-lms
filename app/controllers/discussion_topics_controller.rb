@@ -863,8 +863,12 @@ class DiscussionTopicsController < ApplicationController
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)
-
-    @topic.send(is_new ? :user= : :editor=, @current_user)
+    
+    if is_new
+      @topic.user = @current_user
+    elsif discussion_topic_hash.except(*%w{pinned}).present? # don't update editor if the only thing that changed was the pinned status
+      @topic.editor = @current_user
+    end
     @topic.current_user = @current_user
     @topic.content_being_saved_by(@current_user)
 

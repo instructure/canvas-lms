@@ -631,6 +631,14 @@ describe DiscussionTopicsController do
       expect(@topic.lock_at).not_to be_nil
     end
 
+    it "should not change the editor if only pinned was changed" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+        format: 'json', pinned: true)
+      @topic.reload
+      expect(@topic.pinned).to be_truthy
+      expect(@topic.editor).to_not eq @teacher
+    end
+
     it "should not clear delayed_post_at if published is not changed" do
       @topic.workflow_state = 'post_delayed'
       @topic.save!
