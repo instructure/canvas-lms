@@ -584,7 +584,7 @@ class Message < ActiveRecord::Base
       )
       complete_dispatch
     end
-  rescue AWS::SQS::Errors::ServiceError => e
+  rescue AWS::SQS::Errors::Base => e
     Canvas::Errors.capture(
       e,
       message: 'Message delivery failed',

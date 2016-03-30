@@ -82,6 +82,13 @@ module Services
         expect(@message.workflow_state).to eql("staged")
       end
 
+      it "throws error if queue does not exist" do
+        @queue.stubs(:send_message).raises(AWS::SQS::Errors::NonExistentQueue)
+        expect{@message.deliver}.to raise_error(AWS::SQS::Errors::NonExistentQueue)
+        expect(@message.transmission_errors).to include("AWS::SQS::Errors::NonExistentQueue")
+        expect(@message.workflow_state).to eql("staged")
+      end
+
       it "will send to both services" do
         Setting.set("notification_service_traffic", "true")
         @queue.expects(:send_message).once
