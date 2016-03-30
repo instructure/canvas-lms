@@ -41,7 +41,7 @@ describe 'Viewing graded quizzes' do
         select_regrade_option(1)
         wait_for_ajaximations
         regrade_tour = f('#tour-quiz-regrade-step1')
-        close_regrade_tooltip if regrade_tour.displayed?
+        close_regrade_tooltip if driver.browser == :chrome && regrade_tour.displayed?
         save_question
         expect_new_page_load { click_save_settings_button }
 
