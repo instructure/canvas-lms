@@ -28,4 +28,9 @@ describe CanvasSanitize do
     cleaned = Sanitize.clean("<p dir='rtl'>RightToLeft</p>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<p dir=\"rtl\">RightToLeft</p>")
   end
+
+  it "doesnt strip data-* attributes by default" do
+    cleaned = Sanitize.clean("<p data-item-id='1234'>Item1234</p>", CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq("<p data-item-id=\"1234\">Item1234</p>")
+  end
 end
