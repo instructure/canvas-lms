@@ -20,6 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe 'Submissions API', type: :request do
+  include Api::V1::User
+
+  let(:params) { {} }
 
   before :each do
     HostUrl.stubs(:file_host_with_shard).returns(["www.example.com", Shard.default])
@@ -379,6 +382,7 @@ describe 'Submissions API', type: :request do
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
         'user_name' => 'User',
+        'user' => user_display_json(@student, @course).stringify_keys!,
         'rating_sum' => nil,
         'rating_count' => nil,
       },
@@ -392,6 +396,7 @@ describe 'Submissions API', type: :request do
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
         'user_name' => 'User',
+        'user' => user_display_json(@student, @course).stringify_keys!,
         'rating_sum' => nil,
         'rating_count' => nil,
       }].sort_by { |h| h['user_id'] }
@@ -446,6 +451,7 @@ describe 'Submissions API', type: :request do
         'message' => 'sub 1',
         'user_id' => @student.id,
         'user_name' => 'User',
+        'user' => user_display_json(@student, @course).stringify_keys!,
         'read_state' => 'unread',
         'forced_read_state' => false,
         'parent_id' => e1.id,
@@ -459,6 +465,7 @@ describe 'Submissions API', type: :request do
         'message' => 'student 1',
         'user_id' => @student.id,
         'user_name' => 'User',
+        'user' => user_display_json(@student, @course).stringify_keys!,
         'read_state' => 'unread',
         'forced_read_state' => false,
         'parent_id' => nil,

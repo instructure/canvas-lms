@@ -396,7 +396,7 @@ class DiscussionTopicsApiController < ApplicationController
     ids = Array(params[:ids])
     entries = @topic.discussion_entries.order(:id).find(ids)
     @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
-    render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
+    render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [:display_user])
   end
 
   # @API Mark topic as read
@@ -604,7 +604,7 @@ class DiscussionTopicsApiController < ApplicationController
         @entry.attachment = @attachment
         @entry.save
       end
-      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first, :status => :created
+      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, :status => :created
     else
       render :json => @entry.errors, :status => :bad_request
     end

@@ -1247,6 +1247,7 @@ describe DiscussionTopicsController, type: :request do
         "parent_id" => @entry.parent_id,
         "user_id" => @user.id,
         "user_name" => @user.name,
+        "user" => user_display_json(@user, @course).stringify_keys!,
         "read_state" => "read",
         "forced_read_state" => false,
         "message" => @message,

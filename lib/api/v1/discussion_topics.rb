@@ -138,7 +138,7 @@ module Api::V1::DiscussionTopics
   #   Recognized fields: user_name, subentries.
   #
   # Returns an array of hashes ready to be serialized.
-  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries])
+  def discussion_entry_api_json(entries, context, user, session, includes = [:user_name, :subentries, :display_user])
     entries.map do |entry|
       serialize_entry(entry, user, context, session, includes)
     end
@@ -167,6 +167,8 @@ module Api::V1::DiscussionTopics
     else
       json[:message] = api_user_content(entry.message, context, user)
     end
+
+    json[:user] = user_display_json(entry.user, context) if includes.include?(:display_user)
 
     json.merge!(discussion_entry_attachment(entry, user, context))
     json.merge!(discussion_entry_read_state(entry, user))
