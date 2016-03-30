@@ -20,7 +20,18 @@ module Lti
     before_filter :require_user
 
     def index
-      render json: { hello: :world }
+      @page = MembershipService::PagePresenter.new(@context,
+                                                   @current_user,
+                                                   request.base_url,
+                                                   membership_service_params)
+      render json: @page
+    end
+
+    private
+
+    def membership_service_params
+      keys = %w(role page per_page)
+      params.select { |k,_| keys.include?(k) }
     end
   end
 end
