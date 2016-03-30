@@ -29,6 +29,7 @@ describe "external tool assignments" do
   end
 
   it "should allow creating through the 'More Options' link", priority: "2", test_id: 209973 do
+    skip('Broken by BUG CNVS-28344')
     get "/courses/#{@course.id}/assignments"
 
     #create assignment
@@ -63,6 +64,7 @@ describe "external tool assignments" do
   end
 
   it "should allow editing", priority: "2", test_id: 209974 do
+    skip('Broken by BUG CNVS-28344')
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
