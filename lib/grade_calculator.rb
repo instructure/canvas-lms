@@ -54,7 +54,7 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments.map(&:id)).
-        select("submissions.id, user_id, assignment_id, score, excused")
+        select("submissions.id, user_id, assignment_id, score, excused, submissions.workflow_state")
     submissions_by_user = @submissions.group_by(&:user_id)
 
     result = []
@@ -149,6 +149,9 @@ class GradeCalculator
 
         # ignore submissions for muted assignments
         s = nil if @ignore_muted && a.muted?
+
+        # ignore pending_review quiz submissions
+        s = nil if ignore_ungraded && s.try(:pending_review?)
 
         {
           assignment: a,

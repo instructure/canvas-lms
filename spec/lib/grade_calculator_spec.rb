@@ -372,6 +372,21 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to eql(48.41)
     end
 
+    it "ignores pending_review submissions" do
+      course_with_student(active_all: true)
+      a1 = @course.assignments.create! name: "fake quiz", points_possible: 50
+      a2 = @course.assignments.create! name: "assignment", points_possible: 50
+
+      s1 = a1.grade_student(@student, grade: 25).first
+      Submission.update_all({workflow_state: "pending_review"}, {id: s1.id})
+
+      a2.grade_student(@student, grade: 50)
+
+      enrollment = @student.enrollments.first.reload
+      expect(enrollment.computed_current_score).to eq 100.0
+      expect(enrollment.computed_final_score).to eq 75.0
+    end
+
     it "should not include unpublished assignments" do
       two_graded_assignments
       @assignment2.unpublish
