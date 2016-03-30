@@ -13876,33 +13876,33 @@ es:
         go_to_dashboard: "Ir a su panel de control"
     authenticate: 
       buttons: 
-        enroll_in_course: "Matricularse en el curso"
+        enroll_in_course: "Inscribirse en el curso"
         next: Siguiente
-      getting_started: "Se está matriculando en **%{course}**."
+      getting_started: "Se inscribe en **%{course}**."
       labels: 
         password: Contraseña
     authenticate_or_register: 
       buttons: 
-        enroll_in_course: "Matricularse en el curso"
+        enroll_in_course: "Inscribirse en el curso"
         next: Siguiente
       existing_user: "Ya tengo una ID de inicio de sesión de %{institution_name} "
-      getting_started: "Se está matriculando en **%{course}**."
+      getting_started: "Se inscribe en **%{course}**."
       labels: 
         name: "Nombre completo"
         password: Contraseña
       new_user: "Soy un usuario nuevo"
     confirm_enrollments: 
       buttons: 
-        enroll_in_course: "Matricularse en el curso"
+        enroll_in_course: "Inscribirse en el curso"
         next: Siguiente
-      getting_started: "Se está matriculando en **%{course}**"
+      getting_started: "Se inscribe en **%{course}**"
     course_full: 
       class_full: "Se han cubierto todas las plazas para **%{course}**. Disculpe las molestias."
     enrollment_closed: 
       enrollment_is_closed: "El plazo de matrícula para el curso **%{course}** está cerrado."
     new: 
       titles: 
-        course_enrollment: "Matricularse en %{course}"
+        course_enrollment: "Inscribirse en %{course}"
     successfully_enrolled: 
       already_enrolled: "Se ha matriculado en **%{course}**."
       buttons: 
@@ -14694,7 +14694,7 @@ es:
       invalid_content_type: "Contenido Inválido, se requiere UTF-8"
     sis_import_in_process_notice: "Una importación SIS ya esta procesandose."
   site: 
-    view_privacy_policy: "Ver la política de privacidad"
+    view_privacy_policy: "Declaración de privacidad"
   site_2d8d3df9: Sitio
   site_admin: 
     columns: 
@@ -16055,7 +16055,7 @@ es:
     user_updated: "Se actualizó el usuario."
     welcome: 
       no_courses_message: "No tiene ningún curso, por lo que esta página no le resultará muy útil por el momento. Una vez que haya creado o se haya matriculado en algún curso, comenzará a ver conversaciones de todas sus clases."
-      unpublished_courses_message: "Se ha matriculado en uno o más cursos que aún no han comenzado. Una vez que estén disponibles estos cursos, podrá ver la información correspondiente tanto aquí como en la barra de navegación superior. Mientras tanto, puede matricularse en más cursos o configurar su perfil."
+      unpublished_courses_message: "Se ha matriculado en uno o más cursos que aún no han comenzado. Una vez que estén disponibles estos cursos, podrá ver la información correspondiente tanto aquí como en la barra de navegación superior. Mientras tanto, puede inscribirse en más cursos o configurar su perfil."
       welcome_to_happiness: "¡Bienvenido a Canvas!"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Puede que los usuarios de lectores de pantalla tengan que apagar el cursor virtual con el fin de utilizar estos atajos del teclado"
   validate: 
