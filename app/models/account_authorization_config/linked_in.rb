@@ -38,10 +38,6 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
     super || 'id'.freeze
   end
 
-  def login_button?
-    true
-  end
-
   def unique_id(token)
     token.get("/v1/people/~:(#{login_attribute})?format=json").parsed[login_attribute]
   end

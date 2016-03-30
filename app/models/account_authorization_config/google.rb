@@ -25,10 +25,6 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
     false
   end
 
-  def login_button?
-    true
-  end
-
   def self.recognized_params
     [ :login_attribute, :jit_provisioning, :hosted_domain ].freeze
   end

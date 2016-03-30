@@ -114,10 +114,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   SENSITIVE_PARAMS = [].freeze
 
-  # will always be false unless some subclass wants to have a "Login With X"
-  # button on the login page
-  def login_button?
-    false
+  def self.login_button?
+    Rails.root.join("public/images/sso_buttons/sso-#{sti_name}.svg").exist?
   end
 
   def destroy
