@@ -27,10 +27,10 @@ describe "self enrollment" do
     it "should register a new user" do
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys('new@example.com')
-      f('#initial_action input[value=create]').click
+      move_to_click('#initial_action input[value=create]')
       wait_for_ajaximations
       f("#student_name").send_keys('new guy')
-      f('#enroll_form input[name="user[terms_of_use]"]').click
+      move_to_click('#enroll_form input[name="user[terms_of_use]"]')
       expect_new_page_load {
         submit_form("#enroll_form")
       }
@@ -47,7 +47,7 @@ describe "self enrollment" do
       get "/enroll/#{@course.self_enrollment_code}"
       expect(f("label[for='student_email']").text).to include(custom_label)
       f("#student_email").send_keys("existing@example.com")
-      f('#initial_action input[value=log_in]').click
+      move_to_click('#initial_action input[value=log_in]')
       wait_for_ajaximations
       f("#student_password").send_keys("asdfasdf")
       expect_new_page_load {
@@ -77,7 +77,7 @@ describe "self enrollment" do
 
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys("existing@example.com")
-      f('#initial_action input[value=log_in]').click
+      move_to_click('#initial_action input[value=log_in]')
       wait_for_ajaximations
       f("#student_password").send_keys("asdfasdf")
       expect_new_page_load {

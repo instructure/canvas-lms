@@ -569,6 +569,7 @@ describe "quizzes" do
 
 
     it "works with file upload questions", priority: "1", test_id: 210071 do
+      skip_if_chrome('issue with upload_attachment_answer')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
