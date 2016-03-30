@@ -55,7 +55,7 @@ class GradebookExporter
     assignments = select_in_grading_period calc.assignments, @course, grading_period
 
     assignments = assignments.sort_by do |a|
-      [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
+      [a.assignment_group_id, a.position || 0, a.due_at || CanvasSort::Last, a.title]
     end
     groups = calc.groups
 
