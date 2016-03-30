@@ -240,6 +240,7 @@ describe "account admin question bank" do
     end
 
     it "should align an outcome" do
+      skip_if_chrome('issue with add_outcome_to_bank method')
       mastery_points, possible_points = @outcome.data[:rubric_criterion].values_at(:mastery_points, :points_possible)
       percentage = mastery_points.to_f / possible_points.to_f
       add_outcome_to_bank(@outcome)
@@ -250,6 +251,7 @@ describe "account admin question bank" do
     end
 
     it "should change the outcome set mastery score" do
+      skip_if_chrome('issue with add_outcome_to_bank method')
       f(".add_outcome_link").click
       wait_for_ajax_requests
       add_outcome_to_bank(@outcome, 40)

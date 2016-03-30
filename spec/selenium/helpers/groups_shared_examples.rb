@@ -211,6 +211,7 @@ end
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'conferences_page' do |context|
   it "should allow group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 307624, teacher: 308534) do
+    skip_if_chrome('issue with invite_all_but_one_user method')
     title = 'test conference'
     get conferences_page
     create_conference(title: title)
