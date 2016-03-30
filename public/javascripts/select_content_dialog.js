@@ -92,10 +92,12 @@ define([
       }).fixDialogButtons();
 
       var visibleModuleItemSelect = $('#select_context_content_dialog .module_item_select:visible')[0];
-      if (visibleModuleItemSelect &&  visibleModuleItemSelect.selectedIndex != -1) {
-        $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
-      } else {
-        $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
+      if (visibleModuleItemSelect) {
+        if (visibleModuleItemSelect.selectedIndex != -1) {
+          $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
+        } else {
+          $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
+        }
       }
       $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
     }
