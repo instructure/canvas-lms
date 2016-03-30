@@ -1226,6 +1226,10 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def update_all_update_account_associations
+    Account.root_accounts.active.find_each(&:update_account_associations)
+  end
+
   def course_count
     self.courses.active.count
   end
