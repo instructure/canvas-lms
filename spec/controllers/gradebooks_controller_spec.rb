@@ -47,6 +47,7 @@ describe GradebooksController do
     it "redirects to the login page if the user is logged out" do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       expect(response).to redirect_to(login_url)
+      expect(flash[:warning]).to be_present
     end
 
     it "redirects teacher to gradebook" do

@@ -26,7 +26,7 @@ class GradebooksController < ApplicationController
   include Api::V1::Section
 
   before_filter :require_context
-  before_filter :require_user, only: %w(speed_grader speed_grader_settings)
+  before_filter :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
