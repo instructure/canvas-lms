@@ -59,7 +59,8 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
-        ldap_form.find_element(:id, "no_tls_#{config_id}").click
+        no_tls_radio = ldap_form.find_element(:id, "no_tls_#{config_id}")
+        driver.action.move_to(no_tls_radio).click.perform
         ldap_form.find_element(:id, 'authentication_provider_auth_base').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_filter').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_username').clear
@@ -104,7 +105,8 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('host2.example.dev')
         ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('2')
-        ldap_form.find_element(:id, "start_tls_#{config_id}").click
+        start_tls_radio = ldap_form.find_element(:id, "start_tls_#{config_id}")
+        driver.action.move_to(start_tls_radio).click.perform
         ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('base2')
         ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('filter2')
         ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username2')

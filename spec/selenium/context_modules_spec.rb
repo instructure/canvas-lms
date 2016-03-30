@@ -551,7 +551,8 @@ describe "context modules" do
       wait_for_ajaximations
 
       # Select other radio button
-      fj('#context_module_requirement_count_1').click
+      radio_to_click = f('#context_module_requirement_count_1')
+      driver.action.move_to(radio_to_click).click.perform
       submit_form(edit_form)
       wait_for_ajaximations
 
@@ -582,11 +583,11 @@ describe "context modules" do
     it "should validate locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
-      lock_check = add_form.find_element(:id, 'unlock_module_at')
-      lock_check.click
+      lock_check_click(add_form)
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).to be_displayed
-      lock_check.click
+      # verify unlock
+      lock_check_click(add_form)
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
@@ -601,9 +602,7 @@ describe "context modules" do
       expect(f('#add_context_module_form')).to be_displayed
 
       edit_form = f('#add_context_module_form')
-
-      lock_check = edit_form.find_element(:id, 'unlock_module_at')
-      lock_check.click
+      lock_check_click(edit_form)
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
       unlock_date.send_keys((Date.today + 2.days).to_s)
@@ -749,6 +748,7 @@ describe "context modules" do
       end
 
       it "should use the keyboard shortcuts to navigate through modules and module items" do
+        skip_if_chrome('research - focus on HTML')
         # Test these shortcuts (access menu by pressing comma key):
         # Up : Previous Module/Item
         # Down : Next Module/Item

@@ -54,7 +54,7 @@ describe 'submissions' do
       create_assignment_with_group_category
 
       f('input[name="category[split_groups]"]').click
-      f('button[type="submit"]').click
+      move_to_click('button[type="submit"]')
       wait_for_ajaximations
 
       expect(fj('#assignment_group_category_id:visible')).to include_text("New Group Category")
