@@ -135,7 +135,6 @@ entries['vendor'] = [
   'vendor/backbone',
   'vendor/date',
   'vendor/d3.v3',
-  'vendor/firebugx',
   'vendor/graphael',
   'vendor/i18n',
   'vendor/i18n_js_extension',
