@@ -32,7 +32,7 @@
         </div>
     <% end %>
     <div id="student-grades-show-all" class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
-      <a href="#" class="btn" id="show_all_details_link"><%= t('links.show_details', "Show All Details") %></a>
+      <button type="button" class="Button" id="show_all_details_button"><%= t("Show All Details") %></button>
     </div>
     <div id="assignments-not-weighted" style="margin-top: 10px;">
       <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
