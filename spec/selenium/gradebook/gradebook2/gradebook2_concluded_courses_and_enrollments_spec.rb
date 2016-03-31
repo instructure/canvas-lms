@@ -102,11 +102,11 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(ff('.student-name').count).to eq @course.all_students.count
     end
 
-    it "should not allow editing grades", priority: "1", test_id: 210027 do
+    it "does not allow editing grades", priority: "1", test_id: 210027 do
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-      expect(f('.gradebook-cell', cell).text).to eq '10'
+      expect(cell.text).to eq '10'
       cell.click
-      expect(ff('.grade', cell)).to be_blank
+      expect(f('.grade', cell)).to be_nil # no input box for entry
     end
   end
 end

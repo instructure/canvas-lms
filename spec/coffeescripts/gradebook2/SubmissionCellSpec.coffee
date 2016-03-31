@@ -2,7 +2,7 @@ define [
   'compiled/gradebook2/SubmissionCell'
   'str/htmlEscape'
   'jquery'
-], (SubmissionCell,htmlEscape,$) ->
+], (SubmissionCell, htmlEscape, $) ->
 
   dangerousHTML= '"><img src=/ onerror=alert(document.cookie);>'
   escapedDangerousHTML = htmlEscape dangerousHTML
@@ -34,15 +34,35 @@ define [
 
   test "#class.formatter rounds numbers if they are numbers", ->
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs(0.67).returns('ok')
-    formattedResponse = SubmissionCell.formatter(0,0,{grade: 0.666})
+    formattedResponse = SubmissionCell.formatter(0, 0, { grade: 0.666 }, {}, {})
     equal formattedResponse, 'ok'
 
   test "#class.formatter gives the value to the formatter if submission.grade isnt a parseable number", ->
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('happy').returns('ok')
-    formattedResponse = SubmissionCell.formatter(0,0,{grade: 'happy'})
+    formattedResponse = SubmissionCell.formatter(0, 0, { grade: 'happy' }, {}, {})
     equal formattedResponse, 'ok'
 
   test "#class.formatter adds a percent symbol for assignments with a percent grading_type", ->
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs("73%").returns('ok')
-    formattedResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, { grading_type: "percent" } )
+    formattedResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, { grading_type: "percent" }, {})
     equal formattedResponse, 'ok'
+
+  test "#class.formatter, isInactive adds grayed-out", ->
+    student = { isInactive: true }
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 'happy'}, { }, student)
+    notEqual submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#class.formatter, isInactive: false doesn't add grayed-out", ->
+    student = { isInactive: false }
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#class.formatter, isConcluded adds grayed-out", ->
+    student = { isConcluded: true }
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    notEqual submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#class.formatter, isConcluded doesn't have grayed-out", ->
+    student = { isConcluded: false }
+    submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
+    equal submissionCellResponse.indexOf("grayed-out"), -1

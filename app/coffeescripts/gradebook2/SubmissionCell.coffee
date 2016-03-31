@@ -69,7 +69,7 @@ define [
     validate: () ->
       { valid: true, msg: null }
 
-    @formatter: (row, col, submission, assignment) ->
+    @formatter: (row, col, submission, assignment, student) ->
       if submission.excused
         grade = "EX"
       else
@@ -82,20 +82,27 @@ define [
         if grade && assignment?.grading_type == "percent"
           grade = grade.toString() + "%"
 
-      this.prototype.cellWrapper(grade, {submission: submission, assignment: assignment, editable: false})
+      this.prototype.cellWrapper(grade, {submission: submission, assignment: assignment, editable: false, student: student})
 
     cellWrapper: (innerContents, options = {}) ->
       opts = $.extend({}, {
         classes: '',
-        editable: true
+        editable: true,
+        student: {
+          isInactive: false,
+          isConcluded: false,
+        }
       }, options)
       opts.submission ||= @opts.item[@opts.column.field]
       opts.assignment ||= @opts.column.object
       submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
+      specialClasses.push("grayed-out") if opts.student.isInactive || opts.student.isConcluded
+      specialClasses.push("cannot_edit") if opts.student.isConcluded
+      opts.editable = false if opts.student.isConcluded
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
-      innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents);
+      innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
       innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
 
       if turnitin = extractData(opts.submission)
@@ -104,10 +111,17 @@ define [
 
       tooltipText = $.map(specialClasses, (c)-> GRADEBOOK_TRANSLATIONS["submission_tooltip_#{c}"]).join ', '
 
+      cellCommentHTML = if !opts.student.isConcluded
+        """
+        <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
+        """
+      else
+        ''
+
       """
       #{$.raw if tooltipText then '<div class="gradebook-tooltip">'+ htmlEscape(tooltipText) + '</div>' else ''}
       <div class="gradebook-cell #{htmlEscape if opts.editable then 'gradebook-cell-editable focus' else ''} #{htmlEscape opts.classes} #{htmlEscape specialClasses.join(' ')}">
-        <a href="#" data-user-id=#{opts.submission.user_id} data-assignment-id=#{opts.assignment.id} class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
+        #{$.raw cellCommentHTML}
         #{$.raw innerContents}
       </div>
       """
@@ -160,7 +174,7 @@ define [
       @$input = @$wrapper.find('input').focus().select()
 
   class SubmissionCell.letter_grade extends SubmissionCell
-    @formatter: (row, col, submission, assignment) ->
+    @formatter: (row, col, submission, assignment, student) ->
       innerContents = if submission.excused
         "EX"
       else if submission.score
@@ -168,16 +182,16 @@ define [
       else
         submission.grade
 
-      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false})
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student})
 
   class SubmissionCell.gpa_scale extends SubmissionCell
-    @formatter: (row, col, submission, assignment) ->
+    @formatter: (row, col, submission, assignment, student) ->
       innerContents = if submission.excused
         "EX"
       else
         submission.grade
 
-      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, classes: "gpa_scale_cell"})
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, student: student, classes: "gpa_scale_cell"})
 
   class SubmissionCell.pass_fail extends SubmissionCell
 
@@ -197,15 +211,7 @@ define [
         >#{htmlEscape cssClass}</a>
       """, options)
 
-    # htmlFromSubmission = (submission, editable = false) ->
-    #   cssClass = classFromSubmission(submission)
-    #   """
-    #   <div class="gradebook-cell #{SubmissionCell.classesBasedOnSubmission(submission).join(' ')}">
-    #     <a href="#" class="gradebook-cell-comment"><span class="gradebook-cell-comment-label">submission comments</span></a>
-    #     <a data-value="#{cssClass}" class="gradebook-checkbox gradebook-checkbox-#{cssClass} #{'editable' if editable}" href="#">#{cssClass}</a>
-    #   </div>
-    #   """
-    @formatter: (row, col, submission, assignment) ->
+    @formatter: (row, col, submission, assignment, student) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
       pass_fail::htmlFromSubmission({ submission, assignment, editable: false})
 
