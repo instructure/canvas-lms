@@ -327,14 +327,30 @@ define [
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
       student.secondary_identifier = student.sis_login_id || student.login_id
-      student.is_inactive = _.all student.enrollments, (e) -> e.enrollment_state == 'inactive'
+
+      student.isConcluded = _.all student.enrollments, (e) ->
+        e.enrollment_state == 'completed'
+      student.isInactive = _.all student.enrollments, (e) ->
+        e.enrollment_state == 'inactive'
 
       if @sections_enabled
         mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
         sectionNames = $.toSentence(mySections.sort())
+
+      displayName = if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled
+        student.sortable_name
+      else
+        student.name
+
+      enrollmentStatus = if student.isConcluded
+        I18n.t 'concluded'
+      else if student.isInactive
+        I18n.t 'inactive'
+
       student.display_name = rowStudentNameTemplate
         avatar_url: student.avatar_url
-        display_name: if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled then student.sortable_name else student.name
+        display_name: displayName
+        enrollment_status: enrollmentStatus
         url: student.enrollments[0].grades.html_url+'#tab-assignments'
         sectionNames: sectionNames
         alreadyEscaped: true
@@ -630,24 +646,25 @@ define [
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded or !@rows[row].initialized
         @staticCellFormatter(row, col, '')
-      else if submission.outsideOfGradingPeriod
-        @uneditableCellOutsideOfGradingPeriodFormatter(row, col)
-      else if submission.hidden
-        @uneditableCellFormatter(row, col)
-      else if !submission?
-        @staticCellFormatter(row, col, '-')
       else
-        assignment = @assignments[submission.assignment_id]
-        if !assignment?
-          @staticCellFormatter(row, col, '')
-        else if submission.workflow_state == 'pending_review'
-         (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
+        if submission.outsideOfGradingPeriod
+          @uneditableCellOutsideOfGradingPeriodFormatter(row, col)
+        else if submission.hidden
+          @uneditableCellFormatter(row, col)
+        else if !submission?
+          @staticCellFormatter(row, col, '-')
         else
-          if assignment.grading_type == 'points' && assignment.points_possible
-            SubmissionCell.out_of.formatter(row, col, submission, assignment)
-          else
-            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, @grid)
+          assignment = @assignments[submission.assignment_id]
+          student = @students[submission.user_id]
 
+          if !assignment?
+            @staticCellFormatter(row, col, '')
+          else if submission.workflow_state == 'pending_review'
+           (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student)
+          else if assignment.grading_type == 'points' && assignment.points_possible
+            SubmissionCell.out_of.formatter(row, col, submission, assignment, student)
+          else
+            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student)
 
     indexedOverrides: =>
       @_indexedOverrides ||= (=>
