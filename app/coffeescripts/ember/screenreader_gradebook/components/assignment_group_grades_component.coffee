@@ -17,7 +17,7 @@ define [
     letterGrade:(->
       standard = @get('gradingStandard')
       return null unless standard and @get('hasGrade')
-      percentage = Math.round(parseInt(@get('percent')), round.DEFAULT)
+      percentage = parseFloat(@get('rawPercent').toPrecision(4))
       GradeCalculator.letter_grade standard, percentage
     ).property('gradingStandard', 'hasGrade')
 
@@ -29,6 +29,13 @@ define [
     points: (->
       values = @get('values')
       "#{round(values.score, round.DEFAULT)} / #{round(values.possible, round.DEFAULT)}"
+    ).property('values')
+
+    # This method returns the raw percentage, float errors and all e.g. 54.5 / 100 * 100 will return 54.50000000000001
+    # It's use is in any further calculations so we're not using a pre-rounded number.
+    rawPercent:(->
+      values = @get('values')
+      values.score / values.possible * 100
     ).property('values')
 
     percent:(->

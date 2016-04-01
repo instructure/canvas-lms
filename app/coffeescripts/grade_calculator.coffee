@@ -263,6 +263,8 @@ define [
     @letter_grade: (grading_scheme, score) ->
       score = 0 if score < 0
       letters = _(grading_scheme).filter (row, i) ->
-        score >= row[1] * 100 || i == (grading_scheme.length - 1)
+        # Ensure we're limiting the precision of the lower bound * 100 so we don't get float issues
+        # e.g. 0.545 * 100 gives 54.50000000000001
+        score >= (row[1] * 100).toPrecision(4) || i == (grading_scheme.length - 1)
       letter = letters[0]
       letter[0]
