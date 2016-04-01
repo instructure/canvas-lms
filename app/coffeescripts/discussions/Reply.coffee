@@ -66,6 +66,7 @@ define [
       RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor(@textArea, {
         focus: true,
+        manageParent: true,
         tinyOptions: {
           width: '100%'
         }
