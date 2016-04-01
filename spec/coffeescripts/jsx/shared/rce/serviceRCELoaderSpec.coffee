@@ -142,6 +142,9 @@ define [
 
   module 'loadSidebarOnTarget',
     setup: ->
+      fakeENV.setup()
+      ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
+      ENV.context_asset_string = 'courses_1'
       fixtures.setup()
       @$div = fixtures.create('<div />')
       @sidebar = {}
@@ -149,8 +152,18 @@ define [
       sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, @rce)
 
     teardown: ->
+      fakeENV.teardown()
       fixtures.teardown()
       RCELoader.loadRCE.restore()
+
+  test 'passes host and context from ENV as props to sidebar', ->
+    cb = sinon.spy()
+    RCELoader.loadSidebarOnTarget(@$div, cb)
+    ok @rce.renderSidebarIntoDiv.called
+    props = @rce.renderSidebarIntoDiv.args[0][1]
+    equal props.host, 'http://rce.host'
+    equal props.contextType, 'courses'
+    equal props.contextId, '1'
 
   test 'yields sidebar to callback', ->
     cb = sinon.spy()

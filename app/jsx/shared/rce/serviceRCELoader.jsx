@@ -3,8 +3,9 @@ define([
   'underscore',
   'jsx/shared/rce/editorOptions',
   'jsx/shared/rce/loadEventListeners',
-  'jsx/shared/rce/polyfill'
-], function($, _, editorOptions, loadEventListeners, polyfill) {
+  'jsx/shared/rce/polyfill',
+  'compiled/str/splitAssetString'
+], function($, _, editorOptions, loadEventListeners, polyfill, splitAssetString) {
 
   let RCELoader = {
     preload() {
@@ -25,7 +26,13 @@ define([
     },
 
     loadSidebarOnTarget(target, callback) {
-      let props = { jwt: ENV.JWT }
+      let context = splitAssetString(ENV.context_asset_string)
+      let props = {
+        jwt: ENV.JWT,
+        host: ENV.RICH_CONTENT_APP_HOST,
+        contextType: context[0],
+        contextId: context[1]
+      }
       this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
           callback(polyfill.wrapSidebar(remoteSidebar))
