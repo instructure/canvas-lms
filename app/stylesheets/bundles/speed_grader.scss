@@ -381,6 +381,7 @@ $gradebook_header_height: 52px;
   #rightside_inner {
     @extend %flex-1;
     overflow-y: auto;
+    position: relative;
   }
   #not_gradeable_message {
     padding: 20px;
