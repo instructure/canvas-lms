@@ -108,11 +108,5 @@ describe "gradebook2 - concluded courses and enrollments" do
       cell.click
       expect(ff('.grade', cell)).to be_blank
     end
-
-    it "should hide gradebook upload link and set group weight actions from the menu", priority: "1", test_id: 210028 do
-      f('#gradebook_settings').click
-      expect(f("a.gradebook_upload_link")).to_not be_present
-      expect(f("a.set_group_weights")).to_not be_present
-    end
   end
 end
