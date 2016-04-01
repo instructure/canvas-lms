@@ -25,6 +25,11 @@ describe AssignmentGroupsController do
   end
 
   describe 'GET index' do
+    let(:assignments_ids) do
+      json_response = json_parse(response.body)
+      json_response.first['assignments'].map { |assignment| assignment['id'] }
+    end
+
     describe 'filtering by grading period and overrides' do
       let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) do
@@ -87,11 +92,6 @@ describe AssignmentGroupsController do
           }
         end
 
-        let(:assignments_ids) do
-          json_response = json_parse(response.body)
-          json_response.first['assignments'].map { |assignment| assignment['id'] }
-        end
-
         it 'when there is an assignment with overrides, filter grading periods by the override\'s due_at' do
           user_session(@admin)
           get :index, index_params.merge(grading_period_id: feb_grading_period.id)
@@ -135,6 +135,29 @@ describe AssignmentGroupsController do
           expect(assignments_ids).to include assignment_with_override.id
           expect(assignments_ids).to include assignment.id
         end
+      end
+    end
+
+    describe 'filtering assignments by submission type' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @vanilla_assignment = @course.assignments.create!(name: "Boring assignment")
+        @discussion_assignment = @course.assignments.create!(
+          name: "Discussable assignment",
+          submission_types: "discussion_topic"
+        )
+      end
+
+      it 'should filter assignments by the submission_type' do
+        user_session(@teacher)
+        get :index, {
+          course_id: @course.id,
+          format: :json,
+          include: ['assignments'],
+          exclude_assignment_submission_types: ['discussion_topic']
+        }
+        expect(assignments_ids).to include @vanilla_assignment.id
+        expect(assignments_ids).not_to include @discussion_assignment.id
       end
     end
 

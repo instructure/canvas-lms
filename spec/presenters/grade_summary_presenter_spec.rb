@@ -196,6 +196,13 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(p.assignments).to eq [published_assignment]
     end
+
+    it "filters wiki_page assignments" do
+      wiki_page_assignment_model course: @course
+
+      p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(p.assignments).to eq [published_assignment]
+    end
   end
 
   describe '#sort_options' do

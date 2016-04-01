@@ -492,6 +492,12 @@ describe GradebooksController do
         get "show", :course_id => @course.id
         expect(response).to render_template("screenreader")
       end
+
+      it "requests groups without wiki_page assignments" do
+        get "show", :course_id => @course.id
+        url = controller.js_env[:GRADEBOOK_OPTIONS][:assignment_groups_url]
+        expect(URI.unescape(url)).to include 'exclude_assignment_submission_types[]=wiki_page'
+      end
     end
 
     it "renders the unauthorized page without gradebook authorization" do

@@ -298,7 +298,12 @@ class GradebooksController < ApplicationController
     end
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => chunk_size,
-      :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
+      :assignment_groups_url => api_v1_course_assignment_groups_url(
+        @context,
+        include: ag_includes,
+        override_assignment_dates: "false",
+        exclude_assignment_submission_types: ['wiki_page']
+      ),
       :sections_url => api_v1_course_sections_url(@context),
       :course_url => api_v1_course_url(@context),
       :enrollments_url => custom_course_enrollments_api_url(per_page: per_page),

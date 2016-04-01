@@ -554,7 +554,7 @@ describe "Pages API", type: :request do
                    { :controller => 'wiki_pages_api', :action => 'create', :format => 'json',
                      :course_id => @course.to_param },
                    { :wiki_page => { :title => 'Assignable Page',
-                     :assignment => { :set_assignment => true, :points_possible => 9000 } }})
+                     :assignment => { :set_assignment => true, :only_visible_to_overrides => true } }})
           @course.wiki.wiki_pages.where(url: json['url']).first!
         end
 
@@ -567,7 +567,7 @@ describe "Pages API", type: :request do
           expect(page.assignment).not_to be_nil
           expect(page.assignment.title).to eq 'Assignable Page'
           expect(page.assignment.submission_types).to eq 'wiki_page'
-          expect(page.assignment.points_possible).to eq 9000
+          expect(page.assignment.only_visible_to_overrides).to eq true
         end
       end
     end
@@ -833,10 +833,10 @@ describe "Pages API", type: :request do
                           { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
                             :course_id => @course.to_param, :url => @hidden_page.url },
                           { :wiki_page => { :title => 'Changin\' the Title',
-                                            :assignment => { :points_possible => 9000 } }})
+                                            :assignment => { :only_visible_to_overrides => true } }})
           page = @course.wiki.wiki_pages.where(url: json['url']).first!
           expect(page.assignment.title).to eq 'Changin\' the Title'
-          expect(page.assignment.points_possible).to eq 9000
+          expect(page.assignment.only_visible_to_overrides).to eq true
         end
 
         it 'should destroy and restore a linked assignment' do
@@ -870,10 +870,10 @@ describe "Pages API", type: :request do
                         { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
                           :course_id => @course.to_param, :url => @hidden_page.url },
                         { :wiki_page => { :title => 'Can\'t Change It',
-                                          :assignment => { :points_possible => 9000 } }})
+                                          :assignment => { :only_visible_to_overrides => true } }})
         page = @course.wiki.wiki_pages.where(url: json['url']).first!
         expect(page.assignment.title).to eq 'Content Page Assignment'
-        expect(page.assignment.points_possible).to eq 1.5
+        expect(page.assignment.only_visible_to_overrides).to eq nil
       end
 
       it 'should not destroy linked assignment' do

@@ -410,7 +410,7 @@ class Assignment < ActiveRecord::Base
     self.peer_reviews_assign_at = [self.due_at, self.peer_reviews_assign_at].compact.max
     # have to use peer_reviews_due_at here because it's the column name
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    self.points_possible = nil if self.submission_types == 'not_graded'
+    self.points_possible = nil unless self.graded?
   end
   protected :default_values
 
@@ -1942,8 +1942,6 @@ class Assignment < ActiveRecord::Base
   scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
   scope :undated, -> { where(:due_at => nil) }
 
-  scope :only_graded, -> { where("submission_types<>'not_graded'") }
-
   scope :with_just_calendar_attributes, -> {
     select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
   }
@@ -2007,9 +2005,11 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  scope :expecting_submission, -> { where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL") }
+  scope :expecting_submission, -> do
+    where.not(submission_types: [nil, ''] + %w(none not_graded on_paper wiki_page))
+  end
 
-  scope :gradeable, -> { where("assignments.submission_types<>'not_graded'") }
+  scope :gradeable, -> { where.not(submission_types: %w(not_graded wiki_page)) }
 
   scope :active, -> { where("assignments.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
@@ -2061,11 +2061,13 @@ class Assignment < ActiveRecord::Base
   protected :readable_submission_type
 
   def expects_submission?
-    submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'
+    submission_types.present? &&
+      !expects_external_submission? &&
+      !%w(none not_graded wiki_page).include?(submission_types)
   end
 
   def expects_external_submission?
-    submission_types == 'on_paper' || submission_types == 'external_tool'
+    %w(on_paper external_tool).include?(submission_types)
   end
 
   def non_digital_submission?
@@ -2189,7 +2191,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def graded?
-    submission_types != 'not_graded'
+    submission_types != 'not_graded' && submission_types != 'wiki_page'
   end
 
   def active?
