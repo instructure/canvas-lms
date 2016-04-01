@@ -135,11 +135,10 @@ describe SplitUsers do
       admin = account1.account_users.create(user: user1)
       admin2 = sub_account.account_users.create(user: user2)
       UserMerge.from(user1).into(user2)
+      SplitUsers.split_db_users(user2)
 
-      user1.reload
-      user2.reload
-      expect(admin.user).to eq user1
-      expect(admin2.user).to eq user2
+      expect(admin.reload.user).to eq user1
+      expect(admin2.reload.user).to eq user2
     end
 
     context 'sharding' do
