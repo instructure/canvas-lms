@@ -69,7 +69,7 @@ module DataFixup::PsychMigration
                 if obj_from_syck
                   obj_from_psych = Psych.load(value) rescue nil
                   if obj_from_syck != obj_from_psych
-                    Utf8Cleaner.recursively_strip_invalid_utf8!(obj_from_syck, true)
+                    Utf8Cleaner.recursively_strip_invalid_utf8!(obj_from_syck)
 
                     new_yaml = YAML.dump(obj_from_syck)
                     if YAML.unsafe_load(new_yaml) != obj_from_syck
