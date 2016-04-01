@@ -113,10 +113,7 @@
     }
     p, .more_link {
       @include fontSize(12px);
-      line-height: 13px;
-    }
-    em, .more_link {
-      font-style: italic;
+      margin-bottom: 0;
     }
     em, p {
       @if $use_high_contrast {
@@ -125,12 +122,9 @@
       @else {
         color: #777;
       }
-      padding-bottom: 2px;
-    }
-    p {
-      margin-bottom: 0;
     }
     .more_link {
+      font-style: italic;
       padding-top: 6px;
     }
   }
@@ -170,18 +164,16 @@
       height: 1px;
     }
   }
-  &.to-do-list, &.events {
+  &.events {
     i {
       width: 40px;
       min-width: 40px;
+      padding-right: $ic-sp;
+      text-align: right;
+      box-sizing: border-box;
     }
     .event > a {
       display: flex;
-    }
-    .todo-badge-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      min-width: 40px;
     }
   }
   &.to-do-list {
@@ -189,9 +181,6 @@
       position: relative;
       a.item {
         display: flex;
-        b {
-          padding-right: 24px;
-        }
       }
       a.disable_item_link {
         @if $use_high_contrast {
@@ -204,10 +193,11 @@
         position: absolute;
         background-image: none;
         right: 0;
-        top: 2px;
+        top: 4px;
         z-index: 2;
         border-bottom: none;
         box-shadow: none;
+        text-align: right;
       }
       &:hover {
         a.disable_item_link {
@@ -222,7 +212,21 @@
     }
   }
 }
-
+#right-side .todo-list-header {
+  margin-top: 21px;
+}
+#right-side .right-side-list .todo-badge-wrapper {
+  display: inline-block;
+  vertical-align: top;
+  min-width: 40px;
+  text-align: right;
+  padding-right: $ic-sp;
+  box-sizing: border-box;
+}
+#right-side .right-side-list .IgnoreButton {
+  width: 25px;
+  min-width: 25px;
+}
 // these are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
 // NOTE: they used to get applied to body but were moved to #right side to not force a repaint
 // of the entire page and be less jumpy going in and out display modes.
