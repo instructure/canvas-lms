@@ -1609,6 +1609,12 @@ describe User do
       expect(@user.communication_channels.map(&:path)).to eq ['john@example.com']
       expect(@user.email).to eq 'john@example.com'
     end
+
+    it "doesn't create channels with empty paths" do
+      @user = User.create!
+      expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank")
+      expect(@user.communication_channels.any?).to be_falsey
+    end
   end
 
   describe "event methods" do

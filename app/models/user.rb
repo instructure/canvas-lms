@@ -810,7 +810,7 @@ class User < ActiveRecord::Base
       cc = e
     else
       cc = self.communication_channels.email.by_path(e).first ||
-           self.communication_channels.email.create(path: e)
+           self.communication_channels.email.create!(path: e)
       cc.user = self
     end
     cc.move_to_top
