@@ -228,9 +228,9 @@ describe Course do
     it "should grant delete to the proper individuals" do
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
-      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true, :change_course_state => true})
       @admin1 = @admin
-      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true, :change_course_state => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
       @designer = user(:active_all => true)
@@ -281,6 +281,61 @@ describe Course do
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
       expect(@course.grants_right?(@admin1, :delete)).to be_truthy
       expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+    end
+
+    it "should not grant delete to anyone without :change_course_state rights" do
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
+
+      Account.default.role_overrides.create!(:role => teacher_role, :permission => :change_course_state, :enabled => false)
+      Account.default.role_overrides.create!(:role => designer_role, :permission => :change_course_state, :enabled => false)
+
+      # active, non-sis course
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+
+      # active, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+      @course.clear_permissions_cache(@user)
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
     end
 
     it "should grant reset_content to the proper individuals" do
@@ -400,6 +455,18 @@ describe Course do
         expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
         expect(c.grants_right?(@designer, :read_roster)).to be_truthy
         expect(c.grants_right?(@designer, :read_prior_roster)).to be_truthy
+      end
+
+      it "should grant be able to disable read_roster to date-completed designer" do
+        Account.default.role_overrides.create!(:permission => :read_roster, :role => designer_role, :enabled => false)
+        @enrollment.start_at = 4.days.ago
+        @enrollment.end_at = 2.days.ago
+        @enrollment.save!
+        expect(@enrollment.reload.state_based_on_date).to eq :completed
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read_roster)).to be_falsey
+        expect(c.grants_right?(@designer, :read_prior_roster)).to be_falsey
       end
 
       it "should grant read_as_admin and read to date-completed designer of unpublished course" do
@@ -1313,7 +1380,6 @@ describe Course, "gradebook_to_csv" do
 
     before :once do
       course_with_teacher(:active_all => true)
-      @course.enable_feature!(:differentiated_assignments)
       setup_DA
       @assignment.grade_student(@student1, :grade => "3")
       @assignment2.grade_student(@student2, :grade => "3")
@@ -3176,6 +3242,22 @@ describe Course, "section_visibility" do
 
     it "should return user's sections if a student" do
       expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
+    end
+
+    it "should ignore concluded secitions if option is given" do
+      @student1 = student_in_section(@other_section, {:active_all => true})
+      @student1.enrollments.each(&:conclude)
+
+      all_sections = @course.course_sections
+      expect(@course.sections_visible_to(@student1, all_sections, excluded_workflows: ['deleted', 'completed'])).to be_empty
+    end
+
+    it "should include concluded secitions if no options" do
+      @student1 = student_in_section(@other_section, {:active_all => true})
+      @student1.enrollments.each(&:conclude)
+
+      all_sections = @course.course_sections
+      expect(@course.sections_visible_to(@student1, all_sections)).to eq [@other_section]
     end
 
     it "should return users from all sections" do

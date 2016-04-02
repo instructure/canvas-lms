@@ -85,4 +85,58 @@ describe "RequestContextGenerator" do
       expect(q / 1000000).to eq 60.0
     end
   end
+
+  context "when request provides an override context id" do
+    let(:shared_secret){ 'sup3rs3cr3t!!' }
+    let(:remote_request_context_id){ '1234-5678-9012-3456-7890-1234-5678' }
+
+    let(:remote_signature) do
+      Canvas::Security.sign_hmac_sha512(remote_request_context_id, shared_secret)
+    end
+
+    before(:each) do
+      Thread.current[:context] = nil
+      Canvas::DynamicSettings.reset_cache!
+      Canvas::DynamicSettings.cache['canvas'] = {
+        timetamp: Time.zone.now.to_i,
+        value: { "signing-secret" =>  shared_secret }
+      }
+      env['HTTP_X_REQUEST_CONTEXT_ID'] = Canvas::Security.base64_encode(remote_request_context_id)
+      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = Canvas::Security.base64_encode(remote_signature)
+    end
+
+    after(:each){ Canvas::DynamicSettings.reset_cache! }
+
+    def run_middleware
+      _, headers, _msg = RequestContextGenerator.new(->(_){ [200, {}, []] }).call(env)
+      headers
+    end
+
+    it "uses a provided request context id if another service submits one that is correctly signed" do
+      headers = run_middleware
+      expect(Thread.current[:context][:request_id]).to eq(remote_request_context_id)
+      expect(headers['X-Request-Context-Id']).to eq(remote_request_context_id)
+    end
+
+    it "won't accept an override without a signature" do
+      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = nil
+      headers = run_middleware
+      expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
+      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+    end
+
+    it "rejects a wrong signature" do
+      env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = "nonsense"
+      headers = run_middleware
+      expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
+      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+    end
+
+    it "rejects a tampered ID" do
+      env['HTTP_X_REQUEST_CONTEXT_ID'] = "I-changed-it"
+      headers = run_middleware
+      expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
+      expect(headers['X-Request-Context-Id']).to eq(Thread.current[:context][:request_id])
+    end
+  end
 end

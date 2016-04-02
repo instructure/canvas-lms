@@ -187,4 +187,20 @@ module ContextModulesCommon
     # before it adds click handlers and drag/drop
     sleep 2
   end
+
+   def verify_edit_item_form
+     f('.context_module_item .al-trigger').click
+     wait_for_ajaximations
+     f('.edit_item_link').click
+     wait_for_ajaximations
+     expect(f('#edit_item_form')).to be_displayed
+     expect(f('#content_tag_title')).to be_displayed
+     expect(f('#content_tag_indent_select')).to be_displayed
+   end
+
+  # so terrible
+  def get(url)
+    super
+    wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
+  end
 end

@@ -199,9 +199,6 @@ define [
 
     canGroup: -> !@get('has_submitted_submissions')
 
-    differentiatedAssignmentsEnabled: ->
-      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false
-
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id
@@ -310,10 +307,8 @@ define [
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate',
-        'moderatedGrading', 'postToSISEnabled'
+        'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
       ]
-      if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        fields.push 'isOnlyVisibleToOverrides'
 
       hash = id: @get 'id'
       for field in fields

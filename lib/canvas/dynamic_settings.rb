@@ -48,8 +48,9 @@ module Canvas
         value
       end
 
-      def reset_cache!
+      def reset_cache!(hard: false)
         @cache = {}
+        @strategic_reserve = {} if hard
       end
 
       private
@@ -75,8 +76,27 @@ module Canvas
       end
 
       def store_get(key)
-        Canvas.timeout_protection('consul') do
-          Diplomat::Kv.get("#{KV_NAMESPACE}/#{key}", {recurse: true, consistency: 'stale'})
+        begin
+          # store all values that we get here to
+          # kind-of recover in case of big failure
+          @strategic_reserve ||= {}
+          consul_value = Canvas.timeout_protection('consul', {raise_on_timeout: true}) do
+            Diplomat::Kv.get("#{KV_NAMESPACE}/#{key}", {recurse: true, consistency: 'stale'})
+          end
+          @strategic_reserve[key] = consul_value
+          consul_value
+        rescue Faraday::ConnectionFailed,
+               Faraday::ClientError,
+               Timeout::Error,
+               TimeoutCutoff => exception
+          if @strategic_reserve.key?(key)
+            # we have an old value for this key, log the error but recover
+            Canvas::Errors.capture_exception(:consul, exception)
+            return @strategic_reserve[key]
+          else
+            # didn't have an old value cached, raise the error
+            raise
+          end
         end
       end
 

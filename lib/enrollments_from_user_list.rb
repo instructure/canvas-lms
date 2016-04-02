@@ -38,16 +38,25 @@ class EnrollmentsFromUserList
   def process(list)
     raise ArgumentError, "Must provide a UserList" unless list.is_a?(UserList)
     @enrollments = []
+    @user_ids_to_touch = []
 
     list.addresses.slice!(0,@limit) if @limit
-    @course.transaction do
-      Enrollment.suspend_callbacks(:update_cached_due_dates) do
-        list.users.each { |user| enroll_user(user) }
+    list.users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users|
+      @course.transaction do
+        Enrollment.suspend_callbacks(:update_cached_due_dates) do
+          users.each { |user| enroll_user(user) }
+        end
       end
-      if !@enrollments.empty?
+    end
+    if !@enrollments.empty?
+      @course.transaction do
         DueDateCacher.recompute_course(@course)
       end
     end
+    @user_ids_to_touch.uniq.each_slice(100) do |user_ids|
+      User.where(id: user_ids).touch_all
+    end
+
     @enrollments
   end
   
@@ -57,8 +66,18 @@ class EnrollmentsFromUserList
     return unless user
     return if @enrolled_users.has_key?(user.id)
     @enrolled_users[user.id] = true
-    @course.enroll_user(user, @enrollment_type, :section => @section, :limit_privileges_to_course_section => @limit_privileges_to_course_section, :allow_multiple_enrollments => true, :role => @role).tap do |e|
-      @enrollments << e if e
+    enrollment = @course.enroll_user(user, @enrollment_type,
+                        :section => @section,
+                        :limit_privileges_to_course_section => @limit_privileges_to_course_section,
+                        :allow_multiple_enrollments => true,
+                        :role => @role,
+                        :skip_touch_user => true)
+    if enrollment
+      @enrollments << enrollment
+      if enrollment.need_touch_user
+        @user_ids_to_touch << enrollment.user_id
+        @user_ids_to_touch << enrollment.associated_user_id if enrollment.associated_user_id
+      end
     end
   end
 end

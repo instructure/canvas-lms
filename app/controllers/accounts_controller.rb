@@ -102,6 +102,7 @@ class AccountsController < ApplicationController
   before_filter :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
+  include CustomSidebarLinksHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
 
@@ -609,7 +610,7 @@ class AccountsController < ApplicationController
       @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
       @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
 
-      @announcements = @account.announcements
+      @announcements = @account.announcements.order(:created_at).paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       js_env({
@@ -798,7 +799,7 @@ class AccountsController < ApplicationController
   end
 
   def sis_import
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order('created_at DESC').first
@@ -951,6 +952,6 @@ class AccountsController < ApplicationController
 
   protected
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account))
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :basic))
   end
 end

@@ -55,6 +55,36 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
+# this makes sure that a broken transaction becomes functional again
+# by the time we hit rescue_action_in_public, so that the error report
+# can be recorded
+ActionController::Base.set_callback(:process_action, :around, ->(_r, block) do
+  exception = nil
+  ActiveRecord::Base.transaction(joinable: false, requires_new: true) do
+    begin
+      if Rails.version < '5'
+        # that transaction didn't count as a "real" transaction within the test
+        test_open_transactions = ActiveRecord::Base.connection.instance_variable_get(:@test_open_transactions)
+        ActiveRecord::Base.connection.instance_variable_set(:@test_open_transactions, test_open_transactions.to_i - 1)
+        begin
+          block.call
+        ensure
+          ActiveRecord::Base.connection.instance_variable_set(:@test_open_transactions, test_open_transactions)
+        end
+      else
+        block.call
+      end
+    rescue ActiveRecord::StatementInvalid
+      # these need to properly roll back the transaction
+      raise
+    rescue
+      # anything else, the transaction needs to commit, but we need to re-raise outside the transaction
+      exception = $!
+    end
+  end
+  raise exception if exception
+end)
+
 module RSpec::Core::Hooks
 class AfterContextHook < Hook
   def run(example)
@@ -213,31 +243,34 @@ def truncate_table(model)
 end
 
 def truncate_all_tables
-  model_connections = ActiveRecord::Base.descendants.map(&:connection).uniq
-  model_connections.each do |connection|
-    if connection.adapter_name == "PostgreSQL"
-      # use custom SQL to exclude tables from extensions
-      schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
-      table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT relname
-         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-           AND relkind='r'
-           AND NOT EXISTS (
-             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
-           )
-      SQL
-      table_names.delete('schema_migrations')
-      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
-    else
-      connection.tables.each { |model| truncate_table(model) }
+  raise "don't use truncate_all_tables with transactional fixtures. this kills the postgres" if ActiveRecord::Base.connection.open_transactions > 0
+
+  Shard.with_each_shard do
+    model_connections = ActiveRecord::Base.descendants.map(&:connection).uniq
+    model_connections.each do |connection|
+      if connection.adapter_name == "PostgreSQL"
+        # use custom SQL to exclude tables from extensions
+        schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
+        table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
+           SELECT relname
+           FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+           WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+             AND relkind='r'
+             AND NOT EXISTS (
+               SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
+             )
+        SQL
+        table_names.delete('schema_migrations')
+        next if table_names.empty?
+        connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
+      else
+        connection.tables.each { |model| truncate_table(model) }
+      end
     end
+
+    Role.ensure_built_in_roles!
   end
 end
-
-# wipe out the test db, in case some non-transactional tests crapped out before
-# cleaning up after themselves
-truncate_all_tables
 
 # Make AR not puke if MySQL auto-commits the transaction
 module MysqlOutsideTransaction
@@ -343,7 +376,6 @@ RSpec.configure do |config|
   Onceler.configure do |c|
     c.before :record do
       Account.clear_special_account_cache!(true)
-      Role.ensure_built_in_roles!
       AdheresToPolicy::Cache.clear
       Folder.reset_path_lookups!
     end
@@ -369,13 +401,9 @@ RSpec.configure do |config|
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!(true)
-    Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
     # silence migration specs
     ActiveRecord::Migration.verbose = false
-
-    # allow tests to still run in non-DA state even though it's hard-coded on
-    Feature.definitions["differentiated_assignments"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
@@ -405,6 +433,7 @@ RSpec.configure do |config|
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
+    Canvas::DynamicSettings.reset_cache!
     $spec_api_tokens = {}
   end
 
@@ -420,6 +449,10 @@ RSpec.configure do |config|
       # (it forks and changes the TEST_ENV_NUMBER)
       SimpleCov.command_name("rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}")
     end
+
+    # wipe out the test db, in case some non-transactional tests crapped out before
+    # cleaning up after themselves
+    truncate_all_tables
   end
 
   # this runs on post-merge builds to capture dependencies of each spec;

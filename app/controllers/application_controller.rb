@@ -167,8 +167,7 @@ class ApplicationController < ActionController::Base
 
     hash = {
       :title => tool.label_for(type, I18n.locale),
-      :base_url =>  polymorphic_url([context, :external_tool], url_params),
-      :is_new => tool.integration_type == 'lor'
+      :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
@@ -612,10 +611,18 @@ class ApplicationController < ActionController::Base
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        if course_ids.empty?
+          enrollment_scope = enrollment_scope.none
+        else
+          enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        end
         if group_scope
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          group_scope = group_scope.where(:id => group_ids)
+          if group_ids.empty?
+            group_scope = group_scope.none
+          else
+            group_scope = group_scope.where(:id => group_ids)
+          end
         end
       end
       courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
@@ -1929,8 +1936,9 @@ class ApplicationController < ActionController::Base
   end
 
   def set_js_assignment_data
-    rights = [:manage_assignments, :manage_grades, :read_grades]
+    rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
+    permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
     js_env({
       :URLS => {
@@ -1943,7 +1951,6 @@ class ApplicationController < ActionController::Base
       },
       :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
       :PERMISSIONS => permissions,
-      :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
       :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
       :VALID_DATE_RANGE => CourseDateRange.new(@context),
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),

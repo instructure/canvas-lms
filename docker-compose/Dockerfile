@@ -1,7 +1,6 @@
-FROM ruby:2.1
+FROM instructure/ruby-passenger:2.1
 
-ENV DEBIAN_FRONTEND noninteractive
-
+USER root
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
 RUN  apt-get update -qq \
   && apt-get install -qqy \
@@ -13,29 +12,17 @@ RUN  apt-get update -qq \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
-# Ensure UTF-8 locale
-ENV LANG C.UTF-8
-
 # We will need sfnt2woff in order to build fonts
 WORKDIR /root
-RUN wget http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
+RUN curl -O http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
   && unzip woff-code-latest.zip \
   && make \
-  && cp sfnt2woff /usr/local/bin
+  && cp sfnt2woff /usr/local/bin \
+  && gem uninstall --all --ignore-dependencies --force bundler \
+  && gem install bundler --no-document -v 1.11.2 \
+  && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
-# Canvas requires bundler 1.11.2
-RUN gem uninstall -i /usr/local/lib/ruby/gems/2.1.0 bundler \
-  && gem install bundler -v 1.11.2
-
-RUN mkdir /app
-WORKDIR /app
-
-RUN mkdir /home/docker \
- && useradd -d /home/docker docker \
- && chown -R docker:docker /home/docker /usr/local/bundle
-
-ENV PATH /usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ENV BUNDLE_PATH /app/vendor/bundle/docker/"$RUBY_VERSION"
 USER docker
+WORKDIR /usr/src/app
 
 ENV RAILS_ENV development

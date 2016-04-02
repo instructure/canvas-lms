@@ -61,7 +61,6 @@ module Api::V1::AssignmentGroup
           preloaded_user_content_attachments: user_content_attachments,
           include_visibility: includes.include?('assignment_visibility'),
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
-          differentiated_assignments_enabled: opts[:differentiated_assignments_enabled],
           exclude_description: opts[:exclude_descriptions],
           exclude_rubric: opts[:exclude_rubrics],
           overrides: overrides,

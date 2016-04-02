@@ -14,9 +14,9 @@
   <% elsif @assignment.expects_submission? %>
     <div class="header">
       <% if @current_user_submission.has_submission? %>
-        <%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %>
+        <%= image_tag "graded.png", :alt => '' %> <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
-        <%= image_tag "not_graded.png" %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+        <%= image_tag "not_graded.png", :alt => '' %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
       <% end %>
     </div>
   <% end %>

@@ -18,8 +18,7 @@
 
 class Announcement < DiscussionTopic
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+  belongs_to :context, polymorphic: [:course, :group]
 
   has_a_broadcast_policy
   include HasContentTags

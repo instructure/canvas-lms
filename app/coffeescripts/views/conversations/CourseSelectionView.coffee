@@ -58,11 +58,10 @@ define [
       if !@renderValue() then @loadAll()
 
     is_complete: (course, asOf) ->
-      is_complete = course.get('workflow_state') == 'completed'
-      if course.get('end_at') then is_complete ||= (new Date(course.get('end_at')) < asOf)
-      if course.get('term') && course.get('term').end_at
-        is_complete ||= (new Date(course.get('term').end_at) < asOf)
-      is_complete
+      if course.get('workflow_state') == 'completed' then return true
+      if course.get('end_at') && course.get('restrict_enrollments_to_course_dates') then return (new Date(course.get('end_at')) < asOf)
+      if course.get('term') && course.get('term').end_at then return (new Date(course.get('term').end_at) < asOf)
+      false
 
     createSearchViews: ->
       searchViews = []

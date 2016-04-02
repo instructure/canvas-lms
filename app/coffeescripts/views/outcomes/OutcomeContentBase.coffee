@@ -22,17 +22,15 @@ define [
   'underscore'
   'compiled/views/ValidatedFormView'
   'compiled/views/editor/KeyboardShortcuts'
-  'jsx/shared/rce/loadNewRCE'
-  'jsx/shared/rce/preloadRCE'
-  'jsx/shared/rce/callOnRCE'
+  'jsx/shared/rce/RichContentEditor'
   'tinymce.editor_box'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
   'compiled/tinymce',
-], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts, loadNewRCE, preloadRCE, callOnRCE) ->
+], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts, RichContentEditor) ->
 
-  # immediately fetch RCS module code
-  preloadRCE()
+  richContentEditor = new RichContentEditor({riskLevel: "basic"})
+  richContentEditor.preloadRemoteModule()
 
   # Superclass for OutcomeView and OutcomeGroupView.
   # This view is used to show, add, edit, and delete outcomes and groups.
@@ -87,7 +85,7 @@ define [
       super
 
     _cleanUpTiny: =>
-      callOnRCE(@$el.find('[name="description"]'), 'destroy')
+      richContentEditor.callOnRCE(@$el.find('[name="description"]'), 'destroy')
 
     submit: (e) =>
       e.preventDefault()
@@ -116,7 +114,7 @@ define [
 
     getTinyMceCode: ->
       textarea = @$('textarea')
-      textarea.val(callOnRCE(textarea, 'get_code'))
+      textarea.val(richContentEditor.callOnRCE(textarea, 'get_code'))
 
     setModelUrl: ->
       @model.setUrlTo switch @state
@@ -181,7 +179,7 @@ define [
     setupTinyMCEViewSwitcher: =>
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        callOnRCE(@$('textarea'), 'toggle')
+        richContentEditor.callOnRCE(@$('textarea'), 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
@@ -192,7 +190,7 @@ define [
     # Called from subclasses in render.
     readyForm: ->
       setTimeout =>
-        loadNewRCE(@$('textarea'), {
+        richContentEditor.loadNewEditor(@$('textarea'), {
           getRenderingTarget: (t) ->
             wrappedTextarea = $(t).wrap( "<div id='parent-of-#{t.id}'></div>").get( 0 )
             wrappedTextarea.parentNode
@@ -208,4 +206,6 @@ define [
       @model.set 'title', e.currentTarget.value
 
     tinymceExists: =>
-      return @$el.find('[name="description"]').length > 0 and callOnRCE(@$el.find('[name="description"]'), 'exists?')
+      localElExists = @$el.find('[name="description"]').length > 0
+      editorElExists = richContentEditor.callOnRCE(@$el.find('[name="description"]'), 'exists?')
+      return (localElExists and editorElExists)

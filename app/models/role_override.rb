@@ -17,8 +17,7 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
+  belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
   include Role::AssociationHelper
@@ -286,7 +285,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
       },
       :view_all_grades => {
         :label => lambda { t('permissions.view_all_grades', "View all grades") },
@@ -632,8 +632,14 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :import_sis => {
+        :label => lambda { t('Import SIS data') },
+        :account_only => :root,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
       :manage_sis => {
-        :label => lambda { t('permissions.manage_sis', "Import and manage SIS data") },
+        :label => lambda { t('permissions.manage_sis', "Manage SIS data") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
@@ -783,7 +789,7 @@ class RoleOverride < ActiveRecord::Base
 
   # permissions that apply to concluded courses/enrollments
   def self.concluded_permission_types
-    self.permissions.select{|k, p| p[:applies_to_concluded]}.keys
+    self.permissions.select{|k, p| !!p[:applies_to_concluded]}
   end
 
   def self.manageable_permissions(context, base_role_type=nil)

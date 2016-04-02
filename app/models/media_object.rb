@@ -21,9 +21,9 @@ require 'csv'
 class MediaObject < ActiveRecord::Base
   include Workflow
   belongs_to :user
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'ConversationMessage',
-    'Account', 'Assignment', 'AssessmentQuestion', 'ContextMessage', 'ZipFileImport']
+  belongs_to :context, polymorphic:
+    [:course, :group, :conversation_message, :account, :assignment,
+     :assessment_question, :zip_file_import, { context_user: 'User' }], exhaustive: false
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 

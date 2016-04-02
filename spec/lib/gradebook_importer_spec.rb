@@ -412,7 +412,7 @@ describe GradebookImporter do
 
   context "differentiated assignments" do
     def setup_DA
-      course_with_teacher(active_all: true, differentiated_assignments: true)
+      course_with_teacher(active_all: true)
       @section_one = @course.course_sections.create!(name: 'Section One')
       @section_two = @course.course_sections.create!(name: 'Section Two')
 

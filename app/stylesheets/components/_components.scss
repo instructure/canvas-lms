@@ -68,7 +68,6 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
           font-weight: 300;
           border-radius: $baseBorderRadius;
           padding: $ic-sp/2 $ic-sp;
-          @include breakpoint(short) { padding: $ic-sp/4 $ic-sp; }
           &:hover, &:focus { background: lighten($ic-color-neutral, 5%); }
         }
         // Default UI styles

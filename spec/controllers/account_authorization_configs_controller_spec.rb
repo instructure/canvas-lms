@@ -1,6 +1,24 @@
-require 'spec_helper'
+#
+# Copyright (C) 2015 - 2016 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-RSpec.describe AccountAuthorizationConfigsController, type: :controller do
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe AccountAuthorizationConfigsController do
 
   let!(:account) { Account.create! }
 
@@ -57,5 +75,77 @@ RSpec.describe AccountAuthorizationConfigsController, type: :controller do
       expect(response).to be_success
       expect(response.body).to match("A SAML configuration is required to test SAML")
     end
+  end
+
+  describe "POST #create" do
+
+    it "adds a new auth config successfully" do
+      cas = {
+        auth_type: 'cas',
+        auth_base: 'http://example.com',
+      }
+      post "create", { account_id: account.id }.merge(cas)
+
+      account.reload
+      aac = account.authentication_providers.active.where(auth_type: 'cas').first
+      expect(aac).to be_present
+    end
+
+    it "adds a singleton type successfully" do
+      linkedin = {
+        auth_type: 'linkedin',
+        client_id: '1',
+        client_secret: '2'
+      }
+      post "create", { account_id: account.id }.merge(linkedin)
+
+      account.reload
+      aac = account.authentication_providers.active.where(auth_type: 'linkedin').first
+      expect(aac).to be_present
+    end
+
+    it "rejects a singleton type if it already exists" do
+      linkedin = {
+        auth_type: 'linkedin',
+        client_id: '1',
+        client_secret: '2'
+      }
+      account.authentication_providers.create!(linkedin)
+
+      post "create", { format: :json, account_id: account.id }.merge(linkedin)
+      expect(response.code).to eq "422"
+    end
+
+    it "allows multiple non-singleton types" do
+      cas = {
+        auth_type: 'cas',
+        auth_base: 'http://example.com/cas2',
+      }
+      account.authentication_providers.create!({
+        auth_type: 'cas',
+        auth_base: 'http://example.com/cas'
+      })
+      post "create", { account_id: account.id }.merge(cas)
+
+      account.reload
+      aac_count = account.authentication_providers.active.where(auth_type: 'cas').count
+      expect(aac_count).to eq 2
+    end
+
+    it "allows re-adding a singleton type that was previously deleted" do
+      linkedin = {
+        auth_type: 'linkedin',
+        client_id: '1',
+        client_secret: '2'
+      }
+      aac = account.authentication_providers.create!(linkedin)
+      aac.destroy
+
+      post "create", { account_id: account.id }.merge(linkedin)
+      account.reload
+      aac = account.authentication_providers.active.where(auth_type: 'linkedin').first
+      expect(aac).to be_present
+    end
+
   end
 end

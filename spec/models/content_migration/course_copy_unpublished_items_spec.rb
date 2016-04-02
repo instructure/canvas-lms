@@ -106,5 +106,52 @@ describe ContentMigration do
       expect(quiz_to.assignment).to be_unpublished
       expect(quiz_to.assignment.migration_id).to eq mig_id(@quiz.assignment)
     end
+
+    it "should not re-unpublish module items on re-copy" do
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tags = []
+
+      tags << mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      tags << mod.add_item({ :id => asmnt.id, :type => 'assignment' })
+
+      quiz = @copy_from.quizzes.create!(:title => "some quiz")
+      tags << mod.add_item({ :id => quiz.id, :type => 'quiz' })
+
+      topic = @copy_from.discussion_topics.create!(:title => "some topic")
+      tags << mod.add_item({ :id => topic.id, :type => 'discussion_topic' })
+
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page")
+      tags << mod.add_item({ :id => page.id, :type => 'wiki_page' })
+
+      file = @copy_from.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
+      tags << mod.add_item({ :id => file.id, :type => 'attachment' })
+
+      tags.each do |tag|
+        tag.unpublish
+        tag.save!
+        tag.update_asset_workflow_state!
+      end
+      
+      run_course_copy
+
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      expect(mod_to.content_tags.count).to eq tags.count
+
+      mod_to.content_tags.each do |tag_to|
+        expect(tag_to).to be_unpublished
+        tag_to.publish
+        tag_to.save!
+        tag_to.update_asset_workflow_state!
+      end
+
+      run_course_copy
+
+      mod_to.content_tags.each do |tag_to|
+        tag_to.reload
+        expect(tag_to).to be_published
+      end
+    end
   end
 end

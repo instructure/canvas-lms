@@ -1986,4 +1986,71 @@ describe Enrollment do
       end
     end
   end
+
+  describe ".not_yet_started" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it 'includes users for whom the enrollment has not yet started' do
+      Enrollment.any_instance.stubs(:effective_start_at).returns(1.month.from_now)
+      expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
+    end
+
+    it 'excludes users for whom the enrollment has started' do
+      @enrollment.stubs(:effective_start_at).returns(1.month.ago)
+      expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
+    end
+  end
+
+  describe "readable_state_based_on_date" do
+    before :once do
+      course(:active_all => true)
+      @enrollment = @course.enroll_student(user)
+      @enrollment.accept!
+    end
+
+    it "should return pending for future enrollments (even if view restricted)" do
+      @course.start_at = 1.month.from_now
+      @course.restrict_student_future_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      @enrollment.reload
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :pending
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :accepted
+      expect(@enrollment.readable_state_based_on_date).to eq :pending
+    end
+
+    it "should return completed for completed enrollments (even if view restricted)" do
+      @course.start_at = 2.months.ago
+      @course.conclude_at = 1.month.ago
+      @course.restrict_student_past_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      @enrollment.reload
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+
+      @course.complete!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+
+      @course.restrict_student_past_view = false
+      @course.save!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :completed
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+    end
+  end
 end

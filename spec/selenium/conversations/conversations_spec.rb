@@ -245,6 +245,24 @@ describe "conversations new" do
       expect(conversation_elements.size).to eq 1
     end
 
+    it "should not be able to archive a sent message via the admin archive button" do
+      conversations
+
+      select_view('sent')
+      click_message(0)
+      expect(f('#archive-btn').attribute('disabled')).to be_present
+    end
+
+    it "should not be able to archive a sent message via the cog dropdown" do
+      conversations
+
+      select_view('sent')
+      click_message(0)
+      # Clicks the title-level more options gear menu
+      click_more_options(convo:true)
+      expect(f('.archive-btn.ui-corner-all')).to be_nil
+    end
+
     context "in archive view" do
       before do
         @participant.update_attribute(:workflow_state, 'archived')

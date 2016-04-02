@@ -62,6 +62,18 @@ describe EnrollmentsFromUserList do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
+
+    it "touches only users whose enrollments were updated" do
+      Timecop.freeze(1.hour.ago) do
+        @david_sr = user_with_pseudonym(:username => 'david_richards@example.com')
+        @david_jr = user_with_pseudonym(:username => 'david_richards_jr@example.com')
+        @course.enroll_student(@david_jr)
+      end
+      EnrollmentsFromUserList.process(UserList.new(list_to_parse), @course)
+      cutoff = 30.minutes.ago
+      expect(@david_sr.reload.updated_at).to be > cutoff
+      expect(@david_jr.reload.updated_at).to be < cutoff
+    end
   end
   
 end

@@ -9,7 +9,7 @@ define(function(require) {
   var AnswerRow = React.createClass({
     propTypes: {
       datum: React.PropTypes.object.isRequired,
-      graphSettings: React.PropTypes.object.isRequired
+      globalSettings: React.PropTypes.object.isRequired
     },
 
     getInitialState: function() {
@@ -46,15 +46,36 @@ define(function(require) {
       this.setState({neverLoaded: false});
     },
 
+    getScoreValueDescription: function(datum) {
+      var string;
+      switch (datum.id) {
+        case "top":
+          string = I18n.t("Answers which scored in the top 27%");
+          break;
+        case "middle":
+          string = I18n.t("Answers which scored in the middle 46%");
+          break;
+        case "bottom":
+          string = I18n.t("Answers which scored in the bottom 27%");
+          break;
+        case "ungraded":
+          string = I18n.t("Ungraded answers");
+          break;
+        default:
+          string = I18n.t("Unknown answers");
+      }
+      return string;
+    },
+
     getBarStyles: function() {
-      var width = this.props.graphSettings.xScale(this.props.datum.count) + this.props.graphSettings.visibilityThreshold + "px";
+      var width = this.props.globalSettings.xScale(this.props.datum.count) + this.props.globalSettings.visibilityThreshold + "px";
       // Hacky way to get initial state width animations
       if (this.state.neverLoaded) {
         width = "0px";
       }
       return {
         width: width,
-        height: this.props.graphSettings.barHeight - 2 + "px"
+        height: this.props.globalSettings.barHeight - 2 + "px"
       };
     },
 
@@ -65,10 +86,11 @@ define(function(require) {
 
     render: function() {
       var datum = this.props.datum;
+      var answerText = this.props.globalSettings.useAnswerBuckets ? this.getScoreValueDescription(datum) : datum.answer.text;
       return (
         <tr className={datum.correct ? 'correct' : undefined}>
           <th scope="row" className="answer-textfield">
-            {datum.answer.text}
+            {answerText}
           </th>
           <td className="respondent-link">
             {this.dialogBuilder(datum.answer)}
@@ -76,7 +98,7 @@ define(function(require) {
           <td className="answer-ratio">
             {datum.answer.ratio} <sup>%</sup>
           </td>
-          <td className="answer-distribution-cell" aria-hidden style={{width: this.props.graphSettings.maxWidth}}>
+          <td className="answer-distribution-cell" aria-hidden style={{width: this.props.globalSettings.maxWidth}}>
             {this.renderBarPlot()}
           </td>
         </tr>

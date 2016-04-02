@@ -123,7 +123,7 @@ describe "discussions" do
           get url
 
           replace_content(f('input[name=title]'), title)
-          f('.home').click
+          fln('Home').click
 
           expect(alert_present?).to be_truthy
 

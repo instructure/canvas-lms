@@ -19,9 +19,8 @@
 class SubmissionVersion < ActiveRecord::Base
   attr_accessible :context_id, :context_type, :user_id, :assignment_id, :version_id
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => false, :in => ['Course']
-
+  belongs_to :assignment
+  belongs_to :context, polymorphic: [:course]
   belongs_to :version
 
   validates_presence_of :context_id, :version_id, :user_id, :assignment_id

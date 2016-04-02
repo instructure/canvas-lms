@@ -66,7 +66,17 @@ define([
       variableSchema: customTypes.variableSchema,
       sharedBrandConfigs: customTypes.sharedBrandConfigs,
       allowGlobalIncludes: React.PropTypes.bool,
-      accountID: React.PropTypes.string
+      accountID: React.PropTypes.string,
+      highContrast: React.PropTypes.bool
+    },
+
+    getDefaultProps: function() {
+      if (window.ENV.use_high_contrast) {
+        return { highContrast: true }
+      }
+      else {
+        return { highContrast: false }
+      }
     },
 
     getInitialState() {
@@ -279,6 +289,25 @@ define([
     render() {
       return (
         <div id="main">
+          {
+            this.props.highContrast ? (
+              <div role="alert" className="ic-flash-static ic-flash-error">
+                <h4 className="ic-flash__headline">
+                  <i aria-hidden="true" className="icon-warning" />&nbsp;
+                  {I18n.t('You will not be able to preview your changes')}
+                </h4>
+                <p
+                  className="ic-flash__text"
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      I18n.t('To preview Theme Editor branding, you will need to *turn off High Contrast UI*.', {
+                        wrappers: ['<a href="/profile/settings">$1</a>']
+                      })
+                    }}
+                />
+              </div>
+            ) : null
+          }
           <form
             ref="ThemeEditorForm"
             onSubmit={preventDefault(this.handleFormSubmit)}
@@ -364,10 +393,16 @@ define([
                           </div>
                           <div>
                             <p className="Theme__editor-upload-warning_text-emphasis">
-                              Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!
+                              {I18n.t('Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!')}
                             </p>
-                            <p>Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
-                            </p>
+                            <p
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  I18n.t('Before implementing custom CSS or Javascript, please refer to *our documentation*.', {
+                                    wrappers: ['<a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank">$1</a>']
+                                  })
+                                }}
+                            />
                           </div>
                         </div>
 

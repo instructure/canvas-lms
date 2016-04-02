@@ -19,13 +19,15 @@
 class DelayedMessage < ActiveRecord::Base
   include NotificationPreloader
   belongs_to :notification_policy
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
-    'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
-    'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
-    'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
-    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel',
-    'Alert']
+  belongs_to :context, polymorphic:
+    [:discussion_entry, :assignment, :submission_comment, :submission,
+     :conversation_message, :course, :discussion_topic, :enrollment,
+     :attachment, :assignment_override, :group_membership, :calendar_event,
+     :wiki_page, :assessment_request, :account_user, :web_conference,
+     :account, :user, :appointment_group, :collaborator, :account_report,
+     :alert, { context_communication_channel: 'CommunicationChannel',
+       quiz_submission: 'Quizzes::QuizSubmission',
+       quiz_regrade_run: 'Quizzes::QuizRegradeRun'}]
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,

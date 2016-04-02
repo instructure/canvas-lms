@@ -41,4 +41,42 @@ describe AssignmentsHelper do
       expect(assignment_publishing_enabled?(@assignment, @teacher)).to be_truthy
     end
   end
+
+  describe "#turnitin active?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @assignment.turnitin_enabled = true
+      @context = @assignment.context
+      @assignment.update_attributes!({
+        submission_types: ["online_url"]
+      })
+      @context.account.update_attributes!({
+        turnitin_settings: {:originality_report_visibility => 'after_grading'},
+        turnitin_account_id: 12345,
+        turnitin_shared_secret: "the same combination on my luggage"
+      })
+    end
+
+    it "returns true if turnitin is active on the assignment and account" do
+      expect(turnitin_active?).to be_truthy
+    end
+
+    it "returns false if the assignment does not require submissions" do
+      @assignment.update_attributes!({
+        submission_types: ["none"]
+      })
+      expect(turnitin_active?).to be_falsey
+    end
+
+    it "returns false if turnitin is disabled on the account level" do
+      @context.account.update_attributes!({
+        turnitin_settings: nil,
+        turnitin_account_id: nil,
+        turnitin_shared_secret: nil
+      })
+      expect(turnitin_active?).to be_falsey
+    end
+  end
 end

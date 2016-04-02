@@ -13,7 +13,7 @@
     <% end %>
 
     <span class="subtitle ellipsis">
-      <%= Enrollment.workflow_readable_type(enrollment.state_based_on_date) %>,
+      <%= Enrollment.workflow_readable_type(enrollment.readable_state_based_on_date) %>,
       <%=
         case enrollment.class.to_s
         when 'TeacherEnrollment'

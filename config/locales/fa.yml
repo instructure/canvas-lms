@@ -7181,7 +7181,7 @@ fa:
   links_14b70841: پیوندها
   loading_25990131: "در حال بارگذاری..."
   locales: 
-    fa-IR: "فارسی (crowd-sourced)"
+    fa: "فارسی (crowd-sourced)"
   lock_date_cannot_be_after_course_end_a473158b: "تاریخ قفل کردن نمی تواند بعد از خاتمه درس باشد"
   lock_date_cannot_be_after_section_end_d37da70c: "تاریخ قفل کردن نمی تواند بعد از خاتمه بخش باشد"
   lock_date_cannot_be_after_term_end_cf1a188f: "تاریخ قفل کردن نمی تواند بعد از پایان نیمسال باشد"

@@ -9,9 +9,14 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
   'str/stripTags'
+  'jsx/shared/rce/RichContentEditor'
   'tinymce.editor_box'
   'jquery.instructure_forms'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate,
+      preventDefault, KeyboardShortcuts, stripTags, RichContentEditor) ->
+
+  richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
+  richContentEditor.preloadRemoteModule()
 
   class Reply
 
@@ -30,7 +35,7 @@ define [
       @form.find('.cancel_button').click @hide
       @form.on 'click', '.toggle-wrapper a', (e) =>
         e.preventDefault()
-        @textArea.editorBox('toggle')
+        richContentEditor.callOnRCE(@textArea, 'toggle')
         # hide the clicked link, and show the other toggle link.
         # todo: replace .andSelf with .addBack when JQuery is upgraded.
         $(e.currentTarget).siblings('a').andSelf().toggle()
@@ -60,7 +65,12 @@ define [
     edit: ->
       @form.addClass 'replying'
       @discussionEntry.addClass 'replying'
-      @textArea.editorBox focus: true, tinyOptions: width: '100%'
+      richContentEditor.loadNewEditor(@textArea, {
+        focus: true,
+        tinyOptions: {
+          width: '100%'
+        }
+      })
       @editing = true
       @trigger 'edit', this
 
@@ -168,4 +178,3 @@ define [
   _.extend Reply.prototype, Backbone.Events
 
   Reply
-

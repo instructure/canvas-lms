@@ -10,8 +10,8 @@
     <div class="link_box">
       <span class="links">
       <% if can_do(collaboration, @current_user, :delete) %>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link"><%= image_tag "edit.png" %></a>
-        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.delete', "Delete this Collaboration" %>" class="delete_collaboration_link"><%= image_tag "delete.png" %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.edit', "Edit this Collaboration" %>" class="edit_collaboration_link"><%= image_tag "edit.png", :alt => t('Edit this Collaboration') %></a>
+        <a href="<%= context_url(@context, :context_collaboration_url, collaboration ? collaboration.id : "{{ id }}") %>" title="<%= t 'links.delete', "Delete this Collaboration" %>" class="delete_collaboration_link"><%= image_tag "delete.png", :alt => t('Delete this Collaboration') %></a>
       <% end %>
       </span>
     </div>

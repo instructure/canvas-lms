@@ -16,7 +16,7 @@
             <input type="checkbox" name="category[enable_self_signup]" id="category_enable_self_signup" value="1" />
             <%= t :allow_self_signup, "Allow self sign-up" %>
           </label>
-          <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
+          <%= link_to(image_tag('help.png', :alt => t('What Are Self Sign-Up Groups?')), '#', :class => 'self_signup_help_link no-hover',
                       :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
           <br/>
           <label class="checkbox">

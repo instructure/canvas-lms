@@ -48,7 +48,6 @@ describe RubricAssessment do
     t = Class.new
     t.extend HtmlTextHelper
     expected = t.format_message(comment).first
-    expected.gsub!("\r", '') if CANVAS_RAILS4_0 # data has been round-tripped through YAML, and syck doesn't preserve carriage returns
     expect(@assessment.data.first[:comments_html]).to eq expected
   end
 

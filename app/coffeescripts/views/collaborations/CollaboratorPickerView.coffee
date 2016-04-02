@@ -35,6 +35,7 @@ define [
 
     fetchOptions:
       data:
+        include_inactive: false
         per_page: 50
 
     initialize: ->

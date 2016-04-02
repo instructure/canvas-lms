@@ -59,13 +59,13 @@
         {{#if postToSISEnabled}}
           {{#if postToSIS}}
           <span class="post-to-sis-status enabled">
-            <i class="icon-post-to-sis" title='{{#t}}Post grade to SIS enabled. Click to toggle.{{/t}}' data-tooltip></i>
-            <span class="screenreader-only">{{#t}}The grade for this assignment will sync to the student information system. Click to here to toggle this setting.{{/t}}</span>
+            <img class='icon-post-to-sis accessible_label' src='/images/svg-icons/svg_icon_post_to_sis_active.svg' aria-label='Post grades to SIS enabled' tabindex='0' role='button' width=16 height=20 title='{{#t}}Post grade to SIS enabled. Click to toggle.{{/t}}' data-tooltip />
+            <span class="screenreader-only accessible_label">{{#t}}The grade for this assignment will sync to the student information system.{{/t}}</span>
           </span>
           {{else}}
           <span class="post-to-sis-status disabled">
-            <i class="icon-post-to-sis" title='{{#t}}Post grade to SIS disabled. Click to toggle.{{/t}}' data-tooltip></i>
-            <span class="screenreader-only">{{#t}}The grade for this assignment will not sync to the student information system. Click here to toggle this setting.{{/t}}</span>
+            <img class='icon-post-to-sis accessible_label' src='/images/svg-icons/svg_icon_post_to_sis.svg' aria-label='Post grades to SIS disabled' tabindex='0' role='button' width=16 height=20 title='{{#t}}Post grade to SIS disabled. Click to toggle.{{/t}}' data-tooltip />
+            <span class="screenreader-only accessible_label">{{#t}}The grade for this assignment will not sync to the student information system.{{/t}}</span>
           </span>
           {{/if}}
         {{/if}}

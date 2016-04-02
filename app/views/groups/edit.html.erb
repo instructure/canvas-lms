@@ -31,7 +31,7 @@
 
     <div class="span4 offset1">
       <p>
-        <%= image_tag group_avatar_url(@group), :class => 'avatar' %>
+        <%= image_tag group_avatar_url(@group), :class => 'avatar', :alt => '' %>
         <a href="#" class="change_group_pic">Change avatar</a>
       </p>
       <%= form_tag api_v1_group_url(@group), :method => 'PUT', :class => 'group_avatar_form' do %>

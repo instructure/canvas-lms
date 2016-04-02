@@ -36,8 +36,8 @@ describe 'unpublishing a quiz on the quiz show page' do
       ffj('li', 'ul.page-action-list').each { |link| links_text << link.text }
       expect(links_text.size).to eq 0
 
-      # removes the |Take the Quiz| button
-      expect(f('#take_quiz_link')).to be_nil
+      # retains both |Preview| buttons
+      expect(ff('#preview_quiz_button').count).to eq 2
 
       # shows pre-published options when clicking the cog menu tool
       fj('a.al-trigger', '.header-group-right').click

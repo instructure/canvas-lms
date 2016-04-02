@@ -20,8 +20,7 @@
 # asset_group_code is for the group
 # so, for example, the asset could be an assignment, the group would be the assignment_group
 class AssetUserAccess < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['User', 'Group', 'Course']
+  belongs_to :context, polymorphic: [:user, :group, :course], polymorphic_prefix: true
   belongs_to :user
   has_many :page_views
   before_save :infer_defaults

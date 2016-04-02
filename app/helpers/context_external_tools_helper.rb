@@ -34,7 +34,6 @@ module ContextExternalToolsHelper
     link = content_tag(:a, link_attrs) do
       concat(render(partial: 'external_tools/helpers/icon', locals: {tool: tool})) if options[:show_icon]
       concat(tool[:title])
-      concat(external_tool_new_badge_tag) if tool[:is_new]
     end
 
     if options[:in_list]
@@ -46,16 +45,5 @@ module ContextExternalToolsHelper
     end
 
     raw(link)
-  end
-
-  def external_tool_new_badge_tag
-      # <span class="badge new_badge pull-right"><%= t('links.new_badge', 'New') %></span>
-      tag_attrs = {
-        class: "badge new_badge pull-right"
-      }
-
-      content_tag(:span, tag_attrs) do
-        t('New')
-      end
   end
 end

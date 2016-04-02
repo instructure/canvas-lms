@@ -450,6 +450,30 @@ describe ContentMigration do
       expect(mod2_to.prerequisites.first[:id]).to eq mod1_to.id
     end
 
+    it "should sync module items (even when removed) on re-copy" do
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      page = @copy_from.wiki.wiki_pages.create(:title => "some page")
+      tag1 = mod.add_item({:id => page.id, :type => 'wiki_page'})
+      asmnt = @copy_from.assignments.create!(:title => "some assignment")
+      tag2 = mod.add_item({:id => asmnt.id, :type => 'assignment', :indent => 1})
+
+      run_course_copy
+
+      mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      tag1_to = mod_to.content_tags.where(:migration_id => mig_id(tag1)).first
+      tag2_to = mod_to.content_tags.where(:migration_id => mig_id(tag2)).first
+
+      tag2.destroy
+
+      run_course_copy
+
+      tag1_to.reload
+      tag2_to.reload
+
+      expect(tag1_to).to_not be_deleted
+      expect(tag2_to).to be_deleted
+    end
+
     it "should preserve media comment links" do
       skip unless Qti.qti_enabled?
 

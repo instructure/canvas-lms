@@ -76,6 +76,12 @@ describe Message do
       expect(msg.subject).to include(@assignment.title)
     end
 
+    it "should allow over 255 char in the subject" do
+      assignment_model(title: 'this is crazy ridiculous '*10)
+      msg = generate_message(:assignment_created, :email, @assignment)
+      expect(msg.subject.length).to be > 255
+    end
+
     it "should default to the account time zone if the user has no time zone" do
       original_time_zone = Time.zone
       Time.zone = 'UTC'

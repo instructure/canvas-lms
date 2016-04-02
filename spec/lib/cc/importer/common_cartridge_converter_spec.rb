@@ -2,12 +2,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
 require 'nokogiri'
+require 'tmpdir'
 
 describe "Standard Common Cartridge importing" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_full_test.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_full_test")
+    unzipped_file_path = Dir.mktmpdir
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -23,10 +23,6 @@ describe "Standard Common Cartridge importing" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 
@@ -284,6 +280,8 @@ describe "Standard Common Cartridge importing" do
       expect(@course.discussion_topics.count).to eq 1
       expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
     end
+
+
 
     it "should not import all attachments if :files does not exist" do
       @course = course
@@ -590,8 +588,7 @@ end
 describe "LTI tool combination" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test")
+    unzipped_file_path = Dir.mktmpdir
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -608,10 +605,6 @@ describe "LTI tool combination" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 
@@ -639,8 +632,7 @@ end
 describe "cc assignment extensions" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_assignment_extension")
+    unzipped_file_path = Dir.mktmpdir
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -655,10 +647,6 @@ describe "cc assignment extensions" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
     truncate_all_tables
   end
 

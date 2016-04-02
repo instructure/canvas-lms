@@ -1,7 +1,5 @@
 module DifferentiableAssignment
   def differentiated_assignments_applies?
-    return false if !context.feature_enabled?(:differentiated_assignments)
-
     if self.is_a?(Assignment) || Quizzes::Quiz.class_names.include?(self.class_name)
       self.only_visible_to_overrides
     elsif self.assignment

@@ -6,11 +6,11 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/DialogBaseView'
   'jst/tinymce/InsertUpdateImageView'
-  'jsx/shared/rce/callOnRCE'
+  'jsx/shared/rce/RceCommandShim'
   'compiled/views/TreeBrowserView'
   'compiled/views/RootFoldersFinder'
   'compiled/views/FindFlickrImageView'
-], (I18n, $, _, h, preventDefault, DialogBaseView, template, callOnRCE, TreeBrowserView, RootFoldersFinder, FindFlickrImageView) ->
+], (I18n, $, _, h, preventDefault, DialogBaseView, template, RceCommandShim, TreeBrowserView, RootFoldersFinder, FindFlickrImageView) ->
 
   class InsertUpdateImageView extends DialogBaseView
 
@@ -35,6 +35,7 @@ define [
       @$editor = $("##{@editor.id}")
       @prevSelection = @editor.selection.getBookmark()
       @$selectedNode = $(selectedNode)
+      @rceShim = new RceCommandShim()
       super
       @render()
       @show()
@@ -142,6 +143,6 @@ define [
 
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)
-      callOnRCE(@$editor, 'insert_code', @generateImageHtml())
+      @rceShim.send(@$editor, 'insert_code', @generateImageHtml())
       @editor.focus()
       @close()

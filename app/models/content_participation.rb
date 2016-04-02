@@ -21,8 +21,7 @@ class ContentParticipation < ActiveRecord::Base
 
   attr_accessible :content, :user, :workflow_state
 
-  belongs_to :content, :polymorphic => true
-  validates_inclusion_of :content_type, :allow_nil => true, :in => ['Submission']
+  belongs_to :content, polymorphic: [:submission]
   belongs_to :user
 
   after_save :update_participation_count

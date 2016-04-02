@@ -343,6 +343,20 @@ describe GroupCategory do
       @category = @course.group_categories.create(:name => "Group Category")
     end
 
+    it "should not assign inactive users to groups" do
+      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      student1 = @course.enroll_student(user_model).user
+      inactive_en = @course.enroll_student(user_model)
+      inactive_en.deactivate
+
+      # group1 now has fewer students, and would be favored if it weren't
+      # destroyed. make sure the unassigned student (student2) is assigned to
+      # group2 instead of group1
+      memberships = @category.assign_unassigned_members
+      expect(memberships.size).to eq 1
+      expect(memberships.first.user).to eq student1
+    end
+
     it "should not assign users to inactive groups" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)

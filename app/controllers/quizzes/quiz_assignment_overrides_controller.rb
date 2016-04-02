@@ -131,9 +131,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     scope = scope.where(id: quiz_ids) if quiz_ids.present?
     scope = scope.available unless can_manage
 
-    if @course.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
-    end
+    scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
 
     quizzes = Api.paginate(scope, self, api_route)
 

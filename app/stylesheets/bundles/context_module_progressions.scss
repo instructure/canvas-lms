@@ -144,7 +144,6 @@
   .module-progress-view__students {
     box-sizing: border-box;
     flex: 0 0 $ic-sp*16;
-    @include breakpoint(desktop) { flex: 0 0 $ic-sp*18; }
-    @include breakpoint(wide) { flex: 0 0 $ic-sp*20; }
+    @include breakpoint(desktop) { flex: 0 0 $ic-sp*20; }
   }
 }

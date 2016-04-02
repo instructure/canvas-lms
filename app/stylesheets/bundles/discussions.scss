@@ -715,13 +715,9 @@ $discussion-dark-text: $ic-color-dark;
     @if $use_new_styles {
       background: $lightBackground;
       min-height: 53px;
-      margin-left: $ic-header-primary-width;
-      margin-right: $ic-sp;
+      margin-left: $ic-header-primary-width + ($ic-sp*2);
+      margin-right: $ic-sp*2;
       box-shadow: 0 2px 3px rgba(black, 0.1);
-      @include breakpoint(wide) {
-        margin-left: $ic-header-primary-width + ($ic-sp*2);
-        margin-right: $ic-sp*2;
-      }
     }
     @else {
       min-width: 647px;

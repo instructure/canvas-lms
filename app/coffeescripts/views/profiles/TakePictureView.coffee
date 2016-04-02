@@ -51,7 +51,10 @@ define [
     teardown: ->
       delete @img
       delete @preview
-      @stream?.stop()
+      if @stream?.stop
+        @stream?.stop()
+      else if @stream?.getTracks # MediaStream.stop is deprecated in Chrome 45
+        @stream?.getTracks().forEach (track) -> track.stop()
 
     startMedia: ->
       @getUserMedia(video: true, @displayMedia, $.noop)

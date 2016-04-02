@@ -1407,6 +1407,69 @@ describe Submission do
       end
     end
   end
+
+  describe '#rubric_association_with_assessing_user_id' do
+    before :once do
+      submission_model assignment: @assignment, user: @student
+      rubric_association_model association_object: @assignment, purpose: 'grading'
+    end
+    subject { @submission.rubric_association_with_assessing_user_id }
+
+    it 'sets assessing_user_id to submission.user_id' do
+      expect(subject.assessing_user_id).to eq @submission.user_id
+    end
+  end
+
+  describe '#visible_rubric_assessments_for' do
+    before :once do
+      submission_model assignment: @assignment, user: @student
+      @viewing_user = @teacher
+    end
+    subject { @submission.visible_rubric_assessments_for(@viewing_user) }
+
+    it 'returns empty if assignment is muted?' do
+      @assignment.update_attribute(:muted, true)
+      expect(@assignment.muted?).to be_truthy, 'precondition'
+      expect(subject).to be_empty
+    end
+
+    it 'returns empty if viewing user cannot :read_grade' do
+      student_in_course(active_all: true)
+      @viewing_user = @student
+      expect(@submission.grants_right?(@viewing_user, :read_grade)).to be_falsey, 'precondition'
+      expect(subject).to be_empty
+    end
+
+    context 'with rubric_assessments' do
+      before :once do
+        @assessed_user = @student
+        rubric_association_model association_object: @assignment, purpose: 'grading'
+        student_in_course(active_all: true)
+        [ @teacher, @student ].each do |user|
+          @rubric_association.rubric_assessments.create!({
+            artifact: @submission,
+            assessment_type: 'grading',
+            assessor: user,
+            rubric: @rubric,
+            user: @assessed_user
+          })
+        end
+        @teacher_assessment = @submission.rubric_assessments.where(assessor_id: @teacher).first
+        @student_assessment = @submission.rubric_assessments.where(assessor_id: @student).first
+      end
+      subject { @submission.visible_rubric_assessments_for(@viewing_user) }
+
+      it 'returns rubric_assessments for teacher' do
+        expect(subject).to include(@teacher_assessment)
+      end
+
+      it 'returns only student rubric assessment' do
+        @viewing_user = @student
+        expect(subject).not_to include(@teacher_assessment)
+        expect(subject).to include(@student_assessment)
+      end
+    end
+  end
 end
 
 def submission_spec_model(opts={})

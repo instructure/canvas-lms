@@ -73,7 +73,9 @@ define([
     placements() {
       var allPlacements = {
         "account_navigation":I18n.t("Account Navigation"),
+        "assignment_selection":I18n.t("Assignment Selection"),
         "assignment_menu":I18n.t("Assignment Menu"),
+        "collaboration":I18n.t("Collaboration"),
         "course_home_sub_navigation":I18n.t("Course Home Sub Navigation"),
         "course_navigation":I18n.t("Course Navigation"),
         "course_settings_sub_navigation":I18n.t("Course Settings Sub Navigation"),
@@ -82,15 +84,14 @@ define([
         "file_menu":I18n.t("File Menu"),
         "global_navigation":I18n.t("Global Navigation"),
         "homework_submission":I18n.t("Homework Submission"),
+        "link_selection":I18n.t("Link Selection"),
         "migration_selection":I18n.t("Migration Selection"),
         "module_menu":I18n.t("Module Menu"),
         "post_grades":I18n.t("Post Grades"),
         "quiz_menu":I18n.t("Quiz Menu"),
+        "tool_configuration":I18n.t("Tool Configuration"),
         "user_navigation":I18n.t("User Navigation"),
-        "assignment_selection":I18n.t("Assignment Selection"),
-        "link_selection":I18n.t("Link Selection"),
         "wiki_page_menu":I18n.t("Wiki Page Menu"),
-        "tool_configuration":I18n.t("Tool Configuration")
       };
 
       var tool = this.state.tool;

@@ -64,9 +64,7 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
-      if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
-           @current_user && @assignment &&
-           !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
+      if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
         respond_to do |format|
           flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
@@ -286,6 +284,7 @@ class AssignmentsController < ApplicationController
   end
 
   def syllabus
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
@@ -372,6 +371,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
@@ -422,10 +422,10 @@ class AssignmentsController < ApplicationController
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
-            @assignment.overrides_for(@current_user, ensure_set_not_empty: true)
+            @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
+            @current_user
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 

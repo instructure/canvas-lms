@@ -646,8 +646,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def check_differentiated_assignments
-    return true unless da_on = @context.feature_enabled?(:differentiated_assignments)
-    return render_unauthorized_action if @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
+    return render_unauthorized_action if @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
   end
 
   # the result of several state change functions are the following:

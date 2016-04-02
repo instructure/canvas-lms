@@ -18,6 +18,7 @@
 
 class ContextController < ApplicationController
   include SearchHelper
+  include CustomSidebarLinksHelper
 
   before_filter :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
   before_filter :require_user, :only => [:inbox, :report_avatar_image]
@@ -180,7 +181,7 @@ class ContextController < ApplicationController
   end
 
   def roster
-    return unless authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
+    return unless authorized_action(@context, @current_user, :read_roster)
     log_asset_access([ "roster", @context ], 'roster', 'other')
 
     if @context.is_a?(Course)
@@ -222,7 +223,11 @@ class ContextController < ApplicationController
         }
       })
     elsif @context.is_a?(Group)
-      @users         = @context.participating_users.order_by_sortable_name.uniq
+      if @context.grants_right?(@current_user, :read_as_admin)
+        @users = @context.participating_users.order_by_sortable_name.uniq
+      else
+        @users = @context.participating_users_in_context(sort: true).uniq
+      end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }

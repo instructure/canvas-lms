@@ -6,7 +6,7 @@ define [
   module "mediaEditorLoader",
     setup: ->
       @mel = mediaEditorLoader
-      @mel.callOnRCE = sinon.stub().returns("done")
+      @mel.rceShim = { send: (()-> return "done") }
 
       @collapseSpy = sinon.spy()
       @selectSpy = sinon.spy()
@@ -27,12 +27,17 @@ define [
     equal linkHTML, expectedResult
 
   test 'creates a callback that will run callONRCE', ->
-    @mel.callOnRCE = sinon.stub()
+    shim = {
+      called: false,
+      send: ()->
+        shim.called = true
+    }
+    @mel.rceShim = shim
     @mel.commentCreatedCallback(@fakeED, "ID", "TYPE")
-    ok @mel.callOnRCE.called
+    ok shim.called
 
   test 'creates a callback that try to collapse a selection', ->
-    @mel.callOnRCE = sinon.stub()
+    @mel.rceShim = { send: (()->) }
     @mel.commentCreatedCallback(@fakeED, "ID", "TYPE")
     ok @selectSpy.called
     ok @collapseSpy.called

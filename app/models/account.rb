@@ -207,6 +207,8 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
 
+  add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
+
   def use_new_styles_or_allow_global_includes?
     feature_enabled?(:use_new_styles) || allow_global_includes?
   end
@@ -930,13 +932,32 @@ class Account < ActiveRecord::Base
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
         given { |user|
-          user && RoleOverride.permission_for(self, permission, Role.get_built_in_role(role_name))[:enabled] &&
-          self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
-            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).first &&
-          (!details[:if] || send(details[:if])) }
+          next if permission == :read_sis && self.settings[:strict_sis_check]
+
+          if user && (!details[:if] || send(details[:if]))
+            shard.activate do
+              role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
+                where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).distinct.pluck(:role_id)
+              role_ids.any?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, permission, role)[:enabled] }
+            end
+          end
+        }
         can permission
       end
     end
+
+    given { |user|
+      details = RoleOverride.permissions[:read_sis]
+      if self.settings[:strict_sis_check] && user && (!details[:if] || send(details[:if]))
+        # because apparently some people panic if a student *who is also a teacher* can see sis ids
+        shard.activate do
+          role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
+            where("enrollments.workflow_state IN ('active', 'completed') AND user_id=?", user).distinct.pluck(:role_id)
+          role_ids.any? && role_ids.all?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, :read_sis, role)[:enabled] }
+        end
+      end
+    }
+    can :read_sis
 
     given { |user| !self.account_users_for(user).empty? }
     can :read and can :manage and can :update and can :delete and can :read_outcomes
@@ -1347,7 +1368,10 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if self.root_account? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, :manage_sis)
+      if self.root_account? && self.allow_sis_import && user && self.grants_any_right?(user, :manage_sis, :import_sis)
+        tabs << { id: TAB_SIS_IMPORT, label: t('#account.tab_sis_import', "SIS Import"),
+                  css_class: 'sis_import', href: :account_sis_import_path }
+      end
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && root_account.grants_right?(user, :manage_developer_keys)
     end
     tabs += external_tool_tabs(opts)

@@ -264,19 +264,12 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_visibilities(course, assignments)
-    if include_visibility? && differentiated_assignments?
-      AssignmentStudentVisibility.users_with_visibility_by_assignment(
-        course_id: course.id,
-        assignment_id: assignments.map(&:id)
-      )
+    if include_visibility?
+      AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete('assignment_visibility')
       AssignmentStudentVisibility.none
     end
-  end
-
-  def differentiated_assignments?
-    @context.feature_enabled?(:differentiated_assignments)
   end
 
   def index_groups_json(context, current_user, groups, assignments, submissions = [])
@@ -305,7 +298,6 @@ class AssignmentGroupsController < ApplicationController
           preloaded_user_content_attachments: preloaded_attachments,
           assignments: group_assignments,
           assignment_visibilities: assignment_visibilities(context, assignments),
-          differentiated_assignments_enabled: differentiated_assignments?,
           exclude_descriptions: !!params[:exclude_descriptions],
           overrides: group_overrides,
           submissions: submissions

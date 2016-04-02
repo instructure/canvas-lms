@@ -21,8 +21,7 @@ class LearningOutcome < ActiveRecord::Base
   attr_accessible :context, :description, :short_description, :title, :display_name
   attr_accessible :rubric_criterion, :vendor_guid, :calculation_method, :calculation_int
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
+  belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results
   has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: 'ContentTag'
 

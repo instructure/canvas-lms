@@ -17,8 +17,7 @@
 #
 
 class Alert < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
+  belongs_to :context, polymorphic: [:account, :course]
   has_many :criteria, :class_name => 'AlertCriterion', :dependent => :destroy, :autosave => true
 
   serialize :recipients

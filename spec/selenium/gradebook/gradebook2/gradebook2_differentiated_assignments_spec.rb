@@ -7,7 +7,6 @@ describe "gradebook2" do
   context "differentiated assignments" do
     before :each do
       gradebook_data_setup
-      @course.enable_feature!(:differentiated_assignments)
       @da_assignment = assignment_model({
         :course => @course,
         :name => 'DA assignment',

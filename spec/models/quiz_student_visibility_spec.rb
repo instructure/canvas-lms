@@ -1,20 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "differentiated_assignments" do
-  def course_with_da_flag(feature_method=:enable_feature!)
+  def course_with_differentiated_assignments_enabled
     @course = Course.create!
-    @course.send(feature_method, :differentiated_assignments)
     @user = user_model
     @course.enroll_user(@user)
     @course.save!
-  end
-
-  def course_with_differentiated_assignments_enabled
-    course_with_da_flag :enable_feature!
-  end
-
-  def course_without_differentiated_assignments_enabled
-    course_with_da_flag :disable_feature!
   end
 
   def make_quiz(opts={})

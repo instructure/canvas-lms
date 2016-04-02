@@ -75,7 +75,6 @@ describe AssignmentGroupsController do
         before(:once) do
           root_account.allow_feature!(:multiple_grading_periods)
           root_account.enable_feature!(:multiple_grading_periods)
-          root_account.enable_feature!(:differentiated_assignments)
           account_admin_user(account: root_account)
         end
 
@@ -151,7 +150,6 @@ describe AssignmentGroupsController do
           user_session(@teacher)
           course_group
           @group = course_group
-          @course.enable_feature!(:differentiated_assignments)
           @assignment = @course.assignments.create!(
             title: 'assignment',
             assignment_group: @group,

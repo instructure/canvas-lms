@@ -455,7 +455,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should include overrides if overrides flag is included in the params" do
-        @course.account.enable_feature!(:differentiated_assignments)
         assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments",
           {
             controller: 'assignments_api',
@@ -468,20 +467,13 @@ describe AssignmentsApiController, type: :request do
         expect(assignments_json[0].keys).to include("overrides")
       end
 
-      it "should exclude the only_visible_to_overrides flag if differentiated assignments is off" do
-        @json = api_get_assignment_in_course(@assignment, @course)
-        expect(@json.has_key?('only_visible_to_overrides')).to be_falsey
-      end
-
       it "should include the only_visible_to_overrides flag if differentiated assignments is on" do
-        @course.account.enable_feature!(:differentiated_assignments)
         @json = api_get_assignment_in_course(@assignment, @course)
         expect(@json.has_key?('only_visible_to_overrides')).to be_truthy
         expect(@json['only_visible_to_overrides']).to be_falsey
       end
 
       it "should include visibility data if included" do
-        @course.enable_feature!(:differentiated_assignments)
         json =  api_call(:get,
             "/api/v1/courses/#{@course.id}/assignments.json",
             {
@@ -496,7 +488,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "should show all assignments" do
-        @course.enable_feature!(:differentiated_assignments)
         setup_DA
         count = @course.assignments.reload.length
         json = api_get_assignments_index_from_course(@course)
@@ -506,7 +497,6 @@ describe AssignmentsApiController, type: :request do
       context "as a student" do
         before :once do
           course(:active_all => true)
-          @course.enable_feature!(:differentiated_assignments)
           setup_DA
         end
 
@@ -529,7 +519,6 @@ describe AssignmentsApiController, type: :request do
       context "as an observer" do
         before :once do
           course(:active_all => true)
-          @course.enable_feature!(:differentiated_assignments)
           setup_DA
           @observer = User.create
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active', :allow_multiple_enrollments => true)
@@ -1828,15 +1817,7 @@ describe AssignmentsApiController, type: :request do
         @flag_before = @assignment.only_visible_to_overrides
       end
 
-      it "should not update the only_visible_to_overrides flag if differentiated assignments is off" do
-        raw_api_update_assignment(@course,@assignment,{
-          :only_visible_to_overrides => !@flag_before
-        })
-        expect(@assignment.reload.only_visible_to_overrides).to eq @flag_before
-      end
-
       it "should update the only_visible_to_overrides flag if differentiated assignments is on" do
-        @course.account.enable_feature!(:differentiated_assignments)
         raw_api_update_assignment(@course,@assignment,{
           :only_visible_to_overrides => !@flag_before
         })
@@ -2451,7 +2432,6 @@ describe AssignmentsApiController, type: :request do
     context "differentiated assignments" do
       before :once do
         @user = @teacher
-        @course.enable_feature!(:differentiated_assignments)
         @assignment1 = @course.assignments.create! :only_visible_to_overrides => true
         @assignment2 = @course.assignments.create! :only_visible_to_overrides => true
         section1 = @course.course_sections.create!

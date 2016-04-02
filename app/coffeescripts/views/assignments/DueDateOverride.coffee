@@ -94,7 +94,7 @@ define [
 
     setNewOverridesCollection: (newOverrides) =>
       @model.overrides.reset(newOverrides)
-      onlyVisibleToOverrides = ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED && !@model.overrides.containsDefaultDueDate()
+      onlyVisibleToOverrides = !@model.overrides.containsDefaultDueDate()
       @model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
 
     # =================

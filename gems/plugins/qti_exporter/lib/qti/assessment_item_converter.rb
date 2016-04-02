@@ -219,7 +219,7 @@ class AssessmentItemConverter
         end
       elsif id =~ /solution/i
         @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
-      elsif id =~ /general|all/i
+      elsif id =~ /general_|_all/i
         extract_feedback!(@question, :neutral_comments, f)
       elsif id =~ /feedback_(\d*)_fb/i
         if answer = @question[:answers].find{|a|a[:migration_id]== "RESPONSE_#{$1}"}
@@ -462,7 +462,7 @@ class AssessmentItemConverter
     end
     # Sometimes individual answers are assigned general feedback, don't return
     # the identifier if that's the case
-    id =~ /general|all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
+    id =~ /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
   end
 
 end

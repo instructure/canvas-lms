@@ -56,8 +56,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+  belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
@@ -187,24 +186,28 @@ class DiscussionTopic < ActiveRecord::Base
     category = self.group_category
     return unless category && self.root_topic_id.blank?
     category.groups.active.each do |group|
-      group.shard.activate do
-        DiscussionTopic.unique_constraint_retry do
-          topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
-          topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
-          topic.message = self.message
-          topic.title = "#{self.title} - #{group.name}"
-          topic.assignment_id = self.assignment_id
-          topic.attachment_id = self.attachment_id
-          topic.group_category_id = self.group_category_id
-          topic.user_id = self.user_id
-          topic.discussion_type = self.discussion_type
-          topic.workflow_state = self.workflow_state
-          topic.allow_rating = self.allow_rating
-          topic.only_graders_can_rate = self.only_graders_can_rate
-          topic.sort_by_rating = self.sort_by_rating
-          topic.save if topic.changed?
-          topic
-        end
+      ensure_child_topic_for(group)
+    end
+  end
+
+  def ensure_child_topic_for(group)
+    group.shard.activate do
+      DiscussionTopic.unique_constraint_retry do
+        topic = DiscussionTopic.where(:context_id => group, :context_type => 'Group', :root_topic_id => self).first
+        topic ||= group.discussion_topics.build{ |dt| dt.root_topic = self }
+        topic.message = self.message
+        topic.title = "#{self.title} - #{group.name}"
+        topic.assignment_id = self.assignment_id
+        topic.attachment_id = self.attachment_id
+        topic.group_category_id = self.group_category_id
+        topic.user_id = self.user_id
+        topic.discussion_type = self.discussion_type
+        topic.workflow_state = self.workflow_state
+        topic.allow_rating = self.allow_rating
+        topic.only_graders_can_rate = self.only_graders_can_rate
+        topic.sort_by_rating = self.sort_by_rating
+        topic.save if topic.changed?
+        topic
       end
     end
   end
@@ -986,7 +989,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants if !self.for_assignment? || !course.feature_enabled?(:differentiated_assignments)
+    return active_participants if !self.for_assignment?
     users_with_visibility = AssignmentStudentVisibility.where(assignment_id: self.assignment_id, course_id: course.id).pluck(:user_id)
 
     admin_ids = course.participating_admins.pluck(:id)
@@ -1011,7 +1014,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids).to_a
 
-    if course.feature_enabled?(:differentiated_assignments) && self.for_assignment?
+    if self.for_assignment?
       students_with_visibility = AssignmentStudentVisibility.where(course_id: course.id, assignment_id: assignment_id).pluck(:user_id)
 
       admin_ids = course.participating_admins.pluck(:id)

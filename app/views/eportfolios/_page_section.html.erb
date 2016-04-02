@@ -1,6 +1,6 @@
 <% page_section ||= nil %>
 <div class="section <%= "read_only" if (page_section && (page_section["attachment_id"] || page_section["submission_id"])) %>" id="page_section_<%= idx %>">
-  <a href="#" class="move_link no-hover" title="<%= t('titles.move_section', "Drag to rearrange sections") %>"><%= image_tag "move.png" %></a>
+  <a href="#" class="move_link no-hover" title="<%= t('titles.move_section', "Drag to rearrange sections") %>"><%= image_tag "move.png", :alt => t('Drag to rearrange sections') %></a>
   <div class="section_type_name">
     <% if !page_section || page_section["section_type"] == "rich_text" %>
       <%= t('section_types.rich_text', "Rich Text Content") %>
@@ -23,7 +23,7 @@
         <div style="text-align: center;" class="attachment">
           <% attachment = @portfolio.user.attachments.find(page_section["attachment_id"]) %>
           <% if attachment && attachment.content_type.match(/\Aimage/) %>
-            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %></a>
+            <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>" class="no-hover"><%= image_tag eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid), :alt => attachment.display_name %></a>
           <% elsif attachment %>
             <a href="<%= eportfolio_entry_view_file_path(@portfolio, @page, attachment.uuid) %>">
               <%= t('links.download_attachment', "Click here to Download *%{attachment}*",

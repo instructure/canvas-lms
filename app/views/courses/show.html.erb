@@ -77,6 +77,10 @@
           <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
           </a>
         <% end %>
+
+        <% course_custom_links.each do |link| %>
+          <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+        <% end %>
       </div>
     <% end %>
 

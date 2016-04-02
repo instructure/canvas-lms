@@ -137,7 +137,9 @@
         </div>
       <% #End new styles div %>
       <% if use_new_styles? %></div><% end %>
-      <%= render :partial => 'shared/canvas_footer' %>
+      <% if (use_new_styles? && @show_footer) or !use_new_styles? %>
+        <%= render :partial => 'shared/canvas_footer' %>
+      <% end %>
     </div>
   </div>
 

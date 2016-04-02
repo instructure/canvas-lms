@@ -61,6 +61,6 @@ table.course-list-table {
 
 .course-list-term {
   color: #555;
-  @include fontSize(10px);
+  @include fontSize(12px);
   font-style: italic;
 }

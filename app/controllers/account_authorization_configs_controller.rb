@@ -486,8 +486,20 @@ class AccountAuthorizationConfigsController < ApplicationController
     data = filter_data(aac_data)
     deselect_parent_registration(data)
     account_config = @account.authentication_providers.build(data)
-    if account_config.class.singleton? && @account.authentication_providers.where(auth_type: account_config.auth_type).exists?
-      return render json: { errors: [ { message: "duplicate provider #{account_config.auth_type}" } ] }, status: 422
+    if account_config.class.singleton? && @account.authentication_providers.active.where(auth_type: account_config.auth_type).exists?
+      respond_to do |format|
+        format.html do
+          flash[:error] = t(
+            "Duplicate provider %{provider}", provider: account_config.auth_type
+          )
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json do
+          msg = "duplicate provider #{account_config.auth_type}"
+          render json: { errors: [ { message:  msg } ] }, status: 422
+        end
+      end
+      return
     end
     update_deprecated_account_settings_data(aac_data, account_config)
 

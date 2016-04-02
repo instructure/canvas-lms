@@ -17,6 +17,7 @@ describe "post grades to sis" do
     type_in_tiny('textarea[name=message]', 'Discussion topic message body')
     f('#use_for_grading').click
     f('#assignment_post_to_sis').click
+    wait_for_ajaximations
     click_option('#assignment_group_id', 'Assignment Group')
     expect_new_page_load {submit_form('.form-actions')}
     expect_new_page_load{f(' .edit-btn').click}
@@ -38,6 +39,7 @@ describe "post grades to sis" do
 
     def get_post_grades_dialog
       get "/courses/#{@course.id}/gradebook"
+      wait_for_ajaximations
       expect(f('.post-grades-placeholder > button')).to be_displayed
       f('.post-grades-placeholder > button').click
       wait_for_ajaximations

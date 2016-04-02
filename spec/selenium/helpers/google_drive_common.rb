@@ -16,9 +16,12 @@ module GoogleDriveCommon
       stubs(:authorized?).
       returns(authorized)
 
+    data = stub('data', id: 1, to_json: { id: 1 }, alternateLink: 'http://localhost/googleDoc')
+    doc = stub('doc', data: data)
+    adapter = stub('google_adapter', create_doc: doc, acl_add: nil, acl_remove: nil)
     GoogleDocsCollaboration.any_instance.
-        stubs(:initialize_document).
-        returns(nil)
+        stubs(:google_adapter_for_user).
+        returns(adapter)
 
     GoogleDocsCollaboration.any_instance.
         stubs(:delete_document).

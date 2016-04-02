@@ -35,8 +35,7 @@ li.quiz {
   }
   .ig-title {
     flex: 1;
-    @include breakpoint(desktop) { flex: 0 0 25%; }
-    @include breakpoint(wide) { flex: 0 0 30%; }
+    @include breakpoint(desktop) { flex: 0 0 30%;}
   }
   .ig-details { flex: 1; }
   .default-dates .status-description { font-weight: bold; }

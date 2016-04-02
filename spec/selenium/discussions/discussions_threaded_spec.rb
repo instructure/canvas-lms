@@ -155,6 +155,7 @@ describe "threaded discussions" do
     entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
+    wait_for_ajaximations
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
   end
 

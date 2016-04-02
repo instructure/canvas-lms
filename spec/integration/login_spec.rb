@@ -148,6 +148,7 @@ describe 'login' do
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq cas_ticket
 
+      Canvas.redis.expire(cas_redis_key, Pseudonym::CAS_TICKET_TTL / 2)
       cas_ticket_ttl = Canvas.redis.ttl(cas_redis_key)
       get dashboard_url(:login_success => 1)
       expect(Canvas.redis.ttl(cas_redis_key)).to be > cas_ticket_ttl

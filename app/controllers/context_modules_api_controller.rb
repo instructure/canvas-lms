@@ -370,7 +370,7 @@ class ContextModulesApiController < ApplicationController
         opts[:search_term] = params[:search_term]
       end
 
-      if @context.feature_enabled?(:differentiated_assignments) && includes.include?('items')
+      if includes.include?('items')
         user_ids = [(@student || @current_user).id]
 
         if @context.user_has_been_observer?(@student || @current_user)

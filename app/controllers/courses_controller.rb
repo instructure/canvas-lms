@@ -287,11 +287,12 @@ require 'securerandom'
 class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
+  include CustomSidebarLinksHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_user_or_observer, :only=>[:user_index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
-  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
+  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -490,9 +491,6 @@ class CoursesController < ApplicationController
 
   # @API Create a new course
   # Create a new course
-  #
-  # @argument account_id [Required, Integer]
-  #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
@@ -767,7 +765,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -780,7 +778,8 @@ class CoursesController < ApplicationController
   #   - "bio": Optionally include each user's bio.
   #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
-  #
+  #   - "custom_links": Optionally include plugin-supplied custom links for each student,
+  #   such as analytics information
   # @argument user_id [String]
   #   If included, the user will be queried and if the user is part of the
   #   users set, the page parameter will be modified so that the page
@@ -802,7 +801,8 @@ class CoursesController < ApplicationController
       params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
-      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
+      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && (!params.has_key?(:include_inactive) || value_to_boolean(params[:include_inactive]))
+
       search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
 
@@ -839,7 +839,12 @@ class CoursesController < ApplicationController
         enrollment_scope = @context.enrollments.
           where(user_id: users).
           preload(:course)
-        enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+
+        if search_params[:enrollment_state]
+          enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
+        else
+          enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+        end
         enrollments_by_user = enrollment_scope.group_by(&:user_id)
       end
       render :json => users.map { |u|
@@ -1856,7 +1861,7 @@ class CoursesController < ApplicationController
       @course.start_at = DateTime.parse(params[:course][:start_at]).utc rescue nil
       @course.conclude_at = DateTime.parse(params[:course][:conclude_at]).utc rescue nil
       @course.workflow_state = 'claimed'
-      @course.save
+      @course.save!
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
       @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
@@ -1893,7 +1898,7 @@ class CoursesController < ApplicationController
   # editable through this endpoint will be "syllabus_body"
   #
   # @argument course[account_id] [Integer]
-  #   The unique ID of the account to create to course under.
+  #   The unique ID of the account to move the course to.
   #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed

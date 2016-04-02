@@ -1007,11 +1007,10 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    context 'differentiated assignments on' do
+    context 'differentiated assignments' do
       before :once do
         Timecop.travel(Time.utc(2015)) do
           course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
-          @course.enable_feature!(:differentiated_assignments)
 
           @student_in_overriden_section = User.create
           @student_in_general_section = User.create

@@ -24,7 +24,7 @@ describe "scheduler" do
       if comment
         replace_content(f('#appointment-comment'), comment)
       end
-      driver.execute_script("$('.event-details .reserve_event_link').trigger('click')")
+      f('.event-details .reserve_event_link').click
       wait_for_ajax_requests
     end
 
@@ -42,11 +42,11 @@ describe "scheduler" do
 
       reserve_appointment_manual(0, "my comments")
       expect(f('.agenda-event .ig-row')).to include_text "Reserved"
-      ffj('.agenda-event .ig-row')[0].click
+      f('.agenda-event .ig-row').click
       expect(f('.event-details-content')).to include_text "my comments"
 
       load_month_view
-      ffj('.fc-event')[0].click
+      f('.fc-event').click
       expect(f('.event-details-content')).to include_text "my comments"
     end
 

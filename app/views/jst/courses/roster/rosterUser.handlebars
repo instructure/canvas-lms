@@ -72,6 +72,9 @@
         {{/if}}
         <li><a href="#" data-event="removeFromCourse"><i class="icon-trash"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
       {{/if}}
+      {{#each customLinks}}
+        <li><a href="{{url}}"><i class="{{icon_class}}"></i> {{text}}</a></li>
+      {{/each}}
     </ul>
   </div>
   {{/if}}

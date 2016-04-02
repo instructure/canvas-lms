@@ -164,42 +164,6 @@ describe ContextModule do
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
-
-    context "when differentiated assignments" do
-      before do
-        Course.any_instance.stubs(:feature_enabled?).with(:differentiated_assignments).returns(false)
-      end
-
-      it "adds external tools with a default workflow_state of anonymous" do
-        course_module
-        course_with_student(:active_all => true)
-        @external_tool = @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tool",
-          :course_navigation => {
-            :text => "blah",
-            :url =>  "http://example.com/ims/lti",
-            :default => false
-          }
-        )
-        @tag = @module.add_item(:id => @external_tool.id, :type => "external_tool")
-        expect(@tag.unpublished?).to be_truthy
-      end
-
-      it "adds external_url with a default workflow_state of unpublished" do
-        course_module
-        @tag = @module.add_item(:type => 'external_url', :url => 'http://example.com/lolcats', :title => 'pls view', :indent => 1)
-        expect(@tag.unpublished?).to be_truthy
-      end
-
-      it "should add a header as unpublished" do
-        course_module
-        tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
-        expect(tag.unpublished?).to be_truthy
-      end
-    end
   end
 
   describe "completion_requirements=" do
@@ -827,23 +791,12 @@ describe ContextModule do
       end
 
       context "enabled" do
-        before {@course.enable_feature!(:differentiated_assignments);@module.reload}
         it "should properly require differentiated assignments" do
           expect(@module.evaluate_for(@student_1)).to be_unlocked
           @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
           @module.reload
           expect(@module.evaluate_for(@student_1)).to be_completed
           expect(@module.evaluate_for(@student_2)).to be_completed
-        end
-      end
-
-      context "disabled" do
-        before {@course.disable_feature!(:differentiated_assignments);@module.reload}
-        it "should properly require all assignments" do
-          expect(@module.evaluate_for(@student_1)).to be_unlocked
-          @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
-          expect(@module.evaluate_for(@student_1)).to be_completed
-          expect(@module.evaluate_for(@student_2)).to be_unlocked
         end
       end
     end
@@ -1104,7 +1057,6 @@ describe ContextModule do
     end
 
     context "differentiated_assignments enabled" do
-      before {@course.enable_feature!(:differentiated_assignments);@module.reload}
       it "should properly return differentiated assignments" do
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
@@ -1172,23 +1124,6 @@ describe ContextModule do
         @observer_enrollment.update_attribute(:associated_user_id, @student_1.id)
         @module.reload
         expect(@module.content_tags_visible_to(@observer).map(&:content).include?(@assignment)).to be_truthy
-      end
-    end
-
-    context "differentiated_assignments disabled" do
-      before {@course.disable_feature!(:differentiated_assignments);@module.reload}
-      it "should return all published assignments" do
-        expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
-        expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
-        expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_truthy
-      end
-      it "should not return unpublished assignments" do
-        @assignment.workflow_state = "unpublished"
-        @assignment.save!
-        @module.reload
-        expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
-        expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_falsey
-        expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
     end
   end

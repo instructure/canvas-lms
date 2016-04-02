@@ -51,7 +51,6 @@ class ActiveRecord::Base
     return @all_models if @all_models.present?
     @all_models = (ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
-      !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
       (model.respond_to?(:tableless?) && model.tableless?) ||
       model.abstract_class?
     }
@@ -472,55 +471,83 @@ class ActiveRecord::Base
   #   belongs_to :context, polymorphic: [:course, :account]
   def self.belongs_to(name, scope = nil, options={})
     options = scope if scope.is_a?(Hash)
+    polymorphic_prefix = options.delete(:polymorphic_prefix)
+    exhaustive = options.delete(:exhaustive)
 
-    if options[:polymorphic].is_a?(Array)
-      add_polymorph_methods(name, options[:polymorphic])
+    if CANVAS_RAILS4_0
+      reflection = super
+    else
+      reflection = super[name.to_s]
     end
-    super
+
+    if reflection.options[:polymorphic].is_a?(Array) ||
+        reflection.options[:polymorphic].is_a?(Hash)
+      reflection.options[:exhaustive] = exhaustive
+      reflection.options[:polymorphic_prefix] = polymorphic_prefix
+      add_polymorph_methods(reflection)
+    end
+    reflection
   end
 
-  def self.add_polymorph_methods(generic, specifics)
+  def self.add_polymorph_methods(reflection)
     unless @polymorph_module
       @polymorph_module = Module.new
       include(@polymorph_module)
     end
 
-    specific_classes = specifics.map(&:to_s).map(&:classify).sort
-    validates "#{generic}_type", inclusion: { in: specific_classes }, allow_nil: true
-
-    @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{generic}=(record)
-        if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
-          message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
-          raise ActiveRecord::AssociationTypeMismatch, message
-        end
-        super
+    specifics = []
+    Array.wrap(reflection.options[:polymorphic]).map do |name|
+      if name.is_a?(Hash)
+        specifics.concat(name.to_a)
+      else
+        specifics << [name, name.to_s.camelize]
       end
-    RUBY
+    end
 
-    specifics.each do |specific|
-      class_name = specific.to_s.classify
-
-      # ensure we capture this class's table name
-      table_name = self.table_name
-      belongs_to specific, -> { where(table_name => { "#{generic}_type" => class_name }) }, foreign_key: "#{generic}_id"
-
-      correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
+    unless reflection.options[:exhaustive] == false
+      specific_classes = specifics.map(&:last).sort
+      validates reflection.foreign_type, inclusion: { in: specific_classes }, allow_nil: true
 
       @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{specific}
-        #{generic} if #{correct_type}
+        def #{reflection.name}=(record)
+          if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
+            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+            raise ActiveRecord::AssociationTypeMismatch, message
+          end
+          super
+        end
+      RUBY
+    end
+
+    if reflection.options[:polymorphic_prefix] == true
+      prefix = "#{reflection.name}_"
+    elsif reflection.options[:polymorphic_prefix]
+      prefix = "#{reflection.options[:polymorphic_prefix]}_"
+    end
+
+    specifics.each do |(name, class_name)|
+      # ensure we capture this class's table name
+      table_name = self.table_name
+      belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
+                 foreign_key: reflection.foreign_key,
+                 class_name: class_name
+
+      correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
+
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{prefix}#{name}
+        #{reflection.name} if #{correct_type}
       end
 
-      def #{specific}=(record)
+      def #{prefix}#{name}=(record)
         # we don't want to unset it if it's currently some other type, i.e.
         # foo.bar = Bar.new
         # foo.baz = nil
         # foo.bar.should_not be_nil
         return if record.nil? && !(#{correct_type})
-        association(:#{specific}).send(:raise_on_type_mismatch!, record) if record
+        association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
 
-        self.#{generic} = record
+        self.#{reflection.name} = record
       end
 
       RUBY
@@ -570,7 +597,11 @@ class ActiveRecord::Base
   def self.find_ids_in_ranges(options = {})
     batch_size = options[:batch_size].try(:to_i) || 1000
     subquery_scope = all.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
-    ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
+    subquery_scope = subquery_scope.where("#{quoted_table_name}.#{primary_key} <= ?", options[:end_at]) if options[:end_at]
+
+    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_table_name}.#{primary_key} >= ?", options[:start_at]) : subquery_scope
+    ids = connection.select_rows("select min(id), max(id) from (#{first_subquery_scope.to_sql}) as subquery").first
+
     while ids.first.present?
       ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
       yield(*ids)
@@ -608,11 +639,6 @@ if CANVAS_RAILS4_0
     end
   end
   ActiveRecord::Associations::Builder::Association.prepend(ForceDeprecationAsError)
-end
-
-unless defined? OpenDataExport
-  # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
-  ActiveRecord::Associations::Builder::Association.valid_options << :exportable
 end
 
 ActiveRecord::Relation.class_eval do
@@ -657,7 +683,8 @@ ActiveRecord::Relation.class_eval do
     (connection.adapter_name == 'PostgreSQL' &&
       (Shackles.environment == :slave ||
         connection.readonly? ||
-        connection.open_transactions > (Rails.env.test? ? 1 : 0)))
+        (!Rails.env.test? && connection.open_transactions > 0) ||
+        in_transaction_in_test?))
   end
 
   def find_in_batches_with_cursor(options = {})
@@ -695,7 +722,7 @@ ActiveRecord::Relation.class_eval do
     # changing the name (and source location) of this method
     transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
     # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
-    !!caller.find { |s| s =~ transaction_regex }
+    !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
   end
 
   def find_in_batches_with_temp_table(options = {})
@@ -1191,7 +1218,7 @@ class ActiveRecord::MigrationProxy
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).empty?
+    raise "#{self.name} (#{self.version}) is not tagged as exactly one of predeploy or postdeploy!" unless (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).length == 1
     @migration
   end
 end
@@ -1208,71 +1235,41 @@ module MigratorCache
 end
 ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
 
-class ActiveRecord::Migrator
-  cattr_accessor :migrated_versions
-
-  def pending_migrations_with_runnable
-    pending_migrations_without_runnable.reject { |m| !m.runnable? }
+module Migrator
+  def skipped_migrations
+    pending_migrations(call_super: true).reject(&:runnable?)
   end
-  alias_method_chain :pending_migrations, :runnable
 
-  def migrate(tag = nil)
-    current = migrations.detect { |m| m.version == current_version }
-    target = migrations.detect { |m| m.version == @target_version }
+  def pending_migrations(call_super: false)
+    return super() if call_super
+    super().select(&:runnable?)
+  end
 
-    if target.nil? && !@target_version.nil? && @target_version > 0
-      raise UnknownMigrationVersionError.new(@target_version)
+  def runnable
+    super.select(&:runnable?)
+  end
+
+  def execute_migration_in_transaction(migration, direct)
+    old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+    if defined?(Marginalia)
+      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
+    end
+    if down? && !Rails.env.test? && !$confirmed_migrate_down
+      require 'highline'
+      if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+        raise("Revert not confirmed")
+      end
+      $confirmed_migrate_down = true if $1.downcase == 'a'
     end
 
-    start = up? ? 0 : (migrations.index(current) || 0)
-    finish = migrations.index(target) || migrations.size - 1
-    runnable = migrations[start..finish]
-
-    # skip the last migration if we're headed down, but not ALL the way down
-    runnable.pop if down? && !target.nil?
-
-    runnable.each do |migration|
-      ActiveRecord::Base.logger.info "Migrating to #{migration.name} (#{migration.version})"
-
-      # On our way up, we skip migrating the ones we've already migrated
-      next if up? && migrated.include?(migration.version.to_i)
-
-      # On our way down, we skip reverting the ones we've never migrated
-      if down? && !migrated.include?(migration.version.to_i)
-        migration.announce 'never migrated, skipping'; migration.write
-        next
-      end
-
-      next if !tag.nil? && !migration.tags.include?(tag)
-      next if !migration.runnable?
-
-      begin
-        old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-        if down? && !Rails.env.test? && !$confirmed_migrate_down
-          require 'highline'
-          if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-            raise("Revert not confirmed")
-          end
-          $confirmed_migrate_down = true if $1.downcase == 'a'
-        end
-
-        ddl_transaction(migration) do
-          self.class.migrated_versions = @migrated_versions
-          migration.migrate(@direction)
-          @migrated_versions = self.class.migrated_versions
-          record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
-        end
-      rescue => e
-        canceled_msg = use_transaction?(migration)? "this and " : ""
-        raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
-      ensure
-        ActiveRecord::Base.in_migration = old_in_migration
-      end
-    end
+    super
+  ensure
+    ActiveRecord::Base.in_migration = old_in_migration
+    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
   end
 end
+ActiveRecord::Migrator.prepend(Migrator)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths

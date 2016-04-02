@@ -15,7 +15,7 @@ module Canvas
         # don't fail the test if there is no consul running
       end
     end
-
+    let(:parent_key){ "rich-content-service" }
     let(:diplomat_read_options){ { recurse: true, consistency: 'stale' } }
 
     describe ".config=" do
@@ -58,38 +58,66 @@ module Canvas
     end
 
     describe ".find" do
+
       # we don't need to interact with a real consul for unit tests
-      before { Diplomat::Kv.stubs(:put) }
+      before(:each) do
+        DynamicSettings.config = {} # just to be not nil
+        Diplomat::Kv.stubs(:put)
+        Diplomat::Kv.stubs(:get).
+          with("/config/canvas/#{parent_key}", diplomat_read_options).
+          returns(
+            [
+              { key: "#{parent_key}/app-host", value: "rce.insops.com"},
+              { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
+            ]
+          )
+      end
 
       it "explodes when trying to access it without a config file" do
         DynamicSettings.config = nil
-        expect{ DynamicSettings.find("rich-content-service") }.to(
+        expect{ DynamicSettings.find(parent_key) }.to(
           raise_error(DynamicSettings::ConsulError)
         )
       end
 
       it "loads the children of a k/v node as a hash" do
-        DynamicSettings.config = {} # just to be not nil
-        parent_key = "rich-content-service"
-        Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", diplomat_read_options).returns(
-          [
-            { key: "#{parent_key}/app-host", value: "rce.insops.com"},
-            { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
-          ]
-        )
         rce_settings = DynamicSettings.find(parent_key)
         expect(rce_settings).to eq({
           "app-host" => "rce.insops.com",
           "cdn-host" => "asdfasdf.cloudfront.com"
         })
       end
+
+      it "uses the last found value on catastrophic outage" do
+        DynamicSettings.reset_cache!(hard: true)
+        DynamicSettings.find(parent_key)
+        # some values are now stored in case of connection failure
+        Diplomat::Kv.stubs(:get).
+          with("/config/canvas/#{parent_key}", diplomat_read_options).
+          raises(Faraday::ConnectionFailed, "could not contact consul")
+
+        rce_settings = DynamicSettings.find(parent_key)
+        expect(rce_settings).to eq({
+          "app-host" => "rce.insops.com",
+          "cdn-host" => "asdfasdf.cloudfront.com"
+        })
+      end
+
+      it "cant recover with no value cached for connection failure" do
+        DynamicSettings.reset_cache!(hard: true)
+        Diplomat::Kv.stubs(:get).
+          with("/config/canvas/#{parent_key}", diplomat_read_options).
+          raises(Faraday::ConnectionFailed, "could not contact consul")
+
+        expect{ DynamicSettings.find(parent_key) }.to(
+          raise_error(Faraday::ConnectionFailed)
+        )
+      end
     end
 
     describe ".from_cache" do
       before(:each){ DynamicSettings.config = {} } # just to be not nil
       after(:each){ DynamicSettings.reset_cache! }
-
-      let(:parent_key){ "rich-content-service" }
 
       def stub_consul_with(value)
         Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", diplomat_read_options).returns(
@@ -151,6 +179,41 @@ module Canvas
           stub_consul_with("CHANGED VALUE")
           value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("CHANGED VALUE")
+        end
+      end
+
+      context "using catastrophic cache fallback" do
+        before(:each) do
+          stub_consul_with("rce.insops.com")
+          DynamicSettings.from_cache(parent_key) # prime cache
+          Timecop.travel(Time.zone.now + 11.minutes)
+        end
+
+        after(:each) do
+          Timecop.return
+          Canvas.unstub(:timeout_protection)
+        end
+
+        it "still returns old values if connection fails after timeout" do
+          Diplomat::Kv.stubs(:get).
+            with("/config/canvas/#{parent_key}", diplomat_read_options).
+            raises(Faraday::ConnectionFailed, "could not contact consul")
+          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
+          expect(value["app-host"]).to eq("rce.insops.com")
+        end
+
+        it "returns old value during connection timeout" do
+          Canvas.stubs(:timeout_protection).with('consul', raise_on_timeout: true).
+            raises(Timeout::Error, 'consul took too long')
+          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
+          expect(value["app-host"]).to eq("rce.insops.com")
+        end
+
+        it "uses cached values during TimeoutCutoff events" do
+          Canvas.stubs(:timeout_protection).with('consul', raise_on_timeout: true).
+            raises(TimeoutCutoff, 'consul took too long too many times')
+          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
+          expect(value["app-host"]).to eq("rce.insops.com")
         end
       end
     end

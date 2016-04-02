@@ -72,7 +72,7 @@ describe "discussions overrides" do
       f('.form-actions button[type=submit]').click
       wait_for_ajaximations
       expect(f('.ui-dialog')).to be_present
-      expect(f('#ui-id-7').text).to include('Do you want to go back and select a due date?')
+      expect(f('#ui-id-7').text).to include('Not all sections will be assigned this item')
       f('.ui-dialog .ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       f('.toggle_due_dates').click
@@ -81,10 +81,6 @@ describe "discussions overrides" do
       expect(f('.discussion-topic-due-dates')).to be_present
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(1)').text).to include(@override_due_at_time)
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(2)').text).to include('New Section')
-      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(1)').text).
-                                                                                    not_to include(@default_due_at_time)
-      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(2)').text).
-                                                                                             to include('Everyone else')
     end
 
     context "outside discussions page" do

@@ -1,20 +1,12 @@
 require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook2_srgb_common'
 
 describe "screenreader gradebook" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
+  include Gradebook2SRGBCommon
 
   let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
-
-  def basic_setup(num=1)
-    init_course_with_students num
-    @course.assignments.create!(
-      title: 'Test 1',
-      submission_types: 'online_text_entry',
-      points_possible: 20,
-      grading_type: 'percent'
-    )
-  end
 
   it 'can select a student', priority: "1", test_id: 163994 do
     init_course_with_students 2
@@ -90,19 +82,6 @@ describe "screenreader gradebook" do
     click_option '#assignment_select', a1.name
     expect(f('#assignment_information .assignment_selection').text).to eq a1.name
     expect(f('#assignment_information').text).to include 'Online text entry'
-  end
-
-  it 'updates grade to percentage in percentage grade field', priority: "1", test_id: 163999 do
-    skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-    assignment = basic_setup
-    get srgb
-
-    click_option '#assignment_select', assignment.name
-    click_option '#student_select', @students[0].name
-    replace_content f('#student_and_assignment_grade'), "10\t"
-    wait_for_ajaximations
-    expect(f('#student_and_assignment_grade').attribute 'value').to eq '50%'
   end
 
   it 'displays/removes warning message for resubmitted assignments', priority: "1", test_id: 164000 do
@@ -209,7 +188,7 @@ describe "screenreader gradebook" do
     expect(f('#message_students_dialog')).to_not be_displayed
   end
 
-  it 'has total graded submission', priority: "1", test_id: 164003 do
+  it 'has total graded submission', priority: "1", test_id: 615686 do
     assignment = basic_setup 2
 
     assignment.grade_student @students[0], grade: 15
@@ -288,7 +267,7 @@ describe "screenreader gradebook" do
       gradebook_data_setup
     end
 
-    it "should switch to srgb", priority: "1", test_id: 209987 do
+    it "switches to srgb", priority: "1", test_id: 615682 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder").click
       expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
@@ -298,7 +277,7 @@ describe "screenreader gradebook" do
       expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end
 
-    it "Should show sections in drop-down", priority: "1", test_id: 209989 do
+    it "shows sections in drop-down", priority: "1", test_id: 615680 do
       sections=[]
       2.times do |i|
         sections << @course.course_sections.create!(:name => "other section #{i}")
@@ -393,7 +372,7 @@ describe "screenreader gradebook" do
       wait_for_ajaximations
     end
 
-    it "should have a no point possible warning when a student is selected", priority: "2", test_id: 164226 do
+    it "should have a no point possible warning when a student is selected", priority: "2", test_id: 615711 do
       # select from dropdown
       click_option('#student_select', @students[0].name)
 
@@ -401,12 +380,126 @@ describe "screenreader gradebook" do
       expect(f('#student_information > div.row')).to include_text('Score does not include assignments from the group')
     end
 
-    it "should have a no point possible warning when an assignment is selected", priority: "2", test_id: 602625 do
+    it "should have a no point possible warning when an assignment is selected", priority: "2", test_id: 615691 do
       # select from dropdown
       click_option('#assignment_select', @assignment.name)
 
       expect(f('a > i.icon-warning')).to be_displayed
       expect(f('#assignment_information > div.row')).to include_text('Assignments in this group have no points')
+    end
+  end
+
+  context 'When Grading' do
+    let(:test_course) { course() }
+    let(:teacher)     { user(active_all: true) }
+    let(:student)     { user(active_all: true) }
+    let!(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    let!(:assignment_1) do
+      test_course.assignments.create!(
+        title: 'Points Assignment',
+        grading_type: 'points',
+        points_possible: 10,
+        due_at: 2.days.ago
+      )
+    end
+    let!(:assignment_2) do
+      test_course.assignments.create!(
+        title: 'Percent Assignment',
+        grading_type: 'percent',
+        points_possible: 10
+      )
+    end
+    let!(:assignment_3) do
+      test_course.assignments.create!(
+        title: 'Complete/Incomplete Assignment',
+        grading_type: 'pass_fail',
+        points_possible: 10
+      )
+    end
+    let!(:assignment_4) do
+      test_course.assignments.create!(
+        title: 'Letter Grade Assignment',
+        grading_type: 'letter_grade',
+        points_possible: 10
+      )
+    end
+    let!(:student_submission) do
+      assignment_1.submit_homework(
+        student,
+        submission_type: 'online_text_entry',
+        body: 'Hello!'
+      )
+    end
+    let(:grade_input) { f('#student_and_assignment_grade') }
+    let(:give_homework_8_points) do
+      replace_content(grade_input, '8')
+      2.times { grade_input.send_keys(:tab) }
+    end
+
+    before(:each) do
+      user_session(teacher)
+      get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=srgb"
+      click_option('#student_select', student.name)
+    end
+
+    it 'displays correct Grade for: label on assignments', prority: "1", test_id: 615692 do
+      select_assignment(assignment_1)
+
+      section_header = f("label[for='student_and_assignment_grade']")
+      expect(section_header).to include_text('Grade for: Points Assignment')
+    end
+
+    it 'displays correct Grade for: label on next assignment', prority: "1", test_id: 615953 do
+      select_assignment(assignment_1)
+      fj("button:contains('Next Assignment')").click
+
+      section_header = f("label[for='student_and_assignment_grade']")
+      expect(section_header).to include_text('Grade for: Percent Assignment')
+    end
+
+    it 'displays correct points for graded by Points', priority: "1", test_id: 615695 do
+      select_assignment(assignment_1)
+      give_homework_8_points
+
+      expect(grade_input).to have_value('8')
+    end
+
+    it 'displays correct points for graded by Percent', prority: "1", test_id: 163999 do
+      select_assignment(assignment_2)
+      give_homework_8_points
+
+      keep_trying_until do
+        expect(grade_input).to have_value('80%')
+      end
+    end
+
+    it 'displays correct points for graded by Complete/Incomplete', priority: "1", test_id: 615694 do
+      select_assignment(assignment_3)
+      click_option('#student_and_assignment_grade', 'Complete')
+      # This is an unfortunate hack for a timing issue with the response from SRGB
+      2.times { grade_input.send_keys(:tab) }
+      wait_for_ajaximations
+
+      expect(f('#grading div.ember-view')).to include_text('10 out of 10')
+    end
+
+    it 'displays correct points for graded by Letter Grade', prority: "1", test_id: 163999 do
+      select_assignment(assignment_4)
+      give_homework_8_points
+      # This is an unfortunate hack for a timing issue with the response from SRGB
+      2.times { grade_input.send_keys(:tab) }
+      wait_for_ajaximations
+
+      expect(grade_input).to have_value('B-')
+    end
+
+    it 'displays late submission warning', priority: "1", test_id: 615701 do
+      select_assignment(assignment_1)
+
+      expect(f('p.late.muted em')).to include_text('This submission was late.')
     end
   end
 end

@@ -22,10 +22,9 @@ module Lti
 
     belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
 
-    belongs_to :context, :polymorphic => true
+    belongs_to :context, polymorphic: [:course, :account]
 
     validates_presence_of :tool_proxy, :context
-    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
 
   end
 end

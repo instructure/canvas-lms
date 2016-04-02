@@ -1117,7 +1117,7 @@ describe CoursesController do
       expect(@course.students).to be_empty
       expect(@course.observers.map{|s| s.name}).to be_include("Sam")
       expect(@course.observers.map{|s| s.name}).to be_include("Fred")
-      expect(@course.observer_enrollments.map(&:workflow_state)).to eql(['active', 'active'])
+      expect(@course.observer_enrollments.map(&:workflow_state)).to eql(['invited', 'invited'])
     end
 
     it "will use json for limit_privileges_to_course_section param" do

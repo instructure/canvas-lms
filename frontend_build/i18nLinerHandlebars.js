@@ -9,7 +9,7 @@ var EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
 var ScopedHbsExtractor = require(__dirname + '/../gems/canvas_i18nliner/js/scoped_hbs_extractor');
 var PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')['default'];
 var fs = require('fs');
-var child_process = require('child_process');
+var brandableCss = require(__dirname + "/brandableCss")
 
 var compileHandlebars = function(data){
   var path = data.path;
@@ -34,6 +34,8 @@ var compileHandlebars = function(data){
     throw {error: e};
   }
 };
+
+
 
 var emitTemplate = function(path, name, result, dependencies, cssRegistration, partialRegistration){
   var moduleName = "jst/" + path.replace(/.*\/\jst\//, '').replace(/\.handlebars/, "");
@@ -60,13 +62,7 @@ var buildCssReference = function(name){
     var cssStat = fs.statSync(matchingCssPath);
     if(cssStat.isFile()){
       var bundle = "jst/" + name;
-      var fingerprintArgs = ["exec", "rake", "brand_configs:fingerprints["+bundle+"]"];
-      var fingerprintOutput = child_process.spawnSync("bundle", fingerprintArgs);
-      if(fingerprintOutput.error){
-        console.log("ERROR IN FINGERPRINTING", fingerprintOutput.error);
-        throw fingerprintOutput.error;
-      }
-      var cached = JSON.parse(fingerprintOutput.stdout.toString());
+      var cached = brandableCss.allFingerprintsFor(bundle)
       var firstVariant = Object.keys(cached)[0];
       var options = "";
       if(cached[firstVariant]['includesNoVariables']){

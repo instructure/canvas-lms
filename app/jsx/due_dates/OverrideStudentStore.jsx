@@ -58,7 +58,7 @@ define([
     })
 
     $.getJSON(searchUsersPath,
-      {search_term: nameString, enrollment_type: "student"},
+      {search_term: nameString, enrollment_type: "student", include_inactive: false},
       this._fetchStudentsByNameSuccessHandler.bind(this, {nameString: nameString}),
       this._fetchStudentsByNameErrorHandler.bind(this, {nameString: nameString})
     )
@@ -94,7 +94,7 @@ define([
     var path = this.getContextPath() + "/users"
 
     $.getJSON(path,
-      {per_page: STUDENTS_FETCHED_PER_PAGE, page: pageNumber, enrollment_type: "student"},
+      {per_page: STUDENTS_FETCHED_PER_PAGE, page: pageNumber, enrollment_type: "student", include_inactive: false},
       this._fetchStudentsForCourseSuccessHandler.bind(this, {})
     )
   }

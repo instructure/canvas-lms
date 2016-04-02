@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
-  'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/RceCommandShim',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
@@ -33,7 +33,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(callOnRCE, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
+], function(RceCommandShim, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -685,7 +685,7 @@ define([
       }
       try {
         if($input.data('rich_text')) {
-          val = callOnRCE($input, "get_code", false);
+          val = new RceCommandShim().send($input, "get_code", false);
         }
       } catch(e) {}
       var attr = $input.prop('name') || '';

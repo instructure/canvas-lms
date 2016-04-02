@@ -142,6 +142,19 @@ describe GroupMembership do
       membership.save!
       expect(membership.messages_sent).to be_empty
     end
+
+    it "should not dispatch a message if the course is soft-concluded" do
+      course_with_teacher(:active_all => true)
+      @course.soft_conclude!
+      @course.save!
+      student = user_model
+      group = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+      membership = group.group_memberships.build(user: student)
+      @course.enroll_student(student)
+      Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+      membership.save!
+      expect(membership.messages_sent).to be_empty
+    end
   end
 
   it "should be invalid if group wants a common section, but doesn't have one with the user" do

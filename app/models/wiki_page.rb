@@ -33,6 +33,8 @@ class WikiPage < ActiveRecord::Base
   after_update :post_to_pandapub_when_revised
 
   belongs_to :wiki, :touch => true
+  belongs_to :course, foreign_key: 'wiki_id', primary_key: 'wiki_id'
+  belongs_to :group, foreign_key: 'wiki_id', primary_key: 'wiki_id'
   belongs_to :user
 
   acts_as_url :title, :scope => [:wiki_id, :not_deleted], :sync_url => true

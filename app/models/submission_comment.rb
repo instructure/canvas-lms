@@ -24,9 +24,8 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :author, :class_name => 'User'
   belongs_to :recipient, :class_name => 'User'
   belongs_to :assessment_request
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:course]
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
 

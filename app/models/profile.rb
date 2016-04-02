@@ -1,5 +1,5 @@
 class Profile < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:course], exhaustive: false
   belongs_to :root_account, :class_name => 'Account'
 
   attr_accessible :context, :root_account, :title, :path, :description, :visibility, :position
@@ -94,20 +94,18 @@ class Profile < ActiveRecord::Base
   end
 
   module Association
-    def self.included(klass)
-      klass.has_one :profile, :as => :context
-      klass.class_eval <<-CODE, __FILE__, __LINE__ + 1
-        def profile_with_correct_class
-          profile_without_correct_class || begin
-            profile = #{klass}Profile.new(:context => self)
-            profile.root_account = root_account
-            profile.title = name
-            profile.visibility = "private"
-            profile
-          end
-        end
-        alias_method_chain :profile, :correct_class
-      CODE
+    def self.prepended(klass)
+      klass.has_one :profile, as: :context
+    end
+
+    def profile
+      super || begin
+        profile = Object.const_get("#{self.class.name}Profile", false).new(context: self)
+        profile.root_account = root_account
+        profile.title = name
+        profile.visibility = "private"
+        profile
+      end
     end
   end
 end

@@ -29,7 +29,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(50.0)
       expect(@user.enrollments.first.computed_final_score).to eql(25.0)
     end
-    
+
     it "should recompute when an assignment's points_possible changes'" do
       course_with_student
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => 100)
@@ -37,14 +37,14 @@ describe GradeCalculator do
       @submission = @assignment.grade_student(@user, :grade => "5")
       expect(@user.enrollments.first.computed_current_score).to eql(50.0)
       expect(@user.enrollments.first.computed_final_score).to eql(50.0)
-      
+
       @assignment.points_possible = 5
       @assignment.save!
-      
+
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
-    
+
     it "should recompute when an assignment group's weight changes'" do
       course_with_student
       @course.group_weighting_scheme = "percent"
@@ -78,7 +78,7 @@ describe GradeCalculator do
       @assignment2.context = @course
       @assignment2.save!
     end
-    
+
     describe "group with no grade or muted grade" do
       before(:each) do
         two_groups_two_assignments(50, 10, 50, 10)
@@ -185,7 +185,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(58.0)
       expect(@user.enrollments.first.computed_final_score).to eql(58.0)
     end
-    
+
     it "should incorporate extra credit when the weighted total is more than 100%" do
       two_groups_two_assignments(50, 10, 60, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
@@ -211,7 +211,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(100.0)
     end
-    
+
     it "should incorporate extra credit when the total is more than the possible" do
       two_groups_two_assignments(50, 10, 60, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)
@@ -237,7 +237,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(112.0)
       expect(@user.enrollments.first.computed_final_score).to eql(112.0)
     end
-    
+
     it "should properly calculate the grade when total weight is less than 100%" do
       two_groups_two_assignments(50, 10, 40, 40)
       @submission = @assignment.grade_student(@user, :grade => "10")
@@ -246,7 +246,7 @@ describe GradeCalculator do
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(55.56)
-      
+
       @submission2 = @assignment2.grade_student(@user, :grade => "40")
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
@@ -269,7 +269,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_current_score).to eql(90.0)
       expect(@user.enrollments.first.computed_final_score).to eql(90.0)
     end
-    
+
     def two_graded_assignments
       course_with_student
       @group = @course.assignment_groups.create!(:name => "some group")
@@ -354,7 +354,7 @@ describe GradeCalculator do
 
       @assignment_1.mute!
       @assignment_1.grade_student(@user, :grade => 500)
-      
+
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(93.18)
       expect(@user.enrollments.first.computed_final_score).to eql(75.93)
@@ -610,8 +610,7 @@ describe GradeCalculator do
     end
 
     context "differentiated assignments grade calculation" do
-      def set_up_course_for_differentiated_assignments(enabler_method)
-          @course.send(enabler_method, :differentiated_assignments)
+      def set_up_course_for_differentiated_assignments
           set_grades [[5, 20], [15, 20], [10,20], [nil, 20], [20, 20], [10,20], [nil, 20]]
           @assignments.each do |a|
             a.only_visible_to_overrides = true
@@ -640,9 +639,9 @@ describe GradeCalculator do
         [final_grade_info[:total], final_grade_info[:possible]]
       end
 
-      context "DA enabled" do
+      context "DA" do
         before do
-          set_up_course_for_differentiated_assignments(:enable_feature!)
+          set_up_course_for_differentiated_assignments
         end
         it "should calculate scores based on visible assignments only" do
           # 5 + 15 + 10 + 20 + 10
@@ -662,31 +661,6 @@ describe GradeCalculator do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           # 5 + 15 + 10 + 20 + 10 - 10 - 10
           expect(get_user_points_and_course_total(@user,@course)).to eq [40,60]
-        end
-      end
-
-      context "DA disabled" do
-        before do
-          set_up_course_for_differentiated_assignments(:disable_feature!)
-        end
-        it "should calculate scores based on all active assignments" do
-          # 5 + 15 + 10 + 0 + 20 + 10
-          expect(get_user_points_and_course_total(@user,@course)).to eq [60,140]
-        end
-        it "should drop the lowest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_lowest:1')
-          # 5 + 15 + 10 + 0 + 20 + 10 - 0
-          expect(get_user_points_and_course_total(@user,@course)).to eq [60,120]
-        end
-        it "should drop the highest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_highest:1')
-          # 5 + 15 + 10 + 0 + 20 + 10 - 20
-          expect(get_user_points_and_course_total(@user,@course)).to eq [40,120]
-        end
-        it "shouldnt count an invisible assingment with never drop on" do
-          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@non_overridden_lowest.id}")
-          # 5 + 15 + 10 + 0 + 20 + 10 - 5 - 0
-          expect(get_user_points_and_course_total(@user,@course)).to eq [55,100]
         end
       end
     end

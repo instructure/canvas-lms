@@ -167,7 +167,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit", priority: "3", test_id: 210062 do
+    it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab
@@ -584,6 +584,9 @@ describe "quizzes" do
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"
+
+      Setting.set('context_default_quota', '1') # shouldn't check quota
+
       user_session(@student)
       get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       expect_new_page_load do

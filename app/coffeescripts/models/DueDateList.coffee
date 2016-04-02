@@ -41,7 +41,7 @@ define [
     _overrideSectionIDs: => @overrides.courseSectionIDs()
 
     _onlyVisibleToOverrides: =>
-      ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED && @assignment.isOnlyVisibleToOverrides()
+      @assignment.isOnlyVisibleToOverrides()
 
     _addOverrideForDefaultSectionIfNeeded: =>
       return if @_onlyVisibleToOverrides()

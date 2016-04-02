@@ -575,6 +575,14 @@ describe FilesController do
       expect(assigns[:attachment]).to be_locked
     end
 
+    it "should reject an upload that would exceed quota" do
+      user_session(@teacher)
+      Setting.set('user_default_quota', 7) # seven... seven bytes.
+      post 'create', :user_id => @teacher.id, :format => :json, :attachment => {:display_name => "bob", :uploaded_data => io}
+      expect(response.status).to eq 400
+      expect(response.body).to include 'quota exceeded'
+    end
+
     context "sharding" do
       specs_require_sharding
 

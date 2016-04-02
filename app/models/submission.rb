@@ -1374,6 +1374,26 @@ class Submission < ActiveRecord::Base
     !self.has_submission? && !self.graded?
   end
 
+  def visible_rubric_assessments_for(viewing_user)
+    return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    filtered_assessments = self.rubric_assessments.select do |a|
+      a.grants_right?(viewing_user, :read)
+    end
+    filtered_assessments.sort_by do |a|
+      if a.assessment_type == 'grading'
+        [CanvasSort::First]
+      else
+        [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
+      end
+    end
+  end
+
+  def rubric_association_with_assessing_user_id
+    self.assignment.rubric_association.tap do |association|
+      association.assessing_user_id = self.user_id if association
+    end
+  end
+
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
     progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
@@ -1389,7 +1409,7 @@ class Submission < ActiveRecord::Base
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
 
-      scope = assignment.students_with_visibility(context.students_visible_to(grader))
+      scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
       if section
         scope = scope.where(:enrollments => { :course_section_id => section })
       end
