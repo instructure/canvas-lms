@@ -158,9 +158,9 @@ describe "Api::V1::AssignmentOverride" do
     end
     subject(:assignment_overrides_json) { @subject.assignment_overrides_json([@override], @student) }
 
-    it 'should work when override relation is a quiz' do
-      expect(@override.assignment).to be_nil, 'precondition'
-      expect { assignment_overrides_json }.not_to raise_error
+    it 'delegates to AssignmentOverride.visible_userse_for' do
+      AssignmentOverride.expects(:visible_users_for).once.returns([@student])
+      assignment_overrides_json
     end
   end
 end
