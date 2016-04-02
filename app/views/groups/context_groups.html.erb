@@ -1,6 +1,6 @@
 <% content_for :page_title do %><%= join_title t(:page_title, 'Course Groups'), @context.name %><% end %>
 
-<% if !@context.is_a?(Account) && @context.root_account.feature_enabled?(:student_groups_next)  %>
+<% if !@context.is_a?(Account) %>
   <% js_env :course_id => @context.id %>
   <% js_env :STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE =>  @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups && can_do(@context.groups.temp_record, @current_user, :create) %>
   <% js_bundle :react_groups %>
@@ -50,7 +50,7 @@
 
     <%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
     <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
-    <%= image_tag "warning.png" %>
+    <%= image_tag "warning.png", :alt => '' %>
     <%= t :student_group_warning, <<-TEXT
     If your teacher has talked about putting you into
     groups as part of an assignment, this is not the way to make that happen.

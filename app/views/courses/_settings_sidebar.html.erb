@@ -95,10 +95,10 @@
   <% end %>
 
   <% if @context.feature_enabled?(:conditional_release) && can_do(@context, @current_user, :manage_content) %>
-    <a href='#' class='btn button-sidebar-wide conditional-release-button'>
+    <%= link_to context_url(@context, :course_score_range_defaults_url), :class => 'btn button-sidebar-wide conditional-release-button' do %>
       <i class="icon-group"></i>
       <%= t('Conditional Release') %>
-    </a>
+    <% end %>
   <% end %>
 
   <table class="summary">

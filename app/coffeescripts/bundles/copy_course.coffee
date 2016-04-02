@@ -8,8 +8,9 @@ require [
   'compiled/views/CollectionView',
   'jst/content_migrations/subviews/DaySubstitutionCollection',
   'compiled/models/ContentMigration',
+  'compiled/util/coupleTimeFields',
   'jquery.instructure_date_and_time'
-], (I18n, $, Backbone, DateShiftView, DaySubstitutionView, DaySubstitutionCollection, CollectionView, template, ContentMigration)->
+], (I18n, $, Backbone, DateShiftView, DaySubstitutionView, DaySubstitutionCollection, CollectionView, template, ContentMigration, coupleTimeFields)->
 
   $(document).ready ->
     $(".datetime_field").datetime_field(addHiddenInput: true)
@@ -34,8 +35,24 @@ require [
   dateShiftView.$oldStartDate.val(ENV.OLD_START_DATE).trigger('change')
   dateShiftView.$oldEndDate.val(ENV.OLD_END_DATE).trigger('change')
 
-  $('#course_start_at').on 'change', ->
+  $start = $('#course_start_at')
+  $end = $('#course_conclude_at')
+
+  validateDates = ->
+    start_at = $start.data('unfudged-date')
+    end_at = $end.data('unfudged-date')
+
+    if start_at && end_at && (end_at < start_at)
+      $('button[type=submit]').attr('disabled', true)
+      $end.errorBox(I18n.t 'End date cannot be before start date')
+    else
+      $('button[type=submit]').attr('disabled', false)
+      $('#copy_course_form').hideErrors()
+
+  $start.on 'change', ->
+    validateDates()
     dateShiftView.$newStartDate.val($(this).val()).trigger('change')
 
-  $('#course_conclude_at').on 'change', ->
+  $end.on 'change', ->
+    validateDates()
     dateShiftView.$newEndDate.val($(this).val()).trigger('change')

@@ -164,9 +164,8 @@ $app_height: 143px;
               color: #d6ecfc;
             }
             .desc {
-              margin-top: 5px;
-              font-size: 11px;
-              line-height: 17px;
+              @include fontSize(11px);
+              line-height: $ic-line-height;
             }
           }
         }

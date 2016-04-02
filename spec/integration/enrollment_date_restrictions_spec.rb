@@ -132,7 +132,6 @@ describe "enrollment_date_restrictions" do
     Account.default.account_users.create!(user: @user)
     @user.reload
     get "/users/#{@user.id}"
-    expect(response.body).to match /Inactive/
     expect(response.body).to match /Completed/
     expect(response.body).to match /Active/
   end

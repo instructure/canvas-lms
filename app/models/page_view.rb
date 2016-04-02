@@ -27,8 +27,7 @@ class PageView < ActiveRecord::Base
 
   before_save :ensure_account
   before_save :cap_interaction_seconds
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User', 'UserProfile']
+  belongs_to :context, polymorphic: [:course, :account, :group, :user, :user_profile], polymorphic_prefix: true
 
   attr_accessor :generated_by_hand
   attr_accessor :is_update

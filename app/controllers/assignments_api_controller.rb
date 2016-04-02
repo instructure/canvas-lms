@@ -565,7 +565,6 @@ class AssignmentsApiController < ApplicationController
           preload(:rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
-      da_enabled = @context.feature_enabled?(:differentiated_assignments)
 
       include_params = Array(params[:include])
 
@@ -600,7 +599,7 @@ class AssignmentsApiController < ApplicationController
 
       include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
 
-      if include_visibility && da_enabled
+      if include_visibility
         assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
       end
 

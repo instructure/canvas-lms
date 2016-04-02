@@ -13,6 +13,9 @@ class UserMerge
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+    user_merge_data = target_user.shard.activate do
+      UserMergeData.create!(user: target_user, from_user: from_user)
+    end
 
     if target_user.avatar_state == :none && from_user.avatar_state != :none
       [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
@@ -96,11 +99,13 @@ class UserMerge
 
     destroy_conflicting_module_progressions(@from_user, target_user)
 
-    move_enrollments(@from_user, target_user)
+    move_enrollments(target_user, user_merge_data)
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
-      max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
-      Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
+      max_position = Pseudonym.where(user_id: target_user).order(:position).last.try(:position) || 0
+      pseudonyms_to_move = Pseudonym.where(user_id: from_user)
+      user_merge_data.add_more_data(pseudonyms_to_move)
+      pseudonyms_to_move.update_all(["user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
         Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
@@ -165,9 +170,12 @@ class UserMerge
         Rails.logger.error "migrating discussions failed: #{e}"
       end
 
+      account_users = AccountUser.where(user_id: from_user)
+      user_merge_data.add_more_data(account_users)
+      account_users.update_all(user_id: target_user)
+
       updates = {}
-      ['account_users', 'access_tokens', 'asset_user_accesses',
-       'attachments',
+      ['access_tokens', 'asset_user_accesses', 'attachments',
        'calendar_events', 'collaborations',
        'context_module_progressions',
        'group_memberships', 'page_comments',
@@ -291,31 +299,46 @@ class UserMerge
                       END, sis_batch_id DESC, updated_at DESC").first
   end
 
-  def move_enrollments(from_user, target_user)
+  def handle_conflicts(column, target_user, user_merge_data)
+    users = [from_user, target_user]
+    conflict_scope(column).where(column => users).find_each do |e|
+
+      scope = enrollment_conflicts(e, column, users)
+      keeper = enrollment_keeper(scope)
+
+      # delete all conflicts from target user
+      to_delete = scope.where("id<>?", keeper).where(column => target_user)
+      user_merge_data.add_more_data(to_delete)
+      to_delete.delete_all
+
+      # mark all conflicts on from_user as deleted so they will be left
+      to_delete = scope.active.where("id<>?", keeper).where(column => from_user)
+      user_merge_data.add_more_data(to_delete)
+      to_delete.destroy_all
+    end
+  end
+
+  def remove_self_observers(target_user, user_merge_data)
+    # prevent observing self by marking them as deleted
+    to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
+                                                   (associated_user_id = :target_user AND user_id = :from_user OR
+                                                   associated_user_id = :from_user AND user_id = :target_user)",
+                                                  {target_user: target_user, from_user: from_user})
+    user_merge_data.add_more_data(to_delete)
+    to_delete.destroy_all
+  end
+
+  def move_enrollments(target_user, user_merge_data)
     [:associated_user_id, :user_id].each do |column|
-      users = [from_user, target_user]
       Shard.with_each_shard(from_user.associated_shards) do
         Enrollment.transaction do
-          conflict_scope(column).where(column => users).find_each do |e|
-
-            scope = enrollment_conflicts(e, column, users)
-            keeper = enrollment_keeper(scope)
-
-            # delete all conflicts from target user
-            scope.where("id<>?", keeper).where(column => target_user).delete_all
-
-            # mark all conflicts on from_user as deleted so they will be left
-            scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
-          end
-
-          # prevent observing self by marking them as deleted
-          Enrollment.active.where("type = 'ObserverEnrollment' AND
-                                  (associated_user_id = :target_user AND user_id = :from_user OR
-                                  associated_user_id = :from_user AND user_id = :target_user)",
-                                  {target_user: target_user, from_user: from_user}).destroy_all
+          handle_conflicts(column, target_user, user_merge_data)
+          remove_self_observers(target_user, user_merge_data)
 
           # move all the enrollments that are not marked as deleted to the target user
-          Enrollment.active.where(column => from_user).update_all(column => target_user)
+          to_move = Enrollment.active.where(column => from_user)
+          user_merge_data.add_more_data(to_move)
+          to_move.update_all(column => target_user)
         end
       end
     end

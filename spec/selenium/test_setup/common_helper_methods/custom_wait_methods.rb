@@ -114,21 +114,23 @@ module CustomWaitMethods
     wait_for_animations(wait_start)
   end
 
+  def pause_ajax
+    SeleniumDriverSetup.request_mutex.synchronize { yield }
+  end
+
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
-    val = false
-    seconds.times do |i|
-      puts "trying #{seconds - i}" if i > SECONDS_UNTIL_COUNTDOWN
-      val = false
+    frd_error = nil
+    Selenium::WebDriver::Wait.new(timeout: seconds).until do
       begin
-        val = yield
-        break if val
+        frd_error = nil
+        yield
       rescue StandardError, RSpec::Expectations::ExpectationNotMetError
-        raise if i == seconds - 1
+        frd_error = $ERROR_INFO
+        nil
       end
-      sleep 1
     end
-    raise "Unexpected #{val.inspect}" unless val
-    val
+  rescue Selenium::WebDriver::Error::TimeOutError
+    raise frd_error || $ERROR_INFO
   end
 
   # pass in an Element pointing to the textarea that is tinified.

@@ -59,9 +59,6 @@
   vertical-align: middle;
   padding-right: 5px;
 }
-.user_list .skype_status a img {
-  height: 22px;
-}
 </style>
 <% end %>
 <h1><%= t('headings.registered_services', %{Registered Services}) %></h1>
@@ -99,11 +96,6 @@
       </a>
     <% else %>
       <%= @users_hash[service.user_id].name %>
-    <% end %>
-    <% if service.service == 'skype' %>
-      <span class="skype_status">
-        <a href="skype:<%= service.service_user_name %>?call"><img src="http://mystatus.skype.com/bigclassic/<%= service.service_user_name %>" alt="<%= t('links.alt.skype_status', %{skype status}) %>" /></a>
-      </span>
     <% end %>
   </li>
 <% end %>

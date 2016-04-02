@@ -24,7 +24,7 @@ class RequestContextGenerator
   end
 
   def call(env)
-    request_id = SecureRandom.uuid
+    request_id = generate_request_id(env)
 
     # rack.session.options (where the session_id is saved by our session
     # store) isn't availalbe at this point in the middleware stack. It is
@@ -100,5 +100,19 @@ class RequestContextGenerator
     self.add_meta_header("p", page_view.participated? ? "t" : "f")
     self.add_meta_header("e", page_view.asset_user_access_id)
     self.add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
+  end
+
+  private
+  def generate_request_id(env)
+    if env['HTTP_X_REQUEST_CONTEXT_ID'] && env['HTTP_X_REQUEST_CONTEXT_SIGNATURE']
+      request_context_id = Canvas::Security.base64_decode(env['HTTP_X_REQUEST_CONTEXT_ID'])
+      request_context_signature = Canvas::Security.base64_decode(env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'])
+      if Canvas::Security.verify_hmac_sha512(request_context_id, request_context_signature)
+        return request_context_id
+      else
+        Rails.logger.info("ignoring X-Request-Context-Id header, signature could not be verified")
+      end
+    end
+    SecureRandom.uuid
   end
 end

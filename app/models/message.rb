@@ -562,7 +562,7 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
-      if Setting.get("notification_service_traffic", '').present?
+      if Setting.get("notification_service_traffic", nil).present?
         send(delivery_method)
       end
       enqueue_to_sqs
@@ -576,20 +576,27 @@ class Message < ActiveRecord::Base
   # Returns nothing
   def enqueue_to_sqs
     notification_targets.each do |target|
-      NotificationService.process(global_id, notification_message, path_type, target, remote_configuration)
-      complete_dispatch
+      Services::NotificationService.process(
+        global_id,
+        notification_message,
+        path_type,
+        target
+      )
+      complete_dispatch if Setting.get("notification_service_traffic", nil).nil?
     end
-  rescue AWS::SQS::Errors::ServiceError => e
+  rescue AWS::SQS::Errors::Base => e
     Canvas::Errors.capture(
       e,
       message: 'Message delivery failed',
       to: to,
       object: inspect.to_s
     )
-    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-    self.transmission_errors = error_string
-    self.errored_dispatch
-    raise
+    if Setting.get("notification_service_traffic", nil).nil?
+      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+      self.transmission_errors = error_string
+      self.errored_dispatch
+      raise
+    end
   end
 
   class RemoteConfigurationError < StandardError; end
@@ -865,7 +872,7 @@ class Message < ActiveRecord::Base
           Canvas::Twilio.deliver(
             to,
             body,
-            from_recipient_country: user.account.feature_enabled?(:international_sms_from_recipient_country)
+            from_recipient_country: true
           )
         end
       rescue StandardError => e

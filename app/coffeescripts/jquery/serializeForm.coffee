@@ -1,4 +1,4 @@
-define ['jquery'], ($) ->
+define ['jquery', 'jsx/shared/rce/RceCommandShim'], ($, RceCommandShim) ->
 
   rselectTextarea = /^(?:select|textarea)/i
   rCRLF = /\r?\n/g
@@ -37,7 +37,7 @@ define ['jquery'], ($) ->
       else
         $input.data('date') or null
     else if $input.data('rich_text')
-      $input.editorBox('get_code', false)
+      new RceCommandShim().send($input, 'get_code', false)
     else
       $input.val()
 
@@ -55,4 +55,3 @@ define ['jquery'], ($) ->
       .filter(isSerializable)
       .map(getValue)
       .get()
-

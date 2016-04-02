@@ -20,7 +20,7 @@ module LiveAssessments
   class Assessment < ActiveRecord::Base
     attr_accessible :context, :key, :title
 
-    belongs_to :context, polymorphic: true
+    belongs_to :context, polymorphic: [:course]
     has_many :submissions, class_name: 'LiveAssessments::Submission'
     has_many :results, class_name: 'LiveAssessments::Result'
 

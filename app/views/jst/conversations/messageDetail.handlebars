@@ -27,7 +27,7 @@
           <a href="#"
              role="button"
              data-kyle-menu-options='{"appendMenuTo": "body"}'
-             class="al-trigger Button Button--icon-action"
+             class="al-trigger Button Button--icon-action message-detail-kyle-menu"
              title="{{#t "more_options"}}More options{{/t}}"
              data-tooltip>
             <i class="icon-settings"></i>
@@ -41,10 +41,11 @@
             <li>
               <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
             </li>
-            <li>
-              <a href="#" class="archive-btn">{{archiveToggleMessage}}</a>
-            </li>
-
+            {{#if canArchive}}
+              <li>
+                <a href="#" class="archive-btn">{{archiveToggleMessage}}</a>
+              </li>
+            {{/if}}
             <li><a href="#" class="star-toggle-btn">{{starToggleMessage}}</a></li>
 
             <li>

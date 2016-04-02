@@ -25,12 +25,8 @@ Delayed::Settings.default_job_options = ->{
 # load our periodic_jobs.yml (cron overrides config file)
 Delayed::Periodic.add_overrides(ConfigFile.load('periodic_jobs') || {})
 
-# If there is a sub-hash under the 'queue' key for the database config, use that
-# as the connection for the job queue. The migration that creates the
-# delayed_jobs table is smart enough to use this connection as well.
-db_queue_config = ActiveRecord::Base.configurations[Rails.env]['queue']
-if db_queue_config
-  Delayed::Backend::ActiveRecord::Job.establish_connection(db_queue_config)
+if ActiveRecord::Base.configurations[Rails.env]['queue']
+  ActiveSupport::Deprecation.warn("A queue section in database.yml is no longer supported. Please run migrations, then remove it.")
 end
 
 Delayed::Worker.on_max_failures = proc do |job, err|

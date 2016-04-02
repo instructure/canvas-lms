@@ -38,6 +38,37 @@ describe ContextController do
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
       expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins.map(&:id)
     end
+
+    it "should only show active group members to students" do
+      active_student = user
+      @course.enroll_student(active_student).accept!
+      inactive_student = user
+      @course.enroll_student(inactive_student).deactivate
+
+      @group = @course.groups.create!
+      [@student, active_student, inactive_student].each do |u|
+        @group.add_user(u, 'accepted')
+      end
+
+      user_session(@student)
+      get 'roster', :group_id => @group.id
+      expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id]
+    end
+
+    it "should show all group members to admins" do
+      active_student = user
+      @course.enroll_student(active_student).accept!
+      inactive_student = user
+      @course.enroll_student(inactive_student).deactivate
+
+      @group = @course.groups.create!
+      [@student, active_student, inactive_student].each do |u|
+        @group.add_user(u, 'accepted')
+      end
+      user_session(@teacher)
+      get 'roster', :group_id => @group.id
+      expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [@student.id, active_student.id, inactive_student.id]
+    end
   end
 
   describe "GET 'roster_user'" do

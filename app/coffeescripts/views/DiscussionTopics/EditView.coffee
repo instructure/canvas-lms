@@ -9,6 +9,7 @@ define [
   'underscore'
   'jst/DiscussionTopics/EditView'
   'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'str/htmlEscape'
   'compiled/models/DiscussionTopic'
   'compiled/models/Announcement'
@@ -22,8 +23,11 @@ define [
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
-GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, wikiSidebar,
+GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, wikiSidebar, RichContentEditor,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts) ->
+
+  richContentEditor = new RichContentEditor({riskLevel: "highrisk", sidebar: wikiSidebar})
+  richContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -85,7 +89,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
-        differentiatedAssignmentsEnabled: @model.differentiatedAssignmentsEnabled()
       json.assignment = json.assignment.toView()
       json
 
@@ -107,11 +110,11 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       @_initializeWikiSidebar ($textarea)
 
       _.defer ->
-        $textarea.editorBox()
+        richContentEditor.loadNewEditor($textarea)
         $('.rte_switch_views_link').click (event) ->
           event.preventDefault()
           event.stopPropagation()
-          $textarea.editorBox 'toggle'
+          richContentEditor.callOnRCE($textarea, 'toggle')
           # hide the clicked link, and show the other toggle link.
           # todo: replace .andSelf with .addBack when JQuery is upgraded.
           $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
@@ -133,11 +136,9 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         $('.rte_switch_views_link').first().before((new KeyboardShortcuts()).render().$el)
 
     _initializeWikiSidebar:(textarea) =>
-      unless wikiSidebar.inited
-        wikiSidebar.init()
-        $.scrollSidebar()
-      wikiSidebar.attachToEditor textarea
-      wikiSidebar.show()
+      richContentEditor.initSidebar()
+      $.scrollSidebar()
+      richContentEditor.attachSidebarTo(textarea)
 
     renderAssignmentGroupOptions: =>
       @assignmentGroupSelector = new AssignmentGroupSelector
@@ -228,8 +229,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       data.unlock_at = defaultDate?.get('unlock_at') or null
       data.due_at = defaultDate?.get('due_at') or null
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
-      if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
+      data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
 
       assignment = @model.get('assignment')
       assignment or= @model.createAssignment()
@@ -249,7 +249,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
-          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success: =>
             missingDateDialog.$dialog.dialog('close').remove()
             @model.get('assignment')?.setNullDates()

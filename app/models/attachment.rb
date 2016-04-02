@@ -39,7 +39,14 @@ class Attachment < ActiveRecord::Base
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
 
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, exhaustive: false, polymorphic:
+      [:account, :assessment_question, :assignment, :attachment,
+       :content_export, :content_migration, :course, :eportfolio, :epub_export,
+       :gradebook_upload, :group, :submission, :zip_file_import,
+       { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_user: 'User', quiz: 'Quizzes::Quiz',
+         quiz_statistics: 'Quizzes::QuizStatistics',
+         quiz_submission: 'Quizzes::QuizSubmission' }]
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
@@ -245,7 +252,11 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.where(cloned_item_id: self.cloned_item_id).first : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    dup.assign_attributes(self.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+
+    excluded_atts = EXCLUDED_COPY_ATTRIBUTES
+    excluded_atts += ["locked", "hidden"] if dup == existing
+    dup.assign_attributes(self.attributes.except(*excluded_atts), :without_protection => true)
+
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -296,6 +307,7 @@ class Attachment < ActiveRecord::Base
   attr_accessor :recently_created
 
   validates_presence_of :context_id, :context_type, :workflow_state
+  validates_length_of :content_type, :maximum => maximum_string_length, :allow_blank => true
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment
@@ -1028,8 +1040,10 @@ class Attachment < ActiveRecord::Base
 
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
-    send_later_enqueue_args(:touch, { :run_at => unlock_at,
-                                      :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    Shackles.activate(:master) do
+      send_later_enqueue_args(:touch, { :run_at => unlock_at,
+                                        :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    end
   end
 
   def locked_for?(user, opts={})
@@ -1481,7 +1495,6 @@ class Attachment < ActiveRecord::Base
   def set_publish_state_for_usage_rights
     if self.context &&
        self.context.respond_to?(:feature_enabled?) &&
-       self.context.feature_enabled?(:better_file_browsing) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?
     end

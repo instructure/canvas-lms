@@ -63,7 +63,7 @@ $announcements_disscussion-summary-color: $ic-color-dark;
     color: $announcements_disscussion-summary-color;
     @include fontSize(11px); }
   .discussion-unread-container { width: 56px; }
-  .discussion-author { @include fontSize(10px); }
+  .discussion-author { @include fontSize(12px); }
   .discussion-summary { @include fontSize(12px); color: $announcements_disscussion-summary-color; }
   .discussion-title {
     @include fontSize(14px);

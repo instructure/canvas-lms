@@ -82,8 +82,7 @@ header:not(.ic-app-header) {
 
 .ig-title {
   flex: 0 0 200px;
-  @include breakpoint(desktop) { flex: 0 0 34%; }
-  @include breakpoint(wide) { flex: 0 0 40%; }
+  @include breakpoint(desktop) { flex: 0 0 40%; }
 }
 
 .ig-details {

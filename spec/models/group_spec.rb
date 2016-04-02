@@ -190,6 +190,15 @@ describe Group do
     expect(attachment.grants_right?(teacher, :create)).to be_truthy
   end
 
+  it "should not allow a concluded student to participate" do
+    course_with_student(:active_all => true)
+    group = @course.groups.create
+    group.add_user(@student)
+
+    @student.enrollments.first.conclude
+    expect(group.grants_right?(@student, :participate)).to be_falsey
+  end
+
   it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
     course_with_teacher(active_course: true)
     student_in_course
@@ -201,7 +210,7 @@ describe Group do
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
     course_with_teacher(active_course: true)
-    student_in_course
+    student_in_course.accept!
 
     # default join_level == 'invitation_only' and default category is not self-signup
     group = @course.groups.create

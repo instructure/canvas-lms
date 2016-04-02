@@ -553,7 +553,11 @@ describe AssignmentOverridesController, type: :request do
       @user = @teacher
 
       raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => 'adhoc title' })
-      expect_errors("assignment_override_students" => [{ "attribute"=>"assignment_override_students", "type"=>"invalid", "message"=>"invalid" }])
+      expect_errors("assignment_override_students" => [{
+        "attribute"=>"assignment_override_students",
+        "type"=>"taken",
+        "message"=>"already belongs to an assignment override"
+      }])
     end
 
     context "overridden due_at" do
@@ -717,6 +721,26 @@ describe AssignmentOverridesController, type: :request do
         expect(@override.set).to eq [@other_student]
       end
 
+      it "should relock modules when changing overrides" do
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+
+        mod = @course.context_modules.create!
+        tag = mod.add_item({:id => @assignment.id, :type => "assignment"})
+        mod.completion_requirements = {tag.id => {:type => 'must_submit'}}
+        mod.save!
+
+        @other_student = student_in_course(:course => @course).user
+
+        prog = mod.evaluate_for(@other_student)
+        expect(prog).to be_completed # since they can't see the assignment
+
+        api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@other_student.id] })
+
+        prog.reload
+        expect(prog).to be_unlocked # now they can
+      end
+
       it "should allow changing the title" do
         @new_title = "new #{@title}"
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
@@ -735,7 +759,11 @@ describe AssignmentOverridesController, type: :request do
         @user = @teacher
 
         raw_api_update_override(@course, @assignment, @original_override, :assignment_override => { :student_ids => [@student.id] })
-        expect_errors("assignment_override_students" => [{ "attribute"=>"assignment_override_students", "type"=>"invalid", "message"=>"invalid" }])
+        expect_errors("assignment_override_students" => [{
+          "attribute"=>"assignment_override_students",
+          "type"=>"taken",
+          "message"=>"already belongs to an assignment override"
+        }])
       end
     end
 

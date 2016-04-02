@@ -298,17 +298,22 @@ namespace :js do
       if ENV['RAILS_ENV'] == 'production'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`
+        raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
       else
-        puts "--> Building DEVELOPMENT webpack bundles"
-        `npm run webpack-development`
+        commands = ['npm run webpack-development']
+
+        # if this var is set, we'll need to have optimized version of the
+        # webpack bundles available too
         if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-          # if this var is set, we'll need to have optimized version of the
-          # webpack bundles available too
-          puts "--> Building OPTIMIZED webpack bundles"
-          `npm run webpack-production`
+          commands << 'npm run webpack-production'
+        end
+        require 'parallel'
+        Parallel.each(commands) do |command|
+          puts "--> Running #{command}"
+          system(command)
+          raise "Error running #{command}\nABORTING" if $?.exitstatus != 0
         end
       end
-      raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
     end
   end
 

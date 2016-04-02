@@ -18,7 +18,7 @@ module Turnitin
       update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
       self.send_later(:update_originality_data, submission, asset_string)
     end
-    handle_asynchronously :process, max_attempts: 1, priority: Delayed::LOW_PRIORITY
+    handle_asynchronously :process, max_attempts: 1, run_at: 1.minutes.from_now, priority: Delayed::LOW_PRIORITY
 
     def resubmit(submission, asset_string)
       self.send_later(:update_originality_data, submission, asset_string)
@@ -79,18 +79,28 @@ module Turnitin
     def create_attachment
       attachment = nil
       Dir.mktmpdir do |dirname|
-        turnitin_client.original_submission do |response|
-          filename = response.headers['content-disposition'].match(/filename=(\"?)(.+)\1/)[2]
-          path = File.join(dirname, filename)
-          File.open(path, 'wb') do |f|
-            f.write(response.body)
+        begin
+          turnitin_client.original_submission do |response|
+            filename = response.headers['content-disposition'].match(/filename=(\"?)(.+)\1/)[2]
+            path = File.join(dirname, filename)
+            File.open(path, 'wb') do |f|
+              f.write(response.body)
+            end
+            attachment = @assignment.attachments.new(
+                uploaded_data: Rack::Test::UploadedFile.new(path, response.headers['content-type'], true),
+                display_name: filename,
+                user: @user
+            )
+            attachment.save!
           end
-          attachment = @assignment.attachments.new(
-              uploaded_data: Rack::Test::UploadedFile.new(path, response.headers['content-type'], true),
-              display_name: filename,
+        rescue StandardError
+          @assignment.attachments.create!(
+            uploaded_data: StringIO.new(I18n.t('An error occurred while attempting to contact Turnitin.')),
+              display_name: 'Failed turnitin submission',
+              filename: 'failed_turnitin.txt',
               user: @user
           )
-          attachment.save!
+          raise
         end
       end
       attachment

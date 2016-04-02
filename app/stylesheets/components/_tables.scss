@@ -222,6 +222,23 @@ Enclose our standard Cog Dropdown within a **div class="ic-Table--actions** to r
 
 */
 
+// Base table styles for Canvas
+table {
+  max-width: 100%;
+  background-color: $tableBackground;
+}
+
+// Need to completely hide the border-collapse and
+// border-spacing defaults from TinyMCE so the
+// user-defined cellspacing attribute still works.
+:not(.user_content) > table,
+// However, for tables without cellspacing, we do
+// want to include the defaults.
+.user_content table:not([cellspacing]) {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 $sp-table: 14px; // Will replace this with global spacing variable, when it hits master
 
 //ic-Tab__Panel--is-open

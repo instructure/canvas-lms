@@ -12,7 +12,7 @@ $ic-left-side-width: $ic-sp*15;
 ::-webkit-scrollbar-thumb {
   -webkit-appearance: none;
   box-shadow: inset 0 0 0 2px $ic-color-light;
-  @if $use_high_contrast { background: darken($ic-border-dark, 15%); }
+  @if $use_high_contrast { background: $ic-color-dark; }
   @else { background: $ic-border-dark; }
 }
 
@@ -101,7 +101,6 @@ $ic-left-side-width: $ic-sp*15;
     opacity: 1;
     transform: translate3d(0,0,0);
   }
-  @include breakpoint(short) { padding-top: $ic-sp; }
 }
 
 .ic-app-main-content {
@@ -131,10 +130,6 @@ $ic-left-side-width: $ic-sp*15;
   box-sizing: border-box;
   padding: $ic-sp*2;
   @include breakpoint(desktop) {
-    flex: 0 0 $ic-sp*22;
-    padding-left: $ic-sp;
-  }
-  @include breakpoint(wide) {
     flex: 0 0 $ic-sp*24;
     padding-left: $ic-sp*2;
   }
@@ -178,8 +173,7 @@ $ic-left-side-width: $ic-sp*15;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   margin: 0 $ic-sp*2;
-  padding: $ic-sp 0;
-  @include breakpoint(wide) { padding: 16px 0; }
+  padding: 16px 0;
 }
 
 .ic-app-course-nav-toggle {
@@ -188,6 +182,7 @@ $ic-left-side-width: $ic-sp*15;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
   @include overwrite-default-icon-size(22px);
+  i[class*=icon-], i[class^=icon-] { margin-right: 0; }
 }
 
 .ic-app-crumbs {

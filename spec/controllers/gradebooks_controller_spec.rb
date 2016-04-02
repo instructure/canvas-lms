@@ -61,6 +61,13 @@ describe GradebooksController do
       expect(response).to render_template('grade_summary')
     end
 
+    it "does not allow access for inactive enrollment" do
+      user_session(@student)
+      @student_enrollment.deactivate
+      get 'grade_summary', :course_id => @course.id, :id => nil
+      assert_unauthorized
+    end
+
     it "renders with specified user_id" do
       user_session(@student)
       get 'grade_summary', :course_id => @course.id, :id => @student.id

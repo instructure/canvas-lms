@@ -52,6 +52,7 @@ describe Api::V1::User do
   before :each do
     @test_api = TestUserApi.new
     @test_api.services_enabled = []
+    @test_api.request.protocol = 'http'
   end
 
   context 'user_json' do

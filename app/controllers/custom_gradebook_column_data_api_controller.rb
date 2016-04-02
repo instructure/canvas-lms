@@ -97,7 +97,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   end
 
   def allowed_users
-    @context.students_visible_to(@current_user)
+    @context.students_visible_to(@current_user, include: :inactive)
   end
   private :allowed_users
 

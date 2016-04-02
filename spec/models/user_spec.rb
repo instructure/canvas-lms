@@ -1138,6 +1138,8 @@ describe User do
     end
 
     it "should return a useful avatar_fallback_url" do
+      HostUrl.stubs(:protocol).returns('https')
+
       expect(User.avatar_fallback_url).to eq(
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       )
@@ -1674,6 +1676,17 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
+      it "doesn't include events for enrollments that are inactive due to date" do
+        @enrollment.start_at = 1.day.ago
+        @enrollment.end_at = 2.days.from_now
+        @enrollment.save!
+        event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
+        expect(@user.upcoming_events).to include(event)
+        Timecop.freeze(3.days.from_now) do
+          expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
+        end
+      end
+
       context "after db section context_code filtering" do
         before do
           course_with_teacher(:active_all => true)
@@ -1772,22 +1785,10 @@ describe User do
     end
 
     context "as student" do
-      context "differentiated_assignments on" do
-        before {@course.enable_feature!(:differentiated_assignments)}
-        it "should return assignments only when a student has overrides" do
-          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
-          expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
-        end
-      end
-
-      context "differentiated_assignments off" do
-        before {
-          @course.disable_feature!(:differentiated_assignments)
-        }
-        it "should return all assignments" do
-          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-        end
+      it "should return assignments only when a student has overrides" do
+        expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+        expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
+        expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
       end
     end
 
@@ -1803,44 +1804,21 @@ describe User do
         @observer = User.create
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
       end
-      context "differentiated_assignments on" do
-        before{@course.enable_feature!(:differentiated_assignments)}
-        context "observer watching student with visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
-        end
-        context "observer watching student without visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
-          it "should be false" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
-          end
-        end
-        context "observer watching a only section" do
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      context "observer watching student with visibility" do
+        before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+        it "should be true" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
-      context "differentiated_assignments off" do
-        before{@course.disable_feature!(:differentiated_assignments)}
-        context "observer watching student with visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      context "observer watching student without visibility" do
+        before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+        it "should be false" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
         end
-        context "observer watching student without visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
-        end
-        context "observer watching a only section" do
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      end
+      context "observer watching a only section" do
+        it "should be true" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
     end
@@ -1961,9 +1939,6 @@ describe User do
       @assignment.publish
       @quiz.due_at = 2.days.from_now
       @quiz.save!
-      if opts[:differentiated_assignments]
-        @course.enable_feature!(:differentiated_assignments)
-      end
       if opts[:override]
         create_section_override_for_assignment(@assignment, {course_section: section})
       end
@@ -1971,39 +1946,20 @@ describe User do
     end
 
     context "differentiated_assignments" do
-      context "feature flag on" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should not return the assignments without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
-        end
-
-        it "should return the assignments with an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
-        end
-
-        it "should not return the assignments without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
-        end
-
-        it "should return the assignments in both types of courses" do
-          assignment0 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
-          assignment1 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          assignment2 = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment0)).to be_truthy
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment1)).to be_falsey
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment2)).to be_truthy
-        end
+      before {@student = User.create!(name: "Test Student")}
+      it "should not return the assignments without an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
 
-      context "feature flag off" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should return the assignment without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
-        end
+      it "should return the assignments with an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: true, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
+      end
+
+      it "should not return the assignments without an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
     end
   end
@@ -2423,12 +2379,7 @@ describe User do
       end
 
       it "should not include submissions from students without visibility" do
-        @course1.enable_feature!(:differentiated_assignments)
         expect(@teacher.assignments_needing_grading.length).to eq 2
-      end
-
-      it "should show all submissions with the feature flag off" do
-        expect(@teacher.assignments_needing_grading.length).to eq 3
       end
     end
 

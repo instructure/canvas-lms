@@ -179,6 +179,25 @@ describe "course copy" do
       expect(@new_course.enrollment_term).to eq @account.default_enrollment_term
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
     end
+
+    it "should not be able to submit invalid course dates" do
+      course_with_admin_logged_in
+
+      get "/courses/#{@course.id}/copy"
+
+      replace_content(f('#course_start_at'), 'Aug 15, 2012')
+      replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
+
+      keep_trying_until do
+        expect(f('button.btn-primary').attribute('disabled')).to be_present
+      end
+
+      replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
+
+      keep_trying_until do
+        expect(f('button.btn-primary').attribute('disabled')).to be_blank
+      end
+    end
   end
 
   describe "course file imports" do

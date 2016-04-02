@@ -5,15 +5,14 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :content_tags, :as => :content
   has_many :context_external_tool_placements, :autosave => true
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key,
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :course_home_sub_navigation, :course_settings_sub_navigation,
                   :config_type, :config_url, :config_xml, :tool_id,
-                  :integration_type, :not_selectable
+                  :not_selectable
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -42,13 +41,27 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
 
-  EXTENSION_TYPES = [
-    :user_navigation, :course_navigation, :account_navigation, :resource_selection,
-    :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
-    :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
-    :tool_configuration, :link_selection, :assignment_selection, :post_grades
-  ].freeze
+  EXTENSION_TYPES = [:account_navigation,
+                     :assignment_menu,
+                     :assignment_selection,
+                     :collaboration,
+                     :course_home_sub_navigation,
+                     :course_navigation,
+                     :course_settings_sub_navigation,
+                     :discussion_topic_menu,
+                     :editor_button,
+                     :file_menu,
+                     :global_navigation,
+                     :homework_submission,
+                     :link_selection,
+                     :migration_selection,
+                     :module_menu,
+                     :post_grades,
+                     :quiz_menu,
+                     :resource_selection,
+                     :tool_configuration,
+                     :user_navigation,
+                     :wiki_page_menu].freeze
 
   CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
 
@@ -502,10 +515,12 @@ class ContextExternalTool < ActiveRecord::Base
     contexts.concat contexts_to_search(context)
     return nil if contexts.empty?
 
-    scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
-    scope = scope.placements(*placements)
-    scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
-    scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
+    context.shard.activate do
+      scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
+      scope = scope.placements(*placements)
+      scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      scope.order("#{ContextExternalTool.best_unicode_collation_key('context_external_tools.name')}, context_external_tools.id")
+    end
   end
 
   def self.find_external_tool_by_id(id, context)
@@ -543,15 +558,6 @@ class ContextExternalTool < ActiveRecord::Base
 
     res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
     return res if res
-
-    nil
-  end
-
-  def self.find_integration_for(context, type)
-    contexts_to_search(context).each do |context|
-      tools = context.context_external_tools.active.where(integration_type: type)
-      return tools.first unless tools.empty?
-    end
 
     nil
   end

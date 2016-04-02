@@ -47,7 +47,7 @@ module SectionTabHelper
           tab_has_required_attributes?(tab)
         }.reject { |tab|
           (tab_is?(tab, 'TAB_COLLABORATIONS') &&
-           !Collaboration.any_collaborations_configured?) ||
+           !Collaboration.any_collaborations_configured?(@context)) ||
           (tab_is?(tab, 'TAB_CONFERENCES') && !WebConference.config)
         }
       end

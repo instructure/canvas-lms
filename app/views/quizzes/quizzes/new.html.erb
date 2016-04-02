@@ -341,7 +341,7 @@
                   </label>
                   <div class="options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
                     <input type="text" tabindex="-1" aria-label="<%=t('labels.ip_addresses', "Filter by IP address")%>" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1"  />
-                    <%= link_to(image_tag("find.png"), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter'), 'aria-label' => t('titles.find_ip_address_filter', 'Find IP Address Filter'), :tabindex => -1) %>
+                    <%= link_to(image_tag("find.png", :alt => t('Find IP Address Filter')), '#', :class => 'ip_filtering_link', :title => t('titles.find_ip_address_filter', 'Find IP Address Filter'), 'aria-label' => t('titles.find_ip_address_filter', 'Find IP Address Filter'), :tabindex => -1) %>
                   </div>
                 </div>
                 <% if feature_enabled?(:lockdown_browser) && !@quiz.lockdown_browser_use_lti_tool? %>

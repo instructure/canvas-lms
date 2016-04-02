@@ -643,5 +643,28 @@ describe "people" do
       new_enrollment = @teacher.enrollments.not_deleted.first
       expect(new_enrollment.role).to eq student_role
     end
+
+    it "should not show the option to edit roles for a soft-concluded course" do
+      @course.conclude_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      get "/courses/#{@course.id}/users"
+      open_dropdown_menu("#user_#{@teacher.id}")
+      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be false
+    end
+
+    it "should not show the option to edit roles for a SIS imported enrollment" do
+      student = user_with_pseudonym(:active_all => true)
+      enrollment = @course.enroll_teacher(student)
+      enrollment.sis_source_id = "something"
+      enrollment.save!
+
+      user_session(@teacher)
+
+      get "/courses/#{@course.id}/users"
+      open_dropdown_menu("#user_#{student.id}")
+      expect(dropdown_item_exists?('editRoles', "#user_#{student.id}")).to be false
+    end
   end
 end

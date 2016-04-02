@@ -424,7 +424,6 @@ describe Quizzes::QuizzesController do
 
         @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
         @course.enroll_student(@user1)
-        @course.enable_feature!(:differentiated_assignments)
 
         questions = [{:question_data => { :name => "test 1" }}]
 
@@ -910,6 +909,8 @@ describe Quizzes::QuizzesController do
       section = @course.course_sections.create!
       course_due_date = 3.days.from_now.iso8601
       section_due_date = 5.days.from_now.iso8601
+      Quizzes::Quiz.any_instance.expects(:relock_modules!).once
+
       post 'create', :course_id => @course.id,
         :quiz => {
           :title => "overridden quiz",
@@ -919,6 +920,7 @@ describe Quizzes::QuizzesController do
             :due_at => section_due_date,
           }]
         }
+
       expect(response).to be_success
       quiz = assigns[:quiz].overridden_for(@teacher)
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @teacher)
@@ -1398,7 +1400,6 @@ describe Quizzes::QuizzesController do
     before do
       course_with_teacher(active_all: true)
       @student1, @student2 = n_students_in_course(2,:active_all => true, :course => @course)
-      @course.enable_feature!(:differentiated_assignments)
       @course_section = @course.course_sections.create!
       course_quiz(active = true)
       @quiz.only_visible_to_overrides = true

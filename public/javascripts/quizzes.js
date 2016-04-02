@@ -1706,9 +1706,7 @@ define([
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
         var overrides = overrideView.getOverrides();
-        if (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED) {
-          data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
-        }
+        data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
         var validationData = {
           assignment_overrides: overrideView.getAllDates()
         };
@@ -1721,7 +1719,6 @@ define([
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
-            da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED,
             success: function(){
               missingDateView.$dialog.dialog('close').remove();
               missingDateView.remove();

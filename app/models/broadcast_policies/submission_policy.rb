@@ -58,6 +58,7 @@ module BroadcastPolicies
     private
     def broadcasting_grades?
       course.available? &&
+      !course.concluded? &&
       !assignment.muted? &&
       assignment.published? &&
       submission.quiz_submission.nil? &&
@@ -98,7 +99,6 @@ module BroadcastPolicies
     end
 
     def user_has_visibility?
-      return true unless submission.context.feature_enabled?(:differentiated_assignments)
       AssignmentStudentVisibility.where(assignment_id: submission.assignment_id, user_id: submission.user_id).any?
     end
 

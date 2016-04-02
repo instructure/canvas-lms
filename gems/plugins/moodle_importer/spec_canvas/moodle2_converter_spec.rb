@@ -21,9 +21,12 @@ describe Moodle::Converter do
   end
 
   it "should successfully import the course" do
-    allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
-                        "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",
-                        "Missing links found in imported content"]
+    allowed_warnings = [
+      "Multiple Dropdowns question may have been imported incorrectly",
+      "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",
+      "Missing links found in imported content",
+      "The announcement \"News forum\" could not be linked to the module"
+    ]
     expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
   end
 

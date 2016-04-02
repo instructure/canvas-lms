@@ -95,9 +95,9 @@ describe "course people" do
       expect(f('.roster')).not_to include_text(username)
     end
 
-    def add_user_to_second_section(role=nil)
+    def add_user_to_second_section(role = nil, enrollment_state = 'invited')
       role ||= student_role
-      student_in_course(:user => user_with_pseudonym, :role => role)
+      student_in_course(:user => user_with_pseudonym, :role => role, :enrollment_state => enrollment_state)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -113,10 +113,15 @@ describe "course people" do
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
       @student.enrollments.each{|e|expect(e.role_id).to eq role.id}
+      @student.enrollments.each{|e|expect(e.workflow_state).to eq enrollment_state}
     end
 
     it "should add a user without custom role to another section" do
       add_user_to_second_section
+    end
+
+    it "adds an active enrollment to another section if the user has already accepted their enrollment" do
+      add_user_to_second_section(nil, 'active')
     end
 
     it "should add a user to a second (active) section in a concluded course" do

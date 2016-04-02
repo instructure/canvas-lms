@@ -1,6 +1,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
+describe "assignment group that can't manage a course" do
+  include_context "in-process server selenium tests"
+  include AssignmentsCommon
+
+  it "does not dipsplay the manage cog menu" do
+    @domain_root_account = Account.default
+    course
+    account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+    user_session(@user)
+    @course.require_assignment_group
+    @assignment_group = @course.assignment_groups.first
+    @course.assignments.create(name: "test", assignment_group: @assignment_group)
+    get "/courses/#{@course.id}/assignments"
+
+    cog = ff("#assignmentSettingsCog")[0]
+    wait_for_ajaximations
+
+    expect(cog).to be_nil
+  end
+end
+
 describe "assignment groups" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon

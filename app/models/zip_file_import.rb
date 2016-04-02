@@ -22,8 +22,7 @@ class ZipFileImport < ActiveRecord::Base
 
   belongs_to :attachment
   belongs_to :folder
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Group', 'User', 'Course']
+  belongs_to :context, polymorphic: [:group, :user, :course]
   validates_presence_of :context
 
   serialize :data

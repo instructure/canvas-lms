@@ -397,6 +397,19 @@ describe ExternalToolsController do
         expect(lti_launch.params['accept_media_types']).to eq 'application/vnd.ims.lti.v1.ltilink'
       end
 
+      it "sets proper return data for collaboration" do
+        user_session(@teacher)
+        @tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        @tool.save!
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'collaboration'
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_copy_advice']).to eq nil
+        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'window'
+        expect(lti_launch.params['accept_media_types']).to eq 'application/vnd.ims.lti.v1.ltilink'
+      end
+
       it "sets proper return data for homework_submission" do
         user_session(@teacher)
         assignment = @course.assignments.create!(name: 'an assignment')

@@ -40,6 +40,7 @@ module BasicLTI
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
+        raise InvalidSourceId, 'Invalid sourcedid' if sourceid.blank?
         md = sourceid.match(SOURCE_ID_REGEX)
         raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
@@ -159,13 +160,15 @@ module BasicLTI
       end
 
       def handle_request(tool)
+        #check if we recognize the xml structure
+        return false unless operation_ref_identifier
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (course, assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
         source_id = self.sourcedid
 
         begin
-          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id) if source_id
+          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s

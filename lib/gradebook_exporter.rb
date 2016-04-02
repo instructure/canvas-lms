@@ -26,7 +26,7 @@ class GradebookExporter
   end
 
   def to_csv
-    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.student_enrollments
+    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.admin_visible_student_enrollments
     enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
     student_enrollments = enrollments_for_csv(enrollments_scope, @options)
 
@@ -125,19 +125,16 @@ class GradebookExporter
 
       student_enrollments.each_slice(100) do |student_enrollments_batch|
 
-        da_enabled = @course.feature_enabled?(:differentiated_assignments)
-        if da_enabled
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-            user_id: student_enrollments_batch.map(&:user_id),
-            course_id: @course.id
-          )
-        end
+        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
+          user_id: student_enrollments_batch.map(&:user_id),
+          course_id: @course.id
+        )
 
         student_enrollments_batch.each do |student_enrollment|
           student = student_enrollment.user
           student_sections = student_section_names[student.id].sort.to_sentence
           student_submissions = assignments.map do |a|
-            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+            if visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
               "N/A"
             else
               submission = submissions[[student.id, a.id]]
@@ -150,7 +147,7 @@ class GradebookExporter
               end
             end
           end
-          row = [student.send(name_method), student.id]
+          row = [student_name(student), student.id]
           pseudonym = SisPseudonym.for(student, @course, include_root_account)
           row << pseudonym.try(:sis_user_id) if include_sis_id
           pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
@@ -198,7 +195,14 @@ class GradebookExporter
     @course.feature_enabled?(:all_grading_periods_totals)
   end
 
-  def name_method
-    @course.list_students_by_sortable_name? ? :sortable_name : :name
+  STARTS_WITH_EQUAL = /^\s*=/
+
+  # Returns the student name to use for the export.  If the name
+  # starts with =, quote it so anyone pulling the data into Excel
+  # doesn't have a formula execute.
+  def student_name(student)
+    name = @course.list_students_by_sortable_name? ? student.sortable_name : student.name
+    name = "=\"#{name}\"" if name =~ STARTS_WITH_EQUAL
+    name
   end
 end

@@ -20,7 +20,7 @@ describe "external tool buttons" do
     wait_for_ajaximations
     external_tool_button = f(".mce-instructure_external_tool_button")
     expect(external_tool_button).to be_displayed
-    
+
     external_tool_button.click
     wait_for_ajax_requests
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")

@@ -37,6 +37,11 @@ CompiledReferencePlugin.prototype.apply = function(compiler){
         // extension while we still have a require-js build or we risk loading
         // it's compiled js instead
         result.request = requestString + ".jsx"
+      } else if(/^jst\//.test(requestString)){
+        // this is a handlebars file in canvas. We have to require it with it's full
+        // extension while we still have a require-js build or we risk loading
+        // it's compiled js instead
+        result.request = requestString + ".handlebars"
       } else if(/^compiled\//.test(requestString)){
         // this references a coffesscript file in canvas
         result.request = requestString.replace("compiled/", "coffeescripts/");

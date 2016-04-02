@@ -23,12 +23,13 @@ define([
   'str/htmlEscape',
   'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
   'tinymce_plugins/instructure_external_tools/ExternalToolsHelper',
-  'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/RceCommandShim',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
   'underscore'
-], function(tinymce, I18n, $, htmlEscape, TinyMCEContentItem, ExternalToolsHelper, callOnRCE) {
+], function(tinymce, I18n, $, htmlEscape,
+            TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -84,10 +85,11 @@ define([
             contentItems = data.contentItems,
             itemLength = contentItems.length,
             codePayload;
+        var rceShim = new RceCommandShim()
 
         for(var i = 0; i < itemLength; i++){
           codePayload = TinyMCEContentItem.fromJSON(contentItems[i]).codePayload;
-          callOnRCE($("#" + editor.id), 'insert_code', codePayload)
+          rceShim.send($("#" + editor.id), 'insert_code', codePayload)
         }
         $dialog.find('iframe').attr('src', 'about:blank');
         $dialog.dialog('close')

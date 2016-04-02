@@ -94,6 +94,56 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#update_assignment" do
+    def create_quiz_with_submission(opts)
+      @quiz = @course.quizzes.create!(opts)
+      @quiz.generate_submission(User.create!)
+    end
+
+    it "updates the assignment with new quiz values" do
+      create_quiz_with_submission(quiz_type: 'assignment')
+      @quiz.description = 'new description'
+      @quiz.title = 'new title'
+
+      @quiz.save! # should trigger update_assignment
+      @quiz.reload
+
+      a = @quiz.assignment
+      expect(a.description).to eq('new description')
+      expect(a.title).to eq('new title')
+    end
+
+    it "triggers submission updates when quiz_type changes" do
+      create_quiz_with_submission(quiz_type: 'graded_survey')
+      @quiz.expects(:destroy_related_submissions).never
+      @quiz.quiz_type = 'assignment'
+
+      @quiz.save! # should trigger update_assignment
+      @quiz.reload
+
+      # Submissions should only be destroyed for non-graded quizzes:
+      expect(@quiz.quiz_submissions.count).to eq(1)
+      expect(@quiz.quiz_submissions.first.submission).not_to be_nil
+      expect(@quiz.assignment).not_to be_nil
+      expect(Submission.count).to eq(1)
+    end
+
+    context "with change to non-graded" do
+      it "deletes related graded submissions" do
+        create_quiz_with_submission(quiz_type: 'assignment')
+        @quiz.quiz_type = 'practice_quiz'
+
+        @quiz.save! # should trigger update_assignment
+        @quiz.reload
+
+        expect(@quiz.quiz_submissions.count).to eq(1)
+        expect(@quiz.quiz_submissions.first.submission).to be_nil
+        expect(@quiz.assignment).to be_nil
+        expect(Submission.count).to eq(0)
+      end
+    end
+  end
+
   it_should_behave_like 'Canvas::DraftStateValidations'
 
   it "should infer the times if none given" do
@@ -518,7 +568,6 @@ describe Quizzes::Quiz do
   describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "some quiz")
       q = @course.quizzes.create!(:title => "new quiz")
       g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
       q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
@@ -542,7 +591,6 @@ describe Quizzes::Quiz do
       expect(s.quiz_version).to eql(q.version_number)
       expect(s.finished_at).to be_nil
       expect(s.submission_data).to eql({})
-
     end
 
     it "sets end_at to lock_at when end_at is nil or after lock_at" do
@@ -1726,106 +1774,65 @@ describe Quizzes::Quiz do
         @course.reload
       end
 
-      context 'DA feature on' do
-        before { @course.enable_feature!(:differentiated_assignments) }
+      context 'student with override' do
+        it 'should show the quiz if there is an override' do
+          expect(@quiz.visible_to_user?(@student1)).to be_truthy
+        end
+        it "should grant submit rights" do
+          @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
+          @course.stubs(:grants_right?).with(@student1, nil, :manage_assignments).returns(false)
+          @course.stubs(:grants_right?).with(@student1, nil, :manage_grades).returns(false)
+          expect(@quiz.grants_right?(@student1, :submit)).to eq true
+          @course.unstub(:grants_right?)
+        end
+      end
 
-        context 'student with override' do
-          it 'should show the quiz if there is an override' do
-            expect(@quiz.visible_to_user?(@student1)).to be_truthy
-          end
-          it "should grant submit rights" do
-            @course.stubs(:grants_right?).with(@student1, nil, :participate_as_student).returns(true)
-            @course.stubs(:grants_right?).with(@student1, nil, :manage_assignments).returns(false)
-            @course.stubs(:grants_right?).with(@student1, nil, :manage_grades).returns(false)
-            expect(@quiz.grants_right?(@student1, :submit)).to eq true
-            @course.unstub(:grants_right?)
-          end
+      context 'student without override' do
+        it 'should hide the quiz there is no override' do
+          expect(@quiz.visible_to_user?(@student2)).to be_falsey
+        end
+        it 'should show the quiz if it is not only visible to overrides' do
+          @quiz.only_visible_to_overrides = false
+          @quiz.save!
+          expect(@quiz.visible_to_user?(@student2)).to be_truthy
+        end
+        it 'should not grant submit rights' do
+          @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
+          @course.stubs(:grants_right?).with(@student2, nil, :manage_assignments).returns(false)
+          @course.stubs(:grants_right?).with(@student2, nil, :manage_grades).returns(false)
+          expect(@quiz.grants_right?(@student2, :submit)).to eq false
+        end
+      end
+
+      context 'observer' do
+        before do
+          @observer = User.create
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
         end
 
-        context 'student without override' do
+        context 'with students' do
+          it 'should show the quiz if there is an override' do
+            @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+            expect(@quiz.visible_to_user?(@observer)).to be_truthy
+          end
           it 'should hide the quiz there is no override' do
-            expect(@quiz.visible_to_user?(@student2)).to be_falsey
+            @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+            expect(@quiz.visible_to_user?(@observer)).to be_falsey
           end
           it 'should show the quiz if it is not only visible to overrides' do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
-            expect(@quiz.visible_to_user?(@student2)).to be_truthy
-          end
-          it 'should not grant submit rights' do
-            @course.stubs(:grants_right?).with(@student2, nil, :participate_as_student).returns(true)
-            @course.stubs(:grants_right?).with(@student2, nil, :manage_assignments).returns(false)
-            @course.stubs(:grants_right?).with(@student2, nil, :manage_grades).returns(false)
-            expect(@quiz.grants_right?(@student2, :submit)).to eq false
+            @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+            expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
         end
 
-        context 'observer' do
-          before do
-            @observer = User.create
-            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+        context 'without students' do
+          it 'should show the quiz if there is an override' do
+            expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
-
-          context 'with students' do
-            it 'should show the quiz if there is an override' do
-              @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
-            it 'should hide the quiz there is no override' do
-              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              expect(@quiz.visible_to_user?(@observer)).to be_falsey
-            end
-            it 'should show the quiz if it is not only visible to overrides' do
-              @quiz.only_visible_to_overrides = false
-              @quiz.save!
-              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
-          end
-
-          context 'without students' do
-            it 'should show the quiz if there is an override' do
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
-            it 'should show the quiz even if there is no override' do
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
-          end
-        end
-
-        context 'teacher' do
-          it 'should show the quiz' do
-            expect(@quiz.visible_to_user?(@teacher)).to be_truthy
-          end
-        end
-      end
-
-      context 'DA feature off' do
-        before {@course.disable_feature!(:differentiated_assignments)}
-
-        context 'student' do
           it 'should show the quiz even if there is no override' do
-            expect(@quiz.visible_to_user?(@student1)).to be_truthy
-            expect(@quiz.visible_to_user?(@student2)).to be_truthy
-          end
-        end
-
-        context 'observer' do
-          before do
-            @observer = User.create
-            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
-          end
-
-          context 'with students' do
-            it 'should show the quiz even if there is no override' do
-              @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
-          end
-
-          context 'without students' do
-            it 'should show the quiz' do
-              expect(@quiz.visible_to_user?(@observer)).to be_truthy
-            end
+            expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
         end
 

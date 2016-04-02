@@ -199,7 +199,10 @@ module SIS
             @course = @section.course if @course.nil? || (course_id.blank? && @course.id != @section.course_id) || (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
 
             if @course.id != @section.course_id
-              @messages << "An enrollment listed a section and a course that are unrelated"
+              message = "An enrollment listed a section (#{section_id}) "
+              message << "and a course (#{course_id}) that are unrelated "
+              message << "for user (#{user_id})"
+              @messages << message
               next
             end
 

@@ -69,7 +69,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_assignment_overrides_if_needed
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :available_at, :soft_completed_at
+  attr_accessor :already_enrolled, :available_at, :soft_completed_at, :need_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -77,6 +77,14 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
+  def self.not_yet_started(course)
+    collection = where(course_id: course)
+    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
+    collection.select do |enrollment|
+      enrollment.effective_start_at > Time.zone.now
+    end
+  end
 
   def ensure_role_id
     self.role_id ||= self.role.id
@@ -170,7 +178,6 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
       record.course &&
       !record.user.registered? &&
-      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 
@@ -185,7 +192,7 @@ class Enrollment < ActiveRecord::Base
     }
 
     p.dispatch :enrollment_accepted
-    p.to {self.course.admins - [self.user] }
+    p.to {self.course.participating_admins - [self.user] }
     p.whenever { |record|
       record.course &&
       !record.observer? &&
@@ -669,17 +676,37 @@ class Enrollment < ActiveRecord::Base
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
-    elsif view_restrictable? && !self.restrict_future_view?
-      self.available_at = global_start_at
-      if state == :active
-        # an accepted enrollment state means they still can't participate yet,
-        # but should be able to view just like an invited enrollment
-        :accepted
-      else
-        state
-      end
     else
-      :inactive
+      self.available_at = global_start_at
+      if view_restrictable? && !self.restrict_future_view?
+        if state == :active
+          # an accepted enrollment state means they still can't participate yet,
+          # but should be able to view just like an invited enrollment
+          :accepted
+        else
+          state
+        end
+      else
+        :inactive
+      end
+    end
+  end
+
+  def readable_state_based_on_date
+    # when view restrictions are in place, the effective state_based_on_date is :inactive, but
+    # to admins we should show that they are :completed or :pending
+
+    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
+      :completed
+    else
+      date_state = state_based_on_date
+      if self.available_at
+        :pending
+      elsif self.soft_completed_at
+        :completed
+      else
+        date_state
+      end
     end
   end
 
@@ -849,10 +876,6 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def workflow_readable_type
-    Enrollment.workflow_readable_type(self.workflow_state)
-  end
-
   def readable_role_name
     self.role.built_in? ? self.readable_type : self.role.name
   end
@@ -996,7 +1019,7 @@ class Enrollment < ActiveRecord::Base
     given { |user| self.user == user }
     can :read and can :read_grades
 
-    given { |user, session| self.course.students_visible_to(user, true).where(:id => self.user_id).exists? &&
+    given { |user, session| self.course.students_visible_to(user, include: :priors).where(:id => self.user_id).exists? &&
       self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 

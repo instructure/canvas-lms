@@ -197,7 +197,7 @@ describe "outcomes as a teacher" do
       get outcome_url
       wait_for_ajaximations
 
-      fj(".outcomes-sidebar .outcome-group[data-id = '#{group1.id}']").click
+      f(".outcomes-sidebar .outcome-group[data-id = '#{group1.id}']").click
       wait_for_ajaximations
 
       # bring up modal
@@ -209,11 +209,11 @@ describe "outcomes as a teacher" do
       expect(ffj('.ui-dialog-content').length).to eq 1
 
       # move the outcome group
-      fj('.treeLabel').click
+      f('.treeLabel').click
       wait_for_ajaximations
       f("[role=treeitem][data-id='#{group2.id}'] a span").click
       wait_for_ajaximations
-      fj('.form-controls .btn-primary').click
+      f('.form-controls .btn-primary').click
       wait_for_ajaximations
 
       keep_trying_until do

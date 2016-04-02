@@ -192,14 +192,18 @@ describe "discussions" do
         end
 
         it "should show unread replies on clicking the unread button", priority: "1", test_id: 150489 do
-          expect(f('.new-and-total-badge .new-items').text).to eq('1')
-          expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
+          keep_trying_until do
+            expect(f('.new-and-total-badge .new-items').text).to eq('1')
+            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
+          end
+          # click unread button
           f('.ui-button').click
           wait_for_ajaximations
           keep_trying_until do
             expect(f("#filterResults .discussion-title").text).to include('teacher')
             expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
           end
+          # click unread button again
           f('.ui-button').click
           wait_for_ajaximations
           keep_trying_until do

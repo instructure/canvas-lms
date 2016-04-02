@@ -28,11 +28,11 @@ class ContentTag < ActiveRecord::Base
   include SearchTermHelper
   belongs_to :content, :polymorphic => true
   validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'LearningOutcomeGroup',
-    'Assignment', 'Account', 'Quizzes::Quiz']
-  belongs_to :associated_asset, :polymorphic => true
-  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['LearningOutcomeGroup']
+  belongs_to :context, polymorphic:
+      [:course, :learning_outcome_group, :assignment, :account,
+       { quiz: 'Quizzes::Quiz' }]
+  belongs_to :associated_asset, polymorphic: [:learning_outcome_group],
+             polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
@@ -498,8 +498,9 @@ class ContentTag < ActiveRecord::Base
 
     opts ||= self.context_module.visibility_for_user(user)
     return false unless opts[:can_read]
-    return false unless self.published? || opts[:can_read_as_admin]
-    return true unless opts[:differentiated_assignments]
+
+    return true if opts[:can_read_as_admin]
+    return false unless self.published?
 
     if self.assignment
       self.assignment.visible_to_user?(user, opts)

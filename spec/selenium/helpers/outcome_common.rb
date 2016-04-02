@@ -171,6 +171,7 @@ module OutcomeCommon
     refresh_page
 
     # select group
+    wait_for_ajaximations
     f('.outcome-group').click
     wait_for_ajaximations
     # select nested outcome
@@ -269,7 +270,7 @@ module OutcomeCommon
     get outcome_url
     f('.add_outcome_link').click
     # create array of drop down options
-    drop_down = get_options('#calculation_method').map(&:text)
+    drop_down = get_options('#calculation_method').map(&:text).map(&:strip)
     expected_array = ['Decaying Average', 'n Number of Times', 'Most Recent Score', 'Highest Score']
     # expect
     expect(drop_down.length).to eq(4)
@@ -390,7 +391,7 @@ module OutcomeCommon
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
     wait_for_ajaximations
 
     # create nested group
@@ -398,9 +399,8 @@ module OutcomeCommon
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
 
-    driver.execute_script("$('.submit_button').click()") unless f('.submit_button').nil?
     refresh_page
     wait_for_ajaximations
 

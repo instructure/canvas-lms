@@ -23,8 +23,7 @@ class AssignmentGroup < ActiveRecord::Base
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
 
   attr_readonly :context_id, :context_type
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 

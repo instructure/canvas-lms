@@ -19,8 +19,7 @@
 class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
+  belongs_to :context, polymorphic: [:course, :account, :group, { context_user: 'User' }]
   validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment

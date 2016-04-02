@@ -47,6 +47,52 @@ module AccountReports
       csv(default_courses.where(:workflow_state => ['claimed', 'created']))
     end
 
+    def course_storage
+      courses = root_account.all_courses.active.preload(:account)
+      courses = add_course_sub_account_scope(courses)
+      courses = add_term_scope(courses)
+
+      filename = AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
+        headers = []
+        headers << I18n.t('id')
+        headers << I18n.t('sis id')
+        headers << I18n.t('short name')
+        headers << I18n.t('name')
+        headers << I18n.t('account id')
+        headers << I18n.t('account sis id')
+        headers << I18n.t('account name')
+        headers << I18n.t('storage used in MB')
+        csv << headers
+
+        Shackles.activate(:slave) do
+          @total = courses.count(:all)
+          i = 0
+
+          courses.find_each do |c|
+            row = []
+            row << c.id
+            row << c.sis_source_id
+            row << c.course_code
+            row << c.name
+            row << c.account_id
+            row << c.account.sis_source_id
+            row << c.account.name
+            row << c.storage_quota_used_mb.round(2)
+            csv << row
+            i += 1
+            if i % 5 == 0
+              Shackles.activate(:master) do
+                @account_report.update_attribute(:progress, (i.to_f/@total)*100)
+              end
+            end
+          end
+        end
+      end
+      send_report(filename)
+
+    end
+
     def csv(courses)
       courses = add_course_sub_account_scope(courses)
       courses = add_term_scope(courses)

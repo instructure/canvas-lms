@@ -191,6 +191,20 @@ describe "calendar2" do
           event1.reload
           expect(event1.start_at).to eql(@three_days_earlier)
         end
+
+        it "should extend event to multiple days by draging", priority: "2", test_id: 419527 do
+          create_middle_day_event
+          date_of_middle_day = find_middle_day.attribute('data-date')
+          date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime('%Y-%m-%d')
+          f('.fc-content-skeleton .fc-event-container .fc-resizer')
+          next_day = fj("[data-date = #{date_of_next_day}]")
+          drag_and_drop_element(f('.fc-content-skeleton .fc-event-container .fc-resizer'), next_day)
+          fj('.fc-event:visible').click
+          # observe the event details show date range from event start to date to end date
+          original_day_text = date_of_middle_day.to_datetime.strftime('%b %-d at %-l:%M%P')
+          extended_day_text = (date_of_next_day.to_datetime + 1.day).strftime('%b %-d at %-l:%M%P')
+          expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
+        end
       end
 
       it "more options link should go to calendar event edit page" do

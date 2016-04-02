@@ -22,9 +22,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe 'Moderated Grades API', type: :request do
   before :once do
     course_with_teacher_logged_in active_all: true
+    sec1 = @course.course_sections.create!(:name => "section 1")
+    sec2 = @course.course_sections.create!(:name => "section 2")
     @assignment = @course.assignments.create! name: "asdf"
     @assignment.update_attribute :moderated_grading, true
-    @student1, @student2 = n_students_in_course(2)
+    @student1, @student2, @student3 = n_students_in_course(3)
+    @course.enroll_student(@student1, :section => sec1, :allow_multiple_enrollments => true)
+    @course.enroll_student(@student2, :section => sec1, :allow_multiple_enrollments => true)
+    @course.enroll_student(@student3, :section => sec1, :allow_multiple_enrollments => true)
+    @course.enroll_student(@student3, :section => sec2, :allow_multiple_enrollments => true)
     @user = @teacher
     @assignment.moderated_grading_selections.create! student: @student1
   end
@@ -73,6 +79,17 @@ describe 'Moderated Grades API', type: :request do
       expect(response).to be_success
       expect(json.size).to eq 1
       expect(json.first["id"]).to eq @student2.id
+    end
+
+    it "creates a single selection for students in multiple sections" do
+      json = api_call :post,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
+        {controller: 'moderation_set', action: 'create',
+         format: 'json', course_id: @course.id, assignment_id: @assignment.id},
+        student_ids: [@student3.id]
+
+      expect(json.size).to eq 1
+      expect(json.first["id"]).to eq @student3.id
     end
 
     it 'requires moderate_grades permissions' do

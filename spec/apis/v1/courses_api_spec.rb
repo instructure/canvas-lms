@@ -259,7 +259,7 @@ describe CoursesController, type: :request do
                                 :format => 'json',
                                 :include => [ "observed_users" ] })
 
-      expect(json['enrollments']).to eq [{
+      expect(json['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
@@ -289,7 +289,7 @@ describe CoursesController, type: :request do
                                 :format => 'json',
                                 :include => [ "observed_users" ] })
 
-      expect(json[0]['enrollments']).to eq [{
+      expect(json[0]['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
@@ -318,7 +318,7 @@ describe CoursesController, type: :request do
                                 :id => @observer_course.to_param,
                                 :format => 'json' })
 
-      expect(json[0]['enrollments']).to eq [{
+      expect(json[0]['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
@@ -1949,6 +1949,15 @@ describe CoursesController, type: :request do
         expect(ta_users).not_to be_empty
       end
 
+      it "returns enrollments when filtering by enrollment_state" do
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["completed"], :include => ["enrollments"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+        expect(ta_users.first['enrollments']).to be_present
+      end
+
       it "returns active and invited enrollments if no enrollment state is given" do
         json = api_call(:get, api_url, api_route, :search_term => "TAP")
         ta_users = json.select{ |u| u["name"] == "TAPerson" }
@@ -2420,6 +2429,13 @@ describe CoursesController, type: :request do
                         { :enrollment_type => 'student', :user_id => @target.id, :page => 1, :per_page => 1 })
         expect(json.map{|x| x['id']}.length).to eq 1
         expect(json.map{|x| x['id']}).to eq [@target.id]
+      end
+
+      it "includes custom links if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s,
+                          :format => 'json', :include => %w(custom_links) })
+        expect(json.first).to have_key 'custom_links'
       end
     end
 

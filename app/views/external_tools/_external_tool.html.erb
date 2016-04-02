@@ -13,8 +13,8 @@
   <div class="header clearfix">
     <div class="name"><%= tool.try(:name) %></div>
     <div class="links">
-      <a href="#" rel="<%= context_url(@context, :context_external_tool_url, tool ? tool.id : "{{ id }}") %>" class="update_tool_url edit_tool_link" title="<%= t :edit_tool, "Edit Tool" %>"><%= image_tag "edit.png" %></a>
-      <a href="#" class="delete_tool_link" title="<%= t :delete_tool, "Delete Tool" %>"><%= image_tag "delete.png" %></a>
+      <a href="#" rel="<%= context_url(@context, :context_external_tool_url, tool ? tool.id : "{{ id }}") %>" class="update_tool_url edit_tool_link" title="<%= t :edit_tool, "Edit Tool" %>"><%= image_tag "edit.png", :alt => t('Edit Tool') %></a>
+      <a href="#" class="delete_tool_link" title="<%= t :delete_tool, "Delete Tool" %>"><%= image_tag "delete.png", :alt => t('Delete Tool') %></a>
     </div>
     <div class="clear"></div>
     <div class="custom_fields_string" style="display: none;"><%= tool.try(:custom_fields_string) %></div>

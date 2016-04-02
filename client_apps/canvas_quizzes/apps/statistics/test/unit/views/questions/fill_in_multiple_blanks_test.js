@@ -59,7 +59,6 @@ define(function(require) {
         answerSets: answerSetFixture,
       });
 
-      debugger;
       expect(find('.answer-set-tabs .active').innerText).toMatch('color');
       var answerTextMatches = findAll("th.answer-textfield");
       expect(answerTextMatches[0].innerText).toEqual('red');

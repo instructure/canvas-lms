@@ -541,8 +541,7 @@ describe Quizzes::QuizSerializer do
         course_quiz(true)
       end
 
-      it "returns the value when the feature flag is on" do
-        @quiz.context.stubs(:feature_enabled?).with(:differentiated_assignments).returns true
+      it "returns the value for DA" do
         @quiz.only_visible_to_overrides = true
         json = quiz_serializer(scope: @teacher).as_json
         expect(json[:quiz][:only_visible_to_overrides]).to be_truthy
@@ -551,12 +550,6 @@ describe Quizzes::QuizSerializer do
         json = quiz_serializer(scope: @teacher).as_json
         expect(json[:quiz]).to have_key :only_visible_to_overrides
         expect(json[:quiz][:only_visible_to_overrides]).to be_falsey
-      end
-
-      it "is not in the hash when the feature flag is off" do
-        @quiz.only_visible_to_overrides = true
-        json = quiz_serializer(scope: @teacher).as_json
-        expect(json[:quiz]).not_to have_key :only_visible_to_overrides
       end
     end
 

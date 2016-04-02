@@ -18,7 +18,7 @@
 
 class FeatureFlag < ActiveRecord::Base
   attr_accessible :feature, :state
-  belongs_to :context, polymorphic: true
+  belongs_to :context, polymorphic: [:account, :course, :user]
 
   validate :valid_state, :feature_applies
   before_save :check_cache

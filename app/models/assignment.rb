@@ -65,8 +65,7 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: 'active', type: 'TeacherEnrollment' }) }, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id'
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  belongs_to :context, polymorphic: [:course]
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   belongs_to :grading_standard
   belongs_to :group_category
@@ -533,11 +532,11 @@ class Assignment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to {
+    p.to { |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
       excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
-      participants(include_observers: true, excluded_user_ids: excluded_ids)
+      BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
     }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
@@ -545,14 +544,18 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_changed
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_created?
@@ -562,12 +565,13 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_unmuted
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_unmuted?
     }
-
   end
 
   def notify_of_update=(val)
@@ -831,7 +835,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def include_description?(user)
-    user && !self.locked_for?(user)
+    user && !self.locked_for?(user, :check_policies => true)
   end
 
   def all_day
@@ -897,8 +901,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_submitted_submissions?
+    return @has_submitted_submissions unless @has_submitted_submissions.nil?
     submitted_count > 0
   end
+  attr_writer :has_submitted_submissions
 
   def submitted_count
     return read_attribute(:submitted_count).to_i if read_attribute(:submitted_count)
@@ -1224,7 +1230,7 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+    if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
       uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
@@ -1264,7 +1270,6 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
-    ts = Time.now.to_s
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
@@ -1463,9 +1468,16 @@ class Assignment < ActiveRecord::Base
         json.merge! provisional_grade.grade_attributes
       end
 
-      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
-                                                                                          :methods => submission_comment_methods,
-                                                                                          :only => comment_fields)
+      comments = (provisional_grade || sub).submission_comments
+      if grade_as_group?
+        comments = comments.reject { |comment| comment.group_comment_id.nil? }
+      end
+
+      json[:submission_comments] = comments.as_json(
+        include_root: false,
+        methods: submission_comment_methods,
+        only: comment_fields
+      )
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -1656,7 +1668,7 @@ class Assignment < ActiveRecord::Base
   def visible_students_for_speed_grader(user)
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[user.global_id] ||= (
-      student_scope = user ? context.students_visible_to(user) : context.participating_students
+      student_scope = user ? context.students_visible_to(user, include: :inactive) : context.participating_students
       students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end
@@ -1927,8 +1939,8 @@ class Assignment < ActiveRecord::Base
     chain = api_needed_fields.
       where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
-            AND submission_type IS NOT NULL
-            AND user_id = ?) = 0", user_id).
+            AND (submission_type IS NOT NULL OR excused = ?)
+            AND user_id = ?) = 0", true, user_id).
       limit(limit).
       order("assignments.due_at")
 
@@ -2143,12 +2155,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    if attribute_present? :student_submission_count
+    if !@has_student_submissions.nil?
+      @has_student_submissions
+    elsif attribute_present? :student_submission_count
       student_submission_count.to_i > 0
     else
       submissions.having_submission.where("user_id IS NOT NULL").exists?
     end
   end
+  attr_writer :has_student_submissions
 
   def group_category_deleted_with_submissions?
     self.group_category.try(:deleted_at?) && self.has_student_submissions?
@@ -2219,5 +2234,11 @@ class Assignment < ActiveRecord::Base
     context.feature_enabled?(:post_grades) ||
       context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
       Lti::AppLaunchCollator.any?(context, [:post_grades])
+  end
+
+  def run_if_overrides_changed!
+    self.relock_modules!
+    self.discussion_topic.relock_modules! if self.discussion_topic
+    self.quiz.relock_modules! if self.quiz
   end
 end

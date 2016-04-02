@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
 
   has_many :enrollments, :dependent => :destroy
 
-  has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") }, class_name: 'Enrollment', multishard: true
+  has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -258,7 +258,7 @@ class User < ActiveRecord::Base
 
   scope :with_last_login, lambda {
     select("users.*, MAX(current_login_at) as last_login").
-      joins("LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id").
+      joins("LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id").
       group("users.id")
   }
 
@@ -1308,7 +1308,7 @@ class User < ActiveRecord::Base
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
-      uri.scheme ||= request ? request.protocol[0..-4] : "https" # -4 to chop off the ://
+      uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
       if HostUrl.cdn_host
         uri.host = HostUrl.cdn_host
       elsif request && !uri.host
@@ -1430,9 +1430,7 @@ class User < ActiveRecord::Base
   def assignments_visible_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     published_visible_assignments = course.active_assignments.published
-    if course.feature_enabled?(:differentiated_assignments)
-      published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
-    end
+    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
     published_visible_assignments
   end
 
@@ -1470,9 +1468,8 @@ class User < ActiveRecord::Base
       due_before = options[:due_before] || 1.week.from_now
 
       courses = Course.find(options[:shard_course_ids])
-      courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
       assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
+        filter_by_visibilities_in_given_courses(self.id, courses.map(&:id)).
         published.
         due_between_with_overrides(due_after, due_before).
         expecting_submission.
@@ -1781,7 +1778,7 @@ class User < ActiveRecord::Base
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch([self, 'participating_enrollments'].cache_key) do
+      Rails.cache.fetch([self, 'participating_enrollments', :expires_in => 1.hour].cache_key) do
         self.cached_current_enrollments(:preload_dates => true).select(&:participating?)
       end
     end
@@ -2053,7 +2050,11 @@ class User < ActiveRecord::Base
       group_admin_courses.each do |c|
         context_groups += c.active_groups
       end
-      self.courses + (self.groups.active + context_groups).uniq
+      active_courses = cached_current_enrollments(preload_dates: true, preload_courses: true).
+                       select(&:participating?).
+                       map(&:course).
+                       uniq
+      active_courses + (self.groups.active + context_groups).uniq
     end
   end
 

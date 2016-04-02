@@ -99,12 +99,12 @@ describe 'Web conferences' do
         verify_conference_list_is_empty
       end
 
-      it 'should set focus to the Add Conference button if there are no preceeding conferences', priority: "3" do
+      it 'should set focus to the Add Conference button if there are no preceeding conferences', priority: "2" do
         delete_conference
         check_element_has_focus(new_conference_button)
       end
 
-      it 'should set focus to the cog menu if the delete was cancelled', priority: "3" do
+      it 'should set focus to the cog menu if the delete was cancelled', priority: "2" do
         cog_menu_item = f('.al-trigger')
         delete_conference(cog_menu_item: cog_menu_item, cancel: true)
         check_element_has_focus(cog_menu_item)
@@ -127,7 +127,7 @@ describe 'Web conferences' do
       create_wimba_conference('Second Wimba Conference')
     end
 
-    it 'should set focus to the preceding conference\'s cog after deleting', priority: "3" do
+    it 'should set focus to the preceding conference\'s cog after deleting', priority: "2" do
       settings_triggers = ff('.al-trigger')
       delete_conference(cog_menu_item: settings_triggers.last)
       check_element_has_focus(settings_triggers.first)

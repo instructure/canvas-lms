@@ -237,6 +237,7 @@ require 'atom'
 #
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context_and_read_access, :except => :public_feed
+  before_filter :rich_content_service_config
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
@@ -420,8 +421,8 @@ class DiscussionTopicsController < ApplicationController
                      reject { |category| category.student_organized? }.
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
-                 CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+                 CONTEXT_ACTION_SOURCE: :discussion_topic
+      }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis
@@ -817,6 +818,10 @@ class DiscussionTopicsController < ApplicationController
 
   protected
 
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+  end
+
   def cancel_redirect_url
     topic_type = @topic.is_announcement ? :announcements : :discussion_topics
     @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
@@ -1086,12 +1091,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-    @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
-    @topic.message = @root_topic.message
-    @topic.title = @root_topic.title
-    @topic.assignment_id = @root_topic.assignment_id
-    @topic.user_id = @root_topic.user_id
-    @topic.save
+    @topic = @root_topic.ensure_child_topic_for(@context)
     redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id, extra_params)
   end
 

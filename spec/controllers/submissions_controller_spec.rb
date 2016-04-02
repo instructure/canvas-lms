@@ -432,14 +432,6 @@ describe SubmissionsController do
     end
   end
 
-  def course_with_student_and_submitted_homework
-      course_with_teacher_logged_in(:active_all => true)
-      @teacher = @user
-      student_in_course
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      @submission = @assignment.submit_homework(@user)
-  end
-
   describe "GET zip" do
     it "should zip and download" do
       course_with_student_and_submitted_homework
@@ -461,10 +453,82 @@ describe SubmissionsController do
     end
   end
 
-  describe "GET show" do
-    it "should not expose muted assignment's scores" do
+  describe 'GET /submissions/:id param routing', type: :request do
+    before do
       course_with_student_and_submitted_homework
+      @context = @course
+    end
 
+    describe "preview query param", type: :request do
+      it 'renders with submissions/previews#show if params is present and format is html' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1"
+        expect(request.params[:controller]).to eq 'submissions/previews'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with submissions#show if params is present and format is json' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1", format: :json
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with action #show if params is not present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+    end
+
+    describe "download query param", type: :request do
+      it 'renders with action #download if params is present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?download=12345"
+        expect(request.params[:controller]).to eq 'submissions/downloads'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with action #show if params is not present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+    end
+  end
+
+  describe "GET show" do
+    before do
+      course_with_student_and_submitted_homework
+      @context = @course
+      user_session(@teacher)
+    end
+
+    it "renders show template" do
+      get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+      expect(response).to render_template(:show)
+    end
+
+    it "renders json" do
+      request.accept = Mime::JSON.to_s
+      get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id, format: :json
+      expect(JSON.parse(response.body)['submission']['id']).to eq @submission.id
+    end
+
+    context "with user id not present in course" do
+      before(:once) do
+        course_with_student(active_all: true)
+      end
+
+      it "sets flash error" do
+        get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+        expect(flash[:error]).not_to be_nil
+      end
+
+      it "should redirect to context assignment url" do
+        get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+        expect(response).to redirect_to(course_assignment_url(@context, @assignment))
+      end
+    end
+
+    it "should not expose muted assignment's scores" do
       get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
       expect(response).to be_success
 
@@ -474,38 +538,19 @@ describe SubmissionsController do
     end
 
     it "should show rubric assessments to peer reviewers" do
-      course_with_student_and_submitted_homework
-
-      @assessor = student_in_course.user
+      course_with_student(active_all: true)
+      @assessor = @student
       outcome_with_rubric
-      @association = @rubric.associate_with @assignment, @course, :purpose => 'grading'
+      @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
       @assignment.assign_peer_review(@assessor, @submission.user)
       @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
       user_session(@assessor)
 
-      get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
+      get "show", :id => @submission.user.id, :assignment_id => @assignment.id, :course_id => @context.id
+
       expect(response).to be_success
 
       expect(assigns[:visible_rubric_assessments]).to eq [@assessment]
-    end
-
-    it "should redirect download requests with the download_frd parameter" do
-      # This is because the files controller looks for download_frd to indicate a forced download
-      course_with_teacher_logged_in
-      assignment = assignment_model(course: @course)
-      student_in_course
-      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
-      submission = submission_model(
-        course: @course,
-        assignment: assignment,
-        submission_type: "online_upload",
-        attachment_ids: att.id,
-        attachments: [att],
-        user: @student)
-      get 'show', assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id
-
-      expect(response).to be_redirect
-      expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
     end
   end
 

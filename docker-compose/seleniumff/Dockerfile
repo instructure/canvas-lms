@@ -15,6 +15,9 @@ RUN mkdir -p /opt/firefox \
 
 COPY entry_point.sh /opt/bin/entry_point.sh
 RUN chmod +x /opt/bin/entry_point.sh
+# If you get an error about .X99-lock already existing, you can uncomment
+# this and rebuild. It will delete the lock file.
+# RUN rm /tmp/.X99-lock
 
 EXPOSE 4444
 EXPOSE 5900

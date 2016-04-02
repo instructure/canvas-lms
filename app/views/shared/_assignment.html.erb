@@ -79,12 +79,12 @@
           <a title="<%= t 'links.submission_comments', 'Submission Comments' %>"
              style="display: none;"
              href="<%= submission_url %>" class="no-hover submission_comment_link">
-            <%= image_tag 'word_bubble.png' %>
+            <%= image_tag 'word_bubble.png', :alt => t('Submission Comments') %>
           </a>
           <a title="<%= t 'links.view_rubric_evaluation', 'View Rubric Evaluation' %>"
              href="<%= submission_url %>#rubric"
              class="no-hover rubric_assessment_link" style="display: none;">
-            <%= image_tag "rubric.png" %>
+            <%= image_tag "rubric.png", :alt => t('View Rubric Evaluation') %>
           </a>
         </div>
       </div>

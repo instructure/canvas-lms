@@ -481,6 +481,9 @@ class ExternalToolsController < ApplicationController
     when 'resource_selection', 'link_selection', 'assignment_selection'
       accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
       accept_presentation_document_targets = 'frame,window'
+    when 'collaboration'
+      accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
+      accept_presentation_document_targets = 'window'
     when 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])
       accept_media_types = '*/*'

@@ -7,7 +7,7 @@ if CANVAS_RAILS4_0
   gem 'tzinfo', '0.3.43'
   gem 'foreigner', '0.9.2'
 else
-  gem 'rails', '4.2.5.1'
+  gem 'rails', '4.2.5.2'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.1.3'
@@ -21,11 +21,11 @@ gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_s
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.4.6'
-  gem 'scrypt', '2.0.2'
+  gem 'scrypt', '2.1.1'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.4.4'
+gem 'switchman', '1.5.2'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -40,7 +40,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.17'
-gem 'canvas-jobs', '0.10.4'
+gem 'canvas-jobs', '0.10.5'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -93,7 +93,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.0.6', require: false
-gem 'shackles', '1.0.10'
+gem 'shackles', '1.1.0'
 
 gem 'useragent', '0.10.0', require: false
 

@@ -29,8 +29,7 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :set, :polymorphic => true
-  has_many :assignment_override_students, :dependent => :destroy
-
+  has_many :assignment_override_students, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
   validates_inclusion_of :set_type, :in => %w(CourseSection Group ADHOC)
@@ -68,13 +67,23 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  validate do |record|
+    record.assignment_override_students.each do |s|
+      next if s.valid?
+      s.errors.each do |_, error|
+        record.errors.add(:assignment_override_students, error.type,
+          message: error.message)
+      end
+    end
+  end
+
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
     ['CourseSection', 'Group'].include?(self.set_type) ||
-    set.any? && overridable.context.current_enrollments.where(user_id: set).exists?
+    (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
   def update_cached_due_dates
@@ -111,6 +120,14 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   scope :active, -> { where(:workflow_state => 'active') }
+
+  scope :visible_students_only, -> (visible_ids) do
+    select("assignment_overrides.*").
+    joins(:assignment_override_students).
+    where(
+      assignment_override_students: { user_id: visible_ids },
+    )
+  end
 
   before_validation :default_values
   def default_values
@@ -172,6 +189,12 @@ class AssignmentOverride < ActiveRecord::Base
     end
 
     scope "overriding_#{field}", -> { where("#{field}_overridden" => true) }
+  end
+
+  def visible_student_overrides(visible_student_ids)
+    assignment_override_students.any? do |aos|
+      visible_student_ids.include?(aos.user_id)
+    end
   end
 
   override :due_at

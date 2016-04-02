@@ -21,6 +21,7 @@ define [
         common:       I18n.t("errors.common", "Can't use common passwords (e.g. \"password\")")
         repeated:     I18n.t("errors.repeated", "Can't have the same character more than %{max} times in a row", {max: policy.max_repeats})
         confirmation: I18n.t("errors.mismatch", "Doesn't match")
+        too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
 
     normalizeErrors: (errors, policy) ->
       if errors

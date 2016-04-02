@@ -442,9 +442,8 @@ $revision-button-hover-color: $ic-brand-primary;
     @if $use_new_styles {
       @include breakpoint(desktop) {
         float: left;
-        margin-right: $revision-sidebar-width - 60px;
+        margin-right: $revision-sidebar-width;
       }
-      @include breakpoint(wide) { margin-right: $revision-sidebar-width; }
     }
     @else {
       flex: 3 3 0%;
@@ -460,16 +459,12 @@ $revision-button-hover-color: $ic-brand-primary;
         position: absolute;
         top: 0;
         right: 0;
-        width: $revision-sidebar-width - 60px;
+        width: $revision-sidebar-width;
         aside {
-          width: $revision-sidebar-width - 60px;
+          width: $revision-sidebar-width;
           position: fixed;
           padding-top: $ic-sp*2;
         }
-      }
-      @include breakpoint(wide) {
-        width: $revision-sidebar-width;
-        aside { width: $revision-sidebar-width; }
       }
     }
     @else {

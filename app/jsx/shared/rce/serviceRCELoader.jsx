@@ -92,7 +92,15 @@ define([
       this.loadRCE(host, function (RCE) {
         RCE.renderIntoDiv(renderingTarget, propsForRCE, renderCallback)
       })
+    },
+
+    loadSidebarOnTarget(target, host, callback){
+      let props = {}
+      this.loadRCE(host, function (RCE) {
+        RCE.renderSidebarIntoDiv(target, props, callback)
+      })
     }
+
   }
 
   return RCELoader;

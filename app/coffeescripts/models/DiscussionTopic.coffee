@@ -173,6 +173,3 @@ define [
       @set 'group_category_id', id
 
     canGroup: -> @get('can_group')
-
-    differentiatedAssignmentsEnabled: ->
-      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false

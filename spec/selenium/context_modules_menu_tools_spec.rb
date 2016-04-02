@@ -89,7 +89,6 @@ describe "context modules" do
 
       it "should add links to newly created modules" do
         get "/courses/#{@course.id}/modules"
-        wait_for_modules_ui
 
         f(".add_module_link").click
         wait_for_ajaximations
@@ -111,7 +110,6 @@ describe "context modules" do
 
       it "should add links to newly created module items" do
         get "/courses/#{@course.id}/modules"
-        wait_for_modules_ui
         f("#context_module_#{@module1.id} .add_module_item_link").click
         wait_for_ajaximations
 
@@ -143,7 +141,6 @@ describe "context modules" do
 
       it "should not show add links to newly created module items if not exportable" do
         get "/courses/#{@course.id}/modules"
-        wait_for_modules_ui
 
         f("#context_module_#{@module1.id} .add_module_item_link").click
         wait_for_ajaximations
