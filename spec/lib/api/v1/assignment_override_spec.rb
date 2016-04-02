@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helpe
 
 class Subject
   include Api::V1::AssignmentOverride
+  def session; {} end
 end
 
 describe "Api::V1::AssignmentOverride" do
@@ -144,6 +145,22 @@ describe "Api::V1::AssignmentOverride" do
           expect(invisible_overrides).to be_empty
         end
       end
+    end
+  end
+
+  describe '#assignment_overrides_json' do
+    before :once do
+      course_model
+      student_in_course(active_all: true)
+      @quiz = quiz_model course: @course
+      @override = create_section_override_for_assignment(@quiz)
+      @subject = Subject.new
+    end
+    subject(:assignment_overrides_json) { @subject.assignment_overrides_json([@override], @student) }
+
+    it 'should work when override relation is a quiz' do
+      expect(@override.assignment).to be_nil, 'precondition'
+      expect { assignment_overrides_json }.not_to raise_error
     end
   end
 end

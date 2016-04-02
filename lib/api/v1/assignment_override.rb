@@ -43,7 +43,9 @@ module Api::V1::AssignmentOverride
 
   def assignment_overrides_json(overrides, user = nil)
     visible_users = if user && !overrides.empty?
-                      context = overrides.first.assignment.context
+                      override = overrides.first
+                      assignment_or_quiz = override.assignment || override.quiz
+                      context = assignment_or_quiz.context
                       UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
                     end
     overrides.map{ |override| assignment_override_json(override, visible_users) }
