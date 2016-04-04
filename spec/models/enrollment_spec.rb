@@ -271,6 +271,27 @@ describe Enrollment do
       expect(e.messages_sent).to be_include("Enrollment Registration")
     end
 
+    it "should not send out invitations immediately if the course restricts future viewing" do
+      Notification.create!(:name => "Enrollment Registration")
+      course_with_teacher(:active_all => true)
+      @course.restrict_student_future_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.start_at = 1.day.from_now
+      @course.conclude_at = 3.days.from_now
+      @course.save!
+
+      user_with_pseudonym
+      e = @course.enroll_student(@user)
+      expect(e).to be_inactive
+      expect(e.messages_sent).to_not include("Enrollment Registration")
+
+      Timecop.freeze(2.days.from_now) do
+        expect(e).to be_invited
+        e.any_instantiation.expects(:re_send_confirmation!).once
+        run_jobs
+      end
+    end
+
     it "should not send out invitations to an observer if the student doesn't receive an invitation (e.g. sis import)" do
       Notification.create!(:name => "Enrollment Registration", :category => "Registration")
 
