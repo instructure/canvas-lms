@@ -122,7 +122,7 @@ module DataFixup::PsychMigration
       'Quizzes::Quiz' => 10_000,
       'Quizzes::QuizQuestion' => 10_000,
       'Quizzes::QuizSubmission' => 5_000,
-      'Quizzes::QuizSubmissionSnapshot' => 100_000,
+      'Quizzes::QuizSubmissionSnapshot' => 5_000,
       'Version' => 10_000
     }
 
