@@ -111,7 +111,10 @@ define([
     });
 
     $("#add_notification_form textarea").width('100%');
-    richContentEditor.loadNewEditor($("textarea.edit_notification_form, #add_notification_form textarea"))
+    $("textarea.edit_notification_form, #add_notification_form textarea").each(function(idx, textarea){
+      richContentEditor.loadNewEditor($(textarea))
+    })
+
 
     $("#add_notification_form, .edit_notification_form").submit(function(event) {
       var $this = $(this);
