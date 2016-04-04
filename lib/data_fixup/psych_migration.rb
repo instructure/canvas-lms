@@ -119,8 +119,9 @@ module DataFixup::PsychMigration
       'AssessmentQuestion' => 100_000,
       'ContextModuleProgression' => 100_000,
       'ErrorReport' => 100_000,
-      'Quizzes::QuizQuestion' => 100_000,
-      'Quizzes::QuizSubmission' => 10_000,
+      'Quizzes::Quiz' => 10_000,
+      'Quizzes::QuizQuestion' => 10_000,
+      'Quizzes::QuizSubmission' => 5_000,
       'Quizzes::QuizSubmissionSnapshot' => 100_000,
       'Version' => 10_000
     }
