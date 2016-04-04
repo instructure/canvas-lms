@@ -59,7 +59,8 @@ describe "calendar2" do
       end
 
       it 'should translate am/pm time strings in assignment event datepicker', priority: "2", test_id: 467482 do
-        @user.locale = 'fa-IR'
+        skip('CNVS-28437')
+        @user.locale = 'fa'
         @user.save!
         load_month_view
         f('#create_new_event_link').click
