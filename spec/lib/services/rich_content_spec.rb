@@ -68,6 +68,24 @@ module Services
         expect(env[:JWT]).to eql(jwt)
       end
 
+      it "does not allow file uploading without context" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        env = described_class.env_for(root_account, user: user)
+        expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+      end
+
+      it "lets context decide if uploading is ok" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        context1 = stub("allowed_context", grants_any_right?: true)
+        context2 = stub("forbidden_context", grants_any_right?: false)
+        env1 = described_class.env_for(root_account, user: user, context: context1)
+        env2 = described_class.env_for(root_account, user: user, context: context2)
+        expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(true)
+        expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+      end
+
       context "with only lowest level flag on" do
         let(:root_account){ stub("root_account") }
 

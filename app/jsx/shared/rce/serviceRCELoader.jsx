@@ -37,6 +37,7 @@ define([
         jwt: ENV.JWT,
         refreshToken: refreshToken,
         host: ENV.RICH_CONTENT_APP_HOST,
+        canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
         contextType: context[0],
         contextId: context[1]
       }
