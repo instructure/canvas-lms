@@ -3,7 +3,12 @@
 @import "base/environment";
 @import "components/ic-badge";
 
+
+$ic-DashboardCard-width: 262px;
 $ic-DashboardCard-action-height: 40px;
+$ic-DashboardCard-action-width: floor($ic-DashboardCard-width / 4);
+$ic-DashboardCard-icon-size: 16px;
+$ic-DashboardCard-icon-padding: floor(($ic-DashboardCard-action-width - $ic-DashboardCard-icon-size) / 2);
 $ic-DashboardCard-icon-color: $ic-icon-link-color;
 $ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
 $ic-DashboardCard-toggle-size: 60px;
@@ -40,7 +45,7 @@ $ic-DashboardCard-toggle-size: 60px;
   box-shadow: 0 0 10px rgba(black, 0.2);
   border-bottom: 4px solid #eee;
   background: $ic-color-light;
-  width: 262px;
+  width: $ic-DashboardCard-width;
   display: inline-block;
   vertical-align: top;
   margin: 0 $ic-sp*3 $ic-sp*3 0;
@@ -124,34 +129,39 @@ $ic-DashboardCard-toggle-size: 60px;
   z-index: 1; // when dashcard links get squished, don't cut off badges
 }
 
+
+
 .ic-DashboardCard__action-container {
   background: $ic-color-light;
   box-sizing: border-box;
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   align-items: center;
-  &.ic-DashboardCard__action-container--is-empty {
-    display: block;
-    height: $ic-DashboardCard-action-height;
-  }
-  .ic-DashboardCard__action {
-    transition: color 0.2s;
-    flex: 1;
-    display: block; // fix for IE10
-    position: relative; // for :after alignment
-    line-height: $ic-DashboardCard-action-height;
-    box-sizing: border-box;
-    text-align: center;
-    color: $ic-DashboardCard-icon-color;
-    .no-touch & {
-      &:focus {
-        @if $use_high_contrast { outline: 1px solid $ic-link-color; }
-        @else { outline: none; }
-      }
-      &:hover { color: $ic-DashboardCard-action-hover-font-color; }
+  min-height: $ic-DashboardCard-action-height;
+}
+
+.ic-DashboardCard__action {
+  transition: color 0.2s;
+  display: block; // fix for IE10
+  position: relative; // for :after alignment
+  font-size: $ic-DashboardCard-icon-size;
+  padding: 0 $ic-DashboardCard-icon-padding;
+  line-height: $ic-DashboardCard-action-height;
+  box-sizing: border-box;
+  color: $ic-DashboardCard-icon-color;
+  width: $ic-DashboardCard-action-width;
+
+  .no-touch & {
+    &:focus {
+      @if $use_high_contrast { outline: 1px solid $ic-link-color; }
+      @else { outline: none; }
     }
+    &:hover { color: $ic-DashboardCard-action-hover-font-color; }
   }
 }
+
+
 
 .dashboard-toggle-button {
   -webkit-appearance: none;
