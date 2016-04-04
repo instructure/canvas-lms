@@ -1,0 +1,267 @@
+<div id="options_tab">
+  <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
+    <div style="position: relative;">
+      <div class="title">
+        <label for="quiz_title" class="screenreader-only"><%= t('Quiz Title') %></label>
+        <%= text_field :quiz, :title, :placeholder => "Quiz Title", :maxlength => "254" %>
+      </div>
+
+      <div style="margin: 15px 0 25px;">
+        <%= before_label(:quiz_instructions, "Quiz Instructions") %>
+        <div style="float: right; font-size: 0.8em; cursor: pointer;">
+          <a href="#" class="toggle_description_views_link"><%= t "HTML Editor" %></a>
+          <a href="#" class="toggle_description_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
+        </div>
+        <textarea id="quiz_description" style="display: block;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
+      </div>
+
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" for="quiz_assignment_id"><%= t("Quiz Type") %></label>
+          <div class="controls">
+            <select name="quiz[quiz_type]" id="quiz_assignment_id">
+              <% ['practice_quiz', 'assignment', 'graded_survey', 'survey'].each do |type| %>
+                <option value='<%= type %>' <%= 'selected' if @quiz.quiz_type == type %> ><%= render_quiz_type(type) %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="quiz_assignment_group_id"><%= t("Assignment Group") %></label>
+          <div class="controls">
+            <select name="quiz[assignment_group_id]" id="quiz_assignment_group_id">
+              <% current_group_id = @quiz.assignment && @quiz.assignment.assignment_group_id || @quiz.assignment_group_id
+                 @context.require_assignment_group %>
+              <% @context.assignment_groups.active.each do |g| %>
+                <option value="<%= g.id %>" <%= 'selected' if g.id == current_group_id%>><%= g.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group" id="quiz_points_possible" style="<%= hidden unless @quiz.graded_survey? %>">
+          <%= label :quiz, :points_possible, :quiz_score, :en => "Score", :class => 'control-label' %>
+            <div class="controls">
+              <%= text_field :quiz, :points_possible, :style => "width: 50px;" %> pts
+              <div style="font-size: 0.8em;">
+                <%= t("students will automatically receive full credit once they take the survey") %>
+              </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+          <div class="controls">
+            <p class="option-caption"><strong>Options</strong></p>
+
+            <% if Assignment.sis_grade_export_enabled?(@context) %>
+              <label class="checkbox" id=post_to_sis_option>
+                <%= check_box :assignment, :post_to_sis, :checked => @quiz.assignment ? @quiz.assignment.post_to_sis : @context.account.sis_default_grade_export[:value] %>
+                <%= t("Post Grades to SIS") %>
+              </label>
+            <% end %>
+
+            <label class="checkbox" for="quiz_shuffle_answers">
+              <%= check_box :quiz, :shuffle_answers %>
+              <%= t("Shuffle Answers") %>
+            </label>
+
+            <div>
+              <label class="checkbox inline nowrap" for="time_limit_option" style="margin-top:-3px;">
+                <input type="checkbox" <%= "checked" if @quiz.time_limit %> name="time_limit" id="time_limit_option"/>
+                <%= t("Time Limit") %>
+              </label>
+
+              <label class="checkbox inline" for="quiz_time_limit" style="padding-top:0;">
+                <%= text_field :quiz, :time_limit, :style => "width: 30px;", :"aria-label" => t("How many minutes?") %>
+                <%= t("Minutes") %>
+              </label>
+            </div>
+
+            <div class="quiz_survey_setting" style="<%= hidden unless @quiz.survey? %>">
+              <label class="checkbox" for="quiz_anonymous_submissions">
+                <%= check_box :quiz, :anonymous_submissions %>
+                <%= t("Keep Submissions Anonymous") %>
+              </label>
+            </div>
+
+            <!-- Multiple Attempts -->
+            <div class="option-group">
+              <label class="checkbox" for="multiple_attempts_option">
+                <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts != 1 %> name="multiple_attempts" value="1" id="multiple_attempts_option" />
+                <%= t("Allow Multiple Attempts") %>
+              </label>
+              <div class="options" id="multiple_attempts_suboptions">
+                <div>
+                  <label for="keep_score_select" class="inline"><%= t("Quiz Score to Keep") %></label>
+                  <%= select(:quiz, :scoring_policy, [[render_score_to_keep('keep_highest'), 'keep_highest'], [render_score_to_keep('keep_latest'), 'keep_latest'], [render_score_to_keep('keep_average'), 'keep_average']], {}, :id => 'keep_score_select') %>
+                </div>
+                <div style="margin-top:5px">
+                  <label for="limit_attempts_option" class="checkbox inline nowrap">
+                    <input type="checkbox" <%= "checked" if @quiz.allowed_attempts && @quiz.allowed_attempts > 1 %> name="limit_attempts" id="limit_attempts_option"/>
+                    <%= t("Allowed Attempts") %>
+                  </label>
+                  <%= text_field :quiz, :allowed_attempts, :tabindex => "0", :value => (@quiz.allowed_attempts == -1 ? 1 : @quiz.allowed_attempts), :"aria-label" => t("Number of allowed attempts") %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Response/CA Visibility -->
+            <% if @quiz.restrict_answers_for_concluded_course? %>
+            <div class="option-group disabled">
+              <label class="checkbox" for="never_hide_results">
+                <span data-tooltip title="<%= t('Students cannot view quiz responses after course concludes') %>">
+                  <input id="never_hide_results" type="checkbox" disabled="disable" />
+                  <%= t("Let Students See Their Quiz Responses") %>
+                </span>
+              </label>
+            </div>
+            <% else %>
+            <div class="option-group">
+              <label class="checkbox" for="never_hide_results">
+                <input type="hidden" name="quiz[hide_results][never]" value="0"/>
+                <input type="checkbox" name="quiz[hide_results][never]" value="1" id="never_hide_results" <%= 'checked' if @quiz.hide_results != 'always' %> />
+                <%= t("Let Students See Their Quiz Responses") %>
+              </label>
+              <div class="show_quiz_results_options options">
+                <div id="hide_results_only_after_last_holder">
+                  <label class="checkbox" for="hide_results_only_after_last">
+                    <input type="hidden" name="quiz[hide_results][last_attempt]" value="0"/>
+                    <input type="checkbox" name="quiz[hide_results][last_attempt]" value="1" id="hide_results_only_after_last" <%= 'checked' if @quiz.hide_results == 'until_after_last_attempt' %> />
+                    <%= t("Only After Their Last Attempt") %>
+                  </label>
+                </div>
+
+                <div>
+                  <label class="checkbox" for="quiz_one_time_results">
+                    <%= check_box :quiz, :one_time_results %>
+                    <%= t("Only Once After Each Attempt") %>
+                  </label>
+                </div>
+
+                <div>
+                  <label class="checkbox" for="quiz_show_correct_answers">
+                    <%= check_box :quiz, :show_correct_answers %>
+                    <%= t("Let Students See The Correct Answers") %>
+                  </label>
+                </div>
+
+                <div id="quiz_show_correct_answers_options" class="options">
+                  <div>
+
+                    <div id="quiz_show_correct_answers_last_attempt_container">
+                      <label class="checkbox" for="quiz_show_correct_answers_last_attempt">
+                        <%= check_box :quiz, :show_correct_answers_last_attempt %>
+                        <%= t("Only After Their Last Attempt") %>
+                      </label>
+                    </div>
+
+                    <label for="quiz_show_correct_answers_at" class="inline">
+                      <%= t('Show Correct Answers at') %>
+                    </label>
+
+                    <div class="date_field_container inline">
+                      <label class="screenreader-only" id="show_correct_answers_accessible_label">
+                        <%= t("Show Correct Answers At") %>
+                        <%= datepicker_screenreader_prompt %>
+                      </label>
+                      <%= text_field :quiz, :show_correct_answers_at,
+                        :class => "input-medium date_field",
+                        :type => "text",
+                        :value => @quiz.show_correct_answers_at.as_json,
+                        "aria-labelledby" => "show_correct_answers_accessible_label",
+                        "data-tooltip" =>"",
+                        :title => accessible_date_format %>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="quiz_hide_correct_answers_at" class="inline">
+                      <%= t('Hide Correct Answers at') %>
+                    </label>
+
+                    <div class="date_field_container inline">
+                      <label class="screenreader-only" id="hide_correct_answers_accessible_label">
+                        <%= t("Hide Correct Answers At") %>
+                        <%= datepicker_screenreader_prompt %>
+                      </label>
+                      <%= text_field :quiz, :hide_correct_answers_at,
+                        :class => "input-medium date_field",
+                        :type => "text",
+                        :value => @quiz.hide_correct_answers_at.as_json,
+                        "aria-labelledby" => "hide_correct_answers_accessible_label",
+                        "data-tooltip" =>"",
+                        :title => accessible_date_format %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% end %>
+
+            <!-- OQAAT -->
+            <div class="option-group">
+              <label class="checkbox" for="quiz_one_question_at_a_time">
+                <%= hidden_field_tag "quiz[one_question_at_a_time]", "0", :id => nil %>
+                <%= check_box_tag "quiz[one_question_at_a_time]", "1", @quiz.one_question_at_a_time?, :class => "element_toggler"  %>
+                <%= t('Show one question at a time') %>
+              </label>
+              <div id="one_question_at_a_time_options" style="<%= 'display:none;' unless @quiz.one_question_at_a_time? %>" class="options">
+                <label class="checkbox" for="quiz_cant_go_back">
+                  <%= hidden_field_tag "quiz[cant_go_back]", "0", :id => nil %>
+                  <%= check_box_tag "quiz[cant_go_back]", "1", @quiz.cant_go_back? %>
+                  <%= t("Lock questions after answering") %>
+                </label>
+              </div>
+            </div>
+
+            <p class="option-caption"><strong><%= t("Quiz Restrictions") %></strong></p>
+
+            <!-- Quiz Restrictions -->
+            <div class="option-group">
+              <label class="checkbox" for="enable_quiz_access_code">
+                <input type="checkbox" <%= 'checked' if !@quiz.access_code.blank? %> id="enable_quiz_access_code">
+                <%= t("Require an access code") %>
+              </label>
+
+              <div class="options control-group screenreader-only">
+                <input type="text" tabindex="-1" aria-label="<%=t("Required access code")%>" name="quiz[access_code]" id="quiz_access_code" value="<%= @quiz.access_code %>" placeholder="ex: Password85"  />
+              </div>
+            </div>
+            <div class="option-group">
+              <label class="checkbox" for="enable_quiz_ip_filter">
+                <input type="checkbox" <%= 'checked' if !@quiz.ip_filter.blank? %> id="enable_quiz_ip_filter">
+                <%= t("Filter IP Addresses") %>
+              </label>
+              <div class="options control-group screenreader-only" aria-hidden="<%= !@quiz.ip_filter.blank? %>">
+                <input type="text" tabindex="-1" aria-label="<%=t("Filter by IP address")%>" name="quiz[ip_filter]" id="quiz_ip_filter" value="<%= @quiz.ip_filter %>" maxlength="255" placeholder="ex: 192.168.217.1"  />
+                <%= link_to(image_tag("find.png", :alt => t('Find IP Address Filter')), '#', :class => 'ip_filtering_link', :title => t('Find IP Address Filter'), 'aria-label' => t('Find IP Address Filter'), :tabindex => -1) %>
+              </div>
+            </div>
+            <% if feature_enabled?(:lockdown_browser) && !@quiz.lockdown_browser_use_lti_tool? %>
+              <div class="option-group">
+                <label class="checkbox" for="quiz_require_lockdown_browser">
+                  <%= check_box :quiz, :require_lockdown_browser %>
+                  <%= t("Require Respondus LockDown Browser") %>
+                </label>
+                <div id="lockdown_browser_suboptions" class="options" style="display: none;">
+                  <label class="checkbox" for="quiz_require_lockdown_browser_for_results">
+                    <%= check_box :quiz, :require_lockdown_browser_for_results %>
+                    <%= t("Required to view quiz results") %>
+                  </label>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </fieldset>
+
+      <div id="overrides-wrapper">
+        <label class="control-label">
+          <%= t("Assign") %>
+        </label>
+        <div class="quiz-overrides-column-right js-assignment-overrides overrideFormFlex">
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

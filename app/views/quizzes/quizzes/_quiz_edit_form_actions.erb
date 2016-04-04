@@ -1,0 +1,19 @@
+<div class="form-actions" id="quiz_edit_actions">
+  <div class="row-fluid">
+    <div class="span6 notify">
+      <label for="quiz_notify_of_update" class="checkbox">
+        <input type="checkbox" name="quiz[notify_of_update]" id="quiz_notify_of_update" value="1" />
+        <%= t('Notify users this quiz has changed') %>
+      </label>
+    </div>
+    <div class="span6">
+      <%= link_to context_url(@context, :context_quiz_url, @quiz), :role => 'button', :class => 'btn', :id => 'cancel_button' do %>
+        <%= t("Cancel") %>
+      <% end %>
+      <% unless @quiz.published %>
+        <button type="submit" class="save_and_publish btn btn-publish"><%= t("Save & Publish") %></button>
+      <% end %>
+      <button type="submit" class="save_quiz_button btn btn-primary"><%= t("Save") %></button>
+    </div>
+  </div>
+</div>

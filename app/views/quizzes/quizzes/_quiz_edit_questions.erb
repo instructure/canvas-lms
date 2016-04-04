@@ -1,0 +1,52 @@
+<div id="questions_tab">
+  <div id="show_question_details_wrap">
+    <input type="checkbox" id="show_question_details"
+           <%= "disabled='disabled'" if @quiz.active_quiz_questions.size> Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+    />
+    <label for="show_question_details"> <%= t("Show Question Details") %></label>
+    <br/>
+    <% if @quiz.quiz_questions.active.size > Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT %>
+    <span id='question-detail-disabled' class='hint'>
+      <%= t('NOTE: Question details not available when more than %{question_count}.',
+            :question_count => Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT) %>
+    </span>
+    <% end %>
+  </div>
+  <div id="questions" class="question_editing brief show_correct_answers" style="border-width:0">
+    <% @quiz.root_entries.each do |question| %>
+      <% if question[:entry_type] == "quiz_group" %>
+        <%= render :partial => "question_group", :object => question %>
+      <% else %>
+        <%= render :partial => (@quiz.quiz_questions.active.size > Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "question_teaser" : "display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+      <% end %>
+    <% end %>
+  </div>
+  <%= render :partial => "question_teaser", :object => nil, :locals => {:editing => true } %>
+  <%= render :partial => "display_question", :object => nil, :locals => {:editing => true } %>
+  <%= render :partial => "display_answer", :object => nil %>
+  <%= render :partial => "form_answer", :object => nil %>
+  <%= render :partial => "form_question", :object => nil %>
+  <%= render :partial => "question_group", :object => nil %>
+  <%= render :partial => "find_question_from_bank" %>
+  <%= render :partial => "move_question" %>
+
+  <div style="text-align: center; margin: -1px 1px 1px" class="add_question question_editing">
+    <% new_question_title = t("New Question") %>
+    <% new_question_group_title = t("New Question Group") %>
+    <a href="#" class="add_question_link btn">
+      <i class="icon-add"></i><span class="screenreader-only"><%= new_question_title %></span>
+      <%= new_question_title %>
+    </a>
+    <a href="#" class="add_question_group_link btn" style="margin-left: 20px; margin-right: 20px;">
+      <i class="icon-add"></i><span class="screenreader-only"><%= new_question_group_title %></span>
+      <%= new_question_group_title %>
+    </a>
+    <% if feature_enabled?(:question_banks) && @context.grants_right?(@current_user, :read_question_banks) %>
+      <% find_questions_title = t("Find Questions") %>
+      <a href="#" class="find_question_link btn">
+        <i class="icon-search"></i><span class="screenreader-only"><%= find_questions_title %></span>
+        <%= find_questions_title %>
+      </a>
+    <% end %>
+  </div>
+</div>
