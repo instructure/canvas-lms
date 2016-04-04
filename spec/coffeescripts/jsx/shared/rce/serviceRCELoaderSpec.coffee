@@ -144,6 +144,7 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
+      ENV.RICH_CONTENT_CAN_UPLOAD_FILES = true
       ENV.context_asset_string = 'courses_1'
       fixtures.setup()
       @$div = fixtures.create('<div />')

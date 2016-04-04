@@ -1,6 +1,6 @@
 module Services
   class RichContent
-    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil, real_user: nil)
+    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil, real_user: nil, context: nil)
       enabled = contextually_on(root_account, risk_level)
       env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
       if enabled
@@ -9,6 +9,12 @@ module Services
           env_hash[:JWT] = Canvas::Security::ServicesJwt.
             for_user(domain, user, real_user: real_user)
         end
+
+        env_hash[:RICH_CONTENT_CAN_UPLOAD_FILES] = (
+          user &&
+          context &&
+          context.grants_any_right?(user, :manage_files)
+        ) || false
       end
       env_hash
     end
