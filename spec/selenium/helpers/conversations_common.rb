@@ -87,6 +87,17 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
+  def go_to_inbox_and_select_message
+    conversations
+    select_message(0)
+  end
+
+  def assert_number_of_recipients(num_of_recipients)
+    expect(ff('input[name="recipients[]"]').length).to eq num_of_recipients
+    expect(ff('input[name="recipients[]"]').first).to have_value(@s2.id.to_s)
+    expect(ff('input[name="recipients[]"]').last).to have_value(@s1.id.to_s) if num_of_recipients > 1
+  end
+
   def click_star_toggle_menu_item
     keep_trying_until do
       driver.execute_script("$('#admin-btn').hover().click()")

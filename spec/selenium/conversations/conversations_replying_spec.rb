@@ -24,10 +24,9 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
+
     it "should maintain context and subject", priority: "1", test_id: 138696 do
-      conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
+      go_to_inbox_and_select_message
       f('#reply-btn').click
       expect(f('#compose-message-course')).to have_attribute(:disabled, 'true')
       expect(f('.message_course_ro').text).to eq @group.name
@@ -39,20 +38,9 @@ describe "conversations new" do
       expect(f('.message_subject_ro').text).to eq @convo.subject
     end
 
-    it "should address replies to the most recent author by default", priority: "2", test_id: 197538 do
-      conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
-      f('#reply-btn').click
-      expect(ff('input[name="recipients[]"]').length).to eq 1
-      expect(f('input[name="recipients[]"]')).to have_value(@s2.id.to_s)
-    end
-
     it "should add new messages to the conversation", priority: "1", test_id: 197537 do
-      conversations
       initial_message_count = @convo.conversation_messages.length
-      conversation_elements[0].click
-      wait_for_ajaximations
+      go_to_inbox_and_select_message
       f('#reply-btn').click
       write_message_body('Read chapters five and six.')
       click_send
@@ -62,13 +50,55 @@ describe "conversations new" do
       expect(@convo.conversation_messages.length).to eq initial_message_count + 1
     end
 
-    it "should not allow adding recipients to private messages" do
+    it "should not allow adding recipients to private messages", priority: "2", test_id: 1089655 do
       @convo.update_attribute(:private_hash, '12345')
-      conversations
-      conversation_elements[0].click
-      wait_for_ajaximations
+      go_to_inbox_and_select_message
       f('#reply-btn').click
       expect(f('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
+
+    context "reply and reply all" do
+
+      it "should address replies to the most recent author by default from the icon at the top of the page", priority: "2", test_id: 197538 do
+        go_to_inbox_and_select_message
+        f('#reply-btn').click
+        assert_number_of_recipients(1)
+      end
+
+      it "should reply to all users from the reply all icon on the top of the page", priority: "2", test_id: 1070114 do
+        go_to_inbox_and_select_message
+        f('#reply-all-btn').click
+        assert_number_of_recipients(2)
+      end
+
+      it "should reply to message from the reply icon next to the message", priority: "2", test_id: 1077516 do
+        go_to_inbox_and_select_message
+        f('.message-detail-actions .reply-btn').click
+        assert_number_of_recipients(1)
+      end
+
+      it "should reply to all users from the settings icon next to the message", priority: "2", test_id: 86606 do
+        go_to_inbox_and_select_message
+        f('.message-detail-actions .icon-settings').click
+        f('.ui-menu-item .reply-all-btn').click
+        assert_number_of_recipients(2)
+      end
+
+      it "should reply to message from mouse hover", priority: "2", test_id: 1069285 do
+        go_to_inbox_and_select_message
+        driver.mouse.move_to(f('.message-content .message-item-view'))
+        f('.message-info .reply-btn').click
+        assert_number_of_recipients(1)
+      end
+
+      it "should reply to all from mouse hover", priority: "2", test_id: 1069836 do
+        go_to_inbox_and_select_message
+        driver.mouse.move_to(f('.message-content .message-item-view'))
+        f('.message-info .icon-settings').click
+        f('.ui-menu-item .reply-all-btn').click
+        assert_number_of_recipients(2)
+      end
+    end
   end
 end
+
