@@ -48,7 +48,6 @@ describe ConditionalRelease::Service do
     expect(Service.configured?).to eq true
   end
 
-
   it 'has a default config' do
     stub_config(nil)
     config = Service.config
@@ -83,21 +82,112 @@ describe ConditionalRelease::Service do
     expect(Service.enabled_in_context?(context)).to eq true
   end
 
-  it 'creates environment variables based on feature flag' do
+  it 'reports enabled as true when enabled' do
     context = stub({feature_enabled?: true})
     stub_config({enabled: true, host: 'foo'})
-    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: true})
+    env = Service.env_for(context)
+    expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
   end
 
-  it 'creates no environment variables if feature flag is off' do
+  it 'reports enabled as false if feature flag is off' do
     context = stub({feature_enabled?: false})
     stub_config({enabled: true, host: 'foo'})
-    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: false})
+    env = Service.env_for(context)
+    expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
   end
 
-  it 'creates no environment variables if service is disabled' do
+  it 'reports enabled as false if service is disabled' do
     context = stub({feature_enabled?: true})
     stub_config({enabled: false})
-    expect(Service.env_for(context)).to eq({CONDITIONAL_RELEASE_SERVICE_ENABLED: false})
+    env = Service.env_for(context)
+    expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+  end
+
+  describe 'jwt generation' do
+    before do
+      Canvas::Security::ServicesJwt.stubs(:encryption_secret).returns('secret' * 10)
+      Canvas::Security::ServicesJwt.stubs(:signing_secret).returns('donttell' * 10)
+      Service.stubs(:enabled_in_context?).returns(true)
+    end
+
+    def get_claims(jwt)
+      Canvas::Security::ServicesJwt.new(jwt, false).original_token
+    end
+
+    it 'returns no jwt if not enabled' do
+      Service.stubs(:enabled_in_context?).returns(false)
+      course_with_student_logged_in(active_all: true)
+      env = Service.env_for(@course, @student)
+      expect(env).not_to have_key :CONDITIONAL_RELEASE_JWT
+    end
+    
+    it 'returns no jwt if user not specified' do
+      course_model
+      env = Service.env_for(@course)
+      expect(env).not_to have_key :CONDITIONAL_RELEASE_JWT
+    end
+
+    it 'includes a student jwt for a student viewing a course' do
+      course_with_student_logged_in(active_all: true)
+      env = Service.env_for(@course, @student)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:sub]).to eq @student.id.to_s
+      expect(claims[:role]).to eq 'student'
+      expect(claims[:context_id]).to eq @course.id.to_s
+      expect(claims[:context_type]).to eq 'Course'
+      expect(claims[:account_id]).to eq Account.default.lti_guid.to_s
+    end
+
+    it 'returns a teacher jwt for a teacher viewing a course' do
+      course_with_teacher(active_all: true)
+      env = Service.env_for(@course, @user)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:sub]).to eq @user.id.to_s
+      expect(claims[:role]).to eq 'teacher'
+    end
+
+    it 'returns an admin jwt for an admin viewing a course' do
+      course
+      account_admin_user
+      env = Service.env_for(@course, @admin)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:sub]).to eq @admin.id.to_s
+      expect(claims[:role]).to eq 'admin'
+    end
+
+    it 'returns a no-role jwt for a non-associated user viewing a course' do
+      teacher_in_course
+      course # redefines @course
+      env = Service.env_for(@course, @user)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:sub]).to eq @user.id.to_s
+      expect(claims[:role]).to be_nil
+    end
+
+    it 'returns an admin jwt for an admin viewing an account' do
+      account_admin_user
+      env = Service.env_for(Account.default, @admin)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:sub]).to eq @admin.id.to_s
+      expect(claims[:context_id]).to eq Account.default.id.to_s
+      expect(claims[:context_type]).to eq 'Account'
+      expect(claims[:role]).to eq 'admin'
+    end
+
+    it 'returns a no-role jwt for an admin viewing a different account' do
+      account_admin_user
+      account_model # redefines @account
+      env = Service.env_for(@account, @admin)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:role]).to be_nil
+    end
+
+    it 'succeeds when a session is specified' do
+      course_with_student_logged_in(active_all: true)
+      session = { permissions_key: 'foobar' }
+      env = Service.env_for(@course, @student, session)
+      claims = get_claims env[:CONDITIONAL_RELEASE_JWT]
+      expect(claims[:role]).to eq 'student'
+    end
   end
 end

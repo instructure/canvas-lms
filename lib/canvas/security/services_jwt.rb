@@ -23,7 +23,7 @@ module Canvas
         else
           Canvas::Security.base64_decode(token_string)
         end
-        Canvas::Security.decrypt_services_jwt(original_crypted_token)
+        Canvas::Security.decrypt_services_jwt(original_crypted_token, signing_secret, encryption_secret)
       end
 
       def id

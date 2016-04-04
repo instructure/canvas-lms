@@ -28,8 +28,23 @@ module ConditionalRelease
       edit_object_score_ranges_path: 'javascripts/edit_object_score_ranges.js',
     }.freeze
 
-    def self.env_for(context)
-      { CONDITIONAL_RELEASE_SERVICE_ENABLED: self.enabled_in_context?(context) }
+    def self.env_for(context, user = nil, session = nil)
+      enabled = self.enabled_in_context?(context)
+      env = {
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
+      }
+      if enabled && user
+        env.merge!({
+          CONDITIONAL_RELEASE_JWT: Canvas::Security::ServicesJwt.generate(
+            sub: user.id.to_s,
+            context_type: context.class.name,
+            context_id: context.id.to_s,
+            role: find_role(user, session, context),
+            account_id: Context.get_account(context).lti_guid.to_s
+          )
+        })
+      end
+      env
     end
 
     def self.reset_config_cache
@@ -81,7 +96,16 @@ module ConditionalRelease
       def build_url(path)
         "#{protocol}://#{host}/#{path}"
       end
+
+      def find_role(user, session, context)
+        if Context.get_account(context).grants_right? user, session, :manage
+          'admin'
+        elsif context.is_a?(Course) && context.grants_right?(user, session, :manage_assignments)
+          'teacher'
+        elsif context.grants_right? user, session, :read
+          'student'
+        end
+      end
     end
   end
-
 end

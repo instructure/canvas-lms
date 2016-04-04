@@ -2039,6 +2039,7 @@ class ApplicationController < ActionController::Base
   def setup_live_events_context
     ctx = {}
     ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
+    ctx[:root_account_lti_guid] = @domain_root_account.lti_guid if @domain_root_account
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
