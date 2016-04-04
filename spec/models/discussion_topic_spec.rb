@@ -602,6 +602,18 @@ describe DiscussionTopic do
       expect(group.reload.discussion_topics.size).to eq 1
     end
 
+    it "should not break when groups have silly long names" do
+      group_category = @course.group_categories.create!(:name => "category")
+
+      topic = @course.discussion_topics.build(:title => "here's a reasonable topic name")
+      topic.group_category = group_category
+      topic.save!
+
+      group = @course.groups.create!(:name => "a" * 250, :group_category => group_category)
+      expect(topic.reload.child_topics.size).to eq 1
+      expect(group.reload.discussion_topics.size).to eq 1
+    end
+
     it "should delete child topics when group category is removed" do
       group_category = @course.group_categories.create!(:name => "category")
       group = @course.groups.create!(:name => "group 1", :group_category => group_category)
@@ -1560,6 +1572,15 @@ describe DiscussionTopic do
 
       ann.restore
       expect(ann.reload).to be_active
+    end
+
+    it "should restore a topic with submissions to active state" do
+      discussion_topic_model(:context => @course)
+      @topic.reply_from(user: @student, text: "huttah!")
+      @topic.destroy
+
+      @topic.restore
+      expect(@topic.reload).to be_active
     end
   end
 

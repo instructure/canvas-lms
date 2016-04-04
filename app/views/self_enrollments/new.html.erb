@@ -3,34 +3,53 @@
 
   js_bundle :self_enrollment
   css_bundle :self_enrollment
-  js_env :SELF_ENROLLMENT_OPTIONS => {:confirmEnrollmentUrl => @confirm_enrollment_url} 
+  js_env :SELF_ENROLLMENT_OPTIONS => {:confirmEnrollmentUrl => @confirm_enrollment_url}
 
   if !@current_user && !@embedded_view
     css_bundle :login
     @headers = false
-    @body_classes << "modal"
+    if use_new_styles?
+      @body_classes << "body--login-confirmation"
+    else
+      @body_classes << "modal"
+    end
   end
 %>
 
-<div id="modal-box">
-  <h2><%= t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name) %></h2>
-  <% if !@course.self_enrollment_enabled? %>
-    <%= render :partial => 'enrollment_closed' %>
-  <% elsif @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
-    <% if params[:enrolled] %>
-      <%= render :partial => 'successfully_enrolled' %>
-    <% else %>
-      <%= render :partial => 'already_enrolled' %>
-    <% end %>
-  <% elsif @course.self_enrollment_limit_met? %>
-    <%= render :partial => 'course_full' %>
-  <% else %>
-    <% if @current_user %>
-      <%= render :partial => 'confirm_enrollments' %>
-    <% elsif @domain_root_account.self_registration? %>
-      <%= render :partial => 'authenticate_or_register' %>
-    <% else %>
-      <%= render :partial => 'authenticate' %>
-    <% end %>
+<div
+  id="modal-box"
+  <% if use_new_styles? && !@current_user && !@embedded_view %>class="ic-Login-confirmation"<% end %>
+>
+  <% if use_new_styles? && !@current_user && !@embedded_view %>
+    <header class="ic-Login-confirmation__header">
+      <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
+    </header>
+    <div class="ic-Login-confirmation__content">
   <% end %>
+    <h2
+      <% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>
+    >
+      <%= t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name) %>
+    </h2>
+    <% if !@course.self_enrollment_enabled? %>
+      <%= render :partial => 'enrollment_closed' %>
+    <% elsif @current_user && @course.user_is_student?(@current_user, :include_future => true) %>
+      <% if params[:enrolled] %>
+        <%= render :partial => 'successfully_enrolled' %>
+      <% else %>
+        <%= render :partial => 'already_enrolled' %>
+      <% end %>
+    <% elsif @course.self_enrollment_limit_met? %>
+      <%= render :partial => 'course_full' %>
+    <% else %>
+      <% if @current_user %>
+        <%= render :partial => 'confirm_enrollments' %>
+      <% elsif @domain_root_account.self_registration? %>
+        <%= render :partial => 'authenticate_or_register' %>
+      <% else %>
+        <%= render :partial => 'authenticate' %>
+      <% end %>
+    <% end %>
+  <% if use_new_styles? && !@current_user && !@embedded_view %></div><% end %>
+  <% if @embedded_view %></div><% end %>
 </div>

@@ -159,6 +159,7 @@ module ApplicationHelper
     if @context.respond_to?(:wiki)
       limit = Setting.get('wiki_sidebar_item_limit', 1000000).to_i
       @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
+      @wiki_sidebar_data[:wiki] = @context.wiki
     end
     @wiki_sidebar_data[:wiki_pages] ||= []
     if can_do(@context, @current_user, :manage_files, :read_as_admin)
@@ -225,7 +226,7 @@ module ApplicationHelper
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
-      !(params[:debug_assets] || params[:debug_js])
+      use_webpack? || !(params[:debug_assets] || params[:debug_js])
     else
       # allows overriding by adding ?optimized_js=1 to the url
       params[:optimized_js] || false

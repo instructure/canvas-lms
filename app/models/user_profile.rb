@@ -68,7 +68,7 @@ class UserProfile < ActiveRecord::Base
         @tabs = @tabs.slice(0,2)
       end
 
-      if user && user.user_observees.exists?
+      if user && user.user_observees.active.exists?
         @tabs << { :id => TAB_OBSERVEES, :label => I18n.t('#tabs.observees', 'Observing'), :css_class => 'observees', :href => :observees_profile_path, :no_args => true }
       end
     end

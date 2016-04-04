@@ -89,6 +89,11 @@ define [
         $to.attr 'id', toId
       @$tree.attr 'aria-activedescendant', toId
 
+      if $to[0].scrollIntoViewIfNeeded
+        $to[0].scrollIntoViewIfNeeded()
+      else
+        $to[0].scrollIntoView()
+
 
     # focus the first item in the tree.
     focusFirst: -> @setFocus @$tree.find '[role=treeitem]:first'

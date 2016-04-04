@@ -6,8 +6,14 @@
   <h2><%= @context.nickname_for(@current_user) %></h2>
   <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
 <% else %>
-  <div style="float: right;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
-  <h1><%= t 'titles.course_syllabus', "Course Syllabus" %></h1>
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Primary">
+    <h1 class="ic-Action-header__Heading"><%= t 'titles.course_syllabus', "Course Syllabus" %></h1>
+  </div>
+  <div class="ic-Action-header__Secondary">
+    <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
+  </div>
+</div>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
   <%= user_content(@syllabus_body) %>

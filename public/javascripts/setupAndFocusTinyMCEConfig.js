@@ -16,8 +16,7 @@ define([
       setup : function(ed) {
         var $editor = $("#" + ed.id);
         var focus = function() {
-          $(document).triggerHandler('editor_box_focus', $editor);
-          $.publish('editorBox/focus', $editor);
+          $editor.triggerHandler('editor_box_focus');
         };
 
         ed.on('click', focus);
@@ -50,7 +49,7 @@ define([
         ed.on('init', function(){
           $(window).triggerHandler("resize");
 
-          // this is a hack so that when you drag an image from the wikiSidebar to the editor that it doesn't
+          // this is a hack so that when you drag an image from the sidebar to the editor that it doesn't
           // try to embed the thumbnail but rather the full size version of the image.
           // so basically, to document why and how this works: in wiki_sidebar.js we add the
           // _mce_src="http://path/to/the/fullsize/image" to the images whose src="path/to/thumbnail/of/image/"

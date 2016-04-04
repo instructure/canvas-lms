@@ -39,6 +39,7 @@ event originated as part of a web request:
 | `real_user_id` | Number | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
+| `root_account_id` | Number | The Canvas id of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
 | `context_id` | Number | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `role` | String | The role of the current user in the current context.  |
@@ -165,10 +166,11 @@ should be null in the body.
 | Field | Description |
 | ----- | ----------- |
 | `submission_id` | The Canvas id of the submission that the grade is changing on. |
+| `assignment_id` | The Canvas id of the assignment associated with the submission. |
 | `grade` | The new grade. |
 | `old_grade` | The previous grade, if there was one. |
 | `grader_id` | The Canvas id of the user making the grade change. Null if this was the result of automatic grading. |
-| `student_id` | The Canvas id of the student associated with the submission with the change. |
+| `user_id` | The Canvas id of the user associated with the submission with the change. |
 
 
 #### `wiki_page_created`
@@ -254,6 +256,7 @@ by `asset_type` and `asset_id`.
 | ----- | ----------- |
 | `submission_id` | The Canvas id of the new submission. |
 | `assignment_id` | The Canvas id of the assignment being submitted. |
+| `user_id` | The Canvas id of the user associated with the submission. |
 | `submitted_at` | The timestamp when the assignment was submitted. |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |
@@ -269,6 +272,7 @@ by `asset_type` and `asset_id`.
 | ----- | ----------- |
 | `submission_id` | The Canvas id of the new submission. |
 | `assignment_id` | The Canvas id of the assignment being submitted. |
+| `user_id` | The Canvas id of the user associated with the submission. |
 | `submitted_at` | The timestamp when the assignment was submitted. |
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |

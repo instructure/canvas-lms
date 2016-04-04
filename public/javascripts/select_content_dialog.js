@@ -92,8 +92,12 @@ define([
       }).fixDialogButtons();
 
       var visibleModuleItemSelect = $('#select_context_content_dialog .module_item_select:visible')[0];
-      if (visibleModuleItemSelect &&  visibleModuleItemSelect.selectedIndex != -1) {
-        $(".add_item_button").removeClass('disabled');
+      if (visibleModuleItemSelect) {
+        if (visibleModuleItemSelect.selectedIndex != -1) {
+          $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
+        } else {
+          $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
+        }
       }
       $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
     }
@@ -336,9 +340,9 @@ define([
       var selectedOption = $(this).val();
       var doNotDisable = _.contains(['external_url', 'context_external_tool', 'context_module_sub_header'], selectedOption);
       if (doNotDisable) {
-        $(".add_item_button").removeClass('disabled');
+        $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
       } else {
-        $(".add_item_button").addClass('disabled');
+        $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
       }
 
       $("#select_context_content_dialog .module_item_option").hide();
@@ -377,7 +381,7 @@ define([
     $('#select_context_content_dialog').on('change', '.module_item_select', function () {
       var currentSelectItem = $(this)[0];
       if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
-        $(".add_item_button").removeClass('disabled');
+        $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
       }
 
       if($(this).val() == "new") {

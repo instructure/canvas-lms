@@ -153,8 +153,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wiki_page_tools_file_tree_setup
       keep_trying_until { expect(f("form.edit-form .edit-content")).to be_displayed }
 
-      fj('a.switch_views:visible').click
       clear_wiki_rce
+      switch_editor_views(wiki_page_body)
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       first_folder = @tree1.find_elements(:css, 'li.folder').first
       first_folder.find_element(:css, '.sign.plus').click
@@ -183,9 +183,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     it "should show uploaded files in file tree and add them to the rce" do
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
-      fj('a.switch_views:visible').click
       clear_wiki_rce
-      fj('a.switch_views:visible').click
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       f('.upload_new_file_link').click
 
@@ -212,7 +210,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.upload_new_image_link').click
-      fj('a.switch_views:visible').click
       wiki_page_body = clear_wiki_rce
       wait_for_ajaximations
       keep_trying_until { expect(@image_list.find_elements(:css, 'img.img').length).to eq 2 }
@@ -239,7 +236,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.upload_new_image_link').click
-      fj('a.switch_views:visible').click
       wiki_page_body = clear_wiki_rce
       wait_for_ajaximations
       keep_trying_until { expect(@image_list.find_elements(:css, 'img.img').length).to eq 2 }
@@ -293,7 +289,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      expand_root_folder
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 2
       expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
@@ -305,7 +301,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       expect(f('li.folder')).not_to be_nil
-      f('li.folder span').click
+      expand_root_folder
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 2
     end
@@ -321,7 +317,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       keep_trying_until do
-        fj('li.folder span').click
+        expand_root_folder
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 2
       end
@@ -338,7 +334,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
       keep_trying_until do
-        fj('li.folder span').click
+        expand_root_folder
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 2
       end

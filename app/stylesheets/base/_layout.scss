@@ -8,21 +8,14 @@
 
 $body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
-$embedded-footer-bg:                $ic-color-neutral;
-$embedded-footer-border-color:      $ic-border-color;
-$embedded-footer-box-shadow:        $ic-color-light;
 $layout-modal-bg:                   $ic-color-light;
 $layout-modal-font-color:           $ic-color-dark;
 $footer-links-color:                lighten($ic-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-@if $use_new_styles {
-  body {
-    min-height: 100vh;
-    &:not(.is-inside-submission-frame) { min-width: 768px; }
-  }
+@if $use_new_styles == false {
+  body, html { height: 100%; }
 }
-@else { body, html { height: 100%; } }
 
 @if $use_new_styles {
   body:not(.full-width) .ic-app-container {
@@ -34,7 +27,13 @@ $footer-links-border-color:         lighten($ic-color-dark, 16);
 
 
 body {
-  @if $use_new_styles == false { min-width: $min_main_width; }
+  @if $use_new_styles {
+    min-height: 100vh;
+    &:not(.is-inside-submission-frame):not(.embedded) {
+      min-width: 768px;
+    }
+  }
+  @else { min-width: $min_main_width; }
 
   @if $use_high_contrast { background: white; }
   @else {
@@ -86,26 +85,6 @@ body {
     &.no-headers {
       h2, .h2 {
         display: none;
-      }
-    }
-    .embedded-footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      padding: 14px 0 15px;
-      margin: 0 -1em !important;
-      background-color: $embedded-footer-bg;
-      border-top: 1px solid $embedded-footer-border-color;
-      box-shadow: inset 0 1px 0 $embedded-footer-box-shadow;
-      text-align: right;
-      .footer-info {
-        position: absolute;
-        left: 1em;
-        top: 1.5em;
-      }
-      .controls {
-        margin-left: 15px;
-        margin-right: 15px;
       }
     }
     #modal-box {

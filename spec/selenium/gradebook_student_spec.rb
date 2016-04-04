@@ -58,7 +58,7 @@ describe 'Student Gradebook' do
         [course1, course2, course3].each do |course|
 
           enrollment = ObserverEnrollment.new(user: observer,
-                                 course: course,
+                                     course: course,
                                  workflow_state: 'active')
 
           enrollment.associated_user_id = student
@@ -252,19 +252,19 @@ describe 'Student Gradebook' do
     end
 
     context "as a student" do
-      it_behaves_like 'Arrange By dropdown', 'student'
+      it_behaves_like 'Arrange By dropdown', :student
     end
 
     context "as a teacher" do
-      it_behaves_like 'Arrange By dropdown', 'teacher'
+      it_behaves_like 'Arrange By dropdown', :teacher
     end
 
     context "as an admin" do
-      it_behaves_like 'Arrange By dropdown', 'admin'
+      it_behaves_like 'Arrange By dropdown', :admin
     end
 
     context "as a ta" do
-      it_behaves_like 'Arrange By dropdown', 'ta'
+      it_behaves_like 'Arrange By dropdown', :ta
     end
   end
 end

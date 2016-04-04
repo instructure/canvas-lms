@@ -188,17 +188,19 @@ define [
         courses: @options.courses,
         defaultOption: I18n.t('select_course', 'Select course')
       )
-      @courseView.on('course', @onCourse)
       if @model
         if @model.get('context_code')
-          @courseView.setValue(@model.get('context_code'))
+          @onCourse({id: @model.get('context_code'), name: @model.get('context_name')})
         else
+          @courseView.on('course', @onCourse)
           @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
         @recipientView.disable(false)
       else if @launchParams
+        @courseView.on('course', @onCourse)
         @courseView.setValue(@launchParams.context) if @launchParams.context
         @recipientView.disable(false)
       else
+        @courseView.on('course', @onCourse)
         @courseView.setValue(@defaultCourse)
       if @model
         @courseView.$picker.css('display', 'none')

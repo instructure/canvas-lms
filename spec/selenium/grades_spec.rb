@@ -136,6 +136,7 @@ describe "grades" do
     end
 
     it "should allow student to test modifying grades", priority: "1", test_id: 229660 do
+      skip_if_chrome('issue with blur')
       get "/courses/#{@course.id}/grades"
 
       Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)

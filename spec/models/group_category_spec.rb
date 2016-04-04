@@ -452,10 +452,26 @@ describe GroupCategory do
       expect(category.progresses.count).to eq 2
     end
   end
+
+  context "#clone_groups_and_memberships" do
+    it "should not duplicate wiki ids" do
+      category = @course.group_categories.create!(:name => "Group Category")
+      group = category.groups.create!(name: "Group 1", context: @course)
+      group.wiki # this creates a wiki for the group
+      expect(group.wiki_id).not_to be_nil
+
+      new_category = @course.group_categories.create!(:name => "New Group Category")
+      category.clone_groups_and_memberships(new_category)
+      new_category.reload
+      new_group = new_category.groups.first
+
+      expect(new_group.wiki_id).to be_nil
+    end
+  end
 end
 
 def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})
-  if group_limit = opts[:group_limit]
+  if (group_limit = opts[:group_limit])
     category.group_limit = group_limit
     category.save!
   end

@@ -44,15 +44,18 @@ describe "speed grader" do
     end
   end
 
-  it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
-    student_in_course(:active_user => true).user
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    comment_textarea = f("#speedgrader_comment_textarea")
-    replace_content(comment_textarea, "oh no i forgot to save this comment!")
-    driver.close
-    alert_shown = alert_present?
-    dismiss_alert
-    expect(alert_shown).to eq(true)
+  context "alerts" do
+    it "should alert the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+      student_in_course(active_user: true).user
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      comment_textarea = f("#speedgrader_comment_textarea")
+      replace_content(comment_textarea, "oh no i forgot to save this comment!")
+      # navigate away
+      driver.navigate.refresh
+      alert_shown = alert_present?
+      dismiss_alert
+      expect(alert_shown).to eq(true)
+    end
   end
 
   context "url submissions" do
@@ -433,6 +436,8 @@ describe "speed grader" do
     end
 
     it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+      skip_if_chrome('This test applies to Firefox')
+      skip_if_ie('This test applies to Firefox')
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
       expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
     end

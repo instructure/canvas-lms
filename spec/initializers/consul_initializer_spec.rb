@@ -2,6 +2,11 @@ require_relative '../spec_helper'
 require_relative '../../config/initializers/consul'
 
 describe ConsulInitializer do
+  after(:each) do
+    Canvas::DynamicSettings.reset_cache!
+    Canvas::DynamicSettings.fallback_data = nil
+  end
+
   class FakeLogger
     attr_reader :messages
     def initialize
@@ -41,6 +46,35 @@ describe ConsulInitializer do
       logger = FakeLogger.new
       ConsulInitializer.configure_with(nil, logger)
       expect(logger.messages).to eq([])
+    end
+  end
+
+  describe ".fallback to" do
+    let(:fallback_data) do
+      {
+        'rich-content-service' => {
+          'app-host' => 'rce.docker',
+          'cdn-host' => 'rce.docker'
+        },
+        'canvas' => {
+          'encryption-secret' => 'asdf',
+          'signing-secret' => 'fdas'
+        }
+      }
+    end
+
+    it "provides fallback data to DynamicSettings" do
+      ConsulInitializer.fallback_to(fallback_data)
+      s_secret = Canvas::DynamicSettings.
+        fallback_data['canvas']['signing-secret']
+      expect(s_secret).to eq('fdas')
+    end
+
+    it "puts the data in with indifferent access" do
+      ConsulInitializer.fallback_to(fallback_data)
+      e_secret = Canvas::DynamicSettings.
+        fallback_data[:canvas]["encryption-secret".to_sym]
+      expect(e_secret).to eq('asdf')
     end
   end
 

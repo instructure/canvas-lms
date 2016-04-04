@@ -1,22 +1,23 @@
+@import "base/variables";
 @import "base/environment";
 
-// #4985f5
-$turnitin_blue: rgba(73, 133, 245, 0.5);
+$turnitin_blue: #397af4;
+@if $use_high_contrast { $turnitin_blue: #0d5bed; }
 
-// #4ff057
-$turnitin_green: rgba(79, 240, 87, 0.5);
+$turnitin_green: #009917;
+@if $use_high_contrast { $turnitin_green: #007010; }
 
-// #f5f549
-$turnitin_yellow: rgba(245, 245, 73, 0.5);
+$turnitin_yellow: #897b01;
+@if $use_high_contrast { $turnitin_yellow: #746801; }
 
-// #ffb433
-$turnitin_orange: rgba(255, 180, 51, 0.5);
+$turnitin_orange: #c86604;
+@if $use_high_contrast { $turnitin_orange: #9b5003; }
 
-// #ff383f
-$turnitin_red: rgba(255, 56, 63, 0.5);
+$turnitin_red: #ad393a;
+@if $use_high_contrast { $turnitin_red: #a03536; }
 
-// #b8b8b8
-$turnitin_gray: rgba(184, 184, 184, 0.5);
+$turnitin_gray: #808080;
+@if $use_high_contrast { $turnitin_gray: #666666; }
 
 .turnitin_score_container_caret {
   position: absolute;
@@ -65,8 +66,7 @@ $turnitin_gray: rgba(184, 184, 184, 0.5);
   border-radius: 3px;
   padding: 2px 4px;
   font-weight: bold;
-  text-shadow: rgba(255, 255, 255, 0.5) 1px 0 1px;
-  color: #444;
+  color: $ic-color-light;
   @include fontSize(12px);
   text-decoration: none;
   &.none_score {

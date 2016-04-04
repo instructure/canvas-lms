@@ -54,6 +54,7 @@ describe "quiz taking" do
   end
 
   it "should account for question group settings", priority: "1", test_id: 140591 do
+    skip_if_chrome('research')
     quiz = quiz_model
     bank = AssessmentQuestionBank.create!(context: @course)
     3.times do

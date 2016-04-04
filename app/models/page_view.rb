@@ -234,7 +234,7 @@ class PageView < ActiveRecord::Base
   def do_update(params = {})
     # nothing currently in the block is shard-sensitive, but to prevent
     # accidents in the future, we'll add the correct shard activation now
-    shard = PageView.cassandra? ? Shard.default : Shard.current
+    shard = PageView.db? ? Shard.current : Shard.default
     shard.activate do
       updated_at = params['updated_at'] || self.updated_at || Time.now
       updated_at = Time.parse(updated_at) if updated_at.is_a?(String)

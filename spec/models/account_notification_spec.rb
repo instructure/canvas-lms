@@ -85,6 +85,61 @@ describe AccountNotification do
     expect(@user.preferences[:closed_notifications]).to eq []
   end
 
+  describe "sub accounts" do
+    before :once do
+      @sub_account = Account.default.sub_accounts.create!
+    end
+
+    it "should find announcements where user is enrolled" do
+      params = {
+        subject: 'sub account notification',
+        account: @sub_account,
+        role_ids: [Role.get_built_in_role("StudentEnrollment").id]
+      }
+      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      unenrolled = @user
+      course_with_student(account: @sub_account, active_all: true)
+      students_notifications = AccountNotification.for_user_and_account(@student, Account.default)
+      unenrolled_notifications = AccountNotification.for_user_and_account(unenrolled, Account.default)
+      expect(students_notifications).to include(@announcement)
+      expect(students_notifications).to include(sub_account_announcement)
+      expect(unenrolled_notifications).not_to include(sub_account_announcement)
+    end
+
+    it "should find announcements where user is an account admin" do
+      params = {
+        subject: 'sub account notification',
+        account: @sub_account,
+        role_ids: [Role.get_built_in_role("AccountAdmin").id]
+      }
+      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      non_admin_user = @user
+      account_admin_user(account: @sub_account)
+      admin_notifications = AccountNotification.for_user_and_account(@admin, Account.default)
+      non_admin_notifications = AccountNotification.for_user_and_account(non_admin_user, Account.default)
+      expect(admin_notifications).to include(@announcement)
+      expect(admin_notifications).to include(sub_account_announcement)
+      expect(non_admin_notifications).not_to include(sub_account_announcement)
+    end
+
+    it "should find announcements with no specified roles if users has any sub account role" do
+      params = {
+        subject: 'sub account notification',
+        account: @sub_account,
+      }
+      sub_account_announcement = SubAccountNotification.sub_account_notification(params)
+      unenrolled_user = @user
+      account_admin_user(account: @sub_account)
+      course_with_student(account: @sub_account, active_all: true)
+      student_notifications = AccountNotification.for_user_and_account(@student, Account.default)
+      admin_notifications = AccountNotification.for_user_and_account(@admin, Account.default)
+      unenrolled_notifications = AccountNotification.for_user_and_account(unenrolled_user, Account.default)
+      expect(student_notifications).to include(sub_account_announcement)
+      expect(admin_notifications).to include(sub_account_announcement)
+      expect(unenrolled_notifications).not_to include(sub_account_announcement)
+    end
+  end
+
   describe "survey notifications" do
     it "should only display for flagged accounts" do
       flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first

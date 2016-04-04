@@ -52,6 +52,23 @@ describe EportfoliosController do
     describe "with logged in user" do
       before{ user_session(@user) }
 
+      let(:fake_signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
+      let(:fake_encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+      let(:fake_secrets){
+        {
+          "signing-secret" => fake_signing_secret,
+          "encryption-secret" => fake_encryption_secret
+        }
+      }
+
+      before do
+        Canvas::DynamicSettings.stubs(:find).with("canvas").returns(fake_secrets)
+      end
+
+      after do
+        Canvas::DynamicSettings.unstub(:find)
+      end
+
       it "assigns variables" do
         get 'user_index'
         expect(assigns[:portfolios]).not_to be_nil

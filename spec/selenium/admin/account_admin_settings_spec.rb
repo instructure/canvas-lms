@@ -5,7 +5,7 @@ describe "root account basic settings" do
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
-  include_examples "settings basic tests", false
+  include_examples "settings basic tests", :root_account
 
   it "should change the default user quota", priority: "1", test_id: 250002 do
     course_with_admin_logged_in

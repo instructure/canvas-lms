@@ -12,7 +12,6 @@ define [
   'compiled/widget/assignmentRubricDialog'
   'jsx/shared/rce/RceCommandShim'
   'str/htmlEscape'
-  'compiled/util/wikiSidebarWithMultipleEditors'
   'jquery.instructure_misc_helpers' #scrollSidebar
 ], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView,
     replyTemplate, Reply, assignmentRubricDialog, RceCommandShim, htmlEscape) ->
@@ -95,7 +94,7 @@ define [
     toggleEditorMode: (event) ->
       event.preventDefault()
       event.stopPropagation()
-      new RceCommandShim().send(@$textarea, 'toggle')
+      RceCommandShim.send(@$textarea, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()

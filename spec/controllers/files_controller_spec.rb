@@ -445,6 +445,16 @@ describe FilesController do
         expect(response.status).to eq(404)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
+
+      it "should view file when student's submission was deleted" do
+        @assignment = @course.assignments.create!(title: 'upload_assignment', submission_types: 'online_upload')
+        attachment_model context: @student
+        @assignment.submit_homework @student, attachments: [@attachment]
+        # create an orphaned attachment_association
+        @assignment.submissions.delete_all
+        get 'show', user_id: @student.id, id: @attachment.id, download_frd: 1
+        expect(response).to be_success
+      end
     end
 
     describe "as a teacher" do
@@ -921,6 +931,12 @@ describe FilesController do
       # the file is not available until the third api call is completed
       expect(@attachment.file_state).to eq 'deleted'
       expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
+    end
+
+    it "opens up cors headers" do
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      post "api_create", params[:upload_params].merge(:file => @content)
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end
 
     it "should reject a blank policy" do

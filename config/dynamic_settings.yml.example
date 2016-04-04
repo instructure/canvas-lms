@@ -1,0 +1,12 @@
+# this config file is useful if you don't want to run a consul
+# cluster with canvas.  Just provide the config data you would
+# like for the DynamicSettings class to find, and it will use
+# it whenever a call for consul data is issued. Data should be
+# shaped like the example below, one key for the related set of data,
+# and a hash of key/value pairs (no nesting)
+development:
+  rich-content-service:
+    app-host: "rce.docker"
+  canvas:
+    encryption-secret: "12345"
+    signing-secret: "54321"

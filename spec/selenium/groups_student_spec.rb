@@ -34,7 +34,7 @@ describe "student groups" do
         wait_for_ajaximations
       end
 
-      expect(g1.reload.name).to eq "new group name"
+      expect(g1.reload.name).to include_text("new group name")
     end
 
     it "should show locked student organized, invite only groups", priority: "1", test_id: 180671 do

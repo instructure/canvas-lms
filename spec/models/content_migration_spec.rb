@@ -467,4 +467,30 @@ describe ContentMigration do
     expect(cm.migration_issues).not_to be_empty
     expect(cm.migration_issues.last.error_report.message).to include 'job expired'
   end
+
+  it "delays queueing imports if one in course is already running" do
+    course_with_teacher
+
+    cms = []
+    Timecop.freeze(Time.now) do
+      2.times do
+        cm = ContentMigration.new(:context => @course, :user => @teacher)
+        cm.migration_type = 'common_cartridge_importer'
+        cm.workflow_state = 'exported'
+        cm.save!
+        cm.queue_migration
+        cms << cm
+      end
+
+      dj = Delayed::Job.last
+      expect(dj.tag).to eq "ContentMigration#queue_migration"
+      expect(dj.run_at > 30.minutes.from_now).to be_truthy # should run in the future if something goes wrong
+    end
+
+    cms[1].any_instantiation.expects(:queue_migration).with do |plugin, opts|
+      opts[:retry_count] == 1 && opts[:expires_at].present?
+    end
+
+    run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes
+  end
 end

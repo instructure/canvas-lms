@@ -221,12 +221,12 @@ describe "calendar2" do
         name = 'special assignment'
         create_middle_day_assignment(name)
         keep_trying_until do
-          fj('.fc-event.assignment').click
+          f('.fc-event.assignment').click
           wait_for_ajaximations
-          if (fj('.view_event_link').displayed?)
+          if f('.view_event_link').displayed?
             expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
           end
-          fj('h1.title').displayed?
+          f('h1.title').displayed?
         end
 
         expect(find('h1.title').text).to include(name)
@@ -267,9 +267,9 @@ describe "calendar2" do
       it "should delete an assignment" do
         create_middle_day_assignment
         keep_trying_until do
-          fj('.fc-event').click()
+          f('.fc-event').click()
           driver.execute_script("$('.delete_event_link').hover().click()")
-          fj('.ui-dialog .ui-dialog-buttonset').displayed?
+          f('.ui-dialog .ui-dialog-buttonset').displayed?
         end
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")

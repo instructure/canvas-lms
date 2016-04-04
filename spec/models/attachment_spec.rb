@@ -61,6 +61,15 @@ describe Attachment do
       attachment_with_context(@course)
       expect(@attachment.authenticated_s3_url(:secure => true)).to match(/^https:\/\//)
     end
+
+    context "for a quiz submission upload" do
+      it "should return a routable url", :type => :routing do
+        quiz = @course.quizzes.create
+        submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(user_model)
+        attachment = attachment_with_context(submission)
+        expect(get(attachment.authenticated_s3_url)).to be_routable
+      end
+    end
   end
 
   def configure_crocodoc
@@ -1520,6 +1529,15 @@ describe Attachment do
       att = attachment_model
       expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
       expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
+    end
+  end
+
+  describe '#ajax_upload_params' do
+    it 'returns the attachment filename in the upload params' do
+      attachment_model filename: 'test.txt'
+      pseudonym @user
+      json = @attachment.ajax_upload_params(@user.pseudonym, '', '')
+      expect(json[:upload_params]['Filename']).to eq 'test.txt'
     end
   end
 end

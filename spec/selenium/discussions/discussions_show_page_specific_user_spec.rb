@@ -151,6 +151,23 @@ describe "discussions" do
           end
         end
       end
+
+      it "should not show when users are inactive" do
+        other_student = student_in_course(course: course, name: 'student', active_all: true).user
+        topic.reply_from(:user => other_student, :text => "reply")
+
+        other_student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to_not include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to_not include_text("inactive")
+      end
     end
 
     context "as a teacher" do
@@ -168,7 +185,7 @@ describe "discussions" do
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#has_group_category').click
-        drop_down = get_options('#assignment_group_category_id').map(&:text)
+        drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
         expect(drop_down).to include('category 1')
         click_option('#assignment_group_category_id', @category1.name)
         expect_new_page_load {submit_form('.form-actions')}
@@ -185,6 +202,7 @@ describe "discussions" do
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#use_for_grading').click
         f('#discussion_topic_assignment_points_possible').send_keys('10')
+        wait_for_ajaximations
         click_option('#assignment_group_id', assignment_group.name)
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
@@ -283,7 +301,7 @@ describe "discussions" do
         edit_name = 'edited discussion name'
         get url
         expect_new_page_load { f(".edit-btn").click }
-
+        clear_content('input[name=title]')
         edit(edit_name, 'edit message')
       end
 
@@ -332,6 +350,7 @@ describe "discussions" do
 
       context "in student view" do
         it "should allow student view student to read/post", priority:"2", test_id: 344545 do
+          skip_if_chrome('Can not get to student view in Chrome')
           enter_student_view
           get url
           expect(get_all_replies.count).to eq 0
@@ -349,6 +368,22 @@ describe "discussions" do
           wait_for_ajaximations
           expect(get_all_replies.first).to include_text fake_student.name
         end
+      end
+
+      it "should show when users are inactive" do
+        topic.reply_from(:user => student, :text => "reply")
+
+        student.student_enrollments.each(&:deactivate)
+
+        get url
+        wait_for_ajaximations
+
+        expect(f(".discussion-entries .entry-header .discussion-title")).to include_text("inactive")
+
+        replace_content(f('#discussion-search'), 'reply')
+        wait_for_ajaximations
+
+        expect(f("#filterResults .entry-header .discussion-title")).to include_text("inactive")
       end
     end
 

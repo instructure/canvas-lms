@@ -24,7 +24,7 @@ class Group < ActiveRecord::Base
   include CustomValidations
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb, :leader
-  validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
+  validates :context_id, :context_type, :account_id, :root_account_id, :workflow_state, :uuid, presence: true
   validates_allowed_transitions :is_public, false => true
 
   # use to skip queries in can_participate?, called by policy block

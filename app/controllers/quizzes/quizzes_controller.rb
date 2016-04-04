@@ -28,7 +28,7 @@ class Quizzes::QuizzesController < ApplicationController
   attr_reader :lock_results_if_needed
 
   before_filter :require_context
-  before_filter :rich_content_service_config, only: [:show]
+  before_filter :rich_content_service_config, only: [:show, :new, :edit]
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
@@ -210,13 +210,14 @@ class Quizzes::QuizzesController < ApplicationController
       submission_counts if @quiz.grants_right?(@current_user, session, :grade) || @quiz.grants_right?(@current_user, session, :read_statistics)
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
-      hash = { :QUIZZES_URL => course_quizzes_url(@context),
-             :IS_SURVEY => @quiz.survey?,
-             :QUIZ => quiz_json(@quiz,@context,@current_user,session),
-             :COURSE_ID => @context.id,
-             :LOCKDOWN_BROWSER => @quiz.require_lockdown_browser?,
-             :ATTACHMENTS => Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
-             :CONTEXT_ACTION_SOURCE => :quizzes  }
+      hash = {
+        ATTACHMENTS: Hash[@attachments.map { |_,a| [a.id,attachment_hash(a)]}],
+        CONTEXT_ACTION_SOURCE: :quizzes,
+        COURSE_ID: @context.id,
+        LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
+        QUIZ: quiz_json(@quiz,@context,@current_user,session),
+        QUIZZES_URL: course_quizzes_url(@context)
+      }
       append_sis_data(hash)
       js_env(hash)
 
@@ -696,7 +697,7 @@ class Quizzes::QuizzesController < ApplicationController
   private
 
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+    rce_js_env(:highrisk)
   end
 
   def get_banks(quiz)

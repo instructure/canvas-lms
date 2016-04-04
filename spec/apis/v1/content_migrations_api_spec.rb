@@ -265,6 +265,8 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should queue a migration" do
+      @migration.fail_with_error!(nil) # clear out old migration
+
       @post_params.delete :pre_attachment
       p = Canvas::Plugin.new("hi")
       p.stubs(:default_settings).returns({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
@@ -397,6 +399,8 @@ describe ContentMigrationsController, type: :request do
 
     context "by LTI extension" do
       it "should queue migration with LTI url sent" do
+        #@migration.fail_with_error!(nil) # clear out old migration
+
         post_params = {migration_type: "context_external_tool", settings: {file_url: 'http://example.com/oi.imscc'}}
         json = api_call(:post, @migration_url, @params, post_params)
         migration = ContentMigration.find json['id']

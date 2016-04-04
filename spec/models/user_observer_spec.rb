@@ -22,7 +22,24 @@ describe UserObserver do
   let_once(:student) { user }
 
   it "should not allow a user to observe oneself" do
-    expect { student.observers << student}.to raise_error(ActiveRecord::RecordInvalid)
+    expect { student.observers << student }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it 'should restore deleted observees instead of creating a new one' do
+    observer = user_with_pseudonym
+    student.observers << observer
+    observee = observer.user_observees.first
+    observee.destroy
+
+    re_observee = student.user_observers.create_or_restore(observer_id: observer)
+    expect(observee.id).to eq re_observee.id
+    expect(re_observee.workflow_state).to eq 'active'
+  end
+
+  it 'should create an observees when one does not exist' do
+    observer = user_with_pseudonym
+    re_observee = observer.user_observees.create_or_restore(user_id: student)
+    expect(re_observee).to eq student.user_observers.first
   end
 
   it "should enroll the observer in all pending/active courses" do

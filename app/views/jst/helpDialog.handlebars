@@ -20,6 +20,7 @@
     <div class="button-container">
       <button type="submit" class="btn" data-text-while-loading="{{#t "sending"}}Sending...{{/t}}">{{#t "send_message"}}Send Message{{/t}}</button>
     </div>
+    <input class="input-block-level" type="hidden" name="group_conversation" value="true">
   </form>
   <form class="help-dialog-pane bootstrap-form" id="create_ticket" style="display:none" action="/error_reports" method="POST">
     <h4>{{#t "file_a_ticket_for_a_personal_response_from_our_support_team"}}File a ticket for a personal response from our support team{{/t}}</h4>

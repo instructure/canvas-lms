@@ -20,6 +20,10 @@ module CanvasHttp
     CanvasHttp.request(Net::HTTP::Delete, *args, &block)
   end
 
+  def self.head(*args, &block)
+    CanvasHttp.request(Net::HTTP::Head, *args, &block)
+  end
+
   def self.get(*args, &block)
     CanvasHttp.request(Net::HTTP::Get, *args, &block)
   end

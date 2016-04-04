@@ -198,6 +198,11 @@ module ContextModulesCommon
      expect(f('#content_tag_indent_select')).to be_displayed
    end
 
+  def lock_check_click(form)
+    lock_check = form.find_element(:id, 'unlock_module_at')
+    driver.action.move_to(lock_check).click.perform
+  end
+
   # so terrible
   def get(url)
     super

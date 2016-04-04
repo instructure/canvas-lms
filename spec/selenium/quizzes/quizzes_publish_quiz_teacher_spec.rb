@@ -31,6 +31,7 @@ describe 'publishing a quiz' do
         end
 
         it 'changes the button text on hover to |Unpublish|', priority: "1", test_id: 398936 do
+          driver.mouse.move_to f('#quiz-publish-link')
           expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Unpublish'
         end
 

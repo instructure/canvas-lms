@@ -31,7 +31,6 @@ define([
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'compiled/jquery.rails_flash_notifications',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(RceCommandShim, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
 
@@ -685,7 +684,7 @@ define([
       }
       try {
         if($input.data('rich_text')) {
-          val = new RceCommandShim().send($input, "get_code", false);
+          val = RceCommandShim.send($input, "get_code", false);
         }
       } catch(e) {}
       var attr = $input.prop('name') || '';

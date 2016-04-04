@@ -214,31 +214,7 @@ module Api::V1::User
         json[:sis_import_id] = enrollment.sis_batch_id
       end
       if enrollment.student?
-        json[:grades] = {
-          :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),
-        }
-
-        if has_grade_permissions?(user, enrollment)
-          if opts[:grading_period]
-            student_id = user.id
-            if enrollment.is_a? StudentEnrollment
-              student_id = enrollment.student.id
-            end
-
-            course = enrollment.course
-            gc = GradeCalculator.new(student_id, course,
-                                     grading_period: opts[:grading_period])
-            ((current, _), (final, _)) = gc.compute_scores.first
-            json[:grades][:current_score] = current[:grade]
-            json[:grades][:current_grade] = course.score_to_grade(current[:grade])
-            json[:grades][:final_score] = final[:grade]
-            json[:grades][:final_grade] = course.score_to_grade(final[:grade])
-          else
-            %w{current_score final_score current_grade final_grade}.each do |method|
-              json[:grades][method.to_sym] = enrollment.send("computed_#{method}")
-            end
-          end
-        end
+        json[:grades] = grades_hash(enrollment, user, opts[:grading_period])
       end
       if @domain_root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
         json[:sis_source_id] = enrollment.sis_source_id
@@ -267,8 +243,39 @@ module Api::V1::User
     end
   end
 
-  protected
-  def has_grade_permissions?(user, enrollment)
+  private
+  def grades_hash(enrollment, user, grading_period)
+    grades = {
+      html_url: course_student_grades_url(enrollment.course_id, enrollment.user_id)
+    }
+
+    if grade_permissions?(user, enrollment)
+      if grading_period
+        student_id = enrollment.is_a?(StudentEnrollment) ? enrollment.student.id : user.id
+        calculator = GradeCalculator.new(
+          student_id,
+          enrollment.course,
+          grading_period: grading_period
+        )
+
+        computed        = calculator.compute_scores.first
+        current, final  = computed[:current], computed[:final]
+
+        grades[:current_score] = current[:grade]
+        grades[:current_grade] = enrollment.course.score_to_grade(current[:grade])
+        grades[:final_score]   = final[:grade]
+        grades[:final_grade]   = enrollment.course.score_to_grade(final[:grade])
+      else
+        grades[:current_score] = enrollment.computed_current_score
+        grades[:current_grade] = enrollment.computed_current_grade
+        grades[:final_score]   = enrollment.computed_final_score
+        grades[:final_grade]   = enrollment.computed_final_grade
+      end
+    end
+    grades
+  end
+
+  def grade_permissions?(user, enrollment)
     course = enrollment.course
 
     (user.id == enrollment.user_id && !course.hide_final_grades?) ||

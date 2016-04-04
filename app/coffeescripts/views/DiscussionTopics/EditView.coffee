@@ -8,7 +8,6 @@ define [
   'compiled/views/assignments/PostToSisSelector'
   'underscore'
   'jst/DiscussionTopics/EditView'
-  'wikiSidebar'
   'jsx/shared/rce/RichContentEditor'
   'str/htmlEscape'
   'compiled/models/DiscussionTopic'
@@ -18,16 +17,13 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/editor/KeyboardShortcuts'
-  'compiled/tinymce'
-  'tinymce.editor_box'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
-GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, wikiSidebar, RichContentEditor,
+GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
 htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "highrisk", sidebar: wikiSidebar})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -103,18 +99,20 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       if @assignment.hasSubmittedSubmissions()
         @$discussionPointPossibleWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@initialPointsPossible}")
 
+    # separated out so we can easily stub it
+    scrollSidebar: $.scrollSidebar
+
     render: =>
       super
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
 
-      @_initializeWikiSidebar ($textarea)
-
+      RichContentEditor.initSidebar(show: @scrollSidebar)
       _.defer ->
-        richContentEditor.loadNewEditor($textarea)
+        RichContentEditor.loadNewEditor($textarea, { focus: true })
         $('.rte_switch_views_link').click (event) ->
           event.preventDefault()
           event.stopPropagation()
-          richContentEditor.callOnRCE($textarea, 'toggle')
+          RichContentEditor.callOnRCE($textarea, 'toggle')
           # hide the clicked link, and show the other toggle link.
           # todo: replace .andSelf with .addBack when JQuery is upgraded.
           $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
@@ -134,11 +132,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     attachKeyboardShortcuts: =>
         $('.rte_switch_views_link').first().before((new KeyboardShortcuts()).render().$el)
-
-    _initializeWikiSidebar:(textarea) =>
-      richContentEditor.initSidebar()
-      $.scrollSidebar()
-      richContentEditor.attachSidebarTo(textarea)
 
     renderAssignmentGroupOptions: =>
       @assignmentGroupSelector = new AssignmentGroupSelector

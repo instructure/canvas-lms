@@ -231,6 +231,7 @@ describe "better_file_browsing" do
       end
 
       it "should move a file to a destination if contexts are different" do
+        skip_if_chrome('research')
         get "/courses/#{@course.id}/files"
         folder_name = "destination_folder"
         add_folder(folder_name)
@@ -239,6 +240,7 @@ describe "better_file_browsing" do
       end
 
       it "should move a file to a destination if the contexts are the same" do
+        skip_if_chrome('research')
         get "/files"
         folder_name = "destination_folder"
         add_folder(folder_name)

@@ -518,10 +518,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
   #
   # @argument course[is_public_to_auth_users] [Boolean]
-  #   Set to true if course if public to authenticated users.
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -748,8 +748,9 @@ class CoursesController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
-  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type[] [String, "teacher"|"student"|"student_view"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
+  #   "student_view" implies include[]=test_student.
   #   This argument is ignored if enrollment_role is given.
   #
   # @argument enrollment_role [String] Deprecated
@@ -796,7 +797,7 @@ class CoursesController < ApplicationController
   # @returns [User]
   def users
     get_context
-    if authorized_action(@context, @current_user, :read_roster)
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       #backcompat limit param
       params[:per_page] ||= params[:limit]
 
@@ -830,7 +831,7 @@ class CoursesController < ApplicationController
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
-      if not includes.include?('test_student')
+      unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
         end
@@ -1749,9 +1750,10 @@ class CoursesController < ApplicationController
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
       list = UserList.new(params[:user_list],
-                          :root_account => @context.root_account,
-                          :search_method => @context.user_list_search_mode_for(@current_user),
-                          :initial_type => params[:enrollment_type])
+                          root_account: @context.root_account,
+                          search_method: @context.user_list_search_mode_for(@current_user),
+                          initial_type: params[:enrollment_type],
+                          current_user: @current_user)
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
@@ -1926,7 +1928,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
+  #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -2294,6 +2299,7 @@ class CoursesController < ApplicationController
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
+      ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions).delete_all
       @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all

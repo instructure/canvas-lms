@@ -209,7 +209,7 @@ describe "admin_tools" do
     end
 
     context "permissions" do
-      it "should includ options activity with permissions" do
+      it "should include options activity with permissions" do
         setup_account_admin
         load_admin_tools_page
         wait_for_ajaximations
@@ -224,8 +224,7 @@ describe "admin_tools" do
         expect(select).not_to be_nil
         expect(select).to be_displayed
 
-        options = ffj("#loggingType > option")
-        options.map!{ |o| o.text }
+        options = ffj("#loggingType > option").map(&:text).map(&:strip)
         expect(options).to include("Select a Log type")
         expect(options).to include("Login / Logout Activity")
         expect(options).to include("Grade Change Activity")

@@ -43,7 +43,9 @@ module Api::V1::AssignmentOverride
 
   def assignment_overrides_json(overrides, user = nil)
     visible_users = if user && !overrides.empty?
-                      context = overrides.first.assignment.context
+                      override = overrides.first
+                      assignment_or_quiz = override.assignment || override.quiz
+                      context = assignment_or_quiz.context
                       UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
                     end
     overrides.map{ |override| assignment_override_json(override, visible_users) }
@@ -119,6 +121,7 @@ module Api::V1::AssignmentOverride
         # make sure they were all valid
         found_ids = students.map{ |s| [
           s.id.to_s,
+          s.global_id.to_s,
           ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
           ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack('H*')}" if s.pseudonym),
           ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),

@@ -214,12 +214,12 @@ TEXT
   <div id="completion_criterion_option" class="completion_criterion_option">
     <% ot 'criterion_for_assignment', '%{assignment} %{select_criterion}', :assignment => capture { %>
     <span style="padding: 0 4px;">
-      <select class="id assignment_picker" tabindex="0">
+      <select class="id assignment_picker" tabindex="0" aria-label="<%= t('Requirement subject') %>">
       </select>
     </span>
     <% }, :select_criterion => capture { %>
     <span style="padding: 0 4px;">
-      <select class="type assignment_requirement_picker" tabindex="0">
+      <select class="type assignment_requirement_picker" tabindex="0" aria-label="<%= t('Requirement') %>">
         <option class="any" value="must_view"><%= t('requirements.must_view', %{view the item}) %></option>
         <option class="assignment wiki_page" value="must_mark_done"><%= t(%{mark as done}) %></option>
         <option class="wiki_page discussion_topic" value="must_contribute"><%= t('requirements.must_contribute', %{contribute to the page}) %></option>

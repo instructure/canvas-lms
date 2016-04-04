@@ -207,7 +207,7 @@ class UsersController < ApplicationController
       }
     }
     calculator = grade_calculator([enrollment.user_id], course, grading_periods)
-    totals = calculator.compute_scores.first.first.first
+    totals = calculator.compute_scores.first[:current]
     totals[:hide_final_grades] = course.hide_final_grades?
     render json: totals
   end
@@ -1048,7 +1048,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def api_show
-    @user = params[:id] && params[:id] != 'self' ? api_find(User, params[:id]) : @current_user
+    @user = api_find(User, params[:id])
     if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
       render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
     else
@@ -1961,9 +1961,9 @@ class UsersController < ApplicationController
     calculator = grade_calculator(user_ids, course, grading_periods)
     grades = {}
     calculator.compute_scores.each_with_index do |score, index|
-     computed_score = score.first.first[:grade]
-     user_id = user_ids[index]
-     grades[user_id] = computed_score
+      computed_score = score[:current][:grade]
+      user_id = user_ids[index]
+      grades[user_id] = computed_score
     end
     grades
   end
@@ -2180,7 +2180,7 @@ class UsersController < ApplicationController
       end
       @user.save!
       if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
+        @user.user_observees << @user.user_observees.create_or_restore(user_id: @observee)
       end
 
       if notify_policy.is_self_registration?

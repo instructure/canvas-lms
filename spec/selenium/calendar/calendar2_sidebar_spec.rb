@@ -40,7 +40,8 @@ describe "calendar2" do
           end
 
           orig_titles = ff(title_selector).map(&:text)
-          f("#minical .fc-other-month").click
+          
+          move_to_click("#minical .fc-other-month")
 
           expect(orig_titles).not_to eq ff(title_selector).map(&:text)
         end

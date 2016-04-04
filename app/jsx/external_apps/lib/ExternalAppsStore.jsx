@@ -86,6 +86,17 @@ define([
     });
   };
 
+  store.updateAccessToken = function(context_base_url, accessToken, success, error) {
+    $.ajax({
+      url: context_base_url,
+      dataType: 'json',
+      type: 'PUT',
+      data: { account: { settings: { app_center_access_token: accessToken}}},
+      success: success.bind(this),
+      error: error.bind(this)
+    });
+  };
+
   store.delete = function(tool) {
     var url;
 

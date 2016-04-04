@@ -248,7 +248,7 @@ describe Submission do
 
     context "Submission Graded" do
       before :once do
-        Notification.create(:name => 'Submission Graded')
+        Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
       end
 
       it "should create a message when the assignment has been graded and published" do
@@ -259,6 +259,13 @@ describe Submission do
         expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
         expect(@submission.messages_sent).to be_include('Submission Graded')
+      end
+
+      it "notifies observers" do
+        submission_spec_model
+        course_with_observer(course: @course, associated_user_id: @user.id, active_all: true, active_cc: true)
+        @submission.grade_it!
+        expect(@observer.email_channel.messages.length).to eq 1
       end
 
       it "should not create a message when a muted assignment has been graded and published" do

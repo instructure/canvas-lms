@@ -309,14 +309,6 @@ describe "people" do
       expect(f('#users')).to include_text(@student_1.name)
     end
 
-    def link_to_student(enrollment, student)
-      enrollment.find_element(:css, ".link_enrollment_link").click
-      wait_for_ajax_requests
-      click_option("#student_enrollment_link_option", student.try(:name) || "[ No Link ]")
-      submit_form("#link_student_dialog_form")
-      wait_for_ajax_requests
-    end
-
     it "should deal with observers linked to multiple students" do
       @students = []
       @obs = user_model(:name => "The Observer")
@@ -341,28 +333,6 @@ describe "people" do
 
       expect(enrollments[0]).to include_text @students[0].name
       expect(enrollments[1]).to include_text @students[1].name
-
-      link_to_student(enrollments[0], @students[2])
-      expect(enrollments[0]).to include_text @students[2].name
-      expect(enrollments[1]).to include_text @students[1].name
-
-      link_to_student(enrollments[1], @students[3])
-      expect(enrollments[0]).to include_text @students[2].name
-      expect(enrollments[1]).to include_text @students[3].name
-
-      @obs.reload
-      expect(@obs.enrollments.map { |e| e.associated_user_id }.sort).to eq [@students[2].id, @students[3].id]
-
-      link_to_student(enrollments[0], nil)
-      expect(enrollments[0].find_element(:css, ".associated_user")).not_to be_displayed
-
-      link_to_student(enrollments[0], @students[0])
-      link_to_student(enrollments[1], @students[1])
-      expect(enrollments[0]).to include_text @students[0].name
-      expect(enrollments[1]).to include_text @students[1].name
-
-      @obs.reload
-      expect(@obs.enrollments.map { |e| e.associated_user_id }.sort).to eq [@students[0].id, @students[1].id]
     end
   end
 

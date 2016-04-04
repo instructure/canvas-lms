@@ -35,16 +35,13 @@ define([
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* scrollSidebar */,
   'compiled/jquery.rails_flash_notifications',
-  'compiled/tinymce',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'compiled/behaviors/quiz_selectmenu'
 ], function(FileUploadQuestionView, File, I18n, $, autoBlurActiveInput, _,
             LDBLoginPopup, QuizTakingPolice, QuizLogAuditing,
             QuizLogAuditingEventDumper, KeyboardShortcuts, RichContentEditor) {
 
-  var richContentEditor = new RichContentEditor({riskLevel: "highrisk"});
-  richContentEditor.preloadRemoteModule();
+  RichContentEditor.preloadRemoteModule();
 
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
@@ -555,7 +552,7 @@ define([
         }
 
         if (tagName == "TEXTAREA") {
-          val = richContentEditor.callOnRCE($this, 'get_code');
+          val = RichContentEditor.callOnRCE($this, 'get_code');
         } else if ($this.attr('type') == "text" || $this.attr('type') == 'hidden') {
           val = $this.val();
         } else if (tagName == "SELECT") {
@@ -668,7 +665,7 @@ define([
     setTimeout(function() {
       $(".question_holder textarea.question_input").each(function() {
         $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++);
-        richContentEditor.loadNewEditor($(this));
+        RichContentEditor.loadNewEditor($(this));
       });
     }, 2000);
 

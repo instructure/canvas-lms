@@ -431,6 +431,7 @@ describe "conversations new" do
       wait_for_ajaximations
       click_star_toggle_menu_item
       expect(f('.active', unstarred_elt)).to be_present
+      expect(f('.star-btn', unstarred_elt)['aria-checked']).to eq "true"
       run_progress_job
       expect(@conv_unstarred.reload.starred).to be_truthy
     end

@@ -61,6 +61,7 @@ describe "context modules" do
 
       it "should show tool launch links in the gear for exportable module items" do
         get "/courses/#{@course.id}/modules"
+
         type_to_tag = {
             :assignment_menu => @assignment_tag,
             :quiz_menu => @quiz_tag,
@@ -79,6 +80,8 @@ describe "context modules" do
           expect(link).to be_displayed
           expect(link.text).to match_ignoring_whitespace(@tool.label_for(type))
           expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: type, :module_items => [tag.id])
+          # need to close gear menu
+          gear.click
         end
 
         gear = f("#context_module_item_#{@subheader_tag.id} .al-trigger")

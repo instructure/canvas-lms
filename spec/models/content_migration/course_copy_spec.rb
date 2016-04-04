@@ -360,7 +360,6 @@ describe ContentMigration do
       @copy_from.default_wiki_editing_roles = 'teachers'
       @copy_from.allow_student_organized_groups = false
       @copy_from.default_view = 'modules'
-      @copy_from.show_all_discussion_entries = false
       @copy_from.open_enrollment = true
       @copy_from.storage_quota = 444
       @copy_from.allow_wiki_comments = true

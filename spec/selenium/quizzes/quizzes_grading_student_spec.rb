@@ -37,9 +37,11 @@ describe 'Viewing graded quizzes' do
 
         edit_first_question
         select_different_correct_answer(1)
-        close_regrade_tooltip
-
+        wait_for_ajaximations
         select_regrade_option(1)
+        wait_for_ajaximations
+        regrade_tour = f('#tour-quiz-regrade-step1')
+        close_regrade_tooltip if driver.browser == :chrome && regrade_tour.displayed?
         save_question
         expect_new_page_load { click_save_settings_button }
 
@@ -55,6 +57,7 @@ describe 'Viewing graded quizzes' do
       end
 
       it 'shows the correct quiz score after regrading', priority: "1", test_id: 140631 do
+        wait_for_ajaximations
         original_score = fj('.ic-Table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(4)')
         expect(original_score.text).to eq '1 out of 1'
 

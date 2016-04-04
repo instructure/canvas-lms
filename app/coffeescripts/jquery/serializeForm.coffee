@@ -37,7 +37,7 @@ define ['jquery', 'jsx/shared/rce/RceCommandShim'], ($, RceCommandShim) ->
       else
         $input.data('date') or null
     else if $input.data('rich_text')
-      new RceCommandShim().send($input, 'get_code', false)
+      RceCommandShim.send($input, 'get_code', false)
     else
       $input.val()
 

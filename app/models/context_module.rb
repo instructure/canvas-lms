@@ -256,10 +256,6 @@ class ContextModule < ActiveRecord::Base
     res
   end
 
-  def current?
-    (self.start_at || self.end_at) && (!self.start_at || Time.now >= self.start_at) && (!self.end_at || Time.now <= self.end_at) rescue true
-  end
-
   def self.module_names(context)
     Rails.cache.fetch(['module_names', context].cache_key) do
       names = {}

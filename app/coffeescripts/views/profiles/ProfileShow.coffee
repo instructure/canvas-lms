@@ -22,7 +22,6 @@ define [
   'jquery'
   'jst/profiles/addLinkRow'
   'compiled/util/AvatarWidget'
-  'compiled/tinymce'
   'jquery.instructure_forms'
 ], (I18n, Backbone, $, addLinkRow, AvatarWidget) ->
 

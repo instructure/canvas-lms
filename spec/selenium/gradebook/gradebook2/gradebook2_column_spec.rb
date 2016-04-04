@@ -10,8 +10,6 @@ describe "assignment column headers" do
     gradebook_data_setup
     @assignment = @course.assignments.first
     @header_selector = %([id$="assignment_#{@assignment.id}"])
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
   end
 
   it "should validate row sorting works when first column is clicked", priority: "1", test_id: 220023  do
@@ -36,6 +34,8 @@ describe "assignment column headers" do
   end
 
   it "should have a tooltip with the assignment name", priority: "1", test_id: 220025 do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
     expect(f(@header_selector)["title"]).to eq @assignment.title
   end
 
@@ -51,6 +51,8 @@ describe "assignment column headers" do
 
   it "should allow custom column ordering" do
     skip("drag and drop doesn't seem to work")
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
     columns = ff('.assignment-points-possible')
     expect(columns).not_to be_empty
     driver.action.drag_and_drop_by(columns[1], -300, 0).perform
@@ -133,6 +135,8 @@ describe "assignment column headers" do
   end
 
   it "should validate show attendance columns option", priority: "1", test_id: 220034 do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
     f('#gradebook_settings').click
     f('#show_attendance').find_element(:xpath, '..').click
     headers = ff('.slick-header')
@@ -142,6 +146,8 @@ describe "assignment column headers" do
   end
 
   it "should show letter grade in total column", priority: "1", test_id: 220035 do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .letter-grade-points')).to include_text("A")
     edit_grade('#gradebook_grid .slick-row:nth-child(2) .l2', '50')
     wait_for_ajax_requests

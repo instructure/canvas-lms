@@ -107,7 +107,15 @@
                       :wrapper => '<span class="associated_user_name">\1</span>' %>
                 </div>
               <% end %>
-              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
+              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
+                <% if enrollment.inactive? %>
+                  <%= t 'inactive' %>
+                <% elsif enrollment.completed_at %>
+                  <%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %>
+                <% else %>
+                  <%= t 'completed' %>
+                <% end %>
+              </div>
             </td>
             <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
@@ -115,13 +123,8 @@
                   <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
                     <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
                   </div>
-                  <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? %>">
+                  <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
                     <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
-                  </div>
-                <% end %>
-                <% if can_do(@context, @current_user, :manage_admin_users) && enrollment.is_a?(ObserverEnrollment) %>
-                  <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
-                    <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>
                   </div>
                 <% end %>
                 <div><% if enrollment.defined_by_sis? %>

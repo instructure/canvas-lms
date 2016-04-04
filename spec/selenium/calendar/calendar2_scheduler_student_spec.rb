@@ -39,7 +39,7 @@ describe "scheduler" do
       click_scheduler_link
       wait_for_ajaximations
       click_appointment_link
-
+      wait_for_ajaximations
       reserve_appointment_manual(0, "my comments")
       expect(f('.agenda-event .ig-row')).to include_text "Reserved"
       f('.agenda-event .ig-row').click

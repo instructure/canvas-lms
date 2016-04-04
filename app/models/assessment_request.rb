@@ -19,7 +19,7 @@
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
   include SendToStream
-  attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :comments, :rubric_association, :assessor
+  attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :rubric_association, :assessor
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
@@ -30,7 +30,6 @@ class AssessmentRequest < ActiveRecord::Base
   has_many :ignores, as: :asset
   belongs_to :rubric_assessment
   validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
-  validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   before_save :infer_uuid
   has_a_broadcast_policy

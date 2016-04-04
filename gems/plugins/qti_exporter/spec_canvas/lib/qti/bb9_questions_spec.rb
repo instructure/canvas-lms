@@ -61,6 +61,11 @@ describe "Converting Blackboard 9 qti" do
     hash = get_question_hash(bb9_question_dir, 'true_false', false, :flavor => Qti::Flavors::BBLEARN)
     hash[:answers].each {|m| expect(m[:migration_id]).to eq m[:text].downcase}
   end
+
+  it "replaces negative points possible with zero" do
+    hash = get_question_hash(bb9_question_dir, 'minus_one', false, :flavor => Qti::Flavors::BBLEARN)
+    expect(hash[:points_possible]).to eq 0.0
+  end
 end
 
 module BB9Expected

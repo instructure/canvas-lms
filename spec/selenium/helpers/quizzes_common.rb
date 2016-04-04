@@ -201,10 +201,12 @@ module QuizzesCommon
   end
 
   def click_settings_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(0)').click
   end
 
   def click_questions_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(1)').click
   end
 
@@ -419,6 +421,7 @@ module QuizzesCommon
     visible_regrade_options[option_index].click
     fj('.ui-dialog:visible .btn-primary').click
     wait_for_ajaximations
+    close_regrade_tooltip if driver.browser == :chrome
   end
 
   def visible_regrade_options
@@ -427,7 +430,9 @@ module QuizzesCommon
 
   # clicks |Okay, got it|
   def close_regrade_tooltip
-    fj('.btn.usher-close').click
+    move_to_click('.btn.usher-close') if driver.browser == :chrome
+    f('.btn.usher-close').click if driver.browser != :chrome
+    # may need additional case for IE
     wait_for_ajaximations
   end
 

@@ -2,32 +2,32 @@ define [
   'jquery'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageEditView'
-  'wikiSidebar'
-], ($, WikiPage, WikiPageEditView, wikiSidebar) ->
+  'jsx/shared/rce/RichContentEditor',
+  'helpers/fixtures'
+  'helpers/editorUtils'
+], ($, WikiPage, WikiPageEditView, RichContentEditor, fixtures, editorUtils) ->
+
 
   module 'WikiPageEditView:Init',
     setup: ->
-      @initStub = @stub(wikiSidebar, 'init')
-      @scrollSidebarStub = @stub($, 'scrollSidebar')
-      @attachWikiEditorStub = @stub(wikiSidebar, 'attachToEditor')
-      @attachWikiEditorStub.returns(show: ->)
+      @initSpy = sinon.spy(RichContentEditor, 'initSidebar')
+      @scrollSidebarStub = sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
+
     teardown: ->
+      RichContentEditor.initSidebar.restore()
+      WikiPageEditView.prototype.scrollSidebar.restore()
+      editorUtils.resetRCE()
       $(window).off('beforeunload')
 
   test 'init wiki sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
     wikiPageEditView.render()
-    ok @initStub.calledOnce, 'Called wikiSidebar init once'
+    ok @initSpy.calledOnce, 'Called richContentEditor.initSidebar once'
 
   test 'scroll sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
     wikiPageEditView.render()
     ok @scrollSidebarStub.calledOnce, 'Called scrollSidebar once'
-
-  test 'wiki body gets attached to the wikisidebar', ->
-    wikiPageEditView = new WikiPageEditView
-    wikiPageEditView.render()
-    ok @attachWikiEditorStub.calledOnce, 'Attached wikisidebar to body'
 
   test 'renders escaped angle brackets properly', ->
     body = "<p>&lt;E&gt;</p>"
@@ -37,13 +37,19 @@ define [
     equal view.$wikiPageBody.val(), body
 
 
-  module 'WikiPageEditView:UnsavedChanges'
+  module 'WikiPageEditView:UnsavedChanges',
+    setup: ->
+      fixtures.setup()
+      sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
+
+    teardown: ->
+      fixtures.teardown()
+      WikiPageEditView.prototype.scrollSidebar.restore()
+      editorUtils.resetRCE()
+      $(window).off('beforeunload')
+
   setupUnsavedChangesTest = (test, attributes) ->
     setup = ->
-      @stub($, 'scrollSidebar')
-      @stub(wikiSidebar, 'init')
-      @stub(wikiSidebar, 'attachToEditor').returns(show: ->)
-
       @wikiPage = new WikiPage attributes
       @view = new WikiPageEditView model: @wikiPage
       @view.$el.appendTo('#fixtures')
@@ -52,7 +58,12 @@ define [
       @titleInput = @view.$el.find('[name=title]')
       @bodyInput = @view.$el.find('[name=body]')
 
-      # stub the 'is_dirty' command of the editorBox
+      # stub the 'is_dirty' RCE command. NOTE: this stubs only the editorBox
+      # version with the feature flag off. force these specs to start failing
+      # when run with the feature flag on, at which point this will need to be
+      # updated to stub remoteEditor instead
+      ok !@bodyInput.data('remoteEditor')
+      ok @bodyInput.data('rich_text')
       model = @wikiPage
       bodyInput = @bodyInput
       editorBox = bodyInput.editorBox
@@ -61,14 +72,6 @@ define [
           return bodyInput.val() != model.get('body')
         else
           editorBox.apply(this, arguments)
-
-      # extend the teardown function
-      teardown = @teardown
-      @teardown = ->
-        teardown.apply(this, arguments)
-
-        @view.remove()
-        $(window).off('beforeunload')
 
     setup.call(test, attributes)
 

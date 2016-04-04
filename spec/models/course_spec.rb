@@ -3152,6 +3152,12 @@ describe Course, "conclusions" do
       expect(@ag.appointments_participants.current.size).to eql 0
     end
 
+    it "should cancel all future appointments when deleting an enrollment" do
+      @enrollment.destroy
+      expect(@ag.appointments_participants.size).to eql 1
+      expect(@ag.appointments_participants.current.size).to eql 0
+    end
+
     it "should cancel all future appointments when concluding all enrollments" do
       @course.complete!
       expect(@ag.appointments_participants.size).to eql 1

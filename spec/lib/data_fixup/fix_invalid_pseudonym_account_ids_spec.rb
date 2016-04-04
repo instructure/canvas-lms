@@ -45,7 +45,7 @@ describe DataFixup::FixInvalidPseudonymAccountIds do
 
   end
 
-  it "should mvoe valid pseudonyms to the root_account" do
+  it "should move valid pseudonyms to the root_account" do
     sub_account = Account.create
     root_account = Account.create
 

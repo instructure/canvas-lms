@@ -1,12 +1,16 @@
 module Services
   class RichContent
-
-    def self.env_for(root_account, risk_level: :highrisk)
-      enabled = check_feature_flag(root_account, :rich_content_service)
+    def self.env_for(root_account, risk_level: :highrisk, user: nil, domain: nil)
+      enabled = contextually_on(root_account, risk_level)
       env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
       if enabled
-        env_hash = env_hash.merge(fine_grained_flags(root_account, risk_level))
         env_hash = env_hash.merge(service_settings)
+        if user && domain
+          env_hash[:JWT] = Canvas::Security::ServicesJwt.generate(
+            sub: user.global_id,
+            domain: domain
+          )
+        end
       end
       env_hash
     end
@@ -34,19 +38,12 @@ module Services
         }
       end
 
-      def fine_grained_flags(root_account, risk_level)
-        medium_risk_flag = check_feature_flag(root_account, :rich_content_service_with_sidebar)
-        high_risk_flag = check_feature_flag(root_account, :rich_content_service_high_risk)
-        contextually_on = (
-          risk_level == :basic ||
-          (risk_level == :sidebar && medium_risk_flag) ||
-          high_risk_flag
-        )
-        {
-          RICH_CONTENT_SIDEBAR_ENABLED: medium_risk_flag,
-          RICH_CONTENT_HIGH_RISK_ENABLED: high_risk_flag,
-          RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED: contextually_on
-        }
+      def contextually_on(root_account, risk_level)
+          check_feature_flag(root_account, :rich_content_service) && (
+            risk_level == :basic ||
+            (risk_level == :sidebar && check_feature_flag(root_account, :rich_content_service_with_sidebar)) ||
+            check_feature_flag(root_account, :rich_content_service_high_risk)
+          )
       end
     end
   end

@@ -180,7 +180,7 @@ define([
         case 'accounts':
           return <AccountsTray accounts={this.state.accounts} hasLoaded={this.state.accountsAreLoaded} closeTray={this.closeTray} />;
         case 'profile':
-          return <ProfileTray closeTray={this.closeTray} />;
+          return <ProfileTray userDisplayName={window.ENV.current_user.display_name} userAvatarURL={window.ENV.current_user.avatar_image_url} closeTray={this.closeTray} />;
         default:
           return null;
       }
@@ -188,9 +188,9 @@ define([
 
     render () {
       return (
-          <Tray isOpen={this.state.isTrayOpen} onBlur={this.closeTray} closeTimeoutMS={400}>
-            {this.renderTrayContent()}
-          </Tray>
+        <Tray isOpen={this.state.isTrayOpen} onBlur={this.closeTray} closeTimeoutMS={400}>
+          {this.renderTrayContent()}
+        </Tray>
       );
     }
   });

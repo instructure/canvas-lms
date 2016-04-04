@@ -75,6 +75,8 @@ module Importers
       case item_key[:type]
       when :assessment_question
         "#{context_path}/question_banks/#{item.assessment_question_bank_id}#question_#{item.id}_question_text"
+      when :quiz_question
+        "#{context_path}/quizzes/#{item.quiz_id}/edit" # can't jump to the question unfortunately
       when :syllabus
         "#{context_path}/assignments/syllabus"
       when :wiki_page

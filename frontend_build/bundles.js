@@ -14,7 +14,7 @@ var pluginBundles = glob.sync(pluginBundlesPattern, []);
 // these are bundles that are dependencies, and therefore should not be compiled
 //  as entry points (webpack won't allow that).
 // TODO: Ultimately we should move them to other directories.
-var nonEntryPoints = ['common', 'jquery_ui_menu', 'modules/account_quota_settings', 'modules/content_migration_setup'];
+var nonEntryPoints = ['common', 'modules/account_quota_settings', 'modules/content_migration_setup'];
 
 appBundles.forEach(function(entryFilepath){
   var entryBundlePath = entryFilepath.replace(/^.*app\/coffeescripts\/bundles/, "./app/coffeescripts/bundles")
@@ -135,7 +135,6 @@ entries['vendor'] = [
   'vendor/backbone',
   'vendor/date',
   'vendor/d3.v3',
-  'vendor/firebugx',
   'vendor/graphael',
   'vendor/i18n',
   'vendor/i18n_js_extension',

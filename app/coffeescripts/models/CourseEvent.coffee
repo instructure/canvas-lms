@@ -83,8 +83,6 @@ define [
             I18n.t("field_label.account_id", "Account Id")
         when "group_weighting_scheme"
             I18n.t("field_label.group_weighting_scheme", "Group Weighting Scheme")
-        when "old_account_id"
-            I18n.t("field_label.old_account_id", "Old Account Id")
         when "workflow_state"
             I18n.t("field_label.workflow_state", "Workflow State")
         when "uuid"
@@ -129,8 +127,6 @@ define [
             I18n.t("field_label.sis_source_id", "SIS Source Id")
         when "sis_batch_id"
             I18n.t("field_label.sis_batch_id", "SIS Batch Id")
-        when "show_all_discussion_entries"
-            I18n.t("field_label.show_all_discussion_entries", "Show All Discussion Entries")
         when "open_enrollment"
             I18n.t("field_label.open_enrollment", "Open Enrollment")
         when "storage_quota"

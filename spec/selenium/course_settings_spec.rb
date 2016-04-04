@@ -384,7 +384,8 @@ describe "course settings" do
       page = @course.wiki.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>link</a>})
 
       get "/courses/#{@course.id}/link_validator"
-      f('#link_validator_wrapper button').click
+      wait_for_ajaximations
+      move_to_click('#link_validator_wrapper button')
       wait_for_ajaximations
       run_jobs
 
@@ -400,7 +401,8 @@ describe "course settings" do
       page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
       expect(page_result).to include_text(unpublished_link)
 
-      f('#show_unpublished').click # hide the unpublished results
+      # hide the unpublished results
+      move_to_click('#show_unpublished')
       wait_for_ajaximations
 
       expect(f("#all-results .alert")).to include_text("Found 1 broken link")
@@ -409,7 +411,8 @@ describe "course settings" do
       expect(result).to include_text("Course Syllabus")
       expect(result).to include_text(deleted_link)
 
-      f('#show_unpublished').click # show them again
+      # show them again
+      move_to_click('#show_unpublished')
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
       page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
       expect(page_result).to include_text(unpublished_link)

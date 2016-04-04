@@ -16,48 +16,79 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
-def setup_groups
-  @group1 = @course.assignment_groups.create!(:name => 'group1')
-  @group1.update_attribute(:position, 10)
-  @group1.update_attribute(:group_weight, 40)
-  @group2 = @course.assignment_groups.create!(:name => 'group2')
-  @group2.update_attribute(:position, 7)
-  @group2.update_attribute(:group_weight, 60)
-end
+module AssignmentGroupsApiSpecHelper
+  def setup_groups
+    @group1 = @course.assignment_groups.create!(:name => 'group1')
+    @group1.update_attribute(:position, 10)
+    @group1.update_attribute(:group_weight, 40)
+    @group2 = @course.assignment_groups.create!(:name => 'group2')
+    @group2.update_attribute(:position, 7)
+    @group2.update_attribute(:group_weight, 60)
+  end
 
-def setup_four_assignments(assignment_opts = {})
-  @a1 = @course.assignments.create!({:title => "test1", :assignment_group => @group1, :points_possible => 10, :description => 'Assignment 1'}.merge(assignment_opts))
-  @a2 = @course.assignments.create!({:title => "test2", :assignment_group => @group1, :points_possible => 12, :description => 'Assignment 2'}.merge(assignment_opts))
-  @a3 = @course.assignments.create!({:title => "test3", :assignment_group => @group2, :points_possible => 8, :description => 'Assignment 3'}.merge(assignment_opts))
-  @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9, :description => 'Assignment 4'}.merge(assignment_opts))
-end
+  def setup_four_assignments(assignment_opts = {})
+    @a1 = @course.assignments.create!(
+      {
+        :title => "test1",
+        :assignment_group => @group1,
+        :points_possible => 10,
+        :description => 'Assignment 1'
+      }.merge(assignment_opts)
+    )
+    @a2 = @course.assignments.create!(
+      {
+        :title => "test2",
+        :assignment_group => @group1,
+        :points_possible => 12,
+        :description => 'Assignment 2'
+      }.merge(assignment_opts)
+    )
+    @a3 = @course.assignments.create!(
+      {
+        :title => "test3",
+        :assignment_group => @group2,
+        :points_possible => 8,
+        :description => 'Assignment 3'
+      }.merge(assignment_opts)
+    )
+    @a4 = @course.assignments.create!(
+      {
+        :title => "test4",
+        :assignment_group => @group2,
+        :points_possible => 9,
+        :description => 'Assignment 4'
+      }.merge(assignment_opts)
+    )
+  end
 
-def setup_multiple_grading_periods
-  @course.account.enable_feature!(:multiple_grading_periods)
-  setup_groups
-  @group1_assignment_today = @course.assignments.create!(:assignment_group => @group1, :due_at => Time.now)
-  @group1_assignment_future = @course.assignments.create!(:assignment_group => @group1, :due_at => 3.months.from_now)
-  @group2_assignment_today = @course.assignments.create!(:assignment_group => @group2, :due_at => Time.now)
-  gpg = @course.grading_period_groups.create!
-  @gp_current = gpg.grading_periods.create!(
-    title: 'current',
-    weight: 50,
-    start_date: 1.month.ago,
-    end_date: 1.month.from_now
-  )
-  @gp_future = gpg.grading_periods.create!(
-    title: 'future',
-    weight: 50,
-    start_date: 2.months.from_now,
-    end_date: 4.months.from_now
-  )
+  def setup_multiple_grading_periods
+    @course.account.enable_feature!(:multiple_grading_periods)
+    setup_groups
+    @group1_assignment_today = @course.assignments.create!(:assignment_group => @group1, :due_at => Time.zone.now)
+    @group1_assignment_future = @course.assignments.create!(:assignment_group => @group1, :due_at => 3.months.from_now)
+    @group2_assignment_today = @course.assignments.create!(:assignment_group => @group2, :due_at => Time.zone.now)
+    gpg = @course.grading_period_groups.create!
+    @gp_current = gpg.grading_periods.create!(
+      title: 'current',
+      weight: 50,
+      start_date: 1.month.ago,
+      end_date: 1.month.from_now
+    )
+    @gp_future = gpg.grading_periods.create!(
+      title: 'future',
+      weight: 50,
+      start_date: 2.months.from_now,
+      end_date: 4.months.from_now
+    )
+  end
 end
 
 describe AssignmentGroupsController, type: :request do
   include Api
   include Api::V1::Assignment
+  include AssignmentGroupsApiSpecHelper
 
   before :once do
     course_with_teacher(:active_all => true)
@@ -158,21 +189,41 @@ describe AssignmentGroupsController, type: :request do
     compare_json(json, expected)
   end
 
-  context "excluded descriptions" do
-    it "excludes the descriptions of assignments if the excluded_descriptions param is passed" do
+  context "exclude response fields" do
+    before(:once) do
       setup_groups
       setup_four_assignments
+    end
 
+    it "excludes the descriptions of assignments if 'description' is included " \
+    "in the exclude_response_fields param" do
       json = api_call(:get,
-                      "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&exclude_descriptions=1",
+                      "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
+                      "include[]=assignments&exclude_response_fields[]=description",
                       { controller: 'assignment_groups', action: 'index',
                         format: 'json', course_id: @course.id.to_s,
                         include: ['assignments'],
-                        exclude_descriptions: 1
+                        exclude_response_fields: ['description']
       })
 
       json.each do |group|
-        group["assignments"].each { |a| expect(a).to_not have_key "description" }
+        group["assignments"].each { |a| expect(a).not_to have_key "description" }
+      end
+    end
+
+    it "excludes the needs_grading_count of assignments if " \
+    "'needs_grading_count' is included in the exclude_response_fields param" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
+                      "include[]=assignments&exclude_response_fields[]=needs_grading_count",
+                      { controller: 'assignment_groups', action: 'index',
+                        format: 'json', course_id: @course.id.to_s,
+                        include: ['assignments'],
+                        exclude_response_fields: ['needs_grading_count']
+      })
+
+      json.each do |group|
+        group["assignments"].each { |a| expect(a).not_to have_key "needs_grading_count" }
       end
     end
   end
@@ -453,6 +504,7 @@ end
 describe AssignmentGroupsApiController, type: :request do
   include Api
   include Api::V1::Assignment
+  include AssignmentGroupsApiSpecHelper
 
   context '#show' do
 
@@ -731,5 +783,4 @@ describe AssignmentGroupsApiController, type: :request do
       expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
   end
-
 end

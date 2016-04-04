@@ -1,7 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 class Subject
   include Api::V1::AssignmentOverride
+  def session; {} end
 end
 
 describe "Api::V1::AssignmentOverride" do
@@ -21,6 +23,27 @@ describe "Api::V1::AssignmentOverride" do
       expect(result.first[:due_at]).to eq nil
       expect(result.first[:unlock_at]).to eq nil
       expect(result.first[:lock_at]).to eq nil
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works even with global ids for students" do
+        course_with_student
+
+        # Mock sharding data
+        @shard1.activate { @user = User.create!(name: "Shardy McShardface")}
+        @course.enroll_student @user
+
+        override = { :student_ids => [@student.global_id] }
+
+        subj = Subject.new
+        subj.stubs(:api_find_all).returns [@student]
+        assignment = stub(:context => stub(:students => stub(:active)))
+        result = subj.interpret_assignment_override_data(assignment, override,'ADHOC')
+        expect(result[1]).to be_nil
+        expect(result.first[:students]).to eq [@student]
+      end
     end
   end
 
@@ -122,6 +145,22 @@ describe "Api::V1::AssignmentOverride" do
           expect(invisible_overrides).to be_empty
         end
       end
+    end
+  end
+
+  describe '#assignment_overrides_json' do
+    before :once do
+      course_model
+      student_in_course(active_all: true)
+      @quiz = quiz_model course: @course
+      @override = create_section_override_for_assignment(@quiz)
+      @subject = Subject.new
+    end
+    subject(:assignment_overrides_json) { @subject.assignment_overrides_json([@override], @student) }
+
+    it 'should work when override relation is a quiz' do
+      expect(@override.assignment).to be_nil, 'precondition'
+      expect { assignment_overrides_json }.not_to raise_error
     end
   end
 end

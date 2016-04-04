@@ -52,6 +52,8 @@ describe AccountAuthorizationConfigsController do
       }
     end
 
+    let(:microsoft_hash) { { 'auth_type' => 'microsoft' } }
+
     context "with no aacs" do
       it "renders ok" do
         get 'index', account_id: account.id
@@ -62,6 +64,14 @@ describe AccountAuthorizationConfigsController do
     context "with an AAC" do
       it "renders ok" do
         account.authentication_providers.create!(saml_hash)
+        get 'index', account_id: account.id
+        expect(response).to be_success
+      end
+    end
+
+    context "with a Microsoft AAC" do
+      it "renders ok" do
+        account.authentication_providers.create!(microsoft_hash)
         get 'index', account_id: account.id
         expect(response).to be_success
       end

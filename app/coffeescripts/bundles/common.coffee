@@ -11,7 +11,6 @@ require [
   # be required
   'translations/_core_en'
   'jquery.ajaxJSON'
-  'vendor/firebugx'
   'jquery.google-analytics'
   'vendor/swfobject/swfobject'
   'reminders'

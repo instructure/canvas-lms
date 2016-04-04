@@ -127,7 +127,7 @@ describe Login::CasController do
   end
 
   context "unknown user" do
-    let(:account) { account_with_cas(account: Account.default) }
+    let!(:account) { account_with_cas(account: Account.default) }
 
     before do
       stubby("yes\nfoo@example.com\n")
@@ -138,13 +138,15 @@ describe Login::CasController do
       controller.expects(:logout_user_action).never
 
       # Default to Login url with a nil value
+      session[:sentinel] = true
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
-      expect(flash[:delegated_message]).to_not be_nil
+      expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
+      expect(session[:sentinel]).to be_nil
     end
 
-    it "send to login page if unknoown_user_url is blank" do
+    it "sends to login page if unknown_user_url is blank" do
       # Default to Login url with an empty string value
       account.unknown_user_url = ''
       account.save!
@@ -152,7 +154,7 @@ describe Login::CasController do
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
-      expect(flash[:delegated_message]).to_not be_nil
+      expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
     end
 
     it "uses the unknown_user_url from the aac" do
@@ -186,10 +188,12 @@ describe Login::CasController do
     controller.stubs(:client).returns(cas_client)
     start = Time.now.utc
     cas_client.expects(:validate_service_ticket).returns { sleep 5 }
+    session[:sentinel] = true
     get 'new', :ticket => 'ST-abcd'
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
+    expect(session[:sentinel]).to eq true
   end
 
   it "should set a cookie for site admin login" do

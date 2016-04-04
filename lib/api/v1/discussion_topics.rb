@@ -77,9 +77,10 @@ module Api::V1::DiscussionTopics
 
     locked_json(json, topic, user, session)
     if opts[:include_assignment] && topic.assignment
+      excludes = opts[:exclude_assignment_description] ? ['description'] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
         include_discussion_topic: false, override_dates: opts[:override_dates],
-        exclude_description: opts[:exclude_assignment_description])
+        exclude_response_fields: excludes)
     end
 
     json

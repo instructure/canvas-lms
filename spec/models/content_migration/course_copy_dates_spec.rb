@@ -39,13 +39,9 @@ describe ContentMigration do
                                            :start_at => @old_start + 4.days,
                                            :end_at => @old_start + 4.days + 1.hour)
         cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
-        cm.start_at = @old_start + 2.day
-        cm.end_at = @old_start + 3.days
         cm.save!
 
         cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
-        cm2.start_at = @old_start + 2.day
-        cm2.end_at = @old_start + 3.days
         cm2.save!
       end
 
@@ -94,13 +90,9 @@ describe ContentMigration do
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(new_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
-        expect(new_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
 
         newer_mod = @copy_to.context_modules.last
         expect(newer_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(newer_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
-        expect(newer_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
       end
 
       it "should remove dates" do
@@ -145,13 +137,9 @@ describe ContentMigration do
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at).to be_nil
-        expect(new_mod.start_at).to be_nil
-        expect(new_mod.end_at).to be_nil
 
         newer_mod = @copy_to.context_modules.last
         expect(newer_mod.unlock_at).to be_nil
-        expect(newer_mod.start_at).to be_nil
-        expect(newer_mod.end_at).to be_nil
       end
 
       it "should not create broken assignments from unpublished quizzes" do

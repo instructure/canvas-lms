@@ -246,11 +246,6 @@ describe AssetUserAccess do
         it { is_expected.to eq context }
       end
 
-      describe '#summarized_at' do
-        subject { super().summarized_at }
-        it { is_expected.to be_nil }
-      end
-
       describe '#last_access' do
         subject { super().last_access }
         it { is_expected.not_to be_nil }

@@ -35,9 +35,6 @@ class Login::CanvasController < ApplicationController
   end
 
   def create
-    # reset the session id cookie to prevent session fixation.
-    reset_session_for_login
-
     # Check referer and authenticity token.  If the token is invalid but the referer is trusted
     # and one is not provided then continue.  If the referer is trusted and they provide a token
     # we still want to check it.
@@ -48,6 +45,9 @@ class Login::CanvasController < ApplicationController
         return unsuccessful_login(t("Invalid Authenticity Token"))
       end
     end
+
+    # reset the session id cookie to prevent session fixation.
+    reset_session_for_login
 
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t("No password was given"))

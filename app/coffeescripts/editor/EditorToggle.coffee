@@ -8,12 +8,10 @@ define [
   'react'
   'jsx/editor/SwitchEditorControl'
   'jsx/shared/rce/RichContentEditor'
-  'tinymce.editor_box'
 ], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts,
     React, SwitchEditorControl, RichContentEditor) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   ###
   xsslint safeString.property content
@@ -69,7 +67,8 @@ define [
       opts = {focus: true, tinyOptions: {}}
       if @options.editorBoxLabel
         opts.tinyOptions.aria_label = @options.editorBoxLabel
-      richContentEditor.loadNewEditor(@textArea, opts)
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor(@textArea, opts)
       @editing = true
       @trigger 'edit'
 
@@ -78,11 +77,11 @@ define [
     # @api public
     display: (opts) ->
       if not opts?.cancel
-        @content = @textArea._justGetCode()
+        @content = RichContentEditor.callOnRCE(@textArea, 'get_code')
         @textArea.val @content
         @el.html @content
       @el.insertBefore @textArea
-      @textArea._removeEditor()
+      RichContentEditor.destroyRCE(@textArea)
       @textArea.detach()
       @switchViews.detach() if @options.switchViews
       @infoIcon.detach()
@@ -135,11 +134,7 @@ define [
     # create the switch views links to go between rich text and a textarea
     # @api private
     createSwitchViews: ->
-      component = React.createElement(SwitchEditorControl, {
-        textarea: @textArea,
-        richContentEditor: richContentEditor
-      })
-
+      component = React.createElement(SwitchEditorControl, { textarea: @textArea })
       $container = $("<div class='switch-views'></div>")
       React.render(component, $container[0])
       return $container

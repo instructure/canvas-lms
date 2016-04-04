@@ -315,20 +315,22 @@ describe AppointmentGroup do
       # multiple contexts
       expect(@g8.grants_right?(@teacher, :manage)).to be_falsey  # not in any courses
       expect(@g8.grants_right?(@teacher2, :manage)).to be_truthy
-      expect(@g8.grants_right?(@teacher3, :manage)).to be_falsey # not in all courses
+      expect(@g8.grants_right?(@teacher3, :manage)).to be_truthy # in at least one course
 
       # multiple contexts and sub contexts
       expect(@g9.grants_right?(@teacher2, :manage)).to be_truthy
-      expect(@g9.grants_right?(@teacher3, :manage)).to be_falsey
+      expect(@g9.grants_right?(@teacher3, :manage)).to be_truthy
     end
 
     it "should ignore deleted courses when performing permissions checks" do
       @course3.destroy
+      expect(@g8.active_contexts).not_to include @course3
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
     end
 
     it "should ignore concluded courses when performing permissions checks" do
       @course3.complete!
+      expect(@g8.active_contexts).not_to include @course3
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
     end
   end

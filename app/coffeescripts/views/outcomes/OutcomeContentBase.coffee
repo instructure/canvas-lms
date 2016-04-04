@@ -23,14 +23,11 @@ define [
   'compiled/views/ValidatedFormView'
   'compiled/views/editor/KeyboardShortcuts'
   'jsx/shared/rce/RichContentEditor'
-  'tinymce.editor_box'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-  'compiled/tinymce',
 ], (I18n, $, _, ValidatedFormView, RCEKeyboardShortcuts, RichContentEditor) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "basic"})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   # Superclass for OutcomeView and OutcomeGroupView.
   # This view is used to show, add, edit, and delete outcomes and groups.
@@ -85,7 +82,7 @@ define [
       super
 
     _cleanUpTiny: =>
-      richContentEditor.callOnRCE(@$el.find('[name="description"]'), 'destroy')
+      RichContentEditor.destroyRCE(@$el.find('[name="description"]'))
 
     submit: (e) =>
       e.preventDefault()
@@ -114,7 +111,7 @@ define [
 
     getTinyMceCode: ->
       textarea = @$('textarea')
-      textarea.val(richContentEditor.callOnRCE(textarea, 'get_code'))
+      textarea.val(RichContentEditor.callOnRCE(textarea, 'get_code'))
 
     setModelUrl: ->
       @model.setUrlTo switch @state
@@ -179,7 +176,7 @@ define [
     setupTinyMCEViewSwitcher: =>
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        richContentEditor.callOnRCE(@$('textarea'), 'toggle')
+        RichContentEditor.callOnRCE(@$('textarea'), 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
@@ -190,7 +187,7 @@ define [
     # Called from subclasses in render.
     readyForm: ->
       setTimeout =>
-        richContentEditor.loadNewEditor(@$('textarea'), {
+        RichContentEditor.loadNewEditor(@$('textarea'), {
           getRenderingTarget: (t) ->
             wrappedTextarea = $(t).wrap( "<div id='parent-of-#{t.id}'></div>").get( 0 )
             wrappedTextarea.parentNode
@@ -207,5 +204,5 @@ define [
 
     tinymceExists: =>
       localElExists = @$el.find('[name="description"]').length > 0
-      editorElExists = richContentEditor.callOnRCE(@$el.find('[name="description"]'), 'exists?')
+      editorElExists = RichContentEditor.callOnRCE(@$el.find('[name="description"]'), 'exists?')
       return (localElExists and editorElExists)

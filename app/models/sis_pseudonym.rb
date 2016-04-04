@@ -61,12 +61,12 @@ class SisPseudonym
   end
 
   def pick_pseudonym(account_ids)
-    Pseudonym.where(account_id: account_ids).active.order(:unique_id).
+    Pseudonym.where(account_id: account_ids).active.order(Pseudonym.best_unicode_collation_key(:unique_id)).
       where("sis_user_id IS NOT NULL AND user_id=?", user).first
   end
 
   def pick_user_pseudonym(account_ids)
-    user.pseudonyms.sort_by(&:unique_id).detect do |p|
+    user.pseudonyms.sort_by{|p| Canvas::ICU.collation_key(p.unique_id)}.detect do |p|
       p.workflow_state != 'deleted' && p.sis_user_id && account_ids.include?(p.account_id)
     end
   end

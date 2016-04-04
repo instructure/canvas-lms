@@ -3,8 +3,9 @@ require [
   'quiz_arrows'
   'quiz_inputs'
   'quiz_history'
-], ($, createQuizArrows, inputMethods) ->
+], ($, QuizArrowApplicator, inputMethods) ->
   $ ->
-    createQuizArrows()
+    arrowApplicator = new QuizArrowApplicator()
+    arrowApplicator.applyArrows()
     inputMethods.disableInputs('[type=radio], [type=checkbox]')
     inputMethods.setWidths()

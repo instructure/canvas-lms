@@ -111,6 +111,7 @@ describe 'editing a quiz' do
       end
 
       it 'publishes the quiz', priority: "1", test_id: 351928 do
+        skip_if_chrome('research')
         expect_new_page_load do
           click_save_settings_button
         end
