@@ -23,12 +23,12 @@
       </div>
     <% end %>
     <% if @presenter.editable? %>
-        <div id="student-grades-whatif" class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
-          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"> <i class="icon-check-plus"></i> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
+        <div id="student-grades-whatif" class="show_guess_grades student-grades-revert-guess-button">
+          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"> <i class="icon-check-plus"></i> <%= t("Show Saved \"What-If\" Scores") %></button>
         </div>
-        <div id="student-grades-revert" class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
-          <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
-          <a href="#" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t('links.revert_score', "Revert to Actual Score") %></a>
+        <div id="student-grades-revert" class="revert_all_scores student-grades-revert-guess-button">
+          <%= t("*NOTE*: This is NOT your official score.") %><br/>
+          <button href="#" id="revert-all-to-actual-score" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t("Revert to Actual Score") %></button>
         </div>
     <% end %>
     <div id="student-grades-show-all" class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
