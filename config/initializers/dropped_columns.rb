@@ -138,6 +138,7 @@ class ActiveRecord::Base
                   sis_name
                   bio
                   merge_to
+                  unread_inbox_items_count
                   visibility
                 ).freeze,
     'web_conference_participants' => %w{workflow_state}.freeze,
