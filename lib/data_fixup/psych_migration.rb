@@ -37,6 +37,10 @@ module DataFixup::PsychMigration
     end
 
     def migrate_yaml(progress, model, columns, start_at, end_at)
+      if progress
+        progress.set_results(progress.results.merge(:time_started_at => Time.now.utc))
+      end
+
       total_count = 0
       unparsable_count = 0
       changed_count = 0
@@ -93,7 +97,7 @@ module DataFixup::PsychMigration
         end
       end
       if progress
-        progress.set_results(progress.results.merge(:successful => true, :total_count => total_count,
+        progress.set_results(progress.results.merge(:time_finished_at => Time.now.utc, :successful => true, :total_count => total_count,
           :changed_count => changed_count, :unparsable_count => unparsable_count))
       end
     end
