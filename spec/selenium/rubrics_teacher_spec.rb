@@ -127,6 +127,7 @@ describe "course rubrics" do
     assignment_model
     rubric_model(:context => @course, :free_form_criterion_comments => true)
     course_with_student(:course => @course, :active_all => true)
+    @course.offer!
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     comment = "Hi, please see www.example.com.\n\nThanks."
     @assessment = @association.assess({

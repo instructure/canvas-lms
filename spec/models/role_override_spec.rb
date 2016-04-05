@@ -65,9 +65,9 @@ describe RoleOverride do
 
   it "should be able to be disabled for a custom course role even if enabled from above on the role account (if not locked)" do
     a1 = account_model
-    c1 = course(:account => a1)
+    c1 = course(:account => a1, :active_course => true)
     a2 = account_model(:parent_account => a1)
-    c2 = course(:account => a2)
+    c2 = course(:account => a2, :active_course => true)
 
     role = custom_student_role("some role", :account => a1)
     u1 = user

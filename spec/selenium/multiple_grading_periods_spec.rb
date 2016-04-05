@@ -184,7 +184,7 @@ describe "interaction with multiple grading periods" do
 
   context 'student view' do
     let(:account) { Account.default }
-    let(:test_course) { account.courses.create!(name: 'New Course', workflow_state: 'active') }
+    let(:test_course) { account.courses.create!(name: 'New Course') }
     let(:student) { user(active_all: true) }
     let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
     let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
@@ -209,6 +209,7 @@ describe "interaction with multiple grading periods" do
     let!(:grade_assignment1) { assignment1.grade_student(student, { grade: 8 }) }
 
     before(:each) do
+      test_course.offer!
       user_session(student)
       get "/courses/#{test_course.id}/grades"
     end

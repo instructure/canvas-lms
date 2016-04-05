@@ -446,6 +446,15 @@ describe Course do
         expect(c.grants_right?(@designer, :update)).to be_truthy
       end
 
+      it "should grant permissions for unpublished courses" do
+        c.claim!
+        expect(c.grants_right?(@designer, :read_as_admin)).to be_truthy
+        expect(c.grants_right?(@designer, :read)).to be_truthy
+        expect(c.grants_right?(@designer, :manage)).to be_truthy
+        expect(c.grants_right?(@designer, :update)).to be_truthy
+        expect(c.grants_right?(@designer, :read_roster)).to be_truthy
+      end
+
       it "should grant read_as_admin, read_roster, and read_prior_roster to date-completed designer" do
         @enrollment.start_at = 4.days.ago
         @enrollment.end_at = 2.days.ago
@@ -505,11 +514,21 @@ describe Course do
         expect(c.grants_right?(@student, :read_forum)).to be_falsey
       end
 
+      it "should not grant permissions to active students of an unpublished course" do
+        expect(c).to be_created
+
+        @enrollment.update_attribute(:workflow_state, 'active')
+
+        expect(c.grants_right?(@student, :read)).to be_falsey
+        expect(c.grants_right?(@student, :read_grades)).to be_falsey
+        expect(c.grants_right?(@student, :read_forum)).to be_falsey
+      end
+
       it "should not grant read to completed students of an unpublished course" do
         expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'completed')
         expect(@enrollment).to be_completed
-        expect(c.grants_right?(:read, @student)).to be_falsey
+        expect(c.grants_right?(@student, :read)).to be_falsey
       end
 
       it "should not grant read to soft-completed students of an unpublished course" do
@@ -520,7 +539,7 @@ describe Course do
         expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'active')
         expect(@enrollment.state_based_on_date).to eq :completed
-        expect(c.grants_right?(:read, @student)).to be_falsey
+        expect(c.grants_right?(@student, :read)).to be_falsey
       end
 
       it "should grant :read_outcomes to students in the course" do

@@ -93,7 +93,7 @@ module Lti::MembershipService
 
     context 'course with multiple enrollments' do
       before(:each) do
-        course_with_teacher
+        course_with_teacher(:active_course => true)
         @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
         @ta = user_model
         @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')

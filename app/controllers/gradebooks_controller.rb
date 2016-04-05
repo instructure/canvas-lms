@@ -46,7 +46,7 @@ class GradebooksController < ApplicationController
       return render_unauthorized_action
     end
 
-    if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
+    if authorized_action(@context, @current_user, :read) && authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
       log_asset_access([ "grades", @context ], "grades", "other")
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
