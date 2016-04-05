@@ -321,7 +321,7 @@
                     </td>
                     <td>
                       <% graph = assignment_presenter.graph %>
-                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= graph.title %>">
+                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" aria-hidden="true" title="<%= graph.title %>">
                         <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
                         <div class="grade-summary-graph-component" style="width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
                         <div class="grade-summary-graph-component" style="left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
