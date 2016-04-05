@@ -222,6 +222,17 @@ module Lti
           expect(params[:oauth_signature]).not_to be_empty
         end
 
+        it 'launches gracefully if it can not find the content_tag for the given module_item_id' do
+          course = Course.create!
+          tag = course.context_module_tags.create!(context: account, tag_type: 'context_module')
+          tag.context_module = ContextModule.create!(context: course)
+          tag.save!
+          tag.delete
+          get 'basic_lti_launch_request', course_id: course.id, message_handler_id: message_handler.id,
+              module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
+          expect(response.code).to eq "200"
+        end
+
         it 'sets the active tab' do
           get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id
           expect(response.code).to eq "200"
@@ -257,17 +268,18 @@ module Lti
         end
 
         it 'adds module item substitutions' do
+          course = Course.create!
           parameters = %w( Canvas.module.id Canvas.moduleItem.id ).map do |key|
             IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key )
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
 
-          tag = message_handler.context_module_tags.create!(context: account, tag_type: 'context_module')
-          tag.context_module =  ContextModule.create!(context: Course.create!)
+          tag = message_handler.context_module_tags.create!(context: course, tag_type: 'context_module')
+          tag.context_module = ContextModule.create!(context: course)
           tag.save!
 
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+          get 'basic_lti_launch_request', course_id: course.id, message_handler_id: message_handler.id,
               module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
           expect(response.code).to eq "200"
 
@@ -277,10 +289,11 @@ module Lti
         end
 
         it 'sets the launch to window' do
-          tag = message_handler.context_module_tags.create!(context: account, tag_type: 'context_module', new_tab: true)
-          tag.context_module =  ContextModule.create!(context: Course.create!)
+          course = Course.create!
+          tag = message_handler.context_module_tags.create!(context: course, tag_type: 'context_module', new_tab: true)
+          tag.context_module = ContextModule.create!(context: course)
           tag.save!
-          get 'basic_lti_launch_request', account_id: account.id, message_handler_id: message_handler.id,
+          get 'basic_lti_launch_request', course_id: course.id, message_handler_id: message_handler.id,
               module_item_id: tag.id, params: {tool_launch_context: 'my_custom_context' }
           expect(response.code).to eq "200"
           expect(assigns[:lti_launch].launch_type).to eq 'window'

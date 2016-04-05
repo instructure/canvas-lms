@@ -100,9 +100,11 @@ module Lti
           @lti_launch.link_text = resource_handler.name
           @lti_launch.launch_type = message.launch_presentation_document_target
 
-          module_sequence(message_handler)
-          tool_setting_ids = prep_tool_settings(message_handler.parameters, tool_proxy, message.resource_link_id)
-          message.add_custom_params(custom_params(message_handler.parameters, tool_setting_ids.merge(tool: tool_proxy)))
+          tag = find_tag
+          module_sequence(tag) if tag
+          custom_param_opts = prep_tool_settings(message_handler.parameters, tool_proxy, message.resource_link_id)
+          custom_param_opts[:content_tag] = tag if tag
+          message.add_custom_params(custom_params(message_handler.parameters, custom_param_opts.merge(tool: tool_proxy)))
           message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
 
@@ -127,21 +129,19 @@ module Lti
 
     private
 
-    def module_sequence(message_handler)
+    def module_sequence(tag)
       env_hash = {}
-      if params[:module_item_id]
-        @tag = ContextModuleItem.find_tag_with_preferred([message_handler], params[:module_item_id])
-        @lti_launch.launch_type = 'window' if @tag.new_tab
-        @tag.context_module_action(@current_user, :read)
-        sequence_asset = @tag.try(:content)
-        if sequence_asset
-          env_hash[:SEQUENCE] = {
-              :ASSET_ID => sequence_asset.id,
-              :COURSE_ID => @context.id,
-          }
-          js_hash = {:LTI => env_hash}
-          js_env(js_hash)
-        end
+      tag = @context.context_module_tags.not_deleted.find(params[:module_item_id])
+      @lti_launch.launch_type = 'window' if tag.new_tab
+      tag.context_module_action(@current_user, :read)
+      sequence_asset = tag.try(:content)
+      if sequence_asset
+        env_hash[:SEQUENCE] = {
+            :ASSET_ID => sequence_asset.id,
+            :COURSE_ID => @context.id,
+        }
+        js_hash = {:LTI => env_hash}
+        js_env(js_hash)
       end
     end
 
@@ -172,7 +172,6 @@ module Lti
       default_opts = {
           current_user: @current_user,
           current_pseudonym: @current_pseudonym,
-          content_tag: @tag,
           assignment: nil
       }
       VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
@@ -210,6 +209,10 @@ module Lti
       else
         {}
       end
+    end
+
+    def find_tag
+      @context.context_module_tags.not_deleted.where(id: params[:module_item_id]).first if params[:module_item_id]
     end
 
   end

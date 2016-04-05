@@ -17,12 +17,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
-  describe AppLaunchCollator do
-    let (:account) { Account.create }
-    let (:resource_handler) { ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy) }
+  describe AppLaunchCollator, :include_lti_spec_helpers do
+    let(:account) { Account.create }
+    let(:resource_handler) do
+      ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy)
+    end
 
     describe "#launch_definitions" do
 

@@ -16,10 +16,9 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
-  describe AppCollator do
+  describe AppCollator, :include_lti_spec_helpers do
 
     subject { described_class.new(account, mock_reregistration_url_builder)}
     let(:account) { Account.create }
@@ -46,7 +45,7 @@ module Lti
     describe "#app_definitions" do
 
       it 'returns tool_proxy app definitions' do
-        tool_proxy = create_tool_proxy
+        tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
         definitions = subject.app_definitions(tools_collection)
@@ -137,7 +136,7 @@ module Lti
       it 'has_update set to false for tool proxies without an update_payload' do
         account.root_account.enable_feature!(:lti2_rereg)
 
-        tool_proxy = create_tool_proxy
+        tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
 
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
@@ -162,7 +161,7 @@ module Lti
       it 'has_update set to true for tool proxies with an update_payload' do
         account.root_account.enable_feature!(:lti2_rereg)
 
-        tool_proxy = create_tool_proxy
+        tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
         tool_proxy.update_payload = {one: 2}
         tool_proxy.save!

@@ -22,10 +22,12 @@ rescue LoadError
 end
 
 require 'securerandom'
+require 'lti_spec_helper.rb'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
   c.color = true
+  c.include LtiSpecHelper, :include_lti_spec_helpers
 
   c.around(:each) do |example|
     Timeout::timeout(180) do

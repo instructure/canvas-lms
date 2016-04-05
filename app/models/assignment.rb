@@ -82,10 +82,10 @@ class Assignment < ActiveRecord::Base
     # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
     content = case attrs['content_type']
-                when 'Lti::MessageHandler'
-                  Lti::MessageHandler.find(attrs['content_id'].to_i)
-                when 'ContextExternalTool'
-                  ContextExternalTool.find(attrs['content_id'].to_i)
+              when 'Lti::MessageHandler', 'lti/message_handler'
+                Lti::MessageHandler.find(attrs['content_id'].to_i)
+              when 'ContextExternalTool', 'context_external_tool'
+                ContextExternalTool.find(attrs['content_id'].to_i)
               end
     attrs[:content] = content if content
     attrs.slice!(:url, :new_tab, :content)
