@@ -91,7 +91,7 @@ describe 'Screenreader Gradebook grading' do
     end
 
     it 'updates grade in submission details modal', priority: "2", test_id: 949577 do
-      skip_if_chrome('fails in chrome - due to replace content')
+      skip('fragile')
       select_assignment(assignment_2)
       replace_content(main_grade_input, 8)
       submission_details_button.click
