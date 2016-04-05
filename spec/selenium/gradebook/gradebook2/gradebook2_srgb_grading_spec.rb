@@ -91,6 +91,7 @@ describe 'Screenreader Gradebook grading' do
     end
 
     it 'updates grade in submission details modal', priority: "2", test_id: 949577 do
+      skip_if_chrome('fails in chrome - due to replace content')
       select_assignment(assignment_2)
       replace_content(main_grade_input, 8)
       submission_details_button.click
@@ -99,7 +100,7 @@ describe 'Screenreader Gradebook grading' do
       details_modal_grade_input = f('.submission_details_grade_form input')
       details_modal_grade_input.clear
       replace_content(details_modal_grade_input, 10)
-      fj(".btn:contains('Update Grade')").click
+      f("form.submission_details_grade_form button").click
       wait_for_ajaximations
 
       keep_trying_until do
