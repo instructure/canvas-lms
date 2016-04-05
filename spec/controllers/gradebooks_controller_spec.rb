@@ -202,17 +202,18 @@ describe GradebooksController do
       expect(assigns[:js_env][:submissions].sort_by { |s|
         s['assignment_id']
       }).to eq [
-        {'score' => 5, 'assignment_id' => a2.id, 'excused' => false}
+        {score: 5, assignment_id: a2.id, excused: false, workflow_state: 'graded'}
       ]
     end
 
-    it "includes an 'excused' attribute on the submissions" do
+    it "includes necessary attributes on the submissions" do
       user_session(@student)
       assignment = @course.assignments.create!(points_possible: 10)
       assignment.grade_student(@student, grade: 10)
       get('grade_summary', course_id: @course.id, id: @student.id)
       submission = assigns[:js_env][:submissions].first
-      expect(submission).to include 'excused'
+      expect(submission).to include :excused
+      expect(submission).to include :workflow_state
     end
 
     context "assignment sorting" do

@@ -289,3 +289,12 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     @submissions[1].excused = 1
     result = GradeCalculator.calculate @submissions, [@group]
     assertGrade result, 'final', 10, 10
+
+  test "pending_review submissions", ->
+    @submissions = []
+    @setup_grades @group, [[25, 50], [50, 50]]
+    @submissions[0].workflow_state = "pending_review"
+    result = GradeCalculator.calculate @submissions, [@group]
+
+    assertGrade result, 'current', 50, 50
+    assertGrade result, 'final', 75, 100

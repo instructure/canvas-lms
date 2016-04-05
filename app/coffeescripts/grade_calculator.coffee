@@ -67,9 +67,10 @@ define [
           total: @parse assignments[s.assignment_id].points_possible
           score: @parse s.score
           submitted: s.score? and s.score != ''
+          pending_review: s.workflow_state == "pending_review"
           submission: s
       relevantSubmissionData = if ignoreUngraded
-        _(submissionData).filter (s) -> s.submitted
+        _(submissionData).filter (s) -> s.submitted && not s.pending_review
       else
         submissionData
 
