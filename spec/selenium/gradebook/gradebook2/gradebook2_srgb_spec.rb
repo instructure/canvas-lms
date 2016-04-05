@@ -5,7 +5,7 @@ describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
   include_context 'gradebook_components'
   include_context 'srgb_components'
-  include_context 'srgb_course'
+  include_context 'reusable_course'
   include Gradebook2Common
   include Gradebook2SRGBCommon
 

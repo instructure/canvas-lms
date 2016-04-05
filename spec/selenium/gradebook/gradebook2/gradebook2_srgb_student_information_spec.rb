@@ -4,7 +4,7 @@ require_relative '../../helpers/gradebook2_srgb_common'
 describe 'Screenreader Gradebook Student Information' do
   include_context 'in-process server selenium tests'
   include_context 'srgb_components'
-  include_context 'srgb_course'
+  include_context 'reusable_course'
   include Gradebook2Common
   include Gradebook2SRGBCommon
 
@@ -25,7 +25,6 @@ describe 'Screenreader Gradebook Student Information' do
   end
 
   context 'in Student Information section' do
-
     it 'allows comments in Notes field', priority: "2", test_id: 615709 do
       skip_if_chrome('fails in chrome - due to replace content')
       select_student(student)

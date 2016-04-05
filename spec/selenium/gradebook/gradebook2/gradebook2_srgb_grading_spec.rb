@@ -4,7 +4,7 @@ require_relative '../../helpers/gradebook2_srgb_common'
 describe 'Screenreader Gradebook grading' do
   include_context 'in-process server selenium tests'
   include_context 'srgb_components'
-  include_context 'srgb_course'
+  include_context 'reusable_course'
   include Gradebook2Common
   include Gradebook2SRGBCommon
 
