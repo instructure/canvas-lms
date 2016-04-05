@@ -5,18 +5,25 @@ describe "gradebook2 - concluded courses and enrollments" do
   include Gradebook2Common
 
   let!(:setup) { gradebook_data_setup }
+  let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
+  let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
   context "active course" do
-    it "does not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
-      @student_1.enrollments.where(course_id: @course).first.conclude
-
+    it "does not show concluded enrollments by default", priority: "1", test_id: 210020 do
+      conclude_student_1
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
 
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
+    end
 
+    it "shows/hides concluded enrollments when checked/unchecked in settings cog", priority: "1", test_id: 164223 do
+      conclude_student_1
+
+      get "/courses/#{@course.id}/gradebook2"
+      
       # show concluded
       expect_new_page_load do
         f('#gradebook_settings').click
@@ -36,8 +43,8 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(ff('.student-name').count).to eq @course.students.count
     end
 
-    it "does not show inactive enrollments by default and they can be toggled", priority: "1" do
-      @student_1.enrollments.where(course_id: @course).first.deactivate
+    it "does not show inactive enrollments by default", priority: "1", test_id: 1102065 do
+      deactivate_student_1
 
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
@@ -45,6 +52,12 @@ describe "gradebook2 - concluded courses and enrollments" do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
+    end
+
+    it "shows/hides inactive enrollments when checked/unchecked in settings cog", priority: "1", test_id: 1102066 do
+      deactivate_student_1
+
+      get "/courses/#{@course.id}/gradebook2"
 
       # show deactivated
       expect_new_page_load do
