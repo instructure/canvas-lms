@@ -175,3 +175,10 @@ define [
     RCELoader.loadSidebarOnTarget(@$div, cb)
     equal typeof @sidebar.show, 'function'
     equal typeof @sidebar.hide, 'function'
+
+  test 'provides a callback for loading a new jwt', ->
+    cb = sinon.spy()
+    RCELoader.loadSidebarOnTarget(@$div, cb)
+    ok @rce.renderSidebarIntoDiv.called
+    props = @rce.renderSidebarIntoDiv.args[0][1]
+    equal(typeof props.refreshToken, 'function')
