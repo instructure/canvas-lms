@@ -7,6 +7,12 @@ define([
   'compiled/str/splitAssetString'
 ], function($, _, editorOptions, loadEventListeners, polyfill, splitAssetString) {
 
+  let refreshToken = function(callback){
+    return $.post("/api/v1/jwts").done((response)=>{
+      callback(response.token)
+    })
+  }
+
   let RCELoader = {
     preload() {
       this.loadRCE(function(){})
@@ -29,6 +35,7 @@ define([
       let context = splitAssetString(ENV.context_asset_string)
       let props = {
         jwt: ENV.JWT,
+        refreshToken: refreshToken,
         host: ENV.RICH_CONTENT_APP_HOST,
         contextType: context[0],
         contextId: context[1]
