@@ -17,10 +17,14 @@
     -> canvas loads
 */
 function bzRetainedInfoSetup() {
+alert("ru nning");
   var textareas = document.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
       var name = ta.getAttribute("data-bz-retained");
+
+      if(ta.className.indexOf("bz-retained-field-setup") != -1)
+        return; // already set up, no need to redo
 
       var save = function() {
         var http = new XMLHttpRequest();
@@ -30,6 +34,7 @@ function bzRetainedInfoSetup() {
         http.send(data);
       };
 
+      ta.className += " bz-retained-field-setup";
       ta.addEventListener("change", save);
 
       var http = new XMLHttpRequest();
