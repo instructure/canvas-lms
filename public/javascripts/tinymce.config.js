@@ -94,7 +94,7 @@ define([], function(){
       extended_valid_elements: "*[*]",
       valid_children: "+body[style|script|svg|textarea]",
 
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
+      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url + ",/bz_editor.css",
       browser_spellcheck: true
     };
   };
@@ -188,7 +188,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view");
     return stuff;
   };
 
