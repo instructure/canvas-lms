@@ -183,7 +183,7 @@ class DiscussionTopic < ActiveRecord::Base
         sub_topics << ensure_child_topic_for(group)
       end
     end
-    
+
     self.shard.activate do
       # delete any lingering child topics
       DiscussionTopic.where(:root_topic_id => self).where.not(:id => sub_topics).update_all(:workflow_state => "deleted")
@@ -861,11 +861,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) }
     can :attach
 
-    given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) && self.available_for?(user) }
+    given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) && self.available_for?(user) }
     can :update and can :delete and can :create and can :read and can :attach
 
     # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
-    given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
+    given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :delete and can :read and can :attach
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
@@ -961,7 +961,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
-    p.to { active_participants_with_visibility - [user] }
+    p.to { users_with_permissions(active_participants_with_visibility - [user]) }
     p.whenever { |record|
       record.send_notification_for_context? and
       ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
@@ -984,6 +984,10 @@ class DiscussionTopic < ActiveRecord::Base
     else
       self.participants(include_observers)
     end
+  end
+
+  def users_with_permissions(users)
+    users.select{|u| self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)}
   end
 
   def course
@@ -1065,6 +1069,8 @@ class DiscussionTopic < ActiveRecord::Base
     RequestCache.cache('discussion_visible_for', self, user) do
       # user is the topic's author
       return true if user == self.user
+
+      return false if user && !(is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission

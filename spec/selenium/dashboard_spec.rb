@@ -81,6 +81,16 @@ describe "dashboard" do
       end
     end
 
+    it "should not show announcement stream items without permissions" do
+      @course.account.role_overrides.create!(:role => student_role, :permission => 'read_announcements', :enabled => false)
+
+      announcement = create_announcement
+      item_selector = '#announcement-details tbody tr'
+
+      get "/"
+      expect(f('.no_recent_messages')).to include_text('No Recent Messages')
+    end
+
     def click_recent_activity_header(type='announcement')
       f(".stream-#{type} .stream_header").click
     end

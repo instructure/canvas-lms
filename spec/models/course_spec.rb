@@ -1505,6 +1505,12 @@ describe Course, "tabs_available" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
     end
+
+    it "should not include Announcements without read_announcements rights" do
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
+      tab_ids = @course.uncached_tabs_available(@teacher, {}).map{|t| t[:id] }
+      expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
+    end
   end
 
   context "students" do
@@ -1581,7 +1587,6 @@ describe Course, "tabs_available" do
       Lti::MessageHandler.stubs(:lti_apps_tabs).returns([mock_tab])
       expect(@course.tabs_available(nil, :include_external => true)).to include(mock_tab)
     end
-
   end
 
   context "observers" do
