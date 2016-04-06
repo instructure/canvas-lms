@@ -523,7 +523,13 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| !appointment_group? ^ context.grants_right?(user, session, :read_appointment_participants) }
+    given do |user, session|
+      if appointment_group?
+        context.grants_right?(user, session, :read_appointment_participants)
+      else
+        !hidden? || context.grants_right?(user, session, :manage_calendar)
+      end
+    end
     can :read_child_events
 
     given { |user, session| parent_event && appointment_group? && parent_event.grants_right?(user, session, :manage) }

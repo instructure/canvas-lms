@@ -838,6 +838,24 @@ describe CalendarEventsApiController, type: :request do
         expect(json['hidden']).to be_falsey
       end
 
+      describe "visibility" do
+        before(:once) do
+          student_in_course(:course => @course, :active_all => true)
+        end
+
+        it "should include children of hidden events for teachers" do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{event.id}",
+                    {:controller => 'calendar_events_api', :action => 'show', :id => event.to_param, :format => 'json'})
+          expect(json['child_events'].map { |e| e['id'] }).to match_array(event.child_events.map(&:id))
+        end
+
+        it "should omit children of hidden events for students" do
+          json = api_call_as_user(@student, :get, "/api/v1/calendar_events/#{event.id}",
+                    {:controller => 'calendar_events_api', :action => 'show', :id => event.to_param, :format => 'json'})
+          expect(json['child_events']).to be_empty
+        end
+      end
+
       it "allows media comments in the event description" do
         event.description = '<a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>'
         event.save!
