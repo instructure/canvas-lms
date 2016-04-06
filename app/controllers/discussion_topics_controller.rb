@@ -442,6 +442,10 @@ class DiscussionTopicsController < ApplicationController
       end
       js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
       append_sis_data(js_hash)
+
+      if ConditionalRelease::Service.enabled_in_context?(@context)
+        js_hash.merge! ConditionalRelease::Service.env_for(@context, @user, session)
+      end
       js_env(js_hash)
       render :edit
     end
@@ -863,7 +867,7 @@ class DiscussionTopicsController < ApplicationController
     return unless authorized_action(@topic, @current_user, (is_new ? :create : :update))
 
     process_podcast_parameters(discussion_topic_hash)
-    
+
     if is_new
       @topic.user = @current_user
     elsif discussion_topic_hash.except(*%w{pinned}).present? # don't update editor if the only thing that changed was the pinned status

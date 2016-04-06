@@ -5,3 +5,14 @@
   color: black;
   text-decoration: none;
 }
+
+#discussion-edit-header-tabs {
+  display: flex;
+  align-items: flex-end;
+  #topic-draft-state {
+    padding-bottom: 6px;
+  }
+  #discussion-edit-header-spacer {
+    flex: 1;
+  }
+}

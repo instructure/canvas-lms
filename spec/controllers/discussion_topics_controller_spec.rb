@@ -462,6 +462,34 @@ describe DiscussionTopicsController do
     end
   end
 
+  describe "GET 'edit'" do
+    before(:once) do
+      course_topic
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context 'conditional-release' do
+      it 'should include environment variables if enabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env[:dummy]).to eq 'value'
+      end
+
+      it 'should not include environment variables when disabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env).not_to have_key :dummy
+      end
+    end
+  end
+
   describe "GET 'public_feed.atom'" do
     before(:once) do
       course_topic

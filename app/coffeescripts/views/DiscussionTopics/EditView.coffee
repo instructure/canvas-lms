@@ -40,12 +40,15 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       '#use_for_grading': '$useForGrading'
       '#discussion_topic_assignment_points_possible' : '$assignmentPointsPossible'
       '#discussion_point_change_warning' : '$discussionPointPossibleWarning'
+      '#discussion-edit-view' : '$discussionEditView'
+      '#discussion-details-tab' : '$discussionDetailsTab'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
       'click .save_and_publish': 'saveAndPublish'
       'click .cancel_button' : 'handleCancel'
       'change #use_for_grading' : 'toggleAvailabilityOptions'
+      'change #use_for_grading' : 'updateTabView'
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
     )
 
@@ -85,6 +88,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       json.assignment = json.assignment.toView()
       json
 
@@ -125,6 +129,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderPostToSisOptions) if ENV.POST_TO_SIS
       _.defer(@watchUnload)
       _.defer(@attachKeyboardShortcuts)
+      _.defer(@renderTabs) if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
 
       @$(".datetime_field").datetime_field()
 
@@ -179,6 +184,11 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         nested: true
 
       @postToSisSelector.render()
+
+    renderTabs: =>
+      @$discussionEditView.tabs()
+      @$discussionDetailsTab.show()
+      @updateTabView()
 
     getFormData: ->
       data = super
@@ -311,3 +321,11 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         @$availabilityOptions.hide()
       else
         @$availabilityOptions.show()
+
+    updateTabView: ->
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+        if @$useForGrading.is(':checked')
+          @$discussionEditView.tabs("option", "disabled", false)
+        else
+          @$discussionEditView.tabs("option", "disabled", [1])
+          @$discussionDetailsTab.show()
