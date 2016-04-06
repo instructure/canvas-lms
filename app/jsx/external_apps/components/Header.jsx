@@ -1,9 +1,8 @@
 define([
   'underscore',
   'i18n!external_tools',
-  'react',
-  'react-router'
-], function (_, I18n, React, {Link}) {
+  'react'
+], function (_, I18n, React) {
 
   return React.createClass({
     displayName: 'Header',

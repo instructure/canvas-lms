@@ -1,12 +1,11 @@
 define([
   'i18n!external_tools',
   'react',
-  'react-router',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/ExternalToolsTable',
   'vendor/bootstrap/bootstrap-dropdown',
   'vendor/bootstrap-select/bootstrap-select'
-], function(I18n, React, {Link}, Header, ExternalToolsTable) {
+], function(I18n, React, Header, ExternalToolsTable) {
   return React.createClass({
     displayName: 'ConfigurationTypeSelector',
 

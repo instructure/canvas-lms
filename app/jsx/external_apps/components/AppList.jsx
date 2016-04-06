@@ -1,7 +1,6 @@
 define([
   'i18n!external_tools',
   'react',
-  'react-router',
   'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/lib/ExternalAppsStore',
   'jsx/external_apps/components/AppTile',
@@ -9,20 +8,10 @@ define([
   'jsx/external_apps/components/AppFilters',
   'jsx/external_apps/components/ManageAppListButton',
   'compiled/str/splitAssetString'
-], function(I18n, React, {Link, Navigation}, store, extStore, AppTile, Header, AppFilters, ManageAppListButton, splitAssetString) {
+], function(I18n, React, store, extStore, AppTile, Header, AppFilters, ManageAppListButton, splitAssetString) {
 
   return React.createClass({
     displayName: 'AppList',
-
-    mixins: [ Navigation ],
-
-    statics: {
-      willTransitionTo: function(transition, params, query) {
-        if (!ENV.APP_CENTER.enabled) {
-          transition.redirect('configurations');
-        }
-      }
-    },
 
     getInitialState() {
       return store.getState();
@@ -59,8 +48,8 @@ define([
       if (store.getState().isLoading) {
         return <div ref="loadingIndicator" className="loadingIndicator"></div>;
       } else {
-        return store.filteredApps().map(function (app, index) {
-          return <AppTile key={index} app={app} />;
+        return store.filteredApps().map((app, index) => {
+          return <AppTile key={index} app={app} pathname={this.props.pathname} />;
         });
       }
     },
@@ -70,7 +59,7 @@ define([
         <div className="AppList">
           <Header>
             {this.manageAppListButton()}
-            <Link to="configurations" className="btn view_tools_link lm pull-right">{I18n.t('View App Configurations')}</Link>
+            <a href={`${this.props.pathname}/configurations`} className="btn view_tools_link lm pull-right">{I18n.t('View App Configurations')}</a>
           </Header>
           <AppFilters />
           <div className="app_center">

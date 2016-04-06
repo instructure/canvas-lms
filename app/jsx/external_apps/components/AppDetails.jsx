@@ -1,17 +1,15 @@
 define([
   'i18n!external_tools',
   'react',
-  'react-router',
+  'page',
   'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/AddApp',
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, React, {Navigation, Link, State}, store, Header, AddApp) {
+], function(I18n, React, page, store, Header, AddApp) {
 
   return React.createClass({
     displayName: 'AppDetails',
-
-    mixins: [Navigation, State],
 
     propTypes: {
       params: React.PropTypes.object.isRequired
@@ -24,11 +22,11 @@ define([
     },
 
     componentDidMount() {
-      var app = store.findAppByShortName(this.getParams().shortName);
+      var app = store.findAppByShortName(this.props.shortName);
       if (app) {
         this.setState({ app: app });
       } else {
-        this.transitionTo('appList');
+        page('/');
       }
     },
 
@@ -39,7 +37,7 @@ define([
       store.flagAppAsInstalled(app.short_name);
       store.setState({filter: 'installed', filterText: ''});
       $.flashMessage(I18n.t('The app was added successfully'));
-      this.transitionTo('appList');
+      page('/');
     },
 
     alreadyInstalled() {
@@ -56,8 +54,8 @@ define([
       return (
         <div className="AppDetails">
           <Header>
-            <Link to="configurations" className="btn view_tools_link lm pull-right">{I18n.t('View App Configurations')}</Link>
-            <Link to="appList" className="btn view_tools_link lm pull-right">{I18n.t('View App Center')}</Link>
+            <a href={`${this.props.baseUrl}/configurations`} className="btn view_tools_link lm pull-right">{I18n.t('View App Configurations')}</a>
+            <a href={this.props.baseUrl} className="btn view_tools_link lm pull-right">{I18n.t('View App Center')}</a>
           </Header>
           <div className="app_full">
             <table className="individual-app">
@@ -70,7 +68,7 @@ define([
                     </div>
                     <AddApp ref="addAppButton" app={this.state.app} handleToolInstalled={this.handleToolInstalled} />
 
-                    <Link to="appList" className="app_cancel">&laquo; {I18n.t('Back to App Center')}</Link>
+                    <a href={this.props.pathname} className="app_cancel">&laquo; {I18n.t('Back to App Center')}</a>
                   </td>
                   <td className="individual-app-right" valign="top">
                     <h2 ref="appName">{this.state.app.name}</h2>
