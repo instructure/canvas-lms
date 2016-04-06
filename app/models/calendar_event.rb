@@ -84,9 +84,14 @@ class CalendarEvent < ActiveRecord::Base
       :eventId => google_calendar_id
     }
 
-    results = client.execute!(
-      :api_method => calendar_api.events.delete,
-      :parameters => params)
+    begin
+      results = client.execute!(
+        :api_method => calendar_api.events.delete,
+        :parameters => params)
+    rescue Google::APIClient::TransmissionError => e
+      log_gcal_error(e)
+      return
+    end
   end
 
   def sync_google_calendar
@@ -175,10 +180,15 @@ class CalendarEvent < ActiveRecord::Base
       params[:eventId] = google_calendar_id
     end
 
-    results = client.execute!(
-      :api_method => (!google_calendar_id.nil? && !google_calendar_id.empty?) ? calendar_api.events.update : calendar_api.events.insert,
-      :parameters => params,
-      :body_object => event)
+    begin
+      results = client.execute!(
+        :api_method => (!google_calendar_id.nil? && !google_calendar_id.empty?) ? calendar_api.events.update : calendar_api.events.insert,
+        :parameters => params,
+        :body_object => event)
+    rescue Google::APIClient::TransmissionError => e
+      log_gcal_error(e)
+      return
+    end
 
     event = results.data
 
@@ -197,6 +207,10 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 
+  def log_gcal_error(err)
+    Mailer.debug_message('GCal API Falure', err.to_s).deliver rescue nil # omg! just ignore delivery failures
+  end
+
   def get_gcal_rsvp_status
     return [] if !google_calendar_id || google_calendar_id.empty?
 
@@ -212,9 +226,14 @@ class CalendarEvent < ActiveRecord::Base
       :eventId => google_calendar_id
     }
 
-    results = client.execute!(
-      :api_method => calendar_api.events.get,
-      :parameters => params)
+    begin
+      results = client.execute!(
+        :api_method => calendar_api.events.get,
+        :parameters => params)
+    rescue Google::APIClient::TransmissionError => e
+      log_gcal_error(e)
+      return []
+    end
 
     event = results.data
 
