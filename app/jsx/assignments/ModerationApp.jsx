@@ -59,6 +59,7 @@ define([
             onPublishClick={() => this.props.store.dispatch(Actions.publishGrades())}
             onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
             published={this.state.assignment.published}
+            selectedStudentCount={this.state.studentList.selectedCount}
           />
           <div className='grid-row' role="row">
             <div className='col-xs-12'>

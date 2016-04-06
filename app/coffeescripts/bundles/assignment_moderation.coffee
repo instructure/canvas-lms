@@ -9,6 +9,7 @@ require [
 
   store = configureStore({
     studentList: {
+      selectedCount: 0,
       students: [],
       sort: {
         direction: 'asc',
