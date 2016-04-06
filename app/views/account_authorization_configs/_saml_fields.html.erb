@@ -1,3 +1,8 @@
+<p><%= mt(<<-TEXT, metadata_url: link_to(aac.entity_id, aac.entity_id))
+The Canvas SAML Entity ID is %{metadata_url}, and the Service Provider metadata
+is available at that URL.
+TEXT
+%></p>
 <% css_bundle :saml_fields %>
 <div class="ic-Form-control">
   <%= f.label :idp_entity_id, t('IdP Entity ID'), class: 'ic-Label' %>

@@ -12,7 +12,7 @@ class SetSamlEntityId < ActiveRecord::Migration
     end
     
     AccountAuthorizationConfig.where(auth_type: "saml").each do |aac|
-      if aac.entity_id.blank?
+      if aac['entity_id'].blank?
         aac.entity_id = old_default_domain || aac.saml_default_entity_id
         aac.save!
       end

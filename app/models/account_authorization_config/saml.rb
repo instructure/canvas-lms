@@ -55,6 +55,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     [nil, self]
   end
 
+  def entity_id
+    super || saml_default_entity_id
+  end
+
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
