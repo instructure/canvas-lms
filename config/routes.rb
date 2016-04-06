@@ -661,8 +661,6 @@ CanvasRails::Application.routes.draw do
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
   get 'saml_observee' => 'login/saml#observee_validation', as: :saml_observee
   post 'login/saml' => 'login/saml#create'
-  # deprecated alias
-  post 'saml_consume' => 'login/saml#create'
 
   # the callback URL for all OAuth1.0a based SSO
   get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback

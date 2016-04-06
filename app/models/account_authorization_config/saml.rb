@@ -110,7 +110,6 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
     settings.assertion_consumer_service_url = domains.flat_map do |domain|
       [
-        "#{HostUrl.protocol}://#{domain}/saml_consume",
         "#{HostUrl.protocol}://#{domain}/login/saml"
       ]
     end
