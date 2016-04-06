@@ -2264,3 +2264,13 @@ li.quiz.quiz-loading-overrides {
     width: 100%;
   }
 }
+
+.rce_links {
+  float: right;
+  font-size: 0.8em;
+  cursor: pointer;
+
+  .icon-info {
+    margin-left: 2px;
+  }
+}
