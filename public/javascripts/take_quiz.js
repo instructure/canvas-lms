@@ -553,6 +553,13 @@ define([
 
         if (tagName == "TEXTAREA") {
           val = RichContentEditor.callOnRCE($this, 'get_code');
+          var $tagInstance = $this;
+          $(".toggle_question_content_views_link").click(function(event) {
+            event.preventDefault();
+            RichContentEditor.callOnRCE($tagInstance, 'toggle');
+            //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+            $(this).siblings(".toggle_question_content_views_link").andSelf().toggle();
+          });
         } else if ($this.attr('type') == "text" || $this.attr('type') == 'hidden') {
           val = $this.val();
         } else if (tagName == "SELECT") {
@@ -573,11 +580,6 @@ define([
 
     $questions.find(".question_input").trigger('change', [false, {}]);
 
-    setInterval(function() {
-      $("textarea.question_input").each(function() {
-        $(this).triggerHandler('change', false);
-      });
-    }, 2500);
 
     $(".hide_time_link").click(function(event) {
       event.preventDefault();
@@ -773,5 +775,5 @@ define([
     $('.loading').hide();
   });
 
-  $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);
+  $('.essay_question .answers .rce_links').append((new KeyboardShortcuts()).render().el);
 });
