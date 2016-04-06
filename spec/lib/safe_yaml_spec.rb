@@ -177,4 +177,9 @@ YAML
     str = "1.E+01"
     expect(YAML.load(YAML.dump(str))).to eq str
   end
+
+  it "should dump html-safe strings correctly" do
+    hash = {:blah => "42".html_safe}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
 end
