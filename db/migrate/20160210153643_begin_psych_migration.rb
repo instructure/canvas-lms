@@ -1,6 +1,8 @@
 class BeginPsychMigration < ActiveRecord::Migration
   tag :postdeploy
 
+  disable_ddl_transaction!
+
   def self.runnable? # TODO: Remove when we're ready to run this everywhere
     if ENV['RUN_PSYCH_MIGRATION']
       true
