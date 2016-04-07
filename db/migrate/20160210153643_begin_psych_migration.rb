@@ -1,8 +1,12 @@
 class BeginPsychMigration < ActiveRecord::Migration
   tag :postdeploy
 
+  disable_ddl_transaction!
+
   def self.runnable? # TODO: Remove when we're ready to run this everywhere
-    if ApplicationController.respond_to?(:test_cluster?)
+    if ENV['RUN_PSYCH_MIGRATION']
+      true
+    elsif ApplicationController.respond_to?(:test_cluster?)
       ApplicationController.test_cluster?
     else
       true
