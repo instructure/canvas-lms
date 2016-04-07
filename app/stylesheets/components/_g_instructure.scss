@@ -100,7 +100,8 @@
 .user_content, .mceContentBody {
   position: relative;
   min-height: 5px;
-// firefox max-width images break the parent container
+  max-width: 100%;
+  // firefox max-width images break the parent container
   @-moz-document url-prefix() {
     overflow-x: hidden;
   }
@@ -128,6 +129,7 @@
   border: 0;
   padding: 0;
   margin: 0;
+  max-width: 100%;
 }
 
 .reminder, .reminder-content {
