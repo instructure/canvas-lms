@@ -7,6 +7,7 @@ define([
     classKeyword: "from-react-tinymce",
 
     addToStore: function (targetId, RCEInstance) {
+      window.tinyrce.editorsListing = window.tinyrce.editorsListing || {}
       window.tinyrce.editorsListing[targetId] = RCEInstance;
     },
 
