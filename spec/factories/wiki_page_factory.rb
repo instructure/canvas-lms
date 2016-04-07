@@ -17,14 +17,24 @@
 #
 
 def wiki_page_model(opts={})
-  course = opts.delete(:course) || (course_with_student(:active_all => true); @course)
+  course = opts.delete(:course) || (course_with_student(active_all: true); @course)
   @wiki = course.wiki
   @wiki.save!
   @page = @wiki.wiki_pages.create!(valid_wiki_page_attributes.merge(opts))
 end
 
+def wiki_page_assignment_model(opts={})
+  page = opts.delete(:wiki_page) || wiki_page_model(opts)
+  assignment_model(
+    course: page.course,
+    wiki_page: page,
+    submission_types: 'wiki_page',
+    title: 'Content Page Assignment'
+  )
+end
+
 def valid_wiki_page_attributes
   {
-    :title => "some page"
+    title: "some page"
   }
 end

@@ -258,14 +258,14 @@ describe Assignment do
     let(:assignment) { Assignment.new }
     let(:content_tag) { ContentTag.new }
 
-    it "returns the context module tags for a 'normal' assignment" \
+    it "returns the context module tags for a 'normal' assignment " \
       "(non-quiz and non-discussion topic)" do
       assignment.submission_types = "online_text_entry"
       assignment.context_module_tags << content_tag
       expect(assignment.all_context_module_tags).to eq [content_tag]
     end
 
-    it "returns the context_module_tags on the quiz if the assignment is" \
+    it "returns the context_module_tags on the quiz if the assignment is " \
       "associated with a quiz" do
       quiz = assignment.build_quiz
       quiz.context_module_tags << content_tag
@@ -273,41 +273,64 @@ describe Assignment do
       expect(assignment.all_context_module_tags).to eq([content_tag])
     end
 
-    it "returns the context_module_tags on the discussion topic if the" \
+    it "returns the context_module_tags on the discussion topic if the " \
       "assignment is associated with a discussion topic" do
       assignment.submission_types = "discussion_topic"
       discussion_topic = assignment.build_discussion_topic
       discussion_topic.context_module_tags << content_tag
       expect(assignment.all_context_module_tags).to eq([content_tag])
     end
+
+    it "doesn't return the context_module_tags on the wiki page if the " \
+      "assignment is associated with a wiki page" do
+      assignment.submission_types = "wiki_page"
+      wiki_page = assignment.build_wiki_page
+      wiki_page.context_module_tags << content_tag
+      expect(assignment.all_context_module_tags).to eq([])
+    end
   end
 
-  describe "#discussion_topic?" do
-    subject(:assignment) { Assignment.new }
+  describe "#submission_type?" do
+    shared_examples_for "submittable" do
+      subject(:assignment) { Assignment.new }
+      let(:be_type) { "be_#{submission_type}".to_sym }
+      let(:build_type) { "build_#{submission_type}".to_sym }
 
-    it "returns false if an assignment does not have a discussion topic" \
-      "or a submission_types of 'discussion_topic'" do
-      is_expected.to_not be_discussion_topic
+      it "returns false if an assignment does not have a submission" \
+        "or matching submission_types" do
+        is_expected.not_to send(be_type)
+      end
+
+      it "returns true if the assignment has an associated submission, " \
+        "and it has matching submission_types" do
+        assignment.submission_types = submission_type
+        assignment.send(build_type)
+        expect(assignment).to send(be_type)
+      end
+
+      it "returns false if an assignment does not have its submission_types" \
+        "set, even if it has an associated submission" do
+        assignment.send(build_type)
+        expect(assignment).not_to send(be_type)
+      end
+
+      it "returns false if an assignment does not have an associated" \
+        "submission even if it has submission_types set" do
+        assignment.submission_types = submission_type
+        expect(assignment).not_to send(be_type)
+      end
     end
 
-    it "returns true if the assignment has an associated discussion topic," \
-      "and it has its submission_types set to 'discussion_topic'" do
-      assignment.submission_types = "discussion_topic"
-      assignment.build_discussion_topic
-      expect(assignment).to be_discussion_topic
+    context "topics" do
+      let(:submission_type) { "discussion_topic" }
+
+      include_examples "submittable"
     end
 
-    it "returns false if an assignment does not have its submission_types" \
-      "set to 'discussion_topic', even if it has an associated discussion topic" do
-      assignment.build_discussion_topic
-      expect(assignment).to_not be_discussion_topic
-    end
+    context "pages" do
+      let(:submission_type) { "wiki_page" }
 
-    it "returns false if an assignment does not have an associated" \
-      "discussion topic even if it has submission_types set to" \
-      "'discussion_topic'" do
-      assignment.submission_types = "discussion_topic"
-      expect(assignment).to_not be_discussion_topic
+      include_examples "submittable"
     end
   end
 
@@ -1582,83 +1605,132 @@ describe Assignment do
     end
   end
 
-  context "topics" do
-    before :once do
-      assignment_model(:course => @course, :submission_types => "discussion_topic", :updating_user => @teacher)
+  describe "linked submissions" do
+    shared_examples_for "submittable" do
+      before :once do
+        assignment_model(:course => @course, :submission_types => submission_type, :updating_user => @teacher)
+      end
+
+      it "should create a record if none exists and specified" do
+        expect(@a.submission_types).to eql(submission_type)
+        submittable = @a.send(submission_type)
+        expect(submittable).not_to be_nil
+        expect(submittable.assignment_id).to eql(@a.id)
+        expect(submittable.user_id).to eql(@teacher.id)
+        @a.due_at = Time.zone.now
+        @a.save
+        @a.reload
+        submittable = @a.send(submission_type)
+        expect(submittable).not_to be_nil
+        expect(submittable.assignment_id).to eql(@a.id)
+        expect(submittable.user_id).to eql(@teacher.id)
+      end
+
+      it "should delete a record if no longer specified" do
+        expect(@a.submission_types).to eql(submission_type)
+        submittable = @a.send(submission_type)
+        expect(submittable).not_to be_nil
+        expect(submittable.assignment_id).to eql(@a.id)
+        @a.submission_types = 'on_paper'
+        @a.save!
+        @a.reload
+        submittable = @a.send(submission_type)
+        expect(submittable).to be_nil
+      end
     end
 
-    it "should create a discussion_topic if none exists and specified" do
-      expect(@a.submission_types).to eql('discussion_topic')
-      expect(@a.discussion_topic).not_to be_nil
-      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
-      expect(@a.discussion_topic.user_id).to eql(@teacher.id)
-      @a.due_at = Time.now
-      @a.save
-      @a.reload
-      expect(@a.discussion_topic).not_to be_nil
-      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
-      expect(@a.discussion_topic.user_id).to eql(@teacher.id)
+    context "topics" do
+      let(:submission_type) { "discussion_topic" }
+      let(:submission_class) { DiscussionTopic }
+
+      include_examples "submittable"
+
+      it "should not delete the topic if non-empty when unlinked" do
+        expect(@a.submission_types).to eql(submission_type)
+        @topic = @a.discussion_topic
+        expect(@topic).not_to be_nil
+        expect(@topic.assignment_id).to eql(@a.id)
+        @topic.discussion_entries.create!(:user => @user, :message => "testing")
+        @a.discussion_topic.reload
+        @a.submission_types = 'on_paper'
+        @a.save!
+        @a.reload
+        expect(@a.discussion_topic).to be_nil
+        expect(@a.state).to eql(:published)
+        @topic = submission_class.find(@topic.id)
+        expect(@topic.assignment_id).to eql(nil)
+        expect(@topic.state).to eql(:active)
+      end
+
+      it "should grab the original topic if unlinked and relinked" do
+        expect(@a.submission_types).to eql(submission_type)
+        @topic = @a.discussion_topic
+        expect(@topic).not_to be_nil
+        expect(@topic.assignment_id).to eql(@a.id)
+        @topic.discussion_entries.create!(:user => @user, :message => "testing")
+        @a.discussion_topic.reload
+        @a.submission_types = 'on_paper'
+        @a.save!
+        @a.submission_types = 'discussion_topic'
+        @a.save!
+        @a.reload
+        expect(@a.discussion_topic).to eql(@topic)
+        expect(@a.state).to eql(:published)
+        @topic.reload
+        expect(@topic.state).to eql(:active)
+      end
+
+      it "should not delete the assignment when unlinked from a topic" do
+        expect(@a.submission_types).to eql(submission_type)
+        submittable = @a.send(submission_type)
+        expect(submittable).not_to be_nil
+        expect(submittable.state).to eql(:active)
+        expect(submittable.assignment_id).to eql(@a.id)
+        @a.submission_types = 'on_paper'
+        @a.save!
+        submittable = submission_class.find(submittable.id)
+        expect(submittable.assignment_id).to eql(nil)
+        expect(submittable.state).to eql(:deleted)
+        @a.reload
+        submittable = @a.send(submission_type)
+        expect(submittable).to be_nil
+        expect(@a.state).to eql(:published)
+      end
     end
 
-    it "should delete a discussion_topic if no longer specified" do
-      expect(@a.submission_types).to eql('discussion_topic')
-      expect(@a.discussion_topic).not_to be_nil
-      expect(@a.discussion_topic.assignment_id).to eql(@a.id)
-      @a.submission_types = 'on_paper'
-      @a.save!
-      @a.reload
-      expect(@a.discussion_topic).to be_nil
-    end
+    context "pages" do
+      let(:submission_type) { "wiki_page" }
+      let(:submission_class) { WikiPage }
 
-    it "should not delete the assignment when unlinked from a topic" do
-      expect(@a.submission_types).to eql('discussion_topic')
-      @topic = @a.discussion_topic
-      expect(@topic).not_to be_nil
-      expect(@topic.state).to eql(:active)
-      expect(@topic.assignment_id).to eql(@a.id)
-      @a.submission_types = 'on_paper'
-      @a.save!
-      @topic = DiscussionTopic.find(@topic.id)
-      expect(@topic.assignment_id).to eql(nil)
-      expect(@topic.state).to eql(:deleted)
-      @a.reload
-      expect(@a.discussion_topic).to be_nil
-      expect(@a.state).to eql(:published)
-    end
+      context "feature enabled" do
+        before(:once) { @course.enable_feature!(:conditional_release) }
 
-    it "should not delete the topic if non-empty when unlinked" do
-      expect(@a.submission_types).to eql('discussion_topic')
-      @topic = @a.discussion_topic
-      expect(@topic).not_to be_nil
-      expect(@topic.assignment_id).to eql(@a.id)
-      @topic.discussion_entries.create!(:user => @user, :message => "testing")
-      @a.discussion_topic.reload
-      @a.submission_types = 'on_paper'
-      @a.save!
-      @a.reload
-      expect(@a.discussion_topic).to be_nil
-      expect(@a.state).to eql(:published)
-      @topic = DiscussionTopic.find(@topic.id)
-      expect(@topic.assignment_id).to eql(nil)
-      expect(@topic.state).to eql(:active)
-    end
+        include_examples "submittable"
 
-    it "should grab the original topic if unlinked and relinked" do
-      expect(@a.submission_types).to eql('discussion_topic')
-      @topic = @a.discussion_topic
-      expect(@topic).not_to be_nil
-      expect(@topic.assignment_id).to eql(@a.id)
-      @topic.discussion_entries.create!(:user => @user, :message => "testing")
-      @a.discussion_topic.reload
-      @a.submission_types = 'on_paper'
-      @a.save!
-      @a.submission_types = 'discussion_topic'
-      @a.save!
-      @a.reload
-      expect(@a.discussion_topic).to eql(@topic)
-      expect(@a.state).to eql(:published)
-      @topic.reload
-      expect(@topic.state).to eql(:active)
+        it "should not delete the assignment when unlinked from a page" do
+          expect(@a.submission_types).to eql(submission_type)
+          submittable = @a.send(submission_type)
+          expect(submittable).not_to be_nil
+          expect(submittable.state).to eql(:active)
+          expect(submittable.assignment_id).to eql(@a.id)
+          @a.submission_types = 'on_paper'
+          @a.save!
+          expect(submission_class.exists?(submittable.id)).to be_falsey
+          @a.reload
+          submittable = @a.send(submission_type)
+          expect(submittable).to be_nil
+          expect(@a.state).to eql(:published)
+        end
+      end
+
+      it "should not create a record if feature is disabled" do
+        expect do
+          assignment_model(:course => @course, :submission_types => 'wiki_page', :updating_user => @teacher)
+        end.not_to change { WikiPage.count }
+        expect(@a.submission_types).to eql(submission_type)
+        submittable = @a.send(submission_type)
+        expect(submittable).to be_nil
+      end
     end
   end
 
@@ -2204,6 +2276,35 @@ describe Assignment do
       expect(a1.locked_for?(@user)).to be_truthy
     end
 
+    it "should be locked when associated wiki page is part of a locked module" do
+      @course.enable_feature!(:conditional_release)
+      a1 = assignment_model(:course => @course, :submission_types => "wiki_page")
+      a1.reload
+      expect(a1.locked_for?(@user)).to be_falsey
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.wiki_page.id, :type => 'wiki_page')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      expect(a1.locked_for?(@user)).to be_truthy
+    end
+
+    it "should not be locked by wiki page when feature is disabled" do
+      a1 = wiki_page_assignment_model(:course => @course, :submission_types => "wiki_page")
+      a1.reload
+      expect(a1.locked_for?(@user)).to be_falsey
+
+      m = @course.context_modules.create!
+      m.add_item(:id => a1.wiki_page.id, :type => 'wiki_page')
+
+      m.unlock_at = Time.now.in_time_zone + 1.day
+      m.save
+      a1.reload
+      expect(a1.locked_for?(@user)).to be_falsey
+    end
+
     it "should be locked when associated quiz is part of a locked module" do
       a1 = assignment_model(:course => @course, :submission_types => "online_quiz")
       a1.reload
@@ -2621,14 +2722,30 @@ describe Assignment do
       group_discussion_assignment
     end
 
-    it "destroys the associated discussion topic" do
+    it "destroys the associated page" do
+      course
+      @course.enable_feature!(:conditional_release)
+      wiki_page_assignment_model course: @course
       @assignment.destroy
+      expect(WikiPage.exists?(@page.id)).to be_falsey
+      expect(@assignment.reload).to be_deleted
+    end
+
+    it "does not destroy the associated page" do
+      wiki_page_assignment_model
+      @assignment.destroy
+      expect(WikiPage.exists?(@page.id)).to be_truthy
+      expect(@assignment.reload).to be_deleted
+    end
+
+    it "destroys the associated discussion topic" do
+      @assignment.reload.destroy
       expect(@topic.reload).to be_deleted
       expect(@assignment.reload).to be_deleted
     end
 
     it "does not revive the discussion if touched after destroyed" do
-      @assignment.destroy
+      @assignment.reload.destroy
       expect(@topic.reload).to be_deleted
       @assignment.touch
       expect(@topic.reload).to be_deleted

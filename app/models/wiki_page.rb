@@ -18,15 +18,20 @@
 
 require 'atom'
 
+# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
+require_dependency 'assignment_student_visibility'
+
 class WikiPage < ActiveRecord::Base
-  attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
+  attr_accessible :title, :body, :url, :user_id, :user, :editing_roles, :notify_of_update
   attr_readonly :wiki_id
+  attr_accessor :saved_by
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Workflow
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
+  include Submittable
 
   include SearchTermHelper
 
@@ -41,9 +46,17 @@ class WikiPage < ActiveRecord::Base
 
   validate :validate_front_page_visibility
 
+  before_save :default_submission_values,
+    if: proc { self.context.try(:feature_enabled?, :conditional_release) }
   before_save :set_revised_at
   before_validation :ensure_unique_title
-  after_save :touch_wiki_context
+  after_save  :touch_wiki_context
+  after_save  :update_assignment,
+    if: proc { self.context.try(:feature_enabled?, :conditional_release) }
+
+  scope :without_assignment_in_course, lambda { |course_ids|
+    where(assignment_id: nil).joins(:course).where(courses: {id: course_ids})
+  }
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
@@ -162,11 +175,6 @@ class WikiPage < ActiveRecord::Base
     state :deleted
   end
   alias_method :published?, :active?
-
-  def restore
-    self.workflow_state = 'unpublished'
-    self.save
-  end
 
   def set_revised_at
     self.revised_at ||= Time.now

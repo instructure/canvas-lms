@@ -198,6 +198,14 @@ describe DiscussionTopicsController do
                                   :set => @section)
       end
 
+      it "doesn't show the topic to unassigned students" do
+        @topic.assignment.update_attribute(:only_visible_to_overrides, true)
+        user_session(@student)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_redirect
+        expect(response.location).to eq course_discussion_topics_url @course
+      end
+
       it "doesn't show overrides to students" do
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id

@@ -140,19 +140,19 @@ describe "Pages API", type: :request do
            {"hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.revised_at.as_json, "title" => @hidden_page.title, "front_page" => false}]
         )
       end
-  
+
       it "should paginate" do
         2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :per_page => "2")
         expect(json.size).to eq 2
         urls = json.collect{ |page| page['url'] }
-        
+
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2&page=2",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :per_page => "2", :page => "2")
         expect(json.size).to eq 2
         urls += json.collect{ |page| page['url'] }
-        
+
         expect(urls).to eq @wiki.wiki_pages.sort_by(&:id).collect(&:url)
       end
 
@@ -200,7 +200,7 @@ describe "Pages API", type: :request do
                           :sort=>'title', :order=>'desc')
           expect(json.map {|page|page['title']}).to eq ['Hidden Page', 'gIntermediate Page', 'Front Page']
         end
-        
+
         it "should sort by created_at" do
           @hidden_page.update_attribute(:created_at, 1.hour.ago)
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=created_at&order=asc",
@@ -208,7 +208,7 @@ describe "Pages API", type: :request do
                           :sort=>'created_at', :order=>'asc')
           expect(json.map {|page|page['url']}).to eq [@hidden_page.url, @front_page.url]
         end
-        
+
         it "should sort by updated_at" do
           Timecop.freeze(1.hour.ago) { @hidden_page.touch }
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?sort=updated_at&order=desc",
@@ -218,7 +218,7 @@ describe "Pages API", type: :request do
         end
       end
     end
-    
+
     describe "show" do
       before :once do
         @teacher.short_name = 'the teacher'
@@ -226,7 +226,7 @@ describe "Pages API", type: :request do
         @hidden_page.user_id = @teacher.id
         @hidden_page.save!
       end
-      
+
       it "should retrieve page content and attributes", priority: "1", test_id: 126803 do
         @hidden_page.publish
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
@@ -284,7 +284,7 @@ describe "Pages API", type: :request do
         expect(json['message']).to eq "No front page has been set"
       end
     end
-    
+
     describe "revisions" do
       before :once do
         @timestamps = %w(2013-01-01 2013-01-02 2013-01-03).map { |d| Time.zone.parse(d) }
@@ -431,7 +431,7 @@ describe "Pages API", type: :request do
                  { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                  {}, {}, {:expected_status => 400})
       end
-            
+
       it "should create a new page", priority: "1", test_id: 126819 do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -503,7 +503,7 @@ describe "Pages API", type: :request do
         expect(page).to be_active
         expect(json['published']).to be_truthy
       end
-      
+
       it "should create a new page in unpublished state (draft state)" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -512,7 +512,7 @@ describe "Pages API", type: :request do
         expect(page).to be_unpublished
         expect(json['published']).to be_falsey
       end
-      
+
       it "should create a published front page, even when published is blank", priority: "1", test_id: 126812 do
         front_page_url = 'my-front-page'
         json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
@@ -530,8 +530,10 @@ describe "Pages API", type: :request do
         @course.default_wiki_editing_roles = 'teachers'
         @course.save
         api_call(:post, "/api/v1/courses/#{@course.id}/pages",
-                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
-                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :editing_roles => 'teachers,students,public' } })
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json',
+                   :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page',
+                   :editing_roles => 'teachers,students,public' } })
       end
 
       it 'should not allow students to set editing_roles' do
@@ -539,9 +541,34 @@ describe "Pages API", type: :request do
         @course.default_wiki_editing_roles = 'teachers,students'
         @course.save
         api_call(:post, "/api/v1/courses/#{@course.id}/pages",
-                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
-                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :editing_roles => 'teachers,students,public' } },
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json',
+                   :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page',
+                   :editing_roles => 'teachers,students,public' } },
                  {}, {:expected_status => 401})
+      end
+
+      describe 'should create a linked assignment' do
+        let(:page) do
+          json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                   { :controller => 'wiki_pages_api', :action => 'create', :format => 'json',
+                     :course_id => @course.to_param },
+                   { :wiki_page => { :title => 'Assignable Page',
+                     :assignment => { :set_assignment => true, :points_possible => 9000 } }})
+          @course.wiki.wiki_pages.where(url: json['url']).first!
+        end
+
+        it 'unless flag is disabled' do
+          expect(page.assignment).to be_nil
+        end
+
+        it 'if flag is enabled' do
+          @course.enable_feature!(:conditional_release)
+          expect(page.assignment).not_to be_nil
+          expect(page.assignment.title).to eq 'Assignable Page'
+          expect(page.assignment.submission_types).to eq 'wiki_page'
+          expect(page.assignment.points_possible).to eq 9000
+        end
       end
     end
 
@@ -718,7 +745,7 @@ describe "Pages API", type: :request do
           expect(json['published']).to be_truthy
           expect(@unpublished_page.reload).to be_active
         end
-        
+
         it 'should not publish a page otherwise' do
           json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
                    { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @unpublished_page.url })
@@ -754,7 +781,7 @@ describe "Pages API", type: :request do
         @hidden_page.reload
         expect(@hidden_page.body).to eq 'processed content'
       end
-      
+
       it "should not allow invalid editing_roles" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
@@ -762,7 +789,7 @@ describe "Pages API", type: :request do
                  { :wiki_page => { :editing_roles => 'teachers, chimpanzees, students' }},
                  {}, {:expected_status => 400})
       end
-      
+
       it "should create a page if the page doesn't exist", priority: "1", test_id: 126801 do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/nonexistent-url",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
@@ -772,7 +799,7 @@ describe "Pages API", type: :request do
         expect(page).not_to be_nil
         expect(page.body).to eq 'Nonexistent page content'
       end
-      
+
       describe "notify_of_update" do
         before :once do
           @notify_page = @hidden_page
@@ -785,7 +812,7 @@ describe "Pages API", type: :request do
           @teacher.email_channel.notification_policies.create!(notification: @notification,
                                                                frequency: 'immediately')
         end
-        
+
         it "should notify iff the notify_of_update flag is set" do
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}?wiki_page[body]=updated+front+page",
                    :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
@@ -796,8 +823,72 @@ describe "Pages API", type: :request do
           expect(@teacher.messages.map(&:context_id)).to eq [@notify_page.id]
         end
       end
+
+      context 'feature enabled' do
+        before { @course.enable_feature!(:conditional_release) }
+
+        it 'should update a linked assignment' do
+          wiki_page_assignment_model(:wiki_page => @hidden_page)
+          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                          { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                            :course_id => @course.to_param, :url => @hidden_page.url },
+                          { :wiki_page => { :title => 'Changin\' the Title',
+                                            :assignment => { :points_possible => 9000 } }})
+          page = @course.wiki.wiki_pages.where(url: json['url']).first!
+          expect(page.assignment.title).to eq 'Changin\' the Title'
+          expect(page.assignment.points_possible).to eq 9000
+        end
+
+        it 'should destroy and restore a linked assignment' do
+          wiki_page_assignment_model(:wiki_page => @hidden_page)
+          api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                          { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                            :course_id => @course.to_param, :url => @hidden_page.url },
+                          { :wiki_page => { :assignment => { :set_assignment => false } }})
+          @hidden_page.reload
+          expect(@hidden_page.assignment).to be_nil
+          expect(@hidden_page.old_assignment_id).to eq @assignment.id
+          expect(@assignment.reload).to be_deleted
+          expect(@assignment.wiki_page).to be_nil
+
+          # Restore it
+          api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                          { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                            :course_id => @course.to_param, :url => @hidden_page.url },
+                          { :wiki_page => { :assignment => { :set_assignment => true } }})
+          @hidden_page.reload
+          expect(@hidden_page.assignment).not_to be_nil
+          expect(@hidden_page.old_assignment_id).to eq @assignment.id
+          expect(@assignment.reload).not_to be_deleted
+          expect(@assignment.wiki_page).to eq @hidden_page
+        end
+      end
+
+      it 'should not update a linked assignment' do
+        wiki_page_assignment_model(:wiki_page => @hidden_page)
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                        { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                          :course_id => @course.to_param, :url => @hidden_page.url },
+                        { :wiki_page => { :title => 'Can\'t Change It',
+                                          :assignment => { :points_possible => 9000 } }})
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
+        expect(page.assignment.title).to eq 'Content Page Assignment'
+        expect(page.assignment.points_possible).to eq 1.5
+      end
+
+      it 'should not destroy linked assignment' do
+        wiki_page_assignment_model(:wiki_page => @hidden_page)
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                        { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                          :course_id => @course.to_param, :url => @hidden_page.url },
+                        { :wiki_page => { :assignment => { :set_assignment => false } }})
+        @hidden_page.reload
+        expect(@hidden_page.assignment).not_to be_nil
+        expect(@assignment.reload).not_to be_deleted
+        expect(@assignment.wiki_page).not_to be_nil
+      end
     end
-    
+
     describe "delete" do
       it "should delete a page", priority: "1", test_id: 126805 do
         api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
@@ -874,7 +965,7 @@ describe "Pages API", type: :request do
     before :once do
       course_with_student(:course => @course, :active_all => true)
     end
-    
+
     it "should list pages, excluding hidden ones" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                       :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}")
@@ -882,7 +973,7 @@ describe "Pages API", type: :request do
           [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title}]
       )
     end
-    
+
     it "should paginate, excluding hidden" do
       2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
@@ -897,7 +988,7 @@ describe "Pages API", type: :request do
 
       expect(urls).to eq @wiki.wiki_pages.select{ |p| p.published? }.sort_by(&:id).collect(&:url)
     end
-    
+
     it "should refuse to show a hidden page" do
       api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :url=>@hidden_page.url},
@@ -920,16 +1011,16 @@ describe "Pages API", type: :request do
       other_page = other_wiki.front_page
       other_page.workflow_state = 'active'
       other_page.save!
-      
+
       api_call(:get, "/api/v1/courses/#{other_course.id}/pages",
                {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{other_course.id}"},
                {}, {}, { :expected_status => 401 })
-      
+
       api_call(:get, "/api/v1/courses/#{other_course.id}/pages/front-page",
                {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{other_course.id}", :url=>'front-page'},
                {}, {}, { :expected_status => 401 })
     end
-    
+
     it "should allow access to a wiki in a public unenrolled course" do
       other_course = course
       other_course.is_public = true
@@ -943,11 +1034,11 @@ describe "Pages API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{other_course.id}/pages",
                {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{other_course.id}"})
       expect(json).not_to be_empty
-      
+
       api_call(:get, "/api/v1/courses/#{other_course.id}/pages/front-page",
                {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{other_course.id}", :url=>'front-page'})
     end
-    
+
     describe "module progression" do
       before :once do
         @mod = @course.context_modules.create!(:name => "some module")
@@ -991,7 +1082,7 @@ describe "Pages API", type: :request do
         @editable_page.workflow_state = 'active'
         @editable_page.save!
       end
-      
+
       it "should allow editing the body" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
@@ -1045,7 +1136,7 @@ describe "Pages API", type: :request do
                   :url=>@editable_page.url}, { :wiki_page => { :body => 'edited by student' }})
         expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
       end
-      
+
       it "should not allow creating pages" do
         api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                  { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -1202,40 +1293,40 @@ describe "Pages API", type: :request do
       end
     end
   end
-  
+
   context "group" do
     before :once do
       group_with_user(:active_all => true)
       5.times { |i| @group.wiki.wiki_pages.create!(:title => "Group Wiki Page #{i}", :body => "<blink>Content of page #{i}</blink>") }
     end
-    
+
     it "should list the contents of a group wiki" do
       json = api_call(:get, "/api/v1/groups/#{@group.id}/pages",
                      {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :group_id=>@group.to_param})
-      expect(json.collect { |row| row['title'] }).to eq @group.wiki.wiki_pages.active.order_by_id.collect(&:title)      
+      expect(json.collect { |row| row['title'] }).to eq @group.wiki.wiki_pages.active.order_by_id.collect(&:title)
     end
-    
+
     it "should retrieve page content from a group wiki" do
       testpage = @group.wiki.wiki_pages.last
       json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{testpage.url}",
                       {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :group_id=>@group.to_param, :url=>testpage.url})
       expect(json['body']).to eq testpage.body
     end
-    
+
     it "should create a group wiki page" do
       json = api_call(:post, "/api/v1/groups/#{@group.id}/pages?wiki_page[title]=newpage",
                {:controller=>'wiki_pages_api', :action=>'create', :format=>'json', :group_id=>@group.to_param, :wiki_page => {'title' => 'newpage'}})
       page = @group.wiki.wiki_pages.where(url: json['url']).first!
       expect(page.title).to eq 'newpage'
     end
-    
+
     it "should update a group wiki page" do
       testpage = @group.wiki.wiki_pages.first
       api_call(:put, "/api/v1/groups/#{@group.id}/pages/#{testpage.url}?wiki_page[body]=lolcats",
                {:controller=>'wiki_pages_api', :action=>'update', :format=>'json', :group_id=>@group.to_param, :url=>testpage.url, :wiki_page => {'body' => 'lolcats'}})
       expect(testpage.reload.body).to eq 'lolcats'
     end
-    
+
     it "should delete a group wiki page" do
       count = @group.wiki.wiki_pages.not_deleted.size
       testpage = @group.wiki.wiki_pages.last
@@ -1285,6 +1376,201 @@ describe "Pages API", type: :request do
                         :group_id => @group.to_param, :url => @vpage.url, :summary => '1')
         expect(json['revision_id']).to eq 2
         expect(json['body']).to be_nil
+      end
+    end
+  end
+
+  context "differentiated assignments" do
+    def create_page_for_da(assignment_opts={})
+      assignment = @course.assignments.create!(assignment_opts)
+      assignment.submission_types = 'wiki_page'
+      assignment.save!
+      page = @course.wiki.wiki_pages.build(
+        user: @teacher,
+        editing_roles: "teachers,students",
+        title: assignment_opts[:title])
+      page.assignment = assignment
+      page.save!
+      [assignment, page]
+    end
+
+    def get_index
+      raw_api_call(:get, api_v1_course_wiki_pages_path(@course.id, format: :json),
+        controller: 'wiki_pages_api', action: 'index', format: :json,
+        course_id: @course.id)
+    end
+
+    def get_show(page)
+      raw_api_call(:get, api_v1_course_wiki_page_path(@course.id, page.url, format: :json),
+        controller: 'wiki_pages_api', action: 'show', format: :json,
+        course_id: @course.id, url: page.url)
+    end
+
+    def put_update(page)
+      raw_api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}.json",
+        {controller: 'wiki_pages_api', action: 'update', format: :json,
+          course_id: @course.id, url: page.url}, { wiki_page: {} })
+    end
+
+    def get_revisions(page)
+      raw_api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions.json",
+        controller: 'wiki_pages_api', action: 'revisions', format: :json,
+        course_id: @course.id, url: page.url)
+    end
+
+    def get_show_revision(page)
+      raw_api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions/latest.json",
+        controller: 'wiki_pages_api', action: 'show_revision', format: :json,
+        course_id: @course.id, url: page.url)
+    end
+
+    def post_revert(page)
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions/1.json",
+        controller: 'wiki_pages_api', action: 'revert', format: :json,
+        course_id: @course.id, url: page.url, revision_id: 1)
+    end
+
+    let(:calls){ %i(get_show put_update get_revisions get_show_revision post_revert) }
+
+    def calls_succeed(page, opts={except: []})
+      get_index
+      expect(JSON.parse(response.body).to_s).to include(page.title)
+
+      calls.reject!{|call| opts[:except].include?(call) }
+      calls.each{ |call| expect(self.send(call, page).to_s).to eq "200"}
+    end
+
+    def calls_fail(page)
+      get_index
+      expect(JSON.parse(response.body).to_s).not_to include("#{page.title}")
+
+      calls.each{ |call| expect(self.send(call, page).to_s).to eq "401"}
+    end
+
+    before :once do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @student_with_override, @student_without_override = create_users(2, return_type: :record)
+
+      @assignment_1, @page_assigned_to_override = create_page_for_da(
+        title: "assigned to student_with_override",
+        only_visible_to_overrides: true)
+      @assignment_2, @page_assigned_to_all = create_page_for_da(
+        title: "assigned to all",
+        only_visible_to_overrides: false)
+      @page_unassigned = @course.wiki.wiki_pages.create!(
+        title: "definitely not assigned",
+        user: @teacher,
+        editing_roles: "teachers,students")
+
+      @course.enroll_student(@student_without_override, enrollment_state: 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student_with_override)
+      create_section_override_for_assignment(@assignment_1, course_section: @section)
+
+      @observer = User.create
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment',
+        section: @course.course_sections.first,
+        enrollment_state: 'active')
+    end
+
+    context "enabled" do
+      before(:once) do
+        @course.enable_feature!(:conditional_release)
+      end
+
+      it "lets the teacher see all pages" do
+        @user = @teacher
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each{ |p| calls_succeed(p) }
+      end
+
+      it "lets students with visibility see pages" do
+        @user = @student_with_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "restricts access to students without visibility" do
+        @user = @student_without_override
+        calls_fail(@page_assigned_to_override)
+        calls_succeed(@page_assigned_to_all, except: [:post_revert])
+        calls_succeed(@page_unassigned, except: [:post_revert])
+      end
+
+      it "gives observers same visibility as unassigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
+        @user = @observer
+        calls_fail(@page_assigned_to_override)
+        [@page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
+      end
+
+      it "gives observers same visibility as assigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
+      end
+
+      it "gives observers without visibility all the things" do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p,
+            except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
+      end
+    end
+
+    context "disabled" do
+      before(:once) do
+        @course.disable_feature!(:conditional_release)
+      end
+
+      it "lets the teacher see all pages" do
+        @user = @teacher
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each{ |p| calls_succeed(p) }
+      end
+
+      it "lets students with visibility see pages" do
+        @user = @student_with_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "lets students without visibility see pages" do
+        @user = @student_without_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "gives observers same visibility as unassigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
+      end
+
+      it "gives observers same visibility as assigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
+      end
+
+      it "gives observers without visibility all the things" do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p,
+            except: [:post_revert, :put_update, :get_revisions, :get_show_revision])
+        end
       end
     end
   end

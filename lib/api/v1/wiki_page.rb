@@ -20,10 +20,14 @@ module Api::V1::WikiPage
   include Api::V1::Json
   include Api::V1::User
   include Api::V1::Locked
+  include Api::V1::Assignment
 
-  WIKI_PAGE_JSON_ATTRS = %w(url title created_at editing_roles)
+  WIKI_PAGE_JSON_ATTRS = %w(url title created_at editing_roles).freeze
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true, opts={})
+    opts = opts.reverse_merge(include_assignment: true)
+    opts.delete(:include_assignment) unless wiki_page.context.try(:feature_enabled?, :conditional_release)
+
     hash = api_json(wiki_page, current_user, session, :only => WIKI_PAGE_JSON_ATTRS)
     hash['page_id'] = wiki_page.id
     hash['editing_roles'] ||= 'teachers'
@@ -33,6 +37,13 @@ module Api::V1::WikiPage
     hash['front_page'] = wiki_page.is_front_page?
     hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
     hash['updated_at'] = wiki_page.revised_at
+    if opts[:include_assignment] && wiki_page.for_assignment?
+      hash['assignment'] = assignment_json(wiki_page.assignment, current_user, session)
+      hash['assignment']['assignment_overrides'] =
+        assignment_overrides_json(
+          wiki_page.assignment.overrides_for(current_user, ensure_set_not_empty: true)
+        )
+    end
     locked_json(hash, wiki_page, current_user, 'page', :deep_check_if_needed => opts[:deep_check_if_needed])
     if include_body && !hash['locked_for_user'] && !hash['lock_info']
       hash['body'] = api_user_content(wiki_page.body)

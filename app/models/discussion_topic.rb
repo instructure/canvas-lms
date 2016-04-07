@@ -32,6 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
   include HtmlTextHelper
   include ContextModuleItem
   include SearchTermHelper
+  include Submittable
 
   attr_accessible(
     :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
@@ -58,16 +59,12 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :external_feed
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
-  belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
-  belongs_to :old_assignment, :class_name => 'Assignment'
   belongs_to :root_topic, :class_name => 'DiscussionTopic'
   belongs_to :group_category
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
-
-  has_many :assignment_student_visibilities, :through => :assignment
 
   belongs_to :user
 
@@ -120,13 +117,7 @@ class DiscussionTopic < ActiveRecord::Base
     self.title ||= t '#discussion_topic.default_title', "No Title"
     self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
     @content_changed = self.message_changed? || self.title_changed?
-    if self.assignment_id != self.assignment_id_was
-      @old_assignment_id = self.assignment_id_was
-    end
-    if self.assignment_id
-      self.assignment_id = nil unless (self.assignment && self.assignment.context == self.context) || (self.root_topic && self.root_topic.assignment_id == self.assignment_id)
-      self.old_assignment_id = self.assignment_id if self.assignment_id
-    end
+    default_submission_values
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
     end
@@ -222,14 +213,10 @@ class DiscussionTopic < ActiveRecord::Base
       Assignment.where(:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       ContentTag.delete_for(Assignment.find(@old_assignment_id)) if @old_assignment_id
     elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
-      self.assignment.title = self.title
+      deleted_assignment = self.assignment.deleted?
+      self.sync_assignment
+      self.assignment.workflow_state = "published" if is_announcement && deleted_assignment
       self.assignment.description = self.message
-      self.assignment.submission_types = "discussion_topic"
-      self.assignment.saved_by = :discussion_topic
-      self.assignment.workflow_state = 'published' if self.assignment.deleted?
-      unless is_announcement
-        self.assignment.workflow_state = published? ? 'published' : 'unpublished'
-      end
       if group_category_id_changed?
         self.assignment.validate_assignment_overrides(force_override_destroy: true)
       end
@@ -246,14 +233,6 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :update_assignment
 
-  def restore_old_assignment
-    return nil unless self.old_assignment && self.old_assignment.deleted?
-    self.old_assignment.workflow_state = 'published'
-    self.old_assignment.saved_by = :discussion_topic
-    self.old_assignment.save(:validate => false)
-    self.old_assignment
-  end
-
   def is_announcement; false end
 
   def root_topic?
@@ -268,10 +247,6 @@ class DiscussionTopic < ActiveRecord::Base
   # count of all active discussion_entries
   def discussion_subentry_count
     discussion_entries.active.count
-  end
-
-  def for_assignment?
-    self.assignment && self.assignment.submission_types =~ /discussion_topic/
   end
 
   def for_group_discussion?
@@ -513,19 +488,6 @@ class DiscussionTopic < ActiveRecord::Base
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
     SQL
-  }
-
-  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
-  }
-
-  scope :without_assignment_in_course, lambda { |course_ids|
-    where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
-  }
-
-  scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-    joins(:assignment_student_visibilities)
-      .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
   }
 
   alias_attribute :available_from, :delayed_post_at
@@ -799,12 +761,10 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.restore(:discussion_topic)
     end
 
-    self.child_topics.each do |child|
-      child.restore
-    end
+    self.child_topics.each(&:restore)
   end
 
-  def unlink_from(type)
+  def unlink!(type)
     @saved_by = type
     if self.discussion_entries.empty?
       self.assignment = nil
@@ -813,7 +773,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment = nil
       self.save
     end
-    self.child_topics.each{|t| t.unlink_from(:assignment) }
+    self.child_topics.each{|t| t.unlink!(:assignment) }
   end
 
   def self.per_page

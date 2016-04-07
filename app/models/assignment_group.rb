@@ -80,12 +80,12 @@ class AssignmentGroup < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.assignments.active.include_quiz_and_topic.each{|a| a.destroy }
+    self.assignments.active.include_submittables.each(&:destroy)
     self.save
   end
 
   def restore(try_to_selectively_undelete_assignments = true)
-    to_restore = self.assignments.include_quiz_and_topic
+    to_restore = self.assignments.include_submittables
     if try_to_selectively_undelete_assignments
       # It's a pretty good guess that if an assignment was modified at the same
       # time that this group was last modified, that assignment was deleted

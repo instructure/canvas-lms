@@ -95,10 +95,14 @@ class AssignmentsController < ApplicationController
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
       if request.format.html?
-        if @assignment.submission_types == 'online_quiz' && @assignment.quiz
+        if @assignment.quiz?
           return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
-        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
+        elsif @assignment.discussion_topic? &&
+          @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
+        elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
+          @assignment.wiki_page.grants_right?(@current_user, session, :read)
+          return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
         elsif @assignment.submission_types == 'attendance'
           return redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}")
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
@@ -366,6 +370,8 @@ class AssignmentsController < ApplicationController
       redirect_to new_course_quiz_url(@context, index_edit_params)
     elsif params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
+    elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == 'wiki_page'
+      redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
       edit
     end
@@ -387,6 +393,9 @@ class AssignmentsController < ApplicationController
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
         return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
+      elsif @context.feature_enabled?(:conditional_release) &&
+        @assignment.submission_types == 'wiki_page' && @assignment.wiki_page
+        return redirect_to edit_polymorphic_url([@context, @assignment.wiki_page], index_edit_params)
       end
 
       assignment_groups = @context.assignment_groups.active
@@ -463,14 +472,8 @@ class AssignmentsController < ApplicationController
       if params[:publish]
         @assignment.workflow_state = 'published'
       end
-      if params[:assignment_type] == "quiz"
-        params[:assignment][:submission_types] = "online_quiz"
-      elsif params[:assignment_type] == "attendance"
-        params[:assignment][:submission_types] = "attendance"
-      elsif params[:assignment_type] == "discussion_topic"
-        params[:assignment][:submission_types] = "discussion_topic"
-      elsif params[:assignment_type] == "external_tool"
-        params[:assignment][:submission_types] = "external_tool"
+      if Assignment.assignment_type?(params[:assignment_type])
+        params[:assignment][:submission_types] = Assignment.get_submission_type(params[:assignment_type])
       end
       respond_to do |format|
         @assignment.content_being_saved_by(@current_user)
@@ -482,7 +485,12 @@ class AssignmentsController < ApplicationController
           @assignment.reload
           flash[:notice] = t 'notices.updated', "Assignment was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
-          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
+          format.json do
+            render json: @assignment.as_json(
+              permissions: { user: @current_user, session: session },
+              include: [:quiz, :discussion_topic, :wiki_page]
+            ), status: :ok
+          end
         else
           format.html { render :edit }
           format.json { render :json => @assignment.errors, :status => :bad_request }

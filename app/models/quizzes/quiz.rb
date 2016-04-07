@@ -271,7 +271,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.assignment.restore(:quiz) if self.for_assignment?
   end
 
-  def unlink_from(type)
+  def unlink!(type)
     @saved_by = type
     if self.root_entries.empty? && !self.available?
       self.assignment = nil
