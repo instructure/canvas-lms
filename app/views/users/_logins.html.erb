@@ -3,8 +3,12 @@
   <% js_bundle :user_logins %>
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
   <fieldset id="login_information">
-    <legend><%= t('titles.logins', 'Login Information') %></legend>
-    <table>
+    <legend>
+      <h4 class="profileHeader">
+        <%= t('titles.logins', 'Login Information') %>
+      </h4>
+    </legend>
+    <table class="ic-Table">
       <% pseudonyms = @user.all_active_pseudonyms + [nil] %>
       <% pseudonyms.each do |pseudonym| %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
@@ -19,7 +23,7 @@
           <th scope='row'>
             <b class='unique_id'><%= pseudonym && pseudonym.unique_id %></b>
             <% if pseudonym && ((pseudonym.sis_user_id && can_do(pseudonym.account, @current_user, :read_sis)) || can_do(pseudonym, @current_user, :manage_sis)) %>
-              <div style="font-size: 0.8em; padding-left: 20px;">
+              <div>
                 <%= before_label('sis_id', 'SIS ID') %> <span id="sis_user_id_<%= pseudonym.id %>" class="sis_user_id"><%= pseudonym.sis_user_id %></span>
               </div>
               <div style="display:none" class="can_edit_sis_user_id"><%= can_do(pseudonym, @current_user, :manage_sis) %></div>
@@ -29,25 +33,25 @@
             <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account_id : "{{ account_id }}"), :class => 'account_name') %>
           </td>
           <td class='details'>
-            <table>
-              <tr>
-                <th><%= before_label('last_request', 'Last request') %></th>
+            <table class="ic-Table--condensed">
+              <tr class='login_details'>
+                <td scope="row"><%= before_label('last_request', 'Last request') %></td>
                 <td><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <th><%= before_label('current_login', 'Current login') %></th>
+                <td scope="row"><%= before_label('current_login', 'Current login') %></td>
                 <td><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <th><%= before_label('current_ip', 'Current login IP') %></th>
+                <td scope="row"><%= before_label('current_ip', 'Current login IP') %></td>
                 <td><%= pseudonym.try(:current_login_ip) || t('none', "none") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <th><%= before_label('last_login', 'Last login') %></th>
+                <td scope="row"><%= before_label('last_login', 'Last login') %></td>
                 <td><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <th><%= before_label('last_ip', 'Last login IP') %></th>
+                <td scope="row"><%= before_label('last_ip', 'Last login IP') %></td>
                 <td><%= pseudonym.try(:last_login_ip) || t('none', "none") %></td>
               </tr>
             </table>
@@ -69,7 +73,7 @@
       <% can_reset_mfa = @user.otp_secret_key && can_do(@user, @current_user, :reset_mfa) %>
       <% if can_add_pseudonym || can_reset_mfa %>
         <tr class="add_holder">
-          <td colspan="4" style="font-size: 0.8em;">
+          <td colspan="5">
             <% if can_add_pseudonym %>
               <a href="#" rel="<%= user_pseudonyms_url(@user.id) %>" class="add_pseudonym_link"><%= t('add_login', 'Add Login') %></a>
             <% end %>

@@ -64,7 +64,6 @@ define [
 
     showEditForm: ->
       @$el.addClass('editing').removeClass('not-editing')
-      @$('.profile_links').removeClass('span6')
 
     initEdit: ->
       if @options.links?.length
@@ -77,7 +76,6 @@ define [
 
     cancelEditProfile: ->
       @$el.addClass('not-editing').removeClass('editing')
-      @$('.profile_links').addClass('span6')
 
     ##
     # Event handler that can also be called manually.
