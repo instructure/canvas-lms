@@ -50,7 +50,7 @@ module SeleniumDriverSetup
 
   # prevents specs failing because tooltips are showing etc.
   def move_mouse_to_known_position
-    if run_headless?
+    if run_headless? && ENV["RESET_MOUSE_POSITION"]
       raise "couldn't move mouse (xdotool missing?)" unless system('xdotool mousemove --sync 5000 0')
     end
   end
