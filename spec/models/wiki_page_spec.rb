@@ -527,4 +527,32 @@ describe WikiPage do
       expect(page.reload.locked_for?(@student)).not_to have_key :unlock_at
     end
   end
+
+  describe 'revised_at' do
+    before(:once) do
+      Timecop.freeze(1.hour.ago) do
+        course
+        @page = @course.wiki.wiki_pages.create! title: 'page'
+        @old_timestamp = @page.revised_at
+      end
+    end
+
+    it 'changes when the page title changes' do
+      @page.title = 'changed'
+      @page.save!
+      expect(@page.reload.revised_at).to be > @old_timestamp
+    end
+
+    it 'changes when the content changes' do
+      @page.body = 'changed'
+      @page.save!
+      expect(@page.reload.revised_at).to be > @old_timestamp
+    end
+
+    it "doesn't change when the page is touched" do
+      @page.touch
+      expect(@page.updated_at).to be > @old_timestamp
+      expect(@page.reload.revised_at).to eq @old_timestamp
+    end
+  end
 end

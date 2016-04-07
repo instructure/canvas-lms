@@ -170,7 +170,7 @@ class WikiPage < ActiveRecord::Base
 
   def set_revised_at
     self.revised_at ||= Time.now
-    self.revised_at = Time.now if self.body_changed?
+    self.revised_at = Time.now if self.body_changed? || self.title_changed?
     @page_changed = self.body_changed? || self.title_changed?
     true
   end

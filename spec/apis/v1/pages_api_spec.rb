@@ -136,8 +136,8 @@ describe "Pages API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param)
         expect(json.map {|entry| entry.slice(*%w(hide_from_students url created_at updated_at title front_page))}).to eq(
-          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.updated_at.as_json, "title" => @front_page.title, "front_page" => true},
-           {"hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.updated_at.as_json, "title" => @hidden_page.title, "front_page" => false}]
+          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title, "front_page" => true},
+           {"hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.revised_at.as_json, "title" => @hidden_page.title, "front_page" => false}]
         )
       end
   
@@ -237,7 +237,7 @@ describe "Pages API", type: :request do
                      "url" => @hidden_page.url,
                      "html_url" => "http://www.example.com/courses/#{@course.id}/#{@course.wiki.path}/#{@hidden_page.url}",
                      "created_at" => @hidden_page.created_at.as_json,
-                     "updated_at" => @hidden_page.updated_at.as_json,
+                     "updated_at" => @hidden_page.revised_at.as_json,
                      "title" => @hidden_page.title,
                      "body" => @hidden_page.body,
                      "published" => true,
@@ -260,7 +260,7 @@ describe "Pages API", type: :request do
                      "url" => page.url,
                      "html_url" => "http://www.example.com/courses/#{@course.id}/#{@course.wiki.path}/#{page.url}",
                      "created_at" => page.created_at.as_json,
-                     "updated_at" => page.updated_at.as_json,
+                     "updated_at" => page.revised_at.as_json,
                      "title" => page.title,
                      "body" => page.body,
                      "published" => true,
@@ -879,7 +879,7 @@ describe "Pages API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                       :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}")
       expect(json.map{|entry| entry.slice(*%w(hide_from_students url created_at updated_at title))}).to eq(
-          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.updated_at.as_json, "title" => @front_page.title}]
+          [{"hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title}]
       )
     end
     
