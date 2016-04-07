@@ -21,7 +21,7 @@ module Lti
       include Rails.application.routes.url_helpers
 
       def initialize(course, user, base_url, opts={})
-        @membership_collator = CourseMembershipCollator.new(course, user, opts)
+        @membership_collator = LisPersonCollator.new(course, user, opts)
         @base_url = base_url
         @page = IMS::LTI::Models::MembershipService::Page.new(
           page_of: page_of,

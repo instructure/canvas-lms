@@ -18,20 +18,16 @@
 
 module Lti
   module MembershipService
-    class CourseMembershipCollator
-      attr_reader :role, :per_page, :page, :course, :user, :memberships
+    class LisPersonCollator
+      attr_reader :role, :per_page, :page, :context, :user, :memberships
 
-      def initialize(course, user, opts={})
+      def initialize(context, user, opts={})
         @role = opts[:role]
         @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
         @page = [opts[:page].to_i - 1, 0].max
-        @course = course
+        @context = context
         @user = user
         @memberships = collate_memberships
-      end
-
-      def context
-        @course
       end
 
       def next_page?
@@ -50,7 +46,7 @@ module Lti
         options = {
           enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student']
         }
-        @users ||= UserSearch.scope_for(@course, @user, options)
+        @users ||= UserSearch.scope_for(@context, @user, options)
                              .preload(:communication_channels, :not_ended_enrollments)
                              .offset(@page * @per_page)
                              .limit(@per_page + 1)
