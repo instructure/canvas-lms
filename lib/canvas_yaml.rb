@@ -256,3 +256,16 @@ module FloatScannerFix
   end
 end
 Psych::ScalarScanner.prepend(FloatScannerFix)
+
+module IntegerTransformFix # fixes strings with leading underscores before integers being parsed as integers
+  def transform?(value)
+    SafeYAML::Transform::ToInteger::MATCHERS.each_with_index do |matcher, idx|
+      if matcher.match(value)
+        value = value.gsub(/[_,]/, "") if idx == 0 # only strip these out _after_ we've matched the integer
+        return true, Integer(value)
+      end
+    end
+    try_edge_cases?(value)
+  end
+end
+SafeYAML::Transform::ToInteger.prepend(IntegerTransformFix)
