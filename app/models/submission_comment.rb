@@ -123,6 +123,7 @@ class SubmissionComment < ActiveRecord::Base
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
       !record.submission.assignment.muted? &&
+      record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
 
