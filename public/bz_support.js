@@ -17,7 +17,6 @@
     -> canvas loads
 */
 function bzRetainedInfoSetup() {
-alert("ru nning");
   var textareas = document.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
