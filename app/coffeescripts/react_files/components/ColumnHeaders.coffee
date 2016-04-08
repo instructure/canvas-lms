@@ -2,9 +2,8 @@ define [
   'i18n!react_files'
   'underscore'
   'react'
-  'react-router'
   'compiled/fn/preventDefault'
-], (I18n, _, React, ReactRouter, preventDefault) ->
+], (I18n, _, React, preventDefault) ->
 
   columns = [
     displayName: I18n.t('name', 'Name')

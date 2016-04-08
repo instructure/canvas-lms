@@ -4,8 +4,7 @@ define [
   'jquery'
   'compiled/react_files/components/FolderChild'
   'compiled/models/Folder'
-  'compiled/react_files/routes'
-], (mockFilesENV, React, $, FolderChild, Folder, routes) ->
+], (mockFilesENV, React, $, FolderChild, Folder) ->
 
   # Simulate = React.addons.TestUtils.Simulate
 

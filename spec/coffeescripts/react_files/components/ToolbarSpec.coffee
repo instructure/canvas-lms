@@ -2,9 +2,8 @@ define [
   '../mockFilesENV'
   'jquery'
   'react'
-  'react-router'
   'jsx/files/Toolbar'
-], (mockFilesENV, $, React, Router, Toolbar) ->
+], (mockFilesENV, $, React, Toolbar) ->
 
    #Simulate = React.addons.TestUtils.Simulate
 
