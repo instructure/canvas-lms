@@ -23,7 +23,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
     });
     ed.addButton('bz_retained_field_view', {
       title: 'Add Retained Field Display',
-      image: url + '/button.png',
+      image: url + '/btn-magic-static.png',
       cmd: 'bzRetainedFieldView'
     });
 
