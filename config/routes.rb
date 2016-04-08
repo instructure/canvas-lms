@@ -510,6 +510,7 @@ CanvasRails::Application.routes.draw do
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get :admin_tools
+    get 'search' => 'accounts#course_user_search', :as => :course_user_search
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
     delete 'account_users/:id' => 'accounts#remove_account_user', as: :remove_account_user
     resources :grading_standards, only: [:index, :create, :update, :destroy]

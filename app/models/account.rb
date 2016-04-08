@@ -1328,7 +1328,13 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if root_account.site_admin?
       tabs = []
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      if user && self.grants_right?(user, :read_roster)
+        if feature_enabled?(:course_user_search)
+          tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_course_user_search_path }
+        else
+          tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
+        end
+      end
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
