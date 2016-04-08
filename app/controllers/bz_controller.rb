@@ -103,4 +103,15 @@ class BzController < ApplicationController
     render :json => obj
   end
 
+  # The official Canvas API doesn't offer user deletion but
+  # we want it, so I'm implementing myself (based on the code
+  # from the users_controller through the admin interface)
+  def delete_user
+    user = api_find(User, params[:id])
+    if user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
+      user.destroy!
+    end
+    render :nothing => true
+
+
 end
