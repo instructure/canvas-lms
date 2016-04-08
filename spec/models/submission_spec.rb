@@ -1230,6 +1230,45 @@ describe Submission do
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
     end
 
+    context "canvadocs_submissions records" do
+      before(:once) do
+        @student1, @student2 = n_students_in_course(2)
+        @attachment = crocodocable_attachment_model(context: @student1)
+        @assignment = @course.assignments.create! name: "A1",
+          submission_types: "online_upload"
+      end
+
+      before do
+        Canvadocs.stubs(:enabled?).returns true
+        Canvadocs.stubs(:annotations_supported?).returns true
+        Canvadocs.stubs(:config).returns {}
+      end
+
+      it "ties submissions to canvadocs" do
+        s = @assignment.submit_homework(@student1,
+                                        submission_type: "online_upload",
+                                        attachments: [@attachment])
+        expect(s.canvadocs).to eq [@attachment.canvadoc]
+      end
+
+      it "create records for each group submission" do
+        gc = @course.group_categories.create! name: "Project Groups"
+        group = gc.groups.create! name: "A Team", context: @course
+        group.add_user(@student1)
+        group.add_user(@student2)
+
+        @assignment.update_attribute :group_category, gc
+        @assignment.submit_homework(@student1,
+                                    submission_type: "online_upload",
+                                    attachments: [@attachment])
+
+        [@student1, @student2].each do |student|
+          submission = @assignment.submission_for_student(student)
+          expect(submission.canvadocs).to eq [@attachment.canvadoc]
+        end
+      end
+    end
+
     it "doesn't create jobs for non-previewable documents" do
       job_scope = Delayed::Job.where(strand: "canvadocs")
       orig_job_count = job_scope.count
