@@ -31,7 +31,7 @@ describe 'quizzes question creation edge cases' do
     expect(questions[2]).to have_class('short_answer_question')
   end
 
-  it 'should not create an extra, blank, correct answer when you use [answer] as a placeholder', priority: "1", test_id: 197490 do
+  it 'should not create an extra, blank, correct answer when [answer] is used as a placeholder', priority: "1", test_id: 197490 do
     quiz = @last_quiz
 
     # be a multiple dropdown question
@@ -70,8 +70,7 @@ describe 'quizzes question creation edge cases' do
     expect(quiz.quiz_questions.first.question_data['answers'].detect{|a| a['text'] == ''}).to be_nil
   end
 
-  it 'respects character limits on short answer questions', priority: "1", test_id: 197493 do
-    skip('Fragile check for alert box on character length')
+  it 'respects character limits on short answer questions', priority: "2", test_id: 197493 do
     question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
@@ -80,9 +79,46 @@ describe 'quizzes question creation edge cases' do
     answers = question.find_elements(:css, '.form_answers > .answer')
     answer = answers[0].find_element(:css, '.short_answer input')
 
+    trigger_max_characters_alert(answer) do |alert|
+      expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
+    end
+  end
+
+
+  it 'respects character limits on short answer questions- MFIB', priority: "2", test_id: 1160451 do
+    skip('Skipping this as there is already an existing bug CNVS-27665 for this')
+    question = fj('.question_form:visible')
+    click_option('.question_form:visible .question_type', 'Fill In Multiple Blanks')
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+    type_in_tiny '.question_form:visible textarea.question_content', 'Roses are [color1], violets are [color2]'
+
+    f('#question_content_0_ifr').send_keys(:tab)
+    click_option('div.question.selectable.fill_in_multiple_blanks_question select.blank_id_select', 'color1')
+
+    answers = question.find_elements(:css, '.form_answers > .answer')
+    answer_blank_one = answers[0].find_element(:css, '.short_answer input')
+
+    trigger_max_characters_alert(answer_blank_one) do |alert|
+      expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
+    end
+
+    click_option('div.question.selectable.fill_in_multiple_blanks_question select.blank_id_select', 'color2')
+
+    answers = question.find_elements(:css, '.form_answers > .answer')
+    answer2 = answers[2].find_element(:css, '.short_answer input')
+
+    trigger_max_characters_alert(answer2) do |alert|
+      expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
+    end
+  end
+
+  #  This is a function written to capture common code used
+  #  in MFIB and FIB case for checking number of characters are <80 in answers
+  def trigger_max_characters_alert(web_element)
+
     short_answer_field = lambda do
-      replace_content(answer, 'a'*100)
-      driver.execute_script(%{$('.short_answer input:focus').blur();}) unless alert_present?
+      replace_content(web_element, 'a' * 100)
+      web_element.send_keys(:tab)
     end
 
     keep_trying_until do
@@ -90,9 +126,10 @@ describe 'quizzes question creation edge cases' do
       alert_present?
     end
     alert = driver.switch_to.alert
-    expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
-    alert.dismiss
+    yield (driver.switch_to.alert)
+    accept_alert
   end
+
 
   it 'should show errors for graded quizzes but not surveys', priority: "1", test_id: 197491 do
     quiz_with_new_questions
