@@ -112,6 +112,7 @@ module ConferencesCommon
     undo_form_default_invite_all_users
 
     users_to_invite = opts.fetch(:users_to_invite, possible_conference_attendees)
+    wait_for_ajaximations
     users_to_invite.each(&:click)
 
     # exclude one user
