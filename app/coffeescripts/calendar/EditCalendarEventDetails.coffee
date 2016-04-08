@@ -84,6 +84,8 @@ define [
 
       # override parsed input with user input (for 'More Options' only)
       data.start_date = @$form.find('input[name=date]').val()
+      if data.start_date
+        data.start_date = $.unfudgeDateForProfileTimezone(data.start_date).toISOString()
       data.start_time = @$form.find('input[name=start_time]').val()
       data.end_time = @$form.find('input[name=end_time]').val()
 
