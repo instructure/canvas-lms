@@ -11,8 +11,9 @@ module RuboCop
         METHODS = [:context, :describe].freeze
 
         def on_send(node)
-          return unless top_level_describe?(node)
+          return unless in_spec_dir?
           return if named_as_spec?
+          return unless top_level_describe?(node)
           add_offense node, :expression, MSG
         end
 

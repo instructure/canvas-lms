@@ -16,7 +16,7 @@ module RuboCop
         private
 
         def top_level_spec_def?(node)
-          return false unless file_path =~ SPEC_DIR_REGEX
+          return false unless in_spec_dir?
           return false unless node.def_type?
           return false if node.ancestors.any? do |ancestor|
             ancestor.module_type? || ancestor.class_type? ||
