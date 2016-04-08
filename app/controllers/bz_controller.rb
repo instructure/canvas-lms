@@ -112,6 +112,6 @@ class BzController < ApplicationController
       user.destroy!
     end
     render :nothing => true
-
+  end
 
 end

@@ -5,7 +5,8 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       if(name && name.length) {
         name = name.replace(/</g, '&lt;');
         name = name.replace(/"/g, '&quot;');
-        ed.selection.setContent('<textarea data-bz-retained="'+name+'"></textarea>');
+        //ed.selection.setContent('<textarea data-bz-retained="'+name+'"></textarea>');
+        ed.selection.setContent('<input type="checkbox" data-bz-retained="'+name+'" />');
       }
     });
     ed.addCommand('bzRetainedFieldView', function() {
