@@ -77,6 +77,7 @@ ja:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "利用出来る形式: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "利用出来る形式: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "受諾されました: %{user}, %{role_type}, コース, %{course}"
+  access_token_3be22221: "アクセス トークン"
   access_token_is_valid_until_d2f048cf: "アクセス トークンの有効期限は"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "アクセス トークンを使用すると、ご自分に代わって他のアプリケーションが API コールを発行できるようにすることが可能です。また、アクセス トークンを生成して、*Canvas のオープン API を使用* することで、独自の統合を策定することもできます。"
   accordion_section_1_7888782d: アコーディオンセクション1
@@ -610,6 +611,11 @@ ja:
       delete_button: "%{user} を削除"
       page_title: 削除の確認
       title: "確認: %{user} を %{account} から削除"
+    consortium_user_search: 
+      find_user_by: ログイン/電子メールでユーザを検索
+      find_user_by_label: ログイン/電子メール
+    consortium_users: 
+      user_search_label: ユーザの検索
     course: 
       course_unpublished_title: このコースはまだ公開されていません
       course_unpublished_tooltip: 未公開
@@ -1266,6 +1272,7 @@ ja:
   activity_by_date_878c5b49: 日付別のアクティビティ
   add_2nd_review_ea988088: 2番目の評価を追加
   add_8523c19b: 追加
+  add_a_course_b72b18d7: コースの追加
   add_a_new_announcement_878b717f: 新しいアナウンスの追加
   add_a_new_course_4a041207: 新しいコースの追加
   add_a_new_user_c440d053: 新しいユーザーの追加
@@ -1539,6 +1546,8 @@ ja:
         suspended: 教育機関のアカウントが一時停止されました
     wiki_front_page_default_content_course: "新しいコースの Wiki へようこそ!"
     wiki_front_page_default_content_group: "新しいグループの Wiki へようこそ!"
+  application_id_2aa1640f: "アプリケーション ID"
+  application_secret_e6803c7e: "アプリケーション シークレット"
   apply_781a2546: 適用
   apply_changes_b1dffc70: 変更を適用
   applying_new_styles_to_subaccounts_e8aeeef2: サブアカウントに新しいスタイルを適用
@@ -1576,7 +1585,9 @@ ja:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: このプロファイルの写真をレポートしてもよろしいですか？
   arrange_by_34a545de: 以下によって手配
   arrange_columns_by_assignment_group_33acdf03: 課題グループで列を並べ替え
+  arrange_columns_by_assignment_group_59bbddd0: 課題グループで列を並べ替え
   arrange_columns_by_due_date_888f2551: 期日で列を並べ替え
+  arrange_columns_by_due_date_f74f9e2d: 期日で列を並べ替え
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: このフィールドに入力すると、結果のリストが自動的に更新されます。
   assessment_by_name_7b879a2c: "アセスメント担当者: %{name}"
@@ -2287,6 +2298,7 @@ ja:
     corrupted: 詳細なし
     login: ログイン
     logout: ログアウト
+  authentication_with_provider_was_successful_but_no_6a194137: " %{provider} との認証に成功しましたが、CanvasへのユニークIDは取得できませんでした。"
   authorize_e3f25bb4: 認証する
   available_8606e40c: 使用可能
   available_after_unlock_at_b5682224: "%{unlock_at} 後に利用可能"
@@ -2342,6 +2354,7 @@ ja:
     recording_setting_enabled_description: この会議は録音可能です
   blackboard: 
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
+  blocked_by_running_migration_d8a57cb7: 移行の実行でブロックされました
   blue_daf8fea9: ブルー
   body_shadow_d36e8c2e: ボディーシャドー
   bookmark_service: 
@@ -2958,6 +2971,11 @@ ja:
   collaboration_creation_failed_95ff831f: 共同作業の作成に失敗しました
   collaboration_was_deleted_9cf9934b: 共同作業が削除されました
   collaborations: 
+    auth_google_drive: 
+      google: 
+        drive: 
+          upgrade: 
+            description: "この共同作業にアクセスするには、Google ドライブ アカウントへのアクセスを Canvas に許可する必要があります"
     collaboration: 
       delete: この共同作業を削除してもよろしいですか?
       links: 
@@ -2968,6 +2986,8 @@ ja:
           other: "*%{count}* 人の参加者"
       titles: 
         collaboration: 共同作業
+    collaboration_footer: 
+      started_by: "開始した人: *%{user}*、開始日時: %{at}"
     collaborator_picker: 
       labels: 
         available_groups: 利用できるグループ
@@ -2979,6 +2999,9 @@ ja:
         people: メンバー
         remove_all: すべて削除
       member_instructions: 共同作業者を追加するには、左側の列でユーザまたはグループをクリックまたはタップしてください。
+    delete_button: 
+      links: 
+        delete: この共同作業を削除
     edit: 
       buttons: 
         cancel: キャンセル
@@ -2986,6 +3009,9 @@ ja:
       labels: 
         description: "説明:"
         title: 共同作業のタイトル
+    edit_button: 
+      links: 
+        edit: この共同作業を編集
     errors: 
       cannot_load_collaboration: 共同作業を読み込めません
       create_failed: 共同作業の作成に失敗しました
@@ -3146,6 +3172,7 @@ ja:
   complete_icon_7455be93: アイコンを完了する
   complete_one_item_90e5fb03: 1つのアイテムを完了する
   completed_19711ce7: 完了
+  completed_9b809e44: 完了
   completed_icon_521596e4: 完了したアイコン
   concluded_conferences_cdbe53f9: 終了した会議
   concluded_courses_94782e21: 完了したコース
@@ -3955,6 +3982,7 @@ ja:
       reply_all: すべてに返信
     message_form_dialog: 
       body: 本文
+      comboboxInstructions: "宛先: (選択した受信者にタイプを開始します。下矢印を押して、結果をナビゲートしてください。受け入れ可能なオプションが見つからない場合は、他の選択肢を入力できます。)"
       headings: 
         new_message: 新しいメッセージ
       inbox_actions: 
@@ -4470,13 +4498,13 @@ ja:
         status_link: インポートの状況
         text: "1 つ以上のアイテムを現在インポート中です。これらのアイテムは、利用可能になった後、以下のコースに表示されます。"
     index: 
-      browse_more_courses: その他のコースを参照
+      browse_more_courses: さらにコースを閲覧する
       headings: 
         future_enrollments: 将来の登録
-        my_courses: "マイ コース"
+        my_courses: すべてのコース
         my_groups: "マイ グループ"
         past_enrollments: 過去の登録
-      start_new_course: 新しいコースの開始
+      start_new_course: コース
       titles: 
         courses: コース
         rss: 
@@ -4982,6 +5010,7 @@ ja:
       student: 
         count: 不正解の受講生数
         ratio: 受講生の不正解率
+  current_367624e9: 現在
   current_courses_d5287d50: 現在のコース
   current_grading_standard_for_this_assignment_64c5375e: この課題の現在の採点標準
   current_mastery_score_score_out_of_mastery_points_fedd343f: "現在の熟達スコア: %{mastery_points}のうちの%{score} "
@@ -5658,6 +5687,7 @@ ja:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       学科のコースに登録しているすべての受講生における、
       コース内での現在の成績の分布。
+  district_id_6f408184: 地区のID
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "%{num_minutes}分の同等のスロットに分割。 *Go*"
   domain_3b54c511: ドメイン
   domain_is_required_1d4c8b25: ドメインは必須項目です
@@ -5851,6 +5881,7 @@ ja:
   end_date_cannot_be_before_start_date_eb62ed6d: 終了日は、開始日の前にすることはできません
   end_date_e0093ed7: 終了日
   ending_date_e1ea13a4: 終了日
+  enrolled_as_272da3b9: 登録の役割タイプ
   enrollment: 
     default_course_name: コース
     default_email: 電子メールなし
@@ -5893,6 +5924,9 @@ ja:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "ユーザのルート アカウント ドメインを置き換えるには、\"{{ACCOUNT_DOMAIN}}\" を入力します"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "ユーザの一意の Canvas ID を置き換えるには、\"{{CANVAS_USER_ID}}\" を入力します"
   enter_or_find_an_external_tool_url_6aebbd0d: "外部ツールの URLを入力、または検索"
+  enter_the_access_token_for_your_organization_from__cc77493d: |-
+      *eduappcenter.com*から、あなたの組織にアクセストークンを入力しでください。一度適用されると、EduAppCenter 内であなたの組織が所持する
+      アプリのみが承認されたことが、External Appsページに表記されます。どのように**アクセストークンを作成**するかを学びましょう。
   enter_your_question_and_multiple_answers_31370054: 質問と複数の解答を入力
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "問題を入力し、どの部分を空白にするか指定します。受講生は、それぞれの空白箇所にあるテキスト ボックスに正解を入力しなければなりません。"
   enter_your_question_specifying_where_each_dropdown_b428a9ff: 問題を入力し、どの部分をドロップダウンにするかを指定します。次に、それぞれのドロップダウンに対して考えられる答えを定義します。
@@ -6399,6 +6433,7 @@ ja:
   fair_score_554e2558: 公正なスコア
   fair_use_bee47d77: 公正な使用
   favicon_6e658914: お気に入りアイコン
+  favorites_c7e0207c: お気に入り
   feature_flags: 
     feature_flag: 
       allow: 許可
@@ -6537,6 +6572,7 @@ ja:
   filled_5d8c39e: 塗りつぶされた
   filter_announcements_by_unread_495eeeb3: 未読のアナウンスのみを表示
   filter_by_name_34cbe139: 名前でフィルタ
+  filter_by_student_name_or_secondary_id_83dc524f: "受講生名またはセカンダリ ID でフィルタする"
   filter_discussions_by_assignments_757924ed: ディスカッションを課題でフィルタ
   filter_discussions_by_unread_6c48322: 未読のディスカッションのみを表示
   filter_e3398407: フィルタ
@@ -6815,6 +6851,7 @@ ja:
       switch_to_percent: パーセントに切り替え
       switch_to_points: 点数に切り替え
     ungraded: 採点に考慮されない
+  gradebook_1620a0aa: 成績表
   gradebook_csvs: 
     grades_filename: 成績
   gradebook_performance_764d8b3d: 成績表の成績
@@ -6996,7 +7033,7 @@ ja:
     out_of_final: "最終評価の %{weight}"
     out_of_points_possible: "配点: %{points_possible}"
     react_gradebook: 
-      accessibility_warning: "警告: 成績表のグリッド ビューにはアクセスできません。代わりにここをクリックして、個別ビューを使用してください。"
+      accessibility_warning: "警告: アクセシビリティを高めるには、ここをクリックして、個人の成績表を表示を使用してください。"
       download_scores: エクスポート
       export_current_gradebook: 現在
       filter_by_student: "受講生名またはセカンダリ ID でフィルタする"
@@ -7007,6 +7044,7 @@ ja:
       publish_to_sis: "成績表を SIS に公開"
       set_group_weights: グループの重み付けの設定
       show_concluded_enrollments: 完了した登録の表示
+      show_inactive_enrollments: 非アクティブの登録を表示
       view_grading_history: 採点履歴の表示
     screenreader: 
       page_titles: "成績表: 個別ビュー"
@@ -7699,6 +7737,8 @@ ja:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 有効である場合、必須条件の１つを満たした際、モジュールに完了と表示する選択ができます。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 有効にした場合、LTI起動中にクエリーパラメーターは、ポストボディーにはコピーされません。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "有効な場合、ユーザは LTI 2 ツールを設定できます。"
+  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: (ユーザが選択されていない場合は、すべてのアカウントのユーザに送信されます)
+  if_none_are_selected_send_to_everyone_in_the_entir_21119709: (ユーザが選択されていない場合は、すべてのサブアカウントのユーザに送信されます)
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "ログインができない原因となる設定を設定した場合、%{url}で通常のCanvasログインに直接アクセスすることができます。"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 今すぐ使用権を選択しない場合、このファイルはアップロード後に未公開になります。
@@ -7761,6 +7801,7 @@ ja:
     title_for_topics_category: "%{category} のトピック"
     warnings: 
       truncated_wiki_title: "次の Wiki ページのタイトルは切り詰められました: %{title}"
+  importing_course_content_into_the_same_course_will_b09c69e: 同じコースにコースのコンテンツをインポートすると、コンテンツを最初に複製し、繰り返した場合、その重複を上書きします。
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: それが利用可能である場合には、CanvasのリッチコンテンツサービスからRCEとwikiサイドバーをロードします
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: それが利用可能である場合には、CanvasのリッチコンテンツサービスからRCEをロードします
   in_order_to_complete_the_process_you_will_be_redir_83376e10: プロセスを完了するために、あなたの子供の認証情報でログインする必要があるログインページに、リダイレクトされます。
@@ -7780,6 +7821,7 @@ ja:
   increase_indent_6af90f7c: インデントを増やす
   incremental_update_successfully_generated_against__db3f3f06: 増分更新が正常に以前のSISインポートに対して行われました。
   indigo_2035fc55: インディゴ
+  individual_view_81c2f124: 個別ビュー
   info: 
     old_styleguide: 
       create_collection: コレクションを作成する
@@ -7877,6 +7919,7 @@ ja:
   invite_5b1fcbcd: 招待
   ip_filter_is_not_valid_152a46d8: "IP フィルタは無効です。"
   it_looks_like_your_content_might_not_load_you_can__dfb85860: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
+  it_took_too_long_to_login_please_try_again_c1ed2e28: ログインに時間がかかり過ぎです。もう一度やり直してください
   item_complete_d334fd43: (完了した項目)
   item_incomplete_d6a16040: (完了していない項目)
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} は現在サポートされていません"
@@ -8006,6 +8049,7 @@ ja:
       view_all_or_customize: すべて表示またはカスタマイズ
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
+  learning_mastery_5fc34276: 学習の達成度
   learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
   learning_outcome: 
     no_comment: コメントなし
@@ -8281,6 +8325,7 @@ ja:
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "このコースを一般公開する (受講生データは非公開のままです)"
   malformed_csv_aaa4b7f2: "不正な形式の CSV"
   manage_access_bd923d8d: アクセスの管理
+  manage_app_list_994cc26c: アプリリストを管理する
   manage_avatars: 
     errors: 
       update_failed: 更新に失敗しました。もう一度やり直してください
@@ -8338,7 +8383,7 @@ ja:
       save_failed: 保存が失敗したようです。このポップアップを閉じて、もう一度試してください。
       save_failed_try_again: エントリの保存に失敗しました。もう一度、試してください。
       upload_failed: "アップロードが失敗し、次のエラーが発生しました:"
-    file_size_error: "%{file} のサイズが、許容される最大ファイル サイズ %{max} を超えています。"
+    file_size_error: "%{file}のサイズは、%{max} MB より大きなものが可能なサイズとなります。"
     file_type_error: "%{file} は、許容される %{type} ファイルではありません。"
     links: 
       minimize_embedded_kaltura_content: 埋め込みコンテンツを最小化する
@@ -10336,6 +10381,7 @@ ja:
   move_to_front_bf6f0194: 先頭に移動
   moving_a4d552df: 移動しています...
   multi_factor_authentication_configured_865b1bde: マルチファクタ認証が設定されました
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "複数のCanvasのアカウントは、Clever District %{district_id}に関連しています。"
   multiple_due_dates_6b0d75c6: 複数の期日
   multiple_modules_930713d4: 複数のモジュール
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10405,6 +10451,7 @@ ja:
   next_message_780bcf24: 次のメッセージ
   next_module_item_9bb8a222: 次のモジュール/アイテム
   next_steps_ce0f0d0c: 次の手順
+  nickname_1e6da3ad: ニックネーム
   nickname_7df95b09: "ニックネーム:"
   no_assignment_name_adbb215b: 課題名なし
   no_broken_links_found_38d951e3: リンク切れは見つかりません
@@ -10449,6 +10496,8 @@ ja:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "注: コースの開始日や終了日から外れているアイテムがあります"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "注: 受講生が未採点の課題の作業内容を提出しています。ここで成績を投稿する場合は、直近の提出物を採点してから受講生のスコアを再投稿する必要があります。"
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "注意: サブアカウントのテーマは、このプレビュー中はアクティブではありません。"
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Eメールは常に、Microsoft のユーザーのプロファイルに取り込まれるとは限りらないことに注意してください。OIDは、個人のマイクロソフトアカウントに取り込まれません。　"
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: いくつかの属性は、Cleverのすめてのユーザーを取り込むとは限らないことに注意してください。
   note_this_login_s_account_uses_delegated_authentic_89227914: "注: このログイン アカウントは委任された認証を使用しますが、代替の Canvas パスワード認証も許可しています。このフォームのパスワード フィールドは、委任された認証*ではなく*、代替の Canvas パスワードを上書きします。"
   notes_c42e0fd5: 注意
   notes_for_name_2eefac11: "%{name}へのメモ"
@@ -11116,6 +11165,12 @@ ja:
     catalog_provisioner: 
       description: "CanvasのCatalog アカウントのプロビジョナー"
       name: "Catalog プロビジョナー"
+    clever: 
+      description: Cleverログイン
+    clever_settings: 
+      labels: 
+        client_id: "クライアント ID"
+        client_secret: "クライアント シークレット"
     crocodoc: 
       description: "文書プレビュー オプションとして Crocodoc を有効にする"
       name: Crocodoc
@@ -11337,6 +11392,15 @@ ja:
       labels: 
         password: 認証用パスワード
         username: 認証用ユーザ名
+    microsoft: 
+      description: "Microsoft ログイン"
+    microsoft_settings: 
+      description: " [Microsoftの新しいアプリ](%{ms_app_url})を登録する必要があります。\n\
+          認証されたコールバックURIとして、%{callback_url} を設定する必要があります。\n\
+          アプリケーションを保存後、アプリエーションIDとシークレットをメモし、それらをここに入力してください。"
+      labels: 
+        application_id: "アプリケーション ID"
+        application_secret: "アプリケーション シークレット"
     notices: 
       settings_updated: プラグインの設定は正常に更新されました。
     panda_pub_settings: 
@@ -11874,6 +11938,7 @@ ja:
       publishing: 公開しています...
       unpublish: 未公開
       unpublishing: 公開を中止しています...
+  publish_grades_to_sis_51402d46: "成績表を SIS に公開"
   publish_icon_component: 
     publish: 公開
     publish_click: 公開されています。クリックすると未公開にします
@@ -13387,6 +13452,8 @@ ja:
   reply_to_main_discussion_29823888: "メイン ディスカッションに返信"
   reply_to_topic_12412b0f: トピックへの返信
   require_usage_rights_for_uploaded_files_4507865b: アップロードされたファイルの使用権を要求
+  requirement_f5b75da1: 要件
+  requirement_subject_7cfac6c8: 必須の件名
   reregister_9ab95a57: 再登録
   reregister_toolname_3dde0bfc: "%{toolName}を再登録する"
   reserved_f247b60b: 予約済み
@@ -13946,6 +14013,7 @@ ja:
   send_a_message_to_the_teacher_1ae115b6: この講師にメッセージを送る
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "カスタムフィールドを送信 (Canvas zendeskを使用しない限りチェックはしないでください)"
   send_e3bd0ed0: 送信
+  send_only_to_the_following_types_of_users_d8465c11: "次のタイプのユーザにのみ送信:"
   send_this_announcement_to_unenrolled_users_4ea549d7: 未登録のユーザーにこのアナウンスを送る
   send_this_announcement_to_users_with_the_account_r_bd69c809: "%{role}のアカウントの役割を持つユーザーにこのアナウンスを送る"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "%{role}のコースの役割を持つユーザーにこのアナウンスを送る"
@@ -13969,6 +14037,7 @@ ja:
     overwrite: 既に入力されている成績を上書き
     set_grades_button: 既定の成績の設定
     set_grades_button_loading: 成績を設定しています...
+  set_group_weights_fd41c1f: グループの重み付けの設定
   settings: 
     recaptcha_settings: 
       instructions: "ReCAPTCHA プラグインを使用する前に、[ReCAPTCHA でアカウントを\n\
@@ -14068,14 +14137,16 @@ ja:
         download_message_intro: 受講生の提出物を収集しています。
         download_submissions: すべての提出物のダウンロード
     current_enrollment: 
-      enrolled_as_designer: 設計者として参加登録済み
-      enrolled_as_observer: オブザーバとして参加登録済み
-      enrolled_as_student: 受講生として参加登録済み
-      enrolled_as_ta: "TA として参加登録済み"
-      enrolled_as_teacher: 講師として参加登録済み
+      enrolled_as_designer: 設計者
+      enrolled_as_observer: オブザーバ
+      enrolled_as_student: 受講生
+      enrolled_as_ta: TA
+      enrolled_as_teacher: 講師
       favorited_tooltip: "クリックしてコース メニューから削除します。"
       nonfavorited_tooltip: "クリックしてコース メニューに追加します。"
-      unpublished_course: 未公開
+      published_course: はい
+      published_course_tooltip: このコースは公開されています。
+      unpublished_course: いいえ
       unpublished_course_tooltip: "このコースは公開されていません。受講生がアクセスするには、コース インストラクタに連絡してください。"
     custom_search_results: 
       links: 
@@ -14671,12 +14742,16 @@ ja:
   short_name_ad9bf84f: 省略名
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "レポーティングユーザのCanvas IDを自明する必要があります。"
   show_and_hide_courses_menu_9e09d1d0: コースメニューを表示、非表示にします
+  show_attendance_columns_4d160e16: 出席者列の表示
   show_by_date_e3967761: 日付ごとに表示
   show_by_type_c5d61732: タイプごとに表示
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 件名が一行に収まらない場合、複数の行の上の月の表示にカレンダーのイベントが表示されます。
+  show_concluded_enrollments_6a05544c: 完了した登録の表示
   show_correct_answers_at_a5475aa3: 正解を表示
   show_current_grade_5bf4e0d9: 現在の成績を表示
   show_dashcard_view_76078ecb: dashcard表示を示す
   show_final_grade_a95e14dc: 最終成績を表示
+  show_inactive_enrollments_8f4c4824: 非アクティブの登録を表示
   show_links_to_unpublished_content_30c0450d: 非公開のコンテンツのリンクを表示
   show_lti_2_configuration_ui_94ce35a9: "LTI 2 設定 UI を表示"
   show_me_76823679: 表示
@@ -15154,6 +15229,8 @@ ja:
   teachers_52e2423f: 講師
   teal_f729a294: ティール
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: Canvasでのイベントを、いつ、どのように通知してほしいかを教えてください。
+  tenant_d2a41f78: テナント
+  term_e1c1d390: 期間
   terms: 
     index: 
       date: 
@@ -15248,6 +15325,11 @@ ja:
       
       今後ともよろしくお願いいたします。
        Canvas サポート
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      "%{subject}" の件名で送信したメッセージは、送信されませんでした。このメールからCanvasメッセージに返信するには、最初にCanvasプロファイルの通信チャンネルを確認する必要があります。プロファイルに移動し、このメールアドレス[ https://community.canvaslms.com/docs/DOC-2281 をご覧ください]に確認メールを再送信してください。また、Canvas Inbox [https://community.canvaslms.com/docs/DOC-2670 をご覧ください]を通じ、この人物に連絡することができます。
+      
+      宜しくお願いします。
+      Canvasサポート
   the_module_item_is_locked_27fe420b: "モジュール アイテムはロックされています。"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "ユーザ %{current_user_name} の最近のスコアと結果 %{outcome_name}。"
   the_profile_picture_has_been_reported_d609d6dd: プロファイル写真はレポートされています
@@ -15370,6 +15452,7 @@ ja:
     amsterdam: アムステルダム
     arizona: アリゾナ
     astana: アスタナ
+    asuncion: アスンシオン
     athens: アテネ
     atlantic_time_canada: "大西洋標準時 (カナダ)"
     auckland: オークランド
@@ -15560,7 +15643,9 @@ ja:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "受講生にコースオブザーバー*%{name}* をリンクするためには、彼らをみつけるために受講生の名前を下にタイプし、更新をクリックします。"
   to_minscore_43e5452e: "%{minScore}% まで"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "テーマエディターブランディングをプレビューするには、*High Contrast UIを切る*必要があります。"
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: 特定のClever地区からのユーザーを制限するには、ここに地区のCleverIDを入力してください。
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: 特定のGoogleアプリドメインからのユーザーを背一減するには、ここにドメインを入力してください。
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Azure Active Directoryのユーザーを制限するには、ここにあなたのテナントを入力してください。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
   toggle_dashcard_view_or_recent_activity_stream_1de257: トグルダッシュカードビュー、または最近のアクティビティーストリーム
   toggle_editing_answer_text_as_html_9a93fe6: "回答テキストを HTML として編集するかどうか"
@@ -15589,6 +15674,7 @@ ja:
   tours: 
     quiz_regrade: 
       got_it: わかりました
+  treat_ungraded_as_0_d38c2b41: "未採点を 0 として処理"
   tree_browser: 
     folder_tree_instructions: "上および下矢印キーを使用して、ツリー内を移動できます。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、選択中のアイテムを選択するには Enter キーを押します。"
   turnitin: 
@@ -15611,6 +15697,7 @@ ja:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "うわー！フレンドリーなCatalog開発者に連絡してください。 エラーメッセージ: %{message}"
   unable_to_accept_update_fd53a7e2: 更新を受け入れることができません
   unable_to_dismiss_update_df1e32eb: 解散の更新ができません
+  unable_to_find_clever_district_district_id_61deb1cb: "Clever District %{district_id}は見つかりません"
   unable_to_remove_app_4293cb53: アプリを削除できません
   unarchive_selected_e0c4bd3d: アーカイブ解除が選択されました
   unauthorized: 権限がありません
@@ -15619,6 +15706,7 @@ ja:
   unbookmark_this_question_bank_d87d1a07: この問題バンクのブックマークを登録解除
   unchanged_aca18e02: "[Unchanged]"
   undated_items_toggle_list_visibility_6219e641: "日付のないアイテム: リストの表示/非表示の切り替え"
+  undelivered_message_459916a9: 送信されなかったメッセージ
   undo_a7be8fef: アンドゥーする
   unenrolled_users_e7632d24: 未登録ユーザ
   ungraded_answers_31ef2df7: 未採点の回答
@@ -15839,7 +15927,9 @@ ja:
       notifications: お知らせ
       profile: プロフィール
       settings: 設定
+  user_profile_picture_46bffbc7: "ユーザ プロフィール画像"
   user_s_settings_d65644b4: "%{user} の設定"
+  user_search_results_f5445b8b: ユーザー検索の結果
   user_selected_answer: 選択しました
   user_selected_wrong: "正解は%{correct_answer_text}でした。"
   user_service: 
@@ -16109,6 +16199,8 @@ ja:
       no_courses_message: まだコースが登録されていないので、このページにはあまり内容がありません。コースを作成するか、コースを登録すれば、参加するすべてのクラスの会話が表示されるようになります。
       unpublished_courses_message: "まだ開始していないコースに登録されています。これらのコースが利用可能になった時点で、こちらおよびトップ ナビゲーションにコースについての情報が表示されます。それまでは、ご自由に他のコースにサインアップしたり、プロフィールを設定したりしてください。"
       welcome_to_happiness: "Canvas へようこそ!"
+  users_d1b60cb0: ユーザー
+  users_matching_search_term_c604db9e: "一致するユーザ \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: スクリーンリーダーのユーザーは、これらのキーボードショートカットを使用するために、バーチャルカーソルをオフにすることが必要になる可能性があります
   validate: 
     is_required: このフィールドは必須項目です
@@ -16125,6 +16217,7 @@ ja:
   view_course_analytics_eefe6b2: コース分析の表示
   view_file_8a1c62e5: ファイルを表示
   view_grades_8d3bae6c: 成績を表示
+  view_grading_history_e64bb8fe: 採点履歴の表示
   view_in_speedgrader_773b9d81: "SpeedGrader で表示"
   view_name_app_62a2ad8e: "%{name} アプリを表示"
   view_next_file_a8a4a885: 次のファイルを表示
@@ -16142,6 +16235,7 @@ ja:
   warning_6576b5b8: 警告
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "警告: Firefoxで使用された場合Crocodocには限界があります。コメントは常に保存されるわけではありません。"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "警告: ファイルの移動のアクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
+  warning_for_improved_accessibility_please_click_he_e6472c02: "警告: アクセシビリティを高めるには、ここをクリックして、個人の成績表を表示を使用してください。"
   warning_icon_f64936d7: 警告のアイコン
   warnings: 
     test_install: 
@@ -16157,6 +16251,7 @@ ja:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: 申し訳ありません、ログインエラーが発生しました。あなたの子供の認証情報をご確認の上、再度お試しください。
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "4 文字の確認コードを %{sms_number} にお送りしました。確認コードを下に入力して、この SMS 番号をアクティブ化してください。"
   we_were_unable_to_activate_the_app_578defe7: アプリをアクティブ化できませんでした。
+  we_were_unable_to_add_the_access_token_1f471fe6: アクセストークンを追加できませんでした。
   we_were_unable_to_add_the_app_418877ef: アプリを追加できませんでした。
   we_were_unable_to_deactivate_the_app_5e2632f3: アプリを非アクティブ化できませんでした。
   we_were_unable_to_update_the_app_659f5bc6: アプリを更新できませんでした。
@@ -16351,6 +16446,7 @@ ja:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: このアップグレードを受け入れますか、または却下しますか？
   would_you_like_to_enable_this_app_ccdf735d: このアプリを有効にしますか?
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "受講生がコースを続行できるようにしますか? または、新しい要件が完了するまで、これらのモジュールを再度ロックしますか?"
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: カレンダーの月表示でイベントのタイトルを終了します
   xml_configuration_5ea1b942: "XML 設定"
   yellow_4cf93785: イエロー
   yes_dde87d5: はい
@@ -16426,6 +16522,17 @@ ja:
       を有効にします。有効なOAuthリダイレクトURIとして、 %{callback_url} を設定する必要があります。アプリを保存した後、アプリIDとシークレットをメモし、それらをここに入力します。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       [Googleの開発コンソール](%{google_url})にウェブアプリケーションを作成する必要があります。
+      リダイレクトURIとして、%{callback_url} を追加する必要があります。
+      アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: " [Microsoftの新しいアプリ](%{ms_app_url})を登録する必要があります。\n\
+      認証されたコールバックURIとして、%{callback_url} を設定する必要があります。\n\
+      アプリケーションを保存後、アプリエーションIDとシークレットをメモし、それらをここに入力してください。"
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      [Cleverにアプリを登録](%{clever_url})する必要があります。
+      リダイレクトURIとして、%{callback_url} を追加する必要があります。
+      アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      [Cleverにアプリを登録](%{clever_url})する必要があります。
       リダイレクトURIとして、%{callback_url} を追加する必要があります。
       アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
