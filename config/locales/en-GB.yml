@@ -77,6 +77,7 @@ en-GB:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepted formats: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Accepted: %{user}, %{role_type}, course, %{course}"
+  access_token_3be22221: "Access token"
   access_token_is_valid_until_d2f048cf: "Access token is valid until"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations."
   accordion_section_1_7888782d: "Accordion Section 1"
@@ -612,6 +613,11 @@ en-GB:
       delete_button: "Delete %{user}"
       page_title: "Confirm delete"
       title: "Confirm delete %{user} from %{account}"
+    consortium_user_search: 
+      find_user_by: "Find a user by login/email"
+      find_user_by_label: Login/email
+    consortium_users: 
+      user_search_label: "User search"
     course: 
       course_unpublished_title: "This course hasn't been published yet"
       course_unpublished_tooltip: Unpublished
@@ -1270,6 +1276,7 @@ en-GB:
   activity_by_date_878c5b49: "Activity by Date"
   add_2nd_review_ea988088: "Add 2nd review"
   add_8523c19b: Add
+  add_a_course_b72b18d7: "Add a course"
   add_a_new_announcement_878b717f: "Add a new announcement"
   add_a_new_course_4a041207: "Add a new course"
   add_a_new_user_c440d053: "Add a new user"
@@ -1543,6 +1550,8 @@ en-GB:
         suspended: "Institution suspended"
     wiki_front_page_default_content_course: "Welcome to your new course wiki!"
     wiki_front_page_default_content_group: "Welcome to your new group wiki!"
+  application_id_2aa1640f: "Application ID"
+  application_secret_e6803c7e: "Application secret"
   apply_781a2546: Apply
   apply_changes_b1dffc70: "Apply Changes"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applying new styles to subaccounts"
@@ -1580,7 +1589,9 @@ en-GB:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Are you certain you want to report this profile picture?"
   arrange_by_34a545de: "Arrange by"
   arrange_columns_by_assignment_group_33acdf03: "Arrange Columns by Assignment Group"
+  arrange_columns_by_assignment_group_59bbddd0: "Arrange columns by assignment group"
   arrange_columns_by_due_date_888f2551: "Arrange Columns by Due Date"
+  arrange_columns_by_due_date_f74f9e2d: "Arrange columns by due date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
   assessment_by_name_7b879a2c: "Assessment by %{name}"
@@ -2289,6 +2300,7 @@ en-GB:
     corrupted: "Details not available"
     login: LOGIN
     logout: LOGOUT
+  authentication_with_provider_was_successful_but_no_6a194137: "Authentication with %{provider} was successful, but no unique ID for logging in to Canvas was provided."
   authorize_e3f25bb4: Authorise
   available_8606e40c: Available
   available_after_unlock_at_b5682224: "Available after %{unlock_at}"
@@ -2342,6 +2354,7 @@ en-GB:
     recording_setting_enabled_description: "Enable recording for this conference"
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
+  blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
   blue_daf8fea9: Blue
   body_shadow_d36e8c2e: "Body shadow"
   bookmark_service: 
@@ -2958,6 +2971,11 @@ en-GB:
   collaboration_creation_failed_95ff831f: "Collaboration creation failed"
   collaboration_was_deleted_9cf9934b: "Choose an authentication service"
   collaborations: 
+    auth_google_drive: 
+      google: 
+        drive: 
+          upgrade: 
+            description: "To access this collaboration you must authorise Canvas to access your Google Drive account"
     collaboration: 
       delete: "Are you sure you want to delete this collaboration?"
       links: 
@@ -2968,6 +2986,8 @@ en-GB:
           other: "*%{count}* participants"
       titles: 
         collaboration: Collaboration
+    collaboration_footer: 
+      started_by: "Started by *%{user}*, %{at}"
     collaborator_picker: 
       labels: 
         available_groups: "Available groups"
@@ -2979,6 +2999,9 @@ en-GB:
         people: People
         remove_all: "Remove all"
       member_instructions: "Click or tap a user or group in the left-hand column to add Collaborators."
+    delete_button: 
+      links: 
+        delete: "Delete this collaboration"
     edit: 
       buttons: 
         cancel: Cancel
@@ -2986,6 +3009,9 @@ en-GB:
       labels: 
         description: "Description:"
         title: "Collaboration title"
+    edit_button: 
+      links: 
+        edit: "Edit this collaboration"
     errors: 
       cannot_load_collaboration: "Cannot load collaboration"
       create_failed: "Collaboration creation failed"
@@ -3146,6 +3172,7 @@ en-GB:
   complete_icon_7455be93: "complete icon"
   complete_one_item_90e5fb03: "Complete one item"
   completed_19711ce7: Completed
+  completed_9b809e44: completed
   completed_icon_521596e4: "completed icon"
   concluded_conferences_cdbe53f9: "Concluded conferences"
   concluded_courses_94782e21: "Concluded courses"
@@ -3955,6 +3982,7 @@ en-GB:
       reply_all: "Reply all"
     message_form_dialog: 
       body: Body
+      comboboxInstructions: "To: (Start typing to choose recipients. Press the down arrow to navigate results. If you do not find an acceptable option, you can enter an alternative.)"
       headings: 
         new_message: "New message"
       inbox_actions: 
@@ -4473,10 +4501,10 @@ en-GB:
       browse_more_courses: "Browse more courses"
       headings: 
         future_enrollments: "Future enrolments"
-        my_courses: "My courses"
+        my_courses: "All courses"
         my_groups: "My Groups"
         past_enrollments: "Past enrolments"
-      start_new_course: "Start a new course"
+      start_new_course: Course
       titles: 
         courses: Courses
         rss: 
@@ -4982,6 +5010,7 @@ en-GB:
       student: 
         count: "Wrong student count"
         ratio: "Wrong student ratio"
+  current_367624e9: Current
   current_courses_d5287d50: "Current courses"
   current_grading_standard_for_this_assignment_64c5375e: "Current marking standard for this assignment"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Current Mastery Score: %{score} out of %{mastery_points}"
@@ -5658,6 +5687,7 @@ en-GB:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Distribution of current grades in courses across all students enrolled
               in department courses.
+  district_id_6f408184: "District ID"
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Divide into equal slots of %{num_minutes} minutes. *Go*"
   domain_3b54c511: Domain
   domain_is_required_1d4c8b25: Domainrequired
@@ -5852,6 +5882,7 @@ en-GB:
   end_date_cannot_be_before_start_date_eb62ed6d: "End date cannot be before start date"
   end_date_e0093ed7: "End date"
   ending_date_e1ea13a4: "Ending date"
+  enrolled_as_272da3b9: "Enrolled as"
   enrollment: 
     default_course_name: Course
     default_email: "No email"
@@ -5894,6 +5925,7 @@ en-GB:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "To substitute user's root account domain, enter \"{{ACCOUNT_DOMAIN}}\" "
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "To substitute user's root account domain, enter \"{{CANVAS_USER_ID}}\""
   enter_or_find_an_external_tool_url_6aebbd0d: "Enter or find an external tool URL"
+  enter_the_access_token_for_your_organization_from__cc77493d: "Enter the access token for your organisation from *eduappcenter.com*. Once applied, only apps your organisation has approved in the EduAppCenter will be listed on the External Apps page. Learn how to **generate an access token**."
   enter_your_question_and_multiple_answers_31370054: "Enter your question and multiple answers."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Enter your question specifying where each blank should go. Students must type answers into text boxes at each blank."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown."
@@ -6398,6 +6430,7 @@ en-GB:
   fair_score_554e2558: "Fair score"
   fair_use_bee47d77: "Fair Use"
   favicon_6e658914: Favicon
+  favorites_c7e0207c: Favourites
   feature_flags: 
     feature_flag: 
       allow: Allow
@@ -6536,6 +6569,7 @@ en-GB:
   filled_5d8c39e: Filled
   filter_announcements_by_unread_495eeeb3: "filter announcements by unread"
   filter_by_name_34cbe139: "Filter by name"
+  filter_by_student_name_or_secondary_id_83dc524f: "Filter by student name or secondary ID"
   filter_discussions_by_assignments_757924ed: "filter discussions by assignments"
   filter_discussions_by_unread_6c48322: "filter discussions by unread"
   filter_e3398407: Filter
@@ -6817,6 +6851,7 @@ en-GB:
       switch_to_percent: "Switch to percent"
       switch_to_points: "Switch to points"
     ungraded: "Not factored into grading"
+  gradebook_1620a0aa: Gradebook
   gradebook_csvs: 
     grades_filename: Marks
   gradebook_performance_764d8b3d: "Gradebook Performance"
@@ -6998,7 +7033,7 @@ en-GB:
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
     react_gradebook: 
-      accessibility_warning: "Warning: The Gradebook Grid View is not accessible. Click here to use the Individual View instead."
+      accessibility_warning: "Warning: For improved accessibility, please click here to use the Individual View Gradebook."
       download_scores: Export
       export_current_gradebook: Current
       filter_by_student: "Filter by student name or secondary ID"
@@ -11354,6 +11389,10 @@ en-GB:
       labels: 
         password: "Password for authentication"
         username: "Username for authentication"
+    microsoft_settings: 
+      labels: 
+        application_id: "Application ID"
+        application_secret: "Application secret"
     notices: 
       settings_updated: "Plugin settings successfully updated."
     panda_pub_settings: 
@@ -16159,6 +16198,7 @@ en-GB:
   warning_6576b5b8: warning
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu."
+  warning_for_improved_accessibility_please_click_he_e6472c02: "Warning: For improved accessibility, please click here to use the Individual View Gradebook."
   warning_icon_f64936d7: "warning icon"
   warnings: 
     test_install: 
