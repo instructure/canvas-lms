@@ -85,6 +85,7 @@ ar:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "التنسيقات المقبولة: hex و rgba و rgb و hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "التنسيقات المقبولة: svg و png و jpeg و gif"
   accepted_user_role_type_course_course_2ce91589: "مقبول: %{user}، %{role_type}، مساق، %{course}"
+  access_token_3be22221: "رمز الوصول المميز"
   access_token_is_valid_until_d2f048cf: "رمز الوصول المميز صالح لغاية"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "يمكن استخدام رموز الوصول للسماح للتطبيقات الأخرى بإجراء مكالمات API نيابة عنك. كما يمكنك إنشاء رموز الوصول و*استخدام API المفتوحة لـ Canvas* لمسايرة عمليات التكامل الخاصة بك."
   accordion_section_1_7888782d: "القسم 1 من الأكورديون"
@@ -618,6 +619,11 @@ ar:
       delete_button: "حذف%{user}"
       page_title: "تأكيد الحذف"
       title: "تأكيد حذف %{user} من %{account}"
+    consortium_user_search: 
+      find_user_by: "البحث عن المستخدم حسب اسم الدخول/البريد الإلكتروني"
+      find_user_by_label: "اسم الدخول/البريد الإلكتروني"
+    consortium_users: 
+      user_search_label: "البحث عن مستخدم"
     course: 
       course_unpublished_title: "لم يتم نشر هذا المساق بُعد"
       course_unpublished_tooltip: "غير منشور"
@@ -1297,6 +1303,7 @@ ar:
   activity_by_date_878c5b49: "النشاط حسب التاريخ"
   add_2nd_review_ea988088: "إضافة مراجعة ثانية"
   add_8523c19b: إضافة
+  add_a_course_b72b18d7: "إضافة مساق"
   add_a_new_announcement_878b717f: "إضافة إعلان جديد"
   add_a_new_course_4a041207: "إضافة مساق جديد"
   add_a_new_user_c440d053: "إضافة مستخدم جديد"
@@ -1574,6 +1581,8 @@ ar:
         suspended: "تم إيقاف المعهد مؤقتًا"
     wiki_front_page_default_content_course: "مرحبًا إلى مساق wiki الجديد!"
     wiki_front_page_default_content_group: "مرحبًا إلى مجموعة wiki الجديدة!"
+  application_id_2aa1640f: "معرف التطبيق"
+  application_secret_e6803c7e: "الرمز السري للتطبيق"
   apply_781a2546: تطبيق
   apply_changes_b1dffc70: "تطبيق التغييرات"
   applying_new_styles_to_subaccounts_e8aeeef2: "تطبيق الأنماط الجديدة على الحسابات الفرعية"
@@ -1615,7 +1624,9 @@ ar:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "هل تريد حقاً الإبلاغ عن صورة ملف التعريف هذه؟"
   arrange_by_34a545de: "الترتيب حسب"
   arrange_columns_by_assignment_group_33acdf03: "ترتيب الأعمدة حسب مجموعة المهام"
+  arrange_columns_by_assignment_group_59bbddd0: "ترتيب الأعمدة حسب مجموعة المهام"
   arrange_columns_by_due_date_888f2551: "ترتيب الأعمدة حسب موعد الاستحقاق"
+  arrange_columns_by_due_date_f74f9e2d: "ترتيب الأعمدة حسب موعد الاستحقاق"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "بينما تقوم بالكتابة في هذا الحقل، ستتم تصفية قائمة المجموعات تلقائيًا لتشمل فقط تلك التي تطابق أسماؤها إدخالك."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "سيتم تحديث قائمة النتائج تلقائياً أثناء الكتابة في هذا الحقل."
   assessment_by_name_7b879a2c: "تقييم من قبل %{name}"
@@ -11758,6 +11769,10 @@ ar:
       labels: 
         password: "كلمة مرور المصادقة"
         username: "اسم مستخدم المصادقة"
+    microsoft_settings: 
+      labels: 
+        application_id: "معرف التطبيق"
+        application_secret: "الرمز السري للتطبيق"
     notices: 
       settings_updated: "تم تحديث إعدادات المكون الإضافي بنجاح."
     panda_pub_settings: 
