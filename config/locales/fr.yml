@@ -8372,7 +8372,7 @@ fr:
       save_failed: "Échec de l’enregistrement. Pour réessayer, fermez cet écran."
       save_failed_try_again: "Échec de l’enregistrement de l’entrée. Veuillez réessayer."
       upload_failed: "Échec du téléchargement avec une erreur :"
-    file_size_error: "La taille du fichier %{file} est supérieure à la limite maximale autorisée, à savoir %{max}."
+    file_size_error: "La taille du fichier %{file} est plus grande que %{max} MB, la taille maximale autorisée."
     file_type_error: "%{file} est un fichier %{type}, et ce type n’est accepté."
     links: 
       minimize_embedded_kaltura_content: "Réduire le contenu incorporé"
@@ -10364,6 +10364,7 @@ fr:
   move_to_front_bf6f0194: "Revenir au début"
   moving_a4d552df: "Déplacement en cours..."
   multi_factor_authentication_configured_865b1bde: "Authentification multifacteur configurée"
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Plusieurs comptes Canvas sont associés avec Clever District %{district_id}"
   multiple_due_dates_6b0d75c6: "Dates d'échéance multiples"
   multiple_modules_930713d4: "Multiples modules"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10478,6 +10479,8 @@ fr:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Remarque : certains éléments sont en dehors des dates de début et/ou de fin du cours."
   note_students_have_submitted_work_for_these_assign_7bc34e28: "REMARQUE : les étudiants ont envoyé des éléments qui n’ont pas été notés pour ces travaux. Si vous publiez les notes maintenant, vous devrez les publier à nouveau après avoir noté leurs derniers envois."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Remarque : les thèmes des sous-comptes ne sont pas actifs dans cet aperçu."
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Veuillez noter que le champ 'courriel' pourrait ne pas être renseigné dans le profil d'utilisateur à Microsoft. Oid ne sera pas renseigné pour les comptes Microsoft personnels."
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Veuillez noter que certains attributs pourraient ne pas être renseignés pour tous les utilisateurs à Clever."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Remarque : ce compte utilise une authentification déléguée, mais il permet l’authentification avec le mot de passe Canvas en dernier recours. Dans ce formulaire, les champs du mot de passe actualisent le mot de passe Canvas de secours, *pas* l’authentification déléguée."
   notes_c42e0fd5: Remarques
   notes_for_name_2eefac11: "Notes pour %{name}"
@@ -11147,6 +11150,8 @@ fr:
     catalog_provisioner: 
       description: "Fournisseur de comptes de catalogue pour Canvas"
       name: "Fournisseur de catalogues"
+    clever: 
+      description: "Connexion à Clever"
     clever_settings: 
       labels: 
         client_id: "Identifiant du client"
@@ -11375,6 +11380,10 @@ fr:
     microsoft: 
       description: "Connexion Microsoft"
     microsoft_settings: 
+      description: |-
+          Vous allez devoir enregistrer une [nouvelle application avec Microsoft](%{ms_app_url}).
+          Vous devriez configurer %{callback_url} comme étant l'URL de redirection.
+          Après avoir sauvegardé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
       labels: 
         application_id: "ID de l'application"
         application_secret: "Code secret de l'application"
@@ -11919,6 +11928,7 @@ fr:
       publishing: "Publication en cours..."
       unpublish: "Annuler la publication"
       unpublishing: "Annulation de la publication..."
+  publish_grades_to_sis_51402d46: "Publier les notes sur le SIS"
   publish_icon_component: 
     publish: Publier
     publish_click: "publié, cliquez pour annuler la publication"
@@ -14029,6 +14039,7 @@ fr:
     overwrite: "Remplacer les notes déjà entrées"
     set_grades_button: "Définir la note par défaut"
     set_grades_button_loading: "Configuration des notes..."
+  set_group_weights_fd41c1f: "Définir les pondérations de groupe"
   settings: 
     recaptcha_settings: 
       instructions: |-
@@ -14130,14 +14141,16 @@ fr:
         download_message_intro: "Regroupement en cours de vos envois."
         download_submissions: "Télécharger tous les envois"
     current_enrollment: 
-      enrolled_as_designer: "Inscrit comme concepteur"
-      enrolled_as_observer: "Inscrit comme observateur"
-      enrolled_as_student: "Inscrit comme étudiant"
-      enrolled_as_ta: "Inscrit comme AE"
-      enrolled_as_teacher: "Inscrit comme enseignant"
+      enrolled_as_designer: Concepteur
+      enrolled_as_observer: Observateur
+      enrolled_as_student: Étudiant
+      enrolled_as_ta: AE
+      enrolled_as_teacher: Enseignant
       favorited_tooltip: "Cliquez pour retirer cet élément du menu des cours."
       nonfavorited_tooltip: "Cliquez pour ajouter cet élément dans le menu des cours."
-      unpublished_course: "non publié"
+      published_course: Oui
+      published_course_tooltip: "Ce cours a été publié."
+      unpublished_course: Non
       unpublished_course_tooltip: "Ce cours n’a pas été publié. Les étudiants doivent contacter l’instructeur concerné pour y accéder."
     custom_search_results: 
       links: 
@@ -14732,8 +14745,11 @@ fr:
   short_name_ad9bf84f: "nom abrégé"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "devrait être évident, L'ID canvas de l'utilisateur effectuant une observation"
   show_and_hide_courses_menu_9e09d1d0: "Afficher et masquer le menu des cours"
+  show_attendance_columns_4d160e16: "Afficher les colonnes de présence"
   show_by_date_e3967761: "Afficher par date"
   show_by_type_c5d61732: "Afficher par type"
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Afficher les événements du calendrier dans la vue mensuelle sur plusieurs lignes si leurs titres ne tenaient pas sur une seule ligne."
+  show_concluded_enrollments_6a05544c: "Afficher les inscriptions clôturées"
   show_correct_answers_at_a5475aa3: "Montrer les réponses correctes à"
   show_current_grade_5bf4e0d9: "Afficher la note actuelle"
   show_dashcard_view_76078ecb: "Afficher la vue dashcard"
@@ -15217,6 +15233,8 @@ fr:
   teachers_52e2423f: Enseignants
   teal_f729a294: Sarcelle
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Dîtes-nous quand et comment vous souhaitez être informé des événements dans Canvas."
+  tenant_d2a41f78: Preneur
+  term_e1c1d390: Trimestre
   terms: 
     index: 
       date: 
@@ -15309,6 +15327,11 @@ fr:
       
               Merci,
               L’assistance technique Canvas
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      Le message que vous avez envoyé avec le sujet "%{subject}" n'a pu être délivré. Pour répondre aux messages Canvas depuis cette adresse courriel, il doit tout d'abord  être un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse [Voir https://community.canvaslms.com/docs/DOC-2281]. Vous pouvez aussi contacter cette personne via la boîte de réception [Voir https://community.canvaslms.com/docs/DOC-2670].
+      
+      En vous remerciant,
+      L'équipe de support de Canvas
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et le résultat %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "L'image du profile a été signalée"
@@ -15368,6 +15391,7 @@ fr:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Cette image apparait comme un filigrane de fond sur votre page. Les formats acceptés : PNG, SVG, GIF, JPEG"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Il s’agit d’une liste d’URL de confiance séparées par des virgules. La confiance accordée à n’importe quelle URL de cette liste rend inutile le jeton CSRF lors de la connexion à Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Ce cours est clos, aussi seules les inscriptions closes sont disponibles."
+  this_is_a_message_for_name_7abf1e39: "C'est un message adressé à *%{name}*"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Ceci est la note actuellement choisie pour cette étudiant."
   this_is_the_default_email_address_f3c421fb: "Ceci est l'adresse courriel par défaut"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Cet élément réapparaîtra lorsqu'une nouvelle soumission sera effectuée."
@@ -15431,6 +15455,7 @@ fr:
     amsterdam: Amsterdam
     arizona: Arizona
     astana: Astana
+    asuncion: Asuncion
     athens: Athènes
     atlantic_time_canada: "Heure de l’Atlantique (Canada)"
     auckland: Auckland
@@ -15621,7 +15646,9 @@ fr:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Pour lier l'observateur du cours *%{name}* à un étudiant, commencez par indiquer le nom de l'étudiant ci-dessous, pour les trouver, puis cliquez 'Mettre à jour'."
   to_minscore_43e5452e: "à %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Pour prévisualiser la démarque de l'éditeur de thèmes, vous allez devoir *éteindre l'IU à contraste élevé*."
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "Pour restreindre aux utilisateurs d'un district Clever spécifique, veuillez saisir l'identifiant Clever du district ici. Ceci est requis pour que la connexion instantanée à Clever fonctionne dans un environnement à plusieurs preneurs."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Pour restreindre un domaine Google Apps spécifique aux utilisateurs, veuillez préciser ce domaine ici."
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Pour restreindre aux utilisateurs de votre annuaire actif Azure, Veuillez saisir votre preneur ici. "
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Pour voir les travaux, assurez-vous que la vue *Agenda* est active."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Basculer sur la vue du tableau de bord ou sur le flux d'activité récente"
   toggle_editing_answer_text_as_html_9a93fe6: "Passer l'édition du texte de réponse en mode HTML"
@@ -15650,6 +15677,7 @@ fr:
   tours: 
     quiz_regrade: 
       got_it: "D’accord, c’est noté"
+  treat_ungraded_as_0_d38c2b41: "Considérer ceux non notés comme 0"
   tree_browser: 
     folder_tree_instructions: "Utilisez les flèches vers le bas et vers le haut pour vous déplacer dans l’arborescence. La flèche droite permet de développer les dossiers, la flèche gauche de les réduire et la touche Entrée de valider la sélection."
   turnitin: 
@@ -15672,6 +15700,7 @@ fr:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oups ! Contactez votre sympathique développeur de catalogue. Message d'erreur : %{message}"
   unable_to_accept_update_fd53a7e2: "Impossible d'accepter le mise à jour"
   unable_to_dismiss_update_df1e32eb: "Impossible d'ignorer la mise à jour"
+  unable_to_find_clever_district_district_id_61deb1cb: "Impossible de trouver le Clever District %{district_id}"
   unable_to_remove_app_4293cb53: "Impossible de supprimer l’application"
   unarchive_selected_e0c4bd3d: "Désarchiver la sélection"
   unauthorized: "non autorisé"
@@ -15680,6 +15709,7 @@ fr:
   unbookmark_this_question_bank_d87d1a07: "Supprimer le signet de cette banque de questions"
   unchanged_aca18e02: "[Inchangé]"
   undated_items_toggle_list_visibility_6219e641: "Les éléments non-datés permutent la visibilité de la liste"
+  undelivered_message_459916a9: "Message non délivré"
   undo_a7be8fef: Annuler
   unenrolled_users_e7632d24: "Utilisateurs désinscrits"
   ungraded_answers_31ef2df7: "Réponses non notées"
@@ -15899,7 +15929,9 @@ fr:
       notifications: Notifications
       profile: Profil
       settings: Paramètres
+  user_profile_picture_46bffbc7: "Images de profil de l'utilisateur"
   user_s_settings_d65644b4: "Les paramètres de %{user}"
+  user_search_results_f5445b8b: "Résultats de recherche d'utilisateurs"
   user_selected_answer: "Vous avez choisi "
   user_selected_wrong: "La réponse exacte était %{correct_answer_text}."
   user_service: 
@@ -16173,6 +16205,8 @@ fr:
                   et dans la barre de navigation en haut. Entre-temps, vous pouvez vous inscrire
                   à d’autres cours ou définir votre profil.
       welcome_to_happiness: "Bienvenue dans Canvas !"
+  users_d1b60cb0: Utilisateurs
+  users_matching_search_term_c604db9e: "Les utilisateurs correspondant à \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Les utilisateurs de lecteurs d'écran devront peut-être désactiver le curseur virtuel afin de pouvoir utiliser ces raccourcis clavier"
   validate: 
     is_required: "Ce champ est obligatoire."
@@ -16189,6 +16223,7 @@ fr:
   view_course_analytics_eefe6b2: "Voir les analyses du cours"
   view_file_8a1c62e5: "Voir le fichier"
   view_grades_8d3bae6c: "Voir les notes"
+  view_grading_history_e64bb8fe: "Afficher l’historique de notation"
   view_in_speedgrader_773b9d81: "Afficher dans SpeedGrader"
   view_name_app_62a2ad8e: "Voir l’application %{name}"
   view_next_file_a8a4a885: "Visualiser le fichier suivant"
@@ -16222,6 +16257,7 @@ fr:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Nous sommes désolés, une erreur de connexion est survenue, veuillez vérifier les identifiants de votre enfant puis réessayer."
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "Nous avons envoyé un code de confirmation à 4 caractères à ce numéro %{sms_number}. Inscrivez le code ci-dessous pour activer ce numéro SMS."
   we_were_unable_to_activate_the_app_578defe7: "Impossible d’activer l’application."
+  we_were_unable_to_add_the_access_token_1f471fe6: "Nous n’avons pas pu ajouter le jeton d'accès."
   we_were_unable_to_add_the_app_418877ef: "Nous n’avons pas pu ajouter l’application."
   we_were_unable_to_deactivate_the_app_5e2632f3: "Impossible de désactiver l’application."
   we_were_unable_to_update_the_app_659f5bc6: "Nous n’avons pas pu mettre à jour l’application."
@@ -16416,6 +16452,7 @@ fr:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Désirez-vous accepter ou ignorer cette mise à jour ?"
   would_you_like_to_enable_this_app_ccdf735d: "Voulez-vous activer cette application ?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Voulez-vous laisser les étudiants continuer le cours ou préférez-vous verrouiller à nouveau ces modules jusqu’à ce que les nouvelles conditions soient remplies ?"
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: "Envelopper les titres d'événements dans la vue mensuelle du calendrier"
   xml_configuration_5ea1b942: "Configuration XML "
   yellow_4cf93785: Jaune
   yes_dde87d5: Oui
@@ -16494,6 +16531,18 @@ fr:
       Vous allez devoir créer une application en ligne dans la [Console Développeur de Google](%{google_url}).
       Vous devriez ajouter %{callback_url} comme URL de redirection.
       Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Vous allez devoir enregistrer une [nouvelle application avec Microsoft](%{ms_app_url}).
+      Vous devriez configurer %{callback_url} comme étant l'URL de redirection.
+      Après avoir sauvegardé votre application, prenez note de l'ID client et du code secret client, et saisissez-les ici.
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      Vous allez devoir [enregistrer une application sur Clever](%{clever_url}).
+      Vous devriez configurer %{callback_url} comme étant l'URL de redirection.
+      Après avoir créé votre application, prenez note de l'ID client et du code secret client, et saisissez-les ici.
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      Vous allez devoir [enregistrer une application sur Clever](%{clever_url}).
+      Vous devriez configurer %{callback_url} comme étant l'URL de redirection.
+      Après avoir créé votre application, prenez note de l'ID client et du code secret client, et saisissez-les ici.
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       Vous allez devoir [enregistrer une application sur GitHub](%{github_url}).
       Vous devriez configurer %{callback_url} comme URL de redirection autorisée.
