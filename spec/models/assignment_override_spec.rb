@@ -24,12 +24,15 @@ describe AssignmentOverride do
   end
 
   it "should soft-delete" do
-    @override = assignment_override_model
-    @override.stubs(:assignment_override_students).once.returns stub(:destroy_all)
-    @override.expects(:save!).once
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+    
     @override.destroy
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override.workflow_state).to eq 'deleted'
+    expect(AssignmentOverrideStudent.where(:id => @override_student).first).to be_nil
   end
 
   it "should default set_type to adhoc" do

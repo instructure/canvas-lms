@@ -113,7 +113,7 @@ class AssignmentOverride < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
-      self.assignment_override_students.destroy_all
+      self.assignment_override_students.reload.destroy_all
       self.workflow_state = 'deleted'
       self.save!
     end
