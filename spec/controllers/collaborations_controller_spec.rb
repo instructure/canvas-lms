@@ -194,7 +194,8 @@ describe CollaborationsController do
           {
             title: 'my collab',
             text: 'collab description',
-            url: 'http://example.invalid/test'
+            url: 'http://example.invalid/test',
+            confirmUrl: 'http://example.com/confirm/343'
           }
         ]
       end
@@ -210,6 +211,13 @@ describe CollaborationsController do
         expect(collaboration.title).to eq content_items.first[:title]
         expect(collaboration.description).to eq content_items.first[:text]
         expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+      end
+
+      it "callback url should not be nil if provided" do
+        user_session(@teacher)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = ExternalToolCollaboration.last
+        expect(collaboration.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
       end
 
       it "should callback on success" do

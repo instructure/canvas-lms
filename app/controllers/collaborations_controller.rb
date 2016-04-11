@@ -105,8 +105,9 @@ class CollaborationsController < ApplicationController
 
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create)
-    if params['contentItems']
-      @collaboration = collaboration_from_content_item(JSON.parse(params['contentItems']).first)
+    content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
+    if content_item
+      @collaboration = collaboration_from_content_item(content_item)
       users = []
       group_ids = []
     else
@@ -119,13 +120,13 @@ class CollaborationsController < ApplicationController
     @collaboration.context = @context
     respond_to do |format|
       if @collaboration.save
-        Lti::ContentItemUtil.new(params['contentItems'].first).success_callback if params['contentItems']
+        Lti::ContentItemUtil.new(content_item).success_callback if content_item
         # After saved, update the members
         @collaboration.update_members(users, group_ids)
         format.html { redirect_to @collaboration.url }
         format.json { render :json => @collaboration.as_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
       else
-        Lti::ContentItemUtil.new(params['contentItems'].first).failure_callback if params['contentItems']
+        Lti::ContentItemUtil.new(content_item).failure_callback if content_item
         flash[:error] = t 'errors.create_failed', "Collaboration creation failed"
         format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
         format.json { render :json => @collaboration.errors, :status => :bad_request }
