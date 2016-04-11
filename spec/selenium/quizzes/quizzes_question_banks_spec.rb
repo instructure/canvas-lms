@@ -1,6 +1,5 @@
 require_relative '../common'
 require_relative '../helpers/quizzes_common'
-require_relative '../helpers/testrail_report'
 
 describe 'quizzes question banks' do
   include_context "in-process server selenium tests"

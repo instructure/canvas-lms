@@ -1,6 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
-
 
 describe "account admin question bank" do
   include_context "in-process server selenium tests"
@@ -93,11 +91,9 @@ describe "account admin question bank" do
   end
 
   it "should add bank and multiple choice question" do
-    report_test(71462) do
-      question_bank2 = create_question_bank('question bank 2')
-      get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
-      add_multiple_choice_question
-    end
+    question_bank2 = create_question_bank('question bank 2')
+    get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
+    add_multiple_choice_question
   end
 
   it "should add a multiple choice question" do
