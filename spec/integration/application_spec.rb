@@ -90,15 +90,12 @@ describe "site-wide" do
   context "user headers" do
     before(:each) do
       course_with_teacher
-      @teacher = @user
 
       student_in_course
-      @student = @user
       user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
       @student_pseudonym = @pseudonym
 
       account_admin_user :account => Account.site_admin
-      @admin = @user
       user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
     end
 
@@ -179,5 +176,23 @@ describe "site-wide" do
     expect(assigns[:real_current_user]).to eq @user
     expect(Time.zone.name).to eq "Hawaii"
     expect(I18n.locale).to eq :es
+  end
+
+  context "csrf protection" do
+    it "returns a real status code for csrf errors" do
+      enable_forgery_protection do
+        course_with_teacher
+        student_in_course
+        user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+
+        account_admin_user(:account => Account.site_admin)
+        user_with_pseudonym(:user => @admin, :username => 'admin@example.com', :password => 'password')
+
+        user_session(@admin, @admin.pseudonyms.first)
+        post "/users/#{@student.id}/masquerade"
+
+        expect(response.status).to eq 422
+      end
+    end
   end
 end

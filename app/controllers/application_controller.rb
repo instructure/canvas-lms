@@ -1186,7 +1186,7 @@ class ApplicationController < ActionController::Base
       message = exception.is_a?(RequestError) ? exception.message : nil
       render template: template,
         layout: 'application',
-        status: status,
+        status: status_code,
         locals: {
           error: error,
           exception: exception,
