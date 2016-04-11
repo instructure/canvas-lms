@@ -195,4 +195,11 @@ describe "site-wide" do
       end
     end
   end
+
+  context "error templates" do
+    it "returns an html error page even for non-html requests" do
+      Canvas::Errors.expects(:capture).once.returns({})
+      get "/courses/blah.png"
+    end
+  end
 end

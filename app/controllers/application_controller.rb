@@ -1187,6 +1187,7 @@ class ApplicationController < ActionController::Base
       render template: template,
         layout: 'application',
         status: status_code,
+        formats: [:html],
         locals: {
           error: error,
           exception: exception,
