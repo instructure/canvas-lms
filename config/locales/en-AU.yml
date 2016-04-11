@@ -77,6 +77,7 @@ en-AU:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepted formats: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Accepted: %{user}, %{role_type}, course, %{course}"
+  access_token_3be22221: "Access Token"
   access_token_is_valid_until_d2f048cf: "Access token is valid until"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations."
   accordion_section_1_7888782d: "Accordion Section 1"
@@ -610,6 +611,11 @@ en-AU:
       delete_button: "Delete %{user}"
       page_title: "Confirm Delete"
       title: "Confirm Delete %{user} from %{account}"
+    consortium_user_search: 
+      find_user_by: "Find a User by Login/Email"
+      find_user_by_label: Login/Email
+    consortium_users: 
+      user_search_label: "User Search"
     course: 
       course_unpublished_title: "This course hasn't been published yet"
       course_unpublished_tooltip: Unpublished
@@ -1541,6 +1547,8 @@ en-AU:
         suspended: "Institution Suspended"
     wiki_front_page_default_content_course: "Welcome to your new course wiki!"
     wiki_front_page_default_content_group: "Welcome to your new group wiki!"
+  application_id_2aa1640f: "Application ID"
+  application_secret_e6803c7e: "Application Secret"
   apply_781a2546: Apply
   apply_changes_b1dffc70: "Apply Changes"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applying new styles to sub-accounts"
@@ -11355,6 +11363,10 @@ en-AU:
       labels: 
         password: "Password for authentication"
         username: "Username for authentication"
+    microsoft_settings: 
+      labels: 
+        application_id: "Application ID"
+        application_secret: "Application Secret"
     notices: 
       settings_updated: "Plugin settings successfully updated."
     panda_pub_settings: 
