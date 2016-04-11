@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'saml2'
+
 class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.sti_name
     'saml'.freeze
@@ -41,12 +43,16 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       :login_attribute,
       :idp_entity_id,
       :parent_registration,
-      :jit_provisioning ].freeze
+      :jit_provisioning,
+      :metadata
+    ].freeze
   end
 
   def self.deprecated_params
     [:change_password_url, :login_handle_name, :unknown_user_url].freeze
   end
+
+  SENSITIVE_PARAMS = [:metadata].freeze
 
   before_validation :set_saml_defaults
   validates_presence_of :entity_id
@@ -83,6 +89,33 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def login_attribute
     return 'nameid' unless read_attribute(:login_attribute)
     super
+  end
+
+  def populate_from_metadata(entity)
+    idps = entity.identity_providers
+    raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
+    idp = idps.first
+    self.idp_entity_id = entity.entity_id
+    self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
+    self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
+    self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
+    self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
+  end
+
+  def populate_from_metadata_xml(xml)
+    entity = SAML2::Entity.parse(xml)
+    raise "Must be a single Entity" unless entity.is_a?(SAML2::Entity)
+    populate_from_metadata(entity)
+  end
+  alias_method :metadata=, :populate_from_metadata_xml
+
+  def populate_from_metadata_url(url)
+    response = ::Canvas.timeout_protection("saml_metadata_fetch") do
+      CanvasHttp.get(url)
+    end
+    # raise error unless it's a 2xx
+    response.value
+    populate_from_metadata_xml(response.body)
   end
 
   def saml_settings(current_host=nil)

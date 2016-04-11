@@ -436,6 +436,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # For SAML, the additional recognized parameters are:
   #
+  # - metadata [Optional]
+  #
+  #   An XML document to parse as SAML metadata, and automatically populate idp_entity_id,
+  #   log_in_url, log_out_url, certificate_fingerprint, and identifier_format
+  #
   # - idp_entity_id
   #
   #   The SAML IdP's entity ID
@@ -444,7 +449,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The SAML service's SSO target URL
   #
-  # - log_out_url
+  # - log_out_url [Optional]
   #
   #   The SAML service's SLO target URL
   #
@@ -474,7 +479,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   - urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
   #   - urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
   #
-  # - requested_authn_context
+  # - requested_authn_context [Optional]
   #
   #   The SAML AuthnContext
   #
