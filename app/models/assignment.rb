@@ -42,7 +42,8 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
-    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading
+    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading,
+    :omit_from_final_grade
 
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
@@ -200,6 +201,7 @@ class Assignment < ActiveRecord::Base
     only_visible_to_overrides
     moderated_grading
     grades_published_at
+    omit_from_final_grade
   )
 
   def external_tool?

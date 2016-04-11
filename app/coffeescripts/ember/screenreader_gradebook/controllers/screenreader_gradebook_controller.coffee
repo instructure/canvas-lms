@@ -808,3 +808,7 @@ define [
       enrollments.clear()
       fetchAllPages(url, records: enrollments)
     ).observes('showConcludedEnrollments')
+
+    omitFromFinalGrade: (->
+      @get('selectedAssignment.omit_from_final_grade')
+    ).property('selectedAssignment')

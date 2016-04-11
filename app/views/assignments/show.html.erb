@@ -16,6 +16,11 @@
   js_bundle :assignment_show
 %>
 
+<% if @assignment.omit_from_final_grade %>
+  <div class="alert alert-info omit-from-final-warning">
+    <%= t("This assignment does not count toward the final grade.") %>
+  </div>
+<% end %>
 <div id="assignment_show" class="assignment content_underline_links">
   <% if can_do(@context, @current_user, :read_as_admin) %>
     <div class='assignment-title'>

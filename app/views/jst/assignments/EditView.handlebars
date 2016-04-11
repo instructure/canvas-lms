@@ -76,6 +76,18 @@
   aria-expanded="{{not isNotGraded}}"
   style="{{hiddenIf isNotGraded}}">
 
+  {{!--this empty div is in place to push the checkbox to the right of it--}}
+  <div class="form-column-left"></div>
+  <div id="omit-from-final-grade" class="form-column-right" style="margin-top: 14px;">
+    <label class="checkbox">
+      {{checkbox "omitFromFinalGrade"
+        id="assignment_omit_from_final_grade"
+        name="omit_from_final_grade"
+      }}
+      {{#t}}Do not count this assignment towards the final grade{{/t}}
+    </label>
+  </div>
+
   {{>[assignments/submission_types_form]}}
 
   {{#unless isLargeRoster}}

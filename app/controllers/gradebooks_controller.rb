@@ -133,18 +133,19 @@ class GradebooksController < ApplicationController
 
       visible_assignments.map! do |a|
         {
-          :id => a.id,
-          :submission_types => a.submission_types_array,
-          :points_possible => a.points_possible,
-          :due_at => a.due_at
+          id: a.id,
+          submission_types: a.submission_types_array,
+          points_possible: a.points_possible,
+          due_at: a.due_at,
+          omit_from_final_grade: a.omit_from_final_grade?
         }
       end
 
       {
-        :id           => ag.id,
-        :rules        => ag.rules_hash({stringify_json_ids: true}),
-        :group_weight => ag.group_weight,
-        :assignments  => visible_assignments,
+        id: ag.id,
+        rules: ag.rules_hash({stringify_json_ids: true}),
+        group_weight: ag.group_weight,
+        assignments: visible_assignments,
       }
     end
   end

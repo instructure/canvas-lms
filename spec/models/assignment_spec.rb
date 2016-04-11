@@ -3685,7 +3685,6 @@ describe Assignment do
       end
     end
   end
-
 end
 
 def setup_assignment_with_group

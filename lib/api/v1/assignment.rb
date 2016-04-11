@@ -44,6 +44,7 @@ module Api::V1::Assignment
       group_category_id
       grading_standard_id
       moderated_grading
+      omit_from_final_grade
     )
   }.freeze
 
@@ -93,6 +94,8 @@ module Api::V1::Assignment
     if !assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
     end
+
+    hash['omit_from_final_grade'] = assignment.omit_from_final_grade?
 
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
@@ -294,6 +297,7 @@ module Api::V1::Assignment
     notify_of_update
     integration_id
     integration_data
+    omit_from_final_grade
   )
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(

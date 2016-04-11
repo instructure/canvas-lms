@@ -812,9 +812,10 @@ describe GradebooksController do
   describe '#light_weight_ags_json' do
     it 'returns the necessary JSON for GradeCalculator' do
       ag = @course.assignment_groups.create! group_weight: 100
-      a  = ag.assignments.create! :submission_types => 'online_upload',
-                                  :points_possible  => 10,
-                                  :context  => @course
+      a  = ag.assignments.create! submission_types: 'online_upload',
+                                  points_possible: 10,
+                                  context: @course,
+                                  omit_from_final_grade: true
       AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
       @controller.instance_variable_set(:@current_user, @user)
@@ -833,6 +834,7 @@ describe GradebooksController do
               id: a.id,
               points_possible: 10,
               submission_types: ['online_upload'],
+              omit_from_final_grade: true
             }
           ],
         },
@@ -864,6 +866,7 @@ describe GradebooksController do
             due_at: nil,
             points_possible: 10,
             submission_types: ['online_upload'],
+            omit_from_final_grade: false
           }
         ],
       },

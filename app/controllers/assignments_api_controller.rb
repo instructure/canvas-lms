@@ -519,6 +519,11 @@
 #           "description": "(Optional) If 'overrides' is included in the 'include' parameter, includes an array of assignment override objects.",
 #           "type": "array",
 #           "items": { "$ref": "AssignmentOverride" }
+#         },
+#         "omit_from_final_grade": {
+#           "description": "(Optional) If true, the assignment will be ommitted from the student's final grade",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -821,6 +826,9 @@ class AssignmentsApiController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
   #
+  # @argument assignment[omit_from_final_grade] [Boolean]
+  #   Whether this assignment is counted towards a student's final grade.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -965,6 +973,9 @@ class AssignmentsApiController < ApplicationController
   # as necessary) to match the provided list.
   #
   # NOTE: The assignment overrides feature is in beta.
+  #
+  # @argument assignment[omit_from_final_grade] [Boolean]
+  #   Whether this assignment is counted towards a student's final grade.
   #
   # @returns Assignment
   def update

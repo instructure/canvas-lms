@@ -30,6 +30,11 @@
   </style>
 <% end %>
 
+<% if @assignment.omit_from_final_grade %>
+  <div class="alert alert-info omit-from-final-warning">
+    This assignment does not count towards the final grade.
+  </div>
+<% end %>
   <div class="submission-details-header submission_details">
     <div class="submission-details-header__grade-summary">
       <% if @assignment.muted? %>
