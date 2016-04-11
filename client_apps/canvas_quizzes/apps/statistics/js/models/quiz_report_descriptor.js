@@ -23,24 +23,21 @@ define(function(require) {
     getInteractionLabel: function(report) {
       var label;
       var type = report.reportType;
+      var labelText = '';
 
       if (report.isGenerated) {
         if (type === STUDENT_ANALYSIS) {
-          label = I18n.t('download_student_analysis',
-            'Download student analysis report.');
+          label = I18n.t('Download student analysis report %{statusLabel}', {statusLabel: this.getDetailedStatusLabel(report)});
         } else if (type === ITEM_ANALYSIS) {
-          label = I18n.t('download_item_analysis',
-            'Download item analysis report.');
+          label = I18n.t('Download item analysis report %{statusLabel}', {statusLabel: this.getDetailedStatusLabel(report)});
         }
       }
       else {
         if (type === STUDENT_ANALYSIS) {
-          label = I18n.t('generate_student_analysis_report',
-            'Generate student analysis report.');
+          label = I18n.t('Generate student analysis report %{statusLabel}', {statusLabel: this.getDetailedStatusLabel(report)});
         }
         else if (type === ITEM_ANALYSIS) {
-          label = I18n.t('generate_item_analysis_report',
-            'Generate item analysis report.');
+          label = I18n.t('Generate item analysis report %{statusLabel}', {statusLabel: this.getDetailedStatusLabel(report)});
         }
       }
 
