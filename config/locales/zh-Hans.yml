@@ -77,7 +77,7 @@ zh-Hans:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "可接受的格式：hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "可接受的格式：svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "接受： %{user}, %{role_type}, 课程, %{course}"
-  access_token_3be22221: 访问灵牌
+  access_token_3be22221: 访问令牌
   access_token_is_valid_until_d2f048cf: 访问令牌有效直到
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: 访问令牌可用于允许其它应用程序代表您调用API。您还可生成访问令牌和*使用Canvas的开放API*以得出自己的集成。
   accordion_section_1_7888782d: "折叠第 1节"
@@ -612,10 +612,10 @@ zh-Hans:
       page_title: 确认删除
       title: "确认从 %{account} 删除 %{user}"
     consortium_user_search: 
-      find_user_by: 按登录/电子邮箱查找用户
+      find_user_by: 登录/电子邮箱查找用户
       find_user_by_label: 登录/电子邮箱
     consortium_users: 
-      user_search_label: 用户寻找
+      user_search_label: 用户搜寻
     course: 
       course_unpublished_title: 此课程尚未发布
       course_unpublished_tooltip: 已取消发布
@@ -1548,7 +1548,7 @@ zh-Hans:
         suspended: 机构已挂起
     wiki_front_page_default_content_course: 欢迎使用新课程维基！
     wiki_front_page_default_content_group: 欢迎使用新小组维基！
-  application_id_2aa1640f: 申请ID
+  application_id_2aa1640f: "申请 ID"
   application_secret_e6803c7e: 申请秘密
   apply_781a2546: 应用
   apply_changes_b1dffc70: 应用更改
@@ -2351,7 +2351,7 @@ zh-Hans:
     recording_setting_enabled_description: 启用记录本次会议
   blackboard: 
     no_manifest: "该 Blackboard .zip 在根目录下没有 imsmanifest.xml 文件。"
-  blocked_by_running_migration_d8a57cb7: 通过运行迁移的受阻
+  blocked_by_running_migration_d8a57cb7: 运行迁移受阻
   blue_daf8fea9: 蓝色
   body_shadow_d36e8c2e: 形影
   bookmark_service: 
@@ -3979,7 +3979,7 @@ zh-Hans:
       reply_all: 全部回复
     message_form_dialog: 
       body: 正文
-      comboboxInstructions: "至：(开始键入，选择收件人。 按下箭头导航结果。 如果您没有找到可接受的选项，您可以输入一个替代。)"
+      comboboxInstructions: "收件人：(开始键入所选择的收件人。 按下箭头导航到结果。 如果您没有找到可接受的选项，您可以输入一个替代。)"
       headings: 
         new_message: 新消息
       inbox_actions: 
@@ -4495,7 +4495,7 @@ zh-Hans:
         status_link: 导入状态
         text: 当前正在导入一个或多个项目。一旦可用，这些项目将显示在下面的课程中。
     index: 
-      browse_more_courses: 浏览更多课程
+      browse_more_courses: 浏览更多的课程
       headings: 
         future_enrollments: 未来的注册情况
         my_courses: 所有课程
@@ -5684,7 +5684,7 @@ zh-Hans:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       在注册了部门课程的所有学生中分布当前
               评分。
-  district_id_6f408184: 区的ID
+  district_id_6f408184: "地区的 ID"
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "把%{num_minutes}分钟分成相等的时段。 *去*"
   domain_3b54c511: 域
   domain_is_required_1d4c8b25: 需要域名
@@ -5878,7 +5878,7 @@ zh-Hans:
   end_date_cannot_be_before_start_date_eb62ed6d: 结束日期不能在开始日期之前
   end_date_e0093ed7: 结束日期
   ending_date_e1ea13a4: 结束日期
-  enrolled_as_272da3b9: 注册作为
+  enrolled_as_272da3b9: 注册为
   enrollment: 
     default_course_name: 课程
     default_email: 无电子邮件
@@ -5921,7 +5921,7 @@ zh-Hans:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "输入 \"{{ACCOUNT_DOMAIN}}\" 来代替用户的根帐户域名"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Enter \"{{CANVAS_USER_ID}}\" 来代替用户独特的Canvas ID"
   enter_or_find_an_external_tool_url_6aebbd0d: "输入或找出外部工具 URL"
-  enter_the_access_token_for_your_organization_from__cc77493d: 输入您的机构的*eduappcenter.com*访问灵牌。一旦适用，只有您机构在EduAppCenter批准的应用程序会在外部应用程序的页面中列出。了解如何**生成一个访问灵牌**。
+  enter_the_access_token_for_your_organization_from__cc77493d: "在 *eduappcenter.com* 输入您的机构的访问令牌。一旦适用，只有您机构在EduAppCenter批准的应用程序就会在外部应用程序的页面中列出。了解如何**生成一个访问令牌**。"
   enter_your_question_and_multiple_answers_31370054: 输入您的问题和多个答案。
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: 在指定该浏览的每个空格输入您的问题。学生必须在文本框的每个空格键入答案。
   enter_your_question_specifying_where_each_dropdown_b428a9ff: 在指定该浏览的每个空格输入您的问题。然后为每个空格指定可能的答案。
@@ -6567,7 +6567,7 @@ zh-Hans:
   filled_5d8c39e: 填充
   filter_announcements_by_unread_495eeeb3: 按未读过滤通告
   filter_by_name_34cbe139: 按姓名过滤
-  filter_by_student_name_or_secondary_id_83dc524f: 按学生姓名或二类ID过滤
+  filter_by_student_name_or_secondary_id_83dc524f: "按学生姓名或二类 ID 过滤"
   filter_discussions_by_assignments_757924ed: 按作业过滤讨论
   filter_discussions_by_unread_6c48322: 按未读过滤讨论
   filter_e3398407: 过滤器
@@ -7029,7 +7029,7 @@ zh-Hans:
     out_of_final: "最终的 %{weight}"
     out_of_points_possible: "满分 %{points_possible} 分"
     react_gradebook: 
-      accessibility_warning: 警告：为了提高访问性，请点击这里使用单独视图的评分册。
+      accessibility_warning: 警告：为了提高可访问性，请点击这里以使用单独视图评分册。
       download_scores: 导出
       export_current_gradebook: 目前
       filter_by_student: 通过学生姓名或第二个ID筛选
@@ -7732,8 +7732,8 @@ zh-Hans:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 如果启用，当只有一个条件符合时，单元将标记为完成的选项。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "如果启用，查询参数不会在一个LTI 发送中复制到POST主体。"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如果启用，用户将能够配置 LTI 2 工具。"
-  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: (如果没有选择，给整个账户的所有人发送)
-  if_none_are_selected_send_to_everyone_in_the_entir_21119709: (如果没有选择，给整个子账户的所有人发送)
+  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: (如果没有选择，发送给账户的所有人)
+  if_none_are_selected_send_to_everyone_in_the_entir_21119709: (如果没有选择，发送给子账户的所有人)
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改作业的可能分数，则必须对作业进行重新评分。
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "如果您的配置将引起无法登录的设置，您可以直接在%{url}访问普通Canvas的登录"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您现在不选择使用权限，此文件在上传后将不会发布
@@ -7796,7 +7796,7 @@ zh-Hans:
     title_for_topics_category: "%{category} 主题"
     warnings: 
       truncated_wiki_title: "以下维基页面的标题被截断：%{title}"
-  importing_course_content_into_the_same_course_will_b09c69e: 在同一门课程中导入课程内容将第一次的导入内容复制与覆盖重复内容如果继续。
+  importing_course_content_into_the_same_course_will_b09c69e: 在同一门课程中导入课程内容将复制第一次导入的内容，以及如果继续将覆盖重复的内容。
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: 万一在可用的情况下，从Canvas的富内容服务加载RCE和维基的侧栏
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: 在某情况下，它是可用的，可从Canvas富内容服务的RCE加载
   in_order_to_complete_the_process_you_will_be_redir_83376e10: 为了完成过程，您将被重新导向到要与您孩子验证登录的页面。
@@ -7914,7 +7914,7 @@ zh-Hans:
   invite_5b1fcbcd: 邀请
   ip_filter_is_not_valid_152a46d8: IP过滤无效。
   it_looks_like_your_content_might_not_load_you_can__dfb85860: 看来您的内容可能无法加载。您可以使用此按钮尝试在新选项卡中启动它。
-  it_took_too_long_to_login_please_try_again_c1ed2e28: "用了太长时间登录。 请在试。"
+  it_took_too_long_to_login_please_try_again_c1ed2e28: "花太长时间登录。 请再试。"
   item_complete_d334fd43: （项目完成）
   item_incomplete_d6a16040: （项目未完成）
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} 目前不受支持"
@@ -8382,7 +8382,7 @@ zh-Hans:
       save_failed: 保存似乎失败。请关闭此弹出窗口以重试。
       save_failed_try_again: 条目无法保存。请重试。
       upload_failed: "上传失败，错误:"
-    file_size_error: "%{file}的大小超过了%{max} MB的允许文件大小。"
+    file_size_error: "%{file}大于%{max} MB最大所允许的文件容量。"
     file_type_error: "%{file} 不是可接受的 %{type} 文件。"
     links: 
       minimize_embedded_kaltura_content: 最小化嵌入的内容
@@ -10378,7 +10378,7 @@ zh-Hans:
   move_to_front_bf6f0194: 移动到前面
   moving_a4d552df: 正在移动...
   multi_factor_authentication_configured_865b1bde: 多重身份验证已配置
-  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "多个Canvas账户与Clever区%{district_id}的账户相关"
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "多个Canvas的账户与Clever地区 %{district_id} 的账户相关"
   multiple_due_dates_6b0d75c6: 多个截止日期
   multiple_modules_930713d4: 多个单元
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10493,8 +10493,8 @@ zh-Hans:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: 注：某些项不在课程的开始和/或结束日期范围内
   note_students_have_submitted_work_for_these_assign_7bc34e28: 注：对于这些作业，学生具有尚未评分的提交内容。如果您现在发布这些评分，将需要在对最新的提交项进行评分后重新发布其分数。
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 注意：子账户的主题在此预览中没有激活。
-  note_that_email_may_not_always_be_populated_in_the_bb4a1572: 注意电子邮箱可能总不会在Microsoft的用户档案中自动填入。Oid不会为私人的Microsoft账户自动填入。
-  note_that_some_attributes_may_not_be_populated_for_7c1f2854: 注意有些属性可能不会为所有Clever的用户自动填入。
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: 注意电子邮箱可能不会在微软的用户档案中自动填入。Oid不会作为个人的微软账户而自动填入。
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: 注意有些属性不能为所有Clever的用户自动填入。
   note_this_login_s_account_uses_delegated_authentic_89227914: "注：此登录帐户使用委托的身份验证，但允许回滚 Canvas 密码身份验证。此表中的密码字段更新回滚 Canvas 密码，*而不是* 委托身份验证。"
   notes_c42e0fd5: 备注
   notes_for_name_2eefac11: "%{name} 作为提示"
@@ -11165,7 +11165,7 @@ zh-Hans:
       description: Clever登录
     clever_settings: 
       labels: 
-        client_id: 客户ID
+        client_id: "客户 ID"
         client_secret: 客户秘密
     crocodoc: 
       description: "启用 Crocodoc 作为文档预览选项"
@@ -11385,14 +11385,14 @@ zh-Hans:
         password: 身份验证密码
         username: 身份验证用户名
     microsoft: 
-      description: Microsoft登录
+      description: 微软登录
     microsoft_settings: 
       description: |-
-          您将需要注册一个[与Microsoft的新应用程序](%{ms_app_url})。
-          您应该作为重新导向的URI配置%{callback_url}。
-          保存您的应用程序后，记下申请ID与秘密，并在这里输入。
+          您将需要注册一个[带微软的新应用程序](%{ms_app_url})。
+          您应该为重新导向的URI配置%{callback_url}。
+          在保存您的应用程序后，记下申请 ID 和秘密，并在这里输入。
       labels: 
-        application_id: 申请ID
+        application_id: "申请 ID"
         application_secret: 申请秘密
     notices: 
       settings_updated: 插件设置已成功更新。
@@ -11936,7 +11936,7 @@ zh-Hans:
       publishing: 正在发布...
       unpublish: 取消发布
       unpublishing: 正在取消发布...
-  publish_grades_to_sis_51402d46: 发布评分到SIS
+  publish_grades_to_sis_51402d46: "发布评分到 SIS"
   publish_icon_component: 
     publish: 发布
     publish_click: 已发布，单击可取消发布
@@ -14050,7 +14050,7 @@ zh-Hans:
     overwrite: 覆盖已输入的评分
     set_grades_button: 设置默认评分
     set_grades_button_loading: 正在设置评分...
-  set_group_weights_fd41c1f: 设置小组重量
+  set_group_weights_fd41c1f: 设置小组加权
   settings: 
     recaptcha_settings: 
       instructions: |-
@@ -14156,12 +14156,12 @@ zh-Hans:
       enrolled_as_observer: 观察员
       enrolled_as_student: 学生
       enrolled_as_ta: 助教
-      enrolled_as_teacher: 讲师
+      enrolled_as_teacher: 教师
       favorited_tooltip: 单击可从课程菜单中删除。
       nonfavorited_tooltip: 单击可添加到课程菜单。
-      published_course: 是
-      published_course_tooltip: 这门课程已经被发布。
-      unpublished_course: 否
+      published_course: 是的
+      published_course_tooltip: 这门课程已发布。
+      unpublished_course: 否、不是
       unpublished_course_tooltip: 此课程尚未发布。学生应联系课程导师进行访问。
     custom_search_results: 
       links: 
@@ -14760,7 +14760,7 @@ zh-Hans:
   show_attendance_columns_4d160e16: 显示考勤栏
   show_by_date_e3967761: 按日期显示
   show_by_type_c5d61732: 按类型显示
-  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 如果标题在一栏中放不下，显示月份视图中的多栏日历事件
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 如果标题无法放置在单行里，日历事件则在月份视图的多行中显示。
   show_concluded_enrollments_6a05544c: 显示结束注册
   show_correct_answers_at_a5475aa3: 显示正确答案在
   show_current_grade_5bf4e0d9: 显示当前成绩
@@ -15247,8 +15247,8 @@ zh-Hans:
   teachers_52e2423f: 教师
   teal_f729a294: 蓝绿色
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: 告诉我们如何以及何时您想在Canvas接收活动的通知。
-  tenant_d2a41f78: 承租人
-  term_e1c1d390: 期间
+  tenant_d2a41f78: 承租人、住客
+  term_e1c1d390: 学期、条款
   terms: 
     index: 
       date: 
@@ -15342,7 +15342,7 @@ zh-Hans:
       谢谢您，
       Canvas的支持团队
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
-      您发送的信息与主题栏"%{subject}"不能被发送。 要从此电子邮件回复Canvas信息，它必须首先在您的Canvas档案中确认通信频道。请访问您的档案并为此电子邮箱地址重发送确认电子邮件[查看 https://community.canvaslms.com/docs/DOC-2281]。您也可以通过Canvas的收信箱与这个人联系[查看https://community.canvaslms.com/docs/DOC-2670]。
+      您所发送的带有主题栏"%{subject}"的信息无法传递。 要从此电子邮件中回复Canvas的信息，必须首先在您的Canvas档案中确认通信频道。请访问您的档案，并重新发送确认的电子邮件到此邮箱[查看 https://community.canvaslms.com/docs/DOC-2281]。您也可以通过Canvas的收件箱与此人联系[查看https://community.canvaslms.com/docs/DOC-2670]。
       
       谢谢，
       Canvas支持
@@ -15660,9 +15660,9 @@ zh-Hans:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "要链接课程观察员*%{name}* 到学生，在下面开始输入学生名字，查找他们，然后点击更新。"
   to_minscore_43e5452e: "至 %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: 要预览主题编辑器的品牌，您将需要*关闭高对比度的用户界面*。
-  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "要限制到具体Clever区的用户，在这里输入区的Clever ID。这是要求的为多个承租人的环境中的Clever立即登录。"
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "要限制具体Clever地区的用户，在此输入地区的Clever ID。这要求Clever在多个承租人的环境中立即登录。"
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: 要限制特定的谷歌应用程序领域的用户，在此输入域名。
-  to_restrict_to_users_of_your_azure_active_director_df7cdd41: 要限制到您的Azure活跃目录，在这里输入您的承租人。
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: 要限制您的Azure活跃目录，在此输入您的承租人。
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
   toggle_dashcard_view_or_recent_activity_stream_1de257: 切换断面视图或最近活动流
   toggle_editing_answer_text_as_html_9a93fe6: "切换编辑的文本答案为 HTML"
@@ -15714,7 +15714,7 @@ zh-Hans:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "嗯哦！联系您的友好目录开发人。错误信息： %{message}"
   unable_to_accept_update_fd53a7e2: 无法接受更新
   unable_to_dismiss_update_df1e32eb: 无法撤销更新
-  unable_to_find_clever_district_district_id_61deb1cb: "无法找出Clever区的%{district_id}"
+  unable_to_find_clever_district_district_id_61deb1cb: "无法找到Clever地区的%{district_id}"
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unarchive_selected_e0c4bd3d: 取消存档选择
   unauthorized: 未授权
@@ -15723,7 +15723,7 @@ zh-Hans:
   unbookmark_this_question_bank_d87d1a07: 没有标记此题库
   unchanged_aca18e02: "[不变]"
   undated_items_toggle_list_visibility_6219e641: 无期限项目切换列表的可见性
-  undelivered_message_459916a9: 未发送信息
+  undelivered_message_459916a9: 未发送的信息
   undo_a7be8fef: 后退
   unenrolled_users_e7632d24: 未注册的用户
   ungraded_answers_31ef2df7: 未评分的答案
@@ -16216,7 +16216,7 @@ zh-Hans:
       unpublished_courses_message: 您登记了一个或多个尚未开始的课程。当⏎这些课程可用时，您将在此处和顶部导航⏎看到有关它们的信息。同时，请根据需要登记⏎更多课程或设置您的概要信息。
       welcome_to_happiness: "欢迎使用 Canvas!"
   users_d1b60cb0: 用户
-  users_matching_search_term_c604db9e: "用户匹配\"%{search_term}\""
+  users_matching_search_term_c604db9e: "用户正匹配\"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: 屏幕阅读器的用户可能需要关闭虚拟光标才能使用这些快捷键
   validate: 
     is_required: 此字段为必填字段
@@ -16251,7 +16251,7 @@ zh-Hans:
   warning_6576b5b8: 警告
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: 警告：Crocodoc在Firefox中使用时有它的局限性。评论无法永久保存。
   warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：为改善移动文件的可访问性，请使用位于菜单中的“移动到对话框”选项。
-  warning_for_improved_accessibility_please_click_he_e6472c02: 警告：为了提高访问性，请点击这里使用单独视图的评分册。
+  warning_for_improved_accessibility_please_click_he_e6472c02: 警告：为了提高可访问性，请点击这里以使用单独视图评分册。
   warning_icon_f64936d7: 警告图标
   warnings: 
     test_install: 
@@ -16267,7 +16267,7 @@ zh-Hans:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: 抱歉，出现了一个登录错误，请检查您的孩子的认证并再次尝试。
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "我们发送了一个四字符确认码到 %{sms_number}。在下方输入代码，激活该短信的号码。"
   we_were_unable_to_activate_the_app_578defe7: 我们无法激活该应用程序。
-  we_were_unable_to_add_the_access_token_1f471fe6: 我们无法添加访问灵牌。
+  we_were_unable_to_add_the_access_token_1f471fe6: 我们无法添加访问令牌。
   we_were_unable_to_add_the_app_418877ef: 我们无法添加应用程序。
   we_were_unable_to_deactivate_the_app_5e2632f3: 我们无法取消激活该应用程序。
   we_were_unable_to_update_the_app_659f5bc6: 我们无法更新应用程序。
@@ -16462,7 +16462,7 @@ zh-Hans:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: 您愿意接受还是拒绝此更新？
   would_you_like_to_enable_this_app_ccdf735d: 是否要启用此应用程序？
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要让学生继续学习该课程，还是希望重新锁定这些单元，直到新要求设定完毕？
-  wrap_event_titles_in_calendar_month_view_cbb29fd8: 在日历的月份视图换行事件标题
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: 在日历的月份视图里包裹事件的标题
   xml_configuration_5ea1b942: "XML 配置"
   yellow_4cf93785: 黄色
   yes_dde87d5: 是的
@@ -16541,17 +16541,17 @@ zh-Hans:
       您应该添加 %{callback_url} 作为重新定向URI。
       当您创建应用程序后，记下客户ID和客户密钥，并在此输入它们。
   you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
-      您将需要注册一个[与Microsoft的新应用程序](%{ms_app_url})。
-      您应该作为重新导向的URI配置%{callback_url}。
-      保存您的应用程序后，记下申请ID与秘密，并在这里输入。
+      您将需要注册一个[带微软的新应用程序](%{ms_app_url})。
+      您应该为重新导向的URI配置%{callback_url}。
+      在保存您的应用程序后，记下申请 ID 与秘密，并在此输入。
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
       您将需要[在Clever注册一个应用程序](%{clever_url})。
       您应该作为重新导向的URI配置%{callback_url}。
-      当您创建您的应用程序后，记下客户ID和客户秘密，并在这里输入。
+      在创建您的应用程序后，记下客户ID和客户秘密，并在这里输入。
   you_will_need_to_register_an_application_on_clever_f412c7b8: |-
       您将需要[在Clever注册一个应用程序](%{clever_url})。
-      您应该作为重新导向的URI配置%{callback_url}。
-      当您创建您的应用程序后，记下客户ID和客户秘密，并在这里输入。
+      您应该为重新导向的URI配置%{callback_url}。
+      在您创建应用程序后，记下客户 ID 和客户秘密，并在此输入。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       您将要[在GitHub注册一个应用程序](%{github_url})。
       您应该作为认证回调URL配置%{callback_url}。
