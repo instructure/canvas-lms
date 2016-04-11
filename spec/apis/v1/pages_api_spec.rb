@@ -132,7 +132,7 @@ describe "Pages API", type: :request do
     end
 
     describe "index" do
-      it "should list pages, including hidden ones" do
+      it "should list pages, including hidden ones", priority: "1", test_id: 126789 do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                         :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param)
         expect(json.map {|entry| entry.slice(*%w(hide_from_students url created_at updated_at title front_page))}).to eq(
@@ -227,7 +227,7 @@ describe "Pages API", type: :request do
         @hidden_page.save!
       end
       
-      it "should retrieve page content and attributes" do
+      it "should retrieve page content and attributes", priority: "1", test_id: 126803 do
         @hidden_page.publish
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                         :controller=>"wiki_pages_api", :action=>"show", :format=>"json", :course_id=>"#{@course.id}", :url=>@hidden_page.url)
@@ -248,7 +248,7 @@ describe "Pages API", type: :request do
         expect(json).to eq expected
       end
 
-      it "should retrieve front_page" do
+      it "should retrieve front_page", priority: "1", test_id: 126793 do
         page = @course.wiki.wiki_pages.create!(:title => "hrup", :body => "blooop")
         page.set_as_front_page!
 
@@ -432,7 +432,7 @@ describe "Pages API", type: :request do
                  {}, {}, {:expected_status => 400})
       end
             
-      it "should create a new page" do
+      it "should create a new page", priority: "1", test_id: 126819 do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page' }})
@@ -441,6 +441,18 @@ describe "Pages API", type: :request do
         expect(page.url).to eq 'new-wiki-page'
         expect(page.body).to eq 'hello new page'
         expect(page.user_id).to eq @teacher.id
+      end
+
+      it "should create a front page using PUT", priority: "1", test_id: 126797 do
+        front_page_url = 'new-wiki-front-page'
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                        { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => 'New Wiki Front Page!', :body => 'hello front page' }})
+        expect(json['url']).to eq front_page_url
+        page = @course.wiki.wiki_pages.where(url: front_page_url).first!
+        expect(page.is_front_page?).to be_truthy
+        expect(page.title).to eq 'New Wiki Front Page!'
+        expect(page.body).to eq 'hello front page'
       end
 
       it 'should process body with process_incoming_html_content' do
@@ -468,7 +480,7 @@ describe "Pages API", type: :request do
         expect(page.body).to include("/groups/#{@group.id}/files")
       end
 
-      it "should set as front page" do
+      it "should set as front page", priority: "1", test_id: 126818 do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :title => 'New Wiki Page!', :body => 'hello new page', :published => true, :front_page => true}})
@@ -483,7 +495,7 @@ describe "Pages API", type: :request do
         expect(json['front_page']).to eq true
       end
 
-      it "should create a new page in published state" do
+      it "should create a new page in published state", priority: "1", test_id: 126792 do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
                         { :wiki_page => { :published => true, :title => 'New Wiki Page!', :body => 'hello new page' }})
@@ -501,7 +513,7 @@ describe "Pages API", type: :request do
         expect(json['published']).to be_falsey
       end
       
-      it "should create a published front page, even when published is blank (draft state)" do
+      it "should create a published front page, even when published is blank", priority: "1", test_id: 126812 do
         front_page_url = 'my-front-page'
         json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
                         { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
@@ -534,7 +546,7 @@ describe "Pages API", type: :request do
     end
 
     describe "update" do
-      it "should update page content and attributes" do
+      it "should update page content and attributes", priority: "1", test_id: 126799 do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => @hidden_page.url },
@@ -751,7 +763,7 @@ describe "Pages API", type: :request do
                  {}, {:expected_status => 400})
       end
       
-      it "should create a page if the page doesn't exist" do
+      it "should create a page if the page doesn't exist", priority: "1", test_id: 126801 do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/nonexistent-url",
                  { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
                    :url => 'nonexistent-url' },
@@ -787,7 +799,7 @@ describe "Pages API", type: :request do
     end
     
     describe "delete" do
-      it "should delete a page" do
+      it "should delete a page", priority: "1", test_id: 126805 do
         api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { :controller => 'wiki_pages_api', :action => 'destroy', :format => 'json', :course_id => @course.to_param,
                    :url => @hidden_page.url })
