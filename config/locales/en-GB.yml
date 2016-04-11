@@ -2975,7 +2975,7 @@ en-GB:
       google: 
         drive: 
           upgrade: 
-            description: "To access this collaboration you must authorise Canvas to access your Google Drive account"
+            description: "To access this collaboration, you must authorise Canvas to access your Google Drive account"
     collaboration: 
       delete: "Are you sure you want to delete this collaboration?"
       links: 
@@ -7044,6 +7044,7 @@ en-GB:
       publish_to_sis: "Publish marks to SIS"
       set_group_weights: "Set Group Weights"
       show_concluded_enrollments: "Show Concluded Enrolments"
+      show_inactive_enrollments: "Show inactive enrolments"
       view_grading_history: "View Marking History"
     screenreader: 
       page_titles: "Gradebook: Individual View"
@@ -7742,6 +7743,8 @@ en-GB:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "If enabled, it is possible to mark modules as complete when only one of the requirements is met."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "If enabled, query parameters will not be copied to the POST body during an LTI launch."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "If enabled, users will be able to configure LTI 2 tools."
+  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(If none are selected, send to everyone in the entire account)"
+  if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(If none are selected, send to everyone in the entire sub-account)"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "If you change an assignment's points possible, you must regrade the assignment."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "If you configure settings that prevent you from being able to log in, you can directly access regular Canvas login at %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "If you do not select usage rights now, this file will be unpublished after it's uploaded."
@@ -7804,6 +7807,7 @@ en-GB:
     title_for_topics_category: "%{category} topics"
     warnings: 
       truncated_wiki_title: "The title of the following wiki page was truncated: %{title}"
+  importing_course_content_into_the_same_course_will_b09c69e: "Importing course content into the same course will duplicate content the first time and overwrite duplicates if repeated."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "In cases where it is available, load RCE and wiki sidebar from a canvas-rich content service"
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "In cases when available, load the RCE from a canvas-rich content service"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "In order to complete the process, you will be redirected to a log-in page where you must log in with your child's credentials."
@@ -7823,6 +7827,7 @@ en-GB:
   increase_indent_6af90f7c: "Increase indent"
   incremental_update_successfully_generated_against__db3f3f06: "Incremental update successfully generated against a previous SIS Import."
   indigo_2035fc55: Indigo
+  individual_view_81c2f124: "Individual view"
   info: 
     old_styleguide: 
       create_collection: "Create a collection"
@@ -7920,6 +7925,7 @@ en-GB:
   invite_5b1fcbcd: Invite
   ip_filter_is_not_valid_152a46d8: "IP filtre is not valid."
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "It looks like your content might not load. You can use this button to try launching it in a new tab."
+  it_took_too_long_to_login_please_try_again_c1ed2e28: "It took too long to log in. Please try again"
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} is not currently supported"
@@ -8049,6 +8055,7 @@ en-GB:
       view_all_or_customize: "View All or Customise"
     mobile_auth: 
       log_in_to_canvas: "Log in to Canvas"
+  learning_mastery_5fc34276: "Learning mastery"
   learning_mastery_gradebook_description: |-
       Learning Mastery Gradebook provides a way for teachers to quickly view student and course
       progress on course learning outcomes. Outcomes are presented in a Gradebook-like
@@ -8333,6 +8340,7 @@ en-GB:
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Make this course publicly visible (student data will remain private)"
   malformed_csv_aaa4b7f2: "Malformed CSV"
   manage_access_bd923d8d: "Manage access"
+  manage_app_list_994cc26c: "Manage app list"
   manage_avatars: 
     errors: 
       update_failed: "Update failed. Please try again"
@@ -8390,7 +8398,7 @@ en-GB:
       save_failed: "Saving appears to have failed.  Please close this popup to try again."
       save_failed_try_again: "Entry failed to save.  Please try again."
       upload_failed: "Upload failed with error:"
-    file_size_error: "Size of %{file} is greater than the maximum %{max} allowed file size."
+    file_size_error: "Size of %{file} is greater than the maximum %{max} MB allowed file size."
     file_type_error: "%{file} is not an acceptable %{type} file."
     links: 
       minimize_embedded_kaltura_content: "Minimise embedded content"
@@ -10388,6 +10396,7 @@ en-GB:
   move_to_front_bf6f0194: "Move to Front"
   moving_a4d552df: moving...
   multi_factor_authentication_configured_865b1bde: "Multi-factor authentication configured"
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Multiple Canvas accounts are associated with Clever District %{district_id}"
   multiple_due_dates_6b0d75c6: "Multiple due dates"
   multiple_modules_930713d4: "Multiple modules"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10457,6 +10466,7 @@ en-GB:
   next_message_780bcf24: "Next message"
   next_module_item_9bb8a222: "Next module/item"
   next_steps_ce0f0d0c: "Next steps"
+  nickname_1e6da3ad: Nickname
   nickname_7df95b09: "Nickname:"
   no_assignment_name_adbb215b: "No assignment name"
   no_broken_links_found_38d951e3: "No broken links found"
@@ -10501,6 +10511,8 @@ en-GB:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Note: some items fall outside the start and/or end dates of the course"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "NOTE: Students have submitted work for these assignments that has not been graded. If you post these grades now, you will need to re-post their scores after grading their latest submissions."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Note: sub-account themes are not active during this preview."
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Note that email might not always be populated in the user's profile at Microsoft. OID will not be populated for personal Microsoft accounts."
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Note that some attributes might not be populated for all users at Clever."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Note: This login's account uses delegated authentication, but allows fallback Canvas password authentication. The password fields in this form update the fallback Canvas password, *not* the delegated authentication."
   notes_c42e0fd5: Notes
   notes_for_name_2eefac11: "Notes for %{name}"
@@ -11168,6 +11180,12 @@ en-GB:
     catalog_provisioner: 
       description: "Catalogue Account Provisioner for Canvas"
       name: "Catalogue Provisioner"
+    clever: 
+      description: "Clever login"
+    clever_settings: 
+      labels: 
+        client_id: "Client ID"
+        client_secret: "Client secret"
     crocodoc: 
       description: "Enable Crocodoc as a document preview option"
       name: Crocodoc
@@ -11389,7 +11407,13 @@ en-GB:
       labels: 
         password: "Password for authentication"
         username: "Username for authentication"
+    microsoft: 
+      description: "Microsoft login"
     microsoft_settings: 
+      description: |-
+          You will need to register a [new app with Microsoft](%{ms_app_url}).
+          You should configure %{callback_url} as the Redirect URI.
+          After you save your app, make a note of the Application ID and Secret, and enter them here.
       labels: 
         application_id: "Application ID"
         application_secret: "Application secret"
@@ -11931,6 +11955,7 @@ en-GB:
       publishing: Publishing...
       unpublish: Unpublish
       unpublishing: Unpublishing...
+  publish_grades_to_sis_51402d46: "Publish marks to SIS"
   publish_icon_component: 
     publish: Publish
     publish_click: "published, click to unpublish"
@@ -13441,6 +13466,8 @@ en-GB:
   reply_to_main_discussion_29823888: "Reply to Main Discussion"
   reply_to_topic_12412b0f: "Reply to topic"
   require_usage_rights_for_uploaded_files_4507865b: "Require usage rights for uploaded files"
+  requirement_f5b75da1: Requirement
+  requirement_subject_7cfac6c8: "Requirement subject"
   reregister_9ab95a57: Re-register
   reregister_toolname_3dde0bfc: "Re-register %{toolName}"
   reserved_f247b60b: Reserved
@@ -14000,6 +14027,7 @@ en-GB:
   send_a_message_to_the_teacher_1ae115b6: "Send a message to the teacher"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send Custom Fields (untick unless using Canvas zendesk)"
   send_e3bd0ed0: Send
+  send_only_to_the_following_types_of_users_d8465c11: "Send only to the following types of users:"
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send this announcement to unenrolled users"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send this announcement to users with account role of %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send this announcement to users with a course role of %{role}"
@@ -14023,6 +14051,7 @@ en-GB:
     overwrite: "Overwrite already-entered grades"
     set_grades_button: "Set default grade"
     set_grades_button_loading: "Setting grades..."
+  set_group_weights_fd41c1f: "Set group weights"
   settings: 
     recaptcha_settings: 
       instructions: |-
@@ -14124,14 +14153,16 @@ en-GB:
         download_message_intro: "Your student submissions are being gathered."
         download_submissions: "Download all submissions"
     current_enrollment: 
-      enrolled_as_designer: "Enrolled as a designer"
-      enrolled_as_observer: "Enrolled as an observer"
-      enrolled_as_student: "Enrolled as a student"
-      enrolled_as_ta: "Enrolled as a TA"
-      enrolled_as_teacher: "Enrolled as a teacher"
+      enrolled_as_designer: Designer
+      enrolled_as_observer: Observer
+      enrolled_as_student: Student
+      enrolled_as_ta: TA
+      enrolled_as_teacher: Teacher
       favorited_tooltip: "Click to remove from the courses menu."
       nonfavorited_tooltip: "Click to add to the courses menu."
-      unpublished_course: unpublished
+      published_course: "Yes"
+      published_course_tooltip: "This course has been published."
+      unpublished_course: "No"
       unpublished_course_tooltip: "This course has not been published. Students should contact the course instructor for access."
     custom_search_results: 
       links: 
@@ -14727,12 +14758,16 @@ en-GB:
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "should be self-evident, the canvas ID of the reporting user"
   show_and_hide_courses_menu_9e09d1d0: "Show and hide courses menu"
+  show_attendance_columns_4d160e16: "Show attendance columns"
   show_by_date_e3967761: "Show by date"
   show_by_type_c5d61732: "Show by Type"
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Show calendar events in the month view on multiple lines if the title doesn't fit on a single line."
+  show_concluded_enrollments_6a05544c: "Show concluded enrolments"
   show_correct_answers_at_a5475aa3: "Show Correct Answers At"
   show_current_grade_5bf4e0d9: "Show Current Mark"
   show_dashcard_view_76078ecb: "Show dashcard view"
   show_final_grade_a95e14dc: "Show Final Mark"
+  show_inactive_enrollments_8f4c4824: "Show Inactive Enrolments"
   show_links_to_unpublished_content_30c0450d: "Show links to unpublished content"
   show_lti_2_configuration_ui_94ce35a9: "Show LTI 2 Configuration UI"
   show_me_76823679: "Show me"
@@ -15211,6 +15246,8 @@ en-GB:
   teachers_52e2423f: Teachers
   teal_f729a294: Teal
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Tell us how and when you would like to be notified of events in Canvas."
+  tenant_d2a41f78: Tenant
+  term_e1c1d390: Term
   terms: 
     index: 
       date: 
@@ -15303,6 +15340,11 @@ en-GB:
       
       Thank you,
       Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      The message you sent with the subject line '%{subject}' was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address [See https://community.canvaslms.com/docs/DOC-2281]. You may also contact this person via the Canvas Inbox [See https://community.canvaslms.com/docs/DOC-2670].
+      
+      Thank you,
+      Canvas Support
   the_module_item_is_locked_27fe420b: "The module item is locked."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Most recent scores for user %{current_user_name} and outcome %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "The profile picture has been reported"
@@ -15362,6 +15404,7 @@ en-GB:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URLs to trust. Trusting any URLs in this list will bypass the CSRF token when logging in to Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "This is a concluded course; only concluded enrolments are available."
+  this_is_a_message_for_name_7abf1e39: "This is a message for *%{name}*"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "This is the currently chosen mark for this student."
   this_is_the_default_email_address_f3c421fb: "This is the default email address"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "This item will reappear when a new submission is made."
@@ -15425,6 +15468,7 @@ en-GB:
     amsterdam: Amsterdam
     arizona: Arizona
     astana: Astana
+    asuncion: Asuncion
     athens: Athens
     atlantic_time_canada: "Atlantic Time (Canada)"
     auckland: Auckland
@@ -15615,7 +15659,9 @@ en-GB:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "To link the course observer *%{name}* to a student, start typing the student's name below to find them, then click Update."
   to_minscore_43e5452e: "to %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "To preview Theme editor branding, you will need to *turn off high contrast UI*."
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "To restrict to users from a specific Clever district, enter the district's Clever ID here. This is required for Clever Instant Login to work in a multi-tenant environment."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "To restrict users from specific Google Apps domain, enter the domain here."
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: "To restrict to users of your Azure Active Directory, enter your tenant here."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "To view assignments, make sure the *Agenda* view is active."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Toggle dashcard view or recent activity stream"
   toggle_editing_answer_text_as_html_9a93fe6: "Toggle editing answer text as HTML"
@@ -15644,6 +15690,7 @@ en-GB:
   tours: 
     quiz_regrade: 
       got_it: "Ok, got it"
+  treat_ungraded_as_0_d38c2b41: "Treat Unmarked as 0"
   tree_browser: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
   turnitin: 
@@ -15666,6 +15713,7 @@ en-GB:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Apologies! Contact your friendly Catalogue Developer. Error message: %{message}"
   unable_to_accept_update_fd53a7e2: "Unable to accept update"
   unable_to_dismiss_update_df1e32eb: "Unable to dismiss update"
+  unable_to_find_clever_district_district_id_61deb1cb: "Unable to find Clever District %{district_id}"
   unable_to_remove_app_4293cb53: "Unable to remove app"
   unarchive_selected_e0c4bd3d: "Unarchive Selected"
   unauthorized: unauthorised
@@ -15674,6 +15722,7 @@ en-GB:
   unbookmark_this_question_bank_d87d1a07: "Unbookmark this question bank"
   unchanged_aca18e02: "[Unchanged]"
   undated_items_toggle_list_visibility_6219e641: "Undated items toggle list visibility"
+  undelivered_message_459916a9: "Undelivered message"
   undo_a7be8fef: Undo
   unenrolled_users_e7632d24: "Unenrolled users"
   ungraded_answers_31ef2df7: "Unmarked answers"
@@ -15893,7 +15942,9 @@ en-GB:
       notifications: Notifications
       profile: Profile
       settings: Settings
+  user_profile_picture_46bffbc7: "User profile picture"
   user_s_settings_d65644b4: "%{user}'s Settings"
+  user_search_results_f5445b8b: "User search results"
   user_selected_answer: "You selected"
   user_selected_wrong: "The correct answer was %{correct_answer_text}."
   user_service: 
@@ -16165,6 +16216,8 @@ en-GB:
                   and in the top navigation. In the meantime, feel free to sign up for
                   more courses or set up your profile.
       welcome_to_happiness: "Welcome to Canvas!"
+  users_d1b60cb0: Users
+  users_matching_search_term_c604db9e: "Users matching '%{search_term}'"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers might need to turn off the virtual cursor in order to use these keyboard shortcuts"
   validate: 
     is_required: "This field is required"
@@ -16181,6 +16234,7 @@ en-GB:
   view_course_analytics_eefe6b2: "View Course Analytics"
   view_file_8a1c62e5: "View file"
   view_grades_8d3bae6c: "View marks"
+  view_grading_history_e64bb8fe: "View marking history"
   view_in_speedgrader_773b9d81: "View in SpeedGrader"
   view_name_app_62a2ad8e: "View %{name} app"
   view_next_file_a8a4a885: "View next file"
@@ -16198,7 +16252,7 @@ en-GB:
   warning_6576b5b8: warning
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu."
-  warning_for_improved_accessibility_please_click_he_e6472c02: "Warning: For improved accessibility, please click here to use the Individual View Gradebook."
+  warning_for_improved_accessibility_please_click_he_e6472c02: "Warning: For improved accessibility, please click here to use the Individual view Gradebook."
   warning_icon_f64936d7: "warning icon"
   warnings: 
     test_install: 
@@ -16214,6 +16268,7 @@ en-GB:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Our apologies, a log-in error has occurred; please check your child's credentials and try again."
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "We sent a four-character confirmation code to %{sms_number}. To activate this SMS number, enter the code below."
   we_were_unable_to_activate_the_app_578defe7: "We were unable to activate the app."
+  we_were_unable_to_add_the_access_token_1f471fe6: "We were unable to add the access token."
   we_were_unable_to_add_the_app_418877ef: "We were unable to add the app."
   we_were_unable_to_deactivate_the_app_5e2632f3: "We were unable to deactivate the app."
   we_were_unable_to_update_the_app_659f5bc6: "We were unable to update the app."
@@ -16408,6 +16463,7 @@ en-GB:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Would you like to accept or dismiss this update?"
   would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: "Wrap event titles in calendar month view"
   xml_configuration_5ea1b942: "XML Configuration"
   yellow_4cf93785: Yellow
   yes_dde87d5: "Yes"
@@ -16487,6 +16543,18 @@ en-GB:
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       You will need to create a web application in the [Google Developer Console](%{google_url}).
       You should add %{callback_url} as a redirect URI.
+      After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      You will need to register a [new app with Microsoft](%{ms_app_url}).
+      You should configure %{callback_url} as the Redirect URI.
+      After you save your app, make a note of the Application ID and Secret, and enter them here.
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      You will need to [register an application on Clever](%{clever_url}).
+      You should configure %{callback_url} as the Redirect URL.
+      After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      You will need to [register an application on Clever](%{clever_url}).
+      You should configure %{callback_url} as the redirect URL.
       After you create your app, make a note of the Client ID and Client Secret, and enter them here.
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       You will need to [register an application on GitHub](%{github_url}).
