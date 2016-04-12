@@ -293,7 +293,7 @@ describe AssignmentGroupsController, type: :request do
     end
 
     describe "#index" do
-      let(:api_path) { "api/v1/courses/#{@course.id}/assignment_groups" }
+      let(:api_path) { "/api/v1/courses/#{@course.id}/assignment_groups" }
       let(:api_settings) do
         {
           controller: 'assignment_groups', action: 'index', format: 'json',
@@ -317,7 +317,7 @@ describe AssignmentGroupsController, type: :request do
       it "should only return assignments and submissions within the grading period" do
         student = User.create!
         @course.enroll_student(student)
-        api_path = "api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
+        api_path = "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
         api_settings = {
           controller: 'assignment_groups_api', action: 'show', format: 'json',
           course_id: @course.id, grading_period_id: @gp_future.id,

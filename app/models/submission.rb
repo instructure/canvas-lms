@@ -483,8 +483,8 @@ class Submission < ActiveRecord::Base
   end
 
   def touch_graders
-    if self.assignment && self.user && self.assignment.context.is_a?(Course)
-      self.class.connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
+      if self.assignment && self.user && self.assignment.context.is_a?(Course)
         self.assignment.context.touch_admins_later
       end
     end

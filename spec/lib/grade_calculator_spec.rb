@@ -378,7 +378,7 @@ describe GradeCalculator do
       a2 = @course.assignments.create! name: "assignment", points_possible: 50
 
       s1 = a1.grade_student(@student, grade: 25).first
-      Submission.update_all({workflow_state: "pending_review"}, {id: s1.id})
+      Submission.where(:id => s1.id).update_all(workflow_state: "pending_review")
 
       a2.grade_student(@student, grade: 50)
 

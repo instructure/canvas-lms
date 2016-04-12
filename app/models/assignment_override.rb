@@ -287,6 +287,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def destroy_if_empty_set
     return unless set_type == 'ADHOC'
+    self.assignment_override_students.reload if self.id_was.nil? # fixes a problem with rails 4.2 caching an empty association scope
     self.destroy if set.empty?
   end
 

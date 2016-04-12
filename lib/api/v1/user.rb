@@ -38,7 +38,7 @@ module Api::V1::User
       ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
     end
     if opts[:group_memberships]
-      ActiveRecord::Associations::Preloader.new(users, :group_memberships).run
+      ActiveRecord::Associations::Preloader.new.preload(users, :group_memberships)
     end
   end
 
