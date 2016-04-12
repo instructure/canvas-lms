@@ -486,8 +486,18 @@ RSpec.configure do |config|
       Selinimum::Capture.install!
     end
 
-    config.before do |example|
-      Selinimum::Capture.current_example = example
+    config.prepend_before :all do |group|
+      # ensure these constants get reloaded, otherwise you get the dreaded
+      # `A copy of #{from_mod} has been removed from the module tree but is still active!`
+      BroadcastPolicy.reset_notifiers!
+
+      Selinimum::Capture.current_group = group.class
+    end
+
+    config.around :each do |example|
+      Selinimum::Capture.with_example(example) do
+        example.run
+      end
     end
 
     config.after :suite do

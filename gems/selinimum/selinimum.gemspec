@@ -15,6 +15,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "aws-sdk", "~> 1.63.0"
+  spec.add_dependency "activesupport", ">= 3.2", "< 4.3"
+  spec.add_dependency "activerecord", ">= 3.2", "< 4.3"
 
   spec.add_development_dependency "rspec"
 end

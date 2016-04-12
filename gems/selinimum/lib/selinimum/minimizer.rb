@@ -57,7 +57,7 @@ module Selinimum
     end
 
     def detector_for(file)
-      detectors.detect { |detector| detector.can_process?(file) }
+      detectors.detect { |detector| detector.can_process?(file, spec_dependency_map) }
     end
 
     def warn(message)

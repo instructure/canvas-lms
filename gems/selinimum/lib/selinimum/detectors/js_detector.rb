@@ -4,7 +4,7 @@ require_relative "../errors"
 module Selinimum
   module Detectors
     class JSDetector < GenericDetector
-      def can_process?(file)
+      def can_process?(file, _)
         file =~ %r{\Apublic/javascripts/.*\.js\z}
       end
 

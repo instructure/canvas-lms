@@ -11,7 +11,7 @@ describe Selinimum::Detectors::HandlebarsDetector do
 
   describe "#can_process?" do
     it "process handlebars files in the right path" do
-      expect(subject.can_process?("app/views/jst/foo/_item.handlebars")).to be_truthy
+      expect(subject.can_process?("app/views/jst/foo/_item.handlebars", {})).to be_truthy
     end
   end
 

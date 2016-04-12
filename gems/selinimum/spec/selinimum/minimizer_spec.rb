@@ -3,7 +3,7 @@ require "selinimum/minimizer"
 describe Selinimum::Minimizer do
   describe "#filter" do
     class NopeDetector
-      def can_process?(_)
+      def can_process?(_, _)
         true
       end
 
@@ -13,7 +13,7 @@ describe Selinimum::Minimizer do
     end
 
     class FooDetector
-      def can_process?(file)
+      def can_process?(file, _)
         file =~ /foo/
       end
 

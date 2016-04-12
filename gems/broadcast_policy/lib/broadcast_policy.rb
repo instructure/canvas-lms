@@ -79,6 +79,11 @@ module BroadcastPolicy #:nodoc:
     end
   end
 
+  def self.reset_notifiers!
+    @notifier = nil if @notifier_proc
+    @notification_finder = nil if @notification_finder_proc
+  end
+
   require 'active_support/core_ext/class/attribute'
   require 'active_support/core_ext/string/inflections'
   require 'broadcast_policy/policy_list'

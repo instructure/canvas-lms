@@ -3,7 +3,7 @@ require "selinimum/detectors/js_detector"
 describe Selinimum::Detectors::JSDetector do
   describe "#can_process?" do
     it "processes js files in the right path" do
-      expect(subject.can_process?("public/javascripts/quizzes.js")).to be_truthy
+      expect(subject.can_process?("public/javascripts/quizzes.js", {})).to be_truthy
     end
   end
 

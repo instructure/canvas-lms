@@ -8,13 +8,17 @@ module Selinimum
     #  * _spec.rb files
     #  * views
     #  * controllers
+    #  * gems/models/lib/etc. that are autoloaded after specs start
     class RubyDetector < GenericDetector
-      def can_process?(file)
-        file =~ %r{\A(
-          app/views/.*\.erb |
-          app/controllers/.*\.rb |
-          spec/.*_spec\.rb
-        )\z}x && file !~ GLOBAL_FILES
+      def can_process?(file, map)
+        return false if file =~ GLOBAL_FILES
+        return true if file =~ %r{\A(
+                                   app/views/.*\.erb |
+                                   app/controllers/.*\.rb |
+                                   spec/.*_spec\.rb
+                                 )\z}x
+        return true if map["__all_autoloads"] && map["__all_autoloads"].include?(file)
+        false
       end
 
       # we don't find dependents at this point; we do that during the

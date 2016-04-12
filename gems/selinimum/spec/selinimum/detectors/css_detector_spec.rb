@@ -3,7 +3,7 @@ require "selinimum/detectors/css_detector"
 describe Selinimum::Detectors::CSSDetector do
   describe "#can_process?" do
     it "process scss files in the right path" do
-      expect(subject.can_process?("app/stylesheets/foo.scss")).to be_truthy
+      expect(subject.can_process?("app/stylesheets/foo.scss", {})).to be_truthy
     end
   end
 
