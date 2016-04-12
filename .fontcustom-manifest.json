@@ -678,14 +678,6 @@
       "codepoint": 61853,
       "source": "public/fonts/icons/toggle-right.svg"
     },
-    "tour-info": {
-      "codepoint": 61854,
-      "source": "public/fonts/icons/tour-info.svg"
-    },
-    "tour-step-counter": {
-      "codepoint": 61855,
-      "source": "public/fonts/icons/tour-step-counter.svg"
-    },
     "trash": {
       "codepoint": 61856,
       "source": "public/fonts/icons/trash.svg"

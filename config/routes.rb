@@ -705,8 +705,6 @@ CanvasRails::Application.routes.draw do
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
   get 'search/all_courses' => 'search#all_courses'
-  delete 'tours/dismiss/:name' => 'tours#dismiss', as: :dismiss_tour
-  delete 'tours/dismiss/session/:name' => 'tours#dismiss_session', as: :dismiss_tour_session
   resources :users do
     match 'masquerade', via: [:get, :post]
     delete :delete

@@ -63,8 +63,6 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
-  after_filter :teardown_live_events_context
-  include Tour
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -129,8 +127,6 @@ class ApplicationController < ActionController::Base
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
       @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
-      @js_env[:TOURS] = tours_to_run
-
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 

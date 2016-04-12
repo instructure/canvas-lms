@@ -469,19 +469,10 @@ module QuizzesCommon
     visible_regrade_options[option_index].click
     fj('.ui-dialog:visible .btn-primary').click
     wait_for_ajaximations
-    close_regrade_tooltip if driver.browser == :chrome
   end
 
   def visible_regrade_options
     ffj('label.checkbox:visible', '.regrade_enabled')
-  end
-
-  # clicks |Okay, got it|
-  def close_regrade_tooltip
-    move_to_click('.btn.usher-close') if driver.browser == :chrome
-    f('.btn.usher-close').click if driver.browser != :chrome
-    # may need additional case for IE
-    wait_for_ajaximations
   end
 
   # clicks |Okay, fine|
