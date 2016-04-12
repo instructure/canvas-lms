@@ -163,6 +163,54 @@ module QuizzesCommon
     @quiz
   end
 
+  def quiz_with_essay_questions(goto_edit=true)
+    # TODO: DRY this up
+    @context = @course
+    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    @quiz = quiz_model
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
+    c = bank.assessment_questions.create!
+    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: a
+    )
+
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: b
+    )
+
+    @quest3 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'third question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: c
+    )
+
+    yield bank, @quiz if block_given?
+
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
+  end
+
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
     bank = @context.assessment_question_banks.create!(title: 'Test Bank')

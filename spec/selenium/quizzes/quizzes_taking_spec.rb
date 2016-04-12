@@ -22,6 +22,27 @@ describe "quiz taking" do
     expect(links[1]).to be_displayed
   end
 
+  it 'should toggle only the essay question that was toggled leaving others on the page alone' do
+    @quiz = quiz_with_essay_questions
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    expect_new_page_load{f('#take_quiz_link').click}
+    links = ff('.toggle_question_content_views_link')
+    # first link of the first RCE
+    expect(links[0].text).to eq("HTML Editor")
+    expect(links[0]).to be_displayed
+    # first link of the second RCE
+    expect(links[2].text).to eq("HTML Editor")
+    expect(links[2]).to be_displayed
+    links[0].click
+    # first link hidden, second link now showing
+    expect(links[1].text).to eq("Rich Content Editor")
+    expect(links[0]).not_to be_displayed
+    expect(links[1]).to be_displayed
+    # first link of second RCE is unchanged
+    expect(links[2].text).to eq("HTML Editor")
+    expect(links[2]).to be_displayed
+  end
+
   it "should allow to take the quiz as long as there are attempts left", priority: "1", test_id: 140606 do
     @quiz.allowed_attempts = 2
     @quiz.save!
