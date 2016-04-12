@@ -1308,4 +1308,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.relock_modules!
     self.assignment.relock_modules! if self.assignment
   end
+
+  def run_if_overrides_changed_later!
+    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "quiz_overrides_changed_#{self.global_id}"})
+  end
 end

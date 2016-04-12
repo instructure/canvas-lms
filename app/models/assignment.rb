@@ -2241,4 +2241,8 @@ class Assignment < ActiveRecord::Base
     self.discussion_topic.relock_modules! if self.discussion_topic
     self.quiz.relock_modules! if self.quiz
   end
+
+  def run_if_overrides_changed_later!
+    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "assignment_overrides_changed_#{self.global_id}"})
+  end
 end
