@@ -534,6 +534,17 @@ describe ExternalToolsController do
       get :retrieve, {url: tool.url, account_id:account.id}
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
+
+    it "lets you specify the selection_type" do
+      u = user(active_all: true)
+      account.account_users.create!( user: u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, account_id: account.id, placement: 'collaboration'}
+      expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
+    end
+
   end
 
   describe "GET 'resource_selection'" do
