@@ -257,15 +257,16 @@ module FloatScannerFix
 end
 Psych::ScalarScanner.prepend(FloatScannerFix)
 
-module IntegerTransformFix # fixes strings with leading underscores before integers being parsed as integers
-  def transform?(value)
-    SafeYAML::Transform::ToInteger::MATCHERS.each_with_index do |matcher, idx|
-      if matcher.match(value)
-        value = value.gsub(/[_,]/, "") if idx == 0 # only strip these out _after_ we've matched the integer
-        return true, Integer(value)
-      end
+module ScalarTransformFix
+  def to_guessed_type(value, quoted=false, options=nil)
+    return value if quoted
+
+    if value.is_a?(String)
+      @ss ||= Psych::ScalarScanner.new(Psych::ClassLoader.new)
+      return @ss.tokenize(value) # just skip straight to Psych if it's a scalar because SafeYAML's transform mades me a sad panda
     end
-    try_edge_cases?(value)
+
+    value
   end
 end
-SafeYAML::Transform::ToInteger.prepend(IntegerTransformFix)
+SafeYAML::Transform.singleton_class.prepend(ScalarTransformFix)

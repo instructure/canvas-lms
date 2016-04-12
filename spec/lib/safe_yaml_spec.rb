@@ -188,4 +188,9 @@ YAML
     hash = {:blah => "_42"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
+
+  it "should also dump floaat looking strings followed by an underscore" do
+    hash = {:blah => "42._"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
 end
