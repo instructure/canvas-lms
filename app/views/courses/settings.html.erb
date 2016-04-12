@@ -69,6 +69,14 @@
     <% opts[:disabled] = 'disabled' unless can_manage %>
     <%= form_for @context, :html => opts do |f| %>
     <table class="coursesettings">
+      <% if @context.feature_enabled?(:course_card_images) %>
+      <tr>
+        <td class="form-label"><%= f.blabel :image, :en => "Image" %></td>
+        <td>
+          <div class="CourseImageSelector__Container"></div>
+        </td>
+      </tr>
+      <% end %>
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
         <td class="nobr">

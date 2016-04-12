@@ -1096,7 +1096,8 @@ class CoursesController < ApplicationController
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
-        PUBLISHING_ENABLED: @publishing_enabled
+        PUBLISHING_ENABLED: @publishing_enabled,
+        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
