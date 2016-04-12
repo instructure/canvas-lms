@@ -256,3 +256,17 @@ module FloatScannerFix
   end
 end
 Psych::ScalarScanner.prepend(FloatScannerFix)
+
+module ScalarTransformFix
+  def to_guessed_type(value, quoted=false, options=nil)
+    return value if quoted
+
+    if value.is_a?(String)
+      @ss ||= Psych::ScalarScanner.new(Psych::ClassLoader.new)
+      return @ss.tokenize(value) # just skip straight to Psych if it's a scalar because SafeYAML's transform mades me a sad panda
+    end
+
+    value
+  end
+end
+SafeYAML::Transform.singleton_class.prepend(ScalarTransformFix)

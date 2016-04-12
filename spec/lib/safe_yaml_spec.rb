@@ -182,4 +182,15 @@ YAML
     hash = {:blah => "42".html_safe}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
+
+  it "should dump strings with underscores followed by an integer" do
+    # the ride never ends -_-
+    hash = {:blah => "_42"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should also dump floaat looking strings followed by an underscore" do
+    hash = {:blah => "42._"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
 end
