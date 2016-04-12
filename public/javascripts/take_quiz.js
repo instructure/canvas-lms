@@ -555,11 +555,11 @@ define([
         }
 
         if (tagName == "TEXTAREA") {
-          val = RichContentEditor.callOnRCE($this, 'get_code');
+          val = richContentEditor.callOnRCE($this, 'get_code');
           var $tagInstance = $this;
           $(".toggle_question_content_views_link").click(function(event) {
             event.preventDefault();
-            RichContentEditor.callOnRCE($tagInstance, 'toggle');
+            richContentEditor.callOnRCE($tagInstance, 'toggle');
             //  todo: replace .andSelf with .addBack when JQuery is upgraded.
             $(this).siblings(".toggle_question_content_views_link").andSelf().toggle();
           });
