@@ -933,7 +933,16 @@ module UpdateAndDeleteWithJoins
 
           sql = stmt.to_sql
 
-          join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+          join_sql = nil
+          if CANVAS_RAILS4_0
+            join_sql = arel.join_sql.to_s
+          else
+            collector = Arel::Collectors::Bind.new
+            arel.join_sources.each do |node|
+              connection.visitor.accept(node, collector)
+            end
+            join_sql = collector.compile(arel.bind_values.map{|bvs| connection.quote(*bvs.reverse)})
+          end
           tables, join_conditions = deconstruct_joins(join_sql)
 
           unless tables.empty?
