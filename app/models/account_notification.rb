@@ -96,7 +96,8 @@ class AccountNotification < ActiveRecord::Base
 
   def self.for_account(account, sub_account_ids=nil)
     # Refreshes every 10 minutes at the longest
-    Rails.cache.fetch(['account_notifications3', account].cache_key, expires_in: 10.minutes) do
+    sub_account_ids_hash = Digest::MD5.hexdigest sub_account_ids.try(:sort).to_s
+    Rails.cache.fetch(['account_notifications3', account, sub_account_ids_hash].cache_key, expires_in: 10.minutes) do
       now = Time.now.utc
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
