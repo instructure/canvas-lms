@@ -557,7 +557,7 @@ define([
         if (tagName == "TEXTAREA") {
           val = richContentEditor.callOnRCE($this, 'get_code');
           var $tagInstance = $this;
-          $(".toggle_question_content_views_link").click(function(event) {
+          $this.siblings('.rce_links').find('.toggle_question_content_views_link').click(function(event) {
             event.preventDefault();
             richContentEditor.callOnRCE($tagInstance, 'toggle');
             //  todo: replace .andSelf with .addBack when JQuery is upgraded.
