@@ -1386,6 +1386,14 @@ describe CoursesController do
       expect(@course.name).to_not eq name
       expect(@course.syllabus_body).to eq body
     end
+
+    it "should render the show page with a flash on error" do
+      user_session(@teacher)
+      # cause the course to be invalid
+      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      put 'update', :id => @course.id, :course => { :name => "name change" }
+      expect(flash[:error]).to match(/There was an error saving the changes to the course/)
+    end
   end
 
   describe "POST 'unconclude'" do

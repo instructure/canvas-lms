@@ -2122,7 +2122,10 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :edit }
+          format.html do
+            flash[:error] = t('There was an error saving the changes to the course')
+            redirect_to course_url(@course)
+          end
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
