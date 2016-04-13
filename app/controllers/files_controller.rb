@@ -462,7 +462,7 @@ class FilesController < ApplicationController
     if @attachment.deleted?
       if @current_user.nil? || @attachment.user_id != @current_user.id
         @not_found_message = t('could_not_find_file', "This file has been deleted")
-        render status: 404, template: "shared/errors/404_message"
+        render status: 404, template: "shared/errors/404_message", formats: [:html]
         return
       end
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
@@ -494,7 +494,9 @@ class FilesController < ApplicationController
             @headers = false if params[:ts] && params[:verifier]
             @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
-            render 'shared/errors/404_message', status: :bad_request
+            render 'shared/errors/404_message',
+              status: :bad_request,
+              formats: [:html]
           end
           return
         elsif authorized_action(@attachment, @current_user, :read)
@@ -585,7 +587,9 @@ class FilesController < ApplicationController
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
     unless @attachment
-      return render 'shared/errors/file_not_found', status: :bad_request
+      return render 'shared/errors/file_not_found',
+        status: :bad_request,
+        formats: [:html]
     end
 
     params[:id] = @attachment.id

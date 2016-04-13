@@ -542,6 +542,11 @@ describe FilesController do
       expect(response).to render_template("shared/errors/file_not_found")
     end
 
+    it "should render file_not_found even if the format is non-html" do
+      get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+".css", :format => 'css'
+      expect(response).to render_template("shared/errors/file_not_found")
+    end
+
     it "should ignore bad file_ids" do
       get "show_relative", :file_id => @file.id + 1, :course_id => @course.id, :file_path => @file.full_display_path
       expect(response).to be_redirect
