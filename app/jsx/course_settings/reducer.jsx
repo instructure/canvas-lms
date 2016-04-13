@@ -8,6 +8,11 @@ define([
     MODAL_VISIBILITY (state, action) {
       state.showModal = action.payload.showModal;
       return state;
+    },
+    GOT_COURSE_IMAGE (state, action) {
+      state.courseImage = action.payload.imageString;
+      state.imageUrl = action.payload.imageUrl;
+      return state;
     }
   };
 

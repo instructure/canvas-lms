@@ -14,8 +14,9 @@ define([
       this.handleChange = this.handleChange.bind(this);
     }
 
-    componentDidMount () {
+    componentWillMount () {
       this.props.store.subscribe(this.handleChange);
+      this.props.store.dispatch(Actions.getCourseImage(this.props.courseId));
     }
 
     handleChange () {
@@ -23,10 +24,18 @@ define([
     }
 
     render () {
+
+      const styles = {
+        backgroundImage: `url(${this.state.imageUrl})`
+      };
+
       return (
         <div>
           <input ref="hiddenInput" type="hidden" name={this.props.name} value={this.state.courseImage} />
-          <div className="CourseImageSelector">
+          <div
+            className="CourseImageSelector"
+            style={(this.state.imageUrl) ? styles : {}}
+          >
             <button
               className="Button"
               type="button"

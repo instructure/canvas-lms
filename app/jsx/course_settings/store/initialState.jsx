@@ -1,7 +1,9 @@
 define([], () => {
 
   const initialState = {
-    courseImage: 'abc'
+    courseImage: 'abc',
+    imageUrl: '',
+    showModal: false
   };
 
   return initialState;

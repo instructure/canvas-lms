@@ -30,6 +30,7 @@ require [
     React.render(
       React.createElement(CourseImageSelector, {
         store: courseImageStore,
-        name: "course[image]"
+        name: "course[image]",
+        courseId: window.ENV.COURSE_ID
       }), $('.CourseImageSelector__Container')[0]
     )
