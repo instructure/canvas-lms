@@ -28,7 +28,10 @@ function bzRetainedInfoSetup() {
       var save = function() {
         var http = new XMLHttpRequest();
         http.open("POST", "/bz/user_retained_data", true);
-        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value);
+	var value = ta.value;
+	if(ta.getAttribute("type") == "checkbox")
+		value = ta.checked ? "yes" : "";
+        var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value);
         http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         http.send(data);
       };
@@ -41,7 +44,9 @@ function bzRetainedInfoSetup() {
           // cut off json p stuff
           if(ta.tagName == "SPAN")
             ta.textContent = http.responseText.substring(9);
-          else
+          else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+            ta.checked = (http.responseText.substring(9) == "yes") ? true : false;
+	  else
             ta.value = http.responseText.substring(9);
       };
       http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
