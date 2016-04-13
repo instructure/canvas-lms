@@ -4,7 +4,8 @@
 <% course_home ||= false %>
 <% if course_home %>
   <h2><%= @context.nickname_for(@current_user) %></h2>
-  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
+  <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
+  </div>
 <% else %>
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
@@ -12,6 +13,9 @@
   </div>
   <div class="ic-Action-header__Secondary">
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
+  <% if can_do(@context, @current_user, :manage_content) %>
+    <a href="#" class="edit_syllabus_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></a>
+  <% end %>
   </div>
 </div>
 <% end %>
@@ -24,7 +28,7 @@ The syllabus page shows a table-oriented view of the course schedule, and the ba
 course grading.  You can add any other comments, notes, or thoughts you have about the course
 structure, course policies or anything else.
 
-To add some comments, click the "Edit Syllabus Description" link to the right.
+To add some comments, click the "Edit" link at the top.
 DOC
       %>
 </div>
@@ -45,14 +49,11 @@ DOC
   <div id="syllabus_links">
     <a id="toggle_special_dates_in_syllabus">&nbsp;</a>
   </div>
-  <table id="syllabus">
+  <table id="syllabus" class="ic-Table--condensed">
     <thead>
       <tr>
         <th scope="col" style="width: 25%;"><%= t 'headers.date', "Date" %></th>
-        <th scope="col" style="width: 75%;">
-        <div style="float: right;"></div>
-        <%= t 'headers.details', "Details" %>
-        </th>
+        <th scope="col" style="width: 75%;"><%= t 'headers.details', "Details" %></th>
       </tr>
     </thead>
     <tbody>

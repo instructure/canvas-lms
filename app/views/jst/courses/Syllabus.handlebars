@@ -8,29 +8,34 @@
     &nbsp;
   {{/if}}
 </div>
-<table id="syllabus">
+<table id="syllabus" class="ic-Table ic-Table--condensed">
   <thead>
     <tr>
       <th scope="col" style="width: 25%;">{{#t "headers.date"}}Date{{/t}}</th>
       <th scope="col" style="width: 75%;">
-      <div style="float: right;"></div>
-      {{#t "headers.details"}}Details{{/t}}
+        <div style="float: right;"></div>
+        {{#t "headers.details"}}Details{{/t}}
       </th>
     </tr>
   </thead>
   <tbody>
     {{#each dates}}
     <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
-      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
+      <td scope="row" valign="top" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}">
         {{#if date}}
           {{tDateToString date "medium_with_weekday"}}
         {{/if}}
-      </th>
+      </td>
       <td class="details">
         <table class="detail_list">
           {{#each events}}
           <tr class="syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}">
             <td class="name{{#unless last}} not_last{{/unless}}">
+              {{#ifEqual type 'assignment'}}
+                {{addIcon 'assignment'}}
+              {{else}}
+                {{addIcon 'calendar-month'}}
+              {{/ifEqual}}
               {{#if html_url}}
                 <a href="{{html_url}}">{{title}}</a>
               {{else}}

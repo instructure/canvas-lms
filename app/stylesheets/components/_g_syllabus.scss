@@ -4,40 +4,11 @@
   width: 100%;
   table-layout: fixed;
   margin-bottom: 10px;
-  thead th {
+  thead th, td {
     text-align: left;
-    @if $use_new_styles {
-      padding: $ic-sp/2;
-      border-bottom: 1px solid $ic-border-dark;
-    }
-    @else {
-      background-color: #444;
-      color: #fff;
-      padding: 3px 10px;
-      border-bottom: 1px solid #bbb;
-    }
-    a {
-      font-size: 0.8em;
-      color: #aaa;
-    }
+    @include fontSize(14px);
   }
   tr.date {
-    td, th {
-      text-align: center;
-      @if $use_new_styles {
-        border-bottom: 1px solid $ic-border-light;
-        padding: $ic-sp/2;
-        line-height: 1.3;
-        color: $ic-font-color--subdued;
-      }
-      @else {
-        border-bottom: 1px solid #bbb;
-        padding: 4px 10px;
-        font-size: 0.9em;
-        vertical-align: top;
-        color: #666;
-      }
-    }
     // make all dates in the past be 4% darker than normal,
     // cant use background-color because we want them to still be zebra-striped
     &.date_passed {
@@ -45,57 +16,26 @@
         background-image: url("/images/4_percent_opacity.png");
       }
     }
-    th.day_date {
+    .day_date {
       white-space: nowrap;
-      text-align: left;
     }
     td.details {
-      text-align: left;
-      @if $use_new_styles {
-        padding: $ic-sp/2;
-        line-height: 1.3;
-      }
-      @else {
-        font-size: 1.1em;
-        line-height: 2em;
-        padding: 0 0 0 4px;
-        color: #000;
-      }
+      padding-right: 0;
       td {
         border: none;
         background-color: transparent;
-        font-size: 1em;
-        text-align: left;
-        color: inherit;
-        @if $use_new_styles {
-          padding: $ic-sp/2;
-        }
-        @else {
-          padding: 0;
-        }
-      }
-      .dates {
-        @include fontSize(12px);
-        text-align: right;
-        @if $use_high_contrast {
-          color: #333;
-        }
-        @else {
-          color: #666;
-        }
       }
     }
     table.detail_list {
       width: 100%;
-      td.name {
-        padding-left: 6px;
-      }
+
       td.dates {
-        padding-right: 10px;
+        white-space: nowrap;
+        padding-right: 7px;
+        text-align: right;
       }
       tr.syllabus_assignment {
         .name a {
-          font-weight: bold;
           @if $use_high_contrast {
             text-decoration: none;
             &:hover, &:focus {
@@ -132,11 +72,14 @@
   }
   .special_date_title {
     color: #999;
-    @include fontSize(11px);
-    font-weight: normal;
+    @include fontSize(12px);
   }
 }
-
+.name {
+  > i {
+    padding-right: $ic-sp/2;
+  }
+}
 #toggle_special_dates_in_syllabus {
   &.hidden span.hide {
     display: none;
