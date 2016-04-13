@@ -65,6 +65,17 @@ describe DeveloperKey do
       expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to be_truthy
       expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to be_truthy
     end
+
+    it "does not allow subdomains when it matches in redirect_uris" do
+      key = DeveloperKey.create!(redirect_uris: "http://example.com/a/b")
+      expect(key.redirect_domain_matches?("http://example.com/a/b")).to eq true
+      # other paths on the same domain are NOT ok
+      expect(key.redirect_domain_matches?("http://example.com/other")).to eq false
+      # sub-domains are not ok either
+      expect(key.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
+      expect(key.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
+      expect(key.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+    end
   end
 
   context "Account scoped keys" do

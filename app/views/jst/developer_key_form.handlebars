@@ -8,9 +8,15 @@
         <td><label for='email'>{{#t "owner_email"}}Owner Email:{{/t}}</label></td>
         <td><input type='text' id='email' name='developer_key[email]' value='{{ email }}'/>
     </tr>
+    {{#if redirect_uri}}
     <tr>
-        <td><label for='redirect_uri'>{{#t "redirect_uri"}}Redirect URI:{{/t}}</label></td>
+        <td><label for='redirect_uri'>{{#t "redirect_uri"}}Redirect URI (Legacy):{{/t}}</label></td>
         <td><input type='text' id='redirect_uri' name='developer_key[redirect_uri]' value='{{ redirect_uri }}'/>
+    </tr>
+    {{/if}}
+    <tr>
+        <td><label for='redirect_uris'>{{#t "redirect_uris"}}Redirect URIs:{{/t}}</label></td>
+        <td><textarea id='redirect_uris' name='developer_key[redirect_uris]' class="input-block-level">{{ redirect_uris }}</textarea>
     </tr>
     <tr>
         <td><label for='icon_url'>{{#t "icon_url"}}Icon URL:{{/t}}</label></td>
