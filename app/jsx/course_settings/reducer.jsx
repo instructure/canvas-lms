@@ -1,14 +1,14 @@
 define([
-  'redux',
   './actions',
   './store/initialState',
   'underscore'
-], (Redux, Actions, initialState, _) => {
-
-  const { combineReducers } = Redux;
+], (Actions, initialState, _) => {
 
   const courseImageHandlers = {
-
+    MODAL_VISIBILITY (state, action) {
+      state.showModal = action.payload.showModal;
+      return state;
+    }
   };
 
   const courseImage = (state = initialState, action) => {
@@ -20,8 +20,6 @@ define([
     }
   };
 
-  return combineReducers({
-    courseImage
-  });
+  return courseImage;
 
 });

@@ -15,4 +15,20 @@ define(['jsx/course_settings/reducer'], (reducer) => {
 
     deepEqual(initialState, newState, 'state is unchanged');
   });
+
+  test('sets the modal visibility properly', () => {
+    const action = {
+      type: 'MODAL_VISIBILITY',
+      payload: {
+        showModal: true
+      }
+    };
+
+    const initialState = {
+      showModal: false
+    };
+
+    const newState = reducer(initialState, action);
+    equal(newState.showModal, true, 'state is updated to show the modal');
+  });
 });
