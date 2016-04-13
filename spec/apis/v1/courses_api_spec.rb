@@ -2778,7 +2778,10 @@ describe CoursesController, type: :request do
         'hide_final_grades' => false,
         'lock_all_announcements' => false,
         'restrict_student_past_view' => false,
-        'restrict_student_future_view' => false
+        'restrict_student_future_view' => false,
+        'image_url' => nil,
+        'image_id' => nil,
+        'image' => nil
       })
     end
 
@@ -2812,7 +2815,10 @@ describe CoursesController, type: :request do
         'hide_final_grades' => true,
         'lock_all_announcements' => true,
         'restrict_student_past_view' => true,
-        'restrict_student_future_view' => true
+        'restrict_student_future_view' => true,
+        'image_url' => nil,
+        'image_id' => nil,
+        'image' => nil
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false
