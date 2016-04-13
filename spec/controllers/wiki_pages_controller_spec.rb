@@ -112,6 +112,7 @@ describe WikiPagesController do
 
         context "feature enabled" do
           before do
+            ConditionalRelease::Service.stubs(:configured?).returns(true)
             @course.enable_feature!(:conditional_release)
           end
 
@@ -149,6 +150,7 @@ describe WikiPagesController do
         it "should allow edit" do
           get 'edit', course_id: @course.id, id: @page.url
           expect(response.code).to eq "200"
+          expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
         end
 
         it "should allow revisions" do

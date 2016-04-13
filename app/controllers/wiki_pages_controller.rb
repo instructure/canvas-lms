@@ -73,6 +73,7 @@ class WikiPagesController < ApplicationController
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       log_asset_access([ "pages", @context ], "pages", "other")
+      js_env ConditionalRelease::Service.env_for @context
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       @padless = true
     end
@@ -108,7 +109,9 @@ class WikiPagesController < ApplicationController
 
   def edit
     if @page.grants_any_right?(@current_user, session, :update, :update_content)
-      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+      js_env ConditionalRelease::Service.env_for @context
+      if !ConditionalRelease::Service.enabled_in_context?(@context) ||
+        enforce_assignment_visible(@page)
         add_crumb(@page.title)
         @padless = true
       end
