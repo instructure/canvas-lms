@@ -54,7 +54,8 @@ module Api::V1::Submission
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), current_user)
+      published_comments = submission.comments_for(@current_user).published
+      hash['submission_comments'] = submission_comments_json(published_comments, current_user)
     end
 
     if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)

@@ -152,7 +152,7 @@ class Course < ActiveRecord::Base
   has_many :assignments, -> { order('assignments.created_at') }, as: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, dependent: :destroy
   has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
-  has_many :submission_comments, as: :context
+  has_many :submission_comments, -> { published }, as: :context
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, dependent: :destroy
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
   has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy

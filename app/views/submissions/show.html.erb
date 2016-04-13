@@ -187,7 +187,7 @@
             <% end %>
             <% @submission.visible_submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
-              <div class="comment" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
+              <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
                   <% if comment.media_comment_id && comment.media_comment_type %>
                     <div class="comment_media">

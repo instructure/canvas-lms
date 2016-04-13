@@ -40,7 +40,9 @@ class Submission < ActiveRecord::Base
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
-  has_many :visible_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: false) }, class_name: 'SubmissionComment'
+  has_many :visible_submission_comments,
+    -> { published.visible.for_final_grade.order(:created_at, :id) },
+    class_name: 'SubmissionComment'
   has_many :hidden_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: true) }, class_name: 'SubmissionComment'
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
@@ -1052,6 +1054,7 @@ class Submission < ActiveRecord::Base
     opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
+    opts[:draft] = opts[:draft_comment]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = t('media_comment', "This is a media comment.")
@@ -1070,7 +1073,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :provisional_grade_id]
+                  :anonymous, :hidden, :provisional_grade_id, :draft]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end

@@ -108,7 +108,8 @@ class User < ActiveRecord::Base
   has_many :learning_outcome_results
 
   has_many :submission_comment_participants
-  has_many :submission_comments, -> { preload(submission: [:assignment, :user]) }, through: :submission_comment_participants
+  has_many :submission_comments, -> { published.preload(submission: [:assignment, :user]) },
+    through: :submission_comment_participants
   has_many :collaborators
   has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
   has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'

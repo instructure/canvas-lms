@@ -258,6 +258,34 @@ describe 'Submissions API', type: :request do
       expect(json["grade"]).to eq "5"
     end
 
+    context 'for a submission with a draft comment and a published comment' do
+      before(:once) do
+        @a1.update_submission(@student1, draft_comment: true, comment: 'Draft Answer: forty-one')
+        @a1.update_submission(@student1, comment: 'Answer: forty-two')
+      end
+
+      before(:each) do
+        @user = @student1
+
+        @json = api_call(:get,
+          "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+            :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
+          { :include => %w(submission_comments) })
+      end
+
+      it 'returns only published comments' do
+        expect(@json['submission_comments'].size).to eq(1)
+
+        published_comments = @json['submission_comments'].select do |c|
+          c['comment'] == 'Answer: forty-two'
+        end
+
+        expect(published_comments[0]['comment']).to eq('Answer: forty-two')
+      end
+    end
+
     it "should not show rubric assessments to students on muted assignments" do
       @a1.mute!
       sub = @a1.grade_student(@student1, :grade => 5).first

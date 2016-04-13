@@ -148,8 +148,14 @@
         <a class="dismiss_alert close" href="#">×</a>
         <%= t :crocodoc_pending, "Crocodoc is still processing this document." %>
       </div>
+      <div id="comment_saved" class="alert alert-success speedgrader_alert">
+        <button aria-label="<%= t 'Close' %>" class="dismiss_alert close">×</button>
+        <div id="comment_saved_message">
+          <%= t 'Your comment was auto-saved as a draft.' %>
+        </div>
+      </div>
       <div id="comment_submitted" class="alert alert-success speedgrader_alert">
-        <button aria-label="Close" class="dismiss_alert close">×</button>
+        <button aria-label="<%= t 'Close' %>" class="dismiss_alert close">×</button>
         <div id="comment_submitted_message">
           <%= t :comment_submitted, "Your comment has been submitted." %>
         </div>
@@ -259,8 +265,11 @@
                 <a href="javascript:void 0;" class="delete_comment_link icon-x">
                   <span class="screenreader-only"><%= t('icons.delete_comment', 'Delete comment') %></span>
                 </a>
+                <button class="publish_comment_button">
+                  <span><%= t('Publish') %></span>
+                </button>
                 <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
-                <span class="comment"></span>
+                <span class="draft-marker" aria-label="<%= t('Draft comment') %>">*</span><span class="comment"></span>
                 <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
                 <div class="media_comment_content" style="display:none"></div>
                 <div class="comment_attachments"></div>

@@ -6,7 +6,7 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 }
 
 CanvasRails::Application.routes.draw do
-  resources :submission_comments, only: :destroy
+  resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]
 

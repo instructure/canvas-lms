@@ -18,7 +18,7 @@ class Assignment
 
       comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                         :media_comment_type, :media_comment_id,
-                        :cached_attachments, :attachments].freeze
+                        :cached_attachments, :attachments, :draft].freeze
 
       attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                            :display_name, :filename, :mime_class,

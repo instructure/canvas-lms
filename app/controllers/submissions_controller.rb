@@ -534,7 +534,8 @@ class SubmissionsController < ApplicationController
           :group_comment => params[:submission][:group_comment],
           :hidden => @assignment.muted? && admin_in_context,
           :provisional => provisional,
-          :final => params[:submission][:final]
+          :final => params[:submission][:final],
+          :draft_comment => Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
       end
       begin

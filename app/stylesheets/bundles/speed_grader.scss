@@ -393,11 +393,18 @@ $icon-size: 1.4rem;
     &:first-of-type {
       border-top: none;
     }
+    &.draft {
+      background: lighten($ic-color-alert, 55%);
+    }
+    span.draft-marker {
+      color: $red;
+      padding-right: 0.5em;
+    }
     .comment_citation {
       @include fontSize(12px);
       text-align: right;
     }
-    .delete_comment_link {
+    .delete_comment_link, .publish_comment_button {
       float: right;
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);

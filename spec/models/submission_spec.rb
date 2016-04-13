@@ -853,10 +853,11 @@ describe Submission do
     sc2 = SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "b", :hidden => true)
     sc3 = SubmissionComment.create!(:submission => @submission, :author => @student1, :comment => "c")
     sc4 = SubmissionComment.create!(:submission => @submission, :author => @student2, :comment => "d")
+    SubmissionComment.create!(:submission => @submission, :author => @teacher, :comment => "e", :draft => true)
     @submission.reload
 
     @submission.limit_comments(@teacher)
-    expect(@submission.submission_comments.count).to eql 4
+    expect(@submission.submission_comments.count).to eql 5
     expect(@submission.visible_submission_comments.count).to eql 3
 
     @submission.limit_comments(@student1)
@@ -1646,6 +1647,30 @@ describe Submission do
         expect(subject).not_to include(@teacher_assessment)
         expect(subject).to include(@student_assessment)
       end
+    end
+  end
+
+  describe '#add_comment' do
+    before(:once) do
+      @submission = Submission.create!(@valid_attributes)
+    end
+
+    it 'creates a draft comment when passed true in the draft_comment option' do
+      comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: true)
+
+      expect(comment).to be_draft
+    end
+
+    it 'creates a final comment when not passed in a draft_comment option' do
+      comment = @submission.add_comment(author: @teacher, comment: '42')
+
+      expect(comment).not_to be_draft
+    end
+
+    it 'creates a final comment when passed false in the draft_comment option' do
+      comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: false)
+
+      expect(comment).not_to be_draft
     end
   end
 end

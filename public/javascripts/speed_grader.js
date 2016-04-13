@@ -46,6 +46,7 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment */,
   'compiled/jquery/mediaCommentThumbnail',
+  'compiled/jquery.rails_flash_notifications',
   'vendor/jquery.ba-hashchange' /* hashchange */,
   'vendor/jquery.elastic' /* elastic */,
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
@@ -129,6 +130,8 @@ define([
       $no_annotation_warning = $('#no_annotation_warning'),
       $comment_submitted = $('#comment_submitted'),
       $comment_submitted_message = $('#comment_submitted_message'),
+      $comment_saved = $('#comment_saved'),
+      $comment_saved_message = $('#comment_saved_message'),
       $selectmenu = null,
       browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -513,7 +516,7 @@ define([
       event.preventDefault();
       $("#media_media_recording").show().find(".media_recording").mediaComment('create', 'any', function(id, type) {
         $("#media_media_recording").data('comment_id', id).data('comment_type', type);
-        EG.handleCommentFormSubmit();
+        EG.addSubmissionComment();
       }, function() {
         EG.revertFromFormSubmit();
       }, true);
@@ -823,6 +826,9 @@ define([
   });
 
   function beforeLeavingSpeedgrader() {
+    // Submit any draft comments that need submitting
+    EG.addSubmissionComment(true);
+
     window.opener && window.opener.updateGrades && $.isFunction(window.opener.updateGrades) && window.opener.updateGrades();
 
     var userNamesWithPendingQuizSubmission = $.map(snapshotCache, function(snapshot) {
@@ -1109,6 +1115,9 @@ define([
     },
 
     handleStudentChanged: function(){
+      // Save any draft comments before loading the new student
+      EG.addSubmissionComment(true);
+
       var id = $selectmenu.jquerySelectMenu().val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
@@ -1828,49 +1837,115 @@ define([
 
     showDiscussion: function(){
       var hideStudentNames = utils.shouldHideStudentNames();
+      var that = this;
       $comments.html("");
+
+      function renderComment(comment, commentBlank) {
+        // Serialization seems to have changed... not sure if it's changed everywhere, though...
+        if(comment.submission_comment) { comment = comment.submission_comment; }
+        comment.posted_at = $.datetimeString(comment.created_at);
+
+        var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
+        if (hideStudentName) { comment.author_name = I18n.t('Student'); }
+        var $comment = commentBlank.clone(true).fillTemplateData({ data: comment });
+
+        if (comment.draft === true) {
+          $comment.addClass('draft');
+        } else {
+          $comment.find('.draft-marker').remove();
+          $comment.find('.publish_comment_button').remove();
+        }
+
+        $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
+        if (comment.avatar_path && !hideStudentName) {
+          $comment.find(".avatar").attr('src', comment.avatar_path).show();
+        }
+
+        if (comment.media_comment_type && comment.media_comment_id) {
+          $comment.find(".play_comment_link").data(comment).show();
+        }
+
+        $.each((comment.cached_attachments || comment.attachments || []), function(){
+          var attachment = this.attachment || this;
+          attachment.comment_id = comment.id;
+          attachment.submitter_id = EG.currentStudent.id;
+          $comment.find(".comment_attachments").append($comment_attachment_blank.clone(true).fillTemplateData({
+            data: attachment,
+            hrefValues: ['comment_id', 'id', 'submitter_id']
+          }).show().find("a").addClass(attachment.mime_class));
+        });
+
+        /* Submit a comment and Delete a comment listeners */
+
+        // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
+        // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
+        var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
+            ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id;
+        var commentIsPublishableByMe = comment.draft === true &&
+            parseInt(comment.author_id) === parseInt(ENV.current_user_id);
+
+        $comment.find(".delete_comment_link").click(function(event) {
+          $(this).parents(".comment").confirmDelete({
+            url: "/submission_comments/" + comment.id,
+            message: I18n.t("Are you sure you want to delete this comment?"),
+            success: function(data) {
+              // Let's remove this comment from the client-side cache
+              if (that.currentStudent.submission && that.currentStudent.submission.submission_comments) {
+                var updatedComments = _.reject(
+                  that.currentStudent.submission.submission_comments,
+                  function(item) {
+                    return item.id === comment.id;
+                  }
+                );
+
+                that.currentStudent.submission.submission_comments = updatedComments;
+              }
+
+              // and also remove it from the DOM
+              $(this).slideUp(function() {
+                $(this).remove();
+              });
+            }
+          });
+        }).showIf(commentIsDeleteableByMe);
+
+        $comment.find(".publish_comment_button").click(function(event) {
+          if (confirm(I18n.t('Are you sure you want to publish this comment?'))) {
+            function commentUpdateSucceeded(data) {
+              var $replacementComment = renderComment(data.submission_comment, $comment_blank);
+              $replacementComment.show();
+              $comment.replaceWith($replacementComment);
+            }
+
+            function commentUpdateFailed(jqXHR, textStatus) {
+              $.flashError(I18n.t("Failed to publish draft comment"));
+            }
+
+            var url = '/submission_comments/' + comment.id;
+            var data = {
+              submission_comment: {
+                draft: 'false'
+              }
+            };
+
+            var ajaxOptions = {
+              url: url,
+              data: data,
+              dataType: 'json',
+              type: 'PATCH'
+            };
+
+            $.ajax(ajaxOptions).done(commentUpdateSucceeded).fail(commentUpdateFailed);
+          }
+        }).showIf(commentIsPublishableByMe);
+
+        return $comment;
+      }
+
       if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
         $.each(this.currentStudent.submission.submission_comments, function(i, comment){
-          // Serialization seems to have changed... not sure if it's changed everywhere, though...
-          if(comment.submission_comment) { comment = comment.submission_comment; }
-          comment.posted_at = $.datetimeString(comment.created_at);
+          var $comment = renderComment(comment, $comment_blank);
 
-          var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
-          if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }
-          var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
-          if (comment.avatar_path && !hideStudentName) {
-            $comment.find(".avatar").attr('src', comment.avatar_path).show();
-          }
-          // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
-          // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
-          var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
-                                        ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id;
-
-          $comment.find(".delete_comment_link").click(function(event) {
-            $(this).parents(".comment").confirmDelete({
-              url: "/submission_comments/" + comment.id,
-              message: I18n.t('confirms.delete_comment', "Are you sure you want to delete this comment?"),
-              success: function(data) {
-                $(this).slideUp(function() {
-                  $(this).remove();
-                });
-              }
-            });
-          }).showIf(commentIsDeleteableByMe);
-
-          if (comment.media_comment_type && comment.media_comment_id) {
-            $comment.find(".play_comment_link").data(comment).show();
-          }
-          $.each((comment.cached_attachments || comment.attachments || []), function(){
-            var attachment = this.attachment || this;
-            attachment.comment_id = comment.id;
-            attachment.submitter_id = EG.currentStudent.id;
-            $comment.find(".comment_attachments").append($comment_attachment_blank.clone(true).fillTemplateData({
-              data: attachment,
-              hrefValues: ['comment_id', 'id', 'submitter_id']
-            }).show().find("a").addClass(attachment.mime_class));
-          });
           $comments.append($comment.show());
           $comments.find(".play_comment_link").mediaCommentThumbnail('normal');
         });
@@ -1878,7 +1953,12 @@ define([
       $comments.scrollTop(9999999);  //the scrollTop part forces it to scroll down to the bottom so it shows the most recent comment.
     },
 
-    revertFromFormSubmit: function() {
+    revertFromFormSubmit: function(draftComment) {
+        // This is to continue existing behavior of creating finalized comments by default
+        if (draftComment === undefined) {
+          draftComment = false;
+        }
+
         EG.showDiscussion();
         $add_a_comment_textarea.val("");
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
@@ -1891,13 +1971,25 @@ define([
           disableGroupCommentCheckbox();
         }
 
-        $comment_submitted.show();
-        $comment_submitted_message.attr("tabindex",-1).focus();
+        if (draftComment) {
+          // Show a different message when auto-saving a draft comment
+          $comment_saved.show();
+          $comment_saved_message.attr("tabindex",-1).focus();
+        } else {
+          $comment_submitted.show();
+          $comment_submitted_message.attr("tabindex",-1).focus();
+        }
         $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
 
-    handleCommentFormSubmit: function(){
+    addSubmissionComment: function(draftComment){
+      // This is to continue existing behavior of creating finalized comments by default
+      if (draftComment === undefined) {
+        draftComment = false;
+      }
+
       $comment_submitted.hide();
+      $comment_saved.hide();
       if (
         !$.trim($add_a_comment_textarea.val()).length &&
         !$("#media_media_recording").data('comment_id') &&
@@ -1912,7 +2004,8 @@ define([
         'submission[assignment_id]': jsonData.id,
         'submission[user_id]': EG.currentStudent.id,
         'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0"),
-        'submission[comment]': $add_a_comment_textarea.val()
+        'submission[comment]': $add_a_comment_textarea.val(),
+        'submission[draft_comment]': draftComment
       };
       if ($("#media_media_recording").data('comment_id')) {
         $.extend(formData, {
@@ -1931,7 +2024,7 @@ define([
         $.each(submissions, function(){
           EG.setOrUpdateSubmission(this.submission);
         });
-        EG.revertFromFormSubmit();
+        EG.revertFromFormSubmit(draftComment);
         window.setTimeout(function() {
           $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
         });
@@ -2130,7 +2223,7 @@ define([
     initComments: function(){
       $add_a_comment_submit_button.click(function(event) {
         event.preventDefault();
-        EG.handleCommentFormSubmit();
+        EG.addSubmissionComment();
       });
       $add_attachment.click(function(event) {
         event.preventDefault();
