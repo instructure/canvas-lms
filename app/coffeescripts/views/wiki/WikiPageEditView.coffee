@@ -74,6 +74,9 @@ define [
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
       json.SHOW =
         COURSE_ROLES: json.contextName == "courses"
+
+      json.assignment = json.assignment?.toView()
+
       json
 
     onUnload: (ev) =>
@@ -175,9 +178,20 @@ define [
       super(xhr)
 
     getFormData: ->
-      data = super
-      data.published = true if @shouldPublish
-      data
+      page_data = super
+
+      assign_data = page_data.assignment
+
+      if assign_data?.set_assignment is '1'
+        assign_data.only_visible_to_overrides = true
+        page_data.assignment = @model.get('assignment') or @model.createAssignment()
+        page_data.assignment.set(assign_data)
+      else
+        page_data.assignment = @model.createAssignment(set_assignment: '0')
+      page_data.set_assignment = page_data.assignment.get('set_assignment')
+
+      page_data.published = true if @shouldPublish
+      page_data
 
     cancel: (event) ->
       event?.preventDefault()
