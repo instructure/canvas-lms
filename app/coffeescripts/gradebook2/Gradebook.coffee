@@ -295,6 +295,7 @@ define [
 
     gotChunkOfStudents: (students) =>
       for student in students
+        student.enrollments = _.filter student.enrollments, @isStudentEnrollment
         isStudentView = student.enrollments[0].type == "StudentViewEnrollment"
         student.sections = student.enrollments.map (e) -> e.course_section_id
 
@@ -308,6 +309,9 @@ define [
         @setupGrading(students)
 
       @grid?.render()
+
+    isStudentEnrollment: (e) =>
+      e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
 
     setupGrading: (students) =>
       # fill in dummy submissions, so there's something there even if the
