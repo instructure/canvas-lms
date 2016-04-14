@@ -2,8 +2,9 @@ define([
   'react',
   'react-modal',
   'i18n!course_images',
-  '../actions'
-], (React, Modal, I18n, Actions) => {
+  '../actions',
+  './CourseImagePicker'
+], (React, Modal, I18n, Actions, CourseImagePicker) => {
 
   class CourseImageSelector extends React.Component {
 
@@ -12,6 +13,7 @@ define([
       this.state = props.store.getState();
 
       this.handleChange = this.handleChange.bind(this);
+      this.handleModalClose = this.handleModalClose.bind(this);
     }
 
     componentWillMount () {
@@ -23,6 +25,10 @@ define([
       this.setState(this.props.store.getState());
     }
 
+    handleModalClose () {
+      this.props.store.dispatch(Actions.setModalVisibility(false));
+    }
+
     render () {
 
       const styles = {
@@ -31,7 +37,12 @@ define([
 
       return (
         <div>
-          <input ref="hiddenInput" type="hidden" name={this.props.name} value={this.state.courseImage} />
+          <input
+            ref="hiddenInput"
+            type="hidden"
+            name={this.state.hiddenInputName}
+            value={this.state.courseImage}
+          />
           <div
             className="CourseImageSelector"
             style={(this.state.imageUrl) ? styles : {}}
@@ -47,9 +58,13 @@ define([
           <Modal
             className="CourseImageSelector__Modal"
             isOpen={this.state.showModal}
-            onRequestClose={() => this.props.store.dispatch(Actions.setModalVisibility(false))}
+            onRequestClose={this.handleModalClose}
           >
-            Picker will render here :)
+            <CourseImagePicker
+              courseId={this.props.courseId}
+              handleClose={this.handleModalClose}
+              handleFileUpload={(e, courseId) => this.props.store.dispatch(Actions.uploadFile(e, courseId))}
+            />
           </Modal>
         </div>
       );

@@ -51,5 +51,28 @@ define(['jsx/course_settings/reducer'], (reducer) => {
     equal(newState.imageUrl, 'http://imageUrl', 'state has the image url set');
   });
 
+  test('SET_COURSE_IMAGE_ID', () => {
+    const action = {
+      type: 'SET_COURSE_IMAGE_ID',
+      payload: {
+        imageUrl: 'http://imageUrl',
+        imageId: 42,
+      }
+    };
+
+    const initialState = {
+      imageUrl: '',
+      courseImage: '',
+      showModal: true,
+      hiddenInputName: ''
+    };
+
+    const newState = reducer(initialState, action);
+    equal(newState.imageUrl, 'http://imageUrl', 'image url gets set');
+    equal(newState.courseImage, '42', 'image id gets set');
+    equal(newState.showModal, false, 'modal gets closed');
+    equal(newState.hiddenInputName, 'course[image_id]', 'input name is set properly');
+  });
+
 
 });

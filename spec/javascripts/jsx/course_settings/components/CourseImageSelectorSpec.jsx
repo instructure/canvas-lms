@@ -30,13 +30,6 @@ define([
     equal(React.findDOMNode(component.refs.hiddenInput).value, initialState.courseImage, 'the input matches');
   });
 
-  test('the hidden inputs name property gets set appropriately', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} name="course[image]" />
-    );
-    equal(component.refs.hiddenInput.props.name, 'course[image]', 'the input matches');
-  });
-
   test('it sets the background image style properly', () => {
     const dispatchStub = sinon.stub(fakeStore, 'getState').returns(Object.assign(initialState, {
       imageUrl: 'http://coolUrl'
