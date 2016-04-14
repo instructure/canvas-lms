@@ -49,8 +49,8 @@
 }
 
 .course-color-block:before {
-  content:'\25FC';
-  @include fontSize(20px);
+  content:'\25A0';
+  @include fontSize(21px);
   padding-right: $ic-sp/2;
-  vertical-align: middle;
+  vertical-align: baseline;
 }
