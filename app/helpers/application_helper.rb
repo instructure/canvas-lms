@@ -332,6 +332,64 @@ module ApplicationHelper
             link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
           end
 
+          if tab[:css_class] == 'modules'
+            module_item_id = params[:module_item_id]
+            if module_item_id
+              link << '<ul id="bz-module-nav">'
+              @context.context_modules.each do |context_module|
+                subtext = ''
+
+                subtext << '<li>'
+
+                subtext << "<a href=\"/courses/#{@context.id}/modules/#{context_module.id}\">"
+                subtext << context_module.name
+                subtext << '</a>'
+                
+                subtext << '<ul>'
+                current_indent = 0
+                possible_items = context_module.content_tags_visible_to(@current_user)
+                has_active = false
+                possible_items.each do |item|
+                  while item.indent > current_indent
+                    subtext << '<ul>'
+                    current_indent+=1
+                  end
+                  while item.indent < current_indent
+                    subtext << '</ul>'
+                    current_indent-=1
+                  end
+                  liclass = ''
+                  if item.id.to_i == module_item_id.to_i
+                    liclass = 'active'
+                    has_active = true
+                  end
+                  subtext << "<li class=\"#{liclass}\">"
+                  subtext << "<a class=\"#{liclass}\" href=\"/courses/#{item.context_id}/modules/items/#{item.id}\">"
+
+                  subtext << item.title
+                  subtext << '</a>'
+                  subtext << '</li>'
+                end
+
+                # cleanup any tags at the end
+                while 0 < current_indent
+                  subtext << '</ul>'
+                  current_indent-=1
+                end
+
+                subtext << '</ul>'
+                subtext << '</li>'
+
+                # I only want to how the active module to keep
+                # the nav from being overloaded for the uer
+                if has_active
+                  link << subtext
+                end
+              end
+              link << '</ul>'
+            end
+          end
+
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
