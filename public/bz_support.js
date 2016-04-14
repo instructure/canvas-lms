@@ -14,9 +14,22 @@
   needs to be available separately.
 
   Flow:
-    -> canvas loads
+    1. canvas loads
+    2. this file loads, making the function available
+    3. Canvas coffeecript runs, which can call this function
+    4. bz_custom.js runs
+    5. bottom scripts in view html run, which can also call thi
 */
 function bzRetainedInfoSetup() {
+  function bzChangeRetainedItem(ta, value) {
+          if(ta.tagName == "SPAN")
+            ta.textContent = value;
+          else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+            ta.checked = (value == "yes") ? true : false;
+	  else
+            ta.value = value;
+  }
+
   var textareas = document.querySelectorAll("[data-bz-retained]");
   for(var i = 0; i < textareas.length; i++) {
     (function(ta) {
@@ -34,21 +47,23 @@ function bzRetainedInfoSetup() {
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value);
         http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         http.send(data);
+
+        // we also need to update other views on the same page
+        for(var idx = 0; idx < textareas.length; idx++) {
+            var item = textareas[idx];
+            if(item == ta)
+              continue;
+            if(item.getAttribute("data-bz-retained") == name)
+              bzChangeRetainedItem(item, value);
+        }
       };
 
       ta.className += " bz-retained-field-setup";
       ta.addEventListener("change", save);
 
       var http = new XMLHttpRequest();
-      http.onload = function() {
-          // cut off json p stuff
-          if(ta.tagName == "SPAN")
-            ta.textContent = http.responseText.substring(9);
-          else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
-            ta.checked = (http.responseText.substring(9) == "yes") ? true : false;
-	  else
-            ta.value = http.responseText.substring(9);
-      };
+      // cut off json p stuff
+      http.onload = function() { bzChangeRetainedItem(ta, http.responseText.substring(9)); };
       http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
       http.send();
     })(textareas[i]);
