@@ -92,7 +92,7 @@ describe Assignment::SpeedGrader do
         end
 
         it "only shows group comments" do
-          json = assignment.speed_grader_json(@user)
+          json = Assignment::SpeedGrader.new(assignment, teacher).json
           comments = json.fetch(:submissions).first.fetch(:submission_comments).map do |comment|
             comment.slice(:author_id, :comment)
           end
