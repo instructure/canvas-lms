@@ -75,10 +75,6 @@ describe DeveloperKey do
         expect(@key.authorized_for_account?(Account.find(@account.id))).to be true
       end
 
-      it "should allow allow access to ita accounts sub accounts" do
-        expect(@key.authorized_for_account?(@sub_account1)).to be true
-        expect(@key.authorized_for_account?(@sub_account2)).to be true
-      end
       it "shouldn't allow allow access to a foreign account" do
         expect(@key.authorized_for_account?(@not_sub_account)).to be false
       end
@@ -90,11 +86,6 @@ describe DeveloperKey do
       before :once do
         @account = Account.create!
 
-        @shard1.activate do
-          @sub_account1 = @account.sub_accounts.create!
-          @sub_account2 = @account.sub_accounts.create!
-        end
-
         @not_sub_account = Account.create!
         @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
       end
@@ -105,8 +96,6 @@ describe DeveloperKey do
     context 'without sharding' do
       before :once do
         @account = Account.create!
-        @sub_account1 = @account.sub_accounts.create!
-        @sub_account2 = @account.sub_accounts.create!
 
         @not_sub_account = Account.create!
         @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)

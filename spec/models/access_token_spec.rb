@@ -214,9 +214,6 @@ describe AccessToken do
       expect(@at.authorized_for_account?(@ac)).to be true
     end
 
-    it "sub account should be authorized" do
-      expect(@at.authorized_for_account?(@sub_ac)).to be true
-    end
     it "account should be the account from the developer key" do
       expect(@at.account.id).to be @dk.account.id
     end

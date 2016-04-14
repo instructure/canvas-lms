@@ -65,7 +65,7 @@ class AccessToken < ActiveRecord::Base
     # since you need a refresh token to
     # refresh expired tokens
 
-    if !developer_key_id || slaved_developer_key.try(:active?)
+    if !developer_key_id || cached_developer_key.try(:active?)
       # we are a stand alone token, or a token with an active developer key
       # make sure we
       #   - have a user id
@@ -77,12 +77,12 @@ class AccessToken < ActiveRecord::Base
   end
 
   def app_name
-    slaved_developer_key.try(:name) || "No App"
+    cached_developer_key.try(:name) || "No App"
   end
 
   def authorized_for_account?(target_account)
-    return true unless slaved_developer_key
-    slaved_developer_key.authorized_for_account?(target_account)
+    return true unless cached_developer_key
+    cached_developer_key.authorized_for_account?(target_account)
   end
 
   def record_last_used_threshold
@@ -192,6 +192,11 @@ class AccessToken < ActiveRecord::Base
   end
 
   private
+  def cached_developer_key
+    return nil unless developer_key_id
+    @developer_key ||= DeveloperKey.find_cached(developer_key_id)
+  end
+
   def slaved_developer_key
     Shackles.activate(:slave){ return developer_key }
   end
