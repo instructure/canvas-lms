@@ -2094,6 +2094,24 @@ describe 'Submissions API', type: :request do
 
       expect(json['provisional_grades'].first['score']).to eq 0
     end
+
+    it "should return an error trying to grade a student not enrolled in the course" do
+      @student.enrollments.first.conclude
+      a1 = @course.assignments.create!(
+        title: 'assignment1',
+        grading_type: 'points',
+        points_possible: 15
+      )
+      json = api_call(:put,
+            "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
+            { :controller => 'submissions_api', :action => 'update',
+              :format => 'json', :course_id => @course.id.to_s,
+              :assignment_id => a1.id.to_s, :user_id => @student.id.to_s },
+            { :submission => { :posted_grade => 10 } },
+            {},
+            { expected_status: 400 })
+      expect(json["error"]).not_to be_nil
+    end
   end
 
   it "should allow posting grade by sis id" do

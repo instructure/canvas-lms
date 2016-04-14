@@ -218,7 +218,7 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
     given {|user, session| self.assignment.user_can_read_grades?(user, session) }

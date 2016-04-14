@@ -601,7 +601,12 @@ class SubmissionsApiController < ApplicationController
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
       end
       if submission[:grade] || submission[:excuse]
-        @submissions = @assignment.grade_student(@user, submission)
+        begin
+          @submissions = @assignment.grade_student(@user, submission)
+        rescue Assignment::GradeError => e
+          logger.info "GRADES: grade_student failed because '#{e.message}'"
+          return render json: { error: e.to_s }, status: 400
+        end
         @submission = @submissions.first
       else
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
