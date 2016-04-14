@@ -22,7 +22,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
       label = document.createElement("label");
       label.innerHTML = "<span>Type:</span> ";
       var type = document.createElement("select");
-      type.innerHTML = "<option value=\"textarea\">Text box</option><option value=\"checkbox\">Check box</option>";
+      type.innerHTML = "<option value=\"input\">Single-line text</option><option value=\"textarea\">Multi-line text box</option><option value=\"checkbox\">Check box</option>";
       label.appendChild(type);
       div.appendChild(label);
 
@@ -58,6 +58,8 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
 
         if(type == "checkbox")
           ed.selection.setContent('<input type="checkbox" data-bz-retained="'+name+'" />');
+        else if(type == "input")
+          ed.selection.setContent('<input type="text" data-bz-retained="'+name+'" />');
         else if(type == "textarea")
           ed.selection.setContent('<textarea data-bz-retained="'+name+'"></textarea>');
       });
@@ -68,7 +70,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
         name = name.replace(/"/g, '&quot;');
         if(type == "checkbox")
           ed.selection.setContent('<input type="checkbox" readonly="readonly" data-bz-retained="'+name+'" />');
-        else if(type == "textarea")
+        else
           ed.selection.setContent('<span data-bz-retained="'+name+'">...</span>');
       });
     });
