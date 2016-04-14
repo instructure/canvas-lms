@@ -256,3 +256,20 @@ iframe.tool_launch {
   height: 100%;
   border: none;
 }
+
+#skip_navigation_link {
+  @include accessibility-prompt;
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  &:focus {
+    left: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+    z-index: 1;
+  }
+}
