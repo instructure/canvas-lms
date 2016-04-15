@@ -267,7 +267,7 @@ module Lti
 
         expect(roles).to include 'TeacherEnrollment'
         expect(roles).to include 'DesignerEnrollment'
-        expect(roles).to include 'Account Admin'
+        expect(roles).to include 'AccountAdmin'
       end
     end
 

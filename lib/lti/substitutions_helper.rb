@@ -137,7 +137,7 @@ module Lti
     end
 
     def current_canvas_roles
-      (course_enrollments.map(&:role).map(&:name) + account_enrollments.map(&:readable_type)).uniq.join(',')
+      (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq.join(',')
     end
 
     def enrollment_state
