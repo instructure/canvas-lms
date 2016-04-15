@@ -10,6 +10,7 @@ define [
   'compiled/collections/CalendarEventCollection'
   'compiled/calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
+  'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, moment, tz, fcUtil, calendarEventFilter, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 
