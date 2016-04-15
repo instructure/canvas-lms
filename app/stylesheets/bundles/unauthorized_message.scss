@@ -1,0 +1,39 @@
+#unauthorized_message {
+  border: 1px solid #000;
+  margin: 4em auto;
+  width: 500px;
+  .ui-state-error, &.ui-state-error {
+    position: relative;
+    z-index: 1;
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 3px 3px -1px rgba(0, 0, 0, 0.25);
+    &:before {
+      content: " ";
+      background: transparent url(/images/warning_36.png) 0 4px no-repeat;
+      position: absolute;
+      top: 6px;
+      left: 22px;
+      width: 42px;
+      height: 42px;
+    }
+  }
+  h2, .h2 {
+    font-size: 1.5em;
+    &.ui-state-error {
+      padding: 15px;
+      margin: -1px;
+      color: #fff;
+      height: 60px;
+      line-height: 60px;
+      padding: 0 0 0 80px;
+    }
+  }
+  p {
+    font-size: 1.1em;
+    padding: 2em 3em;
+    font-weight: bold;
+    margin: 0;
+  }
+}
