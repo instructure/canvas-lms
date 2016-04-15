@@ -2025,29 +2025,29 @@ class Course < ActiveRecord::Base
 
   def section_visibilities_for(user, opts={})
     RequestCache.cache('section_visibilities_for', user, self) do
-    shard.activate do
-      Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-        workflow_not = opts[:excluded_workflows] || 'deleted'
+      shard.activate do
+        Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+          workflow_not = opts[:excluded_workflows] || 'deleted'
 
-        enrollments = Enrollment.select([
-          :course_section_id,
-          :limit_privileges_to_course_section,
-          :type,
-          :associated_user_id])
-          .where("user_id=? AND course_id=?", user, self)
-          .where.not(workflow_state: workflow_not)
+          enrollments = Enrollment.select([
+            :course_section_id,
+            :limit_privileges_to_course_section,
+            :type,
+            :associated_user_id])
+            .where("user_id=? AND course_id=?", user, self)
+            .where.not(workflow_state: workflow_not)
 
-        enrollments.map do |e|
-          {
-            :course_section_id => e.course_section_id,
-            :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
-            :type => e.type,
-            :associated_user_id => e.associated_user_id,
-            :admin => e.admin?
-          }
+          enrollments.map do |e|
+            {
+              :course_section_id => e.course_section_id,
+              :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
+              :type => e.type,
+              :associated_user_id => e.associated_user_id,
+              :admin => e.admin?
+            }
+          end
         end
       end
-    end
     end
   end
 

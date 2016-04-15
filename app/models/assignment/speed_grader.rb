@@ -46,7 +46,7 @@ class Assignment
         }
       end
 
-      enrollments = @assignment.context.apply_enrollment_visibility(@assignment.context.student_enrollments, @user)
+      enrollments = @assignment.context.apply_enrollment_visibility(@assignment.context.admin_visible_student_enrollments, @user, nil, include: :inactive)
 
       is_provisional = @grading_role == :provisional_grader || @grading_role == :moderator
       rubric_assmnts = @assignment.visible_rubric_assessments_for(@user, :provisional_grader => is_provisional) || []
@@ -74,10 +74,25 @@ class Assignment
         json
       end
 
-      res[:context][:active_course_sections] = @assignment.context.sections_visible_to(@user, @assignment.sections_with_visibility(@user)).
-        map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
-      res[:context][:enrollments] = enrollments.
-          map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
+      res[:context][:active_course_sections] = @assignment
+        .context
+        .sections_visible_to(
+          @user,
+          @assignment.sections_with_visibility(@user)
+        )
+        .map do |section|
+          section.as_json(
+            include_root: false,
+            only: [:id, :name]
+          )
+        end
+
+      res[:context][:enrollments] = enrollments.map do |enrollment|
+        enrollment.as_json(
+          include_root: false,
+          only: [:user_id, :course_section_id, :workflow_state]
+        )
+      end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
       includes = [:versions, :quiz_submission, :user]
