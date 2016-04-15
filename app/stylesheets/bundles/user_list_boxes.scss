@@ -1,0 +1,59 @@
+@import "base/mixins/typography";
+
+// these are the things that show up when you try to import names w/emails into your course
+#user_list_boxes {
+  position: relative;
+  min-height: 165px;
+  margin-top: 10px;
+  #user_list_textarea_container, #user_list_processing, #user_list_parsed {
+    min-height: 165px;
+    width: 100%;
+    background-color: white;
+    label {
+      font-size: 0.8em;
+    }
+  }
+  textarea {
+    width: 98%;
+    height: 108px;
+    margin: 0;
+  }
+  #user_lists_processed_people {
+    overflow: auto;
+    height: 126px;
+    .ui-widget {
+      margin: 0 8px 8px 0;
+    }
+    .person {
+      display: inline-block;
+      position: relative;
+      background: #FFF;
+      margin: 0 8px 8px 0;
+      padding: 4px;
+      @include fontSize(11px);
+      min-height: 21px;
+      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
+      div {
+        margin: 2px 0 0 33px;
+      }
+      .name::after {
+        content: " ";
+      }
+      .address, .login {
+        font-weight: normal;
+      }
+      &::before {
+        content: "";
+        display: block;
+        height: 100%;
+        background: url(/images/circle-plus.png) no-repeat center center;
+        position: absolute;
+        margin: -4px;
+        width: 33px;
+      }
+      &.existing-user::before {
+        background-image: url(/images/circle-check.png);
+      }
+    }
+  }
+}

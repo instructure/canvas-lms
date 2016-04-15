@@ -1,5 +1,6 @@
 <% root_account = @context.root_account %>
 <% account = @context.respond_to?(:account) ? @context.account : @context %>
+<% css_bundle("user_list_boxes") %>
 <div id="user_list_boxes">
   <a id="user_lists_path" style="display:none;" href="<%= polymorphic_path([@context, :user_lists], :format => :json) %>"></a>
   <div id="user_list_textarea_container" style="z-index: 2;">
