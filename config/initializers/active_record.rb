@@ -1457,6 +1457,59 @@ module SkipTouchCallbacks
     end
   end
 end
-
 ActiveRecord::Base.singleton_class.include(SkipTouchCallbacks::Base)
+
+# This code is copied directly out of ActiveRecord with the exception of 2 lines.
+# The reason we need it it comes down to page views and other "Shardless" classes.
+# PageView is a class that we don’t store data for in postgres, but instead in Cassandra.
+# So it doesn't have a true "shard", but for the purposes of the AR interface in switchman,
+# it's "shard" is the birth shard, and the "conn" line here was pulling a connection
+# to it just to do bind variable merging (which doesn't actually need a real
+# postgres connection).  In Rails 4.2 this won't be a problem anymore,
+# so yank this monkey patch when we're on Rails 4.2
+module MultiMergeWithoutConnection
+  def merge_multi_values
+    lhs_wheres = relation.where_values
+    rhs_wheres = values[:where] || []
+
+    lhs_binds  = relation.bind_values
+    rhs_binds  = values[:bind] || []
+
+    removed, kept = partition_overwrites(lhs_wheres, rhs_wheres)
+
+    where_values = kept + rhs_wheres
+    bind_values  = filter_binds(lhs_binds, removed) + rhs_binds
+
+    # conn = relation.klass.connection
+    # commented because we don't actually need a connection to substitute
+    bv_index = 0
+    where_values.map! do |node|
+      if Arel::Nodes::Equality === node && Arel::Nodes::BindParam === node.right
+        # substitute = conn.substitute_at(bind_values[bv_index].first, bv_index)
+        # commented so we can just pull in the BindParam class and use it directly
+        # rather than establishing a connection to the db first.
+        substitute = Arel::Nodes::BindParam.new "$#{bv_index + 1}"
+        bv_index += 1
+        Arel::Nodes::Equality.new(node.left, substitute)
+      else
+        node
+      end
+    end
+
+    relation.where_values = where_values
+    relation.bind_values  = bind_values
+
+    if values[:reordering]
+      # override any order specified in the original relation
+      relation.reorder! values[:order]
+    elsif values[:order]
+      # merge in order_values from r
+      relation.order! values[:order]
+    end
+
+    relation.extend(*values[:extending]) unless values[:extending].blank?
+  end
+end
+ActiveRecord::Relation::Merger.prepend(MultiMergeWithoutConnection) if CANVAS_RAILS4_0
+
 ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0
