@@ -85,12 +85,10 @@
         text-decoration: none;
         outline: none;
       }
-      .ic-icon-svg, .ic-avatar { transform: scale(1.075); }
       .ic-avatar {
         border-color: $ic-brand-global-nav-avatar-border;
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
       }
-      &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
       .menu-item__badge {
         @include primary-nav-badge-border($ic-global-nav-menu-item__badge-border);
       }
@@ -102,8 +100,6 @@
     }
 
     .ic-icon-svg {
-      transition: all 0.2s ease-out;
-      transform: translate3d(0,0,0);
       width: 26px;
       display: inline-block;
       vertical-align: middle;
@@ -200,7 +196,7 @@
     display: block;
     width: 100%;
     overflow: hidden;
-    margin: 0 auto $ic-sp auto;
+    margin: 0 auto;
     background-image: $ic-brand-header-image;
     background-position: 50%;
     background-repeat: no-repeat;
