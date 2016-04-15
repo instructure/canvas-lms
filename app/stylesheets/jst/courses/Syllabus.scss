@@ -1,0 +1,4 @@
+// this file is so app/views/jst/courses/Syllabus.handlebars pulls in
+// the app/bundles/syllabus.scss bundle without also having to add
+// a css_bundle to the page somwhere.
+@import "bundles/syllabus";
