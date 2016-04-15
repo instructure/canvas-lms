@@ -1,0 +1,51 @@
+// this is legacy stuff, don't use it. please delete it if you can
+
+table.side_tabs_table {
+  border-collapse: collapse;
+  td {
+    vertical-align: top;
+    &.left {
+      width: 25%;
+      border-right: 1px solid #ccc;
+      padding-right: 5px;
+    }
+    &.right {
+      width: 65%;
+      border-left: 1px solid #ccc;
+      padding-left: 5px;
+    }
+  }
+  ul.side_tabs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 300px;
+    overflow: auto;
+    min-width: 150px;
+    li {
+      padding: 2px 5px;
+      margin-bottom: 3px;
+      cursor: pointer;
+      &:hover {
+        background-color: #eee;
+      }
+      &.selected_side_tab {
+        font-weight: bold;
+        background-color: #ddd;
+      }
+      div.sub_content {
+        font-size: 0.8em;
+        padding-left: 10px;
+        color: #888;
+      }
+    }
+  }
+  div.side_tabs_content {
+    max-height: 300px;
+    overflow: auto;
+  }
+  div.side_tabs_content_with_room_for_button {
+    max-height: 252px;
+    overflow: auto;
+  }
+}
