@@ -15,4 +15,19 @@ define([
     ok(component);
   });
 
+  test('calls the handleFileUpload prop when change occurs on the file input', () => {
+    let called = false;
+    const handleFileUploadFunc = () => called = true;
+    const component = TestUtils.renderIntoDocument(
+      <UploadArea
+        courseId="101"
+        handleFileUpload={handleFileUploadFunc}
+      />
+    );
+
+    const input = TestUtils.findRenderedDOMComponentWithClass(component, 'FileUpload__Input');
+    TestUtils.Simulate.change(input);
+    ok(called, 'handleFileUpload was called');
+  });
+
 });

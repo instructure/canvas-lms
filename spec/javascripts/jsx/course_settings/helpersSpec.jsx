@@ -22,4 +22,43 @@ define([
     ok(formData instanceof FormData, 'created a FormData object');
   });
 
+  test('extractInfoFromEvent', () => {
+    const changeEvent = {
+      type: 'change',
+      target: {
+        files: [{type: 'image/jpeg'}]
+      }
+    };
+
+    const dragEvent = {
+      type: 'drop',
+      dataTransfer: {
+        files: [{
+          name: 'test',
+          type: 'image/jpeg'
+        }]
+      },
+    };
+
+    const changeResults = Helpers.extractInfoFromEvent(changeEvent);
+    const expectedChangeResults = {
+      file: {
+        type: 'image/jpeg'
+      },
+      type: 'image/jpeg'
+    };
+
+    const dragResults = Helpers.extractInfoFromEvent(dragEvent);
+    const expectedDragResults = {
+      file: {
+        name: 'test',
+        type: 'image/jpeg'
+      },
+      type: 'image/jpeg'
+    };
+
+    deepEqual(changeResults, expectedChangeResults, 'creates the proper info from change events');
+    deepEqual(dragResults, expectedDragResults, 'creates the proper info from drag events');
+  });
+
 });

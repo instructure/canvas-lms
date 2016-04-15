@@ -81,7 +81,9 @@ define([
             </div>
           </div>
           <div className="CourseImagePicker__Content">
-            <UploadArea />
+            <UploadArea 
+              courseId={this.props.courseId}
+              handleFileUpload={this.props.handleFileUpload}/>
           </div>
         </div>
       );

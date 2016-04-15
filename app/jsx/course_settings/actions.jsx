@@ -82,8 +82,8 @@ define ([
     uploadFile (event, courseId, ajaxLib = axios) {
       event.preventDefault();
       return (dispatch, getState) => {
-        const type = event.dataTransfer.files[0].type;
-        const file = event.dataTransfer.files[0];
+        const { type, file } = Helpers.extractInfoFromEvent(event);
+
         if (Helpers.isValidImageType(type)) {
           const data = {
             name: file.name,
@@ -111,8 +111,8 @@ define ([
           $.flashWarning(I18n.t("'%{type}' is not a valid image type (try jpg, png, or gif)", {type}));
         }
       };
-
     }
+
   };
 
   return Actions;

@@ -6,6 +6,21 @@ define([
   './CourseImagePicker'
 ], (React, Modal, I18n, Actions, CourseImagePicker) => {
 
+  const modalOverrides = {
+    content : {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      right: '0',
+      bottom: '0',
+      border: 'none',
+      padding: '12px',
+      maxWidth: '1420px',
+      borderRadius: '0',
+      background: '#ffffff'
+    }
+  };
+
   class CourseImageSelector extends React.Component {
 
     constructor (props) {
@@ -56,9 +71,9 @@ define([
             </button>
           </div>
           <Modal
-            className="CourseImageSelector__Modal"
             isOpen={this.state.showModal}
             onRequestClose={this.handleModalClose}
+            style={modalOverrides}
           >
             <CourseImagePicker
               courseId={this.props.courseId}

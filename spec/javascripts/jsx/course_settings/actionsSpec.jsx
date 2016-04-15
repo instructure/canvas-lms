@@ -121,7 +121,6 @@ define([
           type: 'image/tiff'
         }]
       },
-      //placeholder method to avoid failure when calling uploadFile
       preventDefault: () => {}
     };
 
@@ -175,7 +174,6 @@ define([
           type: 'image/jpeg'
         }]
       },
-      //placeholder method to avoid failure when calling uploadFile
       preventDefault: () => {}
     };
 
