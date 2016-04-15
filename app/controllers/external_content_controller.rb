@@ -53,9 +53,16 @@ class ExternalContentController < ApplicationController
         end
       end
     end
+    if params[:id]
+      message_auth = Lti::MessageAuthenticator.new(request.original_url, request.GET.merge(request.POST))
+      render_unauthorized_action and return unless message_auth.valid?
+      json_data = (params[:data] && Canvas::Security.decode_jwt(params[:data])) || {}
+      render_unauthorized_action and return unless json_data[:content_item_id] == params[:id]
+      render_unauthorized_action and return unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
+    end
     @headers = false
     js_env(retrieved_data: (@retrieved_data || {}), lti_response_messages: lti_response_messages,
-           service: params[:service])
+           service: params[:service], service_id: params[:id])
   end
 
 

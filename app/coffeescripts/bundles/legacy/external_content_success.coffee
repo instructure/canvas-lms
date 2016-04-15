@@ -6,10 +6,11 @@ require [
   'compiled/jquery.rails_flash_notifications'
 ], ($, I18n) ->
 
-  dataReady = (data) ->
+  dataReady = (data, service_id) ->
     if parentWindow[callback] and parentWindow[callback].ready
       e = jQuery.Event( "externalContentReady" )
       e.contentItems = data
+      e.service_id = service_id
       parentWindow.$(parentWindow).trigger "externalContentReady", e
       parentWindow[callback].ready data
       setTimeout (->
@@ -22,6 +23,7 @@ require [
       $("#dialog_message").text I18n.t("content_failure", "Content retrieval failed, please try again or notify your system administrator of the error.")
 
   lti_response_messages = ENV.lti_response_messages
+  service_id = ENV.service_id
   data = ENV.retrieved_data
   callback = ENV.service
   parentWindow = window.parent
@@ -37,4 +39,4 @@ require [
     ), ->
       $("#dialog_message").text I18n.t("oembed_failure", "Content retrieval failed, please try again or notify your system administrator of the error.")
   else
-    dataReady data
+    dataReady data, service_id

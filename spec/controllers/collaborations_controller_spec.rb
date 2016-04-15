@@ -122,6 +122,21 @@ describe CollaborationsController do
       ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
     end
 
+    it 'redirects to the lti launch url for ExternalToolCollaborations' do
+      course_with_teacher(:active_all => true)
+      user_session(@teacher)
+      collab = ExternalToolCollaboration.create!(
+        title: "my collab",
+        user: @teacher,
+        url: 'http://www.example.com'
+      )
+      collab.context = @course
+      collab.save!
+      get 'show', :course_id=>@course.id, :id => collab.id
+      url = CGI::escape(collab[:url])
+      expect(response).to redirect_to "/courses/#{@course.id}/external_tools/retrieve?display=borderless&url=#{url}"
+    end
+
     context "logged in user" do
       before :once do
         Setting.set('enable_page_views', 'db')
@@ -151,6 +166,7 @@ describe CollaborationsController do
         expect(page_view.url).to match %r{^http://test\.host/courses/\d+/collaborations}
         expect(page_view.participated).to be_truthy
       end
+
     end
 
     context "logged out user" do
@@ -210,7 +226,7 @@ describe CollaborationsController do
         expect(collaboration).to be_is_a(ExternalToolCollaboration)
         expect(collaboration.title).to eq content_items.first[:title]
         expect(collaboration.description).to eq content_items.first[:text]
-        expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+        expect(collaboration.url).to eq content_items[0][:url]
       end
 
       it "callback url should not be nil if provided" do
@@ -240,4 +256,68 @@ describe CollaborationsController do
     end
 
   end
+
+  describe "PUT #update" do
+    context "content_items" do
+
+      let(:collaboration) do
+        collab = @course.collaborations.create!(
+          title: "a collab",
+          user: @teacher
+        )
+        collab.update_attribute :url, 'http://www.example.com'
+        collab.update_attribute :type, "ExternalToolCollaboration"
+        collab
+      end
+
+      let(:content_items) do
+        [
+          {
+            title: 'my collab',
+            text: 'collab description',
+            url: 'http://example.invalid/test',
+            confirmUrl: 'http://example.com/confirm/343'
+          }
+        ]
+      end
+
+      it "should update a collaboration using content-item" do
+        user_session(@teacher)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(assigns[:collaboration]).not_to be_nil
+        expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
+        expect(collaboration).to be_is_a(ExternalToolCollaboration)
+        expect(collaboration.title).to eq content_items.first[:title]
+        expect(collaboration.description).to eq content_items.first[:text]
+        expect(collaboration.url).to eq content_items[0][:url]
+      end
+
+      it "callback url should not be nil if provided" do
+        user_session(@teacher)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        c = ExternalToolCollaboration.find(collaboration.id)
+        expect(c.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
+      end
+
+      it "should callback on success" do
+        user_session(@teacher)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:success_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "should callback on failure" do
+        user_session(@teacher)
+        Collaboration.any_instance.stubs(:save).returns(false)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:failure_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+    end
+  end
+
 end

@@ -88,7 +88,12 @@ class CollaborationsController < ApplicationController
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
-          redirect_to @collaboration.url
+          if @collaboration.is_a? ExternalToolCollaboration
+            url = external_tool_launch_url(@collaboration.url)
+          else
+            url = @collaboration.url
+          end
+          redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
           redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
         else
@@ -137,14 +142,22 @@ class CollaborationsController < ApplicationController
   def update
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
+    content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     begin
-      users     = User.where(:id => Array(params[:user])).to_a
-      group_ids = Array(params[:group])
-      params[:collaboration].delete :collaboration_type
-      @collaboration.attributes = params[:collaboration]
+      if content_item
+        @collaboration = collaboration_from_content_item(content_item, @collaboration)
+        users = []
+        group_ids = []
+      else
+        users     = User.where(:id => Array(params[:user])).to_a
+        group_ids = Array(params[:group])
+        params[:collaboration].delete :collaboration_type
+        @collaboration.attributes = params[:collaboration]
+      end
       @collaboration.update_members(users, group_ids)
       respond_to do |format|
         if @collaboration.save
+          Lti::ContentItemUtil.new(content_item).success_callback if content_item
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.as_json(
                                  :methods => [:collaborator_ids],
@@ -154,6 +167,7 @@ class CollaborationsController < ApplicationController
                                  }
                                )}
         else
+          Lti::ContentItemUtil.new(content_item).failure_callback if content_item
           flash[:error] = t 'errors.update_failed', "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.errors, :status => :bad_request }
@@ -226,9 +240,12 @@ class CollaborationsController < ApplicationController
         user: @current_user
     }
     collaboration.data = content_item
-    collaboration.url = polymorphic_url([:retrieve, @context, :external_tools], url: content_item['url'], display: 'borderless')
+    collaboration.url = content_item['url']
     collaboration
   end
-  private :collaboration_from_content_item
+
+  def external_tool_launch_url(url)
+    polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  end
 
 end

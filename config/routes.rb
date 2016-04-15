@@ -415,11 +415,13 @@ CanvasRails::Application.routes.draw do
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
 
   get 'external_content/success/:service' => 'external_content#success', as: :external_content_success
+  get 'external_content/success/:service/:id' => 'external_content#success', as: :external_content_update
   get 'external_content/retrieve/oembed' => 'external_content#oembed_retrieve', as: :external_content_oembed_retrieve
   get 'external_content/cancel/:service' => 'external_content#cancel', as: :external_content_cancel
 
   %w(account course group user).each do |context|
     match "#{context.pluralize}/:#{context}_id/external_content/success/:service" => 'external_content#success', as: "#{context}_external_content_success", via: [:get, :post]
+    match "#{context.pluralize}/:#{context}_id/external_content/success/:service/:id" => 'external_content#success', as: "#{context}_external_content_update", via: [:get, :post]
   end
 
   # We offer a bunch of atom and ical feeds for the user to get

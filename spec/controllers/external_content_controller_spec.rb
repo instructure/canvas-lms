@@ -49,6 +49,103 @@ describe ExternalContentController do
       expect(data.first.canvas_url).to end_with(e)
 
     end
+
+    context 'external_tool service_id' do
+      let(:test_course) {course}
+      let(:launch_url) {'http://test.com/launch'}
+      let(:tool) do
+        test_course.context_external_tools.create!(
+          {
+            name: 'test tool',
+            domain:'test.com',
+            consumer_key: oauth_consumer_key,
+            shared_secret: 'secret'
+          }
+        )
+      end
+      let(:service_id) {"3"}
+      let(:oauth_consumer_key) {"key"}
+      let(:content_item_selection) do
+        message = IMS::LTI::Models::Messages::ContentItemSelection.new(
+          {
+            lti_message_type: 'ContentItemSelection',
+            lti_version: 'LTI-1p0',
+            content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
+            data: Canvas::Security.create_jwt({content_item_id: service_id, oauth_consumer_key: oauth_consumer_key}),
+            lti_msg: '',
+            lti_log: '',
+            lti_errormsg: '',
+            lti_errorlog: ''
+          }
+        )
+        message.launch_url = launch_url
+        message.oauth_consumer_key = oauth_consumer_key
+        message
+      end
+
+      before(:each) do
+        Lti::MessageAuthenticator.any_instance.stubs(:valid?).returns(true)
+        course_with_teacher
+        user_session(@teacher)
+      end
+
+      it 'validates the signature' do
+        Lti::MessageAuthenticator.any_instance.expects(:valid?).returns(false)
+        post(
+          :success,
+          {
+            service: 'external_tool_dialog',
+            course_id: test_course.id,
+            id: service_id,
+          }.merge(content_item_selection.signed_post_params(tool.shared_secret))
+        )
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "sets the service_id if one is passed in" do
+        post(
+          :success,
+          {
+            service: 'external_tool_dialog',
+            course_id: test_course.id,
+            id: service_id,
+          }.merge(content_item_selection.signed_post_params(tool.shared_secret))
+        )
+        expect(controller.js_env[:service_id]).to eq service_id
+      end
+
+      it "returns a 401 if the service_id, and data attribute don't match" do
+        params = content_item_selection.signed_post_params(tool.shared_secret).
+            merge(
+              {
+                service: 'external_tool_dialog',
+                course_id: test_course.id,
+                id: 3,
+                data: Canvas::Security.create_jwt({content_item_id: "1"})
+              }
+            )
+        post(:success, params)
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns a 401 if the consumer_key, and data attribute don't match" do
+        params = content_item_selection.signed_post_params(tool.shared_secret).
+          merge(
+            {
+              service: 'external_tool_dialog',
+              course_id: test_course.id,
+              id: service_id,
+              data: Canvas::Security.create_jwt({content_item_id: service_id, oauth_consumer_key:'invalid'})
+            }
+          )
+        post(:success, params)
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+    end
+
+
+
   end
 
 

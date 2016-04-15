@@ -22,7 +22,20 @@ module CollaborationsHelper
     if collab.is_a?(GoogleDocsCollaboration) && !google_drive_enabled
       render 'collaborations/auth_google_drive', collaboration: collab
     else
-      render 'collaborations/collaboration', collaboration: collab, user: user
+      data_attrs = {id: collab.id}
+      if collab.is_a?(ExternalToolCollaboration)
+        url = polymorphic_url(
+          [:retrieve, @context, :external_tools],
+          {
+            url: collab.update_url,
+            display: 'borderless',
+            placement: 'collaboration',
+            content_item_id: collab.id
+          }
+        )
+        data_attrs[:update_launch_url] = url
+      end
+      render 'collaborations/collaboration', collaboration: collab, user: user, data_attributes: data_attrs
     end
   end
 
@@ -33,7 +46,9 @@ module CollaborationsHelper
   end
 
   def edit_button(collab, user)
-    render 'collaborations/edit_button', collaboration: collab if can_do(collab, user, :update)
+    if !collab.is_a?(ExternalToolCollaboration) || (collab.is_a?(ExternalToolCollaboration) && collab.update_url)
+      render 'collaborations/edit_button', collaboration: collab if can_do(collab, user, :update)
+    end
   end
 
   def delete_button(collab, user)
