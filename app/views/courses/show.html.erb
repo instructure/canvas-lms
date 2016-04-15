@@ -145,6 +145,7 @@
 
 <% js_bundle 'legacy/courses_show' %>
 <% if @context.created? || @context.claimed? %>
+  <% css_bundle("reminder_course_setup") %>
   <div class="reminder Reminder__course-setup">
     <h2 class="Reminder__course-setup-title">
       <%= t('headings.unpublished', %{This Course is Unpublished}) %>
