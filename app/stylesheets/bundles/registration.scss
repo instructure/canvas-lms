@@ -190,8 +190,5 @@ a {
     border-right: none;
     border-bottom: none;
     background: $white;
-    .ie & {
-      display: none;
-    }
   }
 }

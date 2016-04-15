@@ -5,16 +5,13 @@
   yield :pre_html
 
 -%><!DOCTYPE html>
-<!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
-<!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
+<html class="scripts-not-loaded" lang=<%= @locale %>>
 <head>
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
-  <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
-
+  <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
-
   <%= yield :auto_discovery %>
   <%= yield :head %>
   <%= yield :meta_tags %>
