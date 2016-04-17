@@ -150,7 +150,7 @@ module Selinimum
         def restore_constants_for(cached_autoload, file_path)
           restore_constant(cached_autoload.const, file_path)
           cached_autoload.dependencies.each do |dep|
-            next if current_autoloads[file_path]
+            next if current_autoloads[dep]
             restore_constants_for(cached_autoloads[dep], dep) if cached_autoloads[dep]
           end
         end

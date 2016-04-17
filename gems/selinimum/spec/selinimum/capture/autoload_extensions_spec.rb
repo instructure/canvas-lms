@@ -65,6 +65,23 @@ describe Selinimum::Capture::AutoloadExtensions do
           expect(Object.const_defined?("SelinimumFoo")).to be true
           expect(Object.const_defined?("SelinimumFoo::Baz")).to be true
         end
+
+        it "restores dependencies" do
+          cache_constants("SelinimumFoo") do
+            SelinimumFoo = Class.new
+
+            cache_constants("SelinimumBar") do
+              expect(Object.const_defined?("SelinimumFoo")).to be true
+              SelinimumBar = Class.new
+            end
+          end
+
+          subject.reset_autoloads!
+          cache_constants("SelinimumFoo")
+
+          expect(Object.const_defined?("SelinimumFoo")).to be true
+          expect(Object.const_defined?("SelinimumBar")).to be true
+        end
       end
     end
 
