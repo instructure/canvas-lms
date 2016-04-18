@@ -106,7 +106,7 @@ define [
           color = '#' + color
           $existingStyles = $('#calendar_color_style_overrides');
           $newStyles = $('<style>')
-          $newStyles.text ".group_#{assetString}{ color: #{color}; border-color: #{color}; background-color: #{color};}"
+          $newStyles.text ".group_#{assetString},.group_#{assetString}:hover,.group_#{assetString}:focus{color: #{color}; border-color: #{color}; background-color: #{color};}"
           $existingStyles.append($newStyles)
       }), $('#color_picker_holder')[0]);
 
