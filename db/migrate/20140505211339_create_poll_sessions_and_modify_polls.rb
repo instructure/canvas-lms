@@ -29,17 +29,7 @@ class CreatePollSessionsAndModifyPolls < ActiveRecord::Migration
     change_column :polling_poll_choices, :is_correct, :boolean, default: false
     rename_column :polling_polls, :title, :question
 
-    # MySQL constraints
-    if %w{MySQL Mysql2}.include?(connection.adapter_name)
-      mysql = true
-      remove_foreign_key :polling_poll_submissions, :users
-      remove_foreign_key :polling_poll_submissions, column: :poll_id
-    end
     remove_index :polling_poll_submissions, [:poll_id, :user_id]
-    if mysql
-      add_foreign_key :polling_poll_submissions, :users
-      add_foreign_key :polling_poll_submissions, :polling_polls, column: :poll_id
-    end
 
     add_index :polling_poll_sessions, :course_id
     add_index :polling_poll_sessions, :course_section_id

@@ -389,10 +389,6 @@ class ActiveRecord::Base
     offset = max_date.utc_offset
 
     expression = case connection.adapter_name
-    when 'MySQL', 'Mysql2'
-      # TODO: detect mysql named timezone support and use it
-      offset = "%s%02d:%02d" % [offset < 0 ? "-" : "+", offset.abs / 3600, offset.abs % 3600]
-      "DATE(CONVERT_TZ(#{column}, '+00:00', '#{offset}'))"
     when /sqlite/
       "DATE(STRFTIME('%s', #{column}) + #{offset}, 'unixepoch')"
     when 'PostgreSQL'
@@ -773,10 +769,6 @@ ActiveRecord::Relation.class_eval do
           ensure
             connection.raw_connection.set_notice_processor(&old_proc) if old_proc
           end
-        when 'MySQL', 'Mysql2'
-          pluck.unshift(index) if pluck
-          connection.execute "ALTER TABLE #{table}
-                             ADD temp_primary_key MEDIUMINT NOT NULL PRIMARY KEY AUTO_INCREMENT"
         when 'SQLite'
           # Sqlite always has an implicit primary key
           index = 'rowid'
@@ -820,8 +812,7 @@ ActiveRecord::Relation.class_eval do
       end
     ensure
       unless $!.is_a?(ActiveRecord::StatementInvalid)
-        temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
-        connection.execute "DROP #{temporary}TABLE #{table}"
+        connection.execute "DROP TABLE #{table}"
       end
     end
   end
@@ -1012,8 +1003,6 @@ module UpdateAndDeleteWithJoins
               end
               sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
             end
-          when 'MySQL', 'Mysql2'
-            sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
           else
             raise "Joins in delete not supported!"
         end
@@ -1101,57 +1090,6 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
           col
     }
   end
-end
-
-module MySQLAdapterExtensions
-  def self.included(klass)
-    klass::NATIVE_DATABASE_TYPES[:primary_key] = "bigint DEFAULT NULL auto_increment PRIMARY KEY".freeze
-    klass.alias_method_chain :configure_connection, :pg_compat
-  end
-
-  def rename_index(table_name, old_name, new_name)
-    if version[0] >= 5 && version[1] >= 7
-      return execute "ALTER TABLE #{quote_table_name(table_name)} RENAME INDEX #{quote_column_name(old_name)} TO #{quote_table_name(new_name)}";
-    else
-      old_index_def = indexes(table_name).detect { |i| i.name == old_name }
-      return unless old_index_def
-      add_index(table_name, old_index_def.columns, :name => new_name, :unique => old_index_def.unique)
-      remove_index(table_name, :name => old_name)
-    end
-  end
-
-  def bulk_insert(table_name, records)
-    keys = records.first.keys
-    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
-    execute "INSERT INTO #{quote_table_name(table_name)} (#{quoted_keys}) VALUES" <<
-                records.map{ |record| "(#{keys.map{ |k| quote(record[k]) }.join(', ')})" }.join(',')
-  end
-
-  def add_column_with_foreign_key_check(table, name, type, options = {})
-    Canvas.active_record_foreign_key_check(name, type, options) unless adapter_name == 'Sqlite'
-    add_column_without_foreign_key_check(table, name, type, options)
-  end
-
-  def configure_connection_with_pg_compat
-    configure_connection_without_pg_compat
-    execute "SET SESSION SQL_MODE='PIPES_AS_CONCAT'"
-  end
-
-  def func(name, *args)
-    case name
-      when :group_concat
-        "group_concat(#{func_arg_esc(args.first)} SEPARATOR #{quote(args[1] || ',')})"
-      else
-        super
-    end
-  end
-end
-
-if defined?(ActiveRecord::ConnectionAdapters::MysqlAdapter)
-  ActiveRecord::ConnectionAdapters::MysqlAdapter.send(:include, MySQLAdapterExtensions)
-end
-if defined?(ActiveRecord::ConnectionAdapters::Mysql2Adapter)
-  ActiveRecord::ConnectionAdapters::Mysql2Adapter.send(:include, MySQLAdapterExtensions)
 end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do
@@ -1330,7 +1268,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     begin
       remove_foreign_key(table, options)
     rescue ActiveRecord::StatementInvalid => e
-      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist|Mysql2?::Error: Error on rename/
+      raise unless e.message =~ /PG(?:::)?Error: ERROR:.+does not exist/
     end
   end
 

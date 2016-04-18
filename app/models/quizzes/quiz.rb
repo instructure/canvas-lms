@@ -428,8 +428,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     update_sql = case ActiveRecord::Base.connection.adapter_name
                  when 'PostgreSQL'
                    "started_at + INTERVAL '+? seconds'"
-                 when 'MySQL', 'Mysql2'
-                   "started_at + INTERVAL ? SECOND"
                  when /sqlite/
                    "DATETIME(started_at, '+? seconds')"
                  end

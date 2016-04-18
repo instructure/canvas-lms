@@ -7,12 +7,6 @@ namespace :db do
     abcs = ActiveRecord::Base.configurations
     ["development"].each do |db|
       case abcs[db]["adapter"]
-        when 'mysql', 'mysql2'
-          ActiveRecord::Base.establish_connection(db.to_sym)
-          conn = ActiveRecord::Base.connection
-          conn.execute("DROP DATABASE #{abcs[db]["database"]}")
-          conn.execute("CREATE DATABASE #{abcs[db]["database"]}")
-          ActiveRecord::Base.establish_connection(db.to_sym)
         when "sqlite", "sqlite3"
           dbfile = abcs[db]["database"] || abcs[db]["dbfile"]
           begin

@@ -10,10 +10,9 @@ module DataFixup::PopulateConversationRootAccountIds
     # exceptions where it's currently null, so we need to fix them first...
     Conversation.transaction do
       # old context messages (before conversations)
-      temp_table_options = adapter_name =~ /mysql/ ? 'engine=innodb' : 'AS'
       root_account_id_default = adapter_name =~ /postgres/ ? "CAST(0 AS BIGINT)" : "0"
       conn.execute <<-SQL
-        CREATE TEMPORARY TABLE _conversation_message_old_contexts #{temp_table_options}
+        CREATE TEMPORARY TABLE _conversation_message_old_contexts AS
         SELECT m.id AS conversation_message_id, cm.context_type, cm.context_id, #{root_account_id_default} AS root_account_id
           FROM #{ConversationMessage.quoted_table_name} m, #{conn.quote_table_name('context_messages')} cm
           WHERE m.context_message_id IS NOT NULL AND m.context_message_id = cm.id AND m.context_id IS NULL
@@ -78,17 +77,6 @@ module DataFixup::PopulateConversationRootAccountIds
 
     Conversation.order(:id).pluck(:id).each_slice(1000) do |ids|
       case adapter_name
-        when /mysql/
-          conn.execute <<-SQL
-            UPDATE #{Conversation.quoted_table_name}
-            SET root_account_ids = (
-              SELECT GROUP_CONCAT(DISTINCT context_id ORDER BY context_id SEPARATOR ',')
-              FROM #{ConversationMessage.quoted_table_name}
-              WHERE conversation_id = conversations.id
-                AND context_id IS NOT NULL
-            )
-            WHERE id IN (#{ids.join(', ')})
-          SQL
         when /postgres/
           conn.execute <<-SQL
             UPDATE #{Conversation.quoted_table_name}

@@ -12,13 +12,10 @@ class MessageMigration < ActiveRecord::Migration
 
     return if Rails.env.test?
 
-    unless connection.adapter_name =~ /postgres|mysql/i
+    unless connection.adapter_name =~ /postgres/
       $stderr.puts "don't know how to migrate conversation data for #{connection.adapter_name}!"
       return
     end
-
-    mysql = %w{MySQL Mysql2}.include?(connection.adapter_name)
-    table_opts = mysql ? 'engine=innodb' : 'AS'
 
     # for grouping messages into conversations
     #   private: list of participant ids <= 2
@@ -32,7 +29,7 @@ class MessageMigration < ActiveRecord::Migration
     add_column :conversation_message_participants, :unread, :boolean
 
     execute <<-SQL
-      CREATE TEMPORARY TABLE __migrated_messages #{table_opts}
+      CREATE TEMPORARY TABLE __migrated_messages AS
       SELECT
         id,
         user_id AS author_id,
@@ -41,15 +38,14 @@ class MessageMigration < ActiveRecord::Migration
         COALESCE(root_context_message_id, id) AS root_context_message_id,
         media_comment_id,
         media_comment_type,
-        ''#{mysql ? '' : '::TEXT'} AS signature
+        '::TEXT' AS signature
       FROM
         #{connection.quote_table_name('context_messages')}
     SQL
-    change_column :__migrated_messages, :signature, :text if mysql
     execute "CREATE INDEX index__migrated_messages_on_id ON __migrated_messages (id)"
 
     execute <<-SQL
-      CREATE TEMPORARY TABLE __migrated_message_participants #{table_opts}
+      CREATE TEMPORARY TABLE __migrated_message_participants AS
       SELECT DISTINCT
         context_message_id AS migrated_message_id,
         user_id
@@ -58,72 +54,47 @@ class MessageMigration < ActiveRecord::Migration
     SQL
     execute "CREATE INDEX index_mmp_on_message_id ON __migrated_message_participants (migrated_message_id)"
 
-    if mysql
-      execute  <<-SQL
-        CREATE TEMPORARY TABLE __migrated_message_participant_strings #{table_opts}
-        SELECT migrated_message_id, GROUP_CONCAT(DISTINCT user_id ORDER BY user_id) AS participants, COUNT(DISTINCT user_id) <= 2 AS private
+    execute <<-SQL
+      CREATE TEMPORARY TABLE __migrated_message_participant_strings AS
+      SELECT migrated_message_id, STRING_AGG(user_id::TEXT, ',') AS participants, COUNT(DISTINCT user_id) <= 2 AS private
+      FROM (
+        SELECT DISTINCT migrated_message_id, user_id
         FROM __migrated_message_participants
-        GROUP BY migrated_message_id
-      SQL
-    else
-      execute <<-SQL
-        CREATE TEMPORARY TABLE __migrated_message_participant_strings #{table_opts}
-        SELECT migrated_message_id, STRING_AGG(user_id::TEXT, ',') AS participants, COUNT(DISTINCT user_id) <= 2 AS private
-        FROM (
-          SELECT DISTINCT migrated_message_id, user_id
-          FROM __migrated_message_participants
-          ORDER BY migrated_message_id, user_id
-        ) p
-        GROUP BY migrated_message_id
-      SQL
-    end
+        ORDER BY migrated_message_id, user_id
+      ) p
+      GROUP BY migrated_message_id
+    SQL
     execute "CREATE INDEX index_mmps_on_migrated_message_id ON __migrated_message_participant_strings (migrated_message_id)"
 
     execute <<-SQL
-      UPDATE __migrated_messages #{mysql ? ", __migrated_message_participant_strings" : ""}
+      UPDATE __migrated_messages
       SET signature = CASE WHEN private THEN '' ELSE root_context_message_id || ':' END || participants
-      #{mysql ? "" : " FROM __migrated_message_participant_strings"}
+      FROM __migrated_message_participant_strings
       WHERE migrated_message_id = __migrated_messages.id
     SQL
-    if mysql
-      execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature(767))"
-    else
-      execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature)"
-    end
+    execute "CREATE INDEX index___migrated_messages_on_signature ON __migrated_messages (signature)"
 
     execute <<-SQL
       INSERT INTO #{Conversation.quoted_table_name}(migration_signature, has_attachments, has_media_objects)
       SELECT DISTINCT signature, FALSE, FALSE
       FROM __migrated_messages
     SQL
-    if mysql
-      execute "CREATE INDEX index_conversations_on_migration_signature ON conversations (migration_signature(767))"
-    else
-      add_index :conversations, :migration_signature
-    end
+    add_index :conversations, :migration_signature
 
-    if mysql
-      update <<-SQL
-        UPDATE #{Conversation.quoted_table_name}
-        SET tmp_private_hash = SHA(migration_signature)
-        WHERE migration_signature REGEXP '^[0-9]+(,[0-9]+)?$'
-      SQL
-    else
-      Conversation.where("migration_signature ~ E'^[0-9]+(,[0-9]+)?$'").find_each(:batch_size => 10000) do |conversation|
-        conversation.update_attribute :tmp_private_hash, Digest::SHA1.hexdigest(conversation.migration_signature)
-      end
+    Conversation.where("migration_signature ~ E'^[0-9]+(,[0-9]+)?$'").find_each(:batch_size => 10000) do |conversation|
+      conversation.update_attribute :tmp_private_hash, Digest::SHA1.hexdigest(conversation.migration_signature)
     end
     add_index :conversations, :tmp_private_hash
 
     # in case any private conversations already exist...
     update <<-SQL
-      UPDATE #{Conversation.quoted_table_name} #{mysql ? ", #{Conversation.quoted_table_name} c2" : ""}
-      SET #{mysql ? "conversations." : ""}migration_signature = c2.migration_signature
-      #{mysql ? "" : " FROM #{Conversation.quoted_table_name} c2"}
+      UPDATE #{Conversation.quoted_table_name}
+      SET migration_signature = c2.migration_signature
+      FROM #{Conversation.quoted_table_name} c2
       WHERE conversations.private_hash = c2.tmp_private_hash
     SQL
     execute <<-SQL
-      CREATE TEMPORARY TABLE __existing_private_conversations #{table_opts}
+      CREATE TEMPORARY TABLE __existing_private_conversations AS
       SELECT private_hash FROM #{Conversation.quoted_table_name} WHERE private_hash IS NOT NULL
     SQL
     delete <<-SQL
@@ -133,9 +104,7 @@ class MessageMigration < ActiveRecord::Migration
     # create participants for any group conversations or *new* private conversations
     remove_index :conversation_participants, :column => [:user_id, :last_message_at]
     add_index :conversation_participants, :user_id # temporary for better insert speeds (and to prevent people hitting new messaging from killing the db)
-    subquery = mysql ?
-      "SELECT signature, id FROM __migrated_messages GROUP BY signature ORDER BY signature, id DESC" :
-      "SELECT DISTINCT ON (signature) signature, id FROM __migrated_messages ORDER BY signature, id DESC"
+    subquery = "SELECT DISTINCT ON (signature) signature, id FROM __migrated_messages ORDER BY signature, id DESC"
     execute <<-SQL
       INSERT INTO #{ConversationParticipant.quoted_table_name}(conversation_id, user_id, subscribed, workflow_state, has_attachments, has_media_objects)
       SELECT c.id, mp.user_id, TRUE, 'read', FALSE, FALSE
@@ -222,9 +191,9 @@ class MessageMigration < ActiveRecord::Migration
 
     # attachments
     update <<-SQL
-      UPDATE #{Attachment.quoted_table_name} #{mysql ? ', conversation_messages' : ''}
+      UPDATE #{Attachment.quoted_table_name}
       SET context_id = conversation_messages.id, context_type = 'ConversationMessage'
-      #{mysql ? '' : "FROM #{ConversationMessage.quoted_table_name}"}
+      FROM #{ConversationMessage.quoted_table_name}
       WHERE attachments.context_type = 'ContextMessage' AND conversation_messages.context_message_id = attachments.context_id
     SQL
 
@@ -276,7 +245,7 @@ class MessageMigration < ActiveRecord::Migration
 
     # cached stats
     execute <<-SQL
-      CREATE TEMPORARY TABLE __migrated_conversation_stats #{table_opts}
+      CREATE TEMPORARY TABLE __migrated_conversation_stats AS
       SELECT
         conversation_participant_id,
         COUNT(*) AS message_count,
@@ -289,36 +258,20 @@ class MessageMigration < ActiveRecord::Migration
     execute "CREATE INDEX index_mcs_on_cpi ON __migrated_conversation_stats (conversation_participant_id)"
 
     update <<-SQL
-      UPDATE #{ConversationParticipant.quoted_table_name} #{mysql ? ', __migrated_conversation_stats' : ''}
-      SET #{mysql ? 'conversation_participants.' : ''}message_count = __migrated_conversation_stats.message_count,
-        #{mysql ? 'conversation_participants.' : ''}last_message_at = __migrated_conversation_stats.last_message_at,
-        #{mysql ? 'conversation_participants.' : ''}last_authored_at = __migrated_conversation_stats.last_authored_at
-      #{mysql ? '' : 'FROM __migrated_conversation_stats'}
+      UPDATE #{ConversationParticipant.quoted_table_name}
+      SET message_count = __migrated_conversation_stats.message_count,
+        last_message_at = __migrated_conversation_stats.last_message_at,
+        last_authored_at = __migrated_conversation_stats.last_authored_at
+      'FROM __migrated_conversation_stats'
       WHERE conversation_participants.id = conversation_participant_id
     SQL
-    if mysql
-      execute <<-SQL
-        ALTER TABLE #{ConversationParticipant.quoted_table_name}
-        ADD INDEX index_conversation_participants_on_user_id_and_last_message_at (user_id, last_message_at),
-        DROP INDEX index_conversation_participants_on_user_id
-      SQL
-    else
-      add_index :conversation_participants, [:user_id, :last_message_at]
-      remove_index :conversation_participants, :column => :user_id
-    end
+    add_index :conversation_participants, [:user_id, :last_message_at]
+    remove_index :conversation_participants, :column => :user_id
 
-    if mysql
-      update <<-SQL
-        UPDATE #{User.quoted_table_name}, (SELECT COUNT(*) AS unread_count, user_id FROM #{ConversationParticipant.quoted_table_name} WHERE workflow_state = 'unread' GROUP BY user_id) AS counts
-        SET unread_conversations_count = unread_count
-        WHERE user_id = users.id
-      SQL
-    else
-      execute <<-SQL
-        UPDATE #{User.quoted_table_name}
-        SET unread_conversations_count = (SELECT COUNT(*) FROM #{ConversationParticipant.quoted_table_name} WHERE workflow_state = 'unread' AND user_id = users.id)
-      SQL
-    end
+    execute <<-SQL
+      UPDATE #{User.quoted_table_name}
+      SET unread_conversations_count = (SELECT COUNT(*) FROM #{ConversationParticipant.quoted_table_name} WHERE workflow_state = 'unread' AND user_id = users.id)
+    SQL
 
     remove_column :conversations, :migration_signature
     remove_column :conversations, :tmp_private_hash

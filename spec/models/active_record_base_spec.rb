@@ -475,7 +475,7 @@ describe ActiveRecord::Base do
     end
 
     before do
-      skip "MySQL and Postgres only" unless %w{PostgreSQL MySQL Mysql2}.include?(ActiveRecord::Base.connection.adapter_name)
+      skip "Postgres only" unless ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
     end
 
     it "should do an update all with a join" do
