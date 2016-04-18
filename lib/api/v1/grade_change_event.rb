@@ -39,6 +39,8 @@ module Api::V1::GradeChangeEvent
       :event_type => event.event_type,
       :grade_before => event.grade_before,
       :grade_after => event.grade_after,
+      :excused_before => event.excused_before,
+      :excused_after => event.excused_after,
       :graded_anonymously => event.graded_anonymously,
       :version_number => event.version_number,
       :links => links

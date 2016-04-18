@@ -99,6 +99,8 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:event_type]).to eq @event.event_type
     expect(event[:grade_before]).to eq @previous_grade
     expect(event[:grade_after]).to eq @submission.grade
+    expect(event[:excused_before]).to eq false
+    expect(event[:excused_after]).to eq false
     expect(event[:version_number]).to eq @submission.version_number
     expect(event[:graded_anonymously]).to eq @submission.graded_anonymously
     expect(event[:links][:assignment]).to eq Shard.relative_id_for(@assignment, Shard.current, Shard.current)
@@ -106,6 +108,30 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:links][:student]).to eq Shard.relative_id_for(@student, Shard.current, Shard.current)
     expect(event[:links][:grader]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
     expect(event[:links][:page_view]).to eq @page_view.id
+  end
+
+  it "formats excused submissions" do
+    @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
+    @event = Auditors::GradeChange.record(@excused)
+
+    event = subject.grade_change_event_json(@event, @student, @session)
+    expect(event[:grade_before]).to eq @submission.grade
+    expect(event[:grade_after]).to eq nil
+    expect(event[:excused_before]).to eq false
+    expect(event[:excused_after]).to eq true
+  end
+
+  it "formats formerly excused submissions" do
+    @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
+    Auditors::GradeChange.record(@excused)
+    @unexcused = @assignment.grade_student(@student, grader: @teacher, excused: false).first
+    @event = Auditors::GradeChange.record(@unexcused)
+
+    event = subject.grade_change_event_json(@event, @student, @session)
+    expect(event[:grade_before]).to eq nil
+    expect(event[:grade_after]).to eq nil
+    expect(event[:excused_before]).to eq true
+    expect(event[:excused_after]).to eq false
   end
 
   it "should be formatted as an array of grade change event hashes" do
