@@ -82,17 +82,20 @@ define [
       @show_attendance = !!userSettings.contextGet 'show_attendance'
       @include_ungraded_assignments = userSettings.contextGet 'include_ungraded_assignments'
       @userFilterRemovedRows = []
-      @show_concluded_enrollments =
-        @options.course_is_concluded || !!userSettings.contextGet('show_concluded_enrollments')
-      @show_inactive_enrollments = !!userSettings.contextGet('show_inactive_enrollments')
+      # preferenecs serialization causes these to always come
+      # from the database as strings
+      @showConcludedEnrollments = @options.course_is_concluded ||
+        @options.settings['show_concluded_enrollments'] == "true"
+      @showInactiveEnrollments =
+        @options.settings['show_inactive_enrollments'] == "true"
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
-      @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
-      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
+      @mgpEnabled = @options.multiple_grading_periods_enabled
+      @gradingPeriods = @options.active_grading_periods
       @indexedGradingPeriods = _.indexBy @gradingPeriods, 'id'
       @gradingPeriodToShow = @getGradingPeriodToShow()
-      @gradebookColumnSizeSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings
-      @gradebookColumnOrderSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings
+      @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
+      @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -150,7 +153,7 @@ define [
       @showPostGradesButton()
       @checkForUploadComplete()
 
-      @gotSections(ENV.GRADEBOOK_OPTIONS.sections)
+      @gotSections(@options.sections)
 
     # dependencies - gridReady
     setAssignmentVisibility: (studentIds) ->
@@ -202,15 +205,15 @@ define [
       activePeriodIds = _.pluck(@gradingPeriods, 'id')
       _.contains(activePeriodIds, gradingPeriodId)
 
-    getGradingPeriodToShow: () ->
+    getGradingPeriodToShow: () =>
       currentPeriodId = userSettings.contextGet('gradebook_current_grading_period')
       if currentPeriodId && (@isAllGradingPeriods(currentPeriodId) || @gradingPeriodIsActive(currentPeriodId))
         currentPeriodId
       else
-        ENV.GRADEBOOK_OPTIONS.current_grading_period_id
+        @options.current_grading_period_id
 
     getAssignmentsInClosedGradingPeriods: () ->
-      latestEndDate = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
+      latestEndDate = new Date(@options.latest_end_date_of_admin_created_grading_periods_in_the_past)
       #return assignments whose end date is within the latest closed's end date
       _.select @assignments, (a) =>
         @assignmentIsDueBeforeEndDate(a, latestEndDate)
@@ -341,7 +344,7 @@ define [
         mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
         sectionNames = $.toSentence(mySections.sort())
 
-      displayName = if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled
+      displayName = if @options.list_students_by_sortable_name_enabled
         student.sortable_name
       else
         student.name
@@ -393,7 +396,7 @@ define [
     setStoredSortOrder: (newSortOrder) ->
       @gradebookColumnOrderSettings = newSortOrder
       unless @isInvalidCustomSort()
-        url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
+        url = @options.gradebook_column_order_settings_url
         $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
 
     onColumnsReordered: =>
@@ -1054,8 +1057,8 @@ define [
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore
         course:
-          id:     ENV.GRADEBOOK_OPTIONS.context_id
-          sis_id: ENV.GRADEBOOK_OPTIONS.context_sis_id
+          id:     @options.context_id
+          sis_id: @options.context_sis_id
       @postGradesStore.addChangeListener(@updatePowerschoolPostGradesButton)
 
       @postGradesStore.setSelectedSection @sectionToShow
@@ -1081,20 +1084,18 @@ define [
 
       $settingsMenu = $('.gradebook_dropdown')
       showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
-      showConcludedEnrollmentsEl.prop('checked', @show_concluded_enrollments).change (event) =>
-        if @options.course_is_concluded and @show_concluded_enrollments
+      showConcludedEnrollmentsEl.prop('checked', @showConcludedEnrollments).change (event) =>
+        if @options.course_is_concluded and @showConcludedEnrollments
           showConcludedEnrollmentsEl.prop('checked', true)
           $settingsMenu.menu("refresh")
           return alert(I18n.t 'concluded_course_error_message', 'This is a concluded course, so only concluded enrollments are available.')
-        @show_concluded_enrollments  = showConcludedEnrollmentsEl.is(':checked')
-        userSettings.contextSet 'show_concluded_enrollments', @show_concluded_enrollments
-        window.location.reload()
+        @showConcludedEnrollments  = showConcludedEnrollmentsEl.is(':checked')
+        @saveSettings(@showInactiveEnrollments, @showConcludedEnrollments, -> window.location.reload())
 
       showInactiveEnrollmentsEl = $settingsMenu.find("#show_inactive_enrollments")
-      showInactiveEnrollmentsEl.prop('checked', @show_inactive_enrollments).change (event) =>
-        @show_inactive_enrollments = showInactiveEnrollmentsEl.is(':checked')
-        userSettings.contextSet 'show_inactive_enrollments', @show_inactive_enrollments
-        window.location.reload()
+      showInactiveEnrollmentsEl.prop('checked', @showInactiveEnrollments).change (event) =>
+        @showInactiveEnrollments = showInactiveEnrollmentsEl.is(':checked')
+        @saveSettings(@showInactiveEnrollments, @showConcludedEnrollments, -> window.location.reload())
 
       includeUngradedAssignmentsEl = $settingsMenu.find("#include_ungraded_assignments")
       includeUngradedAssignmentsEl.prop('checked', @include_ungraded_assignments).change (event) =>
@@ -1151,8 +1152,8 @@ define [
 
       @initPreviousGradebookExportLink()
 
-      current_progress = ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress
-      attachment = ENV.GRADEBOOK_OPTIONS.attachment
+      current_progress = @options.gradebook_csv_progress
+      attachment = @options.attachment
 
       if current_progress && current_progress.progress.workflow_state != 'completed'
         $('#download_csv').prop('disabled', true)
@@ -1175,7 +1176,7 @@ define [
           grading_period_id: @getGradingPeriodToShow()
 
         $.ajaxJSON(
-            ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
+            @options.export_gradebook_csv_url,
             'GET',
             params
         ).then((attachment_progress) ->
@@ -1503,8 +1504,16 @@ define [
           @saveColumnWidthPreference(column.id, column.width)
 
     saveColumnWidthPreference: (id, newWidth) ->
-      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings_url
+      url = @options.gradebook_column_size_settings_url
       $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
+
+    saveSettings: (showInactive, showConcluded, callback) =>
+      url = @options.settings_update_url
+      $.ajaxJSON(url, 'PUT', gradebook_settings: {
+        show_inactive_enrollments: showInactive
+        show_concluded_enrollments: showConcluded
+      }).done =>
+        callback()
 
     onBeforeEditCell: (event, {row, cell}) =>
       $cell = @grid.getCellNode(row, cell)
@@ -1705,10 +1714,10 @@ define [
 
     studentsUrl: ->
       switch
-        when @show_concluded_enrollments && @show_inactive_enrollments
+        when @showConcludedEnrollments && @showInactiveEnrollments
           'students_with_concluded_and_inactive_enrollments_url'
-        when @show_concluded_enrollments
+        when @showConcludedEnrollments
           'students_with_concluded_enrollments_url'
-        when @show_inactive_enrollments
+        when @showInactiveEnrollments
           'students_with_inactive_enrollments_url'
         else 'students_url'

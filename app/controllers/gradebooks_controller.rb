@@ -361,6 +361,8 @@ class GradebooksController < ApplicationController
       :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
       :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals),
       :sections => sections_json(@context.active_course_sections, @current_user, session),
+      :settings_update_url => api_v1_course_gradebook_settings_update_url(@context),
+      :settings => @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
     }
   end
 

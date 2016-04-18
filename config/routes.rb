@@ -1797,6 +1797,10 @@ CanvasRails::Application.routes.draw do
     scope(controller: :jwts) do
       post 'jwts', action: :create
     end
+
+    scope(controller: :gradebook_settings) do
+      put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or

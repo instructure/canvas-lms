@@ -9,8 +9,44 @@ describe "gradebook2 - concluded courses and enrollments" do
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
   context "active course" do
+    let(:gradebook_settings_for_course) do
+      -> (teacher, course) do
+        teacher.reload
+          .preferences.fetch(:gradebook_settings, {})[course.id]
+      end
+    end
+
+    it "persists settings for displaying inactive enrollments" do
+      get course_gradebook2_path(@course)
+      wait_for_ajaximations
+      f('#gradebook_settings').click
+
+      expect { f('label[for="show_inactive_enrollments"]').click }
+        .to change { gradebook_settings_for_course.call(@teacher, @course)}
+        .from(nil)
+        .to({
+          "show_inactive_enrollments" => "true",
+          "show_concluded_enrollments" => "false",
+        })
+    end
+
+    it "persists settings for displaying concluded enrollments" do
+      get course_gradebook2_path(@course)
+      wait_for_ajaximations
+      f('#gradebook_settings').click
+
+      expect { f('label[for="show_concluded_enrollments"]').click }
+        .to change { gradebook_settings_for_course.call(@teacher, @course) }
+        .from(nil)
+        .to({
+          "show_inactive_enrollments" => "false",
+          "show_concluded_enrollments" => "true",
+        })
+    end
+
     it "does not show concluded enrollments by default", priority: "1", test_id: 210020 do
       conclude_student_1
+
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
 
@@ -23,7 +59,7 @@ describe "gradebook2 - concluded courses and enrollments" do
       conclude_student_1
 
       get "/courses/#{@course.id}/gradebook2"
-      
+
       # show concluded
       expect_new_page_load do
         f('#gradebook_settings').click
