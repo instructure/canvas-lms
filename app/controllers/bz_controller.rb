@@ -109,7 +109,9 @@ class BzController < ApplicationController
   def delete_user
     user = api_find(User, params[:id])
     if user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
-      user.destroy!
+      # this will not delete the record completely, but will mark it as deleted,
+      # same as if you manually hit the button in the admin page.
+      user.destroy
     end
     render :nothing => true
   end
