@@ -1841,6 +1841,9 @@ define([
     for(var idx in collapsedModules) {
       $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
     }
+    if (window.location.hash) {
+      $.scrollTo($(window.location.hash));
+    }
     var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
     if (!$contextModules.length) {
