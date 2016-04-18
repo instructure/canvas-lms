@@ -31,7 +31,8 @@ define([
 
     render: function () {
       return (
-        <a href={this.props.path} className={classnames('ic-DashboardCard__action', this.props.linkClass)}>
+        <a href={this.props.path} className={classnames('ic-DashboardCard__action', this.props.linkClass)}
+           title={this.props.screenReaderLabel}>
           { this.props.screenReaderLabel ? (
             <span className="screenreader-only">{
               this.props.screenReaderLabel
