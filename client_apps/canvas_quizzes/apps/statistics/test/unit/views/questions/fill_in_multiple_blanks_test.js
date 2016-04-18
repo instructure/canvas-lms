@@ -60,7 +60,7 @@ define(function(require) {
       });
 
       expect(find('.answer-set-tabs .active').innerText).toMatch('color');
-      var answerTextMatches = findAll("th.answer-textfield");
+      var answerTextMatches = findAll("th.answer-textfield .answerText");
       expect(answerTextMatches[0].innerText).toEqual('red');
       expect(answerTextMatches[1].innerText).toEqual('green');
       expect(answerTextMatches[2].innerText).toEqual('blue');
@@ -68,7 +68,7 @@ define(function(require) {
       click('.answer-set-tabs button:contains("size")');
 
       expect(find('.answer-set-tabs .active').innerText).toMatch('size');
-      answerTextMatches = findAll("th.answer-textfield");
+      answerTextMatches = findAll("th.answer-textfield .answerText");
       expect(answerTextMatches[0].innerText).toEqual('S');
       expect(answerTextMatches[1].innerText).toEqual('M');
       expect(answerTextMatches[2].innerText).toEqual('L');
