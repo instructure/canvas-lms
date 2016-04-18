@@ -93,19 +93,19 @@ define [
 
   test 'can take an ISO string', ->
     contains helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
-      "Dec 31, 1969 at 7:00pm"
+      "Dec 31, 1969 at 7pm"
 
   test 'can take a date object', ->
     contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
-      "Dec 31, 1969 at 7:00pm"
+      "Dec 31, 1969 at 7pm"
 
   test 'should parse non-qualified string relative to profile timezone', ->
     contains helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false}).string,
-      "Jan 1, 1970 at 12:00am"
+      "Jan 1, 1970 at 12am"
 
   test 'includes a screenreader accessible version', ->
     contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
-      "<span class='screenreader-only'>Dec 31, 1969 at 7:00pm</span>"
+      "<span class='screenreader-only'>Dec 31, 1969 at 7pm</span>"
 
   test 'includes a visible version', ->
     contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
@@ -125,18 +125,18 @@ define [
 
   test 'displays both zones data from an ISO string', ->
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
-    contains timeTag, "Local: Dec 31, 1969 at 7:00pm"
-    contains timeTag, "Course: Dec 31, 1969 at 6:00pm"
+    contains timeTag, "Local: Dec 31, 1969 at 7pm"
+    contains timeTag, "Course: Dec 31, 1969 at 6pm"
 
   test 'displays both zones data from a date object', ->
     timeTag = helpers.friendlyDatetime(new Date(0), hash: {pubDate: false, contextSensitive: true}).string
-    contains timeTag, "Local: Dec 31, 1969 at 7:00pm"
-    contains timeTag, "Course: Dec 31, 1969 at 6:00pm"
+    contains timeTag, "Local: Dec 31, 1969 at 7pm"
+    contains timeTag, "Course: Dec 31, 1969 at 6pm"
 
   test 'should parse non-qualified string relative to both timezones', ->
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false, contextSensitive: true}).string
-    contains timeTag, "Local: Jan 1, 1970 at 12:00am"
-    contains timeTag, "Course: Dec 31, 1969 at 11:00pm"
+    contains timeTag, "Local: Jan 1, 1970 at 12am"
+    contains timeTag, "Course: Dec 31, 1969 at 11pm"
 
   test 'reverts to friendly display when there is no contextual timezone', ->
     ENV.CONTEXT_TIMEZONE = null
@@ -159,11 +159,11 @@ define [
   test 'just passes through to datetime string if there is no contextual timezone', ->
     ENV.CONTEXT_TIMEZONE = null
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: true})
-    equal titleText, "Dec 31, 1969 at 7:00pm"
+    equal titleText, "Dec 31, 1969 at 7pm"
 
   test 'splits title text to both zones', ->
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: true})
-    equal titleText, "Local: Dec 31, 1969 at 7:00pm<br>Course: Dec 31, 1969 at 6:00pm"
+    equal titleText, "Local: Dec 31, 1969 at 7pm<br>Course: Dec 31, 1969 at 6pm"
 
   test "properly spans day boundaries", ->
     ENV.TIMEZONE = 'America/Chicago'
@@ -176,18 +176,18 @@ define [
     ENV.TIMEZONE = 'America/Detroit'
     ENV.CONTEXT_TIMEZONE = 'America/Detroit'
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: true})
-    equal titleText, "Dec 31, 1969 at 7:00pm"
+    equal titleText, "Dec 31, 1969 at 7pm"
 
   test 'stays as one title when the time is no different even if timezone names differ', ->
     ENV.TIMEZONE = 'America/Detroit'
     ENV.CONTEXT_TIMEZONE = 'America/New_York'
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: true})
-    equal titleText, "Dec 31, 1969 at 7:00pm"
+    equal titleText, "Dec 31, 1969 at 7pm"
 
   test "produces the html attributes if you dont specify just_text", ->
     ENV.CONTEXT_TIMEZONE = null
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: undefined})
-    equal titleText, "data-tooltip data-html-tooltip-title=\"Dec 31, 1969 at 7:00pm\""
+    equal titleText, "data-tooltip data-html-tooltip-title=\"Dec 31, 1969 at 7pm\""
 
   module 'datetimeFormatted',
     setup: -> @snapshot = tz.snapshot()
@@ -196,7 +196,7 @@ define [
   test 'should parse and format relative to profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
     equal helpers.datetimeFormatted('1970-01-01 00:00:00'),
-      "Jan 1, 1970 at 12:00am"
+      "Jan 1, 1970 at 12am"
 
   module 'ifSettingIs'
 

@@ -145,14 +145,14 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12:00am to Mar 9, 2001 at 12:00am.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001 1:05p'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001 3p'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3:00pm.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
         it "should display search params used when given invalid input data" do

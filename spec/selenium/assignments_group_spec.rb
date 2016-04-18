@@ -232,7 +232,7 @@ describe "assignment groups" do
     ag = @course.assignment_groups.first
     time = DateTime.new(Time.now.year,2,7,4,15)
     Timecop.freeze(time) do
-      current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+      current_time = format_time_for_view(time)
       assignment_name, assignment_points = ["Do this", "13"]
 
       # Navigates to assignments index page.

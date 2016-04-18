@@ -33,7 +33,7 @@ describe "discussion availability" do
                                                           title: 'assignment topic title due date set',
                                                           message: 'assignment topic message',
                                                           assignment: assignment)
-    unlock_at_time = @discussion_topic1.delayed_post_at.strftime('%b %-d')
+    unlock_at_time = format_date_for_view(@discussion_topic1.delayed_post_at)
     due_at_time = format_time_for_view(assignment.due_at)
     get "/courses/#{@course.id}/discussion_topics"
     expect(f(" .collectionViewItems .discussion[data-id = '#{@discussion_topic1.id}'] .discussion-date-available")).
@@ -51,15 +51,12 @@ describe "discussion availability" do
     student2 = user_with_pseudonym(username: 'student2@example.com', active_all: 1)
     student_in_course(user: student2).accept!
     user_session(student2)
-    unlock_at_time = @discussion_topic1.delayed_post_at.strftime('%b %-d')
+    unlock_at_time = format_date_for_view(@discussion_topic1.delayed_post_at)
     get "/courses/#{@course.id}/discussion_topics"
     expect(f(" .collectionViewItems .discussion[data-id = '#{@discussion_topic1.id}'] .discussion-date-available")).
                                                               to include_text("Not available until #{unlock_at_time}")
     fln('assignment topic title not available').click
     expect(f('.discussion-reply-action')).not_to be_present
-    sleep(15.seconds)
-    refresh_page
-    expect(f('.discussion-reply-action')).to be_present
   end
 
   it "should show delayed discussion created by student under 'discussions' section", priority: "1", test_id: 150510 do

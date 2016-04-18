@@ -91,21 +91,12 @@ describe "eportfolios" do
 
     it "should validate time stamp on ePortfolio", priority: "2" do
       # Freezes time to 2 days from today.
-      old_time = 2.days.from_now.utc.beginning_of_hour
-      Timecop.freeze(old_time) do
-        current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase
+      new_time = 2.days.from_now.utc.beginning_of_hour
+      Timecop.freeze(new_time) do
+        current_time = format_time_for_view(new_time)
         # Saves an entry to initiate an update.
         @eportfolio_entry.save!
         # Checks for correct time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-
-        # Freezes time to 3 days from previous date.
-        new_time = Timecop.freeze(Date.today + 3).utc
-        current_time = new_time.strftime('%b %-d at %-l') << new_time.strftime('%p').downcase
-        # Saves to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time, then unfreezes time.
         get "/dashboard/eportfolios"
         expect(f(".updated_at")).to include_text(current_time)
       end

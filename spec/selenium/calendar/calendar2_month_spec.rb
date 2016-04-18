@@ -202,8 +202,8 @@ describe "calendar2" do
           drag_and_drop_element(f('.fc-content-skeleton .fc-event-container .fc-resizer'), next_day)
           fj('.fc-event:visible').click
           # observe the event details show date range from event start to date to end date
-          original_day_text = date_of_middle_day.to_datetime.strftime('%b %-d at %-l:%M%P')
-          extended_day_text = (date_of_next_day.to_datetime + 1.day).strftime('%b %-d at %-l:%M%P')
+          original_day_text = format_time_for_view(date_of_middle_day.to_datetime)
+          extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
         end
       end

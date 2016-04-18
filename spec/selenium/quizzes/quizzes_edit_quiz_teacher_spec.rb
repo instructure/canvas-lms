@@ -162,13 +162,13 @@ describe 'editing a quiz' do
       select_first_override_section(default_section.name)
       first_due_at_element.clear
       first_due_at_element.
-          send_keys(default_section_due.strftime('%b %-d, %y'))
+          send_keys(format_date_for_view(default_section_due))
 
       add_override
 
       select_last_override_section(other_section.name)
       last_due_at_element.
-          send_keys(other_section_due.strftime('%b %-d, %y'))
+          send_keys(format_date_for_view(other_section_due))
       expect_new_page_load do
         click_save_settings_button
         wait_for_ajax_requests
@@ -176,11 +176,11 @@ describe 'editing a quiz' do
       overrides = @quiz.reload.assignment_overrides
       expect(overrides.size).to eq 2
       default_override = overrides.detect { |o| o.set_id == default_section.id }
-      expect(default_override.due_at.strftime('%b %-d, %y')).
-          to eq default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.to_date).
+          to eq default_section_due.to_date
       other_override = overrides.detect { |o| o.set_id == other_section.id }
-      expect(other_override.due_at.strftime('%b %-d, %y')).
-          to eq other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.to_date).
+          to eq other_section_due.to_date
     end
 
     context 'when the quiz has a submission' do

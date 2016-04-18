@@ -28,7 +28,7 @@ describe "discussions" do
     user_session(@student1)
     find_vdd_time(@assignment)
     get "/courses/#{@course.id}/discussion_topics"
-    expect(f("#open-discussions .discussion-date-available").text).to include("Available until #{format_date_for_view(@assignment.lock_at)}")
+    expect(f("#open-discussions .discussion-date-available").text).to include("Available until #{format_date_for_view(@assignment.lock_at, :short)}")
     expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
     expect_new_page_load{f('#open-discussions .discussion-title').click}
     expect(f('.discussion-reply-action')).to be_present
@@ -42,7 +42,7 @@ describe "discussions" do
     get "/courses/#{@course.id}/discussion_topics"
     keep_trying_until do
       expect(f("#open-discussions .discussion-date-available").text).
-                                                              to include("Not available until #{format_date_for_view(@override.unlock_at)}")
+                                                              to include("Not available until #{format_date_for_view(@override.unlock_at, :short)}")
       expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
     end
     expect_new_page_load{f('#open-discussions .discussion-title').click}
@@ -87,8 +87,8 @@ describe "discussions" do
                             :allow_multiple_enrollments => true, :associated_user_id => student1.id)
     @course.enroll_user(observer, 'ObserverEnrollment', :enrollment_state => 'active',
                             :associated_user_id => student2.id)
-    lock_at_time = @quiz.lock_at.strftime('%b %-d')
-    unlock_at_time = @override.unlock_at.strftime('%b %-d')
+    lock_at_time = format_date_for_view(@quiz.lock_at)
+    unlock_at_time = format_date_for_view(@override.unlock_at)
     user_session(observer)
     get "/courses/#{@course.id}/discussion_topics"
     driver.mouse.move_to fln('Multiple Dates')

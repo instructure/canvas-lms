@@ -85,8 +85,8 @@ describe "discussions overrides" do
 
     context "outside discussions page" do
       before do
-        @default_due = Time.zone.now.advance(days:1).strftime('%b %-d')
-        @override_due = Time.zone.now.advance(days:2).strftime('%b %-d')
+        @default_due = format_date_for_view(Time.zone.now.advance(days:1))
+        @override_due = format_date_for_view(Time.zone.now.advance(days:2))
       end
 
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do

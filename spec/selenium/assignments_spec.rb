@@ -131,7 +131,7 @@ describe "assignments" do
       # freeze for a certain time, so we don't get unexpected ui complications
       time = DateTime.new(Time.now.year,1,7,2,13)
       Timecop.freeze(time) do
-        due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+        due_at = format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
@@ -195,7 +195,7 @@ describe "assignments" do
         # freeze time to avoid ui complications
         time = DateTime.new(2015,1,7,2,13)
         Timecop.freeze(time) do
-          due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+          due_at = format_time_for_view(time)
           points = '25'
 
           get "/courses/#{@course.id}/assignments"

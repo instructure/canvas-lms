@@ -68,7 +68,7 @@ describe "discussions" do
           wait_for_ajaximations
           fj(".ic-tokeninput-option:visible:first").click
           wait_for_ajaximations
-          fj(".datePickerDateField[data-date-type='due_at']:first").send_keys(due_at1.strftime('%b %-d, %y'))
+          fj(".datePickerDateField[data-date-type='due_at']:first").send_keys(format_date_for_view(due_at1))
 
           f('#add_due_date').click
           wait_for_ajaximations
@@ -77,7 +77,7 @@ describe "discussions" do
           wait_for_ajaximations
           fj(".ic-tokeninput-option:visible:first").click
           wait_for_ajaximations
-          fj(".datePickerDateField[data-date-type='due_at']:last").send_keys(due_at2.strftime('%b %-d, %y'))
+          fj(".datePickerDateField[data-date-type='due_at']:last").send_keys(format_date_for_view(due_at2))
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
           topic = DiscussionTopic.last
@@ -85,9 +85,9 @@ describe "discussions" do
           overrides = topic.assignment.assignment_overrides
           expect(overrides.count).to eq 2
           default_override = overrides.detect { |o| o.set_id == default_section.id }
-          expect(default_override.due_at.strftime('%b %-d, %y')).to eq due_at1.to_date.strftime('%b %-d, %y')
+          expect(default_override.due_at.to_date).to eq due_at1.to_date
           other_override = overrides.detect { |o| o.set_id == new_section.id }
-          expect(other_override.due_at.strftime('%b %-d, %y')).to eq due_at2.to_date.strftime('%b %-d, %y')
+          expect(other_override.due_at.to_date).to eq due_at2.to_date
         end
 
         it "should validate that a group category is selected", priority: "1", test_id: 150469 do
@@ -146,7 +146,7 @@ describe "discussions" do
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
         target_time = 1.day.from_now
         unlock_text = format_time_for_view(target_time)
-        unlock_text_index_page = target_time.strftime('%b %-d')
+        unlock_text_index_page = format_date_for_view(target_time, :short)
         f('#delayed_post_at').send_keys(unlock_text)
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('.entry-content').text).to include("This topic is locked until #{unlock_text}")

@@ -32,11 +32,11 @@ describe "assignment groups" do
       visit_assignment_edit_page(assignment)
 
       expect(first_due_at_element.attribute(:value)).
-        to match due_at.strftime('%b %-d')
+        to match format_date_for_view(due_at)
       expect(first_unlock_at_element.attribute(:value)).
-        to match unlock_at.strftime('%b %-d')
+        to match format_date_for_view(unlock_at)
       expect(first_lock_at_element.attribute(:value)).
-        to match lock_at.strftime('%b %-d')
+        to match format_date_for_view(lock_at)
     end
 
     it "should edit a due date", priority: "2", test_id: 216346 do
@@ -45,11 +45,11 @@ describe "assignment groups" do
 
       # set due_at, lock_at, unlock_at
       first_due_at_element.clear
-      first_due_at_element.send_keys(due_at.strftime('%b %-d, %y'))
+      first_due_at_element.send_keys(format_date_for_view(due_at, :medium))
       update_assignment!
 
-      expect(assignment.reload.due_at.strftime('%b %-d, %y')).
-        to eq due_at.to_date.strftime('%b %-d, %y')
+      expect(assignment.reload.due_at.to_date).
+        to eq due_at.to_date
     end
 
     it "should clear a due date", priority: "2", test_id: 216348 do
@@ -76,24 +76,24 @@ describe "assignment groups" do
 
       first_due_at_element.clear
       first_due_at_element.
-        send_keys(default_section_due.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(default_section_due, :medium))
 
       add_override
       wait_for_ajaximations
       select_last_override_section(other_section.name)
 
       last_due_at_element.
-        send_keys(other_section_due.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(other_section_due, :medium))
 
       update_assignment!
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 2
       default_override = overrides.detect{ |o| o.set_id == default_section.id }
-      expect(default_override.due_at.strftime('%b %-d, %y')).
-        to eq default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.to_date).
+        to eq default_section_due.to_date
       other_override = overrides.detect{ |o| o.set_id == other_section.id }
-      expect(other_override.due_at.strftime('%b %-d, %y')).
-        to eq other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.to_date).
+        to eq other_section_due.to_date
     end
 
     it "should not show inactive students when setting overrides" do
@@ -134,13 +134,13 @@ describe "assignment groups" do
       first_unlock_at_element.clear
       first_lock_at_element.clear
       last_due_at_element.
-        send_keys(due_date.strftime('%b %-d, %y'))
+        send_keys(format_date_for_view(due_date, :medium))
       submit_form('#edit_assignment_form')
       wait_for_ajaximations
       overrides = assign.reload.assignment_overrides
       section_override = overrides.detect{ |o| o.set_id == section1.id }
-      expect(section_override.due_at.strftime('%b %-d, %y'))
-        .to eq due_date.strftime('%b %-d, %y')
+      expect(section_override.due_at.to_date)
+        .to eq due_date.to_date
     end
 
     it "properly validates identical calendar dates when saving and editing", priority: "2", test_id: 216351 do

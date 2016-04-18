@@ -45,7 +45,7 @@ describe "context modules" do
       @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :section => section2)
       get "/courses/#{@course.id}/modules"
       expect(f(".due_date_display").text).not_to be_blank
-      expect(f(".due_date_display").text).to eq @due_at.strftime('%b %-d, %Y')
+      expect(f(".due_date_display").text).to eq format_date_for_view(@due_at)
     end
 
     it "when not associated, and in multiple sections, it should show the latest due date" do
@@ -59,13 +59,13 @@ describe "context modules" do
       @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true, :section => section2)
       get "/courses/#{@course.id}/modules"
       expect(f(".due_date_display").text).not_to be_blank
-      expect(f(".due_date_display").text).to eq @due_at.strftime('%b %-d, %Y')
+      expect(f(".due_date_display").text).to eq format_date_for_view(@due_at)
     end
 
     it "when associated with a student, it should show the student's overridden due date" do
       @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
       get "/courses/#{@course.id}/modules"
-      expect(f(".due_date_display").text).to eq @due_at.strftime('%b %-d, %Y')
+      expect(f(".due_date_display").text).to eq format_date_for_view(@due_at)
       expect(f(".due_date_display").text).not_to be_blank
       expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
     end

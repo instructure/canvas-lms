@@ -8,12 +8,12 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def fill_assignment_overrides
-      fj(".datePickerDateField[data-date-type='due_at']")
-        .send_keys(due_at.strftime('%b %-d, %y'))
-      fj(".datePickerDateField[data-date-type='unlock_at']")
-        .send_keys(unlock_at.strftime('%b %-d, %y'))
-      fj(".datePickerDateField[data-date-type='lock_at']")
-        .send_keys(lock_at.strftime('%b %-d, %y'))
+    f(".datePickerDateField[data-date-type='due_at']")
+      .send_keys(format_date_for_view(due_at))
+    f(".datePickerDateField[data-date-type='unlock_at']")
+      .send_keys(format_date_for_view(unlock_at))
+    f(".datePickerDateField[data-date-type='lock_at']")
+      .send_keys(format_date_for_view(lock_at))
   end
 
   def update_assignment!
@@ -33,12 +33,9 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def compare_assignment_times(a)
-    expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date
-      .strftime('%b %-d, %y')
-    expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date
-      .strftime('%b %-d, %y')
-    expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date
-      .strftime('%b %-d, %y')
+    expect(a.due_at.to_date).to eq due_at.to_date
+    expect(a.unlock_at.to_date).to eq unlock_at.to_date
+    expect(a.lock_at.to_date).to eq lock_at.to_date
   end
 
   def create_assignment!
@@ -245,28 +242,30 @@ module AssignmentOverridesSeleniumHelper
 
   def set_quiz_dates_for_section_a
     now = Time.zone.now
-    @due_at_a = now.advance(days: 2)
-    @unlock_at_a = now
-    @lock_at_a = now.advance(days: 3)
 
-    @quiz.update_attribute(:due_at, @due_at_a)
-    @quiz.update_attribute(:unlock_at, @unlock_at_a)
-    @quiz.update_attribute(:lock_at, @lock_at_a)
+    @quiz.update_attribute(:due_at, now.advance(days: 2))
+    @quiz.update_attribute(:unlock_at, now)
+    @quiz.update_attribute(:lock_at, now.advance(days: 3))
+
+    @due_at_a = @quiz.due_at
+    @unlock_at_a = @quiz.unlock_at
+    @lock_at_a = @quiz.lock_at
   end
 
   def set_quiz_dates_for_section_b
     now = Time.zone.now
-    @due_at_b = now.advance(days: 4)
-    @unlock_at_b = now.advance(days: 1)
-    @lock_at_b = now.advance(days: 4)
 
     add_user_specific_due_date_override(
       @quiz,
       section: @section_b,
-      due_at: @due_at_b,
-      unlock_at: @unlock_at_b,
-      lock_at: @lock_at_b
+      due_at: now.advance(days: 4),
+      unlock_at: now.advance(days: 1),
+      lock_at: now.advance(days: 4)
     )
+
+    @due_at_b = @override.due_at
+    @unlock_at_b = @override.unlock_at
+    @lock_at_b = @override.lock_at
   end
 
   def obtain_due_date(section)

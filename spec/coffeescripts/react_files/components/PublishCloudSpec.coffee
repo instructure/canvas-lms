@@ -48,7 +48,7 @@ define [
 
   test 'should display a non clickable restricted dates icon', ->
     equal @publishCloud.refs.publishCloud.props.onClick, undefined, 'does not have a click event'
-    equal @publishCloud.refs.publishCloud.props.title, "Available after Jan 1, 2014 at 12:00am until Feb 1, 2014 at 12:00am", "has a available from hoverover"
+    equal @publishCloud.refs.publishCloud.props.title, "Available after Jan 1, 2014 at 12am until Feb 1, 2014 at 12am", "has a available from hoverover"
 
   # Unit Tests
 

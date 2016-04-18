@@ -46,7 +46,7 @@ describe "conversations new" do
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
-      time = format_time_for_view(Time.zone.now)
+      time = format_time_for_view(UserNote.last.updated_at)
       remove_user_session
       get student_user_notes_url
       expect(f('.subject').text).to include_text('Christmas')
@@ -76,7 +76,7 @@ describe "conversations new" do
       replace_content(f('textarea'),'FJ Body text 2')
       wait_for_ajaximations
       f('.send_button').click
-      time = format_time_for_view(Time.zone.now)
+      time = format_time_for_view(UserNote.last.updated_at)
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'
       expect(f('.user_content').text).to eq 'FJ Body text 2'

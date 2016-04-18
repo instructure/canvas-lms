@@ -92,7 +92,7 @@ describe "assignments" do
       locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
-      expect(f('#content')).to include_text(unlock_time.strftime("%b %-d"))
+      expect(f('#content')).to include_text(format_date_for_view(unlock_time))
       locked_assignment.update_attributes(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
