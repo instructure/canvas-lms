@@ -192,6 +192,37 @@ describe FilesController do
       expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
     end
 
+    context "file menu tool visibility" do
+      before do
+        course(:active_all => true)
+        @tool = @course.context_external_tools.create!(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+        @tool.file_menu = {
+          :visibility => "admins"
+        }
+        @tool.save!
+        Account.default.enable_feature!(:lor_for_account)
+      end
+
+      before :each do
+        user(:active_all => true)
+        user_session(@user)
+      end
+
+      it "should show restricted external tools to teachers" do
+        @course.enroll_teacher(@user).accept!
+
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools].count).to eq 1
+      end
+
+      it "should not show restricted external tools to students" do
+        @course.enroll_student(@user).accept!
+
+        get 'index', :course_id => @course.id
+        expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
+      end
+    end
+
     describe 'across shards' do
       specs_require_sharding
 
