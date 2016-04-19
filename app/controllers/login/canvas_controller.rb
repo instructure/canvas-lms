@@ -116,7 +116,7 @@ class Login::CanvasController < ApplicationController
       user = pseudonym.login_assertions_for_user
       successful_login(user, pseudonym)
     else
-      unsuccessful_login t("Incorrect username and/or password")
+      unsuccessful_login t("Invalid username or password")
     end
   end
 
