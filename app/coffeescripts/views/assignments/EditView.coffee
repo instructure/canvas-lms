@@ -251,7 +251,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
 
     _attachEditorToDescription: =>
       RichContentEditor.initSidebar(show: @scrollSidebar)
-      RichContentEditor.loadNewEditor(@$description, { focus: true })
+      RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
+
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
         RichContentEditor.callOnRCE(@$description, 'toggle')

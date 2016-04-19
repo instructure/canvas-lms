@@ -36,7 +36,6 @@
     <textarea id="assignment_description"
       name="description"
       aria-label="{{#t "description"}}Description{{/t}}"
-      style="width: 100%; min-height: 300px;"
       {{disabledIfIncludes frozenAttributes "description"}}>
       {{convertApiUserContent description forEditing=1}}
     </textarea>
