@@ -148,7 +148,7 @@ describe ExternalToolsController do
         expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
       end
 
-      it "returns 404 if the tool is not found" do
+      it "returns flash error if the tool is not found" do
         user_session(@teacher)
         get :show, :account_id => @course.account.id, id: 0
         expect(response).to be_redirect
@@ -340,18 +340,26 @@ describe ExternalToolsController do
 
       it "sends content item json for selected content" do
         user_session(@teacher)
-        get :show, :course_id => @course.id, id: @tool.id, :pages => [1,6], :assignments => [6]
+        page = @course.wiki.wiki_pages.create!(title: 'a page')
+        assignment = @course.assignments.create!(name: 'an assignment')
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [page.id], :assignments => [assignment.id]
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
         expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
         expect(params).to include 'export_type=common_cartridge'
-        expect(params).to include "select%5Bpages%5D%5B%5D=1"
-        expect(params).to include "select%5Bpages%5D%5B%5D=6"
-        expect(params).to include "select%5Bassignments%5D%5B%5D=6"
+        expect(params).to include "select%5Bpages%5D%5B%5D=#{page.id}"
+        expect(params).to include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
         expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.course'
         expect(placement['placementOf']['title']).to eq 'a course'
+      end
+
+      it "returns flash error if invalid id params are passed in" do
+        user_session(@teacher)
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [0]
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/error generating the tool launch/)
       end
     end
 

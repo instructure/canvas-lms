@@ -311,6 +311,8 @@ class ExternalToolsController < ApplicationController
       @show_embedded_chat = false if @tool.tool_id == 'chat'
 
       @lti_launch = lti_launch(@tool, placement)
+      return unless @lti_launch
+
       render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
     end
   end
@@ -359,6 +361,8 @@ class ExternalToolsController < ApplicationController
 
     return unless find_tool(params[:external_tool_id], selection_type)
     @lti_launch = lti_launch(@tool, selection_type)
+    return unless @lti_launch
+
     render Lti::AppUtil.display_template('borderless')
   end
 
@@ -382,12 +386,25 @@ class ExternalToolsController < ApplicationController
     case message_type
       when 'ContentItemSelectionResponse', 'ContentItemSelection'
         #ContentItemSelectionResponse is deprecated, use ContentItemSelection instead
-        content_item_selection(tool, selection_type, create_content_item_response, message_type, url)
+        content_item_selection(tool, selection_type, message_type, url)
       when 'ContentItemSelectionRequest'
         content_item_selection_request(tool, selection_type, url)
       else
         basic_lti_launch_request(tool, selection_type, url)
     end
+  rescue Lti::UnauthorizedError
+    render_unauthorized_action
+    nil
+  rescue Lti::UnsupportedExportTypeError, Lti::InvalidMediaTypeError
+    respond_to do |format|
+      err = t('There was an error generating the tool launch')
+      format.html do
+        flash[:error] = err
+        redirect_to named_context_url(@context, :context_url)
+      end
+      format.json { render :json => { error: err } }
+    end
+    nil
   end
   protected :lti_launch
 
@@ -411,7 +428,18 @@ class ExternalToolsController < ApplicationController
   end
   protected :basic_lti_launch_request
 
-  def content_item_selection(tool, placement, content_item_response, message_type, url = nil)
+  def content_item_selection(tool, placement, message_type, url = nil)
+    media_types = params.select do |param|
+      Lti::ContentItemResponse::MEDIA_TYPES.include?(param.to_sym)
+    end
+    content_item_response = Lti::ContentItemResponse.new(
+      @context,
+      self,
+      @current_user,
+      media_types,
+      params["export_type"]
+    )
+
     params = default_lti_params.merge(
       {
         #required params
@@ -435,19 +463,6 @@ class ExternalToolsController < ApplicationController
     lti_launch
   end
   protected :content_item_selection
-
-  def create_content_item_response
-    media_types = params.select { |param| Lti::ContentItemResponse::MEDIA_TYPES.include? param.to_sym }
-    begin
-      Lti::ContentItemResponse.new(@context, self, @current_user, media_types, params["export_type"])
-    rescue Lti::UnauthorizedError
-      render_unauthorized_action
-    rescue Lti::UnsupportedExportTypeError
-      #Legacy API behavior does nothing if the export type is unsupported
-    end
-  end
-
-  protected :create_content_item_response
 
   # Do an official content-item request as specified: http://www.imsglobal.org/LTI/services/ltiCIv1p0pd/ltiCIv1p0pd.html
   def content_item_selection_request(tool, placement, url = nil)
@@ -757,6 +772,8 @@ class ExternalToolsController < ApplicationController
     raise ActiveRecord::RecordNotFound if tool.nil?
 
     launch = lti_launch(tool)
+    return unless launch
+
     params = launch.params.reject {|p| p.starts_with?('oauth_')}
     params[:consumer_key] = tool.consumer_key
     params[:iat] = Time.zone.now.to_i
