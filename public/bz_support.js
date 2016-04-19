@@ -22,12 +22,12 @@
 */
 function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
-          if(ta.tagName == "SPAN")
-            ta.textContent = value;
-          else if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+          if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
             ta.checked = (value == "yes") ? true : false;
-	  else
+	  else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
             ta.value = value;
+	  else
+            ta.textContent = value;
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -37,6 +37,18 @@ function bzRetainedInfoSetup() {
 
       if(ta.className.indexOf("bz-retained-field-setup") != -1)
         return; // already set up, no need to redo
+
+      if(ta.tagName == "IMG") {
+        // this is a hack so the editor will not allow text inside:
+        // the field pretends to be an image in that context. But, when
+        // it is time to display it, we want to switch back to being an
+        // ordinary span.
+        var span = document.createElement("span");
+        span.className = ta.className;
+        span.setAttribute("data-bz-retained", ta.getAttribute("data-bz-retained"));
+        ta.parentNode.replaceChild(span, ta);
+        ta = span;
+      }
 
       var save = function() {
         var http = new XMLHttpRequest();

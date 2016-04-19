@@ -71,7 +71,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
         if(type == "checkbox")
           ed.selection.setContent('<input type="checkbox" readonly="readonly" data-bz-retained="'+name+'" />');
         else
-          ed.selection.setContent('<span data-bz-retained="'+name+'">...</span>');
+          ed.selection.setContent('<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" class=\"bz-magic-viewer\" data-bz-retained="'+name+'"/>');
       });
     });
     ed.addButton('bz_retained_field', {
