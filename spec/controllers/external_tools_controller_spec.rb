@@ -101,6 +101,61 @@ describe ExternalToolsController do
   end
 
   describe "GET 'show'" do
+    context 'basic-lti-launch-request' do
+      it "launches account tools for non-admins" do
+        user_session(@teacher)
+        tool = @course.account.context_external_tools.new(:name => "bob",
+                                                          :consumer_key => "bob",
+                                                          :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.account_navigation = { enabled: true }
+        tool.save!
+
+        get :show, :account_id => @course.account.id, id: tool.id
+
+        expect(response).to be_success
+      end
+
+      it "generates the resource_link_id correctly for a course navigation launch" do
+        user_session(@teacher)
+        tool = @course.context_external_tools.new(:name => "bob",
+                                                          :consumer_key => "bob",
+                                                          :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.course_navigation = { enabled: true }
+        tool.save!
+
+        get :show, :course_id => @course.id, id: tool.id
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
+      end
+
+      it 'generates the correct resource_link_id for a homework submission' do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.save!
+        tool = @course.context_external_tools.new(:name => "bob",
+                                                  :consumer_key => "bob",
+                                                  :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.course_navigation = { enabled: true }
+        tool.homework_submission = { enabled: true }
+        tool.save!
+
+        get :show, course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
+      end
+
+      it "returns 404 if the tool is not found" do
+        user_session(@teacher)
+        get :show, :account_id => @course.account.id, id: 0
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/find valid settings/)
+      end
+    end
+
     context 'ContentItemSelectionResponse' do
       before :once do
         @tool = new_valid_tool(@course)
@@ -300,56 +355,6 @@ describe ExternalToolsController do
       end
     end
 
-    context 'basic-lti-launch-request' do
-      it "launches account tools for non-admins" do
-        user_session(@teacher)
-        tool = @course.account.context_external_tools.new(:name => "bob",
-                                                          :consumer_key => "bob",
-                                                          :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.account_navigation = { enabled: true }
-        tool.save!
-
-        get :show, :account_id => @course.account.id, id: tool.id
-
-        expect(response).to be_success
-      end
-
-      it "generates the resource_link_id correctly for a course navigation launch" do
-        user_session(@teacher)
-        tool = @course.context_external_tools.new(:name => "bob",
-                                                          :consumer_key => "bob",
-                                                          :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.course_navigation = { enabled: true }
-        tool.save!
-
-        get :show, :course_id => @course.id, id: tool.id
-        expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
-      end
-
-      it 'generates the correct resource_link_id for a homework submission' do
-        user_session(@teacher)
-        assignment = @course.assignments.create!(name: 'an assignment')
-        assignment.save!
-        tool = @course.context_external_tools.new(:name => "bob",
-                                                  :consumer_key => "bob",
-                                                  :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.course_navigation = { enabled: true }
-        tool.homework_submission = { enabled: true }
-        tool.save!
-
-        get :show, course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
-        expect(response).to be_success
-
-        lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
-      end
-    end
-  end
-
-  describe "GET 'show'" do
     context 'ContentItemSelectionRequest' do
       before :once do
         @tool = new_valid_tool(@course)

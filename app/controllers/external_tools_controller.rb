@@ -289,33 +289,29 @@ class ExternalToolsController < ApplicationController
   #      }
   def show
     if api_request?
-      if tool = @context.context_external_tools.active.where(id: params[:external_tool_id]).first
-        render :json => external_tool_json(tool, @context, @current_user, session)
-      else
-        raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")
-      end
+      tool = @context.context_external_tools.active.find(params[:external_tool_id])
+      render :json => external_tool_json(tool, @context, @current_user, session)
     else
       placement = placement_from_params
-      if find_tool(params[:id], placement)
+      return unless find_tool(params[:id], placement)
 
-        log_asset_access(@tool, "external_tools", "external_tools")
-
-        @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
-        @redirect_return = true
-
-        success_url = tool_return_success_url(placement)
-        cancel_url = tool_return_cancel_url(placement) || success_url
-        js_env(:redirect_return_success_url => success_url,
-               :redirect_return_cancel_url => cancel_url)
-        js_env(:course_id => @context.id) if @context.is_a?(Course)
-
-        @active_tab = @tool.asset_string
-        @show_embedded_chat = false if @tool.tool_id == 'chat'
-
-        @lti_launch = lti_launch(@tool, placement)
-        render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
-      end
       add_crumb(@context.name, named_context_url(@context, :context_url))
+      log_asset_access(@tool, "external_tools", "external_tools")
+
+      @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
+      @redirect_return = true
+
+      success_url = tool_return_success_url(placement)
+      cancel_url = tool_return_cancel_url(placement) || success_url
+      js_env(:redirect_return_success_url => success_url,
+             :redirect_return_cancel_url => cancel_url)
+      js_env(:course_id => @context.id) if @context.is_a?(Course)
+
+      @active_tab = @tool.asset_string
+      @show_embedded_chat = false if @tool.tool_id == 'chat'
+
+      @lti_launch = lti_launch(@tool, placement)
+      render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
     end
   end
 
@@ -361,11 +357,9 @@ class ExternalToolsController < ApplicationController
     @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_dialog', {include_host: true})
     @headers = false
 
-    tool = find_tool(params[:external_tool_id], selection_type)
-    if tool
-      @lti_launch = lti_launch(@tool, selection_type)
-      render Lti::AppUtil.display_template('borderless')
-    end
+    return unless find_tool(params[:external_tool_id], selection_type)
+    @lti_launch = lti_launch(@tool, selection_type)
+    render Lti::AppUtil.display_template('borderless')
   end
 
   def find_tool(id, selection_type)
