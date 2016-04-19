@@ -1080,6 +1080,7 @@ class ApplicationController < ActionController::Base
       if @page_view && @page_view_update
         @page_view.context = @context if !@page_view.context_id
         @page_view.account_id = @domain_root_account.id
+        @page_view.developer_key_id = @access_token.try(:developer_key_id)
         @page_view.store
         RequestContextGenerator.store_page_view_meta(@page_view)
       end
@@ -1087,6 +1088,7 @@ class ApplicationController < ActionController::Base
       @page_view.destroy if @page_view && !@page_view.new_record?
     end
   rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+    Canvas::Errors.capture_exception(:page_view, e)
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true

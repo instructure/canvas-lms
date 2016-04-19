@@ -382,6 +382,10 @@ class PageView < ActiveRecord::Base
     export_columns(format).map { |c| self.send(c).presence }
   end
 
+  def app_name
+    DeveloperKey.find_cached(developer_key_id).try(:name) if developer_key_id
+  end
+
   # utility class to migrate a postgresql/sqlite3 page_views table to cassandra
   class CassandraMigrator < Struct.new(:start_at, :logger, :migration_data)
     # if you interrupt and re-start the migrator, start_at cannot be changed,

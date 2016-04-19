@@ -24,7 +24,8 @@ describe "page views" do
   end
 
   it "should record the context when commenting on a discussion" do
-    course_with_teacher_logged_in(:active_all => 1)
+    user_with_pseudonym(active_all: 1)
+    course_with_teacher_logged_in(active_all: 1, user: @user)
     @topic = @course.discussion_topics.create!
 
     post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", :message => 'hello'
@@ -34,6 +35,21 @@ describe "page views" do
     expect(pv.context).to eq @course
     expect(pv.controller).to eq 'discussion_topics_api'
     expect(pv.action).to eq 'add_entry'
+  end
+
+  it "records the developer key when an access token was used" do
+    user_with_pseudonym(active_all: 1)
+    course_with_teacher(active_all: 1, user: @user)
+    @topic = @course.discussion_topics.create!
+
+    post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", :message => 'hello', access_token: @user.access_tokens.create!.full_token
+    expect(response).to be_success
+
+    pv = PageView.last
+    expect(pv.context).to eq @course
+    expect(pv.controller).to eq 'discussion_topics_api'
+    expect(pv.action).to eq 'add_entry'
+    expect(pv.developer_key).to eq DeveloperKey.default
   end
 
   describe "update" do

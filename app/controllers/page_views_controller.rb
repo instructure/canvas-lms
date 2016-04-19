@@ -31,6 +31,11 @@
 #           "type": "string",
 #           "format": "uuid"
 #         },
+#         "app_name": {
+#           "description": "If the request is from an API request, the app that generated the access token",
+#           "example": "Canvas for iOS",
+#           "type": "string"
+#         },
 #         "url": {
 #           "description": "The URL requested",
 #           "example": "https://canvas.instructure.com/conversations",

@@ -284,7 +284,7 @@ describe "Users API", type: :request do
         @timestamp = Time.zone.at(1.day.ago.to_i)
         page_view_model(:user => @student, :created_at => @timestamp - 1.day)
         page_view_model(:user => @student, :created_at => @timestamp + 1.day)
-        page_view_model(:user => @student, :created_at => @timestamp)
+        page_view_model(:user => @student, :created_at => @timestamp, developer_key: DeveloperKey.default)
       end
 
       it "should return page view history" do
@@ -294,6 +294,8 @@ describe "Users API", type: :request do
         expect(json.size).to eq 2
         json.each { |j| expect(j['url']).to eq "http://www.example.com/courses/1" }
         expect(json[0]['created_at']).to be > json[1]['created_at']
+        expect(json[0]['app_name']).to be_nil
+        expect(json[1]['app_name']).to eq 'User-Generated'
         expect(response.headers['Link']).to match /next/
         expect(response.headers['Link']).not_to match /last/
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }

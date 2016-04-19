@@ -35,7 +35,7 @@ define [
       method is 'get'
 
     summarizedUserAgent: ->
-      $.parseUserAgentString(@get 'user_agent')
+      @get('app_name') || $.parseUserAgentString(@get 'user_agent')
 
     readableInteractionTime: ->
       seconds = @get 'interaction_seconds'
