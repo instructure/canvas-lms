@@ -50,7 +50,7 @@ define([], function(){
       skin: "light",
       skin_url: "/vendor/tinymce_themes/light",
       plugins: "autolink,media,paste,table,textcolor,link,directionality",
-      paste_data_images: true,
+      paste_data_images: true, /* Needed for IMG hack to get retained data field working */
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
         "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
