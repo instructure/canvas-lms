@@ -86,14 +86,14 @@ define([
           <div className="col-xs-3" role="gridcell">
             <div className="grid-row middle-xs">
               <span className="userAvatar">
-                {!!avatar_url &&
-                  <span className="ic-avatar UserListRow__Avatar">
-                    <img src={avatar_url} alt={`User avatar for ${name}`} />
-                  </span>
-                }
-              </span>
-              <span className="userUrl">
-                <a href={url}>{name}</a>
+                <span className="userUrl">
+                  {!!avatar_url &&
+                    <span className="ic-avatar UserListRow__Avatar">
+                      <img src={avatar_url} alt={`User avatar for ${name}`} />
+                    </span>
+                  }
+                  <a href={url}>{name}</a>
+                </span>
               </span>
             </div>
           </div>

@@ -36,14 +36,26 @@
   border-color: $ic-border-light;
 
   li[role=tab] {
-    padding: 10px 25px;
     font-size: 1.1em;
     color: $ic-link-color;
+    padding: 0;
+
+    a {
+        padding: 10px 25px;
+        display: block;
+        color: inherit;
+    }
 
     &[selected] {
       font-weight: bold;
-      color: $ic-color-dark;
       border-color: $ic-border-light;
+
+      a:link,
+      a:visited,
+      a:hover {
+        text-decoration: none;
+        color: $ic-color-dark;
+      }
     }
   }
 }

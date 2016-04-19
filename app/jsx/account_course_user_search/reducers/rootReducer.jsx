@@ -103,8 +103,26 @@ define([
     }
   };
 
+  const tabListHandlers = {
+    SELECT_TAB: (state, action) => {
+      state.selected = action.payload.tabIndex;
+      return state;
+    }
+  };
+
+  const tabList = (state = initialState, action) => {
+    if (tabListHandlers[action.type]) {
+      const newState = _.extend({}, state);
+      return tabListHandlers[action.type](newState, action);
+    } else {
+      return state;
+    }
+  };
+
+
   return combineReducers({
-    userList
+    userList,
+    tabList
   });
 
 });

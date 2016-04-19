@@ -511,6 +511,7 @@ CanvasRails::Application.routes.draw do
   end
 
   resources :accounts do
+    get 'search(/:tab)', action: :course_user_search
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get :admin_tools

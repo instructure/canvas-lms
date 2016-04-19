@@ -4,7 +4,7 @@ define ->
 
   parseLinkHeader = (jqXhr) ->
     links = {}
-    header = jqXhr.getResponseHeader 'Link'
+    header = jqXhr && jqXhr.getResponseHeader 'Link'
     return links unless header
     while link = regex.exec header
       links[link[2]] = link[1]
