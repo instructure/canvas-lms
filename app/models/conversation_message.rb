@@ -265,6 +265,8 @@ class ConversationMessage < ActiveRecord::Base
     else
       shared_tags = author.conversation_context_codes(false)
       shared_tags &= recipient.conversation_context_codes(false)
+      shared_tags &= conversation.tags if conversation.tags.any?
+
       context_components = shared_tags.map{|t| ActiveRecord::Base.parse_asset_string(t)}
       context_names = Context.names_by_context_types_and_ids(context_components[0,2]).values
     end
