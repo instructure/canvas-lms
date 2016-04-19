@@ -28,7 +28,7 @@ module Canvas
       end
 
       def fingerprinted?(path)
-        /-[0-9a-fA-F]{10}$/.match(path.basename(path.extname).to_s)
+        /-[0-9a-fA-F]{10,32}$/.match(path.basename(path.extname).to_s)
       end
 
       def font?(path)

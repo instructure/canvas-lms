@@ -107,6 +107,7 @@ class ApplicationController < ActionController::Base
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config: active_brand_config.try(:md5),
+        active_brand_config_json_url: active_brand_config_json_url,
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
         current_user: user_display_json(@current_user, :profile),

@@ -86,4 +86,77 @@ describe BrandConfig do
       expect(@parent_config.chain_of_ancestor_configs.length).to eq 1
     end
   end
+
+  describe "to_json" do
+    before :once do
+      setup_subaccount_with_config
+      @brand_variables = JSON.parse(@subaccount_bc.to_json)
+    end
+
+    it "includes custom variables from brand config" do
+      expect(@brand_variables["ic-brand-global-nav-bgd"]).to eq '#123'
+    end
+
+    it "includes custom variables from parent brand config" do
+      expect(@brand_variables["ic-brand-primary"]).to eq '#321'
+    end
+
+    it "includes default variables not found in brand config" do
+      expect(@brand_variables["ic-link-color"]).to eq '#0081bd'
+    end
+  end
+
+  describe "save_all_files!" do
+    before :once do
+      setup_subaccount_with_config
+    end
+
+    before :each do
+      @json_file = StringIO.new
+      @scss_file = StringIO.new
+      @subaccount_bc.stubs(:json_file).returns(@json_file)
+      @subaccount_bc.stubs(:scss_file).returns(@scss_file)
+    end
+
+    describe "with cdn disabled" do
+      before :each do
+        Canvas::Cdn.expects(:enabled?).returns(false)
+        @subaccount_bc.s3_uploader.expects(:upload_file).never
+        File.expects(:delete).never
+      end
+
+      it "writes the json represendation to the json file" do
+        @subaccount_bc.save_all_files!
+        expect(@json_file.string).to eq @subaccount_bc.to_json
+      end
+
+      it "writes the scss represendation to scss file" do
+        @subaccount_bc.save_all_files!
+        expect(@scss_file.string).to eq @subaccount_bc.to_scss
+      end
+    end
+
+    describe "with cdn enabled" do
+      before :each do
+        Canvas::Cdn.expects(:enabled?).returns(true)
+        @upload_expectation = @subaccount_bc.s3_uploader.expects(:upload_file).once
+        @delete_expectation = File.expects(:delete).once
+      end
+
+      it "writes the json represendation to the json file" do
+        @subaccount_bc.save_all_files!
+        expect(@json_file.string).to eq @subaccount_bc.to_json
+      end
+
+      it 'uploads json file to s3 if cdn enabled' do
+        @upload_expectation.with(@subaccount_bc.public_json_path)
+        @subaccount_bc.save_all_files!
+      end
+
+      it 'deletes local json file if cdn enabled' do
+        @delete_expectation.with(@subaccount_bc.json_file)
+        @subaccount_bc.save_all_files!
+      end
+    end
+  end
 end
