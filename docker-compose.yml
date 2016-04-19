@@ -15,7 +15,7 @@ redis:
 #     CASSANDRA_START_RPC: 'true'
 
 consul:
-  image: gliderlabs/consul-server:0.5
+  image: gliderlabs/consul-server:0.6
   command: -node canvas-consul -bootstrap
   environment:
     GOMAXPROCS: "2"
