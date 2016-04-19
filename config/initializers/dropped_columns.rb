@@ -91,6 +91,7 @@ class ActiveRecord::Base
                     old_account_id
                     show_all_discussion_entries
                   ).freeze,
+    'developer_keys' => %w(tool_id).freeze,
     'discussion_topics' => %w(authorization_list_id).freeze,
     'enrollment_terms' => %w(sis_data
                              sis_name
