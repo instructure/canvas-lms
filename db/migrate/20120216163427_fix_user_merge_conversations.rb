@@ -26,7 +26,7 @@ class FixUserMergeConversations < ActiveRecord::Migration
 
     # there may be a bunch more private conversations with the wrong private
     # hash, and there's not a reliable way to figure out which ones those are
-    # in sql alone (unless you have a sha1 method for postgres and sqlite), so
+    # in sql alone (unless you have a sha1 method for postgres), so
     # we just walk them all out of band and make sure they're right (this may
     # also merge some private conversations in the process)
     Conversation.where("private_hash IS NOT NULL").pluck(:id).each_slice(1000) do |ids|

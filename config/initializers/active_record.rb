@@ -343,15 +343,8 @@ class ActiveRecord::Base
   end
 
   def self.like_condition(value, pattern = '?', downcase = true)
-    case connection.adapter_name
-      when 'SQLite'
-        # sqlite is always case-insensitive, and you must specify the escape char
-        "#{value} LIKE #{pattern} ESCAPE '\\'"
-      else
-        # postgres is always case-sensitive (mysql depends on the collation)
-        value = "LOWER(#{value})" if downcase
-        "#{value} LIKE #{pattern}"
-    end
+    value = "LOWER(#{value})" if downcase
+    "#{value} LIKE #{pattern}"
   end
 
   def self.best_unicode_collation_key(col)
@@ -371,9 +364,6 @@ class ActiveRecord::Base
         "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
     else
-      # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
-      # SQLite can have custom collations inserted, but probably not worth the effort
-      # since no one will actually use SQLite in a production install of Canvas)
       col
     end
   end
@@ -384,16 +374,9 @@ class ActiveRecord::Base
     num_days = options[:num_days] || 20
     min_date = (options[:min_date] || max_date.advance(:days => -(num_days-1))).midnight
 
-    # if the db can't do (named) timezones, we do the best we can (dates on the
-    # other side of dst will be wrong though)
     offset = max_date.utc_offset
 
-    expression = case connection.adapter_name
-    when /sqlite/
-      "DATE(STRFTIME('%s', #{column}) + #{offset}, 'unixepoch')"
-    when 'PostgreSQL'
-      "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
-    end
+    expression = "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
 
     result = where(
         "#{column} >= ? AND #{column} < ?",
@@ -403,7 +386,6 @@ class ActiveRecord::Base
       group(expression).
       order(expression).
       count
-    # mysql gives us date keys, sqlite/postgres don't
 
     return result if result.keys.first.is_a?(Date)
     Hash[result.map { |date, count|
@@ -769,9 +751,6 @@ ActiveRecord::Relation.class_eval do
           ensure
             connection.raw_connection.set_notice_processor(&old_proc) if old_proc
           end
-        when 'SQLite'
-          # Sqlite always has an implicit primary key
-          index = 'rowid'
         else
           raise "Temp tables not supported!"
       end
@@ -1100,24 +1079,6 @@ ActiveRecord::Associations::HasOneAssociation.class_eval do
   end
 end
 
-# See https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/66-true-false-conditions-broken-for-sqlite#ticket-66-9
-# The default 't' and 'f' are no good, since sqlite treats them both as 0 in boolean logic.
-# This patch makes it so you can do stuff like:
-#   :conditions => "active"
-# instead of having to do:
-#   :conditions => ["active = ?", true]
-if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
-  ActiveRecord::ConnectionAdapters::SQLiteAdapter.class_eval do
-    def quoted_true
-      '1'
-    end
-
-    def quoted_false
-      '0'
-    end
-  end
-end
-
 class ActiveRecord::Migration
   VALID_TAGS = [:predeploy, :postdeploy, :cassandra]
   # at least one of these tags is required
@@ -1244,7 +1205,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     options[:column] ||= "#{to_table.to_s.singularize}_id"
     column = options[:column]
     case self.adapter_name
-    when 'SQLite'; return
     when 'PostgreSQL'
       foreign_key_name = CANVAS_RAILS4_0 ? foreign_key_name(from_table, column, options) : foreign_key_name(from_table, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'

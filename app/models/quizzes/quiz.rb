@@ -425,12 +425,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_quiz_submission_end_at_times
     new_end_at = time_limit * 60.0
 
-    update_sql = case ActiveRecord::Base.connection.adapter_name
-                 when 'PostgreSQL'
-                   "started_at + INTERVAL '+? seconds'"
-                 when /sqlite/
-                   "DATETIME(started_at, '+? seconds')"
-                 end
+    update_sql = "started_at + INTERVAL '+? seconds'"
 
     # only update quiz submissions that:
     # 1. belong to this quiz;

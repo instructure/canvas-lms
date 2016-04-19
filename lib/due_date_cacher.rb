@@ -42,22 +42,19 @@ class DueDateCacher
 
     # Create insert scope
     insert_scope = Course
-      .select("DISTINCT assignments.id, enrollments.user_id, '#{default_submission.workflow_state}', {{now}}, assignments.context_code, 0")
-      .joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.context_id = courses.id AND assignments.context_type = 'Course'
-        LEFT OUTER JOIN #{Submission.quoted_table_name} ON submissions.user_id = enrollments.user_id AND submissions.assignment_id = assignments.id")
+      .select("DISTINCT assignments.id, enrollments.user_id, '#{default_submission.workflow_state}',
+               now() AT TIME ZONE 'UTC', assignments.context_code, 0")
+      .joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.context_id = courses.id
+                AND assignments.context_type = 'Course'
+              LEFT OUTER JOIN #{Submission.quoted_table_name} ON submissions.user_id = enrollments.user_id
+                AND submissions.assignment_id = assignments.id")
       .joins(:current_enrollments)
       .where("enrollments.user_id IN (?) AND assignments.id IN (?) AND submissions.id IS NULL", overridden_students, @assignments)
 
-    #Set timestamp syntax depending on the connection adapter
-    insert_sql = case ActiveRecord::Base.connection.adapter_name
-                 when 'PostgreSQL'
-                   insert_scope.to_sql.gsub("{{now}}", "now() AT TIME ZONE 'UTC'")
-                 when /sqlite/
-                   insert_scope.to_sql.gsub("{{now}}", "datetime('now')")
-                 end
-
     # Create submissions that do not exist yet to calculate due dates for non submitted assignments.
-    Assignment.connection.update("INSERT INTO #{Submission.quoted_table_name} (assignment_id, user_id, workflow_state, created_at, context_code, process_attempts) #{insert_sql}")
+    Assignment.connection.update("INSERT INTO #{Submission.quoted_table_name} (assignment_id,
+                                  user_id, workflow_state, created_at, context_code,
+                                  process_attempts) #{insert_scope.to_sql}")
   end
 
   def recompute

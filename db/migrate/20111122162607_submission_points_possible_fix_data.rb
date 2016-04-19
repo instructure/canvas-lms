@@ -10,7 +10,6 @@ class SubmissionPointsPossibleFixData < ActiveRecord::Migration
           FROM #{Quizzes::Quiz.quoted_table_name}
           WHERE quiz_id = quizzes.id AND quiz_points_possible <> points_possible AND (points_possible < 2147483647 AND quiz_points_possible = CAST(points_possible AS INTEGER) OR points_possible >= 2147483647 AND quiz_points_possible = 2147483647)
         SQL
-      # no fix needed for sqlite
     end
   end
 
