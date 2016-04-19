@@ -25,8 +25,13 @@ module RuboCop
           _receiver, method_name, *_args = *node
           return unless STUB_METHODS.include? method_name
           return unless node.ancestors.find do |ancestor|
-            ancestor.children[0].to_a[1] == BLOCK_METHOD &&
-              ancestor.children[0].to_a[2].children[0] == BLOCK_ARG
+            child = ancestor.children && ancestor.children[0]
+            child &&
+              child.is_a?(Astrolabe::Node) &&
+              child.to_a[1] == BLOCK_METHOD &&
+              child.to_a[2] &&
+              child.to_a[2].is_a?(Astrolabe::Node) &&
+              child.to_a[2].children[0] == BLOCK_ARG
           end
           add_offense node, :expression, MSG
         end
