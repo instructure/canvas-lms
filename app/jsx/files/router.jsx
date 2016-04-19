@@ -49,16 +49,13 @@ define([
   }
 
   function getSplat (ctx, next) {
-    const index = ctx.pathname.indexOf(ctx.params[0]);
-    if (index) {
-      ctx.unencodedSplat = ctx.pathname.slice(index);
-      ctx.splat = ctx.unencodedSplat.split('/').map((component) => {
-        return encodeURIComponent(component)
-      }).join('/');
-    } else {
-      ctx.splat = '';
-      ctx.unencodedSplat = '';
-    }
+    /* This function only gets called when hitting the /folder/*
+     * route so we make that assumption here with many of the
+     * things being done.
+     */
+    const PATH_PREFIX = '/folder/';
+    const index = ctx.path.indexOf(PATH_PREFIX) + PATH_PREFIX.length
+    ctx.splat = ctx.path.slice(index)
     next();
   }
 
@@ -76,10 +73,7 @@ define([
     start () {
       page.start();
     },
-
-    goToPath (pathToGoTo) {
-      page(pathToGoTo);
-    }
+    getSplat // Export getSplat for testing
   };
 
 });

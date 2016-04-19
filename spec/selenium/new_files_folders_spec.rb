@@ -86,7 +86,6 @@ describe "better_file_browsing, folders" do
     end
 
     it "should be able to create and view a new folder with uri characters", priority: "2", test_id: 193153 do
-      skip('Broken by bug CNVS-28784')
       folder_name = "this#could+be bad? maybe"
       add_folder(folder_name)
       folder = @course.folders.where(:name => folder_name).first
