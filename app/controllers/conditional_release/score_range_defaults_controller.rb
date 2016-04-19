@@ -27,7 +27,7 @@ module ConditionalRelease
       conditional_release_js_env
 
       render locals: {
-        cr_app_url: ConditionalRelease::Service.edit_rule_path,
+        cr_app_url: ConditionalRelease::Service.edit_rule_url,
       }
     end
   end

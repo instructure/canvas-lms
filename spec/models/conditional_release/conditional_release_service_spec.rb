@@ -71,9 +71,11 @@ describe ConditionalRelease::Service do
   it 'creates urls' do
     stub_config({
       protocol: 'foo', host: 'bar',
-      edit_rule_path: 'some/path'
+      create_account_path: 'some/path',
+      edit_rule_path: 'some/other/path'
     })
-    expect(Service.edit_rule_url).to eq 'foo://bar/some/path'
+    expect(Service.create_account_url).to eq 'foo://bar/some/path'
+    expect(Service.edit_rule_url).to eq 'foo://bar/some/other/path'
   end
 
   it 'requires feature flag to be enabled' do

@@ -91,7 +91,7 @@ class Feature
   #
   #     # optional hook to be called before after a feature flag change
   #     # queue a delayed_job to perform any nontrivial processing
-  #     after_state_change_proc:  ->(context, old_state, new_state) { ... }
+  #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
 
   def self.register(feature_hash)
@@ -431,6 +431,12 @@ END
       beta: true,
       development: false,
       root_opt_in: false,
+      after_state_change_proc:  ->(user, context, _old_state, new_state) {
+        if %w(on allowed).include?(new_state) && context.is_a?(Account)
+          @service_account = ConditionalRelease::Setup.new(context.id, user.id)
+          @service_account.activate!
+        end
+      }
     },
     'wrap_calendar_event_titles' =>
     {
