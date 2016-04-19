@@ -78,4 +78,7 @@ define [
     if obj.assignment?.frozen
       obj.can_delete = false
 
+    # disable fullcalendar.js dragging unless the user has permissions
+    obj.editable = false unless obj.can_edit
+
     obj
