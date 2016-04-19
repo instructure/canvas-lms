@@ -90,13 +90,7 @@ class Folder < ActiveRecord::Base
   end
 
   workflow do
-    # Anyone who has read access to the course can view
     state :visible
-    # Anyone who is an enrolled member of the course can view
-    state :protected
-    # Only course admins can view
-    state :private
-    # Not sure what this was for...
     state :hidden
     state :deleted
   end
@@ -211,7 +205,6 @@ class Folder < ActiveRecord::Base
   end
 
   def visible?
-    # everything but private folders should be visible... for now...
     return @visible if defined?(@visible)
     @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
   end
@@ -231,11 +224,6 @@ class Folder < ActiveRecord::Base
 
   def just_hide
     self.workflow_state == 'hidden'
-  end
-
-  def protected?
-    return @protected if defined?(@protected)
-    @protected = (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
   end
 
   def public?
@@ -465,9 +453,6 @@ class Folder < ActiveRecord::Base
 
     given { |user, session| self.context.grants_right?(user, session, :manage_files) }#admins.include?(user) }
     can :update and can :delete and can :create and can :read and can :read_contents
-
-    given {|user, session| self.protected? && !self.locked? && self.context.grants_right?(user, session, :read) && self.context.users.include?(user) }
-    can :read and can :read_contents
 
     given { |user, session| self.context.grants_right?(user, session, :manage_files) }
     can :manage_files
