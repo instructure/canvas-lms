@@ -25,6 +25,7 @@ describe DataFixup::FixRubricAssessmentYAML do
     old_data = @assessment.data
 
     bad_yaml = RubricAssessment.where(:id => @assessment).pluck("data as d").first.gsub(":comments_html: !str", ":comments_html:")
+    bad_yaml += Syckness::TAG # for old times' sake
     bad_data = YAML.load(bad_yaml)
     expect(bad_data.first[:comments_html]).to_not eq "yes" # it's reading it as a boolean
     RubricAssessment.where(:id => @assessment).update_all(['data = ?', bad_yaml])

@@ -76,7 +76,7 @@ describe SubmissionVersion do
 
     context "invalid yaml" do
       before do
-        @version.update_attribute(:yaml, "--- \n- 1\n- 2\n-")
+        @version.update_attribute(:yaml, "--- \n- 1\n- 2\n--3")
       end
 
       it "should error on invalid yaml by default" do
