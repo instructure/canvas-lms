@@ -528,6 +528,19 @@ describe 'Student reports' do
       expect(parsed.length).to eq 2
     end
 
+    it 'does not include a user who has no enrollment activity' do
+      @e1.last_activity_at = nil
+      @e3.last_activity_at = nil
+      @e1.save!
+      @e3.save!
+
+      report = run_report(@type)
+      parsed = parse_report(report, { order: 1 })
+
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
+      expect(parsed.length).to eq 1
+    end
+
     it 'should scope by course if param given' do
       # course1 is e1 and e4
       parameters = {}
