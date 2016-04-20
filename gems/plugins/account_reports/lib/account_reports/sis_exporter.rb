@@ -78,10 +78,11 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_user_short_name', 'short_name')
           headers << I18n.t('#account_reports.report_header_email', 'email')
           headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('created_by_sis')
         end
         csv << headers
         users = root_account.pseudonyms.except(:preload).joins(:user).select(
-          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
+          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
            pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
            users.updated_at AS user_updated_at, users.name, users.short_name").
           where("NOT EXISTS (SELECT user_id
@@ -127,6 +128,7 @@ module AccountReports
               row << u.short_name
               row << emails[u.user_id].try(:path)
               row << u.workflow_state
+              row << u.sis_batch_id? unless @sis_format
               csv << row
             end
           end
@@ -149,6 +151,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_parent_account_id', 'parent_account_id')
           headers << I18n.t('#account_reports.report_header_name', 'name')
           headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('created_by_sis')
         end
         csv << headers
         accounts = root_account.all_accounts.
@@ -180,6 +183,7 @@ module AccountReports
             row << a.parent_sis_source_id
             row << a.name
             row << a.workflow_state
+            row << a.sis_batch_id? unless @sis_format
             csv << row
           end
         end
@@ -201,6 +205,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_status', 'status')
           headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
           headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+          headers << I18n.t('created_by_sis')
         end
         csv << headers
         terms = root_account.enrollment_terms
@@ -224,6 +229,7 @@ module AccountReports
             row << t.workflow_state
             row << default_timezone_format(t.start_at)
             row << default_timezone_format(t.end_at)
+            row << t.sis_batch_id? unless @sis_format
             csv << row
           end
         end
@@ -251,6 +257,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_status', 'status')
           headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
           headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+          headers << I18n.t('created_by_sis')
         end
 
         csv << headers
@@ -300,6 +307,7 @@ module AccountReports
               row << nil
               row << nil
             end
+            row << c.sis_batch_id? unless @sis_format
             csv << row
           end
         end
@@ -325,6 +333,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
           headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
           headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+          headers << I18n.t('created_by_sis')
         end
         csv << headers
         sections = root_account.course_sections.
@@ -385,6 +394,7 @@ module AccountReports
                 row << s.nx_account_id
                 row << s.nx_account_sis_id
               end
+              row << s.sis_batch_id?
             end
             csv << row
           end
@@ -412,6 +422,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_status', 'status')
           headers << I18n.t('#account_reports.report_header_canvas_associated_user_id', 'canvas_associated_user_id')
           headers << I18n.t('#account_reports.report_header_associated_user_id', 'associated_user_id')
+          headers << I18n.t('created_by_sis')
         end
         csv << headers
         enrol = root_account.enrollments.
@@ -480,6 +491,7 @@ module AccountReports
             row << e.enroll_state
             row << e.associated_user_id unless @sis_format
             row << e.ob_sis_id
+            row << e.sis_batch_id? unless @sis_format
             csv << row
           end
         end
@@ -501,6 +513,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
           headers << I18n.t('#account_reports.report_header_name', 'name')
           headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('created_by_sis')
         end
 
         csv << headers
@@ -531,6 +544,7 @@ module AccountReports
             row << g.account_sis_id
             row << g.name
             row << g.workflow_state
+            row << g.sis_batch_id? unless @sis_format
             csv << row
           end
         end
@@ -551,11 +565,13 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
           headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
           headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('created_by_sis')
         end
 
         csv << headers
         gm = root_account.all_groups.
-          select("group_id, sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id, group_memberships.workflow_state").
+          select("group_id, sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id,
+                  group_memberships.workflow_state, group_memberships.sis_batch_id").
           joins("INNER JOIN #{GroupMembership.quoted_table_name} ON groups.id = group_memberships.group_id
                  INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=group_memberships.user_id").
           where("pseudonyms.account_id=groups.root_account_id AND
@@ -590,6 +606,7 @@ module AccountReports
             row << g.user_id unless @sis_format
             row << g.user_sis_id
             row << g.workflow_state
+            row << g.sis_batch_id? unless @sis_format
             csv << row
           end
         end
