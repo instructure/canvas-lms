@@ -865,6 +865,30 @@ describe "Files API", type: :request do
       end
     end
 
+    describe "submissions folder" do
+      before(:once) do
+        @student = user_model
+        @root_folder = Folder.root_folders(@student).first
+        @file = Attachment.create! filename: 'file.txt', display_name: 'file.txt', uploaded_data: StringIO.new('blah'), folder: @root_folder, context: @student
+        @sub_folder = @student.submissions_folder
+        @sub_file = Attachment.create! filename: 'sub.txt', display_name: 'sub.txt', uploaded_data: StringIO.new('bleh'), folder: @sub_folder, context: @student
+      end
+
+      it "should not move a file into a submissions folder" do
+        api_call_as_user(@student, :put, "/api/v1/files/#{@file.id}",
+                         { :controller => "files", :action => "api_update", :format => "json", :id => @file.to_param },
+                         { :parent_folder_id => @sub_folder.to_param },
+                         {}, { :expected_status => 401 })
+      end
+
+      it "should not move a file out of a submissions folder" do
+        api_call_as_user(@student, :put, "/api/v1/files/#{@sub_file.id}",
+                         { :controller => "files", :action => "api_update", :format => "json", :id => @sub_file.to_param },
+                         { :parent_folder_id => @root_folder.to_param },
+                         {}, { :expected_status => 401 })
+      end
+    end
+
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       api_call(:put, @file_path, @file_path_options, {:name => "new name"}, {}, :expected_status => 401)

@@ -51,6 +51,7 @@ class Group < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
+  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: 'context', class_name: 'Folder'
   has_many :collaborators
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
@@ -730,5 +731,13 @@ class Group < ActiveRecord::Base
   # as a favorite.
   def favorite_for_user?(user)
     user.favorites.where(:context_type => 'Group', :context_id => self).exists?
+  end
+
+  def submissions_folder
+    return @submissions_folder if @submissions_folder
+    Folder.unique_constraint_retry do
+      @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
+        .first_or_create!(name: I18n.t('Submissions'))
+    end
   end
 end

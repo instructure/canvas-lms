@@ -1294,6 +1294,14 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 1.megabyte
     end
 
+    it "should not count attachments in submissions folders toward the quota" do
+      user_model
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => 'whatever.png', :folder => @user.submissions_folder)
+      @attachment.update_attribute(:size, 1.megabyte)
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 0
+    end
+
   end
 
   context "#open" do

@@ -698,4 +698,20 @@ describe Group do
       expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
     end
   end
+
+  describe "submissions_folder" do
+    it "creates the root submissions folder on demand" do
+      f = @group.submissions_folder
+      expect(@group.submissions_folders.where(parent_folder_id: Folder.root_folders(@group).first, name: 'Submissions').first).to eq f
+    end
+
+    it "finds the existing root submissions folder" do
+      f = @group.folders.build
+      f.parent_folder_id = Folder.root_folders(@group).first
+      f.name = 'blah'
+      f.submission_context_code = 'root'
+      f.save!
+      expect(@group.submissions_folder).to eq f
+    end
+  end
 end

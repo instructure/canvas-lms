@@ -149,6 +149,9 @@ module Api::V1::Attachment
     elsif context.respond_to?(:folders) && params[:parent_folder_path].is_a?(String)
       @attachment.folder = Folder.assert_path(params[:parent_folder_path], context)
     end
+    if @attachment.folder
+      return unless authorized_action(@attachment.folder, @current_user, :manage_contents)
+    end
     duplicate_handling = check_duplicate_handling_option(params)
     if opts[:check_quota]
       get_quota

@@ -594,6 +594,7 @@ class Attachment < ActiveRecord::Base
 
           if context.is_a?(User)
             excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
 
@@ -982,14 +983,15 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user|
-      self.context.grants_right?(user, :manage_files) &&
-      !self.associated_with_submission?
+    given { |user, session|
+      self.context.grants_right?(user, session, :manage_files) &&
+        !self.associated_with_submission? &&
+        (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
     }
-    can :delete
+    can :delete and can :update
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
-    can :read and can :update and can :create and can :download and can :read_as_admin
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    can :read and can :create and can :download and can :read_as_admin
 
     given { self.public? }
     can :read and can :download

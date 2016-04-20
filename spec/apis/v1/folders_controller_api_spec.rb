@@ -233,6 +233,13 @@ describe "Folders API", type: :request do
       expect(@f2.workflow_state).to eq 'deleted'
     end
 
+    it "will not delete a submissions folder" do
+      user_model
+      api_call_as_user(@user, :delete, @folders_path + "/#{@user.submissions_folder.id}",
+        @folders_path_options.merge(:action => "api_destroy", :id => @user.submissions_folder.to_param),
+                       {:force => true}, {}, {:expected_status => 401})
+    end
+
     it "should return unauthorized error" do
       course_with_student(:course => @course)
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
@@ -404,6 +411,14 @@ describe "Folders API", type: :request do
         :name => "with_path.txt")
       attachment = Attachment.order(:id).last
       expect(attachment.folder_id).to eq @root_folder.id
+    end
+
+    it "should not create a file in a submissions folder" do
+      user_model
+      sub_folder = @user.submissions_folder
+      api_call(:post, "/api/v1/folders/#{sub_folder.id}/files",
+               { :controller => "folders", :action => "create_file", :format => "json", :folder_id => sub_folder.to_param },
+               { :name => "with_path.txt" }, {}, { :expected_status => 401 })
     end
   end
 

@@ -748,6 +748,7 @@ class FilesController < ApplicationController
       if @context.respond_to?(:folders)
         if params[:attachment][:folder_id].present?
           @folder = @context.folders.active.where(id: params[:attachment][:folder_id]).first
+          return unless authorized_action(@folder, @current_user, :manage_contents)
         end
         @folder ||= Folder.unfiled_folder(@context)
         @attachment.folder_id = @folder.id
@@ -854,6 +855,7 @@ class FilesController < ApplicationController
   def create
     if (folder_id = params[:attachment].delete(:folder_id)) && folder_id.present?
       @folder = @context.folders.active.where(id: folder_id).first
+      return unless authorized_action(@folder, @current_user, :manage_contents)
     end
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
@@ -932,6 +934,7 @@ class FilesController < ApplicationController
   def update
     @attachment = @context.attachments.find(params[:id])
     @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
+    return unless authorized_action(@folder, @current_user, :manage_contents) if @folder
     @folder ||= @attachment.folder
     @folder ||= Folder.unfiled_folder(@context)
     if authorized_action(@attachment, @current_user, :update)

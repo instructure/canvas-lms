@@ -52,6 +52,7 @@ class Folder < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
+  validate :restrict_submission_folder_context
 
   def file_attachments_visible_to(user)
     if self.context.grants_right?(user, :manage_files)
@@ -87,6 +88,14 @@ class Folder < ActiveRecord::Base
       seen_folders << folder
     end
     return true
+  end
+
+  def restrict_submission_folder_context
+    if self.for_submissions? && !self.context.is_a?(User) && !self.context.is_a?(Group)
+      errors.add(:submission_context_code, t("submissions folders must be created in User or Group context"))
+      return false
+    end
+    true
   end
 
   workflow do
@@ -432,18 +441,22 @@ class Folder < ActiveRecord::Base
       (self.parent_folder && self.parent_folder.locked?)
   end
 
+  def for_submissions?
+    !self.submission_context_code.nil?
+  end
+
   def currently_locked
     self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.workflow_state == 'hidden'
   end
 
   set_policy do
-    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }#students.include?(user) }
+    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
-    can :read_contents, :read_contents_for_export
+    can :read_as_admin, :read_contents, :read_contents_for_export
 
-    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
+    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }
     can :read_contents, :read_contents_for_export
 
     given do |user, session|
@@ -451,14 +464,11 @@ class Folder < ActiveRecord::Base
     end
     can :read_contents_for_export
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }#admins.include?(user) }
-    can :update and can :delete and can :create and can :read and can :read_contents
-
     given { |user, session| self.context.grants_right?(user, session, :manage_files) }
-    can :manage_files
+    can :read and can :read_contents
 
-    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
-    can :read_as_admin
+    given { |user, session| !self.for_submissions? && self.context.grants_right?(user, session, :manage_files) }
+    can :update and can :delete and can :create and can :manage_contents
   end
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root
