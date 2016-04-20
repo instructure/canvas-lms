@@ -151,6 +151,25 @@ describe SplitUsers do
       expect(submission.reload.user).to eq user1
     end
 
+    it 'should handle conflicting submissions' do
+      course1.enroll_student(user1, enrollment_state: 'active')
+      course1.enroll_student(user2, enrollment_state: 'active')
+      assignment = course1.assignments.new(title: "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      submission1 = Submission.create!(valid_attributes)
+      valid_attributes[:user_id] = user2.id
+      submission2 = Submission.create!(valid_attributes)
+
+      UserMerge.from(user1).into(user2)
+      expect(submission1.reload.user).to eq user1
+      expect(submission2.reload.user).to eq user2
+      SplitUsers.split_db_users(user2)
+      expect(submission1.reload.user).to eq user1
+      expect(submission2.reload.user).to eq user2
+    end
+
     it 'should restore admins' do
       admin = account1.account_users.create(user: user1)
       admin2 = sub_account.account_users.create(user: user2)

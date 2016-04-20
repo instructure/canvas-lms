@@ -54,9 +54,6 @@ class SplitUsers
      scope: -> { joins(:submission_comment) },
      context_id: 'submission_comments.context_id'}.freeze,
     {table: 'submission_comments', foreign_key: :author_id}.freeze,
-    {table: 'submissions',
-     scope: -> { joins(:assignment) },
-     context_id: 'assignments.context_id'}.freeze,
     {table: 'web_conference_participants',
      scope: -> { joins(:web_conference).where(web_conferences: {context_type: 'Course'}) },
      context_id: 'web_conferences.context_id'}.freeze,
@@ -168,6 +165,10 @@ class SplitUsers
                   (update[:foreign_key] || :user_id) => source_user_id).
             update_all((update[:foreign_key] || :user_id) => target_user_id)
         end
+        # avoid conflicting submissions for the unique index on user and assignment
+        source_user.submissions.where(assignment_id: Assignment.where(context_id: courses)).
+          where.not(assignment_id: target_user.submissions.select(:assignment_id)).
+          update_all(user_id: target_user_id)
       end
     end
 
