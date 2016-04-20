@@ -22,24 +22,30 @@ describe "Default Account Reports" do
   include ReportSpecHelper
 
   def create_some_users_with_pseudonyms()
+    sis = @account.sis_batches.create
     @user1 = user_with_pseudonym(:active_all => true,:account => @account,:name => "John St. Clair",
                                  :sortable_name => "St. Clair,John",:username => 'john@stclair.com')
     @user.pseudonym.sis_user_id = "user_sis_id_01"
+    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user2 = user_with_pseudonym(:active_all => true,:username => 'micheal@michaelbolton.com',
                                  :name => 'Michael Bolton',:account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_02"
+    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user3 = user_with_pseudonym(:active_all => true,:account => @account,:name => "Rick Astley",
                                  :sortable_name => "Astley,Rick",:username => 'rick@roll.com')
     @user.pseudonym.sis_user_id = "user_sis_id_03"
+    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user4 = user_with_pseudonym(:active_all => true,:username => 'jason@donovan.com',
                                  :name => 'Jason Donovan',:account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_04"
+    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user5 = user_with_pseudonym(:name => 'James Brown',:account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_05"
+    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user5.destroy
     @user6 = user_with_pseudonym(:active_all => true,:username => 'john@smith.com',
@@ -53,8 +59,10 @@ describe "Default Account Reports" do
   end
 
   def create_an_account()
+    @sis = @account.sis_batches.create
     @sub_account = Account.create(:parent_account => @account,:name => 'English')
     @sub_account.sis_source_id = 'sub1'
+    @sub_account.sis_batch_id = @sis.id
     @sub_account.save!
   end
 
@@ -62,12 +70,15 @@ describe "Default Account Reports" do
     create_an_account()
     @sub_sub_account = Account.create(:parent_account => @sub_account,:name => 'sESL')
     @sub_sub_account.sis_source_id = 'subsub1'
+    @sub_sub_account.sis_batch_id = @sis.id
     @sub_sub_account.save!
     @sub_account3 = Account.create(:parent_account => @account,:name => 'math')
     @sub_account3.sis_source_id = 'sub3'
+    @sub_account3.sis_batch_id = @sis.id
     @sub_account3.save!
     @sub_account4 = Account.create(:parent_account => @account,:name => 'deleted sis account')
     @sub_account4.sis_source_id = 'sub4'
+    @sub_account4.sis_batch_id = @sis.id
     @sub_account4.save!
     @sub_account4.destroy
     @sub_account5 = Account.create(:parent_account => @account,:name => 'other')
@@ -76,10 +87,12 @@ describe "Default Account Reports" do
   end
 
   def create_a_term()
+    @sis = @account.sis_batches.create
     @term1 = EnrollmentTerm.create(:name => 'Fall',:start_at => 6.months.ago,
                                    :end_at => 1.year.from_now)
     @term1.root_account = @account
     @term1.sis_source_id = 'fall12'
+    @term1.sis_batch_id = @sis.id
     @term1.save!
   end
 
@@ -89,6 +102,7 @@ describe "Default Account Reports" do
                                    :end_at => 2.years.from_now)
     @term2.root_account = @account
     @term2.sis_source_id = 'winter13'
+    @term2.sis_batch_id = @sis.id
     @term2.save!
     @term2.destroy
     @term3 = EnrollmentTerm.create(:name => 'Spring',:start_at => 1.week.ago,
@@ -109,6 +123,7 @@ describe "Default Account Reports" do
     @course1.workflow_state = 'available'
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.restrict_enrollments_to_course_dates = true
+    @course1.sis_batch_id = @sis.id
     @course1.save!
 
     @course2 = Course.new(:name => 'Math 101',:course_code => 'MAT101',
@@ -116,12 +131,14 @@ describe "Default Account Reports" do
     @course2.workflow_state = 'available'
     @course2.sis_source_id = "SIS_COURSE_ID_2"
     @course2.restrict_enrollments_to_course_dates = true
+    @course2.sis_batch_id = @sis.id
     @course2.save!
 
     @course3 = Course.new(:name => 'Science 101',:course_code => 'SCI101',
                           :account => @account)
     @course3.workflow_state = 'available'
     @course3.sis_source_id = "SIS_COURSE_ID_3"
+    @course3.sis_batch_id = @sis.id
     @course3.save!
 
     @course4 = Course.new(:name => 'self help',:course_code => 'self',
@@ -135,6 +152,7 @@ describe "Default Account Reports" do
     @course5.enrollment_term_id = @term1.id
     @course5.sis_source_id = "SIS_COURSE_ID_5"
     @course5.workflow_state = 'deleted'
+    @course5.sis_batch_id = @sis.id
     @course5.save!
 
     @course6 = Course.new(:name => 'talking 101',:course_code => 'Tal101',
@@ -150,6 +168,7 @@ describe "Default Account Reports" do
                                   :start_at => @course1.start_at,:end_at => @course1.conclude_at)
     @section1.sis_source_id = 'english_section_1'
     @section1.restrict_enrollments_to_section_dates = true
+    @section1.sis_batch_id = @sis.id
     @section1.save!
 
     @section2 = CourseSection.new(:name => 'English_02',:course => @course1,
@@ -157,6 +176,7 @@ describe "Default Account Reports" do
     @section2.sis_source_id = 'english_section_2'
     @section2.root_account_id = @account.id
     @section2.restrict_enrollments_to_section_dates = true
+    @section2.sis_batch_id = @sis.id
     @section2.save!
 
     @section3 = CourseSection.new(:name => 'Math_01',:course => @course2,
@@ -164,6 +184,7 @@ describe "Default Account Reports" do
     @section3.sis_source_id = 'english_section_3'
     @section3.root_account_id = @account.id
     @section3.restrict_enrollments_to_section_dates = true
+    @section3.sis_batch_id = @sis.id
     @section3.save!
 
     @section4 = CourseSection.new(:name => 'Math_02',:course => @course2)
@@ -185,24 +206,42 @@ describe "Default Account Reports" do
     @role.save!
 
     @enrollment1 = @course1.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active)
+    @enrollment1.sis_batch_id = @sis.id
+    @enrollment1.save!
     @enrollment2 = @course3.enroll_user(@user2,'StudentEnrollment',:enrollment_state => :active)
+    @enrollment2.sis_batch_id = @sis.id
+    @enrollment2.save!
     @enrollment3 = @course1.enroll_user(@user2,'TaEnrollment',:enrollment_state => :active)
+    @enrollment3.sis_batch_id = @sis.id
+    @enrollment3.save!
     @enrollment4 = @course1.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
+    @enrollment4.sis_batch_id = @sis.id
+    @enrollment4.save!
     @enrollment5 = @course2.enroll_user(@user3,'StudentEnrollment',:enrollment_state => :active)
+    @enrollment5.sis_batch_id = @sis.id
+    @enrollment5.save!
     @enrollment6 = @course1.enroll_user(@user4,'TeacherEnrollment',:enrollment_state => :active)
+    @enrollment6.sis_batch_id = @sis.id
+    @enrollment6.save!
     @enrollment6.destroy
     @enrollment7 = @course2.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active,
                                         :associated_user_id => @user3.id)
+    @enrollment7.sis_batch_id = @sis.id
+    @enrollment7.save!
     @enrollment8 = @course4.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
     @enrollment9 = @course1.enroll_user(@user4, 'TeacherEnrollment',
                                         enrollment_state: 'active',
                                         allow_multiple_enrollments: true,
                                         section: @section1)
+    @enrollment9.sis_batch_id = @sis.id
+    @enrollment9.save!
     @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
                                          :enrollment_state => :completed)
     @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
                                          :role => @role,
                                          :enrollment_state => :active)
+    @enrollment11.sis_batch_id = @sis.id
+    @enrollment11.save!
     @enrollment12 = @course4.enroll_user(@user4,'StudentEnrollment',
                                          :enrollment_state => :active)
     Enrollment.where(id: @enrollment12).update_all(workflow_state: 'creation_pending')
@@ -212,14 +251,17 @@ describe "Default Account Reports" do
     create_an_account()
     @group1 = @account.groups.create(:name => 'group1name')
     @group1.sis_source_id = 'group1sis'
+    @group1.sis_batch_id = @sis.id
     @group1.save!
     @group2 = @sub_account.groups.create(:name => 'group2name')
     @group2.sis_source_id = 'group2sis'
+    @group2.sis_batch_id = @sis.id
     @group2.save!
     @group3 = @sub_account.groups.create(:name => 'group3name')
     @group3.save!
     @group4 = @account.groups.create(:name => 'group4name')
     @group4.sis_source_id = 'group4sis'
+    @group4.sis_batch_id = @sis.id
     @group4.save!
     @group4.destroy
   end

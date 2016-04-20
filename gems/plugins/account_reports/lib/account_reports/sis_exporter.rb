@@ -90,13 +90,13 @@ module AccountReports
                              AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
-          users = users.where("sis_user_id IS NOT NULL")
+          users.where!.not(pseudonyms: {sis_batch_id: nil})
         end
 
         if @include_deleted
-          users = users.where("pseudonyms.workflow_state<>'deleted' OR pseudonyms.sis_user_id IS NOT NULL")
+          users.where!("pseudonyms.workflow_state<>'deleted' OR pseudonyms.sis_user_id IS NOT NULL")
         else
-          users = users.where("pseudonyms.workflow_state<>'deleted'")
+          users.where!("pseudonyms.workflow_state<>'deleted'")
         end
 
         users = add_user_sub_account_scope(users)
@@ -157,18 +157,18 @@ module AccountReports
           joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
 
         if @sis_format
-          accounts = accounts.where("accounts.sis_source_id IS NOT NULL")
+          accounts.where!.not(accounts: {sis_batch_id: nil})
         end
 
         if @include_deleted
-          accounts = accounts.where("accounts.workflow_state<>'deleted' OR accounts.sis_source_id IS NOT NULL")
+          accounts.where!("accounts.workflow_state<>'deleted' OR accounts.sis_source_id IS NOT NULL")
         else
-          accounts = accounts.where("accounts.workflow_state<>'deleted'")
+          accounts.where!("accounts.workflow_state<>'deleted'")
         end
 
         if account != root_account
           #this does not give the full tree pf sub accounts, just the direct children.
-          accounts = accounts.where(:accounts => {:parent_account_id => account})
+          accounts.where!(:accounts => {:parent_account_id => account})
         end
 
         Shackles.activate(:slave) do
@@ -206,7 +206,7 @@ module AccountReports
         terms = root_account.enrollment_terms
 
         if @sis_format
-          terms = terms.where("sis_source_id IS NOT NULL")
+          terms = terms.where.not(enrollment_terms: {sis_batch_id: nil})
         end
 
         if @include_deleted
@@ -255,14 +255,14 @@ module AccountReports
 
         csv << headers
         courses = root_account.all_courses.preload(:account, :enrollment_term)
-        courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
+        courses.where!.not(courses: {sis_batch_id: nil}) if @sis_format
 
         if @include_deleted
-          courses = courses.where("(courses.workflow_state='deleted' AND courses.updated_at > ?)
-                                    OR courses.workflow_state<>'deleted'
-                                    OR courses.sis_source_id IS NOT NULL", 120.days.ago)
+          courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
+                          OR courses.workflow_state<>'deleted'
+                          OR courses.sis_source_id IS NOT NULL", 120.days.ago)
         else
-          courses = courses.where("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
+          courses.where!("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
         end
 
         courses = add_course_sub_account_scope(courses)
@@ -338,21 +338,19 @@ module AccountReports
                  LEFT OUTER JOIN #{Account.quoted_table_name} AS nxa ON nxc.account_id = nxa.id")
 
         if @include_deleted
-          sections = sections.where("course_sections.workflow_state<>'deleted'
-                                     OR
-                                     (course_sections.sis_source_id IS NOT NULL
-                                      AND (nxc.sis_source_id IS NOT NULL
-                                           OR rc.sis_source_id IS NOT NULL))")
+          sections.where!("course_sections.workflow_state<>'deleted'
+                           OR
+                           (course_sections.sis_source_id IS NOT NULL
+                            AND (nxc.sis_source_id IS NOT NULL
+                                 OR rc.sis_source_id IS NOT NULL))")
         else
-          sections = sections.where("course_sections.workflow_state<>'deleted'
-                                     AND (nxc.workflow_state<>'deleted'
-                                          OR rc.workflow_state<>'deleted')")
+          sections.where!("course_sections.workflow_state<>'deleted'
+                           AND (nxc.workflow_state<>'deleted'
+                                OR rc.workflow_state<>'deleted')")
         end
 
         if @sis_format
-          sections = sections.where("course_sections.sis_source_id IS NOT NULL
-                                     AND (nxc.sis_source_id IS NOT NULL
-                                     OR rc.sis_source_id IS NOT NULL)")
+          sections.where!.not(course_sections: {sis_batch_id: nil})
         end
 
         sections = add_course_sub_account_scope(sections, 'rc')
@@ -439,23 +437,20 @@ module AccountReports
                  AND enrollments.type <> 'StudentViewEnrollment'")
 
         if @include_deleted
-          enrol = enrol.where("enrollments.workflow_state<>'deleted'
-                              OR
-                              ( pseudonyms.sis_user_id IS NOT NULL
-                                AND enrollments.workflow_state NOT IN ('rejected', 'invited')
-                                AND (courses.sis_source_id IS NOT NULL
-                                   OR cs.sis_source_id IS NOT NULL))")
+          enrol.where!("enrollments.workflow_state<>'deleted'
+                        OR
+                        ( pseudonyms.sis_user_id IS NOT NULL
+                          AND enrollments.workflow_state NOT IN ('rejected', 'invited')
+                          AND (courses.sis_source_id IS NOT NULL
+                             OR cs.sis_source_id IS NOT NULL))")
         else
-          enrol = enrol.where("enrollments.workflow_state<>'deleted'
-                               AND enrollments.workflow_state<>'completed'
-                               AND pseudonyms.workflow_state<>'deleted'")
+          enrol.where!("enrollments.workflow_state<>'deleted'
+                        AND enrollments.workflow_state<>'completed'
+                        AND pseudonyms.workflow_state<>'deleted'")
         end
 
         if @sis_format
-          enrol = enrol.where("pseudonyms.sis_user_id IS NOT NULL
-                               AND enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
-                               AND (courses.sis_source_id IS NOT NULL
-                                 OR cs.sis_source_id IS NOT NULL)")
+          enrol.where!.not(enrollments: {sis_batch_id: nil})
         end
 
         enrol = add_course_sub_account_scope(enrol)
@@ -514,17 +509,17 @@ module AccountReports
           joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id")
 
         if @sis_format
-          groups = groups.where("groups.sis_source_id IS NOT NULL")
+          groups.where!.not(groups: {sis_batch_id: nil})
         end
 
         if @include_deleted
-          groups = groups.where("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
+          groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
         else
-          groups = groups.where("groups.workflow_state<>'deleted'")
+          groups.where!("groups.workflow_state<>'deleted'")
         end
 
         if account != root_account
-          groups = groups.where(:groups => {:context_id => account, :context_type => 'Account'})
+          groups.where!(:groups => {:context_id => account, :context_type => 'Account'})
         end
 
         Shackles.activate(:slave) do
@@ -570,31 +565,31 @@ module AccountReports
                              AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
-          gm = gm.where("pseudonyms.sis_user_id IS NOT NULL AND group_memberships.sis_batch_id IS NOT NULL")
+          gm.where!.not(group_memberships: {sis_batch_id: nil})
         end
 
         if @include_deleted
-          gm = gm.where("(groups.workflow_state<>'deleted'
-                         AND group_memberships.workflow_state<>'deleted')
-                         OR
-                         (pseudonyms.sis_user_id IS NOT NULL
-                         AND group_memberships.sis_batch_id IS NOT NULL)")
+          gm.where!("(groups.workflow_state<>'deleted'
+                      AND group_memberships.workflow_state<>'deleted')
+                      OR
+                      (pseudonyms.sis_user_id IS NOT NULL
+                      AND group_memberships.sis_batch_id IS NOT NULL)")
         else
-          gm = gm.where("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
+          gm.where!("groups.workflow_state<>'deleted' AND group_memberships.workflow_state<>'deleted'")
         end
 
         if account != root_account
-          gm = gm.where(:groups => {:context_id => account, :context_type => 'Account'})
+          gm.where!(:groups => {:context_id => account, :context_type => 'Account'})
         end
 
         Shackles.activate(:slave) do
-          gm.find_each do |gm|
+          gm.find_each do |g|
             row = []
-            row << gm.group_id unless @sis_format
-            row << gm.sis_source_id
-            row << gm.user_id unless @sis_format
-            row << gm.user_sis_id
-            row << gm.workflow_state
+            row << g.group_id unless @sis_format
+            row << g.sis_source_id
+            row << g.user_id unless @sis_format
+            row << g.user_sis_id
+            row << g.workflow_state
             csv << row
           end
         end
@@ -628,19 +623,19 @@ module AccountReports
           where("course_sections.nonxlist_course_id IS NOT NULL")
 
         if @sis_format
-          xl = xl.where("courses.sis_source_id IS NOT NULL AND course_sections.sis_source_id IS NOT NULL")
+          xl.where!.not(course_sections: {sis_batch_id: nil})
         end
 
         if @include_deleted
-          xl = xl.where("(courses.workflow_state<>'deleted'
-                         AND course_sections.workflow_state<>'deleted')
-                         OR
-                         (courses.sis_source_id IS NOT NULL
-                         AND course_sections.sis_source_id IS NOT NULL)")
+          xl.where!("(courses.workflow_state<>'deleted'
+                      AND course_sections.workflow_state<>'deleted')
+                      OR
+                      (courses.sis_source_id IS NOT NULL
+                      AND course_sections.sis_source_id IS NOT NULL)")
         else
-          xl = xl.where("courses.workflow_state<>'deleted'
-                         AND courses.workflow_state<>'completed'
-                         AND course_sections.workflow_state<>'deleted'")
+          xl.where!("courses.workflow_state<>'deleted'
+                     AND courses.workflow_state<>'completed'
+                     AND course_sections.workflow_state<>'deleted'")
         end
 
         xl = add_course_sub_account_scope(xl)
