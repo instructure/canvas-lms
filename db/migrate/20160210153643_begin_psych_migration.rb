@@ -3,16 +3,6 @@ class BeginPsychMigration < ActiveRecord::Migration
 
   disable_ddl_transaction!
 
-  def self.runnable? # TODO: Remove when we're ready to run this everywhere
-    if ENV['RUN_PSYCH_MIGRATION']
-      true
-    elsif ApplicationController.respond_to?(:test_cluster?)
-      ApplicationController.test_cluster?
-    else
-      true
-    end
-  end
-
   def up
     DataFixup::PsychMigration.run if CANVAS_RAILS4_0 || !Rails.env.test?
   end
