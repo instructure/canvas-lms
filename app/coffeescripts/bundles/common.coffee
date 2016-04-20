@@ -24,6 +24,7 @@ require [
   'compiled/behaviors/activate'
   'compiled/behaviors/elementToggler'
   'compiled/behaviors/tooltip'
+  'compiled/behaviors/ic-super-toggle'
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
   'LtiThumbnailLauncher'
