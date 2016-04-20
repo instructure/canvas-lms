@@ -22,12 +22,12 @@
 */
 function bzRetainedInfoSetup() {
   function bzChangeRetainedItem(ta, value) {
-          if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
-            ta.checked = (value == "yes") ? true : false;
-	  else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
-            ta.value = value;
-	  else
-            ta.textContent = value;
+    if(ta.tagName == "INPUT" && ta.getAttribute("type") == "checkbox")
+      ta.checked = (value == "yes") ? true : false;
+    else if(ta.tagName == "INPUT" || ta.tagName == "TEXTAREA")
+      ta.value = value;
+    else
+      ta.textContent = value;
   }
 
   var textareas = document.querySelectorAll("[data-bz-retained]");
@@ -53,14 +53,15 @@ function bzRetainedInfoSetup() {
       var save = function() {
         var http = new XMLHttpRequest();
         http.open("POST", "/bz/user_retained_data", true);
-	var value = ta.value;
-	if(ta.getAttribute("type") == "checkbox")
-		value = ta.checked ? "yes" : "";
+        var value = ta.value;
+        if(ta.getAttribute("type") == "checkbox")
+          value = ta.checked ? "yes" : "";
         var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(value);
         http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         http.send(data);
 
         // we also need to update other views on the same page
+        var textareas = document.querySelectorAll("[data-bz-retained]");
         for(var idx = 0; idx < textareas.length; idx++) {
             var item = textareas[idx];
             if(item == ta)
