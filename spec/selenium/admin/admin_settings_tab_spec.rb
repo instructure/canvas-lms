@@ -492,9 +492,9 @@ describe "admin settings tab" do
     course_with_admin_logged_in(:account => Account.site_admin)
     sis_token = "canvas"
     go_to_feature_options(Account.site_admin.id)
-    move_to_click("#ff_allowed_post_grades")
+    move_to_click("label[for=ff_allowed_post_grades]")
     go_to_feature_options(Account.default.id)
-    move_to_click("#ff_allowed_post_grades")
+    move_to_click("label[for=ff_allowed_post_grades]")
     f("#tab-settings-link").click
     # SIS Agent Token Authentication will not appear without refresh
     refresh_page
@@ -506,7 +506,7 @@ describe "admin settings tab" do
       expect(f("#account_settings_sis_app_token").attribute("value")).to eq sis_token
     }
     go_to_feature_options(Account.default.id)
-    move_to_click("#ff_off_post_grades")
+    move_to_click("label[for=ff_off_post_grades]")
     f('#tab-settings-link').click
     refresh_page
     sis_token_element = f("#account_settings_sis_app_token")

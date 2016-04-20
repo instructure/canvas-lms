@@ -159,6 +159,7 @@ module ThemeEditorCommon
   end
 
   def create_theme(color = 'random')
+    wait_for_ajaximations
     click_global_branding
     all_colors(all_global_branding, color)
 

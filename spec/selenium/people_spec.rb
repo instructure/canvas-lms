@@ -374,7 +374,8 @@ describe "people" do
       replace_content(f('#user_list_textarea'), 'student@example.com')
       click_option('#role_id', ta_role.id.to_s, :value)
       click_option('#course_section_id', 'Unnamed Course', :text)
-      f('#limit_privileges_to_course_section').click
+      scroll_page_to_bottom
+      move_to_click('#limit_privileges_to_course_section')
       f('#next-step').click
       wait_for_ajaximations
 
