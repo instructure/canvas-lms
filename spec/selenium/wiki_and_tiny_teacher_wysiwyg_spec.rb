@@ -282,6 +282,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should remove superscript from text in rce", priority: "1", test_id: 532084 do
+      skip_if_chrome('fragile in chrome')
       text = "<p><sup>This is my text</sup></p>"
       wysiwyg_state_setup(text, html: true)
 
@@ -301,6 +302,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should remove subscript from text in rce", priority: "1", test_id: 532799 do
+      skip_if_chrome('fragile in chrome')
       text = "<p><sub>This is my text</sub></p>"
       wysiwyg_state_setup(text, html: true)
 
@@ -408,6 +410,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should remove bold from text in rce", priority: "1", test_id: 417603 do
+      skip_if_chrome('fragile in chrome')
       text = "<p><strong>This is my text</strong></p>"
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-bold')
@@ -425,6 +428,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should remove italic from text in rce", priority: "1", test_id: 417607 do
+      skip_if_chrome('fragile in chrome')
       text = "<p><em>This is my text</em></p>"
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-italic')
