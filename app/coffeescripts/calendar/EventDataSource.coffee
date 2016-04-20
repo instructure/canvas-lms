@@ -220,7 +220,7 @@ define [
       params = { include: [ 'reserved_times', 'participant_count', 'appointments', 'child_events' ]}
       @startFetch [[ group.url, params ]], dataCB, (() => cb @cache.appointmentGroups[group.id].appointmentEvents)
 
-    getEvents: (start, end, contexts, cb, options = {}) =>
+    getEvents: (start, end, contexts, donecb, datacb, options = {}) =>
       if @inFlightRequest['default']
         @pendingRequests.push([@getEvents, arguments, 'default'])
         return
@@ -267,20 +267,25 @@ define [
         # Yay, this request can be satisfied by the cache
         list = @getEventsFromCache(start, end, contexts)
         list.requestID = options.requestID
-        cb list
+        datacb list if datacb?
+        donecb list
         @processNextRequest()
         return
 
       requestResults = {}
       dataCB = (data, url, params) =>
         return unless data
+        newEvents = []
         key = 'type_'+params.type
         requestResult = requestResults[key] or {events: []}
         requestResult.next = data.next
         for e in data
           event = commonEventFactory(e, @contexts)
           if event && event.object.workflow_state != 'deleted'
+            newEvents.push(event)
             requestResult.events.push(event)
+        newEvents.requestID = options.requestID
+        datacb newEvents if datacb?
         requestResults[key] = requestResult
 
       doneCB = () =>
@@ -324,7 +329,7 @@ define [
         list = @getEventsFromCache(start, end, contexts)
         list.nextPageDate = nextPageDate
         list.requestID = options.requestID
-        cb list
+        donecb list
 
       @startFetch [
         [ '/api/v1/calendar_events', params ]

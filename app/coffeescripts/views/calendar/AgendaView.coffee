@@ -62,7 +62,7 @@ define [
     _fetch: (start, callback) ->
       end = fcUtil.clone(start).year(3000)
       @lastRequestID = $.guid++
-      @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
+      @dataSource.getEvents start, end, @contexts, callback, undefined, {singlePage: true, requestID: @lastRequestID}
 
     refetch: =>
       return unless @startDate

@@ -9366,11 +9366,17 @@ function EventManager(options) { // assumed to be a calendar
 					reportEvents(cache);
 				}
 			}
+		}, function(eventInputs) {
+			if (fetchID == currentFetchID) {
+				for (i = 0; i < eventInputs.length; i++) {
+					renderEvent(eventInputs[i]);
+				}
+			}
 		});
 	}
 	
 	
-	function _fetchEventSource(source, callback) {
+	function _fetchEventSource(source, callback, dataCallback) {
 		var i;
 		var fetchers = fc.sourceFetchers;
 		var res;
@@ -9408,7 +9414,8 @@ function EventManager(options) { // assumed to be a calendar
 					function(events) {
 						callback(events);
 						t.popLoading();
-					}
+					},
+					dataCallback
 				);
 			}
 			else if ($.isArray(events)) {
