@@ -654,6 +654,20 @@ describe Assignment do
       expect(grade).to eql('5%')
     end
 
+    it "should round down percent grades to 2 decimal places" do
+      @assignment.grading_type = 'percent'
+      @assignment.points_possible = 100
+      grade = @assignment.score_to_grade(57.8934)
+      expect(grade).to eql('57.89%')
+    end
+
+    it "should round up percent grades to 2 decimal places" do
+      @assignment.grading_type = 'percent'
+      @assignment.points_possible = 100
+      grade = @assignment.score_to_grade(57.895)
+      expect(grade).to eql('57.9%')
+    end
+
     it "should give a grade to extra credit assignments" do
       @assignment.grading_type = 'points'
       @assignment.points_possible = 0.0
@@ -684,7 +698,6 @@ describe Assignment do
       expect(s.versions.length).to eql(1)
       expect(s2[0].state).to eql(:graded)
     end
-
 
     context "group assignments" do
       before :once do

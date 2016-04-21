@@ -688,7 +688,7 @@ class Assignment < ActiveRecord::Base
   def score_to_grade_percent(score=0.0)
     if points_possible && points_possible > 0
       result = score.to_f / self.points_possible
-      result = (result * 1000.0).round / 10.0
+      (result * 100.0).round(2)
     else
       # there's not really any reasonable value we can set here -- if the
       # assignment is worth no points, any percentage is as valid as any other.
