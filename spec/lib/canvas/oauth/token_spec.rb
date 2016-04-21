@@ -36,11 +36,6 @@ module Canvas::Oauth
         expect(token.is_for_valid_code?).to be_falsey
       end
 
-      it 'is false when the client id does not match the key id' do
-        stub_out_cache (key.id + 1)
-        expect(token.is_for_valid_code?).to be_falsey
-      end
-
       it 'is true otherwise' do
         expect(token.is_for_valid_code?).to be_truthy
       end

@@ -82,12 +82,12 @@ class Oauth2ProviderController < ApplicationController
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_client_secret unless provider.is_authorized_by?(secret)
 
-
     if grant_type == "authorization_code"
       raise OAuth2RequestError :authorization_code_not_supplied unless params[:code]
 
       token = provider.token_for(params[:code])
       raise Canvas::Oauth::RequestError, :invalid_authorization_code  unless token.is_for_valid_code?
+      raise Canvas::Oauth::RequestError, :incorrect_client unless token.key.id == token.client_id
 
       token.create_access_token_if_needed(value_to_boolean(params[:replace_tokens]))
       Canvas::Oauth::Token.expire_code(params[:code])
@@ -97,6 +97,7 @@ class Oauth2ProviderController < ApplicationController
       token = provider.token_for_refresh_token(params[:refresh_token])
       # token = AccessToken.authenticate_refresh_token(params[:refresh_token])
       raise Canvas::Oauth::RequestError, :invalid_refresh_token unless token
+      raise Canvas::Oauth::RequestError, :incorrect_client unless token.access_token.developer_key_id == token.key.id
       token.access_token.regenerate_access_token
     else
       raise Canvas::Oauth::RequestError, :unsupported_grant_type
@@ -114,6 +115,7 @@ class Oauth2ProviderController < ApplicationController
 
   private
   def oauth_error(exception)
+    response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
     return render(exception.to_render_data)
   end
 

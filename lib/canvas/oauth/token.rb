@@ -20,7 +20,7 @@ module Canvas::Oauth
     end
 
     def is_for_valid_code?
-      code_data.present? &&  client_id == key.id
+      code_data.present?
     end
 
     def client_id
