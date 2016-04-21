@@ -9,31 +9,19 @@
 <div id="discussion-edit-view" class="ui-tabs-minimal">
 {{#unless isAnnouncement}}
   <div id="discussion-edit-header" class="discussion-edit-header row-fluid">
-    {{#if CONDITIONAL_RELEASE_SERVICE_ENABLED }}
+    {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
       <ul id="discussion-edit-header-tabs">
        <li><a href="#discussion-details-tab" id="details_link">{{#t}}Details{{/t}}</a></li>
        <li><a href="#discussion-conditional-release-tab" id="conditional_release_link">{{#t}}Conditional Content{{/t}}</a></li>
        <span id="discussion-edit-header-spacer"></span>
-    {{else}}
-      <div class="span4 offset8 text-right">
-    {{/if}}
-      {{#if published}}
-        <span id="topic-draft-state" class="published-status published">
-          <i class="icon-publish"></i>
-          {{#t "buttons.published"}}Published{{/t}}
-        </span>
-      {{else}}
-        <span id="topic-draft-state" class="published-status unpublished">
-          <i class="icon-unpublished"></i>
-          {{#t "buttons.not_published"}}Not Published{{/t}}
-        </span>
-      {{/if}}
-    {{#if CONDITIONAL_RELEASE_SERVICE_ENABLED }}
+       {{>  DiscussionTopics/publishedButton }}
       </ul>
     {{else}}
+      <div class="span4 offset8 text-right">
+        {{>  DiscussionTopics/publishedButton }}
       </div>
-    {{/if}}
     </div>
+    {{/if}}
 {{/unless}}
 
 <div id="discussion-details-tab">
@@ -300,10 +288,10 @@
     </div>
   {{/if}}
 </div>
-{{#if CONDITIONAL_RELEASE_SERVICE_ENABLED }}
+{{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED }}
   {{#unless isAnnouncement }}
     <div id="discussion-conditional-release-tab">
-      Conditional release content goes here
+      <div id="conditional-release-target" />
     </div>
   {{/unless}}
 {{/if}}

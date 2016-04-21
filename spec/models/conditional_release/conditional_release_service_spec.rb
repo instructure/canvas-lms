@@ -71,9 +71,9 @@ describe ConditionalRelease::Service do
   it 'creates urls' do
     stub_config({
       protocol: 'foo', host: 'bar',
-      configure_defaults_app_path: 'some/path'
+      edit_rule_path: 'some/path'
     })
-    expect(Service.configure_defaults_url).to eq 'foo://bar/some/path'
+    expect(Service.edit_rule_url).to eq 'foo://bar/some/path'
   end
 
   it 'requires feature flag to be enabled' do
@@ -113,19 +113,19 @@ describe ConditionalRelease::Service do
       Service.stubs(:enabled_in_context?).returns(false)
       course_with_student_logged_in(active_all: true)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
-      expect(env).not_to have_key :CONDITIONAL_RELEASE_JWT
+      expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
     it 'returns no jwt or env if user not specified' do
       course_model
       env = Service.env_for(@course)
-      expect(env).not_to have_key :CONDITIONAL_RELEASE_JWT
+      expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
-    it 'returns a jwt if everything enabled' do
+    it 'returns an env with jwt if everything enabled' do
       course_with_student_logged_in(active_all: true)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
-      expect(env[:CONDITIONAL_RELEASE_JWT]).to eq :jwt
+      expect(env[:CONDITIONAL_RELEASE_ENV][:jwt]).to eq :jwt
     end
 
     it 'includes assignment data when an assignment is specified' do

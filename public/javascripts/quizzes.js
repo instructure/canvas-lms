@@ -41,6 +41,7 @@ define([
   'INST', // safari sniffing for VO workarounds
   'quiz_formula_solution',
   'jsx/shared/rce/RichContentEditor',
+  'jsx/shared/conditional_release/ConditionalRelease',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -60,7 +61,8 @@ define([
             Handlebars, DueDateOverrideView, Quiz,
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution, RichContentEditor){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution, RichContentEditor,
+            ConditionalRelease){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -1476,6 +1478,16 @@ define([
     return result;
   }
 
+  function toggleConditionalReleaseTab(quizType) {
+    if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+      if (quizType == "assignment") {
+        $('#quiz_tabs').tabs("option", "disabled", false);
+      } else {
+        $('#quiz_tabs').tabs("option", "disabled", [2]);
+      }
+    }
+  }
+
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
     correctAnswerVisibility.init();
@@ -1879,6 +1891,10 @@ define([
       var url = $("#quiz_urls .update_quiz_url").attr('href');
       $("#quiz_title_input").val(quiz_title);
       $("#quiz_title_text").text(quiz_title);
+
+      if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+        toggleConditionalReleaseTab(event.target.value);
+      }
     }).change();
 
     $(".question_form :input").keycodes("esc", function(event) {
@@ -3703,6 +3719,20 @@ define([
         success: function() { window.location.replace(ENV.QUIZZES_URL); }
       });
     });
+
+    if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+      this.conditionalReleaseEditor = ConditionalRelease.attach(
+        $('#conditional-release-target').get(0),
+        I18n.t('quiz'),
+        ENV['CONDITIONAL_RELEASE_ENV']);
+
+      $('div.form').on('change', function(event) {
+        if (!this.assignmentDirty) {
+          this.assignmentDirty = true
+          this.conditionalReleaseEditor.setProps({ assignmentDirty: true });
+        }
+      });
+    }
   });
 
   $.fn.multipleAnswerSetsQuestion = function() {
@@ -4101,7 +4131,6 @@ define([
       if(!showCorrectAnswersLastAttempt) {
         $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
       }
-
     }).triggerHandler('change');
   });
 });
