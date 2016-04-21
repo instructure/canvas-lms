@@ -165,13 +165,13 @@ module Canvas::Oauth
       end
 
       it 'does not put anything else into the json' do
-        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in'])
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in', 'token_type'])
       end
       it 'does not put expires_in in the json when auto_expire_tokens is false' do
         key = token.key
         key.auto_expire_tokens = false
         key.save!
-        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user'])
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'token_type'])
       end
 
     end

@@ -141,7 +141,9 @@ describe Oauth2ProviderController do
       Canvas.stubs(:redis => redis)
       post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code
       expect(response).to be_success
-      expect(JSON.parse(response.body).keys.sort).to match_array(['access_token',  'refresh_token', 'user', 'expires_in'])
+      json = JSON.parse(response.body)
+      expect(json.keys.sort).to match_array(['access_token',  'refresh_token', 'user', 'expires_in', 'token_type'])
+      expect(json['token_type']).to eq 'Bearer'
     end
 
     it 'renders a 400 if the provided code is for the wrong key' do
@@ -158,7 +160,7 @@ describe Oauth2ProviderController do
       post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       expect(response).to be_success
       json = JSON.parse(response.body)
-      expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in']
+      expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
     end
 
     it 'deletes existing tokens for the same key when replace_tokens=1' do
