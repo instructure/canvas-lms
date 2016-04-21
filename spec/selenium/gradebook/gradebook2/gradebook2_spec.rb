@@ -114,6 +114,14 @@ describe "gradebook2" do
     expect(f('.gradebook_dropdown')).to be_displayed
   end
 
+  it "View Grading History menu item redirects to grading history page", priority: "2", test_id: 164218 do
+    get "/courses/#{@course.id}/gradebook2"
+
+    f('#gradebook_settings').click
+    fj('.ui-menu-item a:contains("View Grading History")').click
+    expect(driver.current_url).to include("/courses/#{@course.id}/gradebook/history")
+  end
+
   it "should validate assignment details", priority: "1", test_id: 210048 do
     submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
