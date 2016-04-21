@@ -159,7 +159,7 @@ class ApplicationController < ActionController::Base
 
     context = context.account if context.is_a?(User)
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
-      :root_account => @domain_root_account, :current_user => @current_user})
+      :root_account => @domain_root_account, :current_user => @current_user}).to_a
 
     tools.select!{|tool| ContextExternalTool.visible?(tool.extension_setting(type)['visibility'], @current_user, context, session)}
 
