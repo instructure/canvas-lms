@@ -301,9 +301,11 @@ class Quizzes::QuizzesController < ApplicationController
         :SHOW_QUIZ_ALT_TEXT_WARNING => true,
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
-
       append_sis_data(hash)
       js_env(hash)
+
+      conditional_release_js_env(@quiz.assignment)
+
       render :new
     end
   end

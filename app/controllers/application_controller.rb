@@ -154,6 +154,20 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
+  def conditional_release_js_env(assignment = nil)
+    return unless ConditionalRelease::Service.enabled_in_context?(@context)
+    cr_env = ConditionalRelease::Service.env_for(
+      @context,
+      @current_user,
+      session: session,
+      assignment: assignment,
+      domain: request.env['HTTP_HOST'],
+      real_user: @real_current_user
+    )
+    js_env(cr_env)
+  end
+  helper_method :conditional_release_js_env
+
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
     return [] if context.is_a?(Group)
 

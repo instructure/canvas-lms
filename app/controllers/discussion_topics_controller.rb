@@ -443,11 +443,10 @@ class DiscussionTopicsController < ApplicationController
       end
       js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
       append_sis_data(js_hash)
-
-      if ConditionalRelease::Service.enabled_in_context?(@context)
-        js_hash.merge! ConditionalRelease::Service.env_for(@context, @user, session)
-      end
       js_env(js_hash)
+
+      conditional_release_js_env(@topic.assignment)
+
       render :edit
     end
   end

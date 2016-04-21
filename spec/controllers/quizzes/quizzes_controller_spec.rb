@@ -167,6 +167,26 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:REGRADE_OPTIONS]).to eq({q.id => 'no_regrade' })
       expect(response).to render_template("new")
     end
+
+    context "conditional release" do
+      before do
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'charliemccarthy' })
+      end
+
+      it "should define env when enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @quiz.id
+        expect(assigns[:js_env][:dummy]).to eq 'charliemccarthy'
+      end
+
+      it "should not define env when not enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @quiz.id
+        expect(assigns[:js_env][:dummy]).to be nil
+      end
+    end
   end
 
   describe "GET 'show'" do

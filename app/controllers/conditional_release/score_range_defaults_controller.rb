@@ -23,7 +23,9 @@ module ConditionalRelease
       unless ConditionalRelease::Service.enabled_in_context?(@context)
         return render template: 'shared/errors/404_message', status: :not_found
       end
-      js_env ConditionalRelease::Service.env_for(@context, @current_user, session)
+
+      conditional_release_js_env
+
       render locals: {
         cr_app_url: ConditionalRelease::Service.configure_defaults_url,
       }

@@ -28,23 +28,34 @@ module ConditionalRelease
       edit_object_score_ranges_path: 'javascripts/edit_object_score_ranges.js',
     }.freeze
 
-    def self.env_for(context, user = nil, session = nil)
+    def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
       enabled = self.enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
       if enabled && user
         env.merge!({
-          CONDITIONAL_RELEASE_JWT: Canvas::Security::ServicesJwt.generate(
-            sub: user.id.to_s,
-            context_type: context.class.name,
-            context_id: context.id.to_s,
-            role: find_role(user, session, context),
-            account_id: Context.get_account(context).lti_guid.to_s
-          )
+          CONDITIONAL_RELEASE_JWT: jwt_for(context, user, domain, session: session, real_user: real_user),
+          CONDITIONAL_RELEASE_ENV: {
+            assignment: assignment_attributes(assignment)
+          }
         })
       end
       env
+    end
+
+    def self.jwt_for(context, user, domain, claims: {}, session: nil, real_user: nil)
+      return Canvas::Security::ServicesJwt.generate(
+        claims.merge({
+          sub: user.id.to_s,
+          account_id: Context.get_account(context).root_account.lti_guid.to_s,
+          context_type: context.class.name,
+          context_id: context.id.to_s,
+          role: find_role(user, session, context),
+          workflow: 'conditonal-release-api',
+          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflow: 'conditional-release')
+        })
+      )
     end
 
     def self.reset_config_cache
@@ -105,6 +116,20 @@ module ConditionalRelease
         elsif context.grants_right? user, session, :read
           'student'
         end
+      end
+
+      def assignment_attributes(assignment)
+        return nil unless assignment.present?
+        {
+          id: assignment.id,
+          title: assignment.title,
+          description: assignment.description,
+          points_possible: assignment.points_possible,
+          min_score: assignment.min_score,
+          max_score: assignment.max_score,
+          grading_type: assignment.grading_type,
+          submission_types: assignment.submission_types
+        }
       end
     end
   end

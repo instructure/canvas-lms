@@ -376,6 +376,25 @@ describe AssignmentsController do
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
     end
 
+    context "conditional release" do
+      before do
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'cr-assignment' })
+      end
+
+      it "should define env when enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @assignment.id
+        expect(assigns[:js_env][:dummy]).to eq 'cr-assignment'
+      end
+
+      it "should not define env when not enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @assignment.id
+        expect(assigns[:js_env][:dummy]).to be nil
+      end
+    end
   end
 
   describe "PUT 'update'" do

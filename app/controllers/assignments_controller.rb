@@ -379,7 +379,7 @@ class AssignmentsController < ApplicationController
 
   def edit
     rce_js_env(:highrisk)
-    js_env(ConditionalRelease::Service.env_for(@context, @current_user, session))
+
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
@@ -449,6 +449,7 @@ class AssignmentsController < ApplicationController
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
       append_sis_data(hash)
       js_env(hash)
+      conditional_release_js_env(@assignment)
       @padless = true
       render :edit
     end
