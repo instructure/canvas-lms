@@ -81,7 +81,7 @@ module UserSearch
       if enrollment_types.any?{ |et| !Enrollment.readable_types.keys.include?(et) }
         raise ArgumentError, 'Invalid Enrollment Type'
       end
-      users = users.where(:enrollments => { :type => enrollment_types })
+      users = users.joins(:enrollments).where(:enrollments => { :type => enrollment_types })
     end
 
     if exclude_groups
