@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -73,7 +73,12 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      # FIXME: This action will not be used with Accounts after CNVS-27101 is implemented
+      if @context.is_a? Account
+        grading_periods = []
+      else
+        grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      end
       paginated_grading_periods, meta = paginate_for(grading_periods)
       render json: serialize_json_api(paginated_grading_periods, meta).merge(index_permissions)
     end

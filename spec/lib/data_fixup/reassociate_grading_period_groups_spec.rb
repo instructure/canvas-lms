@@ -1,22 +1,27 @@
 require 'spec_helper'
 
 describe DataFixup::ReassociateGradingPeriodGroups do
-  before(:each) do
-    @root_account = Account.create(name: 'new account')
-    create_grading_periods_for(@root_account, grading_periods: [:current])
-    @root_account.enrollment_terms.create!
-    @sub_account = @root_account.sub_accounts.create!
-    create_grading_periods_for(@sub_account, grading_periods: [:future])
-    @sub_account.enrollment_terms.create!
-    course = @root_account.courses.create!
-    create_grading_periods_for(course, grading_periods: [:old])
-  end
-
-  let(:root_account_grading_period_group) { @root_account.grading_period_groups.first }
+  let(:root_account_grading_period_group) { GradingPeriodGroup.find_by(account_id: @root_account) }
   let(:root_account_grading_period) { root_account_grading_period_group.grading_periods.first }
   let(:first_term) { @root_account.enrollment_terms.first }
   let(:second_term) { @root_account.enrollment_terms.second }
   let(:sub_account_term) { @sub_account.enrollment_terms.first }
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+  let(:period_helper) { Factories::GradingPeriodHelper.new }
+
+  before(:each) do
+    @root_account = Account.create(name: 'new account')
+    group = group_helper.legacy_create_for_account(@root_account)
+    period_helper.create_presets_for_group(group, :current)
+    @root_account.enrollment_terms.create!
+    @sub_account = @root_account.sub_accounts.create!
+    group = group_helper.legacy_create_for_account(@sub_account)
+    period_helper.create_presets_for_group(group, :future)
+    @sub_account.enrollment_terms.create!
+    course = @root_account.courses.create!
+    group = group_helper.create_for_course(course)
+    period_helper.create_presets_for_group(group, :past)
+  end
 
   context "pre-fixup" do
     it "root account enrollment terms do not have an associated grading period group" do

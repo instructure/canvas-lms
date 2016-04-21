@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -43,13 +43,16 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
-  # Takes a context and returns an Array (not an ActiveRecord::Relation)
+  # Takes a course and returns an Array (not an ActiveRecord::Relation)
   # which means this method is not .where() chainable
-  def self.for(context)
-    "#{self.name}::#{context.class}#{self.name}Finder"
-      .constantize
-      .new(context)
-      .grading_periods
+  def self.for(course)
+    periods = active.grading_periods_by(course_id: course.id)
+    if periods.exists?
+      periods
+    else
+      grading_period_group_ids = EnrollmentTerm.select(:grading_period_group_id).where(id: course.enrollment_term)
+      active.where(grading_period_group_id: grading_period_group_ids)
+    end
   end
 
   def self.current_period_for(context)
@@ -66,13 +69,11 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def account_group?
-    grading_period_group.course_id.nil? &&
-      grading_period_group.account_id.present?
+    grading_period_group.course_id.nil?
   end
 
   def course_group?
-    grading_period_group.course_id.present? &&
-      grading_period_group.account_id.nil?
+    grading_period_group.course_id.present?
   end
 
   def assignments_for_student(assignments, student)

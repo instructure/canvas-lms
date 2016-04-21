@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../file_uploads_spec_helper'
 
 describe 'Submissions API', type: :request do
   include Api::V1::User
@@ -1643,7 +1643,7 @@ describe 'Submissions API', type: :request do
       @course.enroll_student(@student2).accept!
 
       @course.account.enable_feature!(:multiple_grading_periods)
-      gpg = @course.grading_period_groups.create!
+      gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
       @gp1 = gpg.grading_periods.create!(
         title: 'first',
         weight: 50,

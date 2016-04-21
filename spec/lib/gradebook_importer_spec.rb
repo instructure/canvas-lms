@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../spec_helper'
 
 require 'csv'
 
@@ -460,7 +460,7 @@ describe GradebookImporter do
   end
 
   context "multiple grading periods" do
-    let(:group)     { course.grading_period_groups.create }
+    let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
     let!(:old_period) do
       old_period_params = { title: "Course Period 2: old period",
                             start_date: 2.months.ago,

@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015-2016 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../spec_helper'
 require_relative '../../../app/models/assignment/filter_with_overrides_by_due_at'
 
@@ -7,7 +25,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
   end
   let(:account) { Account.create! }
   let(:course) { account.courses.create! }
-  let(:group)  { course.grading_period_groups.create! }
+  let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
   let(:period) do
     group.grading_periods.create!(
       title: "a default period",

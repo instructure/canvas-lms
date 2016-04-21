@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,78 +16,72 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require_relative '../sharding_spec_helper'
 
 describe UsersController do
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
- describe "external_tool" do
+  describe "external_tool" do
+    let(:account) { Account.default }
 
-   let :account do
-     Account.default
-   end
+    let :tool do
+      tool = account.context_external_tools.new({
+        name: "bob",
+        consumer_key: "bob",
+        shared_secret: "bob",
+        tool_id: 'some_tool',
+        privacy_level: 'public'
+      })
+      tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+      tool.resource_selection = {
+        :url => "http://#{HostUrl.default_host}/selection_test",
+        :selection_width => 400,
+        :selection_height => 400
+      }
+      user_navigation = {
+        :text => 'example',
+        :labels => {
+          'en' => 'English Label',
+          'sp' => 'Spanish Label'
+        }
+      }
+      tool.settings[:user_navigation] = user_navigation
+      tool.save!
+      tool
+    end
 
-   let :tool do
-     tool = account.context_external_tools.new(
-         name: "bob",
-         consumer_key: "bob",
-         shared_secret: "bob",
-         tool_id: 'some_tool',
-         privacy_level: 'public'
-     )
-     tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
-     tool.resource_selection = {
-         :url => "http://#{HostUrl.default_host}/selection_test",
-         :selection_width => 400,
-         :selection_height => 400
-     }
-     user_navigation = {
-         :text => 'example',
-         :labels => {
-             'en' => 'English Label',
-             'sp' => 'Spanish Label'
-         }
-     }
-     tool.settings[:user_navigation] = user_navigation
-     tool.save!
-     tool
-   end
+    it "removes query string when post_only = true" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
+      tool.user_navigation = { text: "example" }
+      tool.settings['post_only'] = 'true'
+      tool.save!
 
-   it "removes query string when post_only = true" do
-     u = user(:active_all => true)
-     account.account_users.create!(user: u)
-     user_session(@user)
-     tool.user_navigation = {
-         :text => "example"
-     }
-     tool.settings['post_only'] = 'true'
-     tool.save!
+      get :external_tool, {id:tool.id, user_id:u.id}
+      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
+    end
 
-     get :external_tool, {id:tool.id, user_id:u.id}
-     expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
-   end
+    it "does not remove query string from url" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
+      tool.user_navigation = { text: "example" }
+      tool.save!
 
-   it "does not remove query string from url" do
-     u = user(:active_all => true)
-     account.account_users.create!(user: u)
-     user_session(@user)
-     tool.user_navigation = {
-         :text => "example"
-     }
-     tool.save!
+      get :external_tool, {id:tool.id, user_id:u.id}
+      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
+    end
 
-     get :external_tool, {id:tool.id, user_id:u.id}
-     expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
-   end
+    it "uses localized labels" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
 
-   it "uses localized labels" do
-     u = user(:active_all => true)
-     account.account_users.create!(user: u)
-     user_session(@user)
-
-     get :external_tool, {id:tool.id, user_id:u.id}
-     expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
-   end
- end
+      get :external_tool, {id:tool.id, user_id:u.id}
+      expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
+    end
+  end
 
   describe "index" do
     before :each do
@@ -778,7 +772,7 @@ describe UsersController do
     let!(:student_enrollment) do
       course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
     end
-    let(:grading_period_group) { test_course.grading_period_groups.create! }
+    let(:grading_period_group) { group_helper.create_for_course(test_course) }
     let(:grading_period) do
       grading_period_group.grading_periods.create!(
         title: "Some Semester",
@@ -890,7 +884,7 @@ describe UsersController do
       let(:test_course) { course(active_all: true) }
       let(:student1) { user(active_all: true) }
       let(:student2) { user(active_all: true) }
-      let(:grading_period_group) { test_course.grading_period_groups.create! }
+      let(:grading_period_group) { group_helper.create_for_course(test_course) }
       let!(:grading_period) do
         grading_period_group.grading_periods.create!(
           title: "Some Semester",

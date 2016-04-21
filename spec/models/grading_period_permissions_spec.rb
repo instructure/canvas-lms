@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,19 +19,19 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod, "permissions:" do
+  let(:period_helper) { Factories::GradingPeriodHelper.new }
   let(:permissions) { [:read, :create, :update, :delete] }
 
   context "course belonging to root account" do
     before(:once) do
       @root_account = Account.default
+      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @root_account, active_all: true)
       course_with_student(course: @course, active_all: true)
-      @root_account_period =
-        grading_periods(context: @root_account, count: 1).first
-      @sub_account_period =
-        grading_periods(context: @sub_account, count: 1).first
-      @course_period = grading_periods(context: @course, count: 1).first
+      @root_account_period = period_helper.create_with_group_for_account(@root_account)
+      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
+      @course_period = period_helper.create_with_group_for_course(@course)
     end
 
     context "root-account admin" do
@@ -207,14 +207,13 @@ describe GradingPeriod, "permissions:" do
   context "course belonging to sub-account" do
     before(:once) do
       @root_account = Account.default
+      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @sub_account, active_all: true)
       course_with_student(course: @course, active_all: true)
-      @root_account_period =
-        grading_periods(context: @root_account, count: 1).first
-      @sub_account_period =
-        grading_periods(context: @sub_account, count: 1).first
-      @course_period = grading_periods(context: @course, count: 1).first
+      @root_account_period = period_helper.create_with_group_for_account(@root_account)
+      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
+      @course_period = period_helper.create_with_group_for_course(@course)
     end
 
     context "root-account admin" do
