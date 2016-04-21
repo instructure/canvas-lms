@@ -16,12 +16,19 @@ module EpubExports
     end
 
     private
-    def courses_without_epub_exports
-      @_courses_without_epub_exports ||= current_user.current_and_concluded_courses.to_a
+    def courses_not_including_epub_exports
+
+      @_courses_not_including_epub_exports ||= Course.joins(:enrollments).
+        where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions).
+        where(
+        'enrollments.type IN (?) AND enrollments.user_id = ?',
+        [StudentEnrollment, TeacherEnrollment],
+        current_user
+      )
     end
 
     def courses_with_feature_enabled
-      @_courses_with_feature_enabled ||= courses_without_epub_exports.delete_if do |course|
+      @_courses_with_feature_enabled ||= courses_not_including_epub_exports.delete_if do |course|
         !course.feature_enabled?(:epub_export)
       end
     end

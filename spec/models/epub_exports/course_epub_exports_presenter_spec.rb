@@ -24,36 +24,46 @@ describe EpubExports::CourseEpubExportsPresenter do
     student_in_course(active_all: true)
     @epub_export = @course.epub_exports.create(user: @student)
     @course_with_epub = @course
-    course_with_user('StudentEnrollment', active_all: true, user: @student)
+    @course_without_epub = course_with_user('StudentEnrollment',
+      active_all: true, user: @student
+    ).course
+    @course_as_obsever = course_with_user('ObserverEnrollment',
+      active_all: true,
+      user: @student
+    ).course
   end
 
   describe "#courses" do
-    let_once(:presenter) do
-      EpubExports::CourseEpubExportsPresenter.new(@student)
+    subject(:courses) do
+      EpubExports::CourseEpubExportsPresenter.new(@student).courses
     end
 
-    it "should set latest_epub_export for course with epub_export" do
-      @course.enable_feature!(:epub_export)
-      @course_with_epub.enable_feature!(:epub_export)
-      courses = presenter.courses
+    context 'when feature is enabled' do
+      before do
+        [@course_with_epub, @course_without_epub, @course_as_obsever].map {|course| course.enable_feature!(:epub_export) }
+      end
 
-      expect(courses.find do |course|
-        course.id == @course_with_epub.id
-      end.latest_epub_export).to eq @epub_export
+      it "sets latest_epub_export for course with epub_export" do
+        expect(courses.find do |course|
+          course.id == @course_with_epub.id
+        end.latest_epub_export).to eq @epub_export
+      end
 
-      expect(courses.find do |course|
-        course.id == @course.id
-      end.latest_epub_export).to be_nil
+      it 'does not set latest_epub_export for course without epub_export' do
+        expect(courses.find do |course|
+          course.id == @course_without_epub.id
+        end.latest_epub_export).to be_nil
+      end
+
+      it 'does not include course for which user is an observer' do
+        expect(courses).not_to include(@course_as_observer)
+      end
     end
 
     it "should only include courses that have the feature enabled" do
-
-      courses = presenter.courses
-
       expect(courses.find do |course|
         course.id == @course_with_epub.id
       end).to be_nil
-
     end
   end
 end
