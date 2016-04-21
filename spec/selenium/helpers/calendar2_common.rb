@@ -247,7 +247,7 @@ module Calendar2Common
   # This checks the date in the edit modal, since Week View and Month view events are placed via absolute
   # positioning and there is no other way to verify the elements are on the right date
   def assert_edit_modal_date(due_at)
-    f('.fc-event').click
+    move_to_click('.fc-event')
     wait_for_ajaximations
     expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %-d')}")
   end
