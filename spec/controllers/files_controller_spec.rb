@@ -962,6 +962,11 @@ describe FilesController do
       expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end
 
+    it "has a preflight point for options requests (mostly safari)" do
+      process :api_create_success_cors, 'OPTIONS', id: ""
+      expect(response.header['Access-Control-Allow-Headers']).to eq('Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding')
+    end
+
     it "should reject a blank policy" do
       post "api_create", { :file => @content }
       assert_status(400)
