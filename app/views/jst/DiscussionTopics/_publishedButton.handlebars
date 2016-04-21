@@ -1,0 +1,11 @@
+{{#if published}}
+  <span id="topic-draft-state" class="published-status published">
+    <i class="icon-publish"></i>
+    {{#t "buttons.published"}}Published{{/t}}
+  </span>
+{{else}}
+  <span id="topic-draft-state" class="published-status unpublished">
+    <i class="icon-unpublished"></i>
+    {{#t "buttons.not_published"}}Not Published{{/t}}
+  </span>
+{{/if}}

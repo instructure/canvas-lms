@@ -17,11 +17,13 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/editor/KeyboardShortcuts'
+  'jsx/shared/conditional_release/ConditionalRelease'
   'jquery.instructure_misc_helpers' # $.scrollSidebar
   'compiled/jquery.rails_flash_notifications' #flashMessage
 ], (I18n, ValidatedFormView, AssignmentGroupSelector, GradingTypeSelector,
 GroupCategorySelector, PeerReviewsSelector, PostToSisSelector, _, template, RichContentEditor,
-htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts) ->
+htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, MissingDateDialog, KeyboardShortcuts,
+ConditionalRelease) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -42,14 +44,16 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       '#discussion_point_change_warning' : '$discussionPointPossibleWarning'
       '#discussion-edit-view' : '$discussionEditView'
       '#discussion-details-tab' : '$discussionDetailsTab'
+      '#conditional-release-target' : '$conditionalReleaseTarget'
 
     events: _.extend(@::events,
       'click .removeAttachment' : 'removeAttachment'
       'click .save_and_publish': 'saveAndPublish'
       'click .cancel_button' : 'handleCancel'
       'change #use_for_grading' : 'toggleAvailabilityOptions'
-      'change #use_for_grading' : 'updateTabView'
+      'change #use_for_grading' : 'toggleConditionalReleaseTab'
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
+      'change' : 'onChange'
     )
 
     messages:
@@ -88,7 +92,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
-        CONDITIONAL_RELEASE_SERVICE_ENABLED: ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       json.assignment = json.assignment.toView()
       json
 
@@ -130,6 +133,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@watchUnload)
       _.defer(@attachKeyboardShortcuts)
       _.defer(@renderTabs) if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+      _.defer(@loadConditionalRelease) if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
 
       @$(".datetime_field").datetime_field()
 
@@ -188,7 +192,15 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     renderTabs: =>
       @$discussionEditView.tabs()
       @$discussionDetailsTab.show()
-      @updateTabView()
+      @toggleConditionalReleaseTab()
+
+    loadConditionalRelease: =>
+      if !ENV.CONDITIONAL_RELEASE_ENV
+        return # can happen during unit tests due to _.defer
+      @conditionalReleaseEditor = ConditionalRelease.attach(
+        @$conditionalReleaseTarget.get(0),
+        I18n.t('discussion topic'),
+        ENV.CONDITIONAL_RELEASE_ENV)
 
     getFormData: ->
       data = super
@@ -322,10 +334,15 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       else
         @$availabilityOptions.show()
 
-    updateTabView: ->
+    toggleConditionalReleaseTab: ->
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         if @$useForGrading.is(':checked')
           @$discussionEditView.tabs("option", "disabled", false)
         else
           @$discussionEditView.tabs("option", "disabled", [1])
           @$discussionDetailsTab.show()
+
+    onChange: ->
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
+        @assignmentDirty = true
+        @conditionalReleaseEditor.setProps({ assignmentDirty: true })

@@ -24,8 +24,8 @@ module ConditionalRelease
       enabled: false, # required
       host: nil,      # required
       protocol: nil,  # defaults to Canvas
-      configure_defaults_app_path: 'javascripts/edit_defaults.js',
-      edit_object_score_ranges_path: 'javascripts/edit_object_score_ranges.js',
+      edit_rule_path: "api/editor",
+      create_account_path: 'api/account',
     }.freeze
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
@@ -35,9 +35,10 @@ module ConditionalRelease
       }
       if enabled && user
         env.merge!({
-          CONDITIONAL_RELEASE_JWT: jwt_for(context, user, domain, session: session, real_user: real_user),
           CONDITIONAL_RELEASE_ENV: {
-            assignment: assignment_attributes(assignment)
+            jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
+            assignment: assignment_attributes(assignment),
+            edit_rule_url: edit_rule_url
           }
         })
       end
@@ -45,7 +46,7 @@ module ConditionalRelease
     end
 
     def self.jwt_for(context, user, domain, claims: {}, session: nil, real_user: nil)
-      return Canvas::Security::ServicesJwt.generate(
+      Canvas::Security::ServicesJwt.generate(
         claims.merge({
           sub: user.id.to_s,
           account_id: Context.get_account(context).root_account.lti_guid.to_s,
@@ -74,12 +75,12 @@ module ConditionalRelease
       !!(configured? && context.feature_enabled?(:conditional_release))
     end
 
-    def self.configure_defaults_url
-      build_url configure_defaults_app_path
+    def self.edit_rule_url
+      build_url edit_rule_path
     end
 
-    def self.edit_object_score_ranges_url
-      build_url edit_object_score_ranges_path
+    def self.create_account_url
+      build_url create_account_path
     end
 
     def self.protocol
@@ -90,12 +91,16 @@ module ConditionalRelease
       config[:host]
     end
 
-    def self.configure_defaults_app_path
-      config[:configure_defaults_app_path]
+    def self.unique_id
+      config[:unique_id] || "conditional-release-service@instructure.auth"
     end
 
-    def self.edit_object_score_ranges_path
-      config[:edit_object_score_ranges_path]
+    def self.edit_rule_path
+      config[:edit_rule_path]
+    end
+
+    def self.create_account_path
+      config[:create_account_path]
     end
 
     class << self

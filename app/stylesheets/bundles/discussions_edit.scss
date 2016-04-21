@@ -1,4 +1,5 @@
 @import "base/_environment.scss";
+@import "components/conditional_release";
 
 .removeAttachment {
   @include fontSize(20px);

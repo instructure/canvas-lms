@@ -85,6 +85,7 @@ GroupCategorySelector, fakeENV) ->
     equal view.$el.find('#podcast_enabled').length, 1
     equal view.$el.find('#podcast_has_student_posts_container').length, 0
 
+  conditionalReleaseEnv = { assignment: { id: 1 }, jwt: 'foo' }
   test 'does not show conditional release tab when feature not enabled', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
     view = @editView()
@@ -93,23 +94,29 @@ GroupCategorySelector, fakeENV) ->
 
   test 'shows disabled conditional release tab when feature enabled, but not assignment', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView()
     view.renderTabs()
+    view.loadConditionalRelease()
     equal view.$el.find('#discussion-conditional-release-tab').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), true
 
   test 'shows enabled conditional release tab when feature enabled, and assignment', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.renderTabs()
+    view.loadConditionalRelease()
     equal view.$el.find('#discussion-conditional-release-tab').length, 1
     equal view.$discussionEditView.hasClass('ui-tabs'), true
     equal view.$discussionEditView.tabs("option", "disabled"), false
 
   test 'enables conditional release tab when changed to assignment', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView()
+    view.loadConditionalRelease()
     view.renderTabs()
     equal view.$discussionEditView.tabs("option", "disabled"), true
 
@@ -119,10 +126,38 @@ GroupCategorySelector, fakeENV) ->
 
   test 'disables conditional release tab when changed from assignment', ->
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
+    view.loadConditionalRelease()
     view.renderTabs()
     equal view.$discussionEditView.tabs("option", "disabled"), false
 
     view.$useForGrading.prop('checked', false)
     view.$useForGrading.trigger('change')
     equal view.$discussionEditView.tabs("option", "disabled"), true
+
+  test 'renders conditional release tab content', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
+    view = @editView({ withAssignment: true })
+    view.loadConditionalRelease()
+    equal 1, view.$conditionalReleaseTarget.children().size()
+
+  test 'conditional release editor is disabled on change', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
+    view = @editView({ withAssignment: true })
+    view.loadConditionalRelease()
+    view.onChange()
+    equal false, view.conditionalReleaseEditor.enabled()
+
+  test 'conditional release editor is disabled only once', ->
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+    ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
+    view = @editView({ withAssignment: true })
+    view.loadConditionalRelease()
+    debugger
+    stub = @stub(view.conditionalReleaseEditor, 'setProps')
+    view.onChange()
+    view.onChange()
+    ok stub.calledOnce
