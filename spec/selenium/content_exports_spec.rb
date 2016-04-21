@@ -34,7 +34,7 @@ describe "content exports" do
       expect(@export.export_type).to eq 'qti'
     end
 
-    it "should selectively create qti export" do
+    it "should selectively create qti export", priority: "2", test_id: 1341342 do
       q1 = @course.quizzes.create!(:title => 'quiz1')
       q2 = @course.quizzes.create!(:title => 'quiz2')
 
