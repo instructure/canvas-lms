@@ -68,22 +68,6 @@ class ActionController::Base
   before_filter :force_utf8_params
 end
 
-module ActiveRecord::Coders
-  class Utf8SafeYAMLColumn < YAMLColumn
-    def load(*args)
-      val = super
-      Utf8Cleaner.recursively_strip_invalid_utf8!(val, true) if val
-      val
-    end
-  end
-end
-
-class ActiveRecord::Base
-  def self.serialize_utf8_safe(attr_name, class_name = Object)
-    serialize(attr_name, ::ActiveRecord::Coders::Utf8SafeYAMLColumn.new(class_name))
-  end
-end
-
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
 if RUBY_VERSION < "2."
   require 'net/protocol'

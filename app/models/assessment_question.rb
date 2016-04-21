@@ -39,7 +39,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_dropdowns_question", "calculated_question",
                         "essay_question", "true_false_question", "file_upload_question"]
 
-  serialize_utf8_safe :question_data
+  serialize :question_data
 
   set_policy do
     given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }

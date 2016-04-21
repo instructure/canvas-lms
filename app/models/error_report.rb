@@ -21,9 +21,9 @@ require 'iconv'
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
-  serialize_utf8_safe :http_env
+  serialize :http_env
   # misc key/value pairs with more details on the error
-  serialize_utf8_safe :data, Hash
+  serialize :data, Hash
 
   before_save :guess_email
 

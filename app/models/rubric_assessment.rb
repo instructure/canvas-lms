@@ -31,7 +31,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :artifact, touch: true,
              polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
   has_many :assessment_requests, :dependent => :destroy
-  serialize_utf8_safe :data
+  serialize :data
 
   simply_versioned
 

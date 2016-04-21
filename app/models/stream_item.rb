@@ -20,7 +20,7 @@ require 'open_object'
 require 'set'
 
 class StreamItem < ActiveRecord::Base
-  serialize_utf8_safe :data
+  serialize :data
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances

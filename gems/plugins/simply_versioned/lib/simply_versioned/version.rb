@@ -26,10 +26,6 @@ class Version < ActiveRecord::Base #:nodoc:
   def model
     obj = versionable_type.constantize.new
     YAML::load( self.yaml ).each do |var_name,var_value|
-      if (coder = obj.class.serialized_attributes[var_name]) && coder.is_a?(ActiveRecord::Coders::Utf8SafeYAMLColumn)
-        Utf8Cleaner.recursively_strip_invalid_utf8!(var_value, true)
-      end
-
       # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
       obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
     end

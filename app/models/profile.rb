@@ -4,7 +4,7 @@ class Profile < ActiveRecord::Base
 
   attr_accessible :context, :root_account, :title, :path, :description, :visibility, :position
 
-  serialize_utf8_safe :data
+  serialize :data
 
   validates_presence_of :root_account
   validates_presence_of :context
