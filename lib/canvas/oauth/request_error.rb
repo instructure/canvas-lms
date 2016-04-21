@@ -46,12 +46,6 @@ module Canvas::Oauth
       unsupported_grant_type: {
         error: :unsupported_grant_type,
         error_description: "The grant_type you requested is not currently supported"
-      }.freeze,
-
-      client_not_authorized_for_account: {
-        error: :invalid_scope,
-        error_description: "client does not have access to specified account",
-        http_status: 401
       }.freeze
     }.freeze
 

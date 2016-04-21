@@ -437,12 +437,14 @@ describe "API Authentication", type: :request do
               developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
 
               @user.access_tokens.create!(developer_key: developer_key)
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
             end
           end
         end

@@ -37,10 +37,21 @@ class Oauth2ProviderController < ApplicationController
 
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
-    raise Canvas::Oauth::RequestError, :client_not_authorized_for_account unless provider.key.authorized_for_account?(@domain_root_account)
 
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
+
+    unless provider.key.authorized_for_account?(@domain_root_account)
+      return redirect_to Canvas::Oauth::Provider.final_redirect(self,
+        error: "unauthorized_client",
+        error_description: "Client does not have access to the specified Canvas account.")
+    end
+
+    unless params[:response_type] == 'code'
+      return redirect_to Canvas::Oauth::Provider.final_redirect(self,
+        error: "unsupported_response_type",
+        error_description: "Only response_type=code is permitted")
+    end
 
     if @current_pseudonym && !params[:force_login]
       redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user)
