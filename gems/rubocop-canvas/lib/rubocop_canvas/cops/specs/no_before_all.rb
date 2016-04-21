@@ -1,8 +1,11 @@
 module RuboCop
   module Cop
-    module Lint
-      class SpecsBeforeAll < Cop
-        MSG = "Use `before(:once)` for efficient data setup, rather than manually setting up and tearing down with `:all` hooks. Learn more here: https://discourse.instructure.com/t/speeding-up-specs-with-once-ler/87"
+    module Specs
+      class NoBeforeAll < Cop
+        MSG = "Use `before(:once)` for efficient data setup, rather than"\
+              " manually setting up and tearing down with `:all` hooks."\
+              " Learn more here: https://discourse.instructure.com/t/speeding-up-specs-with-once-ler/87"
+
         BAD_METHOD = :before
         BAD_ARG = :all
 

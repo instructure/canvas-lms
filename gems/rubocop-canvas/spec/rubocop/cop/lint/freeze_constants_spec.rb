@@ -10,6 +10,7 @@ describe RuboCop::Cop::Lint::FreezeConstants do
     inspect_source(cop, %{ BLAH = [1,2,3,4] })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/should be frozen/)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'likes frozen arrays' do
@@ -21,6 +22,7 @@ describe RuboCop::Cop::Lint::FreezeConstants do
     inspect_source(cop, %{ FOO = {one: 'two', three: 'four'} })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/should be frozen/)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'is ok with frozen hashes' do
@@ -31,6 +33,7 @@ describe RuboCop::Cop::Lint::FreezeConstants do
   it 'catches nested arrays within a hash' do
     inspect_source(cop, %{ FOO = {one: 'two', three: ['a', 'b']}.freeze })
     expect(cop.offenses.size).to eq(1)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'will go several levels deep with one offense for each structure' do
@@ -46,6 +49,7 @@ describe RuboCop::Cop::Lint::FreezeConstants do
       }
     })
     expect(cop.offenses.size).to eq(4)
+    expect(cop.offenses.all? { |off| off.severity.name == :warning })
   end
 
   it "doesnt care about integers" do
@@ -91,6 +95,7 @@ describe RuboCop::Cop::Lint::FreezeConstants do
   it 'also catches unfrozen nested arrays' do
     inspect_source(cop, %{ MATRIX = [[[1,2], [3,4]], [[5,6], [7,8]]] })
     expect(cop.offenses.size).to eq(7)
+    expect(cop.offenses.all? { |off| off.severity.name == :warning })
   end
 
   it 'doesnt interrupt code with no constant assignments' do

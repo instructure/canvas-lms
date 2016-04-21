@@ -1,17 +1,18 @@
 module RuboCop
   module Cop
-    module Lint
+    module Specs
       # most of this has been stolen from:
       # https://github.com/nevir/rubocop-rspec/blob/master/lib/rubocop/rspec/top_level_describe.rb
       # https://github.com/nevir/rubocop-rspec/blob/9aa33ee7014e8d6d580b12fe2651b32ccdaa7a92/lib/rubocop/cop/rspec/file_path.rb
-      class SpecsEnsureSpecExtension < Cop
+      class EnsureSpecExtension < Cop
         include RuboCop::Cop::FileMeta
 
-        MSG = "Spec files need to end with \"_spec.rb\" for rspec to find and run them."
+        MSG = "Spec files need to end with \"_spec.rb\""\
+              " for rspec  to find and run them."
+
         METHODS = [:context, :describe].freeze
 
         def on_send(node)
-          return unless in_spec_dir?
           return if named_as_spec?
           return unless top_level_describe?(node)
           add_offense node, :expression, MSG

@@ -12,6 +12,7 @@ describe RuboCop::Cop::Migration::SendLater do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/if_production/)
+    expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 
   it 'disallows send_later in predeploys' do
@@ -26,5 +27,6 @@ describe RuboCop::Cop::Migration::SendLater do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/predeploy/)
+    expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 end

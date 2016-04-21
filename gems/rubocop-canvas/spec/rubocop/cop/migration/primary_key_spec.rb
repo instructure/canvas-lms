@@ -24,5 +24,6 @@ describe RuboCop::Cop::Migration::PrimaryKey do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/include a primary key/)
+    expect(cop.offenses.first.severity.name).to eq(:convention)
   end
 end

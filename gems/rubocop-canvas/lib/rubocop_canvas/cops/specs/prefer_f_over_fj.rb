@@ -1,13 +1,13 @@
 module RuboCop
   module Cop
-    module Lint
-      class SpecsFOverFj < Cop
+    module Specs
+      class PreferFOverFj < Cop
         include RuboCop::Cop::Consts::JQuerySelectors
 
         SUSPECT_METHOD_NAMES = {
           fj: 'f',
           ffj: 'ff'
-        }
+        }.freeze
 
         def on_send(node)
           _receiver, method_name, *args = *node
@@ -26,11 +26,15 @@ module RuboCop
 
         def error_msg(method)
           alternative = SUSPECT_METHOD_NAMES[method]
-          "Prefer `#{alternative}` instead of `#{method}`; `#{method}` should only be used if you are doing jquery-fake-css selectors (e.g. `:visible`). Unlike `#{alternative}`, `#{method}` will not wait for the element to appear in the DOM, often contributing to flickering failures."
+          "Prefer `#{alternative}` instead of `#{method}`; `#{method}`"\
+            " should only be used if you are doing jquery-fake-css selectors"\
+            " (e.g. `:visible`). Unlike `#{alternative}`, `#{method}`"\
+            " will not wait for the element to appear in the DOM,"\
+            " often contributing to flickering failures."
         end
 
         def autocorrect(node)
-          _, method_name, *_ = *node
+          _, method_name, *_args = *node
           lambda do |corrector|
             corrector.replace(node.loc.selector, SUSPECT_METHOD_NAMES[method_name])
           end

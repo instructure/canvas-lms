@@ -13,24 +13,27 @@ require 'rubocop_canvas/helpers/git_proxy'
 require 'rubocop_canvas/helpers/migration_tags'
 
 # cops
+## datafixup
+require 'rubocop_canvas/cops/datafixup/eager_load'
 require 'rubocop_canvas/cops/datafixup/find_ids'
-
+## lint
 require 'rubocop_canvas/cops/lint/freeze_constants'
-require 'rubocop_canvas/cops/lint/sleep'
-require 'rubocop_canvas/cops/lint/specs_before_all'
-require 'rubocop_canvas/cops/lint/specs_before_once_stubs'
-require 'rubocop_canvas/cops/lint/specs_ensure_spec_extension'
-require 'rubocop_canvas/cops/lint/specs_execute_script'
-require 'rubocop_canvas/cops/lint/specs_f_over_fj'
-require 'rubocop_canvas/cops/lint/specs_helper_modules'
-require 'rubocop_canvas/cops/lint/specs_rm_rf'
-require 'rubocop_canvas/cops/lint/timecop_no_block'
-
+require 'rubocop_canvas/cops/lint/no_file_utils_rm_rf'
+require 'rubocop_canvas/cops/lint/no_sleep'
+## migration
 require 'rubocop_canvas/cops/migration/concurrent_index'
 require 'rubocop_canvas/cops/migration/primary_key'
 require 'rubocop_canvas/cops/migration/remove_column'
 require 'rubocop_canvas/cops/migration/send_later'
+## rails
 require 'rubocop_canvas/cops/rails/smart_time_zone'
+## specs
+require 'rubocop_canvas/cops/specs/no_before_all'
+require 'rubocop_canvas/cops/specs/no_before_once_stubs'
+require 'rubocop_canvas/cops/specs/ensure_spec_extension'
+require 'rubocop_canvas/cops/specs/no_execute_script'
+require 'rubocop_canvas/cops/specs/prefer_f_over_fj'
+require 'rubocop_canvas/cops/specs/scope_helper_modules'
 
 module RuboCop
   module Canvas

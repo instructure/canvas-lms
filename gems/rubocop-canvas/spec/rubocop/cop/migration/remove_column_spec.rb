@@ -14,6 +14,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
       })
       expect(cop.offenses.size).to eq(1)
       expect(cop.messages.first).to match(/remove_column/)
+      expect(cop.offenses.first.severity.name).to eq(:convention)
     end
 
     it 'disallows remove_column in `self.up`' do
@@ -28,6 +29,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
       })
       expect(cop.offenses.size).to eq(1)
       expect(cop.messages.first).to match(/remove_column/)
+      expect(cop.offenses.first.severity.name).to eq(:convention)
     end
 
     it 'allows remove_column in `down`' do
