@@ -14,8 +14,8 @@ describe "external tool assignments" do
 
     #create assignment
     f('.add_assignment').click
-    f('.create_assignment_dialog input[name="name"]').send_keys('test1')
     f('.ui-datepicker-trigger').click
+    f('.create_assignment_dialog input[name="name"]').send_keys('test1')
     datepicker = datepicker_next
     datepicker.find_element(:css, '.ui-datepicker-ok').click
     replace_content(f('.create_assignment_dialog input[name="points_possible"]'), '5')
