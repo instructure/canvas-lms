@@ -10,6 +10,16 @@ class BzController < ApplicationController
   before_filter :require_user, :only => [:last_user_url]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
 
+  def accessibility_check
+    @items = []
+    WikiPage.all.each do |page|
+      doc = Nokogiri::HTML(page.body)
+      doc.css('img[alt=""]:not(.bz-magic-viewer), img:not([alt]):not(.bz-magic-viewer)').each do |img|
+        @items << { :page => page, :img => img.to_html, :problem => 'Missing alt text' }
+      end
+    end
+  end
+
   def user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = ''
