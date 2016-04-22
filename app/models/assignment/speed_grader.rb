@@ -127,6 +127,7 @@ class Assignment
         end
 
         comments = (provisional_grade || sub).submission_comments
+        comments = comments.preload({submission: {assignment: {context: :root_account}}})
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
