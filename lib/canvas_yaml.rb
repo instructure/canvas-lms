@@ -25,7 +25,11 @@
 require 'yaml'
 
 require 'syck' # so we can undo all the things before something else requires it
-YAML::ENGINE.yamler = 'psych' if defined?(YAML::ENGINE)
+if defined?(YAML::ENGINE)
+  YAML::ENGINE.yamler = 'psych'
+else
+  YAML = Psych # :/
+end
 
 require 'safe_yaml'
 
