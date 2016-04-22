@@ -2519,6 +2519,7 @@ describe CoursesController, type: :request do
         'id' => @course1.id,
         'name' => @course1.name,
         'account_id' => @course1.account_id,
+        'root_account_id' => @course1.root_account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
         'grading_standard_id' => nil,
