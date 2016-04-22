@@ -710,6 +710,12 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  def save_selected_contexts
+    @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
+    @current_user.save!
+    render json: {status: 'ok'}
+  end
+
   protected
 
   def get_calendar_context

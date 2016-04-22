@@ -1871,4 +1871,15 @@ describe CalendarEventsApiController, type: :request do
     end
   end
 
+  context 'save_selected_contexts' do
+    it 'persists contexts' do
+      json = api_call(:post, "/api/v1/calendar_events/save_selected_contexts", {
+          controller: 'calendar_events_api',
+          action: 'save_selected_contexts',
+          format: 'json',
+          selected_contexts: ['course_1', 'course_2', 'course_3']
+      })
+      expect(@user.reload.preferences[:selected_calendar_contexts]).to eq(['course_1', 'course_2', 'course_3'])
+    end
+  end
 end

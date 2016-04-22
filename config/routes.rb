@@ -1332,6 +1332,7 @@ CanvasRails::Application.routes.draw do
       delete 'calendar_events/:id', action: :destroy
       post 'calendar_events/:id/reservations', action: :reserve
       post 'calendar_events/:id/reservations/:participant_id', action: :reserve, as: 'calendar_event_reserve'
+      post 'calendar_events/save_selected_contexts', action: :save_selected_contexts
     end
 
     scope(controller: :appointment_groups) do
