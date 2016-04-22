@@ -65,7 +65,7 @@ class AccessToken < ActiveRecord::Base
     # since you need a refresh token to
     # refresh expired tokens
 
-    if !developer_key_id || developer_key.try(:active?)
+    if !developer_key_id || slaved_developer_key.try(:active?)
       # we are a stand alone token, or a token with an active developer key
       # make sure we
       #   - have a user id
@@ -77,12 +77,12 @@ class AccessToken < ActiveRecord::Base
   end
 
   def app_name
-    developer_key.try(:name) || "No App"
+    slaved_developer_key.try(:name) || "No App"
   end
 
   def authorized_for_account?(target_account)
-    return true unless self.developer_key
-    self.developer_key.authorized_for_account?(target_account)
+    return true unless slaved_developer_key
+    slaved_developer_key.authorized_for_account?(target_account)
   end
 
   def record_last_used_threshold
@@ -97,7 +97,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def expired?
-    (developer_key == DeveloperKey.default || developer_key.try(:auto_expire_tokens)) && expires_at && expires_at < DateTime.now.utc
+    (slaved_developer_key == DeveloperKey.default || slaved_developer_key.try(:auto_expire_tokens)) && expires_at && expires_at < DateTime.now.utc
   end
 
   def token=(new_token)
@@ -114,7 +114,7 @@ class AccessToken < ActiveRecord::Base
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
-      if developer_key != DeveloperKey.default && !self.expires_at_changed? && developer_key.try(:auto_expire_tokens)
+      if slaved_developer_key != DeveloperKey.default && !self.expires_at_changed? && slaved_developer_key.try(:auto_expire_tokens)
         self.expires_at = DateTime.now.utc + 1.hour
       end
     end
@@ -142,7 +142,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def protected_token?
-    developer_key != DeveloperKey.default
+    slaved_developer_key != DeveloperKey.default
   end
 
   def regenerate=(val)
@@ -189,5 +189,10 @@ class AccessToken < ActiveRecord::Base
   # The hint is only returned in visible_token, if protected_token is false.
   def self.serialization_excludes
     [:crypted_token, :token_hint, :crypted_refresh_token]
+  end
+
+  private
+  def slaved_developer_key
+    Shackles.activate(:slave){ return developer_key }
   end
 end

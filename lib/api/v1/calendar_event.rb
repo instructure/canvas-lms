@@ -56,17 +56,6 @@ module Api::V1::CalendarEvent
     appointment_group ||= AppointmentGroup.find(options[:appointment_group_id]) if options[:appointment_group_id]
     appointment_group ||= event.appointment_group
 
-    if event.effective_context_code
-      if appointment_group
-        codes_for_user = appointment_group.context_codes_for_user(user)
-        hash['context_code'] = (event.effective_context_code.split(',') & codes_for_user).first
-        hash['effective_context_code'] = hash['context_code']
-      else
-        hash['effective_context_code'] = event.effective_context_code
-      end
-    end
-    hash['context_code'] ||= event.context_code
-
     # force it to load
     include_child_events = include.include?('child_events')
     if include_child_events
@@ -74,6 +63,18 @@ module Api::V1::CalendarEvent
     else
       hash["child_events_count"] = options[:child_events_count] || event.child_events.size
     end
+
+    if event.effective_context_code
+      if appointment_group
+        common_context_codes = common_ag_context_codes(appointment_group, user, event, include_child_events)
+        hash['context_code'] = (event.effective_context_code.split(',') & common_context_codes).first
+        hash['effective_context_code'] = hash['context_code']
+      else
+        hash['effective_context_code'] = event.effective_context_code
+      end
+    end
+    hash['context_code'] ||= event.context_code
+
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
     # but if nobody is logged in, no sections apply, so show the base event
@@ -204,4 +205,30 @@ module Api::V1::CalendarEvent
   ensure
     @context = orig_context
   end
+
+  private
+
+  # find context codes shared by the viewing user and the user signed up (if any),
+  # falling back on the viewing user's contexts
+  def common_ag_context_codes(appointment_group, user, event, include_child_events)
+    codes_for_user = appointment_group.context_codes_for_user(user)
+
+    event_user = event.user
+    event_user ||= infer_user_from_child_events(event.child_events) if include_child_events
+    if event_user
+      codes_for_event_user = appointment_group.context_codes_for_user(event_user)
+      common_codes = codes_for_user & codes_for_event_user
+      return common_codes if common_codes.any?
+    end
+    codes_for_user
+  end
+
+  # for an AG in multiple courses, if all students signing up for a slot are in the same course,
+  # put the event on that course's calendar
+  def infer_user_from_child_events(child_events)
+    unique_user_ids = child_events.map(&:user_id).uniq
+    return child_events.first.user if unique_user_ids.length == 1
+    nil
+  end
+
 end
