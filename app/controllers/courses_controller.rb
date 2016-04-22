@@ -1975,6 +1975,10 @@ class CoursesController < ApplicationController
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
   #
+  # @argument course[storage_quota_mb] [Integer]
+  #   Set the storage quota for the course, in megabytes. The caller must have
+  #   the "Manage storage quotas" account permission.
+  #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students
   #   immediately.
