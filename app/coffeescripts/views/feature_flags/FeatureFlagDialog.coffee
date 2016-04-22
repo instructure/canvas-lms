@@ -26,16 +26,23 @@ define [
         height  : 300
         width   : 500
         buttons : [text: @labels.okay, click: @onConfirm, class: 'btn-primary']
+        open    : @onOpen
+        close   : @onClose
       if @hasCancelButton
         options.buttons.unshift(text: @labels.cancel, click: @onCancel)
       options
 
+    onOpen: (e) =>
+      @okay = false
+
+    onClose: (e) =>
+      if @okay then @deferred.resolve() else @deferred.reject()
+
     onCancel: (e) =>
-      @deferred.reject()
       @close()
 
     onConfirm: (e) =>
-      if @hasCancelButton then @deferred.resolve() else @deferred.reject()
+      @okay = @hasCancelButton
       @close()
 
     toJSON: ->
