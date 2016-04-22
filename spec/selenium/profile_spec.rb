@@ -181,6 +181,7 @@ describe "profile" do
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
       submit_form(register_form)
+      sleep 1 # wait a moment before we close any dialogs, since this spec fails intermittently ... this way we can catch any formError thingies in the video capture
       wait_for_ajaximations
       close_visible_dialog
       keep_trying_until { expect(f('.other_channels .path')).to include_text(test_cell_number) }
