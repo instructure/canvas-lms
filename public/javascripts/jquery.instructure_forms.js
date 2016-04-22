@@ -86,7 +86,10 @@ define([
         var newData = null;
         try {
           newData = options.processData.call($form, formData);
-        } catch(e) { error = e; }
+        } catch(e) {
+          error = e;
+          if (INST && INST.environment !== 'production') throw error;
+        }
         if(newData === false) {
           return false;
         } else if(newData) {
@@ -101,7 +104,10 @@ define([
         submitParam = null;
         try {
           submitParam = options.beforeSubmit.call($form, formData);
-        } catch(e) { error = e; }
+        } catch(e) {
+          error = e;
+          if (INST && INST.environment !== 'production') throw error;
+        }
         if(submitParam === false) {
           return false;
         }
@@ -150,9 +156,6 @@ define([
       }
       if(error && !options.preventDegradeToFormSubmit) {
         if (loadingPromise) loadingPromise.reject();
-        if(INST && INST.environment == 'development') {
-          $.flashError('formSubmit error, trying to gracefully degrade. See console for details');
-        }
         return;
       }
       event.preventDefault();
