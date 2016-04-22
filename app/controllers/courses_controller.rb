@@ -1979,6 +1979,19 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
+  # @argument event [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
+  #   The action to take on each course.
+  #   * 'claim' makes a course no longer visible to students. This action is also called "unpublish" on the web site.
+  #     A course cannot be unpublished if students have received graded submissions.
+  #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
+  #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
+  #     in prior-enrollment lists.
+  #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
+  #     All enrollments are deleted. Course content may be physically deleted at a future date.
+  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
+  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
+  #     will be unpublished. Deleted enrollments will not be recovered.
+  #
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
   #
