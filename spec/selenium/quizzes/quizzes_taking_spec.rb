@@ -55,6 +55,12 @@ describe "quiz taking" do
     expect(f('#take_quiz_link')).to be_nil
   end
 
+  it 'should show take quiz button for admins enrolled as a student' do
+    course_with_teacher(user: @student, course: @course)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    expect(f('#take_quiz_link')).to be_present
+  end
+
   it "should show a prompt when attempting to submit with unanswered questions", priority: "1", test_id: 140608 do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
