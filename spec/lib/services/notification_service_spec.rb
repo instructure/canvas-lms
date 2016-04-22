@@ -89,21 +89,6 @@ module Services
         expect(@message.workflow_state).to eql("staged")
       end
 
-      it "will send to both services" do
-        Setting.set("notification_service_traffic", "true")
-        @queue.expects(:send_message).once
-        @message.path_type = "email"
-        @message.expects(:deliver_via_email).once
-        expect{@message.deliver}.not_to raise_error
-      end
-
-      it "does not restage if sending with both methods" do
-        Setting.set("notification_service_traffic", "true")
-        @queue.stubs(:send_message).raises(AWS::SQS::Errors::ServiceError)
-
-        expect{@message.deliver}.not_to raise_error
-      end
-
       context 'payload contents' do
         class SendMessageSpy
           attr_accessor :sent_hash
