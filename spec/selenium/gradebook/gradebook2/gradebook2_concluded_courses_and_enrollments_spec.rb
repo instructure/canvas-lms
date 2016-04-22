@@ -16,7 +16,7 @@ describe "gradebook2 - concluded courses and enrollments" do
       end
     end
 
-    it "persists settings for displaying inactive enrollments" do
+    it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
       get course_gradebook2_path(@course)
       wait_for_ajaximations
       f('#gradebook_settings').click
@@ -30,7 +30,7 @@ describe "gradebook2 - concluded courses and enrollments" do
         })
     end
 
-    it "persists settings for displaying concluded enrollments" do
+    it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
       get course_gradebook2_path(@course)
       wait_for_ajaximations
       f('#gradebook_settings').click
