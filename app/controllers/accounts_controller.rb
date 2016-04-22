@@ -405,9 +405,12 @@ class AccountsController < ApplicationController
       unauthorized = false
 
       # account settings (:manage_account_settings)
-      account_settings = account_params.select {|k, v| [:name, :default_time_zone].include?(k.to_sym)}.with_indifferent_access
+      account_settings = account_params.select {|k, v| [:name, :default_time_zone, :settings].include?(k.to_sym)}.with_indifferent_access
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
+          if account_settings[:settings]
+            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing)
+          end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
@@ -476,11 +479,23 @@ class AccountsController < ApplicationController
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
-  # @argument account[settings][restrict_student_past_view] [Boolean]
+  # @argument account[settings][restrict_student_past_view][value] [Boolean]
   #   Restrict students from viewing courses after end date
   #
-  # @argument account[settings][restrict_student_future_view] [Boolean]
+  # @argument account[settings][restrict_student_past_view][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][restrict_student_future_view][value] [Boolean]
   #   Restrict students from viewing courses before start date
+  #
+  # @argument account[settings][restrict_student_future_view][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][restrict_student_future_listing][value] [Boolean]
+  #   Restrict students from viewing future enrollments in course list
+  #
+  # @argument account[settings][restrict_student_future_listing][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \
