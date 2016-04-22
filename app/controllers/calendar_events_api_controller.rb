@@ -710,6 +710,24 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  def visible_contexts
+    get_context
+    get_all_pertinent_contexts(include_groups: true, favorites_first: true)
+    selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
+
+    contexts = @contexts.map do |context|
+      {
+        id: context.id,
+        name: context.nickname_for(@current_user),
+        asset_string: context.asset_string,
+        color: @current_user.custom_colors[context.asset_string],
+        selected: selected_contexts.include?(context.asset_string)
+      }
+    end
+
+    render json: {contexts: Api.recursively_stringify_json_ids(contexts)}
+  end
+
   def save_selected_contexts
     @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
     @current_user.save!
