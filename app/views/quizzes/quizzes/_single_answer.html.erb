@@ -22,6 +22,11 @@
     <%= 'readonly="readonly"' unless editable %>
   />
 <% elsif question_type.entry_type == "textarea" %>
+  <div class="rce_links">
+    <a href="#" class="toggle_question_content_views_link"><%= t "HTML Editor" %></a>
+    <a href="#" class="toggle_question_content_views_link" style="display:none;"><%= t "Rich Content Editor" %></a>
+  </div>
+  <div class="clearfix"></div>
   <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>><%= value %></textarea>
 <% elsif question_type.entry_type == "file" %>
   <% if !editable%>

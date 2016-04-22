@@ -144,6 +144,7 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
+      ENV.RICH_CONTENT_CAN_UPLOAD_FILES = true
       ENV.context_asset_string = 'courses_1'
       fixtures.setup()
       @$div = fixtures.create('<div />')
@@ -175,3 +176,10 @@ define [
     RCELoader.loadSidebarOnTarget(@$div, cb)
     equal typeof @sidebar.show, 'function'
     equal typeof @sidebar.hide, 'function'
+
+  test 'provides a callback for loading a new jwt', ->
+    cb = sinon.spy()
+    RCELoader.loadSidebarOnTarget(@$div, cb)
+    ok @rce.renderSidebarIntoDiv.called
+    props = @rce.renderSidebarIntoDiv.args[0][1]
+    equal(typeof props.refreshToken, 'function')

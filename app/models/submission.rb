@@ -560,10 +560,16 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          canvadocs << a.create_canvadoc unless a.canvadoc
+          a.create_canvadoc! unless a.canvadoc
+          unless canvadocs.exists?(attachment: a)
+            canvadocs << a.canvadoc
+          end
         elsif a.crocodocable?
           submit_to_canvadocs = true
-          crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
+          a.create_crocodoc_document! unless a.crocodoc_document
+          unless crocodoc_documents.exists?(attachment: a)
+            crocodoc_documents << a.crocodoc_document
+          end
         end
 
         if submit_to_canvadocs

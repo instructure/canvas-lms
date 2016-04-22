@@ -9,7 +9,10 @@ define [
     React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || columnData: {assignment: {id: '1', points_possible: 10}}
+    cellData = props || {
+      columnData: { assignment: { id: '1', points_possible: 10 } }
+      rowData: { student: { enrollment_state: 'active' } }
+    }
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 
@@ -17,6 +20,7 @@ define [
     props =
       cellData:  {id: '1', grade: grade, score: '10', assignment_id: '1'}
       columnData: {assignment: {id: '1', points_possible: 100}}
+      rowData: { student: { enrollment_state: 'active' } }
     $.extend(props, additionalProps)
     buildComponent(props)
 

@@ -4,8 +4,10 @@ module Canvas::Security
   describe ServicesJwt do
     include_context "JWT setup"
 
-    def build_wrapped_token(user_id)
-      crypted_token = ServicesJwt.generate({ sub: user_id }, false)
+    def build_wrapped_token(user_id, real_user_id: nil)
+      payload = { sub: user_id }
+      payload[:masq_sub] = real_user_id if real_user_id
+      crypted_token = ServicesJwt.generate(payload, false)
       payload = {
         iss: "some other service",
         user_token: crypted_token
@@ -42,13 +44,20 @@ module Canvas::Security
       end
     end
 
-    describe "#user_global_id" do
+    describe "user ids" do
+      let(:user_id){ 42 }
 
       it "can get the user_id out of a wrapped issued token" do
-        user_id = 42
         base64_encoded_wrapper = build_wrapped_token(user_id)
         jwt = ServicesJwt.new(base64_encoded_wrapper)
         expect(jwt.user_global_id).to eq(user_id)
+      end
+
+      it "can pull out the masquerading user if provided" do
+        real_user_id = 24
+        base64_encoded_wrapper = build_wrapped_token(user_id, real_user_id: real_user_id)
+        jwt = ServicesJwt.new(base64_encoded_wrapper)
+        expect(jwt.masquerading_user_global_id).to eq(real_user_id)
       end
     end
 
@@ -97,6 +106,48 @@ module Canvas::Security
             to raise_error(ArgumentError)
         end
 
+      end
+
+      describe "via .for_user" do
+        let(:user){ stub(global_id: 42) }
+        let(:host){ "example.instructure.com" }
+        let(:masq_user){ stub(global_id: 24) }
+        let(:translate_token) do
+          ->(jwt){
+            decoded_crypted_token = Canvas::Security.base64_decode(jwt)
+            return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+          }
+        end
+
+        it "can build from a user and host" do
+          jwt = ServicesJwt.for_user(host, user)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body[:sub]).to eq(42)
+          expect(decrypted_token_body[:domain]).to eq("example.instructure.com")
+        end
+
+        it "includes masquerading user if given" do
+          jwt = ServicesJwt.for_user(host, user, real_user: masq_user)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body[:sub]).to eq(42)
+          expect(decrypted_token_body[:masq_sub]).to eq(24)
+        end
+
+        it "doesn't include the masq key if there is no real user" do
+          jwt = ServicesJwt.for_user(host, user, real_user: nil)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body.keys.include?(:masq_sub)).to eq(false)
+        end
+
+        it "errors without a host" do
+          expect{ ServicesJwt.for_user(nil, user) }.
+            to raise_error(ArgumentError)
+        end
+
+        it "errors without a user" do
+          expect{ ServicesJwt.for_user(host, nil) }.
+            to raise_error(ArgumentError)
+        end
       end
     end
   end

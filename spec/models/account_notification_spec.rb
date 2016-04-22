@@ -138,6 +138,21 @@ describe AccountNotification do
       expect(admin_notifications).to include(sub_account_announcement)
       expect(unenrolled_notifications).not_to include(sub_account_announcement)
     end
+
+    it "should cache based on sub_account_ids" do
+      params = {
+        subject: 'sub account notification',
+        account: @sub_account,
+      }
+      SubAccountNotification.sub_account_notification(params)
+      enable_cache do
+        root_and_sub_account = AccountNotification.for_account(Account.default, [@sub_account.id])
+        expect(root_and_sub_account.count).to eq 2
+
+        root_account_only = AccountNotification.for_account(Account.default)
+        expect(root_account_only.count).to eq 1
+      end
+    end
   end
 
   describe "survey notifications" do

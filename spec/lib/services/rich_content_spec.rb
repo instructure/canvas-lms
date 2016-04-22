@@ -54,6 +54,38 @@ module Services
         expect(env[:JWT]).to eql(jwt)
       end
 
+      it "includes a masquerading user if provided" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        masq_user = stub("masq_user", global_id: 'other global id')
+        domain = stub("domain")
+        jwt = stub("jwt")
+        Canvas::Security::ServicesJwt.stubs(:generate).
+          with(sub: user.global_id, domain: domain, masq_sub: masq_user.global_id).
+          returns(jwt)
+        env = described_class.env_for(root_account,
+          user: user, domain: domain, real_user: masq_user)
+        expect(env[:JWT]).to eql(jwt)
+      end
+
+      it "does not allow file uploading without context" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        env = described_class.env_for(root_account, user: user)
+        expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+      end
+
+      it "lets context decide if uploading is ok" do
+        root_account = stub("root_account", feature_enabled?: true)
+        user = stub("user", global_id: 'global id')
+        context1 = stub("allowed_context", grants_any_right?: true)
+        context2 = stub("forbidden_context", grants_any_right?: false)
+        env1 = described_class.env_for(root_account, user: user, context: context1)
+        env2 = described_class.env_for(root_account, user: user, context: context2)
+        expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(true)
+        expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
+      end
+
       context "with only lowest level flag on" do
         let(:root_account){ stub("root_account") }
 

@@ -63,6 +63,13 @@ describe SubmissionComment do
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 
+    it "should not dispatch notification on create if student is inactive" do
+      @student.enrollments.first.deactivate
+
+      @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
+    end
+
     it "should not dispatch notification on create for provisional comments" do
       @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional => true)
       expect(@comment.messages_sent).to be_empty

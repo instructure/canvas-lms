@@ -77,6 +77,7 @@ nb:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "Godkjente formater: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjente formater: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Godtatt: %{user}, %{role_type}, kurs, %{course}"
+  access_token_3be22221: Tilgangssymbol
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig frem til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangsnøkler kan brukes for å tillate andre applikasjoner til å gjøre API-oppkall på dine vegne. Du kan også generere tilgangsnøkler og bruke *Canvas Open API* for å finne på dine egne integrasjoner."
   accordion_section_1_7888782d: "Accordion-seksjon 1"
@@ -610,6 +611,11 @@ nb:
       delete_button: "Slett %{user}"
       page_title: "Bekreft sletting"
       title: "Bekreft sletting av %{user} fra %{account}"
+    consortium_user_search: 
+      find_user_by: "Finn en bruker via innlogging/epost"
+      find_user_by_label: Innlogging/epost
+    consortium_users: 
+      user_search_label: Brukersøk
     course: 
       course_unpublished_title: "Dette kurset er ikke publisert enda"
       course_unpublished_tooltip: "Ikke publisert"
@@ -1268,6 +1274,7 @@ nb:
   activity_by_date_878c5b49: "Aktivitet etter Dato"
   add_2nd_review_ea988088: "Legg til vurdering nr 2."
   add_8523c19b: "Legg til"
+  add_a_course_b72b18d7: "Legg til et kurs"
   add_a_new_announcement_878b717f: "Legg til en ny kunngjøring"
   add_a_new_course_4a041207: "Legg til et nytt kurs"
   add_a_new_user_c440d053: "Legg til en ny bruker"
@@ -1541,6 +1548,8 @@ nb:
         suspended: "Institusjonen er suspendert"
     wiki_front_page_default_content_course: "Velkommen til din nye kurswiki!"
     wiki_front_page_default_content_group: "Velkommen til din nye gruppe-wiki!"
+  application_id_2aa1640f: "Søknads ID"
+  application_secret_e6803c7e: "Hemmelig søknad"
   apply_781a2546: Bruk
   apply_changes_b1dffc70: "Bruk endringer"
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stiler til underkontoer"
@@ -1578,7 +1587,9 @@ nb:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere dette profilbildet?"
   arrange_by_34a545de: "Sortere etter"
   arrange_columns_by_assignment_group_33acdf03: "Ordne kolonner etter Innleveringsgruppe"
+  arrange_columns_by_assignment_group_59bbddd0: "Ordne kolonner etter oppgavegruppe"
   arrange_columns_by_due_date_888f2551: "Ordne kolonner av fristdato"
+  arrange_columns_by_due_date_f74f9e2d: "Ordne kolonner etter dato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Etter hvert som du skriver tekst i dette feltet, vil listen over resultater bli oppdatert."
   assessment_by_name_7b879a2c: "Vurdert av %{name}"
@@ -2288,6 +2299,7 @@ nb:
     corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
     logout: "LOGG UT"
+  authentication_with_provider_was_successful_but_no_6a194137: "Autentisering med %{provider} var vellykket, men ingen unik ID for å logge på Canvas ble gitt."
   authorize_e3f25bb4: Autoriser
   available_8606e40c: Tilgjengelig
   available_after_unlock_at_b5682224: "Tilgjengelig etter %{unlock_at}"
@@ -2338,6 +2350,7 @@ nb:
     recording_setting_enabled_description: "Aktiver innspilling for denne konferansen"
   blackboard: 
     no_manifest: "Denne Blackboard-zipfilen har ingen imsmanifest.xml-fil i rotmappen."
+  blocked_by_running_migration_d8a57cb7: "Blokkert ved å kjøre migrasjon"
   blue_daf8fea9: Blå
   body_shadow_d36e8c2e: Brødtekst-skygge
   bookmark_service: 
@@ -2964,6 +2977,8 @@ nb:
           other: "*%{count}* deltagere"
       titles: 
         collaboration: Samarbeid
+    collaboration_footer: 
+      started_by: "Startet av *%{user}*, %{at}"
     collaborator_picker: 
       labels: 
         available_groups: "Tilgjengelige grupper"
@@ -2975,6 +2990,9 @@ nb:
         people: Personer
         remove_all: "Fjern alle"
       member_instructions: "Klikk eller merk en bruker eller gruppe i venstre kolonne for å legge til samarbeidspartnere."
+    delete_button: 
+      links: 
+        delete: "Slett dette samarbeidet"
     edit: 
       buttons: 
         cancel: Avbryt
@@ -2982,6 +3000,9 @@ nb:
       labels: 
         description: "Beskrivelse:"
         title: Samarbeidstittel
+    edit_button: 
+      links: 
+        edit: "Rediger dette samarbeidet"
     errors: 
       cannot_load_collaboration: "Kan ikke laste Samarbeid"
       create_failed: "Etablering av Samarbeid mislyktes"
@@ -3136,6 +3157,7 @@ nb:
   complete_icon_7455be93: "fullført ikon"
   complete_one_item_90e5fb03: "Fullfør ett element"
   completed_19711ce7: Fullført
+  completed_9b809e44: fullført
   completed_icon_521596e4: "fullført ikon"
   concluded_conferences_cdbe53f9: "Avsluttende konferanser"
   concluded_courses_94782e21: "Konkludert Kurs"
@@ -4463,13 +4485,13 @@ nb:
         status_link: "Importere Status"
         text: "Ett eller flere elementer blir nå importert. De vil bli vist i kurset under en gang når de er tilgjengelige."
     index: 
-      browse_more_courses: "Bla gjennom flere kurs"
+      browse_more_courses: "Se flere kurs"
       headings: 
         future_enrollments: "Framtidige påmeldinger"
-        my_courses: "Mine kurs"
+        my_courses: "Alle kurs"
         my_groups: "Mine grupper"
         past_enrollments: "Tidligere deltagelser"
-      start_new_course: "Start et nytt kurs"
+      start_new_course: Kurs
       titles: 
         courses: Kurs
         rss: 
@@ -4975,6 +4997,7 @@ nb:
       student: 
         count: "Feil studentantall"
         ratio: "Feil studentratio"
+  current_367624e9: Nåværende
   current_courses_d5287d50: "Gjeldende kurs"
   current_grading_standard_for_this_assignment_64c5375e: "Nåværende vurderingsstandard for denne oppgaven"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Nåværende Mestring Poeng: %{score} out of %{mastery_points}"
@@ -5649,6 +5672,7 @@ nb:
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis samtlige vurderinger når \"Alle vurderingerperiodene\" nedtrekksmenyvalg er  valgt (Flere vurderingerperioder må være aktivert)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis poengsummene for \"Alle karakterperiodene\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Fordeling av aktuelle karakterer i kurs på tvers av alle innrullerte studenter i organisasjonens kurs."
+  district_id_6f408184: "Distrikt ID"
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like luker på %{num_minutes} minutter. *Gå*"
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er påkrevd"
@@ -5844,6 +5868,7 @@ nb:
   end_date_cannot_be_before_start_date_eb62ed6d: "Sluttdato kan ikke være før startdato"
   end_date_e0093ed7: Sluttdato
   ending_date_e1ea13a4: Sluttdato
+  enrolled_as_272da3b9: "Påmeldt som"
   enrollment: 
     default_course_name: Kurs
     default_email: "Ingen epost"
@@ -6392,6 +6417,7 @@ nb:
   fair_score_554e2558: "Rettferdig poengsum"
   fair_use_bee47d77: "Virkelig Bruk"
   favicon_6e658914: Favicon
+  favorites_c7e0207c: Favoritter
   feature_flags: 
     feature_flag: 
       allow: Tillat
@@ -6528,6 +6554,7 @@ nb:
   filled_5d8c39e: Utfylt
   filter_announcements_by_unread_495eeeb3: "filtrer annonseringer med ulest"
   filter_by_name_34cbe139: "Filtrer etter navn"
+  filter_by_student_name_or_secondary_id_83dc524f: "Filtrer etter studentnavn eller sekundær ID"
   filter_discussions_by_assignments_757924ed: "filtrer diskusjoner med oppdrager"
   filter_discussions_by_unread_6c48322: "filtrer diskusjoner med ulest"
   filter_e3398407: Filter
@@ -6807,6 +6834,7 @@ nb:
       switch_to_percent: "Bytt til prosent"
       switch_to_points: "Bytt til poeng"
     ungraded: "Ikke tatt med i sensur"
+  gradebook_1620a0aa: Karakterbok
   gradebook_csvs: 
     grades_filename: Vurderinger
   gradebook_performance_764d8b3d: Vurderingsbok-ytelse
@@ -6999,6 +7027,7 @@ nb:
       publish_to_sis: "Publiser vurderinger til SIS"
       set_group_weights: "Still gruppevekter"
       show_concluded_enrollments: "Vis konkluderte påmeldinger"
+      show_inactive_enrollments: "Vis inaktive påmeldinger"
       view_grading_history: "Vis vurderingshistorie"
     screenreader: 
       page_titles: "Karakteroversikt: Individuell visning"
@@ -7695,6 +7724,7 @@ nb:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiver, vil moduler har muligheten til å bli markert som fullført når kun ett av kravene er møtt."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Når aktivert, blir ikke søkeparametre kopiert til POST-body under en LTI-lansering"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktivert, vil brukerne kunne konfigurere LTI 2 verktøy."
+  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Om ingen er valgt, sendt til alle på hele kontoen)"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du endrer oppdragets poeng mulig må du gi karakter oppdraget på nytt."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Om du konfigurerer innstillinger som gjør at du ikke kan logge inn, kan du åpne vanlig Canvas på %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke velger bruksrettigheter nå, vil denne filen være upublisert etter at den er lastet opp."
@@ -7780,6 +7810,7 @@ nb:
   increase_indent_6af90f7c: "Øk innryk"
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering generert mot en forrige SIS-import."
   indigo_2035fc55: Indigo
+  individual_view_81c2f124: "Individuell visning"
   info: 
     old_styleguide: 
       create_collection: "Opprett en samling"
@@ -7877,6 +7908,7 @@ nb:
   invite_5b1fcbcd: Inviter
   ip_filter_is_not_valid_152a46d8: "IP-filteret er ikke gyldig."
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
+  it_took_too_long_to_login_please_try_again_c1ed2e28: "Det tok for lang tid å logge inn. Vennligst prøv igjen"
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} støttes ikke for øyeblikket"
@@ -8006,6 +8038,7 @@ nb:
       view_all_or_customize: "Vis alle eller Tilpass"
     mobile_auth: 
       log_in_to_canvas: "Logg inn på Canvas"
+  learning_mastery_5fc34276: Læremestring
   learning_mastery_gradebook_description: |-
       Karakterbok for mestringsbaserte læring gir lærerne en rask måte å vise studentenes og kursets
       fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
@@ -8340,7 +8373,7 @@ nb:
       save_failed: "Lagring ser ut til å ha mislyktes. Lukk denne boksen for å prøve igjen."
       save_failed_try_again: "Innlegget kunne ikke lagres. Prøv igjen."
       upload_failed: "Opplasting feilet med feilen:"
-    file_size_error: "Størrelsen på %{file} er større enn maksimum %{max} tillatt størrelse på filer."
+    file_size_error: "Størrelsen på %{file} er større enn den maksimale %{max} MB tillatte filstørrelse."
     file_type_error: "%{file} er ikke en akseptert %{type} fil."
     links: 
       minimize_embedded_kaltura_content: "Minimer inkludert innhold"
@@ -10400,6 +10433,7 @@ nb:
   next_message_780bcf24: "Neste melding"
   next_module_item_9bb8a222: "Neste modul/element"
   next_steps_ce0f0d0c: "Neste steg"
+  nickname_1e6da3ad: Kallenavn
   nickname_7df95b09: "Kallenavn:"
   no_assignment_name_adbb215b: "Ingen Overdragelse Navn"
   no_broken_links_found_38d951e3: "Ingen lenkebrudd funnet"
@@ -11330,6 +11364,10 @@ nb:
       labels: 
         password: "Passord for autentisering"
         username: "Brukernavn for autentisering"
+    microsoft_settings: 
+      labels: 
+        application_id: "Søknads ID"
+        application_secret: "Hemmelig søknad"
     notices: 
       settings_updated: "Innstillinger for programtillegg ble oppdatert."
     panda_pub_settings: 
@@ -13372,6 +13410,7 @@ nb:
   reply_to_main_discussion_29823888: "Reply to Main Discussion"
   reply_to_topic_12412b0f: "Svar på temaet"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettigheter for opplastede filer"
+  requirement_f5b75da1: Krav
   reregister_9ab95a57: "Registrere på nytt"
   reregister_toolname_3dde0bfc: "Registrere %{toolName} på nytt"
   reserved_f247b60b: Reservert
@@ -13954,6 +13993,7 @@ nb:
     overwrite: "Overskriv karakterene som er lagt inn allerede"
     set_grades_button: "Sett standardkarakter"
     set_grades_button_loading: "Setter vurderinger…"
+  set_group_weights_fd41c1f: "Sett vekting for grupper"
   settings: 
     recaptcha_settings: 
       instructions: |-
@@ -14055,14 +14095,16 @@ nb:
         download_message_intro: "Ditt Student innleveringer blir samlet."
         download_submissions: "Laste ned alle innleveringer"
     current_enrollment: 
-      enrolled_as_designer: "Påmeldt som designer"
-      enrolled_as_observer: "Påmeldt som observatør"
-      enrolled_as_student: "Påmeldt som student"
-      enrolled_as_ta: "Påmeldt som LA"
-      enrolled_as_teacher: "Påmeldt som faglærer"
+      enrolled_as_designer: Designer
+      enrolled_as_observer: Observere
+      enrolled_as_student: Student
+      enrolled_as_ta: TA
+      enrolled_as_teacher: Lærer
       favorited_tooltip: "Klikk for å fjerne fra kurs menyen."
       nonfavorited_tooltip: "Klikk for å legge til kurs menyen."
-      unpublished_course: upublisert
+      published_course: Ja
+      published_course_tooltip: "Dette kurset har blitt publisert."
+      unpublished_course: Nei
       unpublished_course_tooltip: "Kurset har ikke blitt publisert. Studenter bør ta kontakt med faglærer for tilgang."
     custom_search_results: 
       links: 
@@ -14662,6 +14704,7 @@ nb:
   show_current_grade_5bf4e0d9: "Vis gjeldende vurdering"
   show_dashcard_view_76078ecb: "Vis oversikt"
   show_final_grade_a95e14dc: "Vis endelig karakter"
+  show_inactive_enrollments_8f4c4824: "Vis inaktive påmeldinger"
   show_links_to_unpublished_content_30c0450d: "Vis lenker til innhold som ikke er publisert"
   show_lti_2_configuration_ui_94ce35a9: "Vis LTI 2 Konfigurasjon UI"
   show_me_76823679: "Vis meg"
@@ -15292,6 +15335,7 @@ nb:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet vises som vannmerke i bakgrunnen på siden din. Godkjente formater: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommaseparert liste over URL's til å stole på. Tillitsfulle noen URL's i denne listen vil hoppe over CSRF token ved pålogging til Canvas"
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er et avsluttet kurs , så bare konkludert påmeldingene er tilgjengelig."
+  this_is_a_message_for_name_7abf1e39: "Dette er en beskjed til *%{name}*"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Dette er nåværende valgt karakter for denne studenten"
   this_is_the_default_email_address_f3c421fb: "Dette er standard e-postadresse"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Dette elementet vises på nytt når en ny innleveringen er foretatt."
@@ -15821,7 +15865,9 @@ nb:
       notifications: Varsler
       profile: Profil
       settings: Innstillinger
+  user_profile_picture_46bffbc7: "Brukers profilbilde"
   user_s_settings_d65644b4: "Innstillinger for %{user}"
+  user_search_results_f5445b8b: "Brukers søkeresultat"
   user_selected_answer: "Du valgte"
   user_selected_wrong: "Riktige svaret var %{correct_answer_text}."
   user_service: 
@@ -16091,6 +16137,7 @@ nb:
           og i toppmenyen. I mellomtiden kan du melde deg på 
           flere kurs eller fylle inn informasjon i din profil.
       welcome_to_happiness: "Velkommen til Canvas!"
+  users_d1b60cb0: Brukere
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukere av skjermlesere trenger kanskje å slå av den virtuelle markøren for å kunne bruke disse tastatursnarveiene"
   validate: 
     is_required: "Dette feltet er obligatorisk"
@@ -16107,6 +16154,7 @@ nb:
   view_course_analytics_eefe6b2: "Vis Kurs Analytics"
   view_file_8a1c62e5: "Vis fil"
   view_grades_8d3bae6c: "Vis vurderinger"
+  view_grading_history_e64bb8fe: "Se på karakterhistorikk"
   view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_next_file_a8a4a885: "Se neste fil"
