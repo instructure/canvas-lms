@@ -351,11 +351,11 @@ module ApplicationHelper
                 has_active = false
                 possible_items.each do |item|
                   while item.indent > current_indent
-                    subtext << '<ul>'
+                    subtext << '<li><ul>'
                     current_indent+=1
                   end
                   while item.indent < current_indent
-                    subtext << '</ul>'
+                    subtext << '</ul></li>'
                     current_indent-=1
                   end
                   liclass = ''
@@ -373,7 +373,7 @@ module ApplicationHelper
 
                 # cleanup any tags at the end
                 while 0 < current_indent
-                  subtext << '</ul>'
+                  subtext << '</ul></li>'
                   current_indent-=1
                 end
 
