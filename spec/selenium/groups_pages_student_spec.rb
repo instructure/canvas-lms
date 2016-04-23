@@ -32,7 +32,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "home page" do
-      it_behaves_like 'home_page', 'student'
+      it_behaves_like 'home_page', :student
 
       it "should only allow group members to access the group home page", priority: "1", test_id: 319908 do
         get url
@@ -43,7 +43,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
-      it_behaves_like 'announcements_page', 'student'
+      it_behaves_like 'announcements_page', :student
 
       it "should allow group members to delete their own announcements", priority: "1", test_id: 326521 do
         create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
@@ -75,7 +75,7 @@ describe "groups" do
         wait_for_ajaximations
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        expect(fj('.discussion-summary').text).to include_text('Rey is Yodas daughter ')
+        expect(f('.discussion-summary').text).to include_text('Rey is Yodas daughter ')
       end
 
       it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do
@@ -105,7 +105,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "people page" do
-      it_behaves_like 'people_page', 'student'
+      it_behaves_like 'people_page', :student
 
       it "should display and show a list of group members", priority: "1", test_id: 273614 do
         get people_page
@@ -123,7 +123,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      it_behaves_like 'discussions_page', 'student'
+      it_behaves_like 'discussions_page', :student
 
       it "should allow discussions to be created within a group", priority: "1", test_id: 273615 do
         get discussions_page
@@ -186,7 +186,7 @@ describe "groups" do
         type_in_tiny('textarea[name=message]','The slopes are ready,')
         f('.btn-primary').click
         wait_for_ajaximations
-        expect(fj('.user_content').text).to include_text('The slopes are ready,')
+        expect(f('.user_content').text).to include_text('The slopes are ready,')
       end
 
       it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
@@ -203,7 +203,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      it_behaves_like 'pages_page', 'student'
+      it_behaves_like 'pages_page', :student
 
       it "should allow group members to create a page", priority: "1", test_id: 273611 do
         get pages_page
@@ -228,7 +228,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "Files page" do
-      it_behaves_like 'files_page', 'student'
+      it_behaves_like 'files_page', :student
 
       it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
         get files_page
@@ -295,7 +295,7 @@ describe "groups" do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
       end
 
-      it_behaves_like 'conferences_page', 'student'
+      it_behaves_like 'conferences_page', :student
 
       it "should allow access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
         get conferences_page

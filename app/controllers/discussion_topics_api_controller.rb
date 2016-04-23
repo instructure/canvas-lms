@@ -118,8 +118,23 @@ class DiscussionTopicsApiController < ApplicationController
         User.find(shard_ids)
       end
 
+      include_enrollment_state = params[:include_enrollment_state] && (@context.is_a?(Course) || @context.is_a?(Group)) &&
+        @context.grants_right?(@current_user, session, :read_as_admin)
+      enrollments = nil
+      if include_enrollment_state
+        enrollment_context = @context.is_a?(Course) ? @context : @context.context
+        all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
+        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+      end
+
       participant_info = participants.map do |participant|
-        user_display_json(participant, @context.is_a_context? && @context)
+        json = user_display_json(participant, @context.is_a_context? && @context)
+        if include_enrollment_state
+          enrolls = all_enrollments.select{|e| e.user_id == participant.id}
+          json[:isInactive] = enrolls.any? && enrolls.all?(&:inactive?)
+        end
+
+        json
       end
 
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)

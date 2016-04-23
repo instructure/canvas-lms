@@ -18,19 +18,6 @@
 
 module AuthenticationMethods
 
-  def authorized(*groups)
-    authorized_roles = groups
-    return true
-  end
-
-  def authorized_roles
-    @authorized_roles ||= []
-  end
-
-  def consume_authorized_roles
-    authorized_roles = []
-  end
-
   def load_pseudonym_from_policy
     if (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
@@ -74,6 +61,11 @@ module AuthenticationMethods
       @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
       unless @current_user && @current_pseudonym
         raise AccessTokenError
+      end
+      if services_jwt.masquerading_user_global_id
+        @real_current_user = User.find(services_jwt.masquerading_user_global_id)
+        @real_current_pseudonym = @real_current_user.find_pseudonym_for_account(@domain_root_account, true)
+        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
     rescue JSON::JWT::InvalidFormat,             # definitely not a JWT

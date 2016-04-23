@@ -25,7 +25,7 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.5.2'
+gem 'switchman', '1.5.3'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -54,7 +54,7 @@ gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.33'
+gem 'ims-lti', '2.0.0.beta.37', require: 'ims'
 gem 'json', '1.8.2'
 gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false
@@ -99,9 +99,9 @@ gem 'useragent', '0.10.0', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
-gem 'sentry-raven', '0.15.3', require: false
+gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '1.0.3'
-gem 'diplomat', '0.14.0', require: false
+gem 'diplomat', '0.15.0', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'

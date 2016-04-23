@@ -33,6 +33,7 @@ describe "context modules" do
       modules[0].add_item({id: @assignment2.id, type: 'assignment'})
       get "/courses/#{@course.id}/modules"
       ff(".icon-mini-arrow-down")[1].click
+      wait_for_ajaximations
     end
 
     it "should show all module items", priority: "1", test_id: 126743 do
@@ -165,6 +166,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
+      check_element_has_focus f("#add_context_module_form .assignment_picker")
       expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
@@ -461,8 +463,8 @@ describe "context modules" do
 
       mod1 = @course.context_modules.where(:name => first_module_name).first
       mod3 = @course.context_modules.where(:name => third_module_name).first
-      context_module = f("#context_module_#{mod3.id}")
-      driver.action.move_to(context_module).perform
+
+      move_to_click("#context_module_#{mod3.id}")
       f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
       f("#context_module_#{mod3.id} .edit_module_link").click
       expect(add_form).to be_displayed
@@ -549,7 +551,8 @@ describe "context modules" do
       wait_for_ajaximations
 
       # Select other radio button
-      fj('#context_module_requirement_count_1').click
+      radio_to_click = f('#context_module_requirement_count_1')
+      driver.action.move_to(radio_to_click).click.perform
       submit_form(edit_form)
       wait_for_ajaximations
 
@@ -580,11 +583,11 @@ describe "context modules" do
     it "should validate locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
-      lock_check = add_form.find_element(:id, 'unlock_module_at')
-      lock_check.click
+      lock_check_click(add_form)
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).to be_displayed
-      lock_check.click
+      # verify unlock
+      lock_check_click(add_form)
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
@@ -599,9 +602,7 @@ describe "context modules" do
       expect(f('#add_context_module_form')).to be_displayed
 
       edit_form = f('#add_context_module_form')
-
-      lock_check = edit_form.find_element(:id, 'unlock_module_at')
-      lock_check.click
+      lock_check_click(edit_form)
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
       unlock_date.send_keys((Date.today + 2.days).to_s)
@@ -747,6 +748,7 @@ describe "context modules" do
       end
 
       it "should use the keyboard shortcuts to navigate through modules and module items" do
+        skip_if_chrome('research - focus on HTML')
         # Test these shortcuts (access menu by pressing comma key):
         # Up : Previous Module/Item
         # Down : Next Module/Item

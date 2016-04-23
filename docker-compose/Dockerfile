@@ -14,11 +14,12 @@ RUN  apt-get update -qq \
 
 # We will need sfnt2woff in order to build fonts
 WORKDIR /root
-RUN curl -O http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
+RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
+  && curl -O http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
   && unzip woff-code-latest.zip \
   && make \
   && cp sfnt2woff /usr/local/bin \
-  && gem uninstall --all --ignore-dependencies --force bundler \
+  && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v 1.11.2 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 

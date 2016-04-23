@@ -361,15 +361,6 @@ describe "dashboard" do
       # submission page should load
       expect(f('h2').text).to eq "Submission Details"
     end
-  end
-
-  context "as a teacher" do
-
-    before (:each) do
-      course_with_teacher_logged_in(:active_cc => true)
-    end
-
-    it_should_behave_like 'load events list'
 
     it "should validate the functionality of soft concluded courses on courses page", priority: "1", test_id: 216374 do
       term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
@@ -379,10 +370,30 @@ describe "dashboard" do
       c1.name = 'a_soft_concluded_course'
       c1.update_attributes!(:enrollment_term => term)
       c1.reload
-
       get "/courses"
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
+
+    context "course menu customization" do
+
+      it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
+        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+        get "/"
+        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+        wait_for_ajaximations
+        expect(fj('#courses_menu_item')).to include_text('My Courses')
+        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+      end
+    end
+  end
+
+  context "as a teacher" do
+
+    before (:each) do
+      course_with_teacher_logged_in(:active_cc => true)
+    end
+
+    it_should_behave_like 'load events list'
 
     context "restricted future courses" do
       before :once do
@@ -444,41 +455,6 @@ describe "dashboard" do
 
         #verify todo list is updated
         expect(f('.to-do-list > li')).to be_nil
-      end
-    end
-
-    it "should show submitted essay quizzes in the todo list", priority: "1", test_id: 216377 do
-      quiz_title = 'new quiz'
-      student_in_course(:active_all => true)
-      q = @course.quizzes.create!(:title => quiz_title)
-      q.quiz_questions.create!(:question_data => {:id => 31, :name => "Quiz Essay Question 1", :question_type => 'essay_question', :question_text => 'qq1', :points_possible => 10})
-      q.generate_quiz_data
-      q.workflow_state = 'available'
-      q.save
-      q.reload
-      qs = q.generate_submission(@user)
-      qs.mark_completed
-      qs.submission_data = {"question_31" => "<p>abeawebawebae</p>", "question_text" => "qq1"}
-      Quizzes::SubmissionGrader.new(qs).grade_submission
-      get "/"
-
-      todo_list = f('.to-do-list')
-      expect(todo_list).not_to be_nil
-      expect(todo_list).to include_text(quiz_title)
-    end
-
-    context "course menu customization" do
-
-      it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216378 do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
-
-        get "/"
-
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        expect(fj('#courses_menu_item')).to include_text('My Courses')
-        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
       end
     end
   end

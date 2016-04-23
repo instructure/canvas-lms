@@ -40,14 +40,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @assignment = @course.assignments.create(:name => assignment_name)
       get "/courses/#{@course.id}/pages/front-page/edit"
       wait_for_ajaximations
-      fj('a.switch_views:visible').click
       clear_wiki_rce
-      fj('a.switch_views:visible').click
       #check assignment accordion
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
       keep_trying_until { expect(accordion.find_element(:link, assignment_name)).to be_displayed }
       accordion.find_element(:link, assignment_name).click
+      wait_for_ajaximations
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce')).to include_text(assignment_name)
       end

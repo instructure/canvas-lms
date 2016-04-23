@@ -17,13 +17,36 @@
 #
 
 class UserObserver < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :observer, :class_name => 'User'
-  attr_accessible
+  belongs_to :user, inverse_of: :user_observees
+  belongs_to :observer, :class_name => 'User', inverse_of: :user_observers
+  strong_params
 
   after_create :create_linked_enrollments
 
   validate :not_same_user, :if => lambda { |uo| uo.changed? }
+
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+
+  def self.create_or_restore(attributes)
+    UserObserver.unique_constraint_retry do
+      if (user_observer = where(attributes).take)
+        if user_observer.workflow_state == 'deleted'
+          user_observer.workflow_state = 'active'
+          user_observer.save!
+        end
+      else
+        user_observer = create!(attributes)
+      end
+      user_observer.user.touch
+      user_observer
+    end
+  end
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save!
+  end
 
   def not_same_user
     self.errors.add(:observer_id, "Cannot observe yourself") if self.user_id == self.observer_id

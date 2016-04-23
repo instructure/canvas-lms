@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,14 +14,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+module Lti
+  class MembershipServiceController < ApplicationController
+    before_filter :require_context
+    before_filter :require_user
 
-require File.expand_path('../spec_helper.rb', File.dirname(__FILE__))
+    def index
+      @page = MembershipService::PagePresenter.new(@context,
+                                                   @current_user,
+                                                   request.base_url,
+                                                   membership_service_params)
+      render json: @page
+    end
 
-describe InboxItem do
-  it "should truncate its title to 255 characters on validation" do
-    long_subject = ' Re: Re: ' + (0..299).map { 'a' }.join('')
-    inbox_item   = InboxItem.new(:subject => long_subject)
-    inbox_item.valid?
-    expect(inbox_item.subject).to match(/^a{255}$/)
+    private
+
+    def membership_service_params
+      keys = %w(role page per_page)
+      params.select { |k,_| keys.include?(k) }
+    end
   end
 end

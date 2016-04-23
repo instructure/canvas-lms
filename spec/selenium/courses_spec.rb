@@ -132,6 +132,7 @@ describe "courses" do
       end
 
       it "should open up the choose home page dialog from the wizard" do
+        skip_if_chrome('research')
         course_with_teacher_logged_in
         create_new_course
 
@@ -175,38 +176,40 @@ describe "courses" do
       end
 
       it "should complete 'Select Navigation Links' checklist item" do
+        skip_if_chrome('research')
         course_with_teacher_logged_in
         get "/courses/#{@course.id}"
 
         # Navigate to Navigation tab
         go_to_checklist
-        f('#wizard_select_navigation').click()
-        f('.ic-wizard-box__message-button a').click()
+        f('#wizard_select_navigation').click
+        f('.ic-wizard-box__message-button a').click
 
         # Modify Naviagtion
-        f('#navigation_tab').click()
-        f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click()
-        f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click()
-        f('#tab-navigation .btn').click()
+        f('#navigation_tab').click
+        f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click
+        f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click
+        f('#tab-navigation .btn').click
 
         go_to_checklist
         check_if_item_complete('select_navigation')
       end
 
       it "should complete 'Add Course Calendar Events' checklist item" do
+        skip_if_chrome('research')
         course_with_teacher_logged_in
         get "/courses/#{@course.id}"
 
         # Navigate to Calendar tab
         go_to_checklist
-        f('#wizard_course_calendar').click()
-        f('.ic-wizard-box__message-button a').click()
+        f('#wizard_course_calendar').click
+        f('.ic-wizard-box__message-button a').click
 
         # Add Event
-        f("#create_new_event_link").click()
+        f("#create_new_event_link").click
         wait_for_ajaximations
         replace_content(f('#edit_calendar_event_form #calendar_event_title'), "Event")
-        f("#edit_calendar_event_form button.event_button").click()
+        f("#edit_calendar_event_form button.event_button").click
         wait_for_ajaximations
 
         go_to_checklist
@@ -214,13 +217,14 @@ describe "courses" do
       end
 
       it "should complete 'Publish the Course' checklist item" do
+        skip_if_chrome('research')
         course_with_teacher_logged_in
         get "/courses/#{@course.id}"
 
         # Publish from Checklist
         go_to_checklist
-        f('#wizard_publish_course').click()
-        f('.ic-wizard-box__message-button button').click()
+        f('#wizard_publish_course').click
+        f('.ic-wizard-box__message-button button').click
 
         go_to_checklist
         check_if_item_complete('publish_course')

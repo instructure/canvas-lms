@@ -56,6 +56,7 @@ describe "assignments turn it in" do
   end
 
   it "should create turnitin settings" do
+    skip_if_chrome('issue with change_turnitin_settings method')
     expect {
       get "/courses/#{@course.id}/assignments/new"
       f('#assignment_name').send_keys('test assignment')
@@ -67,6 +68,7 @@ describe "assignments turn it in" do
   end
 
   it "should edit turnitin settings" do
+    skip_if_chrome('issue with change_turnitin_settings method')
     assignment = @course.assignments.create!(
         :name => 'test assignment',
         :due_at => (Time.now.utc + 2.days),

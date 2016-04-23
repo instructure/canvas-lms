@@ -1,7 +1,10 @@
 require "fileutils"
 
 module SeleniumDriverSetup
-  RECENT_SPEC_RUNS_LIMIT = 10
+  # Number of recent specs to show in failure pages
+  RECENT_SPEC_RUNS_LIMIT = 500
+  # Number of identical failures in a row before we abort this worker
+  RECENT_SPEC_FAILURE_LIMIT = 10
 
   def setup_selenium
 
@@ -100,7 +103,7 @@ module SeleniumDriverSetup
     begin
       tries ||= 3
       puts "Thread: provisioning selenium chrome ruby driver"
-      driver = Selenium::WebDriver.for :chrome
+      driver = Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
     rescue StandardError => e
       puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
       sleep 2
@@ -203,15 +206,19 @@ module SeleniumDriverSetup
     "http://#{$app_host_and_port}"
   end
 
-  def self.note_recent_spec_run(example)
+  def self.note_recent_spec_run(example, exception)
     @recent_spec_runs ||= []
-    @recent_spec_runs << { location: example.metadata[:location], exception: example.exception }
+    @recent_spec_runs << {
+      location: example.metadata[:location],
+      exception: exception,
+      pending: example.pending
+    }
     @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
 
     if ENV["ABORT_ON_CONSISTENT_BADNESS"]
-      recent_errors = @recent_spec_runs.map { |run| run[:exception] && run[:exception].to_s }.compact
-      if recent_errors.size >= RECENT_SPEC_RUNS_LIMIT && recent_errors.uniq.size == 1
-        $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_RUNS_LIMIT} times in a row, aborting"
+      recent_errors = @recent_spec_runs.last(RECENT_SPEC_FAILURE_LIMIT).map { |run| run[:exception] && run[:exception].to_s }.compact
+      if recent_errors.size >= RECENT_SPEC_FAILURE_LIMIT && recent_errors.uniq.size == 1
+        $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_FAILURE_LIMIT} times in a row, aborting"
         RSpec.world.wants_to_quit = true
       end
     end
@@ -224,9 +231,9 @@ module SeleniumDriverSetup
     end
   end
 
-  def record_errors(example, log_messages)
+  def record_errors(example, exception, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
-    return unless js_errors.present? || example.exception
+    return unless js_errors.present? || exception
 
     # always send js errors to stdout, even if the spec passed. we have to
     # empty the JSErrorCollector anyway, so we might as well show it.
@@ -236,7 +243,7 @@ module SeleniumDriverSetup
       puts "  JS Error: #{error["errorMessage"]} (#{error["sourceName"]}:#{error["lineNumber"]})"
     end
 
-    return unless example.exception && ENV["CAPTURE_SCREENSHOTS"]
+    return unless exception && ENV["CAPTURE_SCREENSHOTS"]
 
     errors_path = Rails.root.join("log/seleniumfailures")
     FileUtils.mkdir_p(errors_path)
@@ -245,7 +252,7 @@ module SeleniumDriverSetup
     screenshot_name = summary_name + ".png"
     driver.save_screenshot(errors_path.join(screenshot_name))
 
-    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs.map { |r| r[:location] }
+    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
 
     log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
 

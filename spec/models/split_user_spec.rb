@@ -28,7 +28,7 @@ describe SplitUsers do
     describe 'with merge data' do
 
       it 'should split multiple users if no merge_data is specified' do
-        enrollment1 = course1.enroll_user(user1)
+        enrollment1 = course1.enroll_student(user1, enrollment_state: 'active')
         enrollment2 = course1.enroll_student(user2, enrollment_state: 'active')
         enrollment3 = course2.enroll_student(user1, enrollment_state: 'active')
         enrollment4 = course3.enroll_teacher(user1)
@@ -44,10 +44,58 @@ describe SplitUsers do
         expect(user2).not_to be_deleted
         expect(user3).not_to be_deleted
         expect(enrollment1.reload.user).to eq user1
+        expect(enrollment1.workflow_state).to eq 'active'
         expect(enrollment2.reload.user).to eq user2
         expect(enrollment3.reload.user).to eq user1
         expect(enrollment4.reload.user).to eq user1
         expect(enrollment5.reload.user).to eq user3
+      end
+
+      it 'should handle user_observers' do
+        observer1 = user_model
+        observer2 = user_model
+        user1.observers << observer1
+        user2.observers << observer2
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.observers).to eq [observer1]
+        expect(user2.observers).to eq [observer2]
+      end
+
+      it 'should handle user_observees' do
+        observee1 = user_model
+        observee2 = user_model
+        observee1.observers << user1
+        observee2.observers << user2
+        UserMerge.from(user1).into(user2)
+
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees).to eq observee1.user_observers
+        expect(user2.user_observees).to eq observee2.user_observers
+      end
+
+      it 'should handle duplicate user_observers' do
+        observer1 = user_model
+        observee1 = user_model
+        observee1.observers << user1
+        observee1.observers << user2
+        user1.observers << observer1
+        user2.observers << observer1
+        UserMerge.from(user1).into(user2)
+        SplitUsers.split_db_users(user2)
+
+        expect(user1.user_observees.count).to eq 1
+        expect(user2.user_observees.count).to eq 1
+        expect(user1.observers).to eq [observer1]
+        expect(user2.observers).to eq [observer1]
+
+        expect(user1.user_observees.first.workflow_state).to eq 'active'
+        expect(user2.user_observees.first.workflow_state).to eq 'active'
+        expect(user1.user_observers.first.workflow_state).to eq 'active'
+        expect(user2.user_observers.first.workflow_state).to eq 'active'
       end
 
       it 'should only split users from merge_data when specified' do
@@ -89,15 +137,33 @@ describe SplitUsers do
       expect(submission.reload.user).to eq user1
     end
 
+    it 'should handle conflicting submissions' do
+      course1.enroll_student(user1, enrollment_state: 'active')
+      course1.enroll_student(user2, enrollment_state: 'active')
+      assignment = course1.assignments.new(title: "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {assignment_id: assignment.id, user_id: user1.id, grade: "1.5", url: "www.instructure.com"}
+      submission1 = Submission.create!(valid_attributes)
+      valid_attributes[:user_id] = user2.id
+      submission2 = Submission.create!(valid_attributes)
+
+      UserMerge.from(user1).into(user2)
+      expect(submission1.reload.user).to eq user1
+      expect(submission2.reload.user).to eq user2
+      SplitUsers.split_db_users(user2)
+      expect(submission1.reload.user).to eq user1
+      expect(submission2.reload.user).to eq user2
+    end
+
     it 'should restore admins' do
       admin = account1.account_users.create(user: user1)
       admin2 = sub_account.account_users.create(user: user2)
       UserMerge.from(user1).into(user2)
+      SplitUsers.split_db_users(user2)
 
-      user1.reload
-      user2.reload
-      expect(admin.user).to eq user1
-      expect(admin2.user).to eq user2
+      expect(admin.reload.user).to eq user1
+      expect(admin2.reload.user).to eq user2
     end
 
     context 'sharding' do

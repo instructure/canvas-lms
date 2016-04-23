@@ -44,6 +44,28 @@ describe Login::Oauth2Controller do
       expect(response).to_not be_redirect
     end
 
+    it "rejects logins that take more than 10 minutes" do
+      get :new, auth_type: 'facebook'
+      expect(response).to be_redirect
+      state = CGI.parse(URI.parse(response.location).query)['state'].first
+      expect(state).to_not be_nil
+
+      aac.any_instantiation.expects(:get_token).never
+      Timecop.travel(15.minutes) do
+        get :create, state: state
+        expect(response).to redirect_to(login_url)
+        expect(flash[:delegated_message]).to eq "It took too long to login. Please try again"
+      end
+    end
+
+    it "does not destroy existing sessions if it's a bogus request" do
+      session[:sentinel] = true
+
+      get :create, state: ''
+      expect(response).not_to be_success
+      expect(session[:sentinel]).to eq true
+    end
+
     it "works" do
       session[:oauth2_nonce] = 'bob'
       aac.any_instantiation.expects(:get_token).returns('token')
@@ -52,9 +74,12 @@ describe Login::Oauth2Controller do
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
 
+      session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
       get :create, state: jwt
       expect(response).to redirect_to(dashboard_url(login_success: 1))
+      # ensure the session was reset
+      expect(session[:sentinel]).to be_nil
     end
 
     it "redirects to login if no user found" do
@@ -67,6 +92,19 @@ describe Login::Oauth2Controller do
       get :create, state: jwt
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to_not be_blank
+    end
+
+    it "redirects to login if no user information returned" do
+      aac.any_instantiation.expects(:get_token).returns('token')
+      aac.any_instantiation.expects(:unique_id).with('token').returns(nil)
+
+      session[:oauth2_nonce] = 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+
+      get :create, state: jwt
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to_not be_blank
+      expect(flash[:delegated_message]).to match(/no unique ID/)
     end
 
     it "(safely) displays an error message from the server" do

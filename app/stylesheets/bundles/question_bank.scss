@@ -1,0 +1,69 @@
+@import "base/environment";
+
+#move_question_dialog .question_name {
+}
+#move_question_dialog .question_text {
+  font-size: 0.8em;
+  margin-left: 20px;
+}
+#move_question_dialog ul.questions {
+  margin: 5px 20px;
+  overflow: auto;
+  min-height: 50px;
+  max-height: 200px;
+}
+#move_question_dialog ul.questions .list_question .list_question_text {
+  padding-left: 30px;
+  color: $ic-font-color--subdued;
+  font-size: 0.8em;
+  max-height: 1.7em;
+  overflow: hidden;
+  > *:first-child { margin-top: 0; }
+}
+
+#move_question_dialog ul.banks {
+  margin: 5px 20px;
+  overflow: auto;
+  min-height: 30px;
+  max-height: 150px;
+}
+#move_question_dialog li.bank {
+  margin-bottom: 5px;
+  padding-left: 2px;
+}
+#move_question_dialog li.bank .bank_label {
+  float: left;
+}
+#move_question_dialog li.bank .bank_radio {
+  float: left;
+}
+#move_question_dialog li.bank .bank_label .bank_name {
+  display: block;
+  margin-left: $ic-sp/2;
+}
+#move_question_dialog li.bank .bank_label .context_name {
+  font-size: 0.8em;
+  display: block;
+  padding-left: 10px;
+  color: $ic-hint-text;
+}
+#questions.uneditable .question_holder .display_question .move {
+  display: none;
+}
+#questions.uneditable .question_holder .display_question .links {
+  display: none;
+}
+.bottom_links {
+  text-align: right;
+  margin-right: 10px;
+  clear: left;
+}
+#questions.uneditable .question_holder .display_question .bottom_links {
+  display: none;
+}
+
+.move_question_dialog_actions {
+  margin-top: $ic-sp;
+  text-align: right;
+  padding-bottom: $ic-sp/2;
+}

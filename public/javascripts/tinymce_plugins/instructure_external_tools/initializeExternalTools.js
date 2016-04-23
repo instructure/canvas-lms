@@ -85,11 +85,10 @@ define([
             contentItems = data.contentItems,
             itemLength = contentItems.length,
             codePayload;
-        var rceShim = new RceCommandShim()
 
         for(var i = 0; i < itemLength; i++){
           codePayload = TinyMCEContentItem.fromJSON(contentItems[i]).codePayload;
-          rceShim.send($("#" + editor.id), 'insert_code', codePayload)
+          RceCommandShim.send($("#" + editor.id), 'insert_code', codePayload)
         }
         $dialog.find('iframe').attr('src', 'about:blank');
         $dialog.dialog('close')

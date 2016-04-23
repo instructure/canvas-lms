@@ -27,6 +27,7 @@ describe "speed grader - quiz submissions" do
   end
 
   it "lets you view previous quiz submissions", priority: "1", test_id: 283743 do
+    skip_if_chrome('broken - needs research')
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     submission_dropdown = f("#submission_to_view")

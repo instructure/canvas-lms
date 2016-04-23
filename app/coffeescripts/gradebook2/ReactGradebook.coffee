@@ -130,12 +130,14 @@ define [
         hideNotesColumn: !@options.teacher_notes || @options.teacher_notes.hidden
         showAttendanceColumns: userSettings.contextGet('showAttendanceColumns')
         showConcludedEnrollments: userSettings.contextGet('showConcludedEnrollments')
+        showInactiveEnrollments: userSettings.contextGet('showInactiveEnrollments')
         arrangeBy: storedSortOrder.sortType
       _.defaults(savedPreferences, GradebookConstants.DEFAULT_TOOLBAR_PREFERENCES)
 
     initCheckboxes: (preferences) ->
       $('#show_attendance').prop('checked', preferences.showAttendanceColumns)
       $('#show_concluded_enrollments').prop('checked', preferences.showConcludedEnrollments)
+      $('#show_inactive_enrollments').prop('checked', preferences.showInactiveEnrollments)
 
     initStudentNamesOption: (preferences) ->
       namesHidden = preferences.hideStudentNames
@@ -166,6 +168,7 @@ define [
       $('#arrange_by_toggle').click(@arrangeByToggle)
       $('#notes_toggle').click(@notesToggle)
       $('#show_concluded_enrollments').change(@concludedEnrollmentsChange)
+      $('#show_inactive_enrollments').change(@inactiveEnrollmentsChange)
 
     attachSetWeightsDialogHandlers: () ->
       $.subscribe('assignment_group_weights_changed', @updateAssignmentGroupWeights)
@@ -226,6 +229,11 @@ define [
         $showConcludedEnrollments.prop('checked', true)
         return alert(I18n.t 'This is a concluded course, so only concluded enrollments are available.')
       userSettings.contextSet 'showConcludedEnrollments', $showConcludedEnrollments.prop('checked')
+      StudentEnrollmentsActions.load()
+
+    inactiveEnrollmentsChange: () =>
+      $showInactiveEnrollments = $('#show_inactive_enrollments')
+      userSettings.contextSet 'showInactiveEnrollments', $showInactiveEnrollments.prop('checked')
       StudentEnrollmentsActions.load()
 
     initHeader: ->

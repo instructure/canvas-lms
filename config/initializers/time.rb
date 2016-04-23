@@ -29,3 +29,9 @@ class ActiveSupport::TimeWithZone
     self.utc.as_json_without_utc(options)
   end
 end
+
+# Add Paraguay (Asuncion) as a friendly time zone
+ActiveSupport::TimeZone::MAPPING['Asuncion'] = 'America/Asuncion'
+ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)
+ActiveSupport::TimeZone.instance_variable_set(:@zones_map, nil)
+ActiveSupport::TimeZone.instance_variable_set(:@lazy_zones_map, nil)

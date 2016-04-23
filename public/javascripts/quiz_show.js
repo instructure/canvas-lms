@@ -33,7 +33,7 @@ define([
   'jquery.instructure_misc_plugins' /* ifExists, confirmDelete */,
   'jquery.disableWhileLoading',
   'message_students' /* messageStudents */
-], function(I18n, $, MessageStudentsDialog, showAnswerArrows, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper) {
+], function(I18n, $, MessageStudentsDialog, QuizArrowApplicator, inputMethods, Quiz, PublishButtonView, QuizLogAuditingEventDumper) {
 
 
   $(document).ready(function () {
@@ -56,7 +56,8 @@ define([
       };
     }
 
-    showAnswerArrows();
+    var arrowApplicator = new QuizArrowApplicator();
+    arrowApplicator.applyArrows();
     // quiz_show is being pulled into ember show for now. only hide inputs
     // when we don't have a .allow-inputs
     if (!$('.allow-inputs').length) {

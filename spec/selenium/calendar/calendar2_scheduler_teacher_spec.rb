@@ -160,7 +160,7 @@ describe "scheduler" do
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
           # using fj to avoid selenium caching
-          keep_trying_until { expect(fj('#message_participants_form')).to be_nil }
+          keep_trying_until { expect(f('#message_participants_form')).to be_nil }
         end
       end
       expect(student1.conversations.first.messages.size).to eq 6 # registered/all * 3

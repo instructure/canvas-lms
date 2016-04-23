@@ -30,7 +30,7 @@ $ic-left-side-width: $ic-sp*15;
   box-sizing: border-box;
   min-height: 100vh;
 
-  body:not(.ic-no-flex-layout) & {
+  body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;
     flex-direction: column;
   }
@@ -39,7 +39,7 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-layout-horizontal {
   position: relative;
 
-  body:not(.ic-no-flex-layout) & {
+  body:not(.ic-no-flex-layout):not(.embedded) & {
     transition: all 0.1s ease-out;
     flex: 1 0 auto;
     display: flex;
@@ -62,7 +62,7 @@ $ic-left-side-width: $ic-sp*15;
     }
   }
 
-  body.course-menu-expanded:not(.ic-no-flex-layout) & {
+  body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded) & {
     margin-left: $ic-left-side-width;
 
     &:before {
@@ -104,7 +104,7 @@ $ic-left-side-width: $ic-sp*15;
 }
 
 .ic-app-main-content {
-  body:not(.ic-no-flex-layout) & {
+  body:not(.ic-no-flex-layout):not(.embedded) & {
     box-sizing: border-box;
     flex: 1;
     @include breakpoint(desktop) { display: flex; }
@@ -117,7 +117,7 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-content__primary {
   box-sizing: border-box;
   @include breakpoint(desktop) {
-    body:not(.ic-no-flex-layout) & {
+    body:not(.ic-no-flex-layout):not(.embedded) & {
       flex: 1;
 
       // Fix Firefox and IE Edge issues with contents breaking out of flex container

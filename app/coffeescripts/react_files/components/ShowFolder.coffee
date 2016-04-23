@@ -65,9 +65,6 @@ define [
     componentWillUnmount: ->
       @unregisterListeners()
 
-      setTimeout =>
-        @props.onResolvePath({currentFolder:undefined, rootTillCurrentFolder:undefined})
-
     componentDidUpdate: ->
       # hooray for a11y
       @redirectToCourseFiles() if not @props.currentFolder? or @props.currentFolder?.get('locked_for_user')

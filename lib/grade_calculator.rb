@@ -57,7 +57,7 @@ class GradeCalculator
         select("submissions.id, user_id, assignment_id, score, excused")
     submissions_by_user = @submissions.group_by(&:user_id)
 
-    scores = []
+    result = []
     @user_ids.each_slice(100) do |batched_ids|
       load_assignment_visibilities_for_users(batched_ids)
       batched_ids.each do |user_id|
@@ -65,11 +65,19 @@ class GradeCalculator
         user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
         current, current_groups = calculate_current_score(user_id, user_submissions)
         final, final_groups = calculate_final_score(user_id, user_submissions)
-        scores << [[current, current_groups], [final, final_groups]]
+
+        scores = {
+          current: current,
+          current_groups: current_groups,
+          final: final,
+          final_groups: final_groups
+        }
+
+        result << scores
       end
       clear_assignment_visibilities_cache
     end
-    scores
+    result
   end
 
   def compute_and_save_scores

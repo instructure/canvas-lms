@@ -1,53 +1,86 @@
 define [
   'jsx/shared/rce/RceCommandShim',
-  'helpers/fakeENV'
-], (RceCommandShim, fakeENV) ->
+  'wikiSidebar',
+  'helpers/fixtures'
+], (RceCommandShim, wikiSidebar, fixtures) ->
 
-  module 'RceCommandShim',
+  module 'RceCommandShim - send',
     setup: ->
-      fakeENV.setup()
-      @fakeStore = {
-        called: false,
-        callOnRCE: (target, methodName)=>
-          @fakeStore.called = true
-          @fakeStore.callTarget = target
-          @fakeStore.callMethodName = methodName
-      }
-      @targetElement = {
-        is_a: "dom_element",
-        oldSchoolCalled: false,
-        attr: (()-> "dom_element_id")
-        editorBox: ()=>
-          @targetElement.oldSchoolCalled = true
-      }
-      @fakeJquery = ()=>
-        return @targetElement
-      @shim = new RceCommandShim({
-        jQuery: @fakeJquery,
-        store: @fakeStore
-      })
+      fixtures.setup()
+      @$target = fixtures.create('<textarea />')
 
     teardown: ->
-      fakeENV.teardown()
+      fixtures.teardown()
 
-  test 'uses editor box when feature flag contextually off', ->
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = false
-    @shim.send(@targetElement, "someMethod")
-    ok !@fakeStore.called
-    ok @targetElement.oldSchoolCalled
+  test "just forwards through target's remoteEditor if set", ->
+    remoteEditor = { call: sinon.stub().returns("methodResult") }
+    @$target.data('remoteEditor', remoteEditor)
+    equal RceCommandShim.send(@$target, "methodName", "methodArgument"), "methodResult"
+    ok remoteEditor.call.calledWith("methodName", "methodArgument")
 
-  test 'goes through RCE store when feature flag contextually on', ->
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = true
-    @shim.send(@targetElement, "someMethod")
-    equal(@targetElement.oldSchoolCalled, false)
-    ok @fakeStore.called
-    equal(@fakeStore.callTarget, @targetElement)
-    equal(@fakeStore.callMethodName, "someMethod")
+  test "uses editorBox if remoteEditor is not set but rich_text is set", ->
+    sinon.stub(@$target, 'editorBox').returns("methodResult")
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', true)
+    equal RceCommandShim.send(@$target, "methodName", "methodArgument"), "methodResult"
+    ok @$target.editorBox.calledWith("methodName", "methodArgument")
 
-  test "falls back to using target value if editor load fails for 'get_code'", ->
-    ENV.RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED = true
-    # jquery api for an element with no editor attached
-    @targetElement.val = (()=> "current text in textarea")
-    @targetElement.data = (()=> false)
-    value = @shim.send(@targetElement, "get_code")
-    equal(value, "current text in textarea")
+  test "returns false for exists? if neither remoteEditor nor rich_text are set (e.g. load failed)", ->
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', null)
+    equal RceCommandShim.send(@$target, "exists?"), false
+
+  test "returns target's val() for get_code if neither remoteEditor nor rich_text are set (e.g. load failed)", ->
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', null)
+    @$target.val('current raw value')
+    equal RceCommandShim.send(@$target, "get_code"), 'current raw value'
+
+  module 'RceCommandShim - focus',
+    setup: ->
+      fixtures.setup()
+      @$target = fixtures.create('<textarea />')
+
+    teardown: ->
+      fixtures.teardown()
+
+  test "just forwards through target's remoteEditor if set", ->
+    remoteEditor = { focus: sinon.spy() }
+    @$target.data('remoteEditor', remoteEditor)
+    RceCommandShim.focus(@$target)
+    ok remoteEditor.focus.called
+
+  test "uses wikiSidebar if remoteEditor is not set but rich_text is set", ->
+    sinon.spy(wikiSidebar, 'attachToEditor')
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', true)
+    RceCommandShim.focus(@$target)
+    ok wikiSidebar.attachToEditor.calledWith(@$target)
+    wikiSidebar.attachToEditor.restore()
+
+  module 'RceCommandShim - destroy',
+    setup: ->
+      fixtures.setup()
+      @$target = fixtures.create('<textarea />')
+
+    teardown: ->
+      fixtures.teardown()
+
+  test "forwards through target's remoteEditor if set", ->
+    remoteEditor = { destroy: sinon.spy() }
+    @$target.data('remoteEditor', remoteEditor)
+    RceCommandShim.destroy(@$target)
+    ok remoteEditor.destroy.called
+
+  test "clears target's remoteEditor afterwards if set", ->
+    remoteEditor = { destroy: sinon.spy() }
+    @$target.data('remoteEditor', remoteEditor)
+    RceCommandShim.destroy(@$target)
+    equal @$target.data('remoteEditor'), undefined
+
+  test "uses editorBox if remoteEditor is not set but rich_text is set", ->
+    sinon.spy(@$target, 'editorBox')
+    @$target.data('remoteEditor', null)
+    @$target.data('rich_text', true)
+    RceCommandShim.destroy(@$target)
+    ok @$target.editorBox.calledWith("destroy")

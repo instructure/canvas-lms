@@ -809,4 +809,24 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.first).to be_deleted
   end
 
+  it "should not enroll users into deleted sections" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "S001,test_1,Sec1,deleted,,"
+    )
+    importer = process_csv_data(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,S001,active,,,",
+    )
+    warnings = importer.warnings.map { |r| r.last }
+    expect(warnings.first).to include("not a valid section")
+  end
 end

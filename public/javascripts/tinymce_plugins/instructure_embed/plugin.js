@@ -24,9 +24,10 @@ define([
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
+  'jsx/shared/rce/RceCommandShim',
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers'
-], function(tinymce, I18n, $, htmlEscape) {
+], function(tinymce, I18n, $, htmlEscape, RceCommandShim) {
 
   var $box, $editor, $userURL, $altText, $actions, $flickrLink;
 
@@ -78,7 +79,7 @@ define([
       var title = data.title,
           html = '<a href="' + htmlEscape(data.link_url) + '"><img src="' + htmlEscape(data.image_url) + '" title="' + htmlEscape(title) + '"alt="' + htmlEscape(title) + '" style="max-width: 500; max-height: 500"></a>';
       $box.dialog('close');
-      $editor.editorBox('insert_code', html);
+      RceCommandShim.send($editor, 'insert_code', html);
     });
   }
 
@@ -87,7 +88,8 @@ define([
         text = $userURL.val();
 
     event.preventDefault();
-    $editor.editorBox('insert_code', "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>");
+    var html = "<img src='" + htmlEscape(text) + "' alt='" + htmlEscape(alt) + "'/>";
+    RceCommandShim.send($editor, 'insert_code', html);
     $box.dialog('close');
   }
 
@@ -149,7 +151,7 @@ define([
 
         if (search === 'flickr') $flickrLink.click();
       });
-        
+
       /* replaced by instructure_image button
          but this plugin is still used by the wiki sidebar (for now)
       editor.addButton('instructure_embed', {
@@ -173,4 +175,3 @@ define([
 
   tinymce.PluginManager.add('instructure_embed', tinymce.plugins.InstructureEmbed);
 });
-

@@ -412,7 +412,7 @@
   <a href="<%= eportfolio_entry_view_file_path(@portfolio.id, @page.id, "{{ uuid }}") %>" class="eportfolio_download_url">&nbsp;</a>
   <div id="eportfolio_category_id"><%= @category.id %></div>
   <div id="eportfolio_view_image" style="text-align: center;">
-    <a href="#" class="eportfolio_download" title="<%= t('links.view_original', "View the Original File") %>"><img src="#" class="eportfolio_image"/><a/>
+    <a href="#" class="eportfolio_download" title="<%= t('links.view_original', "View the Original File") %>"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="eportfolio_image"/><a/>
   </div>
   <div id="eportfolio_download_file" style="text-align: center;">
     <a href="#" class="eportfolio_download"><%= t('links.download_file', "Click here to download %{filename}", :filename => raw('<span class="filename">&nbsp;</span>')) %></a>

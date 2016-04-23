@@ -252,6 +252,9 @@ describe ContentExportsApiController, type: :request do
       let_once(:quiz_to_copy) do
         t_course.quizzes.create! title: 'thaumolinguistics'
       end
+      let_once(:announcement) do
+        t_course.announcements.create! title: 'hear ye!', message: 'wat'
+      end
 
       it "should create a selective course export with old migration id format" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
@@ -340,6 +343,15 @@ describe ContentExportsApiController, type: :request do
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.settings['selected_content']['quizzes']).to eq({CC::CCHelper.create_key(quiz_to_copy) => "1"})
         expect(export.export_object?(quiz_to_copy)).to be_truthy
+      end
+
+      it "should select announcements correctly" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:announcements => [announcement.id]} })
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.settings['selected_content']['announcements']).to eq({CC::CCHelper.create_key(announcement) => "1"})
+        expect(export.export_object?(announcement)).to be_truthy
       end
 
       it "should select using shortened collection names" do

@@ -93,6 +93,25 @@ describe CollaborationsController do
       get 'index', :group_id => group.id
       expect(response).to be_success
     end
+
+    it "only returns collaborations that the user has access to read" do
+      user_session(@student)
+      collab1 = @course.collaborations.create!(
+        title: "inaccessible",
+        user: @teacher
+      ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+
+      collab2 = @course.collaborations.create!(
+        title: "accessible",
+        user: @student
+      ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+
+
+      get 'index', course_id: @course.id
+
+      expect(assigns[:collaborations]).to eq [collab2]
+    end
+
   end
 
   describe "GET 'show'" do

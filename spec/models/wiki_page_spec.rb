@@ -506,5 +506,25 @@ describe WikiPage do
       mod.save
       expect(pageC.reload).to be_locked_for @student
     end
+
+    it "includes a future unlock date" do
+      course_with_student_logged_in active_all: true
+      page = @course.wiki.wiki_pages.create! title: 'page'
+      mod = @course.context_modules.create name: 'teh module', unlock_at: 1.week.from_now
+      mod.add_item type: 'wiki_page', id: page.id
+      mod.workflow_state = 'unpublished'
+      mod.save!
+      expect(page.reload.locked_for?(@student)[:unlock_at]).to eq mod.unlock_at
+    end
+
+    it "doesn't reference an expired unlock-at date" do
+      course_with_student_logged_in active_all: true
+      page = @course.wiki.wiki_pages.create! title: 'page'
+      mod = @course.context_modules.create name: 'teh module', unlock_at: 1.week.ago
+      mod.add_item type: 'wiki_page', id: page.id
+      mod.workflow_state = 'unpublished'
+      mod.save!
+      expect(page.reload.locked_for?(@student)).not_to have_key :unlock_at
+    end
   end
 end

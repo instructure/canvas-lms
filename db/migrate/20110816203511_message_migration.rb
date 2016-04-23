@@ -181,7 +181,7 @@ class MessageMigration < ActiveRecord::Migration
       FROM
         #{ConversationMessage.quoted_table_name} cm,
         #{ConversationParticipant.quoted_table_name} cp,
-        #{InboxItem.quoted_table_name} ii
+        #{connection.quote_table_name('inbox_items')} ii
       WHERE
         cm.conversation_id = cp.conversation_id
         AND ii.asset_id = cm.context_message_id
@@ -209,8 +209,8 @@ class MessageMigration < ActiveRecord::Migration
     SQL
 
     # hide inbox_items from the users
-    update "UPDATE #{InboxItem.quoted_table_name} SET workflow_state = 'retired' WHERE asset_type IN ('ContextMessage', 'SubmissionComment') AND workflow_state = 'read'"
-    update "UPDATE #{InboxItem.quoted_table_name} SET workflow_state = 'retired_unread' WHERE asset_type IN ('ContextMessage', 'SubmissionComment') AND workflow_state = 'unread'"
+    update "UPDATE #{connection.quote_table_name('inbox_items')} SET workflow_state = 'retired' WHERE asset_type IN ('ContextMessage', 'SubmissionComment') AND workflow_state = 'read'"
+    update "UPDATE #{connection.quote_table_name('inbox_items')} SET workflow_state = 'retired_unread' WHERE asset_type IN ('ContextMessage', 'SubmissionComment') AND workflow_state = 'unread'"
 
 
     update <<-SQL

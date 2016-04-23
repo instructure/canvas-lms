@@ -2,7 +2,7 @@
 
 This is an extension of the RuboCop gem that provides some extra linters
 ("cops") that might be handy, and that provides a neat way to do
-inline commenting in gerrit as a result of linted source
+inline commenting in gerrit as a result of linted source.
 
 ## Usage
 

@@ -22,6 +22,7 @@ describe "user_content" do
   describe "iframes" do
 
     it "should serve embed tags from a safefiles iframe" do
+      skip_if_chrome('research')
       factory_with_protected_attributes(Announcement, :context => @course, :title => "hey all read this k", :message => message_body)
       get "/courses/#{@course.to_param}/discussion_topics/#{Announcement.first.to_param}"
       wait_for_ajaximations
@@ -36,6 +37,7 @@ describe "user_content" do
     end
 
     it "should iframe calendar json requests" do
+      skip_if_chrome('research')
       e = factory_with_protected_attributes(CalendarEvent, :context => @course, :title => "super fun party", :description => message_body, :start_at => 5.minutes.ago, :end_at => 5.minutes.from_now)
       get "/calendar2"
       wait_for_ajaximations

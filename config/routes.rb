@@ -679,11 +679,18 @@ CanvasRails::Application.routes.draw do
   # routes, so we let this route exist only for tests
   get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
 
+  get 'login/clever' => 'login/clever#new', as: :clever_login
+  # Clever gets their own callback, cause we have to add additional processing
+  # for their Instant Login feature
+  get 'login/clever/callback' => 'login/clever#create', as: :clever_callback
+  get 'login/clever/:id' => 'login/clever#new'
   get 'login/facebook' => 'login/facebook#new', as: :facebook_login
   get 'login/github' => 'login/github#new', as: :github_login
   get 'login/google' => 'login/google#new', as: :google_login
   get 'login/google/:id' => 'login/google#new'
   get 'login/linkedin' => 'login/linkedin#new', as: :linkedin_login
+  get 'login/microsoft' => 'login/microsoft#new'
+  get 'login/microsoft/:id' => 'login/microsoft#new', as: :microsoft_login
   get 'login/openid_connect' => 'login/openid_connect#new'
   get 'login/openid_connect/:id' => 'login/openid_connect#new', as: :openid_connect_login
   get 'login/twitter' => 'login/twitter#new', as: :twitter_login
@@ -846,7 +853,7 @@ CanvasRails::Application.routes.draw do
 
   post 'selection_test' => 'external_content#selection_test'
 
-  resources :quiz_submissions do
+  scope '/quizzes/quiz_submissions/:quiz_submission_id', as: 'quiz_submission' do
     concerns :files
   end
 
@@ -1849,6 +1856,9 @@ CanvasRails::Application.routes.draw do
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+
+    # Membership Service
+    get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :index, as: :course_membership_service
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

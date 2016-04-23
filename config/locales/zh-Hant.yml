@@ -77,6 +77,7 @@ zh-Hant:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: 可接受的格式：hex，rgba，rgb，hsl
   accepted_formats_svg_png_jpg_gif_f793e4bc: "可接受的格式：svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "已接受：%{user}，%{role_type}，課程，%{course}"
+  access_token_3be22221: 存取權仗
   access_token_is_valid_until_d2f048cf: 權限令牌有效期至
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "存取權杖可以被用於允許其他應用程式來代表您進行 API 調用。您還可以生成存取權杖並*使用 Canvas Open API*以提供您自己的整合。"
   accordion_section_1_7888782d: "Accordion 控件1"
@@ -610,6 +611,11 @@ zh-Hant:
       delete_button: "刪除 %{user}"
       page_title: 確認刪除
       title: "確認從 %{account} 刪除 %{user}"
+    consortium_user_search: 
+      find_user_by: 透過登入/電子郵件尋找使用者
+      find_user_by_label: 登入/電子郵件
+    consortium_users: 
+      user_search_label: 使用者搜尋
     course: 
       course_unpublished_title: 本課程尚未公佈
       course_unpublished_tooltip: 已解除發佈
@@ -1266,6 +1272,7 @@ zh-Hant:
   activity_by_date_878c5b49: 按日期劃分的活動
   add_2nd_review_ea988088: 添加第2檢閲
   add_8523c19b: 新增
+  add_a_course_b72b18d7: 新增一個課程
   add_a_new_announcement_878b717f: 新增新宣告
   add_a_new_course_4a041207: 新增新課程
   add_a_new_user_c440d053: 新增新使用者
@@ -1539,6 +1546,8 @@ zh-Hant:
         suspended: 被暫停的機構
     wiki_front_page_default_content_course: "歡迎來到您的新課程 wiki！"
     wiki_front_page_default_content_group: "歡迎來到您的新群組 wiki！"
+  application_id_2aa1640f: 應用程式ID
+  application_secret_e6803c7e: 應用程式密碼
   apply_781a2546: 套用
   apply_changes_b1dffc70: 應用更改
   applying_new_styles_to_subaccounts_e8aeeef2: 將新風格應用到子賬戶中
@@ -1576,7 +1585,9 @@ zh-Hant:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: 您確定要報告該個人檔案圖片嗎？
   arrange_by_34a545de: 排列規則為
   arrange_columns_by_assignment_group_33acdf03: 按任務群組排列欄
+  arrange_columns_by_assignment_group_59bbddd0: 按任務群組排列欄
   arrange_columns_by_due_date_888f2551: 按截止日期排列欄
+  arrange_columns_by_due_date_f74f9e2d: 按截止日期排列欄
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 當您在這個欄位中鍵入時，群組清單將被自動篩選，以便只包括那些與您的輸入相符的名字。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: 在你鍵入內容時，搜索結果清單會自動更新。
   assessment_by_name_7b879a2c: "由 %{name} 評估"
@@ -2283,6 +2294,7 @@ zh-Hant:
     corrupted: 詳細資料不可用
     login: 登入
     logout: 登出
+  authentication_with_provider_was_successful_but_no_6a194137: "使用 %{provider} 的認證成功，但未能提供唯一的ID以用於登錄Canvas。"
   authorize_e3f25bb4: 授權
   available_8606e40c: 可用！
   available_after_unlock_at_b5682224: "在 %{unlock_at} 之後可用"
@@ -2333,6 +2345,7 @@ zh-Hant:
     recording_setting_enabled_description: 啟用針對此次會議的記錄
   blackboard: 
     no_manifest: "此 Blackboard .zip 在根目錄中沒有 imsmanifest.xml 檔案。"
+  blocked_by_running_migration_d8a57cb7: 運行遷移受阻
   blue_daf8fea9: 藍色
   body_shadow_d36e8c2e: 主體陰影
   bookmark_service: 
@@ -2949,6 +2962,11 @@ zh-Hant:
   collaboration_creation_failed_95ff831f: 協作建立失敗
   collaboration_was_deleted_9cf9934b: 協作已刪除
   collaborations: 
+    auth_google_drive: 
+      google: 
+        drive: 
+          upgrade: 
+            description: "為了存取該協作，您必須授權 Canvas 存取您的 Google Drive 帳戶"
     collaboration: 
       delete: 是否確定要刪除此協作？
       links: 
@@ -2959,6 +2977,8 @@ zh-Hant:
           other: "*%{count}* 個參與者"
       titles: 
         collaboration: 協作
+    collaboration_footer: 
+      started_by: "由 *%{user}* 開始於 %{at}"
     collaborator_picker: 
       labels: 
         available_groups: 可用的群組
@@ -2970,6 +2990,9 @@ zh-Hant:
         people: 人員
         remove_all: 全部移除
       member_instructions: 按一下或點一下左側欄中的使用者或群組以新增協作者。
+    delete_button: 
+      links: 
+        delete: 刪除此協作
     edit: 
       buttons: 
         cancel: 取消
@@ -2977,6 +3000,9 @@ zh-Hant:
       labels: 
         description: 說明：
         title: 協作標題
+    edit_button: 
+      links: 
+        edit: 編輯此協作
     errors: 
       cannot_load_collaboration: 無法載入協作
       create_failed: 協作建立失敗
@@ -3133,6 +3159,7 @@ zh-Hant:
   complete_icon_7455be93: 完成圖標
   complete_one_item_90e5fb03: 完成一個項目
   completed_19711ce7: 已完成
+  completed_9b809e44: 已完成
   completed_icon_521596e4: 完成的圖標
   concluded_conferences_cdbe53f9: 已結束的會議
   concluded_courses_94782e21: 已結束課程
@@ -3942,6 +3969,7 @@ zh-Hant:
       reply_all: 全部回覆
     message_form_dialog: 
       body: 本文
+      comboboxInstructions: "收信人: (請鍵入並選擇收信人。點一下下拉箭頭選取結果。如果您沒有找到任何可接受的選項，可自行輸入收信人信息。)"
       headings: 
         new_message: 新郵件
       inbox_actions: 
@@ -4460,10 +4488,10 @@ zh-Hant:
       browse_more_courses: 瀏覽更多課程
       headings: 
         future_enrollments: 未來註冊
-        my_courses: 我的課程
+        my_courses: 所有課程
         my_groups: 我的群組
         past_enrollments: 過去的註冊
-      start_new_course: 開始新課程
+      start_new_course: 課程
       titles: 
         courses: 課程
         rss: 
@@ -4969,6 +4997,7 @@ zh-Hant:
       student: 
         count: 錯誤的學生數
         ratio: 錯誤的學生比例
+  current_367624e9: 當前
   current_courses_d5287d50: 當前課程
   current_grading_standard_for_this_assignment_64c5375e: 目前對任務的評分標準
   current_mastery_score_score_out_of_mastery_points_fedd343f: "目前的精通分數：總分 %{mastery_points} 中得分 %{score}"
@@ -5643,6 +5672,7 @@ zh-Hant:
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "當\"所有評分週期\" 下拉選項被選中時，顯示所有評分。(多個評分週期選項必須啟動)"
   display_totals_for_all_grading_periods_ad1ea050: 顯示“所有評分時段”的總分
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: 在註冊了部門課程的所有學生中分佈當前評分
+  district_id_6f408184: 地區ID
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "將時閒段平均分爲 %{num_minutes} 分鐘. *前往*"
   domain_3b54c511: 網域
   domain_is_required_1d4c8b25: 本域為必填
@@ -5834,6 +5864,7 @@ zh-Hant:
   end_date_cannot_be_before_start_date_eb62ed6d: 結束日期不可早於開始日期
   end_date_e0093ed7: 結束日期
   ending_date_e1ea13a4: 結束日期
+  enrolled_as_272da3b9: 註冊為
   enrollment: 
     default_course_name: 課程
     default_email: 無電子郵件
@@ -5876,6 +5907,7 @@ zh-Hant:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "輸入『{{ACCOUNT_DOMAIN}}』以代替使用者的根帳戶域"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "輸入『{{CANVAS_USER_ID}}』以代替使用者的唯一的 Canvas ID"
   enter_or_find_an_external_tool_url_6aebbd0d: 輸入或查找一個外部工具URL
+  enter_the_access_token_for_your_organization_from__cc77493d: "請輸入您組織來自 *eduappcenter.com*的存取權杖。在應用之後，只有您組織在EduAppCenter 中准許過的應用程式才會出現在外部應用頁面的列表中。學習如何 **生成一個存取權杖**。"
   enter_your_question_and_multiple_answers_31370054: 輸入您的問題和多個答案。
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: 請輸入您的問題，並指定每個空白的所在處。學生必須在每個空白處的文字方塊中鍵入正確答案。
   enter_your_question_specifying_where_each_dropdown_b428a9ff: 請輸入您的問題，並指定每個下拉式清單的所在處。然後定義每個下拉式清單的可能的答案。
@@ -6379,6 +6411,7 @@ zh-Hant:
   fair_score_554e2558: 公平分數
   fair_use_bee47d77: 公平使用
   favicon_6e658914: Favicon
+  favorites_c7e0207c: 我的最愛
   feature_flags: 
     feature_flag: 
       allow: 允許
@@ -6515,6 +6548,7 @@ zh-Hant:
   filled_5d8c39e: 已填充
   filter_announcements_by_unread_495eeeb3: 通過『未讀取』篩選器對宣告進行篩選
   filter_by_name_34cbe139: 按名稱篩選
+  filter_by_student_name_or_secondary_id_83dc524f: "按學生名稱或助理 ID 篩選"
   filter_discussions_by_assignments_757924ed: 通過『任務』篩選器對討論進行篩選
   filter_discussions_by_unread_6c48322: 通過『未讀取』篩選器對討論進行篩選
   filter_e3398407: 篩選器
@@ -6788,6 +6822,7 @@ zh-Hant:
       switch_to_percent: 切換至百分比
       switch_to_points: 切換至點
     ungraded: 不計入評分
+  gradebook_1620a0aa: 成績冊
   gradebook_csvs: 
     grades_filename: 成績
   gradebook_performance_764d8b3d: 成績冊總評
@@ -6969,7 +7004,7 @@ zh-Hant:
     out_of_final: "最終的 %{weight}"
     out_of_points_possible: "超出 %{points_possible}"
     react_gradebook: 
-      accessibility_warning: 警告：本成績冊格線檢視表不可存取。按一下此處以使用個人檢視表。
+      accessibility_warning: 警告：為改善存取性能，請按一下此處以使用個人成績冊檢視模式。
       download_scores: 匯出
       export_current_gradebook: 當前
       filter_by_student: "按學生名稱或助理 ID 篩選"
@@ -6980,6 +7015,7 @@ zh-Hant:
       publish_to_sis: "發佈成績至 SIS"
       set_group_weights: 設定群組權重
       show_concluded_enrollments: 顯示已結束的註冊
+      show_inactive_enrollments: 顯示不活躍的註冊
       view_grading_history: 檢視評分記錄
     screenreader: 
       page_titles: 成績冊：個人檢視表
@@ -7665,6 +7701,8 @@ zh-Hant:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 啓用后，模塊將在僅有一項要求滿足時可被標記為完成。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 選中此項，查詢參數將不會在LTI啓動時寫入POST主體部分。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如啟用，用戶將能夠對 LTI 2工具進行配置。"
+  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: (如果任何一個都沒有被選中，則發送給所有賬戶中的每個人)
+  if_none_are_selected_send_to_everyone_in_the_entir_21119709: (如果任何一個都沒有被選中，則發送給所有下一級賬戶中的每個人)
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改一項任務的分數，有可能您必須對該任務重新進行評分。
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "如果您的配置方案導致無法登入，您可以通過%{url}正常登入Canvas"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您現在不選擇使用權，那麼該檔案在其上傳之後將被撤銷發佈。
@@ -7727,6 +7765,7 @@ zh-Hant:
     title_for_topics_category: "%{category} 主題"
     warnings: 
       truncated_wiki_title: "以下 Wiki 頁面的標題被截斷：%{title}"
+  importing_course_content_into_the_same_course_will_b09c69e: 導入課程內容到同一個課程中會首先複製內容，如果重複導入操作將會覆寫所複製的內容。
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "在可用情況下，從Canvas 豐富內容服務中載入RCE和wiki邊欄"
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "在可用情況下，從Canvas 豐富內容服務中載入RCE"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: 為完成本流程，本頁將會跳轉至登錄頁面，您需要使用您孩子的密碼登錄。
@@ -7746,6 +7785,7 @@ zh-Hant:
   increase_indent_6af90f7c: 增加縮排
   incremental_update_successfully_generated_against__db3f3f06: "增量更新針對之前的一個 SIS 匯入而成功生成。"
   indigo_2035fc55: 靛藍色
+  individual_view_81c2f124: 個人檢視
   info: 
     old_styleguide: 
       create_collection: 建立集合
@@ -7843,6 +7883,7 @@ zh-Hant:
   invite_5b1fcbcd: 邀請
   ip_filter_is_not_valid_152a46d8: "IP 篩選器無效。"
   it_looks_like_your_content_might_not_load_you_can__dfb85860: 看起來您的內容可能無法載入。您可以使用該按鈕來嘗試在新標籤中啟動它。
+  it_took_too_long_to_login_please_try_again_c1ed2e28: 登入用時過長。請再試一次。
   item_complete_d334fd43: (項目完成)
   item_incomplete_d6a16040: (項目未完成)
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} 當前不被支持"
@@ -7970,6 +8011,7 @@ zh-Hant:
       view_all_or_customize: 全部檢視或者自訂
     mobile_auth: 
       log_in_to_canvas: "登入 Canvas"
+  learning_mastery_5fc34276: 學習精通
   learning_mastery_gradebook_description: 學習精通成績冊提供了一種方法，教師可以快速檢視課程的學習成果中的學生和課程進度。成果以成績冊般的形式呈現，學生的進步以數值評分顯示，以及以精通/接近精通/補修的形式顯示。
   learning_outcome: 
     no_comment: 無註解
@@ -8243,6 +8285,7 @@ zh-Hant:
   make_this_course_publicly_visible_student_data_wil_3954d6c8: 使此課程公開可見（學生數據仍保持私密）
   malformed_csv_aaa4b7f2: "CSV 格式錯誤"
   manage_access_bd923d8d: 管理權限
+  manage_app_list_994cc26c: 管理應用列表
   manage_avatars: 
     errors: 
       update_failed: 更新失敗，請再試一次
@@ -8300,7 +8343,7 @@ zh-Hant:
       save_failed: 儲存似乎已經失敗。請關閉這個快顯視窗，然後再試一次。
       save_failed_try_again: 輸入項目無法儲存。請再試一次。
       upload_failed: 上傳失敗，出現錯誤：
-    file_size_error: "%{file} 的大小大於允許的檔案大小的最大值 %{max}。"
+    file_size_error: " %{file} 的大小超過了允許的最大文件大小 %{max} MB 。"
     file_type_error: "%{file} 不是可接受的 %{type} 檔案。"
     links: 
       minimize_embedded_kaltura_content: 最小化嵌入內容
@@ -10266,6 +10309,7 @@ zh-Hant:
   move_to_front_bf6f0194: 移至前面
   moving_a4d552df: 正在移動…
   multi_factor_authentication_configured_865b1bde: 多因素驗證已設定
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "多個 Canvas 賬戶已關聯到Clever域 %{district_id}"
   multiple_due_dates_6b0d75c6: 多個截止日期
   multiple_modules_930713d4: 多個模組
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10335,6 +10379,7 @@ zh-Hant:
   next_message_780bcf24: 下一個郵件
   next_module_item_9bb8a222: 下一個模組/項目
   next_steps_ce0f0d0c: 接下來的步驟
+  nickname_1e6da3ad: 暱稱
   nickname_7df95b09: 暱稱：
   no_assignment_name_adbb215b: 無任務名稱
   no_broken_links_found_38d951e3: 找不到斷鏈
@@ -10379,6 +10424,8 @@ zh-Hant:
   note_some_items_fall_outside_the_start_and_or_end__feab0642: 注：一些項目超出了該課程開始和/或結束日期範圍
   note_students_have_submitted_work_for_these_assign_7bc34e28: 注：學生們已經為這些尚未進行評分的任務提交了作業。如果您現在公佈這些評分，您將需要再對他們最新的提交項進行評分之後重新公佈他們的分數。
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 注意：本預覽沒有激活子賬戶主題。
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: 請注意在微軟用戶檔案中電子郵件地址並不一定總會被填充。個人的微軟賬戶不會填充Oid資訊。
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: 注意有些內容不會為所有Clever用戶填充。
   note_this_login_s_account_uses_delegated_authentic_89227914: "注：此次登入的帳戶使用的是委派的驗證，但允許切換回 Canvas 密碼驗證。此表格中的密碼欄位更新的是切換回的 Canvas 密碼，*而不是*委派的驗證。"
   notes_c42e0fd5: 注釋
   notes_for_name_2eefac11: "針對 %{name} 的筆記"
@@ -11047,6 +11094,12 @@ zh-Hant:
     catalog_provisioner: 
       description: Canvas的目錄賬戶提供商
       name: "Catalog 目錄提供商"
+    clever: 
+      description: "Clever 登入"
+    clever_settings: 
+      labels: 
+        client_id: 用戶端ID
+        client_secret: 用戶端密碼
     crocodoc: 
       description: "啟用 Crocodoc 作為文件預覽選項"
       name: Crocodoc
@@ -11269,6 +11322,15 @@ zh-Hant:
       labels: 
         password: 驗證密碼
         username: 驗證使用者名稱
+    microsoft: 
+      description: 微軟登入
+    microsoft_settings: 
+      description: "您需要[在微軟上創建新應用t](%{ms_app_url}).\n\
+          您需要將 %{callback_url} 配置為重定向URL。\n\
+          在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。 "
+      labels: 
+        application_id: 應用程式ID
+        application_secret: 應用程式密碼
     notices: 
       settings_updated: 外掛程式設定已成功更新。
     panda_pub_settings: 
@@ -11799,6 +11861,7 @@ zh-Hant:
       publishing: 正在發佈…
       unpublish: 解除發佈
       unpublishing: 正在解除發佈...
+  publish_grades_to_sis_51402d46: "發佈成績至 SIS"
   publish_icon_component: 
     publish: 發佈
     publish_click: 已發佈。按一下以解除發佈
@@ -13305,6 +13368,8 @@ zh-Hant:
   reply_to_main_discussion_29823888: 回復主要討論
   reply_to_topic_12412b0f: 回覆主題
   require_usage_rights_for_uploaded_files_4507865b: 要求用於已上傳檔案的使用權
+  requirement_f5b75da1: 要求
+  requirement_subject_7cfac6c8: 要求主題
   reregister_9ab95a57: 再註冊
   reregister_toolname_3dde0bfc: "再註冊%{toolName}"
   reserved_f247b60b: 已預約
@@ -13864,6 +13929,7 @@ zh-Hant:
   send_a_message_to_the_teacher_1ae115b6: 傳送郵件給教師
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "發送自定義欄位 (除非使用 Canvas zendesk，否則取消核取)"
   send_e3bd0ed0: 傳送
+  send_only_to_the_following_types_of_users_d8465c11: 僅發送給以下類型的使用者：
   send_this_announcement_to_unenrolled_users_4ea549d7: 將本宣告發送給未註冊進入課程的用戶
   send_this_announcement_to_users_with_the_account_r_bd69c809: "將本宣告發送給賬戶角色為 %{role} 的用戶"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "將本宣告發送給課程角色為 %{role} 的用戶"
@@ -13887,6 +13953,7 @@ zh-Hant:
     overwrite: 覆蓋已經輸入的成績
     set_grades_button: 說定預設成績
     set_grades_button_loading: "正在 成績..."
+  set_group_weights_fd41c1f: 設定群組權重
   settings: 
     recaptcha_settings: 
       instructions: |-
@@ -13986,14 +14053,16 @@ zh-Hant:
         download_message_intro: 正在收集您學生的提交件。
         download_submissions: 下載所有提交件
     current_enrollment: 
-      enrolled_as_designer: 註冊為設計師
-      enrolled_as_observer: 註冊為觀察者
-      enrolled_as_student: 註冊為學生
-      enrolled_as_ta: 註冊為助教
-      enrolled_as_teacher: 註冊為教師
+      enrolled_as_designer: 設計師
+      enrolled_as_observer: 觀察者
+      enrolled_as_student: 學生
+      enrolled_as_ta: 助教
+      enrolled_as_teacher: 教師
       favorited_tooltip: 按一下以從課程功能表中移除。
       nonfavorited_tooltip: 按一下以新增至課程功能表。
-      unpublished_course: 未發佈
+      published_course: 是
+      published_course_tooltip: 本課程已經公佈。
+      unpublished_course: 否
       unpublished_course_tooltip: 本課程尚未發佈。學生應連絡課程導師以進行存取。
     custom_search_results: 
       links: 
@@ -14588,12 +14657,16 @@ zh-Hant:
   short_name_ad9bf84f: 短名稱
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "不言而喻，匯報用戶的 Canvas ID"
   show_and_hide_courses_menu_9e09d1d0: 顯示與隱藏課程選單
+  show_attendance_columns_4d160e16: 顯示考勤欄
   show_by_date_e3967761: 按日期顯示
   show_by_type_c5d61732: 按類型顯示
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: 在月份檢視中顯示日曆事件，如果單行無法容納，則顯示為多行。
+  show_concluded_enrollments_6a05544c: 顯示已結束的註冊
   show_correct_answers_at_a5475aa3: 將正確答案顯示在
   show_current_grade_5bf4e0d9: 顯示當前評分
   show_dashcard_view_76078ecb: "顯示 dashcard 瀏覽"
   show_final_grade_a95e14dc: 顯示最終成績
+  show_inactive_enrollments_8f4c4824: "顯示不活躍的註冊 "
   show_links_to_unpublished_content_30c0450d: 顯示未發佈內容的鏈接
   show_lti_2_configuration_ui_94ce35a9: "顯示 LTI 2 配置 UI"
   show_me_76823679: 給我看看
@@ -15066,6 +15139,8 @@ zh-Hant:
   teachers_52e2423f: 教師
   teal_f729a294: 深青色
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: 告訴我們您希望在何時以何方式得到Canvas事件通知。
+  tenant_d2a41f78: 租借用戶
+  term_e1c1d390: 期限
   terms: 
     index: 
       date: 
@@ -15158,6 +15233,11 @@ zh-Hant:
       
       感謝，
       Canvas支援團隊
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      您發送的主題為"%{subject}" 的郵件未能投遞。 要通過本郵件向Canvas 回复郵件，您的Canvas檔案中必須有經確認的通訊渠道。請訪問您的檔案，並向下列地址再次發送確認郵件 [See https://community.canvaslms.com/docs/DOC-2281]. 您還可以通過Canvas 收件箱聯繫相關個人 [See https://community.canvaslms.com/docs/DOC-2670].
+      
+                謝謝,
+                Canvas 支援團隊
   the_module_item_is_locked_27fe420b: 該模組項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
   the_profile_picture_has_been_reported_d609d6dd: 個人檔案圖片已報告
@@ -15217,6 +15297,7 @@ zh-Hant:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "本圖像將作為您頁面的背景水印。可接受的格式：png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "這是一個可信任的 URL 的清單，以逗號分開。信任此清單中的任何 URL 將讓您在登入 Canvas  時略過 CSRF 權杖。"
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: 這是已結束的課程，所以只有已結束的註冊可用。
+  this_is_a_message_for_name_7abf1e39: "這是一封發送給 *%{name}* 的郵件"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: 當前為該學生選取的評分。
   this_is_the_default_email_address_f3c421fb: 這是預設電子郵件地址
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: 當有新提交件時，本項目將再次出現。
@@ -15280,6 +15361,7 @@ zh-Hant:
     amsterdam: 阿姆斯特丹
     arizona: 亞歷桑那
     astana: 阿斯塔那
+    asuncion: 亞松森
     athens: 雅典
     atlantic_time_canada: "大西洋時間 (加拿大)"
     auckland: 奧克蘭
@@ -15470,7 +15552,9 @@ zh-Hant:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "要將課程觀察員 *%{name}* 連結到某位學生，在下面開始輸入該學生姓名，查找他們，然後點擊更新。"
   to_minscore_43e5452e: "至 %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: 要預覽主題編輯器圖標，您需要*關閉高對比度UI*.
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: 要限制特定Clever域的用戶，請在此輸入那個Clever域的ID。這是在多名租借用戶環境下使用Clever快速登入功能的必須要求。
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "要僅限特定Google Apps域的用戶使用，請在此輸入域名稱。"
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: "要僅限特定Azure 活躍域的用戶使用，請在此輸入租借用戶名稱。"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
   toggle_dashcard_view_or_recent_activity_stream_1de257: 切換儀表板視角或近期活動流
   toggle_editing_answer_text_as_html_9a93fe6: "切換編輯答案文字為 HTML"
@@ -15499,6 +15583,7 @@ zh-Hant:
   tours: 
     quiz_regrade: 
       got_it: 好的，知道了
+  treat_ungraded_as_0_d38c2b41: "將未評分視為 0"
   tree_browser: 
     folder_tree_instructions: 使用向上和向下方向鍵來瀏覽整個樹。按向右鍵展開資料夾，按向左鍵收起資料夾，按回車選定要選擇的項目。
   turnitin: 
@@ -15521,6 +15606,7 @@ zh-Hant:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "抱歉！請聯係您的Catalog開發人員。錯誤代碼：%{message}"
   unable_to_accept_update_fd53a7e2: 無法接受更新
   unable_to_dismiss_update_df1e32eb: 無法解除更新
+  unable_to_find_clever_district_district_id_61deb1cb: "無法找到 Clever 域 %{district_id}"
   unable_to_remove_app_4293cb53: 無法移除應用程式
   unarchive_selected_e0c4bd3d: 已選取消存檔
   unauthorized: 未授權
@@ -15529,6 +15615,7 @@ zh-Hant:
   unbookmark_this_question_bank_d87d1a07: 取消將此題庫加為書籤
   unchanged_aca18e02: "[不變]"
   undated_items_toggle_list_visibility_6219e641: 未登記日期的項目切換清單可視性
+  undelivered_message_459916a9: 未發送的郵件
   undo_a7be8fef: 撤銷
   unenrolled_users_e7632d24: 未註冊的使用者
   ungraded_answers_31ef2df7: 未評分的答案
@@ -15748,7 +15835,9 @@ zh-Hant:
       notifications: 通知
       profile: 個人檔案
       settings: 設定
+  user_profile_picture_46bffbc7: 使用者個人檔案圖片
   user_s_settings_d65644b4: "%{user} 的設定"
+  user_search_results_f5445b8b: 使用者搜尋結果
   user_selected_answer: 您已選擇
   user_selected_wrong: "正確答案為 %{correct_answer_text}。"
   user_service: 
@@ -16018,6 +16107,8 @@ zh-Hant:
           一旦您建立或者註冊了課程，您將會開始看到來自您的班級的所有交談。
       unpublished_courses_message: 您已經註冊了尚未開始的一個或多個課程。一旦這些課程可用，您將在此處以及頂部導覽看到有關其的資訊。在此期間，可隨時報名參加更多的課程，或建立您的個人檔案。
       welcome_to_happiness: "歡迎使用 Canvas！"
+  users_d1b60cb0: 使用者
+  users_matching_search_term_c604db9e: "使用者相符\"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: 使用屏幕閱讀器的使用者或許需要關閉虛擬光標，以便使用這些鍵盤快速鍵。
   validate: 
     is_required: 此欄位為必填項
@@ -16034,6 +16125,7 @@ zh-Hant:
   view_course_analytics_eefe6b2: 檢視課程分析
   view_file_8a1c62e5: 檢視文檔
   view_grades_8d3bae6c: 監視評分
+  view_grading_history_e64bb8fe: 檢視評分記錄
   view_in_speedgrader_773b9d81: "在 SpeedGrader 檢視"
   view_name_app_62a2ad8e: "檢視 %{name} 應用程式"
   view_next_file_a8a4a885: 檢視下一個文檔
@@ -16051,6 +16143,7 @@ zh-Hant:
   warning_6576b5b8: 警告
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: 注意：Crocodoc在Firefox瀏覽器使用時受限。評論無法保存。
   warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：爲了提高移動檔案的可存取性，請使用功能表中的『移動到對話方塊』選項。
+  warning_for_improved_accessibility_please_click_he_e6472c02: 警告：為改善存取性能，請按一下此處以使用個人成績冊檢視模式。
   warning_icon_f64936d7: 警告圖標
   warnings: 
     test_install: 
@@ -16066,6 +16159,7 @@ zh-Hant:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: 很抱歉，登入發生錯誤，請檢查您孩子的密碼並再試一次。
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "我們傳送了四個字元的確認碼至 %{sms_number}。輸入以下代碼來啟動此簡訊號碼。"
   we_were_unable_to_activate_the_app_578defe7: 我們無法激活該應用程式。
+  we_were_unable_to_add_the_access_token_1f471fe6: 我們無法添加該存取權杖。
   we_were_unable_to_add_the_app_418877ef: 我們無法添加該應用程式。
   we_were_unable_to_deactivate_the_app_5e2632f3: 我們無法停用該應用程式。
   we_were_unable_to_update_the_app_659f5bc6: 我們無法更新該應用程式。
@@ -16260,6 +16354,7 @@ zh-Hant:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: 是否要放棄此此更新？
   would_you_like_to_enable_this_app_ccdf735d: 是否要啟用此應用程式？
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要讓學生繼續學習該課程，還是希望重新鎖定這些模組，直至新要求設定完畢？
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: 在月曆檢視中折疊事件標題
   xml_configuration_5ea1b942: "XML 配置"
   yellow_4cf93785: 黃色
   yes_dde87d5: 是
@@ -16338,6 +16433,17 @@ zh-Hant:
       你需要在[Google開發者控制臺](%{google_url})上創建一個新的在綫申請。
       您需要將%{callback_url}增添為一個重定向URL.
       完成創建程式后，保存好您的客戶ID和客戶密碼，並在此輸入。
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: "您需要[在微軟上創建新應用t](%{ms_app_url}).\n\
+      您需要將 %{callback_url} 配置為重定向URL。\n\
+      在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。 "
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      您需要 [在 Clever上新建一個應用](%{clever_url})。
+      您需要將 %{callback_url} 配置為重定向URL。
+      在您創建應用之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      您需要 [在Clever上註冊一個應用](%{clever_url})。
+      您需要將 %{callback_url} 配置為重定向URL。
+      在創建應用之後，請保存好您的客戶端ID和客戶端密碼，並在此輸入。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       您需要[在GitHub上註冊一個申請](%{github_url})。
       您需要將%{callback_url}鏈接配置為授權回調URL。

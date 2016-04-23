@@ -4,7 +4,6 @@ define [
   'compiled/views/ValidatedFormView'
   'underscore'
   'jquery'
-  'wikiSidebar'
   'jsx/shared/rce/RichContentEditor'
   'jst/assignments/EditView'
   'compiled/userSettings'
@@ -16,17 +15,14 @@ define [
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly'
   'compiled/views/editor/KeyboardShortcuts'
-  'compiled/tinymce'
-  'tinymce.editor_box'
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
-], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, RichContentEditor, template,
+], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
 userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
 
-  richContentEditor = new RichContentEditor({riskLevel: "highrisk", sidebar: wikiSidebar})
-  richContentEditor.preloadRemoteModule()
+  RichContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -236,7 +232,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
       @_attachEditorToDescription()
-      $ @_initializeWikiSidebar
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
       if ENV?.HAS_GRADED_SUBMISSIONS
@@ -251,18 +246,17 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
+    # separated out so we can easily stub it
+    scrollSidebar: $.scrollSidebar
+
     _attachEditorToDescription: =>
-      richContentEditor.loadNewEditor(@$description)
+      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.loadNewEditor(@$description, { focus: true })
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        richContentEditor.callOnRCE(@$description, 'toggle')
+        RichContentEditor.callOnRCE(@$description, 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
-
-    _initializeWikiSidebar: =>
-      richContentEditor.initSidebar()
-      $.scrollSidebar()
-      richContentEditor.attachSidebarTo(@$description)
 
     addTinyMCEKeyboardShortcuts: =>
       keyboardShortcutsView = new RCEKeyboardShortcuts()

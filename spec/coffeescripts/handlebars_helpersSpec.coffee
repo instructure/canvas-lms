@@ -2,12 +2,13 @@ define [
   'compiled/handlebars_helpers'
   'jquery'
   'underscore'
+  'helpers/assertions'
   'helpers/fakeENV'
   'timezone'
   'vendor/timezone/America/Detroit'
   'vendor/timezone/America/Chicago'
   'vendor/timezone/America/New_York'
-], ({helpers}, $, _, fakeENV, tz, detroit, chicago, newYork) ->
+], ({helpers}, $, _, {contains}, fakeENV, tz, detroit, chicago, newYork) ->
 
   module 'handlebars_helpers'
 
@@ -91,16 +92,24 @@ define [
     teardown: -> tz.restore(@snapshot)
 
   test 'can take an ISO string', ->
-    equal helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
-      "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at 7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+    contains helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false}).string,
+      "Dec 31, 1969 at 7:00pm"
 
   test 'can take a date object', ->
-    equal helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
-      "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at 7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+    contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
+      "Dec 31, 1969 at 7:00pm"
 
   test 'should parse non-qualified string relative to profile timezone', ->
-    equal helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false}).string,
-      "<time data-tooltip data-html-tooltip-title='Jan 1, 1970 at 12:00am' datetime='1970-01-01T05:00:00.000Z' undefined>Jan 1, 1970</time>"
+    contains helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false}).string,
+      "Jan 1, 1970 at 12:00am"
+
+  test 'includes a screenreader accessible version', ->
+    contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
+      "<span class='screenreader-only'>Dec 31, 1969 at 7:00pm</span>"
+
+  test 'includes a visible version', ->
+    contains helpers.friendlyDatetime(new Date(0), hash: {pubDate: false}).string,
+      "<span aria-hidden='true'>Dec 31, 1969</span>"
 
   module 'contextSensitive FriendlyDatetime',
     setup: ->
@@ -116,23 +125,23 @@ define [
 
   test 'displays both zones data from an ISO string', ->
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
-    ok(timeTag.indexOf("Local: Dec 31, 1969 at 7:00pm") > -1)
-    ok(timeTag.indexOf("Course: Dec 31, 1969 at 6:00pm") > -1)
+    contains timeTag, "Local: Dec 31, 1969 at 7:00pm"
+    contains timeTag, "Course: Dec 31, 1969 at 6:00pm"
 
   test 'displays both zones data from a date object', ->
     timeTag = helpers.friendlyDatetime(new Date(0), hash: {pubDate: false, contextSensitive: true}).string
-    ok(timeTag.indexOf("Local: Dec 31, 1969 at 7:00pm") > -1)
-    ok(timeTag.indexOf("Course: Dec 31, 1969 at 6:00pm") > -1)
+    contains timeTag, "Local: Dec 31, 1969 at 7:00pm"
+    contains timeTag, "Course: Dec 31, 1969 at 6:00pm"
 
   test 'should parse non-qualified string relative to both timezones', ->
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00', hash: {pubDate: false, contextSensitive: true}).string
-    ok(timeTag.indexOf("Local: Jan 1, 1970 at 12:00am") > -1)
-    ok(timeTag.indexOf("Course: Dec 31, 1969 at 11:00pm") > -1)
+    contains timeTag, "Local: Jan 1, 1970 at 12:00am"
+    contains timeTag, "Course: Dec 31, 1969 at 11:00pm"
 
   test 'reverts to friendly display when there is no contextual timezone', ->
     ENV.CONTEXT_TIMEZONE = null
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
-    equal timeTag, "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at 7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
+    contains timeTag, "<span aria-hidden='true'>Dec 31, 1969</span>"
 
   module 'contextSensitiveDatetimeTitle',
     setup: ->

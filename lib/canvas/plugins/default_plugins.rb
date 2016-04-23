@@ -1,3 +1,13 @@
+Canvas::Plugin.register('clever', nil,
+  name: 'Clever',
+  description: -> { t :description, 'Clever Login' },
+  website: 'https://clever.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/clever_settings',
+  encrypted_settings: [:client_secret]
+)
 Canvas::Plugin.register('facebook', nil,
   name: 'Facebook',
   description: -> { t :description, 'Facebook Login' },
@@ -7,7 +17,7 @@ Canvas::Plugin.register('facebook', nil,
   version: '2.0.0',
   settings_partial: 'plugins/facebook_settings',
   encrypted_settings: [:app_secret]
-                       )
+)
 Canvas::Plugin.register('github', nil,
   name: 'GitHub',
   description: -> { t :description, 'Github Login' },
@@ -17,7 +27,7 @@ Canvas::Plugin.register('github', nil,
   version: '1.0.0',
   settings_partial: 'plugins/github_settings',
   encrypted_settings: [:client_secret]
-                       )
+)
 Canvas::Plugin.register('linked_in', nil,
   name: 'LinkedIn',
   description: -> { t :description, 'LinkedIn integration' },
@@ -28,7 +38,17 @@ Canvas::Plugin.register('linked_in', nil,
   settings_partial: 'plugins/linked_in_settings',
   validator: 'LinkedInValidator',
   encrypted_settings: [:client_secret]
-                       )
+)
+Canvas::Plugin.register('microsoft', nil,
+  name: 'Microsoft',
+  description: -> { t :description, 'Microsoft Login'},
+  website: 'https://apps.dev.microsoft.com',
+  author: 'Siimpl',
+  author_website: 'https://siimpl.io',
+  version: '1.0.0',
+  settings_partial: 'plugins/microsoft_settings',
+  encrypted_settings: [:application_secret]
+)
 Canvas::Plugin.register('diigo', nil, {
   :name => lambda{ t :name, 'Diigo' },
   :description => lambda{ t :description, 'Diigo integration' },
@@ -49,7 +69,7 @@ Canvas::Plugin.register('twitter', nil,
   settings_partial: 'plugins/twitter_settings',
   validator: 'TwitterValidator',
   encrypted_settings: [:consumer_secret]
-                       )
+)
 Canvas::Plugin.register('yo', nil, {
   :name => lambda{ t :name, 'Yo'},
   :description => lambda{ t :description, 'Just Yo' },

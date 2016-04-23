@@ -48,6 +48,7 @@ describe "submissions" do
     end
 
     it "should allow a student view student to view/submit assignments", priority: "1", test_id: 237034 do
+      skip_if_chrome('Student view breaks test in Chrome')
       @assignment = @course.assignments.create(
           :title => 'Cool Assignment',
           :points_possible => 10,
@@ -70,6 +71,7 @@ describe "submissions" do
     end
 
     it "should allow a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
+      skip_if_chrome('Student view breaks test in Chrome')
       @assignment = @course.assignments.create(
           :title => 'Cool Assignment',
           :points_possible => 10,

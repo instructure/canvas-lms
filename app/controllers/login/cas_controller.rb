@@ -32,13 +32,10 @@ class Login::CasController < ApplicationController
     # CAS sends a GET with a ticket when it's doing a login
     return create if params[:ticket]
 
-    reset_session_for_login
     redirect_to delegated_auth_redirect_uri(client.add_service_to_login_url(cas_login_url))
   end
 
   def create
-    reset_session_for_login
-
     logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
@@ -57,6 +54,8 @@ class Login::CasController < ApplicationController
     end
 
     if st.is_valid?
+      reset_session_for_login
+
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
       pseudonym ||= aac.provision_user(st.user) if aac.jit_provisioning?
 

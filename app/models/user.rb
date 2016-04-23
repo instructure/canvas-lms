@@ -53,9 +53,13 @@ class User < ActiveRecord::Base
   has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
-  has_many :user_observers, :dependent => :delete_all
+  has_many :user_observers, dependent: :destroy, inverse_of: :user
   has_many :observers, :through => :user_observers, :class_name => 'User'
-  has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
+  has_many :user_observees,
+           class_name: 'UserObserver',
+           foreign_key: :observer_id,
+           dependent: :destroy,
+           inverse_of: :observer
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
@@ -102,7 +106,6 @@ class User < ActiveRecord::Base
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
 
-  has_many :inbox_items, -> { order('created_at DESC') }
   has_many :submission_comment_participants
   has_many :submission_comments, -> { preload(submission: [:assignment, :user]) }, through: :submission_comment_participants
   has_many :collaborators
@@ -181,6 +184,7 @@ class User < ActiveRecord::Base
     self.from("(#{scopes.join("\nUNION\n")}) users")
   }
   scope :active, -> { where("users.workflow_state<>'deleted'") }
+  scope :active_user_observers, -> { where.not(user_observers: {workflow_state: 'deleted'}) }
 
   scope :has_current_student_enrollments, -> do
     where("EXISTS (?)",
@@ -608,7 +612,9 @@ class User < ActiveRecord::Base
     @visible_groups ||= begin
       enrollments = self.cached_current_enrollments(preload_courses: true)
       visible_groups = self.current_groups.select do |group|
-        group.context_type != 'Course' || enrollments.any? { |en| en.course == group.context && !en.inactive? && (en.admin? || en.course.available?)}
+        group.context_type != 'Course' || enrollments.any? do |en|
+          en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
+        end
       end
     end
   end
@@ -825,15 +831,6 @@ class User < ActiveRecord::Base
 
   def short_name
     read_attribute(:short_name) || name
-  end
-
-  def unread_inbox_items_count
-    count = read_attribute(:unread_inbox_items_count)
-    if count.nil?
-      self.unread_inbox_items_count = count = self.inbox_items.unread.count rescue 0
-      self.save
-    end
-    count
   end
 
   workflow do
@@ -1076,7 +1073,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.where(user_id: self.id).exists? }
+    given { |user| user && user.user_observees.active.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 
@@ -2355,8 +2352,10 @@ class User < ActiveRecord::Base
   end
 
   def mark_all_conversations_as_read!
-    conversations.unread.update_all(:workflow_state => 'read')
-    User.where(:id => id).update_all(:unread_conversations_count => 0, :updated_at => Time.now.utc)
+    updated = conversations.unread.update_all(:workflow_state => 'read')
+    if updated > 0
+      User.where(:id => id).update_all(:unread_conversations_count => 0)
+    end
   end
 
   def conversation_participant(conversation_id)
@@ -2367,7 +2366,10 @@ class User < ActiveRecord::Base
   #
   # Returns nothing.
   def reset_unread_conversations_counter
-    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count, :updated_at => Time.now.utc)
+    unread_count = conversations.unread.count
+    if self.unread_conversations_count != unread_count
+      self.class.where(:id => id).update_all(:unread_conversations_count => unread_count)
+    end
   end
 
   def set_menu_data(enrollment_uuid)

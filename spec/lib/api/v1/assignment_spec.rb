@@ -83,7 +83,7 @@ describe "Api::V1::Assignment" do
       expect(json["overrides"].first.keys.sort).to eq ["assignment_id","id", "title", "student_ids"].sort
     end
 
-    it "excludes descriptions when exclude_description flag is passed" do
+    it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
       assignment.description = "Foobers"
       json = api.assignment_json(assignment, user, session,
                                  {override_dates: false})
@@ -93,15 +93,22 @@ describe "Api::V1::Assignment" do
 
 
       json = api.assignment_json(assignment, user, session,
-                                 {override_dates: false, exclude_description: true})
+                                 {override_dates: false, exclude_response_fields: ['description']})
       expect(json).to be_a(Hash)
-      expect(json).to_not have_key "description"
+      expect(json).not_to have_key "description"
 
       json = api.assignment_json(assignment, user, session,
                                  {override_dates: false})
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
       expect(json['description']).to eq(api.api_user_content("Foobers", @course, user, {}))
+    end
+
+    it "excludes needs_grading_counts when exclude_response_fields flag is " \
+    "passed and includes 'needs_grading_count'" do
+      params = { override_dates: false, exclude_response_fields: ['needs_grading_count'] }
+      json = api.assignment_json(assignment, user, session, params)
+      expect(json).not_to have_key "needs_grading_count"
     end
   end
 end

@@ -312,6 +312,24 @@ describe UserList do
       expect(ul.errors).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :not_found}]
     end
 
+    it "doesn't find site admins if you're not a site admin" do
+      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => Account.site_admin)
+      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      jt = @user
+      user_with_pseudonym
+      other = @user
+
+      ul = UserList.new 'jt@instructure.com', current_user: other
+      expect(ul.addresses).to eq []
+      expect(ul.errors).to eq [{:address => 'jt@instructure.com', :type => :email, :details => :not_found}]
+
+      # when it's the user _from_ site admin doing it, it can be found
+      Account.default.stubs(:trusted_account_ids).returns([Account.site_admin.id])
+      ul = UserList.new 'jt@instructure.com', current_user: jt
+      expect(ul.addresses).to eq [{:address => 'jt@instructure.com', :type => :pseudonym, :user_id => jt.id, :name => 'JT', :shard => Shard.default}]
+      expect(ul.errors).to eq []
+    end
+
     it "should find users from trusted accounts" do
       account = Account.create!
       Account.default.stubs(:trusted_account_ids).returns([account.id])

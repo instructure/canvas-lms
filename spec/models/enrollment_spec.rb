@@ -2053,4 +2053,19 @@ describe Enrollment do
       expect(@enrollment.readable_state_based_on_date).to eq :completed
     end
   end
+
+  describe "update user account associations if necessary" do
+    it "should create a user_account_association when restoring a deleted enrollment" do
+      sub_account = Account.default.sub_accounts.create!
+      course = Course.create!(:account => sub_account)
+      @enrollment = course.enroll_student(user)
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
+
+      @enrollment.destroy
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq false
+
+      @enrollment.restore
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
+    end
+  end
 end

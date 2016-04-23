@@ -96,8 +96,8 @@ describe Account do
         "S004,C004,Sec4,,,active",
         "S005,C005,Sec5,,,active",
         "S006,C006,Sec6,,,active",
-        "S007,C007,Sec7,,,deleted",
-        "S008,C001,Sec8,,,deleted",
+        "S007,C007,Sec7,,,active",
+        "S008,C001,Sec8,,,active",
         "S009,C008,Sec9,,,active",
         "S001S,C001S,Sec1,,,active",
         "S002S,C002S,Sec2,,,active",
@@ -105,8 +105,8 @@ describe Account do
         "S004S,C004S,Sec4,,,active",
         "S005S,C005S,Sec5,,,active",
         "S006S,C006S,Sec6,,,active",
-        "S007S,C007S,Sec7,,,deleted",
-        "S008S,C001S,Sec8,,,deleted",
+        "S007S,C007S,Sec7,,,active",
+        "S008S,C001S,Sec8,,,active",
         "S009S,C008S,Sec9,,,active"
       ])
 

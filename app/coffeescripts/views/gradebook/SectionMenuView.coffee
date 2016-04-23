@@ -14,6 +14,7 @@ define [
     @optionProperty 'sections'
     @optionProperty 'course'
     @optionProperty 'showSections'
+    @optionProperty 'disabled'
 
     @optionProperty 'currentSection'
 
@@ -36,7 +37,7 @@ define [
     render: ->
       @detachEvents()
       super
-      @$('button').kyleMenu()
+      @$('button').prop('disabled', @disabled).kyleMenu()
       @attachEvents()
 
     detachEvents: ->

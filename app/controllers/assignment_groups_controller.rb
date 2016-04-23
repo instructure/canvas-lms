@@ -241,10 +241,14 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_includes
     includes = [:context, :external_tool_tag, {:quiz => :context}]
-    includes += [:rubric, :rubric_association] unless params[:exclude_rubrics]
+    includes += [:rubric, :rubric_association] unless assignment_excludes.include?('rubric')
     includes << :discussion_topic if include_params.include?("discussion_topic")
     includes << :assignment_overrides if include_overrides?
     includes
+  end
+
+  def assignment_excludes
+    params[:exclude_response_fields] || []
   end
 
   def filter_by_grading_period?
@@ -287,22 +291,18 @@ class AssignmentGroupsController < ApplicationController
         group_overrides = group_assignments.map{|assignment| assignment.assignment_overrides.select(&:active?)}.flatten
       end
 
-      assignment_group_json(
-        group,
-        current_user,
-        session,
-        params[:include],
-        {
-          stringify_json_ids: stringify_json_ids?,
-          override_assignment_dates: override_dates?,
-          preloaded_user_content_attachments: preloaded_attachments,
-          assignments: group_assignments,
-          assignment_visibilities: assignment_visibilities(context, assignments),
-          exclude_descriptions: !!params[:exclude_descriptions],
-          overrides: group_overrides,
-          submissions: submissions
-        }
-      )
+      options = {
+        stringify_json_ids: stringify_json_ids?,
+        override_assignment_dates: override_dates?,
+        preloaded_user_content_attachments: preloaded_attachments,
+        assignments: group_assignments,
+        assignment_visibilities: assignment_visibilities(context, assignments),
+        exclude_response_fields: assignment_excludes,
+        overrides: group_overrides,
+        submissions: submissions
+      }
+
+      assignment_group_json(group, current_user, session, params[:include], options)
     end
   end
 
@@ -315,7 +315,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def user_content_attachments(assignments, context)
-    if params[:exclude_descriptions]
+    if assignment_excludes.include?('description')
       {}
     else
       api_bulk_load_user_content_attachments(assignments.map(&:description), context)

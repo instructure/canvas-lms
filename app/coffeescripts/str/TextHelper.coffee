@@ -49,7 +49,7 @@ define [
     )
   ///gi
 
-  th = 
+  th =
     quoteClump: (lines) ->
       "<div class='quoted_text_holder'>
         <a href='#' class='show_quoted_text_link'>#{htmlEscape I18n.t("quoted_text_toggle", "show quoted text")}</a>
@@ -57,7 +57,7 @@ define [
           #{$.raw lines.join "\n"}
         </div>
       </div>"
-  
+
     formatMessage: (message) ->
       # replace any links with placeholders so we don't escape them
       links = []
@@ -67,22 +67,22 @@ define [
             AUTO_LINKIFY_PLACEHOLDER
           else
             link = match
-            link = "http://" + link if link[0..3] == 'www.'
+            link = "http://" + link unless link[0..6] == 'http://' or link[0..7] == 'https://'
             links.push link
             "<a href='#{htmlEscape(link)}'>#{htmlEscape(match)}</a>"
         )
         AUTO_LINKIFY_PLACEHOLDER
-  
+
       # now escape html
       message = htmlEscape message
-  
+
       # now put the links back in
       message = message.replace new RegExp(AUTO_LINKIFY_PLACEHOLDER, 'g'), (match, i) ->
         placeholderBlocks.shift()
-  
+
       # replace newlines
       message = message.replace /\n/g, '<br />\n'
-  
+
       # generate quoting clumps
       processedLines = []
       quoteBlock = []

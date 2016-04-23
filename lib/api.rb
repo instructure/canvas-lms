@@ -76,7 +76,8 @@ module Api
   # returned in the result.
   def self.map_ids(ids, collection, root_account, current_user = nil)
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
-    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user)
+    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user,
+                            root_account: root_account)
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
       relation = relation_for_sis_mapping_and_columns(collection, columns, sis_mapping, root_account)
@@ -141,7 +142,8 @@ module Api
   MAX_ID_LENGTH = 18
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
 
-  def self.sis_parse_id(id, lookups, _current_user = nil)
+  def self.sis_parse_id(id, lookups, _current_user = nil,
+                        root_account: nil)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
@@ -166,11 +168,13 @@ module Api
     return column, sis_id
   end
 
-  def self.sis_parse_ids(ids, lookups, current_user = nil)
+  def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
     # returns {column_name => [column_value,...].uniq, ...}
     columns = {}
     ids.compact.each do |id|
-      column, sis_id = sis_parse_id(id, lookups, current_user)
+      column, sis_id = sis_parse_id(id, lookups,
+                                    current_user,
+                                    root_account: root_account)
       next unless column && sis_id
       columns[column] ||= []
       columns[column] << sis_id

@@ -59,7 +59,8 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
-        ldap_form.find_element(:id, "no_tls_#{config_id}").click
+        no_tls_radio = ldap_form.find_element(:id, "no_tls_#{config_id}")
+        driver.action.move_to(no_tls_radio).click.perform
         ldap_form.find_element(:id, 'authentication_provider_auth_base').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_filter').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_username').clear
@@ -104,7 +105,8 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('host2.example.dev')
         ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('2')
-        ldap_form.find_element(:id, "start_tls_#{config_id}").click
+        start_tls_radio = ldap_form.find_element(:id, "start_tls_#{config_id}")
+        driver.action.move_to(start_tls_radio).click.perform
         ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('base2')
         ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('filter2')
         ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username2')
@@ -520,5 +522,45 @@ describe 'account authentication' do
         expect(Account.default.authentication_providers.count).to eq 2
       end
     end
+
+    context 'microsoft' do
+      it 'should allow creation of config', priority: "1" do
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        add_microsoft_config
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
+        config = Account.default.authentication_providers.active.last
+        expect(config.entity_id).to eq '1234'
+        expect(config.login_attribute).to eq 'sub'
+      end
+
+      it 'should allow update of config', priority: "1" do
+        add_microsoft_config
+        wait_for_ajax_requests
+        config_id = Account.default.authentication_providers.active.last.id
+
+        microsoft_form = f("#edit_microsoft#{config_id}")
+        microsoft_form.find_element(:id, 'authentication_provider_application_id').clear
+        submit_form(microsoft_form)
+
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
+        config = Account.default.authentication_providers.active.last
+        expect(config.entity_id).to eq ''
+        expect(config.login_attribute).to eq 'sub'
+      end
+
+      it 'should allow deletion of config', priority: "1" do
+        add_microsoft_config
+        wait_for_ajax_requests
+        config_id = Account.default.authentication_providers.active.last.id
+        config = "#delete-aac-#{config_id}"
+        expect_new_page_load(true) do
+          f(config).click
+        end
+
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
+      end
+    end
+
   end
 end

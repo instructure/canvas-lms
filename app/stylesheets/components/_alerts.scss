@@ -330,3 +330,15 @@ $ic-notification-border-thickness: 2px;
   margin-left: $ic-sp;
   margin-bottom: $ic-sp/2;
 }
+
+.notification_account_content {
+  width: 100%;
+  background-color: $ic-color-neutral;
+}
+
+.notification_account_content_text {
+  font-size: 0.8em;
+  font-weight: 300;
+  padding-left: 12px;
+  line-height: 22px;
+}

@@ -377,7 +377,7 @@ END
       display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
       description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'allowed',
       beta: true,
       development: false,
       root_opt_in: false
@@ -389,7 +389,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'rich_content_service_high_risk' =>
@@ -399,7 +399,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'conditional_release' =>
@@ -412,6 +412,14 @@ END
       development: true,
       root_opt_in: false,
     },
+    'wrap_calendar_event_titles' =>
+    {
+      display_name: -> { I18n.t('Wrap event titles in Calendar month view') },
+      description: -> { I18n.t("Show calendar events in the month view on multiple lines if the title doesn't fit on a single line") },
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true
+    }
   )
 
   def self.definitions

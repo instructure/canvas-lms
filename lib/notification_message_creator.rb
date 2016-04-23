@@ -258,8 +258,6 @@ class NotificationMessageCreator
   def increment_user_counts(user_id, count=1)
     @user_counts[user_id] ||= 0
     @user_counts[user_id] += count
-    @user_counts["#{user_id}_#{@notification.category_spaceless}"] ||= 0
-    @user_counts["#{user_id}_#{@notification.category_spaceless}"] += count
   end
 
   def user_asset_context(user_asset)
@@ -297,8 +295,6 @@ class NotificationMessageCreator
   def too_many_messages_for?(user)
     all_messages = recent_messages_for_user(user.id) || 0
     @user_counts[user.id] = all_messages
-    for_category = recent_messages_for_user("#{user.id}_#{@notification.category_spaceless}") || 0
-    @user_counts["#{user.id}_#{@notification.category_spaceless}"] = for_category
     all_messages >= user.max_messages_per_day
   end
 
@@ -312,17 +308,9 @@ class NotificationMessageCreator
     elsif messages
       Rails.cache.write(['recent_messages_for', id].cache_key, messages, :expires_in => 1.hour)
     else
-      category = nil
       user_id = id
-      if id.is_a?(String)
-        user_id, category = id.split(/_/)
-      end
       messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        lookup = Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true)
-        if category
-          lookup = lookup.where(:notification_category => category.gsub(/_/, " "))
-        end
-        lookup.count
+        Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true).count
       end
     end
   end

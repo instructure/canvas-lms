@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssignmentGroup do
 
-  before(:each) do
+  before(:once) do
     @valid_attributes = {
       :name => "value for name",
       :rules => "value for rules",
@@ -28,6 +28,8 @@ describe AssignmentGroup do
       :assignment_weighting_scheme => "value for assignment weighting scheme",
       :group_weight => 1.0
     }
+    course_with_student(active_all: true)
+    @course.update_attribute(:group_weighting_scheme, 'percent')
   end
 
   it "should act as list" do
@@ -36,20 +38,18 @@ describe AssignmentGroup do
 
   context "visible assignments" do
     before(:each) do
-      @u = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
-      @c = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
-      @ag = @c.assignment_groups.create!(@valid_attributes)
-      @s = @c.course_sections.create!(name: "test section")
-      student_in_section(@s, user: @u)
-      assignments = (0...4).map { @c.assignments.create!({:title => "test_foo",
+      @ag = @course.assignment_groups.create!(@valid_attributes)
+      @s = @course.course_sections.create!(name: "test section")
+      student_in_section(@s, user: @student)
+      assignments = (0...4).map { @course.assignments.create!({:title => "test_foo",
                                   :assignment_group => @ag,
                                   :points_possible => 10,
                                   :only_visible_to_overrides => true})}
       assignments.first.destroy
-      assignments.second.grade_student(@u, {grade: 10})
+      assignments.second.grade_student(@student, {grade: 10})
       assignment_to_override = assignments.last
       create_section_override_for_assignment(assignment_to_override, course_section: @s)
-      @c.reload
+      @course.reload
       @ag.reload
     end
 
@@ -57,35 +57,37 @@ describe AssignmentGroup do
       it "should return only active assignments with overrides or grades for the user" do
         expect(@ag.active_assignments.count).to eq 3
         # one with override, one with grade
-        expect(@ag.visible_assignments(@u).count).to eq 2
-        expect(AssignmentGroup.visible_assignments(@u, @c, [@ag]).count).to eq 2
+        expect(@ag.visible_assignments(@student).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(@student, @course, [@ag]).count).to eq 2
       end
     end
 
     context "logged out users" do
       it "should return published assignments for logged out users so that invited users can see them before accepting a course invite" do
-        @c.active_assignments.first.unpublish
+        @course.active_assignments.first.unpublish
         expect(@ag.visible_assignments(nil).count).to eq 2
-        expect(AssignmentGroup.visible_assignments(nil, @c, [@ag]).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(nil, @course, [@ag]).count).to eq 2
       end
     end
   end
 
   context "broadcast policy" do
     context "grade weight changed" do
-      # it "should have a 'Grade Weight Changed' policy" do
-        # assignment_group_model
-        # @ag.broadcast_policy_list.map {|bp| bp.dispatch}.should be_include('Grade Weight Changed')
-      # end
+      before(:once) do
+        Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
+        assignment_group_model
+      end
 
-      # it "should create a message when the grade weight changes on an assignment group" do
-        # Notification.create!(:name => 'Grade Weight Changed')
-        # assignment_group_model
-        # @ag.group_weight = 0.2
-        # @ag.save!
-        # @ag.context.messages_sent.should be_include('Grade Weight Changed')
-      # end
+      it "sends a notification when the grade weight changes" do
+        @ag.update_attribute(:group_weight, 0.2)
+        expect(@ag.context.messages_sent['Grade Weight Changed'].any?{|m| m.user_id == @student.id}).to be_truthy
+      end
 
+      it "sends a notification to observers when the grade weight changes" do
+        course_with_observer(course: @course, associated_user_id: @student.id, active_all: true)
+        @ag.reload.update_attribute(:group_weight, 0.2)
+        expect(@ag.context.messages_sent['Grade Weight Changed'].any?{|m| m.user_id == @observer.id}).to be_truthy
+      end
     end
   end
 
@@ -133,8 +135,5 @@ describe AssignmentGroup do
 end
 
 def assignment_group_model(opts={})
-  @u = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
-  @c = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
-  @c.enroll_student(@u)
-  @ag = @c.assignment_groups.create!(@valid_attributes.merge(opts))
+  @ag = @course.assignment_groups.create!(@valid_attributes.merge(opts))
 end

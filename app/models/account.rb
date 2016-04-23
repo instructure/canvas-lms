@@ -206,6 +206,7 @@ class Account < ActiveRecord::Base
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
+  add_setting :app_center_access_token
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
 
@@ -1225,22 +1226,8 @@ class Account < ActiveRecord::Base
     end
   end
 
-  # this will take an account and make it a sub_account of
-  # itself.  Also updates all it's descendant accounts to point to
-  # the correct root account, and updates the pseudonyms to
-  # points to the new root account as well.
-  def consume_account(account)
-    account.all_accounts.each do |sub_account|
-      sub_account.root_account = self.root_account
-      sub_account.save!
-    end
-    account.parent_account = self
-    account.root_account = self.root_account
-    account.save!
-    account.pseudonyms.each do |pseudonym|
-      pseudonym.account = self.root_account
-      pseudonym.save!
-    end
+  def update_all_update_account_associations
+    Account.root_accounts.active.find_each(&:update_account_associations)
   end
 
   def course_count

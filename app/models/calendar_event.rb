@@ -397,7 +397,7 @@ class CalendarEvent < ActiveRecord::Base
   def participants
     # TODO: User#participants should probably be fixed to return [self],
     # then we can simplify this again
-    context_type == 'User' ? [context] : context.participants
+    context_type == 'User' ? [context] : context.participants(include_observers: true)
   end
 
   attr_reader :updating_user
@@ -603,7 +603,7 @@ class CalendarEvent < ActiveRecord::Base
         loc_string << @event.location_name + ", " if @event.location_name.present?
         loc_string << @event.location_address if @event.location_address.present?
       else
-        loc_string = @event.location
+        loc_string = nil
       end
 
       event.location = loc_string

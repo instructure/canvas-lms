@@ -207,7 +207,7 @@ class Rubric < ActiveRecord::Base
     return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
-    return true if data.criteria != self.criteria
+    return true if Rubric.normalize(data.criteria) != Rubric.normalize(self.criteria)
     false
   end
 
@@ -256,5 +256,22 @@ class Rubric < ActiveRecord::Base
 
   def update_assessments_for_new_criteria(new_criteria)
     criteria = self.data
+    end
+
+  # undo innocuous changes introduced by migrations which break `will_change_with_update?`
+  def self.normalize(criteria)
+    case criteria
+    when Array
+      criteria.map { |criterion| Rubric.normalize(criterion) }
+    when Hash
+      h = criteria.reject { |k, v| v.blank? }.stringify_keys
+      h.delete('title') if h['title'] == h['description']
+      h.each do |k, v|
+        h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)
+      end
+      h
+    else
+      criteria
+    end
   end
 end

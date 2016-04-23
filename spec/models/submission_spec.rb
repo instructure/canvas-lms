@@ -248,7 +248,7 @@ describe Submission do
 
     context "Submission Graded" do
       before :once do
-        Notification.create(:name => 'Submission Graded')
+        Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
       end
 
       it "should create a message when the assignment has been graded and published" do
@@ -259,6 +259,13 @@ describe Submission do
         expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
         expect(@submission.messages_sent).to be_include('Submission Graded')
+      end
+
+      it "notifies observers" do
+        submission_spec_model
+        course_with_observer(course: @course, associated_user_id: @user.id, active_all: true, active_cc: true)
+        @submission.grade_it!
+        expect(@observer.email_channel.messages.length).to eq 1
       end
 
       it "should not create a message when a muted assignment has been graded and published" do
@@ -1221,6 +1228,45 @@ describe Submission do
       s.save
       expect(a1.crocodoc_document(true)).to eq cd
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
+    end
+
+    context "canvadocs_submissions records" do
+      before(:once) do
+        @student1, @student2 = n_students_in_course(2)
+        @attachment = crocodocable_attachment_model(context: @student1)
+        @assignment = @course.assignments.create! name: "A1",
+          submission_types: "online_upload"
+      end
+
+      before do
+        Canvadocs.stubs(:enabled?).returns true
+        Canvadocs.stubs(:annotations_supported?).returns true
+        Canvadocs.stubs(:config).returns {}
+      end
+
+      it "ties submissions to canvadocs" do
+        s = @assignment.submit_homework(@student1,
+                                        submission_type: "online_upload",
+                                        attachments: [@attachment])
+        expect(s.canvadocs).to eq [@attachment.canvadoc]
+      end
+
+      it "create records for each group submission" do
+        gc = @course.group_categories.create! name: "Project Groups"
+        group = gc.groups.create! name: "A Team", context: @course
+        group.add_user(@student1)
+        group.add_user(@student2)
+
+        @assignment.update_attribute :group_category, gc
+        @assignment.submit_homework(@student1,
+                                    submission_type: "online_upload",
+                                    attachments: [@attachment])
+
+        [@student1, @student2].each do |student|
+          submission = @assignment.submission_for_student(student)
+          expect(submission.canvadocs).to eq [@attachment.canvadoc]
+        end
+      end
     end
 
     it "doesn't create jobs for non-previewable documents" do

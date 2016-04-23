@@ -183,8 +183,8 @@ module Api::V1
 
     def mgp_scores_from_calculator(grade_calculator)
       grade_calculator.compute_scores.map do |scores|
-        current_score = scores.first.first[:grade]
-        final_score = scores.second.first[:grade]
+        current_score = scores[:current][:grade]
+        final_score = scores[:final][:grade]
         {
           current_period_computed_current_score: current_score,
           current_period_computed_final_score: final_score,

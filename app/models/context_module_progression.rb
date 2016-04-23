@@ -239,7 +239,9 @@ class ContextModuleProgression < ActiveRecord::Base
       if requirement_met
         remove_incomplete_requirement(requirement[:id])
       else
-        self.update_incomplete_requirement!(requirement, score) # hold onto the score if requirement not met
+        unless sub.is_a?(Submission) && sub.unsubmitted?
+          self.update_incomplete_requirement!(requirement, score) # hold onto the score if requirement not met
+        end
       end
       requirement_met
     end

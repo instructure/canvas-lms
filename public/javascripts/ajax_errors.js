@@ -27,9 +27,6 @@ define([
   INST.errorCount = 0;
   window.onerror = function (msg, url, line, column, errorObj) {
     INST.errorCount += 1;
-    if(INST.environment == "production") {
-      return true;
-    }
   };
 
   // puts the little red box when something bad happens in ajax.

@@ -1,13 +1,13 @@
 define([
   'react',
-  'i18n!editor'
-], function(React, I18n){
+  'i18n!editor',
+  'jsx/shared/rce/RichContentEditor'
+], function(React, I18n, RichContentEditor){
 
   var SwitchEditorControl = React.createClass({
     displayName: 'SwitchEditor',
     propTypes: {
-      textarea: React.PropTypes.object.isRequired,
-      richContentEditor: React.PropTypes.object.isRequired
+      textarea: React.PropTypes.object.isRequired
     },
 
     getInitialState () {
@@ -16,7 +16,7 @@ define([
 
     toggle(e){
       e.preventDefault()
-      this.props.richContentEditor.callOnRCE(this.props.textarea, 'toggle')
+      RichContentEditor.callOnRCE(this.props.textarea, 'toggle')
       if(this.state.mode == "rce"){
         this.setState({mode: "html"})
       }else{

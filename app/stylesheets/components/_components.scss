@@ -130,7 +130,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   }
 }
 .image-block {
-  @if $use_new_styles { display: flex; }
+  @if $use_new_styles { display: flex; min-width: 1px;}
   @else { @include clearfix; }
 
   .image-block-image {
@@ -143,6 +143,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   .image-block-content {
     @if $use_new_styles {
       flex: 1;
+      min-width: 1px;
     }
     @else {
       display: table-cell;

@@ -616,7 +616,8 @@ class AccountsController < ApplicationController
       js_env({
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
-        CONTEXT_BASE_URL: "/accounts/#{@context.id}"
+        CONTEXT_BASE_URL: "/accounts/#{@context.id}",
+        MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5)
       })
     end
   end
@@ -876,8 +877,9 @@ class AccountsController < ApplicationController
     end
 
     list = UserList.new(params[:user_list],
-                        :root_account => @context.root_account,
-                        :search_method => @context.user_list_search_mode_for(@current_user))
+                        root_account: @context.root_account,
+                        search_method: @context.user_list_search_mode_for(@current_user),
+                        current_user: @current_user)
     users = list.users
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
@@ -952,6 +954,6 @@ class AccountsController < ApplicationController
 
   protected
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :basic))
+    rce_js_env(:basic)
   end
 end

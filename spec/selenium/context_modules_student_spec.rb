@@ -231,6 +231,7 @@ describe "context modules" do
     end
 
     it "should allow a student view student to progress through module content" do
+      skip_if_chrome('breaks because of masquerade_bar')
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student
 
@@ -551,6 +552,23 @@ describe "context modules" do
         validate_context_module_item_icon(@tag_4.id, @no_icon)
       end
 
+      it "should show incomplete for differentiated assignments" do
+        @course.course_sections.create!
+        assignment = @course.assignments.create!(:title => "assignmentt")
+        create_section_override_for_assignment(assignment)
+        assignment.only_visible_to_overrides = true
+        assignment.save!
+
+        tag = @module_1.add_item({:id => assignment.id, :type => 'assignment'})
+        @module_1.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+        @module_1.require_sequential_progress = false
+        @module_1.save!
+
+        go_to_modules
+
+        validate_context_module_item_icon(tag.id, @open_item_icon)
+      end
+
       it "should show a warning icon when module item is a min score requirement that didn't meet score requirment" do
         add_min_score_assignment
         grade_assignment(50)
@@ -561,7 +579,10 @@ describe "context modules" do
 
       it "should show an info icon when module item is a min score requirement that has not yet been graded" do
         add_min_score_assignment
-        @assignment_4.submit_homework(@user)
+        @assignment_4.submission_types = 'online_text_entry'
+        @assignment_4.save!
+
+        @assignment_4.submit_homework(@user, :body => "body")
         go_to_modules
 
         validate_context_module_item_icon(@tag_4.id, 'icon-info')

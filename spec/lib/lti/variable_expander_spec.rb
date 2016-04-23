@@ -209,6 +209,14 @@ module Lti
       context 'context is a course' do
         subject { described_class.new(root_account, course, controller, current_user: user) }
 
+        it 'has substitution for $Canvas.api.membershipServiceUrl' do
+          exp_hash = { test: '$Canvas.api.membershipServiceUrl' }
+          course.stubs(:id).returns('1')
+          controller.stubs(:course_membership_service_url).returns("/api/lti/courses/#{course.id}/membership_service")
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "/api/lti/courses/1/membership_service"
+        end
+
         it 'has substitution for $Canvas.course.id' do
           course.stubs(:id).returns(123)
           exp_hash = {test: '$Canvas.course.id'}

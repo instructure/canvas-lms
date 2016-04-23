@@ -39,7 +39,7 @@ define [
       # getting called every time we switch views, *before* the events are rendered.
       # That makes this a great place to clear out the previous classes.
 
-      @calendar.find(".fc-content td")
+      @calendar.find(".fc-widget-content td")
         .removeClass("event slot-available")
         .removeAttr('title')
       @mainCalendar.getEvents start, end, timezone, cb

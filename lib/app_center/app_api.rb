@@ -42,14 +42,14 @@ module AppCenter
       return json
     end
 
-    def get_apps(page = 1, per_page = 72)
+    def get_apps(page = 1, per_page = 72, app_center_access_token=nil)
       return {} unless valid_app_center?
 
       uri = URI.parse(@app_center.settings['apps_index_endpoint'])
       params = URI.decode_www_form(uri.query || '')
-      params << ['access_token', @app_center.settings['token']]
+      access_token = app_center_access_token ? app_center_access_token : @app_center.settings['token']
+      params << ['access_token', access_token]
       uri.query = URI.encode_www_form(params)
-
       json = fetch_app_center_response(uri.to_s, 5.minutes, page, per_page)
       if json['lti_apps']
         json['lti_apps'].each do |app|

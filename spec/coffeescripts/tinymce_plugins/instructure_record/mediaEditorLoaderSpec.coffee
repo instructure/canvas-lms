@@ -1,12 +1,13 @@
 define [
   'tinymce_plugins/instructure_record/mediaEditorLoader',
+  'jsx/shared/rce/RceCommandShim',
   'jquery'
-], (mediaEditorLoader, $)->
+], (mediaEditorLoader, RceCommandShim, $)->
 
   module "mediaEditorLoader",
     setup: ->
+      sinon.stub(RceCommandShim, 'send')
       @mel = mediaEditorLoader
-      @mel.rceShim = { send: (()-> return "done") }
 
       @collapseSpy = sinon.spy()
       @selectSpy = sinon.spy()
@@ -17,6 +18,7 @@ define [
           collapse: @collapseSpy
 
     teardown: ->
+      RceCommandShim.send.restore()
       window.$.mediaComment.restore  && window.$.mediaComment.restore()
 
   test 'properly makes link html', ->
@@ -27,17 +29,10 @@ define [
     equal linkHTML, expectedResult
 
   test 'creates a callback that will run callONRCE', ->
-    shim = {
-      called: false,
-      send: ()->
-        shim.called = true
-    }
-    @mel.rceShim = shim
     @mel.commentCreatedCallback(@fakeED, "ID", "TYPE")
-    ok shim.called
+    ok RceCommandShim.send.called
 
   test 'creates a callback that try to collapse a selection', ->
-    @mel.rceShim = { send: (()->) }
     @mel.commentCreatedCallback(@fakeED, "ID", "TYPE")
     ok @selectSpy.called
     ok @collapseSpy.called

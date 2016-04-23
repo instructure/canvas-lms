@@ -120,6 +120,20 @@ describe GroupsController do
       expect(assigns[:previous_groups]).to eq([group2])
     end
 
+    it 'should not show restricted previous groups' do
+      group_with_user(group_context: @course, user: @student, active_all: true)
+
+      @course.soft_conclude!
+      @course.restrict_student_past_view = true
+      @course.save!
+
+      user_session(@student)
+
+      get 'index'
+      expect(assigns[:current_groups]).to eq([])
+      expect(assigns[:previous_groups]).to eq([])
+    end
+
     describe 'pagination' do
       before :once do
         group_with_user(:group_context => @course, :user => @student, :active_all => true)
@@ -314,29 +328,29 @@ describe GroupsController do
       post 'create', :course_id => @course.id, :group => {:name => "some group", :group_category_id => 11235}
       expect(response).not_to be_success
     end
-    
+
     describe "quota" do
       before do
         Setting.set('group_default_quota', 11.megabytes)
       end
-      
+
       context "teacher" do
         before do
           user_session(@teacher)
         end
-        
+
         it "should ignore the storage_quota_mb parameter" do
           post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
           expect(assigns[:group].storage_quota_mb).to eq 11
         end
       end
-      
+
       context "account admin" do
         before do
           account_admin_user
           user_session(@admin)
         end
-        
+
         it "should set the storage_quota_mb parameter" do
           post 'create', :course_id => @course.id, :group => {:name => "a group", :storage_quota_mb => 22}
           expect(assigns[:group].storage_quota_mb).to eq 22
@@ -378,19 +392,19 @@ describe GroupsController do
       put 'update', :course_id => @course.id, :id => @group.id, :group => {:group_category_id => 11235}
       expect(response).not_to be_success
     end
-    
+
     describe "quota" do
       before :once do
         @group = @course.groups.build(:name => "teh gruop")
         @group.storage_quota_mb = 11
         @group.save!
       end
-      
+
       context "teacher" do
         before do
           user_session(@teacher)
         end
-        
+
         it "should ignore the quota parameter" do
           put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
           @group.reload
@@ -398,13 +412,13 @@ describe GroupsController do
           expect(@group.storage_quota_mb).to eq 11
         end
       end
-      
+
       context "account admin" do
         before do
           account_admin_user
           user_session(@admin)
         end
-        
+
         it "should update group quota" do
           put 'update', :course_id => @course.id, :id => @group.id, :group => {:name => 'the group', :storage_quota_mb => 22}
           @group.reload
@@ -414,7 +428,7 @@ describe GroupsController do
       end
     end
   end
-  
+
   describe "DELETE destroy" do
     it "should require authorization" do
       @group = @course.groups.create!(:name => "some group")

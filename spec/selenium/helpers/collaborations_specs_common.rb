@@ -68,6 +68,7 @@ module CollaborationsSpecsCommon
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
+    wait_for_ajaximations
 
     fj('.available-users:visible a').click
     keep_trying_until { expect(ffj('.members-list li').length).to eq 1 }
@@ -81,7 +82,7 @@ module CollaborationsSpecsCommon
 
     f('.edit_collaboration_link').click
     wait_for_ajaximations
-    fj("#groups-filter-btn-#{@collaboration.id}:visible").click
+    move_to_click("#groups-filter-btn-#{@collaboration.id}")
     wait_for_ajaximations
 
     groups = ffj('.available-groups:visible a')
@@ -105,8 +106,9 @@ module CollaborationsSpecsCommon
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
-
+    wait_for_ajaximations
     fj('.available-users:visible a').click
+    wait_for_ajaximations
     fj('.members-list a').click
     expect(ffj('.members-list li').length).to eq 0
   end

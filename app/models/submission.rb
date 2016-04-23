@@ -560,10 +560,16 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          canvadocs << a.create_canvadoc unless a.canvadoc
+          a.create_canvadoc! unless a.canvadoc
+          unless canvadocs.exists?(attachment: a)
+            canvadocs << a.canvadoc
+          end
         elsif a.crocodocable?
           submit_to_canvadocs = true
-          crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
+          a.create_crocodoc_document! unless a.crocodoc_document
+          unless crocodoc_documents.exists?(attachment: a)
+            crocodoc_documents << a.crocodoc_document
+          end
         end
 
         if submit_to_canvadocs
@@ -779,14 +785,14 @@ class Submission < ActiveRecord::Base
     }
 
     p.dispatch :submission_graded
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_grade_changed?
@@ -1029,7 +1035,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :recipient, :provisional_grade_id]
+                  :anonymous, :hidden, :provisional_grade_id]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end

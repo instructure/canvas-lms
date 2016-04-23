@@ -25,5 +25,5 @@ end
 
 def submission_comment_model(opts={})
   args = valid_submission_comment_attributes.merge(opts)
-  @submission_comment = (@submission || submission_model).add_comment(args)
+  @submission_comment = (opts.delete(:submission) || @submission || submission_model).add_comment(args)
 end

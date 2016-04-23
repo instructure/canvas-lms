@@ -20,7 +20,6 @@ require 'atom'
 
 class DiscussionEntry < ActiveRecord::Base
   include Workflow
-  include SendToInbox
   include SendToStream
   include TextHelper
   include HtmlTextHelper
@@ -59,25 +58,6 @@ class DiscussionEntry < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
-  end
-
-  on_create_send_to_inboxes do
-    if self.context && self.context.respond_to?(:available?) && self.context.available?
-      user_id = nil
-      if self.parent_entry
-        user_id = self.parent_entry.user_id
-      else
-        user_id = self.discussion_topic.user_id unless self.discussion_topic.assignment_id
-      end
-      if user_id && user_id != self.user_id
-        {
-          :recipients => user_id,
-          :subject => t("#subject_reply_to", "Re: %{subject}", :subject => self.discussion_topic.title),
-          :html_body => self.message,
-          :sender => self.user_id
-        }
-      end
-    end
   end
 
   set_broadcast_policy do |p|

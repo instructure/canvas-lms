@@ -2,33 +2,49 @@ define([
   'jquery',
   'underscore',
   'jsx/shared/rce/editorOptions',
-  'jsx/shared/rce/rceStore',
-  'jsx/shared/rce/loadEventListeners'
-], function($, _, editorOptions, RCEStore, loadEventListeners){
+  'jsx/shared/rce/loadEventListeners',
+  'jsx/shared/rce/polyfill',
+  'compiled/str/splitAssetString'
+], function($, _, editorOptions, loadEventListeners, polyfill, splitAssetString) {
+
+  let refreshToken = function(callback){
+    return $.post("/api/v1/jwts").done((response)=>{
+      callback(response.token)
+    })
+  }
+
   let RCELoader = {
-    preload(host) {
-      this.loadRCE(host, function(){})
+    preload() {
+      this.loadRCE(function(){})
     },
 
-    loadOnTarget(target, tinyMCEInitOptions, host) {
+    loadOnTarget(target, tinyMCEInitOptions, callback) {
       const textarea = this.getTargetTextarea(target)
       const getTargetFn = tinyMCEInitOptions.getRenderingTarget || this.getRenderingTarget
       const renderingTarget = getTargetFn(textarea)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
-      const renderCallback = function(rceInstance){
-        RCEStore.addToStore(textarea.id, rceInstance)
-      }
-
-      this.loadRCE(host, function (RCE) {
-        RCE.renderIntoDiv(renderingTarget, propsForRCE, renderCallback)
+      this.loadRCE(function(RCE) {
+        RCE.renderIntoDiv(renderingTarget, propsForRCE, function(remoteEditor) {
+          callback(textarea, polyfill.wrapEditor(remoteEditor))
+        })
       })
     },
 
-    loadSidebarOnTarget(target, host, callback){
-      let props = {}
-      this.loadRCE(host, function (RCE) {
-        RCE.renderSidebarIntoDiv(target, props, callback)
+    loadSidebarOnTarget(target, callback) {
+      let context = splitAssetString(ENV.context_asset_string)
+      let props = {
+        jwt: ENV.JWT,
+        refreshToken: refreshToken,
+        host: ENV.RICH_CONTENT_APP_HOST,
+        canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
+        contextType: context[0],
+        contextId: context[1]
+      }
+      this.loadRCE(function (RCE) {
+        RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
+          callback(polyfill.wrapSidebar(remoteSidebar))
+        })
       })
     },
 
@@ -48,7 +64,7 @@ define([
     *
     * @private
     */
-    loadRCE(host, cb) {
+    loadRCE(cb) {
       if(this.cachedModule !== null){
         cb(this.cachedModule)
       } else {
@@ -58,7 +74,7 @@ define([
           // multiple times, so anybody who wants the module can queue up
           // a callback, but first one to this point performs the load
           this.loadingFlag = true
-          let moduleUrl = this.buildModuleUrl(host)
+          let moduleUrl = this.buildModuleUrl()
           $.getScript(moduleUrl, (res) => { this.onRemoteLoad() })
         }
       }
@@ -118,7 +134,6 @@ define([
      * @return {Hash} ready-to-use options hash to use as react props
      */
     createRCEProps(textarea, tinyMCEInitOptions) {
-      let textareaClassName = textarea.classList + " " + RCEStore.classKeyword
       let width = textarea.offsetWidth
       let height = textarea.offsetHeight
 
@@ -133,7 +148,7 @@ define([
         editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
         defaultContent: textarea.value || tinyMCEInitOptions.defaultContent,
         textareaId: textarea.id,
-        textareaClassName: textareaClassName,
+        textareaClassName: textarea.className,
         language: ENV.LOCALE,
         mirroredAttrs: this._attrsToMirror(textarea)
       }
@@ -146,14 +161,18 @@ define([
      * @private
      * @return {String} ready-to-use URL for loading RCE remotely
      */
-    buildModuleUrl(host) {
+    buildModuleUrl() {
+      let host, path
+      if (window.ENV.RICH_CONTENT_CDN_HOST) {
+        host = window.ENV.RICH_CONTENT_CDN_HOST
+        path = '/latest'
+      } else {
+        host = window.ENV.RICH_CONTENT_APP_HOST
+        path = '/get_module'
+      }
       // trim trailing slash if there is one, as we're going to add one below
       host = host.replace(/\/$/, "")
-      var moduleUrl = '//'+ host +'/get_module'
-      if(host.indexOf("cloudfront") > -1){
-        moduleUrl = '//' + host + '/latest'
-      }
-      return moduleUrl
+      return '//' + host + path
     },
 
     /**

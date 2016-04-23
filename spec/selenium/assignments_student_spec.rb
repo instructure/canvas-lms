@@ -283,7 +283,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("#show_by_type")
       ag_el = f("#assignment_group_#{ag.id}")
       expect(ag_el).to be_present
       expect(ag_el.text).to match @assignment.name
@@ -298,7 +298,7 @@ describe "assignments" do
       expect(f('.new_assignment')).to be_nil
       expect(f('#addGroup')).to be_nil
       expect(f('.add_assignment')).to be_nil
-      f("#show_by_type").click
+      move_to_click("#show_by_type")
       expect(f("ag_#{ag.id}_manage_link")).to be_nil
     end
 
@@ -321,7 +321,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("#show_by_type")
       expect(is_checked('#show_by_type')).to be_truthy
       expect(f("#assignment_group_#{ag.id}")).not_to be_nil
 
@@ -340,7 +340,7 @@ describe "assignments" do
       expect(f('#assignment_group_overdue')).to be_nil
       expect(f('#assignment_group_past')).to be_nil
 
-      f("#show_by_type").click
+      move_to_click("#show_by_type")
       expect(f("#assignment_group_#{empty_ag.id}")).to be_nil
     end
 
@@ -357,7 +357,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      f("#show_by_type").click
+      move_to_click("#show_by_type")
       expect(f("#assignment_group_#{empty_ag.id}")).not_to be_nil
     end
 

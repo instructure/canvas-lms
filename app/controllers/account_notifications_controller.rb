@@ -223,7 +223,6 @@ class AccountNotificationsController < ApplicationController
   #     "end_at": "2014-02-01T00:00:00Z",
   #     "message": "This is a global notification"
   #   }
-
   def update
     account_notification = @account.announcements.find(params[:id])
     if account_notification
@@ -269,12 +268,7 @@ class AccountNotificationsController < ApplicationController
 
   protected
   def require_account_admin
-    get_context
-    if !@account || @account.parent_account_id
-      flash[:notice] = t(:permission_denied_notice, "You cannot create announcements for that account")
-      redirect_to account_settings_path(params[:account_id])
-      return false
-    end
+    require_account_context
     return false unless authorized_action(@account, @current_user, :manage_alerts)
   end
 

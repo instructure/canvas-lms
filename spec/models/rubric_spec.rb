@@ -259,4 +259,38 @@ describe Rubric do
       end
     end
   end
+
+  it "normalizes criteria for comparison" do
+    criteria = [{:id => "45_392",
+      :description => "Description of criterion",
+      :long_description => "",
+      :points => 5,
+      :mastery_points => nil,
+      :ignore_for_scoring => nil,
+      :learning_outcome_migration_id => nil,
+      :title => "Description of criterion",
+      :ratings =>
+        [{:description => "Full Marks",
+          :id => "blank",
+          :criterion_id => "45_392",
+          :points => 5},
+         {:description => "No Marks",
+          :id => "blank_2",
+          :criterion_id => "45_392",
+          :points => 0}]}]
+    expect(Rubric.normalize(criteria)).to eq(
+      [{"description" => "Description of criterion",
+        "points" => 5.0,
+        "id" => "45_392",
+        "ratings" =>
+          [{"description" => "Full Marks",
+            "points" => 5.0,
+            "criterion_id" => "45_392",
+            "id" => "blank"},
+           {"description" => "No Marks",
+            "points" => 0.0,
+            "criterion_id" => "45_392",
+            "id" => "blank_2"}]}]
+    )
+  end
 end

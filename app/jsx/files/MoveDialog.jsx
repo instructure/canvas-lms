@@ -5,8 +5,9 @@ define([
   'jsx/shared/modal',
   'jsx/shared/modal-content',
   'jsx/shared/modal-buttons',
-  'jsx/files/BBTreeBrowser'
-], function (I18n, React, MoveDialog, Modal, ModalContent, ModalButtons, BBTreeBrowser) {
+  'jsx/files/BBTreeBrowser',
+  'classnames'
+], function (I18n, React, MoveDialog, Modal, ModalContent, ModalButtons, BBTreeBrowser, classnames) {
 
   const modalOverrides = {
     overlay : {
@@ -25,12 +26,17 @@ define([
   };
 
   MoveDialog.renderMoveButton = function () {
+    const buttonClassNames = classnames({
+      'disabled': !this.state.destinationFolder,
+      'btn': true,
+      'btn-primary': true
+    });
     if (this.state.isCopyingFile) {
       return (
         <button
           type='submit'
-          disabled={!this.state.destinationFolder}
-          className='btn btn-primary'
+          aria-disabled={!this.state.destinationFolder}
+          className={buttonClassNames}
           data-text-while-loading={I18n.t('Copying...')}
         >
           {I18n.t('Copy to Folder')}
@@ -40,8 +46,8 @@ define([
       return (
         <button
           type='submit'
-          disabled={!this.state.destinationFolder}
-          className='btn btn-primary'
+          aria-disabled={!this.state.destinationFolder}
+          className={buttonClassNames}
           data-text-while-loading={I18n.t('Moving...')}
         >
           {I18n.t('Move')}

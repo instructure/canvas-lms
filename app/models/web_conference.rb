@@ -305,9 +305,9 @@ class WebConference < ActiveRecord::Base
 
   def active?(force_check=false)
     if !force_check
+      return false if self.ended_at && Time.now > self.ended_at
       return true if self.start_at && (self.end_at.nil? || self.end_at && Time.now > self.start_at && Time.now < self.end_at)
       return true if self.ended_at && Time.now < self.ended_at
-      return false if self.ended_at && Time.now > self.ended_at
       return @conference_active if @conference_active
     end
     @conference_active = (conference_status == :active)

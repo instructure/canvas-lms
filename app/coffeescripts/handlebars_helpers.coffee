@@ -83,7 +83,12 @@ define [
       else
         timeTitle = htmlEscape $.datetimeString(datetime)
 
-      new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
+      new Handlebars.SafeString """
+        <time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>
+          <span aria-hidden='true'>#{$.friendlyDatetime(fudged)}</span>
+          <span class='screenreader-only'>#{htmlEscape timeTitle}</span>
+        </time>
+      """
 
 
     fudge: (datetime) ->

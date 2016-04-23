@@ -2864,6 +2864,17 @@ describe User do
       expect(@student.visible_groups.size).to eq 0
     end
 
+    it 'excludes groups in courses with concluded enrollments' do
+      course_with_student
+      @course.conclude_at = Time.zone.now - 2.days
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @group = Group.create! context: @course, name: 'GroupOne'
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
     it "should include account groups" do
       account = account_model(:parent_account => Account.default)
       student = user active_all: true
