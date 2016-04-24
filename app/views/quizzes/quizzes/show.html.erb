@@ -275,10 +275,12 @@
     </h1>
 
     <% if @submission && params[:preview] %>
-      <h3>
-        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
-        <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
-      </h3>
+      <p>
+        <div class="alert">
+          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <%= t 'This is a preview of the draft version of the quiz' %>
+        </div>
+      </p>
     <% end %>
 
     <div class="row-fluid">

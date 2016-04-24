@@ -18,14 +18,16 @@
   <header class="quiz-header">
     <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>
     <% if @submission.preview? %>
-      <% preview_title = @quiz.published? ? t('headers.published_preview',
-            "This is a preview of the published version of the quiz") :
-            t('headers.draft_preview',
-            "This is a preview of the draft version of the quiz") %>
-      <h3>
-        <i class="icon-warning"></i>
-        <%= preview_title %>
-      </h3>
+      <p>
+        <div class="alert">
+          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <% if @quiz.published? %>
+            <%= t 'This is a preview of the published version of the quiz' %>
+          <% else %>
+            <%= t 'This is a preview of the draft version of the quiz' %>
+          <% end %>
+        </div>
+      </p>
     <% end %>
     <%= before_label(:started, "Started") %>
     <%= datetime_string(@submission.started_at) %>

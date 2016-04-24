@@ -19,20 +19,54 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
-describe "/quizzes/quizzes/take_quiz" do
-  it "should render" do
+describe '/quizzes/quizzes/take_quiz' do
+  it 'should render' do
     course_with_student
     view_context
-    assigns[:quiz] = @course.quizzes.create!(:description => "Hello")
+    assigns[:quiz] = @course.quizzes.create!(description: 'Hello')
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(assigns[:quiz],
-                                                     assigns[:submission],
-                                                     params
-                                                    )
-    render "quizzes/quizzes/take_quiz"
+    assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
+      assigns[:quiz],
+      assigns[:submission],
+      params
+    )
+    render 'quizzes/quizzes/take_quiz'
     doc = Nokogiri::HTML(response.body)
-    expect(doc.css('#quiz-instructions').first.content.strip).to eq "Hello"
+    expect(doc.css('#quiz-instructions').first.content.strip).to eq 'Hello'
     expect(response).not_to be_nil
   end
-end
 
+  it 'should render preview alert for unpublished quiz' do
+    course_with_student
+    view_context
+    assigns[:quiz] = @course.quizzes.create!
+    assigns[:submission] = assigns[:quiz].generate_submission(@user)
+    assigns[:submission].update_attribute(:workflow_state, 'preview')
+    assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
+      assigns[:quiz],
+      assigns[:submission],
+      params
+    )
+    render 'quizzes/quizzes/take_quiz'
+
+    expect(response).to include 'preview of the draft version'
+  end
+
+  it 'should render preview alert for published quiz' do
+    course_with_student
+    view_context
+    quiz = @course.quizzes.create!
+    quiz.publish!
+    assigns[:quiz] = quiz
+    assigns[:submission] = quiz.generate_submission(@user)
+    assigns[:submission].update_attribute(:workflow_state, 'preview')
+    assigns[:quiz_presenter] = Quizzes::TakeQuizPresenter.new(
+      assigns[:quiz],
+      assigns[:submission],
+      params
+    )
+    render 'quizzes/quizzes/take_quiz'
+
+    expect(response).to include 'preview of the published version'
+  end
+end

@@ -104,5 +104,47 @@ describe "/quizzes/quizzes/show" do
     end
   end
 
+  it 'should render teacher partial for teachers' do
+    course_with_teacher_logged_in(active_all: true)
+    view_context
+    assigns[:quiz] = @course.quizzes.create!
+    render 'quizzes/quizzes/show'
+    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
+    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
+  end
+
+  it 'should render student partial for students' do
+    course_with_student_logged_in(active_all: true)
+    quiz = @course.quizzes.build
+    quiz.publish!
+    assigns[:quiz] = quiz
+    view_context
+    render 'quizzes/quizzes/show'
+    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_student'
+    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
+  end
+
+  it 'should render draft version warning' do
+    course_with_student_logged_in(active_all: true)
+    quiz = @course.quizzes.create
+    quiz.workflow_state = 'available'
+    quiz.save!
+    quiz.reload
+    quiz.assignment.mute!
+    quiz.assignment.grade_student(@student, grade: 5)
+    submission = quiz.quiz_submissions.create
+    submission.score = 5
+    submission.user = @student
+    submission.attempt = 1
+    submission.workflow_state = 'complete'
+    submission.save
+    assigns[:quiz] = quiz
+    assigns[:submission] = submission
+    params[:preview] = true
+    view_context
+    render 'quizzes/quizzes/show'
+
+    expect(response).to include 'preview of the draft version'
+  end
 end
 
