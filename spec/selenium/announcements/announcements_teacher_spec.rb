@@ -59,6 +59,11 @@ describe "announcements" do
         refresh_and_filter(:string, 'jake', user_name)
       end
 
+      it "should search an entire phrase" do
+        replace_content(f('#searchTerm'), 'new 001')
+        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq 1
+      end
+
       it "should return multiple items in the search", priority: "1", test_id: 220362 do
         new_title = 'updated'
         what_to_create.first.update_attributes(:title => "#{new_title} first")
