@@ -2295,6 +2295,7 @@ mi:
     corrupted: "Kāore he mokamoka"
     login: TAKIURU
     logout: Takiputa
+  authentication_with_provider_was_successful_but_no_6a194137: "Motuhēhēnga ki %{provider} ko angitu, engari i whakaratohia kahore TT ahurei mō te te takiuru roto ki Kanaweti."
   authorize_e3f25bb4: "whakamana "
   available_8606e40c: wātea
   available_after_unlock_at_b5682224: "Wātea i muri %{unlock_at}"
@@ -2972,6 +2973,8 @@ mi:
           other: " *%{count}* kaiuru"
       titles: 
         collaboration: Tahi
+    collaboration_footer: 
+      started_by: "i tīmataria e te *%{user}*, %{at}"
     collaborator_picker: 
       labels: 
         available_groups: "rōpū wātea"
@@ -8299,7 +8302,7 @@ mi:
       save_failed: "Puta Tiaki rahua ki te kua. Katia koa tēnei pakūake ki ngana anō."
       save_failed_try_again: "I rahua te Tāurunga ki te whakaora. Tēnā ngana anō."
       upload_failed: "I rahua te Tukuatu ki hapa:"
-    file_size_error: "He nui ake te mōrahi %{max} whakaaetia rahi kōnae Rahi o te %{file}."
+    file_size_error: "he nui ake te mōrahi %{max} tukua MB rahi kōnae rahi o te %{file}."
     file_type_error: "e kore he %{file} te %{type} kōnae manakohia."
     links: 
       minimize_embedded_kaltura_content: "Whakamōkito ihirangi tāmau"
@@ -10273,6 +10276,7 @@ mi:
   move_to_front_bf6f0194: "Nuku ki Mua "
   moving_a4d552df: "neke ..."
   multi_factor_authentication_configured_865b1bde: "Motuhēhēnga Maha-tauwehe whirihora"
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "E hāngai ana ngā pūkete Kanaweti maha ki District Clever %{district_id}"
   multiple_due_dates_6b0d75c6: "Rā e tika Maha "
   multiple_modules_930713d4: "Kōwae maha"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -15197,6 +15201,11 @@ mi:
       
       Mauruuru koutou,
       Tautoko kānawehi
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      Te karere ka tonoa koe ki te rārangi kaupapa "%{subject}" kihai i tukua. Ki te whakautu ki a Kanaweti karere i tenei īmēra, me tuatahi te mea he hongere kōrero whakapumautia i roto i to koutou kōtaha Kanaweti. Tēnā, haere ki tō kōtaha me te tuku anō i te īmēra haamauraa mō tenei wāhitau īmēra [kite https://community.canvaslms.com/docs/DOC-2281]. Kia hoki e koe te whakapā atu i tenei tangata mā te Canvas Pouakauru [kite https://community.canvaslms.com/docs/DOC-2670].
+      
+      Mauruuru koutou,
+      Tautoko kānawehi
   the_module_item_is_locked_27fe420b: "Kiia te tūemi kōwae te."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Ko te tatau tino tata mō te kaiwhakamahi %{current_user_name} me te putanga %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Kua korerotia te pikitia kōtaha kua"
@@ -15256,6 +15265,7 @@ mi:
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Puta tēnei whakapakoko ano he tohuwai papamuri ki tou whārangi. Hōputu Whakaaetia: teitei, SVG, GIF, JPEG"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Ko te rārangi piko wehea o URL o ki te whakawhirinaki tenei. Te whakawhirinaki ki tetahi URL o roto i tēnei rārangi, ka hipa i te tohu CSRF ina takiuru ki Kanaweti."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Ko te akoranga faaoti tenei, na e wātea ana ngā whakaurunga anake faaoti. "
+  this_is_a_message_for_name_7abf1e39: "Ko te karere mo tenei *%{name}*"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Ko te kōeke i whiriwhiri i tēnei wā mō tēnei ākonga tenei."
   this_is_the_default_email_address_f3c421fb: "Ko te wāhitau īmēra taunoa tenei"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Ka puta tēnei tūemi ka hanga he tāpaetanga hou te."
@@ -15564,6 +15574,7 @@ mi:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uh oh! Whakapā atu ki tō Developer Putumōhio hoa. Karere Hapa:% {message}"
   unable_to_accept_update_fd53a7e2: "Kāore e taea te farii i te whakahōu"
   unable_to_dismiss_update_df1e32eb: "Kāore e taea te tonoa whakahōu"
+  unable_to_find_clever_district_district_id_61deb1cb: "Kāore e taea te te kitea Clever District %{district_id}"
   unable_to_remove_app_4293cb53: "Kāore e taea te tango taupānga "
   unarchive_selected_e0c4bd3d: "Unarchive tīpakohia "
   unauthorized: kāore
@@ -16067,6 +16078,7 @@ mi:
           whakaturia ake akoranga ranei ake tou kōtaha.
       welcome_to_happiness: "Nau mai ki Kanaweti!"
   users_d1b60cb0: kaiwhakamahi
+  users_matching_search_term_c604db9e: "ōrite kaiwhakamahi \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "kia Me Kaiwhakamahi o kaipānui mata ki te tahuri atu te pehu mariko i roto i te tikanga ki te whakamahi i enei pokatata papapātuhi"
   validate: 
     is_required: "Hiahiatia tēnei mara te"
@@ -16387,6 +16399,18 @@ mi:
       Ka hiahia koe ki te waihanga i tētahi taupānga tukutuku i roto i te [Google Developer Papatohu](%{google_url}).
       Kia tāpiri koe i %{callback_url} rite te aronga URI.
       I muri te hanga e koe tou taupānga, hanga he tuhipoka o te ID Kiritaki me Kiritaki Secret, ka tomo ratou ki konei.
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Ka Me koe ki te rēhita i tētahi [taupānga hou ki Microsoft](%{ms_app_url}).
+      me whirihora e koe %{callback_url} rite te anō URI.
+      I muri whakaora koe tou taupānga, hanga he tuhipoka o te ID Taupānga ko Secret, ka tomo ratou ki konei.
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      Ka Me koe ki [te rēhita i tētahi tono i runga i Clever](%{clever_url}).
+      me whirihora e koe %{callback_url} rite te anō URL.
+      I muri te hanga koe tou taupānga, hanga he tuhipoka o te ID Kiritaki me Kiritaki Secret, ka tomo ratou ki konei.
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      Ka Me koe ki [te rēhita i tētahi tono i runga i Clever](%{clever_url}).
+      me whirihora e koe %{callback_url} rite te URL aronga.
+      I muri te hanga koe tou taupānga, hanga he tuhipoka o te ID Kiritaki me Kiritaki Secret, ka tomo ratou ki konei.
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       Ka Me ki [rēhita i tētahi tono i runga i GitHub](%{github_url}).
       Me whirihora e koe %{callback_url} rite te Whakamanatanga hokiwaea URL.
