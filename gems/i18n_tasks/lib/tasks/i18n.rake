@@ -76,6 +76,7 @@ namespace :i18n do
     require 'active_record'
     require 'will_paginate'
     I18n.load_path.unshift(*WillPaginate::I18n.load_path)
+    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')] if ENV['RAILS_LOAD_ALL_LOCALES'] && !ENV['RAILS_LOAD_LOCAL_LOCALES']
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'
