@@ -1786,11 +1786,12 @@ class User < ActiveRecord::Base
     opts = {limit: 20}.merge(opts.slice(:start_at, :limit))
     shard.activate do
       Rails.cache.fetch([self, 'submissions_for_context_codes', context_codes, opts].cache_key, expires_in: 15.minutes) do
-        opts[:start_at] ||= 2.weeks.ago
+        opts[:start_at] ||= 4.weeks.ago
 
         Shackles.activate(:slave) do
           submissions = []
-          submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).eager_load(:assignment).
+          submissions += self.submissions.where("submissions.submitted_at > ? OR submissions.created_at > ?", opts[:start_at], opts[:start_at]).
+            for_context_codes(context_codes).eager_load(:assignment).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
             limit(opts[:limit]).to_a
