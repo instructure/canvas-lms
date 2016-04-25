@@ -31,7 +31,7 @@ define([
       if (this.props.shortcuts) {
         return this.props.shortcuts.map(function(shortcut) {
           return (
-            <li>
+            <li key={shortcut.keycode}>
               <span className="keycode">{shortcut.keycode}</span>
               <span className="colon">:</span>
               <span className="description">{shortcut.description}</span>
