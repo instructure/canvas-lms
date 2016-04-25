@@ -49,6 +49,7 @@ define([
           query={this.props.query}
           collection={this.state.collection}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+          splat={this.props.splat}
         />
       )
     }

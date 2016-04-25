@@ -58,8 +58,8 @@ define [
     getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
       initialItem = null
-      onlyIdsToPreview = @props.query.only_preview?.split(',')
-      files = if !!@props.query.search_term
+      onlyIdsToPreview = props.query.only_preview?.split(',')
+      files = if !!props.query.search_term
                 props.collection.models
               else
                 props.currentFolder.files.models
@@ -68,12 +68,12 @@ define [
                       return true unless onlyIdsToPreview
                       file.id in onlyIdsToPreview
 
-      visibleFile = @props.query.preview and _.findWhere(files, {id: @props.query.preview})
+      visibleFile = props.query.preview and _.findWhere(files, {id: props.query.preview})
 
       if !visibleFile
         responseDataRequested = ["enhanced_preview_url"]
         responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
-        new File({id: @props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
+        new File({id: props.query.preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
@@ -87,19 +87,13 @@ define [
       otherItems: items.otherItems
       currentFolder: props.currentFolder
       params: props.params
-      otherItemsString: (@props.query.only_preview if @props.query.only_preview)
+      otherItemsString: (props.query.only_preview if props.query.only_preview)
       otherItemsIsBackBoneCollection: items.otherItems instanceof Backbone.Collection
 
     setUpOtherItemsQuery: (otherItems) ->
       otherItems.map((item) ->
         item.id
       ).join(',')
-
-    getRouteIdentifier: ->
-      if @props.query.search_term
-        '/search'
-      else
-        @props.pathname
 
     getNavigationParams: (opts = {id: null, except: []}) ->
       obj =
