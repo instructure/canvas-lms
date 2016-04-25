@@ -2,8 +2,8 @@ class DropZipFileImports < ActiveRecord::Migration
   tag :postdeploy
 
   def up
-    while Attachment.where(:context_type => "ZipFileImport").limit(1000).delete_all > 0; end
     drop_table :zip_file_imports
+    while Attachment.where(:context_type => "ZipFileImport").limit(1000).delete_all > 0; end
   end
 
   def down
