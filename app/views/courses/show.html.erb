@@ -120,7 +120,7 @@
     <% end %>
   <% end %>
   <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true, :period => :two_weeks} %>
+    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
   <% end %>
 <% end %>
 
