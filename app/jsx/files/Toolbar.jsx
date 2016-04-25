@@ -38,7 +38,7 @@ define([
             className='btn btn-add-folder'
             aria-label= {I18n.t('Add Folder')}
           >
-            <i className='icon-plus' />
+            <i className='icon-plus' />&nbsp;
             <span className= {phoneHiddenSet} >
               {I18n.t('Folder')}
             </span>
@@ -113,7 +113,7 @@ define([
           aria-label= {I18n.t('Move')}
           dataTooltip= ''
         >
-          <i className='icon-copy-course' />
+          <i className='icon-updown' />
         </button>
       );
     }
