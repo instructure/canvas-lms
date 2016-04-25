@@ -2863,6 +2863,18 @@ describe 'Submissions API', type: :request do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
       end
+
+      it "should upload to a student's Submissions folder if the feature is enabled" do
+        @course.root_account.enable_feature! :submissions_folder
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        f = Attachment.last.folder
+        expect(f.submission_context_code).to eq @course.asset_string
+      end
+
+      it "should not do so otherwise" do
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        expect(Attachment.last.folder).not_to be_for_submissions
+      end
     end
 
     it "should reject invalid urls" do
