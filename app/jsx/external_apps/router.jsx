@@ -5,8 +5,9 @@ define([
   'jsx/external_apps/components/AppList',
   'jsx/external_apps/components/AppDetails',
   'jsx/external_apps/components/Configurations',
+  'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/lib/regularizePathname'
-], function(React, page, Root, AppList, AppDetails, Configurations, regularizePathname) {
+], function(React, page, Root, AppList, AppDetails, Configurations, AppCenterStore, regularizePathname) {
 
   const currentPath = window.location.pathname;
   const re = /(.*\/settings|.*\/details)/;
@@ -34,7 +35,12 @@ define([
   const renderAppDetails = (ctx) => {
     React.render(
       <Root>
-        <AppDetails shortName={ctx.params.shortName} pathname={ctx.pathname} baseUrl={baseUrl} />
+        <AppDetails
+          shortName={ctx.params.shortName}
+          pathname={ctx.pathname}
+          baseUrl={baseUrl}
+          store={AppCenterStore}
+        />
       </Root>
     , targetNodeToRenderIn);
   };

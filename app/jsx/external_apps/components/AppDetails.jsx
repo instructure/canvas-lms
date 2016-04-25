@@ -2,17 +2,18 @@ define([
   'i18n!external_tools',
   'react',
   'page',
-  'jsx/external_apps/lib/AppCenterStore',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/AddApp',
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, React, page, store, Header, AddApp) {
+], function(I18n, React, page, Header, AddApp) {
 
   return React.createClass({
     displayName: 'AppDetails',
 
     propTypes: {
-      params: React.PropTypes.object.isRequired
+      store: React.PropTypes.object.isRequired,
+      baseUrl: React.PropTypes.string.isRequired,
+      shortName: React.PropTypes.string.isRequired
     },
 
     getInitialState() {
@@ -22,7 +23,7 @@ define([
     },
 
     componentDidMount() {
-      var app = store.findAppByShortName(this.props.shortName);
+      var app = this.props.store.findAppByShortName(this.props.shortName);
       if (app) {
         this.setState({ app: app });
       } else {
@@ -34,8 +35,8 @@ define([
       var app = this.state.app;
       app.is_installed = true;
       this.setState({ app: app });
-      store.flagAppAsInstalled(app.short_name);
-      store.setState({filter: 'installed', filterText: ''});
+      this.props.store.flagAppAsInstalled(app.short_name);
+      this.props.store.setState({filter: 'installed', filterText: ''});
       $.flashMessage(I18n.t('The app was added successfully'));
       page('/');
     },
@@ -68,7 +69,7 @@ define([
                     </div>
                     <AddApp ref="addAppButton" app={this.state.app} handleToolInstalled={this.handleToolInstalled} />
 
-                    <a href={this.props.pathname} className="app_cancel">&laquo; {I18n.t('Back to App Center')}</a>
+                    <a href={this.props.baseUrl} className="app_cancel">&laquo; {I18n.t('Back to App Center')}</a>
                   </td>
                   <td className="individual-app-right" valign="top">
                     <h2 ref="appName">{this.state.app.name}</h2>
