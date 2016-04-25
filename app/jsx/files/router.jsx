@@ -48,14 +48,20 @@ define([
     next();
   }
 
-  function getSplat (ctx, next) {
+  function getFolderSplat (ctx, next) {
     /* This function only gets called when hitting the /folder/*
      * route so we make that assumption here with many of the
      * things being done.
      */
     const PATH_PREFIX = '/folder/';
-    const index = ctx.path.indexOf(PATH_PREFIX) + PATH_PREFIX.length
-    ctx.splat = ctx.path.slice(index)
+    const index = ctx.pathname.indexOf(PATH_PREFIX) + PATH_PREFIX.length;
+    const rawSplat = ctx.pathname.slice(index);
+    ctx.splat = rawSplat.split('/').map((part) => window.encodeURIComponent(part)).join('/');
+    next();
+  }
+
+  function getSplat (ctx, next) {
+    ctx.splat = '';
     next();
   }
 
@@ -63,17 +69,18 @@ define([
    * Route Configuration
    */
   page.base(filesEnv.baseUrl);
+  page('*', getSplat); // Generally this will overridden by the folder route's middleware
   page('*', parseQueryString); // Middleware to parse querystring to object
   page('/', renderShowFolder);
   page('/search', renderSearchResults);
   page('/folder', '/');
-  page('/folder/*', getSplat, renderShowFolder);
+  page('/folder/*', getFolderSplat, renderShowFolder);
 
   return {
     start () {
       page.start();
     },
-    getSplat // Export getSplat for testing
+    getFolderSplat // Export getSplat for testing
   };
 
 });

@@ -24,6 +24,7 @@ define([
           params={this.props.params}
           query={this.props.query}
           pathname={this.props.pathname}
+          splat={this.props.splat}
         />
       );
     }

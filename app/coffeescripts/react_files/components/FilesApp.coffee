@@ -65,12 +65,6 @@ define [
         retObj.search_term = @props.query.search_term
       retObj
 
-    getPreviewRoute: ->
-      if @props.query?.search_term
-        '/search'
-      else
-        @props.pathname
-
     openModal: (contents, afterClose) ->
       @setState
         modalContents: contents

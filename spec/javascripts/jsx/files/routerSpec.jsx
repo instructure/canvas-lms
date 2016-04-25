@@ -3,21 +3,32 @@ define([
   'jsx/files/router',
 ], (React, router) => {
 
-  const TestUtils = React.addons.TestUtils
+  const TestUtils = React.addons.TestUtils;
+
+  // No op for next().
+  const fakeNext = () => {};
 
   module('Files Client-side Router');
 
-  test('getSplat returns the proper splat on ctx given uri characters', () => {
+  test('getFolderSplat returns the proper splat on ctx given uri characters', () => {
     const fakeCtx = {
-      path: '/folder/this%23could%2Bbe%20bad%3F%20maybe',
+      pathname: '/folder/this#could+be bad? maybe'
     };
 
-    // No op for next().
-    const fakeNext = () => {};
-
-    router.getSplat(fakeCtx, fakeNext);
+    router.getFolderSplat(fakeCtx, fakeNext);
 
     equal(fakeCtx.splat, 'this%23could%2Bbe%20bad%3F%20maybe', 'splat is correctly encoded');
+
+  });
+
+  test('getFolderSplat returns the proper splat on ctx with multiple levels', () => {
+    const fakeCtx = {
+      pathname: '/folder/this#could+be bad? maybe/another?bad folder/something else'
+    };
+
+    router.getFolderSplat(fakeCtx, fakeNext);
+
+    equal(fakeCtx.splat, 'this%23could%2Bbe%20bad%3F%20maybe/another%3Fbad%20folder/something%20else', 'splat is correctly encoded');
 
   });
 

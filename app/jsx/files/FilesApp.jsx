@@ -31,10 +31,20 @@ define([
   FilesApp.previewItem = function (item) {
     this.clearSelectedItems(() => {
       this.toggleItemSelected(item, null, () => {
-        const queryString  = $.param(this.getPreviewQuery());
+        const queryString = $.param(this.getPreviewQuery());
         page(`${this.getPreviewRoute()}?${queryString}`);
-      })
+      });
     });
+  };
+
+  FilesApp.getPreviewRoute = function () {
+    if (this.props.query && this.props.query.search_term) {
+      return '/search';
+    } else if (this.props.splat) {
+      return `/folder/${this.props.splat}`;
+    } else {
+      return '';
+    }
   };
 
   FilesApp.render = function () {

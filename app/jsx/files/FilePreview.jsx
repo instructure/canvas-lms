@@ -55,19 +55,27 @@ define([
     FocusStore.setFocusToItem();
   };
 
+  FilePreview.getRouteIdentifier = function () {
+    if (this.props.query && this.props.query.search_term) {
+      return '/search';
+    } else if (this.props.splat) {
+      return `/folder/${this.props.splat}`;
+    } else {
+      return '';
+    }
+  };
+
   FilePreview.renderArrowLink = function (direction) {
     var nextItem = (direction === 'left') ?
                    CollectionHandler.getPreviousInRelationTo(this.state.otherItems, this.state.displayedItem) :
                    CollectionHandler.getNextInRelationTo(this.state.otherItems, this.state.displayedItem);
 
     var linkText = (direction === 'left') ? I18n.t('View previous file') : I18n.t('View next file')
+    const baseUrl = page.base();
     return (
       <div className='col-xs-1 ef-file-arrow_container'>
         <a
-          href={`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams((nextItem) ? {id: nextItem.id} : null))}`}
-          to={this.getRouteIdentifier()}
-          query={this.getNavigationParams((nextItem) ? {id: nextItem.id} : null)}
-          params={this.props.params}
+          href={`${baseUrl}${this.getRouteIdentifier()}?${$.param(this.getNavigationParams((nextItem) ? {id: nextItem.id} : null))}`}
           className='ef-file-preview-container-arrow-link'
         >
           <div className='ef-file-preview-arrow-link'>
