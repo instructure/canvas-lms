@@ -68,6 +68,10 @@ class ActionController::Base
   before_filter :force_utf8_params
 end
 
+module ActiveRecord::Coders
+  Utf8SafeYAMLColumn = YAMLColumn
+end
+
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
 if RUBY_VERSION < "2."
   require 'net/protocol'
