@@ -9144,6 +9144,7 @@ fa:
         create_quiz: "ایجاد آزمون"
       tool: 
         cancel: لغو
+    dialog_title: "افزودن مورد به {moduleName}%"
     item: 
       cancel: لغو
       edit_item: "ویرایش مورد ماژول"
