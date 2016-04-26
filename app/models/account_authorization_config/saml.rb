@@ -93,7 +93,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
-      @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
+      @saml_settings.idp_cert_fingerprint = (certificate_fingerprint || '').split.presence
       @saml_settings.name_identifier_format = self.identifier_format
       @saml_settings.requested_authn_context = self.requested_authn_context
       @saml_settings.logger = logger
