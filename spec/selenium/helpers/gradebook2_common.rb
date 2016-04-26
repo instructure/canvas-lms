@@ -9,9 +9,11 @@ module Gradebook2Common
     let(:test_course) { course() }
     let(:teacher)     { user(active_all: true) }
     let(:student)     { user(active_all: true) }
+    let(:concluded_student) { user(name: 'Stewie Griffin', active_all: true) }
     let(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
     end
     let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
     let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
