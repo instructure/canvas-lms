@@ -603,8 +603,8 @@ TEXT
               </tr>
             </table>
           </fieldset>
-        <% end %>
-
+	    <% end %>
+	         
         <% if @account.root_account? and not (exposed_services = Account.services_exposed_to_ui_hash(:service, @current_user)).empty? %>
           <fieldset>
             <legend><%= t(:enabled_web_serices_title, "Enabled Web Services") %></legend>

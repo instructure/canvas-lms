@@ -1,0 +1,360 @@
+=begin
+VeriCiteV1
+
+=end
+
+require 'date'
+require 'json'
+require 'logger'
+require 'tempfile'
+require 'net/https'
+require 'uri'
+
+module VeriCiteClient
+  class ApiClient
+    # The Configuration object holding settings to be used in the API client.
+    attr_accessor :config
+
+    # Defines the headers to be used in HTTP requests of all API calls by default.
+    #
+    # @return [Hash]
+    attr_accessor :default_headers
+
+    def initialize(config = Configuration.default)
+      @config = config
+      @user_agent = "ruby-vericite-#{VERSION}"
+      @default_headers = {
+        'Content-Type' => "application/json",
+        'User-Agent' => @user_agent
+      }
+    end
+
+    def self.default
+      @@default ||= ApiClient.new
+    end
+
+    # Call an API with given options.
+    #
+    # @return [Array<(Object, Fixnum, Hash)>] an array of 3 elements:
+    #   the data deserialized from response body (could be nil), response status code and response headers.
+    def call_api(http_method, path, opts = {})
+      response = build_request(http_method, path, opts)
+
+      if @config.debugging
+        @config.logger.debug "HTTP response body ~BEGIN~\n#{response.body}\n~END~\n"
+      end
+
+      unless response.kind_of? Net::HTTPSuccess
+        fail ApiError.new(:code => response.code,
+                          :response_headers => response.to_hash,
+                          :response_body => response.body),
+             response.message
+      end
+
+      if opts[:return_type]
+        data = deserialize(response, opts[:return_type])
+      else
+        data = nil
+      end
+      return data, response.code, response.to_hash
+    end
+
+    def build_request(http_method, path, opts = {})
+      url = build_request_url(path)
+      http_method = http_method.to_sym.downcase
+
+      header_params = @default_headers.merge(opts[:header_params] || {})
+      query_params = opts[:query_params] || {}
+      form_params = opts[:form_params] || {}
+
+      if [:post, :patch, :put, :delete].include?(http_method)
+        req_body = build_request_body(header_params, form_params, opts[:body])
+        if @config.debugging
+          @config.logger.debug "HTTP request body param ~BEGIN~\n#{req_body}\n~END~\n"
+        end
+      end
+      uri = URI("#{url}?#{URI.encode_www_form(query_params)}")
+      https = Net::HTTP.new(uri.host,uri.port)
+      https.use_ssl = true
+      rootCA = '/etc/ssl/certs'
+      if File.directory? rootCA
+        https.ca_path = rootCA
+        https.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        https.verify_depth = 5
+      else
+        https.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
+      path = "#{uri.path}?#{uri.query}"
+      case http_method
+      when :put
+        req = Net::HTTP::Put.new(uri)
+      when :post
+        req = Net::HTTP::Post.new(uri)
+      when :get
+        req = Net::HTTP::Get.new(uri)
+      when :delete
+        req = Net::HTTP::Delete.new(uri)
+      end    
+      req.body = req_body
+      # Headers
+      header_params.each do |key, value|
+        if key == :consumer
+          key = "consumer"
+        elsif key == :consumerSecret
+          key = "consumerSecret"
+        end
+        req.add_field(key, value)
+      end 
+      res = https.start{|con|
+        con.request(req)
+      }
+    end
+
+    # Check if the given MIME is a JSON MIME.
+    # JSON MIME examples:
+    #   application/json
+    #   application/json; charset=UTF8
+    #   APPLICATION/JSON
+    def json_mime?(mime)
+       !!(mime =~ /\Aapplication\/json(;.*)?\z/i)
+    end
+
+    # Deserialize the response to the given return type.
+    #
+    # @param [String] return_type some examples: "User", "Array[User]", "Hash[String,Integer]"
+    def deserialize(response, return_type)
+      body = response.body
+      return nil if body.nil? || body.empty?
+
+      # return response body directly for String return type
+      return body if return_type == 'String'
+
+      # handle file downloading - save response body into a tmp file and return the File instance
+      return download_file(response) if return_type == 'File'
+
+      # ensuring a default content type
+      content_type = response.to_hash['Content-Type'] || 'application/json'
+
+      fail "Content-Type is not supported: #{content_type}" unless json_mime?(content_type)
+
+      begin
+        data = JSON.parse("[#{body}]", :symbolize_names => true)[0]
+      rescue JSON::ParserError => e
+        if %w(String Date DateTime).include?(return_type)
+          data = body
+        else
+          raise e
+        end
+      end
+
+      convert_to_type data, return_type
+    end
+
+    # Convert data to the given return type.
+    def convert_to_type(data, return_type)
+      return nil if data.nil?
+      case return_type
+      when 'String'
+        data.to_s
+      when 'Integer'
+        data.to_i
+      when 'Float'
+        data.to_f
+      when 'BOOLEAN'
+        data == true
+      when 'DateTime'
+        # parse date time (expecting ISO 8601 format)
+        DateTime.parse data
+      when 'Date'
+        # parse date time (expecting ISO 8601 format)
+        Date.parse data
+      when 'Object'
+        # generic object (usually a Hash), return directly
+        data
+      when /\AArray<(.+)>\z/
+        # e.g. Array<Pet>
+        sub_type = $1
+        data.map {|item| convert_to_type(item, sub_type) }
+      when /\AHash\<String, (.+)\>\z/
+        # e.g. Hash<String, Integer>
+        sub_type = $1
+        {}.tap do |hash|
+          data.each {|k, v| hash[k] = convert_to_type(v, sub_type) }
+        end
+      else
+        # models, e.g. Pet
+        VeriCiteClient.const_get(return_type).new.tap do |model|
+          model.build_from_hash data
+        end
+      end
+    end
+
+    # Save response body into a file in (the defined) temporary folder, using the filename
+    # from the "Content-Disposition" header if provided, otherwise a random filename.
+    #
+    # @see Configuration#temp_folder_path
+    # @return [Tempfile] the file downloaded
+    def download_file(response)
+      content_disposition = response.to_hash['Content-Disposition']
+      if content_disposition
+        filename = content_disposition[/filename=['"]?([^'"\s]+)['"]?/, 1]
+        prefix = sanitize_filename(filename)
+      else
+        prefix = 'download-'
+      end
+      prefix = prefix + '-' unless prefix.end_with?('-')
+
+      tempfile = nil
+      encoding = response.body.encoding
+      Tempfile.open(prefix, @config.temp_folder_path, encoding: encoding) do |file|
+        file.write(response.body)
+        tempfile = file
+      end
+      @config.logger.info "Temp file written to #{tempfile.path}, please copy the file to a proper folder "\
+                          "with e.g. `FileUtils.cp(tempfile.path, '/new/file/path')` otherwise the temp file "\
+                          "will be deleted automatically with GC. It's also recommended to delete the temp file "\
+                          "explicitly with `tempfile.delete`"
+      tempfile
+    end
+
+    # Sanitize filename by removing path.
+    # e.g. ../../sun.gif becomes sun.gif
+    #
+    # @param [String] filename the filename to be sanitized
+    # @return [String] the sanitized filename
+    def sanitize_filename(filename)
+      filename.gsub /.*[\/\\]/, ''
+    end
+
+    def build_request_url(path)
+      # Add leading and trailing slashes to path
+      path = "/#{path}".gsub(/\/+/, '/')
+      URI.encode(@config.base_url + path)
+    end
+
+    def build_request_body(header_params, form_params, body)
+      # http form
+      if header_params['Content-Type'] == 'application/x-www-form-urlencoded' ||
+          header_params['Content-Type'] == 'multipart/form-data'
+        data = {}
+        form_params.each do |key, value|
+          case value
+          when File, Array, nil
+            # let typhoeus handle File, Array and nil parameters
+            data[key] = value
+          else
+            data[key] = value.to_s
+          end
+        end
+      elsif body
+        data = body.is_a?(String) ? body : body.to_json
+      else
+        data = nil
+      end
+      data
+    end
+
+    # Update hearder and query params based on authentication settings.
+    def update_params_for_auth!(header_params, query_params, auth_names)
+      Array(auth_names).each do |auth_name|
+        auth_setting = @config.auth_settings[auth_name]
+        next unless auth_setting
+        case auth_setting[:in]
+        when 'header' then header_params[auth_setting[:key]] = auth_setting[:value]
+        when 'query'  then query_params[auth_setting[:key]] = auth_setting[:value]
+        else fail ArgumentError, 'Authentication token must be in `query` of `header`'
+        end
+      end
+    end
+
+    def user_agent=(user_agent)
+      @user_agent = user_agent
+      @default_headers['User-Agent'] = @user_agent
+    end
+
+    # Return Accept header based on an array of accepts provided.
+    # @param [Array] accepts array for Accept
+    # @return [String] the Accept header (e.g. application/json)
+    def select_header_accept(accepts)
+      return nil if accepts.nil? || accepts.empty?
+      # use JSON when present, otherwise use all of the provided
+      json_accept = accepts.find { |s| json_mime?(s) }
+      return json_accept || accepts.join(',')
+    end
+
+    # Return Content-Type header based on an array of content types provided.
+    # @param [Array] content_types array for Content-Type
+    # @return [String] the Content-Type header  (e.g. application/json)
+    def select_header_content_type(content_types)
+      # use application/json by default
+      return 'application/json' if content_types.nil? || content_types.empty?
+      # use JSON when present, otherwise use the first one
+      json_content_type = content_types.find { |s| json_mime?(s) }
+      return json_content_type || content_types.first
+    end
+
+    # Convert object (array, hash, object, etc) to JSON string.
+    # @param [Object] model object to be converted into JSON string
+    # @return [String] JSON string representation of the object
+    def object_to_http_body(model)
+      return model if model.nil? || model.is_a?(String)
+      _body = nil
+      if model.is_a?(Array)
+        _body = model.map{|m| object_to_hash(m) }
+      else
+        _body = object_to_hash(model)
+      end
+      _body.to_json
+    end
+
+    # Convert object(non-array) to hash.
+    # @param [Object] obj object to be converted into JSON string
+    # @return [String] JSON string representation of the object
+    def object_to_hash(obj)
+      if obj.respond_to?(:to_hash)
+        obj.to_hash
+      else
+        obj
+      end
+    end
+
+    # Build parameter value according to the given collection format.
+    # @param [String] collection_format one of :csv, :ssv, :tsv, :pipes and :multi
+    def build_collection_param(param, collection_format)
+      case collection_format
+      when :csv
+        param.join(',')
+      when :ssv
+        param.join(' ')
+      when :tsv
+        param.join("\t")
+      when :pipes
+        param.join('|')
+      when :multi
+        # return the array directly as typhoeus will handle it as expected
+        param
+      else
+        fail "unknown collection format: #{collection_format.inspect}"
+      end
+    end
+    
+    def uploadfile(path, file)
+      url = URI.parse(path)
+      
+      response = Net::HTTP.start(url.host) do |http|
+        http.send_request("PUT", url.request_uri, (file.is_a?(String) ? file : file.read), {
+          # This is required, or Net::HTTP will add a default unsigned content-type.
+          "content-type" => "",
+        })
+      end
+      unless response.kind_of? Net::HTTPSuccess
+        fail ApiError.new(:code => response.code,
+                          :response_headers => response.to_hash,
+                          :response_body => response.body),
+             response.message
+      end
+      response
+    end
+  end
+end

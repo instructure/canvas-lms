@@ -134,6 +134,12 @@ module Api::V1::Submission
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
     end
+    
+    if attempt.vericite_data.present? && attempt.grants_right?(@current_user, :view_vericite_report)
+      vericite_hash = attempt.vericite_data.dup
+      vericite_hash.delete(:last_processed_attempt)
+      hash['vericite_data'] = vericite_hash
+    end
 
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup

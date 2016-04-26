@@ -382,6 +382,33 @@ $cell_height: 33px;
   }
 }
 
+.gradebook-cell-vericite {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
+  width: 20px;
+  height: 16px;
+  &.no-score {
+    background-image: url(/images/vericite_no_score.png);
+  }
+  &.none-score {
+    background-image: url(/images/vericite_none_score.png);
+  }
+  &.acceptable-score {
+    background-image: url(/images/vericite_acceptable_score.png);
+  }
+  &.warning-score {
+    background-image: url(/images/vericite_warning_score.png);
+  }
+  &.problem-score {
+    background-image: url(/images/vericite_problem_score.png);
+  }
+  &.failure-score {
+    background-image: url(/images/vericite_failure_score.png);
+  }
+}
+
 .gradebook-cell-comment {
   position: absolute;
   top: -1px;

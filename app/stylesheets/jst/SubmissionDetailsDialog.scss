@@ -35,6 +35,9 @@
     a.turnitin_similarity_score {
       @include fontSize(10px);
     }
+    a.vericite_similarity_score {
+      @include fontSize(10px);
+    }
   }
   .submission_details_comments {
     overflow: auto;

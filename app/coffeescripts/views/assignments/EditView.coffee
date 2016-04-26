@@ -4,25 +4,27 @@ define [
   'compiled/views/ValidatedFormView'
   'underscore'
   'jquery'
-  'jsx/shared/rce/RichContentEditor'
+  'wikiSidebar'
   'jst/assignments/EditView'
   'compiled/userSettings'
   'compiled/models/TurnitinSettings'
+  'compiled/models/VeriCiteSettings'
   'compiled/views/assignments/TurnitinSettingsDialog'
+  'compiled/views/assignments/VeriCiteSettingsDialog'
   'compiled/fn/preventDefault'
   'compiled/views/calendar/MissingDateDialogView'
   'compiled/views/assignments/AssignmentGroupSelector'
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/jquery/toggleAccessibly'
   'compiled/views/editor/KeyboardShortcuts'
+  'compiled/tinymce'
+  'tinymce.editor_box'
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
-], (INST, I18n, ValidatedFormView, _, $, RichContentEditor, template,
-userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
+], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
+userSettings, TurnitinSettings, VeriCiteSettings, TurnitinSettingsDialog, VeriCiteSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
-
-  RichContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -40,7 +42,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
     ALLOWED_EXTENSIONS = '#allowed_extensions_container'
     TURNITIN_ENABLED = '#assignment_turnitin_enabled'
+    VERICITE_ENABLED = '#assignment_vericite_enabled'
     ADVANCED_TURNITIN_SETTINGS = '#advanced_turnitin_settings_link'
+    ADVANCED_VERICITE_SETTINGS = '#advanced_vericite_settings_link'
     GRADING_TYPE_SELECTOR = '#grading_type_selector'
     GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
     EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
@@ -69,7 +73,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
       els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
       els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
+      els["#{VERICITE_ENABLED}"] = '$vericiteEnabled'
       els["#{ADVANCED_TURNITIN_SETTINGS}"] = '$advancedTurnitinSettings'
+      els["#{ADVANCED_VERICITE_SETTINGS}"] = '$advancedVeriCiteSettings'
       els["#{GRADING_TYPE_SELECTOR}"] = '$gradingTypeSelector'
       els["#{GRADED_ASSIGNMENT_FIELDS}"] = '$gradedAssignmentFields'
       els["#{EXTERNAL_TOOL_SETTINGS}"] = '$externalToolSettings'
@@ -92,7 +98,9 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
+      events["click #{ADVANCED_VERICITE_SETTINGS}"] = 'showVeriCiteDialog'
       events["change #{TURNITIN_ENABLED}"] = 'toggleAdvancedTurnitinSettings'
+      events["change #{VERICITE_ENABLED}"] = 'toggleAdvancedVeriCiteSettings'
       events["change #{ALLOW_FILE_UPLOADS}"] = 'toggleRestrictFileUploads'
       events["click #{EXTERNAL_TOOLS_URL}_find"] = 'showExternalToolsDialog'
       events["change #assignment_points_possible"] = 'handlePointsChange'
@@ -123,7 +131,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       ["assignment_group_id","grading_type","submission_type","submission_types",
        "points_possible","allowed_extensions","peer_reviews","peer_review_count",
        "automatic_peer_reviews","group_category_id","grade_group_students_individually",
-       "turnitin_enabled"]
+       "turnitin_enabled", "vericite_enabled"]
 
     handlePointsChange:(ev) =>
       ev.preventDefault()
@@ -193,6 +201,14 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         turnitinDialog.off()
         turnitinDialog.remove()
 
+    showVeriCiteDialog: (ev) =>
+      ev.preventDefault()
+      vericiteDialog = new VeriCiteSettingsDialog(model: @assignment.get('vericite_settings'))
+      vericiteDialog.render().on 'settings:change', (settings) =>
+        @assignment.set 'vericite_settings', new VeriCiteSettings(settings)
+        vericiteDialog.off()
+        vericiteDialog.remove()
+
     showExternalToolsDialog: =>
       # TODO: don't use this dumb thing
       INST.selectContentDialog
@@ -211,6 +227,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
     toggleAdvancedTurnitinSettings: (ev) =>
       ev.preventDefault()
       @$advancedTurnitinSettings.toggleAccessibly @$turnitinEnabled.prop('checked')
+
+    toggleAdvancedVeriCiteSettings: (ev) =>
+      ev.preventDefault()
+      @$advancedVeriCiteSettings.toggleAccessibly @$vericiteEnabled.prop('checked')
 
     handleRestrictFileUploadsChange: =>
       @$allowedExtensions.toggleAccessibly @$restrictFileUploads.prop('checked')
@@ -232,6 +252,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
 
       @_attachEditorToDescription()
+      $ @_initializeWikiSidebar
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
       if ENV?.HAS_GRADED_SUBMISSIONS
@@ -246,17 +267,20 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
-    # separated out so we can easily stub it
-    scrollSidebar: $.scrollSidebar
-
     _attachEditorToDescription: =>
-      RichContentEditor.initSidebar(show: @scrollSidebar)
-      RichContentEditor.loadNewEditor(@$description, { focus: true })
+      @$description.editorBox()
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        RichContentEditor.callOnRCE(@$description, 'toggle')
+        @$description.editorBox 'toggle'
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+
+    _initializeWikiSidebar: =>
+      # $("#sidebar_content").hide()
+      unless wikiSidebar.inited
+        wikiSidebar.init()
+        $.scrollSidebar()
+      wikiSidebar.attachToEditor(@$description).show()
 
     addTinyMCEKeyboardShortcuts: =>
       keyboardShortcutsView = new RCEKeyboardShortcuts()

@@ -65,6 +65,7 @@ define([
     submissionForm.submit(function(event) {
       var self = this;
       var $turnitin = $(this).find(".turnitin_pledge");
+      var $vericite = $(this).find(".vericite_pledge");
       if($("#external_tool_submission_type").val() == "online_url_to_file") {
         event.preventDefault();
         event.stopPropagation();
@@ -72,6 +73,13 @@ define([
         return;
       }
       if($turnitin.length > 0 && !$turnitin.attr('checked')) {
+        alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+      }
+      
+      if($vericite.length > 0 && !$vericite.attr('checked')) {
         alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
         event.preventDefault();
         event.stopPropagation();

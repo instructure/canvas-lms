@@ -1,0 +1,43 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        Get your credentials from <a href="http://www.vericite.com" target="_blank">VeriCite</a>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :account_id, :en => "VeriCite Account ID" %></td>
+      <td>
+        <%= f.text_field :account_id %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :shared_secret, :en => "VeriCite Shared Secret" %></td>
+      <td>
+        <%= f.text_field :shared_secret %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :host, :en => "VeriCite Host" %></td>
+      <td>
+        <%= f.text_field :host %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :comments, :en => "Submission Comments" %></td>
+      <td>
+        <%= f.text_area :comments, :rows => '4' %>
+      </td>
+    </tr>
+    
+    <tr>
+      <td><%= f.blabel :pledge, :en => "VeriCite Pledge" %></td>
+      <td>
+        <%= f.text_area :pledge, :rows => '4' %>
+      </td>
+    </tr>
+  </table>
+<% end %>

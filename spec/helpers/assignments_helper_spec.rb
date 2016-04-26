@@ -79,4 +79,42 @@ describe AssignmentsHelper do
       expect(turnitin_active?).to be_falsey
     end
   end
+
+  describe "#vericite active?" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @assignment.vericite_enabled = true
+      @context = @assignment.context
+      @assignment.update_attributes!({
+        submission_types: ["online_url"]
+      })
+      @context.account.update_attributes!({
+        vericite_settings: {:originality_report_visibility => 'after_grading'},
+        vericite_account_id: 12345,
+        vericite_shared_secret: "the same combination on my luggage"
+      })
+    end
+
+    it "returns true if vericite is active on the assignment and account" do
+      expect(vericite_active?).to be_truthy
+    end
+
+    it "returns false if the assignment does not require submissions" do
+      @assignment.update_attributes!({
+        submission_types: ["none"]
+      })
+      expect(vericite_active?).to be_falsey
+    end
+
+    it "returns false if vericite is disabled on the account level" do
+      @context.account.update_attributes!({
+        vericite_settings: nil,
+        vericite_account_id: nil,
+        vericite_shared_secret: nil
+      })
+      expect(vericite_active?).to be_falsey
+    end
+  end
 end

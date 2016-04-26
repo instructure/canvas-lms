@@ -14,4 +14,5 @@ define ['i18n!gradebook2'], (I18n) ->
     submission_tooltip_media_recording: I18n.t('titles.media_recording', "Media Recording Submission"),
     submission_tooltip_online_quiz: I18n.t('title.quiz', "Quiz Submission"),
     submission_tooltip_turnitin: I18n.t('title.turnitin', 'Has Turnitin score'),
+    submission_tooltip_vericite: I18n.t('title.vericite', 'Has VeriCite score'),
     submission_update_error: I18n.t('error.update', 'There was an error updating this assignment. Please refresh the page and try again.')

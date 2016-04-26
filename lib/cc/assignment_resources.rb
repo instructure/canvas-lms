@@ -197,7 +197,7 @@ module CC
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
       atts = [:points_possible, :grading_type,
-              :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
+              :all_day, :submission_types, :position, :turnitin_enabled, :vericite_enabled, :peer_review_count,
               :peer_reviews, :automatic_peer_reviews, :moderated_grading,
               :anonymous_peer_reviews, :grade_group_students_individually, :freeze_on_copy, :muted]
       atts.each do |att|

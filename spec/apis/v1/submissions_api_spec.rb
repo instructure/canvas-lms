@@ -1186,6 +1186,58 @@ describe 'Submissions API', type: :request do
     expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
 
   end
+  
+  it "should return vericite data if present" do
+    student = user(:active_all => true)
+    course_with_teacher(:active_all => true)
+    @course.enroll_student(student).accept!
+    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1.vericite_settings = {:originality_report_visibility => 'after_grading'}
+    a1.save!
+    submission = submit_homework(a1, student)
+    sample_vericite_data = {
+      :last_processed_attempt=>1,
+      "attachment_504177"=> {
+        :error=>true,
+        :state=>"failure",
+        :similarity_score=>100,
+        :object_id=>"123345"
+      }
+    }
+    submission.vericite_data = sample_vericite_data
+    submission.save!
+
+    # as teacher
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
+    expect(json).to have_key 'vericite_data'
+    sample_vericite_data.delete :last_processed_attempt
+    expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
+
+    # as student before graded
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
+    expect(json).not_to have_key 'vericite_data'
+
+    # as student after grading
+    a1.grade_student(student, {:grade => 11})
+    @user = student
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
+    expect(json).to have_key 'vericite_data'
+    expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
+
+  end
 
   it "should return all submissions for a student" do
     student1 = user(:active_all => true)

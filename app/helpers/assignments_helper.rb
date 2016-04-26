@@ -80,4 +80,9 @@ module AssignmentsHelper
     @assignment.turnitin_enabled? && @context.turnitin_enabled? &&
     !@assignment.submission_types.include?("none")
   end
+
+  def vericite_active?
+    @assignment.vericite_enabled? && @context.vericite_enabled? &&
+    !@assignment.submission_types.include?("none")
+  end
 end

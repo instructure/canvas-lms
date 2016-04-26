@@ -312,6 +312,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "vericite_enabled": {
+#           "description": "Boolean flag indicating whether or not VeriCite has been enabled for the assignment. NOTE: This flag will not appear unless your account has the VeriCite plugin available",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "turnitin_settings": {
 #           "description": "Settings to pass along to turnitin to control what kinds of matches should be considered. originality_report_visibility can be 'immediate', 'after_grading', 'after_due_date', or 'never' exclude_small_matches_type can be null, 'percent', 'words' exclude_small_matches_value: - if type is null, this will be null also - if type is 'percent', this will be a number between 0 and 100 representing match size to exclude as a percentage of the document size. - if type is 'words', this will be number > 0 representing how many words a match must contain for it to be considered NOTE: This flag will not appear unless your account has the Turnitin plugin available",
 #           "$ref": "TurnitinSettings"
@@ -733,6 +738,12 @@ class AssignmentsApiController < ApplicationController
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
   #
+  # @argument assignment[vericite_enabled] [Boolean]
+  #   Only applies when the VeriCite plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles VeriCite submissions for the assignment.
+  #   Will be ignored if VeriCite is not available for the course.
+  #
   # @argument assignment[turnitin_settings]
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
@@ -876,6 +887,12 @@ class AssignmentsApiController < ApplicationController
   #   the submission_types array includes "online_upload".
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
+  #
+  # @argument assignment[vericite_enabled] [Boolean]
+  #   Only applies when the VeriCite plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles VeriCite submissions for the assignment.
+  #   Will be ignored if VeriCite is not available for the course.
   #
   # @argument assignment[turnitin_settings]
   #   Settings to send along to turnitin. See Assignment object definition for

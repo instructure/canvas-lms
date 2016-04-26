@@ -1,0 +1,98 @@
+@import "base/environment";
+
+// #4985f5
+$vericite_blue: rgba(73, 133, 245, 0.5);
+
+// #4ff057
+$vericite_green: rgba(79, 240, 87, 0.5);
+
+// #f5f549
+$vericite_yellow: rgba(245, 245, 73, 0.5);
+
+// #ffb433
+$vericite_orange: rgba(255, 180, 51, 0.5);
+
+// #ff383f
+$vericite_red: rgba(255, 56, 63, 0.5);
+
+// #b8b8b8
+$vericite_gray: rgba(184, 184, 184, 0.5);
+
+.vericite_score_container_caret {
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 50%;
+  content: "";
+  border-width: 4px;
+  border-color: transparent;
+  border-style: solid;
+  left: -8px;
+  margin-top: -4px;
+  &.none_score {
+    border-right-color: $vericite_blue;
+  }
+  &.acceptable_score {
+    border-right-color: $vericite_green;
+  }
+  &.warning_score {
+    border-right-color: $vericite_yellow;
+  }
+  &.problem_score {
+    border-right-color: $vericite_orange;
+  }
+  &.failure_score {
+    border-right-color: $vericite_red;
+  }
+  &.submission_error, &.submission_pending {
+    border-right-color: $vericite_gray;
+  }
+}
+
+.vericite_score_container {
+  position: relative;
+  margin-left: 10px;
+}
+
+.vericite_similarity_score,
+.vericite_similarity_score:link,
+.vericite_similarity_score:visited,
+.vericite_similarity_score:active,
+.vericite_similarity_score:hover,
+.vericite_similarity_score:focus {
+  display: inline-block;
+  white-space: nowrap;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-weight: bold;
+  text-shadow: rgba(255, 255, 255, 0.5) 1px 0 1px;
+  color: #444;
+  @include fontSize(10px);
+  text-decoration: none;
+  &.none_score {
+    background-color: $vericite_blue;
+  }
+  &.acceptable_score {
+    background-color: $vericite_green;
+  }
+  &.warning_score {
+    background-color: $vericite_yellow;
+  }
+  &.problem_score {
+    background-color: $vericite_orange;
+  }
+  &.failure_score {
+    background-color: $vericite_red;
+  }
+  &.submission_error, &.submission_pending {
+    background-color: $vericite_gray;
+  }
+}
+
+.vericite_resubmit_container {
+  text-align: right;
+}
+
+.vericite-comments {
+  font-size: 0.8em;
+}

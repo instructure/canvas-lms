@@ -364,6 +364,7 @@ describe ContentMigration do
       @copy_from.storage_quota = 444
       @copy_from.allow_wiki_comments = true
       @copy_from.turnitin_comments = "Don't plagiarize"
+      @copy_from.vericite_comments = "Didn't plagiarize"
       @copy_from.self_enrollment = true
       @copy_from.license = "cc_by_nc_nd"
       @copy_from.locale = "es"

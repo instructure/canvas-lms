@@ -98,6 +98,11 @@ module Api::V1::Assignment
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
+    
+    if assignment.context && assignment.context.vericite_enabled?
+      hash['vericite_enabled'] = assignment.vericite_enabled
+      hash['vericite_settings'] = vericite_settings_json(assignment)
+    end
 
     if PluginSetting.settings_for_plugin(:assignment_freezer)
       hash['freeze_on_copy'] = assignment.freeze_on_copy?
@@ -266,6 +271,15 @@ module Api::V1::Assignment
 
     settings.slice(*API_ALLOWED_TURNITIN_SETTINGS)
   end
+  
+  def vericite_settings_json(assignment)
+    settings = assignment.vericite_settings.with_indifferent_access
+    [:exclude_quoted].each do |key|
+      settings[key] = value_to_boolean(settings[key])
+    end
+
+    settings.slice(*API_ALLOWED_VERICITE_SETTINGS)
+  end
 
   API_ALLOWED_ASSIGNMENT_INPUT_FIELDS = %w(
     name
@@ -289,6 +303,8 @@ module Api::V1::Assignment
     grade_group_students_individually
     turnitin_enabled
     turnitin_settings
+    vericite_enabled
+    vericite_settings
     grading_standard_id
     freeze_on_copy
     notify_of_update
@@ -306,6 +322,11 @@ module Api::V1::Assignment
     exclude_small_matches_type
     exclude_small_matches_value
     submit_papers_to
+  )
+  
+  API_ALLOWED_VERICITE_SETTINGS = %w(
+    originality_report_visibility
+    exclude_quoted
   )
 
   def update_api_assignment(assignment, assignment_params, user)
@@ -445,6 +466,11 @@ module Api::V1::Assignment
       update_params.delete("turnitin_enabled")
       update_params.delete("turnitin_settings")
     end
+    
+    if !assignment.context.try(:vericite_enabled?)
+      update_params.delete("vericite_enabled")
+      update_params.delete("vericite_settings")
+    end
 
     # use Assignment#turnitin_settings= to normalize, but then assign back to
     # hash so that it is written with update_params
@@ -457,6 +483,13 @@ module Api::V1::Assignment
       end
       turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
       assignment.turnitin_settings = turnitin_settings
+    end
+    
+    # use Assignment#vericite_settings= to normalize, but then assign back to
+    # hash so that it is written with update_params
+    if update_params.has_key?("vericite_settings")
+      vericite_settings = update_params.delete("vericite_settings").slice(*API_ALLOWED_VERICITE_SETTINGS)
+      assignment.vericite_settings = vericite_settings
     end
 
     # TODO: allow rubric creation

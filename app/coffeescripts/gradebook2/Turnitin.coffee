@@ -4,7 +4,7 @@ define [
 ], (I18n, {max, invert}) ->
 
   Turnitin =
-    extractData: (submission) ->
+    extractDataTurnitin: (submission) ->
       return unless submission?.turnitin_data
       data = items: []
   
@@ -25,7 +25,7 @@ define [
       data.state = stateList[max(states)]
       data
 
-    extractDataFor: (submission, key, urlPrefix) ->
+    extractDataForTurnitin: (submission, key, urlPrefix) ->
       data = submission.turnitin_data
       return {} unless data and data[key] and data[key].similarity_score?
       data = data[key]
