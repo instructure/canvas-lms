@@ -24,11 +24,11 @@ define [
         "grading_periods":[
           {
             "id":"1", "start_date":"2015-03-01T06:00:00Z", "end_date":"2015-05-31T05:00:00Z",
-            "weight":null, "title":"Spring", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           },
           {
             "id":"2", "start_date":"2015-06-01T05:00:00Z", "end_date":"2015-08-31T05:00:00Z",
-            "weight":null, "title":"Summer", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Summer", "permissions": { "update":true, "delete":true }
           }
         ]
         "can_create_grading_periods": true,
@@ -38,11 +38,11 @@ define [
         "grading_periods":[
           {
             "id":"1", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
-            "weight":null, "title":"Spring", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           },
           {
             "id":"2", "startDate": new Date("2015-06-01T05:00:00Z"), "endDate": new Date("2015-08-31T05:00:00Z"),
-            "weight":null, "title":"Summer", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Summer", "permissions": { "update":true, "delete":true }
           }
         ]
         "can_create_grading_periods": true,
@@ -51,7 +51,7 @@ define [
       @createdPeriodData = "grading_periods":[
         {
           "id":"3", "start_date":"2015-04-20T05:00:00Z", "end_date":"2015-04-21T05:00:00Z",
-          "weight":null, "title":"New Period!", "permissions": { "read":true, "manage":true }
+          "weight":null, "title":"New Period!", "permissions": { "update":true, "delete":true }
         }
       ]
       @server.respondWith "GET", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
@@ -91,7 +91,7 @@ define [
       {
         "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"New Period. I'm not saved yet!",
-        "permissions": { "read":true, "manage":true }
+        "permissions": { "update":true, "delete":true }
       }
     ]
     @gradingPeriodCollection.setState({periods: unsavedPeriod})
@@ -110,7 +110,7 @@ define [
       "id":"1", "startDate": new Date("2069-03-01T06:00:00Z"), "endDate": new Date("2070-05-31T05:00:00Z"),
       "weight":null, "title":"Updating an existing period!"
     }
-    updatedPeriodComponent.props = {permissions: {read: true, manage: true}}
+    updatedPeriodComponent.props = {permissions: {read: true, update: true, delete: true}}
     @gradingPeriodCollection.updateGradingPeriodCollection(updatedPeriodComponent)
     updatedPeriod = _.find(@gradingPeriodCollection.state.periods, (p) => p.id == "1")
     deepEqual updatedPeriod.title, updatedPeriodComponent.state.title
@@ -128,11 +128,11 @@ define [
     formattedIndexData = [
       {
         "id":"1", "startDate": startDate, "endDate": endDate,
-        "weight":null, "title":"Spring", "permissions": { "read":false, "manage":false }
+        "weight":null, "title":"Spring", "permissions": { "read":false, "update":false, "delete":false }
       },
       {
         "id":"2", "startDate": startDate, "endDate": endDate,
-        "weight":null, "title":"Summer", "permissions": { "read":false, "manage":false }
+        "weight":null, "title":"Summer", "permissions": { "read":false, "update":false, "delete":false }
       }
     ]
     @gradingPeriodCollection.setState({periods: formattedIndexData})
@@ -198,11 +198,11 @@ define [
   test 'areNoDatesOverlapping periods are not overlapping when endDate of earlier period is the same as start date for the latter', ->
     periodOne = {
       'id': '1', startDate: new Date("2029-03-01T06:00:00Z"), endDate: new Date("2030-05-31T05:00:00Z"),
-      weight: null, title: "Spring", permissions: { read:true, manage:true }
+      weight: null, title: "Spring", permissions: { read:true, update: true, delete: true }
     }
     periodTwo = {
       'id': 'new2', startDate: new Date("2030-05-31T05:00:00Z"), endDate: new Date("2031-05-31T05:00:00Z"),
-      weight: null, title: "Spring", permissions: { read:true, manage:true }
+      weight: null, title: "Spring", permissions: { read:true, update: true, delete: true }
     }
     @gradingPeriodCollection.setState({periods: [periodOne, periodTwo]})
     ok @gradingPeriodCollection.areNoDatesOverlapping(periodTwo)
@@ -210,11 +210,11 @@ define [
   test 'areNoDatesOverlapping periods are overlapping when a period falls within another', ->
     periodOne = {
       'id': '1', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"),
-      weight: null, title: "Spring", permissions: { read:true, manage:true }
+      weight: null, title: "Spring", permissions: { read:true, update: true, delete: true }
     }
     periodTwo = {
       'id': 'new2', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"),
-      weight: null, title: "Spring", permissions: { read:true, manage:true }
+      weight: null, title: "Spring", permissions: { read:true, update: true, delete: true }
     }
     @gradingPeriodCollection.setState({periods: [periodOne, periodTwo]})
     ok !@gradingPeriodCollection.areNoDatesOverlapping(periodTwo)
@@ -222,10 +222,10 @@ define [
   test 'areDatesOverlapping adding two periods at the same time that overlap returns true', ->
     existingPeriod = @gradingPeriodCollection.state.periods[0]
     periodOne = {
-      id: 'new1', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {manage: true}
+      id: 'new1', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {update: true, delete: true}
     }
     periodTwo = {
-      id: 'new2', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {manage: true}
+      id: 'new2', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {update: true, delete: true}
     }
     @gradingPeriodCollection.setState({periods: [existingPeriod, periodOne, periodTwo]})
     ok !@gradingPeriodCollection.areDatesOverlapping(existingPeriod)
@@ -239,12 +239,20 @@ define [
   test 'renderAddPeriodButton renders a button if canAddNewPeriods is true (based on permissions)', ->
     ok @gradingPeriodCollection.renderAddPeriodButton()
 
-  test 'renderSaveButton does not render a button if the user cannot manage any of the periods on the page', ->
+  test 'renderSaveButton does not render a button if the user cannot update any of the periods on the page', ->
     uneditable = [{
       "id":"12", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
-      "weight":null, "title":"Spring", "permissions": { "read":true, "manage":false }
+      "weight":null, "title":"Spring", "permissions": { "read":true, "update":false, "delete":false }
     }]
     @gradingPeriodCollection.setState({ periods: uneditable })
+    notOk @gradingPeriodCollection.renderSaveButton()
+
+    _.extend(uneditable, {"permissions": {"update": true, delete: false}})
+    @gradingPeriodCollection.setState({ periods: uneditable})
+    notOk @gradingPeriodCollection.renderSaveButton()
+
+    _.extend(uneditable, {"permissions": {"delete": false, delete: true}})
+    @gradingPeriodCollection.setState({ periods: uneditable})
     notOk @gradingPeriodCollection.renderSaveButton()
 
   test 'renderSaveButton renders a button if the user is not at the course grading periods page', ->
@@ -260,7 +268,7 @@ define [
         "grading_periods":[
           {
             "id":"1", "start_date":"2015-03-01T06:00:00Z", "end_date":"2015-05-31T05:00:00Z",
-            "weight":null, "title":"Spring", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           }
         ]
         "can_create_grading_periods": true,
@@ -270,7 +278,7 @@ define [
         "grading_periods":[
           {
             "id":"1", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
-            "weight":null, "title":"Spring", "permissions": { "read":true, "manage":true }
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           }
         ]
         "can_create_grading_periods": true,

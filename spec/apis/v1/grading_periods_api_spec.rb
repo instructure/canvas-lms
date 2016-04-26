@@ -30,34 +30,35 @@ describe GradingPeriodsController, type: :request do
     end
 
     context "multiple grading periods feature flag turned on" do
-      describe 'POST create' do
-        let(:weight) { 99 }
-        let(:start_date) { 5.months.since(now) }
-        let(:end_date) { 8.months.since(now) }
-        let(:now) { Time.zone.now.change(usec: 0) }
-
-        def post_create(params, raw=false)
-          helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:post,
-                      "/api/v1/accounts/#{@account.id}/grading_periods",
-                      { controller: 'grading_periods', action: 'create', format: 'json',
-                        account_id: @account.id },
-                      { grading_periods: [params] }, {}, {})
+      describe 'GET show' do
+        before :once do
+          @grading_period = @account.grading_periods.active.first
         end
 
-        context "creates a grading period successfully" do
-          subject(:account_grading_periods) { @account.grading_periods }
-          before do
-            post_create(title: 'a title', weight: weight, start_date: start_date, end_date: end_date)
-          end
+        def get_show(raw = false, data = {})
+          helper = method(raw ? :raw_api_call : :api_call)
+          helper.call(:get,
+                      "/api/v1/accounts/#{@account.id}/grading_periods/#{@grading_period.id}",
+          { controller: 'grading_periods', action: 'show', format: 'json',
+            account_id: @account.id,
+            id: @grading_period.id,
+          }, data)
+        end
 
-          it { expect(account_grading_periods.count).to eql 4 }
-          it { expect(account_grading_periods.last.weight).to eq weight }
-          it { expect(account_grading_periods.last.start_date).to eq start_date }
-          it { expect(account_grading_periods.last.end_date).to eq end_date }
+        it "retrieves the grading period specified" do
+          json = get_show
+          period = json['grading_periods'].first
+          expect(period['id']).to eq(@grading_period.id.to_s)
+          expect(period['weight']).to eq(@grading_period.weight)
+          expect(period['title']).to eq(@grading_period.title)
+          expect(period['permissions']).to include(
+            "read"   => true,
+            "create" => true,
+            "delete" => true,
+            "update" => true
+          )
         end
       end
-
       describe 'PUT update' do
         before :once do
           @grading_period = @account.grading_periods.find { |g| g.workflow_state == "active" }
@@ -131,6 +132,7 @@ describe GradingPeriodsController, type: :request do
       grading_periods count: 3, context: @course
       @course.grading_periods.active.last.destroy
     end
+
     context "multiple grading periods feature flag turned on" do
 
       describe 'GET show' do
@@ -154,35 +156,18 @@ describe GradingPeriodsController, type: :request do
           expect(period['id']).to eq(@grading_period.id.to_s)
           expect(period['weight']).to eq(@grading_period.weight)
           expect(period['title']).to eq(@grading_period.title)
-          expect(period['permissions']).to eq("read" => true, "manage" => true)
+          expect(period['permissions']).to include(
+            "read"   => true,
+            "create" => false,
+            "delete" => true,
+            "update" => true
+          )
         end
 
         it "doesn't return deleted grading periods" do
           @grading_period.destroy
           get_show(true)
           expect(response.status).to eq 404
-        end
-      end
-
-      describe 'POST create' do
-        def post_create(params, raw=false)
-          helper = method(raw ? :raw_api_call : :api_call)
-          helper.call(:post,
-                      "/api/v1/courses/#{@course.id}/grading_periods",
-                      { controller: 'grading_periods', action: 'create', format: 'json',
-                        course_id: @course.id },
-                      { grading_periods: [params] }, {}, {})
-        end
-
-        it "creates a grading period successfully" do
-          now = Time.zone.now
-          post_create(
-            title: 'an period',
-            weight: 99,
-            start_date: 10.month.since(now),
-            end_date: 12.month.since(now)
-          )
-          expect(@course.grading_periods.active.last.weight).to eq(99)
         end
       end
 

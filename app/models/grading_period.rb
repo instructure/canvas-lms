@@ -28,20 +28,19 @@ class GradingPeriod < ActiveRecord::Base
   validate :start_date_is_before_end_date
   validate :not_overlapping, unless: :skip_not_overlapping_validator?
 
-  set_policy do
-    given { |user| self.grading_period_group.grants_right?(user, :read) }
-    can :read
-
-    given { |user| self.grading_period_group.grants_right?(user, :manage) }
-    can :manage
-  end
-
   scope :current, -> do
     where("start_date <= :now AND end_date >= :now", now: Time.zone.now)
   end
 
   scope :grading_periods_by, ->(context_with_ids) do
     joins(:grading_period_group).where(grading_period_groups: context_with_ids).readonly(false)
+  end
+
+  set_policy do
+    %i[read create update delete].each do |permission|
+      given { |user| grading_period_group.grants_right?(user, permission) }
+      can permission
+    end
   end
 
   # Takes a context and returns an Array (not an ActiveRecord::Relation)
@@ -64,6 +63,16 @@ class GradingPeriod < ActiveRecord::Base
     self.for(context).find do |grading_period|
       grading_period.id == grading_period_id.to_i
     end
+  end
+
+  def account_group?
+    grading_period_group.course_id.nil? &&
+      grading_period_group.account_id.present?
+  end
+
+  def course_group?
+    grading_period_group.course_id.present? &&
+      grading_period_group.account_id.nil?
   end
 
   def assignments_for_student(assignments, student)
@@ -89,10 +98,6 @@ class GradingPeriod < ActiveRecord::Base
     start_date <= date && end_date >= date
   end
 
-  def is_closed?
-    Time.now > end_date
-  end
-
   def last?
     grading_period_group
       .grading_periods
@@ -100,6 +105,7 @@ class GradingPeriod < ActiveRecord::Base
       .sort_by(&:end_date)
       .last == self
   end
+  alias_method :is_last, :last?
 
   def overlapping?
     overlaps.active.exists?
@@ -107,6 +113,25 @@ class GradingPeriod < ActiveRecord::Base
 
   def skip_not_overlapping_validator
     @_skip_not_overlapping_validator = true
+  end
+
+  def self.json_for(context, user)
+    periods = self.for(context).sort_by(&:start_date)
+    self.periods_json(periods, user)
+  end
+
+  def self.periods_json(periods, user)
+    periods.map do |period|
+      period.as_json_with_user_permissions(user)
+    end
+  end
+
+  def as_json_with_user_permissions(user)
+    as_json(
+      only: [:id, :title, :start_date, :end_date],
+      permissions: { user: user },
+      methods: :is_last
+    ).fetch(:grading_period)
   end
 
   private
@@ -146,14 +171,6 @@ class GradingPeriod < ActiveRecord::Base
     if start_date && end_date && end_date < start_date
       errors.add(:end_date, t('errors.invalid_grading_period_end_date',
                               'Grading period end date precedes start date'))
-    end
-  end
-
-  def self.json_for(context, user)
-    self.for(context).sort_by(&:start_date).map do |gp|
-      json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: user})
-      json[:grading_period][:is_last] = gp.last?
-      json[:grading_period]
     end
   end
 end

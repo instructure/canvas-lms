@@ -111,7 +111,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
           startDate: new Date(''),
           endDate: new Date(''),
           id: _.uniqueId('new'),
-          permissions: { read: true, manage: true }
+          permissions: { read: true, update: true, delete: true}
         };
         let periods = update(this.state.periods, {$push: [newPeriod]});
         this.setState({periods: periods, saveDisabled: false});
@@ -204,7 +204,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       this.setState({disabled: true}, () => {
         if (this.areGradingPeriodsValid()) {
           $.ajax({
-            type: 'PUT',
+            type: 'PATCH',
             url: ENV.GRADING_PERIODS_URL + '/batch_update',
             dataType: 'json',
             contentType: 'application/json',
@@ -236,7 +236,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     renderSaveButton: function() {
-      if (_.any(this.state.periods, period => period.permissions.manage)) {
+      if (_.all(this.state.periods, period => period.permissions.update || period.permissions.create)) {
         let buttonText = this.state.disabled ? I18n.t('Updating') : I18n.t('Save');
         return (
           <div className='form-actions'>

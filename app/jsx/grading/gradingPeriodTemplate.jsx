@@ -15,9 +15,12 @@ define([
       startDate: types.instanceOf(Date).isRequired,
       endDate: types.instanceOf(Date).isRequired,
       id: types.string.isRequired,
-      readonly: types.bool.isRequired,
+      permissions: types.shape({
+        update: types.bool.isRequired,
+        delete: types.bool.isRequired,
+      }).isRequired,
       requiredPropsIfEditable: function(props) {
-        if (props.readonly) return;
+        if (!props.permissions.update && !props.permissions.delete) return;
 
         const requiredProps = {
           disabled: 'boolean',
@@ -63,7 +66,7 @@ define([
     },
 
     renderDeleteButton: function() {
-      if (this.props.readonly) return null;
+      if (!this.props.permissions.delete) return null;
       let cssClasses = "Button Button--icon-action icon-delete-grading-period";
       if (this.props.disabled) cssClasses += " disabled";
       return (
@@ -83,13 +86,7 @@ define([
     },
 
     renderTitle: function() {
-      if (this.props.readonly) {
-        return (
-          <div id={this.addIdToText("period_title_")} ref="title">
-            {this.props.title}
-          </div>
-        );
-      } else {
+      if (this.props.permissions.update) {
         return (
           <input id={this.addIdToText("period_title_")}
                  type="text"
@@ -98,17 +95,17 @@ define([
                  disabled={this.props.disabled}
                  ref="title"/>
         );
+      } else {
+        return (
+          <div id={this.addIdToText("period_title_")} ref="title">
+            {this.props.title}
+          </div>
+        );
       }
     },
 
     renderStartDate: function() {
-      if (this.props.readonly) {
-        return (
-          <div id={this.addIdToText("period_start_date_")} ref="startDate">
-            {DatesHelper.formatDateForDisplay(this.props.startDate)}
-          </div>
-        );
-      } else {
+      if (this.props.permissions.update) {
         return (
           <input id={this.addIdToText("period_start_date_")}
                  type="text"
@@ -118,17 +115,17 @@ define([
                  defaultValue={DatesHelper.formatDateForDisplay(this.props.startDate)}
                  disabled={this.props.disabled}/>
         );
+      } else {
+        return (
+          <div id={this.addIdToText("period_start_date_")} ref="startDate">
+            {DatesHelper.formatDateForDisplay(this.props.startDate)}
+          </div>
+        );
       }
     },
 
     renderEndDate: function() {
-      if (this.props.readonly) {
-        return (
-          <div id={this.addIdToText("period_end_date_")} ref="endDate">
-            {DatesHelper.formatDateForDisplay(this.props.endDate)}
-          </div>
-        );
-      } else {
+      if (this.props.permissions.update) {
         return(
           <input id={this.addIdToText("period_end_date_")} type="text"
                  className="input-grading-period-date date_field"
@@ -136,6 +133,12 @@ define([
                  name="endDate"
                  defaultValue={DatesHelper.formatDateForDisplay(this.props.endDate)}
                  disabled={this.props.disabled}/>
+        );
+      } else {
+        return (
+          <div id={this.addIdToText("period_end_date_")} ref="endDate">
+            {DatesHelper.formatDateForDisplay(this.props.endDate)}
+          </div>
         );
       }
     },

@@ -10,14 +10,31 @@ class GradingPeriodGroup < ActiveRecord::Base
   validate :associated_with_course_or_account_or_enrollment_term?
 
   set_policy do
-    given { |user| multiple_grading_periods_enabled? && (course || account).grants_right?(user, :read) }
+    given do |user|
+      multiple_grading_periods_enabled? &&
+        (course || account).grants_right?(user, :read)
+    end
     can :read
 
-    given { |user| account && multiple_grading_periods_enabled? && account.associated_user?(user) }
+    given do |user|
+      account &&
+        multiple_grading_periods_enabled? &&
+        account.associated_user?(user)
+    end
     can :read
 
-    given { |user| multiple_grading_periods_enabled? && (course || account).grants_right?(user, :manage) }
-    can :manage
+    given do |user|
+      multiple_grading_periods_enabled? &&
+        (course || account).grants_right?(user, :manage)
+    end
+    can :update and can :delete
+
+    given do |user|
+      account &&
+      multiple_grading_periods_enabled? &&
+      account.grants_right?(user, :manage)
+    end
+    can :create
   end
 
   def multiple_grading_periods_enabled?

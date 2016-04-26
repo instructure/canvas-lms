@@ -12,7 +12,10 @@ define [
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
         id: "1"
-        readonly: true
+        permissions: {
+          update: false
+          delete: false
+        }
 
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
       @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
@@ -62,7 +65,10 @@ define [
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
         id: "1"
-        readonly: false
+        permissions: {
+          update: true
+          delete: true
+        }
         disabled: false
         onDeleteGradingPeriod: ->
         onDateChange: ->
@@ -106,7 +112,10 @@ define [
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
         id: "1"
-        readonly: false
+        permissions: {
+          update: true
+          delete: true
+        }
         disabled: false
         onDeleteGradingPeriod: ->
         onDateChange: ->

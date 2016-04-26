@@ -98,36 +98,6 @@ class GradingPeriodsController < ApplicationController
     end
   end
 
-  # @API Create a single grading period
-  # @beta
-  #
-  # Create a new grading period for the current user
-  #
-  # @argument grading_periods[][start_date] [Required, Date]
-  #   The date the grading period starts.
-  #
-  # @argument grading_periods[][end_date] [Required, Date]
-  #
-  # @argument grading_periods[][weight] [Number]
-  #   The percentage weight of how much the period should count toward the course grade.
-  #
-  # @example_response
-  #   {
-  #     "grading_periods": [GradingPeriod]
-  #   }
-  #
-  def create
-    grading_period_params = params[:grading_periods].first
-    grading_period = context_grading_period_group.grading_periods.build(grading_period_params)
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
-      if grading_period.save
-        render json: serialize_json_api(grading_period)
-      else
-        render json: grading_period.errors, status: :bad_request
-      end
-    end
-  end
-
   # @API Update a single grading period
   # @beta
   #
@@ -148,9 +118,9 @@ class GradingPeriodsController < ApplicationController
   #
   def update
     grading_period = GradingPeriod.active.find(params[:id])
-    grading_period_params = params[:grading_periods][0]
+    grading_period_params = params[:grading_periods].first
 
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
+    if grading_period && authorized_action(grading_period, @current_user, :update)
       if grading_period.update_attributes(grading_period_params)
         render json: serialize_json_api(grading_period)
       else
@@ -166,16 +136,21 @@ class GradingPeriodsController < ApplicationController
   def destroy
     grading_period = GradingPeriod.active.find(params[:id])
 
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
+    if grading_period && authorized_action(grading_period, @current_user, :delete)
       grading_period.destroy
       head :no_content
     end
   end
 
   def batch_update
+    return unless authorized_action(@context, @current_user, :manage)
+
     periods = find_or_build_periods_with_params(params[:grading_periods])
+    unless batch_update_rights?(periods)
+      return render_unauthorized_action
+    end
+
     @context.grading_periods.transaction do
-      periods.each { |period| authorized_action(period, @current_user, :manage) }
       errors = no_overlapping_for_new_periods_validation_errors(periods).
         concat(validation_errors(periods))
       if errors.present?
@@ -216,6 +191,20 @@ class GradingPeriodsController < ApplicationController
       period.assign_attributes(period_params.except(:id))
       period
     end
+  end
+
+  def batch_update_rights?(periods)
+    new_periods, existing_periods = periods.partition(&:new_record?)
+    current_user_can_create?(new_periods) &&
+      current_user_can_update?(existing_periods)
+  end
+
+  def current_user_can_create?(periods)
+    periods.all? { |p| p.grants_right?(@current_user, :create) }
+  end
+
+  def current_user_can_update?(periods)
+    periods.all? { |p| p.grants_right?(@current_user, :update) }
   end
 
   def context_grading_period_group

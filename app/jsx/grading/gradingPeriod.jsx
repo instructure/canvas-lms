@@ -19,7 +19,10 @@ define([
       updateGradingPeriodCollection: types.func.isRequired,
       onDeleteGradingPeriod: types.func.isRequired,
       disabled: types.bool.isRequired,
-      permissions: types.object.isRequired
+      permissions: types.shape({
+        update: types.bool.isRequired,
+        delete: types.bool.isRequired,
+      }).isRequired
     },
 
     getInitialState: function(){
@@ -78,7 +81,7 @@ define([
                                title={this.props.title}
                                startDate={this.props.startDate}
                                endDate={this.props.endDate}
-                               readonly={!this.props.permissions.manage}
+                               permissions={this.props.permissions}
                                disabled={this.props.disabled}
                                onDeleteGradingPeriod={this.props.onDeleteGradingPeriod}
                                onDateChange={this.onDateChange}

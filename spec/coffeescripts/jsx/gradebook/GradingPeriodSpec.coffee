@@ -22,13 +22,13 @@ define [
       @createdPeriodData = "grading_periods":[
         {
           "id":"3", "start_date":"2015-04-20T05:00:00Z", "end_date":"2015-04-21T05:00:00Z",
-          "weight":null, "title":"New Period!", "permissions": { "read":true, "manage":true }
+          "weight":null, "title":"New Period!", "permissions": { "update":true, "delete":true }
         }
       ]
       @updatedPeriodData = "grading_periods":[
         {
           "id":"1", "startDate":"2015-03-01T06:00:00Z", "endDate":"2015-05-31T05:00:00Z",
-          "weight":null, "title":"Updated Grading Period!", "permissions": { "read":true, "manage":true }
+          "weight":null, "title":"Updated Grading Period!", "permissions": { "update":true, "delete":true }
         }
       ]
       @server.respondWith "POST", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdPeriodData]
@@ -40,7 +40,7 @@ define [
         endDate: new Date("2015-05-31T00:00:00Z")
         weight: null
         disabled: false
-        permissions: { read: true, manage: true }
+        permissions: { read: true, update: true, create: true, delete: true }
         onDeleteGradingPeriod: ->
         updateGradingPeriodCollection: sinon.spy()
 
