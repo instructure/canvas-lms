@@ -42,7 +42,7 @@ describe UserObserver do
     expect(re_observee).to eq student.user_observers.first
   end
 
-  it "should enroll the observer in all pending/active courses" do
+  it "should enroll the observer in all pending/active courses and restore them after destroy" do
     c1 = course(:active_all => true)
     e1 = student_in_course(:course => c1, :user => student)
     c2 = course(:active_all => true)
@@ -54,10 +54,20 @@ describe UserObserver do
     observer = user_with_pseudonym
     student.observers << observer
 
-    enrollments = observer.observer_enrollments.sort_by(&:course_id)
+    enrollments = observer.observer_enrollments.order(:course_id)
     expect(enrollments.size).to eql 2
     expect(enrollments.map(&:course_id)).to eql [c1.id, c2.id]
     expect(enrollments.map(&:workflow_state)).to eql ["active", "active"]
+    observer.destroy
+    expect(enrollments.reload.map(&:workflow_state)).to eql ["deleted", "deleted"]
+    observer.workflow_state = 'registered'
+    observer.save!
+    p = observer.pseudonyms.first
+    p.workflow_state = 'active'
+    p.save!
+    observer.user_observees.create_or_restore(user_id: student)
+    observer.reload
+    expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
 
   it "should not enroll the observer in institutions where they lack a login" do
