@@ -1,0 +1,17 @@
+<p>The following potential accessibility problems were found:</p>
+<ul>
+<%
+  @items.each do |p|
+    %>
+      <li>
+        Page: <%= link_to p[:page].title, "/courses/#{p[:page].context.id}/pages/#{p[:page].id}/edit" %>
+        <br />
+        <%= p[:problem] %>
+        <div>
+          <%= p[:html].html_safe %>
+        </div>
+      </li>
+    <%
+  end
+%>
+</ul>
