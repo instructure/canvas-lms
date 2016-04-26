@@ -262,7 +262,7 @@ describe "Default Account Reports" do
         #term does not impact user report
         parameters["include_deleted"] = true
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, header: true})
+        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
         headers = parsed.shift
         expect(headers).to eq ['user_id', 'login_id', 'password', 'first_name',
                                'last_name', 'full_name', 'sortable_name',
@@ -292,7 +292,7 @@ describe "Default Account Reports" do
       it "should run sis report" do
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
         expect(parsed.length).to eq 4
 
         expect(parsed[0]).to eq ["user_sis_id_01", "john@stclair.com", nil,
@@ -413,7 +413,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
         parameters["accounts"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 3
         expect(parsed[0]).to eq ["sub1",nil,"English","active"]
@@ -434,7 +434,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["accounts"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 4
         expect(parsed[0]).to eq ["sub1",nil,"English","active"]
@@ -471,7 +471,7 @@ describe "Default Account Reports" do
         parameters["enrollment_term"] = @term3.id
         parameters["include_deleted"] = true
         parameters["terms"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq ["fall12","Fall","active",@term1.start_at.iso8601,
@@ -519,7 +519,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term"] = ''
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 3
         expect(parsed[0]).to eq [@course1.sis_source_id,@course1.course_code,@course1.name,
@@ -536,7 +536,7 @@ describe "Default Account Reports" do
         parameters["enrollment_term_id"] = "sis_term_id:fall12"
         parameters["include_deleted"] = true
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq [@course1.sis_source_id,@course1.course_code,@course1.name,
@@ -595,7 +595,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq ["SIS_COURSE_ID_2","MAT101","Math 101",nil,
@@ -624,7 +624,7 @@ describe "Default Account Reports" do
         @course2.destroy
         parameters = {}
         parameters["sections"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
 
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq [@section1.sis_source_id,@course1.sis_source_id,@section1.name,"active",
@@ -860,7 +860,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["group_membership"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
         expect(parsed.length).to eq 2
         expect(parsed[0]).to eq [@group1.sis_source_id,"user_sis_id_01","accepted"]
         expect(parsed[1]).to eq [@group2.sis_source_id,"user_sis_id_02","accepted"]
@@ -870,7 +870,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["group_membership"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: [0, 1]})
         expect(parsed.length).to eq 3
         expect(parsed[0]).to eq [@group1.sis_source_id,"user_sis_id_01","accepted"]
         expect(parsed[1]).to eq [@group2.sis_source_id,"user_sis_id_02","accepted"]
@@ -929,7 +929,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv",{params: parameters})
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
         expect(parsed[0]).to eq ["SIS_COURSE_ID_1","english_section_3","deleted"]
         expect(parsed[1]).to eq ["SIS_COURSE_ID_2","english_section_1","active"]
         expect(parsed.length).to eq 2
@@ -984,7 +984,7 @@ describe "Default Account Reports" do
       parameters["accounts"] = true
       parameters["users"] = true
       parameters["courses"] = true
-      parsed = read_report("sis_export_csv", {params: parameters, header: true})
+      parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 'skip'})
 
       accounts_report = parsed["accounts.csv"][1..-1].sort_by { |r| r[0] }
       expect(accounts_report[0]).to eq ["sub1", nil, "English", "active"]

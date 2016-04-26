@@ -101,7 +101,7 @@ describe "Outcome Reports" do
 
     it "should run the Student Competency report" do
 
-      parsed = read_report(@type)
+      parsed = read_report(@type, {order: [0, 1]})
 
       expect(parsed[0][0]).to eq @user2.sortable_name
       expect(parsed[0][1]).to eq @user2.id.to_s
@@ -178,8 +178,7 @@ describe "Outcome Reports" do
       @outcome.save!
       outcome_group.add_outcome(@outcome)
 
-      param = {}
-      parsed = read_report(@type, {params: param, account: sub_account})
+      parsed = read_report(@type, {order: [0, 1], account: sub_account})
       expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
                            @submission.submitted_at.iso8601, @submission.grade.to_f.to_s,
@@ -205,7 +204,7 @@ describe "Outcome Reports" do
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
       expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
-      parsed = parse_report(report)
+      parsed = parse_report(report, {order: 0})
 
       expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
                            @assignment.title, @assignment.id.to_s,
@@ -235,7 +234,7 @@ describe "Outcome Reports" do
       lor.score = @submission.score
       lor.save!
 
-      parsed = read_report(@type)
+      parsed = read_report(@type, {order: 0})
       expect(parsed.length).to eq 2
     end
   end
