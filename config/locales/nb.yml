@@ -369,7 +369,7 @@ nb:
     titles: 
       configure_report: "Konfigurer rapport"
       open_registration_delegated_warning_dialog: "En ekstern \"Identity Provider\" er slått på"
-      what_are_quiz_ip_filters: "Hva er IP-filtere for prøver?"
+      what_are_quiz_ip_filters: "Hva er IP-filtre for tester?"
     user: Bruker
   account_sis_id_2e4a461: "konto sis-id"
   account_surveys_b0039876: Kontoundersøkelser
@@ -571,7 +571,7 @@ nb:
           reports: 
             check_box: Rapporter
           tests: 
-            check_box: Prøver
+            check_box: Tester
     avatars: 
       all_link: 
         one: "Alle %{count}"
@@ -795,12 +795,12 @@ nb:
           reports: 
             check_box: Rapporter
           tests: 
-            check_box: Prøver
+            check_box: Tester
     scantron_quiz_csv_parameters: 
       account_reports: 
         edison: 
           quiz_id: 
-            field: Prøve-ID
+            field: Test-ID
           section_id: 
             field: Klasse-ID
     settings: 
@@ -924,7 +924,7 @@ nb:
         outgoing_email_default_name_option_custom: "Egendefinert \"Fra\"-navn"
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
         prevent_course_renaming_by_teachers: "Ikke la lærere endre navn på kursene sine"
-        restrict_quiz_questions: "Forhindre studentene fra å se prøvespørsmålene etter at kurset er over"
+        restrict_quiz_questions: "Forhindre studentene fra å se testspørsmålene etter at kurset er over"
         restrict_student_future_listing: "Begrense studentene fra å se fremtidige kurs i påmeldingsliste"
         restrict_student_future_view: "Begrense studentene fra å få tilgang til kursene før oppstartsdato"
         restrict_student_past_view: "Begrense studentene fra å få tilgang til kursene etter sluttdato"
@@ -991,9 +991,9 @@ nb:
           IP-filtere for prøver er en måte å begrense tilgang til prøver til datamaskiner i et visst IP-område.
           
           Angi et sett av med IP-adressefiltre som forelesere kan bruke for å beskytte tilgang til prøvene. Filtrene kan være en kommaseparert liste over adresser, eller en adresse etterfulgt av en kvalifikator ("192.168.217.1/24" eller "192.168.217.1/255.255.255.0").
-      quiz_ip_filters_help_title: "Hva er IP-filtere for prøver?"
-      quiz_ip_filters_help_tooltip: "Hva er IP-filtere for prøver?"
-      quiz_ip_filters_title: "IP-addressefiltre for prøve"
+      quiz_ip_filters_help_title: "Hva er IP-filtre for tester?"
+      quiz_ip_filters_help_tooltip: "Hva er IP-filtre for tester?"
+      quiz_ip_filters_title: "IP-addressefiltre for test"
       quotas: 
         default_account_quota_title: "Standard kontokvoter"
         default_course_storage_quota: Kurskvote
@@ -1218,7 +1218,7 @@ nb:
       account_reports: 
         unused_courses: 
           main: 
-            text: "Dette er en rapport over alle kurs som mangler alle følgende elementer: oppgaver, kunngjøringer, diskusjoner, filer, moduler, sider og prøver."
+            text: "Dette er en rapport over alle kurs som mangler alle følgende elementer: oppgaver, kunngjøringer, diskusjoner, filer, moduler, sider og tester."
     update_failed_notice: "Oppdatering av kontoinnstillinger feilet"
     user_access_csv_parameters: 
       account_reports: 
@@ -1379,7 +1379,7 @@ nb:
   all_groups_cea25817: "Alle grupper"
   all_my_files_a0213441: "Alle mine filer"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer må være før sluttdatoen"
-  all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
+  all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt testen"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
   all_terms_cd27b0fb: "Alle vilkår"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillat en moderator gjennomgå flere uavhengige vurderinger for valgte innleveringer"
@@ -1548,7 +1548,7 @@ nb:
         suspended: "Institusjonen er suspendert"
     wiki_front_page_default_content_course: "Velkommen til din nye kurswiki!"
     wiki_front_page_default_content_group: "Velkommen til din nye gruppe-wiki!"
-  application_id_2aa1640f: "Søknads ID"
+  application_id_2aa1640f: Søknads-ID
   application_secret_e6803c7e: "Hemmelig søknad"
   apply_781a2546: Bruk
   apply_changes_b1dffc70: "Bruk endringer"
@@ -1632,7 +1632,7 @@ nb:
       a_discussion_post: "et diskusjonsinnlegg"
       a_file_upload: "en filopplasting"
       a_media_recording: "en medieinnspilling"
-      a_quiz: "en prøve"
+      a_quiz: "en test"
       a_text_entry_box: "en tekstboks"
       a_website_url: "en nettsteds-URL"
       external_tool: "et eksternt verktøy"
@@ -1794,7 +1794,7 @@ nb:
       more: "Flere alternativer"
       multiple_due_dates: "Flere frister"
       not_graded_type: "Ikke vurdert"
-      quiz_type: Prøve
+      quiz_type: Test
       save: Lagre
       saving: Lagrer...
     create_group: 
@@ -2119,7 +2119,7 @@ nb:
           details: "Detaljer om innlevering"
           download_attachment: "Last ned %{attachment_display_name}"
           view_original_page: "Se den opprinnelige siden"
-          view_quiz: "Se prøvesvarene"
+          view_quiz: "Se testsvarene"
           view_survey: "Se innlevert svar på undersøkelsen"
         view_rubric_evaluation: "Se evaluering av vurderingsveiledningene"
       messages: 
@@ -2299,7 +2299,7 @@ nb:
     corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
     logout: "LOGG UT"
-  authentication_with_provider_was_successful_but_no_6a194137: "Autentisering med %{provider} var vellykket, men ingen unik ID for å logge på Canvas ble gitt."
+  authentication_with_provider_was_successful_but_no_6a194137: "Autentisering med %{provider} var vellykket, men ingen unik ID for å logge inn på Canvas ble gitt."
   authorize_e3f25bb4: Autoriser
   available_8606e40c: Tilgjengelig
   available_after_unlock_at_b5682224: "Tilgjengelig etter %{unlock_at}"
@@ -2719,7 +2719,7 @@ nb:
       assignment: Oppgave
       discussion: Diskusjon
       event: Hendelse
-      quiz: Prøve
+      quiz: Test
     input_is_invalid_date: "Inndata ikke gyldig dato."
     loading_more_items: "Laster flere elementer."
     loading_undated_events: "Laster udaterte hendelser"
@@ -2905,7 +2905,7 @@ nb:
   canvas_revision_unknown: Ukjent
   canvas_ticketing_email_connector_27e253ae: "Canvas ticketing e-posttilkobler"
   canvas_ticketing_web_post_connector_11158897: "Canvac ticketing webpost-tilkobler"
-  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil sette karakter på nytt i alle dine innleveringer etter at du lagrer prøven, dette kan ta noen minutter."
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil revurdere alle dine innleveringer etter at du lagrer testen. Dette kan ta noen minutter."
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Forsiktig! Endringer til gruppemedlemskap blir brukt på alle grupper som allerede har innlevering-innsendinger. Det kan hende at gruppe-innlevering-innsendinger ikke blir justert på grunn av det. Vil du opprette en ny gruppe for fremtidige innleveringer?"
   cas_url_4ba2843e: CAS-URL
   catalog_already_enabled_56478a3c: "Katalog allerede aktivert"
@@ -2967,6 +2967,11 @@ nb:
   collaboration_creation_failed_95ff831f: "Etablering av samarbeid mislyktes"
   collaboration_was_deleted_9cf9934b: "Samarbeid ble slettet"
   collaborations: 
+    auth_google_drive: 
+      google: 
+        drive: 
+          upgrade: 
+            description: "For å få tilgang til dette samarbeidet må du tillate Canvas til å få tilgang til din Google Drive konto"
     collaboration: 
       delete: "Er du sikker på at du vil slette dette samarbeidet?"
       links: 
@@ -3256,7 +3261,7 @@ nb:
       export_type: Eksporttype
       labels: 
         course: Kurs
-        quiz: Prøve
+        quiz: Test
       links: 
         download: "Kurseksport fra %{date}: *Klikk her for å laste ned*"
         download_file_export: "Fil Eksporterer fra %{date}: *Klikk her for å laste ned*"
@@ -3275,8 +3280,8 @@ nb:
       this_may_take_a_bit: "dette kan ta en stund..."
     quiz_export_checklist: 
       labels: 
-        all_quizzes: "Alle prøver"
-      select_quizzes: "Velg prøver å eksportere"
+        all_quizzes: "Alle tester"
+      select_quizzes: "Velg hvilke tester som skal eksporteres"
   content_for_section_1_7ecfb319: "Innhold for Seksjon 1"
   content_for_section_2_e7c6e2a3: "Innhold for Seksjon 2"
   content_for_section_3_90c1d235: "Innhold for Seksjon 3"
@@ -3315,10 +3320,10 @@ nb:
       page_locked_module: "Denne sien er del av modulen *%{module}* og er ikke tilgjengelig enda."
       page_locked_no_reason: "Denne siden er låst. Ingen annen grunn er oppgitt."
       page_locked_until: "Denne siden er låst inntil %{date}."
-      quiz_locked_at: "Denne prøven ble låst %{at}."
-      quiz_locked_module: "Denne prøven er del av modulen *%{module}* og er ikke tilgjengelig enda."
-      quiz_locked_no_reason: "Denne prøven er låst. Ingen annen grunn er oppgitt."
-      quiz_locked_until: "Denne prøven er låst inntil %{date}."
+      quiz_locked_at: "Denne testen ble låst %{at}."
+      quiz_locked_module: "Denne testen er del av modulen *%{module}* og er ikke tilgjengelig enda."
+      quiz_locked_no_reason: "Denne testen er låst. Ingen annen grunn er oppgitt."
+      quiz_locked_until: "Denne testen er låst inntil %{date}."
       topic_locked_at: "Dette temaet ble låst %{at}."
       topic_locked_module: "Dette temaet er del av modulen *%{module}* og er ikke tilgjengelig enda."
       topic_locked_no_reason: "Dette temaet er låst. Ingen annen grunn er oppgitt."
@@ -3828,7 +3833,7 @@ nb:
       external_tools: "Eksterne verktøy"
       external_urls: "Eksterne URLer"
       files: Filer
-      quizzes: Prøver
+      quizzes: Tester
       wiki_pages: Wiki-sider
     points_possible_short: "%{points} poeng"
     prerequisites_message: 
@@ -3970,6 +3975,7 @@ nb:
       reply_all: "Svar til alle"
     message_form_dialog: 
       body: Tekst
+      comboboxInstructions: "Til: (Begynn å skrive for å velge mottakere. Trykk pil ned for å navigere blant resultatene. Dersom du ikke finner et akseptabelt valg kan du skrive inn et alternativ.)"
       headings: 
         new_message: "Ny melding"
       inbox_actions: 
@@ -4075,9 +4081,9 @@ nb:
     one: "1 poeng"
     other: "%{count} poeng"
   count_quizzes_found_e5e29bb4: 
-    one: "1 prøve funnet."
-    other: "%{count} prøver funnet."
-    zero: "Ingen matchende prøver funnet."
+    one: "1 test funnet."
+    other: "%{count} tester funnet."
+    zero: "Ingen matchende tester funnet."
   count_results_9926447c: 
     one: "Ett resultat"
     other: "%{count} resultater"
@@ -4194,8 +4200,8 @@ nb:
       module_meta: "Feil ved eksport av modulens metadata"
       organization: "Feil ved generering av organisasjonsstruktur"
       question_bank: "Feil ved eksport av spørsmålsbanken \"%{title}\""
-      quiz: "Feil ved eksport av prøven \"%{title}\""
-      quiz_is_locked: "Prøven \"%{title}\" kunne ikke kopieres fordi den er låst."
+      quiz: "Feil ved eksport av testen \"%{title}\""
+      quiz_is_locked: "Testen \"%{title}\" kunne ikke kopieres fordi den er låst."
       quizzes: "Feil ved eksport av enkelte tester"
       resources: "Kunne ikke koble enkelte ressurser"
       rubrics: "Feil ved eksport av vurderingsveiledninger"
@@ -4843,8 +4849,8 @@ nb:
       number_of_assignments: "# Overdragelse"
       number_of_submissions: "# Innleveringer"
       page_title: Kursstatistikk
-      quiz: Prøve
-      quiz_questions: Prøvespørsmål
+      quiz: Test
+      quiz_questions: Testspørsmål
       quiz_submissions: "Svar på spørsmålene"
       quizzes: Tester
       submission_type: Innleveringstype
@@ -4980,7 +4986,7 @@ nb:
       title: Spørsmålstittel
     quiz: 
       question: 
-        count: "Antall spørsmål på prøven"
+        count: "Antall spørsmål på testen"
     read_only_field: "(kun lese)"
     root_account: Rotkonto
     section: Seksjon
@@ -5211,7 +5217,7 @@ nb:
   delete_grading_scheme_6b308832: "Slett karaktersettingsplan"
   delete_group_86c381ec: "Slett gruppe"
   delete_my_account_41060aad: "Slett kontoen min"
-  delete_quiz_142b8099: "Slett prøve"
+  delete_quiz_142b8099: "Slett test"
   delete_requirement_bce2d943: "Slett krav"
   delete_rubric_9b66412d: "Slett rubrikk"
   delete_selected_a023ccf8: "Slett valgt"
@@ -5426,7 +5432,7 @@ nb:
       student_settings: Studentinnstillinger
     edit: 
       new_assignment: "Ny oppgave"
-      new_quiz: "Ny prøve"
+      new_quiz: "Ny test"
     edit_crumb: Rediger
     edit_view: 
       allow_liking: "Tillat liking"
@@ -5672,7 +5678,7 @@ nb:
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis samtlige vurderinger når \"Alle vurderingerperiodene\" nedtrekksmenyvalg er  valgt (Flere vurderingerperioder må være aktivert)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis poengsummene for \"Alle karakterperiodene\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Fordeling av aktuelle karakterer i kurs på tvers av alle innrullerte studenter i organisasjonens kurs."
-  district_id_6f408184: "Distrikt ID"
+  district_id_6f408184: Distrikt-ID
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like luker på %{num_minutes} minutter. *Gå*"
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er påkrevd"
@@ -5753,7 +5759,7 @@ nb:
   edit_permissions_for_count_items_d65e3855: 
     one: "Rediger tillatelser for: %{itemName}"
     other: "Rediger tillatelser for%{count} elementer"
-  edit_quiz_ededddd8: "Rediger prøve"
+  edit_quiz_ededddd8: "Rediger test"
   edit_role_1e96ad20: "Rediger Rolle"
   edit_rubric: 
     buttons: 
@@ -6245,7 +6251,7 @@ nb:
   example_https_schoolofrock_edu_d4326f03: "eksempel: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Eksempel element poeng"
   example_school_of_rock_41f32c31: "eksempel: \"School of Rock\""
-  exceeds_mastery_1f995dce: "Overgår Mestring"
+  exceeds_mastery_1f995dce: "Overgår forventningene"
   excuse_this_assignment_for_the_selected_student_af04e132: "Unnskyld denne innleveringen for den valgte studenten"
   excused_5877183c: Fritatt!
   excused_cf8792eb: Fritatt
@@ -6449,14 +6455,14 @@ nb:
     high_contrast: "Høy kontrast UI"
     html5_first_videos: "Foretrekk HTML5 for videoavspilling"
     k12: "Spesifikke K-12 funksjoner"
-    learning_mastery_gradebook: "Karakterbok for mestringsbasert læring"
+    learning_mastery_gradebook: "Vurderinger av måloppnåelse"
     lor: "LOR Ekstern verktøyene"
     multiple_grading_periods: "Flere vurderingsperioder"
     new_quiz_statistics: "Ny statistikkside for prøver"
     post_grades: "Send vurderinger til SIS"
     quiz_log_auditing: "Spørrekonkurranse Logg Revisjon"
     student_groups: "Ny side for studentgrupper"
-    student_outcome_gradebook: "Karakterbok for studentens mestringsbaserte læring"
+    student_outcome_gradebook: "Vurderinger av studentenes måloppnåelse"
   field_name_31fff38e: Feltnavn
   file_content_a99b5c6b: Fil-innhold
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Fil %{filename} kunne ikke inkluderes i dette ePub-dokumentet. Vennligst se egen zip-fil for tilgang."
@@ -6620,7 +6626,7 @@ nb:
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgende fra din Salesforce tilkoblede applikasjon"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dine brukeres feilrapporter publisert til Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få dine brukeres feilrapporter publisert til Salesforce"
-  global_branding_df1cae12: "Global markedsføring"
+  global_branding_df1cae12: "Global markevarebygging"
   global_message_icons: 
     announcement: kunngjøring
     calendar: kalender
@@ -6683,7 +6689,7 @@ nb:
     confirms: 
       delete_comment: "Er du sikker på at du vil slette denne kommentaren?"
       unsaved_changes: |-
-          Følgende studenter har endringer til sine prøveinnleveringer som ikke er lagret: 
+          Følgende studenter har endringer til sine testinnleveringer som ikke er lagret: 
           
            %{users}
           Fortsett likevel?
@@ -6816,13 +6822,13 @@ nb:
       scored_more_than_on: "Fikk et resultat høyere enn %{cutoff} på %{assignment}"
     submitted_late: "Levert etter fristen"
     title: 
-      quiz: Prøveinnlevering
+      quiz: "Innlevering av test"
       turnitin: "Har Turnitin-resultat"
     titles: 
       discussion: Diskusjonsinnlevering
       media: "Innlevering av mediekommentar"
       media_recording: "Innlevering av mediaopptak"
-      quiz_review: "Denne prøven må gås gjennom"
+      quiz_review: "Denne testen må gjennomgås"
       text: "Innlevering av tekstinnlegg"
       upload: "Innlevering med filopplasting"
       url: "Innlevering av URL"
@@ -6845,7 +6851,7 @@ nb:
     no_file_attached: "Vi oppdaget ikke en CSV å laste opp. Vennligst velg en CSV å laste opp og sende inn på nytt."
     show: 
       assignment_answer: "Denne oppgaven er"
-      assignment_example: "Prøve om egenkapitalindekser"
+      assignment_example: "Test om egenkapitalindekser"
       assignment_question: "Oppgaven som er etterspurt"
       buttons: 
         continue: "Fortsett %{icon}"
@@ -6906,7 +6912,7 @@ nb:
       close_rubric: "Lukk vurderingsveiledning"
       close_score: Lukk
       close_score_screenreader: "Lukk resultatdetaljer"
-      collapse: "Kollapse alle grupper tilknyttet mestringsbasert læring."
+      collapse: "Kollapse alle grupper tilknyttet vurdering av måloppnåelse"
       collapse_title: Skjul
       comment_count: 
         one: "1 kommentar"
@@ -6914,7 +6920,7 @@ nb:
       comment_count_screenreader: "Les kommentarer"
       comments: Kommentarer
       disabled_for_student_view: "Resultater fra Teststudenten er ikke inkludert i karakterstatistikken."
-      expand: "Utvid alle grupper tilknyttet mestringsbasert læring."
+      expand: "Utvid alle grupper tilknyttet vurdering av måloppnåelse."
       expand_title: Utvid
       for_course: "For kurset"
       grading_in_progress: "Faglærer arbeider med karakterene"
@@ -6936,7 +6942,7 @@ nb:
         only_graded: "Beregn basert på kun rettede oppgaver"
         total: Total
         your_score: "Ditt resultat"
-      learning_outcomes: "Mestringsbasert læring"
+      learning_outcomes: Måloppnåelse
       links: 
         click_to_view: "klikk her for å vise"
         download: "Last ned %{attachment}"
@@ -7016,7 +7022,7 @@ nb:
     out_of_final: "%{weight} av Total"
     out_of_points_possible: "av %{points_possible}"
     react_gradebook: 
-      accessibility_warning: "Advarsel: karakterbok Grid View er ikke tilgjengelig. Klikk her for å bruke den individuelle syn i stedet."
+      accessibility_warning: "Advarsel: For forbedret tilgjengelighet, klikk her for å benytte karakterbok i individuell visning."
       download_scores: Eksport
       export_current_gradebook: Nåværende
       filter_by_student: "Filtrer etter studentnavn eller sekundær ID"
@@ -7147,7 +7153,7 @@ nb:
       total: Total
   graded_25cd3fcd: Karaktersatt
   graded_quiz_7fabdf1f: "Rettet prøve"
-  graded_survey_c0f0c395: "Rettet undersøkelse"
+  graded_survey_c0f0c395: "Vurdert undersøkelse"
   grades_a61eba0a: Vurderinger
   grading_box: 
     out_of_points_possible: "av %{assignment.points_possible}"
@@ -7624,7 +7630,7 @@ nb:
     message_will_be_sent_to_all_the_teachers_tas_in_the_course: "Beskjed sendes til samtlige lærere og LAer i kurset."
     please_select_one: "Vennligst velg én..."
     report_problem: "Rapporter et problem"
-    report_problem_sub: "Om Canvas ikke virker som forutsatt, gi oss beskjed"
+    report_problem_sub: "Om Canvas ikke virker som det skal, gi oss beskjed"
     search_the_canvas_guides: "Let i Canvas brukerhåndbøker"
     see_if_your_issue_is_addressed_in_the_canvas_guides: "Se om din sak er omtalt i *Canvas brukerhåndbøker*."
     send_message: "Send beskjed"
@@ -7715,7 +7721,7 @@ nb:
     file_upload_submission: Filopplastingsinnlevering
     media_submission: Medieinnlevering
     online_url_submission: "ONline URL-innlevering"
-    quiz_submission: Prøveinnlevering
+    quiz_submission: "Innlevering av test"
     text_entry_submission: "Innlevering med fritekstsvar"
   id_ac7afadf: id
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID allerede benyttet for denne kontoen og autentiseringsleverandør"
@@ -7725,6 +7731,7 @@ nb:
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Når aktivert, blir ikke søkeparametre kopiert til POST-body under en LTI-lansering"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktivert, vil brukerne kunne konfigurere LTI 2 verktøy."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Om ingen er valgt, sendt til alle på hele kontoen)"
+  if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(dersom ingen er valg, send til samtlige i hele underkontoen)"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du endrer oppdragets poeng mulig må du gi karakter oppdraget på nytt."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Om du konfigurerer innstillinger som gjør at du ikke kan logge inn, kan du åpne vanlig Canvas på %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke velger bruksrettigheter nå, vil denne filen være upublisert etter at den er lastet opp."
@@ -7791,6 +7798,7 @@ nb:
     title_for_topics_category: "%{category}-temaer"
     warnings: 
       truncated_wiki_title: "Tittelen for følgende wikiside ble forkortet: %{title}"
+  importing_course_content_into_the_same_course_will_b09c69e: "Importere kursinnholdet inn i det samme kurset vil duplisere innholdet første gangen, og overskrive duplikater dersom gjentatt."
   in_cases_where_it_is_available_load_the_rce_and_th_2b94310d: "I tilfeller der det er tilgjengelig, last RCE og wiki-sidestolpen fra en rikholdig canvas innholdstjeneste"
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "I tilfeller der det er tilgjengelig, last RCE fra en rikholdig innholdstjeneste fra canvas"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For å fullføre prosessen blir du omdirigert til en påloggingsside der du vil trenge logge inn med ditt barns opplysninger."
@@ -7918,7 +7926,7 @@ nb:
   item_type_document_493ac5b0: "Elementtype: Dokument"
   item_type_download_e949cdb6: "Elementtype: Last ned"
   item_type_link_5a2abed2: "Elementtype: Lenke"
-  item_type_quiz_c894ddb1: "Elementtype: Prøve"
+  item_type_quiz_c894ddb1: "Elementtype: Test"
   items_299a7626: "Elementer:"
   items_items_selected_5b55e566: "%{items} elementer valgt"
   items_selected_have_different_usage_rights_52b325cc: "Elementer som er valgt har ulike bruksrettigheter."
@@ -8040,10 +8048,9 @@ nb:
       log_in_to_canvas: "Logg inn på Canvas"
   learning_mastery_5fc34276: Læremestring
   learning_mastery_gradebook_description: |-
-      Karakterbok for mestringsbaserte læring gir lærerne en rask måte å vise studentenes og kursets
-      fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
-      format og studentens fremdrift vises både som en numerisk score og som mestret/nær
-      mestring/forbedringspotensial.
+      Vurderinger av måloppnåelse gir lærerne en rask måte å vise studentenes og kursets 
+      fremdrift i forhold til kursets læringsmål. Læringsmålene presenteres i et karakterboklignende format
+      og studentenes fremdrift vises både som en numerisk score og om de overgår/innfrir/innfrir ikke forventningene i forhold til læringsmålet.
   learning_outcome: 
     no_comment: "Ingen kommentar"
     no_description: "Ingen beskrivelse"
@@ -8164,7 +8171,7 @@ nb:
   link_url_cf96376: "Link Url"
   linked_assignment_message: "koblet til oppgaven \"%{title}\""
   linked_discussion_topic_message: "koblet til diskusjonstemaet \"%{title}\""
-  linked_quiz_message: "koblet til prøven \"%{title}\""
+  linked_quiz_message: "koblet til testen \"%{title}\""
   linkedin_5726caca: LinkedIn
   links: 
     dashboard: "Mitt kontrollpanel"
@@ -8292,7 +8299,7 @@ nb:
   login_label_1dea0f9d: Innloggingstekst
   login_link_color_a887a109: "Farge logg inn lenke"
   login_logo_5eecf564: "Logg inn logo"
-  login_screen_83518c07: "Logg inn skjermbildet"
+  login_screen_83518c07: Innloggingssiden
   login_with_auth_type_a0aaa52a: "Logg inn med *%{auth_type}*"
   login_with_provider_3fd3998e: "Logg inn med %{provider}"
   logout_a9312e35: "Logg ut"
@@ -8318,6 +8325,7 @@ nb:
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Sørg for at dette kurs er offentlig synlig (studentdata vil forbli privat)"
   malformed_csv_aaa4b7f2: "Misformet CSV"
   manage_access_bd923d8d: "Administrere tilgang"
+  manage_app_list_994cc26c: "Administrer app-liste"
   manage_avatars: 
     errors: 
       update_failed: "Oppdatering mislyktes, vennligst prøv igjen"
@@ -8341,9 +8349,9 @@ nb:
   mark_done_9d81bcd9: "Merk som ferdig"
   marked_done_8f61ebb8: "merket som ferdig"
   marked_done_9fd646f: "Merket ferdig"
-  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Master-poengsum reflekterer den høyeste poengsummen av en vurdert innlevering eller prøve."
+  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Hovedpoengsum reflekterer den høyeste poengsummen av en vurdert innlevering eller test."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poengsum for mestring reflekterer den siste vurderte oppgave eller quiz."
-  mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Mestringsresultatet reflekterer den siste vurderte oppgaven eller prøven."
+  mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Måloppnåelse reflekterer den siste vurderte oppgaven eller testen."
   matching_left_side_900f860b: "Matching venstre side"
   matching_right_side_920e71b2: "Matching høyre side"
   mathquill: 
@@ -8373,7 +8381,7 @@ nb:
       save_failed: "Lagring ser ut til å ha mislyktes. Lukk denne boksen for å prøve igjen."
       save_failed_try_again: "Innlegget kunne ikke lagres. Prøv igjen."
       upload_failed: "Opplasting feilet med feilen:"
-    file_size_error: "Størrelsen på %{file} er større enn den maksimale %{max} MB tillatte filstørrelse."
+    file_size_error: "Størrelsen på %{file} er større enn den maksimale %{max} MB tillatte filstørrelsen."
     file_type_error: "%{file} er ikke en akseptert %{type} fil."
     links: 
       minimize_embedded_kaltura_content: "Minimer inkludert innhold"
@@ -8398,7 +8406,7 @@ nb:
   media_recordings_749aef6d: Medieinnspillinger
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
-  meets_mastery_754e1c06: "Oppfyller Mestring"
+  meets_mastery_754e1c06: "Innfrir forventningene"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ut av maksimalt %{max_membership}"
   members_af25c21d: Medlemmer
   membership_by_invitation_only_9bc27199: "Medlemsskap kun etter invitasjon"
@@ -9056,7 +9064,7 @@ nb:
           link: "Klikk for å se eksporter"
           subject: "Kurseksport ferdig: %{course}"
         subject: "Kurseksport ferdig: %{course}"
-    content_locked: "Denne prøven er for tiden låst."
+    content_locked: "Denne testen er for tiden låst."
     content_locked_at: "Innholdet ble låst %{at}."
     content_locked_module: "Dette innholdet er del av modulen *%{module}* og er ikke tilgjengelig enda."
     content_locked_until: "Innholdet er låst inntil %{date}."
@@ -9841,28 +9849,28 @@ nb:
         subject: "Canvas Registrering Komplett"
       twitter: 
         body: "Canvas varsel - Du har blitt registrert for en Canvas-konto på %{account}!"
-    quiz_locked: "Denne prøven er for tiden låst."
-    quiz_locked_at: "Denne prøven ble låst %{at}."
-    quiz_locked_module: "Denne prøven er del av modulen *%{module}* og er ikke tilgjengelig ennå."
-    quiz_locked_until: "Denne prøven er låst inntil %{date}."
+    quiz_locked: "Denne testen er for tiden låst."
+    quiz_locked_at: "Denne testen ble låst %{at}."
+    quiz_locked_module: "Denne testen er del av modulen *%{module}* og er ikke tilgjengelig ennå."
+    quiz_locked_until: "Denne testen er låst inntil %{date}."
     quiz_module_time_locked: "Denne quizen er en del av modulen *%{module}*, som er låst inntil %{time}."
     quiz_regrade_finished: 
       email: 
-        body: "Ny karaktersetting er ferdig for prøven %{quiz}"
+        body: "Ny vurdering er ferdig for testen %{quiz}"
         html: 
-          body: "Ny karaktersetting er ferdig for prøven %{quiz}"
-          link_message: "Du kan vise prøven her:"
-          subject: "Karakterrevisjon for prøven er ferdig: %{quiz}, %{context}"
-        link_message: "Du kan se prøven her:"
-        subject: "Karakterrevisjon for prøven er ferdig: %{quiz}, %{context}"
+          body: "Ny vurdering er ferdig for testen %{quiz}"
+          link_message: "Du kan se testen her:"
+          subject: "Ny vurdering for testen er ferdig: %{quiz}, %{context}"
+        link_message: "Du kan se testen her:"
+        subject: "Ny vurdering for testen er ferdig: %{quiz}, %{context}"
       sms: 
-        body_sms: "Karakterrevisjon for prøven er ferdig %{title} in %{context}."
+        body_sms: "Ny vurdering for testen er ferdig %{title} in %{context}."
         more_info: "Mer informasjon på %{url}"
       summary: 
-        body: "Ny karaktersettingen er ferdig for din prøve %{title}."
-        subject: "Prøven er vurdert på nytt: %{quiz}, %{context}"
+        body: "Ny vurdering er ferdig for %{title} testen din."
+        subject: "Testen er vurdert på nytt: %{quiz}, %{context}"
       twitter: 
-        body: "Canvas-varsel – karakter på prøve er revidert: %{quiz}"
+        body: "Canvas-varsel – vurdering på testen er revidert: %{quiz}"
     quiz_unpublished_module: "Denne prøven er del av en upublisert modul og er ikke tilgjengelig ennå."
     report_generated: 
       email: 
@@ -10042,14 +10050,14 @@ nb:
         tweet: "Canvas-varsel - Rettet: %{assignment}, %{context}"
     submission_needs_grading: 
       email: 
-        body: "%{user_name} har fullført prøven %{quiz_title}, og den krever manuell karaktersetting."
+        body: "%{user_name} har fullført testen %{quiz_title}, og den krever manuell vurdering."
         html: 
-          body: "%{user_name} har fullført prøven %{quiz_title}, og den krever manuell karaktersetting."
+          body: "%%{user_name} har fullført testen %{quiz_title}, og den krever manuell vurdering."
           link_message: "Du kan gå gjennom innleveringen her"
-          subject: "Prøve innlevert: %{quiz}, %{context}"
+          subject: "Test innlevert: %{quiz}, %{context}"
           submitted_date: "levert: %{date}"
         link_message: "Du kan gå gjennom innleveringen her:"
-        subject: "Prøve innlevert: %{quiz}, %{context}"
+        subject: "Test innlevert: %{quiz}, %{context}"
         submitted_date: "levert: %{date}"
       sms: 
         body_sms: "Karakteren din for %{title}, %{context} ble nettopp endret."
@@ -10060,11 +10068,11 @@ nb:
         score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
       summary: 
-        body: "En innlevering har ankommet for prøven din, *%{title}*, og den behøver manuell karaktersetting."
-        subject: "Prøve innlevert: %{quiz}, %{context}"
+        body: "Du har fått en ny innlevering på testen din, *%{title}*, og den behøver manuell vurdering."
+        subject: "Test innlevert: %{quiz}, %{context}"
         submitted_date: "levert: %{date}"
       twitter: 
-        body: "Canvas-varsel – prøve innlevert: %{quiz}, %{user_name}"
+        body: "Canvas-varsel – test innlevert: %{quiz}, %{user_name}"
     summaries: 
       email: 
         daily_body: "Du har meldt deg på for å få en daglig rapport med varsler fra Canvas-kontoen din. Nedenfor er rapporten for %{date}:"
@@ -10153,8 +10161,8 @@ nb:
     group_type: Gruppe
     learning_outcome_type: Læringsmål
     module_type: Modul
-    quiz_question_type: Prøvespørsmål
-    quiz_type: Prøve
+    quiz_question_type: Testspørsmål
+    quiz_type: Test
     rubric_type: Vurderingsveiledning
     webct: 
       course_not_found: "Blackboardkurset ble ikke funnet."
@@ -10194,7 +10202,7 @@ nb:
     external_url: "Ekstern URL"
     file: Fil
     page: Side
-    quiz: Prøve
+    quiz: Test
     sub_header: Undertittel
   module_locked_f6a7ea9d: "Modul låst"
   module_menu_3201af4e: Modul-meny
@@ -10367,6 +10375,7 @@ nb:
   move_to_front_bf6f0194: "Flytt til forsiden"
   moving_a4d552df: Flytting...
   multi_factor_authentication_configured_865b1bde: "Flerfaktors autentisering konfigurert"
+  multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Flere Canvas-kontoer er assosiert med Clever District %{district_id}"
   multiple_due_dates_6b0d75c6: "Flere frister"
   multiple_modules_930713d4: "Flere moduler"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
@@ -10409,14 +10418,14 @@ nb:
   name_only_5f56718e: "Kun navn"
   nav_avatar_border_3246beb1: "Marg nav-avatar"
   nav_background_fd299145: Nav-bakgrunn
-  nav_badge_3c67de17: Nav-skilt
+  nav_badge_3c67de17: Nav-merke
   nav_icon_active_e4825558: "Nav-ikon aktiv"
   nav_icon_ca3fef59: "Nav ikon"
   nav_logo_4b255c91: "Nav logo"
   nav_logo_background_ba33fb7f: "Nav logo-bakgrunn"
   nav_text_94206145: "Nav tekst"
   nav_text_active_a924ae88: "Nav tekst aktiv"
-  near_mastery_f25174a4: "Nær Mestring"
+  near_mastery_f25174a4: "Innfrir nesten forventningene"
   need_a_canvas_account_221d18ed: "Trenger du en Canvas-konto?"
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny konto Rolle"
@@ -10458,7 +10467,7 @@ nb:
   no_results_found_58717065: "Ingen resultater funnet"
   no_score_yet_c94e919b: "Ingen poengsum ennå"
   no_students_dd8de9f0: "Ingen studenter"
-  no_students_have_taken_the_quiz_yet_e667644b: "Ingen studenter har tatt prøven"
+  no_students_have_taken_the_quiz_yet_e667644b: "Ingen studenter har tatt testen"
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studenter har tatt undersøkelsen ennå"
   no_tls_618add1a: "Ingen TLS"
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights' objekt som følger"
@@ -10481,6 +10490,8 @@ nb:
       karaktersatt. Dersom du publiserer disse karakterene nå, må du re-publisere karakterene 
       etter at de har levert.
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Merk: underkonto-temaer er ikke aktive under denne forhåndsvisningen."
+  note_that_email_may_not_always_be_populated_in_the_bb4a1572: "Merk at e-post kanskje ikke alltid fylles ut i brukerprofilen til Microsoft. Oid vil ikke fylles ut for personlige Microsoft-kontoer."
+  note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Merk at noen attributter ikke fylles ut for alle brukere av Clever."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Merk: Denne påloggingen konto bruker delegert godkjenning, men kan falle tilbake Canvas passordautentisering. Passordfeltene i dette skjemaet oppdatere reserve Canvas passord, *ikke* den delegerte godkjenning."
   notes_c42e0fd5: notater
   notes_for_name_2eefac11: "Notater for %{name}"
@@ -10524,7 +10535,7 @@ nb:
       grading: Karaktersetting
       grading_policies: "Retningslinjer for karaktersetting"
       invitiation: Invitasjon
-      late_grading: "Forsinket karaktersetting"
+      late_grading: "Forsinket vurdering"
       membership_update: "Oppdatering av medlemskap"
       migration: Flytting
       one: Andre
@@ -10581,7 +10592,7 @@ nb:
         *Kun faglærer og admin:*
         
         Sen innlevering av oppgave
-    late_grading_display: "Forsinket karaktersetting"
+    late_grading_display: "Forsinket vurdering"
     membership_update_description: |-
         *Kun admin: avventer påmelding aktivert*
         
@@ -11152,6 +11163,12 @@ nb:
     catalog_provisioner: 
       description: "Catalog konto Provisioner for Canvas"
       name: "Katalog Commissions"
+    clever: 
+      description: "Smart pålogging"
+    clever_settings: 
+      labels: 
+        client_id: Klient-ID
+        client_secret: Klienthemmelighet
     crocodoc: 
       description: "Aktiver Crocodoc som et alternativ for forhåndsvisning av dokumenter"
       name: Crocodoc
@@ -11364,7 +11381,13 @@ nb:
       labels: 
         password: "Passord for autentisering"
         username: "Brukernavn for autentisering"
+    microsoft: 
+      description: Microsoft-pålogging
     microsoft_settings: 
+      description: |-
+          Du trenger å registrere en [ny app hos Microsoft](%{ms_app_url}).
+          Du bør konfigurere %{callback_url} som omadresserings-URL.
+          Notere det søknads-ID og hemmelighet etter at du har lagret appen din, og skrev de inn her.
       labels: 
         application_id: "Søknads ID"
         application_secret: "Hemmelig søknad"
@@ -11523,9 +11546,9 @@ nb:
   previous_time_cc96b361: "Forrige (%{time})"
   previous_timestamp_19343a58: "Forrige (%{timestamp})"
   previously_unhandled_error_encountered_while_refre_ec9c2d81: "Tidligere ubehandlet feil oppstod mens forfriskende utfall"
-  primary_button_3a98f4bc: "Primær knapp"
+  primary_button_3a98f4bc: Primærknapp
   primary_button_text_1f55d27b: "Primær knappetekst"
-  primary_color_630fc6f3: "Primær farge"
+  primary_color_630fc6f3: Primærfarge
   primary_color_button_b75db628: "Primær fargeknapp"
   primary_color_button_disabled_9081ddff: "Primær fargeknapp deaktivert"
   privacy_290109ea: Personvern
@@ -11902,6 +11925,7 @@ nb:
       publishing: Publiserer…
       unpublish: "Fjern publisering"
       unpublishing: "Fjerner publisering…"
+  publish_grades_to_sis_51402d46: "Publisere karakterer til SIS"
   publish_icon_component: 
     publish: Publiser
     publish_click: "publisert, klikk for å fjerne publisering"
@@ -12046,7 +12070,7 @@ nb:
       regrade_options: "Velg et revurderingsvalg for studenter som allerede har tatt quizen. Canvas vil revurdere alle innleveringene dine etter at du har lagret quizen (studentens resultater KAN bli påvirket)."
       some_scores_reduced: "Gi kun poeng til korrekte svar (*enkelte studenters resultater kan bli redusert*)"
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
-  quiz_e0dcce8f: Prøve
+  quiz_e0dcce8f: Test
   quiz_log_auditing: 
     buttons: 
       reload_events: Oppdater
@@ -12223,7 +12247,7 @@ nb:
         other: "%{count} studenter har scoret mellom %{start} og %{end}%."
         zero: "Ingen studenter har scoret mellom %{start} og %{end}%."
       table_description: "Sammendrag statistikk for alle slått i innleveringer"
-    title: Prøvestatistikk
+    title: Teststatistikk
     unknown_answer: "Noe annet"
     user_names: brukernavn
   quizzes: 
@@ -12258,14 +12282,14 @@ nb:
     confirms: 
       delete_answer: "Er du sikker? Å slette svar fra et spørsmål med innleveringer fjerner muligheten til å karaktersette spørsmålet på nytt."
       delete_question: "Er du sikker på at du ønsker å slette dette spørsmålet?"
-      delete_quiz: "Er du sikker på at du ønsker å slette denne prøven?"
-      scrap_and_restart: "Forkast denne prøven og begynn på nytt?"
+      delete_quiz: "Er du sikker på at du ønsker å slette denne testen?"
+      scrap_and_restart: "Forkast denne testen og begynn på nytt?"
     default_answer_comments: "Respons om studenten velger dette svaret"
     default_answer_comments_on_match: "Respons om studenten matcher dette svaret"
     default_comments_on_wrong_match: "Respons om brukeren ikke matcher dette"
     default_quesiton_name: Spørsmål
     default_question_name: Spørsmål
-    default_quiz_title: Prøve
+    default_quiz_title: Test
     default_response_to_essay: "Respons å vise studenten etter at han/hun har svart"
     default_response_to_file_upload: "Respons å vise studenten etter at han/hun har svart"
     dismiss_notification: Avskjedige
@@ -12304,28 +12328,28 @@ nb:
       buttons: 
         publishing_quizzes: "Publiserer tester …"
       confirms: 
-        delete_quiz: "Er du sikker på at du ønsker å slette denne prøven?"
-      default_title: "Navnløs prøve"
+        delete_quiz: "Er du sikker på at du ønsker å slette denne testen?"
+      default_title: "Navnløs test"
       flash: 
-        fail: "Prøve ikke slettet"
-        removed: "Prøve slettet."
+        fail: "Testen ble ikke slettet"
+        removed: "Testen ble slettet."
       multiple_due_dates: "Flere datoer"
     index_view: 
-      add_quiz: Prøve
+      add_quiz: Test
       links: 
         manage_question_banks: "Behandle spørsmålsbanker"
         publish_multiple_quizzes: "Publiser flere tester"
         settings: Innstillinger
       quizzes_title: Tester
-      search_for_quiz: "Søk etter prøve"
-      title_add_quiz: "Legg til prøve"
+      search_for_quiz: "Søk etter test"
+      title_add_quiz: "Legg til test"
     label: 
       answer: 
         text: "Svartekst, riktekstområde"
       question: 
         instructions: "Spørsmålsinstruksjoner, riktekstområde"
       quiz: 
-        instructions: "Prøveinstruksjoner, riktekstområde"
+        instructions: "Testinstruksjoner, riktekstområde"
     labels: 
       answer_text: Svartekst
       comments_on_answer: "Kommentarer, om brukeren velger dette svaret"
@@ -12375,7 +12399,7 @@ nb:
       time_up: "Tiden er ute!"
       titles: 
         autosubmit_dialog: "Utestående Spørrekonkurranse innleveringer"
-        extend_quiz_time: "Forleng tiden på prøven"
+        extend_quiz_time: "Forleng tiden på testen"
         student_extensions: Studenttillegg
     more_questions: "flere spørsmål"
     no_filters_found: "Ingen filtre funnet"
@@ -12396,21 +12420,21 @@ nb:
       current_filter: "Gjeldende filter"
       default_question_input: "[ Velg ]"
       default_text_only_question_name: Mellomrom
-      default_title: "Navnløs prøve"
+      default_title: "Navnløs test"
       errors: 
         invalid_hide_results: "Skjuling av resultater er ugyldig"
         invalid_ip_filter: "IP-filter er ugyldig"
-        invalid_quiz_type: "Prøvetype er ugyldig"
+        invalid_quiz_type: "Testtype er ugyldig"
       question_name_counter: "Spørsmål %{question_number}"
       types: 
-        quiz: Prøve
+        quiz: Test
         survey: Undersøkelse
-    quiz_attempts_length_error: "Antall forsøk for en prøve er begrenset til 3 sifre. Om du vil gi studentene et ubegrenset antall forsøk, ikke merk boksen \"Tillat flere forsøk\" til venstre"
-    quiz_attempts_nan_error: "Prøveforsøk kan kun oppgis med tall"
+    quiz_attempts_length_error: "Antall forsøk for en test er begrenset til 3. Om du vil gi studentene et ubegrenset antall forsøk, ikke merk boksen \"Tillat flere forsøk\" til venstre"
+    quiz_attempts_nan_error: "Testforsøk kan kun oppgis med tall"
     quiz_group: 
       errors: 
-        no_bank: "Kunne ikke finne spørsmålsbank for prøvegruppen %{group_name}"
-        no_permissions: "Brukeren hadde ikke tillatelse til å bruker spørsmålsbanken i prøvegruppen %{group_name}"
+        no_bank: "Kunne ikke finne spørsmålsbank for testgruppen %{group_name}"
+        no_permissions: "Brukeren hadde ikke tillatelse til å bruke spørsmålsbanken i testgruppen %{group_name}"
       question_group: Spørsmålsgruppe
     quiz_item_group_view: 
       no_quizzes: "Ingen tester funnet"
@@ -12420,8 +12444,8 @@ nb:
         delete: Slett
         edit: Rediger
       settings: Innstillinger
-      title_delete: "Slett prøve"
-      title_edit: "Rediger prøve"
+      title_delete: "Slett test"
+      title_edit: "Rediger test"
     quiz_question: 
       defaults: 
         question_name: Spørsmål
@@ -12447,9 +12471,9 @@ nb:
       created: opprettet
     quiz_submissions: 
       errors: 
-        invalid_submissions: "Kunne ikke bekrefte at denne prøve-innlevering er din. Vennligst forsøk igjen."
-        late_quiz: "Du leverte prøven for sent, og svarene ble muligens ikke lagret."
-        protected_quiz: "Denne prøven er beskyttet og kun tilgjengelig fra enkelte steder. Datamaskinen du bruker er ikke et gyldig sted å ta denne prøven fra."
+        invalid_submissions: "Kunne ikke bekrefte at denne testinnleveringen er din. Vennligst forsøk igjen."
+        late_quiz: "Du leverte testen for sent, og svarene ble muligens ikke lagret."
+        protected_quiz: "Denne testen er beskyttet og kun tilgjengelig enkelte steder. Datamaskinens plassering er ugyldig for å ta denne testen."
       show: 
         score_out_of: "Du fikk %{score} av %{points_possible}"
       still_zipping: "Filzipping pågår fremdeles..."
@@ -12459,10 +12483,10 @@ nb:
           submit: "Send inn"
         labels: 
           access_code: Adgangskode
-        quiz_restricted: "Denne prøven har en adgangskode. Du må spørre foreleseren din om å skrive den inn eller fortelle deg den for å ta prøven."
+        quiz_restricted: "Denne testen har en adgangskode. Du må spørre læreren din om å skrive den inn eller fortelle deg den for å ta testen."
         survey_restricted: "Denne undersøkelsen har en adgangskode. Du må spørre foreleseren din om å skrive den inn eller fortelle deg den for å ta undersøkelsen."
       default_history_crumb: Historikk
-      default_title: "Ny prøve"
+      default_title: "Ny test"
       display_answer: 
         labels: 
           answer_with_margin: "med marginen"
@@ -12503,7 +12527,7 @@ nb:
           question_correct_comment: "Studentene vil se denne kommentaren om de svarer riktig"
           question_incorrect_comment: "Studentene vil se denne kommentaren om de svarer feil"
           question_neutral_comment: "Studentene vil se denne kommentaren når de har besvart spørsmålet"
-        unsupported_question_type: "Dette spørsmålet ble importert fra en ekstern kilde. Det var et spørsmål av typen '%{question_type}' som ikke støttes i dette prøve-verktøyet."
+        unsupported_question_type: "Dette spørsmålet ble importert fra en ekstern kilde. Det var et spørsmål av typen '%{question_type}' som ikke støttes i dette testverktøyet."
         you_left_this_blank: "(Du lot denne være tom)"
       download_file_upload_submissions: 
         links: 
@@ -12517,13 +12541,13 @@ nb:
           intro: Intro
           variables: Variabler
       errors: 
-        no_more_attempts: "Du har ingen prøveforsøk igjen"
-        quiz_deleted: "Den prøven er slettet"
-        quiz_update_failed: "Oppdatering av prøven mislyktes"
+        no_more_attempts: "Du har ingen forsøk igjen på testen"
+        quiz_deleted: "Den testen er slettet"
+        quiz_update_failed: "Prøven ble ikke oppdatert"
       fabulous_quizzes: 
         page_titles: Prøver
       find_question_from_bank: 
-        already_added: "dette spørsmålet er allerede i prøven"
+        already_added: "dette spørsmålet er allerede i testen"
         bank_description: "%{bank_name}, %{n} spørsmål"
         buttons: 
           add_questions: "Legg til spørsmål"
@@ -12549,7 +12573,7 @@ nb:
         options: 
           new_group: "[ Ny gruppe ]"
           no_group: "[ Ingen gruppe ]"
-        select_a_question_bank: "Velg en spørsmålsbank fra listen nedenfor for å koble den til prøven som en spørsmålsgruppe."
+        select_a_question_bank: "Velg en spørsmålsbank fra listen nedenfor for å koble den til testen som en spørsmålsgruppe."
         titles: 
           add_new_question_group: "Legg til en ny spørsmålsgruppe"
       form_answer: 
@@ -12582,7 +12606,7 @@ nb:
         distractor_instructions: "skriv hvert distraherende element på en egen linje"
         equation_example: "dvs. \"Hva er 5 pluss [x]?\""
         explanation: 
-          generate_possible_solutions: "Til slutt, lag så mange kombinasjoner av variabler og løsninger som du trenger i prøven din."
+          generate_possible_solutions: "Til slutt, lag så mange kombinasjoner av variabler og løsninger som du trenger i testen din."
         explanations: 
           calculated: "Skriv inn spørsmålet ditt, lag en formel, og generer et sett av mulige svarkombinasjoner. Studentene vil se spørsmålet med et tilfeldig utvalgt sett av variabler fylt inn, og må skrive inn det riktige svarnummeret."
           equations: "Du kan definere variabler ved å skrive inn variabelnavn omgitt av parenteser."
@@ -12660,27 +12684,27 @@ nb:
         count_attempts_left: 
           one: "%{user} har 1 forsøk igjen"
           other: "%{user} har %{count} forsøk igjen"
-        default_quiz_name: "Prøve %{course_name}"
+        default_quiz_name: "Test %{course_name}"
         default_survey_name: "Undersøkelse %{course_name}"
         grade_by_question_warning: "Muligheten til å sette vurderinger pr spørsmål fungerer dårlig når spørsmål stokkes i en gruppe."
         headers: 
-          quiz_submissions: Prøveinnleveringer
+          quiz_submissions: Testinnleveringer
           survey_submissions: "Respons på undersøkelse"
         latest_quiz_results: "Her er de siste testeresultatene for %{user}. Du kan endre resultatene til spørsmålene og legge til flere kommentarer, og så klikke \"Oppdater poengsum\" på bunnen av siden."
         latest_survey_results: "Her er de siste undersøkelseresultatene for %{user}. Du kan endre resultatene til spørsmålene og legge til kommentarer, og så klikke \"Oppdater resultat\" på bunnen av siden."
         links: 
-          back_to_quiz: "Tilbake til prøven"
+          back_to_quiz: "Tilbake til testen"
           back_to_survey: "Tillbake til undersøkelsen"
         logged_out_user: "Avlogget bruker %{index}"
         named_quiz_results: "Resultater fra %{quiz_name} for %{user}"
         next_questions_arrow_title: "Neste spørsmål"
         no_more_attempts: "%{user} har ingen flere forsøk"
-        page_title_quiz: "%{user}s prøvehistorikk"
+        page_title_quiz: "%{user} sin testhistorikk"
         page_title_survey: "%{user}s undersøkelseshistorikk"
         prev_questions_arrow_title: "Forrige spørsmål"
-        quiz_not_yet_taken: "Prøven er ikke tatt ennå."
-        quiz_not_yet_taken_or_in_progress: "Prøven er ikke tatt ennå, eller pågår nå"
-        quiz_unlimited_attempts: "Prøven har et ubegrenset antall forsøk"
+        quiz_not_yet_taken: "Testen er ikke tatt ennå."
+        quiz_not_yet_taken_or_in_progress: "Testen er ikke tatt ennå, eller pågår nå"
+        quiz_unlimited_attempts: "Testen har et ubegrenset antall forsøk"
         score_for_attempt: "Forsøk %{attempt_number}: %{score}"
         survey_not_yet_taken: "Undersøkelsen er ikke tatt ennå."
         survey_not_yet_taken_or_in_progress: "Undersøkelsen er ikke tatt ennå, eller pågår nå"
@@ -12694,7 +12718,7 @@ nb:
       index: 
         page_titles: Tester
       invalid_ip: 
-        quiz_protected: "Denne prøven er beskyttet og kun tilgjengelig fra visse steder. Du kan ikke ta prøven fra datamaskinen du bruker nå."
+        quiz_protected: "Denne testen er beskyttet og kun tilgjengelig enkelte steder. Du kan ikke ta testen fra datamaskinen du bruker nå."
         survey_protected: "Denne undersøkelsen er beskyttet og kun tilgjengelig fra visse steder. Du kan ikke ta undersøkelsen fra datamaskinen du bruker nå."
       lockdown_browser_required: 
         headers: 
@@ -12703,7 +12727,7 @@ nb:
           download_lockdown: "Om du ikke har installert nettleseren, last den ned herfra"
         links: 
           download_lockdown: "[Last ned Respondus LockDown Browser]"
-        requires_lockdown: "Denne prøven krever Respondus LockDown Browser. Start denne for å ta prøven og se resultatene dine."
+        requires_lockdown: "Denne testen krever Respondus LockDown Browser. Start denne for å ta testen og se resultatene dine."
       managed_quiz_data: 
         anonymous_student: "Student %{user_counter}"
         logged_out_user: "Avlogget bruker %{user_counter}"
@@ -12720,7 +12744,7 @@ nb:
         end_quiz_reference_time_current_end: "gjeldende slutt-tid"
         end_quiz_reference_time_now: nå
         end_the_quiz: "Avslutt spørrekonkurranse"
-        extended_quiz_time_explanation: "Du kan gi denne studenten mer tid på nåværende prøveforsøk. Hvor mye tid vil du gi ham/henne?"
+        extended_quiz_time_explanation: "Du kan gi denne studenten mer tid på nåværende testforsøk. Hvor mye tid vil du gi ham/henne?"
         extra_time_on_every_attempt: "Ekstra tid på hvert forsøk:"
         finished_in: "fullført på %{duration}"
         global_extra_attempt_time: "alle allerede får %{count} minutter"
@@ -12736,7 +12760,7 @@ nb:
         labels: 
           ending: Slutter
           extra_attempts: "Ekstra forsøk"
-          manually_unlock: "Lås opp prøven manuelt for neste forsøk"
+          manually_unlock: "Lås opp testen manuelt for neste forsøk"
           reset_has_seen_results: "La elevene se resultater en gang til"
           started: Startet
         maximum_of_1440_minutes: "Maksimum av 1440 minutter (24 timer)"
@@ -12745,7 +12769,7 @@ nb:
         moderate_page_title: "%{title}: Moderer"
         outstanding_autosubmission_description: "Disse spørrekonkurranse innleveringer er enestående, sannsynligvis fordi en student forlot spørrekonkurranse siden før innlevering. Hvis du ønsker å vurdere dem, kan du trykke på \"Send\" under."
         outstanding_quiz_submissions_found: "Det er enestående spørrekonkurranse innleveringer."
-        page_title: "Moderer prøven"
+        page_title: "Moderer testen"
         reload_student_table: "Oppdater student tabellen"
         student_gets_extra_time: 
           one: "*%{student_name}* **får 1 ekstra minutt på hver forsøk**"
@@ -12774,8 +12798,8 @@ nb:
       multi_answer: 
         choose_answer: Velg
       muted: 
-        muted_quiz_description: "Testeresultatet ditt er ikke tilgjengelig, fordi instruktøren ikke er ferdig med å rette den. Når instruktøren er ferdig med å rette prøven vil resultatet vises på denne siden."
-        muted_quiz_header: "Din prøve er satt til passiv status"
+        muted_quiz_description: "Testresultatet ditt er ikke tilgjengelig, fordi læreren ikke er ferdig med å rette den. Når læreren er ferdig med å rette testen vil resultatet vises på denne siden."
+        muted_quiz_header: "Testen din er satt til passiv status"
       new: 
         allowed_attempts: "Antall tillatte forsøk"
         anonymous_submissions: "La innleveringer være anonyme"
@@ -12785,7 +12809,7 @@ nb:
           save: Lagre
           save_and_publish: "Lagre & publiser"
         cant_go_back: "Lås spørsmål etter svar er avgitt"
-        default_page_title: "Ny prøve"
+        default_page_title: "Ny test"
         group: Oppgavegruppe
         headers: 
           ip_filters: "Hva er IP-filtre for tester?"
@@ -12801,12 +12825,12 @@ nb:
           hide_results_only_after_last: "Bare etter deres siste forsøk"
           ip_addresses: "Filtrer etter IP-adresse"
           ip_filter: "Filtrer IP-adresser"
-          never_hide_results: "La studentene se svarene deres på prøven"
-          quiz_instructions: Prøveinstruksjoner
-          quiz_notify: "Varsle brukerne om at prøven er endret"
+          never_hide_results: "La studentene se svarene deres på tesen"
+          quiz_instructions: Testinstruksjoner
+          quiz_notify: "Varsle brukerne om at testen er endret"
           quiz_score: Resultat
           require_access_code: "Krev en tilgangskode"
-          restrict_quiz: Prøvebegrensninger
+          restrict_quiz: Testbegrensninger
           show_question_details: "Vis spørsmålsdetaljer "
         limited_attempts: "Tillatte forsøk"
         links: 
@@ -12824,8 +12848,8 @@ nb:
         points_possible: "Poeng %{n}"
         post_to_sis: "Send vurderinger til SIS"
         quiz_access_code: "Påkrevd tilgangskode"
-        quiz_title: Prøvetittel
-        quiz_type: Prøvetype
+        quiz_title: "Testens tittel"
+        quiz_type: Testtype
         require_lockdown_browser: "Krev Respondus LockDown Browser "
         require_lockdown_browser_for_results: "Kreves for å vise testeresultater"
         retrieving_filters: "Henter filtre… "
@@ -12833,7 +12857,7 @@ nb:
         show_correct_answers: "La studentene se de korrekte svarene"
         show_correct_answers_at: "Vis korrekte svar"
         show_correct_answers_last_attempt: "Bare etter deres siste forsøk"
-        shuffle_answers: "Stokk svar"
+        shuffle_answers: "Tilfeldig rekkefølge"
         students_cannot_view_responses_after_course_concludes: "Studentene kan ikke se testeresponser etter at kurset er over"
         time_limit: "Hvor mange minutter?"
         titles: 
@@ -12841,13 +12865,13 @@ nb:
           delete: Slett
           find_ip_address_filter: "Finn IP-adressefilter"
         warnings: 
-          has_student_submissions: "Studenter har allerede tatt eller begynt å ta denne prøven, så vær forsiktig med å redigere den. Om du endrer spørsmål på en betydelig måte bør du vurdere å endre karakteren for de studentene som tok den gamle versjonen av prøven."
+          has_student_submissions: "Studenter har allerede tatt eller begynt å ta denne testen, så vær forsiktig med å redigere den. Om du endrer spørsmål betydelig, bør du vurdere å endre vurderingen for de studentene som tok den gamle versjonen av testen."
       notices: 
-        cant_view_submission_while_muted: "Du kan ikke se prøvehistorien mens prøven er passiv."
-        has_submissions_already: "Husk at noen studenter kan ha tatt eller være i ferd med å ta prøven"
-        less_than_allotted_time: "Du startet prøven like før den skulle fullføres, så du har ikke så mye tid å fullføre på."
+        cant_view_submission_while_muted: "Du kan ikke se testhistorikken mens testen er passiv."
+        has_submissions_already: "Husk at noen studenter kan ha tatt eller være i ferd med å ta testen"
+        less_than_allotted_time: "Du startet testen like før den skulle fullføres, så du har ikke så mye tid å fullføre på."
         no_submission_for_user: "Ingen levering er tilgjengelig for den brukeren"
-        quiz_updated: "Prøven er oppdatert"
+        quiz_updated: "Testen er oppdatert"
         quizzes_published: 
           one: "1 prøve ble publisert!"
           other: "%{count} tester ble publisert!"
@@ -12924,7 +12948,7 @@ nb:
           submission_details: "Detaljer om innlevering"
           time: Tid
         links: 
-          preview_quiz_again: "Forhåndsvis prøven igjen"
+          preview_quiz_again: "Forhåndsvis testen igjen"
           preview_survey_again: "Forhåndsvis undersøkelsen igjen"
         no_more_attempts: "Ingen flere forsøk er tilgjengelig"
         questions_not_graded: "Noen spørsmål har ennå ikke fått karakter"
@@ -12947,13 +12971,13 @@ nb:
         no_time_limit: "Ingen tidsfrist"
         one_question_at_a_time: "Ett spørsmål av gangen"
         points: Poeng
-        quiz_type: Prøvetype
+        quiz_type: Testtype
         require_lockdown_browser: "Krev Respondus LockDown Browser "
         require_lockdown_browser_for_results: "Kreves for å se testeresultater"
         require_lockdown_browser_monitor: "Webcam kreves"
         score_to_keep: "Resultat å beholde"
         show_correct_answers: "Vis riktige svar"
-        shuffle_answers: "Stokk svar"
+        shuffle_answers: "Tilfeldig rekkefølge"
         time_limit: 
           one: "1 minutt"
           other: "%{count} minutter"
@@ -12966,22 +12990,22 @@ nb:
         labels: 
           final_score: "Endelig resultat"
           fudge_points: Justeringspoeng
-          fudge_points_changed_points_quiz: "Siden %{user} tok denne prøven har antall oppnåelige poeng blitt endret med %{difference}. Du kan tilpasse denne endringen og manuelt legge til positive eller negative poeng med denne boksen."
+          fudge_points_changed_points_quiz: "Siden %{user} tok denne testen har antall oppnåelige poeng blitt endret med %{difference}. Du kan tilpasse denne endringen og manuelt legge til positive eller negative poeng med denne boksen."
           fudge_points_changed_points_survey: "Siden %{user} tok denne undersøkelsen har antall oppnåelige poeng blitt endret med %{difference}. Du kan tilpasse denne endringen og manuelt legge til positive eller negative poeng med denne boksen."
           fudge_points_generic_explanation: "Du kan manuelt justere resultatet ved å legge til positive eller negative poeng i denne boksen."
           questions_need_review: "Følgende spørsmål trenger en gjennomgang"
           quiz_score: Testeresultat
           score_for_attempt: "Resultat for dette forsøket"
-          score_for_quiz: "Resultat for denne prøven"
+          score_for_quiz: "Resultat for denne testen"
           score_for_survey: "Resultat for denne undersøkelsen"
           survey_score: "Resultat for undersøkelsen"
         links: 
           click_to_view_results: "Klikk for å vise resultatene"
         questions_not_graded: "Noen spørsmål har ennå ikke fått karakter"
-        quiz_fudged_negative: "Resultatet på denne prøven har blitt manuelt endret med %{fudge} poeng."
-        quiz_fudged_positive: "Resultatet på denne prøven har blitt manuelt endret med +%{fudge} poeng."
-        quiz_not_yet_taken: "Denne prøven er ikke tatt ennå."
-        quiz_submission_needs_review: "Prøven har endret seg signifikant siden innleveringen ble gjort. Denne innleveringen kan ha behov for ny vurdering."
+        quiz_fudged_negative: "Resultatet på denne testen har blitt manuelt endret med %{fudge} poeng."
+        quiz_fudged_positive: "Resultatet på denne testen har blitt manuelt endret med +%{fudge} poeng."
+        quiz_not_yet_taken: "Denne testen er ikke tatt ennå."
+        quiz_submission_needs_review: "Testen har endret seg signifikant siden innleveringen ble gjort. Denne innleveringen kan ha behov for ny vurdering."
         requires_lockdown: "Respondus LockDown Browser kreves for å vise testeresultatene dine."
         submitted_at: "Levert %{when}"
         survey_fudged_negative: "Resultatet på denne undersøkelsen har blitt manuelt endret med %{fudge} poeng."
@@ -12996,7 +13020,7 @@ nb:
           attempts_left: "Forsøk igjen"
           attempts_so_far: "Forsøk hittil"
           latest_submission: "Siste innlevering"
-          quiz_details: Prøvedetaljer
+          quiz_details: Testdetaljer
           quiz_due: "Leveres innen"
           quiz_time_limit: Tidsbegrensning
           survey_details: "Detaljer om undersøkelsen"
@@ -13013,22 +13037,22 @@ nb:
         student_mute_notification: "Faglæreren arbeider med karakterene"
         unlimited_attempts: "Ubegrenset antall forsøk"
       read_only: 
-        default_page_title: "Ny prøve"
+        default_page_title: "Ny test"
         headers: 
-          quiz_details: Prøvedetaljer
+          quiz_details: Testdetaljer
         labels: 
           question_details: "Vis spørsmålsdetaljer "
-          quiz_instructions: Prøveinstruksjoner
+          quiz_instructions: Testinstruksjoner
         links: 
-          back_to_quiz_page: "Tilbake til prøvesiden"
+          back_to_quiz_page: "Tilbake til testsiden"
       refresh_quiz_after_popup: 
         headers: 
-          loading_in_lockdown: "Laster prøve i Respondus LockDown Browser"
+          loading_in_lockdown: "Laster test i Respondus LockDown Browser"
       show: 
         buttons: 
-          lock_quiz: "Lås denne prøven nå"
+          lock_quiz: "Lås denne testen nå"
           lock_survey: "Lås undersøkelsen nå"
-          unlock_quiz: "La studentene ta prøven nå"
+          unlock_quiz: "La studentene ta testen nå"
           unlock_survey: "La studentene ta undersøkelsen nå"
         course_concluded_notice: "Denne quizen er ikke lenger tilgjengelig da kurset er avsluttet."
         labels: 
@@ -13037,14 +13061,14 @@ nb:
           warning_icon: Advarsel
         links: 
           edit: Rediger
-          keep_editing_this_quiz: "Fortsett å redigere denne prøven"
+          keep_editing_this_quiz: "Fortsett å redigere denne testen"
           keep_editing_this_survey: "Fortsett å redigere denne undersøkelsen"
           message_students_who: "Send melding til studenter som..."
-          moderate_this_quiz: "Moderer prøven"
+          moderate_this_quiz: "Moderer testen"
           moderate_this_survey: "Moderer undersøkelsen"
           preview: Forhåndsvisning
-          quiz_statistics: Prøvestatistikk
-          see_full_quiz: "Se hele prøven"
+          quiz_statistics: Teststatistikk
+          see_full_quiz: "Se hele testen"
           show_assignment_rubric: Vurderingsskjema
           show_student_quiz_results: "Vis studentens testeresultater"
           show_student_survey_results: "Vis resultater fra studentundersøkelsen"
@@ -13053,8 +13077,8 @@ nb:
         only_registered_users: "Kun registrerte, påmeldte brukere kan gjennomføre tellende tester"
         quiz_regraded_your_score_affected: 
           one: "Denne prøven har blitt vurdert på nytt; ditt resultat ble påvirket."
-          other: "Denne prøven har blitt vurdert på nytt; ditt nye resultat reflekterer at %{count} spørsmål ble påvirket."
-        quiz_regraded_your_score_not_affected: "Denne prøven har blitt vurdert på nytt; ditt resultatet ble ikke påvirket."
+          other: "Denne testen har blitt vurdert på nytt, ditt nye resultat reflekterer at %{count} spørsmål ble påvirket."
+        quiz_regraded_your_score_not_affected: "Denne testen har blitt vurdert på nytt, resultatet ditt ble ikke påvirket."
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 student levert så langt"
@@ -13062,9 +13086,9 @@ nb:
         titles: 
           delete: Slett
           related_items: "Relaterte elementer"
-          unlock_for_how_long: "I hvor lang tid ønsker du å låse opp prøven?"
+          unlock_for_how_long: "I hvor lang tid ønsker du å låse opp testen?"
         warnings: 
-          draft_version: "Dette er en forhåndsvisning av kladden av prøven"
+          draft_version: "Dette er en forhåndsvisning av kladden av testen"
       single_answer: 
         upload: "Last opp"
       statistics: 
@@ -13104,7 +13128,7 @@ nb:
         attempt: Forsøk
         attempt_history: Forsøkshistorikk
         questions_not_graded: "Noen spørsmål har ennå ikke fått karakter"
-        quiz_attempt_history_description: "En tabell som viser prøveforsøkshistorikken din. Hvert forsøk er på venstre side. Forsøket, tiden og resultatet er på toppen."
+        quiz_attempt_history_description: "En tabell som viser historikken for testforsøkene dine. Hvert forsøk er på venstre side. Forsøket, tiden og resultatet er på toppen."
         regraded: "Rettet på nytt"
         score: Resultat
         time: Tid
@@ -13114,9 +13138,9 @@ nb:
           next: Neste
           out_of_time_submit: "Ok, greit"
           previous: Forrige
-          submit_quiz: "Lever prøve"
+          submit_quiz: "Lever test"
         headers: 
-          draft_preview: "Dette er en forhåndsvisning av kladden av prøven"
+          draft_preview: "Dette er en forhåndsvisning av kladden av testen"
           published_preview: "Dette er en forhåndsvisning av den publiserte versjonen av spørrekonkurranse"
         labels: 
           started: Startet
@@ -13127,9 +13151,9 @@ nb:
         quiz_instructions: Prøveinstruksjoner
       take_quiz_in_popup: 
         headers: 
-          loading_in_lockdown: "Laster prøve i Respondus LockDown Browser"
+          loading_in_lockdown: "Laster test i Respondus LockDown Browser"
         links: 
-          return_to_quiz_page: "[Klikk her](%{url}) for å gå tilbake til prøvesiden."
+          return_to_quiz_page: "[Klikk her](%{url}) for å gå tilbake til testsiden."
       take_quiz_right_side: 
         labels: 
           attempt_due: "Siste frist for forsøket"
@@ -13138,7 +13162,7 @@ nb:
           time_running: "Tiden går"
         links: 
           hide_time_running: Skjul
-          keep_editing_quiz: "Fortsett å redigere denne prøven"
+          keep_editing_quiz: "Fortsett å redigere denne testen"
           keep_editing_survey: "Fortsett å redigere denne undersøkelsen"
     retrieving_filters: "Henter filtre… "
     rubric: 
@@ -13158,17 +13182,17 @@ nb:
         already_published: Publisert!
         publishing: Publiserer...
       confirms: 
-        delete_quiz: "Er du sikker på at du ønsker å slette denne prøven?"
+        delete_quiz: "Er du sikker på at du ønsker å slette denne testen?"
         delete_quiz_submissions_warning: 
           one: "Advarsel: 1 student har allerede tatt denne prøven. Om du sletter den vil ferdige innleveringer slettes og fjernes fra karakteroversikten."
-          other: "Advarsel: %{count} studenter har allerede tatt denne prøven. Om du sletter den vil ferdige innleveringer slettes og fjernes fra karakteroversikten."
+          other: "Advarsel: %{count} studenter har allerede tatt denne testen. Om du sletter den vil ferdige innleveringer slettes og fjernes fra vurderingsoversikten."
       links: 
         hide_student_quiz_results: "Skjul studentens testeresultater"
         hide_student_survey_results: "Skjul resultatene av studentundersøkelsen"
         show_student_quiz_results: "Vis studentens testeresultater"
         show_student_survey_results: "Vis resultater fra studentundersøkelsen"
-      students_who_have_not_taken_the_quiz: "Studenter som IKKE har tatt prøven"
-      students_who_have_taken_the_quiz: "Studenter som har tatt prøven"
+      students_who_have_not_taken_the_quiz: "Studenter som IKKE har tatt testen"
+      students_who_have_taken_the_quiz: "Studenter som har tatt testen"
     statistics: 
       count_attempts: 
         one: "1 forsøk"
@@ -13185,7 +13209,7 @@ nb:
         unanswered_questions: 
           one: "Du har 1 ubesvart spørsmål (se til høyre for detaljer).  Lever likevel?"
           other: "Du har %{count} ubesvarte spørsmål (se på høyre side for detaljer).  Lever likevel?"
-        unfinished_quiz: "Du er i ferd med å forlate prøven uten å fullføre. Vil du fortsette uansett?"
+        unfinished_quiz: "Du er i ferd med å forlate testen uten å fullføre. Vil du fortsette uansett?"
         unseen_questions: 
           one: "Det er fortsatt 1 spørsmål du ikke har sett. Levere likevel?"
           other: "Det er fortsatt %{count} spørsmål du ikke har sett. Levere likevel?"
@@ -13214,13 +13238,13 @@ nb:
         due_date_one_minute_left: "Ett minutt igjen Før Spørrekonkurranse vil bli markert som Sent"
         due_date_thirty_minutes_left: "Tretti minutter igjen Før Spørrekonkurranse vil bli markert som Sent"
         extra_time: "Du har fått ekstra tid på dette forsøket"
-        less_time: "Tiden din for denne prøven er redusert."
+        less_time: "Tiden din for denne testen er redusert."
         submission_five_minutes_left: "Denne Spørrekonkurranse skal leveres i fem minutter"
         submission_one_minute_left: "Denne Spørrekonkurranse skal leveres i ett minutt"
         submission_thirty_minutes_left: "Denne Spørrekonkurranse skal leveres i tretti minutter"
       question_answered: Besvart
       question_unanswered: "Ikke besvart ennå"
-      saved_at: "Prøve lagret %{t}"
+      saved_at: "Test lagret %{t}"
       saving: Lagrer...
       saving_not_needed: "Ingen nye data å lagre. Sist sjekket %{t}"
       seconds_count: 
@@ -13244,11 +13268,11 @@ nb:
       click_to_set_as_correct: "Klikk for å merke dette svaret som korrekt"
       click_to_unset_as_correct: "Klikk for å fjerne merkingen av dette svaret som korrekt"
       find_question_bank: "Finn spørsmålsbank"
-      find_quiz_question: "Finn prøvespørsmål"
-      help_with_formulas: "Hjelp til med prøvespørsmålformler"
+      find_quiz_question: "Finn testspørsmål"
+      help_with_formulas: "Hjelp til med testspørsmålformler"
       ip_address_filtering: IP-adressefiltrering
       set_as_correct: "Dette svaret er korrekt"
-    toggle_message: "slå av/på prøvesynlighet"
+    toggle_message: "slå av/på synlighet for test"
     top_level: "-- Topp nivå --"
     ? "true"
     : Sant
@@ -13411,6 +13435,7 @@ nb:
   reply_to_topic_12412b0f: "Svar på temaet"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettigheter for opplastede filer"
   requirement_f5b75da1: Krav
+  requirement_subject_7cfac6c8: Behovsemne
   reregister_9ab95a57: "Registrere på nytt"
   reregister_toolname_3dde0bfc: "Registrere %{toolName} på nytt"
   reserved_f247b60b: Reservert
@@ -13441,7 +13466,7 @@ nb:
     options_2: 
       description: "Planlegg student tilgjengelighet"
   restricted_access_d3e99a39: "Begrenset tilgang"
-  resume_quiz_afeceb87: "Fortsett prøve"
+  resume_quiz_afeceb87: "Fortsett test"
   resume_survey_58dce775: "Fortsett undersøkelse"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
   retry_ebd5f8ba: "Prøv på nytt"
@@ -13738,7 +13763,7 @@ nb:
       result_sub_count: "Totalt resultater:"
     screenreader_gradebook: 
       assignments: Oppgaver
-      learning_mastery: "Mestringsbasert læring"
+      learning_mastery: Måloppnåelse
     settings: 
       assignment_toggles_and_actions: 
         download_current_scores: "Last ned Nåværende resultater (.csv)"
@@ -13970,6 +13995,7 @@ nb:
   send_a_message_to_the_teacher_1ae115b6: "Send en melding til foreleseren"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send tilpassede felt (avmarker med mindre du bruker Canvas zendesk)"
   send_e3bd0ed0: Send
+  send_only_to_the_following_types_of_users_d8465c11: "Send kun til følgende typer brukere:"
   send_this_announcement_to_unenrolled_users_4ea549d7: "Send denne kunngjøringen til avregistrerte brukere"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "Send denne kunngjøringen til brukere med kontorolle %{role}"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Send denne kunngjøringen til brukere med kursrolle %{role}"
@@ -14528,7 +14554,7 @@ nb:
         indentation: Innrykk
         page_name: Sidenavn
         quiz_group: Gruppe
-        quiz_name: Prøvenavn
+        quiz_name: "Navn på test"
         topic_name: Temanavn
         url: URL
         wiki_page_name: Sidenavn
@@ -14536,13 +14562,13 @@ nb:
       loading: Laster...
       new_assignment_option: "[ Ny oppgave ]"
       new_page_option: "[ Ny side ]"
-      new_quiz_option: "[ Ny prøve ]"
+      new_quiz_option: "[ Ny test ]"
       new_tab: "Last i ny fane"
       new_topic_option: "[ Nytt tema]"
       options: 
         assignments: Oppgaver
-      quiz_item: Prøve
-      quiz_notice: "Velg prøven du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny prøve\"."
+      quiz_item: Test
+      quiz_notice: "Velg testen du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny test\"."
       quiz_select_label: "Velg quiz du vil knytte til, eller legge til en ny side ved å velge \"Ny Quiz\"."
       select_item_type_label: "Velg innhold type for å legge til."
       sub_header_notice: "Skriv inn teksten du vil legge til som en *modul* underoverskrift"
@@ -14637,7 +14663,7 @@ nb:
         grades_page: "Klikk for å sette inn en lenke til karaktersiden"
         modules: "Klikk for å sette inn en lenke til denne modulen"
         modules_page: "Klikk for å sette inn en lenke til modulsiden"
-        quizzes: "Klikk for å sette inn en lenke til denne prøven"
+        quizzes: "Klikk for å sette inn en lenke til denne testen"
         syllabus_page: "Klikk for å sette inn en lenke til kursoversikt"
         users_page: "Klikk for å sette inn en lenke til personsiden"
         wiki_pages: "Klikk for å sette inn en lenke til denne siden"
@@ -14698,8 +14724,11 @@ nb:
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bør være selvforklarende, Canvas ID til rapporterende brukeren"
   show_and_hide_courses_menu_9e09d1d0: "Vis og skjul kursmeny"
+  show_attendance_columns_4d160e16: "Vis kolonner for deltakelse"
   show_by_date_e3967761: "Vis etter dato"
   show_by_type_c5d61732: "Vis etter type"
+  show_calendar_events_in_the_month_view_on_multiple_e94c33ae: "Vis kalenderoppføringer i månedsvisning på flere linjer dersom tittelen ikke passer på en enkel linje"
+  show_concluded_enrollments_6a05544c: "Vis fullførte påmeldinger"
   show_correct_answers_at_a5475aa3: "Vis riktige svar på"
   show_current_grade_5bf4e0d9: "Vis gjeldende vurdering"
   show_dashcard_view_76078ecb: "Vis oversikt"
@@ -14827,7 +14856,7 @@ nb:
     submissions_dropdown: 
       grade: "(karakter: %{grade})"
       loud_late: "FOR SEN"
-      see_all_quiz_attempts: "Se alle prøve-forsøk"
+      see_all_quiz_attempts: "Se alle testforsøk"
       submission_to_view: "Innleveringer for gjennomsyn:"
       submitted: "*Innlevert:* %{submittedAt}"
   speedgrader_d9a6fa90: Speedgrader
@@ -14856,7 +14885,7 @@ nb:
     none: Ingen
     notes: Merknader
     on_paper: "På papir"
-    online_quiz: "Nettbasert prøve"
+    online_quiz: "Nettbasert test"
     online_text_entry: "Online innlegg av tekst"
     online_upload: "Online opplasting"
     online_url: "Online URL"
@@ -14910,11 +14939,7 @@ nb:
   student_name_hidden_b894d102: "student (navn skjult)"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Studentnavn må være skjult fordi anonym sensur er nødvendig."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studentnavn må være skjult fordi dette er en anonym spørreundersøkelse."
-  student_outcome_gradebook_description: |-
-      Karakterbok for studentenes mestringsbaserte læring gir studentene en rask måte å se egen
-      fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
-      format og fremdrift vises både som en numerisk resultat og som mestret/nær
-      mestring/forbedringspotensial.
+  student_outcome_gradebook_description: "Vurderinger av måloppnåelse gir studentene en rask måte å se egen fremdrift i forhold til kursets læringsmål. Læringsmålene presenteres i et karakterboklignende format og studentenes fremdrift vises både som en numerisk score og om de overgår/innfrir/innfrir ikke forventningene i forhold til læringsmålet."
   student_summary: 
     student_summary_table_ascending: "Student Oppsummering Tabell sortert stigende etter %{sortText}"
     student_summary_table_descending: "Student Oppsummering Tabell sortert synkende etter %{sortText}"
@@ -14923,17 +14948,17 @@ nb:
   students_being_observed_4de3e520: "Studenter som blir observert"
   students_must_complete_all_of_these_requirements_15fa97f7: "Studentene må gjennomføre alle disse kravene"
   students_who_have_taken_the_quiz_count_69dbbda0: 
-    one: "Studenter som har tatt prøven (%{count})"
-    other: "Studenter som har tatt prøven (%{count})"
-    zero: "Studenter som har tatt prøven"
+    one: "Studenter som har tatt testen (%{count})"
+    other: "Studenter som har tatt testen (%{count})"
+    zero: "Studenter som har tatt testen"
   students_who_have_taken_the_survey_count_ef9e6492: 
     one: "Studenter som har tatt undersøkelsen (%{count})"
     other: "Studenter som har tatt undersøkelsen (%{count})"
     zero: "Studenter som har tatt undersøkelsen"
   students_who_haven_t_taken_the_quiz_count_9966e994: 
-    one: "Studenter som ikke har tatt prøven (%{count})"
-    other: "Studenter som ikke har tatt prøven (%{count})"
-    zero: "Student som ikke har tatt prøven"
+    one: "Studenter som ikke har tatt testen (%{count})"
+    other: "Studenter som ikke har tatt tesetn (%{count})"
+    zero: "Student som ikke har tatt testen"
   students_who_haven_t_taken_the_survey_count_c03f4d80: 
     one: "Studenter som ikke har tatt undersøkelsen (%{count})"
     other: "Studenter som ikke har tatt undersøkelsen (%{count})"
@@ -15080,7 +15105,7 @@ nb:
       preview_crocodoc_document: "Forhåndsvis din innlevering og se tilbakemeldingen, hvis tilgjengelig"
       preview_submission: "Forhåndsvis innleveringen"
       preview_title: "Forhåndsvisning av %{title}"
-      quiz_submission: "Denne innleveringen var en prøve. Omdirigerer til prøvesiden."
+      quiz_submission: "Denne innleveringen var en test. Omdirigerer til testsiden."
       show_entire_discussion: "Vis hele diskusjonen"
       titles: 
         external_link: "Lenker til en ekstern side."
@@ -15174,14 +15199,16 @@ nb:
     syllabus: Kursoversikt
     tab_location_error: "Den faneplasseringen er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke behandles"
-  take_the_quiz_87214d7e: "Ta prøven"
-  take_the_quiz_again_8ea51a6c: "Ta prøven på nytt"
+  take_the_quiz_87214d7e: "Ta testen"
+  take_the_quiz_again_8ea51a6c: "Ta testen på nytt"
   take_the_survey_ada59508: "Ta undersøkelsen"
   take_the_survey_again_24ce22c2: "Ta undersøkelsen på nytt"
   teacher_5a73b637: Lærer
   teachers_52e2423f: Forelesere
   teal_f729a294: Blågrønn
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Fortell oss hvordan og når du ønsker å bli varslet om hendelser i Canvas."
+  tenant_d2a41f78: Bruker
+  term_e1c1d390: Termin
   terms: 
     index: 
       date: 
@@ -15274,6 +15301,11 @@ nb:
       
       Takk,
       Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
+      Meldingen du sendte med emnelinjen "%{subject}" ble ikke levert. For å svare på Canvas-meldinger fra denne e-posten må du først bekrefte informasjonskanalen i Canvas-profilen din. Vennligst besøk profilen din og send en bekreftelses e-post på nytt til denne e-postadressen [Se https://community.canvaslms.com/docs/DOC-2281]. Du kan også kontakte denne personen vi Canvas-innboks [Se https://community.canvaslms.com/docs/DOC-2670].
+      
+      Takk
+      Canvas brukerstøtte
   the_module_item_is_locked_27fe420b: "Modulen element er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: |-
       De nyligste poengsummene for brukeren
@@ -15290,7 +15322,7 @@ nb:
   the_state_parameter_is_required_ffadf213: "Staten parameteren er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Den øverste spor representerer dager hvor *student sendte meldinger* til kursinstruktører. Den nederste sporet er for **meldinger fra instruktørene** til studenter."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik ID brukt for representasjon av den spesifikke forespørsel/respons-syklusen denne feilrapporten skjedde rundt"
-  the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressen til en tilstrekkelig priviligert bruker kan brukes som maskerade som rapporteringsbrukeren på den samme siden for å redusere problemet"
+  the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressen som en bruker med riktige rettigheter kan bruke for å forkle seg som rapporteringsbrukeren på den samme siden for å reprodusere problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressen av siden brukeren var på da den rapporterte feilen"
   theme_editor_b7b00f6b: "Theme Editor"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Endringer i Theme Editor har blitt avbrutt."
@@ -15352,11 +15384,11 @@ nb:
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denne siden kan ikke endres ettersom karakterene allerede er innsendt."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denne spørsmålsgruppen er satt for å plukke flere spørsmål enn det som er tilgjengelig."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Dette spørsmålet vil vise en avkryssingsboks ved siden av hvert svar."
-  this_quiz_has_been_excused_d89d2b74: "Denne prøven har blitt fritatt"
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne prøven er ikke publisert* Kun forelesere kan se prøven fram til den blir publisert."
+  this_quiz_has_been_excused_d89d2b74: "Denne testen har blitt fritatt"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne testen er ikke publisert* Kun lærere kan se testen fram til den blir publisert."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denne opptakeren bruker Flash. Som et resultat finner du det kanskje enklere å foreta et opptak på din lokale maskin, og deretter bruke 'last opp media' fanen for å laste den opp."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Denne rapporten viser alle kursene i et gitt semester. Den resulterende CSV-filen vil ha en rad per kurs, og vil vise kurs-ID, kursets SIS-ID, kursets kortnavn, kursets navn, konto-ID, kontoens SIS-ID, kontonavn og brukt lagringsplass i MB."
-  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne prøven siden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevarebygging. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidebar , vil du se en * forhåndsvise endringene * knapp . Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
+  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne testsiden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevare. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidemeny, vil du se en * forhåndsvise endringene * knapp. Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Svarene fra denne studenten er skult ettersom oppgaven er anonym."
   this_student_wrote_f1a3f22d: "Denne student skrev:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Denne innleveringen har allerede blitt vurdert og er klar for moderering."
@@ -15399,6 +15431,7 @@ nb:
     amsterdam: Amsterdam
     arizona: Arizona
     astana: Astana
+    asuncion: Asuncion
     athens: Aten
     atlantic_time_canada: "Atlantiske Tid (Kanada)"
     auckland: Auckland
@@ -15588,7 +15621,9 @@ nb:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "For å koble kursobservatøren *%{name}* til en student, skriv inn navnet på studenten nedenfor for å finne den og så klikk Oppdater."
   to_minscore_43e5452e: "til %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å forhåndsvise tema-editorens merke, må du *slå av høy kontrast UI*."
+  to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "For å omdirigere brukere fra et spesifikt Clever-distrikt, skriv distriktets Clever-ID inn her. Dette er påkrevet for pålogging til Lever for å jobbe i et flerbrukermiljø."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Skriv inn domenet her for å begrense brukere fra et spesifikt Google Apps domene."
+  to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Skriv inn flerbruker-ID'en din her for å begrense brukere av din Azure Active-mappe."
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "For å vise oppgaver, sørge for at *Agenda* visningen er aktiv."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Bytt dashcard-visning og nylig aktivitetsstrøm"
   toggle_editing_answer_text_as_html_9a93fe6: "Toggle redigering svaret tekst som HTML"
@@ -15616,6 +15651,7 @@ nb:
   tours: 
     quiz_regrade: 
       got_it: "Ok, forstått"
+  treat_ungraded_as_0_d38c2b41: "Behandle ikke karaktersatt som 0"
   tree_browser: 
     folder_tree_instructions: "Bruk opp og ned piltastene til å navigere gjennom treet. Trykk høyre for å utvide mapper, venstre for å kollapse, og enter for å velge de valgt element."
   turnitin: 
@@ -15638,6 +15674,7 @@ nb:
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "UH oh! Kontakt din vennlig Catalog Developer . Feilmelding: %{message}"
   unable_to_accept_update_fd53a7e2: "Kan ikke akseptere oppdatering"
   unable_to_dismiss_update_df1e32eb: "Kan ikke fjerne oppdatering"
+  unable_to_find_clever_district_district_id_61deb1cb: "Klarer ikke å finne Clever-distrikt %{district_id}"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
   unarchive_selected_e0c4bd3d: "Dearkiver valgt"
   unauthorized: uautorisert
@@ -15646,6 +15683,7 @@ nb:
   unbookmark_this_question_bank_d87d1a07: "Fjerne bokmerke fra denne spørsmålsbanken"
   unchanged_aca18e02: "[Unchanged]"
   undated_items_toggle_list_visibility_6219e641: "Udaterte gjenstander veksler synligheten på listen"
+  undelivered_message_459916a9: "Melding ikke sendt"
   undo_a7be8fef: Angre
   unenrolled_users_e7632d24: "Uregistrerte brukere"
   ungraded_answers_31ef2df7: "Svar uten vurdering"
@@ -15657,7 +15695,7 @@ nb:
   unknown_answers_9688a2bc: "Ukjente svar"
   unknown_content_type_ae6d08e8: "Ukjent innholdstype"
   unknown_question_bank: "Ukjent spørsmålsbank"
-  unknown_quiz: "Ukjent prøve"
+  unknown_quiz: "Ukjent test"
   unknown_user_url_82196ba7: "Ukjent bruker-URL"
   unlock_at_bb930b34: "Lås inntil"
   unlock_at_time_a0bbfb9: "Lås opp: %{time}"
@@ -16138,6 +16176,7 @@ nb:
           flere kurs eller fylle inn informasjon i din profil.
       welcome_to_happiness: "Velkommen til Canvas!"
   users_d1b60cb0: Brukere
+  users_matching_search_term_c604db9e: "Brukere som matcher \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukere av skjermlesere trenger kanskje å slå av den virtuelle markøren for å kunne bruke disse tastatursnarveiene"
   validate: 
     is_required: "Dette feltet er obligatorisk"
@@ -16172,6 +16211,7 @@ nb:
   warning_6576b5b8: advarsel
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Advarsel: Crocodoc har begrensninger når den brukes i Firefox. Kommentarer vil ikke alltid lagres."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: For bedre tilgjengelighet i å flytte filer, kan du bruke Flytt til Dialog alternativet finner du i menyen."
+  warning_for_improved_accessibility_please_click_he_e6472c02: "Advarsel: For forbedret tilgjengelighet, klikk her for å benytte karakterbok i individuell visning."
   warning_icon_f64936d7: varselsiko
   warnings: 
     test_install: 
@@ -16187,6 +16227,7 @@ nb:
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Vi beklager, men det har oppstått ved feil ved innlogging. Sjekk igjen."
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "Vi sender en bekreftelseskode på fire tegn til %{sms_number}. Skriv inn koden nedenfor for å aktivere dette sms-nummeret"
   we_were_unable_to_activate_the_app_578defe7: "Vi klarte ikke å aktivere app."
+  we_were_unable_to_add_the_access_token_1f471fe6: "Vi klarte ikke å legge til tilgangssymbolet."
   we_were_unable_to_add_the_app_418877ef: "Vi klarte ikke å legge den appen."
   we_were_unable_to_deactivate_the_app_5e2632f3: "Vi klarte ikke å deaktivere app."
   we_were_unable_to_update_the_app_659f5bc6: "Vi klarte ikke å oppdatere programmet."
@@ -16208,7 +16249,7 @@ nb:
   week_s_cb1492ee: Uke(r)
   welcome_to_the_canvas_theme_editor_73091d1: "Velkommen til Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkommen til dine kurs! For å tilpasse listen over kurs, klikk på \"alle kurs\" og stjernemarker kursene du vil se."
-  well_below_mastery_37664bdc: "Vel Nedenfor Mestring"
+  well_below_mastery_37664bdc: "Innfrir ikke forventningene"
   what_are_self_sign_up_groups_af1f002a: "Hva er selvregistrerings grupper?"
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Når aktivert, kan globale JavaScript og CSS-filer lastes opp i *%{t_theme_editor}*."
@@ -16381,6 +16422,7 @@ nb:
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Ønsker du å godta eller forkaste denne oppdateringen?"
   would_you_like_to_enable_this_app_ccdf735d: "Ønsker du å aktivere denne app?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Har du lyst til å la studenter fortsette i kurset eller ønsker du å låse opp igjen disse modulene til de nye kravene er fullført?"
+  wrap_event_titles_in_calendar_month_view_cbb29fd8: "Pakk arrangementstitler inn i kalender månedsvisning"
   xml_configuration_5ea1b942: "XML Konfigurasjon"
   yellow_4cf93785: Gu
   yes_dde87d5: Ja
@@ -16405,7 +16447,7 @@ nb:
   you_can_disable_this_feature_d5e61373: "Du kan deaktivere denne funksjonen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan skjule eller vise en kursets oppgaver ved veksling dem på eller av."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Du kan logge inn direkte med denne tilbyderen ved å gå til %{url}"
-  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan nå gjøre valg for ny vurdering av studenter som allerede har tatt prøven."
+  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan nå gjøre valg for ny vurdering av studenter som allerede har tatt testen."
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Du kan svare på denne kommentaren  ved å svare på denne meldingen, eller gjennomgå detaljene på innleveringen ved å bruke denne lenken: %{link}."
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Du kan svare på denne meldingen i Canvas ved å svare direkte på denne e-posten, eller ved å klikke på denne lenken: %{link}."
   you_can_review_the_submission_details_by_clicking__9abc5515: "Du kan gjennomgå detaljene i innleveringen ved å klikke på denne lenken: %{link}."
@@ -16418,10 +16460,10 @@ nb:
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikke endre temaer på denne subaccount ."
   you_cannot_remove_this_enrollment_c87be1cb: "Du  kan ikke fjerne denne kurspåmeldingen."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Du har ikke tilgang til den forespurte diskusjonen."
-  you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke tilgang til den forespurte prøven."
+  you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke tilgang til den forespurte testen."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette kurset."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for et aktivt kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
-  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne prøven.* Disse endringene vil ikke vises for studentene før du lagrer prøven."
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne testen.* Disse endringene vil ikke vises for studentene før du lagrer testen."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen læringsmål. *Klikk her* for å opprette et."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: |-
       Du har ingen læringsmål. Klikk her for å gå til siden for
@@ -16460,6 +16502,18 @@ nb:
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: "Du vil trenge å opprette en nettapplikasjon i [Google Developer Console](%{google_url}).\n\
       Du bør legge til %{callback_url} som en omdirigerings-URI.\n\
       Etter at du oppretter appen, noter\b Client ID og Client Secret, og oppgi det her."
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Du trenger å registrere en [ny app hos Microsoft](%{ms_app_url}).
+      Du bør konfigurere %{callback_url} som omadresserings-URL.
+      Notere det søknads-ID og hemmelighet etter at du har lagret appen din, og skrev de inn her.
+  you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
+      Du trenger å [registrere en applikasjon på Clever](%{clever_url}).
+      Du trenger å konfigurere %{callback_url} som omdirigerings-URL
+      Noter klient-ID’en og klient-hemmeligheten din etter at du har laget appen, og skriv dem inn her.
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      Du trenger å [registrere en applikasjon på Clever](%{clever_url}).
+      Du bør konfigurere %{callback_url} som omdirigerings-URL.
+      Notere ned klient-ID og klient-hemmelighet, og skriv dem inn her.
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       Du vil trenge å [register an application on GitHub](%{github_url}).
       Du bør konfigurere %{callback_url} som autentiseringscallback URL.
