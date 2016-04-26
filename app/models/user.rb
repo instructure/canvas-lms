@@ -881,6 +881,8 @@ class User < ActiveRecord::Base
       if root_account == :all
         # make sure to hit all shards
         enrollment_scope = self.enrollments.shard(self)
+        user_observer_scope = self.user_observers.shard(self)
+        user_observee_scope = self.user_observees.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
         account_users = self.account_users.shard(self)
         has_other_root_accounts = false
@@ -891,6 +893,8 @@ class User < ActiveRecord::Base
         # student view user won't be cross shard, so that will still be the
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
+        user_observer_scope = self.user_observers(self)
+        user_observee_scope = self.user_observees(self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
@@ -899,6 +903,8 @@ class User < ActiveRecord::Base
       end
 
       self.delete_enrollments(enrollment_scope)
+      user_observer_scope.destroy_all
+      user_observee_scope.destroy_all
       pseudonym_scope.each(&:destroy)
       account_users.each(&:destroy)
 
