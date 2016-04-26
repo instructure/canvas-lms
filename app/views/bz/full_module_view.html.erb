@@ -1,0 +1,6 @@
+<% @pages.each do |page| %>
+<h1 class="page-title"><%= link_to page.title, "/courses/#{@course_id}/pages/#{page.id}" %></h1>
+<%= page.body.html_safe if page.body %>
+<hr />
+<hr />
+<% end %>
