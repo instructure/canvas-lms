@@ -14,6 +14,9 @@ CanvasRails::Application.routes.draw do
   get 'bz/event_rsvps' => 'bz#event_rsvps'
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
+
+  get 'bz/accessibility_check' => 'bz#accessibility_check'
+  get 'bz/full_module_view' => 'bz#full_module_view'
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
 

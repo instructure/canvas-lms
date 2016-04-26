@@ -10,6 +10,47 @@ class BzController < ApplicationController
   before_filter :require_user, :only => [:last_user_url]
   skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
 
+  def accessibility_check
+    @items = []
+    WikiPage.all.each do |page|
+      doc = Nokogiri::HTML(page.body)
+      doc.css('img:not(.bz-magic-viewer)').each do |img|
+        if img.attributes["alt"].nil?
+          @items << { :page => page, :html => img.to_html, :problem => 'Missing alt text' }
+        elsif img.attributes["alt"].value == ""
+          @items << { :page => page, :html => img.to_html, :problem => 'Empty alt text' }
+        elsif img.attributes["alt"].value.ends_with?(".png")
+          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+        elsif img.attributes["alt"].value.ends_with?(".jpg")
+          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+        elsif img.attributes["alt"].value.ends_with?(".svg")
+          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+        elsif img.attributes["alt"].value.ends_with?(".gif")
+          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+        end
+      end
+      doc.css('iframe[src*="vimeo"]').each do |img|
+        @items << { :page => page, :html => img.to_html, :problem => 'Ensure video has CC' }
+      end
+      doc.css('iframe[src*="youtu"]').each do |img|
+        @items << { :page => page, :html => img.to_html, :problem => 'Ensure video has CC' }
+      end
+    end
+  end
+
+  def full_module_view
+    @course_id = params[:course_id]
+    @module_sequence = params[:module_sequence]
+    items = Course.find(@course_id.to_i).context_modules[@module_sequence.to_i].content_tags_visible_to(@current_user)
+    @pages = []
+    items.each do |item|
+      if item.content_type == "WikiPage"
+        wp = WikiPage.find(item.content_id)
+        @pages << wp
+      end
+    end
+  end
+
   def user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
     data = ''
