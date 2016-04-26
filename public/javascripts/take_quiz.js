@@ -46,6 +46,11 @@ define([
   var lastAnswerSelected = null;
   var lastSuccessfulSubmissionData = null;
   var showDeauthorizedDialog;
+
+  // need to keep a top level reference or
+  // it can get garbage collected
+  var quizTakingPoliceTopLevel = null;
+
   var quizSubmission = (function() {
     var timeMod = 0,
         endAt = $(".end_at"),
@@ -672,15 +677,15 @@ define([
     }, 2000);
 
     if (QuizTakingPolice) {
-      var quizTakingPolice = new QuizTakingPolice();
+      quizTakingPoliceTopLevel = new QuizTakingPolice();
 
-      quizTakingPolice.addEventListener('message', function(e) {
+      quizTakingPoliceTopLevel.addEventListener('message', function(e) {
         if (e.data === 'stopwatchTick') {
           quizSubmission.updateTime();
         }
       });
 
-      quizTakingPolice.postMessage({
+      quizTakingPoliceTopLevel.postMessage({
         code: 'startStopwatch',
         frequency: quizSubmission.clockInterval
       });
