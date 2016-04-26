@@ -200,6 +200,12 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:debugging, t('debug.logout_response_redirect_from_idp', "Received LogoutResponse from IdP"))
       end
 
+      unless saml_response.success_status?
+        logger.error "Failed SAML LogoutResponse: #{saml_response.status_code}: #{saml_response.status_message}"
+        flash[:delegated_message] = t("There was a failure logging out at your IdP")
+        return redirect_to login_url
+      end
+
       # for parent using self-registration to observe a student
       # following saml validation of student
       # resume registration process
