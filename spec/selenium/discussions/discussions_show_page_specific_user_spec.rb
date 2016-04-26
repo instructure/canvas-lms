@@ -309,7 +309,7 @@ describe "discussions" do
         get url
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments'
+        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments.'
         expect(DiscussionTopic.last.locked?).to be_truthy
 
         expect(ff('.discussion-reply-action')).to_not be_empty # should let teachers reply

@@ -22,8 +22,7 @@ module Api::V1::Locked
   def locked_json(hash, object, user, type, options={})
     context = object.context if object.respond_to?(:context)
     locked = nil
-    locked = object.locked_for?(user, :check_policies => true, :context => context,
-      :deep_check_if_needed => options[:deep_check_if_needed]) if object.respond_to?(:locked_for?)
+    locked = object.locked_for?(user, {check_policies: true, context: context}.merge(options)) if object.respond_to?(:locked_for?)
 
     hash[:locked_for_user] = !!locked
     if locked
