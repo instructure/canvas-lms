@@ -56,8 +56,16 @@ class GradingPeriodGroup < ActiveRecord::Base
     can :create
   end
 
+  def self.for(account)
+    root_account = account.root_account? ? account : account.root_account
+    grading_period_group_ids = root_account
+      .active_enrollment_terms.select(:grading_period_group_id)
+    active.where(id: grading_period_group_ids)
+  end
+
   def multiple_grading_periods_enabled?
-    (course || root_account).feature_enabled?(:multiple_grading_periods) || account_grading_period_allowed?
+    (course || root_account).feature_enabled?(:multiple_grading_periods) ||
+      account_grading_period_allowed?
   end
 
   private
@@ -74,11 +82,18 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def associated_with_course_or_account_or_enrollment_term?
-    has_enrollment_terms = enrollment_terms.loaded? ? enrollment_terms.any?(&:active?) : enrollment_terms.active.exists?
-    if has_enrollment_terms
+    if enrollment_terms?
       validate_with_enrollment_terms
+    elsif active?
+      validate_without_enrollment_terms
+    end
+  end
+
+  def enrollment_terms?
+    if enrollment_terms.loaded?
+      enrollment_terms.any?(&:active?)
     else
-      validate_without_enrollment_terms if active?
+      enrollment_terms.active.exists?
     end
   end
 
@@ -104,6 +119,6 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def account_grading_period_allowed?
-    !!(root_account && root_account.feature_allowed?(:multiple_grading_periods))
+   root_account.present? && root_account.feature_allowed?(:multiple_grading_periods)
   end
 end

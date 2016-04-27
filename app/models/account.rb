@@ -1099,8 +1099,8 @@ class Account < ActiveRecord::Base
       special_account_list.map { |key| send(key) }
     end
   end
-  define_special_account(:default, 'Default Account')
-  define_special_account(:site_admin)
+  define_special_account(:default, 'Default Account') # Account.default
+  define_special_account(:site_admin) # Account.site_admin
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache

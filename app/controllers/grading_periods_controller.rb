@@ -80,7 +80,12 @@ class GradingPeriodsController < ApplicationController
         grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
       end
       paginated_grading_periods, meta = paginate_for(grading_periods)
-      render json: serialize_json_api(paginated_grading_periods, meta).merge(index_permissions)
+      respond_to do |format|
+        format.json do
+          render json: serialize_json_api(paginated_grading_periods, meta)
+            .merge(index_permissions)
+        end
+      end
     end
   end
 
@@ -99,7 +104,9 @@ class GradingPeriodsController < ApplicationController
     fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
 
     if authorized_action(grading_period, @current_user, :read)
-      render json: serialize_json_api(grading_period)
+      respond_to do |format|
+        format.json { render json: serialize_json_api(grading_period) }
+      end
     end
   end
 
@@ -125,11 +132,15 @@ class GradingPeriodsController < ApplicationController
     grading_period = GradingPeriod.active.find(params[:id])
     grading_period_params = params[:grading_periods].first
 
-    if grading_period && authorized_action(grading_period, @current_user, :update)
-      if grading_period.update_attributes(grading_period_params)
-        render json: serialize_json_api(grading_period)
-      else
-        render json: grading_period.errors, status: :bad_request
+    if authorized_action(grading_period, @current_user, :update)
+      respond_to do |format|
+        if grading_period.update_attributes(grading_period_params)
+          format.json { render json: serialize_json_api(grading_period) }
+        else
+          format.json do
+            render json: grading_period.errors, status: :unprocessable_entity
+          end
+        end
       end
     end
   end
@@ -137,13 +148,16 @@ class GradingPeriodsController < ApplicationController
   # @API Delete a grading period
   # @beta
   #
-  # <b>204 No Content</b> response code is returned if the deletion was successful.
+  # <b>204 No Content</b> response code is returned if the deletion was
+  # successful.
   def destroy
     grading_period = GradingPeriod.active.find(params[:id])
 
-    if grading_period && authorized_action(grading_period, @current_user, :delete)
+    if authorized_action(grading_period, @current_user, :delete)
       grading_period.destroy
-      head :no_content
+      respond_to do |format|
+        format.json { head :no_content }
+      end
     end
   end
 
@@ -156,14 +170,21 @@ class GradingPeriodsController < ApplicationController
     end
 
     @context.grading_periods.transaction do
-      errors = no_overlapping_for_new_periods_validation_errors(periods).
-        concat(validation_errors(periods))
-      if errors.present?
-        render json: { errors: errors }, status: :bad_request
-      else
-        periods.each(&:save!)
-        paginated_periods, meta = paginate_for(periods)
-        render json: serialize_json_api(paginated_periods, meta)
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
+
+      respond_to do |format|
+        if errors.present?
+          format.json do
+            render json: {errors: errors}, status: :unprocessable_entity
+          end
+        else
+          periods.each(&:save!)
+          paginated_periods, meta = paginate_for(periods)
+          format.json do
+            render json: serialize_json_api(paginated_periods, meta)
+          end
+        end
       end
     end
   end

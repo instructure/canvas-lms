@@ -32,6 +32,7 @@ describe GradingPeriodsController do
     account_admin_user(account: root_account)
     user_session(@admin)
     root_account.enable_feature!(:multiple_grading_periods)
+    request.accept = 'application/json'
   end
 
   describe 'GET index' do

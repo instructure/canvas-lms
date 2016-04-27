@@ -352,7 +352,7 @@ describe GradingPeriod do
 
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
-      let(:grading_period_group) { course.grading_period_groups.create! }
+      let(:grading_period_group) { group_helper.create_for_course(course) }
 
       it { is_expected.not_to be_account_group }
     end
@@ -361,7 +361,7 @@ describe GradingPeriod do
   describe '#course_group?' do
     context "given a course grading period group" do
       subject(:course_period) { grading_period_group.grading_periods.create!(params) }
-      let(:grading_period_group) { course.grading_period_groups.create! }
+      let(:grading_period_group) { group_helper.create_for_course(course) }
 
       it { is_expected.to be_course_group }
     end

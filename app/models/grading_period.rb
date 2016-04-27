@@ -38,13 +38,14 @@ class GradingPeriod < ActiveRecord::Base
 
   set_policy do
     %i[read create update delete].each do |permission|
-      given { |user| grading_period_group.grants_right?(user, permission) }
+      given do |user|
+        grading_period_group.present? &&
+          grading_period_group.grants_right?(user, permission)
+      end
       can permission
     end
   end
 
-  # Takes a course and returns an Array (not an ActiveRecord::Relation)
-  # which means this method is not .where() chainable
   def self.for(course)
     periods = active.grading_periods_by(course_id: course.id)
     if periods.exists?

@@ -35,7 +35,7 @@ module DataFixup::MoveSubAccountGradingPeriodsToCourses
   end
 
   def self.copy_periods_to_course(course, current_grading_period_group)
-    group = course.grading_period_groups.active.first_or_create
+    group = course.grading_period_groups.active.first_or_create!
     current_grading_period_group.grading_periods.active.each do |period|
       group.grading_periods << period.dup
     end

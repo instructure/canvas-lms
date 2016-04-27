@@ -119,7 +119,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
       end
     end
 
-    context " without grading periods" do
+    context "without grading periods" do
       let(:root_account_periods_attrs) do
         root_account_periods.to_a.map do |period|
           { title: period.title, start_date: period.start_date, end_date: period.end_date }

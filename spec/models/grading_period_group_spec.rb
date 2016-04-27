@@ -20,37 +20,72 @@ require_relative '../spec_helper'
 
 describe GradingPeriodGroup do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+  let(:valid_attributes) { { title: "A Title" } }
 
-  describe "#title" do
-    it "can be mass-assigned" do
-      group = GradingPeriodGroup.new(title: "Example Title")
-      expect(group.title).to eql("Example Title")
+  # after dev lands in master, re add this title validation
+  # it { is_expected.to validate_presence_of(:title) }
+  it { is_expected.to belong_to(:course) }
+  it { is_expected.to have_many(:enrollment_terms).inverse_of(:grading_period_group) }
+  it { is_expected.to have_many(:grading_periods).dependent(:destroy) }
+
+  it { is_expected.to allow_mass_assignment_of(:title) }
+
+  describe ".for" do
+    context "given a root account" do
+      let(:root_account) { Account.default }
+      context "given a set with a term" do
+        let(:term) { root_account.enrollment_terms.first }
+        let!(:grading_period_set) do
+          GradingPeriodGroup.create!(valid_attributes) do |set|
+            set.enrollment_terms << term
+          end
+        end
+
+        it "fetches sets via enrollment terms" do
+          sets = GradingPeriodGroup.for(root_account)
+          expect(sets.count).to eql 1
+          expect(sets).to include grading_period_set
+        end
+
+        context "given a sub account" do
+          let(:sub_account) { root_account.sub_accounts.create! }
+          it "fetches sets on the root account" do
+            sets = GradingPeriodGroup.for(sub_account)
+            expect(sets.count).to eql 1
+            expect(sets).to include grading_period_set
+          end
+        end
+      end
     end
 
-    it "is optional" do
-      group = GradingPeriodGroup.new
-      expect(group.title).to be_nil
+    context "given a course" do
+      let(:course) { root_account.courses.create! }
+      it "is expected to fail" do
+        expect {
+          GradingPeriodGroup.for(course)
+        }.to raise_error
+      end
     end
   end
 
   describe "validation" do
+    let(:account) { Account.default }
+    let(:group) { GradingPeriodGroup.new valid_attributes }
+    let(:enrollment_term) { account.enrollment_terms.create! }
+
     it "is valid with only an active enrollment term" do
-      enrollment_term = Account.default.enrollment_terms.create!
-      group = GradingPeriodGroup.new
       group.enrollment_terms << enrollment_term
       expect(group).to be_valid
     end
 
     it "is valid with a course" do
       course = Course.create!(account: Account.default)
-      group = GradingPeriodGroup.new
-      group.course = course
+      group = course.grading_period_groups.build(title: 'a group on a course')
       expect(group).to be_valid
     end
 
     it "is not valid without a course or an enrollment term" do
-      grading_period_group = GradingPeriodGroup.new
-      expect(grading_period_group).not_to be_valid
+      expect(group).not_to be_valid
     end
 
     it "is not valid with enrollment terms associated with different accounts" do
@@ -58,31 +93,25 @@ describe GradingPeriodGroup do
       account_2 = account_model
       term_1 = account_1.enrollment_terms.create!
       term_2 = account_2.enrollment_terms.create!
-      grading_period_group = GradingPeriodGroup.new
-      grading_period_group.enrollment_terms << term_1
-      grading_period_group.enrollment_terms << term_2
-      expect(grading_period_group).not_to be_valid
+      group.enrollment_terms << term_1
+      group.enrollment_terms << term_2
+      expect(group).not_to be_valid
     end
 
     it "is valid with only deleted enrollment terms and is deleted" do
-      enrollment_term = Account.default.enrollment_terms.create!
       enrollment_term.destroy
-      group = GradingPeriodGroup.new
       group.enrollment_terms << enrollment_term
       group.workflow_state = 'deleted'
       expect(group).to be_valid
     end
 
     it "is not valid with only deleted enrollment terms and not deleted" do
-      enrollment_term = Account.default.enrollment_terms.create!
       enrollment_term.destroy
-      group = GradingPeriodGroup.new
       group.enrollment_terms << enrollment_term
       expect(group).not_to be_valid
     end
 
     it "is not valid with only deleted enrollment terms and undeleted" do
-      enrollment_term = Account.default.enrollment_terms.create!
       group = group_helper.create_for_enrollment_term(enrollment_term)
       enrollment_term.destroy
       group.reload
@@ -96,7 +125,6 @@ describe GradingPeriodGroup do
       term_1 = account_1.enrollment_terms.create!
       term_2 = account_2.enrollment_terms.create!
       term_2.destroy
-      group = GradingPeriodGroup.new
       group.enrollment_terms << term_1
       group.enrollment_terms << term_2
       expect(group).not_to be_valid
@@ -104,7 +132,7 @@ describe GradingPeriodGroup do
 
     it "is not able to mass-assign the course id" do
       course = course()
-      grading_period_group = GradingPeriodGroup.new(course_id: course.id)
+      grading_period_group = GradingPeriodGroup.new(valid_attributes.merge(course_id: course.id))
       expect(grading_period_group.course_id).to be_nil
       expect(grading_period_group.course).to be_nil
     end
@@ -115,7 +143,7 @@ describe GradingPeriodGroup do
       term_1 = Account.default.enrollment_terms.create!
       group_1 = group_helper.create_for_enrollment_term(term_1)
       term_2 = Account.default.enrollment_terms.create!
-      group_2 = GradingPeriodGroup.new
+      group_2 = GradingPeriodGroup.new valid_attributes
       group_2.enrollment_terms.concat([term_1, term_2])
       group_2.save!
       expect(group_1.reload).to be_deleted
@@ -154,12 +182,11 @@ describe GradingPeriodGroup do
     end
   end
 
-  context "Soft deletion" do
+  it_behaves_like "soft deletion" do
     let(:account) { Account.create! }
     let(:course) { Course.create!(account: account) }
-    let(:creation_arguments) { {} }
+    let(:creation_arguments) { {title: "A title"} }
     subject { course.grading_period_groups }
-    include_examples "soft deletion"
   end
 
   describe "permissions" do
@@ -518,18 +545,6 @@ describe GradingPeriodGroup do
           })
         end
       end
-    end
-  end
-
-  describe "#enrollment_terms" do
-    it "returns the associated enrollment terms" do
-      account = account_model
-      term_1 = account.enrollment_terms.create!
-      term_2 = account.enrollment_terms.create!
-      group = group_helper.create_for_enrollment_term(term_1)
-      term_2.update_attribute(:grading_period_group, group)
-      group.reload
-      expect(group.enrollment_terms).to match_array([term_1, term_2])
     end
   end
 end
