@@ -187,7 +187,9 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     saml_request = Onelogin::Saml::LogoutRequest.generate(
       session[:name_qualifier],
+      session[:sp_name_qualifer],
       session[:name_id],
+      session[:name_identifier_format],
       session[:session_index],
       settings
     )

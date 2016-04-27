@@ -127,7 +127,9 @@ class Login::SamlController < ApplicationController
 
           session[:saml_unique_id] = unique_id
           session[:name_id] = response.name_id
+          session[:name_identifier_format] = response.name_identifier_format
           session[:name_qualifier] = response.name_qualifier
+          session[:sp_name_qualifier] = response.sp_name_qualifier
           session[:session_index] = response.session_index
           session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
           session[:login_aac] = aac.id

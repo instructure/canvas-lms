@@ -41,7 +41,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -81,7 +83,9 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: unique_id,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "such a lie"
@@ -105,7 +109,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -152,7 +158,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -183,13 +191,15 @@ describe Login::SamlController do
       @aac2.save!
 
       @stub_hash = {
-          :issuer => @aac2.idp_entity_id,
-          :is_valid? => true,
-          :success_status? => true,
-          :name_id => @unique_id,
-          :name_qualifier => nil,
-          :session_index => nil,
-          :process => nil,
+          issuer: @aac2.idp_entity_id,
+          is_valid?: true,
+          success_status?: true,
+          name_id: @unique_id,
+          name_identifier_format: nil,
+          name_qualifier: nil,
+          sp_name_qualifier: nil,
+          session_index: nil,
+          process: nil,
       }
     end
 
@@ -234,7 +244,9 @@ describe Login::SamlController do
         is_valid?: true,
         success_status?: true,
         name_id: @unique_id,
+        name_identifier_format: nil,
         name_qualifier: nil,
+        sp_name_qualifier: nil,
         session_index: nil,
         process: nil
       }
@@ -414,7 +426,9 @@ SAML
              is_valid?: true,
              success_status?: true,
              name_id: nil,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "saml_entity",
@@ -439,7 +453,9 @@ SAML
              is_valid?: true,
              success_status?: true,
              name_id: @unique_id,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "saml_entity"
@@ -470,7 +486,9 @@ SAML
            is_valid?: true,
            success_status?: true,
            name_id: nil,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity",
@@ -499,7 +517,9 @@ SAML
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
