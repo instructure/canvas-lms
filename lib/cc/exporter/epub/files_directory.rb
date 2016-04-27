@@ -1,7 +1,8 @@
 module CC::Exporter::Epub
   class FilesDirectory
-    def initialize(files)
-      @files = files
+    def initialize(exporter)
+      @files = exporter.unsupported_files
+      @filename_prefix = exporter.filename_prefix
     end
     attr_reader :files
 
@@ -43,7 +44,7 @@ module CC::Exporter::Epub
     end
 
     def filename
-      @_filename ||= "#{Time.zone.now.strftime('%Y-%b-%d_%H-%M-%S')}.zip"
+      "#{@filename_prefix}.zip"
     end
 
     def zip_file
