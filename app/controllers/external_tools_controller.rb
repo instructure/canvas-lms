@@ -478,7 +478,10 @@ class ExternalToolsController < ApplicationController
       accept_media_types = '*/*'
       accept_presentation_document_targets = 'none'
       extra_params[:accept_copy_advice] = true
-      accept_media_types = assignment.allowed_extensions.map { |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',') if assignment.allowed_extensions.present?
+      if assignment.submission_types.include?('online_upload') && assignment.allowed_extensions.present?
+        extra_params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
+        accept_media_types = assignment.allowed_extensions.map { |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',')
+      end
     else
       # todo: we _could_, if configured, have any other placements return to the content migration page...
       raise "Content-Item not supported at this placement"

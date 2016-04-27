@@ -426,12 +426,47 @@ describe ExternalToolsController do
         user_session(@teacher)
         assignment = @course.assignments.create!(name: 'an assignment')
         assignment.allowed_extensions += ['pdf', 'jpeg']
+        assignment.submission_types = 'online_upload'
         assignment.save!
         get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
         expect(response).to be_success
 
         lti_launch = assigns[:lti_launch]
         expect(lti_launch.params['accept_media_types']).to eq 'application/pdf,image/jpeg'
+      end
+
+      it "sends the ext_content_file_extensions parameter for restricted file types" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.allowed_extensions += ['pdf', 'jpeg']
+        assignment.submission_types = 'online_upload'
+        assignment.save!
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['ext_content_file_extensions']).to eq 'pdf,jpeg'
+      end
+
+      it "doesn't set the ext_content_file_extensions parameter if online_upload isn't accepted" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.submission_types = 'online_text_entry'
+        assignment.allowed_extensions += ['pdf', 'jpeg']
+        assignment.save!
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params.key?('ext_content_file_extensions')).not_to be
+      end
+
+      it "sets the accept_media_types parameter to '*.*'' if online_upload isn't accepted" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.allowed_extensions += ['pdf', 'jpeg']
+        assignment.save!
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_media_types']).to eq '*/*'
       end
 
 
