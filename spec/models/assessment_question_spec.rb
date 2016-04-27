@@ -55,8 +55,7 @@ describe AssessmentQuestion do
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    expect(@attachment.reload.cloned_item.attachments.length).to eq 2
-    @clone = @attachment.cloned_item.attachments.last
+    @clone = @question.attachments.where(root_attachment: @attachment).first
 
     expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
@@ -66,8 +65,7 @@ describe AssessmentQuestion do
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    expect(@attachment.reload.cloned_item.attachments.length).to eq 2
-    @clone = @attachment.cloned_item.attachments.last
+    @clone = @question.attachments.where(root_attachment: @attachment).first
 
     expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
@@ -79,8 +77,7 @@ describe AssessmentQuestion do
             'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    expect(@attachment.reload.cloned_item.attachments.length).to eq 2
-    @clone = @attachment.cloned_item.attachments.last
+    @clone = @question.attachments.where(root_attachment: @attachment).first
 
     expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'>"
   end
@@ -91,8 +88,7 @@ describe AssessmentQuestion do
     data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    expect(@attachment.reload.cloned_item.attachments.length).to eq 2
-    @clone = @attachment.cloned_item.attachments.last
+    @clone = @question.attachments.where(root_attachment: @attachment).first
 
     expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
@@ -129,8 +125,7 @@ describe AssessmentQuestion do
 
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachments.each {|k, ary| ary.each {|a| a.reload; expect(a.cloned_item.attachments.length).to eq 2 } }
-    @attachment_clones = Hash[@attachments.map{|k, ary| [k, ary.map {|a| a.cloned_item.attachments.last }]}]
+    @attachment_clones = Hash[@attachments.map{|k, ary| [k, ary.map {|a| @question.attachments.where(root_attachment_id: a).first}]}]
 
     @attachment_clones.each do |key, ary|
       string = eval "@question.question_data#{key}"
