@@ -149,6 +149,7 @@ describe ContentMigration do
     it "should copy assignment attributes" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
       @assignment.turnitin_enabled = true
+      @assignment.vericite_enabled = true
       @assignment.peer_reviews = true
       @assignment.peer_review_count = 2
       @assignment.automatic_peer_reviews = true
@@ -160,7 +161,7 @@ describe ContentMigration do
 
       @assignment.save!
 
-      attrs = [:turnitin_enabled, :peer_reviews,
+      attrs = [:turnitin_enabled, :vericite_enabled, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
           :position, :peer_review_count, :muted, :omit_from_final_grade]

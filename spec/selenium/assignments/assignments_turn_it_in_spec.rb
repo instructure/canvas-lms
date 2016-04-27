@@ -28,6 +28,7 @@ describe "assignments turn it in" do
     f('#exclude_biblio').click # 1 -> 0
     f('#exclude_quoted').click # 1 -> 0
     f('#exclude_small_matches').click # 0 -> 1
+    f('#exclude_small_matches_type_r1').click
     f('#exclude_small_matches_words_value').click # 0 -> 1
     f('#submit_papers_to').click # 1 -> 0
     f('#exclude_small_matches_words_value').send_keys([:backspace, "5"]) # '0' -> 5

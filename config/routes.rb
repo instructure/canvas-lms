@@ -240,6 +240,8 @@ CanvasRails::Application.routes.draw do
       resources :submissions do
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
+        post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
+        get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
       end
       get :rubric
       resource :rubric_association, path: :rubric do
@@ -525,6 +527,7 @@ CanvasRails::Application.routes.draw do
     get 'statistics/over_time/:attribute' => 'accounts#statistics_graph', as: :statistics_graph
     get 'statistics/over_time/:attribute.:format' => 'accounts#statistics_graph', as: :formatted_statistics_graph
     get :turnitin_confirmation
+    get :vericite_confirmation
     resources :permissions, controller: :role_overrides, only: [:index, :create] do
       collection do
         post :add_role

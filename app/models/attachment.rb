@@ -346,6 +346,11 @@ class Attachment < ActiveRecord::Base
     TURNITINABLE_MIME_TYPES.include?(content_type)
   end
 
+  def vericiteable?
+    # accept any file format
+    true
+  end
+
   def flag_as_recently_created
     @recently_created = true
   end

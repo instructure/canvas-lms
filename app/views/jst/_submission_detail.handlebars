@@ -24,6 +24,11 @@
           <span class="turnitin_score_container">{{> turnitinScore}}</span>
         {{/with}}
       {{/if}}
+      {{#if vericite.reportUrl}}
+        {{#with vericite}}
+          <span class="turnitin_score_container">{{> vericiteScore}}</span>
+        {{/with}}
+      {{/if}}
     {{/ifEqual}}
   {{else}}
     {{#t "no_submission"}}No submission{{/t}}

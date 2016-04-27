@@ -1,0 +1,89 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<div class="ic-notification">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-info"></i>
+    <span class="screenreader-only">
+      <%= accessible_message_icon_text("information") %>
+    </span>
+  </div>
+  <div class="ic-notification__content">
+    <div class="ic-notification__message">
+      <h4 class="ic-notification__title">
+        <%= t('plagiarism_compatibility', 'Plagiarism plugins compatibility notice:') %>
+      </h4>
+      <span class="notification_message">
+        Plagiarism plugins are mutually exclusive and do not work with other enabled plagiarism plugins. Please make sure only one plugin is enabled at a time.
+      <span>
+    </div>
+  </div>
+</div>
+  <table  class="formtable">
+    <tr>
+      <td colspan="2">
+        Get your credentials from <a href="http://www.vericite.com" target="_blank">VeriCite</a>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :account_id, :en => "VeriCite Account ID" %></td>
+      <td>
+        <%= f.text_field :account_id %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :shared_secret, :en => "VeriCite Shared Secret" %></td>
+      <td>
+        <%= f.text_field :shared_secret %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :host, :en => "VeriCite Host" %></td>
+      <td>
+        <%= f.text_field :host %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :comments, :en => "Submission Comments" %></td>
+      <td>
+        <%= f.text_area :comments, :rows => '4' %>
+        <br/>
+        <%= mt :default_comments_settings, "*Text entered here will be displayed to students when submitting for an assignment.*" %>
+      </td>
+    </tr>
+
+    <tr>
+      <td><%= f.blabel :pledge, :en => "VeriCite Pledge" %></td>
+      <td>
+        <%= f.text_area :pledge, :rows => '4' %>
+        <br/>
+        <%= mt :pledge_description, "*Text entered here will be displayed to students when submitting for an assignment. The student will be required to check the box for the pledge before submitting. If left blank, no pledge is shown or required to submit.*" %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :show_preliminary_score, :en => "Show Preliminary Score" %></td>
+      <td><%= f.check_box :show_preliminary_score %></td>
+    </tr>
+    <tr>
+      <td><%= mt :default_assignment_settings, "**Default Assignment Settings**" %>:</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :type, :en => "Students Can See the Originality Report" %></td>
+      <td><%= f.select :release_to_students, {"Immediately"=>'immediate', "After the assignment is graded"=>'after_grading', "After the Due Date"=>'after_due_date', "Never"=>'never'} %>
+    </tr>
+    <tr>
+      <td><%= f.blabel :exclude_quotes, :en => "Exclude Quotes" %></td>
+      <td><%= f.check_box :exclude_quotes %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :exclude_self_plag, :en => "Exclude Self Plagiarism" %></td>
+      <td><%= f.check_box :exclude_self_plag %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :store_in_index, :en => "Store in Index" %></td>
+      <td><%= f.check_box :store_in_index %></td>
+    </tr>
+  </table>
+<% end %>

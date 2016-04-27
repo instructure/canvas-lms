@@ -113,10 +113,23 @@ class GradeSummaryAssignmentPresenter
   end
 
   def turnitin
+    plagiarism('turnitin')
+  end
+
+  def vericite
+    plagiarism('vericite')
+  end
+
+  def plagiarism(type)
+    if type == 'vericite'
+      plagData = submission.vericite_data(true)
+    else
+      plagData = submission.turnitin_data
+    end
     t = if is_text_entry?
-          submission.turnitin_data[submission.asset_string]
+          plagData[submission.asset_string]
         elsif is_online_upload? && file
-          submission.turnitin_data[file.asset_string]
+          plagData[file.asset_string]
         end
     t.try(:[], :state) ? t : nil
   end
@@ -138,7 +151,12 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect{|a| submission.turnitin_data && submission.turnitin_data[a.asset_string] }
+    @file ||= submission.attachments.detect{|a| is_plagiarism_attachment?(a) }
+  end
+
+  def is_plagiarism_attachment?(a)
+    (submission.turnitin_data && submission.turnitin_data[a.asset_string]) ||
+    (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string])
   end
 
   def comments
