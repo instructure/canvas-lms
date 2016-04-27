@@ -107,7 +107,7 @@ module D2LExpected
           }
 
   TRUE_FALSE =
-          {:question_type=>"multiple_choice_question",
+          {:question_type=>"true_false_question",
            :incorrect_comments=>"",
            :points_possible=>1,
            :answers=>

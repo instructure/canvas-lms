@@ -138,6 +138,7 @@ class AssessmentItemConverter
     /text\s?information/i => 'text_only_question',
     /image/i => 'text_only_question',
     'trueFalse' => 'true_false_question',
+    /true\/false/i => 'true_false_question',
     'multiple_dropdowns' => 'multiple_dropdowns_question'
   }
 
