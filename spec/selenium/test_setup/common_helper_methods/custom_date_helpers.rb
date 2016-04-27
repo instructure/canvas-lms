@@ -16,7 +16,7 @@ module CustomDateHelpers
       date = format_date_for_view(time.to_date, date_format)
       "#{date} at #{time_string(time)}"
     else
-      datetime_string(time, :no_words).gsub(/ +/, ' ')
-    end
+      datetime_string(time, :no_words)
+    end.gsub(/ +/, ' ')
   end
 end
