@@ -90,9 +90,11 @@ describe SubmissionsController do
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true)
-      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
+      att1 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/doc.doc", "application/msword", true))
+      att2 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id,
+           :submission => {:submission_type => "online_upload", :attachment_ids => [att1.id, att2.id].join(',')},
+           :attachments => {"0" => {:uploaded_data => "doc.doc"}, "1" => {:uploaded_data => "txt.txt"}}
       expect(response).to be_redirect
       expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].user_id).to eql(@user.id)
