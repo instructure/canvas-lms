@@ -106,8 +106,8 @@ module Lti
                        -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" }
 
     register_expansion 'Canvas.api.membershipServiceUrl', [],
-                       -> { @controller.course_membership_service_url(@context) },
-                       COURSE_GUARD
+                       -> { @controller.polymorphic_url([@context, :membership_service]) },
+                       -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
     # returns the account id for the current context.
     # @example
