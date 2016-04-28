@@ -28,9 +28,7 @@ module RuboCop
           alternative = SUSPECT_METHOD_NAMES[method]
           "Prefer `#{alternative}` instead of `#{method}`; `#{method}`"\
             " should only be used if you are doing jquery-fake-css selectors"\
-            " (e.g. `:visible`). Unlike `#{alternative}`, `#{method}`"\
-            " will not wait for the element to appear in the DOM,"\
-            " often contributing to flickering failures."
+            " (e.g. `:visible`)"
         end
 
         def autocorrect(node)

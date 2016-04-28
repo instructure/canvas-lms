@@ -32,7 +32,10 @@ module CustomSeleniumActions
     fj("input[type=radio][value=#{value}]", scope)
   end
 
-  # f means "find" this is a shortcut to finding elements
+  # find an element via css selector
+  #
+  # like other selenium methods, this will wait until it finds the
+  # element on the page
   def f(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
     begin
@@ -52,7 +55,13 @@ module CustomSeleniumActions
     end
   end
 
-  # short for find with jquery
+  # find an element via fake-jquery-css selector
+  #
+  # useful for fake-jquery-css like `:visible`. if you're using
+  # vanilla css, prefer `f` over `fj`.
+  #
+  # like other selenium methods, this will wait until it finds the
+  # element on the page
   def fj(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
     begin
