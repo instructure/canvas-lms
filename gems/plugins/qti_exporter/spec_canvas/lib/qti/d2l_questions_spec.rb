@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
 describe "Converting D2L QTI" do
   before do
+    skip("updating qtimigrationtool")
     @opts = { :flavor => Qti::Flavors::D2L }
   end
 
