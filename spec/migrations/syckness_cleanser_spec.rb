@@ -10,11 +10,11 @@ describe DataFixup::SycknessCleanser do
     new_yaml = old_yaml + Syckness::TAG
     User.where(:id => @user).update_all(["preferences = ?", new_yaml])
 
-    DataFixup::SycknessCleanser.run
+    DataFixup::SycknessCleanser.run(User, ['preferences'])
 
     expect(User.where(:id => @user).pluck("preferences as y").first).to eq old_yaml
 
-    DataFixup::SycknessCleanser.run # make sure it doesn't break anything just in case
+    DataFixup::SycknessCleanser.run(User, ['preferences']) # make sure it doesn't break anything just in case
 
     expect(User.where(:id => @user).pluck("preferences as y").first).to eq old_yaml
   end
