@@ -325,9 +325,6 @@ define [
 
     rowIndex: 0
     addRow: (student) =>
-      student.row = @rowIndex
-      @rowIndex++
-
       student.computed_current_score ||= 0
       student.computed_final_score ||= 0
       student.secondary_identifier = student.sis_login_id || student.login_id
@@ -360,6 +357,8 @@ define [
         alreadyEscaped: true
 
       if @rowFilter(student)
+        student.row = @rowIndex
+        @rowIndex++
         @rows.push(student)
 
       @grid?.updateRowCount(@rows.length)
