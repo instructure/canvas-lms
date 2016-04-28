@@ -418,4 +418,54 @@ describe GradeSummaryPresenter do
       end
     end
   end
+
+  describe "#student_enrollment_for" do
+    let(:gspcourse) do
+      course
+    end
+
+    let(:teacher) do
+      teacher_in_course({course: gspcourse}).user
+    end
+
+    let(:inactive_student_enrollment) do
+      enrollment = course_with_user('StudentEnrollment', {course: gspcourse})
+      enrollment.workflow_state = 'inactive'
+      enrollment.save!
+      enrollment
+    end
+
+    let(:inactive_student) do
+      inactive_student_enrollment.user
+    end
+
+    let(:other_student_enrollment) do
+      course_with_user('StudentEnrollment', {course: gspcourse})
+    end
+
+    let(:other_student) do
+      other_student_enrollment.user
+    end
+
+    it "includes active enrollments" do
+      gsp = GradeSummaryPresenter.new(gspcourse, other_student, nil)
+      enrollment = gsp.student_enrollment_for(gspcourse, other_student.id)
+
+      expect(enrollment).to eq(other_student_enrollment)
+    end
+
+    it "doesn't include inactive enrollments" do
+      gsp = GradeSummaryPresenter.new(gspcourse, inactive_student, nil)
+      enrollment = gsp.student_enrollment_for(gspcourse, inactive_student.id)
+
+      expect(enrollment).to be_nil
+    end
+
+    it "includes inactive enrollments if you can read grades" do
+      gsp = GradeSummaryPresenter.new(gspcourse, teacher, inactive_student.id.to_s)
+      enrollment = gsp.student_enrollment_for(gspcourse, inactive_student.id)
+
+      expect(enrollment).to eq(inactive_student_enrollment)
+    end
+  end
 end

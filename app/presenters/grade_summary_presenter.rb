@@ -74,7 +74,9 @@ class GradeSummaryPresenter
   end
 
   def student_enrollment_for(course, user)
-    course.all_student_enrollments.where(user_id: user).where.not(:workflow_state => "inactive").first
+    enrollment = course.all_student_enrollments.where(user_id: user)
+    enrollment = enrollment.where.not(workflow_state: "inactive") unless user_has_elevated_permissions?
+    enrollment.first
   end
 
   def selectable_courses
