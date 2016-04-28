@@ -23,6 +23,9 @@ define([
     send($target, methodName, ...args) {
       let remoteEditor = $target.data('remoteEditor')
       if (remoteEditor) {
+        if(methodName == 'get_code' && remoteEditor.isHidden()){
+          return $target.val()
+        }
         return remoteEditor.call(methodName, ...args)
       } else if ($target.data('rich_text')) {
         return $target.editorBox(methodName, ...args)
