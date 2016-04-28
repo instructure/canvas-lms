@@ -346,7 +346,7 @@ describe "course settings" do
         expect(f("#all-results")).to be_displayed
       end
 
-      expect(f("#all-results .alert")).to include_text("Found 17 broken links")
+      expect(f("#all-results .alert")).to include_text("Found 17 unresponsive links")
 
       result_links = ff("#all-results .result a")
       expect(result_links.map{|link| link.text.strip}).to match_array([
@@ -394,7 +394,7 @@ describe "course settings" do
         expect(f("#all-results")).to be_displayed
       end
 
-      expect(f("#all-results .alert")).to include_text("Found 3 broken links")
+      expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
       syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}
       expect(syllabus_result).to include_text(unpublished_link)
       expect(syllabus_result).to include_text(deleted_link)
@@ -405,7 +405,7 @@ describe "course settings" do
       move_to_click('label[for=show_unpublished]')
       wait_for_ajaximations
 
-      expect(f("#all-results .alert")).to include_text("Found 1 broken link")
+      expect(f("#all-results .alert")).to include_text("Found 1 unresponsive link")
       expect(ff("#all-results .result a").count).to eq 1
       result = f("#all-results .result")
       expect(result).to include_text("Course Syllabus")
@@ -414,7 +414,7 @@ describe "course settings" do
       # show them again
       move_to_click('label[for=show_unpublished]')
 
-      expect(f("#all-results .alert")).to include_text("Found 3 broken links")
+      expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
       page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
       expect(page_result).to include_text(unpublished_link)
     end
