@@ -363,11 +363,17 @@ module ApplicationHelper
                     liclass = 'active'
                     has_active = true
                   end
+
+                  liclass += ' ' + item.content_type
                   subtext << "<li class=\"#{liclass}\">"
-                  subtext << "<a class=\"#{liclass}\" href=\"/courses/#{item.context_id}/modules/items/#{item.id}\">"
+                  if item.content_type != 'ContextModuleSubHeader'
+                    subtext << "<a class=\"#{liclass}\" href=\"/courses/#{item.context_id}/modules/items/#{item.id}\">"
+                  end
 
                   subtext << item.title
-                  subtext << '</a>'
+                  if item.content_type != 'ContextModuleSubHeader'
+                    subtext << '</a>'
+                  end
                   subtext << '</li>'
                 end
 
