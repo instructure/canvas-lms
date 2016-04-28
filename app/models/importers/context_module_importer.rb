@@ -97,7 +97,7 @@ module Importers
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
       if hash[:workflow_state] == 'unpublished'
-        item.workflow_state = 'unpublished' if item.new_record? # otherwise leave it alone
+        item.workflow_state = 'unpublished' if item.new_record? || item.deleted? # otherwise leave it alone
       else
         item.workflow_state = 'active'
       end

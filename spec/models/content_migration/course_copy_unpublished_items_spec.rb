@@ -133,7 +133,7 @@ describe ContentMigration do
         tag.save!
         tag.update_asset_workflow_state!
       end
-      
+
       run_course_copy
 
       mod_to = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
@@ -151,6 +151,20 @@ describe ContentMigration do
       mod_to.content_tags.each do |tag_to|
         tag_to.reload
         expect(tag_to).to be_published
+
+        tag_to.content.destroy if tag_to.content
+      end
+      mod_to.destroy
+
+      run_course_copy
+
+      mod_to.reload
+      expect(mod_to).to_not be_deleted
+      mod_to.content_tags.each do |tag_to|
+        if tag_to.content
+          tag_to.content.reload
+          expect(tag_to.content).to_not be_deleted
+        end
       end
     end
   end

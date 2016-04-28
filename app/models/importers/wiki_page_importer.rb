@@ -69,7 +69,7 @@ module Importers
         if state == 'active' && Canvas::Plugin.value_to_boolean(hide_from_students) == false
           item.workflow_state = 'active'
         else
-          item.workflow_state = 'unpublished' if item.new_record?
+          item.workflow_state = 'unpublished' if item.new_record? || item.deleted?
         end
       end
 
