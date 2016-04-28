@@ -459,30 +459,31 @@ class ExternalToolsController < ApplicationController
   def content_item_selection_request(tool, placement, url = nil)
     extra_params = {}
     return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_dialog', {include_host: true})
-
+    accept_presentation_document_targets = []
     # choose accepted return types based on placement
     # todo, make return types configurable at installation?
     case placement
     when 'migration_selection'
       accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
-      accept_presentation_document_targets = 'download'
+      accept_presentation_document_targets << 'download'
       extra_params[:accept_copy_advice] = true
       extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
     when 'editor_button'
       accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*'
-      accept_presentation_document_targets = 'embed,frame,iframe,window'
+      accept_presentation_document_targets += %w(embed frame iframe window)
     when 'resource_selection', 'link_selection', 'assignment_selection'
       accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
-      accept_presentation_document_targets = 'frame,window'
+      accept_presentation_document_targets += %w(frame window)
     when 'collaboration'
       accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
-      accept_presentation_document_targets = 'window'
+      accept_presentation_document_targets << 'window'
     when 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])
       accept_media_types = '*/*'
-      accept_presentation_document_targets = 'none'
-      extra_params[:accept_copy_advice] = true
-      if assignment.submission_types.include?('online_upload') && assignment.allowed_extensions.present?
+      accept_presentation_document_targets << 'window' if assignment.submission_types.include?('online_url')
+      accept_presentation_document_targets << 'none' if assignment.submission_types.include?('online_upload')
+      extra_params[:accept_copy_advice] = !!assignment.submission_types.include?('online_upload')
+      if assignment.submission_types.strip == ('online_upload') && assignment.allowed_extensions.present?
         extra_params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
         accept_media_types = assignment.allowed_extensions.map { |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',')
       end
@@ -496,7 +497,7 @@ class ExternalToolsController < ApplicationController
         lti_message_type: 'ContentItemSelectionRequest',
         lti_version: 'LTI-1p0',
         accept_media_types: accept_media_types,
-        accept_presentation_document_targets: accept_presentation_document_targets,
+        accept_presentation_document_targets: accept_presentation_document_targets.uniq.join(','),
         content_item_return_url: return_url,
         #optional params
         accept_multiple: false,
