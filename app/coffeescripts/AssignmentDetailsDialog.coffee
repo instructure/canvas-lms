@@ -2,9 +2,10 @@ define [
   'i18n!assignment_details'
   'jquery'
   'jst/AssignmentDetailsDialog'
+  'compiled/util/round'
   'jqueryui/dialog'
   'compiled/jquery/fixDialogButtons'
-], (I18n, $, assignmentDetailsDialogTemplate) ->
+], (I18n, $, assignmentDetailsDialogTemplate, round) ->
 
   class AssignmentDetailsDialog
     constructor: ({@assignment, @students}) ->
@@ -41,7 +42,7 @@ define [
         average: do (scores) =>
           total = 0
           total += score for score in scores
-          @nonNumericGuard Math.round(total / scores.length)
+          @nonNumericGuard round((total / scores.length), 2)
 
       scores: scores
       locals: locals
