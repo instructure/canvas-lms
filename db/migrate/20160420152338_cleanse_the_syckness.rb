@@ -2,7 +2,10 @@ class CleanseTheSyckness < ActiveRecord::Migration
   tag :postdeploy
 
   def up
-    DataFixup::SycknessCleanser.send_later_if_production_enqueue_args(:run, {:strand => Shard.current.database_server.id.to_s})
+    DataFixup::SycknessCleanser.columns_hash.each do |model, columns|
+      DataFixup::SycknessCleanser.send_later_if_production_enqueue_args(:run,
+        {:strand => "syckness_cleanse_#{Shard.current.database_server.id}", :priority => Delayed::MAX_PRIORITY}, model, columns)
+    end
   end
 
   def down
