@@ -2833,6 +2833,20 @@ describe 'Submissions API', type: :request do
           'media_type' => 'audio',
         })
       end
+
+      it "should copy files to the submissions folder if they're not there already" do
+        @course.root_account.enable_feature! :submissions_folder
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
+        a2 = attachment_model(:context => @user)
+        json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
+        submission_attachment_ids = json['attachments'].map { |a| a['id'] }
+        expect(submission_attachment_ids.size).to eq 2
+        expect(submission_attachment_ids.delete(a1.id)).not_to be_nil
+        copy = Attachment.find(submission_attachment_ids.last)
+        expect(copy.folder).to eq @user.submissions_folder(@course)
+        expect(copy.root_attachment).to eq a2
+      end
     end
 
     context "submission file uploads" do
