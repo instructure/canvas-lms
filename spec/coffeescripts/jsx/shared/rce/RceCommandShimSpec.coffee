@@ -4,16 +4,21 @@ define [
   'helpers/fixtures'
 ], (RceCommandShim, wikiSidebar, fixtures) ->
 
+  remoteEditor = null
   module 'RceCommandShim - send',
     setup: ->
       fixtures.setup()
       @$target = fixtures.create('<textarea />')
+      remoteEditor = {
+        hidden: false,
+        isHidden: (()=> return remoteEditor.hidden)
+        call: sinon.stub().returns("methodResult")
+      }
 
     teardown: ->
       fixtures.teardown()
 
   test "just forwards through target's remoteEditor if set", ->
-    remoteEditor = { call: sinon.stub().returns("methodResult") }
     @$target.data('remoteEditor', remoteEditor)
     equal RceCommandShim.send(@$target, "methodName", "methodArgument"), "methodResult"
     ok remoteEditor.call.calledWith("methodName", "methodArgument")
@@ -35,6 +40,17 @@ define [
     @$target.data('rich_text', null)
     @$target.val('current raw value')
     equal RceCommandShim.send(@$target, "get_code"), 'current raw value'
+
+  test "returns target val for get_code if editor is hidden", ->
+    remoteEditor.hidden = true
+    @$target.data('remoteEditor', remoteEditor)
+    @$target.val('current HTML value')
+    equal RceCommandShim.send(@$target, "get_code"), 'current HTML value'
+
+  test "uses the editors get_code if visible", ->
+    remoteEditor.hidden = false
+    @$target.data('remoteEditor', remoteEditor)
+    equal RceCommandShim.send(@$target, "get_code"), 'methodResult'
 
   module 'RceCommandShim - focus',
     setup: ->
