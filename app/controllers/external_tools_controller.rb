@@ -196,6 +196,10 @@ class ExternalToolsController < ApplicationController
         resource_type: params[:launch_type]
     }
 
+    if params[:launch_type] == 'assessment'
+      opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag)
+    end
+
     adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), variable_expander(assignment: assignment), opts)
 
     launch_settings = {
