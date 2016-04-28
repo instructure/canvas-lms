@@ -107,13 +107,11 @@ describe PseudonymsController do
         expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_empty
       end
 
-      it "should send password-change email for users with pseudonyms in a different account" do
+      it "should not send password-change email for users with pseudonyms in a different account" do
         pseudonym(@user, :account => Account.site_admin)
         get 'forgot_password', :pseudonym_session => {:unique_id_forgot => @pseudonym.unique_id}
         expect(response).to be_redirect
-        expect(assigns[:ccs]).to include(@cc)
-        expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_nil
-        expect(assigns[:ccs].detect{|cc| cc == @cc}.messages_sent).not_to be_empty
+        expect(assigns[:ccs]).not_to include(@cc)
       end
     end
 

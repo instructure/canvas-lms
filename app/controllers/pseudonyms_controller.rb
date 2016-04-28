@@ -91,7 +91,7 @@ class PseudonymsController < ApplicationController
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.canvas_authentication?) }
+        @domain_root_account.pseudonyms.active.where(user_id: cc.user_id).exists?
       end
     end
     respond_to do |format|
