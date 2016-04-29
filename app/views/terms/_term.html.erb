@@ -11,7 +11,6 @@
         </div>
       <% end %>
       <%= term && t(:course_count, "Course", :count => @course_counts_by_term[term.id] || 0) %><br/>
-      <%= term && t(:user_count, "User", :count => @user_counts_by_term[term.id.to_s] || 0) %>
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
         <div class="control-group edit_term">
