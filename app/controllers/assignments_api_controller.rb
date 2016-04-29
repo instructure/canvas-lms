@@ -322,7 +322,7 @@
 #           "type": "boolean"
 #         },
 #         "external_tool_tag_attributes": {
-#           "description": "(Optional) assignment's settings for external tools if submission_types include 'external_tool'. Only url and new_tab are included. Use the 'External Tools' API if you need more information about an external tool.",
+#           "description": "(Optional) assignment's settings for external tools if submission_types include 'external_tool'. Only url and new_tab are included (new_tab defaults to false).  Use the 'External Tools' API if you need more information about an external tool.",
 #           "$ref": "ExternalToolTagAttributes"
 #         },
 #         "peer_reviews": {
@@ -768,14 +768,8 @@ class AssignmentsApiController < ApplicationController
   #   assign scores to each member of the group.
   #
   # @argument assignment[external_tool_tag_attributes]
-  #   Hash of attributes if submission_types is ["external_tool"]
-  #   Example:
-  #     external_tool_tag_attributes: {
-  #       // url to the external tool
-  #       url: "http://instructure.com",
-  #       // create a new tab for the module, defaults to false.
-  #       new_tab: false
-  #     }
+  #   Hash of external tool parameters if submission_types is ["external_tool"].
+  #   See Assignment object definition for format.
   #
   # @argument assignment[points_possible] [Float]
   #   The maximum points possible on the assignment.
@@ -912,14 +906,8 @@ class AssignmentsApiController < ApplicationController
   #   assign scores to each member of the group.
   #
   # @argument assignment[external_tool_tag_attributes]
-  #   Hash of attributes if submission_types is ["external_tool"]
-  #   Example:
-  #     external_tool_tag_attributes: {
-  #       // url to the external tool
-  #       url: "http://instructure.com",
-  #       // create a new tab for the module, defaults to false.
-  #       new_tab: false
-  #     }
+  #   Hash of external tool parameters if submission_types is ["external_tool"].
+  #   See Assignment object definition for format.
   #
   # @argument assignment[points_possible] [Float]
   #   The maximum points possible on the assignment.
