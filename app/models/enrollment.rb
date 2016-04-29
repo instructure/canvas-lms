@@ -103,7 +103,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def valid_role?
-    return true if role.built_in?
+    return true if self.deleted? || role.built_in?
 
     unless self.role.base_role_type == self.type
       self.errors.add(:role_id, "is not valid for the enrollment type")
