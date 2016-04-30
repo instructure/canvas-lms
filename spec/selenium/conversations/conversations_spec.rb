@@ -207,7 +207,7 @@ describe "conversations new" do
       f('#delete-btn').click
 
       driver.switch_to.alert.accept
-      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+      expect_flash_message :success, /Message Deleted!/
     end
 
     it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
@@ -218,7 +218,7 @@ describe "conversations new" do
       click_more_options(convo:true)
       f('.delete-btn.ui-corner-all').click
       driver.switch_to.alert.accept
-      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+      expect_flash_message :success, /Message Deleted!/
     end
 
     it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
@@ -260,7 +260,7 @@ describe "conversations new" do
       click_message(0)
       # Clicks the title-level more options gear menu
       click_more_options(convo:true)
-      expect(f('.archive-btn.ui-corner-all')).to be_nil
+      expect(f("#content")).not_to contain_css('.archive-btn.ui-corner-all')
     end
 
     context "in archive view" do
@@ -379,12 +379,11 @@ describe "conversations new" do
       expect(conversation_elements.size).to eq 1
       conversation_elements[0].click
       wait_for_ajaximations
-      fj('#delete-btn').click
+      f('#delete-btn').click
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(conversation_elements.size).to eq 0
-      expect(ffj('.message-list .paginatedLoadingIndicator:visible').length).to eq 0
-      expect(ffj('.actions .btn-group button:disabled').size).to eq 4
+      expect(f('.messages')).not_to contain_css('li')
+      expect(f('.message-list')).not_to contain_jqcss('.paginatedLoadingIndicator:visible')
+      expect(ff('.actions .btn-group button:disabled').size).to eq 4
     end
   end
 
@@ -404,7 +403,7 @@ describe "conversations new" do
 
       star_btn = f('.star-btn', unstarred_elt)
       expect(star_btn).to be_present
-      expect(f('.active', unstarred_elt)).to be_nil
+      expect(unstarred_elt).not_to contain_css('.active')
 
       click_star_icon(unstarred_elt,star_btn)
       expect(f('.active', unstarred_elt)).to be_present
@@ -420,7 +419,7 @@ describe "conversations new" do
 
       star_btn.click
       wait_for_ajaximations
-      expect(f('.active', starred_elt)).to be_nil
+      expect(starred_elt).not_to contain_css('.active')
       expect(@conv_starred.reload.starred).to be_falsey
     end
 
@@ -442,7 +441,7 @@ describe "conversations new" do
       starred_elt.click
       wait_for_ajaximations
       click_star_toggle_menu_item
-      expect(f('.active', starred_elt)).to be_nil
+      expect(starred_elt).not_to contain_css('.active')
       run_progress_job
       expect(@conv_starred.reload.starred).to be_falsey
     end

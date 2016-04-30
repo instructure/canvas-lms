@@ -25,7 +25,7 @@ describe "gradebook2" do
       cell = f(selector)
       expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
       cell.click
-      expect(f(selector + ' .grade')).to be_nil
+      expect(cell).not_to contain_css('.grade')
       # student 2, assignment 4 (not grayed out)
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l5')
       expect(cell.find_element(:css, '.gradebook-cell')).not_to have_class('grayed-out')

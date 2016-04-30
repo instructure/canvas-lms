@@ -29,7 +29,7 @@ describe "submissions" do
       f('button[type="submit"]').click
 
       expect(f("#sidebar_content")).to include_text("Turned In!")
-      expect(fj(".error_text")).to be_nil
+      expect(f("#content")).not_to contain_css(".error_text")
     end
 
     it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
@@ -113,7 +113,7 @@ describe "submissions" do
       wait_for_ajaximations
       f('#submit_file_button').click
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_truthy
+      expect_flash_message :error
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -135,7 +135,7 @@ describe "submissions" do
       f('.submission_attachment input').send_keys(fullpath)
       f('#submit_file_button').click
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_truthy
+      expect_flash_message :error
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -188,7 +188,7 @@ describe "submissions" do
       # expect
       expect(f('#sidebar_content .details')).not_to include_text "Turned In!"
       expect(f('#sidebar_content .details')).not_to include_text "Not Turned In!"
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should show not graded anonymously" do
@@ -286,7 +286,7 @@ describe "submissions" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}"
       in_frame('preview_frame') do
-        expect(ff('.turnitin_score_container')).to be_empty
+        expect(f("body")).not_to contain_css('.turnitin_score_container')
       end
     end
 
@@ -436,7 +436,7 @@ describe "submissions" do
         end
 
         # Make sure the flash message is being displayed
-        expect(flash_message_present?(:error)).to be_truthy
+        expect_flash_message :error
 
         # navigate off the page and dismiss the alert box to avoid problems
         # with other selenium tests
@@ -475,10 +475,6 @@ describe "submissions" do
       user_session @students[0]
 
       get "/courses/#{@course.id}/assignments"
-      index_scores = ff('.score-display')
-      index_scores.each do
-        expect(score.text).to eq 'Excused'
-      end
 
       assignments.size.times do |i|
         get "/courses/#{@course.id}/assignments/#{assignments[i].id}"
@@ -498,7 +494,7 @@ describe "submissions" do
 
       @assignment.grade_student @student, {excuse: 1}
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(f('a.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('a.submit_assignment_link')
       expect(f('#assignment_show .assignment-title').text).to eq 'assignment 1'
     end
   end

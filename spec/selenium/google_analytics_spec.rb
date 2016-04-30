@@ -5,7 +5,7 @@ describe "google analytics" do
 
   it "should not include tracking script if not asked to" do
     get "/"
-    expect(fj('script[src$="google-analytics.com/ga.js"]')).to be_nil
+    expect(f("#content")).not_to contain_jqcss('script[src$="google-analytics.com/ga.js"]')
   end
   
   it "should include tracking script if google_analytics_key is configured" do

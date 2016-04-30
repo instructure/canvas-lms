@@ -93,8 +93,7 @@ module DiscussionsCommon
     expect(fj("#{li_selector} .al-trigger")).to be_displayed
     fj("#{li_selector} .al-trigger").click
     wait_for_ajaximations
-    menu_item = fj(menu_item_selector)
-    expect(menu_item).to be_nil
+    expect(f("body")).not_to contain_jqcss(menu_item_selector)
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
@@ -168,8 +167,12 @@ module DiscussionsCommon
   def check_permissions(number_of_checkboxes = 1)
     get url
     wait_for_ajaximations
-    checkboxes = ff('.discussion .al-trigger')
-    expect(checkboxes.length).to eq number_of_checkboxes
+    if number_of_checkboxes > 0
+      checkboxes = ff('.discussion .al-trigger')
+      expect(checkboxes.length).to eq number_of_checkboxes
+    else
+      expect(f("#content")).not_to contain_css(".discussion .al-trigger")
+    end
     expect(ff('.discussion-list li.discussion').length).to eq DiscussionTopic.count
   end
 

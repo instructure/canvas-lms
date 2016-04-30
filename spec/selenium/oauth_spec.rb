@@ -66,7 +66,7 @@ describe "oauth2 flow" do
     it "should show no icon if icon_url is not set on the developer key" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
       expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
-      expect(f('.icon_url')).to be_nil
+      expect(f("#content")).not_to contain_css('.icon_url')
     end
 
     it "should show the developer keys icon if icon_url is set" do
@@ -85,7 +85,7 @@ describe "oauth2 flow" do
 
     it "should not show remember authorization checkbox for unscoped requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com"
-      expect(f('#remember_access')).to be_nil
+      expect(f("#content")).not_to contain_css('#remember_access')
     end
   end
 end

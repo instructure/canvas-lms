@@ -128,7 +128,6 @@ describe "discussions" do
           expect(alert_present?).to be_truthy
 
           driver.switch_to.alert.dismiss
-          expect(fj('#discussion-title input[value=new title]'))
         end
       end
 

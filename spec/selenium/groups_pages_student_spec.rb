@@ -49,7 +49,7 @@ describe "groups" do
         create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
         expect(ff('.discussion-topic').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-topic').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
@@ -84,7 +84,7 @@ describe "groups" do
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         f('.discussion-title').click
-        expect(f('.edit-btn')).to be_nil
+        expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
@@ -147,7 +147,7 @@ describe "groups" do
         expect(f('#threaded')).to be_displayed
         expect(f('#allow_rating')).to be_displayed
         # Shouldn't be Enable Podcast Feed option
-        expect(f('#podcast_enabled')).to be_nil
+        expect(f("#content")).not_to contain_css('#podcast_enabled')
       end
 
       it "should only allow group members to access discussions", priority: "1", test_id: 315332 do
@@ -161,7 +161,7 @@ describe "groups" do
         get discussions_page
         expect(ff('.discussion-title-block').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-title-block').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-title-block')
       end
 
       it "should not be able to delete a discussion by a different creator", priority: "1", test_id: 420009 do
@@ -171,7 +171,7 @@ describe "groups" do
                                 message: 'There are no hover boards!')
         get discussions_page
         expect(ff('.discussion-title-block').size).to eq 1
-        expect(f('#manage_link')).to be_nil
+        expect(f("#content")).not_to contain_css('#manage_link')
       end
 
       it "should allow group members to edit their discussions", priority: "1", test_id: 312866 do
@@ -196,7 +196,7 @@ describe "groups" do
                                 message: 'Where are my skis?')
         get discussions_page
         f('.discussion-title').click
-        expect(f('.edit-btn')).to be_nil
+        expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
     end
@@ -321,8 +321,8 @@ describe "groups" do
         wait_for_ajaximations
         # Reload page and new collaboration will be displayed on main window
         refresh_page
-        expect(element_exists(fj('.collaboration .title:contains("c1")'))).to be true
-        expect(element_exists(fj('.collaboration .description:contains("c1 description")'))).to be true
+        expect(fj('.collaboration .title:contains("c1")')).to be_present
+        expect(fj('.collaboration .description:contains("c1 description")')).to be_present
       end
 
       it 'can invite people within your group', priority: "1", test_id: 273642 do
@@ -330,7 +330,7 @@ describe "groups" do
         seed_students(2, 'non-group student')
         get collaborations_page
         students_in_group.each do |student|
-          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be true
+          expect(fj(".available-users li:contains(#{student.sortable_name}) .icon-user")).to be_present
         end
       end
 
@@ -338,8 +338,9 @@ describe "groups" do
         # overriding '@students' array with new students not included in the group
         seed_students(2, 'non-group Student')
         get collaborations_page
+        users = f(".available-users")
         @students.each do |student|
-          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be false
+          expect(users).not_to contain_jqcss("li:contains(#{student.sortable_name}) .icon-user")
         end
       end
 

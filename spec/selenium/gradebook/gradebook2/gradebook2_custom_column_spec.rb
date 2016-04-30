@@ -12,7 +12,7 @@ describe "gradebook2 - custom columns" do
   end
 
   def header_text(n)
-    f(".container_0 .slick-header-column:nth-child(#{n})").try(:text)
+    f(".container_0 .slick-header-column:nth-child(#{n})").text
   end
 
   it "shows custom columns", priority: "2", test_id: 164225 do
@@ -29,7 +29,7 @@ describe "gradebook2 - custom columns" do
     wait_for_ajaximations
 
     expect(header_text(3)).to eq col.title
-    expect(header_text(4)).not_to eq hidden.title
+    expect(ff(".container_0 .slick-header-column").map(&:text).join).not_to include hidden.title
     expect(ff(".slick-cell.custom_column").count { |c| c.text == "123456" }).to eq 1
   end
 

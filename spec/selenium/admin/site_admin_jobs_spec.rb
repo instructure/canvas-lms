@@ -128,8 +128,8 @@ describe "site admin jobs ui" do
           expect(future_jobs.count).to eq(0)
         end
 
-        expect(fj("#jobs-grid .odd")).to be_nil # using fj to bypass selenium cache
-        expect(fj("#jobs-grid .even")).to be_nil #using fj to bypass selenium cache
+        expect(f("#content")).not_to contain_css("#jobs-grid .odd")
+        expect(f("#content")).not_to contain_css("#jobs-grid .even")
       end
 
       it "should check current popular tags" do
@@ -217,8 +217,8 @@ describe "site admin jobs ui" do
         wait_for_ajaximations
         expect(Delayed::Job.count).to eq num_of_jobs - 3
 
-        expect(fj("#jobs-grid .odd")).to be_nil # using fj to bypass selenium cache
-        expect(fj("#jobs-grid .even")).to be_nil #using fj to bypass selenium cache
+        expect(f("#content")).not_to contain_css("#jobs-grid .odd")
+        expect(f("#content")).not_to contain_css("#jobs-grid .even")
       end
     end
   end

@@ -250,7 +250,7 @@ describe "grades" do
     it "should not show assignment statistics on assignments with less than 5 submissions", 
         priority: "1", test_id: 229667 do
       get "/courses/#{@course.id}/grades"
-      expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
+      expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
     it "should not show assignment statistics on assignments when it is diabled on the course", 
@@ -265,7 +265,7 @@ describe "grades" do
       @course.update_attributes(:hide_distribution_graphs => true)
 
       get "/courses/#{@course.id}/grades"
-      expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
+      expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
     it "should show rubric even if there are no comments", priority: "1", test_id: 229669 do

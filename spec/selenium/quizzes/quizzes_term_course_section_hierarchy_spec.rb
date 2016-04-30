@@ -32,8 +32,8 @@ describe "quizzes section hierarchy" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # make sure it does not create a blank submissions
-    expect(f(' .quiz_score')).not_to be_present
-    expect(f(' .quiz_duration')).not_to be_present
+    expect(f("#content")).not_to contain_css('.quiz_score')
+    expect(f("#content")).not_to contain_css('.quiz_duration')
     # take and submit the quiz
     answer_questions_and_submit(@quiz, 3)
   end
@@ -42,8 +42,8 @@ describe "quizzes section hierarchy" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # make sure it does not create a blank submissions
-    expect(f(' .quiz_score')).not_to be_present
-    expect(f(' .quiz_duration')).not_to be_present
+    expect(f("#content")).not_to contain_css('.quiz_score')
+    expect(f("#content")).not_to contain_css('.quiz_duration')
     expect_new_page_load(true) { f('#section-tabs .quizzes').click }
   end
 

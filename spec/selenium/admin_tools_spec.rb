@@ -127,7 +127,7 @@ describe "admin_tools" do
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
           expect(f('#commMessagesSearchResults .alert').text).to include('No messages found')
-          expect(f('#commMessagesSearchResults .message-body')).to be_nil
+          expect(f("#content")).not_to contain_css('#commMessagesSearchResults .message-body')
         end
 
         it "should display valid search params used" do
@@ -173,8 +173,7 @@ describe "admin_tools" do
 
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
 
@@ -183,8 +182,7 @@ describe "admin_tools" do
           setup_account_admin({:view_notifications => false})
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
     end
@@ -241,8 +239,7 @@ describe "admin_tools" do
           )
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .logging > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.logging')
         end
 
         it "should not include login activity option for revoked permission" do

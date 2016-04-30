@@ -29,7 +29,7 @@ describe 'editing a quiz' do
       end
 
       it 'hides the |Save and Publish| button', priority: "1", test_id: 255478 do
-        expect(f('.save_and_publish')).to be_nil
+        expect(f("#content")).not_to contain_css('.save_and_publish')
       end
 
       it 'shows the speedgrader link', priority: "1", test_id: 351926 do
@@ -99,7 +99,7 @@ describe 'editing a quiz' do
         expect_new_page_load do
           click_save_settings_button
         end
-        expect(f('.icon-speed-grader')).to be_nil
+        expect(f("#content")).not_to contain_css('.icon-speed-grader')
       end
 
       it 'shows the |Save and Publish| button', priority: "1", test_id: 255479 do
@@ -126,7 +126,7 @@ describe 'editing a quiz' do
       click_questions_tab
       click_new_question_button
       f('.question_holder .question_form .cancel_link').click
-      expect(ff('.question_holder .question_form').length).to eq 0
+      expect(f('.question_holder')).not_to contain_css('.question_form')
     end
 
     it 'changes the quiz\'s description', priority: "1", test_id: 210057 do

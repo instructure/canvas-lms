@@ -7,7 +7,7 @@ describe "gradebook2 - total points toggle" do
   let!(:setup) { gradebook_data_setup }
 
   def should_show_percentages
-    ff(".total-column").each { |total| expect(total.text).to match(/%/) }
+    ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
   end
 
   def open_display_dialog
@@ -44,7 +44,7 @@ describe "gradebook2 - total points toggle" do
     toggle_grade_display
 
     expected_points = 15, 10, 10
-    ff(".total-column").each do |total|
+    ff(".slick-row .slick-cell:nth-child(5)").each do |total|
       expect(total.text).to match(/\A#{expected_points.shift}$/)
     end
 
@@ -73,7 +73,6 @@ describe "gradebook2 - total points toggle" do
     close_dialog_and_dont_show_again
 
     open_display_dialog
-    dialog = fj('.ui-dialog:visible')
-    expect(dialog).to equal nil
+    expect(f("body")).not_to contain_jqcss('.ui-dialog:visible')
   end
 end

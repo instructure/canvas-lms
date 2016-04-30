@@ -46,7 +46,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       save_wiki
 
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce a')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('a')
       end
     end
 
@@ -73,7 +73,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce li')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('li')
       end
     end
 
@@ -92,7 +92,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce li')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('li')
       end
     end
 
@@ -113,7 +113,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f("#mceu_3 .mce-caret").click
       f(".mce-colorbutton-grid div[title='No color']").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce span')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('span')
       end
     end
 
@@ -134,7 +134,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f("#mceu_4 .mce-caret").click
       f(".mce-colorbutton-grid div[title='No color']").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce span')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('span')
       end
     end
 
@@ -285,10 +285,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       skip_if_chrome('fragile in chrome')
       text = "<p><sup>This is my text</sup></p>"
       wysiwyg_state_setup(text, html: true)
-
       shift_click_button('.mce-i-superscript')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce sup')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('sup')
       end
     end
 
@@ -308,7 +307,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       shift_click_button('.mce-i-subscript')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce sub')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('sub')
       end
     end
 
@@ -334,7 +333,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       select_all_wiki
       f('.mce-i-unlink').click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce p a')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('p a')
       end
     end
 
@@ -397,7 +396,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce table')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('table')
       end
     end
 
@@ -415,7 +414,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-bold')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce strong')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('strong')
       end
     end
 
@@ -433,7 +432,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-italic')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce em')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('em')
       end
     end
 
@@ -448,7 +447,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-underline')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce u')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('u')
       end
     end
 

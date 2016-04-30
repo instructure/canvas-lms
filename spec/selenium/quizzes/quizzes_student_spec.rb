@@ -71,12 +71,12 @@ describe 'quizzes' do
           it 'can\'t see the resume quiz button if quiz is locked', priority: "1", test_id: 209410 do
             update_quiz_lock(5.minutes.ago, nil)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#not_right_side .take_quiz_button')).not_to be_present
+            expect(f('#not_right_side')).not_to contain_css('.take_quiz_button')
           end
 
           it 'can\'t see the publish button', priority: "1", test_id: 209411 do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#quiz-publish-link')).not_to be_present
+            expect(f('#content')).not_to contain_css('#quiz-publish-link')
           end
 
           it 'can\'t see unpublished warning', priority: "1", test_id: 209412 do
@@ -87,7 +87,7 @@ describe 'quizzes' do
 
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-            expect(f('.unpublished_warning')).not_to be_present
+            expect(f('#content')).not_to contain_css('.unpublished_warning')
           end
         end
       end
@@ -220,14 +220,14 @@ describe 'quizzes' do
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
 
       take_and_answer_quiz
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
 
       # shouldn't show to an observer either
       user_session(@observer)
       sub = @quiz.quiz_submissions.where(:user_id => @student).first
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{sub.id}"
 
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
 
       # attempt two
       user_session(@student)
@@ -247,7 +247,7 @@ describe 'quizzes' do
     it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
       take_and_answer_quiz
 
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209480 do

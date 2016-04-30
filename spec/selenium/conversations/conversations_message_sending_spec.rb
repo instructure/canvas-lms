@@ -161,7 +161,7 @@ describe "conversations new" do
 
         get '/conversations'
         f('.icon-compose').click
-        expect(fj("#compose-message-course option:contains('#{@course.name}')")).not_to be
+        expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
       end
 
       it "should not show course after end date", priority: "1", test_id: 478995 do
@@ -171,7 +171,7 @@ describe "conversations new" do
 
         get '/conversations'
         f('.icon-compose').click
-        expect(fj("#compose-message-course option:contains('#{@course.name}')")).not_to be
+        expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
       end
     end
 
@@ -250,7 +250,7 @@ describe "conversations new" do
         f('.message-body textarea').send_keys("I'll pay you Tuesday for a hamburger today")
         click_send
 
-        expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+        expect_flash_message :success, /Message sent!/
       end
 
       context "Message Address Book" do
@@ -306,12 +306,10 @@ describe "conversations new" do
 
   def assert_result_names(tf, names)
     names.each do |name|
-      keep_trying_until(5) do
-        if tf
-          expect(fj(".ac-result-container .result-name:contains(#{name})")).to be_truthy
-        else
-          expect(fj(".ac-result-container .result-name:contains(#{name})")).to be_falsey
-        end
+      if tf
+        expect(fj(".ac-result-container .result-name:contains(#{name})")).to be_truthy
+      else
+        expect(f(".ac-result-container")).not_to contain_jqcss(".result-name:contains(#{name})")
       end
     end
   end

@@ -130,7 +130,6 @@ describe 'quizzes question creation' do
       submit_form(question)
       wait_for_ajax_requests
 
-      close_regrade_tooltip if f('.btn.usher-close')
       move_to_click('label[for=show_question_details]')
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")
       expect(finished_question).to be_displayed
@@ -278,10 +277,12 @@ describe 'quizzes question creation' do
       # get focus out of tinymce to allow change event to propogate
       f(".question_header").click
       f('button.recompute_variables').click
-      val = f('.variables.value').to_i
+      val = f('.variable .value').text.to_i
       expect(val <= 10 && val >= 0)
-      f('button.recompute_variables').click
-      keep_trying_until { expect(f('.variables.value').to_i != val) }
+      keep_trying_until do
+        f('button.recompute_variables').click
+        f('.variable .value').text.to_i != val
+      end
       fj('.supercalc:visible').send_keys('x + y')
       f('button.save_formula_button').click
       # normally it's capped at 200 (to keep the yaml from getting crazy big)...

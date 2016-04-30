@@ -28,7 +28,7 @@ describe "post grades to sis" do
     Account.default.set_feature_flag!('post_grades', 'off')
     get "/courses/#{@course.id}/discussion_topics/new"
     f('#use_for_grading').click
-    expect(f('#assignment_post_to_sis')).not_to be_present
+    expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
   end
 
   context "gradebook_post_grades" do

@@ -42,7 +42,7 @@ describe "gradebook2 - multiple grading periods" do
       user_session(@teacher)
     end
 
-    let(:uneditable_cells) { f('.cannot_edit') }
+    let(:uneditable_cells) { '.cannot_edit' }
     let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
 
     context "assignments in past grading periods" do
@@ -58,7 +58,7 @@ describe "gradebook2 - multiple grading periods" do
 
         select_period_in_the_past
         expect(gradebook_header).to include_text("past-due assignment")
-        expect(uneditable_cells).to_not be_present
+        expect(f("#content")).not_to contain_css(uneditable_cells)
       end
 
       it "teachers should not be able to edit", priority: "1", test_id: 210023 do
@@ -68,7 +68,7 @@ describe "gradebook2 - multiple grading periods" do
 
         select_period_in_the_past
         expect(gradebook_header).to include_text("past-due assignment")
-        expect(uneditable_cells).to be_present
+        expect(f("#content")).to contain_css(uneditable_cells)
       end
     end
 
@@ -81,7 +81,7 @@ describe "gradebook2 - multiple grading periods" do
         get "/courses/#{@course.id}/gradebook2"
 
         expect(gradebook_header).to include_text("No Due Date")
-        expect(uneditable_cells).to_not be_present
+        expect(f("#content")).not_to contain_css(uneditable_cells)
       end
 
       it "teachers should be able to edit", priority: "1", test_id: 210015 do
@@ -90,7 +90,7 @@ describe "gradebook2 - multiple grading periods" do
         get "/courses/#{@course.id}/gradebook2"
 
         expect(gradebook_header).to include_text("No Due Date")
-        expect(uneditable_cells).to_not be_present
+        expect(f("#content")).not_to contain_css(uneditable_cells)
       end
     end
   end

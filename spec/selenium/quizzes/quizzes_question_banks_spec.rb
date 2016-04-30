@@ -153,13 +153,10 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
 
-      expect(f('.find_question_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.find_question_link')
 
-      keep_trying_until do
-        f('.add_question_group_link').click
-        wait_for_ajaximations
-        expect(f('.find_bank_link')).to be_nil
-      end
+      f('.add_question_group_link').click
+      expect(f("#content")).not_to contain_css('.find_bank_link')
     end
 
     it 'should create a question group from a question bank', priority: "1", test_id: 319907 do
@@ -303,9 +300,9 @@ describe 'quizzes question banks' do
 
       expect_new_page_load { view_banks_link.click }
 
-      expect(f('.add_bank_link')).to be_nil
-      expect(f('.edit_bank_link')).to be_nil
-      expect(f('.delete_bank_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_bank_link')
+      expect(f("#content")).not_to contain_css('.edit_bank_link')
+      expect(f("#content")).not_to contain_css('.delete_bank_link')
 
       view_bank_link = f("#question_bank_#{@bank.id} a.title")
       expect(view_bank_link).to be_displayed
@@ -330,9 +327,9 @@ describe 'quizzes question banks' do
 
       expect_new_page_load { view_banks_link.click }
 
-      expect(f('.add_bank_link')).to be_nil
-      expect(f('.edit_bank_link')).to be_nil
-      expect(f('.delete_bank_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_bank_link')
+      expect(f("#content")).not_to contain_css('.edit_bank_link')
+      expect(f("#content")).not_to contain_css('.delete_bank_link')
 
       view_bank_link = f("#question_bank_#{@bank.id} a.title")
       expect(view_bank_link).to be_displayed
@@ -351,7 +348,7 @@ describe 'quizzes question banks' do
       Account.default.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
 
       get "/courses/#{@course.id}/quizzes"
-      expect(f('.view_question_banks')).to be_nil
+      expect(f("#content")).not_to contain_css('.view_question_banks')
 
       get "/courses/#{@course.id}/question_banks"
       expect(f('#unauthorized_message')).to be_displayed
@@ -385,7 +382,7 @@ describe 'quizzes question banks' do
       submit_dialog('#move_question_dialog', '.submit_button')
       wait_for_ajaximations
       refresh_page
-      expect(f('.more_questions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.more_questions_link')
       expect(source_bank.assessment_question_count).to eq(50)
       expect(target_bank.assessment_question_count).to eq(1)
     end

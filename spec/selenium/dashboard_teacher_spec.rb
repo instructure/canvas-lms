@@ -55,11 +55,11 @@ describe "dashboard" do
         expect(ignore_link['title']).to include_text("Ignore until new submission")
         ignore_link.click
         wait_for_ajaximations
-        expect(f('.to-do-list > li')).to be_nil
+        expect(f("#content")).not_to contain_css('.to-do-list > li')
 
         get "/"
 
-        expect(f('.to-do-list')).to be_nil
+        expect(f("#content")).not_to contain_css('.to-do-list')
       end
 
       assignment.reload
@@ -83,7 +83,7 @@ describe "dashboard" do
         assignment_model({:submission_types => ['online_text_entry'], :course => @course})
         get "/"
         find('.toggle-details').click
-        expect(element_exists(fj('.fake-link:contains("Unnamed")'))).to be true
+        expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end
 
       it 'does not show an unpublished assignment under recent activity under dashboard', priority: "2", test_id: 108722 do
@@ -154,11 +154,11 @@ describe "dashboard" do
             wait_for_ajaximations
           end
 
-          expect(f('.to-do-list > li')).to be_nil
+          expect(f("#content")).not_to contain_css('.to-do-list > li')
 
           get "/"
 
-          expect(f('.to-do-list')).to be_nil
+          expect(f("#content")).not_to contain_css('.to-do-list')
         end
 
         pg.save! # reload
@@ -215,7 +215,7 @@ describe "dashboard" do
       enable_cache do
         get "/"
 
-        expect(f('.to-do-list')).to be_nil
+        expect(f("#content")).not_to contain_css('.to-do-list')
       end
     end
 

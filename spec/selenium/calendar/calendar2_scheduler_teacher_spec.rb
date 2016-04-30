@@ -158,9 +158,7 @@ describe "scheduler" do
           expect(form.find_all('.participant_list li')).not_to be_empty
           set_value(form.find('#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
-          wait_for_ajaximations
-          # using fj to avoid selenium caching
-          keep_trying_until { expect(f('#message_participants_form')).to be_nil }
+          expect(f("body")).not_to contain_css('#message_participants_form')
         end
       end
       expect(student1.conversations.first.messages.size).to eq 6 # registered/all * 3
@@ -198,9 +196,7 @@ describe "scheduler" do
       expect(form.find_all('.participant_list li')).not_to be_empty
       set_value(form.find('#body'), 'hello')
       submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
-      wait_for_ajaximations
-      # using fj to avoid selenium caching
-      keep_trying_until { expect(f('#message_participants_form')).to be_nil }
+      expect(f("body")).not_to contain_css('#message_participants_form')
 
       part1 = student1.conversations.first
       expect(part1.tags).to eq ["course_#{first_course.id}"]
@@ -215,7 +211,7 @@ describe "scheduler" do
       wait_for_ajaximations
       click_appointment_link
       wait_for_ajaximations
-      expect(element_exists('.agenda-event .ig-row')).to be_truthy
+      expect(f('.agenda-event .ig-row')).to be_present
     end
 
     it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do

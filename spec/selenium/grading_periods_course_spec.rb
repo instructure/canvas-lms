@@ -39,7 +39,7 @@ describe 'Course Grading Periods' do
 
     it 'creates a blank grading period form when Add Grading Period is clicked', priority: "1", test_id: 239999 do
       get "/courses/#{@course.id}/grading_standards"
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
       f('#add-period-button').click
       expect(ff('.grading-period').length).to eq(1)
     end
@@ -130,7 +130,7 @@ describe 'Course Grading Periods' do
   context 'with Multiple Grading Periods feature off', priority: "1", test_id: 240005 do
     it 'does not contain a tab for grading periods' do
       get "/courses/#{@course.id}/grading_standards"
-      expect(f(".grading_periods_tab")).to be_nil
+      expect(f("#content")).not_to contain_css(".grading_periods_tab")
     end
   end # mgp feature off
 end # course grading periods

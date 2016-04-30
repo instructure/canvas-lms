@@ -146,7 +146,7 @@ describe "admin settings tab" do
 
   context "global includes" do
     it "should not have a global includes section by default" do
-      expect(fj('#account_settings_global_includes_settings:visible')).to be_nil
+      expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
     end
 
     it "should have a global includes section if enabled" do
@@ -161,7 +161,7 @@ describe "admin settings tab" do
       Account.default.save!
       acct = account_model(:root_account => Account.default)
       get "/accounts/#{acct.id}/settings"
-      expect(fj('#account_settings_global_includes_settings:visible')).to be_nil
+      expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
     end
 
     it "a sub-account should have a global includes section if enabled by the parent" do
@@ -221,8 +221,8 @@ describe "admin settings tab" do
       filter_hash = add_quiz_filter
       f("#ip_filters .delete_filter_link").click
       click_submit
-      expect(f("#ip_filters .value[value='#{filter_hash.values.first}']")).to be_nil
-      expect(f("#ip_filters .name[value='#{filter_hash.keys.first}']")).to be_nil
+      expect(f("#account_settings")).not_to contain_css("#ip_filters .value[value='#{filter_hash.values.first}']")
+      expect(f("#account_settings")).not_to contain_css("#ip_filters .name[value='#{filter_hash.keys.first}']")
       expect(Account.default.settings[:ip_filters]).to be_nil
     end
   end
@@ -279,8 +279,8 @@ describe "admin settings tab" do
         click_submit
         expect(Account.default.settings[:equella_endpoint]).to be_nil
         expect(Account.default.settings[:equella_teaser]).to be_nil
-        expect(fj("#account_settings_equella_endpoint:visible")).to be_nil
-        expect(fj("#account_settings_equella_teaser:visible")).to be_nil
+        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_endpoint:visible")
+        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_teaser:visible")
       end
     end
   end
@@ -431,13 +431,13 @@ describe "admin settings tab" do
     it "should not display external integration keys if no key types exist" do
       ExternalIntegrationKey.stubs(:key_types).returns([])
       get "/accounts/#{Account.default.id}/settings"
-      expect(f("#external_integration_keys")).to be_nil
+      expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end
 
     it "should not display external integration keys if no rights are granted" do
       ExternalIntegrationKey.any_instance.stubs(:grants_right_for?).returns(false)
       get "/accounts/#{Account.default.id}/settings"
-      expect(f("#external_integration_keys")).to be_nil
+      expect(f("#account_settings")).not_to contain_css("#external_integration_keys")
     end
 
     it "should display keys with the correct rights" do
@@ -457,11 +457,11 @@ describe "admin settings tab" do
 
       expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq 'External Key 0:'
       expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
-      expect(f("label[for='account_external_integration_keys_external_key2']")).to be_nil
+      expect(f("#account_settings")).not_to contain_css("label[for='account_external_integration_keys_external_key2']")
 
       expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
       expect(f("#external_integration_keys span").text).to eq key_value
-      expect(f("#account_external_integration_keys_external_key2")).to be_nil
+      expect(f("#account_settings")).not_to contain_css("#account_external_integration_keys_external_key2")
     end
 
     it "should update writable keys" do
@@ -509,7 +509,6 @@ describe "admin settings tab" do
     move_to_click("label[for=ff_off_post_grades]")
     f('#tab-settings-link').click
     refresh_page
-    sis_token_element = f("#account_settings_sis_app_token")
-    expect(@sis_token_element).to be_nil
+    expect(f("#account_settings")).not_to contain_css("#account_settings_sis_app_token")
   end
 end

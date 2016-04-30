@@ -25,7 +25,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
     end
 
     it 'prevents taking the quiz', priority: "2", test_id: 282398 do
-      expect(f('.take_quiz_button')).to be_nil
+      expect(f("#content")).not_to contain_css('.take_quiz_button')
     end
   end
 
@@ -47,7 +47,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
     end
 
     it 'prevents taking the quiz', priority: "2", test_id: 282400 do
-      expect(f('.take_quiz_button')).to be_nil
+      expect(f("#content")).not_to contain_css('.take_quiz_button')
     end
 
     it 'indicates quiz is locked', priority: "2", test_id: 321949 do

@@ -155,7 +155,7 @@ describe 'Screenreader Gradebook grading' do
       tab_out_of_input(main_grade_input)
 
       # warning should be removed
-      expect(f('.resubmitted.muted em')).to be_nil
+      expect(f("#content")).not_to contain_css('.resubmitted.muted em')
     end
   end
 end

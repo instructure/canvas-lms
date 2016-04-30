@@ -97,14 +97,14 @@ describe "group weights" do
       f('#group_weighting_scheme').click
       submit_dialog('.ui-dialog-buttonset', '.ui-button')
       refresh_page
-      expect(ff('.icon-warning').count).to eq(0)
+      expect(f("body")).not_to contain_css('.icon-warning')
     end
 
     it 'should not display triangle warnings if an assignment is muted in both header and total column' do
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@assignment2)
-      expect(fj('.total-cell .icon-warning')).to be_nil
-      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_nil
+      expect(f("#content")).not_to contain_jqcss('.total-cell .icon-warning')
+      expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")
     end
 
     it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
@@ -112,9 +112,9 @@ describe "group weights" do
       @assignment2.save!
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@assignment2)
-      expect(fj('.total-cell .icon-warning')).to be_displayed
+      expect(f('.total-cell .icon-warning')).to be_displayed
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
-      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")).to be_nil
+      expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")
     end
   end
 end

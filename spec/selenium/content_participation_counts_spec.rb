@@ -23,6 +23,6 @@ describe "courses" do
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
 
     get "/courses/#{@course.id}/grades"
-    expect(f("#section-tabs .grades .nav-badge")).to be_nil
+    expect(f("#content")).not_to contain_css("#section-tabs .grades .nav-badge")
   end
 end

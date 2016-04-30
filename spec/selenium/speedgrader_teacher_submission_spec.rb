@@ -161,7 +161,7 @@ describe "speed grader submissions" do
       # The second user just has one, and grading the user shouldn't trigger a page error.
       # (In the original bug, it would trigger a change on the select box for choosing submission versions,
       # which had another student's data in it, so it would try to load a version that didn't exist.)
-      expect(fj('#submission_to_view')).to be_nil
+      expect(f("#content")).not_to contain_css('#submission_to_view')
       f('#grade_container').find_element(:css, 'input').send_keys("5\n")
       wait_for_ajaximations
 

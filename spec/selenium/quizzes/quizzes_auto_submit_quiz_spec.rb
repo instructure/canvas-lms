@@ -20,11 +20,11 @@ describe 'taking a quiz' do
     end
 
     def verify_times_up_dialog
-      keep_trying_until(10) { expect(fj('#times_up_dialog:visible')).to include_text 'Time\'s Up!' }
+      expect(fj('#times_up_dialog:visible')).to include_text 'Time\'s Up!'
     end
 
     def verify_no_times_up_dialog
-      expect(fj('#times_up_dialog:visible').nil?).to be_truthy
+      expect(f("body")).not_to contain_jqcss('#times_up_dialog:visible')
     end
 
     context 'when the quiz has a lock date' do

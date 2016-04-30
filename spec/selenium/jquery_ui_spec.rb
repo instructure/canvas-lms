@@ -190,18 +190,16 @@ describe "jquery ui" do
       JS
     end
 
-    def options
-      fj('.al-selenium .al-options:visible')
-    end
-
     it "should open every time when pressing return" do
-      expect(options).to be_nil
+      container = f('.al-selenium')
+      options = '.al-options:visible'
+      expect(container).not_to contain_jqcss(options)
       active.send_keys(:return)
-      expect(options).not_to be_nil
+      expect(container).to contain_jqcss(options)
       f('.al-selenium .al-trigger').click
-      expect(options).to be_nil
+      expect(container).not_to contain_jqcss(options)
       active.send_keys(:return)
-      expect(options).not_to be_nil
+      expect(container).to contain_jqcss(options)
     end
   end
 end

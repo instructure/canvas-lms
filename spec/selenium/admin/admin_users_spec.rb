@@ -52,7 +52,7 @@ describe "admin courses tab" do
       add_user({:name => name})
       bogus_name = "ser 1"
       f("#right-side #user_name").send_keys(bogus_name)
-      ff(".ui-menu-item .ui-corner-all").count == 0
+      expect(f("body")).not_to contain_css(".ui-menu-item .ui-corner-all")
     end
   end
 end

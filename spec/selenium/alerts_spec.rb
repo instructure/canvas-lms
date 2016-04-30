@@ -82,8 +82,7 @@ describe "Alerts" do
     find('#tab-alerts-link').click
     wait_for_ajaximations
     find("#edit_alert_#{alert.id} .delete_link").click
-    wait_for_ajaximations
-    keep_trying_until { fj("#edit_alert_#{alert.id}").blank? }
+    expect(f("#content")).not_to contain_css("#edit_alert_#{alert.id}")
 
     @alerts.reload
     expect(@alerts).to be_empty
@@ -111,8 +110,7 @@ describe "Alerts" do
     find('.add_alert_link').click
     wait_for_ajaximations
     find('.alert.new .cancel_button').click
-    wait_for_ajaximations
-    keep_trying_until { expect(ffj(".alert.new")).to be_empty }
+    expect(f("#content")).not_to contain_css(".alert.new")
     expect(@alerts).to be_empty
   end
 
@@ -175,7 +173,7 @@ describe "Alerts" do
       alertElement = find("#edit_alert_#{alert.id}")
       alertElement.find(".edit_link").click
       wait_for_ajaximations
-      expect(fj("#edit_alert_#{alert.id} .add_recipient_link:visible")).to be_blank
+      expect(f("#edit_alert_#{alert.id}")).not_to contain_jqcss(".add_recipient_link:visible")
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
       alertElement.find('.recipients .delete_item_link').click

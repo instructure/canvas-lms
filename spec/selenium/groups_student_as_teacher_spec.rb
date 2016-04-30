@@ -16,21 +16,13 @@ describe "student groups" do
 
     it "if there are no student groups, there should not be a student groups tab", priority:"2", test_id: 182050 do
       get "/courses/#{@course.id}/users"
-      all_tabs = ffj(".group-category-tab-link")
-
-      all_tabs.each do |tab|
-        expect(tab).to_not include_text("Student Groups")
-      end
+      expect(f(".ui-tabs-nav")).not_to contain_link("Student Groups")
     end
 
     it "if there are student groups, there should be a student groups tab", priority:"2", test_id: 182051 do
       create_student_group_as_a_teacher(group_name)
       get "/courses/#{@course.id}/users"
-      all_tabs = ffj(".group-category-tab-link")
-
-      all_tabs.each do |tab|
-        expect(tab).to include_text("Student Groups")
-      end
+      expect(f(".ui-tabs-nav")).to contain_link("Student Groups")
     end
 
     context "with a student group created" do
@@ -56,7 +48,7 @@ describe "student groups" do
       it "teacher can delete a student group", priority: "1", test_id: 182060 do
         expect(f(".group-name")).to include_text(group_name.to_s)
         delete_group
-        expect(f(".group-name")).to be_nil
+        expect(f("#content")).not_to contain_css(".group-name")
       end
 
       it "should list all students in the student group", priority: "1", test_id: 182061 do

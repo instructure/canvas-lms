@@ -113,8 +113,8 @@ describe "manage groups" do
 
       # assert all 5 students are in unassigned
       expect(ff(unassigned_users_selector).size).to eq 5
-      expect(ff(group1_users_selector).size).to eq 0
-      expect(ff(group2_users_selector).size).to eq 0
+      expect(f("#content")).not_to contain_css(group1_users_selector)
+      expect(f("#content")).not_to contain_css(group2_users_selector)
 
       drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
       drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
@@ -123,7 +123,7 @@ describe "manage groups" do
       # assert there is still 0 students in group 1
       expect(ff(unassigned_users_selector).size).to eq 3
       expect(ff(group1_users_selector).size).to eq 2
-      expect(ff(group2_users_selector).size).to eq 0
+      expect(f("#content")).not_to contain_css(group2_users_selector)
 
       drag_and_drop_element( fj(first_group1_user), fj(unassigned_group_selector) )
       drag_and_drop_element( fj(first_group1_user), fj(group2_selector) )
@@ -131,7 +131,7 @@ describe "manage groups" do
       # assert there are 0 students in group 0
       # assert there is 1 student in group 1
       expect(ff(unassigned_users_selector).size).to eq 4
-      expect(ff(group1_users_selector).size).to eq 0
+      expect(f("#content")).not_to contain_css(group1_users_selector)
       expect(ff(group2_users_selector).size).to eq 1
     end
 
@@ -146,7 +146,7 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      expect(f('.group-category-actions .al-trigger')).to be_nil # can't edit/delete etc.
+      expect(f("#content")).not_to contain_css('.group-category-actions .al-trigger') # can't edit/delete etc.
 
       # user never leaves "Everyone" list, only gets added to a group once
       2.times do
@@ -231,8 +231,8 @@ describe "manage groups" do
       # now the menu should not show unassigned-member options
       fj(actions_button).click
       wait_for_ajaximations
-      expect(fj([actions_button, message_users].join(" + "))).to be_nil
-      expect(fj([actions_button, randomly_assign_users].join(" + "))).to be_nil
+      expect(f("#content")).not_to contain_css([actions_button, message_users].join(" + "))
+      expect(f("#content")).not_to contain_css([actions_button, randomly_assign_users].join(" + "))
     end
   end
 

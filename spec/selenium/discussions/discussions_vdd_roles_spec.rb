@@ -46,7 +46,7 @@ describe "discussions" do
       expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
     end
     expect_new_page_load{f('#open-discussions .discussion-title').click}
-    expect(f('.discussion-reply-action')).not_to be_present
+    expect(f("#content")).not_to contain_css('.discussion-reply-action')
     expect(f('.discussion-fyi').text).to include("This topic is locked until #{@unlock_at_time}")
   end
 

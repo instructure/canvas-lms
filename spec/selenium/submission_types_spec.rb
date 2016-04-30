@@ -39,17 +39,17 @@ describe "assignments" do
       @assignment.update_attributes(:submission_types => 'not_graded')
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate on paper submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, 'on_paper', false)
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate no submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, nil, false)
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
     it "should validate that website url submissions are allowed" do

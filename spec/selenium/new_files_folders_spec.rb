@@ -35,7 +35,7 @@ describe "better_file_browsing, folders" do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
-      expect(fln("new test folder")).not_to be_present
+      expect(f("#content")).not_to contain_link("new test folder")
       expect(fln("test folder")).to be_present
     end
 
@@ -56,7 +56,7 @@ describe "better_file_browsing, folders" do
 
     it "should delete a folder from cog icon", priority: "1", test_id: 223502 do
       delete(0, :cog_icon)
-      expect(fln("new test folder")).not_to be_present
+      expect(f("#content")).not_to contain_link("new test folder")
     end
 
     it "should unpublish and publish a folder from cloud icon", priority: "1", test_id: 220354 do

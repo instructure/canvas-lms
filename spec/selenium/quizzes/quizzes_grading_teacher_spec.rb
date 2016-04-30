@@ -75,7 +75,7 @@ describe 'Grading quizzes' do
           ' because either an answer was removed or the question type was changed after a student' \
           ' completed a submission.'
 
-        expect(visible_regrade_options.count).to eq 0
+        expect(f("#content")).not_to contain_jqcss(".regrade_enabled label.checkbox:visible")
       end
     end
   end

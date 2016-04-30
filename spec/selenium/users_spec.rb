@@ -46,7 +46,7 @@ describe "users" do
       page_view = rows.first
       expect(page_view).to include_text('Firefox')
       expect(page_view).to include_text('assignments')
-      expect(f('#page_view_results tr img')).to be_nil # should not have a participation
+      expect(f("#page_view_results")).not_to contain_css('tr img') # should not have a participation
     end
 
     it "should validate page view with a participation" do
@@ -65,7 +65,7 @@ describe "users" do
       expect(page_view_url.text).to eq second_student.id.to_s
       expect_new_page_load { page_view_url.click }
       expect(f('.user_details .name').text).to eq second_student.name
-      expect(ff("#page_view_results tr").length).to eq 0 # validate the second student has no page views
+      expect(f("#page_view_results")).not_to contain_css('tr') # validate the second student has no page views
     end
 
     it "should validate all page views were loaded" do
@@ -164,28 +164,28 @@ describe "users" do
 
     it "should show an error if the user id entered is the current users" do
       get "/users/#{@student_1.id}/admin_merge"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
       f('#manual_user_id').send_keys(@student_1.id)
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect(flash_message_present?(:error, /You can't merge an account with itself./)).to be_truthy
+      expect_flash_message :error, /You can't merge an account with itself./
     end
 
     it "should show an error if invalid text is entered in the id box" do
       get "/users/#{@student_1.id}/admin_merge"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
       expect_new_page_load { f('button[type="submit"]').click }
       wait_for_ajaximations
-      expect(flash_message_present?(:error, /No active user with that ID was found./)).to be_truthy
+      expect_flash_message :error, /No active user with that ID was found./
     end
 
     it "should show an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
       f('#manual_user_id').send_keys(1234567809)
       expect_new_page_load { f('button[type="submit"]').click }
-      expect(flash_message_present?(:error, /No active user with that ID was found./)).to be_truthy
+      expect_flash_message :error, /No active user with that ID was found./
     end
   end
 
@@ -202,7 +202,7 @@ describe "users" do
       %w{teacher student parent}.each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
-        expect(f('input[name="user[terms_of_use]"]', form)).to be_nil
+        expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
         fj('.ui-dialog-titlebar-close:visible').click
       end
     end
@@ -217,7 +217,7 @@ describe "users" do
       %w{teacher student parent}.each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
-        expect(f('input[name="user[terms_of_use]"]', form)).to be_nil
+        expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
         fj('.ui-dialog-titlebar-close:visible').click
       end
     end

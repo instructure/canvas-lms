@@ -103,7 +103,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Friday
           expect(element_location).to eq @friday
@@ -123,7 +123,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Friday
           expect(element_location).to eq @friday
@@ -143,7 +143,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Event should be moved to Friday
           expect(element_location).to eq @friday
@@ -163,7 +163,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Monday
           expect(element_location).to eq @monday
@@ -183,7 +183,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Event should be moved to Monday
           expect(element_location).to eq @monday
@@ -259,10 +259,10 @@ describe "calendar2" do
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        expect(fj('.fc-event:visible')).to be_nil
+        expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        expect(fj('.fc-event:visible')).to be_nil
+        expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
       end
 
       it "should delete an assignment" do
@@ -275,10 +275,10 @@ describe "calendar2" do
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        expect(fj('.fc-event')).to be_nil
+        expect(f("#content")).not_to contain_css('.fc-event')
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        expect(fj('.fc-event')).to be_nil
+        expect(f("#content")).not_to contain_css('.fc-event')
       end
 
       it "should not have a delete link for a frozen assignment" do

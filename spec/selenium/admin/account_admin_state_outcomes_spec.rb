@@ -81,7 +81,7 @@ describe "account admin outcomes" do
         driver.switch_to.alert.accept
         refresh_page
         wait_for_ajaximations
-        expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+        expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
       end
       expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     end

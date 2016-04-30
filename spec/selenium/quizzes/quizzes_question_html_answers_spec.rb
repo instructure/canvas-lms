@@ -48,7 +48,7 @@ describe 'quizzes question with html answers' do
   def check_for_no_edit_button(option)
     click_option('.question_form:visible .question_type', option)
     driver.execute_script "$('.answer').addClass('hover');"
-    expect(fj('.edit_html:visible')).to be_nil
+    expect(f("#content")).not_to contain_jqcss('.edit_html:visible')
   end
 
   it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers', priority: "1", test_id: 209358 do

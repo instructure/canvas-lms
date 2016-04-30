@@ -163,12 +163,8 @@ describe "account admin question bank" do
   it "should delete a multiple choice question" do
     hover_and_click("#question_#{@question.id} .delete_question_link")
     driver.switch_to.alert.accept
-    wait_for_ajaximations
-    @question.reload
-    keep_trying_until do
-      expect(@question.workflow_state).to eq "deleted"
-      expect(fj("#questions .question_name")).to be_nil
-    end
+    keep_trying_until { @question.reload.workflow_state == "deleted" }
+    expect(f("#content")).not_to contain_css("#questions .question_name")
   end
 
   context "moving multiple questions" do
@@ -258,8 +254,7 @@ describe "account admin question bank" do
       add_outcome_to_bank(@outcome)
       fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link").click
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(fj("[data-id='#{@outcome.id}']:visible .delete_outcome_link")).to be_nil
+      expect(f("#content")).not_to contain_jqcss("[data-id='#{@outcome.id}']:visible .delete_outcome_link")
     end
   end
 end

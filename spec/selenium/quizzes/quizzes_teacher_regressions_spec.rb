@@ -81,6 +81,6 @@ describe 'quizzes regressions' do
     f('.show_rubric_link').click
     wait_for_ajaximations
     fj('#rubrics .add_rubric_link:visible').click
-    keep_trying_until { expect(fj('.rubric_grading:visible')).to be_nil }
+    expect(f("#content")).not_to contain_jqcss('.rubric_grading:visible')
   end
 end

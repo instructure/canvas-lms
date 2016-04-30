@@ -37,7 +37,7 @@ describe "new account user search" do
 
     click_tab
 
-    expect(f('button.add_user')).to be_blank
+    expect(f("#content")).not_to contain_css('button.add_user')
   end
 
   it "should be able to create users" do
@@ -86,7 +86,7 @@ describe "new account user search" do
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 11
-    expect(f(".load_more")).to be_nil
+    expect(f("#content")).not_to contain_css(".load_more")
   end
 
   it "should search by name" do

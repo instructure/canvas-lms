@@ -75,7 +75,7 @@ describe "interaction with differentiated quizzes" do
         @da_quiz.assignment.grade_student(@user, {:grade => nil})
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        expect(f(".take_quiz_link")).to be nil
+        expect(f("#content")).not_to contain_css(".take_quiz_link")
       end
     end
 

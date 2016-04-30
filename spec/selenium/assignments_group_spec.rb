@@ -5,7 +5,7 @@ describe "assignment group that can't manage a course" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
-  it "does not dipsplay the manage cog menu" do
+  it "does not display the manage cog menu" do
     @domain_root_account = Account.default
     course
     account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
@@ -15,10 +15,9 @@ describe "assignment group that can't manage a course" do
     @course.assignments.create(name: "test", assignment_group: @assignment_group)
     get "/courses/#{@course.id}/assignments"
 
-    cog = ff("#assignmentSettingsCog")[0]
     wait_for_ajaximations
 
-    expect(cog).to be_nil
+    expect(f("#content")).not_to contain_css("#assignmentSettingsCog")
   end
 end
 
@@ -338,8 +337,8 @@ describe "assignment groups" do
 
     it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2", test_id: 210085 do
       get "/courses/#{@course.id}/assignments"
-      expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
-      expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
+      expect(f("#content")).not_to contain_css("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")
+      expect(f("#content")).not_to contain_css("#assignment_#{@frozen_assign.id} .delete_assignment_link")
     end
 
     it "should not be locked for admin", priority: "2", test_id: 210086 do

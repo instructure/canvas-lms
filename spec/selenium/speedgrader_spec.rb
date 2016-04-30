@@ -307,7 +307,7 @@ describe 'Speedgrader' do
 
       driver.switch_to.frame f('#speedgrader_iframe')
       expect(f('header.quiz-header').text).to include quiz.title
-      expect(f('#quiz-nav-inner-wrapper')).to be_nil
+      expect(f("#content")).not_to contain_css('#quiz-nav-inner-wrapper')
 
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
       @teacher.save!

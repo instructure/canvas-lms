@@ -38,7 +38,7 @@ describe "dashboard" do
       get "/"
 
       # No "To Do" list shown
-      expect(f('.right-side-list.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.right-side-list.to-do-list')
       coming_up_list = f('.right-side-list.events')
 
       2.times { |i| check_list_text.call(coming_up_list, names[i]) }

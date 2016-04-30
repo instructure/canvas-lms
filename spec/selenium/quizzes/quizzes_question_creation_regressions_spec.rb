@@ -59,7 +59,6 @@ describe 'quizzes question creation edge cases' do
     submit_form(question)
     wait_for_ajax_requests
 
-    close_regrade_tooltip if f('.btn.usher-close')
     # check to see if the questions displays correctly
     move_to_click('label[for=show_question_details]')
     quiz.reload

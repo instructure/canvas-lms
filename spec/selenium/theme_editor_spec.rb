@@ -59,7 +59,7 @@ describe 'Theme Editor' do
     all_colors(all_global_branding)
 
     # expect no validation error message to be present
-    expect(single_warning_message).not_to be
+    expect(f("body")).not_to contain_css(warning_message_css)
   end
 
   it 'should accept valid shortened Hex IDs', priority: "2", test_id: 240455 do
@@ -112,9 +112,9 @@ describe 'Theme Editor' do
 
   it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
     open_theme_editor(Account.default.id)
-    fj('.Theme__editor-color-block_input-text').send_keys(random_hex_color)
+    f('.Theme__editor-color-block_input-text').send_keys(random_hex_color)
 
-    expect(f('div.progress-bar__bar-container')).not_to be
+    expect(f("body")).not_to contain_css('div.progress-bar__bar-container')
     preview_your_changes
     expect(f('div.progress-bar__bar-container')).to be
   end

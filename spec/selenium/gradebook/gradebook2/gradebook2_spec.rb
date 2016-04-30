@@ -61,7 +61,7 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
 
     expect(ff('.student-name').length).to eq @all_students.size
-    expect(ff('.avatar img').length).to eq 0
+    expect(f("body")).not_to contain_css('.avatar img')
 
     @account = Account.default
     @account.enable_service(:avatars)
@@ -88,7 +88,7 @@ describe "gradebook2" do
 
     # make sure you can un-mute
     toggle_muting(@second_assignment)
-    expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_nil
+    expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")
     expect(@second_assignment.reload).not_to be_muted
   end
 
@@ -192,7 +192,7 @@ describe "gradebook2" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    expect(ff(".total-cell .icon-muted")).to be_empty
+    expect(f("body")).not_to contain_css(".total-cell .icon-muted")
   end
 
   it "should hide and show student names", priority: "2", test_id: 164220 do
@@ -211,12 +211,12 @@ describe "gradebook2" do
     wait_for_ajaximations
 
     toggle_hiding_students
-    expect(fj('.student-name:visible')).to be_nil
+    expect(f("#content")).not_to contain_jqcss('.student-name:visible')
     expect(ffj('.student-placeholder:visible').length).to be > 0
 
     toggle_hiding_students
     expect(ffj('.student-name:visible').length).to be > 0
-    expect(fj('.student-placeholder:visible')).to be_nil
+    expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
   end
 
   context "downloading and uploading submissions" do
@@ -261,13 +261,13 @@ describe "gradebook2" do
 
   it "should show late submissions" do
     get "/courses/#{@course.id}/gradebook2"
-    expect(ff('.late').count).to eq 0
+    expect(f("body")).not_to contain_css(".late")
 
     @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
     @student_3_submission.save!
     get "/courses/#{@course.id}/gradebook2"
 
-    keep_trying_until { expect(ffj('.late').count).to eq 1 }
+    keep_trying_until { expect(ff('.late').count).to eq 1 }
   end
 
   it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
@@ -358,7 +358,7 @@ describe "gradebook2" do
       replace_value('#gradebook_grid input.grade', '10')
       f('#gradebook_grid input.grade').send_keys(:enter)
       wait_for_ajaximations
-      expect(element_exists('#gradebook_grid .icon-quiz')).not_to be_truthy
+      expect(f('#gradebook_grid')).not_to contain_css('.icon-quiz')
     end
   end
 end

@@ -26,14 +26,14 @@ describe 'Account Grading Periods' do
     it 'does NOT show grading periods created by courses under this account', priority: "1", test_id: 240004 do
       course_grading_period = create_grading_periods_for(@course).first
       get "/accounts/#{@account.id}/grading_standards"
-      expect(f("#period_title_#{course_grading_period.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#period_title_#{course_grading_period.id}")
     end
 
     it 'add without saving does not create a grading period', priority: "1", test_id: 202308 do
       get "/accounts/#{@account.id}/grading_standards"
       f('#add-period-button').click
       refresh_page
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     it 'creates a grading period', priority: "1", test_id: 244001 do
@@ -117,8 +117,7 @@ describe 'Account Grading Periods' do
       ff('.icon-delete-grading-period').first.click
       expect(driver.switch_to.alert.text).to eq('Are you sure you want to delete this grading period?')
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     it 'deletes an unsaved grading period', priority: "1", test_id: 202314 do
@@ -126,8 +125,7 @@ describe 'Account Grading Periods' do
       f('#add-period-button').click
       expect(ff('.grading-period').length).to be(1)
       ff('.icon-delete-grading-period').first.click
-      wait_for_ajaximations
-      expect(ff('.grading-period').length).to be(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     # there is a lot of repeated code in the inheritance tests, since we are testing 3 roles on 3 pages
@@ -350,7 +348,7 @@ describe 'Account Grading Periods' do
   context 'with Multiple Grading Periods feature off', priority: "1", test_id: 202305 do
     it 'does not contain a tab for grading periods' do
       get "/courses/#{@course.id}/grading_standards"
-      expect(f(".grading_periods_tab")).to be_nil
+      expect(f("#content")).not_to contain_css(".grading_periods_tab")
     end
   end # mgp feature off
 end  # account grading periods

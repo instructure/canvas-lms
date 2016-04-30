@@ -189,12 +189,8 @@ describe "calendar2" do
       expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
 
       # Change calendar week until the highlight is not there (it should eventually)
-      count = 0
-      while ff(".fc-agendaWeek-view .fc-today").size > 0
-        change_calendar
-        count += 1
-        raise if count > 10
-      end
+      2.times { change_calendar }
+      expect(f(".fc-agendaWeek-view")).not_to contain_css(".fc-today")
 
       # Back to today. Make sure that the highlight is present again
       change_calendar(:today)
@@ -286,13 +282,13 @@ describe "calendar2" do
         quick_jump_to_date(@initial_time_str)
 
         # Drag and drop assignment to new date
-        icon_array = ffj('.fc-view-container .icon-assignment')
+        icon_array = ff('.fc-view-container .icon-assignment')
         drag_and_drop_element(icon_array[0], icon_array[1])
-        expect(flash_message_present?(:error)).to be false
+        expect_no_flash_message :error
 
         # Assignment should be due on Saturday
-        expect(element_exists(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
-         .fc-time-grid-event:contains(#{assignment1.title})"))).to be true
+        expect(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
+         .fc-time-grid-event:contains(#{assignment1.title})")).to be_present
 
         # Assignment time should stay at 9:00am
         assignment1.reload
@@ -309,13 +305,13 @@ describe "calendar2" do
         quick_jump_to_date(@initial_time_str)
 
         # Drag and drop event to new date
-        icon_array = ffj('.fc-view-container .icon-calendar-month')
+        icon_array = ff('.fc-view-container .icon-calendar-month')
         drag_and_drop_element(icon_array[0], icon_array[1])
-        expect(flash_message_present?(:error)).to be false
+        expect_no_flash_message :error
 
         # Event should be due on Saturday
-        expect(element_exists(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
-         .fc-time-grid-event:contains(#{event1.title})"))).to be true
+        expect(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
+         .fc-time-grid-event:contains(#{event1.title})")).to be_present
 
         # Calendar item time should stay at 9:00am
         event1.reload
