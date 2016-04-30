@@ -370,4 +370,19 @@ describe FilesController do
     expect(response.body).to_not include("This file has not been unlocked yet")
     expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
   end
+
+  it "should allow downloads from assignments without context" do
+    host!("test.host")
+    allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
+    assignment = assignment_model(:course => @course)
+    attachment = attachment_model(:context => assignment, :uploaded_data => stub_png_data, :content_type => 'image/png')
+
+    get "http://test.host/assignments/#{assignment.id}/files/#{attachment.id}/download"
+    expect(response).to be_redirect
+    expect(response['Location']).to include("files/#{attachment.id}")
+
+    get response['Location']
+    expect(response).to be_success
+  end
 end
