@@ -828,9 +828,14 @@ CanvasRails::Application.routes.draw do
   get 'equation_images/:id' => 'equation_images#show', as: :equation_images, id: /.+/
 
   # assignments at the top level (without a context) -- we have some specs that
-  # assert these routes exist, but just 404. I'm not sure we ever actually want
-  # top-level assignments available, maybe we should change the specs instead.
-  resources :assignments, only: [:index, :show]
+  # assert these routes exist, but just 404 unless it is a download from local
+  # storage. I'm not sure we ever actually want top-level assignments available, 
+  # maybe we should change the specs instead.
+  # Note, if local storage is used, a file is fetched from this top level 
+  # (i.e. SpeedGrader document preview with Google Docs viewer)
+  resources :assignments, only: [:index, :show] do
+    get "files/:id/download" => 'files#show', download: '1'
+  end
 
   resources :files, :except => [:new] do
     get 'download' => 'files#show', download: '1'
