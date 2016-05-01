@@ -119,4 +119,30 @@ describe TatlTael::Linter do
       end
     end
   end
+
+  describe "#ban_new_erb" do
+    context "erb additions exist" do
+      let(:changes) { [double(path: "yarg.erb", added?: true)] }
+
+      it "yields" do
+        expect { |b| subject.ban_new_erb(&b) }.to yield_with_no_args
+      end
+    end
+
+    context "erb non additions exist" do
+      let(:changes) { [double(path: "yarg.erb", added?: false)] }
+
+      it "does not yield" do
+        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
+      end
+    end
+
+    context "no erb changes exist" do
+      let(:changes) { [double(path: "yarg.js", added?: true)] }
+
+      it "does not yield" do
+        expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
+      end
+    end
+  end
 end

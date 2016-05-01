@@ -13,11 +13,23 @@ module TatlTael
       @git = git || TatlTael::GitProxy.new(git_dir)
     end
 
+    def ban_new_erb
+      yield if new_erb?
+    end
+
     def ensure_specs
       yield if needs_specs? && !spec_changes?
     end
 
     private
+
+    ERB_REGEX = /\.erb$/
+    def new_erb?
+      changes.any? do |change|
+        change.path =~ ERB_REGEX &&
+          change.added?
+      end
+    end
 
     NEED_SPECS_REGEX = /(app|lib|public)\/.*\.(coffee|js|jsx|html|erb|rb)$/
     EXCLUDED_SUB_DIR_REGEX = /(bower|mediaelement|shims|vendor)\//
