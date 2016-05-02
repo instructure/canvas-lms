@@ -14899,6 +14899,7 @@ tr:
       support_desk_livechat: "Destek Masası Canlı Sohbet"
   switch_to_3f310557: "Geçiş Yap"
   switch_to_group_group_name_786b913b: "%{group_name} grubuna geçiş yap"
+  switch_to_table_view_3aae9919: "Tablo görünümüne geç"
   syllabus: "Ders Programı"
   syllabus_f191f65b: "Ders Programı"
   system_default_language_28a1052d: "Sistem Varsayılanı (%{language})"
