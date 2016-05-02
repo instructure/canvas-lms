@@ -6,24 +6,16 @@ describe "Converting Blackboard Vista qti" do
 
   before(:all) do
     archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
-    @export_folder = File.join(File.dirname(archive_file_path), "qti_vista_archive")
+    unzipped_file_path = create_temp_dir!
+    @export_folder = create_temp_dir!
     @converter = Qti::Converter.new(:export_archive_path=>archive_file_path, :base_download_dir=>unzipped_file_path, :flavor => Qti::Flavors::WEBCT)
     @converter.export
-    @converter.delete_unzipped_archive
     @assessment = @converter.course[:assessments][:assessments].first
     @questions = @converter.course[:assessment_questions][:assessment_questions]
 
     @course_data = @converter.course.with_indifferent_access
     @course_data['all_files_export'] ||= {}
     @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
-  end
-
-  after(:all) do
-    @converter.delete_unzipped_archive
-    if File.exist?(@export_folder)
-      FileUtils::rm_rf(@export_folder)
-    end
   end
 
   def import_into_course

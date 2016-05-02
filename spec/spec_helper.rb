@@ -22,6 +22,7 @@ rescue LoadError
 end
 
 require 'securerandom'
+require 'tmpdir'
 require 'lti_spec_helper.rb'
 
 RSpec.configure do |c|
@@ -291,6 +292,15 @@ def ensure_group_cleanup!(group)
   end
 end
 
+def cleanup_temp_dirs!
+  if $temp_dirs
+    $temp_dirs.each do |dir|
+      FileUtils::rm_rf(dir) if File.exist?(dir)
+    end
+    $temp_dirs = []
+  end
+end
+
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
 Mocha::Mock.class_eval do
@@ -407,6 +417,7 @@ RSpec.configure do |config|
   end
 
   config.after :all do |group|
+    cleanup_temp_dirs!
     ensure_group_cleanup!(group) if ENV['ENSURE_GROUP_CLEANUP']
   end
 
@@ -599,6 +610,13 @@ RSpec.configure do |config|
 
   def update_with_protected_attributes(ar_instance, attrs)
     update_with_protected_attributes!(ar_instance, attrs) rescue false
+  end
+
+  def create_temp_dir!
+    dir = Dir.mktmpdir
+    $temp_dirs ||= []
+    $temp_dirs << dir
+    dir
   end
 
   def process_csv_data(*lines)

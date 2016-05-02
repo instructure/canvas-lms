@@ -5,8 +5,8 @@ if Qti.migration_executable
   describe "QTI 2.1 zip" do
     def import_fixture(filename)
       archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti2_conformance', filename)
-      unzipped_file_path = File.join(File.dirname(archive_file_path), "qti_#{File.basename(archive_file_path, '.zip')}", 'oi')
-      @export_folder = File.join(File.dirname(archive_file_path), "qti_#{filename}".gsub('.zip', ''))
+      unzipped_file_path = create_temp_dir!
+      @export_folder = create_temp_dir!
       @course = Course.create!(:name => filename)
       @migration = ContentMigration.create(:context => @course)
 
@@ -21,12 +21,6 @@ if Qti.migration_executable
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       expect(@migration.migration_issues).to be_empty
-    end
-
-    after :each do
-      if @export_folder && File.exist?(@export_folder)
-        FileUtils::rm_rf(@export_folder)
-      end
     end
 
     it "should import VE_IP_01" do
