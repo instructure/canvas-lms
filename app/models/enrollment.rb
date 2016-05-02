@@ -660,7 +660,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
       calculated_state_based_on_date
     end
   end

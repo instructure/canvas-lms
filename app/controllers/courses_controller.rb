@@ -1229,6 +1229,7 @@ class CoursesController < ApplicationController
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
         enrollment.accept!
+        @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
 

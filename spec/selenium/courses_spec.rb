@@ -460,6 +460,17 @@ describe "courses" do
       Account.default.save!
     end
 
+    it "should auto-accept the course invitation if previews are not allowed" do
+      Account.default.settings[:allow_invitation_previews] = false
+      Account.default.save!
+      enroll_student(@student, false)
+
+      create_session(@student.pseudonym)
+      get "/courses/#{@course.id}"
+      assert_flash_notice_message /Invitation accepted!/
+      expect(f(".ic-notification button[name='accept'] ")).to be_nil
+    end
+
     it "should accept the course invitation" do
       enroll_student(@student, false)
 
