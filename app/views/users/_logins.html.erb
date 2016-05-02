@@ -118,7 +118,7 @@
         <td><%= f.password_field :password %></td>
       </tr>
       <tr class="password">
-        <td>&nbsp;</td>
+        <td><%= f.blabel :password_confirmation, :en => "Confirm Password" %></td>
         <td><%= f.password_field :password_confirmation %></td>
       </tr>
       <!-- explicit width is sad, but the dialog auto width will make the
