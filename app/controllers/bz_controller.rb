@@ -7,35 +7,54 @@ require 'google/api_client/auth/storages/file_store'
 
 class BzController < ApplicationController
 
-  before_filter :require_user, :only => [:last_user_url]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
+  before_filter :require_user
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
 
-  def accessibility_check
+  def accessibility_mapper
     @items = []
     WikiPage.all.each do |page|
       doc = Nokogiri::HTML(page.body)
       doc.css('img:not(.bz-magic-viewer)').each do |img|
         if img.attributes["alt"].nil?
-          @items << { :page => page, :html => img.to_html, :problem => 'Missing alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value == ""
-          @items << { :page => page, :html => img.to_html, :problem => 'Empty alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".png")
-          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".jpg")
-          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".svg")
-          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         elsif img.attributes["alt"].value.ends_with?(".gif")
-          @items << { :page => page, :html => img.to_html, :problem => 'Poor alt text' }
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
         end
       end
-      doc.css('iframe[src*="vimeo"]').each do |img|
-        @items << { :page => page, :html => img.to_html, :problem => 'Ensure video has CC' }
+      doc.css('iframe[src*="vimeo"]:not([data-bz-accessibility-ok])').each do |img|
+        orig = img.to_xhtml
+        img.set_attribute('data-bz-accessibility-ok', 'yes')
+        repl = img.to_xhtml
+        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
-      doc.css('iframe[src*="youtu"]').each do |img|
-        @items << { :page => page, :html => img.to_html, :problem => 'Ensure video has CC' }
+      doc.css('iframe[src*="youtu"]:not([data-bz-accessibility-ok])').each do |img|
+        orig = img.to_xhtml
+        img.set_attribute('data-bz-accessibility-ok', 'yes')
+        repl = img.to_xhtml
+        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
       end
     end
+  end
+
+  def save_html_changes
+    # FIXME: require admin user login properly
+    if @current_user.email != 'admin@beyondz.org'
+      raise "unauthorized"
+    end
+
+    page = WikiPage.find(params[:page_id])
+    page.body = page.body.gsub(params[:original_html], params[:new_html])
+    page.save
+
+    redirect_to bz_accessibility_mapper_path
   end
 
   def full_module_view

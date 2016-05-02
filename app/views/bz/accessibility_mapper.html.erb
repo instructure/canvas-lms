@@ -1,0 +1,44 @@
+<p>The following potential accessibility problems were found:</p>
+<p>Total: <%= @items.length %></p>
+<ul>
+<%
+  shown = 0
+  @items.each do |p|
+    %>
+      <li>
+        Page: <%= link_to p[:page].title, "/courses/#{p[:page].context.id}/pages/#{p[:page].id}/edit" %>
+        <p>
+        <%= p[:problem] %>
+        </p>
+
+        <% if p[:fix] == 'tag' %>
+          <%= form_tag do |f| %>
+            <%= hidden_field_tag 'page_id', p[:page][:id] %>
+            <%= hidden_field_tag 'original_html', p[:html] %>
+            <%= text_area_tag 'new_html', p[:html], size: '120x4', style: 'width: 80%;' %>
+            <%= submit_tag %>
+          <% end %>
+        <% end %>
+
+        <% if p[:fix] == 'button' %>
+          <%= form_tag do |f| %>
+            <%= hidden_field_tag 'page_id', p[:page][:id] %>
+            <%= hidden_field_tag 'original_html', p[:html] %>
+            <%= hidden_field_tag 'new_html', p[:fix_html] %>
+            <%= submit_tag 'Mark as OK' %>
+          <% end %>
+        <% end %>
+
+
+        <div>
+          <%= p[:html].html_safe %>
+        </div>
+      </li>
+    <%
+    shown += 1
+    if shown >= 10
+      break
+    end
+  end
+%>
+</ul>
