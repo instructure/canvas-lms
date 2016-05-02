@@ -341,9 +341,9 @@ module ApplicationHelper
 
                 subtext << '<li>'
 
-                subtext << "<a href=\"/courses/#{@context.id}/modules/#{context_module.id}\">"
+                subtext << "<span class=\"bz-nav-module-name\">"
                 subtext << context_module.name
-                subtext << '</a>'
+                subtext << '</span>'
                 
                 subtext << '<ul>'
                 current_indent = 0
