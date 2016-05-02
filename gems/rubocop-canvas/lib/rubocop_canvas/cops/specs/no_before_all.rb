@@ -15,7 +15,7 @@ module RuboCop
           first_arg = args.to_a.first
           return unless first_arg
           return unless BAD_ARG == first_arg.children.first
-          add_offense node, :expression, MSG
+          add_offense node, :expression, MSG, :warning
         end
       end
     end

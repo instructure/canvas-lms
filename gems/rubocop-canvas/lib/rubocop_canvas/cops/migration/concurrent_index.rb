@@ -32,13 +32,17 @@ module RuboCop
 
         def add_offenses(node, algorithm_name)
           if algorithm_name != :concurrently
-            add_offense(node, :expression, "Unknown algorithm name"\
-                          " `#{algorithm_name}`, did you mean `:concurrently`?")
+            add_offense(node, :expression,
+                        "Unknown algorithm name"\
+                        " `#{algorithm_name}`, did you mean `:concurrently`?",
+                        :warning)
           end
 
           if algorithm_name == :concurrently && !@disable_ddl_transaction
-            add_offense(node, :expression, "Concurrent index adds require"\
-                                                 " `disable_ddl_transaction!`")
+            add_offense(node, :expression,
+                        "Concurrent index adds require"\
+                        " `disable_ddl_transaction!`",
+                        :warning)
           end
         end
       end

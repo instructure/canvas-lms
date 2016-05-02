@@ -20,9 +20,9 @@ module RuboCop
           if named_as_controller?
             add_offense node, :expression, CONTROLLER_MSG, :error
           elsif named_as_spec?
-            add_offense node, :expression, SPEC_MSG
+            add_offense node, :expression, SPEC_MSG, :warning
           else
-            add_offense node, :expression, OTHER_MSG
+            add_offense node, :expression, OTHER_MSG, :warning
           end
         end
       end

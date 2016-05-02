@@ -48,7 +48,8 @@ module RuboCop
           add_offense(node, :selector,
                       format(MSG,
                              "#{klass}.#{method_name}",
-                             "Time.zone.#{safe_method_name}")
+                             "Time.zone.#{safe_method_name}"),
+                      :warning
                      )
         end
 

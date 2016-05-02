@@ -15,7 +15,7 @@ module RuboCop
 
         def on_def(node)
           return unless top_level_def?(node)
-          add_offense node, :expression, MSG
+          add_offense node, :expression, MSG, :warning
         end
 
         private

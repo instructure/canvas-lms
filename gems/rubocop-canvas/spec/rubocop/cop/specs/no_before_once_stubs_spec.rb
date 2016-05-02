@@ -44,7 +44,7 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
       })
       expect(cop.offenses.size).to eq(5)
       expect(cop.messages.all? { |msg| msg =~ /Use `before\(:once\)`/ })
-      expect(cop.offenses.all? { |off| off.severity.name == :convention })
+      expect(cop.offenses.all? { |off| off.severity.name == :warning })
     end
   end
 end

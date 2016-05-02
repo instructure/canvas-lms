@@ -7,7 +7,7 @@ describe RuboCop::Cop::Specs::NoBeforeAll do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/Use `before\(:once\)`/)
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'allows before(:each)' do

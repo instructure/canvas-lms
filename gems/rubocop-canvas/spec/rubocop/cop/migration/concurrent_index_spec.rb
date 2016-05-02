@@ -12,7 +12,7 @@ describe RuboCop::Cop::Migration::ConcurrentIndex do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/disable_ddl/)
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'ignores non-concurrent indexes' do
@@ -50,6 +50,6 @@ describe RuboCop::Cop::Migration::ConcurrentIndex do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/unknown algorithm/i)
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 end

@@ -14,14 +14,18 @@ module RuboCop
 
         def check_send_later(node, method_name)
           if method_name.to_s !~ /if_production/
-            add_offense(node, :expression, "All `send_later`s in migrations "\
-                                        "should be `send_later_if_production`")
+            add_offense(node, :expression,
+                        "All `send_later`s in migrations"\
+                        " should be `send_later_if_production`",
+                        :warning)
           end
 
           if tags.include?(:predeploy)
-            add_offense(node, :expression, "`send_later` cannot be used in a "\
-                                "predeploy migration, since job servers won't"\
-                                " have the new code yet")
+            add_offense(node, :expression,
+                        "`send_later` cannot be used in a"\
+                        " predeploy migration, since job servers won't"\
+                        " have the new code yet",
+                        :warning)
           end
         end
       end

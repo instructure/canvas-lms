@@ -35,7 +35,7 @@ module RuboCop
               child.to_a[2].is_a?(Astrolabe::Node) &&
               child.to_a[2].children[0] == BLOCK_ARG
           end
-          add_offense node, :expression, MSG
+          add_offense node, :expression, MSG, :warning
         end
       end
     end

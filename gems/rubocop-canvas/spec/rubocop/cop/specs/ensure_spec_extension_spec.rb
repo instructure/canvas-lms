@@ -55,7 +55,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
         })
         expect(cop.offenses.size).to eq(1)
         expect(cop.messages.first).to match(/Spec files need to end with "_spec.rb"/)
-        expect(cop.offenses.first.severity.name).to eq(:convention)
+        expect(cop.offenses.first.severity.name).to eq(:warning)
       end
     end
 
@@ -72,7 +72,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
         })
         expect(cop.offenses.size).to eq(1)
         expect(cop.messages.first).to match(/Spec files need to end with "_spec.rb"/)
-        expect(cop.offenses.first.severity.name).to eq(:convention)
+        expect(cop.offenses.first.severity.name).to eq(:warning)
       end
     end
   end

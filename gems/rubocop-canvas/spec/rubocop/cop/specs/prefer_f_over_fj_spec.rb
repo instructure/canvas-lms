@@ -11,7 +11,7 @@ describe RuboCop::Cop::Specs::PreferFOverFj do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/Prefer `f`/)
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
   it 'disallows ffj' do
@@ -24,6 +24,6 @@ describe RuboCop::Cop::Specs::PreferFOverFj do
     })
     expect(cop.offenses.size).to eq(1)
     expect(cop.messages.first).to match(/Prefer `ff`/)
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 end

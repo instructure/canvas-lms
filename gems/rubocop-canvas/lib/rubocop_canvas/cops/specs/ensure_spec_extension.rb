@@ -15,7 +15,7 @@ module RuboCop
         def on_send(node)
           return if named_as_spec?
           return unless top_level_describe?(node)
-          add_offense node, :expression, MSG
+          add_offense node, :expression, MSG, :warning
         end
 
         private
