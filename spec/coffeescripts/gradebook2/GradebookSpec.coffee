@@ -1,8 +1,9 @@
 define [
   'compiled/gradebook2/Gradebook'
+  'jsx/gradebook2/DataLoader'
   'underscore'
   'timezone'
-], (Gradebook, _, tz) ->
+], (Gradebook, DataLoader, _, tz) ->
 
   module "Gradebook2#gradeSort"
 
@@ -668,3 +669,24 @@ define [
   test 'when show concluded and hide inactive are true, enrollmentUrl returns "students_with_concluded_and_inactive_enrollments_url"', ->
     self = @setupThis(showConcludedEnrollments: true, showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'
+
+  module 'Gradebook#showNotesColumn',
+    setup: ->
+      @loadNotes = @stub(DataLoader, "getDataForColumn")
+
+    setupShowNotesColumn: (opts) ->
+      defaultOptions =
+        options: {}
+        toggleNotesColumn: ->
+      self = _.defaults(opts || {}, defaultOptions)
+      @showNotesColumn = Gradebook.prototype.showNotesColumn.bind(self)
+
+  test 'loads the notes if they have not yet been loaded', ->
+    @setupShowNotesColumn(teacherNotesNotYetLoaded: true)
+    @showNotesColumn()
+    ok @loadNotes.calledOnce
+
+  test 'does not load the notes if they are already loaded', ->
+    @setupShowNotesColumn(teacherNotesNotYetLoaded: false)
+    @showNotesColumn()
+    ok @loadNotes.notCalled

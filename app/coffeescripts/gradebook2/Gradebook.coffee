@@ -50,7 +50,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (loadGradebookData, React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+], (DataLoader, React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
   $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
   groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
@@ -96,6 +96,7 @@ define [
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
+      @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -118,7 +119,7 @@ define [
         response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
       submissionParams['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
-      dataLoader = loadGradebookData(
+      dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams: assignmentGroupsParams
 
@@ -1646,24 +1647,9 @@ define [
       handleClick = (e, method, params) ->
         $.ajaxJSON(e.target.href, method, params)
 
-      toggleNotesColumn = (f) =>
-        columnsToReplace = @numberOfFrozenCols
-        f()
-        cols = @grid.getColumns()
-        cols.splice 0, columnsToReplace,
-          @parentColumns..., @customColumnDefinitions()...
-        @grid.setColumns(cols)
-        @grid.invalidate()
-
       teacherNotesDataLoaded = false
-      showNotesColumn = =>
-        toggleNotesColumn =>
-          @customColumns.splice 0, 0, @options.teacher_notes
-          @grid.setNumberOfColumnsToFreeze ++@numberOfFrozenCols
-        linkContainer.html(hideLink())
-
       hideNotesColumn = =>
-        toggleNotesColumn =>
+        @toggleNotesColumn =>
           for c, i in @customColumns
             if c.teacher_notes
               @customColumns.splice i, 1
@@ -1678,7 +1664,8 @@ define [
         if $target.hasClass("show")
           handleClick(e, "PUT", "column[hidden]": false)
           .then =>
-            showNotesColumn()
+            @showNotesColumn()
+            linkContainer.html(hideLink())
             @reorderCustomColumns(@customColumns.map (c) -> c.id)
         if $target.hasClass("hide")
           handleClick(e, "PUT", "column[hidden]": true)
@@ -1690,7 +1677,8 @@ define [
             "column[teacher_notes]": true)
           .then (data) =>
             @options.teacher_notes = data
-            showNotesColumn()
+            @showNotesColumn()
+            linkContainer.html(hideLink())
 
       notes = @options.teacher_notes
       if !notes
@@ -1699,6 +1687,24 @@ define [
         linkContainer.html(showLink())
       else
         linkContainer.html(hideLink())
+
+    toggleNotesColumn: (callback) =>
+      columnsToReplace = @numberOfFrozenCols
+      callback()
+      cols = @grid.getColumns()
+      cols.splice 0, columnsToReplace,
+        @parentColumns..., @customColumnDefinitions()...
+      @grid.setColumns(cols)
+      @grid.invalidate()
+
+    showNotesColumn: =>
+      if @teacherNotesNotYetLoaded
+        @teacherNotesNotYetLoaded = false
+        DataLoader.getDataForColumn(@options.teacher_notes, @options.custom_column_data_url, {}, @gotCustomColumnDataChunk)
+
+      @toggleNotesColumn =>
+        @customColumns.splice 0, 0, @options.teacher_notes
+        @grid.setNumberOfColumnsToFreeze ++@numberOfFrozenCols
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
