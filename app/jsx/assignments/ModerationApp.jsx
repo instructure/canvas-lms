@@ -56,10 +56,21 @@ define([
           <FlashMessageHolder {...this.state.flashMessage} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: this.state.assignment.title})}</h1>
           <Header
-            onPublishClick={() => this.props.store.dispatch(Actions.publishGrades())}
-            onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
+            onPublishClick={
+              () => {
+                this.props.store.dispatch(Actions.publishStarted());
+                this.props.store.dispatch(Actions.publishGrades())
+              }
+            }
+            onReviewClick={
+              () => {
+                this.props.store.dispatch(Actions.moderationStarted());
+                this.props.store.dispatch(Actions.addStudentToModerationSet());
+              }
+            }
             published={this.state.assignment.published}
             selectedStudentCount={this.state.studentList.selectedCount}
+            inflightAction={this.state.inflightAction}
           />
           <div className='grid-row' role="row">
             <div className='col-xs-12'>

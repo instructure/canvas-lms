@@ -331,6 +331,75 @@ define [
       error: true
     deepEqual newState.flashMessage, expected, 'updates state'
 
+  module 'inflightAction reducer',
+    setup: ->
+      @initialState =
+        inflightAction:
+          review: false
+          publish: false
+
+      @inflightInitialState =
+        students: {}
+        inflightAction:
+          review: true
+          publish: true
+
+  test 'marks the review action as in-flight on ACTION_DISPATCHED with a payload of review', ->
+    reviewActionDispatchedAction =
+      type: 'ACTION_DISPATCHED'
+      payload:
+        name: 'review'
+
+    stateWithReviewDispatched = rootReducer(@initialState, reviewActionDispatchedAction)
+    equal stateWithReviewDispatched.inflightAction.review, true
+    equal stateWithReviewDispatched.inflightAction.publish, false
+
+  test 'marks the publish action as in-flight on ACTION_DISPATCHED with a payload of publish', ->
+    publishActionDispatchedAction =
+      type: 'ACTION_DISPATCHED'
+      payload:
+        name: 'publish'
+
+    stateWithPublishDispatched = rootReducer(@initialState, publishActionDispatchedAction)
+    equal stateWithPublishDispatched.inflightAction.publish, true
+    equal stateWithPublishDispatched.inflightAction.review, false
+
+  test 'lands the review action on UPDATED_MODERATION_SET', ->
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        students: []
+
+    stateWithReviewLanded = rootReducer(@inflightInitialState, updatedModerationSetAction)
+    equal stateWithReviewLanded.inflightAction.review, false
+
+  test 'lands the review action on UPDATE_MODERATION_SET_FAILED', ->
+    updateModerationSetFailedAction =
+      type: 'UPDATE_MODERATION_SET_FAILED'
+      payload:
+        time: Date.now()
+
+    stateWithReviewLanded = rootReducer(@inflightInitialState, updateModerationSetFailedAction)
+    equal stateWithReviewLanded.inflightAction.review, false
+
+  test 'lands the publish action on PUBLISHED_GRADES', ->
+    publishedGradesAction =
+      type: 'PUBLISHED_GRADES'
+      payload:
+        time: Date.now()
+
+    stateWithPublishLanded = rootReducer(@inflightInitialState, publishedGradesAction)
+    equal stateWithPublishLanded.inflightAction.publish, false
+
+  test 'lands the publish action on PUBLISHED_GRADES_FAILED', ->
+    publishedGradesFailedAction =
+      type: 'PUBLISHED_GRADES_FAILED'
+      payload:
+        time: Date.now()
+
+    stateWithPublishLanded = rootReducer(@inflightInitialState, publishedGradesFailedAction)
+    equal stateWithPublishLanded.inflightAction.publish, false
+
   module "sorting mark1 column on SORT_MARK1_COLUMN"
 
   test 'default to descending order when clicking on a new column', ->

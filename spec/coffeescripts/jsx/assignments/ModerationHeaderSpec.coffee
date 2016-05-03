@@ -11,7 +11,11 @@ define [
         onPublishClick: ->
         onReviewClick: ->
         published: false,
-        selectedStudentCount: 0
+        selectedStudentCount: 0,
+        inflightAction: {
+          review: false,
+          publish: false
+        }
 
     teardown: ->
       @props = null
@@ -36,6 +40,16 @@ define [
     ok publishBtnNode.disabled, 'publish button is disabled'
     React.unmountComponentAtNode(headerNode.parentNode)
 
+  test 'disables Publish button if publish action is in flight', ->
+    @props.inflightAction.publish = true
+    HeaderElement = React.createElement(Header, @props)
+    header = TestUtils.renderIntoDocument(HeaderElement)
+    headerNode = React.findDOMNode(header)
+    publishBtnNode = React.findDOMNode(header.refs.publishBtn)
+
+    ok publishBtnNode.disabled, 'publish button is disabled'
+    React.unmountComponentAtNode(headerNode.parentNode)
+
   test 'disables Add Reviewer button if selectedStudentCount is 0', ->
     HeaderElement = React.createElement(Header, @props)
     header = TestUtils.renderIntoDocument(HeaderElement)
@@ -53,6 +67,17 @@ define [
     addReviewerBtnNode = React.findDOMNode(header.refs.addReviewerBtn)
 
     notOk addReviewerBtnNode.disabled, 'add reviewers button is disabled'
+    React.unmountComponentAtNode(headerNode.parentNode)
+
+  test 'disables Add Reviewer button if review action is in flight', ->
+    @props.selectedStudentCount = 1
+    @props.inflightAction.review = true
+    HeaderElement = React.createElement(Header, @props)
+    header = TestUtils.renderIntoDocument(HeaderElement)
+    headerNode = React.findDOMNode(header)
+    addReviewerBtnNode = React.findDOMNode(header.refs.addReviewerBtn)
+
+    ok addReviewerBtnNode.disabled, 'add reviewers button is disabled'
     React.unmountComponentAtNode(headerNode.parentNode)
 
   test 'calls onReviewClick prop when review button is clicked', ->
