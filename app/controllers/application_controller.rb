@@ -118,7 +118,8 @@ class ApplicationController < ActionController::Base
         k12: k12?,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
-          open_registration: @domain_root_account.try(:open_registration?)
+          open_registration: @domain_root_account.try(:open_registration?),
+          eportfolios_enabled: @current_user.try(:eportfolios_enabled?)
         }
       }
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
