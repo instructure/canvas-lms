@@ -91,7 +91,7 @@ module AccountReports
                              AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
-          users.where!.not(pseudonyms: {sis_batch_id: nil})
+          users = users.where.not(pseudonyms: {sis_batch_id: nil})
         end
 
         if @include_deleted
