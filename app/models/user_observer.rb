@@ -32,6 +32,7 @@ class UserObserver < ActiveRecord::Base
       if (user_observer = where(attributes).take)
         if user_observer.workflow_state == 'deleted'
           user_observer.workflow_state = 'active'
+          user_observer.sis_batch_id = nil
           user_observer.save!
           user_observer.create_linked_enrollments
         end
@@ -47,6 +48,7 @@ class UserObserver < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.save!
+    remove_linked_enrollments
   end
 
   def not_same_user
@@ -57,5 +59,14 @@ class UserObserver < ActiveRecord::Base
     user.student_enrollments.active_or_pending.each do |enrollment|
       enrollment.create_linked_enrollment_for(observer)
     end
+  end
+
+  def remove_linked_enrollments
+    observer.observer_enrollments.shard(observer).where(associated_user_id: user).find_each do |enrollment|
+      enrollment.workflow_state = 'deleted'
+      enrollment.save!
+    end
+    observer.update_account_associations
+    observer.touch
   end
 end

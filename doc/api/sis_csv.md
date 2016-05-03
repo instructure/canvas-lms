@@ -618,3 +618,42 @@ E411208,1B,active
 E411208,2A,active
 E411208,2A,active
 </pre>
+
+user_observers.csv
+----------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>observer_id</td>
+<td>text</td>
+<td><b>Required field</b>. The User identifier from users.csv for the observing user.</td>
+</tr>
+<tr>
+<td>student_id</td>
+<td>text</td>
+<td><b>Required field</b>. The User identifier from users.csv for the student user.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td><b>Required field</b>. active, deleted</td>
+</tr>
+</table>
+
+user_observers.csv is optional. The goal of user_observers.csv is to provide a
+way to create user_observers. These observers will automatically be enrolled as
+an observer for each of the students enrollments. When a user_observer is
+deleted the observer enrollments of the student are also deleted.
+
+Sample:
+
+<pre>observer_id,student_id,status
+u411208,u411222,active
+u411208,u411295,active
+u413405,u411385,deleted
+</pre>

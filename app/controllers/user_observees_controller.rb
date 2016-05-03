@@ -162,7 +162,7 @@ class UserObserveesController < ApplicationController
   def destroy
     raise ActiveRecord::RecordNotFound unless has_observee?(observee)
 
-    remove_observee(observee)
+    user.user_observees.active.where(user_id: observee).destroy_all
     render json: user_json(observee, @current_user, session)
   end
 
@@ -185,16 +185,6 @@ class UserObserveesController < ApplicationController
         end
       end
     end
-  end
-
-  def remove_observee(observee)
-    user.observer_enrollments.shard(user).where(:associated_user_id => observee).each do |enrollment|
-      enrollment.workflow_state = 'deleted'
-      enrollment.save
-    end
-    user.user_observees.active.where(user_id: observee).destroy_all
-    user.update_account_associations
-    user.touch
   end
 
   def has_observee?(observee)
