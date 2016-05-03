@@ -92,7 +92,7 @@ gem 'ruby-saml-mod', '0.3.0'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
-gem 'sanitize', '2.0.6', require: false
+gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.1.0'
 
 gem 'useragent', '0.10.0', require: false
