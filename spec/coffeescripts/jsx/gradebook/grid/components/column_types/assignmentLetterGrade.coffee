@@ -57,4 +57,3 @@ define [
 
     equal(grade, 'A')
     equal(score, '')
-

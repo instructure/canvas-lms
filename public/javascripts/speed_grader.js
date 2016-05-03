@@ -1504,12 +1504,6 @@ define([
           result = 0;
         }
 
-        // For some reason, assignments and other submissions fill the
-        // select dropdown with 0 based values. Quizzes started with 1.
-        if (jsonData.context.quiz && result > 0) {
-          result = result - 1;
-        }
-
         return result;
       };
 
@@ -1641,7 +1635,7 @@ define([
             var grade = s.grade;
           }
           return {
-            value: s.version || i,
+            value: i,
             late: s.late,
             selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
@@ -1728,7 +1722,6 @@ define([
         return jsonData.context.students.length;
       };
     },
-
     loadAttachmentInline: function(attachment){
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
@@ -1808,18 +1801,13 @@ define([
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
-
-              this.currentStudent.submission &&
-              !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
-              this.currentStudent.submission.currentSelectedIndex != null ?
-              '&version=' + this.currentStudent.submission.currentSelectedIndex :
-              ''
+              SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)
             ) + (
               utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
             )) + '" frameborder="0"></iframe>'))
             .show();
-	      }
-  	  }
+        }
+      }
     },
 
     showRubric: function(){
