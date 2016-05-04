@@ -347,6 +347,25 @@ describe DiscussionTopicsController do
         expect(assigns[:groups].size).to eql(2)
       end
 
+      it "should only show applicable groups if DA applies" do
+        user_session(@teacher)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        asmt = @topic.assignment
+        asmt.only_visible_to_overrides = true
+        override = asmt.assignment_overrides.build
+        override.set = @group2
+        override.save!
+        asmt.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_success
+        expect(assigns[:groups]).to eq([@group2])
+      end
+
       it "should redirect to the student's group" do
         user_session(@student)
         @group1.add_user(@student)
