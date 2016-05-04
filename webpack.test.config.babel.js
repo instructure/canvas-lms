@@ -42,6 +42,14 @@ testWebpackConfig.module.loaders.push({
   loaders: ["qunitDependencyLoader"]
 });
 
+// Some plugins use a special spec_canvas path for their specs
+testWebpackConfig.module.loaders.push({
+  test: /\/spec_canvas\/coffeescripts\//,
+  loaders: [
+    'qunitDependencyLoader'
+  ]
+});
+
 testWebpackConfig.module.loaders.push({
   test: /\/spec\/javascripts\/jsx\//,
   loaders: ["qunitJsxDependencyLoader"]
