@@ -30,6 +30,7 @@ define([
   'jquery' /* $ */,
   'compiled/userSettings',
   'jsx/shared/rce/RichContentEditor',
+  'eportfolios/eportfolio_section',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
@@ -42,7 +43,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, userSettings, RichContentEditor) {
+], function(I18n, $, userSettings, RichContentEditor, EportfolioSection) {
 
   // optimization so user isn't waiting on RCS to
   // respond when they hit edit
@@ -70,21 +71,8 @@ define([
       if(section_type == "rich_text" || section_type == "html" || $section.hasClass('read_only')) {
         idx++;
         var name = "section_" + idx;
-        if(section_type == "rich_text") {
-          data[name + '[section_type]'] = "rich_text";
-          var $richText = $section.find('.edit_section');
-          var editorContent = RichContentEditor.callOnRCE($richText, "get_code")
-          if (editorContent){ data[name + '[content]'] = editorContent;}
-        } else if(section_type == "html") {
-          data[name + '[section_type]'] = "html";
-          data[name + '[content]'] = $section.find(".edit_section").val();
-        } else if(section_type == "submission") {
-          data[name + '[section_type]'] = "submission";
-          data[name + '[submission_id]'] = $section.getTemplateData({textValues: ['submission_id']}).submission_id;
-        } else if(section_type == "attachment") {
-          data[name + '[section_type]'] = "attachment";
-          data[name + '[attachment_id]'] = $section.getTemplateData({textValues: ['attachment_id']}).attachment_id;
-        }
+        var sectionContent = EportfolioSection.fetchContent($section, section_type, name)
+        data = $.extend(data, sectionContent)
       }
     });
     data['section_count'] = idx;
