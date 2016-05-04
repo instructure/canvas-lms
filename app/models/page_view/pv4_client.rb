@@ -32,11 +32,14 @@ class PageView
       end_time ||= Time.now.utc
       start_time ||= Time.at(0).utc
 
-      params = "start_time=#{start_time.iso8601(PRECISION)}&end_time=#{end_time.iso8601(PRECISION)}"
+      params = "start_time=#{start_time.utc.iso8601(PRECISION)}"
+      params << "&end_time=#{end_time.utc.iso8601(PRECISION)}"
       params << "&last_page_view_id=#{last_page_view_id}" if last_page_view_id
       params << "&limit=#{limit}" if limit
-      response = CanvasHttp.get(@uri.merge("users/#{user_id}/page_views?#{params}").to_s,
-        "Authorization" => "Bearer #{@access_token}")
+      response = CanvasHttp.get(
+        @uri.merge("users/#{user_id}/page_views?#{params}").to_s,
+        "Authorization" => "Bearer #{@access_token}"
+      )
 
       json = JSON.parse(response.body)
       raise response.body unless json['page_views']

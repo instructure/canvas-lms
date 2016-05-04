@@ -33,6 +33,7 @@ class UserObserver < ActiveRecord::Base
         if user_observer.workflow_state == 'deleted'
           user_observer.workflow_state = 'active'
           user_observer.save!
+          user_observer.create_linked_enrollments
         end
       else
         user_observer = create!(attributes)

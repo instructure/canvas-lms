@@ -94,7 +94,7 @@ module UserSearch
   private
 
   def self.complex_sql
-    @_complex_sql ||= <<-SQL
+    <<-SQL
       (EXISTS (SELECT 1 FROM #{Pseudonym.quoted_table_name}
          WHERE #{like_condition('pseudonyms.sis_user_id')}
            AND pseudonyms.user_id = users.id

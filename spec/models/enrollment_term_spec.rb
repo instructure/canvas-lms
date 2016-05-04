@@ -23,7 +23,7 @@ describe EnrollmentTerm do
     begin
       account_model
       term = @account.default_enrollment_term
-      
+
       translations = {
         :test_locale => {
           :account => {
@@ -121,17 +121,6 @@ describe EnrollmentTerm do
       course_with_teacher(active_course: true, active_enrollment: true)
       @course.enrollment_term_id = @t3.id
       @course.save!
-    end
-
-    describe ".users_counts" do
-      it "returns user counts" do
-        student_in_course(active_all: true, course: @t1.courses.first)
-
-        counts = {}
-        counts[@t1.id.to_s] = 2
-        counts[@t2.id.to_s] = 1
-        expect(EnrollmentTerm.user_counts(Account.default, [@t1, @t2])).to eq counts
-      end
     end
 
     describe ".courses_counts" do
