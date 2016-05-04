@@ -141,7 +141,10 @@ end
 shared_examples 'people_page' do |context|
   it "should allow group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323329, teacher: 324926) do
     get people_page
-    expect_new_page_load { fln('View Registered Services').click }
+    expect_new_page_load do
+      f("#people-options .Button").click
+      fln('View Registered Services').click
+    end
     # Checks that we are on the Registered Services page
     expect(f('.btn.button-sidebar-wide')).to be_displayed
   end
@@ -235,4 +238,3 @@ shared_examples 'conferences_page' do |context|
     expect(f('#concluded-conference-list')).to include_text('There are no concluded conferences')
   end
 end
-
