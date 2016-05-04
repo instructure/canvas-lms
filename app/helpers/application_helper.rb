@@ -354,19 +354,21 @@ module ApplicationHelper
                 current_indent = -1
                 possible_items = context_module.content_tags_visible_to(@current_user)
                 has_active = false
+                last_item_element = main_module_list_item
                 possible_items.each do |item|
                   while item.indent > current_indent
                     module_list_stack.push module_list_item
-                    module_list_item = HtmlElement.new('li', module_list_item) if module_list_item.tag_name != 'li'
-                    module_list_item = HtmlElement.new('ul', module_list_item)
+                    module_list_item = HtmlElement.new('ul', last_item_element)
                     current_indent+=1
                   end
                   while item.indent < current_indent
                     module_list_item = module_list_stack.pop 
+                    last_item_element = module_list_item
                     current_indent-=1
                   end
 
                   item_element = HtmlElement.new('li', module_list_item)
+                  last_item_element = item_element
                   item_element.add_class(item.content_type)
 
                   liclass = ''
@@ -1007,6 +1009,9 @@ class HtmlElement
   end
   def add_class(c)
     @class_name += ' ' + c
+  end
+  def remove_class(c)
+    @class_name.sub!(c, '')
   end
   def text_content=(t)
     @text_content = t
