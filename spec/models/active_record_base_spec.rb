@@ -545,7 +545,7 @@ describe ActiveRecord::Base do
 
   describe "nested conditions" do
     it "should not barf if the condition has a question mark" do
-      expect(User.joins(:enrollments).where(enrollments: { sis_source_id: 'a?c'}).first).to be_nil
+      expect(User.joins(:enrollments).where(enrollments: { workflow_state: 'a?c'}).first).to be_nil
     end
   end
 

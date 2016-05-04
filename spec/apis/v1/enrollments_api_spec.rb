@@ -75,7 +75,6 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
-          'sis_source_id'                      => new_enrollment.sis_source_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -583,7 +582,6 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
-          'sis_source_id'                      => new_enrollment.sis_source_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -889,7 +887,6 @@ describe EnrollmentsApiController, type: :request do
             'sis_import_id'                      => @enrollment.sis_batch_id,
             'sis_course_id'                      => nil,
             'sis_section_id'                     => nil,
-            'sis_source_id'                      => @enrollment.sis_source_id,
             'course_integration_id'              => nil,
             'section_integration_id'             => nil,
             'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
@@ -956,7 +953,6 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             },
-            'sis_source_id' => e.sis_source_id,
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at'  => e.created_at.xmlschema,
@@ -1033,7 +1029,6 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             },
-            'sis_source_id' => e.sis_source_id,
             'associated_user_id' => nil,
             'updated_at'         => e.updated_at.xmlschema,
             'created_at'         => e.created_at.xmlschema,
@@ -1425,7 +1420,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           }
           h['grades'] = {
@@ -1682,7 +1676,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           })
         end
@@ -1739,7 +1732,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           })
         end

@@ -4016,21 +4016,18 @@ describe Course do
         # Both of these need to be defined, as they're both involved in SIS imports
         # and expected manual enrollment behavior
         @enrollment.sis_batch_id = batch.id
-        @enrollment.sis_source_id = 'abc:1234'
         @enrollment.save
       end
 
       it 'should retain SIS attributes if re-enrolled, but the SIS enrollment is still active' do
         e2 = @course.enroll_student @user
         expect(e2.sis_batch_id).not_to eql nil
-        expect(e2.sis_source_id).not_to eql nil
       end
 
       it 'should remove SIS attributes from enrollments when re-created manually' do
         @enrollment.destroy
         @enrollment = @course.enroll_student @user
         expect(@enrollment.sis_batch_id).to eql nil
-        expect(@enrollment.sis_source_id).to eql nil
       end
     end
 

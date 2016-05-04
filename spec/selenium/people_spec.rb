@@ -151,8 +151,8 @@ describe "people" do
 
     it "should display remove option for student with/without SIS id", priority: "1", test_id: 332576 do
       enroll_student(@student_2)
-      @student = user
-      @course.enroll_student(@student).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      @course.enroll_student(@student)
       @course.save
       get "/courses/#{@course.id}/users"
       # check 1st student
@@ -444,8 +444,11 @@ describe "people" do
     end
 
     it "should gray out sections the user doesn't have permission to remove" do
-      @student = user_with_pseudonym
-      @course.enroll_student(@student, allow_multiple_enrollments: true).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      e = @course.enroll_student(@student, allow_multiple_enrollments: true)
+      sis = @course.root_account.sis_batches.create
+      e.sis_batch_id = sis.id
+      e.save!
       get "/courses/#{@course.id}/users"
       ff(".icon-settings")[1].click
       fln("Edit Sections").click
@@ -649,9 +652,10 @@ describe "people" do
     end
 
     it "should not show the option to edit roles for a SIS imported enrollment" do
+      sis = @course.root_account.sis_batches.create
       student = user_with_pseudonym(:active_all => true)
       enrollment = @course.enroll_teacher(student)
-      enrollment.sis_source_id = "something"
+      enrollment.sis_batch_id = sis.id
       enrollment.save!
 
       user_session(@teacher)
