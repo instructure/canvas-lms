@@ -1,125 +1,94 @@
-/** @jsx React.DOM */
-var React = require('react');
-var Tray = require('../../lib/main');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Tray from '../../lib/main';
+import cx from 'classnames';
 
-function cx(map) {
-  var className = [];
-  Object.keys(map).forEach(function (key) {
-    if (map[key]) {
-      className.push(key);
-    }
-  });
-  return className.join(' ');
-}
-
-var App = React.createClass({
-  getInitialState: function () {
+const App = React.createClass({
+  getInitialState() {
     return {
       orientation: 'left',
       isTrayOpen: false
     };
   },
 
-  handleNavClick: function (e) {
-    var type = e.target.getAttribute('data-type');
+  handleNavClick(e) {
+    const type = e.target.getAttribute('data-type');
     this.openTray(type);
   },
 
-  handleNavKeyPress: function (e) {
+  handleNavKeyPress(e) {
     if (e.which === 13 || e.which === 32) {
-      var type = e.target.getAttribute('data-type');
+      const type = e.target.getAttribute('data-type');
       this.openTray(type);
     }
   },
 
-  handleOrientationChange: function (e) {
+  handleOrientationChange(e) {
     this.setState({
       orientation: e.target.value
     });
   },
 
-  openTray: function (type) {
-    this.setState({
-      type: type,
-      isTrayOpen: true
-    });
-  },
-
-  closeTray: function () {
-    this.setState({
-      isTrayOpen: false
-    }, function () {
-      setTimeout(function () {
-        this.setState({
-          type: null
-        });
-      }.bind(this), 150);
-    });
-  },
-
-  renderTrayContent: function () {
+  renderTrayContent() {
     switch (this.state.type) {
-      case 'foo':
-        return (
-          <div>
-            <h2>Foo</h2>
-            <div>Content for foo</div>
-            <nav role="navigation">
-              <div><a href="javascript://">A</a></div>
-              <div><a href="javascript://">B</a></div>
-              <div><a href="javascript://">C</a></div>
-            </nav>
-          </div>
-        );
-        break;
-      case 'bar':
-        return (
-          <div>
-            <h2>Bar</h2>
-            <div>Lorem Ipsum</div>
-            <nav role="navigation">
-              <div><a href="javascript://">A</a></div>
-              <div><a href="javascript://">B</a></div>
-              <div><a href="javascript://">C</a></div>
-            </nav>
-          </div>
-        );
-        break;
-      case 'baz':
-        return (
-          <div>
-            <h2>Baz</h2>
-            <div>Other stuff here</div>
-            <nav role="navigation">
-              <div><a href="javascript://">A</a></div>
-              <div><a href="javascript://">B</a></div>
-              <div><a href="javascript://">C</a></div>
-            </nav>
-          </div>
-        );
-        break;
-      default:
-        return (
-          <h1>You shouldn't see me</h1>
-        );
+    case 'foo':
+      return (
+        <div>
+          <h2>Foo</h2>
+          <div>Content for foo</div>
+          <nav role="navigation">
+            <div><a href="#">A</a></div>
+            <div><a href="#">B</a></div>
+            <div><a href="#">C</a></div>
+          </nav>
+        </div>
+      );
+    case 'bar':
+      return (
+        <div>
+          <h2>Bar</h2>
+          <div>Lorem Ipsum</div>
+          <nav role="navigation">
+            <div><a href="#">A</a></div>
+            <div><a href="#">B</a></div>
+            <div><a href="#">C</a></div>
+          </nav>
+        </div>
+      );
+    case 'baz':
+      return (
+        <div>
+          <h2>Baz</h2>
+          <div>Other stuff here</div>
+          <nav role="navigation">
+            <div><a href="#">A</a></div>
+            <div><a href="#">B</a></div>
+            <div><a href="#">C</a></div>
+          </nav>
+        </div>
+      );
+    default:
+      return (
+        <h1>You shouldn't see me</h1>
+      );
     }
   },
- 
-  render: function () {
+
+  render() {
     return (
       <div>
         <ul role="menu" className={cx({
-            'navigation': true,
-            'navigation-left': this.state.orientation === 'left',
-            'navigation-right': this.state.orientation === 'right'
-          })}
+          'navigation': true,
+          'navigation-left': this.state.orientation === 'left',
+          'navigation-right': this.state.orientation === 'right'
+        })}
         >
           <li role="menuitem"
               className={cx({ active: this.state.type === 'foo' })}
           >
             <a tabIndex={0}
                 role="button"
-                aria-haspopup={true}
+                aria-haspopup
                 data-type="foo"
                 onKeyPress={this.handleNavKeyPress}
                 onClick={this.handleNavClick}>Foo</a>
@@ -129,7 +98,7 @@ var App = React.createClass({
           >
             <a tabIndex={0}
                 role="button"
-                aria-haspopup={true}
+                aria-haspopup
                 data-type="bar"
                 onKeyPress={this.handleNavKeyPress}
                 onClick={this.handleNavClick}>Bar</a>
@@ -139,7 +108,7 @@ var App = React.createClass({
           >
             <a tabIndex={0}
                 role="button"
-                aria-haspopup={true}
+                aria-haspopup
                 data-type="baz"
                 onKeyPress={this.handleNavKeyPress}
                 onClick={this.handleNavClick}>Baz</a>
@@ -163,7 +132,26 @@ var App = React.createClass({
         </div>
       </div>
     );
+  },
+
+  openTray(type) {
+    this.setState({
+      type: type,
+      isTrayOpen: true
+    });
+  },
+
+  closeTray() {
+    this.setState({
+      isTrayOpen: false
+    }, () => {
+      setTimeout(() => {
+        this.setState({
+          type: null
+        });
+      }, 150);
+    });
   }
 });
 
-React.render(<App/>, document.getElementById('example'));
+ReactDOM.render(<App/>, document.getElementById('example'));

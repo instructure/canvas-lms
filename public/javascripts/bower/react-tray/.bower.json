@@ -1,15 +1,14 @@
 {
   "name": "react-tray",
   "homepage": "https://github.com/instructure-react/react-tray",
-  "version": "0.1.2",
-  "_release": "0.1.2",
+  "version": "0.3.0",
+  "_release": "0.3.0",
   "_resolution": {
     "type": "version",
-    "tag": "v0.1.2",
-    "commit": "d6cbe653bd586da057d728892e229fb4c2f4aed5"
+    "tag": "v0.3.0",
+    "commit": "b052164a72d020e5bd4c09bdeda3673d07fc1713"
   },
-  "_source": "git://github.com/instructure-react/react-tray.git",
-  "_target": "~0.1.2",
-  "_originalSource": "react-tray",
-  "_direct": true
+  "_source": "https://github.com/instructure-react/react-tray.git",
+  "_target": "0.3.0",
+  "_originalSource": "react-tray"
 }

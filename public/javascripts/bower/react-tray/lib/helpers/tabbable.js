@@ -10,40 +10,42 @@
  * http://api.jqueryui.com/category/ui-core/
  */
 
-function focusable(element, isTabIndexNotNaN) {
-  var nodeName = element.nodeName.toLowerCase();
-  return (/input|select|textarea|button|object/.test(nodeName) ?
-    !element.disabled :
-    "a" === nodeName ?
-      element.href || isTabIndexNotNaN :
-      isTabIndexNotNaN) && visible(element);
-}
-
 function hidden(el) {
   return (el.offsetWidth <= 0 && el.offsetHeight <= 0) ||
     el.style.display === 'none';
 }
 
 function visible(element) {
-  while (element) {
-    if (element === document.body) break;
-    if (hidden(element)) return false;
-    element = element.parentNode;
+  let el = element;
+  while (el) {
+    if (el === document.body) break;
+    if (hidden(el)) return false;
+    el = el.parentNode;
   }
   return true;
 }
 
+function focusable(element, isTabIndexNotNaN) {
+  const nodeName = element.nodeName.toLowerCase();
+  /* eslint no-nested-ternary:0 */
+  return (/input|select|textarea|button|object/.test(nodeName) ?
+    !element.disabled :
+    nodeName === 'a' ?
+      element.href || isTabIndexNotNaN :
+      isTabIndexNotNaN) && visible(element);
+}
+
 function tabbable(element) {
-  var tabIndex = element.getAttribute('tabindex');
+  let tabIndex = element.getAttribute('tabindex');
   if (tabIndex === null) tabIndex = undefined;
-  var isTabIndexNaN = isNaN(tabIndex);
+  const isTabIndexNaN = isNaN(tabIndex);
   return (isTabIndexNaN || tabIndex >= 0) && focusable(element, !isTabIndexNaN);
 }
 
 function findTabbableDescendants(element) {
-  return [].slice.call(element.querySelectorAll('*'), 0).filter(function(el) {
+  return [].slice.call(element.querySelectorAll('*'), 0).filter((el) => {
     return tabbable(el);
   });
 }
 
-module.exports = findTabbableDescendants;
+export default findTabbableDescendants;
