@@ -2878,7 +2878,8 @@ describe Course, 'tabs_available' do
 
   it "should include external tools if configured on the account" do
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
+    @course.account = @account
+    @course.save!
     tool = new_external_tool @account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
@@ -2895,7 +2896,8 @@ describe Course, 'tabs_available' do
 
   it "should include external tools if configured on the root account" do
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
+    @course.account = @account
+    @course.save!
     tool = new_external_tool @account.root_account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!

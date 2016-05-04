@@ -2466,28 +2466,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # This will move the course to be in the specified account.
-  # All enrollments, sections, and other objects attached to the course will also be updated.
-  def move_to_account(new_root_account, new_sub_account=nil)
-    self.account = new_sub_account || new_root_account
-    self.save if new_sub_account
-    self.root_account = new_root_account
-    user_ids = []
-
-    CourseSection.where(:course_id => self).each do |cs|
-      cs.update_attribute(:root_account_id, new_root_account.id)
-    end
-
-    Enrollment.where(:course_id => self).each do |e|
-      e.update_attribute(:root_account_id, new_root_account.id)
-      user_ids << e.user_id
-    end
-
-    self.save
-    User.update_account_associations(user_ids)
-  end
-
-
   cattr_accessor :settings_options
   self.settings_options = {}
 
