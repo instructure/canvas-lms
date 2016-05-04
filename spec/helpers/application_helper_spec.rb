@@ -88,15 +88,17 @@ describe ApplicationHelper do
   end
 
   describe "Time Display Helpers" do
-    before do
+    before :each do
       @zone = Time.zone
       Time.zone = "Alaska"
-      Timecop.freeze(Time.utc(2013,3,13,9,12))
     end
 
-    after do
-      Timecop.return
+    after :each do
       Time.zone = @zone
+    end
+
+    around do |example|
+      Timecop.freeze(Time.zone.local(2013,3,13,9,12), &example)
     end
 
     describe '#context_sensitive_datetime_title' do
@@ -508,9 +510,10 @@ describe ApplicationHelper do
 
               includes = helper.get_global_includes
               expect(includes).to eq [{js: '/path/to/js'}]
+            end
 
-              # a little time passes, so updated_at changes
-              Timecop.freeze(now + 5.seconds)
+            # a little time passes, so updated_at changes
+            Timecop.freeze(now + 5.seconds) do
 
               @domain_root_account.settings = @domain_root_account.settings.merge(
                 global_javascript: '/path/to/new/js'

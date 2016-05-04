@@ -1496,13 +1496,9 @@ describe DiscussionTopic do
       topic_with_nested_replies
     end
 
-    before :each do
+    around do |example|
       # materialized view jobs are now delayed
-      Timecop.travel(Time.now + 20.seconds)
-    end
-
-    after :each do
-      Timecop.return
+      Timecop.freeze(Time.zone.now + 20.seconds, &example)
     end
 
     it "should return nil if the view has not been built yet, and schedule a job" do

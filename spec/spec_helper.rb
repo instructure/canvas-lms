@@ -468,6 +468,8 @@ RSpec.configure do |config|
     # wipe out the test db, in case some non-transactional tests crapped out before
     # cleaning up after themselves
     truncate_all_tables
+
+    Timecop.safe_mode = true
   end
 
   # this runs on post-merge builds to capture dependencies of each spec;
