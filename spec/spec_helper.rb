@@ -289,25 +289,6 @@ def ensure_group_cleanup!(group)
   end
 end
 
-# Make AR not puke if MySQL auto-commits the transaction
-module MysqlOutsideTransaction
-  def outside_transaction?
-    # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
-    # and then can't release it because it doesn't exist, we're not in a transaction
-    execute('SAVEPOINT outside_transaction')
-    !!execute('RELEASE SAVEPOINT outside_transaction') rescue true
-  end
-end
-
-module ActiveRecord::ConnectionAdapters
-  if defined?(MysqlAdapter)
-    MysqlAdapter.send(:include, MysqlOutsideTransaction)
-  end
-  if defined?(Mysql2Adapter)
-    Mysql2Adapter.send(:include, MysqlOutsideTransaction)
-  end
-end
-
 # Be sure to actually test serializing things to non-existent caches,
 # but give Mocks a pass, since they won't exist in dev/prod
 Mocha::Mock.class_eval do
@@ -486,8 +467,18 @@ RSpec.configure do |config|
       Selinimum::Capture.install!
     end
 
-    config.before do |example|
-      Selinimum::Capture.current_example = example
+    config.prepend_before :all do |group|
+      # ensure these constants get reloaded, otherwise you get the dreaded
+      # `A copy of #{from_mod} has been removed from the module tree but is still active!`
+      BroadcastPolicy.reset_notifiers!
+
+      Selinimum::Capture.current_group = group.class
+    end
+
+    config.around :each do |example|
+      Selinimum::Capture.with_example(example) do
+        example.run
+      end
     end
 
     config.after :suite do

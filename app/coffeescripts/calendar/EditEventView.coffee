@@ -36,6 +36,8 @@ define [
           'start_date', 'start_time', 'end_time',
           'title', 'description', 'location_name', 'location_address',
           'duplicate')
+        if picked_params.start_date
+          picked_params.start_date = $.dateString($.fudgeDateForProfileTimezone(picked_params.start_date), {format: 'medium'})
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date

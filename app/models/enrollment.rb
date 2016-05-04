@@ -68,6 +68,7 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
+  after_save :dispatch_invitations_later
   after_destroy :update_assignment_overrides_if_needed
 
   attr_accessor :already_enrolled, :available_at, :soft_completed_at, :need_touch_user
@@ -176,7 +177,7 @@ class Enrollment < ActiveRecord::Base
       record.course &&
       record.user.registered? &&
       !record.observer? &&
-      ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_registration
@@ -185,7 +186,7 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
       record.course &&
       !record.user.registered? &&
-      ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_notification
@@ -205,6 +206,15 @@ class Enrollment < ActiveRecord::Base
       !record.observer? &&
       !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
     }
+  end
+
+  def dispatch_invitations_later
+    # if in an invited state but not frd "invited?" because of future date restrictions, send it later
+    if (self.just_created || self.workflow_state_changed? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
+        !self.self_enrolled && !(self.observer? && self.user.registered?)
+      # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
+      self.send_later_enqueue_args(:re_send_confirmation_if_invited!, {:run_at => self.available_at, :singleton => "send_enrollment_invitations_#{global_id}"})
+    end
   end
 
   scope :active, -> { where("enrollments.workflow_state<>'deleted'") }
@@ -789,6 +799,10 @@ class Enrollment < ActiveRecord::Base
     self.save
     @re_send_confirmation = false
     true
+  end
+
+  def re_send_confirmation_if_invited!
+    self.re_send_confirmation! if self.invited?
   end
 
   def has_permission_to?(action)

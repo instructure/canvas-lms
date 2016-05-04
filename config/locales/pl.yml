@@ -12086,7 +12086,6 @@ pl:
   qti_img_matching_question: "Zaimportowane pasujące pytanie zawiera obrazy po obu stronach, co nie jest obsługiwane"
   qti_img_matching_question_distractors: "Zaimportowane pasujące pytanie zawiera obrazy w wyborze, nie można tego naprawić, ponieważ zawiera również fałszywe odpowiedzi"
   qti_name: "QTI Converter"
-  qualified_locale: pl-PL
   question_9121487: Pytanie
   question_answered: "Z udzieloną odpowiedzią"
   question_bank: 

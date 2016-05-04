@@ -1,0 +1,24 @@
+.conditional-release-editor {
+  padding-top: 12px;
+}
+
+.conditional-release-editor-layout {
+  width: 90% !important;
+  height: 90% !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.conditional-release-editor-body {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.conditional-release-editor-frame {
+  border: none;
+  flex: 1 1 auto;
+}
+
+.conditional-release-save-data {
+  padding: 12px 0px;
+}

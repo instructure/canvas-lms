@@ -61,6 +61,7 @@ describe "calendar2" do
         events = ff('.fc-event')
         expect(events.size).to eq 1
         expect(events.first.text).to include "1p"
+        expect(events.first).not_to have_class 'fc-draggable'
         events.first.click
 
         details = f('.event-details-content')

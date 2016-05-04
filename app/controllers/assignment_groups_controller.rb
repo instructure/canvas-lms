@@ -96,6 +96,10 @@ class AssignmentGroupsController < ApplicationController
   #  "assignment_visibility" & "submission" are only valid are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
+  # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
+  #  If "assignments" are included, those with the specified submission types
+  #  will be excluded from the assignment groups.
+  #
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
@@ -330,7 +334,16 @@ class AssignmentGroupsController < ApplicationController
       context,
       groups,
       assignment_includes
-    ).with_student_submission_count.all
+    )
+
+    if params[:exclude_assignment_submission_types].present?
+      exclude_types = params[:exclude_assignment_submission_types]
+      exclude_types = Array.wrap(exclude_types) &
+        %w(online_quiz discussion_topic wiki_page external_tool)
+      assignments = assignments.where.not(submission_types: exclude_types)
+    end
+
+    assignments = assignments.with_student_submission_count.all
 
     if params[:grading_period_id].present? && multiple_grading_periods?
       assignments = filter_assignments_by_grading_period(assignments, context)

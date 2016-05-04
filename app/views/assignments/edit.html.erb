@@ -12,13 +12,15 @@
   js_bundle :assignment_edit
 %>
 
-<div id="edit_assignment_header" class="header-bar">
-</div>
-
+<% if ConditionalRelease::Service.enabled_in_context?(@context) %>
+<div id="edit_assignment_header-cr" class="header-bar"></div>
+<% else %>
+<div id="edit_assignment_header" class="header-bar"></div>
 <div id="edit_assignment_wrapper">
   <form id="edit_assignment_form" class="form-horizontal bootstrap-form">
   </form>
 </div>
+<% end %>
 
 <%= render "groups/add_group_category" %>
 <%= render "shared/select_content_dialog", :only => [:external_tools], lti_app_placements: [Lti::ResourcePlacement::ASSIGNMENT_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] %>

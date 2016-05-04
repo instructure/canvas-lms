@@ -30,6 +30,8 @@
     "moment": "~2.10.6",
     "reflux": "~0.2.7",
     "axios": "~0.5.4",
-    "react-tabs": "https://github.com/rackt/react-tabs.git#1ad1031ec4a50784225a05611c4959d15745fc3d"
+    "react-tabs": "https://github.com/rackt/react-tabs.git#1ad1031ec4a50784225a05611c4959d15745fc3d",
+    "page": "visionmedia/page.js#~1.6.4",
+    "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81"
   }
 }

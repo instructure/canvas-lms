@@ -473,6 +473,25 @@ describe WikiPage do
       @page.restore
       expect(@page.reload).to be_unpublished
     end
+
+    it "should restore a linked assignment if enabled" do
+      course
+      @course.enable_feature!(:conditional_release)
+      wiki_page_assignment_model course: @course
+      @page.workflow_state = 'deleted'
+      @page.save!
+      expect(@assignment.reload).to be_deleted
+      @page.restore
+      expect(@page.reload).to be_unpublished
+      expect(@page.assignment).to be_unpublished
+    end
+
+    it "should not restore a linked assignment" do
+      wiki_page_assignment_model
+      @page.workflow_state = 'deleted'
+      expect { @page.save! }.not_to change { @assignment.workflow_state }
+      expect { @page.restore }.not_to change { @assignment.workflow_state }
+    end
   end
 
   describe "context_module_action" do
@@ -525,6 +544,71 @@ describe WikiPage do
       mod.workflow_state = 'unpublished'
       mod.save!
       expect(page.reload.locked_for?(@student)).not_to have_key :unlock_at
+    end
+  end
+
+  describe 'revised_at' do
+    before(:once) do
+      Timecop.freeze(1.hour.ago) do
+        course
+        @page = @course.wiki.wiki_pages.create! title: 'page'
+        @old_timestamp = @page.revised_at
+      end
+    end
+
+    it 'changes when the page title changes' do
+      @page.title = 'changed'
+      @page.save!
+      expect(@page.reload.revised_at).to be > @old_timestamp
+    end
+
+    it 'changes when the content changes' do
+      @page.body = 'changed'
+      @page.save!
+      expect(@page.reload.revised_at).to be > @old_timestamp
+    end
+
+    it "doesn't change when the page is touched" do
+      @page.touch
+      expect(@page.updated_at).to be > @old_timestamp
+      expect(@page.reload.revised_at).to eq @old_timestamp
+    end
+  end
+
+  describe "visible_to_students_in_course_with_da" do
+    before :once do
+      @course = course(:active_course => true)
+      @page_unassigned = wiki_page_model(:title => "plain old page", :course => @course)
+      @page_assigned = wiki_page_model(:title => "page with assignment", :course => @course)
+      @student1, @student2 = create_users(2, return_type: :record)
+
+      @assignment = @course.assignments.create!(:title => "page assignment", only_visible_to_overrides: true)
+      @assignment.submission_types = 'wiki_page'
+      @assignment.save!
+      @page_assigned.assignment_id = @assignment.id
+      @page_assigned.save!
+
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student1)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @course.reload
+    end
+
+    it "returns pages with no assignment" do
+      expect(WikiPage.visible_to_students_in_course_with_da([@student2.id], [@course.id]))
+        .to include @page_unassigned
+    end
+
+    it "does not return pages with assignment and no visibility" do
+      expect(WikiPage.visible_to_students_in_course_with_da([@student2.id], [@course.id]))
+        .not_to include @page_assigned
+    end
+
+    it "returns pages with assignment and student visibility" do
+      expect(WikiPage.visible_to_students_in_course_with_da([@student1.id], [@course.id]))
+        .to include @page_assigned, @page_unassigned
     end
   end
 end

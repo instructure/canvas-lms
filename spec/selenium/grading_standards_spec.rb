@@ -103,8 +103,8 @@ describe "grading standards" do
       expect(rows.length).to eq @standard.data.length
       rows.each_with_index do |r, idx|
         expect(r.find_element(:css, '.name').text).to eq @standard.data[idx].first
-        expect(r.find_element(:css, '.value').text).to eq(idx == 0 ? "100" : "< #{@standard.data[idx - 1].last * 100}")
-        expect(r.find_element(:css, '.next_value').text).to eq "#{@standard.data[idx].last * 100}"
+        expect(r.find_element(:css, '.value').text).to eq(idx == 0 ? "100" : "< #{round_if_whole(@standard.data[idx - 1].last * 100)}")
+        expect(r.find_element(:css, '.next_value').text).to eq "#{round_if_whole(@standard.data[idx].last * 100)}"
       end
       dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
       expect(dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).not_to be_displayed

@@ -5,89 +5,94 @@ define([
   "./UsersStore",
   "./UsersList",
   "./UsersToolbar",
-  "./renderSearchMessage"
-], function(React, I18n, _, UsersStore, UsersList, UsersToolbar, renderSearchMessage) {
+  "./renderSearchMessage",
+  "./store/configureStore",
+  "./actions/UserActions"
+], function(React, I18n, _, UsersStore, UsersList, UsersToolbar, renderSearchMessage, configureStore, UserActions) {
 
-  var MIN_SEARCH_LENGTH = 3;
+  const MIN_SEARCH_LENGTH = 3;
 
   var UsersPane = React.createClass({
     propTypes: {
-      accountId: React.PropTypes.string,
+      store: React.PropTypes.object
     },
 
-    getInitialState() {
-      var filters = {
-        search_term: ""
-      };
-
-      return {
-        filters,
-        draftFilters: filters,
-        errors: {}
-      }
+    getInitialState () {
+      return this.props.store.getState().userList;
     },
-
-    componentWillMount() {
-      UsersStore.addChangeListener(this.refresh);
+    componentDidMount () {
+      this.unsubscribe = this.props.store.subscribe(this.handleStateChange);
+      this.props.store.dispatch(UserActions.apiGetUsers());
     },
-
-    componentDidMount() {
-      this.fetchUsers();
+    componentWillUnmount () {
+      this.unsubscribe();
     },
-
-    componentWillUnmount() {
-      UsersStore.removeChangeListener(this.refresh);
+    handleStateChange () {
+      this.setState(this.props.store.getState().userList);
     },
-
-    fetchUsers() {
-      UsersStore.load(this.state.filters);
-    },
-
-    fetchMoreUsers() {
+    fetchMoreUsers () {
       UsersStore.loadMore(this.state.filters);
     },
-
-    onUpdateFilters(newFilters) {
-      this.setState({
-        errors: {},
-        draftFilters: _.extend({}, this.state.draftFilters, newFilters)
-      });
+    handleApplyingSearchFilter () {
+      this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH));
     },
-
-    onApplyFilters() {
-      var filters = this.state.draftFilters;
-      if (filters.search_term && filters.search_term.length < MIN_SEARCH_LENGTH) {
-        this.setState({errors: {search_term: I18n.t("Search term must be at least %{num} characters", {num: MIN_SEARCH_LENGTH})}})
-      } else {
-        this.setState({filters, errors: {}}, this.fetchUsers);
+    handleUpdateSearchFilter (searchFilter) {
+      this.props.store.dispatch(UserActions.updateSearchFilter(searchFilter));
+    },
+    handleSubmitEditUserForm (attributes, id) {
+      this.props.store.dispatch(UserActions.apiUpdateUser(attributes, id));
+    },
+    handleOpenEditUserDialog (user) {
+      this.props.store.dispatch(UserActions.openEditUserDialog(user));
+    },
+    handleCloseEditUserDialog (user) {
+      this.props.store.dispatch(UserActions.closeEditUserDialog(user));
+    },
+    handleGetMoreUsers () {
+      this.props.store.dispatch(UserActions.getMoreUsers());
+    },
+    handleAddNewUser (attributes) {
+      this.props.store.dispatch(UserActions.apiCreateUser(this.state.accountId, attributes));
+    },
+    handleAddNewUserFormErrors (errors) {
+      for (const key in errors) {
+        this.props.store.dispatch(UserActions.addError({[key]: errors[key]}));
       }
     },
-
-    refresh() {
-      this.forceUpdate();
-    },
-
-    render() {
-      var { filters, draftFilters, errors } = this.state;
-      var users = UsersStore.get(filters);
-      var isLoading = !(users && !users.loading);
-
+    render () {
+      const {next, timezones, accountId, users, isLoading, errors, searchFilter} = this.state;
+      const collection = {data: users, loading: isLoading, next: next};
       return (
         <div>
-          <UsersToolbar
-            onUpdateFilters={this.onUpdateFilters}
-            onApplyFilters={this.onApplyFilters}
-            isLoading={isLoading}
-            {...draftFilters}
-            errors={errors}
-            accountId={this.props.accountId}
-          />
+          {<UsersToolbar
+              onUpdateFilters={this.handleUpdateSearchFilter}
+              onApplyFilters={this.handleApplyingSearchFilter}
+              isLoading={isLoading}
+              errors={errors}
+              {...searchFilter}
+              accountId={accountId}
+              handlers={{
+                handleAddNewUser: this.handleAddNewUser,
+                handleAddNewUserFormErrors: this.handleAddNewUserFormErrors
+              }}
+              userList={this.state}
+          />}
 
-          {users && users.data &&
-            <UsersList accountId={this.props.accountId} users={users.data} />
+          {!_.isEmpty(users) &&
+            <UsersList
+              timezones={timezones}
+              accountId={accountId}
+              users={users}
+              handlers={{
+                handleSubmitEditUserForm: this.handleSubmitEditUserForm,
+                handleOpenEditUserDialog: this.handleOpenEditUserDialog,
+                handleCloseEditUserDialog: this.handleCloseEditUserDialog
+              }}
+              permissions={this.state.permissions}
+            />
           }
 
-          {renderSearchMessage(users, this.fetchMoreUsers, I18n.t("No users found"))}
+          {renderSearchMessage(collection, this.handleGetMoreUsers, I18n.t("No users found"))}
         </div>
       );
     }

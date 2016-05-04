@@ -208,7 +208,7 @@ class SubmissionsController < ApplicationController
 
     if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
       flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
-      redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
       return
     end
 

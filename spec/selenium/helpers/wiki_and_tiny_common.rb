@@ -193,10 +193,6 @@ module WikiAndTinyCommon
 
   def shift_click_button(selector)
     el = f(selector)
-    driver.action.move_to(el).click.perform
-    driver.action.key_down(:shift)
-        .click
-        .key_up(:shift)
-        .perform
+    driver.action.key_down(:shift).click(el).key_up(:shift).perform
   end
 end

@@ -18,7 +18,7 @@
 
 class Quizzes::QuizSubmissionSnapshot < ActiveRecord::Base
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
-  serialize_utf8_safe :data
+  serialize :data
 
   attr_accessible :quiz_submission, :attempt, :data
 end

@@ -55,7 +55,7 @@
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
         <% end %>
         <% if @submission.assignment.points_possible %>
-          <%= t('out_of_points', 'out of %{points_possible}', :points_possible => @submission.assignment.points_possible) %>
+          <%= t('out_of_points', 'out of %{points_possible}', :points_possible => round_if_whole(@submission.assignment.points_possible)) %>
         <% end %>
         <br/>
 

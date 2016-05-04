@@ -51,7 +51,7 @@
               <% if @at_least_one_due_at %>
                 <div class="due_at"><%= datetime_string(assignment.due_at) rescue nbsp %>&nbsp;</div>
               <% end %>
-              <div class="possible" style="float: left;"><%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => assignment.points_possible) if assignment.points_possible %></div>
+              <div class="possible" style="float: left;"><%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => round_if_whole(assignment.points_possible)) if assignment.points_possible %></div>
               <div class="options"><a href="#" class="options_dropdown no-hover"><%= image_tag "blank.png", :alt => '' %></a></div>
             </div>
           </td>

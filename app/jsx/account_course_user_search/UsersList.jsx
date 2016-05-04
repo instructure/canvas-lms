@@ -5,16 +5,19 @@ define([
   "./UsersListRow",
 ], function(React, I18n, _, UsersListRow) {
 
-  var { number, string, func, shape, arrayOf } = React.PropTypes;
+  var { string, array, object } = React.PropTypes;
 
   var UsersList = React.createClass({
     propTypes: {
-      accountId: React.PropTypes.string,
-      users: arrayOf(shape(UsersListRow.propTypes)).isRequired
+      accountId: string.isRequired,
+      users: array.isRequired,
+      timezones: object.isRequired,
+      permissions: object.isRequired,
+      handlers: object.isRequired
     },
 
     render() {
-      var { users } = this.props;
+      const { users, timezones, accountId } = this.props;
 
       return (
         <div className="content-box" role='grid'>
@@ -25,16 +28,32 @@ define([
             <div role='columnheader' className="col-md-3">
               <strong><small>{I18n.t("Email")}</small></strong>
             </div>
-            <div role='columnheader' className="col-md-3">
+            <div role='columnheader' className="col-xs-1">
               <strong><small>{I18n.t("SIS ID")}</small></strong>
             </div>
             <div role='columnheader' className="col-md-3">
               <strong><small>{I18n.t("Last Login")}</small></strong>
             </div>
+            <div role='columnheader' className="col-md-2">
+              <span className='screenreader-only'>{I18n.t("User option links")}</span>
+            </div>
           </div>
 
           <div className='users-list' role='rowgroup'>
-            {users.map((user) => <UsersListRow key={user.id} accountId={this.props.accountId} {...user} />)}
+            {
+              users.map((user) => {
+                return (
+                  <UsersListRow
+                    handlers={this.props.handlers}
+                    key={user.id}
+                    timezones={timezones}
+                    accountId={accountId}
+                    user={user}
+                    permissions={this.props.permissions}
+                  />
+                );
+              })
+            }
           </div>
         </div>
       );

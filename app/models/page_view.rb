@@ -382,7 +382,7 @@ class PageView < ActiveRecord::Base
     export_columns(format).map { |c| self.send(c).presence }
   end
 
-  # utility class to migrate a postgresql/mysql/sqlite3 page_views table to cassandra
+  # utility class to migrate a postgresql/sqlite3 page_views table to cassandra
   class CassandraMigrator < Struct.new(:start_at, :logger, :migration_data)
     # if you interrupt and re-start the migrator, start_at cannot be changed,
     # since it's saved in cassandra to persist the migration state

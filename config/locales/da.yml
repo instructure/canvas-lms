@@ -11985,7 +11985,6 @@ da:
   qti_img_matching_question: "Importerede matchende spørgsmål indeholder billeder på begge sider, hvilket ikke er understøttet"
   qti_img_matching_question_distractors: "Importerede matchende spørgsmål indeholder billeder indeni valg, og kan ikke blive ordnet, fordi det også indeholder forkerte spørgmål"
   qti_name: "QTI konverter"
-  qualified_locale: da-DK
   question_9121487: Spørgsmål
   question_answered: Besvaret
   question_bank: 

@@ -131,7 +131,7 @@ class GradeSummaryPresenter
     includes << :assignment_group if @assignment_order == :assignment_group
     visible_assignments = AssignmentGroup
       .visible_assignments(student, @context, groups, includes)
-      .where.not(submission_types: 'not_graded')
+      .where.not(submission_types: %w(not_graded wiki_page))
       .except(:order)
 
     if grading_period_id

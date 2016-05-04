@@ -150,18 +150,6 @@ YAML
     expect(YAML.load(psych_yaml)).to eq old_result
   end
 
-  it "should seamlessly dump yaml into a psych-compatible format (and be cross-compatible)" do
-    yaml = "--- \nsadness: \"\\xF0\\x9F\\x98\\x82\"\n"
-    hash = YAML.load(yaml)
-
-    psych_dump = "---\nsadness: \"\\U0001F602\"\n#{Syckness::TAG}"
-    expect(hash.to_yaml).to eq psych_dump
-    expect(YAML.dump(hash)).to eq psych_dump
-
-    expect(YAML.load(psych_dump)).to eq hash
-    expect(YAML.unsafe_load(psych_dump)).to eq hash
-  end
-
   it "should work with aliases" do
     hash = {:a => 1}.with_indifferent_access
     obj = {:blah => hash, :bloop => hash}.with_indifferent_access

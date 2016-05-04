@@ -222,7 +222,7 @@ module Importers
       migration.save
       ActiveRecord::Base.skip_touch_context(false)
       if course.changed?
-        course.save
+        course.save!
       else
         course.touch
       end
@@ -292,17 +292,32 @@ module Importers
     def self.shift_date_options(course, options={})
       return({remove_dates: true}) if Canvas::Plugin.value_to_boolean(options[:remove_dates])
       result = {}
+      remove_bad_end_dates!(options)
       result[:old_start_date] = Date.parse(options[:old_start_date]) rescue course.real_start_date
       result[:old_end_date] = Date.parse(options[:old_end_date]) rescue course.real_end_date
       result[:new_start_date] = Date.parse(options[:new_start_date]) rescue course.real_start_date
-      result[:new_end_date] = Date.parse(options[:new_end_date]) rescue course.real_end_date
+      result[:new_end_date] = Date.parse(options[:new_end_date]) rescue nil
+      # infer a new end date preserving course duration, instead of using the unshifted old end date
+      if result[:new_end_date].nil? && result[:new_start_date].present? &&
+         result[:old_end_date].present? && result[:old_start_date].present?
+        result[:new_end_date] = result[:new_start_date] + (result[:old_end_date] - result[:old_start_date])
+      end
       result[:day_substitutions] = options[:day_substitutions]
       result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
       time_zone = result[:time_zone] || Time.zone
-      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue course.real_start_date
-      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue course.real_end_date
+      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue result[:new_start_date]
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue result[:new_end_date]
       result
+    end
+
+    def self.remove_bad_end_dates!(options)
+      old_start = DateTime.parse(options[:old_start_date]) rescue nil
+      old_end   = DateTime.parse(options[:old_end_date]) rescue nil
+      options[:old_end_date] = nil if old_start && old_end && old_end < old_start
+      new_start = DateTime.parse(options[:new_start_date]) rescue nil
+      new_end   = DateTime.parse(options[:new_end_date]) rescue nil
+      options[:new_end_date] = nil if new_start && new_end && new_end < new_start
     end
 
     def self.shift_date(time, options={})

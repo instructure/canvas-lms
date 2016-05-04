@@ -5,7 +5,6 @@ require [
   # true modules that we manage in this file
   'Backbone'
   'compiled/helpDialog'
-  'compiled/tours'
 
   # modules that do their own thing on every page that simply need to
   # be required
@@ -25,6 +24,7 @@ require [
   'compiled/behaviors/activate'
   'compiled/behaviors/elementToggler'
   'compiled/behaviors/tooltip'
+  'compiled/behaviors/ic-super-toggle'
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
   'LtiThumbnailLauncher'
@@ -47,9 +47,8 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, _, Backbone, helpDialog, tours) ->
+], ($, _, Backbone, helpDialog) ->
   helpDialog.initTriggers()
-  tours.init()
 
   $('#skip_navigation_link').on 'click', ->
     $($(this).attr('href')).attr('tabindex', -1).focus()

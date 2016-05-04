@@ -35,6 +35,17 @@
         </select>
         {{#t "editing_roles.can_edit_page"}}can edit this page{{/t}}
       </div>
+      {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
+        <div class="controls">
+          <label class="checkbox" for="conditional_content">
+            {{checkbox "assignment.set_assignment"
+              id="conditional_content"
+              class="element_toggler"
+              checked=set_assignment}}
+            {{#t}}Conditional content{{/t}}
+          </label>
+        </div>
+      {{/if}}
     </div>
   {{/if}}
 </div>

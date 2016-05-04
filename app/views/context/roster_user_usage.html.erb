@@ -17,7 +17,7 @@
 #usage_report th {
   padding: 2px 5px;
   border-bottom: 1px dotted #888;
-  
+
 }
 #usage_report td {
   padding: 8px 5px;
@@ -41,7 +41,7 @@
 }
 #usage_report .wiki_page .type_icon {
   background: url(/images/file.png) no-repeat left 50%;
-}  
+}
 #usage_report .attachment .type_icon {
   background-image: url(/images/file_download.png);
 }
@@ -73,7 +73,7 @@
           <span class="type_icon" title="<%= access.asset.class if access.asset %>"><%= image_tag "blank.png", :alt => '', :style => "height: 20px;" %></span>
           <span class="readable_name"><%= access.readable_name %></span>
         </td>
-        <td class="view_score"><%= access.corrected_view_score %></td>
+        <td class="view_score"><%= round_if_whole(access.corrected_view_score) %></td>
         <td class="participate_score"><%= access.participate_score %></td>
         <td class="last_viewed time_ago_date" data-timestamp="<%= access.last_access.try_rescue(:iso8601) %>"><%= datetime_string(access.last_access) %></td>
       </tr>

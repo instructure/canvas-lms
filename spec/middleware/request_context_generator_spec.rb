@@ -41,7 +41,7 @@ describe "RequestContextGenerator" do
       [ 200, {}, [] ]
     }).call(env)
     f = pv.created_at.try(:utc).try(:iso8601, 2)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5;p=f;f=#{f};"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5.0;p=f;f=#{f};"
   end
 
   it "should generate a request_id and store it in Thread.current" do

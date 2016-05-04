@@ -11921,7 +11921,6 @@ de:
   qti_img_matching_question: "Importierte übereinstimmende Frage enthält auf beiden Seiten Bilder. Dies wird nicht unterstützt."
   qti_img_matching_question_distractors: "Importierte übereinstimmende Frage enthält Bilder in den Auswahlmöglichkeiten und konnte nicht korrigiert werden, da sie außerdem falsche Antworten enthält."
   qti_name: "QTI Converter"
-  qualified_locale: de-DE
   question_9121487: Frage
   question_answered: Beantwortet
   question_bank: 

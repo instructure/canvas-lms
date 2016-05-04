@@ -144,7 +144,7 @@ describe ContextModule do
         get @test_url
         expect(response).to be_success
         html = Nokogiri::HTML(response.body)
-        expect(html.css('#test_content').length).to eq(0)
+        expect(html.css('#test_content').length).to eq(@test_content_length || 0)
 
         # complete first module's requirements
         p1 = @mod1.evaluate_for(@student)

@@ -139,8 +139,13 @@ class WikiPagesApiController < ApplicationController
   before_filter :get_wiki_page, :except => [:create, :index]
   before_filter :require_wiki_page, :except => [:create, :update, :update_front_page, :index]
   before_filter :was_front_page, :except => [:index]
+  before_filter only: [:show, :update, :destroy, :revisions, :show_revision, :revert] do
+    check_differentiated_assignments(@page) if @context.feature_enabled?(:conditional_release)
+  end
 
   include Api::V1::WikiPage
+  include Api::V1::Assignment
+  include SubmittableHelper
 
   # @API Show front page
   #
@@ -225,7 +230,9 @@ class WikiPagesApiController < ApplicationController
         scope = scope.not_deleted
       end
 
-      scope = WikiPages::ScopedToUser.new(@context.wiki, @current_user, scope).scope
+      @context.shard.activate do
+        scope = WikiPages::ScopedToUser.new(@context.wiki, @current_user, scope).scope
+      end
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
@@ -293,6 +300,7 @@ class WikiPagesApiController < ApplicationController
 
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
+        apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
       else
         render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -364,6 +372,7 @@ class WikiPagesApiController < ApplicationController
       if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
+        apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
       else
         render :json => @page.errors, :status => update_params.is_a?(Symbol) ? update_params : :bad_request
@@ -611,6 +620,10 @@ class WikiPagesApiController < ApplicationController
     page_params[:user_id] = @current_user.id if @current_user
     page_params[:body] = process_incoming_html_content(page_params[:body]) if page_params.include?(:body)
     page_params
+  end
+
+  def assignment_params
+    params[:wiki_page] && params[:wiki_page][:assignment]
   end
 
   def process_front_page

@@ -24,9 +24,40 @@ module ConditionalRelease
       enabled: false, # required
       host: nil,      # required
       protocol: nil,  # defaults to Canvas
-      configure_defaults_app_path: 'javascripts/edit_defaults.js',
-      edit_object_score_ranges_path: 'javascripts/edit_object_score_ranges.js',
+      edit_rule_path: "api/editor",
+      create_account_path: 'api/account',
     }.freeze
+
+    def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
+      enabled = self.enabled_in_context?(context)
+      env = {
+        CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
+      }
+      if enabled && user
+        env.merge!({
+          CONDITIONAL_RELEASE_ENV: {
+            jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
+            assignment: assignment_attributes(assignment),
+            edit_rule_url: edit_rule_url
+          }
+        })
+      end
+      env
+    end
+
+    def self.jwt_for(context, user, domain, claims: {}, session: nil, real_user: nil)
+      Canvas::Security::ServicesJwt.generate(
+        claims.merge({
+          sub: user.id.to_s,
+          account_id: Context.get_account(context).root_account.lti_guid.to_s,
+          context_type: context.class.name,
+          context_id: context.id.to_s,
+          role: find_role(user, session, context),
+          workflow: 'conditonal-release-api',
+          canvas_token: Canvas::Security::ServicesJwt.for_user(domain, user, real_user: real_user, workflow: 'conditional-release')
+        })
+      )
+    end
 
     def self.reset_config_cache
       @config = nil
@@ -36,16 +67,20 @@ module ConditionalRelease
       @config ||= DEFAULT_CONFIG.merge(config_file)
     end
 
-    def self.enabled?
-      config[:enabled] && config[:host]
+    def self.configured?
+      !!(config[:enabled] && config[:host])
     end
 
-    def self.configure_defaults_url
-      build_url configure_defaults_app_path
+    def self.enabled_in_context?(context)
+      !!(configured? && context.feature_enabled?(:conditional_release))
     end
 
-    def self.edit_object_score_ranges_url
-      build_url edit_object_score_ranges_path
+    def self.edit_rule_url
+      build_url edit_rule_path
+    end
+
+    def self.create_account_url
+      build_url create_account_path
     end
 
     def self.protocol
@@ -56,23 +91,51 @@ module ConditionalRelease
       config[:host]
     end
 
-    def self.configure_defaults_app_path
-      config[:configure_defaults_app_path]
+    def self.unique_id
+      config[:unique_id] || "conditional-release-service@instructure.auth"
     end
 
-    def self.edit_object_score_ranges_path
-      config[:edit_object_score_ranges_path]
+    def self.edit_rule_path
+      config[:edit_rule_path]
     end
 
-    def self.config_file
-      ConfigFile.load('conditional_release').try(:symbolize_keys) || {}
+    def self.create_account_path
+      config[:create_account_path]
     end
-    private_class_method :config_file
 
-    def self.build_url(path)
-      "#{protocol}://#{host}/#{path}"
+    class << self
+      private
+      def config_file
+        ConfigFile.load('conditional_release').try(:symbolize_keys) || {}
+      end
+
+      def build_url(path)
+        "#{protocol}://#{host}/#{path}"
+      end
+
+      def find_role(user, session, context)
+        if Context.get_account(context).grants_right? user, session, :manage
+          'admin'
+        elsif context.is_a?(Course) && context.grants_right?(user, session, :manage_assignments)
+          'teacher'
+        elsif context.grants_right? user, session, :read
+          'student'
+        end
+      end
+
+      def assignment_attributes(assignment)
+        return nil unless assignment.present?
+        {
+          id: assignment.id,
+          title: assignment.title,
+          description: assignment.description,
+          points_possible: assignment.points_possible,
+          min_score: assignment.min_score,
+          max_score: assignment.max_score,
+          grading_type: assignment.grading_type,
+          submission_types: assignment.submission_types
+        }
+      end
     end
-    private_class_method :build_url
   end
-
 end

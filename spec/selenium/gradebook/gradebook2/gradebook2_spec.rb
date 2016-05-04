@@ -106,7 +106,7 @@ describe "gradebook2" do
     end
   end
 
-  it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 210029 do
+  it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 164217 do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
@@ -270,7 +270,7 @@ describe "gradebook2" do
     keep_trying_until { expect(ffj('.late').count).to eq 1 }
   end
 
-  it "should not display a speedgrader link for large courses" do
+  it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do
     Course.any_instance.stubs(:large_roster?).returns(true)
 
     get "/courses/#{@course.id}/gradebook2"

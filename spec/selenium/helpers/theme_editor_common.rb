@@ -160,12 +160,15 @@ module ThemeEditorCommon
 
   def create_theme(color = 'random')
     click_global_branding
+    wait_for_ajaximations
     all_colors(all_global_branding, color)
 
     click_global_navigation
+    wait_for_ajaximations
     all_colors(all_global_navigation, color)
 
     click_watermarks_and_other_images
+    wait_for_ajaximations
     all_colors(all_watermarks, color)
   end
 end

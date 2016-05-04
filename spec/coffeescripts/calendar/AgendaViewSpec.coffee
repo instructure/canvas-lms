@@ -114,7 +114,7 @@ define [
     equal @container.find('.ig-row').length, 70, 'finds 70 ig-rows'
 
   test 'renders non-assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 
@@ -126,7 +126,7 @@ define [
     ok @container.find('.ig-details').slice(2, 3).text().match(/13:00/), 'formats according to locale'
 
   test 'renders assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 

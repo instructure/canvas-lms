@@ -13,12 +13,12 @@ define([
   "compiled/jquery.rails_flash_notifications"
 ], function($, React, _, I18n, userUtils, Modal, ModalContent, ModalButtons, UsersStore, IcInput, IcCheckbox) {
 
-  var { arrayOf } = React.PropTypes;
+  var { object } = React.PropTypes;
 
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -32,6 +32,11 @@ define([
   };
 
   var NewUserModal = React.createClass({
+
+    propTypes: {
+      userList: object.isRequired
+    },
+
     getInitialState() {
       return {
         isOpen: false,
@@ -52,7 +57,7 @@ define([
       var { data } = this.state;
       var newData = {};
       newData[field] = value;
-      if (field == 'name') {
+      if (field === 'name') {
         // shamelessly copypasted from user_sortable_name.js
         var sortable_name_parts = userUtils.nameParts(data.sortable_name);
         if ($.trim(data.sortable_name) == '' || userUtils.firstNameFirst(sortable_name_parts) == $.trim(data.name)) {
@@ -70,12 +75,13 @@ define([
 
     onSubmit() {
       var { data } = this.state;
+
+      // Basic client side validation
       var errors = {}
       if (!data.name) errors.name = I18n.t("Full name is required");
       if (!data.email) errors.email = I18n.t("Email is required");
       if (Object.keys(errors).length) {
-        this.setState({ errors });
-        return;
+        return this.props.handlers.handleAddNewUserFormErrors(errors);
       }
 
       var url = `/accounts/${window.ENV.ACCOUNT_ID}/users`
@@ -86,23 +92,16 @@ define([
           send_confirmation: data.send_confirmation
         }
       };
-      return $.ajaxJSON(url, "POST", params,
-        () => {
-          UsersStore.clearState();
-          if (UsersStore.lastParams) UsersStore.load(UsersStore.lastParams);
-          this.closeModal();
-          $.flashMessage(I18n.t("%{user_name} successfully added!", {user_name: data.name}));
-        },
-        (result) => {
-          if (result.errors && result.errors.pseudonym) {
-            this.setState({ errors: {email: I18n.t("Email is invalid or in use") }});
-          }
-        }
-      );
+
+      this.props.handlers.handleAddNewUser(params)
+      this.setState({
+        isOpen: false
+      });
     },
 
     render() {
-      var { data, isOpen, errors } = this.state;
+      var { data, isOpen } = this.state;
+      let {errors} = this.props.userList;
       var onChange = (field) => {
         return (e) => this.onChange(field, e.target.value);
       };

@@ -349,9 +349,9 @@ define([
         this.form.submit();
     });
 
-    $("#show_all_details_link").click(function(event) {
+    $("#show_all_details_button").click(function(event) {
       event.preventDefault();
-      $button = $('#show_all_details_link');
+      $button = $('#show_all_details_button');
       $button.toggleClass('showAll');
 
       if ($button.hasClass('showAll')) {

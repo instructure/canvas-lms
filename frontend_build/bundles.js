@@ -73,7 +73,6 @@ entries['instructure-common'] = [
   'compiled/models/User',
   'compiled/PandaPub',
   'compiled/registration/incompleteRegistrationWarning',
-  'compiled/tours',
   'compiled/util/brandableCss',
   'compiled/util/DateValidator',
   'compiled/util/PandaPubPoller',

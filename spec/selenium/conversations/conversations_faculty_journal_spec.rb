@@ -152,8 +152,13 @@ describe "conversations new" do
     it "should have the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
       skip_if_chrome('Fragile in Chrome')
       f('#compose-btn').click
+      wait_for_ajaximations
       expect(f('.user_note')).not_to be_displayed
-      compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
+
+      select_message_course(@course)
+      add_message_recipient(@s1)
+      write_message_body('Give the Turkey his day')
+
       expect(f('.user_note')).to be_displayed
       add_message_recipient(@s2)
       checkbox = f('.user_note')
@@ -169,8 +174,12 @@ describe "conversations new" do
     it "should have the Journal entry checkbox visible", priority: "1", test_id: 75008 do
       skip_if_chrome('Fragile in Chrome')
       f('#compose-btn').click
+      wait_for_ajaximations
       expect(f('.user_note')).not_to be_displayed
-      compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
+
+      select_message_course(@course)
+      add_message_recipient(@s1)
+      write_message_body('Give the Turkey his day')
       expect(f('.user_note')).to be_displayed
       add_message_recipient(@s2)
       expect(f('.user_note')).to be_displayed

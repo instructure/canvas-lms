@@ -23,7 +23,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, polymorphic:
     [:course, :group, :conversation_message, :account, :assignment,
-     :assessment_question, :zip_file_import, { context_user: 'User' }], exhaustive: false
+     :assessment_question, { context_user: 'User' }], exhaustive: false
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 

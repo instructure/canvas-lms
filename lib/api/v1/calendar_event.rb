@@ -65,10 +65,18 @@ module Api::V1::CalendarEvent
     end
 
     if event.effective_context_code
-      if appointment_group
-        common_context_codes = common_ag_context_codes(appointment_group, user, event, include_child_events)
-        hash['context_code'] = (event.effective_context_code.split(',') & common_context_codes).first
-        hash['effective_context_code'] = hash['context_code']
+      if appointment_group && include_child_events
+        common_context_codes = common_ag_context_codes(appointment_group, user, event)
+        effective_context_code = (event.effective_context_code.split(',') & common_context_codes).first
+        if effective_context_code
+          hash['context_code'] = hash['effective_context_code'] = effective_context_code
+        else
+          # the teacher has no courses in common with the signups
+          include_child_events = false
+          hash["child_events"] = []
+          hash["child_events_count"] = 0
+          hash['effective_context_code'] = event.effective_context_code
+        end
       else
         hash['effective_context_code'] = event.effective_context_code
       end
@@ -208,17 +216,15 @@ module Api::V1::CalendarEvent
 
   private
 
-  # find context codes shared by the viewing user and the user signed up (if any),
-  # falling back on the viewing user's contexts
-  def common_ag_context_codes(appointment_group, user, event, include_child_events)
+  # find context codes shared by the viewing user and the user signed up,
+  # falling back on the viewing user's contexts if no users are signed up
+  def common_ag_context_codes(appointment_group, user, event)
     codes_for_user = appointment_group.context_codes_for_user(user)
 
-    event_user = event.user
-    event_user ||= infer_user_from_child_events(event.child_events) if include_child_events
+    event_user = event.user || infer_user_from_child_events(event.child_events)
     if event_user
       codes_for_event_user = appointment_group.context_codes_for_user(event_user)
-      common_codes = codes_for_user & codes_for_event_user
-      return common_codes if common_codes.any?
+      return codes_for_user & codes_for_event_user
     end
     codes_for_user
   end

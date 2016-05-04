@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
-  // var d3 = require('d3');
   var _ = require('lodash');
   var I18n = require('i18n!quiz_statistics.answers_tables');
   var UserListDialog = require('jsx!./../user_list_dialog');
@@ -30,13 +29,17 @@ define(function(require) {
     },
 
     renderBarPlot: function() {
+      var checkAltText = I18n.t('correct check icon');
+
       return (
         <div
           key={this.props.datum.id}
           className={this.getBarClass()}
           style={this.getBarStyles()}
+          alt={I18n.t('Graph bar')}
+          title={this.props.datum.correct ? I18n.t('Correct Answer') : I18n.t('Incorrect Answer')}
         >
-          { this.props.datum.correct && <i className="icon-check"/> }
+          { this.props.datum.correct && <i className="icon-check" alt={checkAltText}/> }
         </div>
 
       );
@@ -87,16 +90,20 @@ define(function(require) {
     render: function() {
       var datum = this.props.datum;
       var answerText = this.props.globalSettings.useAnswerBuckets ? this.getScoreValueDescription(datum) : datum.answer.text;
+      // describedby doesn't seem to be working so I'm simulating what it would be doing with an aria-label
+      var answerLabel = this.props.datum.correct ? I18n.t("%{answer}, (Correct answer)", {answer: answerText}) : I18n.t("%{answer}, (Incorrect answer)", {answer: answerText})
+
       return (
-        <tr className={datum.correct ? 'correct' : undefined}>
+        <tr className={datum.correct ? 'correct' : undefined} >
           <th scope="row" className="answer-textfield">
-            {answerText}
+            <span className='screenreader-only'>{answerLabel}</span>
+            <span className="answerText" aria-hidden='true'>{answerText}</span>
           </th>
           <td className="respondent-link">
             {this.dialogBuilder(datum.answer)}
           </td>
           <td className="answer-ratio">
-            {datum.answer.ratio} <sup>%</sup>
+            {datum.answer.ratio} <sup>{I18n.t('%')}</sup>
           </td>
           <td className="answer-distribution-cell" aria-hidden style={{width: this.props.globalSettings.maxWidth}}>
             {this.renderBarPlot()}

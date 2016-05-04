@@ -116,8 +116,10 @@ module DiscussionsCommon
   end
 
   def set_checkbox(selector, check)
-    cb = fj(selector + (check ? ':not(:checked)' : ':checked'))
-    driver.action.move_to(cb).click.perform
+    cb = fj('#' + selector + (check ? ':not(:checked)' : ':checked'))
+    if cb
+      f("label[for=#{selector}]").click # have to click on the label because the input isn't visible
+    end
   end
 
   def filter(opts)
@@ -127,12 +129,12 @@ module DiscussionsCommon
     # logic for dealing with options
       case opts
       when {:only_graded=>true}
-        set_checkbox('#onlyGraded', opts[:only_graded])
+        set_checkbox('onlyGraded', opts[:only_graded])
       when {:only_unread=>true}
-        set_checkbox('#onlyUnread', opts[:only_unread])
+        set_checkbox('onlyUnread', opts[:only_unread])
       when {:only_unread=>true, :only_graded=>true}
-        set_checkbox('#onlyGraded', opts[:only_graded])
-        set_checkbox('#onlyUnread', opts[:only_unread])
+        set_checkbox('onlyGraded', opts[:only_graded])
+        set_checkbox('onlyUnread', opts[:only_unread])
       end
     wait_for_animations
   end

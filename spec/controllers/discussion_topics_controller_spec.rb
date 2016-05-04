@@ -198,6 +198,14 @@ describe DiscussionTopicsController do
                                   :set => @section)
       end
 
+      it "doesn't show the topic to unassigned students" do
+        @topic.assignment.update_attribute(:only_visible_to_overrides, true)
+        user_session(@student)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_redirect
+        expect(response.location).to eq course_discussion_topics_url @course
+      end
+
       it "doesn't show overrides to students" do
         user_session(@student)
         get 'show', :course_id => @course.id, :id => @topic.id
@@ -459,6 +467,34 @@ describe DiscussionTopicsController do
       due_at = 1.day.from_now
       get 'new', course_id: @course.id, due_at: due_at.iso8601
       expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:assignment][:due_at]).to eq due_at.iso8601
+    end
+  end
+
+  describe "GET 'edit'" do
+    before(:once) do
+      course_topic
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context 'conditional-release' do
+      it 'should include environment variables if enabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env[:dummy]).to eq 'value'
+      end
+
+      it 'should not include environment variables when disabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env).not_to have_key :dummy
+      end
     end
   end
 

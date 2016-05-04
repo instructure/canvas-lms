@@ -201,6 +201,14 @@ describe GradebookExporter do
 
       expect([rows[1]["ID"], rows[2]["ID"]]).to match_array([student1.id.to_s, student2.id.to_s])
     end
+
+    it 'handles gracefully any assignments with nil position' do
+      course.assignments.create! title: 'assignment #1'
+      assignment = course.assignments.create! title: 'assignment #2'
+      assignment.update_attribute(:position, nil)
+
+      expect { exporter.to_csv }.not_to raise_error
+    end
   end
 
   context "a course with a student whose name starts with an equals sign" do

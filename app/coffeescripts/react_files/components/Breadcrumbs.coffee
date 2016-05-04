@@ -3,16 +3,14 @@ define [
   'jquery'
   'underscore'
   'react'
-  'react-router'
   'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes'
-], (I18n, $, _, React, ReactRouter, BreadcrumbCollapsedContainerComponent, withReactElement, customPropTypes) ->
+], (I18n, $, _, React, BreadcrumbCollapsedContainerComponent, withReactElement, customPropTypes) ->
 
   MAX_CRUMB_WIDTH = 500
   MIN_CRUMB_WIDTH = if window.ENV.use_new_styles then 80 else 40
 
-  Link =   ReactRouter.Link
   BreadcrumbCollapsedContainer =   BreadcrumbCollapsedContainerComponent
 
   Breadcrumbs =
@@ -20,8 +18,7 @@ define [
 
     propTypes:
       rootTillCurrentFolder: React.PropTypes.arrayOf(customPropTypes.folder)
-
-    mixins: [ReactRouter.State]
+      contextAssetString: React.PropTypes.string.isRequired
 
     getInitialState: ->
       {

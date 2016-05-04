@@ -6,7 +6,7 @@ module Selinimum
     class CSSDetector < JSDetector
       DIRECTORY = "app/stylesheets"
 
-      def can_process?(file)
+      def can_process?(file, _)
         file =~ %r{\Aapp/stylesheets/.*css\z}
       end
 

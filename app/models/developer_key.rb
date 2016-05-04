@@ -33,6 +33,7 @@ class DeveloperKey < ActiveRecord::Base
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_save :nullify_empty_tool_id
+  after_save :clear_cache
 
   validates_as_url :redirect_uri
 
@@ -73,12 +74,26 @@ class DeveloperKey < ActiveRecord::Base
 
   def authorized_for_account?(target_account)
     return true unless account_id
-    account_ids = target_account.account_chain.map{|acct| acct.global_id}
-    account_ids.include? account.global_id
+    target_account.id == account_id
   end
 
   def account_name
     account.try(:name)
+  end
+
+  class << self
+    def find_cached(id)
+      global_id = Shard.global_id_for(id)
+      MultiCache.fetch("developer_key/#{global_id}") do
+        Shackles.activate(:slave) do
+          DeveloperKey.find(global_id)
+        end
+      end
+    end
+  end
+
+  def clear_cache
+    MultiCache.delete("developer_key/#{global_id}")
   end
 
   def self.get_special_key(default_key_name)

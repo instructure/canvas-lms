@@ -24,6 +24,13 @@ require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/test_setup/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/test_setup/selenium_driver_setup')
 
+if ENV["TESTRAIL_RUN_ID"]
+  require 'testrailtagging'
+  RSpec.configure do |config|
+    TestRailRSpecIntegration.register_rspec_integration(config,:canvas, add_formatter: false)
+  end
+end
+
 Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
 
 include I18nUtilities
@@ -161,6 +168,11 @@ shared_context "in-process server selenium tests" do
     Rails.logger.capture_messages do
       example.run
     end
+  end
+
+  before do |example|
+    start_capturing_video
+    move_mouse_to_known_position
   end
 
   after(:each) do |example|

@@ -60,7 +60,7 @@ class Announcement < DiscussionTopic
 
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { active_participants(true) - [user] }
+    to { users_with_permissions(active_participants(true) - [user]) }
     whenever { |record|
       record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
@@ -100,7 +100,7 @@ class Announcement < DiscussionTopic
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }
     can :create
 
-    given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
+    given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } #admins.include?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given do |user, session|

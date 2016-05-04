@@ -283,6 +283,27 @@ describe "better_file_browsing" do
     end
   end
 
+  context "File Preview" do
+    before(:each) do
+      course_with_teacher_logged_in
+      add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
+               @course, "a_file.txt")
+      add_file(fixture_file_upload('files/b_file.txt', 'text/plain'),
+               @course, "b_file.txt")
+      get "/courses/#{@course.id}/files"
+    end
+
+    it "should switch files in preview when clicking the arrows" do
+      fln("a_file.txt").click
+      ff('.ef-file-preview-container-arrow-link')[0].click
+      wait_for_ajaximations
+      expect(f('.ef-file-preview-header-filename').text).to eq('b_file.txt')
+      ff('.ef-file-preview-container-arrow-link')[1].click
+      wait_for_ajaximations
+      expect(f('.ef-file-preview-header-filename').text).to eq('a_file.txt')
+    end
+  end
+
   context "Usage Rights Dialog" do
     def set_usage_rights_in_modal(rights = 'creative_commons')
       set_value f('.UsageRightsSelectBox__select'), rights

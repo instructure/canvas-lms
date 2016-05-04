@@ -123,7 +123,7 @@ describe GradingStandard do
 
   context "score_to_grade" do
     it "should compute correct grades" do
-      input = [['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.55], ['M', 0.00]]
+      input = [['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.555], ['E', 0.545], ['M', 0.00]]
       standard = GradingStandard.new
       standard.data = input
       expect(standard.score_to_grade(1005)).to eql("A")
@@ -142,6 +142,8 @@ describe GradingStandard do
       expect(standard.score_to_grade(69.5)).to eql("C")
       expect(standard.score_to_grade(69.499)).to eql("D")
       expect(standard.score_to_grade(60)).to eql("D")
+      expect(standard.score_to_grade(55.5)).to eql("D")
+      expect(standard.score_to_grade(54.5)).to eql("E")
       expect(standard.score_to_grade(50)).to eql("M")
       expect(standard.score_to_grade(0)).to eql("M")
       expect(standard.score_to_grade(-100)).to eql("M")

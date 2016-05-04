@@ -1,13 +1,12 @@
 define [
   'jquery'
   'react'
-  'react-router'
   'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
   '../mockFilesENV'
   '../../helpers/stubRouterContext'
-], ($, React, ReactRouter, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
+], ($, React, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
   simulate = React.addons.TestUtils.Simulate
   simulateNative = React.addons.TestUtils.SimulateNative
   TestUtils = React.addons.TestUtils

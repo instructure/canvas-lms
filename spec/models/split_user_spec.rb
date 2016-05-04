@@ -25,6 +25,20 @@ describe SplitUsers do
       expect(pseudonym3.user).to eq user2
     end
 
+    it 'should not split if the data is too old' do
+      pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
+      pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
+      Timecop.travel(93.days.ago) do
+        UserMerge.from(user2).into(user1)
+      end
+
+      expect(SplitUsers.split_db_users(user1)).to eq []
+
+      expect(user2.workflow_state).to eq 'deleted'
+      expect(pseudonym1.reload.user).to eq user1
+      expect(pseudonym2.reload.user).to eq user1
+    end
+
     describe 'with merge data' do
 
       it 'should split multiple users if no merge_data is specified' do

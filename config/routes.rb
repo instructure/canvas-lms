@@ -76,7 +76,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :files do
-    resources :files do
+    resources :files, :except => [:new] do
       get 'inline' => 'files#text_show', as: :text_inline
       get 'download' => 'files#show', download: '1'
       get 'download.:type' => 'files#show', as: :typed_download, download: '1'
@@ -150,11 +150,6 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-  concern :zip_file_imports do
-    resources :zip_file_imports, only: [:new, :create, :show]
-    get 'imports/files' => 'content_imports#files', as: :import_files
-  end
-
   # There are a lot of resources that are all scoped to the course level
   # (assignments, files, wiki pages, user lists, forums, etc.).  Many of
   # these resources also apply to groups and individual users.  We call
@@ -216,7 +211,6 @@ CanvasRails::Application.routes.draw do
 
     get 'attendance' => 'gradebooks#attendance'
     get 'attendance/:user_id' => 'gradebooks#attendance', as: :attendance_user
-    concerns :zip_file_imports
 
     # DEPRECATED old migration emails pointed the user to this url, leave so the controller can redirect
     get 'imports/list' => 'content_imports#index', as: :import_list
@@ -488,7 +482,6 @@ CanvasRails::Application.routes.draw do
     concerns :discussions
     resources :calendar_events
     concerns :files, :file_images, :relative_files, :folders
-    concerns :zip_file_imports
 
     resources :external_tools, only: :show do
       collection do
@@ -712,13 +705,10 @@ CanvasRails::Application.routes.draw do
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
   get 'search/all_courses' => 'search#all_courses'
-  delete 'tours/dismiss/:name' => 'tours#dismiss', as: :dismiss_tour
-  delete 'tours/dismiss/session/:name' => 'tours#dismiss_session', as: :dismiss_tour_session
   resources :users do
     match 'masquerade', via: [:get, :post]
     delete :delete
     concerns :files, :file_images
-    concerns :zip_file_imports
 
     resources :page_views, only: :index
     resources :folders do
@@ -824,6 +814,7 @@ CanvasRails::Application.routes.draw do
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
   post 'object_snippet' => 'context#object_snippet'
+  get 'saml2' => 'accounts#saml_meta_data'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports
@@ -841,7 +832,7 @@ CanvasRails::Application.routes.draw do
   # top-level assignments available, maybe we should change the specs instead.
   resources :assignments, only: [:index, :show]
 
-  resources :files do
+  resources :files, :except => [:new] do
     get 'download' => 'files#show', download: '1'
   end
 
@@ -1188,6 +1179,7 @@ CanvasRails::Application.routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
+      post 'users/:id/split', controller: 'users', action: 'split'
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
@@ -1304,6 +1296,8 @@ CanvasRails::Application.routes.draw do
       post 'users/:user_id/communication_channels/:id', action: :reset_bounce_count, as: 'reset_bounce_count'
       get 'accounts/:account_id/bouncing_communication_channels.csv', action: :bouncing_channel_report
       post 'accounts/:account_id/bouncing_communication_channels/reset', action: :bulk_reset_bounce_counts
+      get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report
+      post 'accounts/:account_id/unconfirmed_communication_channels/confirm', action: :bulk_confirm
       delete 'users/:user_id/communication_channels/:id', action: :destroy
       delete 'users/:user_id/communication_channels/:type/:address', action: :destroy, constraints: { address: %r{[^/?]+} }
     end
@@ -1402,6 +1396,9 @@ CanvasRails::Application.routes.draw do
     scope(controller: :files) do
       post 'files/:id/create_success', action: :api_create_success
       get 'files/:id/create_success', action: :api_create_success
+      match '/api/v1/files/:id/create_success', via: [:options], action: :api_create_success_cors
+
+
       # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
       get 'files/:id', action: :api_show, as: 'attachment'
       delete 'files/:id', action: :destroy
@@ -1802,6 +1799,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :jwts) do
       post 'jwts', action: :create
+    end
+
+    scope(controller: :gradebook_settings) do
+      put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
     end
   end
 

@@ -49,7 +49,7 @@ define [
 
   test "should localize start date", ->
     I18nStubber.pushFrame()
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'date.formats.full': '%-d %b %Y %-k:%M'
 

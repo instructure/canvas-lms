@@ -405,8 +405,8 @@ describe CoursesController, type: :request do
     it "should return courses from observed user's shard if different than observer" do
       parent = nil
       @shard2.activate do
-        parent = User.create
-        parent.account.id = (@me.account.id + 1)
+        a = Account.create
+        parent = user_with_pseudonym(name: 'Zombo', username: 'nobody2@example.com', account: a)
         parent.user_observees.create! do |uo|
           uo.user_id = @me.id
         end

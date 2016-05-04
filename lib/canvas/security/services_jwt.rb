@@ -23,7 +23,7 @@ module Canvas
         else
           Canvas::Security.base64_decode(token_string)
         end
-        Canvas::Security.decrypt_services_jwt(original_crypted_token)
+        Canvas::Security.decrypt_services_jwt(original_crypted_token, signing_secret, encryption_secret)
       end
 
       def id
@@ -49,7 +49,7 @@ module Canvas
         Canvas::Security.base64_encode(crypted_token)
       end
 
-      def self.for_user(domain, user, real_user: nil)
+      def self.for_user(domain, user, real_user: nil, workflow: nil)
         if domain.blank? || user.nil?
           raise ArgumentError, "Must have a domain and a user to build a JWT"
         end
@@ -59,6 +59,7 @@ module Canvas
           domain: domain
         }
         payload[:masq_sub] = real_user.global_id if real_user
+        payload[:workflow] = workflow if workflow
         generate(payload)
       end
 

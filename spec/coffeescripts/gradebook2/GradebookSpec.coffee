@@ -646,8 +646,8 @@ define [
     setupThis:(options) ->
       options = options || {}
       defaults = {
-        show_concluded_enrollments: false
-        show_inactive_enrollments: false
+        showConcludedEnrollments: false
+        showInactiveEnrollments: false
       }
       _.defaults options, defaults
 
@@ -658,13 +658,13 @@ define [
     equal @studentsUrl.call(@setupThis()), 'students_url'
 
   test 'when concluded only, enrollmentUrl returns "students_with_concluded_enrollments_url"', ->
-    self = @setupThis(show_concluded_enrollments: true)
+    self = @setupThis(showConcludedEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_enrollments_url'
 
   test 'when inactive only, enrollmentUrl returns "students_with_inactive_enrollments_url"', ->
-    self = @setupThis(show_inactive_enrollments: true)
+    self = @setupThis(showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_inactive_enrollments_url'
 
   test 'when show concluded and hide inactive are true, enrollmentUrl returns "students_with_concluded_and_inactive_enrollments_url"', ->
-    self = @setupThis(show_concluded_enrollments: true, show_inactive_enrollments: true)
+    self = @setupThis(showConcludedEnrollments: true, showInactiveEnrollments: true)
     equal @studentsUrl.call(self), 'students_with_concluded_and_inactive_enrollments_url'

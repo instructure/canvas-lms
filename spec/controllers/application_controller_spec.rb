@@ -129,7 +129,10 @@ describe ApplicationController do
     it "should auto-set timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
-      expect(@controller.js_env[:LOCALE]).to eq 'fr-FR'
+      expect(@controller.js_env[:LOCALE]).to eq 'fr'
+      expect(@controller.js_env[:BIGEASY_LOCALE]).to eq 'fr_FR'
+      expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq 'fr'
+      expect(@controller.js_env[:MOMENT_LOCALE]).to eq 'fr'
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 

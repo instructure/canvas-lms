@@ -368,7 +368,7 @@ describe GradebookImporter do
     )
     expect(@gi.assignments).to eq [@assignment1]
     submission = @gi.students.first.gradebook_importer_submissions.first
-    expect(submission['original_grade']).to eq '8'
+    expect(submission['original_grade']).to eq '8.0'
     expect(submission['grade']).to eq '10'
     expect(submission['assignment_id']).to eq @assignment1.id
   end

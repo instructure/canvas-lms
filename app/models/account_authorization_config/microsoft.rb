@@ -50,10 +50,6 @@ class AccountAuthorizationConfig::Microsoft < AccountAuthorizationConfig::OpenID
     auth_filter
   end
 
-  def login_button?
-    true
-  end
-
   def self.recognized_params
     [:tenant, :login_attribute, :jit_provisioning].freeze
   end

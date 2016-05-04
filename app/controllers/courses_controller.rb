@@ -1096,7 +1096,8 @@ class CoursesController < ApplicationController
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
-        PUBLISHING_ENABLED: @publishing_enabled
+        PUBLISHING_ENABLED: @publishing_enabled,
+        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
@@ -1312,7 +1313,7 @@ class CoursesController < ApplicationController
 
       @pending_enrollment = enrollment
 
-      if @context.root_account.allow_invitation_previews?
+      if @context.root_account.allow_invitation_previews? || enrollment.admin?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
         # directly call the next action; it's just going to redirect anyway, so no need to have
@@ -1978,6 +1979,19 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
+  # @argument event [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
+  #   The action to take on each course.
+  #   * 'claim' makes a course no longer visible to students. This action is also called "unpublish" on the web site.
+  #     A course cannot be unpublished if students have received graded submissions.
+  #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
+  #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
+  #     in prior-enrollment lists.
+  #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
+  #     All enrollments are deleted. Course content may be physically deleted at a future date.
+  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
+  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
+  #     will be unpublished. Deleted enrollments will not be recovered.
+  #
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
   #
@@ -2122,7 +2136,10 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :edit }
+          format.html do
+            flash[:error] = t('There was an error saving the changes to the course')
+            redirect_to course_url(@course)
+          end
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
