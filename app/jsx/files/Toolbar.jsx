@@ -153,6 +153,12 @@ define([
     }
   }
 
+  Toolbar.componentDidUpdate = function (prevProps) {
+    if (prevProps.selectedItems.length !== this.props.selectedItems.length){
+      $.screenReaderFlashMessageExclusive(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: this.props.selectedItems.length}))
+    }
+  }
+
   Toolbar.renderRestrictedAccessButtons = function () {
     if (this.props.userCanManageFilesForContext){
       return (
