@@ -170,7 +170,7 @@ module FloatScannerFix
         @string_cache[string] = true
         string
       else
-        Float(string.gsub(/[,_]|\.([Ee]|$)/, '\1')) # TODO: Remove when https://github.com/tenderlove/psych/pull/276 is merged
+        Float(string.gsub(/[,_:]|\.([Ee]|$)/, '\1')) # TODO: Remove when https://github.com/tenderlove/psych/pull/276 is merged
       end
     else
       int = parse_int string.gsub(/[,_]/, '')

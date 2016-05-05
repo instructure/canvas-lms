@@ -181,4 +181,9 @@ YAML
     hash = {:blah => "42._"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
+
+  it "should dump whatever this is too" do
+    hash = {:blah => "4,2:0."}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
 end
