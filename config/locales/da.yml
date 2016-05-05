@@ -1382,7 +1382,13 @@ da:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillad en moderator at evaluere flere uafhængige karakterer for valgte indsendelser"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad samlet bedømmelseseksport til SIS"
   allow_lor_tools: "Tillad brugerne at se og bruge eksterne værtøjer til konfigurering af LOR."
-  allow_opt_out_of_inbox: "Tillad brugere at fravælge samtaleindbakken. Dette vil bevirke at alle samtalesbeskeder og notifikationer sendes som ASAP notifikation til brugerens primære email, skjule samtalesindbakkens ulæste besked mærke på indbakkken og skjule samtalesnotifikation indstillinger."
+  allow_opt_out_of_inbox: |-
+      Tillad brugere at fravælge samtaleindbakken. Dette vil
+      bevirke at alle samtale beskeder og notifikationer
+      sendes som ASAP notifikation til brugerens primære
+      email, skjule samtalesindbakkens ulæste besked
+      mærke på indbakkken og skjule samtalesnotifikation
+      indstillinger.
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillad studerende at se hvem, der har meldt sig til tidsplaceringer."
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillad muligheden for at sende bekendtgørelser gennem vores forsendelseskø"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillader underviserne at vælge karakterdata for samlet eksport til SIS integrationer."
@@ -2335,7 +2341,12 @@ da:
   before_using_this_feature_we_recommend_trying_the__7e6f194e: "Før brug af denne funktion anbefaler vi at prøve *********%{t_theme_editor}********* for enhver branding. Aktivering af denne funktion giver mulighed for at uploade brugertilpassede JavaScript og CSS filer i Theme Editor. Modifikationer foretaget via denne metode kan være i modstrid med fremtidige ændringer til Canvas DOM (f.eks.: element klassenavne eller HTML strukturer) og er derfore ikke understøttet. Du skal også sørge for at enhver ændring du foretager er tilgængelig for alle, inklusiv for eksempel dem, der benytter *skærmlæsere* og **dem** ***der er afhængig af*** ****høj kontrast funktionen****. Instructure fragiver sig ethvert ansvar for ændringer du foretager. Det er dit ansvar at sikre, at de *****overholder***** ******enhver****** *******standard******* der er krævet i din retskreds. Dem, der benytter denne funktion bør have en avanceret forståelse af JavaScript og CSS og skal vedligeholde deres egen kode. ********Benyttes for eget ansvar!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Før du kan redigerer din profil, skal du bekræfte din e-mailadresse (%{email}) ved at klikke på linket i den e-mail, vi sendte til dig. Hvis du ikke kan se den, *klik for at sende e-mail igen*, og tjek din spammappe."
   beginning_date_2d2a29ac: Begyndelsesdato
-  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Neden for dette søge felt er en liste af %{content_type}. Mens du taster vil listen blive filtreret til at matche din forespørgsel. Samtalesbeskeder vil blive filtreret efter hvilken som helst mulighed du vælger."
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: |-
+      Neden for dette søge felt er en liste af
+      %{content_type}. Mens du taster vil listen blive filtreret
+      til at matche din forespørgsel. Samtale beskeder vil
+      blive filtreret efter hvilken som helst mulighed du
+      vælger.
   beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: |-
       En ny, simplere, mere bruervenlig fil browsing interface. Du kan aktivere det på kursusniveau,
@@ -2582,14 +2593,21 @@ da:
       manage: "Administrer %{title} mødegruppe"
       message_groups: "Send besked til grupper, der..."
       message_students: "Send besked til studerende, der..."
-      scheduler_explanation_student_header: "Du har ingen gruppeaftaler at tilmdelde dig til"
+      scheduler_explanation_student_header: "Du har ingen gruppeaftaler at tilmelde dig til"
       scheduler_explanation_student_paragraph_1: "undervisere kan bruge dette planlægningsværktøj til at planlægge ting, deres studerende kan tilmelde sig. Ting som: \"arbejdstid\", \"gruppe presentation tids-\n\
           rum\" eller \"frokost med en alumnis\". "
       scheduler_explanation_student_paragraph_2: "Ingen af dine undervisere har oprettet aftaler, du kan tilmelde dig. Du får besked, når der oprettes aftaler, du kan melde dig til."
-      scheduler_explanation_teacher_header: "Du har ikke oprettet aftalegruppe, eller der er ingen du kan tilmdelde dig"
+      scheduler_explanation_teacher_header: |-
+          Du har ikke oprettet aftalegruppe, eller der er ingen du
+          kan tilmelde dig
       scheduler_explanation_teacher_paragraph_1: "Dette er et planlægningsværktøj. Du kan benytte det til at oprette aftalegupper, som din studerende kan tilmelde sig."
       scheduler_explanation_teacher_paragraph_2: "For eksempel, hvis du ønsker at gennemgå en midt-termin opgave med hver af de studerende på dit kursus. Du skal oprette en ny aftalegruppe, specifier datoer og tider, hvor du er tilgængelig, split den tid i blokke af 15 minutter og kun tillad en student per tidsblok."
-      scheduler_explanation_teacher_paragraph_3: "De studernde vil derefter få besked og kan se, at de skal tilmelde sig for en af de specificerede tidsblokker. De vil blive vist en kalender med de tilgængelige tidsblokker over deres andre kalendere så de kan vælge en tid, der passer dem."
+      scheduler_explanation_teacher_paragraph_3: |-
+          De studerende vil derefter få besked og kan se, at de
+          skal tilmelde sig for en af de specificerede tidsblokker.
+          Der vil blive vist en kalender med de tilgængelige
+          tidsblokker over deres andre kalendere så de kan
+          vælge en tid, der passer dem.
       scheduler_explanation_teacher_paragraph_4: "Kom i gang nu ved at klikke på knappen \"Opret en aftalegruppe\" til højre."
       signed_up_for: "*%{title} mødegruppe* Du er tilmedlt"
       x_groups_have_signed_up: "%{participant_count} grupper er tilmeldt"
@@ -2643,7 +2661,7 @@ da:
       date: Dato
       details: "Detaljer:"
       group_category: "Gruppe Kategori"
-      group_signup: "Få de studerende til at tilmdelde sig i grupper."
+      group_signup: "Få de studerende til at tilmelde sig i grupper."
       location: Lokalitet
       name: Navn
       time_range: Tidsomfang
@@ -3691,11 +3709,20 @@ da:
         course_modules: Kursusmoduler
       help: 
         create: |-
-            Kursus moduler lader dig organisere opgaver, sider, filer etc. ind i mindre sektioner eller enheder. Moduler kan blive centreret omkring et tema, fokuseret på et specielt emner eller endda blot grupperet kronologisk.
+            Kursus moduler lader dig organisere opgaver, sider,
+            filer etc. ind i mindre sektioner eller enheder. Moduler
+            kan blive centreret omkring et tema, fokuseret på et
+            specielt emner eller endda blot grupperet kronologisk.
             
-            Du kan også sekvensere moduler ved at definere kriterier og forudsætninger for hver modul. Studerende vil ikke have adgang til modulerne indtil de har låst op for alle deres forudsætnigner. På den måde kan du forhindre studernde i at få adgang til specifikt indhold indtil de her, f.eks. mindst 75% på en bedømt quiz.
+            Du kan også sekvensere moduler ved at definere
+            kriterier og forudsætninger for hver modul. Studerende
+            vil ikke have adgang til modulerne indtil de har låst op
+            for alle deres forudsætnigner. På den måde kan du
+            forhindre studerende i at få adgang til specifikt indhold
+            indtil de her, f.eks. mindst 75% på en bedømt quiz.
             
-            For at starte med at organisere dit kursus ind i moduler, klik på knappen "%{button}" til højre.
+            For at starte med at organisere dit kursus ind i
+            moduler, klik på knappen "%{button}" til højre.
         no_modules: "Ingen moduler er blevet defineret for dette kursus."
       images: 
         alt: 
@@ -3850,7 +3877,7 @@ da:
       add: "Tilføj Modul"
       add_item: "Tiilføj element til %{module}"
       add_prerequisite: "Tilføj forudsætning til %{module}"
-      edit: "Rediger Modul Indstillinger"
+      edit: "Rediger modul indstillinger"
       edit_item: "Rediger elementdetaljer"
     url_show: 
       new_tab: "Denne side bliver åbnet i et nyt browervindue."
@@ -3942,7 +3969,7 @@ da:
       mark_as_read: "Marker som læst"
       mark_as_unread: "Marker som ulæst"
       more_options: "Flere muligheder"
-      page_title_header: Samtaleer
+      page_title_header: Samtaler
       reply: Svar
       reply_all: "Svar alle"
       search_for_recipients: "Søg modtagere"
@@ -3953,7 +3980,7 @@ da:
       starred: Stjernemarkeret
       submission_comments: Indsendelseskommentarer
       titles: 
-        conversations: Samtaleer
+        conversations: Samtaler
       unread: Ulæst
     mark_as_read: "Marker som læst"
     mark_as_unread: "Marker som ulæst"
@@ -5053,10 +5080,10 @@ da:
           Du vil ikke kunne genåbne den.
     conversations_collapse: 
       one: "Sammenfold %{count} samtalesbesked"
-      other: "Sammenfold %{count} samtalesbeskeder"
+      other: "Sammenfold %{count} samtale beskeder"
     conversations_expand: 
       one: "Udvid %{count} samtalesbesked"
-      other: "Udvid %{count} samtalesbeskeder"
+      other: "Udvid %{count} samtale beskeder"
     discussions_collapse: 
       one: "Sammenfold %{count} diskussion"
       other: "Sammenfold %{count} diskussioner"
@@ -5599,7 +5626,7 @@ da:
   discussions: 
     are_your_sure_delete: "Er du sikker på, at du ønsker at slette denne indtastning?"
     cant_subscribe_not_in_group: "Du skal være i denne gruppe for at tilmelde dig"
-    cant_subscribe_not_in_group_set: "Du skal være i en associeret gruppe for at tilmdelde dig"
+    cant_subscribe_not_in_group_set: "Du skal være i en associeret gruppe for at tilmelde dig"
     closed_for_comments: "Lukket for kommentarer"
     confirm_delete_discussion_topic: "Er du sikker på, at du ønsker at slette dette diskussionsemne?"
     delete: Slet
@@ -7660,7 +7687,7 @@ da:
       assignment_details: Opgavedetaljer
       assignment_label: "Besøg kursusopgaver"
       conversation_details: Samtaledetaljer
-      conversation_label: "Besøg Samtaleer"
+      conversation_label: "Besøg samtaler"
       discussion_details: Diskussionsdetaljer
       discussion_label: "Besøg kursusdiskussioner"
       peer_review_details: "Detaljer for peer review"
@@ -7674,7 +7701,7 @@ da:
         other: "*%{count}* Opgave notifikationer"
       x_new_in_conversations: 
         one: "*1* samtalesbesked"
-        other: "*%{count}* samtalesbeskeder"
+        other: "*%{count}* samtale beskeder"
       x_new_in_discussions: 
         one: "*1* Diskussion"
         other: "*%{count}* Diskussioner"
@@ -9092,11 +9119,11 @@ da:
           reply_to_conversation_message: "Du kan besvare denne besked i Canvas ved at svare direkte på denne email."
           subject: "%{user_name}, du har lige sendt en besked i Canvas."
           unknown_user: "Ukendt bruger"
-          view_message: "Se denne besked i Samtaleer"
+          view_message: "Se denne besked i samtaler"
         reply_to_conversation_message: "Du kan besvare denne besked i Canvas ved at svare direkte på denne email."
         subject: "%{user_name}, du har lige sendt en besked i Canvas."
         unknown_user: "Ukendt bruger"
-        view_message: "Se denne besked i Samtaleer"
+        view_message: "Se denne besked i Samtaler"
       sms: 
         body: "%{user_name}, du har lige sendt en besked i Canvas:"
         more_info: "Mere information %{url}"
@@ -9118,11 +9145,11 @@ da:
           reply_to_conversation_message: "Du kan besvare denne besked i Canvas ved at svare direkte på denne email."
           subject: "%{user_name} har lige sendt dig en besked i Canvas."
           unknown_user: "Ukendt bruger"
-          view_message: "Se denne besked i Samtaleer"
+          view_message: "Se denne besked i Samtaler"
         reply_to_conversation_message: "Du kan besvare denne besked i Canvas ved at svare direkte på denne email."
         subject: "%{user_name} har lige sendt dig en besked i Canvas."
         unknown_user: "Ukendt bruger"
-        view_message: "Se denne besked i Samtaleer"
+        view_message: "Se denne besked i Samtaler"
       sms: 
         body: "%{user_name} har lige sendt dig en besked i Canvas:"
         more_info: "Mere information %{url}"
@@ -10554,12 +10581,12 @@ da:
       recording_ready: "Optagelse parat"
       registration: Reigstrering
       reminder: Påmindelse
-      student_appointment_signups: "Studerendesaftale tilmeldinger"
+      student_appointment_signups: "Aftalegruppe tilmelding"
       submission_comment: Indsendelseskommentar
     conversation_created_description: "Du oprettede en samtale"
     conversation_created_display: "Samtale oprettet af mig"
     conversation_message_description: "Ny besked"
-    conversation_message_display: Samtalesbesked
+    conversation_message_display: "Samtale besked"
     course_content_description: |-
         Ændring af kursusindhold
         
@@ -10639,7 +10666,7 @@ da:
       content_export_failed: "Indholdseksport mislykkedes"
       content_export_finished: "Indholdseksport færdig"
       conversation_created: "Samtale oprettet"
-      conversation_message: Samtalesbesked
+      conversation_message: "Samtale besked"
       enrollment_accepted: "Tilmeldelse accepteret"
       enrollment_invitation: Tilmeldelsesinvitation
       enrollment_notification: Tilmeldelsesnotifikatino
@@ -10698,7 +10725,7 @@ da:
         *Kun Instructør og Admin:*
         
         Studerendesaftale tilmeldelse
-    student_appointment_display: "Studerendesaftale tilmeldinger"
+    student_appointment_display: "Aftalegruppe tilmelding"
     submission_comment_description: Opgaveindsendelseskommentar
     submission_comment_display: Indsendelseskommentar
     web_conference_recording_ready: "En konference optagelse er parat"
@@ -10709,7 +10736,7 @@ da:
       errors: 
         saving_preferences_failed: "Ups! Noget gik galt. Prøv venligst igen"
       push: 
-        display: "Psush notifikation"
+        display: "Push notifikationer"
       sms: 
         display: Mobilnummer
       twitter: 
@@ -10729,7 +10756,7 @@ da:
     groups: 
       admin: Administrative
       alerts: Alarmer
-      communication: Samtaleer
+      communication: Samtaler
       conferences: Konferencer
       course: Kursusaktiviteter
       discussions: Diskussioner
@@ -14557,13 +14584,19 @@ da:
       add_to_module: "Tilføj %{item} til *modul*"
       assignment_item: Besvarelse
       assignment_item_select_label: "Vælg opgaven du ønsker at associere, eller tilføj en opgave ved at sævlge \"Ny opgave\"."
-      assignment_notice: "Vælg den opgave du ønkser at associere med dette *modul*, eller tilføj en opgave ved at vælge *Ny opgave*."
+      assignment_notice: |-
+          Vælg den opgave du ønsker at tilføje til dette *modul*,
+          eller tilføj en opgave ved at vælge *Ny opgave*.
       content_page_item: Indholdsside
       discussion_item: Diskussion
       discussion_topic_select_label: "Vælg det emne du ønsker at associere, eller tilføj et emne ved at vælge \"Nyt emne\"."
       domain_match_notice: "for at benytte dette værktøj skal domænet matche %{domain}"
       external_tool_item: "Eksternt Værktøj"
-      external_tool_notice: "Vælg et værktøj fra nedenstående liste, eller indtast URL for et eksternt værktøj du allerede ved er konfiguret med Basic LTI for at tiljøfe et link til dette *modul*."
+      external_tool_notice: |-
+          Vælg et værktøj fra nedenstående liste, eller indtast
+          URL for et eksternt værktøj du allerede ved er
+          konfiguret med Basic LTI for at tilføje et link til dette
+          *modul*.
       external_url_item: "Eksternt URL"
       external_url_notice: "Indtast en URL og sidetitel for tilføjelse af link til webside til dette *modul*."
       file_item: Fil
@@ -14594,12 +14627,16 @@ da:
       options: 
         assignments: Opgaver
       quiz_item: Quiz
-      quiz_notice: "Vælg den quiz du ønsker at associere med dette *modul*, og tilføj en ny ved at vægle \"Ny quiz\"."
+      quiz_notice: |-
+          Vælg den quiz du ønsker at tilføje til dette *modul*, og
+          tilføj en ny ved at vælge "Ny quiz".
       quiz_select_label: "Vælg den quiz du ønsker at associere, eller tilføj en ny ved at vælge \"Ny quiz\"."
       select_item_type_label: "Vælg typen af indhold der skal tilføjes."
       sub_header_notice: "Indtast den tekst, du ønsker at tilføje som et *modul* under-toptekst"
       text_header_item: Toptekst
-      topic_notice: "Vælg det emne du ønsker at associere med dette *modul*, eller tilføj et emne ved at vægle \"Nyt emne\"."
+      topic_notice: |-
+          Vælg det emne du ønsker at tilføje til dette *modul*,
+          eller tilføj et emne ved at vælge "Nyt emne".
       wiki_page_notice: "Vælg den wiki side du ønsker at associere med dette *modul*, eller tilføj en ny side ved at vælge \"Ny side\"."
       wiki_page_select_label: "Vælg den wiki side du ønsker at associere med dette 'modul', eller tilføj en ny side ved at vælge \"Ny side\"."
     static_notices: 
