@@ -93,6 +93,57 @@ describe Api::V1::User do
         })
     end
 
+    it 'should show SIS data to sub account admins' do
+      student = User.create!(:name => 'User')
+      student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+
+      sub_account = Account.create!(:parent_account => Account.default)
+      sub_admin = account_admin_user(:account => sub_account)
+
+      course = sub_account.courses.create!
+
+      expect(@test_api.user_json(student, sub_admin, {}, [], course)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User',
+        'sis_user_id' => 'xyz',
+        'integration_id' => nil,
+        'login_id' => 'xyz',
+        'sis_login_id' => 'xyz'
+      })
+    end
+
+    it 'should show SIS data to teachers only in courses they are teachers in' do
+      student = User.create!(:name => 'User')
+      student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+
+      teacher = user
+      course1 = course(:active_all => true)
+      course1.enroll_user(teacher, "TeacherEnrollment").accept!
+      course2 = course(:active_all => true)
+      course2.enroll_user(teacher, "StudentEnrollment").accept!
+
+      expect(@test_api.user_json(student, teacher, {}, [], course1)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User',
+        'sis_user_id' => 'xyz',
+        'integration_id' => nil,
+        'login_id' => 'xyz',
+        'sis_login_id' => 'xyz'
+      })
+
+      expect(@test_api.user_json(student, teacher, {}, [], course2)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User'
+      })
+
+    end
+
     it 'should use the SIS pseudonym instead of another pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
@@ -183,7 +234,7 @@ describe Api::V1::User do
     def test_context(mock_context, context_to_pass)
       mock_context.expects(:account).returns(mock_context)
       mock_context.expects(:global_id).returns(42)
-      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       expect(if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
       else
@@ -217,7 +268,7 @@ describe Api::V1::User do
       @test_api.context = mock()
       @test_api.context.expects(:global_id).returns(42)
       @test_api.context.expects(:account).returns(@test_api.context)
-      @test_api.context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      @test_api.context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?).to eq true
     end
@@ -226,7 +277,7 @@ describe Api::V1::User do
       mock_context = mock()
       mock_context.expects(:global_id).returns(42)
       mock_context.expects(:account).returns(mock_context)
-      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
     end

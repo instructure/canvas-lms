@@ -46,23 +46,29 @@ module Api::V1::User
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
+
       if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
         if (sis_pseudonym = SisPseudonym.for(user, @domain_root_account, include_root_account))
           # the sis fields on pseudonym are poorly named -- sis_user_id is
           # the id in the SIS import data, where on every other table
           # that's called sis_source_id.
-          json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
-                      :integration_id => sis_pseudonym.integration_id,
-                      # TODO: don't send sis_login_id; it's garbage data
-                      :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
+
+          if user_can_read_sis_data?(current_user, context)
+            json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
+                        :integration_id => sis_pseudonym.integration_id,
+                        # TODO: don't send sis_login_id; it's garbage data
+                        :sis_login_id => sis_pseudonym.unique_id
+          end
           json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
+
         if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
           json[:login_id] = pseudonym.unique_id
         end
       end
+
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
@@ -187,9 +193,9 @@ module Api::V1::User
         permissions_account = context.is_a?(Account) ? context : context.account
       end
       !!(
-        permissions_context.grants_right?(current_user, :manage_students) ||
+        permissions_context.grants_any_right?(current_user, :manage_students, :read_sis) ||
         permissions_account.membership_for_user(current_user) ||
-        permissions_account.root_account.grants_any_right?(current_user, :manage_sis, :read_sis)
+        permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )
     )
   end
@@ -221,7 +227,7 @@ module Api::V1::User
       if enrollment.student?
         json[:grades] = grades_hash(enrollment, user, opts[:grading_period])
       end
-      if @domain_root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+      if user_can_read_sis_data?(@current_user, enrollment.course)
         json[:sis_source_id] = enrollment.sis_source_id
         json[:sis_course_id] = enrollment.course.sis_source_id
         json[:course_integration_id] = enrollment.course.integration_id
@@ -293,5 +299,10 @@ module Api::V1::User
     context.is_a?(Group) ?
       [context.id] :
       context.groups.map(&:id)
+  end
+
+  def user_can_read_sis_data?(user, context)
+    sis_id_context = (context.is_a?(Course) || context.is_a?(Account)) ? context : @domain_root_account
+    sis_id_context.grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
   end
 end
