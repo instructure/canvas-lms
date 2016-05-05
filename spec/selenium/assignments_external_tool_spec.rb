@@ -11,7 +11,7 @@ describe "external tool assignments" do
 
   it "should allow creating through index", priority: "2", test_id: 209971  do
     get "/courses/#{@course.id}/assignments"
-
+    expect_no_flash_message :error
     #create assignment
     f('.add_assignment').click
     f('.ui-datepicker-trigger').click
@@ -41,7 +41,6 @@ describe "external tool assignments" do
     keep_trying_until do
       fj('#context_external_tools_select td .tools .tool:first-child:visible').click
       wait_for_ajaximations
-      #sleep 2 # wait for javascript to execute
       expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
     end
     keep_trying_until do
