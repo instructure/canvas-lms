@@ -202,14 +202,18 @@ define [
       else
         { pass: 'pass', complete: 'pass', fail: 'fail', incomplete: 'fail' }[submission.grade] || ''
 
+    iconClassFromSubmission = (submission) ->
+        { pass: 'icon-check', complete: 'icon-check', fail: 'icon-x', incomplete: 'icon-x' }[submission.grade] || ''
+
     htmlFromSubmission: (options={}) ->
       cssClass = classFromSubmission(options.submission)
+      iconClass = iconClassFromSubmission(options.submission)
       SubmissionCell::cellWrapper("""
         <a data-value="#{htmlEscape cssClass}"
            class="gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass}
-           #{htmlEscape('editable' if options.editable)}" href="#"
-        >#{htmlEscape cssClass}</a>
-      """, options)
+           #{htmlEscape('editable' if options.editable)}" href="#">
+           #{htmlEscape cssClass}</a>
+        <i class="#{htmlEscape iconClass}" role="presentation"></i> """, options)
 
     @formatter: (row, col, submission, assignment, student) ->
       return SubmissionCell.formatter.apply(this, arguments) unless submission.grade?
