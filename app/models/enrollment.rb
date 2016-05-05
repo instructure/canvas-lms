@@ -430,7 +430,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if workflow_state_changed? && course
+    if workflow_state_changed? && (student? || fake_student?) && course
       DueDateCacher.recompute_course(course)
     end
   end
