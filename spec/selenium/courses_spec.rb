@@ -178,7 +178,6 @@ describe "courses" do
       it "should complete 'Select Navigation Links' checklist item" do
         skip_if_chrome('research')
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Navigate to Navigation tab
         go_to_checklist
@@ -199,7 +198,6 @@ describe "courses" do
         skip_if_chrome('research')
 
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Navigate to Calendar tab
         go_to_checklist
@@ -220,12 +218,10 @@ describe "courses" do
       it "should complete 'Publish the Course' checklist item" do
         skip_if_chrome('research')
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Publish from Checklist
         go_to_checklist
         f('#wizard_publish_course').click
-        wait_for_ajaximations
         f('.ic-wizard-box__message-button button').click
 
         go_to_checklist
