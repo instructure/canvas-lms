@@ -318,11 +318,13 @@ describe "groups" do
         replace_content(find('#collaboration_description'), "c1 description")
         fj('.available-users li:contains("1, Test Student") .icon-user').click
         fj('.btn:contains("Start Collaborating")').click
-        wait_for_ajaximations
-        # Reload page and new collaboration will be displayed on main window
-        refresh_page
-        expect(fj('.collaboration .title:contains("c1")')).to be_present
-        expect(fj('.collaboration .description:contains("c1 description")')).to be_present
+        keep_trying_until do
+          # verifies collaboration will be displayed on main window
+          tab1 = driver.window_handles.first
+          driver.switch_to.window(tab1)
+          expect(fj('.collaboration .title:contains("c1")')).to be_present
+          expect(fj('.collaboration .description:contains("c1 description")')).to be_present
+        end
       end
 
       it 'can invite people within your group', priority: "1", test_id: 273642 do
