@@ -54,11 +54,6 @@ describe GradingPeriodsController do
     describe 'GET index' do
       let(:sub_account_admin) { account_admin_user(account: sub_account) }
       context "can_create_grading_periods" do
-        it "is a key returned with the collection" do
-          get :index, account_id: root_account.id
-          expect(json_parse).to have_key 'can_create_grading_periods'
-        end
-
         it "returns true if the context is a root account " \
         "and the user is a root account admin" do
           get :index, account_id: root_account.id
@@ -73,11 +68,6 @@ describe GradingPeriodsController do
       end
 
       context "can_toggle_grading_periods" do
-        it "is a key returned with the collection" do
-          get :index, account_id: root_account.id
-          expect(json_parse).to have_key 'can_toggle_grading_periods'
-        end
-
         it "returns true if the user is a root account admin" do
           get :index, account_id: root_account.id
           expect(json_parse['can_toggle_grading_periods']).to eq true

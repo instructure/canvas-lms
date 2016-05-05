@@ -98,37 +98,30 @@ define [
     endDateNode = React.findDOMNode(@gradingPeriod.refs.endDate)
     equal endDateNode.value, "May 31, 2015 at 12am"
 
-
   module 'custom prop validation for editable periods',
-    defaultProps: ->
-      title: "Spring"
-      startDate: new Date("2015-03-01T00:00:00Z")
-      endDate: new Date("2015-05-31T00:00:00Z")
-      id: "1"
-      readonly: false
-      disabled: false
-      onDeleteGradingPeriod: ->
-      onDateChange: ->
-      onTitleChange: ->
-
     setup: ->
       @consoleWarn = @stub(console, 'warn')
+      @props =
+        title: "Spring"
+        startDate: new Date("2015-03-01T00:00:00Z")
+        endDate: new Date("2015-05-31T00:00:00Z")
+        id: "1"
+        readonly: false
+        disabled: false
+        onDeleteGradingPeriod: ->
+        onDateChange: ->
+        onTitleChange: ->
 
   test 'does not warn of invalid props if all required props are present and of the correct type', ->
-    props = @defaultProps()
-    React.createElement(GradingPeriod, props)
+    React.createElement(GradingPeriod, @props)
     ok @consoleWarn.notCalled
 
-  test 'warns of missing props if required props are missing', ->
-    props = @defaultProps()
-    delete props.disabled
-    invalidPropMessage = "Warning: Failed propType: GradingPeriodTemplate: required prop disabled not provided or of wrong type."
-    React.createElement(GradingPeriod, props)
-    ok @consoleWarn.calledWithExactly(invalidPropMessage)
+  test 'warns if required props are missing', ->
+    delete @props.disabled
+    React.createElement(GradingPeriod, @props)
+    ok @consoleWarn.calledOnce
 
-  test 'warns of invalid props if required props are of the wrong type', ->
-    props = @defaultProps()
-    props.onDeleteGradingPeriod = 'hi ;)'
-    invalidPropMessage = "Warning: Failed propType: GradingPeriodTemplate: required prop onDeleteGradingPeriod not provided or of wrong type."
-    React.createElement(GradingPeriod, props)
-    ok @consoleWarn.calledWithExactly(invalidPropMessage)
+  test 'warns if required props are of the wrong type', ->
+    @props.onDeleteGradingPeriod = "a/s/l?"
+    React.createElement(GradingPeriod, @props)
+    ok @consoleWarn.calledOnce

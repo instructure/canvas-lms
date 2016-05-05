@@ -75,15 +75,7 @@ class GradingPeriodsController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
       paginated_grading_periods, meta = paginate_for(grading_periods)
-      can_create_grading_periods = @context.is_a?(Account) &&
-        @context.root_account? && @context.grants_right?(@current_user, :manage)
-      can_toggle_grading_periods = @domain_root_account.grants_right?(@current_user, :manage) ||
-                       @context.feature_allowed?(:multiple_grading_periods, exclude_enabled: true)
-      permissions = {
-        can_create_grading_periods: can_create_grading_periods,
-        can_toggle_grading_periods: can_toggle_grading_periods
-      }.as_json
-      render json: serialize_json_api(paginated_grading_periods, meta).merge(permissions)
+      render json: serialize_json_api(paginated_grading_periods, meta).merge(index_permissions)
     end
   end
 
@@ -247,5 +239,16 @@ class GradingPeriodsController < ApplicationController
       scope: @current_user,
       include_root: false
     }).as_json
+  end
+
+  def index_permissions
+    can_create_grading_periods = @context.is_a?(Account) &&
+      @context.root_account? && @context.grants_right?(@current_user, :manage)
+    can_toggle_grading_periods = @domain_root_account.grants_right?(@current_user, :manage) ||
+      @context.feature_allowed?(:multiple_grading_periods, exclude_enabled: true)
+    {
+      can_create_grading_periods: can_create_grading_periods,
+      can_toggle_grading_periods: can_toggle_grading_periods
+    }.as_json
   end
 end
