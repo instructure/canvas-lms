@@ -1931,6 +1931,12 @@ describe Enrollment do
       @course.enroll_student(user)
     end
 
+    it "does not trigger a batch when enrollment is not student" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
+      @course.enroll_teacher(user)
+    end
+
     it "triggers a batch when enrollment is deleted" do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).with(@course)
