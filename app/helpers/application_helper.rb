@@ -341,6 +341,7 @@ module ApplicationHelper
               previous_list = nil
               is_next = false
               @context.context_modules.each do |context_module|
+                next if context_module.workflow_state != 'active'
 
                 main_module_list_item = HtmlElement.new('li')
                 module_list_item = main_module_list_item
