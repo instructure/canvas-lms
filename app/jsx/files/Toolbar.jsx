@@ -36,7 +36,7 @@ define([
             type= 'button'
             onClick= {this.addFolder}
             className='btn btn-add-folder'
-            ariaLabel= {I18n.t('Add Folder')}
+            aria-label= {I18n.t('Add Folder')}
           >
             <i className='icon-plus' />
             <span className= {phoneHiddenSet} >
@@ -67,7 +67,7 @@ define([
           }.bind(this)
           }
           title= {I18n.t('Delete')}
-          ariaLabel= {I18n.t('Delete')}
+          aria-label= {I18n.t('Delete')}
           dataTooltip= ''
         >
           <i className='icon-trash' />
@@ -85,7 +85,7 @@ define([
           className= 'Toolbar__ManageUsageRights ui-button btn-rights'
           onClick= {this.openUsageRightsDialog}
           title= {I18n.t('Manage Usage Rights')}
-          ariaLabel= {I18n.t('Manage Usage Rights')}
+          aria-label= {I18n.t('Manage Usage Rights')}
           dataTooltip= ''
         >
           <i className= 'icon-files-copyright' />
@@ -110,7 +110,7 @@ define([
             })
           }.bind(this)}
           title= {I18n.t('Move')}
-          ariaLabel= {I18n.t('Move')}
+          aria-label= {I18n.t('Move')}
           dataTooltip= ''
         >
           <i className='icon-copy-course' />
@@ -129,7 +129,7 @@ define([
             href= {this.props.selectedItems[0].get('url')}
             download= {true}
             title= {this.downloadTitle}
-            ariaLabel= {this.downloadTitle}
+            aria-label= {this.downloadTitle}
             dataTooltip= ''
           >
             <i className='icon-download' />
@@ -143,7 +143,7 @@ define([
             className='ui-button btn-download'
             onClick= {this.downloadSelectedAsZip}
             title= {this.downloadTitle}
-            ariaLabel= {this.downloadTitle}
+            aria-label= {this.downloadTitle}
             dataTooltip= ''
           >
             <i className='icon-download'/>
@@ -168,7 +168,7 @@ define([
           className= 'ui-button btn-restrict'
           onClick= {this.openRestrictedDialog}
           title= {I18n.t('Manage Access')}
-          ariaLabel= {I18n.t('Manage Access')}
+          aria-label= {I18n.t('Manage Access')}
           dataTooltip= ''
         >
           <i className= 'icon-cloud-lock' />
@@ -213,7 +213,7 @@ define([
       <header
         className='ef-header'
         role='region'
-        ariaLabel= {I18n.t('Files Toolbar')}
+        aria-label= {I18n.t('Files Toolbar')}
       >
         <form
           className= { formClassName }
@@ -221,7 +221,7 @@ define([
         >
           <input
             placeholder= {I18n.t('Search for files')}
-            ariaLabel= {I18n.t('Search for files')}
+            aria-label= {I18n.t('Search for files')}
             type= 'search'
             ref='searchTerm'
             className='ic-Input'
@@ -247,7 +247,7 @@ define([
               className= {viewBtnClasses}
               title= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               role= 'button'
-              ariaLabel= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
+              aria-label= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               dataTooltip= ''
               ariaDisabled= {!this.showingButtons || selectedItemIsFolder}
               disabled= {!this.showingButtons || selectedItemIsFolder}
