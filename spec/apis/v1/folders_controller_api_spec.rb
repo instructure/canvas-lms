@@ -28,50 +28,48 @@ describe "Folders API", type: :request do
   end
 
   describe "#index" do
-    def make_folders
-      @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course , :position => 1)
-      @f2 = @root.sub_folders.create!(:name => "folder2" , :context => @course, :position => 2)
-      @f3 = @root.sub_folders.create!(:name => "11folder", :context => @course, :position => 3)
-      @f4 = @root.sub_folders.create!(:name => "zzfolder", :context => @course, :position => 4, :locked => true)
-      @f5 = @root.sub_folders.create!(:name => "aafolder", :context => @course, :position => 5, :hidden => true)
-    end
+    context "with folders" do
+      before(:once) do
+        @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course , :position => 1)
+        @f2 = @root.sub_folders.create!(:name => "folder2" , :context => @course, :position => 2)
+        @f3 = @root.sub_folders.create!(:name => "11folder", :context => @course, :position => 3)
+        @f4 = @root.sub_folders.create!(:name => "zzfolder", :context => @course, :position => 4, :locked => true)
+        @f5 = @root.sub_folders.create!(:name => "aafolder", :context => @course, :position => 5, :hidden => true)
+      end
 
-    it "should list folders in alphabetical order" do
-      make_folders
-      json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
-      res = json.map{|f|f['name']}
-      expect(res).to eq %w{11folder aafolder folder1 folder2 zzfolder}
-    end
+      it "should list folders in alphabetical order" do
+        json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{11folder aafolder folder1 folder2 zzfolder}
+      end
 
-    it "should list folders in saved order if flag set" do
-      make_folders
-      json = api_call(:get, @folders_path + "/#{@root.id}/folders?sort_by=position", @folders_path_options.merge(:action => "api_index", :sort_by => 'position'), {})
+      it "should list folders in saved order if flag set" do
+        json = api_call(:get, @folders_path + "/#{@root.id}/folders?sort_by=position", @folders_path_options.merge(:action => "api_index", :sort_by => 'position'), {})
 
-      res = json.map{|f|f['name']}
-      expect(res).to eq %w{folder1 folder2 11folder zzfolder aafolder}
-    end
+        res = json.map{|f|f['name']}
+        expect(res).to eq %w{folder1 folder2 11folder zzfolder aafolder}
+      end
 
-    it "should allow getting locked folder if authed" do
-      make_folders
-      json = api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(:action => "api_index", :id => @f4.id.to_param), {})
+      it "should allow getting locked folder if authed" do
+        json = api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(:action => "api_index", :id => @f4.id.to_param), {})
 
-      expect(json).to eq []
-    end
+        expect(json).to eq []
+      end
 
-    it "should not list hidden folders if not authed" do
-      make_folders
-      course_with_student(:course => @course)
-      json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
+      it "should not list hidden folders if not authed" do
+        course_with_student(:course => @course)
+        json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options, {})
 
-      expect(json.any?{|f|f[:id] == @f5.id}).to eq false
-    end
+        expect(json.any?{|f|f[:id] == @f5.id}).to eq false
+      end
 
-    it "should not list locked folders if not authed" do
-      make_folders
-      course_with_student(:course => @course)
-      raw_api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(:action => "api_index", :id => @f4.id.to_param), {})
+      it "should not list locked folders if not authed" do
+        course_with_student(:course => @course)
+        raw_api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(:action => "api_index", :id => @f4.id.to_param), {})
 
-      expect(response.code).to eq "401"
+        expect(response.code).to eq "401"
+      end
+
     end
 
     it "should 404 for no folder found" do
