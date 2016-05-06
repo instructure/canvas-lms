@@ -23,7 +23,7 @@ namespace :brand_configs do
   # bucket has all static assets including the css for custom themes people
   # have created in the Theme Editor.
   desc "generate all brands and upload everything to s3"
-  task :generate_and_upload_all do
+  task :generate_and_upload_all => :environment do
     Rake::Task['brand_configs:clean'].invoke
     BrandableCSS.save_default_json!
     Rake::Task['brand_configs:write'].invoke
