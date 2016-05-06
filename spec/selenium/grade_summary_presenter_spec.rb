@@ -49,6 +49,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'maintains focus on show what-if/revert to original buttons', priority: 2, test_id: 229660 do
+      skip("bug QA-727 - Grade Summary Presenter spec is not passing under Jenkins")
       student_submission.student_entered_score = 8
       student_submission.save!
 
