@@ -353,6 +353,7 @@ module ApplicationHelper
                 module_list_stack = []
 
                 current_indent = -1
+                last_header_item = nil
                 possible_items = context_module.content_tags_visible_to(@current_user)
                 has_active = false
                 last_item_element = main_module_list_item
@@ -366,6 +367,7 @@ module ApplicationHelper
                     module_list_item = module_list_stack.pop 
                     last_item_element = module_list_item
                     current_indent-=1
+                    last_header_item = nil # we went up a level, so no longer appropriate to copy links
                   end
 
                   item_element = HtmlElement.new('li', module_list_item)
@@ -384,10 +386,17 @@ module ApplicationHelper
                   end
 
                   if item.content_type == 'ContextModuleSubHeader'
-                    item_element.text_content = item.title
+                    a = HtmlElement.new('span', item_element)
+                    a.text_content = item.title
+                    last_header_item = a
                   else
                     a = HtmlElement.new('a', item_element)
                     a.href = "/courses/#{item.context_id}/modules/items/#{item.id}"
+                    unless last_header_item.nil?
+                      last_header_item.tag_name = 'a'
+                      last_header_item.href = "/courses/#{item.context_id}/modules/items/#{item.id}"
+                      last_header_item = nil
+                    end
                     a.add_class(liclass)
                     a.text_content = item.title
                   end
