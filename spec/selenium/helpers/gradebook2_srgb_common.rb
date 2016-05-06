@@ -12,6 +12,7 @@ module Gradebook2SRGBCommon
     let(:secondary_id_label) { f('#student_information .secondary_id') }
     let(:student_dropdown) { f('#student_select') }
     let(:assignment_dropdown) { f('#assignment_select') }
+    let(:default_grade) { f("#set_default_grade") }
     # global checkboxes
     let(:ungraded_as_zero) { f('#ungraded') }
     let(:hide_student_names) { f('#hide_names_checkbox') }

@@ -271,14 +271,11 @@ describe "Screenreader Gradebook" do
     end
 
     it "should focus on accessible elements when setting default grades", priority: "1", test_id: 209991 do
-      get "/courses/#{@course.id}/gradebook"
-      f("#change_gradebook_version_link_holder").click
-      refresh_page
-      Selenium::WebDriver::Support::Select.new(f("#assignment_select"))
-                                          .select_by(:text, 'second assignment')
+      get srgb
+      select_assignment(@second_assignment)
 
       # When the modal opens the close button should have focus
-      f("#set_default_grade").click
+      default_grade.click
       focused_classes = driver.execute_script('return document.activeElement.classList')
       expect(focused_classes).to include("ui-dialog-titlebar-close")
 
