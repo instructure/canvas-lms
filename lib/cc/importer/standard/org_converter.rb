@@ -122,11 +122,21 @@ module CC::Importer::Standard
                     :linked_resource_title => get_node_val(item_node, 'title')
             }
           when /webcontent|learning-application-resource\z/
-            # todo check intended use
-            item = {:indent => indent, :linked_resource_type => 'FILE_TYPE'}
+            item = {:indent => indent}
             item[:linked_resource_id] = item_node['identifierref']
             item[:linked_resource_title] = get_node_val(item_node, 'title')
-        end
+
+            if resource[:intended_use] == "assignment" &&
+                (assignments = @course[:assignments].select{|a| a[:migration_id] == item[:linked_resource_id]}.presence)
+              assignments.each do |a|
+                # because of course the title isn't anywhere else
+                a[:title] ||= item[:linked_resource_title]
+              end
+              item[:linked_resource_type] = "ASSIGNMENT"
+            else
+              item[:linked_resource_type] = "FILE_TYPE"
+            end
+          end
 
         if item && resource[:intended_user_role] == 'Instructor'
           item[:workflow_state] = 'unpublished'
