@@ -1,5 +1,4 @@
 <%
-  idx ||= 0
   module_item_next ||= nil
   module_item = module_item_next
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
@@ -108,8 +107,6 @@
     </div>
 
     <% if editable || module_item.nil? %>
-      <% idx += 1 %>
-      <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>&amp;module_sequence=<%= idx %>">See All Pages</a>
       <div class="ig-admin">
         <span
           data-module-type="<%= module_item && module_item.content_type_class %>"
