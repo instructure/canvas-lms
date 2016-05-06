@@ -50,6 +50,7 @@ define([], function(){
       skin: "light",
       skin_url: "/vendor/tinymce_themes/light",
       plugins: "autolink,media,paste,table,textcolor,link,directionality",
+      paste_data_images: true, /* Needed for IMG hack to get retained data field working */
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
         "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
@@ -92,9 +93,9 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      valid_children: "+body[style|script|svg|textarea]",
+      valid_children: "+body[style|script|svg|textarea|img]",
 
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
+      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url + ",/bz_editor.css",
       browser_spellcheck: true
     };
   };
@@ -188,7 +189,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view");
     return stuff;
   };
 

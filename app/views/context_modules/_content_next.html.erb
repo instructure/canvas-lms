@@ -172,6 +172,7 @@ input.move-module-label-spacer {
 <div class="header-bar">
   <% if can_do(@context, @current_user, :manage_content) %>
     <div class="header-bar-right">
+      <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>">See All Together</a>
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <button class="btn btn-primary add_module_link">
         <i class="icon-plus" role="presentation"></i>

@@ -86,7 +86,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     quiz.show_correct_answers_at_changed? ||
       quiz.hide_correct_answers_at_changed?
   }
-  sanitize_field :description, CanvasSanitize::SANITIZE
+  # Commented because we want more control to allow magic fields in quiz descriptions
+  # sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
 
   before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?

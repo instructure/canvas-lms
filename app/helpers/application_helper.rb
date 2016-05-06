@@ -332,6 +332,102 @@ module ApplicationHelper
             link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
           end
 
+          if tab[:css_class] == 'modules'
+
+            module_item_id = params[:module_item_id]
+            if module_item_id
+              outer_list = HtmlElement.new('ul')
+              outer_list.id = 'bz-module-nav'
+              previous_list = nil
+              is_next = false
+              @context.context_modules.each do |context_module|
+                next if context_module.workflow_state != 'active'
+
+                main_module_list_item = HtmlElement.new('li')
+                module_list_item = main_module_list_item
+
+                module_list_header = HtmlElement.new('span', module_list_item)
+                module_list_header.add_class("bz-nav-module-name") 
+                module_list_header.text_content = context_module.name
+
+                module_list_stack = []
+
+                current_indent = -1
+                last_header_item = nil
+                possible_items = context_module.content_tags_visible_to(@current_user)
+                has_active = false
+                last_item_element = main_module_list_item
+                possible_items.each do |item|
+                  while item.indent > current_indent
+                    module_list_stack.push module_list_item
+                    module_list_item = HtmlElement.new('ul', last_item_element)
+                    current_indent+=1
+                  end
+                  while item.indent < current_indent
+                    module_list_item = module_list_stack.pop 
+                    last_item_element = module_list_item
+                    current_indent-=1
+                    last_header_item = nil # we went up a level, so no longer appropriate to copy links
+                  end
+
+                  item_element = HtmlElement.new('li', module_list_item)
+                  last_item_element = item_element
+                  item_element.add_class(item.content_type)
+
+                  liclass = ''
+                  if item.id.to_i == module_item_id.to_i
+                    item_element.add_class('active')
+                    parent = item_element.parent
+                    while(parent)
+                      parent.add_class('active-parent')
+                      parent = parent.parent
+                    end
+                    has_active = true
+                  end
+
+                  if item.content_type == 'ContextModuleSubHeader'
+                    a = HtmlElement.new('span', item_element)
+                    a.text_content = item.title
+                    last_header_item = a
+                  else
+                    a = HtmlElement.new('a', item_element)
+                    a.href = "/courses/#{item.context_id}/modules/items/#{item.id}"
+                    unless last_header_item.nil?
+                      last_header_item.tag_name = 'a'
+                      last_header_item.href = "/courses/#{item.context_id}/modules/items/#{item.id}"
+                      last_header_item = nil
+                    end
+                    a.add_class(liclass)
+                    a.text_content = item.title
+                  end
+                end
+
+                if is_next
+                  main_module_list_item.add_class('bz-next-module')
+                  main_module_list_item.simplify_for_nav
+                  outer_list.add_child(main_module_list_item)
+                  is_next = false
+                  break
+                end
+
+                # I only want to how the active module to keep
+                # the nav from being overloaded for the uer
+                if has_active
+                  unless previous_list.nil?
+                    previous_list.add_class('bz-previous-module')
+                    previous_list.simplify_for_nav
+                    outer_list.add_child(previous_list)
+                  end
+                  outer_list.add_child(main_module_list_item)
+                  is_next = true
+                end
+
+                previous_list = main_module_list_item
+              end
+              link << outer_list.to_html
+            end
+          end
+
           html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
@@ -898,3 +994,101 @@ module ApplicationHelper
     end
   end
 end
+
+class HtmlElement
+  def initialize(tn, parent = nil)
+    @tag_name = tn
+    unless parent.nil?
+      parent.add_child(self)
+    end
+    @children = []
+    @href = ''
+    @id = ''
+    @class_name = ''
+    @text_content = ''
+  end
+  def add_child(element)
+    @children << element
+    element.parent = self
+  end
+  def tag_name=(tn)
+    @tag_name = tn
+  end
+  def tag_name
+    @tag_name
+  end
+  def add_class(c)
+    @class_name += ' ' + c
+  end
+  def remove_class(c)
+    @class_name.sub!(c, '')
+  end
+  def text_content=(t)
+    @text_content = t
+  end
+  def id=(id)
+    @id = id
+  end
+  def href=(href)
+    @href = href
+  end
+  def href
+    @href
+  end
+  def parent=(parent)
+    @parent = parent
+  end
+  def parent
+    @parent
+  end
+  def to_html
+    html = ''
+    unless @tag_name.empty?
+      html += '<' + @tag_name + ' class="'+@class_name+'"'
+      unless @id.empty?
+        html += ' id="' + @id + '"'
+      end
+      unless @href.empty?
+        html += ' href="' + @href + '"'
+      end
+      html += '>'
+    end
+    html += @text_content.gsub('<', '&lt;')
+    @children.each do |c|
+      html += c.to_html
+    end
+    unless @tag_name.empty?
+      html += '</' + @tag_name + '>'
+    end
+  end
+
+  # This is not really generic, but ruby doesn't allow
+  # nested stuff and I don't want to make enough innards
+  # public to do this outside.
+  def simplify_for_nav
+    return if @children.length == 0
+    # We want to only show the main header and the first link
+    original_children = @children
+    link = find_first_link
+    unless link.nil?
+      original_children[0].tag_name = 'a'
+      original_children[0].href = link
+    end
+    @children = [original_children[0]]
+  end
+
+  def find_first_link
+    @children.each do |c|
+      if c.tag_name == 'a'
+        return c.href
+      else
+        n = c.find_first_link
+        if !n.nil?
+          return n
+        end
+      end
+    end
+    nil
+  end
+end
+

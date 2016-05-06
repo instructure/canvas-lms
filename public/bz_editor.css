@@ -1,0 +1,21 @@
+/*
+  This file is loaded in the WYSIWYG editor, but NOT the rest of the site.
+
+  It can hold special CSS for styling elements inside the editor, such as
+  dynamic pieces that are modified by javascript once they are live.
+*/
+
+[data-bz-retained] {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="30"> <text x="10" y="20" style="stroke: %23999999; fill: %23cccccc;">Magic Field</text> </svg>');
+  background-position: left top;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Viewer for a magic field */
+.bz-magic-viewer[data-bz-retained] {
+  display: inline-block;
+  width: 4em;
+  height: 1em;
+  text-align: center;
+}
