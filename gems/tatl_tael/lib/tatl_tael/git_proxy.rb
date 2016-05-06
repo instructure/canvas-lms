@@ -9,18 +9,26 @@ module TatlTael
       @git_dir = git_dir
     end
 
-    def changes(git_dir)
+    def changes
       command = "git diff-tree --no-commit-id --name-status -r HEAD"
-      raw_changes = shell(command, git_dir)
+      raw_changes = shell(command)
       raw_changes.split("\n").map do |raw_change|
         status, path = raw_change.split("\t")
         TatlTael::Change.new(status, path)
       end
     end
 
+    def wip?
+      first_line =~ /\A(\(|\[)?wip\b/i ? true : false
+    end
+
     private
 
-    def shell(command, git_dir)
+    def first_line
+      `git log --pretty=%s -1 HEAD`.strip
+    end
+
+    def shell(command)
       if git_dir
         Dir.chdir(git_dir) do
           Kernel.send(:`, command)
