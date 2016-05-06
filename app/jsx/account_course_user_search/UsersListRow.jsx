@@ -29,10 +29,9 @@ define([
       const links = [];
       const { id, name } = this.props.user;
       const { handleOpenEditUserDialog } = this.props.handlers;
-
       if (this.props.permissions.can_masquerade) {
         links.push(
-          <a className="al-trigger-gray icon-masquerade" href={`/users/${id}/masquerade`}>
+          <a className="al-trigger-gray icon-masquerade" key="masqueradeLink" href={`/users/${id}/masquerade`}>
             <span className="screenreader-only">{I18n.t("Masquerade as %{name}", {name})}</span>
           </a>
         );
@@ -40,7 +39,7 @@ define([
 
       if (this.props.permissions.can_message_users) {
         links.push(
-          <a className="al-trigger-gray icon-message" href={`/conversations?user_name=${name}&user_id=${id}`}>
+          <a className="al-trigger-gray icon-message" key="messageUserLink" href={`/conversations?user_name=${name}&user_id=${id}`}>
             <span className="screenreader-only">{I18n.t("Send message to %{name}", {name})}</span>
           </a>
         );
@@ -48,7 +47,7 @@ define([
 
       if (this.props.permissions.can_edit_users) {
         links.push(
-          <a className="al-trigger-gray icon-edit" href="#" onClick={handleOpenEditUserDialog.bind(null, this.props.user)} role="button">
+          <a className="al-trigger-gray icon-edit" key="canEditUserLink" href="#" onClick={handleOpenEditUserDialog.bind(null, this.props.user)} role="button">
             <span className="screenreader-only">{I18n.t("Edit %{name}", {name})}</span>
           </a>
         );

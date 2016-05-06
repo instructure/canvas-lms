@@ -45,17 +45,17 @@ define([
       var tabs = [];
       var panels = [];
       if (permissions.can_read_course_list) {
-        tabs.push(<Tab>{I18n.t("Courses")}</Tab>);
+        tabs.push(<Tab key='courses'>{I18n.t("Courses")}</Tab>);
         panels.push(
-          <TabPanel>
+          <TabPanel key='coursePanel'>
             <CoursesPane roles={this.props.roles} addUserUrls={this.props.addUserUrls} />
           </TabPanel>
         );
       }
       if (permissions.can_read_roster) {
-        tabs.push(<Tab>{I18n.t("People")}</Tab>);
+        tabs.push(<Tab key='people'>{I18n.t("People")}</Tab>);
         panels.push(
-          <TabPanel>
+          <TabPanel key='peoplePanel'>
             <UsersPane store={this.props.store} />
           </TabPanel>
         );
