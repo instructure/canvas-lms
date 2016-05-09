@@ -4,6 +4,8 @@ module Gradebook2Common
   shared_context 'gradebook_components' do
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
+    let(:show_notes) { fj('li a:contains("Show Notes Column")') }
+    let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
     let(:test_course) { course(active_course: true) }
