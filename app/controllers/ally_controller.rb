@@ -29,7 +29,8 @@ class AllyController < ApplicationController
         :clientId => plugin_data[:client_id],
         :baseUrl => plugin_data[:base_url],
         :path => request.path,
-        :body => request.body
+        :header => request.to_hash["authorization"][0],
+        :body => request.body,
       }
       render :json => data
     end
@@ -38,7 +39,6 @@ class AllyController < ApplicationController
   ##
   # Proxy data from the Ally REST API
   def proxy
-    t1 = Time.now
     if (request = get_request())
       # TODO: Cache the HTTP object per hostname allowing
       # for connection pooling

@@ -25,7 +25,7 @@ module Ally
     def sign(course_id, user_id, role, method, path, parameters)
       consumer = OAuth::Consumer.new(@client_id, @secret, {
         :site   => @base_url,
-        :scheme => :query_string
+        :scheme => :header
       })
 
       # Add the Ally authentication specific parameters
