@@ -45,6 +45,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
       keep_trying_until { expect(accordion.find_element(:link, assignment_name)).to be_displayed }
+      wait_for_ajaximations
       accordion.find_element(:link, assignment_name).click
       wait_for_ajaximations
       in_frame wiki_page_body_ifr_id do
