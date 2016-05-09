@@ -1694,6 +1694,7 @@ nl:
     unmute_dialog: "De opdracht is momenteel verborgen. Hierdoor kunnen cursisten hun cijfers en feedback niet zien. Wil je dit nu ongedaan maken?"
     unmuting_assignment: "Bezig met het ongedaan maken van opdracht..."
   assignment_name_b2d87383: "Naam van de opdracht "
+  assignment_name_grade_history_b506426c: "%{assignment_name} geschiedenis cijfers"
   assignment_options_1e5b7074: Opdrachtopties
   assignment_override: 
     student_count: 
@@ -7237,6 +7238,7 @@ nl:
     titles: 
       grading_scheme_info: "Beoordelingsschema bekijken/bewerken"
   grading_type_type_7d8b42d7: "Beoordelingtype: %{type}"
+  graph_bar_b5daa23d: "Graph balk"
   graphs_89fcfeb: Grafieken
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Fantastisch, nu heb je een cursus. Nu wat? Voordat je deze voor iedereen publiceert wil je deze misschien controleren en ervoor zorgen dat je de basiswerkingen hebt opgemaakt. Neem de lijst links door om ervoor te zorgen dat jouw cursus klaar is voor gebruik. "
   green_15af4778: Groen
@@ -8391,6 +8393,7 @@ nl:
   mark_done_9d81bcd9: "Als gereed markeren"
   marked_done_8f61ebb8: "als gereed gemarkeerd"
   marked_done_9fd646f: "Als gereed gemarkeerd"
+  masquerade_as_name_8bb004c5: "Masker toepassen als %{name}"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Meesterschap scores geven de hoogste score weer van een beoordeelde opdracht of toets."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Beheersingsscore geeft de meest recent beoordeelde opdracht of toets weer."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Beheersingsscore geeft de meest recent beoordeelde opdracht of toets weer."
@@ -10469,6 +10472,7 @@ nl:
   nav_avatar_border_3246beb1: "Nav Avator Rand"
   nav_background_fd299145: "Nav achtergrond"
   nav_badge_3c67de17: "Nav badge"
+  nav_badge_text_574b6eb: "Nav badge tekst"
   nav_icon_active_e4825558: "Nav icoon actief"
   nav_icon_ca3fef59: "Nav icoon"
   nav_logo_4b255c91: "Nav logo"
@@ -10548,6 +10552,7 @@ nl:
   note_this_login_s_account_uses_delegated_authentic_89227914: "Let op: Deze login van de account gebruikt gedelegeerde verificatie, maar laat verificatie van terugvalwachtwoord voor Canvas toe. De velden van het wachtwoord in dit formulier werkt het terugvalwachtwoord voor Canvas bij, *niet* de gedelegeerde verificatie. "
   notes_c42e0fd5: Opmerkingen
   notes_for_name_2eefac11: "Notities voor %{name}"
+  nothing_to_split_off_of_this_user_28ba9dd5: "Geen afsplitsing voor deze gebruiker"
   notification: 
     added_to_conversation_description: "Je bent aan een gesprek  toegevoegd"
     added_to_conversation_display: "Toegevoegd aan gesprek"
@@ -11340,6 +11345,9 @@ nl:
         publish_endpoint: "Eindpunt om naar te publiceren"
         success_timeout: "Success melding voor time-out (in seconden)"
         wait_for_success: "Wachten op succes meldingen"
+    i18n: 
+      description: "Aangepaste landinstellingen"
+      name: I18n
     ims_es_importer_settings: 
       labels: 
         course_long_name_selection: "Selectie van cursus met lange naam"
@@ -12594,7 +12602,7 @@ nl:
         links: 
           download_submissions: "Alle bestanden downloaden"
       equations_help: 
-        equation_functions: "Naast variabelen is er ook een verzameling hulpfuncties beschikbaar die je kunt gebruiken om nuttige waardes te genereren. Bijvoorbeeld: %{example}. Om een uitleg over een bepaalde hulpfunctie te zien, selecteer deze dan in de onderstaande lijst:"
+        equation_functions: "Naast variabelen is er ook een collectie hulpfuncties beschikbaar die je kunt gebruiken om handige waardes te genereren. Bijvoorbeeld: %{example}. Om uitleg te krijgen over een bepaalde hulpfunctie, selecteer je deze uit onderstaande lijst:"
         equation_intro: "Berekende vragen zijn gebaseerd op een in een bepaalde volgorde berekende set van een of meerdere formules. Je kunt tussenliggende variabelen in deze formules definiëren, maar het numerieke resultaat van de laatste formule wordt gebruikt om het juiste antwoord te genereren. Bijvoorbeeld: %{example} Voor deze set formules is het uiteindelijke antwoord 71. Er zijn echter geen vooraf gedefinieërde variabelen, dus alle cursisten zouden dezelfde vraag met hetzelfde antwoord (moeten)hebben. Zie het tabblad \"Variabelen\" voor meer informatie over variabelen."
         equation_variables2: "Je kunt ook variabelen voor de tekst van jouw vraag definiëren door gebruik te maken van vierkante haakjes (\"Wat is [a] + [b]?\"). Voor iedere variablele, zul je een \"Voorbeeld van waarde\" zien op basis van de variabele instellingen. Hierdoor kun je jouw wiskunde controleren en er voor te zorgen dat de formules werken. Bij voorbeeld, als jouw vraag is \"Wat is [a] + 5?\" dan zal je gevraagd worden om de variabele te definiëren \"a\". Als de voorbeeld waarde voor \"a\" 5.2 was, dan kun je schrijven: %{example}. Met deze formule kun je ieder aantal sets oplossingen generen, met een verschillende waarde van \"a\" voor iedere set. Een cursist zou de vraag kunnen zien, \"Wat is 5.2 + 5?\" en een andere cursist zou kunnen zien \"Wat is 9+5?\"."
         links: 
@@ -13500,6 +13508,7 @@ nl:
   reply_to_main_discussion_29823888: "Reageren op hoofdddiscussie"
   reply_to_topic_12412b0f: "Op onderwerp antwoorden"
   require_an_access_code_600e06e8: "Toegangscode nodig maken"
+  require_respondus_lockdown_browser_31425b3a: "Respondus LockDown Browser vereist"
   require_usage_rights_for_uploaded_files_4507865b: "Gebruiksrechten voor geüploade bestanden vereist "
   required_access_code_592902d7: "Verplichte toegangscode"
   required_to_view_quiz_results_dba7368b: "Nodig om toetsresultaten te bekijken"
@@ -14073,6 +14082,7 @@ nl:
   send_this_announcement_to_users_with_the_course_ro_46904d40: "Deze aankondiging sturen naar gebruikers met de accountfunctie van %{role}"
   send_to_ce05b460: "Verzenden naar"
   sending_message_8ac5bc90: "Bericht aan het versturen..."
+  sending_message_failed_please_try_again_b53cc904: "Verzenden van bericht mislukt, probeer het opnieuw"
   sends_international_text_messages_from_a_phone_num_10afbad6: "Verzendt internationale tekstberichten vanaf een telefoonnummer in het land van de ontvanger, indien mogelijk."
   sequence_footer: 
     next_module: "Volgende module:"
@@ -15024,6 +15034,7 @@ nl:
   students_1b8cd07b: Cursisten
   students_being_observed_4de3e520: "Cursisten worden waargenomen"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Cursisten kunnen toetsantwoorden niet bekijken na afloop van cursus"
+  students_have_either_already_taken_or_started_taki_a076336: "Cursisten hebben deze test al gemaakt of zijn al begonnen, dus wees voorzichtig met het wijzigen. Als je de vragen aanzienlijk verandert, zou je moeten overwegen om de cursisten die de oude versie hebben gemaakt opnieuw te beoordelen."
   students_must_complete_all_of_these_requirements_15fa97f7: "Cursisten moeten al deze vereisten voltooien"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Cursisten die de toets gemaakt hebben (%{count})"
@@ -15355,6 +15366,9 @@ nl:
   the_app_was_added_successfully_3f785a23: "De app werd succesvol toegevoegd "
   the_app_was_deactivated_573520ab: "De app is gedeactiveerd"
   the_app_was_updated_successfully_3d71cd1b: "De app werd succesvol bijgewerkt "
+  the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
+      De Canvas SAML Entity ID is %{metadata_url}, en de Service Provider metadata
+      is op die URL beschikbaar.
   the_error_stack_trace_if_there_is_one_b7e008a1: "De fout stapeltracering, als er een is"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Het tabblad Bestanden is de plaats waar je dia's van lezingen, voorbeelden van documenten, hulpstukken om te studeren -- wat dan ook dat jouw cursist wil downloaden. Jouw bestanden met Canvas uploaden en organiseren is makkelijk. Wij zullen je laten zien hoe. "
   the_following_fields_are_invalid_fields_b3565800: "De volgende velden zijn ongeldig: %{fields}"
@@ -15981,6 +15995,7 @@ nl:
         student: Cursist
       journal_header: Faculteitsnieuws
       page_title: Afdelingsnieuws
+  user_option_links_66090987: "Optie koppelingen voor gebruiker"
   user_profile: 
     profile_title_too_long: "Titel is te lang"
     tabs: 
