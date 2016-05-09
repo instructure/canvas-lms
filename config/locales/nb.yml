@@ -3,6 +3,7 @@
 --- 
 nb: 
   1_item_scores_5512cd03: "1- Element poeng"
+  1_user_found_76399771: "1 bruker funnet."
   1st_reviewer_3c1d0119: "1st Anmelder"
   25th_75th_ile_406a67bf: "25. til 75. %ile"
   25th_75th_percentile_aa4c11f2: "25. til 75. persentil"
@@ -42,6 +43,7 @@ nb:
   LongTextEditor: 
     cancel: Avbryt
     save: Lagre
+  _b4455c8b: "%"
   _section_not_synced_yet_cd07d0dd: "-- Seksjon synkroniseres ikke ennå"
   _start_from_a_template__a03ea3b3: "-- Begynn fra en mal --"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En beregnede verdien brukes ikke med denne beregningsmetoden"
@@ -1309,6 +1311,7 @@ nb:
   add_students_to_the_course_874be8fb: "Legg til studenter til kurset"
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til kurset"
   add_user_e73e8e50: "Legg til bruker"
+  add_users_to_name_b8109bbb: "Legg brukere til %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til dine oppgaver. Du kan lage en lang liste, eller bryte dem opp i grupper - og til og med spesifisere vekting for hver oppgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg inn Zendesk Instance sin tilpassede felt-ID for hver av følgende (felt som ikke har ID-er, vil ikke bli loggført):"
   admin_4d3ba42f: Admin
