@@ -26,7 +26,6 @@ define [
       availableContexts = (c.asset_string for c in contexts)
       @contexts   = fragmentData.show.split(',') if fragmentData.show
       @contexts or= selectedContexts
-      @contexts or= userSettings.get('checked_calendar_codes')
       @contexts or= availableContexts
 
       @contexts = _.intersection(@contexts, availableContexts)
@@ -41,13 +40,13 @@ define [
       if !@savedContexts
         @savedContexts = @contexts
         @contexts = []
-        @notify()
+        @notifyOnChange()
 
     restoreList: () =>
       if @savedContexts
         @contexts = @savedContexts
         @savedContexts = null
-        @notify()
+        @notifyOnChange()
 
     toggle: (context) ->
       index = $.inArray context, @contexts
@@ -56,9 +55,15 @@ define [
       else
         @contexts.push context
         @contexts.shift() if @contexts.length > 10
+      @notifyOnChange()
+
+    notifyOnChange: =>
       @notify()
 
-    notify: ->
+      $.ajaxJSON '/api/v1/calendar_events/save_selected_contexts', 'POST',
+        selected_contexts: @contexts
+
+    notify: =>
       $.publish 'Calendar/visibleContextListChanged', [@contexts]
 
       @$holder.find('.context_list_context').each (i, li) =>
@@ -69,11 +74,9 @@ define [
            .find('.context-list-toggle-box')
            .attr('aria-checked', visible)
 
+      userSettings.set('checked_calendar_codes', @contexts)
+
   return sidebar = (contexts, selectedContexts, dataSource) ->
-
-    if selectedContexts
-      userSettings.set('checked_calendar_codes', selectedContexts)
-
     $holder   = $('#context-list-holder')
     $skipLink = $('.skip-to-calendar')
     $colorPickerBtn = $('.ContextList__MoreBtn')
@@ -85,8 +88,6 @@ define [
     $holder.on 'click keyclick', '.context-list-toggle-box', (event) ->
       parent = $(this).closest('.context_list_context')
       visibleContexts.toggle $(parent).data('context')
-      userSettings.set('checked_calendar_codes',
-        _.map($(parent).parent().children('.checked'), (c) -> $(c).data('context')))
 
     $holder.on 'click keyclick', '.ContextList__MoreBtn', (event) ->
       positions =

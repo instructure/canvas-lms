@@ -1548,4 +1548,24 @@ describe Attachment do
       expect(json[:upload_params]['Filename']).to eq 'test.txt'
     end
   end
+
+  describe 'copy_to_folder!' do
+    before(:once) do
+      attachment_model filename: 'test.txt'
+      @folder = @context.folders.create! name: 'over there'
+    end
+
+    it 'copies a file into a folder' do
+      dup = @attachment.copy_to_folder!(@folder)
+      expect(dup.root_attachment).to eq @attachment
+      expect(dup.display_name).to eq 'test.txt'
+    end
+
+    it "handles duplicates" do
+      attachment_model filename: 'test.txt', folder: @folder
+      dup = @attachment.copy_to_folder!(@folder)
+      expect(dup.root_attachment).to eq @attachment
+      expect(dup.display_name).not_to eq 'test.txt'
+    end
+  end
 end

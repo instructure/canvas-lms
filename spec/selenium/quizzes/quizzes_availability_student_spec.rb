@@ -18,7 +18,7 @@ describe 'Taking a quiz as a student' do
 
     it 'prevents taking the quiz', priority: 1, test_id: 140615 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      expect(f('#take_quiz_link')).to be_nil
+      expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation').text).to include_text "This quiz is locked " \
         "until #{format_time_for_view(@quiz.unlock_at)}"
     end
@@ -33,7 +33,7 @@ describe 'Taking a quiz as a student' do
 
     it 'prevents taking the quiz', priority: 1, test_id: 140616 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      expect(f('#take_quiz_link')).to be_nil
+      expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation').text).to include_text "This quiz was locked " \
         "#{format_time_for_view(@quiz.lock_at)}"
     end

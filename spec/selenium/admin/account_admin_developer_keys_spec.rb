@@ -18,7 +18,7 @@ describe 'developer keys' do
 
   it 'should create without error', priority: "1", test_id: 344077 do
     get "/accounts/#{Account.default.id}/developer_keys"
-    expect(ff("#keys tbody tr").length).to eq 0
+    expect(f("#keys")).not_to contain_css("tbody tr")
 
     f(".add_key").click
     expect(f("#edit_dialog")).to be_displayed
@@ -79,7 +79,7 @@ describe 'developer keys' do
     f("#keys tbody tr.key .delete_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying_until { ff("#keys tbody tr").length == 0 }
+    expect(f("#keys")).not_to contain_css("tbody tr")
     expect(Account.default.developer_keys.nondeleted.count).to eq 0
   end
 

@@ -133,7 +133,7 @@ define [
       events
 
     processNextRequest: (inFlightCheckKey='default') =>
-      for id, [method, args, key] of @pendingRequests
+      for [method, args, key], id in @pendingRequests
         if key == inFlightCheckKey
           @pendingRequests.splice(id, 1)
           method args...

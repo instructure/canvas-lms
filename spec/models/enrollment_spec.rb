@@ -1916,14 +1916,6 @@ describe Enrollment do
     end
   end
 
-  describe "#sis_user_id" do
-    it "should work when sis_source_id is nil" do
-      course_with_student(:active_all => 1)
-      expect(@enrollment.sis_source_id).to be_nil
-      expect(@enrollment.sis_user_id).to be_nil
-    end
-  end
-
   describe "updating cached due dates" do
     before :once do
       course_with_student
@@ -1937,6 +1929,12 @@ describe Enrollment do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).with(@course)
       @course.enroll_student(user)
+    end
+
+    it "does not trigger a batch when enrollment is not student" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
+      @course.enroll_teacher(user)
     end
 
     it "triggers a batch when enrollment is deleted" do

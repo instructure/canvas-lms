@@ -53,31 +53,30 @@ describe "calendar2" do
         event = @course.calendar_events.create!(title: "ohai",
                                                 start_at: start_date, end_at: start_date + 1.hour)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 1
+        expect(ff('.ig-row').length).to eq 1
         fj('.context-list-toggle-box:last').click
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should be navigable via the jump-to-date control" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 1
+        expect(ff('.ig-row').length).to eq 1
       end
 
       it "should be navigable via the minical" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
         f('.fc-prev-button').click
         f('#right-side .fc-day-number').click
-        wait_for_ajaximations
-        keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
+        expect(ff('.ig-row').length).to eq 1
       end
 
       it "should persist the start date across reloads" do
@@ -124,8 +123,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should allow deleting assignments", priority: "1", test_id: 138858 do
@@ -139,8 +137,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should allow deleting a quiz", priority: "1" do
@@ -153,8 +150,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should display midnight assignments at 11:59" do
@@ -262,8 +258,7 @@ describe "calendar2" do
           f('.event-details .delete_event_link').click
           fj('.ui-dialog:visible .btn-primary').click
 
-          wait_for_ajaximations
-          expect(ffj('.ig-row').length).to eq 0
+          expect(f("#content")).not_to contain_css('.ig-row')
         end
 
         it "should allow editing via modal", priority: "1", test_id: 138855 do
@@ -338,7 +333,7 @@ describe "calendar2" do
 
       # click on the event and rxpect there not to be a delete button
       f('.ig-row').click
-      expect(f('.event-details .delete_event_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
   end
 end

@@ -24,16 +24,20 @@ describe 'Course Grading Periods' do
       expect(period_title).to eq(@account_grading_period.title)
     end
 
-    it 'allows deleting grading periods', priority: "1", test_id: 202320 do
-      create_grading_periods_for(@course)
+    it 'allows grading periods to be deleted', priority: "1", test_id: 202320 do
+      grading_period_selector = '.grading-period'
+      create_grading_periods_for(@course, grading_periods: [:old, :current])
       get "/courses/#{@course.id}/grading_standards"
-      expect(ff('.grading-period').length).to be 1
-      expect(f(".icon-delete-grading-period")).to be_present
+      expect(ff(grading_period_selector).length).to be 2
+      f('.icon-delete-grading-period').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      expect(ff(grading_period_selector).length).to be 1
     end
 
     it 'does not allow adding grading periods', priority: "1", test_id: 239999 do
       get "/courses/#{@course.id}/grading_standards"
-      expect(f("#add-period-button")).not_to be_present
+      expect(f('#grading_periods')).to_not contain_css(('#add-period-button'))
     end
 
     it 'allows updating grading periods', priority: "1", test_id: 202317 do

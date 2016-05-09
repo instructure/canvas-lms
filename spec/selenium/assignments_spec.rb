@@ -43,7 +43,7 @@ describe "assignments" do
       it "should not exist in a published assignment", priority: "1", test_id: 140648 do
         create_assignment
 
-        expect(f(".save_and_publish")).to be_nil
+        expect(f("#content")).not_to contain_css(".save_and_publish")
       end
 
       context "moderated grading assignments" do
@@ -174,8 +174,8 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      driver.execute_script "$('.edit_assignment').first().hover().click()"
-      expect(fj('.form-dialog .ui-datepicker-trigger:visible')).to be_nil
+      hover_and_click(".edit_assignment")
+      expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       expect(f('.multiple_due_dates input').attribute('disabled')).to be_present
       assignment_title = f("#assign_#{@assignment.id}_assignment_name")
       assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
@@ -300,7 +300,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f(".description.teacher-version")).to be_present
-      expect(ff(".edit_assignment_link")).to be_empty
+      expect(f("#content")).not_to contain_css(".edit_assignment_link")
     end
 
     context "group assignments" do
@@ -365,14 +365,14 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
         wait_for_ajaximations
-        expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
+        expect(f("div#assignment_group_#{@frozen_assign.assignment_group_id}")).not_to contain_css("a.delete_group")
       end
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
         wait_for_ajaximations
-        expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
+        expect(f("div#assignment_#{@frozen_assign.id}")).not_to contain_jqcss("a.delete_assignment:visible")
       end
 
       it "should allow editing the due date even if completely frozen", priority: "2", test_id: 649310 do
@@ -402,7 +402,7 @@ describe "assignments" do
 
       accept_alert
       wait_for_ajaximations
-      expect(element_exists("#assignment_#{as.id}")).to be_falsey
+      expect(f("#content")).not_to contain_css("#assignment_#{as.id}")
 
       as.reload
       expect(as.workflow_state).to eq 'deleted'
@@ -549,7 +549,7 @@ describe "assignments" do
       it 'should not show when no passback configured', priority: "1", test_id: 244956 do
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
+        expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
       end
 
       it 'should show when powerschool is enabled', priority: "1", test_id: 244913 do
@@ -575,7 +575,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
+        expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
       end
 
       it 'should display post to SIS icon on assignments page when enabled', priority: "2", test_id: 649314 do

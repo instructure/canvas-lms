@@ -29,7 +29,7 @@ describe "announcements" do
         f('#delete').click
         driver.switch_to.alert.accept
         wait_for_ajax_requests
-        expect(ff('.discussion-topic').count).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
         expect(what_to_create.where(:workflow_state => 'active').count).to eq 0
       end
 
@@ -91,7 +91,7 @@ describe "announcements" do
         announcement_model(:title => title, :user => @user)
         get url
 
-        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
         f('.discussion-actions .al-trigger').click
         wait_for_ajaximations
         f('.al-options li a.icon-lock').click
@@ -101,7 +101,7 @@ describe "announcements" do
         wait_for_ajaximations
         f('.al-options li a.icon-lock').click
         wait_for_ajaximations
-        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
       end
 
       it "should remove an announcement when it is deleted from the delete option in the cog menu", priority: "1", test_id: 220364 do
@@ -116,7 +116,7 @@ describe "announcements" do
         alert = driver.switch_to.alert
         expect(alert.text).to match "Are you sure you want to delete this announcement?"
         alert.accept
-        expect(f('.discussion-topic')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should start a new topic", priority: "1", test_id: 150528 do
@@ -180,21 +180,7 @@ describe "announcements" do
         driver.switch_to.alert.accept
         wait_for_ajaximations
         expect(what_to_create.last.workflow_state).to eq 'deleted'
-        expect(f('.discussionTopicIndexList')).to be_nil
-      end
-
-      it "should reorder topics", priority: "1", test_id: 220368 do
-        3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
-        get url
-
-        topics = ff('.discussion-topic')
-        driver.action.move_to(topics[0]).perform
-        # drag first topic to second place
-        # (using topics[2] as target to get the dragging to work)
-        driver.action.drag_and_drop(fj('.discussion-drag-handle:visible', topics[0]), topics[2]).perform
-        wait_for_ajax_requests
-        new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
-        expect(new_topics[0]).not_to include_text('new topic 0')
+        expect(f("#content")).not_to contain_css('.discussionTopicIndexList')
       end
     end
 
@@ -246,7 +232,7 @@ describe "announcements" do
       expect {
         f('.external_feed .close').click
         wait_for_ajax_requests
-        expect(element_exists('.external_feed')).to be_falsey
+        expect(f("#content")).not_to contain_css('.external_feed')
       }.to change(ExternalFeed, :count).by(-1)
     end
 

@@ -23,15 +23,15 @@ module AccountReports::ReportHelper
 
   def parse_utc_string(datetime)
     if datetime.is_a? String
-      Time.use_zone('UTC') {Time.zone.parse(datetime)}
+      Time.use_zone('UTC') { Time.zone.parse(datetime) }
     else
       datetime
     end
   end
 
-# This function will take a datetime or a datetime string and convert into
-# iso8601 for the root_account's timezone
-# A string datetime needs to be in UTC
+  # This function will take a datetime or a datetime string and convert into
+  # iso8601 for the root_account's timezone
+  # A string datetime needs to be in UTC
   def default_timezone_format(datetime, account=root_account)
     datetime = parse_utc_string(datetime)
     if datetime
@@ -45,13 +45,13 @@ module AccountReports::ReportHelper
   # strftime for the root_account's timezone
   # it will then format the datetime using the given format string
   def timezone_strftime(datetime, format, account=root_account)
-    if datetime = parse_utc_string(datetime)
+    if (datetime = parse_utc_string(datetime))
       (datetime.in_time_zone(account.default_time_zone)).strftime(format)
     end
   end
 
-# This function will take a datetime string and parse into UTC from the
-# root_account's timezone
+  # This function will take a datetime string and parse into UTC from the
+  # root_account's timezone
   def account_time_parse(datetime, account=root_account)
     Time.use_zone(account.default_time_zone) do
       Time.zone.parse datetime.to_s rescue nil
@@ -68,7 +68,7 @@ module AccountReports::ReportHelper
 
   def term
     if (term_id = (@account_report.has_parameter? "enrollment_term_id") || (@account_report.has_parameter? "enrollment_term"))
-      @term ||= api_find(root_account.enrollment_terms,term_id)
+      @term ||= api_find(root_account.enrollment_terms, term_id)
     end
   end
 
@@ -91,7 +91,8 @@ module AccountReports::ReportHelper
   end
 
   def assignment_group
-    if(assignment_group_id = (@account_report.has_parameter? "assignment_group_id") || (@account_report.has_parameter? "assignment_group"))
+    if (assignment_group_id = (@account_report.has_parameter? "assignment_group_id") ||
+      (@account_report.has_parameter? "assignment_group"))
       @assignment_group = course.assignment_groups.find(assignment_group_id)
     end
   end
@@ -102,9 +103,9 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_term_scope(scope,table = 'courses')
+  def add_term_scope(scope, table = 'courses')
     if term
-      scope.where(table => { :enrollment_term_id => term })
+      scope.where(table => {:enrollment_term_id => term})
     else
       scope
     end
@@ -130,15 +131,15 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_course_enrollments_scope(scope,table = 'enrollments')
+  def add_course_enrollments_scope(scope, table = 'enrollments')
     if course
-      scope.where(table => { :course_id => course })
+      scope.where(table => {:course_id => course})
     else
       scope
     end
   end
 
-  def add_user_sub_account_scope(scope,table = 'users')
+  def add_user_sub_account_scope(scope, table = 'users')
     if account != root_account
       scope.where("EXISTS (SELECT user_id
                            FROM #{UserAccountAssociation.quoted_table_name} uaa
@@ -170,7 +171,7 @@ module AccountReports::ReportHelper
   def report_extra_text
     if check_report_key(:enrollment_term_id)
       add_extra_text(I18n.t('account_reports.default.term_text', "Term: %{term_name};",
-                       :term_name => term_name))
+                            :term_name => term_name))
     end
 
     if start_at && check_report_key(:start_at)
@@ -222,15 +223,18 @@ module AccountReports::ReportHelper
       file)
   end
 
-  def write_report(headers)
+  def write_report(headers, &block)
+    file = generate_and_run_report(headers, &block)
+    Shackles.activate(:master) { send_report(file) }
+  end
+
+  def generate_and_run_report(headers)
     file = AccountReports.generate_file(@account_report)
     CSV.open(file, "w") do |csv|
       csv << headers
-      yield csv
+      Shackles.activate(:slave) { yield csv }
     end
-    Shackles.activate(:master) do
-      send_report(file)
-    end
+    file
   end
 
   def add_extra_text(text)

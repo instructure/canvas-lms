@@ -37,7 +37,7 @@ describe "assignments turn it in" do
     wait_for_ajaximations
 
     # dialog is closed and removed from the page
-    expect(f('#assignment_turnitin_settings')).to be_nil
+    expect(f("#content")).not_to contain_css('#assignment_turnitin_settings')
   end
 
   def expected_settings

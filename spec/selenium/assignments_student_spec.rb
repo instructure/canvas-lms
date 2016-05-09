@@ -83,7 +83,7 @@ describe "assignments" do
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
       expect(f('.ui-state-error')).to be_displayed
-      expect(f('#assignment_show')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_show')
     end
 
     it "should verify lock until date is enforced" do
@@ -115,7 +115,7 @@ describe "assignments" do
       driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
       expect(f(".student-assignment-overview")).to be_displayed
     end
 
@@ -127,7 +127,7 @@ describe "assignments" do
       driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
-      expect(f(".student-assignment-overview")).to be_nil
+      expect(f("#content")).not_to contain_css(".student-assignment-overview")
     end
 
     context "overridden lock_at" do
@@ -295,11 +295,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('.new_assignment')).to be_nil
-      expect(f('#addGroup')).to be_nil
-      expect(f('.add_assignment')).to be_nil
+      expect(f("#content")).not_to contain_css('.new_assignment')
+      expect(f("#content")).not_to contain_css('#addGroup')
+      expect(f("#content")).not_to contain_css('.add_assignment')
       move_to_click("label[for=show_by_type]")
-      expect(f("ag_#{ag.id}_manage_link")).to be_nil
+      expect(f("#content")).not_to contain_css("ag_#{ag.id}_manage_link")
     end
 
     it "should default to grouping by date" do
@@ -337,11 +337,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('#assignment_group_overdue')).to be_nil
-      expect(f('#assignment_group_past')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_group_overdue')
+      expect(f("#content")).not_to contain_css('#assignment_group_past')
 
       move_to_click("label[for=show_by_type]")
-      expect(f("#assignment_group_#{empty_ag.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#assignment_group_#{empty_ag.id}")
     end
 
     it "should show empty assignment groups if they have a weight" do

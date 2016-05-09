@@ -3,6 +3,7 @@ require 'nokogiri'
 module Qti
 class AssessmentTestConverter
   include Canvas::Migration::XMLHelper
+  include HtmlHelper
   DEFAULT_POINTS_POSSIBLE = 1
 
   attr_reader :base_dir, :identifier, :href, :interaction_type, :title, :quiz
@@ -80,6 +81,18 @@ class AssessmentTestConverter
       end
       if id = get_node_att(meta, 'instructureField[name=assignment_identifierref]', 'value')
         @quiz[:assignment_migration_id] = id
+      end
+
+      if @opts[:flavor] == Qti::Flavors::D2L
+        if intro = get_node_att(meta, 'instructureField[name=d2l_intro_message]', 'value')
+          @quiz[:questions].unshift({:question_type => 'text_only_question', :question_text => intro, :migration_id => unique_local_id})
+        end
+        if html = get_node_att(meta, 'instructureField[name=assessment_rubric_html]', 'value')
+          if node = (Nokogiri::HTML::DocumentFragment.parse(html) rescue nil)
+            description = sanitize_html_string(node.text)
+            @quiz[:description] = description if description.present?
+          end
+        end
       end
     end
   end

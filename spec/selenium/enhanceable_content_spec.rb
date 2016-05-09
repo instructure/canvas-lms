@@ -151,7 +151,7 @@ describe "enhanceable_content" do
         student_in_course(:course => @course, :active_user => true)
         user_session(@student)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
-        expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).to be_nil
+        expect(f("#content")).not_to contain_css('#media_comment_0_deadbeef span.media_comment_thumbnail')
       end
 
       it "should show for teachers" do

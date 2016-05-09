@@ -148,7 +148,7 @@ describe "course settings" do
       wait_for_ajaximations
       f('.student_view_button').click
       wait_for_ajaximations
-      expect(fln("Home")).not_to be_present
+      expect(f("#content")).not_to contain_link("Home")
     end
 
     it "should add a section" do
@@ -297,7 +297,7 @@ describe "course settings" do
     ffj("#tab-details input:visible").each do |input|
       expect(input.attribute('disabled')).to be_present
     end
-    expect(f(".course_form button[type='submit']")).to be_nil
+    expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
 
   context "link validator" do

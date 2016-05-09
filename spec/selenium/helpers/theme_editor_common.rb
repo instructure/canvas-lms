@@ -33,12 +33,12 @@ module ThemeEditorCommon
     wait_for_ajaximations
   end
 
-  def single_warning_message
-    f('.ic-Form-message--error')
+  def warning_message_css
+    '.ic-Form-message--error'
   end
 
   def all_warning_messages
-    ff('.ic-Form-message--error')
+    ff(warning_message_css)
   end
 
   def click_global_branding

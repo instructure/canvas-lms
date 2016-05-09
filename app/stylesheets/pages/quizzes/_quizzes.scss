@@ -1794,17 +1794,6 @@ ul#quiz_versions {
   }
 }
 
-// use a solid color instead of a gradient in IE, because IE's gradient
-// filter causes the box to hide overflow (including the box's comment
-// arrow.
-.ie .quiz_comment {
-  background: #f4f5f6;
-  filter: none;
-  &:after {
-    border-bottom-color: #f4f5f6;
-  }
-}
-
 .answer_comment_holder {
   border-radius: 5px;
   border: 1px solid #faa;

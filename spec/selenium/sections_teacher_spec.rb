@@ -37,7 +37,7 @@ describe "sections" do
       wait_for_ajaximations
 
       expect(fj("#enrollment_#{e1.id} .unenroll_user_link")).not_to be_nil
-      expect(fj("#enrollment_#{e2.id} .unenroll_user_link")).to be_nil
+      expect(f("#content")).not_to contain_css("#enrollment_#{e2.id} .unenroll_user_link")
     end
   end
 end

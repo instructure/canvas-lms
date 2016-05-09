@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'nokogiri'
-  spec.add_dependency 'sanitize', '~> 2.0.3'
+  spec.add_dependency 'sanitize', '~> 2.1.0'
   spec.add_dependency 'canvas_text_helper'
   spec.add_dependency 'iconv', '~> 1.0'
 

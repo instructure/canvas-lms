@@ -160,13 +160,13 @@ describe "discussions" do
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('.discussion-title').text).to eq "Student Discussion"
-        expect(f('#topic_publish_button')).not_to be_present
+        expect(f("#content")).not_to contain_css('#topic_publish_button')
       end
 
       it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223507 do
         # given
         get url
-        expect(f('#disussion_attachment_uploaded_data')).to be_nil
+        expect(f("#content")).not_to contain_css('#disussion_attachment_uploaded_data')
         # when
         course.allow_student_forum_attachments = true
         course.save!
@@ -181,7 +181,7 @@ describe "discussions" do
         it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223508 do
           # given
           get url
-          expect(f('label[for=discussion_attachment_uploaded_data]')).to be_nil
+          expect(f("#content")).not_to contain_css('label[for=discussion_attachment_uploaded_data]')
           # when
           course.allow_student_forum_attachments = true
           course.save!

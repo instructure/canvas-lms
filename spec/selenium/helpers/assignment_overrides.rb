@@ -300,7 +300,7 @@ module AssignmentOverridesSeleniumHelper
 
   def obtain_date_from_quiz_show_page(row_number, cell_number, load_page=false)
     get "/accounts/#{@account.id}/courses/#{@course.id}/quizzes/#{@quiz.id}" if load_page
-    fj("tr:nth-child(#{row_number}) td:nth-child(#{cell_number}) .screenreader-only", f('.assignment-dates'))
+    f("tr:nth-child(#{row_number}) td:nth-child(#{cell_number}) .screenreader-only")
   end
 
   def validate_quiz_show_page(message)

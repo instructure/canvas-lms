@@ -2833,6 +2833,20 @@ describe 'Submissions API', type: :request do
           'media_type' => 'audio',
         })
       end
+
+      it "should copy files to the submissions folder if they're not there already" do
+        @course.root_account.enable_feature! :submissions_folder
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
+        a2 = attachment_model(:context => @user)
+        json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
+        submission_attachment_ids = json['attachments'].map { |a| a['id'] }
+        expect(submission_attachment_ids.size).to eq 2
+        expect(submission_attachment_ids.delete(a1.id)).not_to be_nil
+        copy = Attachment.find(submission_attachment_ids.last)
+        expect(copy.folder).to eq @user.submissions_folder(@course)
+        expect(copy.root_attachment).to eq a2
+      end
     end
 
     context "submission file uploads" do
@@ -2862,6 +2876,18 @@ describe 'Submissions API', type: :request do
       it "should reject uploading files to other students' submissions" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
                         { :controller => "submissions_api", :action => "create_file", :format => "json", :course_id => @course.to_param, :assignment_id => @assignment.to_param, :user_id => @student2.to_param }, {}, {}, { :expected_status => 401 })
+      end
+
+      it "should upload to a student's Submissions folder if the feature is enabled" do
+        @course.root_account.enable_feature! :submissions_folder
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        f = Attachment.last.folder
+        expect(f.submission_context_code).to eq @course.asset_string
+      end
+
+      it "should not do so otherwise" do
+        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
+        expect(Attachment.last.folder).not_to be_for_submissions
       end
     end
 

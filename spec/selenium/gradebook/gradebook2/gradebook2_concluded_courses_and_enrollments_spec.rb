@@ -155,7 +155,7 @@ describe "gradebook2 - concluded courses and enrollments" do
       cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
       expect(cell.text).to eq '10'
       cell.click
-      expect(f('.grade', cell)).to be_nil # no input box for entry
+      expect(cell).not_to contain_css('.grade') # no input box for entry
     end
   end
 end

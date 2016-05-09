@@ -273,6 +273,14 @@ class Attachment < ActiveRecord::Base
     dup
   end
 
+  def copy_to_folder!(folder, on_duplicate = :rename)
+    copy = self.clone_for(folder.context, nil, force_copy: true)
+    copy.folder = folder
+    copy.save!
+    copy.handle_duplicates(on_duplicate)
+    copy
+  end
+
   def ensure_media_object
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/

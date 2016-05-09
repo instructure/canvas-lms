@@ -45,12 +45,12 @@ describe "discussions" do
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
           driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
-          keep_trying_until { expect(ff('.discussion_entry.unread')).to be_empty }
+          expect(f("#content")).not_to contain_css('.discussion_entry.unread')
           expect(ff('.discussion_entry.read').length).to eq reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
           # refresh page and make sure nothing is unread and everthing is .read
           get url
-          expect(ff(".discussion_entry.unread")).to be_empty
+          expect(f("#content")).not_to contain_css('.discussion_entry.unread')
           expect(f('.new-and-total-badge .new-items').text).to eq ''
 
           # Mark one as unread manually, and create a new reply. The new reply
@@ -85,12 +85,12 @@ describe "discussions" do
           get url
 
           expect(ff('.discussion-entries .unread').length).to eq reply_count
-          expect(ff('.discussion-entries .read').length).to eq 0
+          expect(f("#content")).not_to contain_css('.discussion-entries .read')
 
           f("#discussion-managebar .al-trigger").click
           f('.mark_all_as_read').click
           wait_for_ajaximations
-          expect(ff('.discussion-entries .unread').length).to eq 0
+          expect(f('.discussion-entries')).not_to contain_css('.unread')
           expect(ff('.discussion-entries .read').length).to eq reply_count
         end
 
@@ -168,7 +168,7 @@ describe "discussions" do
         it "should collapse and expand reply", priority: "1", test_id: 150486 do
           f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
-          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")
           f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
@@ -214,8 +214,8 @@ describe "discussions" do
         it "should collapse and expand multiple replies", priority: "1", test_id: 150490 do
           f('#collapseAll').click
           wait_for_ajaximations
-          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
-          expect(fj("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")
           f('#expandAll').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
@@ -227,7 +227,7 @@ describe "discussions" do
         message = %{<p><object width="425" height="350" data="http://www.example.com/swf/software/flash/about/flash_animation.swf" type="application/x-shockwave-flash</object></p>"}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        expect(f('#content object')).not_to be_present
+        expect(f("#content")).not_to contain_css("object")
         iframe = f('#content iframe.user_content_iframe')
         expect(iframe).to be_present
         # the sizing isn't exact due to browser differences
@@ -262,8 +262,8 @@ describe "discussions" do
         message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        expect(f('#content object')).not_to be_present
-        expect(f('#content embed')).not_to be_present
+        expect(f("#content")).not_to contain_css("object")
+        expect(f("#content")).not_to contain_css("embed")
         iframe = f('#content iframe.user_content_iframe')
         expect(iframe).to be_present
         forms = ff('form.user_content_post_form')
@@ -281,7 +281,7 @@ describe "discussions" do
 
       it "should display the current username when adding a reply", priority: "1", test_id: 150485 do
         get url
-        expect(get_all_replies.count).to eq 0
+        expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
         expect(get_all_replies.count).to eq 1
         expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name

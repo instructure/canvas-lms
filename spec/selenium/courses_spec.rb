@@ -82,7 +82,7 @@ describe "courses" do
       it "should not show course status if published and graded submissions exist" do
         course_with_student_submissions({submission_points: true})
         get "/courses/#{@course.id}"
-        expect(f('#course_status')).to be_nil
+        expect(f("#content")).not_to contain_css('#course_status')
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
@@ -109,7 +109,7 @@ describe "courses" do
         @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
 
         get "/courses/#{@course.id}"
-        expect(f('#course_status_actions')).to be_nil
+        expect(f("#content")).not_to contain_css('#course_status_actions')
       end
     end
 
@@ -128,7 +128,7 @@ describe "courses" do
 
       def check_if_item_not_complete(item)
         expect(f("#wizard_#{item}.ic-wizard-box__content-trigger")).to be_displayed
-        expect(f("#wizard_#{item}.ic-wizard-box__content-trigger--checked")).to be_nil
+        expect(f("#content")).not_to contain_css("#wizard_#{item}.ic-wizard-box__content-trigger--checked")
       end
 
       it "should open up the choose home page dialog from the wizard" do
@@ -178,7 +178,6 @@ describe "courses" do
       it "should complete 'Select Navigation Links' checklist item" do
         skip_if_chrome('research')
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Navigate to Navigation tab
         go_to_checklist
@@ -199,7 +198,6 @@ describe "courses" do
         skip_if_chrome('research')
 
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Navigate to Calendar tab
         go_to_checklist
@@ -220,12 +218,10 @@ describe "courses" do
       it "should complete 'Publish the Course' checklist item" do
         skip_if_chrome('research')
         course_with_teacher_logged_in
-        get "/courses/#{@course.id}"
 
         # Publish from Checklist
         go_to_checklist
         f('#wizard_publish_course').click
-        wait_for_ajaximations
         f('.ic-wizard-box__message-button button').click
 
         go_to_checklist
@@ -302,7 +298,7 @@ describe "courses" do
       # Test that the page loads properly the first time.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
       expect(ff('.roster .rosterUser').length).to eq 50
     end
 
@@ -343,36 +339,6 @@ describe "courses" do
       wait_for_ajaximations
       sections = ff('.roster .section')
       expect(sections.map(&:text).sort).to eq ["One", "One", "Two", "Unnamed Course", "Unnamed Course"]
-    end
-
-    it "should display users section name properly when separated by custom roles" do
-      course_with_teacher_logged_in(:active_all => true)
-      user1 = user
-      section1 = @course.course_sections.create!(:name => 'One')
-      section2 = @course.course_sections.create!(:name => 'Two')
-
-      role1 = @course.account.roles.build :name => "CustomStudent1"
-      role1.base_role_type = "StudentEnrollment"
-      role1.save!
-      role2 = @course.account.roles.build :name => "CustomStudent2"
-      role2.base_role_type = "StudentEnrollment"
-      role2.save!
-
-      @course.enroll_user(user1, "StudentEnrollment", :section => section1, :role => role1).accept!
-      @course.enroll_user(user1, "StudentEnrollment", :section => section2, :role => role2, :allow_multiple_enrollments => true).accept!
-      roles_to_sections = {'CustomStudent1' => 'One', 'CustomStudent2' => 'Two'}
-
-      get "/courses/#{@course.id}/users"
-
-      wait_for_ajaximations
-
-      role_wrappers = ff('.student_roster .users-wrapper')
-      role_wrappers.each do |rw|
-        role_name = ff('.h3', rw).first.text
-        sections = ff('.section', rw)
-        expect(sections.count).to eq 1
-        expect(roles_to_sections[role_name]).to eq sections.first.text
-      end
     end
 
     context "course_home_sub_navigation lti apps" do
@@ -424,7 +390,7 @@ describe "courses" do
         tool.workflow_state = 'deleted'
         tool.save!
         get "/courses/#{@course.id}"
-        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
+        expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
 
       it "should not display admin tools to students" do
@@ -437,7 +403,7 @@ describe "courses" do
 
         course_with_student_logged_in(course: @course, active_all: true)
         get "/courses/#{@course.id}"
-        expect(ff(".course-home-sub-navigation-lti").size).to eq 0
+        expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
     end
 
@@ -468,7 +434,7 @@ describe "courses" do
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
       assert_flash_notice_message /Invitation accepted!/
-      expect(f(".ic-notification button[name='accept'] ")).to be_nil
+      expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
     end
 
     it "should accept the course invitation" do

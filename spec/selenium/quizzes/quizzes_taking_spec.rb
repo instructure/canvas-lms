@@ -52,7 +52,7 @@ describe "quiz taking" do
     expect(f('#take_quiz_link')).to be_present
     expect_new_page_load{f('#take_quiz_link').click}
     answer_questions_and_submit(@quiz, 2)
-    expect(f('#take_quiz_link')).to be_nil
+    expect(f("#content")).not_to contain_css('#take_quiz_link')
   end
 
   it 'should show take quiz button for admins enrolled as a student' do

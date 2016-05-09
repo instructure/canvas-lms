@@ -329,7 +329,7 @@ shared_examples_for "permission tests" do
           button.send_keys(:enter)
           expect(f('.btn-group.open')).to be_displayed # it opened
           button.send_keys(:escape)
-          expect(f('.btn-group.open')).to be_falsey # it closed
+          expect(f("#content")).not_to contain_css('.btn-group.open') # it closed
           check_element_has_focus(button)
         end
       end

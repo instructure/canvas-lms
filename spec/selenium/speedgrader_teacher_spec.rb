@@ -98,7 +98,7 @@ describe "speed grader" do
     f('#add_attachment').click
     expect(f('#comment_attachments input')).to be_displayed
     f('#comment_attachments a').click
-    expect(element_exists('#comment_attachments input')).to be_falsey
+    expect(f("#comment_attachments")).not_to contain_css("input")
 
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
@@ -168,7 +168,7 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    expect(ff("#avatar_image").length).to eq 0
+    expect(f("#content")).not_to contain_css("#avatar_image")
     expect(ff("#comments > .comment .avatar").length).to eq 1
     expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
   end
@@ -217,10 +217,9 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    keep_trying_until { ffj('#students_selectmenu option').size > 0 }
-    expect(ffj('#students_selectmenu option').size).to eq 1 # just the one student
-    expect(ffj('#section-menu ul li').size).to eq 1 # "Show all sections"
-    expect(fj('#students_selectmenu #section-menu')).to be_nil # doesn't get inserted into the menu
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(ff('#section-menu ul li').size).to eq 1 # "Show all sections"
+    expect(f("#students_selectmenu")).not_to contain_css('#section-menu') # doesn't get inserted into the menu
   end
 
   it "displays inactive students" do
@@ -231,8 +230,7 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    keep_trying_until { ffj('#students_selectmenu option').size > 0 }
-    expect(ffj('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
     expect(f('#enrollment_inactive_notice').text).to eq 'Notice: Inactive Student'
 
     replace_content f('#grading-box-extended'), "5", tab_out: true

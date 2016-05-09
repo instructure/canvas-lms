@@ -44,7 +44,7 @@ define([
             className={ToggleButtonClasses}
             onClick={this.handleChange}>
             <span className="screenreader-only">
-              {this.state.recent_activity_dashboard ? I18n.t("Show dashcard view") : I18n.t("Show recent activity stream")}
+              {this.state.recent_activity_dashboard ? I18n.t("Show dashboard card view") : I18n.t("Show recent activity stream")}
             </span>
             <div className="dashboard-toggle-button-layout" aria-hidden={true}>
               <div

@@ -48,6 +48,10 @@ describe "Exportable" do
       expect(zip).not_to be_nil
     end
 
+    it "creates a zip file whose name includes the cartridge's name" do
+      expect(zip_path).to include('unicode-filename-test')
+    end
+
     after do
       File.delete(epub_path) if File.exist?(epub_path)
       File.delete(zip_path) if File.exist?(zip_path)

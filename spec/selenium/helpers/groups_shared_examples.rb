@@ -80,7 +80,7 @@ shared_examples 'announcements_page' do |context|
     expect_new_page_load { f('.btn-primary').click }
     fj(".ui-accordion-header a:contains('Announcements')").click
     expect(fln('Group Announcement')).to be_displayed
-    expect(fln('Course Announcement')).to be_nil
+    expect(f("#content")).not_to contain_link('Course Announcement')
   end
 
   it "should only access group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273624, teacher: 324931) do
@@ -124,7 +124,7 @@ shared_examples 'pages_page' do |context|
     wait_for_ajaximations
     fj(".ui-accordion-header a:contains('Wiki Pages')").click
     expect(fln("#{group_page.title}")).to be_displayed
-    expect(fln("#{course_page.title}")).to be_nil
+    expect(f("#content")).not_to contain_link("#{course_page.title}")
   end
 
   it "should only access group files in pages right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
@@ -160,7 +160,7 @@ shared_examples 'discussions_page' do |context|
     expect_new_page_load { f('.btn-primary').click }
     fj(".ui-accordion-header a:contains('Discussions')").click
     expect(fln("#{group_dt.title}")).to be_displayed
-    expect(fln("#{course_dt.title}")).to be_nil
+    expect(f("#content")).not_to contain_link("#{course_dt.title}")
   end
 
   it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do

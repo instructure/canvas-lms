@@ -127,7 +127,7 @@ describe "content migrations", :non_parallel do
       expect(cancel_btn).to be_displayed
       cancel_btn.click
 
-      expect(f('#migrationFileUpload')).not_to be_present
+      expect(f("#content")).not_to contain_css('#migrationFileUpload')
     end
 
     it "should submit, queue and list migrations" do
@@ -404,7 +404,7 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
 
       expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
-      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
+      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
 
       admin_logged_in
 
@@ -425,7 +425,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
+      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
       f('#include_completed_courses').click
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end

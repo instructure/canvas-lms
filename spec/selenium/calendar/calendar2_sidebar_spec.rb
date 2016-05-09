@@ -58,7 +58,7 @@ describe "calendar2" do
         wait_for_ajax_requests
 
         #Because it is in a past month, it should not be on the mini calendar
-        expect(f(".event")).to be_nil
+        expect(f("#content")).not_to contain_css(".event")
 
         #Go back a month
         f(".fc-prev-button").click
@@ -78,13 +78,13 @@ describe "calendar2" do
           expect(context_course_item).to have_class('checked')
           expect(f('.fc-event')).to be_displayed
 
-          fj('.context_list_context:nth-child(2) .context-list-toggle-box').click
+          f('.context_list_context:nth-child(2) .context-list-toggle-box').click
           expect(context_course_item).to have_class('not-checked')
-          expect(element_exists('.fc_event')).to be_falsey
+          expect(f("#content")).not_to contain_css('.fc_event')
         end
 
         it "should constrain context selection to 10" do
-          30.times do |x|
+          11.times do |x|
             course_with_teacher(:course_name => "Course #{x + 1}", :user => @user, :active_all => true).course
           end
 
@@ -110,7 +110,7 @@ describe "calendar2" do
 
           # Click the toggle button. First button should be user, second should be course
           ff(".context-list-toggle-box")[1].click
-          expect(f('.fc-title')).to be_nil
+          expect(f("#content")).not_to contain_css('.fc-title')
 
           #Turn back on the calendar and verify that your item appears
           ff(".context-list-toggle-box")[1].click

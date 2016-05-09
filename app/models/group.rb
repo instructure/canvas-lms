@@ -177,8 +177,12 @@ class Group < ActiveRecord::Base
   end
 
   def participants(include_observers=false)
-    # argument needed because #participants is polymorphic for contexts
-    participating_users.uniq
+    users = participating_users.uniq.all
+    if include_observers && self.context.is_a?(Course)
+      (users + User.observing_students_in_course(users, self.context)).flatten.uniq
+    else
+      users
+    end
   end
 
   def context_code
@@ -733,7 +737,7 @@ class Group < ActiveRecord::Base
     user.favorites.where(:context_type => 'Group', :context_id => self).exists?
   end
 
-  def submissions_folder
+  def submissions_folder(_course = nil)
     return @submissions_folder if @submissions_folder
     Folder.unique_constraint_retry do
       @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')

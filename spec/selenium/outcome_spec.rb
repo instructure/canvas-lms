@@ -122,7 +122,10 @@ describe "outcomes" do
 
         it "should retain the settings after saving", priority: "1", test_id: 261714 do
           click_option('#calculation_method', "n Number of Times")
-          save_without_error(rand(2..5), 'n Number of Times')
+          save_without_error(3, 'n Number of Times')
+          refresh_page
+          fj('.outcomes-sidebar .outcome-level:first li').click
+          expect(f('#calculation_int').text).to eq('3')
           expect(f('#calculation_method').text).to include('n Number of Times')
         end
       end

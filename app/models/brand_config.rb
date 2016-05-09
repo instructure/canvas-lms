@@ -61,7 +61,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def get_value(variable_name)
-    self.variables[variable_name]
+    effective_variables[variable_name]
   end
 
   def overrides?
@@ -96,12 +96,28 @@ class BrandConfig < ActiveRecord::Base
     scss_dir.join('_brand_variables.scss')
   end
 
+  def to_json
+    BrandableCSS.all_brand_variable_values(self).to_json
+  end
+
+  def json_file
+    public_brand_dir.join("variables-#{BrandableCSS.default_variables_md5}.json")
+  end
+
   def scss_dir
     BrandableCSS.branded_scss_folder.join(md5)
   end
 
+  def public_brand_dir
+    BrandableCSS.public_brandable_css_folder.join(md5)
+  end
+
   def public_folder
     "dist/brandable_css/#{md5}"
+  end
+
+  def public_json_path
+    "#{public_folder}/variables-#{BrandableCSS.default_variables_md5}.json"
   end
 
   def save_scss_file!
@@ -110,10 +126,32 @@ class BrandConfig < ActiveRecord::Base
     scss_file.write(to_scss)
   end
 
-  def remove_scss_file!
-    return unless scss_dir.exist?
-    logger.info "removing: #{scss_dir}"
-    scss_dir.rmtree
+  def save_json_file!
+    logger.info "saving brand variables file: #{json_file}"
+    public_brand_dir.mkpath
+    json_file.write(to_json)
+    move_json_to_s3_if_enabled!
+  end
+
+  def move_json_to_s3_if_enabled!
+    return unless Canvas::Cdn.enabled?
+    s3_uploader.upload_file(public_json_path)
+    File.delete(json_file)
+  end
+
+  def s3_uploader
+    @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
+  end
+
+  def save_all_files!
+    save_scss_file!
+    save_json_file!
+  end
+
+  def remove_scss_dir!
+    return unless brand_dir.exist?
+    logger.info "removing: #{brand_dir}"
+    brand_dir.rmtree
   end
 
   def compile_css!(opts=nil)
@@ -143,7 +181,7 @@ class BrandConfig < ActiveRecord::Base
 
   def save_and_sync_to_s3!(progress=nil)
     progress.update_completion!(5) if progress
-    save_scss_file!
+    save_all_files!
     progress.update_completion!(10) if progress
     compile_css! on_progress: -> (percent_complete) {
       # send at most 1 UPDATE query per 2 seconds
@@ -163,7 +201,7 @@ class BrandConfig < ActiveRecord::Base
       first
     if unused_brand_config
       unused_brand_config.destroy
-      unused_brand_config.remove_scss_file!
+      unused_brand_config.remove_brand_dir!
     end
   end
 

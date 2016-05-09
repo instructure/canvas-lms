@@ -225,10 +225,6 @@ class SubmissionsController < ApplicationController
       if online_upload?
         return unless extensions_allowed?
         return unless has_file_attached?
-
-        # Create and save Attachment objects, and store them in our params data structure for later processing
-        create_and_save_uploaded_attachments
-
       elsif is_google_doc?
         params[:submission][:submission_type] = 'online_upload'
         attachment = submit_google_doc(params[:google_doc][:document_id])
@@ -244,6 +240,7 @@ class SubmissionsController < ApplicationController
     end
 
     params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
+    copy_attachments_to_submissions_folder! if @context.root_account.feature_enabled?(:submissions_folder)
 
     begin
       @submission = @assignment.submit_homework(@current_user, params[:submission])
@@ -302,6 +299,16 @@ class SubmissionsController < ApplicationController
   end
   private :lookup_existing_attachments
 
+  def copy_attachments_to_submissions_folder!
+    params[:submission][:attachments].map! do |attachment|
+      if attachment.folder.for_submissions?
+        attachment # already in a submissions folder
+      else
+        attachment.copy_to_folder!(attachment.context.submissions_folder(@context))
+      end
+    end
+  end
+
   def is_media_recording?
     return params[:submission][:submission_type] == 'media_recording'
   end
@@ -349,22 +356,6 @@ class SubmissionsController < ApplicationController
     return true
   end
   private :process_api_submission_params
-
-  def create_and_save_uploaded_attachments
-    params[:attachments].each do |idx, attachment|
-      if attachment[:uploaded_data] && !attachment[:uploaded_data].is_a?(String)
-        attachment[:user] = @current_user
-        if @group
-          attachment = @group.attachments.new(attachment)
-        else
-          attachment = @current_user.attachments.new(attachment)
-        end
-        attachment.save
-        params[:submission][:attachments] << attachment
-      end
-    end
-  end
-  private :create_and_save_uploaded_attachments
 
   def online_upload?
     return params[:attachments] && params[:submission][:submission_type] == 'online_upload'

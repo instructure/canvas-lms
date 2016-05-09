@@ -59,13 +59,14 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}"
       wait_for_ajaximations
       # validations
-      expect(element_exists('.al-trigger')).to be_truthy
+      expect(f('.al-trigger')).to be_present
       expect(f('.course-title')).to include_text 'Unnamed Course'
-      expect(element_exists('span.front-page.label')).to be_falsey
-      expect(element_exists('button.btn.btn-published')).to be_falsey
+      content = f("#content")
+      expect(content).not_to contain_css('span.front-page.label')
+      expect(content).not_to contain_css('button.btn.btn-published')
       f('.al-trigger').click
-      expect(element_exists('.icon-trash')).to be_falsey
-      expect(element_exists('.icon-clock')).to be_truthy
+      expect(content).not_to contain_css('.icon-trash')
+      expect(f('.icon-clock')).to be_present
     end
 
     it "navigates to the wiki pages edit page from the show page" do
@@ -80,7 +81,7 @@ describe "Wiki Pages" do
 
     it "should alert a teacher when accessing a non-existant page", priority: "1", test_id: 126842 do
       get "/courses/#{@course.id}/pages/fake"
-      expect(flash_message_present?(:info)).to be_truthy
+      expect_flash_message :info
     end
 
     it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
@@ -124,7 +125,7 @@ describe "Wiki Pages" do
       fj('button:contains("Delete")').click
       wait_for_ajaximations
       get "/courses/#{@course.id}/pages/deleted"
-      expect(flash_message_present?(:info)).to be_truthy
+      expect_flash_message :info
     end
   end
 
@@ -139,12 +140,12 @@ describe "Wiki Pages" do
       page.workflow_state = 'deleted'
       page.save!
       get "/courses/#{@course.id}/pages/delete_deux"
-      expect(flash_message_present?(:warning)).to be_truthy
+      expect_flash_message :warning
     end
 
     it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
       get "/courses/#{@course.id}/pages/non-existant"
-      expect(flash_message_present?(:warning)).to be_truthy
+      expect_flash_message :warning
     end
   end
 
@@ -485,7 +486,7 @@ describe "Wiki Pages" do
       foo = @course.wiki.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
-      expect(f('.view_all_pages')).to be_nil
+      expect(f("#content")).not_to contain_css('.view_all_pages')
 
     end
   end

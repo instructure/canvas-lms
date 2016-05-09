@@ -7,6 +7,7 @@ module SeleniumDriverSetup
   RECENT_SPEC_FAILURE_LIMIT = 10
   # Number of failures to record
   MAX_FAILURES_TO_RECORD = 20
+  IMPLICIT_WAIT_TIMEOUT = 10
 
   def setup_selenium
 
@@ -30,7 +31,7 @@ module SeleniumDriverSetup
 
     focus_viewport driver if run_headless?
 
-    driver.manage.timeouts.implicit_wait = 10
+    driver.manage.timeouts.implicit_wait = IMPLICIT_WAIT_TIMEOUT
     driver.manage.timeouts.script_timeout = 60
 
     driver

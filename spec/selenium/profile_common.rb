@@ -79,7 +79,7 @@ shared_examples 'user settings change pic cancel' do |context|
 
     fj('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only :contains("Cancel")').click
     wait_for_ajaximations
-    expect(f('.ui-widget-overlay')).to be_nil
+    expect(f("body")).not_to contain_css('.ui-widget-overlay')
   end
 end
 

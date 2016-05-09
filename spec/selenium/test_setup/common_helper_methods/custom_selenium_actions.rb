@@ -35,24 +35,22 @@ module CustomSeleniumActions
   # find an element via css selector
   #
   # like other selenium methods, this will wait until it finds the
-  # element on the page
+  # element on the page, and will eventually raise if it's not found
+  #
+  # if you need to assert the non-existence of something, instead
+  # consider using the contain_css matcher, as it will return as soon as
+  # it can (but wait if necessary), e.g.
+  #
+  #   expect(f('#content')).not_to contain_css('.this-should-be-gone')
   def f(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    begin
-      (scope || driver).find_element :css, selector
-    rescue
-      nil
-    end
+    (scope || driver).find_element :css, selector
   end
 
   # short for find with link
   def fln(link_text, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    begin
-      (scope || driver).find_element :link, link_text
-    rescue
-      nil
-    end
+    (scope || driver).find_element :link, link_text
   end
 
   # find an element via fake-jquery-css selector
@@ -61,34 +59,45 @@ module CustomSeleniumActions
   # vanilla css, prefer `f` over `fj`.
   #
   # like other selenium methods, this will wait until it finds the
-  # element on the page
+  # element on the page, and will eventually raise if it's not found
+  #
+  # if you need to assert the non-existence of something, instead consider
+  # using the contain_jqcss matcher, as it will return as soon as it
+  # can (but wait if necessary), e.g.
+  #
+  #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    begin
-      keep_trying_until { find_with_jquery selector, scope }
-    rescue
-      nil
-    end
+    keep_trying_until { find_with_jquery selector, scope }
+  rescue Selenium::WebDriver::Error::TimeOutError
+    raise Selenium::WebDriver::Error::NoSuchElementError
   end
 
-  # same as `f` except tries to find several elements instead of one
+  # same as `f`, but returns all matching elements
+  #
+  # like other selenium methods, this will wait until it finds elements on
+  # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    begin
-      (scope || driver).find_elements :css, selector
-    rescue
-      []
-    end
+    result = (scope || driver).find_elements :css, selector
+    raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
+    result
   end
 
-  # same as find with jquery but tries to find several elements instead of one
+  # same as `fj`, but returns all matching elements
+  #
+  # like other selenium methods, this will wait until it finds elements on
+  # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    begin
-      find_all_with_jquery selector, scope
-    rescue
-      []
+    result = nil
+    keep_trying_until do
+      result = find_all_with_jquery(selector, scope)
+      result.present?
     end
+    result
+  rescue Selenium::WebDriver::Error::TimeOutError
+    raise Selenium::WebDriver::Error::NoSuchElementError
   end
 
   def find_with_jquery(selector, scope = nil)
@@ -137,8 +146,13 @@ module CustomSeleniumActions
     Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
-  def element_exists(css_selector)
-    !ffj(css_selector).empty?
+  # this is a smell; you should know what's on the page you're testing,
+  # so conditionally doing stuff based on elements == :poop:
+  def element_exists?(selector)
+    disable_implicit_wait { f(selector) }
+    true
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    false
   end
 
   def first_selected_option(select_element)
@@ -181,8 +195,10 @@ module CustomSeleniumActions
     driver.execute_script(src)
   end
 
-  def switch_views_available?
-    fj('a.switch_views:visible').present? || fj('a.toggle_question_content_views_link:visible').present?
+  def assert_can_switch_views!
+    fj('a.switch_views:visible,a.toggle_question_content_views_link:visible')
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "switch views is not available!"
   end
 
   def switch_editor_views(tiny_controlling_element)
@@ -190,20 +206,14 @@ module CustomSeleniumActions
       tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
     end
     selector = tiny_controlling_element.to_s.to_json
-    keep_trying_until { switch_views_available? }
+    assert_can_switch_views!
     driver.execute_script(%Q{
       $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
     })
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id=nil)
-    if switch_views_available?
-      switch_editor_views(tiny_controlling_element)
-      tiny_controlling_element.clear
-      expect(tiny_controlling_element[:value]).to be_empty
-      switch_editor_views(tiny_controlling_element)
-    else
-      raise "Must provide iframe Id if we can't switch views" unless iframe_id
+    if iframe_id
       in_frame iframe_id do
         tinymce_element = f("body")
         while tinymce_element.text.length > 0 do
@@ -212,6 +222,12 @@ module CustomSeleniumActions
           tinymce_element = f("body")
         end
       end
+    else
+      assert_can_switch_views!
+      switch_editor_views(tiny_controlling_element)
+      tiny_controlling_element.clear
+      expect(tiny_controlling_element[:value]).to be_empty
+      switch_editor_views(tiny_controlling_element)
     end
   end
 
@@ -413,5 +429,107 @@ module CustomSeleniumActions
   def move_to_click(selector)
     el = driver.find_element :css, selector
     driver.action.move_to(el).click.perform
+  end
+
+  def disable_implicit_wait
+    driver.manage.timeouts.implicit_wait = 0
+    yield
+  ensure
+    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
+  end
+end
+
+# assert the presence (or absence) of something inside the element via css
+# selector. will return as soon as the expectation is met, e.g.
+#
+#   expect(f('#courses')).to contain_css("#course_123")
+#   f('#delete_course').click
+#   expect(f('#courses')).not_to contain_css("#course_123")
+#
+RSpec::Matchers.define :contain_css do |selector|
+  match do |element|
+    begin
+      # rely on implicit_wait
+      f(selector, element)
+      true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
+    end
+  end
+
+  match_when_negated do |element|
+    disable_implicit_wait do # so find_element calls return ASAP
+      begin
+        keep_trying_until do
+          begin
+            f(selector, element)
+            false
+          rescue Selenium::WebDriver::Error::NoSuchElementError
+            true
+          end
+        end
+      rescue Selenium::WebDriver::Error::TimeOutError
+        false
+      end
+    end
+  end
+end
+
+# assert the presence (or absence) of something inside the element via
+# fake-jquery-css selector. will return as soon as the expectation is met,
+# e.g.
+#
+#   expect(f('#weird-ui')).to contain_css(".something:visible")
+#   f('#hide-things').click
+#   expect(f('#weird-ui')).not_to contain_css(".something:visible")
+#
+RSpec::Matchers.define :contain_jqcss do |selector|
+  match do |element|
+    begin
+      keep_trying_until { find_with_jquery(selector, element) }
+      true
+    rescue Selenium::WebDriver::Error::TimeOutError
+      false
+    end
+  end
+
+  match_when_negated do |element|
+    begin
+      keep_trying_until { !find_with_jquery(selector, element) }
+    rescue Selenium::WebDriver::Error::TimeOutError
+      false
+    end
+  end
+end
+
+# assert the presence (or absence) of a link with certain text inside the
+# element. will return as soon as the expectation is met, e.g.
+#
+#   expect(f('#weird-ui')).to contain_link("Click Here")
+#   f('#hide-things').click
+#   expect(f('#weird-ui')).not_to contain_link("Click Here")
+#
+RSpec::Matchers.define :contain_link do |text|
+  match do |element|
+    begin
+      # rely on implicit_wait
+      fln(text, element)
+      true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
+    end
+  end
+
+  match_when_negated do |element|
+    disable_implicit_wait do # so find_element calls return ASAP
+      keep_trying_until do
+        begin
+          fln(text, element)
+          false
+        rescue Selenium::WebDriver::Error::NoSuchElementError
+          true
+        end
+      end
+    end
   end
 end

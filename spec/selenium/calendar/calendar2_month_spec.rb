@@ -85,6 +85,7 @@ describe "calendar2" do
           @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
           @initial_time_str = @initial_time.strftime('%Y-%m-%d')
           @one_day_later = @initial_time + 24.hours
+          @one_day_later_str = @one_day_later.strftime('%Y-%m-%d')
           @three_days_earlier = @initial_time - 72.hours
         end
 
@@ -103,7 +104,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Friday
           expect(element_location).to eq @friday
@@ -123,7 +124,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Friday
           expect(element_location).to eq @friday
@@ -143,7 +144,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Event should be moved to Friday
           expect(element_location).to eq @friday
@@ -163,7 +164,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Assignment should be moved to Monday
           expect(element_location).to eq @monday
@@ -183,7 +184,7 @@ describe "calendar2" do
                                 find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
 
           # Expect no pop up errors with drag and drop
-          expect(flash_message_present?(:error)).to be false
+          expect_no_flash_message :error
 
           # Event should be moved to Monday
           expect(element_location).to eq @monday
@@ -205,6 +206,22 @@ describe "calendar2" do
           original_day_text = format_time_for_view(date_of_middle_day.to_datetime)
           extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
+        end
+
+        it "allows dropping onto the minical" do
+          # fullcalendar drop onto minical doesn't work under webpack. We should figure out why...
+          pending("fullcalendar drop onto minical doesn't work under webpack") if CANVAS_WEBPACK
+
+          event = make_event(start: @initial_time)
+          load_month_view
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(f('.calendar .fc-event'), fj("#minical .fc-day-number[data-date=#{@one_day_later_str}]"))
+          keep_trying_until { fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]") }
+          wait_for_ajaximations
+
+          event.reload
+          expect(event.start_at).to eq(@one_day_later)
         end
       end
 
@@ -259,10 +276,10 @@ describe "calendar2" do
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        expect(fj('.fc-event:visible')).to be_nil
+        expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        expect(fj('.fc-event:visible')).to be_nil
+        expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
       end
 
       it "should delete an assignment" do
@@ -275,10 +292,10 @@ describe "calendar2" do
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        expect(fj('.fc-event')).to be_nil
+        expect(f("#content")).not_to contain_css('.fc-event')
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        expect(fj('.fc-event')).to be_nil
+        expect(f("#content")).not_to contain_css('.fc-event')
       end
 
       it "should not have a delete link for a frozen assignment" do

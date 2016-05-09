@@ -601,10 +601,10 @@ describe "quizzes" do
       upload_attachment_answer
       expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
       # delete the attachment id
-      fj('.delete-attachment').click
-      keep_trying_until { expect(fj('.answered')).to eq nil }
+      f('.delete-attachment').click
+      expect(f("#content")).not_to contain_css('.answered')
 
-      fj('.upload-label').click
+      f('.upload-label').click
       wait_for_ajaximations
       keep_trying_until { expect(file_upload_submission_data).to eq [""] }
       upload_attachment_answer
@@ -685,7 +685,7 @@ describe "quizzes" do
       @quiz.save!
 
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
-      expect(ff("#take_quiz_link").size).to eq 0
+      expect(f("#content")).not_to contain_css("#take_quiz_link")
     end
   end
 end

@@ -2,11 +2,13 @@
   <%= appointment_group_url(asset.appointment_group) %>
 <% end %>
 
+<% if asset.grants_right?(user, :read) -%>
 <% define_content :footer_link do %>
   <a href="<%= content(:link) %>">
     <%= t 'click_to_see_appointment', 'Click here to view the appointment' %>
   </a>
 <% end %>
+<% end -%>
 
 <% courses = asset.appointment_group.participant_type == 'Group' ?
     asset.appointment_group.contexts.first.name  :
@@ -41,7 +43,11 @@
           <td valign="top"><%= asset.context.name %></td>
       </tr>
     <% end %>
-    <% if asset.appointment_group.available_slots -%>
+    <tr>
+      <td style="padding-right: 10px;" valign="top"><%= t 'Course' %>:</td>
+      <td valign="top"><%= courses %></td>
+    </tr>
+    <% if asset.appointment_group.available_slots && asset.grants_right?(user, :read) -%>
       <tr>
           <td style="padding-right: 10px;" valign="top"><%= t :slots_remaining, 'Available time slots' %>:</td>
           <td valign="top"><%= asset.appointment_group.available_slots %></td>

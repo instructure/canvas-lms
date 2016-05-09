@@ -8,6 +8,8 @@ require 'open3'
 # changes here if they happen may need to be mirrored in that file.
 
 module BrandableCSS
+  extend ActionView::Helpers::AssetTagHelper
+
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
@@ -85,13 +87,29 @@ module BrandableCSS
       end.freeze
     end
 
+    def variables_map_with_image_urls
+      @variables_map_with_image_urls ||= variables_map.each_with_object({}) do |(key, config), memo|
+        if config['type'] == 'image'
+          memo[key] = config.merge('default' => image_url(config['default']))
+        else
+          memo[key] = config
+        end
+      end.freeze
+    end
+
+    def default_variables_md5
+      @default_variables_md5 ||= Digest::MD5.hexdigest(variables_map_with_image_urls.to_json)
+    end
+
     # gets the *effective* value for a brandable variable
-    def brand_variable_value(variable_name, active_brand_config=nil)
+    def brand_variable_value(variable_name, active_brand_config=nil, config_map=variables_map)
       explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
       return explicit_value if explicit_value
-      config = variables_map[variable_name]
+      config = config_map[variable_name]
       default = config['default']
-      return brand_variable_value(default[1..-1], active_brand_config) if default && default.starts_with?('$')
+      if default && default.starts_with?('$')
+        return brand_variable_value(default[1..-1], active_brand_config, config_map)
+      end
 
       # while in our sass, we want `url(/images/foo.png)`,
       # the Rails Asset Helpers expect us to not have the '/images/', eg: <%= image_tag('foo.png') %>
@@ -99,8 +117,50 @@ module BrandableCSS
       default
     end
 
+    def all_brand_variable_values(active_brand_config=nil)
+      variables_map.each_with_object({}) do |(key, _), memo|
+        memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls)
+      end
+    end
+
     def branded_scss_folder
       Pathname.new(CONFIG['paths']['branded_scss_folder'])
+    end
+
+    def public_brandable_css_folder
+      Pathname.new('public/dist/brandable_css')
+    end
+
+    def default_brand_folder
+      public_brandable_css_folder.join('default')
+    end
+
+    def default_brand_json_file
+      default_brand_folder.join("variables-#{default_variables_md5}.json")
+    end
+
+    def default_json
+      all_brand_variable_values.to_json
+    end
+
+    def save_default_json!
+      default_brand_folder.mkpath
+      default_brand_json_file.write(default_json)
+      move_default_json_to_s3_if_enabled!
+    end
+
+    def move_default_json_to_s3_if_enabled!
+      return unless Canvas::Cdn.enabled?
+      s3_uploader.upload_file(public_default_json_path)
+      File.delete(default_brand_json_file)
+    end
+
+    def s3_uploader
+      @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
+    end
+
+    def public_default_json_path
+      "dist/brandable_css/default/variables-#{default_variables_md5}.json"
     end
 
     def variants

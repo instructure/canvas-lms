@@ -18,7 +18,7 @@ describe "help dialog" do
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
   end
 
@@ -29,13 +29,13 @@ describe "help dialog" do
 
     it "should show the Help dialog when help is clicked and feedback is enabled" do
       get "/dashboard"
-      expect(element_exists("#help-dialog")).to be_falsey
-      expect(ff('.help_dialog_trigger').length).to eq 0
+      expect(f("body")).not_to contain_css('#help-dialog')
+      expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       expect(ff('.help_dialog_trigger').length).to eq 2
-      expect(element_exists("#help-dialog")).to be_falsey
+      expect(f("body")).not_to contain_css('#help-dialog')
       f('.help_dialog_trigger').click
       wait_for_ajaximations
       expect(f("#help-dialog")).to be_displayed
@@ -69,7 +69,7 @@ describe "help dialog" do
       Setting.set('show_feedback_link', 'true')
       course_with_ta(course: @course)
       get "/courses/#{@course.id}"
-      expect(element_exists("#help-dialog")).to be_falsey
+      expect(f("body")).not_to contain_css("#help-dialog")
       trigger = f('.help_dialog_trigger')
       expect(trigger).to be_displayed
       trigger.click
@@ -126,7 +126,7 @@ describe "help dialog" do
       f('.help_dialog_trigger').click
       wait_for_ajaximations
       expect(f("#help-dialog")).to be_displayed
-      expect(element_exists("#help-dialog a[href='#teacher_feedback']")).to be_falsey
+      expect(f("#help-dialog")).not_to contain_css("a[href='#teacher_feedback']")
     end
 
     it "should show the Help dialog on the speedGrader when help is clicked and feedback is enabled" do
@@ -135,7 +135,7 @@ describe "help dialog" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
-      expect(ff('.help_dialog_trigger').length).to eq 0
+      expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

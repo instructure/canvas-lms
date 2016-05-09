@@ -40,7 +40,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.17'
-gem 'canvas-jobs', '0.10.5'
+gem 'inst-jobs', '0.11.1'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -92,7 +92,7 @@ gem 'ruby-saml-mod', '0.3.0'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
-gem 'sanitize', '2.0.6', require: false
+gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.1.0'
 
 gem 'useragent', '0.10.0', require: false

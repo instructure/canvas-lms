@@ -44,7 +44,7 @@ describe "external tool buttons" do
       f(element).click
       wait_for_ajax_requests
     end
-    keep_trying_until { !expect(f("#external_tool_button_dialog")).not_to be_displayed }
+    expect(f("body")).not_to contain_jqcss("#external_tool_button_dialog:visible")
   end
 
   it "should work with groups" do
@@ -101,8 +101,8 @@ describe "external tool buttons" do
     # find things whose id *ends* with instructure_external_button_...
     expect(fj("[id$='instructure_external_button_#{tools[0].id}']")).to be_displayed
     expect(fj("[id$='instructure_external_button_#{tools[1].id}']")).to be_displayed
-    expect(fj("[id$='instructure_external_button_#{tools[2].id}']")).to be_nil
-    expect(fj("[id$='instructure_external_button_#{tools[3].id}']")).to be_nil
+    expect(f("#content")).not_to contain_jqcss("[id$='instructure_external_button_#{tools[2].id}']")
+    expect(f("#content")).not_to contain_jqcss("[id$='instructure_external_button_#{tools[3].id}']")
     expect(f(".mce_instructure_external_button_clump")).to be_displayed
     f(".mce_instructure_external_button_clump").click
 

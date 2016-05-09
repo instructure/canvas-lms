@@ -31,7 +31,7 @@ class Oauth2ProviderController < ApplicationController
       return render()
     end
 
-    scopes = params.fetch(:scopes, '').split(',')
+    scopes = (params[:scope] || params[:scopes] || '').split(' ')
 
     provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
 

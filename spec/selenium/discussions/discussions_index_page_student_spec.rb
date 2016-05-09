@@ -52,13 +52,13 @@ describe "discussions" do
         course.allow_student_discussion_topics = false
         course.save!
         get url
-        expect(f('#new-discussion-btn')).to be_nil
+        expect(f("#content")).not_to contain_css('#new-discussion-btn')
       end
 
       it "should not not be able to publish/unpublish discussions", priority: "1", test_id: 150508 do
         @course.discussion_topics.create!(user: teacher, title: 'Philip J. Fry', message: 'teacher topic message')
         get url
-        expect(f('.icon-unpublished')).to be_nil
+        expect(f("#content")).not_to contain_css('.icon-unpublished')
       end
 
       describe "gear menu" do
@@ -71,7 +71,7 @@ describe "discussions" do
           student_topic
           get(url)
           fj("[data-id=#{topic.id}] .al-trigger").click
-          expect(ffj('.icon-pin:visible').length).to eq 0
+          expect(f("#content")).not_to contain_jqcss('.icon-pin:visible')
         end
 
         it "should not allow a student to delete/edit topics if they didn't create any", priority: "1", test_id: 270944 do
@@ -109,7 +109,7 @@ describe "discussions" do
           f('.subscription-toggler').click
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-          expect(f('.icon-discussion-check')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion-check')
           expect(f('.icon-discussion')).to be_displayed
           teacher_topic.reload
           expect(teacher_topic.subscribed?(student)).to be_falsey
@@ -141,12 +141,12 @@ describe "discussions" do
           wait_for_subscription_icon_to_load("icon-discussion-check")
           expect(f('.icon-discussion-check')).to be_displayed
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
-          expect(f('.icon-discussion-check')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion-check')
           expect(f('.icon-discussion-x')).to be_displayed
           f('.subscription-toggler').click
           wait_for_ajaximations
           wait_for_subscription_icon_to_load("icon-discussion")
-          expect(f('.icon-discussion-x')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion-x')
           expect(f('.icon-discussion')).to be_displayed
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
           expect(f('.icon-discussion')).to be_displayed
@@ -156,7 +156,7 @@ describe "discussions" do
           get url
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseenter')})
-          expect(f('.icon-discussion')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion')
           expect(f('.icon-discussion-x')).to be_displayed
         end
       end

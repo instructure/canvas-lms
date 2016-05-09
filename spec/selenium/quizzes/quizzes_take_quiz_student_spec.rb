@@ -60,7 +60,7 @@ describe 'taking a quiz' do
         end
 
         def verify_no_access_code_prompt
-          expect(f('#quiz_access_code')).to be_falsey
+          expect(f("#content")).not_to contain_css('#quiz_access_code')
         end
 
         it 'only asks once for the access code', priority: "1", test_id: 522898 do

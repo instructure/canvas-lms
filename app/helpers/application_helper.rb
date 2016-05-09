@@ -278,9 +278,14 @@ module ApplicationHelper
       bundles = css_bundles.map do |(bundle,plugin)|
         css_url_for(bundle, plugin)
       end
+      bundles << css_url_for("disable_transitions") if disable_css_transitions?
       bundles << {:media => 'all'}
       stylesheet_link_tag(*bundles)
     end
+  end
+
+  def disable_css_transitions?
+    Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
   def css_variant
@@ -675,6 +680,12 @@ module ApplicationHelper
         brand_config_for_account(opts)
       end
     end
+  end
+
+  def active_brand_config_json_url(opts={})
+    path = active_brand_config(opts).try(:public_json_path)
+    path ||= BrandableCSS.public_default_json_path
+    "/#{path}"
   end
 
   def brand_config_for_account(opts={})

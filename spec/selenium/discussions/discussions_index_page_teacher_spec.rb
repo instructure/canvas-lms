@@ -82,7 +82,7 @@ describe "discussions" do
         # Student cannot reply to a closed discussion
         user_session(student)
         get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}"
-        expect(f('.discussion-reply-action')).not_to be_present
+        expect(f("#content")).not_to contain_css('.discussion-reply-action')
       end
 
 
@@ -199,7 +199,7 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           expect(topic.reload.workflow_state).to eq 'deleted'
-          expect(f('.discussion-list li.discussion')).to be_nil
+          expect(f("#content")).not_to contain_css('.discussion-list li.discussion')
         end
 
         it "should restore a deleted topic with replies", priority: "2", test_id: 927756 do

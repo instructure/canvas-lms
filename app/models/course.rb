@@ -2076,9 +2076,9 @@ class Course < ActiveRecord::Base
 
     visibilities = section_visibilities_for(user)
     visibility_level = enrollment_visibility_level_for(user, visibilities)
-    account_admin = visibility_level == :full && visibilities.empty?
+
     # teachers, account admins, and student view students can see student view students
-    if !visibilities.any?{|v|v[:admin] || v[:type] == 'StudentViewEnrollment' } && !account_admin
+    unless visibility_level == :full || visibilities.any?{|v| v[:admin] || v[:type] == 'StudentViewEnrollment' }
       scope = scope.where("enrollments.type<>'StudentViewEnrollment'")
     end
 
@@ -2465,28 +2465,6 @@ class Course < ActiveRecord::Base
       account = account.parent_account
     end
   end
-
-  # This will move the course to be in the specified account.
-  # All enrollments, sections, and other objects attached to the course will also be updated.
-  def move_to_account(new_root_account, new_sub_account=nil)
-    self.account = new_sub_account || new_root_account
-    self.save if new_sub_account
-    self.root_account = new_root_account
-    user_ids = []
-
-    CourseSection.where(:course_id => self).each do |cs|
-      cs.update_attribute(:root_account_id, new_root_account.id)
-    end
-
-    Enrollment.where(:course_id => self).each do |e|
-      e.update_attribute(:root_account_id, new_root_account.id)
-      user_ids << e.user_id
-    end
-
-    self.save
-    User.update_account_associations(user_ids)
-  end
-
 
   cattr_accessor :settings_options
   self.settings_options = {}

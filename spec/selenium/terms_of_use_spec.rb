@@ -9,7 +9,7 @@ describe "terms of use test" do
 
   it "should not require a user to accept the terms if they haven't changed", priority: "1", test_id: 268275 do
     login_as
-    expect(f('.reaccept_terms')).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
   it "should not require a user to accept the terms if already logged in when they change", priority: "2", test_id: 268712 do
@@ -18,7 +18,7 @@ describe "terms of use test" do
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
     get "/"
-    expect(f('.reaccept_terms')).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
   it "should require a user to accept the terms if they have changed", priority: "1", test_id: 268933 do
@@ -32,7 +32,7 @@ describe "terms of use test" do
       f('[name="user[terms_of_use]"]').click
       submit_form form
     }
-    expect(f('.reaccept_terms')).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
   it "should require users to check the box" do
@@ -95,7 +95,7 @@ describe "terms of use SOC2 compliance test" do
       submit_form form
     }
 
-    expect(f('.reaccept_terms')).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
   it "should grandfather in previously registered users without prompting them to reaccept the terms", priority: "1", test_id: 268936 do
@@ -111,11 +111,10 @@ describe "terms of use SOC2 compliance test" do
     login_as
 
     # terms page shouldn't be visible
-    expect(f('.reaccept_terms')).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
 
     # view a different page, verify terms page isn't displayed
     get "/profile/settings"
-    form = f('.reaccept_terms')
-    expect(form).not_to be_present
+    expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 end

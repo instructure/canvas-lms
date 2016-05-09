@@ -39,11 +39,11 @@ describe "dashboard" do
       item_selector = '#announcement-details tbody tr'
       expect(ff(item_selector).size).to eq 1
       f('#announcement-details .ignore-item').click
-      keep_trying_until { expect(ff(item_selector).size).to eq 0 }
+      expect(f("#content")).not_to contain_css(item_selector)
 
       # should still be gone on reload
       get url
-      expect(ff(item_selector).size).to eq 0
+      expect(f("#content")).not_to contain_css(item_selector)
 
       expect(@user.recent_stream_items.size).to eq 0
       expect(items.first.reload.hidden).to eq true
@@ -153,7 +153,7 @@ describe "dashboard" do
       assignment_model({:submission_types => ['online_text_entry'], :course => @course})
       get "/"
       find('.toggle-details').click
-      expect(element_exists(fj('.fake-link:contains("Unnamed")'))).to be true
+      expect(fj('.fake-link:contains("Unnamed")')).to be_present
     end
 
     it "should show account notifications on the dashboard", priority: "1", test_id: 215582 do
@@ -336,7 +336,7 @@ describe "dashboard" do
       Enrollment.update_all(:created_at => 1.minute.ago) # need to make created_at and updated_at different
 
       get "/"
-      expect(f('.no_recent_messages')).to be_nil
+      expect(f("#content")).not_to contain_css('.no_recent_messages')
 
       get "/courses/#{@second_course.id}"
       expect(f('.no_recent_messages')).to include_text('No Recent Messages')
@@ -430,7 +430,7 @@ describe "dashboard" do
         get "/courses"
         expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
 
-        expect(fj("#future_enrollments_table a[href='/courses/#{@c2.id}']")).to be_nil # should not have a link
+        expect(f("#content")).not_to contain_css("#future_enrollments_table a[href='/courses/#{@c2.id}']") # should not have a link
         expect(f("#future_enrollments_table")).to include_text(@c2.name) # but should still show restricted future enrollment
       end
 
@@ -464,7 +464,7 @@ describe "dashboard" do
         get "/"
 
         #verify todo list is updated
-        expect(f('.to-do-list > li')).to be_nil
+        expect(f("#content")).not_to contain_css('.to-do-list > li')
       end
     end
   end

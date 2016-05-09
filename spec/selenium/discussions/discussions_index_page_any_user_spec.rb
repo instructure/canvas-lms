@@ -51,7 +51,7 @@ describe "discussions" do
                                              })
           end
           get url
-          expect(f('.btn-large')).to be_nil
+          expect(f("#content")).not_to contain_css('.btn-large')
         end
       end
 
@@ -66,7 +66,7 @@ describe "discussions" do
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
           wait_for_subscription_icon_to_load("icon-discussion-check")
-          expect(f('.icon-discussion')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion')
           expect(f('.icon-discussion-check')).to be_displayed
           topic.reload
           expect(topic.subscribed?(somebody)).to be_truthy
@@ -82,7 +82,7 @@ describe "discussions" do
           wait_for_ajaximations
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
           wait_for_subscription_icon_to_load('icon-discussion')
-          expect(f('.icon-discussion-check')).to be_nil
+          expect(f("#content")).not_to contain_css('.icon-discussion-check')
           expect(f('.icon-discussion')).to be_displayed
           topic.reload
           expect(topic.subscribed?(somebody)).to be_falsey

@@ -13,18 +13,6 @@ define([
       userAvatarURL: React.PropTypes.string.isRequired
     },
 
-    getInitialState () {
-      return {
-        logoutFormSubmitted: false
-      };
-    },
-
-    submitLogoutForm() {
-      if (!this.state.logoutFormSubmitted) {
-        this.setState({logoutFormSubmitted: true}, () => this.refs.logoutForm.getDOMNode().submit());
-      }
-    },
-
     render() {
       return (
         <div>
@@ -80,9 +68,11 @@ define([
             <li className="ReactTray-list-item">
               <a href="/files" className="ReactTray-list-item__link">{I18n.t('Files')}</a>
             </li>
-            <li className="ReactTray-list-item">
-              <a href="/dashboard/eportfolios" className="ReactTray-list-item__link">{I18n.t('ePortfolios')}</a>
-            </li>
+            {window.ENV.SETTINGS.eportfolios_enabled &&
+              <li className="ReactTray-list-item">
+                <a href="/dashboard/eportfolios" className="ReactTray-list-item__link">{I18n.t('ePortfolios')}</a>
+              </li>
+            }
           </ul>
         </div>
       );

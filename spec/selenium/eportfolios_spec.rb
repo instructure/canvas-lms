@@ -147,11 +147,9 @@ describe "eportfolios" do
         f("#delete_eportfolio_form").displayed?
       }
       submit_form("#delete_eportfolio_form")
-      fj("#wrapper-container .eportfolios").click
-      keep_trying_until {
-        expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
-        expect(f("#portfolio_#{@eportfolio.id}")).to be_nil
-      }
+      f("#wrapper-container .eportfolios").click
+      expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
+      expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq 'deleted'
     end
 

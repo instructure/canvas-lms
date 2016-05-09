@@ -108,7 +108,7 @@ describe "Screenreader Gradebook" do
 
     replace_content f('#student_and_assignment_grade'), "15\t"
     wait_for_ajaximations
-    expect(f('p.resubmitted')).to be_nil
+    expect(f("#content")).not_to contain_css('p.resubmitted')
   end
 
   it 'grades match default gradebook grades', priority: "1", test_id: 163994 do
@@ -323,7 +323,7 @@ describe "Screenreader Gradebook" do
       it "is not displayed for assignments which are not submitted online" do
         click_option '#assignment_select', @assignment.name
 
-        expect(f("#submissions_download_button")).to_not be_present
+        expect(f("#content")).not_to contain_css("#submissions_download_button")
       end
 
       it "is displayed for assignments which allow both online and non-online submittion" do

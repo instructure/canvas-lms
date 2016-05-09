@@ -47,10 +47,6 @@ define [
     componentWillUpdate: (nextProps) ->
       @showingButtons = nextProps.selectedItems.length
 
-    componentDidUpdate: (prevProps) ->
-      if prevProps.selectedItems.length isnt @props.selectedItems.length
-        $.screenReaderFlashMessage(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length}))
-
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
     # dialog window. This allows us to do react things inside of this already rendered

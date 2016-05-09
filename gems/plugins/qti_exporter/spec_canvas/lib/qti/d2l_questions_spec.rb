@@ -2,7 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
 describe "Converting D2L QTI" do
   before do
-    skip("updating qtimigrationtool")
     @opts = { :flavor => Qti::Flavors::D2L }
   end
 
@@ -61,6 +60,7 @@ describe "Converting D2L QTI" do
   end
 
   it "should convert the assessment into a quiz" do
+    Qti::AssessmentTestConverter.any_instance.stubs(:unique_local_id).returns("random")
     expect(get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first).to eq D2LExpected::ASSESSMENT
   end
 
@@ -109,7 +109,7 @@ module D2LExpected
   TRUE_FALSE =
           {:question_type=>"true_false_question",
            :incorrect_comments=>"",
-           :points_possible=>1,
+           :points_possible=>5.0,
            :answers=>
                    [{:text=>"True",
                      :weight=>100,
@@ -131,11 +131,14 @@ module D2LExpected
                 :title=>"01 Early Bird Storybook Week 2",
                 :quiz_name=>"01 Early Bird Storybook Week 2",
                 :quiz_type=>nil,
-                :questions=>[{:migration_id=>"QUES_443669_562987", :question_type=>"question_reference"},
+                :questions=>[
+                             {:migration_id=>"random", :question_text=>"<p>introduction</p>", :question_type=>"text_only_question"},
+                             {:migration_id=>"QUES_443669_562987", :question_type=>"question_reference"},
                              {:migration_id=>"QUES_443669_123456", :question_type=>"question_reference"}],
                 :time_limit => 15,
                 :allowed_attempts=>-1,
-                :assignment_migration_id=>'435646'
+                :assignment_migration_id=>'435646',
+                :description => "<p>description</p>"
   }
 
   ASSESSMENT_REFS = {:title=>"Quiz 2",
@@ -159,7 +162,7 @@ module D2LExpected
                      :assignment_migration_id=>'164842'}
 
   LONG_ANSWER = {:question_bank_name=>"02gilback",
-                 :points_possible=>1,
+                 :points_possible=>5.0,
                  :answers=>[],
                  :question_text=>"Write an essay on writing essays",
                  :question_name=>"",
@@ -202,7 +205,7 @@ module D2LExpected
                     :incorrect_comments=>"",
                     :question_bank_id=>"SECT_3981973",
                     :question_bank_name=>"02gilback",
-                    :points_possible=>1,
+                    :points_possible=>6.2,
                     :answers=>
                             [{:comments=>"", :text=>"answer 1", :weight=>100},
                              {:comments=>"", :text=>"answer 2", :weight=>100},
@@ -220,7 +223,7 @@ module D2LExpected
               :incorrect_comments=>"",
               :question_bank_id=>"SECT_3981973",
               :question_bank_name=>"02gilback",
-              :points_possible=>1,
+              :points_possible=>5.0,
               :answers=>
                       [{:right=>"1",
                         :html=>"<em><strong>A</strong></em>",
@@ -251,7 +254,7 @@ module D2LExpected
           :question_bank_id=>"SECT_3981973",
           :incorrect_comments=>"",
           :imported_formula=>"2 * {x}   {y} - {z}",
-          :points_possible=>1,
+          :points_possible=>3.0,
           :question_bank_name=>"02gilback",
           :question_text=>"<p>Solve the formula:</p>",
           :question_name=>"multi variable math",
@@ -298,14 +301,14 @@ module D2LExpected
                   :question_type => "multiple_answers_question",
                   :question_bank_id => "SECT_3981973",
                   :incorrect_comments => "",
-                  :points_possible => 0,
+                  :points_possible => 2.5,
                   :question_bank_name => "02gilback",
                   :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>"}
 
   TEXT_ONLY = [{:answers => [],
                  :correct_comments => "",
                  :incorrect_comments => "",
-                 :points_possible => 1,
+                 :points_possible => 5.0,
                  :question_text => "<p>Is this <strong>true</strong> or false?</p>",
                  :question_name => "text only q 1",
                  :migration_id => "QUES_968903_1181388",
@@ -313,7 +316,7 @@ module D2LExpected
                 {:answers => [],
                  :correct_comments => "",
                  :incorrect_comments => "",
-                 :points_possible => 1,
+                 :points_possible => 5.0,
                  :question_text => "<img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
                  :question_name => "text only q 2",
                  :migration_id => "QUES_968903_1181388b",

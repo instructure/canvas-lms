@@ -56,7 +56,7 @@ describe "discussion availability" do
     expect(f(" .collectionViewItems .discussion[data-id = '#{@discussion_topic1.id}'] .discussion-date-available")).
                                                               to include_text("Not available until #{unlock_at_time}")
     fln('assignment topic title not available').click
-    expect(f('.discussion-reply-action')).not_to be_present
+    expect(f("#content")).not_to contain_css('.discussion-reply-action')
   end
 
   it "should show delayed discussion created by student under 'discussions' section", priority: "1", test_id: 150510 do

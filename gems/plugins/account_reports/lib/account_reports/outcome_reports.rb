@@ -101,11 +101,8 @@ module AccountReports
                                                    AND r.content_tag_id = ct.id)
           LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters])).
-        where("
-          ct.tag_type = 'learning_outcome'
-          AND ct.workflow_state <> 'deleted'
-          AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))"
-      )
+        where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
+               AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
         students = students.where("pseudonyms.workflow_state<>'deleted' AND c.workflow_state='available'")
@@ -142,34 +139,28 @@ module AccountReports
       t_headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
       t_headers << I18n.t('#account_reports.report_header_assignment_url', 'assignment url')
 
-        # Generate the CSV report
-      filename = AccountReports.generate_file(@account_report)
-      CSV.open(filename, "w") do |csv|
-        csv << t_headers
-        Shackles.activate(:slave) do
-          @total = students.count(:all)
-          i = 0
-          students.find_each do |row|
-            row = row.attributes.dup
-            row['assignment url'] =
-              "https://#{host}" +
-                "/courses/#{row['course id']}" +
-                "/assignments/#{row['assignment id']}"
-            row['submission date']=default_timezone_format(row['submission date'])
-            csv << headers.map { |h| row[h] }
+      # Generate the CSV report
+      write_report t_headers do |csv|
 
-            if i % 100 == 0
-              Shackles.activate(:master) do
-                @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-              end
+        @total = students.count(:all)
+        i = 0
+        students.find_each do |row|
+          row = row.attributes.dup
+          row['assignment url'] = "https://#{host}"
+          row['assignment url'] << "/courses/#{row['course id']}"
+          row['assignment url'] << "/assignments/#{row['assignment id']}"
+          row['submission date']=default_timezone_format(row['submission date'])
+          csv << headers.map { |h| row[h] }
+
+          if i % 100 == 0
+            Shackles.activate(:master) do
+              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
             end
-            i += 1
           end
+          i += 1
         end
         csv << ['No outcomes found'] if @total == 0
       end
-
-      send_report(filename)
     end
 
     def outcome_order
@@ -268,30 +259,25 @@ module AccountReports
       t_headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
 
       # Generate the CSV report
-      filename = AccountReports.generate_file(@account_report)
-      CSV.open(filename, "w") do |csv|
-        csv << t_headers
-        Shackles.activate(:slave) do
-          @total = students.count(:all)
-          i = 0
-          students.find_each do |row|
-            row = row.attributes.dup
-            row['submission date']=default_timezone_format(row['submission date'])
+      write_report t_headers do |csv|
 
-            csv << headers.map { |h| row[h] }
+        @total = students.count(:all)
+        i = 0
+        students.find_each do |row|
+          row = row.attributes.dup
+          row['submission date']=default_timezone_format(row['submission date'])
 
-            if i % 100 == 0
-              Shackles.activate(:master) do
-                @account_report.update_attribute(:progress, (i.to_f/@total)*100)
-              end
+          csv << headers.map { |h| row[h] }
+
+          if i % 100 == 0
+            Shackles.activate(:master) do
+              @account_report.update_attribute(:progress, (i.to_f/@total)*100)
             end
-            i += 1
           end
+          i += 1
         end
         csv << ['No outcomes found'] if @total == 0
       end
-
-      send_report(filename)
     end
   end
 

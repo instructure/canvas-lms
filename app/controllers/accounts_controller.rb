@@ -186,7 +186,8 @@ class AccountsController < ApplicationController
   end
 
   def course_user_search
-    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    return unless authorized_action(@account, @current_user, :read)
+    can_read_course_list = !@account.site_admin? && @account.grants_right?(@current_user, session, :read_course_list)
     can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
     can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
 

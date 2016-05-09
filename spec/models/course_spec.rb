@@ -2878,7 +2878,8 @@ describe Course, 'tabs_available' do
 
   it "should include external tools if configured on the account" do
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
+    @course.account = @account
+    @course.save!
     tool = new_external_tool @account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
@@ -2895,7 +2896,8 @@ describe Course, 'tabs_available' do
 
   it "should include external tools if configured on the root account" do
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
-    @course.move_to_account(@account.root_account, @account)
+    @course.account = @account
+    @course.save!
     tool = new_external_tool @account.root_account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
@@ -3298,6 +3300,16 @@ describe Course, "section_visibility" do
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
+    end
+
+    it "should return student view students to account admins who are also observers for some reason" do
+      @course.student_view_student
+      @admin = account_admin_user
+
+      @course.enroll_user(@admin, "ObserverEnrollment")
+      
       visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end

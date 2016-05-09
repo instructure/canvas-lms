@@ -920,6 +920,40 @@ describe FilesController do
       expect(response.status).to eq 401
     end
 
+    it "creates a file in the submissions folder if intent=='submit' and the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      assignment = @course.assignments.create!(:submission_types => 'online_upload')
+      post 'create_pending', {:attachment => {
+        :context_code => assignment.context_code,
+        :asset_string => assignment.asset_string,
+        :filename => 'test.txt',
+        :intent => 'submit'
+      }}
+      f = assigns[:attachment].folder
+      expect(f.submission_context_code).to eq @course.asset_string
+    end
+
+    it "uses a submissions folder for group assignments when the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      category = group_category
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].context).to eq group
+      expect(assigns[:attachment].folder).to be_for_submissions
+    end
+
     context "sharding" do
       specs_require_sharding
 
