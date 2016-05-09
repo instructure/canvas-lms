@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,6 +23,8 @@ class EnrollmentTerm < ActiveRecord::Base
 
   attr_accessible :name, :start_at, :end_at
   belongs_to :root_account, :class_name => 'Account'
+  belongs_to :grading_period_group, inverse_of: :enrollment_terms
+  has_many :grading_periods, through: :grading_period_group
   has_many :enrollment_dates_overrides
   has_many :courses
   has_many :enrollments, :through => :courses
@@ -33,6 +35,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
+  before_save :destroy_orphaned_grading_period_group
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
@@ -162,6 +165,19 @@ class EnrollmentTerm < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     save!
+  end
+
+  def destroy_orphaned_grading_period_group
+    is_being_destroyed = workflow_state_changed? && deleted?
+    had_previous_group = grading_period_group_id_changed? && grading_period_group_id_was
+
+    if is_being_destroyed || had_previous_group
+      grading_period_group_criteria = { grading_period_group_id: grading_period_group_id_was }
+      remaining_terms = EnrollmentTerm.active.where(grading_period_group_criteria).where.not(id: self)
+      unless remaining_terms.exists?
+        GradingPeriodGroup.destroy(grading_period_group_id_was)
+      end
+    end
   end
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
