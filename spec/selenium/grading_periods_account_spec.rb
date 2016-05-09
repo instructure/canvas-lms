@@ -196,7 +196,7 @@ describe 'Account Grading Periods' do
 
         it 'is inherited by sub-account, cannot delete admin grading periods ' \
         'as sub-admin', priority: "1", test_id: 250257 do
-          expect(f('.icon-delete-grading-period')).not_to be_present
+          expect(f('#content')).not_to contain_css('.icon-delete-grading-period')
         end
       end # as sub-admin
 

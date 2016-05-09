@@ -141,7 +141,7 @@ describe "interaction with multiple grading periods" do
 
     it 'does not allow creation of a sub-account GP', priority: "1", test_id: 202324 do
       view_sub_account_grading_period
-      expect(f('#add-period-button')).not_to be_present
+      expect(f('#grading_periods')).not_to contain_css('#add-period-button')
     end
 
     it 'displays GPs from parent account on course level', priority: "1", test_id: 202325 do
@@ -153,7 +153,7 @@ describe "interaction with multiple grading periods" do
 
     it 'does not allow creation of a GP in sub-account course', priority: "1", test_id: 587759 do
       view_sub_course_grading_period
-      expect(f('#add-period-button')).not_to be_present
+      expect(f('#grading_periods')).not_to contain_css('#add-period-button')
     end
   end
 
