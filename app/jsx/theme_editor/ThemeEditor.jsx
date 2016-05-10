@@ -293,7 +293,9 @@ define([
           { this.props.useHighContrast &&
             <div role="alert" className="ic-flash-static ic-flash-error">
               <h4 className="ic-flash__headline">
-                <i aria-hidden="true" className="icon-warning" />&nbsp;
+                <div className="ic-flash__icon" aria-hidden="true">
+                  <i className="icon-warning"></i>
+                </div>
                 {I18n.t('You will not be able to preview your changes')}
               </h4>
               <p

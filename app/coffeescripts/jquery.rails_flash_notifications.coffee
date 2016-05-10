@@ -65,11 +65,24 @@ define [
       ), 7000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
+    if type is "success"
+      icon = "check"
+    else if type is "warning" || type is "error"
+      icon = "warning"
+    else
+      icon = "info"
     $node = $("""
       <li class="ic-flash-#{htmlEscape(type)}">
-        <i></i>
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-#{htmlEscape(icon)}"></i>
+        </div>
         #{escapeContent(content)}
-        <a href="#" class="close_link icon-end">#{htmlEscape I18n.t("close", "Close")}</a>
+        <button type="button" class="Button Button--icon-action close_link">
+          <span class="screenreader-only">
+            #{htmlEscape I18n.t("close", "Close")}
+          </span>
+          <i class="icon-x" aria-hidden="true"></i>
+        </button>
       </li>
     """)
 
