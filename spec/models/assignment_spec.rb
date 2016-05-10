@@ -611,7 +611,7 @@ describe Assignment do
       end
 
       it "uses the canvas default" do
-        expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Standard"
+        expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Scheme"
       end
     end
 
