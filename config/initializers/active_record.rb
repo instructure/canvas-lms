@@ -774,7 +774,7 @@ ActiveRecord::Relation.class_eval do
         end
       end
     ensure
-      unless $!.is_a?(ActiveRecord::StatementInvalid)
+      if !$!.is_a?(ActiveRecord::StatementInvalid) || connection.open_transactions == 0
         connection.execute "DROP TABLE #{table}"
       end
     end
