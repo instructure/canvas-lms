@@ -3721,15 +3721,16 @@ define([
     });
 
     if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
-      this.conditionalReleaseEditor = ConditionalRelease.attach(
+      window.conditionalRelease = window.conditionalRelease || {};
+      conditionalRelease.editor = ConditionalRelease.attach(
         $('#conditional-release-target').get(0),
         I18n.t('quiz'),
         ENV['CONDITIONAL_RELEASE_ENV']);
 
       $('div.form').on('change', function(event) {
-        if (!this.assignmentDirty) {
-          this.assignmentDirty = true
-          this.conditionalReleaseEditor.setProps({ assignmentDirty: true });
+        if (!conditionalRelease.assignmentDirty) {
+          conditionalRelease.assignmentDirty = true
+          conditionalRelease.editor.setProps({ assignmentDirty: true });
         }
       });
     }
