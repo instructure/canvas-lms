@@ -1180,6 +1180,22 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  def make_childless
+    child = children.take
+    return unless child
+    child.root_attachment_id = nil
+    child.filename ||= filename
+    if Attachment.s3_storage?
+      if s3object.exists? && !child.s3object.exists?
+        s3object.copy_to(child.s3object)
+      end
+    else
+      child.uploaded_data = open
+    end
+    child.save!
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
+  end
+
   def restore
     self.file_state = 'available'
     self.save
