@@ -1260,7 +1260,7 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload annotatable: opts[:wants_annotation]
+      doc.upload annotatable: opts[:wants_annotation], preferred_renders: opts[:preferred_renders]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e

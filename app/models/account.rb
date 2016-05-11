@@ -186,6 +186,7 @@ class Account < ActiveRecord::Base
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
+  add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
   add_setting :external_notification_warning, :boolean => true, :default => false
   # Terms of Use and Privacy Policy settings for the root account
