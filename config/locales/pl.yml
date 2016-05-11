@@ -16529,7 +16529,7 @@ pl:
       title: "Testowa instalacja Canvas"
       weekly_message: 
         few: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tygodnie."
-        one: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tydzień."
+        one: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co tydzień."
         other: "Ta instalacja Canvas jest przeznaczona jedynie do celów testowych; będzie się uruchamiać co %{count} tygodni."
   watermark_c93fae0d: "Znak wodny"
   watermark_opacity_ce3d3097: "Nieprzezroczystośc znaku wodnego"
