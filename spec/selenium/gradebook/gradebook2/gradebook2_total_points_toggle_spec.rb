@@ -10,6 +10,13 @@ describe "gradebook2 - total points toggle" do
     ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
   end
 
+  def should_show_points
+    expected_points = 15, 10, 10
+    ff(".slick-row .slick-cell:nth-child(5)").each do |total|
+      expect(total.text).to match(/\A#{expected_points.shift}$/)
+    end
+  end
+  
   def open_display_dialog
     f("#total_dropdown").click
     f(".toggle_percent").click
@@ -31,6 +38,19 @@ describe "gradebook2 - total points toggle" do
     submit_dialog(dialog, '.ui-button')
   end
 
+  it "setting group weights should switch to percentage", test_id: 164231, priority: "2" do
+    get "/courses/#{@course.id}/gradebook2"
+
+    toggle_grade_display
+    should_show_points
+
+    group = AssignmentGroup.where(name: @group.name).first
+    set_group_weight(group, 50)
+
+    disable_group_weight
+    should_show_percentages
+  end
+
   it "should warn the teacher that studens will see a change" do
     get "/courses/#{@course.id}/gradebook2"
     open_display_dialog
@@ -43,10 +63,7 @@ describe "gradebook2 - total points toggle" do
     should_show_percentages
     toggle_grade_display
 
-    expected_points = 15, 10, 10
-    ff(".slick-row .slick-cell:nth-child(5)").each do |total|
-      expect(total.text).to match(/\A#{expected_points.shift}$/)
-    end
+    should_show_points
 
     toggle_grade_display
     should_show_percentages

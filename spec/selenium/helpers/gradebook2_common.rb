@@ -352,6 +352,22 @@ module Gradebook2Common
     expect(@course.reload.group_weighting_scheme).to eq 'percent'
   end
 
+  def disable_group_weight
+    f('#gradebook_settings').click
+    f('[aria-controls="assignment_group_weights_dialog"]').click
+
+    dialog = f('#assignment_group_weights_dialog')
+    # expect(dialog).to be_displayed
+
+    group_check = dialog.find_element(:id, 'group_weighting_scheme')
+    keep_trying_until do
+      group_check.click
+      # expect(is_checked('#group_weighting_scheme')).to be_falsy
+    end
+    fj('.ui-button:contains("Save")').click
+    refresh_page
+  end
+
   def validate_group_weight_text(assignment_groups, weight_numbers)
     assignment_groups.each_with_index do |ag, i|
       heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
