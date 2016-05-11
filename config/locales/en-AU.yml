@@ -16366,7 +16366,7 @@ en-AU:
       periodic_message: "This Canvas installation is only for testing, and will reset periodically."
       title: "Canvas Test Installation"
       weekly_message: 
-        one: "This Canvas installation is only for testing, and will reset every %{count} weeks."
+        one: "This Canvas installation is only for testing, and will reset every weeks."
         other: "This Canvas installation is only for testing, and will reset every %{count} weeks."
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: "Watermark Opacity"
