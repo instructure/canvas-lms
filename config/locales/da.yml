@@ -271,16 +271,16 @@ da:
     report_header_attempt: Forsøg
     report_header_canvas_account_id: canvas_account_id
     report_header_canvas_associated_user_id: canvas_associated_user_id
-    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_course_id: canvas_kursus_id
     report_header_canvas_group_id: canvas_group_id
-    report_header_canvas_nonxlist_course_id: canvas_nonxlist_course_id
+    report_header_canvas_nonxlist_course_id: canvas_nonxlist_kursus_id
     report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
     report_header_canvas_user_id: canvas_user_id
-    report_header_canvas_xlist_course_id: canvas_xlist_course_id
+    report_header_canvas_xlist_course_id: canvas_xlist_kursus_id
     report_header_course: Kursus
-    report_header_course__id: course_id
+    report_header_course__id: kursus_id
     report_header_course_id: Kursus-id
     report_header_course_name: Kursusnavn
     report_header_course_sis: "kursus sis"
@@ -307,7 +307,7 @@ da:
     report_header_long__name: long_name
     report_header_long_name: "langt navn"
     report_header_name: Navn
-    report_header_nonxlist_course_id: nonxlist_course_id
+    report_header_nonxlist_course_id: nonxlist_kursus_id
     report_header_outcome_score: "score for indlæringsmål"
     report_header_parent_account_id: parent_account_id
     report_header_role: Rolle
@@ -344,7 +344,7 @@ da:
     report_header_user_name: Brugernavn
     report_header_user_short_name: short_name
     report_header_user_sis_id: "bruger sis id"
-    report_header_xlist_course_id: xlist_course_id
+    report_header_xlist_course_id: xlist_kursus_id
     sis_exporter: 
       reports: "Rapporter: %{files}"
     student: 
@@ -639,7 +639,7 @@ da:
       account_reports: 
         linn_benton: 
           course_ids: 
-            text: "course_ids:"
+            text: "kursus_ids:"
     course_type: Kursus
     courses: 
       courses_crumb: Kurser
@@ -2286,7 +2286,7 @@ da:
     over_quota: "Den downloadede fil overskrider kvotaen."
     title: 
       migration_list: "Tilknyttede filer"
-    upload_error_invalid_response_code: "Ugyldig responskode, forventet 200 fik %{code}"
+    upload_error_invalid_response_code: "Ugyldig responskode, forventet 200, fik %{code}"
     upload_error_invalid_url: "Kunne ikke fortolke URL: %{url}"
     upload_error_over_quota: "filstørrelsen overskrider kvotebegrænsninger: %{bytes} bytes"
     upload_error_relative_uri: "Der er ikke oplyst host for URL: %{url}"
@@ -2379,7 +2379,7 @@ da:
       permissions: "Rediger tilladelse for: %{name}"
     unpublished_title: "Ikke offentliggjort"
   broken_file_link_found_in_your_course_7cc24395: "Der blev fundet et brudt fillink i dit kursus"
-  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "samlenavn skal være et af de følgende: %{bucket_names}"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "bucket-navn skal være en af de følgende: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "Der opstod en fejl under eksport af kurset med bb_lcid %{id} fra Blackboard"
     export_failed_no_id: "Der opstod en fejl under import af et kursus"
@@ -2899,9 +2899,9 @@ da:
         login_expiration_minimum: "Sessionens udløb skal være 20 minutter eller større"
         need_integer: "Indtast et heltal for afspilningslistens cache"
         stream_name_required: "Kinesis stream-navn er påkrævet."
-  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas Notifikation - Ændring: %{assignment_name}, %{course_name}"
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-besked - Ændring: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-besked - Inviteret: %{course} som %{role_type}"
-  canvas_alert_invited_course_as_role_type_ea825937: "Canvas Alarm - Inviteret: kursus som %{role_type}"
+  canvas_alert_invited_course_as_role_type_ea825937: "Canvas-besked - Inviteret: kursus som %{role_type}"
   canvas_by_instructure_1490381: "Canvas fra Instructure"
   canvas_cartridge_description: "Dette aktiverer konvertering af en canvas-eksport til det mellemliggende json-format, som skal importeres"
   canvas_cartridge_display: "Canvas Common Cartridge"
@@ -4543,9 +4543,9 @@ da:
       backup_restored: "Gendannelse af backup var vellykket!"
       concluded: "Kursets afslutning var vellykket"
       deleted: "Kursets sletning var vellykket"
-      enrollment_not_active: "Dit medlemsskab til kursus, %{course}, er endnu ikke aktiveret"
+      enrollment_not_active: "Dit medlemskab i kurset %{course} er endnu ikke aktiveret"
       failed_conclude: "Kurset afsluttedes ikke"
-      invitation_accepted: "Invitation accepteret!  Velkommen til %{course}!"
+      invitation_accepted: "Invitation accepteret! Velkommen til %{course}"
       invitation_cancelled: "Invitation annulleret."
       login_to_accept: "Du skal logge på, inden du kan acceptere tilmeldingen."
       preview_course: "Du er blevet inviteret til at melde dig til dette kursus. Du kan kigge dig omkring, men du skal acceptere invitationen til tilmelding, inden du kan deltage."
@@ -5062,8 +5062,8 @@ da:
       one: "Udvid %{count} meddelelse"
       other: "Skjul %{count} meddelelser"
     assignments_collapse: 
-      one: "Sammenfold %{count} opgavenotifikation"
-      other: "Sammenfold %{count} opgavenotifikationer"
+      one: "Skjul %{count} opgavenotifikation"
+      other: "Skjul %{count} opgavenotifikationer"
     assignments_expand: 
       one: "Udvid %{count} opgavenotifikation"
       other: "Udvid %{count} opgavenotifikationer"
@@ -5073,11 +5073,11 @@ da:
           
           You will not be able to reopen it.
     conversations_collapse: 
-      one: "Sammenfold %{count} samtalesbesked"
-      other: "Sammenfold %{count} samtale beskeder"
+      one: "Skjul %{count} samtalebesked"
+      other: "Skjul %{count} samtalebeskeder"
     conversations_expand: 
-      one: "Udvid %{count} samtalesbesked"
-      other: "Udvid %{count} samtale beskeder"
+      one: "Udvid %{count} samtalebesked"
+      other: "Udvid %{count} samtalebeskeder"
     discussions_collapse: 
       one: "Skjul %{count} diskussion"
       other: "Skjul %{count} diskussioner"
@@ -6721,7 +6721,7 @@ da:
       no_students_in_groups_back: "Beklager, afleveringer til denne opgave kan ikke bedømmes i SpeedGrader, fordi der ikke udpeget brugere. Udpeg brugere til dette gruppesæt og prøv igen. Klik på 'OK' for at gå tilbage."
       no_students_in_groups_close: "Beklager, afleveringer til denne opgave kan ikke bedømmes i SpeedGrader, fordi der ikke udpeget brugere. Udpeg brugere til dette gruppesæt og prøv igen. Klik på 'OK' for at lukke dette vindue."
       no_students_in_section: "Kunne ikke finde nogen studerende i den sektion. Vender tilbage til visning af alle sektioner."
-    allow_message: "Klik \"Tillad\" knap for at begynde optagelse."
+    allow_message: "Klik på knappen \"Tillad\" for at begynde optagelsen."
     begin_record_prompt: "Klik på knappen \"Optag\" for at begynde."
     buttons: 
       dialog_buttons: Annuller
@@ -8859,7 +8859,7 @@ da:
       summary: 
         subject: "Opgaven blev ændret: %{title}, %{course}"
       twitter: 
-        assignment_change: "Canvas Notifikation - Ændring: %{assignment_name}, %{course_name}"
+        assignment_change: "Canvas-besked - Ændring: %{assignment_name}, %{course_name}"
     assignment_created: 
       email: 
         assignment_created: "Opgave oprettet - %{assignment_name}, %{course_name}"
@@ -9117,8 +9117,8 @@ da:
         html: 
           body2: "Der opstod et problem under eksport af kurset *%{course}*. Informer din systemadministrator, og giv dem følgende eksportidentikator:"
           link: "Klik for at vise eksporter"
-          subject: "Kursuseksport mislykkedes: %{course}"
-        subject: "Kursuseksport mislykkedes: %{course}"
+          subject: "Eksport af kurset mislykkedes: %{course}"
+        subject: "Eksport af kurset mislykkedes: %{course}"
     content_export_finished: 
       email: 
         body: "Din indholdseksport for \"%{course}\" er fuldendt."
@@ -9482,7 +9482,7 @@ da:
           click_to_reset: "Klik på følgende link for at indstille ny adgangskode"
         login_at_account: "%{login_email} på %{account_name}"
         login_managed_by_account: "brugeroplysningerne til dette login administreres af %{account_name}"
-        password_from_account: "Adgangskoden for dette login bør være givet til dig af system administrtorer på  %{account_name}, og instructure har ikke adgang til din adgangskode. Hvis din adgangskode ikke virker, kontakt venligst system administratorer om at ændre eller verificere din adgangskode."
+        password_from_account: "Du skulle have modtaget adgangskoden til dette login fra systemadministratoren på %{account_name}, og Instructure har ikke adgang til din adgangskode. Hvis ikke din adgangskode virker, skal du kontakte systemadministratoren om at ændre eller kontrollere din adgangskode."
         requested_password_reset: "Du anmodede om bekræftelse af din adgangskode til at logge på Canvas."
         subject: "Glemt adgangskode: Canvas"
     grade_weight_changed: 
@@ -9528,7 +9528,7 @@ da:
         body: "Gruppen %{group_name} indsendte en sen aflevering for %{assignment_name} i kurset %{course_name}."
         subject: "Sen opgave: %{group_name}, %{assignment_name}"
       twitter: 
-        subject: "Canvas Notifikation: Sen gruppeindsendelse. %{group_name}, %{assignment_name}"
+        subject: "Canvas-besked - Sen gruppeaflevering: %{group_name}, %{assignment_name}"
     group_membership_accepted: 
       email: 
         account_group: "Din anmodning om tilmelding til gruppen %{group_name} for kontoen %{account_name} er blevet accepteret."
@@ -9593,7 +9593,7 @@ da:
         body: "der er blevet oprettet en konto for dig på %{host}, men du har allerede en Canvas-konto.  Hvis du vil forene den, skal du gå ind på følgende webadresse:"
         html: 
           account_created: "Der er oprettet en konto til dig på %{host}, men du har allerede en Canvas-konto."
-          merge2: "Hvis du ønsker at flette dem sammen, *klik her!*"
+          merge2: "*Klik her*, hvis du gerne vil forene dem"
           subject: "Ny Canvas-konto"
         subject: "Ny Canvas-konto"
     message: 
@@ -9671,28 +9671,28 @@ da:
         body_course: "Canvas-advarsel - Ny gruppe: %{group} for kurset %{course}"
     new_context_group_membership_invitation: 
       email: 
-        body_account: "Du er blevet inviteret til at deltage gruppen %{group} for konto %{account}."
-        body_course: "Du er blevet inviteret til at deltage i gruppen %{group} for kursus %{course}."
+        body_account: "Du er blevet inviteret til at melde dig til gruppen %{group} for kontoen %{account}."
+        body_course: "Du er blevet inviteret til at melde dig til gruppen %{group} for kurset %{course}."
         details: "Du kan tjekke gruppen ved klikke på linket nedenfor:"
         html: 
-          body_account: "Du er blevet inviteret til at deltage i gruppen %{group} for konto %{account}."
-          body_course: "Du er blevet inviteret til at deltage i gruppen %{group} for kurus %{course}."
+          body_account: "Du er blevet inviteret til at melde dig til gruppen %{group} for kontoen %{account}."
+          body_course: "Du er blevet inviteret til at melde dig til gruppen %{group} for kurset %{course}."
           details: "Du kan undersøge gruppen ved at klikke her"
           subject: "Nyt gruppemedlem til %{course_or_account}"
           title: "Nyt gruppemedlem: %{group_name}"
         subject: "Nyt gruppemedlem til %{course_or_account}"
-        title: "Nyt gruppemedlemsskab: %{group_name}"
+        title: "Nyt gruppemedlem: %{group_name}"
       sms: 
-        body_account: "Du er blevet inviteret til at delatge i gruppen %{group} for konto %{account}."
-        body_course: "Du er blevet inviteret til at deltage i gruppen %{group} for kursus %{course}."
+        body_account: "Du er blevet inviteret til at melde dig til gruppen %{group} for kontoen %{account}."
+        body_course: "Du er blevet inviteret til at melde dig til gruppen %{group} for kurset %{course}."
         details: "Yderligere oplysninger på %{url}"
       summary: 
-        body_account: "Du er blevet inviteret til at deltage i gruppen %{group} for konto %{account}."
-        body_course: "Du er blevet inviteret til at deltage i gruppen %{group} for kurus %{course}."
+        body_account: "Du er blevet inviteret til at melde dig til gruppen %{group} for kontoen %{account}."
+        body_course: "Du er blevet inviteret til at melde dig til gruppen %{group} for kurset %{course}."
         subject: "Nyt gruppemedlem til %{course_or_account}"
       twitter: 
         body_account: "Canvas-besked - Invitation: %{group} til kontoen %{account}"
-        body_course: "Canvas Notifikation - Invitation: %{group} for kursus %{course}."
+        body_course: "Canvas-besked - Invitation: %{group} til kurset %{course}"
     new_course: 
       email: 
         body: "Der er blevet føjet et kursus, %{course} til kontoen %{account}"
@@ -9820,11 +9820,11 @@ da:
     new_student_organized_group: 
       email: 
         body_account: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kontoen %{account}. Første medlem er %{user}."
-        body_course: "En ny studiegruppe kaldet \"%{group_name}\" er blevet oprettet for kurus %{course}. Det første medlem er %{user}."
+        body_course: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kurset %{course}. Første medlem er %{user}."
         details: "Du kan se detaljerne for denne gruppe ved at klikke på nedenstående link:"
         html: 
           body_account: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kontoen %{account}. Første medlem er %{user}."
-          body_course: "En ny studiegruppe kaldet \"%{group_name}\" er blevet oprettet for kusus %{course}. Det første medlem er %{user}."
+          body_course: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kurset %{course}. Første medlem er %{user}."
           details: "Klik her for at se nærmere oplysninger om gruppen"
           subject: "Ny studiegruppe for %{course_or_account}"
           title: "Ny studiegruppe: %{group_name}"
@@ -9832,15 +9832,15 @@ da:
         title: "Ny studiegruppe: %{group_name}"
       sms: 
         body_account: "En ny gruppe ved navn \"%{group_name}\" blev oprettet til denne konto %{account}. Det første medlem er %{user}."
-        body_course: "En ny gruppe kaldet \"%{group_name}\" er oprettet for kusus %{course}. Det første medlem er %{user}."
+        body_course: "En ny gruppe ved navn \"%{group_name}\" blev oprettet til dette kursus %{course}. Det første medlem er %{user}."
         detail: "Yderligere oplysninger på %{url}"
       summary: 
         body_account: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kontoen %{account}. Første medlem er %{user}."
-        body_course: "En ny studiegruppe kaldet \"%{group_name}\" er blevet oprettet for kusus %{course}. Det første medlem %{user}."
+        body_course: "Det blev oprettet en ny studiegruppe ved navn \"%{group_name}\" for kurset %{course}. Første medlem er %{user}."
         subject: "Ny studiegruppe for %{course_or_account}"
       twitter: 
         body_account: "Canvas-besked - Ny gruppe: %{group_name} til kontoen %{account}"
-        body_course: "Canvas Notifikation - Ny gruppe: %{group_name} for kursus %{course}"
+        body_course: "Canvas-besked - Ny gruppe: %{group_name} til kurset %{course}"
     new_user: 
       email: 
         body: "En ny bruger, %{user}, har lige registreret sig til kontoen %{account}"
@@ -9866,7 +9866,7 @@ da:
     page_unpublished_module: "Denne side er en del af et ikke offentliggjort modul, og er endnu ikke tilgængeligt."
     peer_review_invitation: 
       email: 
-        body: "Du er blevet inviteret til at foretage peer review %{reviewee}. Følg nedenstående link for at vurdere dem!"
+        body: "Du er blevet inviteret til at pier reviewe %{reviewee}. Følg nedenstående link for at evaluere dem!"
         html: 
           link_message: "Klik her for at færdiggøre din evaluering"
         subject: "Tildelt peer review for %{reviewee}"
@@ -9875,7 +9875,7 @@ da:
       summary: 
         body: "Du er blevet inviteret til at foretage peer review %{reviewee}. Følg nedenstående link for at vurdere dem!"
       twitter: 
-        body: "Du er blevet inviteret til at foretage peer review %{reviewee}. Følg nedenstående link for at vurdere dem!"
+        body: "Du er blevet inviteret til at pier reviewe %{reviewee}. Følg nedenstående link for at evaluere dem!"
     pseudonym_registration: 
       email: 
         body: "Du er blevet registreret til en Canvas-konto på %{account}! Inden du logger på og begynder at bruge Canvas, skal du afslutte registreringsprocessen."
@@ -12002,7 +12002,7 @@ da:
     notices: 
       account_registered: "Konto registreret!"
       account_updated: "Konto opdateret!"
-      email_sent: "Bekræftelseemail sendt til %{email}, vær sikker på, at du tjekker din spamboks"
+      email_sent: "Bekræftelse af adgangskode sendt til %{email}. Sørg for, at du tjekker mappen til uønsket post."
       link_invalid: "Linket du brugte, er ikke længere gyldigt. Hvis du ikke kan logge på, skal du klikke på \"Kan du ikke huske din adgangskode\" for at gendanne din adgangskode."
       password_changed: "Adgangskode ændret"
   public_a749f507: Offentligt
@@ -12814,7 +12814,7 @@ da:
           score_pending_review: "Scoren afventer evaluering og kan eventuelt ændre sig"
           submission_needs_review: "Denne aflevering skal evalueres"
         unnamed_quiz_results: "Quizresultater for %{user}"
-        unnamed_survey_results: "Sprøgeundersøgelsesresultater for %{user}"
+        unnamed_survey_results: "Spørgeundersøgelsesresultater for %{user}"
         view_log: "Vis log"
       index: 
         page_titles: Quizzer
@@ -16249,7 +16249,7 @@ da:
       almost_there: "Du er næsten i mål ..."
       done_resending: "Færdig! Beskeden tager muligvis få minutter."
       failed_resending: "Anmodningen mislykkedes. Prøv igen."
-      invite_to_read: "Vi invitere dig til at se dette korte overblik af Canvas. Du kan også *læse om hvordan Canvas hjælper* med at bringe studerende i 27 lande tættere til forlæsningssteder, instruktører og klassekammerater."
+      invite_to_read: "Vi opfordrer dig til at se denne korte oversigt over Canvas. *Du kan endvidere læse om, hvordan Canvas hjælper* med at bringe studerende i 27 lande tættere på forelæsningssteder, undervisere og klassekammerater."
       links: 
         download_pdf: "download PDF"
       need_flash: "Du skal bruge Flash Player 8+ og have Javascript aktiveret for at vise denne video."
