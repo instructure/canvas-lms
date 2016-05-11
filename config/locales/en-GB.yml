@@ -3542,7 +3542,7 @@ en-GB:
         student_teacher_activity: "Your interactions report with %{user}"
         teacher_activity: "Student interactions report for %{user}"
         title: 
-          enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
+          enrollment_sis_defined: "This enrolment was defined by the university, and can't be deleted"
         user_account_details: "User account details"
         user_grades: "Grades for %{user}"
         user_only_view_section: "limit this user to only see fellow section users"
@@ -4657,8 +4657,8 @@ en-GB:
         update_course: "Update course details"
       course_conclude_at_warning_message: "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active."
       course_conclude_at_warning_title: "Course ending at midnight"
-      course_open_enrollment: "This course has enabled open enrolment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
-      course_open_enrollment_without_code: "This course has enabled open enrollment. Students can self-enrol in the course once you share with them this URL: *%{url}*"
+      course_open_enrollment: "This course has enabled open enrolment. Students can self-enrol in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      course_open_enrollment_without_code: "This course has enabled open enrolment. Students can self-enrol in the course once you share with them this URL: *%{url}*"
       course_overrides_term: "This will override any term availability settings."
       course_settings_title: "Course settings"
       deatils: 
@@ -4795,7 +4795,7 @@ en-GB:
     show: 
       change_home_page: Change
       details: 
-        confirm_unenroll: "Are you sure you want to unenroll in this course? You will no longer be able to see the course schedule or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
+        confirm_unenroll: "Are you sure you want to unenrol in this course? You will no longer be able to see the course schedule or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
       draft_state: 
         buttons: 
           cancel: Cancel
@@ -10709,7 +10709,7 @@ en-GB:
       conversation_message: "Conversation message"
       enrollment_accepted: "Enrolment accepted"
       enrollment_invitation: "Enrolment invitation"
-      enrollment_notification: "Enrollment Notification"
+      enrollment_notification: "Enrolment Notification"
       enrollment_registration: "Enrolment registration"
       event_date_changed: "Event date changed"
       forgot_password: "Forgot password"
@@ -14066,14 +14066,14 @@ en-GB:
         go_to_dashboard: "Go to your dashboard"
     authenticate: 
       buttons: 
-        enroll_in_course: "Enroll in course"
+        enroll_in_course: "Enrol in course"
         next: Next
       getting_started: "You are enrolling in **%{course}**."
       labels: 
         password: Password
     authenticate_or_register: 
       buttons: 
-        enroll_in_course: "Enroll in course"
+        enroll_in_course: "Enrol in course"
         next: Next
       existing_user: "I already have a %{institution_name} login"
       getting_started: "You are enrolling in **%{course}**."
@@ -14083,7 +14083,7 @@ en-GB:
       new_user: "I am a new user"
     confirm_enrollments: 
       buttons: 
-        enroll_in_course: "Enroll in course"
+        enroll_in_course: "Enrol in course"
         next: Next
       getting_started: "You are enrolling in **%{course}**"
     course_full: 
@@ -14092,7 +14092,7 @@ en-GB:
       enrollment_is_closed: "Enrolment is closed for **%{course}**."
     new: 
       titles: 
-        course_enrollment: "Enroll in %{course}"
+        course_enrollment: "Enrol in %{course}"
     successfully_enrolled: 
       already_enrolled: "You have successfully enrolled in **%{course}**."
       buttons: 
@@ -15948,7 +15948,7 @@ en-GB:
     users_added: 
       one: "1 user added"
       other: "%{count} users added"
-    users_adding_failed: "Failed to enroll users"
+    users_adding_failed: "Failed to enrol users"
     users_existed: 
       one: "(1 user already existed)"
       other: "(%{count} users already existed)"
@@ -16096,7 +16096,7 @@ en-GB:
       titles: 
         configure_com_prefs: "Configure communication preferences"
     confirms: 
-      unenroll_user: "Are you sure you want to unenroll this user?"
+      unenroll_user: "Are you sure you want to unenrol this user?"
     could_not_find_url: "Could not find download URL"
     crumbs: 
       grades: Marks
@@ -16208,7 +16208,7 @@ en-GB:
       enrollments: Enrolments
       logins: Logins
       no_emails: "no emails"
-      no_enrollments: "no enrollments"
+      no_enrollments: "no enrolments"
       no_logins: "no logins"
       user: User
       will_be_deleted: "will be deleted"
@@ -16359,7 +16359,7 @@ en-GB:
       periodic_message: "This Canvas installation is only for testing, and will reset periodically."
       title: "Canvas test installation"
       weekly_message: 
-        one: "This Canvas installation is only for testing, and will reset every %{count} weeks."
+        one: "This Canvas installation is only for testing, and will reset every weeks."
         other: "This Canvas installation is only for testing, and will reset every %{count} weeks."
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: "Watermark opacity"
