@@ -4063,6 +4063,7 @@ nl:
   correct_answers_are_no_longer_available_c67dfc28: "De juiste antwoorden zijn niet langer beschikbaar."
   correct_answers_will_be_available_from_to_5762e8c6: "De juiste antwoorden zullen beschikbaar zijn %{from} - %{to}."
   correct_answers_will_be_available_on_date_48137: "Juiste antwoorden zullen beschikbaar zijn op %{date}."
+  correct_check_icon_617da6c3: "vinkje corrigeren"
   couldn_t_find_an_authority_to_update_44d9407e: "Kon geen toestemming vinden om bij te werken"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Kon Canvas CSV import kopteksten niet vinden "
   couldn_t_generate_diff_message_a0528b20: "Kon diff niet genereren: %{message}"
@@ -12316,7 +12317,7 @@ nl:
     title: Toetsstatistieken
     unknown_answer: "Iets anders"
     user_names: Gebruikersnamen
-  quiz_title_4b50ade9: "Naam toets"
+  quiz_title_4b50ade9: Toetsnaam
   quiz_type_be1633db: Toetstype
   quizzes: 
     alerts: 
