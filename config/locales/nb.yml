@@ -5946,6 +5946,7 @@ nb:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Skriv inn \"{{ACCOUNT_DOMAIN}}\" som erstattning for brukerens rotdomene"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Skriv inn \"{{CANVAS_USER_ID}}\" som erstattning for brukerens unike Canvas-ID"
   enter_or_find_an_external_tool_url_6aebbd0d: "Legg til eller finn et eksternt URL-verktøy"
+  enter_the_access_token_for_your_organization_from__cc77493d: "Skriv inn tilgangssymbolet til din organisasjon fra *eduappcenter.com*. Når du har søkt er det kun appene din organisasjon har godkjent som blir listet opp på den eksterne app-siden. Lær hvordan du **genererer en tilgangssymbol**."
   enter_your_question_and_multiple_answers_31370054: "Skriv inn spørsmålet ditt og flere svar."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Skriv inn spørsmålet ditt, spesifisere hvor hvert tomme felt skal stå. Studentene må skrive svaret inn i hvert tomme tekstfelt."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Skriv inn spørsmålet ditt, spesifisere hvor nedtrekksmenyen skal plasseres. Definere deretter mulige svar for hver nedtrekksmeny."
