@@ -56,42 +56,41 @@ class CommunicationChannel < ActiveRecord::Base
 
   RETIRE_THRESHOLD = 1
 
-  # TODO: Will need to be internationalized. Also, do we want to allow this to be specified in a config file?
   def self.country_codes
     # [country code, name, true if email should be used instead of Twilio]
-    @country_codes ||= [
-      ['54', 'Argentina', false],
-      ['61', 'Australia', false],
-      ['32', 'Belgium', false],
-      ['55', 'Brazil', false],
-      ['1', 'Canada', false],
-      ['56', 'Chile', false],
-      ['57', 'Colombia', false],
-      ['45', 'Denmark', false],
-      ['358', 'Finland', false],
-      ['49', 'Germany', false],
-      ['504', 'Honduras', false],
-      ['852', 'Hong Kong', false],
-      ['353', 'Ireland', false],
-      ['352', 'Luxembourg', false],
-      ['60', 'Malaysia', false],
-      ['52', 'Mexico', false],
-      ['31', 'Netherlands', false],
-      ['64', 'New Zealand', false],
-      ['47', 'Norway', false],
-      ['507', 'Panama', false],
-      ['51', 'Peru', false],
-      ['63', 'Philippines', false],
-      ['974', 'Qatar', false],
-      ['966', 'Saudi Arabia', false],
-      ['65', 'Singapore', false],
-      ['34', 'Spain', false],
-      ['46', 'Sweden', false],
-      ['41', 'Switzerland', false],
-      ['971', 'United Arab Emirates', false],
-      ['44', 'United Kingdom', false],
-      ['1', 'United States', true]
-    ]
+    [
+      ['54', I18n.t('Argentina'), false],
+      ['61', I18n.t('Australia'), false],
+      ['32', I18n.t('Belgium'), false],
+      ['55', I18n.t('Brazil'), false],
+      ['1', I18n.t('Canada'), false],
+      ['56', I18n.t('Chile'), false],
+      ['57', I18n.t('Colombia'), false],
+      ['45', I18n.t('Denmark'), false],
+      ['358', I18n.t('Finland'), false],
+      ['49', I18n.t('Germany'), false],
+      ['504', I18n.t('Honduras'), false],
+      ['852', I18n.t('Hong Kong'), false],
+      ['353', I18n.t('Ireland'), false],
+      ['352', I18n.t('Luxembourg'), false],
+      ['60', I18n.t('Malaysia'), false],
+      ['52', I18n.t('Mexico'), false],
+      ['31', I18n.t('Netherlands'), false],
+      ['64', I18n.t('New Zealand'), false],
+      ['47', I18n.t('Norway'), false],
+      ['507', I18n.t('Panama'), false],
+      ['51', I18n.t('Peru'), false],
+      ['63', I18n.t('Philippines'), false],
+      ['974', I18n.t('Qatar'), false],
+      ['966', I18n.t('Saudi Arabia'), false],
+      ['65', I18n.t('Singapore'), false],
+      ['34', I18n.t('Spain'), false],
+      ['46', I18n.t('Sweden'), false],
+      ['41', I18n.t('Switzerland'), false],
+      ['971', I18n.t('United Arab Emirates'), false],
+      ['44', I18n.t('United Kingdom'), false],
+      ['1', I18n.t('United States'), true]
+    ].sort_by{ |a| Canvas::ICU.collation_key(a[1]) }
   end
 
   def self.sms_carriers
