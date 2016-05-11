@@ -376,11 +376,27 @@ module Lti
           expect(exp_hash[:test]).to eq 'Buy as many ducks as you can'
         end
 
-        it 'has substitution for $Canvas.assignment.pointsPossible' do
-          assignment.stubs(:points_possible).returns(10)
-          exp_hash = {test: '$Canvas.assignment.pointsPossible'}
-          subject.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq 10
+        describe "$Canvas.assignment.pointsPossible" do
+          it 'has substitution for $Canvas.assignment.pointsPossible' do
+            assignment.stubs(:points_possible).returns(10.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 10
+          end
+
+          it 'does not round if not whole' do
+            assignment.stubs(:points_possible).returns(9.5)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9.5"
+          end
+
+          it 'rounds if whole' do
+            assignment.stubs(:points_possible).returns(9.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9"
+          end
         end
 
         it 'has substitution for $Canvas.assignment.unlockAt' do
