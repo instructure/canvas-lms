@@ -135,7 +135,7 @@ module CustomSeleniumActions
   end
 
   def is_checked(css_selector)
-    driver.execute_script('return $("'+css_selector+'").prop("checked")')
+    !!fj(css_selector)[:checked]
   end
 
   def get_value(selector)
