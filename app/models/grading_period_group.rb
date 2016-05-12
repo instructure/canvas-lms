@@ -1,7 +1,7 @@
 class GradingPeriodGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_accessible # None of this model's attributes are mass-assignable
+  attr_accessible :title
   belongs_to :account
   belongs_to :course
   has_many :grading_periods, dependent: :destroy

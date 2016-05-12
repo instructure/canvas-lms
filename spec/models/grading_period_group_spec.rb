@@ -21,6 +21,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe GradingPeriodGroup do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
+  describe "#title" do
+    it "can be mass-assigned" do
+      group = GradingPeriodGroup.new(title: "Example Title")
+      expect(group.title).to eql("Example Title")
+    end
+
+    it "is optional" do
+      group = GradingPeriodGroup.new
+      expect(group.title).to be_nil
+    end
+  end
+
   describe "validation" do
     it "is valid with only an active enrollment term" do
       enrollment_term = Account.default.enrollment_terms.create!
