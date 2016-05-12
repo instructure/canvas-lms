@@ -721,34 +721,37 @@ class Quizzes::Quiz < ActiveRecord::Base
 
 
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, :update)
     ::Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
-      locked = false
+      user_submission = user && quiz_submissions.where(user_id: user.id).first
+      return false if user_submission && user_submission.manually_unlocked
+
       quiz_for_user = self.overridden_for(user)
-      if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
-        sub = user && quiz_submissions.where(user_id: user).first
-        if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
-        end
-      elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
-        sub = user && quiz_submissions.where(user_id: user).first
-        if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at, :can_view => true}
-        end
-      elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        sub = user && quiz_submissions.where(user_id: user).first
-        if !sub || !sub.manually_unlocked
-          locked = l
-        end
-      elsif item = locked_by_module_item?(user, opts[:deep_check_if_needed])
-        sub = user && quiz_submissions.where(user_id: user).first
-        if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
-        end
+
+      unlock_time_not_yet_reached = quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.zone.now
+      lock_time_already_occurred = quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.zone.now
+
+      locked = false
+      lock_info = { asset_string: asset_string }
+      if unlock_time_not_yet_reached
+        locked = lock_info.merge({ unlock_at: quiz_for_user.unlock_at })
+      elsif lock_time_already_occurred
+        locked = lock_info.merge({ lock_at: quiz_for_user.lock_at, can_view: true })
+      elsif !opts[:skip_assignment] && (assignment_lock = locked_by_assignment?(user, opts))
+        locked = assignment_lock
+      elsif (module_lock = locked_by_module_item?(user, opts[:deep_check_if_needed]))
+        locked = lock_info.merge({ context_module: module_lock.context_module.attributes })
+      elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student)
+        locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })
       end
 
     locked
     end
+  end
+
+  def locked_by_assignment?(user, opts = {})
+    return false unless for_assignment?
+
+    assignment.locked_for?(user, opts)
   end
 
   def clear_locked_cache(user)

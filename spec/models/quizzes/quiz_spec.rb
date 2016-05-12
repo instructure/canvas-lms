@@ -1751,6 +1751,131 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe '#locked_for?' do
+    let(:quiz) { @course.quizzes.create! }
+    let(:student) { student_in_course(course: @course, active_enrollment: true).user }
+    let(:subject_user) { student }
+    let(:opts) { {} }
+
+    subject { quiz.locked_for?(subject_user, opts) }
+
+    before do
+      @course.offer!
+    end
+
+    shared_examples 'overrides' do
+      context 'when a user has a manually unlocked submission' do
+        before do
+          quiz_submission = quiz.generate_submission(subject_user)
+          quiz_submission.manually_unlocked = true
+          quiz_submission.save
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+
+    context '#unlock_at time has not yet occurred' do
+      before do
+        quiz.unlock_at = 1.hour.from_now
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :unlock_at }
+    end
+
+    context '#unlock_at time has passed' do
+      before do
+        quiz.unlock_at = 1.hour.ago
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context '#lock_at time as passed' do
+      before do
+        quiz.lock_at = 1.hour.ago
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :lock_at }
+    end
+
+    context '#lock_at time has not yet occurred' do
+      before do
+        quiz.lock_at = 1.hour.from_now
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'quiz is for an assignment' do
+      let(:assignment_lock_info) { quiz.assignment.locked_for?(subject_user, opts) }
+
+      before do
+        # need the after_save hooks to run for fully-prepare the quiz
+        quiz.save!
+      end
+
+      context 'assignment is not locked' do
+        before do
+          expect(assignment_lock_info).not_to be_present
+        end
+
+        it { is_expected.to be false }
+      end
+
+      context 'assignment is locked' do
+        before do
+          quiz.assignment.unlock_at = 1.day.from_now
+          quiz.assignment.save
+        end
+
+        include_examples 'overrides'
+
+        it { is_expected.to be_truthy }
+
+        it 'returns the lock info for the assignment' do
+          expect(subject).to eq assignment_lock_info
+        end
+
+        context 'skipping assignments' do
+          let(:opts) { { skip_assignment: true } }
+
+          it { is_expected.to be false }
+        end
+      end
+    end
+
+    context 'modules are locked' do
+      before do
+        locked_module = @course.context_modules.create!(name: 'locked module', unlock_at: 1.day.from_now)
+        locked_module.add_item(id: quiz.id, type: 'quiz')
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :context_module }
+    end
+
+    context 'user is not a student' do
+      let(:admin) { account_admin_user(account: @course.account) }
+      let(:subject_user) { admin }
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :missing_permission }
+    end
+  end
+
   describe '.class_names' do
     it 'returns an array of all acceptable class names' do
       expect(Quizzes::Quiz.class_names).to eq ['Quiz', 'Quizzes::Quiz']
