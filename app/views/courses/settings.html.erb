@@ -650,7 +650,7 @@
   </div>
 <% end %>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
-  <%= render :partial => "shared/grading_standard", :object => @context.grading_standard, :locals => {:read_only => !can_manage} %>
+  <%= render partial: "shared/grading_standard", object: @context.grading_standard, locals: {read_only: !can_manage} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
