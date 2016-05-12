@@ -142,7 +142,9 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.custom_find_by_unique_id(unique_id)
-    self.for_auth_configuration(unique_id, nil) if unique_id
+    return unless unique_id
+    active.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
+      AccountAuthorizationConfig.active.where(auth_type: ['canvas', 'ldap']).where("authentication_provider_id=account_authorization_configs.id")).first
   end
 
   def self.for_auth_configuration(unique_id, aac)
