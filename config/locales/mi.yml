@@ -11210,6 +11210,9 @@ mi:
       description: "Tiritiri tuhinga Google Tuhinga"
       name: "Google Tuhinga"
     google_docs_settings: 
+      description: |-
+          Ka Me ki [rēhita koutou rohe ki Google](%{google_url}).
+          Hanga he tuhipoka o koutou "OAuth Kiritaki Key" me "OAuth Kiritaki Secret" uara.
       labels: 
         api_key: "OAuth Kiritaki Key"
         secret_key: "OAuth Kiritaki Secret"
@@ -11349,6 +11352,9 @@ mi:
     microsoft: 
       description: "Microsoft Takiuru"
     microsoft_settings: 
+      description: |-
+          Ka Me koe ki te rēhita i tētahi [taupānga hou ki Microsoft](%{ms_app_url}).
+          me whirihora e koe %{callback_url} rite te anō URI.
       labels: 
         application_id: "ID Taupānga"
         application_secret: "ngaro Taupānga"
