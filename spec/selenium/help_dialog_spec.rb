@@ -85,7 +85,7 @@ describe "help dialog" do
       wait_for_ajaximations
       expect(feedback_form).not_to be_displayed
       cm = ConversationMessage.last
-      expect(cm.recipients).to eq @course.instructors
+      expect(cm.recipients).to match_array @course.instructors
       expect(cm.recipients.count).to eq 2
       expect(cm.body).to match(/test message/)
     end

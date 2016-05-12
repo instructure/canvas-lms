@@ -6,7 +6,7 @@ module Gradebook2Common
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
   end
   shared_context 'reusable_course' do
-    let(:test_course) { course() }
+    let(:test_course) { course(active_course: true) }
     let(:teacher)     { user(active_all: true) }
     let(:student)     { user(active_all: true) }
     let(:concluded_student) { user(name: 'Stewie Griffin', active_all: true) }

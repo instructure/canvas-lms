@@ -137,7 +137,9 @@ module Lti
     end
 
     def current_canvas_roles
-      (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq.join(',')
+      roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
+      roles = roles.map{|role| role == "AccountAdmin" ? "Account Admin" : role} # to maintain backwards compatibility
+      roles.join(',')
     end
 
     def enrollment_state

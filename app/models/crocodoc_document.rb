@@ -33,6 +33,7 @@ class CrocodocDocument < ActiveRecord::Base
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/excel
     application/vnd.ms-excel
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
   ).freeze
 
   def upload

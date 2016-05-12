@@ -401,7 +401,7 @@ module Lti
                        ASSIGNMENT_GUARD
 
     register_expansion 'Canvas.assignment.pointsPossible', [],
-                       -> { @assignment.points_possible },
+                       -> { TextHelper.round_if_whole(@assignment.points_possible) },
                        ASSIGNMENT_GUARD
     # @deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.unlockAt', [],

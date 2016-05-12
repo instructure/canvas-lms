@@ -240,7 +240,9 @@ class SubmissionsController < ApplicationController
     end
 
     params[:submission][:attachments] = params[:submission][:attachments].compact.uniq
-    copy_attachments_to_submissions_folder! if @context.root_account.feature_enabled?(:submissions_folder)
+    if @context.root_account.feature_enabled?(:submissions_folder)
+      params[:submission][:attachments] = self.class.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments])
+    end
 
     begin
       @submission = @assignment.submit_homework(@current_user, params[:submission])
@@ -299,12 +301,14 @@ class SubmissionsController < ApplicationController
   end
   private :lookup_existing_attachments
 
-  def copy_attachments_to_submissions_folder!
-    params[:submission][:attachments].map! do |attachment|
-      if attachment.folder.for_submissions?
+  def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
+    attachments.map do |attachment|
+      if attachment.folder && attachment.folder.for_submissions?
         attachment # already in a submissions folder
+      elsif attachment.context.respond_to?(:submissions_folder)
+        attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
       else
-        attachment.copy_to_folder!(attachment.context.submissions_folder(@context))
+        attachment # in a weird context; leave it alone
       end
     end
   end

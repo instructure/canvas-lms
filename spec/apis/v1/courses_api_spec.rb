@@ -1334,7 +1334,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
 
@@ -1345,7 +1344,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
   end

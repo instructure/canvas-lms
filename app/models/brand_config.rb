@@ -149,9 +149,9 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def remove_scss_dir!
-    return unless brand_dir.exist?
-    logger.info "removing: #{brand_dir}"
-    brand_dir.rmtree
+    return unless scss_dir.exist?
+    logger.info "removing: #{scss_dir}"
+    scss_dir.rmtree
   end
 
   def compile_css!(opts=nil)
@@ -201,7 +201,7 @@ class BrandConfig < ActiveRecord::Base
       first
     if unused_brand_config
       unused_brand_config.destroy
-      unused_brand_config.remove_brand_dir!
+      unused_brand_config.remove_scss_dir!
     end
   end
 

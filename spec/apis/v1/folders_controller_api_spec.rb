@@ -96,6 +96,21 @@ describe "Folders API", type: :request do
       expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
       expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
     end
+
+    context "student" do
+      before(:once) do
+        student_in_course
+        @root = Folder.root_folders(@student).first
+        @normal_folder = @student.folders.create! name: "Normal folder", parent_folder_id: @root
+        @student.submissions_folder
+      end
+
+      it "indicates submissions folders" do
+        json = api_call(:get, @folders_path + "/#{@root.id}/folders", @folders_path_options.merge(:id => @root.to_param))
+        expect(json.detect { |f| f['id'] == @normal_folder.id }['for_submissions']).to eq false
+        expect(json.detect { |f| f['id'] == @student.submissions_folder.id }['for_submissions']).to eq true
+      end
+    end
   end
 
   describe "#show" do

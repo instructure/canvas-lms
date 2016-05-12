@@ -98,6 +98,11 @@
 #         "locked_for_user": {
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "for_submissions": {
+#           "example": false,
+#           "type": "boolean",
+#           "description": "If true, indicates this is a read-only folder containing files submitted to assignments"
 #         }
 #       }
 #     }

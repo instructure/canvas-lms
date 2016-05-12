@@ -42,7 +42,7 @@ define [
       checkedRows = []
       for override in data.assignment_overrides
         continue if _.contains(checkedRows, override.rowKey)
-        dateValidator = new DateValidator({date_range: ENV.VALID_DATE_RANGE, data: override})
+        dateValidator = new DateValidator({date_range: _.extend({}, ENV.VALID_DATE_RANGE), data: override})
         rowErrors = dateValidator.validateDates()
         errors = _.extend(errors, rowErrors)
         for own element, msg of rowErrors

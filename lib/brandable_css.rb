@@ -164,7 +164,7 @@ module BrandableCSS
     end
 
     def variants
-      @variants ||= CONFIG['variants'].map{|(k)| k }.freeze
+      @variants ||= CONFIG['variants'].keys.freeze
     end
 
     def brandable_variants
