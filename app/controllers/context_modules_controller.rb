@@ -359,7 +359,9 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      @tag = @module.add_item(params[:item])
+      prms = params[:item]
+      prms[:section_restrict] = params[:section_restrict]
+      @tag = @module.add_item(prms)
       json = @tag.as_json
       json['content_tag'].merge!(
           publishable: module_item_publishable?(@tag),

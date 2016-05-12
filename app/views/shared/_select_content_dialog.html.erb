@@ -277,6 +277,18 @@
         </select>
       </div>
       <% end %>
+      <div class="context_module_content">
+        <%= before_label :restriction, "Show to" %>
+        <div style="padding-left: 1em;">
+          <label><input type="radio" name="show_to" value="everybody" checked /> Everybody</label><br />
+          <label><input type="radio" name="show_to" value="restricted" /> Only these sections:</label>
+          <div style="padding-left: 1em;">
+            <% @context.course_sections.each do |section| %>
+              <label><input type="checkbox" name="section_restrict[]" value="<%= section.id %>" /> <%= section.name %></label><br />
+            <% end %>
+          </div>
+        </div>
+      </div>
     <div class="button-container">
       <button type="button" class="cancel_button btn"><%= t "#buttons.cancel", "Cancel" %></button>
       <button type="button" class="add_item_button btn btn-primary"><%= t "#buttons.add_item", "Add Item" %></button>

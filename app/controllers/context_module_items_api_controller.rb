@@ -353,6 +353,7 @@ class ContextModuleItemsApiController < ApplicationController
       end
 
       item_params[:url] = params[:module_item][:external_url]
+      item_params[:section_restrict] = params[:section_restrict]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
         @tag.workflow_state = 'unpublished'
