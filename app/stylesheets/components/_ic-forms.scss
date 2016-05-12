@@ -759,7 +759,7 @@ New and improved version of a common Canvas UI: a header with action buttons on 
   </div>
 </div>
 ```
-### **.ic-action-box**
+### **.ic-Form-action-box**
 
 This responsive pattern is useful for when you need to build instances of things using form elements. It features an area on the right for interactions with the form, such as Delete.
 
@@ -1087,7 +1087,7 @@ Reduce the width of your screen to see how the example components below both sca
 ```html
 <div class="grid-row">
   <div class="col-md-6">
-    
+
     <div class="ic-Form-group">
       <div class="ic-Form-control ic-Form-control--has-warning">
         <!-- start super toggle -->
@@ -1117,7 +1117,7 @@ Reduce the width of your screen to see how the example components below both sca
 
   </div>
   <div class="col-md-6">
-    
+
     <div class="ic-Form-group ic-Form-group--horizontal">
       <div class="ic-Form-control ic-Form-control--has-error">
         <!-- start super toggle -->
@@ -1264,7 +1264,7 @@ textarea.ic-Input {
 
 
 // We removed -webkit-appearance from anything with the
-// .ic-Input class, to give us more styling control. 
+// .ic-Input class, to give us more styling control.
 // This makes the select's caret disappear in IE Edge and Webkit.
 // So we add it back in with these hacks.
 
@@ -1803,11 +1803,11 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
   margin-bottom: $ic-sp*2;
   @include breakpoint(desktop) { margin-bottom: $ic-sp; }
-  
+
   .ic-Form-control {
     margin-bottom: $ic-sp/2;
     @include breakpoint(desktop) {
@@ -1831,5 +1831,5 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box__Actions {
   box-sizing: border-box;
-  padding-left: $ic-sp*2;
+  padding-left: $ic-sp*4;
 }
