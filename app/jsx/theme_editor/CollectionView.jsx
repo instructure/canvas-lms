@@ -144,26 +144,16 @@ define([
                   <i className="icon-plus" />
                   &nbsp;
                   {I18n.t('Theme')}
-                  &nbsp;
+                  &nbsp;&nbsp;
                   <i className="icon-mini-arrow-down" />
                 </button>
-                <ul className="al-options">
-                  <li className="ui-menu-item ui-state-disabled">
-                    {I18n.t('Which Theme would you like to start from?')}
+                <ul className="al-options ic-ThemeCard-add-template-menu">
+                  <li className="ui-menu-item ui-menu-item--helper-text">
+                    {I18n.t('Create theme based on')} &hellip;
                   </li>
                   {
-                    [{
-                      key: 'globalThemes',
-                      humanName: I18n.t('Canvas Templates')
-                    },{
-                      key: 'accountSpecificThemes',
-                      humanName: I18n.t('My Themes')
-                    }].map(collection =>
-                      thingsToShow[collection.key] && [
-                        <li className="ui-menu-item ui-state-disabled">
-                          <span className="ui-menu-input-group">{collection.humanName}</span>
-                        </li>
-                      ].concat((thingsToShow[collection.key]).map(sharedConfig =>
+                    ['globalThemes', 'accountSpecificThemes'].map(collection =>
+                      _.map(thingsToShow[collection], sharedConfig =>
                         <li>
                           <a
                             aria-role="button"
@@ -175,7 +165,7 @@ define([
                         </li>
                       )
                     )
-                  )}
+                  }
                 </ul>
               </div>
             </div>
