@@ -482,6 +482,13 @@ class Submission < ActiveRecord::Base
     turnitin_data.select{|_, v| v.is_a?(Hash) && v.key?(:outcome_response)}.any?
   end
 
+  def external_tool_url
+    if self.submission_type == 'basic_lti_launch'
+      base_url = "#{HostUrl.protocol}://#{HostUrl.default_host}"
+      base_url + "/courses/#{assignment.context.id}/external_tools/retrieve?display=borderless&assignment_id=#{assignment.id}&url=#{URI.encode(url)}"
+    end
+  end
+
   def touch_graders
     self.class.connection.after_transaction_commit do
       if self.assignment && self.user && self.assignment.context.is_a?(Course)

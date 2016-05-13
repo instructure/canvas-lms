@@ -253,5 +253,15 @@ describe BasicLTI::BasicOutcomes do
       expect(submission.submission_type).to eq 'online_upload'
     end
 
+    it 'accepts LTI launch URLs as a data format with a specific submission type' do
+      xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+      expect(request.code_major).to eq 'success'
+      expect(request.handle_request(tool)).to be_truthy
+      submission = assignment.submissions.where(user_id: @user.id).first
+      expect(submission.submission_type).to eq 'basic_lti_launch'
+    end
+
   end
 end

@@ -1321,7 +1321,7 @@ class Assignment < ActiveRecord::Base
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
-                when "online_url"
+                when "online_url", "basic_lti_launch"
                   opts[:url].present?
                 when "online_upload"
                   opts[:attachments].size > 0
