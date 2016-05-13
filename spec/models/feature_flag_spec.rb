@@ -29,7 +29,8 @@ describe FeatureFlag do
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User'),
-      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course')
+      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course'),
+      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course', root_opt_in: true)
     })
   end
 
@@ -107,6 +108,11 @@ describe FeatureFlag do
       t_root_account.allow_feature! :hidden_feature
       t_sub_account.enable_feature! :hidden_feature
       expect(t_sub_account.lookup_feature_flag(:hidden_feature)).not_to be_unhides_feature
+    end
+
+    it "should be true on a sub-account root-opt-in feature flag with no root or site admin flags set" do
+      t_course.enable_feature! :hidden_root_opt_in_feature
+      expect(t_course.feature_flag(:hidden_root_opt_in_feature)).to be_unhides_feature
     end
   end
 end
