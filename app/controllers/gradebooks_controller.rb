@@ -493,6 +493,7 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_zip_upload
+    return unless authorized_action(@context, @current_user, :manage_grades)
     unless @context.allows_gradebook_uploads?
       flash[:error] = t('errors.not_allowed', "This course does not allow score uploads.")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
