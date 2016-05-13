@@ -233,9 +233,8 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
 .ic-ThemeCard-status {
   padding: $ic-sp/2 $ic-sp;
   color: $ic-color-light;
-  position: absolute;
-  top: -4px; left: -4px;
   &.ic-ThemeCard-status--is-active-theme {
+    padding: $ic-sp $ic-sp 8px $ic-sp; // taking off 4px for bottom border 
     background: $ic-color-success;
   }
 }
