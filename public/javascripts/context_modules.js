@@ -1033,6 +1033,11 @@ define([
           var $item = modules.addItemToModule($module, item_data);
           $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
           var url = $module.find(".add_module_item_link").attr('rel');
+	  item_data["section_restrict[]"] = [];
+	  var res = document.querySelectorAll("[name=\"section_restrict[]\"]");
+	  for(var i = 0; i < res.length; i++)
+	  	if(res[i].checked)
+			item_data["section_restrict[]"].push(res[i].value);
           $module.disableWhileLoading(
             $.ajaxJSON(url, 'POST', item_data, function(data) {
               $item.remove();

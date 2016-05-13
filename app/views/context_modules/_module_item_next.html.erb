@@ -102,6 +102,16 @@
       <span class="graded" style="display: none;"><%= tag && tag.graded? ? '1' : '0' %></span>
     </div>
     <div class="ig-details">
+      <div class="bz_section_restrictions">
+        <%
+          if module_item
+          restrictions = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+          if restrictions.any?
+        %> Only for: 
+        <% restrictions.each do |restriction| %>
+          <%= CourseSection.find(restriction.section_id).name %>
+        <% end end end %>
+      </div>
       <div class="due_date_display"></div>
       <div class="points_possible_display"></div>
     </div>
