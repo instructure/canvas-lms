@@ -4,7 +4,7 @@ module Canvas
   module Cdn
     class S3Uploader
 
-      attr_accessor :bucket, :config
+      attr_accessor :bucket, :config, :mutex
 
       def initialize(folder='dist')
         require 'aws-sdk'
@@ -13,6 +13,7 @@ module Canvas
         @s3 = AWS::S3.new(access_key_id: config.aws_access_key_id,
                           secret_access_key: config.aws_secret_access_key)
         @bucket = @s3.buckets[config.bucket]
+        @mutex = Mutex.new
       end
 
       def local_files
@@ -59,7 +60,7 @@ module Canvas
       def upload_file(remote_path)
         local_path = Pathname.new("#{Rails.public_path}/#{remote_path}")
         return if (local_path.extname == '.gz') || local_path.directory?
-        s3_object = bucket.objects[remote_path]
+        s3_object = mutex.synchronize { bucket.objects[remote_path] }
         return log("skipping already existing #{remote_path}") if s3_object.exists?
         options = options_for(local_path)
         s3_object.write(handle_compression(local_path, options), options)
