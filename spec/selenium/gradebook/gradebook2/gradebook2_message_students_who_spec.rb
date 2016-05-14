@@ -127,9 +127,9 @@ describe "gradebook2 - message students who" do
     wait_for_animations
     check_element_has_focus(message_form.find_element(:css, '#subject'))
 
-    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
     message_form.find_element(:css, '#body').send_keys('ohai student2')
-    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
 
     submit_form(message_form)
     wait_for_ajax_requests
@@ -149,11 +149,11 @@ describe "gradebook2 - message students who" do
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
     replace_content(message_form.find_element(:css, '.cutoff_score'), '1000')
     wait_for_animations
-    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
 
     replace_content(message_form.find_element(:css, '.cutoff_score'), '1')
     wait_for_animations
-    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
   end
 
   it "disables the submit button if all students are manually removed" do
@@ -172,14 +172,14 @@ describe "gradebook2 - message students who" do
     remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
     expect(remove_buttons.size).to eq 3
 
-    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
 
     remove_buttons.each do |button|
       button.click
       wait_for_animations
     end
 
-    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
   end
 
   it "should not send messages to inactive students" do

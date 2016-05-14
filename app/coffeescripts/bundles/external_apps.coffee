@@ -1,21 +1,19 @@
 require [
   'jquery'
   'react'
-  'react-router'
-  'jsx/external_apps/routes'
-], ($, React, Router, routes) ->
+  'jsx/external_apps/router'
+], ($, React, router) ->
   alreadyRendered = false
 
   render_react_apps = (tabId) ->
     targetNode = document.getElementById('external_tools')
     if tabId == 'tab-tools-link'
-      Router.run routes, Router.HistoryLocation, (Handler) ->
-        React.render React.createElement(Handler, null), targetNode
-
+      router.start(targetNode)
       alreadyRendered = true
     else if alreadyRendered
       React.unmountComponentAtNode(targetNode)
       alreadyRendered = false
+      router.stop();
 
   activeTabId = $('li.ui-state-active > a').prop('id')
   render_react_apps(activeTabId) if activeTabId

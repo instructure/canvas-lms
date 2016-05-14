@@ -23,6 +23,11 @@ class UserMergeData < ActiveRecord::Base
   strong_params
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :splitable, -> { where('created_at > ?', split_time) }
+
+  def self.split_time
+    Time.zone.now - Setting.get('user_merge_to_split_time', 90.days.to_i).to_i
+  end
 
   def add_more_data(objects, user=nil)
     objects.each do |o|

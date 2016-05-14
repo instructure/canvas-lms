@@ -311,13 +311,14 @@ describe "new groups" do
       f(".ui-menu-item .edit-group-assignment").click
       wait_for_ajaximations
 
+      click_option("#move_from_group_#{@testgroup[0].id}", @testgroup[1].id.to_s, :value)
       f(".set-group").click
       wait_for_ajaximations
 
       f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text("Test Student 1")
-      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 4")
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 2")
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-leader")).to be_displayed
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-leader")).to be_nil
     end

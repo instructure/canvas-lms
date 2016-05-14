@@ -101,7 +101,7 @@ describe 'Student Gradebook' do
     end
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    f('#show_all_details_link').click
+    f('#show_all_details_button').click
     details = ff('[id^="score_details"] td')
 
     expectations.each_with_index do |expectation, index|
@@ -111,7 +111,7 @@ describe 'Student Gradebook' do
       expect(details[i + 2].text).to eq "Low: #{expectation[:low]}"
     end
 
-    f('#show_all_details_link').click
+    f('#show_all_details_button').click
     details = ff('[id^="grade_info"]')
     details.each do |detail|
       expect(detail.css_value 'display').to eq 'none'

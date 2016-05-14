@@ -59,7 +59,7 @@
         <% else %>
           <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
             :grade => @current_user_submission.grade,
-            :points_possible => @assignment.points_possible,
+            :points_possible => round_if_whole(@assignment.points_possible),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
           } %></div>
           <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {

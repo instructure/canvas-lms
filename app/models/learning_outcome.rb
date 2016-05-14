@@ -25,7 +25,7 @@ class LearningOutcome < ActiveRecord::Base
   has_many :learning_outcome_results
   has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: 'ContentTag'
 
-  serialize_utf8_safe :data
+  serialize :data
 
   before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults

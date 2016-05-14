@@ -677,6 +677,12 @@ module ApplicationHelper
     end
   end
 
+  def active_brand_config_json_url(opts={})
+    path = active_brand_config(opts).try(:public_json_path)
+    path ||= BrandableCSS.public_default_json_path
+    "/#{path}"
+  end
+
   def brand_config_for_account(opts={})
     account = Context.get_account(@context)
 

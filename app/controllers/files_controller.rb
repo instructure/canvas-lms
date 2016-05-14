@@ -100,13 +100,23 @@ require 'securerandom'
 #     }
 #
 class FilesController < ApplicationController
-  before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status,:public_url]
-  before_filter :check_file_access_flags, :only => [:show_relative, :show]
-  before_filter :open_cors, only: [:api_create, :api_create_success, :show_thumbnail]
-  prepend_around_filter :load_pseudonym_from_policy, :only => :create
-  skip_before_filter :verify_authenticity_token, :only => :api_create
-  before_filter :verify_api_id, only: [:api_show, :api_create_success, :api_file_status, :api_update, :destroy]
+  before_filter :require_user, only: :create_pending
+  before_filter :require_context, except: [
+    :assessment_question_show, :image_thumbnail, :show_thumbnail, :preflight,
+    :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
+    :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url
+  ]
+
+  before_filter :check_file_access_flags, only: [:show_relative, :show]
+  before_filter :open_cors, only: [
+    :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
+  ]
+
+  prepend_around_filter :load_pseudonym_from_policy, only: :create
+  skip_before_filter :verify_authenticity_token, only: :api_create
+  before_filter :verify_api_id, only: [
+    :api_show, :api_create_success, :api_file_status, :api_update, :destroy
+  ]
 
   include Api::V1::Attachment
   include Api::V1::Avatar
@@ -364,18 +374,6 @@ class FilesController < ApplicationController
     end
   end
 
-  def text_show
-    @attachment = @context.attachments.find(params[:file_id])
-    if authorized_action(@attachment,@current_user,:read)
-      if @attachment.grants_right?(@current_user, :download)
-        @headers = false
-        render
-      else
-        show
-      end
-    end
-  end
-
   def assessment_question_show
     @context = AssessmentQuestion.find(params[:assessment_question_id])
     @attachment = @context.attachments.find(params[:id])
@@ -462,7 +460,7 @@ class FilesController < ApplicationController
     if @attachment.deleted?
       if @current_user.nil? || @attachment.user_id != @current_user.id
         @not_found_message = t('could_not_find_file', "This file has been deleted")
-        render status: 404, template: "shared/errors/404_message"
+        render status: 404, template: "shared/errors/404_message", formats: [:html]
         return
       end
       flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
@@ -494,7 +492,9 @@ class FilesController < ApplicationController
             @headers = false if params[:ts] && params[:verifier]
             @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
             logger.error "Error downloading a file: #{e} - #{e.backtrace}"
-            render 'shared/errors/404_message', status: :bad_request
+            render 'shared/errors/404_message',
+              status: :bad_request,
+              formats: [:html]
           end
           return
         elsif authorized_action(@attachment, @current_user, :read)
@@ -585,7 +585,9 @@ class FilesController < ApplicationController
     @attachment ||= Folder.find_attachment_in_context_with_path(@context, path)
 
     unless @attachment
-      return render 'shared/errors/file_not_found', status: :bad_request
+      return render 'shared/errors/file_not_found',
+        status: :bad_request,
+        formats: [:html]
     end
 
     params[:id] = @attachment.id
@@ -672,13 +674,6 @@ class FilesController < ApplicationController
       #set cache to expoire in 1 day, max-age take seconds, and Expires takes a date
       response.headers["Cache-Control"] = "private, max-age=86400"
       response.headers["Expires"] = 1.day.from_now.httpdate
-    end
-  end
-
-  # GET /files/new
-  def new
-    @attachment = @context.attachments.build
-    if authorized_action(@attachment, @current_user, :create)
     end
   end
 
@@ -806,6 +801,10 @@ class FilesController < ApplicationController
     else
       render(:nothing => true, :status => :bad_request)
     end
+  end
+
+  def api_create_success_cors
+    render nothing: true, status: :ok
   end
 
   def api_create_success
@@ -1111,7 +1110,7 @@ class FilesController < ApplicationController
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
-    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding'
   end
 
   def render_attachment_json(attachment, deleted_attachments, folder = attachment.folder)

@@ -314,7 +314,7 @@ define [
     equal errors['due_at'][0]['message'], 'Due date cannot be before unlock date'
 
   test "renders due dates with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'

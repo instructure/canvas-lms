@@ -46,7 +46,7 @@ class GradebooksController < ApplicationController
       return render_unauthorized_action
     end
 
-    if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
+    if authorized_action(@context, @current_user, :read) && authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
       log_asset_access([ "grades", @context ], "grades", "other")
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
@@ -72,8 +72,16 @@ class GradebooksController < ApplicationController
         end
 
         submissions_json = @presenter.submissions.
-          reject { |s| s.pending_review? || !s.user_can_read_grade?(@current_user) }.
-          map { |s| { "assignment_id" => s.assignment_id, "score" => s.score, "excused" => s.excused? } }
+          select { |s| s.user_can_read_grade?(@current_user) }.
+          map do |s|
+            {
+              assignment_id: s.assignment_id,
+              score: s.score,
+              excused: s.excused?,
+              workflow_state: s.workflow_state,
+            }
+          end
+
 
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
@@ -290,7 +298,12 @@ class GradebooksController < ApplicationController
     end
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => chunk_size,
-      :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
+      :assignment_groups_url => api_v1_course_assignment_groups_url(
+        @context,
+        include: ag_includes,
+        override_assignment_dates: "false",
+        exclude_assignment_submission_types: ['wiki_page']
+      ),
       :sections_url => api_v1_course_sections_url(@context),
       :course_url => api_v1_course_url(@context),
       :enrollments_url => custom_course_enrollments_api_url(per_page: per_page),
@@ -353,6 +366,8 @@ class GradebooksController < ApplicationController
       :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
       :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals),
       :sections => sections_json(@context.active_course_sections, @current_user, session),
+      :settings_update_url => api_v1_course_gradebook_settings_update_url(@context),
+      :settings => @current_user.preferences.fetch(:gradebook_settings, {}).fetch(@context.id, {}),
     }
   end
 
@@ -470,6 +485,7 @@ class GradebooksController < ApplicationController
   end
 
   def submissions_zip_upload
+    return unless authorized_action(@context, @current_user, :manage_grades)
     unless @context.allows_gradebook_uploads?
       flash[:error] = t('errors.not_allowed', "This course does not allow score uploads.")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)

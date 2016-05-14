@@ -86,11 +86,20 @@ module LocaleSelection
   # if the locale name is not yet translated, it won't be included (even if
   # there are other translations for that locale)
   def available_locales
-    I18n.available_locales.inject({}) do |hash, locale|
+    result = {}
+    settings = Canvas::Plugin.find(:i18n).settings || {}
+    enabled_custom_locales = settings.select { |locale, enabled| enabled }.map(&:first).map(&:to_sym)
+    I18n.available_locales.each do |locale|
       name = I18n.send(:t, :locales, :locale => locale)[locale]
-      hash[locale.to_s] = name if name
-      hash
+      custom = I18n.send(:t, :custom, locale: locale) == true
+      next if custom && !enabled_custom_locales.include?(locale)
+      result[locale.to_s] = name if name
     end
+    result
+  end
+
+  def self.custom_locales
+    @custom_locales ||= I18n.available_locales.select{ |locale| I18n.send(:t, :custom, :locale => locale) == true }.sort
   end
 
   def crowdsourced_locales

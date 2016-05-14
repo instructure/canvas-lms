@@ -38,7 +38,7 @@ module Api::V1::User
       ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
     end
     if opts[:group_memberships]
-      ActiveRecord::Associations::Preloader.new(users, :group_memberships).run
+      ActiveRecord::Associations::Preloader.new.preload(users, :group_memberships)
     end
   end
 
@@ -119,6 +119,11 @@ module Api::V1::User
 
       if includes.include?('custom_links')
         json[:custom_links] = roster_user_custom_links(user)
+      end
+
+      if includes.include?('time_zone')
+        zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
+        json[:time_zone] = zone.name
       end
     end
   end

@@ -300,7 +300,7 @@ define [
     equal @$field.data('time-ampm'), 'pm'
 
   test 'sets time-* to fudged, 24-hour values', ->
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     @field.updateData()
     equal @$field.data('time-hour'), '21'
     equal @$field.data('time-minute'), '56'
@@ -444,7 +444,7 @@ define [
     equal @field.formatSuggest(), ' 9:56pm'
 
   test 'localizes formatting of dates and times', ->
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.pushFrame()
     I18nStubber.setLocale 'pt_PT'
     I18nStubber.stub 'pt_PT', 'date.formats.full_with_weekday': "%a, %-d %b %Y %k:%M"
@@ -565,7 +565,7 @@ define [
     equal @$field.val(), '9:56pm'
 
   test 'localizes value', ->
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.pushFrame()
     I18nStubber.setLocale 'pt_PT'
     I18nStubber.stub 'pt_PT', 'date.formats.full': "%-d %b %Y %-k:%M"

@@ -76,6 +76,7 @@ define([
         return false;
       }
     });
+    $("#account_notification_start_at,#account_notification_end_at").datetime_field({addHiddenInput: true});
     $(".datetime_field").datetime_field();
 
     globalAnnouncements.augmentView()

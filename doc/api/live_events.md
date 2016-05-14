@@ -40,6 +40,7 @@ event originated as part of a web request:
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
 | `root_account_id` | Number | The Canvas id of the root account associated with the current user. |
+| `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
 | `context_id` | Number | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `role` | String | The role of the current user in the current context.  |

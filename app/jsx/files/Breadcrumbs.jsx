@@ -2,25 +2,24 @@ define([
   'react',
   'i18n!react_files',
   'classnames',
-  'react-router',
   'compiled/react_files/components/Breadcrumbs',
+  'compiled/react_files/modules/filesEnv',
   'jsx/files/BreadcrumbCollapsedContainer',
   'compiled/str/splitAssetString'
-], function(React, I18n, classnames, ReactRouter, Breadcrumbs, BreadcrumbCollapsedContainer, splitAssetString) {
+], function(React, I18n, classnames, Breadcrumbs, filesEnv, BreadcrumbCollapsedContainer, splitAssetString) {
 
   var MAX_CRUMB_WIDTH = 500
   var MIN_CRUMB_WIDTH = (window.ENV.use_new_styles) ? 80 : 40;
 
-  var Link = ReactRouter.Link;
-
   Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
-    var [contextType, contextId] = splitAssetString(window.ENV.context_asset_string, false);
-    var isContextRoot = !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && (folder.get("context_id") || -1).toString() === contextId);
-    var name = (isRootCrumb  && isContextRoot) ? I18n.t('files', 'Files') : folder && (folder.get('custom_name') || folder.get('name'));
+    const [contextType, contextId] = splitAssetString(this.props.contextAssetString, false);
+    const isContextRoot = !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && (folder.get("context_id") || -1).toString() === contextId);
+    const name = (isRootCrumb  && isContextRoot) ? I18n.t('files', 'Files') : folder && (folder.get('custom_name') || folder.get('name'));
+
     return (
       <li key={name}>
-        <Link
-          to={(isRootCrumb) ? 'rootFolder' : 'folder'}
+        <a
+          href={(isRootCrumb && isContextRoot) ? filesEnv.baseUrl : `${filesEnv.baseUrl}/folder/${(folder) ? folder.urlPath(): null}`}
           params={{splat: (isRootCrumb) ? null : folder.urlPath()}}
           // only add title tooltips if there's a chance they could be ellipsized
           title={(this.state.maxCrumbWidth < 500) ? name : null}
@@ -31,7 +30,7 @@ define([
           >
             {name}
           </span>
-        </Link>
+        </a>
       </li>
     );
 
@@ -42,17 +41,17 @@ define([
       return [
         this.renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
         <li key='searchLink'>
-          <Link
-            to='search'
-            query={this.getQuery()}
+          <a
+            href='/search'
+            query={this.props.query}
             params={{splat: ''}}
           >
             <span className='ellipsis'>
-              {this.getQuery().search_term &&
-                I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: this.getQuery().search_term})
+              {this.props.query.search_term &&
+                I18n.t('search_results_for', 'search results for "%{search_term}"', {search_term: this.props.query.search_term})
               }
             </span>
-          </Link>
+          </a>
         </li>
       ];
     } else {

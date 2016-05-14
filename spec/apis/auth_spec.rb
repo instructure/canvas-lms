@@ -353,14 +353,14 @@ describe "API Authentication", type: :request do
       it "should require the developer key to have a redirect_uri" do
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
         expect(response).to be_client_error
-        expect(response.body).to match /invalid redirect_uri/
+        expect(response.body).to match /redirect_uri/
       end
 
       it "should require the redirect_uri domains to match" do
         @key.update_attribute :redirect_uri, 'http://www.example2.com/oauth2response'
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
         expect(response).to be_client_error
-        expect(response.body).to match /invalid redirect_uri/
+        expect(response.body).to match /redirect_uri/
 
         @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
@@ -437,12 +437,14 @@ describe "API Authentication", type: :request do
               developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
 
               @user.access_tokens.create!(developer_key: developer_key)
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
             end
           end
         end

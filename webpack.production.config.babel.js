@@ -19,7 +19,7 @@ try {
   console.log("NO CDN FILE, USING LOCAL ASSETS");
 }
 
-productionWebpackConfig.devtool = undefined;
+productionWebpackConfig.devtool = 'cheap-source-map';
 productionWebpackConfig.output.path = __dirname + '/public/webpack-dist-optimized';
 productionWebpackConfig.output.publicPath = publicPath;
 

@@ -95,6 +95,50 @@ describe ContentMigration do
         expect(newer_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
       end
 
+      it "infers a sensible end date if not provided" do
+        skip unless Qti.qti_enabled?
+        options = {
+                :everything => true,
+                :shift_dates => true,
+                :old_start_date => 'Jul 1, 2012',
+                :old_end_date => nil,
+                :new_start_date => 'Aug 5, 2012',
+                :new_end_date => nil
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        new_asmnt = @copy_to.assignments.first
+        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+      end
+
+      it "ignores a bad end date" do
+        skip unless Qti.qti_enabled?
+        options = {
+                :everything => true,
+                :shift_dates => true,
+                :old_start_date => 'Jul 1, 2012',
+                :old_end_date => nil,
+                :new_start_date => 'Aug 5, 2012',
+                :new_end_date => 'Jul 4, 2012'
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        new_asmnt = @copy_to.assignments.first
+        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+      end
+
       it "should remove dates" do
         skip unless Qti.qti_enabled?
         options = {

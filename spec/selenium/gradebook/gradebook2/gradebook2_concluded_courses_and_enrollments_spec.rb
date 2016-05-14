@@ -5,10 +5,47 @@ describe "gradebook2 - concluded courses and enrollments" do
   include Gradebook2Common
 
   let!(:setup) { gradebook_data_setup }
+  let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
+  let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }
 
   context "active course" do
-    it "does not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
-      @student_1.enrollments.where(course_id: @course).first.conclude
+    let(:gradebook_settings_for_course) do
+      -> (teacher, course) do
+        teacher.reload
+          .preferences.fetch(:gradebook_settings, {})[course.id]
+      end
+    end
+
+    it "persists settings for displaying inactive enrollments", priority: "2", test_id: 1372593 do
+      get course_gradebook2_path(@course)
+      wait_for_ajaximations
+      f('#gradebook_settings').click
+
+      expect { f('label[for="show_inactive_enrollments"]').click }
+        .to change { gradebook_settings_for_course.call(@teacher, @course)}
+        .from(nil)
+        .to({
+          "show_inactive_enrollments" => "true",
+          "show_concluded_enrollments" => "false",
+        })
+    end
+
+    it "persists settings for displaying concluded enrollments", priority: "2", test_id: 1372592 do
+      get course_gradebook2_path(@course)
+      wait_for_ajaximations
+      f('#gradebook_settings').click
+
+      expect { f('label[for="show_concluded_enrollments"]').click }
+        .to change { gradebook_settings_for_course.call(@teacher, @course) }
+        .from(nil)
+        .to({
+          "show_inactive_enrollments" => "false",
+          "show_concluded_enrollments" => "true",
+        })
+    end
+
+    it "does not show concluded enrollments by default", priority: "1", test_id: 210020 do
+      conclude_student_1
 
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
@@ -16,6 +53,12 @@ describe "gradebook2 - concluded courses and enrollments" do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
+    end
+
+    it "shows/hides concluded enrollments when checked/unchecked in settings cog", priority: "1", test_id: 164223 do
+      conclude_student_1
+
+      get "/courses/#{@course.id}/gradebook2"
 
       # show concluded
       expect_new_page_load do
@@ -36,8 +79,8 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(ff('.student-name').count).to eq @course.students.count
     end
 
-    it "does not show inactive enrollments by default and they can be toggled", priority: "1" do
-      @student_1.enrollments.where(course_id: @course).first.deactivate
+    it "does not show inactive enrollments by default", priority: "1", test_id: 1102065 do
+      deactivate_student_1
 
       expect(@course.students.count).to eq @all_students.size - 1
       expect(@course.all_students.count).to eq @all_students.size
@@ -45,6 +88,12 @@ describe "gradebook2 - concluded courses and enrollments" do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
+    end
+
+    it "shows/hides inactive enrollments when checked/unchecked in settings cog", priority: "1", test_id: 1102066 do
+      deactivate_student_1
+
+      get "/courses/#{@course.id}/gradebook2"
 
       # show deactivated
       expect_new_page_load do
@@ -107,12 +156,6 @@ describe "gradebook2 - concluded courses and enrollments" do
       expect(cell.text).to eq '10'
       cell.click
       expect(f('.grade', cell)).to be_nil # no input box for entry
-    end
-
-    it "should hide gradebook upload link and set group weight actions from the menu", priority: "1", test_id: 210028 do
-      f('#gradebook_settings').click
-      expect(f("a.gradebook_upload_link")).to_not be_present
-      expect(f("a.set_group_weights")).to_not be_present
     end
   end
 end

@@ -384,8 +384,9 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
-      type = type.pluralize.to_sym
-      raise "invalid type" unless ITEM_TYPES.include?(type) && scope.reflections.key?(type)
+      type = type.pluralize
+      type = type.to_sym if CANVAS_RAILS4_0
+      raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
       @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item

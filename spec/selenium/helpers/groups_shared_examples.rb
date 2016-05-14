@@ -26,7 +26,7 @@ shared_examples 'home_page' do |context|
 
   it "should have a working link to add an announcement from the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273604, teacher: 319911) do
     get url
-    expect_new_page_load { fln('New Announcement').click }
+    expect_new_page_load { fln('Announcement').click }
     expect(f('.btn-primary')).to be_displayed
   end
 

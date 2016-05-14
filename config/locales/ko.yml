@@ -9103,7 +9103,6 @@ ko:
   qti_display: QTI
   qti_file_description: "QTI .zip 파일"
   qti_name: "QTI 변환기"
-  qualified_locale: ko-KR
   question_answered: 답변함
   question_bank: 
     align_outcomes: "성과 정렬"

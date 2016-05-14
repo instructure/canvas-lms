@@ -9,10 +9,10 @@
       <% pseudonyms.each do |pseudonym| %>
         <tr class='login <%= 'blank' unless pseudonym %>' style="<%= hidden unless pseudonym %>">
           <td class='sso-icon'>
-            <% if pseudonym.try(:authentication_provider).try(:login_button?) %>
+            <% if lookup_context.template_exists?("shared/svg/_svg_icon_#{pseudonym.try(:authentication_provider).try(:auth_type)}.svg") %>
               <%= render(partial: "shared/svg/svg_icon_#{pseudonym.authentication_provider.auth_type}.svg") %>
               <span class="screenreader-only">
-                <%= t("This login is for %{provider}", provider: pseudonym.authentication_provider.auth_type) %>
+                <%= t("This login is for %{provider}", provider: pseudonym.authentication_provider.class.display_name) %>
               </span>
             <% end %>
           </td>

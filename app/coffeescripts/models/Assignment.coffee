@@ -37,6 +37,7 @@ define [
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
+    isPage: => @_hasOnlyType 'wiki_page'
     isExternalTool: => @_hasOnlyType 'external_tool'
     isNotGraded: => @_hasOnlyType 'not_graded'
     isAssignment: =>
@@ -241,11 +242,13 @@ define [
     iconType: =>
       return 'quiz' if @isQuiz()
       return 'discussion' if @isDiscussionTopic()
+      return 'document' if @isPage()
       return 'assignment'
 
     objectType: =>
       return 'Quiz' if @isQuiz()
       return 'Discussion' if @isDiscussionTopic()
+      return 'WikiPage' if @isPage()
       return 'Assignment'
 
     htmlUrl: =>

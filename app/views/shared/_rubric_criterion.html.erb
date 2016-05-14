@@ -102,7 +102,7 @@
     <div class="displaying">
       <span style="white-space: nowrap;">
         <span class="criterion_rating_points_holder" style="<%= hidden unless assessment_rating %>">
-          <span class="criterion_rating_points"><%= assessment_rating ? assessment_rating[:points] : nbsp %></span> /
+          <span class="criterion_rating_points"><%= assessment_rating ? round_if_whole(assessment_rating[:points]) : nbsp %></span> /
         </span>
         <%= t :points, "%{points} pts", :points => %{<span class="display_criterion_points">#{ criterion.points rescue 5 }</span>}.html_safe %><br />
       </span>

@@ -63,8 +63,6 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
-  after_filter :teardown_live_events_context
-  include Tour
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -109,6 +107,7 @@ class ApplicationController < ActionController::Base
       @js_env = {
         ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config: active_brand_config.try(:md5),
+        active_brand_config_json_url: active_brand_config_json_url,
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
         current_user: user_display_json(@current_user, :profile),
@@ -128,8 +127,12 @@ class ApplicationController < ActionController::Base
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
       @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
       @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-      @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
-      @js_env[:TOURS] = tours_to_run
+      unless @js_env[:LOCALE]
+        @js_env[:LOCALE] = I18n.locale.to_s
+        @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
+        @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
+        @js_env[:MOMENT_LOCALE] = I18n.moment_locale
+      end
 
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
@@ -158,12 +161,28 @@ class ApplicationController < ActionController::Base
   end
   helper_method :rce_js_env
 
+  def conditional_release_js_env(assignment = nil)
+    return unless ConditionalRelease::Service.enabled_in_context?(@context)
+    cr_env = ConditionalRelease::Service.env_for(
+      @context,
+      @current_user,
+      session: session,
+      assignment: assignment,
+      domain: request.env['HTTP_HOST'],
+      real_user: @real_current_user
+    )
+    js_env(cr_env)
+  end
+  helper_method :conditional_release_js_env
+
   def external_tools_display_hashes(type, context=@context, custom_settings=[])
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
-      :root_account => @domain_root_account, :current_user => @current_user})
+      :root_account => @domain_root_account, :current_user => @current_user}).to_a
+
+    tools.select!{|tool| ContextExternalTool.visible?(tool.extension_setting(type)['visibility'], @current_user, context, session)}
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
@@ -1186,7 +1205,8 @@ class ApplicationController < ActionController::Base
       message = exception.is_a?(RequestError) ? exception.message : nil
       render template: template,
         layout: 'application',
-        status: status,
+        status: status_code,
+        formats: [:html],
         locals: {
           error: error,
           exception: exception,
@@ -2039,6 +2059,7 @@ class ApplicationController < ActionController::Base
   def setup_live_events_context
     ctx = {}
     ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
+    ctx[:root_account_lti_guid] = @domain_root_account.lti_guid if @domain_root_account
     ctx[:user_id] = @current_user.global_id if @current_user
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym

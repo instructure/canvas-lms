@@ -46,6 +46,7 @@ describe "calendar2" do
         keep_trying_until { title.displayed? }
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
+        expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/  # passed in ISO format, not localized
         expect(f('.title').attribute('value')).to eq event_title
         expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)

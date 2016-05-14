@@ -92,6 +92,11 @@ describe DiscussionTopic do
       @relevant_permissions = [:read, :reply, :update, :delete]
     end
 
+    it "should not grant moderate permissions without read permissions" do
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
+      expect((@topic.check_policy(@teacher2) & @relevant_permissions)).to be_empty
+    end
+
     it "should grant permissions if it not locked" do
       @topic.publish!
       expect((@topic.check_policy(@teacher1) & @relevant_permissions).map(&:to_s).sort).to eq ['read', 'reply', 'update', 'delete'].sort
@@ -213,7 +218,7 @@ describe DiscussionTopic do
 
       account = @course.root_account
       nobody_role = custom_account_role('NobodyAdmin', account: account)
-      account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true })
+      account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true, read_forum: true })
       admin = account_admin_user(account: account, role: nobody_role, active_user: true)
       expect(@topic.visible_for?(admin)).to be_truthy
     end
@@ -1602,19 +1607,21 @@ describe DiscussionTopic do
     end
 
     it "should not allow replies from students to locked topics" do
-      discussion_topic_model
+      course_with_teacher(:active_all => true)
+      discussion_topic_model(:context => @course)
       @topic.lock!
       @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
-      student_in_course(:course => @course)
+      student_in_course(:course => @course).accept!
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
     it "should not allow replies from students to topics locked based on date" do
-      discussion_topic_model
+      course_with_teacher(:active_all => true)
+      discussion_topic_model(:context => @course)
       @topic.unlock_at = 1.day.from_now
       @topic.save!
       @topic.reply_from(:user => @teacher, :text => "reply") # should not raise error
-      student_in_course(:course => @course)
+      student_in_course(:course => @course).accept!
       expect { @topic.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end

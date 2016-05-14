@@ -7,7 +7,7 @@ if CANVAS_RAILS4_0
   gem 'tzinfo', '0.3.43'
   gem 'foreigner', '0.9.2'
 else
-  gem 'rails', '4.2.5.2'
+  gem 'rails', '4.2.6'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.1.3'
@@ -40,7 +40,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.17'
-gem 'canvas-jobs', '0.10.5'
+gem 'inst-jobs', '0.11.1'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -54,7 +54,7 @@ gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.37', require: 'ims'
+gem 'ims-lti', '2.0.0.beta.39', require: 'ims'
 gem 'json', '1.8.2'
 gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false

@@ -19,7 +19,7 @@
 
   <li style="<%= hidden if @quiz.quiz_type == 'survey' %>">
     <span class="title"><%= t('headers.points', "Points") %></span>
-    <span class="value"><%= @quiz.points_possible || 0 %></span>
+    <span class="value"><%= round_if_whole(@quiz.points_possible) || 0 %></span>
   </li>
 
   <li>

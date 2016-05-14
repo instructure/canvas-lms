@@ -402,7 +402,7 @@ describe "course settings" do
       expect(page_result).to include_text(unpublished_link)
 
       # hide the unpublished results
-      move_to_click('#show_unpublished')
+      move_to_click('label[for=show_unpublished]')
       wait_for_ajaximations
 
       expect(f("#all-results .alert")).to include_text("Found 1 broken link")
@@ -412,7 +412,8 @@ describe "course settings" do
       expect(result).to include_text(deleted_link)
 
       # show them again
-      move_to_click('#show_unpublished')
+      move_to_click('label[for=show_unpublished]')
+
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
       page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
       expect(page_result).to include_text(unpublished_link)

@@ -124,7 +124,6 @@ class User < ActiveRecord::Base
   has_many :all_conversations, -> { preload(:conversation) }, class_name: 'ConversationParticipant'
   has_many :conversation_batches, -> { preload(:root_conversation_message) }
   has_many :favorites
-  has_many :zip_file_imports, :as => :context
   has_many :messages
   has_many :sis_batches
   has_many :sis_post_grades_statuses
@@ -811,7 +810,7 @@ class User < ActiveRecord::Base
       cc = e
     else
       cc = self.communication_channels.email.by_path(e).first ||
-           self.communication_channels.email.create(path: e)
+           self.communication_channels.email.create!(path: e)
       cc.user = self
     end
     cc.move_to_top

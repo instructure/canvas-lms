@@ -1,6 +1,5 @@
 require_relative '../common'
 require_relative '../helpers/quizzes_common'
-require_relative '../helpers/testrail_report'
 
 describe 'quizzes question banks' do
   include_context "in-process server selenium tests"
@@ -257,6 +256,7 @@ describe 'quizzes question banks' do
     end
 
     it 'should allow editing quiz questions that belong to a quiz bank', priority: "1", test_id: 217531 do
+      skip_if_chrome('fragile')
       @course.account = Account.default
       @course.save
 

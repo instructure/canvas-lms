@@ -19,6 +19,7 @@ if settings.present?
     config.sanitize_credit_cards = false
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
+      AuthenticationMethods::LoggedOutError
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
     }

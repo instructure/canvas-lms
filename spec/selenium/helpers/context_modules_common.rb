@@ -199,8 +199,7 @@ module ContextModulesCommon
    end
 
   def lock_check_click(form)
-    lock_check = form.find_element(:id, 'unlock_module_at')
-    driver.action.move_to(lock_check).click.perform
+    move_to_click('label[for=unlock_module_at]')
   end
 
   # so terrible

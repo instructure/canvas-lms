@@ -130,7 +130,8 @@ describe 'quizzes question creation' do
       submit_form(question)
       wait_for_ajax_requests
 
-      move_to_click('#show_question_details')
+      close_regrade_tooltip if f('.btn.usher-close')
+      move_to_click('label[for=show_question_details]')
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")
       expect(finished_question).to be_displayed
       expect(finished_question.find_elements(:css, '.answer.correct_answer').length).to eq 2

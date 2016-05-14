@@ -139,6 +139,18 @@ module Canvas::Security
           expect(decrypted_token_body.keys.include?(:masq_sub)).to eq(false)
         end
 
+        it "includes workflow if given" do
+          jwt = ServicesJwt.for_user(host, user, workflow: 'foo')
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body[:workflow]).to eq 'foo'
+        end
+
+        it "does not include a workflow if not given" do
+          jwt = ServicesJwt.for_user(host, user)
+          decrypted_token_body = translate_token.call(jwt)
+          expect(decrypted_token_body).not_to have_key :workflow
+        end
+
         it "errors without a host" do
           expect{ ServicesJwt.for_user(nil, user) }.
             to raise_error(ArgumentError)

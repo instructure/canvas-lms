@@ -204,7 +204,7 @@ define [
     equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at 7:00pm'
 
   test 'should translate into the profile locale', ->
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.setLocale 'pt'
     I18nStubber.stub 'pt',
       'date.formats.medium': "%-d %b %Y"
@@ -223,7 +223,7 @@ define [
 
   test 'should accept localized strings and return them fudged', ->
     tz.changeZone(detroit, 'America/Detroit')
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.setLocale 'pt'
     I18nStubber.stub 'pt',
       # this isn't the real format, but we want the %Y in here to make it

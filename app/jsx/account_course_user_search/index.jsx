@@ -16,7 +16,7 @@ define([
 
   var stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore];
 
-  var App = React.createClass({
+  const AccountCourseUserSearch = React.createClass({
     propTypes: {
       accountId: string.isRequired,
       permissions: shape({
@@ -40,7 +40,7 @@ define([
     },
 
     render() {
-      var { permissions, accountId } = this.props;
+      const { timezones, permissions, accountId } = this.props;
 
       var tabs = [];
       var panels = [];
@@ -48,7 +48,7 @@ define([
         tabs.push(<Tab>{I18n.t("Courses")}</Tab>);
         panels.push(
           <TabPanel>
-            <CoursesPane />
+            <CoursesPane roles={this.props.roles} addUserUrls={this.props.addUserUrls} />
           </TabPanel>
         );
       }
@@ -56,7 +56,7 @@ define([
         tabs.push(<Tab>{I18n.t("People")}</Tab>);
         panels.push(
           <TabPanel>
-            <UsersPane accountId={accountId}/>
+            <UsersPane store={this.props.store} />
           </TabPanel>
         );
       }
@@ -95,5 +95,5 @@ define([
     }
   });
 
-  return App;
+  return AccountCourseUserSearch;
 });

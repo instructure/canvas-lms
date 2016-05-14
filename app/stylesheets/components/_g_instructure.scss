@@ -307,7 +307,6 @@
       i[class*=icon-], i[class^=icon-] {
         color: lighten( $grayDark, 15% );
         vertical-align: top;
-        margin-top: 8px;
       }
       i.icon-check {
         @if $use_new_styles { color: $ic-color-success; }
@@ -319,9 +318,9 @@
         margin-top: 2px;
       }
     }
-    div.event-details, div.todo-details {
+    .event-details, .todo-details {
       display: inline-block;
-      margin-left: 5px;
+      padding-right: $ic-sp*2;
     }
   }
   .events_list {

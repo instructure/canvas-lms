@@ -40,14 +40,9 @@ define [
     columns: columns
 
     propTypes:
-      to: React.PropTypes.string.isRequired
       query: React.PropTypes.object.isRequired
-      params: React.PropTypes.object.isRequired
       toggleAllSelected: React.PropTypes.func.isRequired
       areAllItemsSelected: React.PropTypes.func.isRequired
-      splat: React.PropTypes.string
-
-    mixins: [ReactRouter.State]
 
     getInitialState: ->
       return {

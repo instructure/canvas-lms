@@ -78,23 +78,23 @@ define [
     equal +m.toDate(), +expected
 
   test 'moment can change locales with single arity', ->
-    tz.changeLocale("en_US")
+    tz.changeLocale("en_US", "en")
     m1 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
     ok !m1._locale._abbr.match(/fr/)
     ok !m1.isValid()
 
-    tz.changeLocale("fr_FR")
+    tz.changeLocale("fr_FR", "fr")
     m2 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
     ok m2._locale._abbr.match(/fr/)
     ok m2.isValid()
 
   test 'moment can change locales with multiple arity', ->
-    tz.changeLocale("en_US")
+    tz.changeLocale("en_US", "en")
     m1 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
     ok !m1._locale._abbr.match(/fr/)
     ok !m1.isValid()
 
-    tz.changeLocale(french, "fr_FR")
+    tz.changeLocale(french, "fr_FR", "fr")
     m2 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
     ok m2._locale._abbr.match(/fr/)
     ok m2.isValid()
@@ -155,7 +155,7 @@ define [
 
   test "format() should promote 12-hour+am/pm into 24-hour if the locale doesn't define am/pm", ->
     time = tz.parse('1969-07-21 15:00:00')
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     equal tz.format(time, '%-l%P'), "15"
     equal tz.format(time, '%I%P'), "15"
     equal tz.format(time, '%r'), "15:00:00"
@@ -169,7 +169,7 @@ define [
     equal tz.format(epoch, 'time.formats.tiny'), "12:00am"
 
   test "format() should localize when given a localization key", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'date.formats.full': '%-d %b %Y %-l:%M%P'
     equal tz.format(moonwalk, 'date.formats.full'), "21 juil. 1969 2:56"
@@ -227,13 +227,13 @@ define [
       equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"
 
   test 'changeLocale(...) should synchronously curry in a loaded locale', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
 
   test 'changeLocale(...) should asynchronously curry in a locale by name', ->
     expect(1)
     stop()
-    tz.changeLocale('fr_FR').then ->
+    tz.changeLocale('fr_FR', 'fr').then ->
       start()
       equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
 
@@ -246,7 +246,7 @@ define [
     ok tz.hasMeridian()
 
   test "hasMeridian() false if locale doesn't define am/pm", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     ok !tz.hasMeridian()
 
   test "useMeridian() true if locale defines am/pm and uses 12-hour format", ->
@@ -260,14 +260,14 @@ define [
     ok !tz.useMeridian()
 
   test "useMeridian() false if locale doesn't define am/pm and instead uses 24-hour format", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%-k:%M'
     ok !tz.hasMeridian()
     ok !tz.useMeridian()
 
   test "useMeridian() false if locale doesn't define am/pm but still uses 12-hour format (format will be corrected)", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%-l:%M%P'
     ok !tz.hasMeridian()
@@ -334,7 +334,7 @@ define [
         "time.formats.short": "%d %b %H:%M"
         "time.formats.tiny": "%l:%M%P"
         "time.formats.tiny_on_the_hour": "%l%P"
-      tz.changeLocale("en_US")
+      tz.changeLocale("en_US", "en")
 
     teardown: ->
       tz.restore(@snapshot)
@@ -418,7 +418,7 @@ define [
         "time.formats.short": "%d %b %H:%M"
         "time.formats.tiny": "%k:%M"
         "time.formats.tiny_on_the_hour": "%k:%M"
-      tz.changeLocale(french, "fr_FR")
+      tz.changeLocale(french, "fr_FR", "fr")
 
     teardown: ->
       tz.restore(@snapshot)
@@ -494,7 +494,7 @@ define [
         "time.formats.short": "%b %d %H:%M"
         "time.formats.tiny": "%H:%M"
         "time.formats.tiny_on_the_hour": "%k:%M"
-      tz.changeLocale(chinese, "zh_CN")
+      tz.changeLocale(chinese, "zh_CN", "zh-cn")
 
     teardown: ->
       tz.restore(@snapshot)

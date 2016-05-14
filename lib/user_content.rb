@@ -96,20 +96,21 @@ module UserContent
 
   # TODO: try and discover the motivation behind the "huhs"
   def self.css_size(val)
-    if !val || val.to_f == 0
+    to_f = TextHelper.round_if_whole(val.to_f)
+    if !val || to_f == 0
       # no value, non-numeric value, or 0 value (whether "0", "0px", "0%",
       # etc.); ignore
       nil
-    elsif val == "#{val.to_f}%" || val == "#{val.to_f}px"
+    elsif val == "#{to_f}%" || val == "#{to_f}px"
       # numeric percentage or specific px value; use as is
       val
-    elsif val.to_f.to_s == val
+    elsif to_f.to_s == val
       # unadorned numeric value; make px (after adding 10... huh?)
-      (val.to_f + 10).to_s + "px"
+      (to_f + 10).to_s + "px"
     else
       # numeric value embedded, but has additional text we didn't recognize;
       # just extract the numeric part (without a px... huh?)
-      val.to_f.to_s
+      to_f.to_s
     end
   end
 

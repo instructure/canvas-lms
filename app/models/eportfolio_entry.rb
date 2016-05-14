@@ -36,7 +36,7 @@ class EportfolioEntry < ActiveRecord::Base
   has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
 
-  serialize_utf8_safe :content
+  serialize :content
 
   set_policy do
     given {|user| user && self.allow_comments }

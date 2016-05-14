@@ -1,13 +1,11 @@
 define([
+  'jquery',
   'underscore',
   'i18n!react_files',
   'react',
   'classnames',
-  'react-router',
   'compiled/react_files/components/ColumnHeaders',
-  ], function(_, I18n, React, classnames, ReactRouter, ColumnHeaders) {
-
-    var Link = ReactRouter.Link;
+  ], function($, _, I18n, React, classnames, ColumnHeaders) {
 
     ColumnHeaders.renderColumns = function (sort, order) {
       return this.columns.map((column) => {
@@ -24,9 +22,12 @@ define([
           'visible-desktop': column.displayNameShort,
           'ef-usage-rights-col-offset': (column.property === 'usage_rights')
         });
+
+        const href = `${this.props.pathname}?${$.param(this.queryParamsFor(this.props.query, column.property))}`;
         var linkProps = _.defaults({
-              query: this.queryParamsFor(this.getQuery(), column.property),
-              className: 'ef-plain-link'
+              query: this.queryParamsFor(this.props.query, column.property),
+              className: 'ef-plain-link',
+              href
             }, this.props);
         var linkText;
         if (column.property === 'select') {
@@ -47,7 +48,7 @@ define([
             role='columnheader'
             aria-sort={{asc: 'ascending', desc: 'descending'}[isSortedCol && order] || 'none'}
           >
-            <Link {...linkProps}>
+            <a {...linkProps}>
               <span className={linkClassName}>
                 {linkText}
               </span>
@@ -68,21 +69,21 @@ define([
                 </span>
               </i>
             )}
-          </Link>
+          </a>
         </div>
         );
       })
     }
 
     ColumnHeaders.render = function () {
-      var sort = this.getQuery().sort || 'name';
-      var order = this.getQuery().order || 'asc';
+      const sort = this.props.query.sort || 'name';
+      const order = this.props.query.order || 'asc';
 
-      var selectAllCheckboxClass = classnames({
+      const selectAllCheckboxClass = classnames({
         'screenreader-only': this.state.hideToggleAll
       });
 
-      var selectAllLabelClass = classnames({
+      const selectAllLabelClass = classnames({
         'screenreader-only': !this.state.hideToggleAll
       });
 

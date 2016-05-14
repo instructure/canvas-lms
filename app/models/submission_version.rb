@@ -43,7 +43,7 @@ class SubmissionVersion < ActiveRecord::Base
         begin
           return nil unless Submission.where(:id => version.versionable_id).exists?
           version.model
-        rescue ArgumentError
+        rescue Psych::SyntaxError
           return nil
         end
       else

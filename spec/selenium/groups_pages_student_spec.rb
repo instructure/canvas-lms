@@ -70,12 +70,12 @@ describe "groups" do
         f('.discussion-title').click
         f('.edit-btn').click
         expect(driver.title).to eq 'Edit Announcement'
-        type_in_tiny('textarea[name=message]','Rey is Yodas daughter ')
+        type_in_tiny('textarea[name=message]','Rey is Yodas daughter')
         f('.btn-primary').click
         wait_for_ajaximations
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        expect(f('.discussion-summary').text).to include_text('Rey is Yodas daughter ')
+        expect(f('.discussion-summary').text).to include_text('Rey is Yodas daughter')
       end
 
       it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do

@@ -10478,7 +10478,6 @@ fa:
   qti_img_matching_question: "پرسش نظیر وارد شده دارای تصاویری در هر دو طرف است که پشتیبانی نشده اند"
   qti_img_matching_question_distractors: "پرسش نظیر وارد شده دارای تصاویری در داخل گزینه هاست و نمی تواند ثابت شود، زیرا دارای گزینه های نادرست نیز هست"
   qti_name: "مبدل QTI"
-  qualified_locale: fa-IR
   question_answered: "پاسخ داده شده"
   question_bank: 
     align_outcomes: "تطبیق دادن نتایج"

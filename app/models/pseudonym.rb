@@ -138,11 +138,7 @@ class Pseudonym < ActiveRecord::Base
   }
 
   def self.to_lower_column(column)
-    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      column
-    else
-      "LOWER(#{column})"
-    end
+    "LOWER(#{column})"
   end
 
   def self.custom_find_by_unique_id(unique_id)

@@ -51,10 +51,7 @@ describe "student groups" do
       @course.save!
       user_session(@students.first)
       get "/courses/#{@course.id}/groups"
-      fln("Visit").click
-      keep_trying_until do
-        expect(f("#unauthorized_message")).to be_displayed
-      end
+      expect(f("#unauthorized_message")).to be_displayed
     end
 
     describe "new student group" do

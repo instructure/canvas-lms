@@ -29,10 +29,6 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
   alias_method :app_secret=, :client_secret=
   alias_method :app_secret, :client_secret
 
-  def login_button?
-    true
-  end
-  
   def client_id
     self.class.globally_configured? ? app_id : super
   end

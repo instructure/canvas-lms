@@ -1264,6 +1264,7 @@ ul#quiz_versions {
   #unpublished_changes_message {
     padding: 12px;
     border-width: 1px;
+    margin-bottom: 0.7em;
   }
   #quiz_display_points_possible {
     line-height: 40px;
@@ -1281,7 +1282,24 @@ ul#quiz_versions {
     overflow-x: scroll;
   }
   #quiz_tabs {
-    margin-top: 0.7em;
+    #quiz_tabs_tab_list {
+      display: flex;
+      align-items: flex-end;
+
+      #quiz_tabs_spacer {
+        flex: 1;
+      }
+
+      .header-bar-right {
+        display: flex;
+        align-items: center;
+
+        .admin-links {
+          padding-bottom: 6px;
+        }
+      }
+    }
+
     #questions_tab {
       background: $backgroundColor;
       #show_question_details_wrap {

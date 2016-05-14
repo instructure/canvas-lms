@@ -21,7 +21,7 @@
     id="context_module_<%= context_module ? context_module.id : "blank" %>"
     style="<%= hidden unless context_module %>"
 >
-  <a name="module_<%= context_module.id if context_module %>"></a>
+  <a id="module_<%= context_module.id if context_module %>"></a>
   <div class="ig-header header" id="<%= context_module.id if context_module %>">
     <span
       class="sortable-handle reorder_module_link"

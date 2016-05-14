@@ -1,6 +1,5 @@
 <%
   content_for :page_title, t('titles.course_enrollment', 'Enroll in %{course}', :course => @course.name)
-
   js_bundle :self_enrollment
   css_bundle :self_enrollment
   js_env :SELF_ENROLLMENT_OPTIONS => {:confirmEnrollmentUrl => @confirm_enrollment_url}
@@ -9,7 +8,7 @@
     css_bundle :login
     @headers = false
     if use_new_styles?
-      @body_classes << "body--login-confirmation"
+      @body_classes << "full-width body--login-confirmation"
     else
       @body_classes << "modal"
     end

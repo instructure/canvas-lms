@@ -279,6 +279,19 @@ describe ContextModulesController do
       expect(response).to redirect_to course_discussion_topic_url(@course, topic, :module_item_id => topicTag.id)
     end
 
+    it "should redirect to a wiki page" do
+      user_session(@student)
+
+      @module = @course.context_modules.create!
+      page = wiki_page_model(course: @course)
+
+      page_tag = @module.add_item :type => 'wiki_page', :id => page.id
+
+      get 'item_redirect', :course_id => @course.id, :id => page_tag.id
+      expect(response).to be_redirect
+      expect(response).to redirect_to course_wiki_page_url(@course, page, :module_item_id => page_tag.id)
+    end
+
     it "should redirect to a quiz page" do
       user_session(@student)
 

@@ -3,157 +3,152 @@
 // compilation to extract i18nliner scopes, and then we wrap the resulting
 // template in an AMD module, giving it dependencies on handlebars, it's scoped
 // i18n object if it needs one, and any brandableCss variant stuff it needs.
+import Handlebars from 'handlebars'
+import {pick} from 'lodash'
+import {EmberHandlebars} from 'ember-template-compiler'
+import ScopedHbsExtractor from './../gems/canvas_i18nliner/js/scoped_hbs_extractor'
+import {allFingerprintsFor} from 'brandable_css/lib/main'
+import _PreProcessor from './../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor'
+const PreProcessor = _PreProcessor.default
 
-var Handlebars = require('handlebars');
-var EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
-var ScopedHbsExtractor = require(__dirname + '/../gems/canvas_i18nliner/js/scoped_hbs_extractor');
-var PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')['default'];
-var fs = require('fs');
-var brandableCss = require(__dirname + "/brandableCss")
-
-var compileHandlebars = function(data){
-  var path = data.path;
-  var source = data.source;
+const compileHandlebars = (data) => {
+  const path = data.path
+  const source = data.source
   try {
-    var translationCount = 0;
-    var ast = Handlebars.parse(source);
-    var extractor = new ScopedHbsExtractor(ast, {path: path});
-    var scope = extractor.scope;
-    PreProcessor.scope = scope;
-    PreProcessor.process(ast);
-    extractor.forEach(function() { translationCount++; });
+    let translationCount = 0
+    const ast = Handlebars.parse(source)
+    const extractor = new ScopedHbsExtractor(ast, {path})
+    const scope = extractor.scope
+    PreProcessor.scope = scope
+    PreProcessor.process(ast)
+    extractor.forEach(() => translationCount++ )
 
-    var precompiler = data.ember ? EmberHandlebars : Handlebars;
-    var result = precompiler.precompile(ast).toString();
-    var payload = {template: result, scope: scope, translationCount: translationCount};
-    return payload;
+    const precompiler = data.ember ? EmberHandlebars : Handlebars
+    const result = precompiler.precompile(ast).toString()
+    const payload = {template: result, scope: scope, translationCount: translationCount}
+    return payload
   }
   catch (e) {
-    e = e.message || e;
-    console.log(e);
-    throw {error: e};
-  }
-};
-
-
-
-var emitTemplate = function(path, name, result, dependencies, cssRegistration, partialRegistration){
-  var moduleName = "jst/" + path.replace(/.*\/\jst\//, '').replace(/\.handlebars/, "");
-  return "" +
-    "define('"+ moduleName +"', " + JSON.stringify(dependencies) + ", function(Handlebars){\n" +
-      "var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};\n" +
-      "templates['" + name + "'] = template("+ result['template'] +");\n" +
-      partialRegistration + "\n" +
-      cssRegistration + "\n" +
-      "return templates['"+ name +"'];\n" +
-    "});";
-};
-
-var resourceName = function(path){
-  return path
-    .replace(/^.+\/app\/views\/jst\/(?:plugins\/[^\/]*\/)?/, '')
-    .replace(/\.handlebars$/, '')
-    .replace(/_/g, '-');
-};
-
-var buildCssReference = function(name){
-  var matchingCssPath = __dirname + "/../app/stylesheets/jst/" + name + ".scss";
-  try {
-    var cssStat = fs.statSync(matchingCssPath);
-    if(cssStat.isFile()){
-      var bundle = "jst/" + name;
-      var cached = brandableCss.allFingerprintsFor(bundle)
-      var firstVariant = Object.keys(cached)[0];
-      var options = "";
-      if(cached[firstVariant]['includesNoVariables']){
-        options = JSON.stringify(cached[firstVariant]);
-      }else{
-        options = JSON.stringify(cached) + "[arguments[1].getCssVariant()]";
-      }
-      var css_registration = "\n"+
-        "var options = " + options + ";\n" +
-        "arguments[1].loadStylesheet('" + bundle + "', options);\n";
-      return css_registration;
-    }
-  } catch(e) {
-    if(e.code == 'ENOENT'){
-      // no matching css file, just return a blank string;
-      return "";
-    }else{
-      throw e;
-    }
+    e = e.message || e
+    console.log(e)
+    throw {error: e}
   }
 }
 
-var findReferencedPartials = function(source){
-  var partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g;
-  var partials = [];
-  var match;
+const emitTemplate = (path, name, result, dependencies, cssRegistration, partialRegistration) => {
+  const moduleName = `jst/${path.replace(/.*\/\jst\//, '').replace(/\.handlebars/, '')}`
+  return `
+    define('${moduleName}', ${JSON.stringify(dependencies)}, function(Handlebars){
+      var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+      var name = '${name}';
+      templates[name] = template(${result['template']});
+      ${partialRegistration}
+      ${cssRegistration}
+      return templates[name];
+    });
+  `
+}
+
+const resourceName = (path) => {
+  return path
+    .replace(/^.+\/app\/views\/jst\/(?:plugins\/[^\/]*\/)?/, '')
+    .replace(/\.handlebars$/, '')
+    .replace(/_/g, '-')
+}
+
+// given an object, returns a new object with just the 'combinedChecksum' property of each item
+const getCombinedChecksums = (obj) => {
+  return Object.keys(obj).reduce((accumulator, key) => {
+    accumulator[key] = pick(obj[key], 'combinedChecksum')
+    return accumulator
+  }, {})
+}
+
+const buildCssReference = (name) => {
+  const bundle = 'jst/' + name
+  const cached = allFingerprintsFor(bundle + '.scss')
+  const firstVariant = Object.keys(cached)[0]
+  if (!firstVariant) {
+    // no matching css file, just return a blank string
+    return ''
+  }
+
+  const options = cached[firstVariant].includesNoVariables ?
+    // there is no branding / high contrast specific variables in this file,
+    // all users will use the same file.
+    JSON.stringify(pick(cached[firstVariant], 'combinedChecksum', 'includesNoVariables'))
+  :
+    // Spit out all the combinedChecksums into the compiled js file and use brandableCss.getCssVariant()
+    // at runtime to determine which css variant to load, based on the user & account's settings
+    JSON.stringify(getCombinedChecksums(cached)) + '[brandableCss.getCssVariant()]'
+
+  return `
+    var brandableCss = arguments[1];
+    brandableCss.loadStylesheet('${bundle}', ${options});
+  `
+}
+
+const partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g
+const findReferencedPartials = (source) => {
+  let partials = []
+  let match
   while(match = partialRegexp.exec(source)){
-    partials.push(match[1].trim());
+    partials.push(match[1].trim())
   }
 
-  var uniquePartials = partials.filter(function(elem, pos) {
-    return partials.indexOf(elem) == pos;
-  });
+  const uniquePartials = partials.filter((elem, pos) => partials.indexOf(elem) == pos)
 
-  return uniquePartials;
-};
+  return uniquePartials
+}
 
-var emitPartialRegistration = function(path, resourceName){
-  var baseName = path.split("/").pop();
-  if(baseName.indexOf("_") == 0){
-    var partialName = baseName.replace(/^_/, "");
-    var partialPath = path.replace(baseName, partialName).replace(/.*\/\jst\//, '').replace(/\.handlebars/, "");
-    var partialRegistration = "" +
-      "\nHandlebars.registerPartial('" + partialPath + "', "+
-                                 "templates['" + resourceName +"']);\n";
-    return partialRegistration;
-  } else {
-    return "";
+const emitPartialRegistration = (path, resourceName) => {
+  const baseName = path.split('/').pop()
+  if (baseName.startsWith('_')) {
+    const partialName = baseName.replace(/^_/, '')
+    const partialPath = path.replace(baseName, partialName).replace(/.*\/\jst\//, '').replace(/\.handlebars/, '')
+    return `
+      Handlebars.registerPartial('${partialPath}', templates['${resourceName}']);
+    `
   }
-};
+  return ''
+}
 
-var buildPartialRequirements = function(partialPaths){
-  var requirements = [];
-  partialPaths.forEach(function(partial){
-    var partialParts = partial.split("/");
-    partialParts[partialParts.length - 1] = "_" + partialParts[partialParts.length - 1];
-    var requirePath = partialParts.join("/");
-    requirements.push("jst/" + requirePath);
-  });
-  return requirements;
-};
+const buildPartialRequirements = (partialPaths) => {
+  const requirements = partialPaths.map(partial => {
+    const partialParts = partial.split('/')
+    partialParts[partialParts.length - 1] = '_' + partialParts[partialParts.length - 1]
+    const requirePath = partialParts.join('/')
+    return 'jst/' + requirePath
+  })
+  return requirements
+}
 
-module.exports = function (source) {
-  this.cacheable();
-  var name = resourceName(this.resourcePath)
-  var dependencies = ['handlebars'];
+export default function i18nLinerHandlebarsLoader (source) {
+  this.cacheable()
+  const name = resourceName(this.resourcePath)
+  const dependencies = ['handlebars']
 
-  var partialRegistration = emitPartialRegistration(this.resourcePath, name);
+  var partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  var cssRegistration = buildCssReference(name);
-  if(cssRegistration != ""){
+  var cssRegistration = buildCssReference(name)
+  if (cssRegistration){
     // arguments[1] will be brandableCss
-    dependencies.push("compiled/util/brandableCss");
+    dependencies.push('compiled/util/brandableCss')
   }
 
-  var partials = findReferencedPartials(source);
-  var partialRequirements = buildPartialRequirements(partials);
-  partialRequirements.forEach(function(requirement){
-    dependencies.push(requirement);
-  });
+  const partials = findReferencedPartials(source)
+  const partialRequirements = buildPartialRequirements(partials)
+  partialRequirements.forEach(requirement => dependencies.push(requirement))
 
-  var result = compileHandlebars({path: this.resourcePath, source: source});
-
-  if(result['error']){
-    console.log("THERE WAS AN ERROR IN PRECOMPILATION", result);
-    throw result;
+  const result = compileHandlebars({path: this.resourcePath, source})
+  if (result.error){
+    console.log('THERE WAS AN ERROR IN PRECOMPILATION', result)
+    throw result
   }
 
-  if(result["translationCount"] > 0){
-    dependencies.push("i18n!" + result["scope"] +"");
+  if (result.translationCount > 0) {
+    dependencies.push('i18n!' + result.scope)
   }
-  var compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration);
-  return compiledTemplate;
-};
+  var compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
+  return compiledTemplate
+}

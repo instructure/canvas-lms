@@ -27,6 +27,10 @@ module Canvas
         uploader = Canvas::Cdn::S3Uploader.new(*args)
         uploader.upload!(&block)
       end
+
+      def enabled?
+        !!config.bucket
+      end
     end
   end
 end

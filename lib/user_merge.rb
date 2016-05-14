@@ -132,11 +132,6 @@ class UserMerge
             # a) delete empty submissions where there is a non-empty submission in the from user
             # b) don't delete otherwise
             subscope = scope.having_submission.select(unique_id)
-            if %w{MySQL Mysql2}.include?(model.connection.adapter_name)
-              # handing the scope directly to from doesn't work until Rails 4, and I don't
-              # feel like backporting at the moment
-              subscope = Submission.from("(#{subscope.to_sql}) AS s").select(unique_id)
-            end
             already_scope.where(unique_id => subscope).without_submission.delete_all
           end
           # for the from user
@@ -144,10 +139,6 @@ class UserMerge
           # b) move the empty submission over to the new user if there is no collision, as we don't mind persisting the what_if history in this case
           # c) if there is an empty submission for each user for this assignment, prefer the target user
           subscope = already_scope.select(unique_id)
-          if %w{MySQL Mysql2}.include?(model.connection.adapter_name)
-            # ditto
-            subscope = Submission.from("(#{subscope.to_sql}) AS s").select(unique_id)
-          end
           scope = scope.where("#{unique_id} NOT IN (?)", subscope)
           model.transaction do
             update_versions(from_user, target_user, scope, table, :user_id)

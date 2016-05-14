@@ -40,7 +40,7 @@ define [
 
   test 'formattedDate returns a localized Date', ->
     snapshot = tz.snapshot()
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.pushFrame()
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',

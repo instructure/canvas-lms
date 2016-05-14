@@ -57,7 +57,7 @@ class Assignment
 
       # if we're a provisional grader, calculate whether the student needs a grade
       preloaded_pg_counts = is_provisional && @assignment.provisional_grades.not_final.group("submissions.user_id").count
-      ActiveRecord::Associations::Preloader.new(@assignment, :moderated_grading_selections) if is_provisional
+      ActiveRecord::Associations::Preloader.new.preload(@assignment, :moderated_grading_selections) if is_provisional
 
       res[:context][:students] = students.map do |u|
         json = u.as_json(:include_root => false,

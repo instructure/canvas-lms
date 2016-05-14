@@ -274,8 +274,35 @@ $cell_height: 33px;
   }
 }
 
+// We need both visibility and opacity because visibility is binary but opacity will allow fading in/out
+@keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-o-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-moz-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-webkit-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
 .gradebook-tooltip {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   background-color: #444444;
   color: white;
   border-radius: 3px;
@@ -295,8 +322,17 @@ $cell_height: 33px;
     left: 15px;
     content: "";
   }
-  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected &, .slick-cell.active & {
-    display: block;
+  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
+    visibility: visible;
+    opacity: 1;
+  }
+  .slick-cell.active &, .slick-cell.editable & {
+    visibility: visible;
+    opacity: 1;
+    -webkit-animation: fade-in-and-out 2s 1 forwards;
+    -moz-animation: fade-in-and-out 2s 1 forwards;
+    -o-animation: fade-in-and-out 2s 1 forwards;
+    animation: fade-in-and-out 2s 1 forwards;
   }
   &.first-row {
     @include first-row-tooltip();

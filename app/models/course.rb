@@ -199,7 +199,6 @@ class Course < ActiveRecord::Base
   has_many :appointment_groups, :through => :appointment_group_contexts
   has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: 'CalendarEvent', foreign_key: :effective_context_code, primary_key: :asset_string
   attr_accessor :import_source
-  has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
   has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
   has_many :grading_period_groups, dependent: :destroy
@@ -1225,11 +1224,12 @@ class Course < ActiveRecord::Base
   end
 
   def active_enrollment_allows(user, permission, allow_future=true)
-    return false unless user && permission
+    return false unless user && permission && !self.deleted?
 
+    is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
+      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !e.admin?) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
@@ -2418,14 +2418,14 @@ class Course < ActiveRecord::Base
         tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
         tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
 
+        unless announcements.temp_record.grants_right?(user, :read)
+          tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
+        end
+
         if !user || !self.grants_right?(user, :manage_content)
           # remove some tabs for logged-out users or non-students
           unless grants_any_right?(user, :read_as_admin, :participate_as_student)
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
-          end
-
-          unless announcements.temp_record.grants_right?(user, :read)
-            tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 
           # remove hidden tabs from students

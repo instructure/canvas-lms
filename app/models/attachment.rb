@@ -42,7 +42,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :context, exhaustive: false, polymorphic:
       [:account, :assessment_question, :assignment, :attachment,
        :content_export, :content_migration, :course, :eportfolio, :epub_export,
-       :gradebook_upload, :group, :submission, :zip_file_import,
+       :gradebook_upload, :group, :submission,
        { context_folder: 'Folder', context_sis_batch: 'SisBatch',
          context_user: 'User', quiz: 'Quizzes::Quiz',
          quiz_statistics: 'Quizzes::QuizStatistics',
@@ -1167,6 +1167,7 @@ class Attachment < ActiveRecord::Base
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
     self.context.clear_avatar_image_url_with_uuid(self.uuid) if self.context_type == 'User' && self.uuid.present?
+    true
   end
 
   def restore

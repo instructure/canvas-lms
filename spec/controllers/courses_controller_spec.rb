@@ -848,6 +848,25 @@ describe CoursesController do
         expect(@enrollment).to be_active
       end
 
+      it "should not error when previewing an unpublished course as an invited admin" do
+        @account = Account.create!
+        @account.settings[:allow_invitation_previews] = false
+        @account.save!
+
+        course(:account => @account)
+        user(:active_all => true)
+        enrollment = @course.enroll_teacher(@user, :enrollment_state => 'invited')
+        user_session(@user)
+
+        get 'show', :id => @course.id
+
+        expect(response).to be_success
+        expect(response).to render_template('show')
+        expect(assigns[:context_enrollment]).to eq enrollment
+        enrollment.reload
+        expect(enrollment).to be_invited
+      end
+
       it "should ignore invitations that have been accepted (not logged in)" do
         @enrollment.accept!
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
@@ -1366,6 +1385,14 @@ describe CoursesController do
       @course.reload
       expect(@course.name).to_not eq name
       expect(@course.syllabus_body).to eq body
+    end
+
+    it "should render the show page with a flash on error" do
+      user_session(@teacher)
+      # cause the course to be invalid
+      Course.where(id: @course).update_all(start_at: Time.now.utc, conclude_at: 1.day.ago)
+      put 'update', :id => @course.id, :course => { :name => "name change" }
+      expect(flash[:error]).to match(/There was an error saving the changes to the course/)
     end
   end
 
