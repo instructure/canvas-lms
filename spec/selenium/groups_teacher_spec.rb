@@ -401,6 +401,7 @@ describe "new groups" do
     end
 
     it 'should create a group with a given name and limit', priority: "2", test_id: 94166 do
+      skip("broken qa-729")
       group_test_setup(5,1,1)
       3.times do |n|
         add_user_to_group(@students[n+1], @testgroup.first, false)
