@@ -129,7 +129,7 @@
           <td><%= link_to @context.root_account.name, account_url(@context.root_account.id), :id => "course_root_account" %></td>
       <% end %>
       </tr><tr>
-        <td class="form-label"><%= f.blabel :account_id, :en => "Department" %></td>
+        <td class="form-label"><%= f.blabel :account_id, :en => "Subaccount" %></td>
         <td>
           <% can_edit_account = false %>
           <% if can_manage %>
