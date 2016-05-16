@@ -96,14 +96,12 @@ describe 'creating a quiz' do
         get "/courses/#{@course.id}/quizzes"
         expect_new_page_load do
           f('.new-quiz-link').click
-          wait_for_ajaximations
         end
       end
 
       it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
         expect_new_page_load do
           click_save_settings_button
-          wait_for_ajax_requests
         end
         expect(f('#quiz_title')).to include_text 'Unnamed Quiz'
       end

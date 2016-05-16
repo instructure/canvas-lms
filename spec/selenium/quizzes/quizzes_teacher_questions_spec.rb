@@ -182,11 +182,9 @@ describe "quizzes questions" do
 
       expect_new_page_load do
         f('.save_quiz_button').click
-        wait_for_ajaximations
       end
       expect_new_page_load do
         f('.quiz-publish-button').click
-        wait_for_ajaximations
       end
 
       user_session(@student)

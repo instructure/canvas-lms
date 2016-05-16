@@ -99,6 +99,7 @@ module CustomValidators
         driver.switch_to.alert.accept
       end
     end
+    wait_for_dom_ready
     wait_for_ajaximations
   end
 end

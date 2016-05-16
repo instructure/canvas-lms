@@ -13,17 +13,16 @@ module CustomWaitMethods
 
   def wait_for_dom_ready
     driver.execute_async_script(<<-JS)
-     var callback = arguments[arguments.length - 1];
-     var pollForJqueryAndRequire = function(){
-        if (window.jQuery && window.require && !window.requirejs.s.contexts._.defQueue.length) {
-          jQuery(function(){
-            setTimeout(callback, 1);
-          });
-        } else {
-          setTimeout(pollForJqueryAndRequire, 1);
+      var callback = arguments[arguments.length - 1];
+      if (document.readyState === "complete") {
+        callback();
+      } else {
+        document.onreadystatechange = function() {
+          if (document.readyState === "complete") {
+            callback();
+          }
         }
-      }
-      pollForJqueryAndRequire();
+      };
     JS
   end
 
