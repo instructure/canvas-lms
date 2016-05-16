@@ -125,8 +125,7 @@ class CollaborationsController < ApplicationController
     content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     if content_item
       @collaboration = collaboration_from_content_item(content_item)
-      users = []
-      group_ids = []
+      users, group_ids = content_item_visibility(content_item)
     else
       users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
@@ -158,8 +157,7 @@ class CollaborationsController < ApplicationController
     begin
       if content_item
         @collaboration = collaboration_from_content_item(content_item, @collaboration)
-        users = []
-        group_ids = []
+        users, group_ids = content_item_visibility(content_item)
       else
         users     = User.where(:id => Array(params[:user])).to_a
         group_ids = Array(params[:group])
@@ -258,6 +256,15 @@ class CollaborationsController < ApplicationController
 
   def external_tool_launch_url(url)
     polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  end
+
+  def content_item_visibility(content_item)
+    visibility = content_item['ext_canvas_visibility']
+    lti_user_ids = visibility && visibility['users'] || []
+    lti_group_ids = visibility && visibility['groups'] || []
+    users = User.where(lti_context_id: lti_user_ids)
+    groups = Group.where(lti_context_id: lti_group_ids)
+    [users, groups]
   end
 
 end
