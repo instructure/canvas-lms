@@ -5,7 +5,7 @@
   js_env PROFILE: @user_data if @user_data[:can_edit]
   js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
 %>
-<%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
+<%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "ic-Form-control" } do %>
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit] %>
@@ -17,137 +17,144 @@
         <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>
     </div>
-    <div class="image-block-content row-fluid">
+
+    <div class="profileContent__Block">
       <% if @user_data[:can_edit_name] %>
-        <h1 class="h1">
-          <span class="hide-if-editing"><%= @user_data[:short_name] %></span>
-        </h1>
-        <label class="show-if-editing"><%= t('name', 'Name') %>: <br><input type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required></label>
-        <p>
+        <h2 class="hide-if-editing"><%= @user_data[:short_name] %></h2>
+        <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:
+          <input class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
+        </label>
+        <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
-          <label class="show-if-editing"><%= t('title', 'Title') %>: <br><input type="text" name="user_profile[title]" value="<%= @user_data[:title] %>"></label>
+          <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
+            <input class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+          </label>
         </p>
       <% else %>
-        <h1 class="h1">
-          <span><%= @user_data[:short_name] %></span>
-        </h1>
-        <p>
-          <span><%= @user_data[:title] %></span>
-        </p>
+        <h2><%= @user_data[:short_name] %></h2>
+        <p><%= @user_data[:title] %></p>
       <% end %>
 
       <div class="show-if-editing edit-contact-methods">
-        <h2 class="h5 border border-b"><%= t('#profile.ways_to_contact_me', "Ways to contact me") %></h2>
-        <% if @user_data[:user_services].present? %>
-          <div class="row-fluid">
-            <div class="span6">
-              <ul class="social-links">
+        <h3 class="profileHeader"><%= t('#profile.ways_to_contact_me', "Contact") %></h3>
+          <% if @user_data[:user_services].present? %>
+            <ul class="social-links">
+              <li>
+                <label for="social_message" class="social message ic-Label" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+              </li>
+              <% @user_data[:user_services].each do |s| %>
                 <li>
-                  <label for="social_message" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_me, 'message me in Canvas' %></label>
+                  <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                  <label for="social_<%= s[:service] %>" class="social <%= s[:service] %> ic-Label" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
+                  <input class="ic-Input" type="hidden" value="0" name="user_services[<%= s[:service] %>">
+                  <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
                 </li>
-                <% @user_data[:user_services].each do |s| %>
-                  <li>
-                    <% service_name = s[:service_name] || s[:service].to_s.titleize %>
-                    <label for="social_<%= s[:service] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></label>
-                    <input type="hidden" value="0" name="user_services[<%= s[:service] %>">
-                    <%= check_box_tag "user_services[#{s[:service]}]", 1, s[:visible], :id => "social_#{s[:service]}" %>
-                  </li>
-                <% end %>
-              </ul>
-            </div>
-            <div class="span6 social-instructions">
+              <% end %>
+            </ul>
+            <div class="social-instructions">
               <p>
                 <%= t(:social_instructions, "Check the contact methods you'd like to be visible to others on your profile.") %><br>
                 <%= link_to(t(:manage_settings, "Manage Registered Services"), settings_profile_path)  %>
               </p>
             </div>
+          <% else %>
+            <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
+          <% end %>
+      </div>
+
+      <div class="hide-if-editing">
+        <h3 class="profileHeader"><%= t :ways_to_contact_user, "Contact" %></h3>
+        <% if @user_data[:user_services].blank? %>
+          <% if @user != @current_user %>
+            <p><%= t('#profile.no_registered_services', "No registered services.") %></p>
+          <% else %>
+            <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
+          <% end %>
+        <% else %>
+          <ul class="social-links">
+            <% if current_user_is_account_admin %>
+              <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
+            <% end %>
+            <% if @user_data[:user_services].present? && @user.show_user_services %>
+              <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
+                <% service_name = s[:service_name] || s[:service].to_s.titleize %>
+                <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
+              <% end %>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+
+      <div>
+        <h3 for="profile_bio" class="profileHeader"><%= t :bio, "Biography" %></h3>
+        <% if @user_data[:bio] %>
+          <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
+        <% else %>
+          <p class="hide-if-editing"><%= t('user_has_no_bio', "%{user} hasn't added a bio", :user => @user_data[:short_name]) %></p>
+        <% end %>
+        <% if @user_data[:can_edit] %>
+          <div class="show-if-editing">
+            <textarea class="ic_Input" id="profile_bio" name="user_profile[bio]"><%= @user_data[:bio] %></textarea>
           </div>
-        <% else %>
-          <p><%= t('#profile.you_have_no_services', "You haven't registered any services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
         <% end %>
       </div>
-      <div class="hide-if-editing">
-        <h2 class="h5 border border-b"><%= t :ways_to_contact_user, "Ways to contact %{name}", :name => @user_data[:short_name] %></h2>
-        <ul class="social-links">
-          <% if current_user_is_account_admin %>
-            <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
-          <% end %>
-          <% if @user_data[:user_services].present? && @user.show_user_services %>
-            <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
-              <% service_name = s[:service_name] || s[:service].to_s.titleize %>
-              <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
-            <% end %>
-          <% end %>
-        </ul>
-      </div>
-    </div>
-  </div>
 
-  <div class="v-gutter">
-    <h2 class="h1 border border-b"><label for="profile_bio" style="font-size: 22px"><%= t :bio, "Bio" %></label></h2>
-    <% if @user_data[:bio] %>
-      <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
-    <% else %>
-      <p class="hide-if-editing"><%= t('user_has_no_bio', "%{user} hasn't added a bio", :user => @user_data[:short_name]) %></p>
-    <% end %>
-    <% if @user_data[:can_edit] %>
-      <div class="show-if-editing">
-        <textarea id="profile_bio" name="user_profile[bio]"><%= @user_data[:bio] %></textarea>
-      </div>
-    <% end %>
-  </div>
-
-  <div class="row-fluid v-gutter">
-    <% if @user != @current_user %>
-      <div class="span6 hide-if-editing">
-        <h2 class="h1 border border-b"><%= t :know_this_person_as, "You Know This Person as a..." %></h2>
-        <% if @user_data[:common_contexts] %>
-          <ul>
-            <% @user_data[:common_contexts].each do |context| %>
-              <li><%= context[:roles].join(', ') %> in <a href="<%= context[:html_url] %>"><%= context[:name] %></a></li>
+      <div>
+        <% if @user != @current_user %>
+          <div class="hide-if-editing">
+            <h3 class="profileHeader"><%= t :user_enrolled, "Enrollments" %></h3>
+            <% if @user_data[:common_contexts] %>
+              <ul>
+                <% @user_data[:common_contexts].each do |context| %>
+                  <li class="profileEnrollment__Items"><%= context[:roles].join(', ') %> in <a href="<%= context[:html_url] %>"><%= context[:name] %></a></li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p><%= t('nothing_in_common', "You don't have anything in common") %></p>
             <% end %>
-          </ul>
-        <% else %>
-          <p><%= t('nothing_in_common', "You don't have anything in common") %></p>
+          </div>
         <% end %>
       </div>
-    <% end %>
 
-    <div class="profile_links span6">
-      <h2 class="h1 border border-b"><%= t :links, "Links" %></h2>
-      <div class="hide-if-editing">
-        <% if @user_data[:links].length > 0 %>
-          <ul>
-            <% @user_data[:links].each do |link| %>
-              <li><a href="<%= add_uri_scheme_name(link[:url]) %>"><%= link[:title] %></a></li>
-            <% end %>
-          </ul>
-        <% else %>
-          <p><%= t  :no_links, "%{name} hasn't added any links", :name => @user_data[:short_name] %></p>
+      <div class="profile_links">
+        <h3 class="profileHeader"><%= t :links, "Links" %></h3>
+        <div class="hide-if-editing">
+          <% if @user_data[:links].length > 0 %>
+            <ul class="profileLink">
+              <% @user_data[:links].each do |link| %>
+                <li class="profileLink__Item">
+                  <i class="icon-link" role="presentation"></i>
+                  <a href="<%= add_uri_scheme_name(link[:url]) %>"><%= link[:title] %></a>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p><%= t  :no_links, "%{name} hasn't added any links", :name => @user_data[:short_name] %></p>
+          <% end %>
+        </div>
+
+        <% if @user_data[:can_edit] %>
+          <input type="hidden" name="delete_links" value="1">
+          <div class="show-if-editing">
+            <table id="edit_links_table">
+              <thead>
+                <th scope="col"><%= t :links_title, 'Title' %></th>
+                <th></th>
+                <th scope="col"><%= t :links_url, 'URL' %></th>
+              </thead>
+              <tbody id="profile_link_fields"></tbody>
+            </table>
+            <button data-event="addLinkField" class="btn btn-small"><%= t :add_link_field, "Add another link" %></button>
+          </div>
         <% end %>
       </div>
 
       <% if @user_data[:can_edit] %>
-        <input type="hidden" name="delete_links" value="1">
-        <div class="show-if-editing">
-          <table id="edit_links_table">
-            <thead>
-              <th scope="col"><%= t :links_title, 'Title' %></th>
-              <th></th>
-              <th scope="col"><%= t :links_url, 'URL' %></th>
-            </thead>
-            <tbody id="profile_link_fields"></tbody>
-          </table>
-          <button data-event="addLinkField" class="btn btn-small"><%= t :add_link_field, "Add another link" %></button>
+        <div class="form-actions no-margin-bottom show-if-editing">
+          <button data-event="cancelEditProfile" class="btn"><%= t('cancel', 'Cancel') %></button>
+          <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
         </div>
       <% end %>
     </div>
-
-    <% if @user_data[:can_edit] %>
-      <div class="form-actions no-margin-bottom show-if-editing">
-        <button data-event="cancelEditProfile" class="btn"><%= t('cancel', 'Cancel') %></button>
-        <button class="btn btn-primary"><%= t('save_profile', 'Save Profile') %></button>
-      </div>
-    <% end %>
   </div>
 <% end %>

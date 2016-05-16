@@ -3,6 +3,7 @@ require_relative '../../helpers/groups_common'
 
 describe "gradebook2" do
   include_context "in-process server selenium tests"
+  include_context "gradebook_components"
   include Gradebook2Common
   include GroupsCommon
 
@@ -225,6 +226,20 @@ describe "gradebook2" do
     toggle_hiding_students
     expect(ffj('.student-name:visible').length).to be > 0
     expect(f("#content")).not_to contain_jqcss('.student-placeholder:visible')
+  end
+
+  it "should hide and show notes", priority: "2", test_id: 164224 do
+    get "/courses/#{@course.id}/gradebook2"
+
+    # show notes column
+    gradebook_settings_cog.click
+    show_notes.click
+    expect(f("#content")).to contain_jqcss('.custom_column:visible')
+
+    # hide notes column
+    gradebook_settings_cog.click
+    hide_notes.click
+    expect(f("#content")).not_to contain_jqcss('.custom_column:visible')
   end
 
   context "downloading and uploading submissions" do

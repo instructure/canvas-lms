@@ -519,6 +519,15 @@ describe GradebooksController do
     end
   end
 
+  describe "POST 'submissions_zip_upload'" do
+    it "requires authentication" do
+      course
+      assignment_model
+      post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
+      assert_unauthorized
+    end
+  end
+
   describe "POST 'update_submission'" do
     it "allows adding comments for submission" do
       user_session(@teacher)

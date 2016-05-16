@@ -1,14 +1,18 @@
 require_relative 'git_proxy'
+require 'forwardable'
 
 module TatlTael
   class Linter
+    extend ::Forwardable
+
     attr_reader :git
     private :git
+    def_delegator :git, :wip?
 
     attr_reader :git_dir
     private :git_dir
 
-    def initialize(git_dir:, git: nil)
+    def initialize(git_dir: ".", git: nil)
       @git_dir = git_dir
       @git = git || TatlTael::GitProxy.new(git_dir)
     end
@@ -50,7 +54,7 @@ module TatlTael
     end
 
     def changes
-      @changes ||= git.changes(git_dir)
+      @changes ||= git.changes
     end
   end
 end

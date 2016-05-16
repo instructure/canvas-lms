@@ -35,7 +35,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
-  before_save :destroy_orphaned_grading_period_group
+  before_update :destroy_orphaned_grading_period_group
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at

@@ -56,19 +56,7 @@
 
     {{#if canManage}}
       <div class="ig-admin">
-        {{#if postToSISEnabled}}
-          {{#if postToSIS}}
-          <span class="post-to-sis-status enabled">
-            <img class='icon-post-to-sis accessible_label' src='/images/svg-icons/svg_icon_post_to_sis_active.svg' aria-label='Post grades to SIS enabled' tabindex='0' role='button' width=16 height=20 title='{{#t}}Post grade to SIS enabled. Click to toggle.{{/t}}' data-tooltip />
-            <span class="screenreader-only accessible_label">{{#t}}The grade for this assignment will sync to the student information system.{{/t}}</span>
-          </span>
-          {{else}}
-          <span class="post-to-sis-status disabled">
-            <img class='icon-post-to-sis accessible_label' src='/images/svg-icons/svg_icon_post_to_sis.svg' aria-label='Post grades to SIS disabled' tabindex='0' role='button' width=16 height=20 title='{{#t}}Post grade to SIS disabled. Click to toggle.{{/t}}' data-tooltip />
-            <span class="screenreader-only accessible_label">{{#t}}The grade for this assignment will not sync to the student information system.{{/t}}</span>
-          </span>
-          {{/if}}
-        {{/if}}
+        <span class="sis-button" data-view="sis-button"></span>
 
         <span class="publish-icon" data-view="publish-icon"></span>
 

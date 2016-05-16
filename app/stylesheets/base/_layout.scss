@@ -256,7 +256,23 @@ iframe.tool_launch {
   height: 100%;
   border: none;
 }
-
+// implemented to make new profile page use flex for layout //
+.ic-Layout {
+  display: flex;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  width: 100%;
+}
+.ic-Layout__Primary {
+  flex: 2;
+    @include breakpoint(desktop) {
+    flex: 3;
+  }
+}
+.ic-Layout__Secondary {
+  flex: 1;
+  text-align: right;
+}
 #skip_navigation_link {
   @include accessibility-prompt;
   position: absolute;

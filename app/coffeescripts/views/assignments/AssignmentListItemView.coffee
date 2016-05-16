@@ -7,6 +7,7 @@ define [
   'compiled/views/assignments/DateDueColumnView'
   'compiled/views/assignments/DateAvailableColumnView'
   'compiled/views/assignments/CreateAssignmentView'
+  'compiled/views/SisButtonView'
   'compiled/views/MoveDialogView'
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentListItem'
@@ -16,7 +17,7 @@ define [
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, SisButtonView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -28,7 +29,8 @@ define [
     @child 'dateDueColumnView',       '[data-view=date-due]'
     @child 'dateAvailableColumnView', '[data-view=date-available]'
     @child 'editAssignmentView',      '[data-view=edit-assignment]'
-    @child 'moveAssignmentView', '[data-view=moveAssignment]'
+    @child 'sisButtonView',           '[data-view=sis-button]'
+    @child 'moveAssignmentView',      '[data-view=moveAssignment]'
 
     els:
       '.edit_assignment': '$editAssignmentButton'
@@ -38,7 +40,6 @@ define [
       'click .delete_assignment': 'onDelete'
       'click .tooltip_link': preventDefault ->
       'keydown': 'handleKeys'
-      'click .post-to-sis-status': 'togglePostToSIS'
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
@@ -64,6 +65,7 @@ define [
 
     initializeChildViews: ->
       @publishIconView    = false
+      @sisButtonView = false
       @editAssignmentView = false
       @dateAvailableColumnView = false
       @moveAssignmentView = false
@@ -85,6 +87,9 @@ define [
           closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> "#{ENV.URLS.assignment_sort_base_url}/#{@parentListView.value()}/reorder"
 
+        if @model.postToSISEnabled()
+          @sisButtonView = new SisButtonView(model: @model)
+
       @dateDueColumnView       = new DateDueColumnView(model: @model)
       @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
@@ -95,6 +100,7 @@ define [
     render: ->
       @toggleHidden(@model, @model.get('hidden'))
       @publishIconView.remove()         if @publishIconView
+      @sisButtonView.remove()           if @sisButtonView
       @editAssignmentView.remove()      if @editAssignmentView
       @dateDueColumnView.remove()       if @dateDueColumnView
       @dateAvailableColumnView.remove() if @dateAvailableColumnView
@@ -266,27 +272,6 @@ define [
 
     editItem: =>
       @$("#assignment_#{@model.id}_settings_edit_item").click()
-
-    togglePostToSIS: (e) =>
-      c = @model.postToSIS()
-      @model.postToSIS(!c)
-      e.preventDefault()
-      $t = $(e.currentTarget)
-      @model.save({}, {
-        success: =>
-          if c
-            $t.removeClass('post-to-sis-status enabled')
-            $t.addClass('post-to-sis-status disabled')
-            $t.find('.icon-post-to-sis').prop('title', I18n.t("Post grade to SIS disabled. Click to toggle."))
-                                        .prop('src', '/images/svg-icons/svg_icon_post_to_sis.svg')
-            $t.find('.screenreader-only').text(I18n.t("The grade for this assignment will not sync to the student information system. Click here to toggle this setting."))
-          else
-            $t.removeClass('post-to-sis-status disabled')
-            $t.addClass('post-to-sis-status enabled')
-            $t.find('.icon-post-to-sis').prop('title', I18n.t("Post grade to SIS enabled. Click to toggle."))
-                                        .prop('src', '/images/svg-icons/svg_icon_post_to_sis_active.svg')
-            $t.find('.screenreader-only').text(I18n.t("The grade for this assignment will sync to the student information system. Click here to toggle this setting."))
-      })
 
     deleteItem: =>
       @$("#assignment_#{@model.id}_settings_delete_item").click()

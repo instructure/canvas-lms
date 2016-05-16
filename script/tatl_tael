@@ -31,6 +31,12 @@ end
 
 linter = TatlTael::Linter.new(git_dir: git_dir)
 
+# don't run for wips
+if linter.wip?
+  puts "WIP detected, TatlTael will not run."
+  exit 0
+end
+
 linter.ensure_specs do
   post("Your commit does not include specs."\
        " Please add some to verify your changes.")

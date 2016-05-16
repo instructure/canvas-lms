@@ -261,6 +261,21 @@ describe Submission do
         expect(@submission.messages_sent).to be_include('Submission Graded')
       end
 
+      it "should not create a message for a soft-concluded student" do
+        submission_spec_model
+        @course.start_at = 2.weeks.ago
+        @course.conclude_at = 1.weeks.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        @submission.reload
+        expect(@submission.assignment).to eql(@assignment)
+        expect(@submission.assignment.state).to eql(:published)
+        @submission.grade_it!
+        expect(@submission.messages_sent).to_not be_include('Submission Graded')
+      end
+
       it "notifies observers" do
         submission_spec_model
         course_with_observer(course: @course, associated_user_id: @user.id, active_all: true, active_cc: true)
