@@ -214,6 +214,19 @@ describe "scheduler" do
       expect(f('.agenda-event .ig-row')).to be_present
     end
 
+    it "should validate the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
+      create_appointment_group
+      ag = AppointmentGroup.first
+      student_in_course(course: @course, active_all: true)
+      ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
+      load_month_view
+      expect(f('.fc-content .fc-title').text).to include('new appointment group')
+      f('#week').click
+      expect(f('.fc-content .fc-title').text).to include('new appointment group')
+      f('#agenda').click
+      expect(f('.agenda-event .ig-title').text).to include('new appointment group')
+    end
+
     it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do
       get "/calendar2"
       click_scheduler_link
