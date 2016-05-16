@@ -37,13 +37,46 @@ if linter.wip?
   exit 0
 end
 
-linter.ensure_specs do
-  post("Your commit does not include specs."\
-       " Please add some to verify your changes.")
-end
+errors = []
 
 linter.ban_new_erb do
-  post("Your commit includes new ERB files,"\
-       " which has been a no-no in Canvas since 2011."\
-       " All new UI should be built in React on top of documented APIs")
+  errors << "Your commit includes new ERB files,"\
+            " which has been a no-no in Canvas since 2011."\
+            " All new UI should be built in React on top of documented APIs"
+end
+
+linter.ensure_coffee_specs do
+  errors << "Your commit includes coffee changes,"\
+            " but does not include coffee specs."\
+            " Please add some to verify your changes."
+end
+
+linter.ensure_jsx_specs do
+  errors << "Your commit includes jsx changes,"\
+            " but does not include jsx specs."\
+            " Please add some to verify your changes."\
+            " See /doc/testing_javascript.md for help."
+end
+
+linter.ensure_ruby_specs do
+  if linter.selenium_specs?
+    errors << "Your commit includes ruby changes,"\
+              " but does not include ruby specs."\
+              " Please add some to verify your changes."
+  else
+    errors << "Your commit includes ruby changes,"\
+              " but does not include non-selenium specs (model, controller, etc)."\
+              " Please add some to verify your changes."
+  end
+end
+
+linter.ensure_no_unnecessary_selenium_specs do
+  errors << "Your commit modifies selenium specs,"\
+            " when your changes might be more appropriately"\
+            " tested at a lower level (see above)."\
+            " Please limit your selenium specs to happy-path scenarios."
+end
+
+unless errors.empty?
+  post(errors.join("\n\n"))
 end
