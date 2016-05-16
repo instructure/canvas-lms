@@ -7,6 +7,7 @@ describe "gradebook2 - total points toggle" do
   let!(:setup) { gradebook_data_setup }
 
   def should_show_percentages
+    wait_for_ajaximations
     ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
   end
 

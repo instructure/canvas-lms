@@ -359,12 +359,12 @@ module Gradebook2Common
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
     dialog = f('#assignment_group_weights_dialog')
-    # expect(dialog).to be_displayed
+    expect(dialog).to be_displayed
 
     group_check = dialog.find_element(:id, 'group_weighting_scheme')
     keep_trying_until do
       group_check.click
-      # expect(is_checked('#group_weighting_scheme')).to be_falsy
+      expect(is_checked('#group_weighting_scheme')).to be_falsey
     end
     fj('.ui-button:contains("Save")').click
     refresh_page
