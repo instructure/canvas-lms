@@ -320,7 +320,7 @@ describe "calendar2" do
         change_calendar(:next)
 
         # Verify known dates in calendar header and grid
-        expect(header_text).to include_text('February 2012')
+        expect(header_text).to include('February 2012')
         first_wednesday = '.fc-day-number.fc-wed:first'
         expect(fj(first_wednesday).text).to eq('1')
         expect(fj(first_wednesday).attribute('data-date')).to eq('2012-02-01')
@@ -335,7 +335,7 @@ describe "calendar2" do
         change_calendar(:prev)
 
         # Verify known dates in calendar header and grid
-        expect(header_text).to include_text('December 2011')
+        expect(header_text).to include('December 2011')
         first_thursday = '.fc-day-number.fc-thu:first'
         expect(fj(first_thursday).text).to eq('1')
         expect(fj(first_thursday).attribute('data-date')).to eq('2011-12-01')
@@ -427,8 +427,8 @@ describe "calendar2" do
         find(".fc-event").click
 
         #expect to find the location name and address
-        expect(find('.event-details-content').text).to include_text(location_name)
-        expect(find('.event-details-content').text).to include_text(location_address)
+        expect(find('.event-details-content')).to include_text(location_name)
+        expect(find('.event-details-content')).to include_text(location_address)
       end
 
       it "should bring up a calendar date picker when clicking on the month" do
@@ -439,8 +439,8 @@ describe "calendar2" do
 
         # Expect that a the event picker is present
         # Check various elements to verify that the calendar looks good
-        expect(find('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-        expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
+        expect(find('.ui-datepicker-header')).to include_text(Time.now.utc.strftime("%B"))
+        expect(find('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
       it "should strikethrough past due assignment", priority: "1", test_id: 518370 do

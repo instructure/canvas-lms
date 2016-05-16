@@ -80,7 +80,7 @@ describe "calendar2" do
       replace_content(f('.ui-dialog #assignment_title'), "Assignment 2!")
       submit_form('#edit_assignment_form')
       wait_for_ajaximations
-      expect(assignment2.reload.title).to include_text("Assignment 2!")
+      expect(assignment2.reload.title).to include("Assignment 2!")
       expect(assignment2.assignment_group).to eq group2
     end
 
@@ -89,7 +89,7 @@ describe "calendar2" do
       get "/calendar2"
       f('.fc-event').click
       wait_for_ajaximations
-      driver.execute_script("$('.edit_event_link').hover().click()")
+      hover_and_click '.edit_event_link'
       wait_for_ajaximations
       original_more_options = f('.more_options_link')['href']
       expect(original_more_options).not_to match(/undefined/)
@@ -98,13 +98,13 @@ describe "calendar2" do
       wait_for_ajaximations
       assignment.reload
       wait_for_ajaximations
-      expect(assignment.title).to include_text("edited title")
+      expect(assignment.title).to include("edited title")
 
-      fj('.fc-event').click
+      f('.fc-event').click
       wait_for_ajaximations
-      driver.execute_script("$('.edit_event_link').hover().click()")
+      hover_and_click '.edit_event_link'
       wait_for_ajaximations
-      expect(fj('.more_options_link')['href']).to match(original_more_options)
+      expect(f('.more_options_link')['href']).to match(original_more_options)
     end
 
     it "should make an assignment undated if you delete the start date" do
@@ -121,7 +121,7 @@ describe "calendar2" do
       wait_for_ajax_requests
       f("#undated-events-button").click
       expect(f("#content")).not_to contain_css('.fc-event')
-      expect(f('.undated_event_title').text).to include_text("undate me")
+      expect(f('.undated_event_title')).to include_text("undate me")
     end
 
     context "event editing", priority: "1", test_id: 138853 do

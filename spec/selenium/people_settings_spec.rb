@@ -236,8 +236,8 @@ describe "course people" do
       go_to_people_page
 
       observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
-      expect(observer_row).to include_text students[0].name
-      expect(observer_row).to include_text students[1].name
+      expect(observer_row).to include students[0].name
+      expect(observer_row).to include students[1].name
       # remove an observer
       use_link_dialog(obs) do
         fj("#link_students input:visible").send_keys(:backspace)

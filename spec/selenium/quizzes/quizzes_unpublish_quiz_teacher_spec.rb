@@ -7,9 +7,8 @@ describe 'unpublishing a quiz on the quiz show page' do
 
   def unpublish_quiz_via_ui
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    f('#quiz-publish-link').click
-    wait_for_ajaximations
     wait_for_quiz_publish_button_to_populate
+    f('#quiz-publish-link').click
   end
 
   context 'as a teacher' do
@@ -23,10 +22,11 @@ describe 'unpublishing a quiz on the quiz show page' do
 
       # changes the button's text to |Unpublished|
       driver.mouse.move_to f('#footer')
-      expect(f('#quiz-publish-link').text.strip!.split("\n")[1].split('.')[0]).to eq 'Unpublished'
+      expect(f('#quiz-publish-link')).to include_text 'Unpublished'
 
       # changes the button text on hover to |Publish|
-      expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Publish'
+      driver.mouse.move_to f('#quiz-publish-link')
+      expect(f('#quiz-publish-link')).to include_text 'Publish'
 
       # displays the 'This quiz is unpublished' message
       expect(f('.alert .unpublished_warning')).to be_displayed

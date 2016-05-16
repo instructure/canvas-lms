@@ -49,10 +49,10 @@ describe "conversations new" do
       time = format_time_for_view(UserNote.last.updated_at)
       remove_user_session
       get student_user_notes_url
-      expect(f('.subject').text).to include_text('Christmas')
+      expect(f('.subject')).to include_text('Christmas')
       expect(f('.user_content').text).to eq 'The Fat Man cometh.'
-      expect(f('.creator_name').text).to include_text(@teacher.name)
-      expect(f('.creator_name').text).to include_text(time)
+      expect(f('.creator_name')).to include_text(@teacher.name)
+      expect(f('.creator_name')).to include_text(time)
     end
 
     it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
@@ -80,7 +80,7 @@ describe "conversations new" do
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'
       expect(f('.user_content').text).to eq 'FJ Body text 2'
-      expect(f('.creator_name').text).to include_text(time)
+      expect(f('.creator_name')).to include_text(time)
     end
 
     it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518 do

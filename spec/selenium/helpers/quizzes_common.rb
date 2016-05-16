@@ -385,12 +385,7 @@ module QuizzesCommon
   end
 
   def wait_for_quiz_publish_button_to_populate
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until do
-      f('#quiz-publish-link').present? &&
-      f('#quiz-publish-link').text.present? &&
-      f('#quiz-publish-link').text.strip!.split("\n") != []
-    end
+    keep_trying_until { f('#quiz-publish-link').text.present? }
   end
 
   # @argument answer_chooser [#call]

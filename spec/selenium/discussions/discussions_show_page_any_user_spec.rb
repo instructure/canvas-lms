@@ -320,10 +320,8 @@ describe "discussions" do
 
           last_entry = DiscussionEntry.last
           expect(last_entry.depth).to eq 2
-          expect(last_entry.message).to include_text(side_comment_text)
-          keep_trying_until do
-            expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
-          end
+          expect(last_entry.message).to include(side_comment_text)
+          expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
         end
 
         it "should create multiple side comments but only show 10 and expand the rest", priority: "1", test_id: 345489 do

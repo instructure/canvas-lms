@@ -180,12 +180,12 @@ describe 'dashcards' do
       it 'should customize color by selecting from color palet in the calendar page', priority: "1", test_id: 239994 do
         select_color_pallet_from_calendar_page
 
-        old_color = fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+        old_color = f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
 
         expect(f('.ColorPicker__Container')).to be_displayed
         f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
         wait_for_ajaximations
-        new_color =  fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+        new_color =  f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
 
         # make sure that we choose a new color for background
         if old_color == new_color
@@ -197,9 +197,9 @@ describe 'dashcards' do
         rgb = convert_hex_to_rgb_color(new_color)
         get '/'
         keep_trying_until(5) do
-          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
           refresh_page
-          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
           expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
         end
       end
@@ -208,16 +208,16 @@ describe 'dashcards' do
         select_color_pallet_from_calendar_page
 
         hex = random_hex_color
-        replace_content(fj("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
+        replace_content(f("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         wait_for_ajaximations
         get '/'
         keep_trying_until(5) do
-          if fj('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
+          if f('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
             rgb = convert_hex_to_rgb_color(hex)
-            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+            expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
           else
-            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(hex)
+            expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(hex)
           end
           expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
         end
@@ -233,12 +233,12 @@ describe 'dashcards' do
 
       it 'should customize dashcard color by selecting from color palet', priority: "1", test_id: 238196 do
         # gets the default background color
-        old_color = fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+        old_color = f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
 
         expect(f('.ColorPicker__Container')).to be_displayed
         f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
         wait_for_ajaximations
-        new_color =  fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+        new_color =  f('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
 
         # make sure that we choose a new color for background
         if old_color == new_color
@@ -249,9 +249,9 @@ describe 'dashcards' do
         f('.ColorPicker__Container .Button--primary').click
         rgb = convert_hex_to_rgb_color(new_color)
         keep_trying_until(5) do
-          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
           refresh_page
-          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
         end
       end
 
@@ -262,14 +262,14 @@ describe 'dashcards' do
       it 'should customize dashcard color', priority: "1", test_id: 239991 do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed
-        replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
+        replace_content(f("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         keep_trying_until(5) do
-          if fj('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
+          if f('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
             rgb = convert_hex_to_rgb_color(hex)
-            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
+            expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
           else
-            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(hex)
+            expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(hex)
           end
         end
       end

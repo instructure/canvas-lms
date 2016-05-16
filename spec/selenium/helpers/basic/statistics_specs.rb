@@ -6,7 +6,7 @@ shared_examples_for "statistics basic tests" do
   end
 
   def validate_item_list(css, header_text)
-    expect(f(css).text).to include_text(header_text)
+    expect(f(css)).to include_text(header_text)
   end
 
   context "with admin initially logged in" do

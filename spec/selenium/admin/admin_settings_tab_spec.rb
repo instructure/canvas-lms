@@ -190,7 +190,7 @@ describe "admin settings tab" do
 
     it "should click on the quiz help link" do
       f(".ip_help_link").click
-      expect(f("#ip_filters_dialog").text).to include_text "What are Quiz IP Filters?"
+      expect(f("#ip_filters_dialog")).to include_text "What are Quiz IP Filters?"
     end
 
     it "should add a quiz filter " do

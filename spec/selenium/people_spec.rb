@@ -427,7 +427,7 @@ describe "people" do
       wait_for_ajaximations
       ff('.ui-button-text')[1].click
       wait_for_ajaximations
-      expect(ff(".StudentEnrollment")[0].text).to include_text("section2")
+      expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
@@ -440,7 +440,7 @@ describe "people" do
      fln("Remove user from section2").click
      ff('.ui-button-text')[1].click
      wait_for_ajaximations
-     expect(ff(".StudentEnrollment")[0].text).not_to include_text("section2")
+     expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
     it "should gray out sections the user doesn't have permission to remove" do

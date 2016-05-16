@@ -157,7 +157,7 @@ module DiscussionsCommon
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    expect(f('#discussion_topic .discussion-title').text).to include_text(title)
+    expect(f('#discussion_topic .discussion-title')).to include_text(title)
   end
 
   def topic_index_element(topic)

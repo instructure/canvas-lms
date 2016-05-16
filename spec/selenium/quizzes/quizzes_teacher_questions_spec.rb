@@ -46,7 +46,7 @@ describe "quizzes questions" do
 
       submit_form(question)
       question = f("#question_#{quest1.id}")
-      expect(question.find_element(:css, ".question_name").text).to include_text('edited question')
+      expect(question.find_element(:css, ".question_name")).to include_text('edited question')
       f('#show_question_details').click
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end

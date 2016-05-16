@@ -155,7 +155,7 @@ describe "calendar2" do
       change_calendar(:next)
 
       # Verify Week and Day labels are correct
-      expect(header_text).to include_text("Jan 8 — 14, 2012")
+      expect(header_text).to include("Jan 8 — 14, 2012")
       expect(f('.fc-sun')).to include_text('SUN 1/8')
     end
 
@@ -166,7 +166,7 @@ describe "calendar2" do
       # Click non all-day event
       fj('.fc-agendaWeek-view .fc-time-grid .fc-slats .fc-widget-content:not(.fc-axis):first').click
       event_from_modal(title,false,false)
-      expect(f('.fc-title').text).to include title
+      expect(f('.fc-title')).to include_text title
     end
 
     it "should create all day event on week calendar", priority: "1", test_id: 138865 do
@@ -174,9 +174,9 @@ describe "calendar2" do
       load_week_view
 
       # click all day event
-      fj('.fc-agendaWeek-view .fc-week .fc-wed').click
+      f('.fc-agendaWeek-view .fc-week .fc-wed').click
       event_from_modal(title,false,false)
-      expect(f('.fc-title').text).to include title
+      expect(f('.fc-title')).to include_text title
     end
 
     it "should have a working today button", priority: "1", test_id: 142042 do
@@ -209,8 +209,8 @@ describe "calendar2" do
       f(".fc-event").click
 
       # expect to find the location name and address
-      expect(f('.event-details-content').text).to include_text(location_name)
-      expect(f('.event-details-content').text).to include_text(location_address)
+      expect(f('.event-details-content')).to include_text(location_name)
+      expect(f('.event-details-content')).to include_text(location_address)
     end
 
     it "should bring up a calendar date picker when clicking on the week range", priority: "2", test_id: 768985 do
@@ -220,8 +220,8 @@ describe "calendar2" do
 
       # Expect that a the event picker is present
       # Check various elements to verify that the calendar looks good
-      expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-      expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      expect(f('.ui-datepicker-header')).to include_text(Time.now.utc.strftime("%B"))
+      expect(f('.ui-datepicker-calendar')).to include_text("Mo")
     end
 
     it "should extend event time by dragging", priority: "1", test_id: 138864 do

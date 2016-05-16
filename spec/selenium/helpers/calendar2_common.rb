@@ -151,7 +151,7 @@ module Calendar2Common
     publish_toggle = edit_assignment_form.find('#assignment_published')
     move_to_click('label[for=assignment_published]') if publish
     submit_form(edit_assignment_form)
-    keep_trying_until { expect(f('.fc-month-view .fc-title')).to include_text(assignment_title) }
+    expect(f('.fc-month-view .fc-title')).to include_text(assignment_title)
   end
 
   # Creates event from clicking on the mini calendar
@@ -180,14 +180,12 @@ module Calendar2Common
 
     submit_form(edit_event_form)
     wait_for_ajax_requests
-    keep_trying_until do
-      if should_duplicate
-        4.times do |i|
-          expect(ff('.fc-month-view .fc-title')[i]).to include_text("#{event_title} #{i + 1}")
-        end
-      else
-        expect(f('.fc-month-view .fc-title')).to include_text(event_title)
+    if should_duplicate
+      4.times do |i|
+        expect(ff('.fc-month-view .fc-title')[i]).to include_text("#{event_title} #{i + 1}")
       end
+    else
+      expect(f('.fc-month-view .fc-title')).to include_text(event_title)
     end
   end
 

@@ -52,7 +52,7 @@ describe "dashboard" do
         get "/"
 
         ignore_link = f('.to-do-list .disable_item_link')
-        expect(ignore_link['title']).to include_text("Ignore until new submission")
+        expect(ignore_link['title']).to include("Ignore until new submission")
         ignore_link.click
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.to-do-list > li')
@@ -149,7 +149,7 @@ describe "dashboard" do
           get "/"
 
           ff('.to-do-list .disable_item_link').each do |link|
-            expect(link['title']).to include_text("Ignore until new mark")
+            expect(link['title']).to include("Ignore until new mark")
             link.click
             wait_for_ajaximations
           end

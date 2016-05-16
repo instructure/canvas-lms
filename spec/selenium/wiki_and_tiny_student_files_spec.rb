@@ -71,7 +71,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 1
-      expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
+      expect(f('li.folder li.folder .name')).to include_text("visible subfolder")
     end
 
     it "should not show sub-folder in the sidebar if it is hidden" do
@@ -83,7 +83,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 1
-      expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
+      expect(f('li.folder li.folder .name')).to include_text("visible subfolder")
     end
 
     it "should not show file in the sidebar if it is hidden" do
@@ -98,7 +98,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('li.folder span.plus').click
       wait_for_ajaximations
       expect(ff('li.folder li.file').count).to eq 1
-      expect(f('li.folder li.file .name').text).to include_text("foo.txt")
+      expect(f('li.folder li.file .name')).to include_text("foo.txt")
     end
 
     it "should not show file in the sidebar if it is locked" do
@@ -115,7 +115,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         wait_for_ajaximations
         expect(ff('li.folder li.file').count).to eq 1
       end
-      expect(f('li.folder li.file .name').text).to include_text("foo.txt")
+      expect(f('li.folder li.file .name')).to include_text("foo.txt")
     end
   end
 

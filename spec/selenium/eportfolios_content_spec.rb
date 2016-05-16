@@ -118,13 +118,4 @@ describe "add content box" do
       expect(PageComment.count).to eq 0
     end
   end
-
-  it "should add a course submission" do
-    skip('fragile')
-    f(".add_submission_link").click
-    wait_for_ajaximations
-    keep_trying_until { expect(f(".submission_list")).to include_text(@assignment.title) }
-    f(".select_submission_button").click
-    submit_form(".form_content")
-  end
 end

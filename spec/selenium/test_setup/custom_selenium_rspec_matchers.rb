@@ -1,3 +1,5 @@
+require_relative "common_helper_methods/custom_wait_methods"
+
 module CustomSeleniumRspecMatchers
 
   class HasClass
@@ -23,16 +25,31 @@ module CustomSeleniumRspecMatchers
     HasClass.new(class_name)
   end
 
-
   class IncludeText
+    include CustomWaitMethods
+
     def initialize(text)
       @text = text
     end
 
     def matches?(element)
+      raise "`include_text` can only be used on an element; use `include` if you're checking if one string includes another" if element.is_a?(String)
+      raise "`include_text` will wait for you; don't nest it in `keep_trying_until`" if @__in_keep_trying_until
       @element = element
-      @element_text = @element.instance_of?(String) ? @element : @element.text
-      @element_text.include?(@text)
+      keep_trying_until do
+        @element_text = @element.text
+        @element_text.include?(@text)
+      end
+    end
+
+    def does_not_match?(element)
+      raise "`include_text` can only be used on an element; use `include` if you're checking if one string includes another" if element.is_a?(String)
+      raise "`include_text` will wait for you; don't nest it in `keep_trying_until`" if @__in_keep_trying_until
+      @element = element
+      keep_trying_until do
+        @element_text = @element.text
+        !@element_text.include?(@text)
+      end
     end
 
     def failure_message

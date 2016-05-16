@@ -184,7 +184,7 @@ describe "profile" do
       submit_form(register_form)
       wait_for_ajaximations
       close_visible_dialog
-      keep_trying_until { expect(f('.other_channels .path')).to include_text(test_cell_number) }
+      expect(f('.other_channels .path')).to include_text(test_cell_number)
     end
 
     it "should register a service" do

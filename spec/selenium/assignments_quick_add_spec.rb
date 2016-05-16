@@ -45,9 +45,9 @@ describe 'assignments' do
         f('.more_options').click
 
         expect(f('#edit_assignment_header')).to be
-        expect(f('#assignment_name').attribute(:value)).to include_text(@assignment_name)
-        expect(f('#assignment_points_possible').attribute(:value)).to include_text(@assignment_points)
-        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include_text('Jul 31')
+        expect(f('#assignment_name').attribute(:value)).to include(@assignment_name)
+        expect(f('#assignment_points_possible').attribute(:value)).to include(@assignment_points)
+        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include('Jul 31')
       end
 
       it 'should work for discussions and transfer values', priority:"1", test_id: 58760 do
@@ -55,9 +55,9 @@ describe 'assignments' do
         f('.more_options').click
 
         expect(f('.discussion-edit-header')).to be
-        expect(f('#discussion-title').attribute(:value)).to include_text(@assignment_name)
-        expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to include_text(@assignment_points)
-        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include_text('Jul 31')
+        expect(f('#discussion-title').attribute(:value)).to include(@assignment_name)
+        expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to include(@assignment_points)
+        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include('Jul 31')
       end
 
       it 'should work for quizzes and transfer values', priority:"1", test_id: 238873 do
@@ -65,8 +65,8 @@ describe 'assignments' do
         f('.more_options').click
 
         expect(f('#quiz_edit_wrapper')).to be
-        expect(f('#quiz_title').attribute(:value)).to include_text(@assignment_name)
-        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include_text('Jul 31')
+        expect(f('#quiz_title').attribute(:value)).to include(@assignment_name)
+        expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include('Jul 31')
       end
     end
   end
@@ -81,7 +81,7 @@ describe 'assignments' do
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
 
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include_text(@title)
+      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
     end
 
     it 'should work with a quiz', priority:"1", test_id: 269809 do
@@ -89,14 +89,14 @@ describe 'assignments' do
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
 
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include_text(@title)
+      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
     end
 
     it 'should work with a graded discussion', priority:"1", test_id: 269810 do
       assignment = @course.assignments.create!(name:  @title, submission_types: 'discussion_topic')
       get "/courses/#{@course.id}/assignments"
       click_cog_to_edit
-      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include_text(@title)
+      expect(f("#assign_#{assignment.id}_assignment_name").attribute(:value)).to include(@title)
     end
   end
 end

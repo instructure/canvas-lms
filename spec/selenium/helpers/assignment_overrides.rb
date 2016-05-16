@@ -304,7 +304,7 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def validate_quiz_show_page(message)
-    expect(f('#quiz_show').text).to include_text("#{message}")
+    expect(f('#quiz_show')).to include_text("#{message}")
   end
 
   def validate_vdd_quiz_tooltip_dates(context_selector, message)

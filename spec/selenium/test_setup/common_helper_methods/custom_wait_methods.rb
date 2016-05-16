@@ -118,6 +118,7 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
+    @__in_keep_trying_until = true
     frd_error = nil
     Selenium::WebDriver::Wait.new(timeout: seconds).until do
       begin
@@ -130,6 +131,8 @@ module CustomWaitMethods
     end
   rescue Selenium::WebDriver::Error::TimeOutError
     raise frd_error || $ERROR_INFO
+  ensure
+    @__in_keep_trying_until = false
   end
 
   # pass in an Element pointing to the textarea that is tinified.

@@ -104,8 +104,8 @@ describe "course settings" do
         el.text != ""
       end
       message = f('.self_enrollment_message')
-      expect(message.text).to include(code)
-      expect(message.text).not_to include('self_enrollment_code')
+      expect(message).to include_text(code)
+      expect(message).not_to include_text('self_enrollment_code')
     end
   end
 
@@ -171,10 +171,8 @@ describe "course settings" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Delete Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Delete Section')
 
       f('.delete_section_link').click
       keep_trying_until do
@@ -191,10 +189,8 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Edit Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Edit Section')
 
       f('.edit_section_link').click
       section_input = f('#course_section_name_edit')
@@ -208,17 +204,15 @@ describe "course settings" do
     it "should move a nav item to disabled" do
       skip('fragile')
       get "/courses/#{@course.id}/settings#tab-navigation"
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')
-      end
+      body = f('body')
+      expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')
       disabled_div = f('#nav_disabled_list')
       announcements_nav = f('#nav_edit_tab_id_14')
       driver.action.click_and_hold(announcements_nav).
           move_to(disabled_div).
           release(disabled_div).
           perform
-      keep_trying_until { expect(f('#nav_disabled_list')).to include_text(announcements_nav.text) }
+      expect(f('#nav_disabled_list')).to include_text(announcements_nav.text)
     end
   end
 

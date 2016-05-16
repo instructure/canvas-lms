@@ -91,18 +91,18 @@ describe "site admin jobs ui" do
       ff("#jobs-grid .slick-row .l0.r0").find do |element|
         element.click if element.text == job.id.to_s
       end
-      expect(fj('#job-id').text).to eq job.id.to_s
-      fj('#job-handler-show').click()
+      expect(f('#job-id').text).to eq job.id.to_s
+      f('#job-handler-show').click
       wait_for_ajax_requests
       expect(get_value('#job-handler')).to eq job.handler
-      fj('a.ui-dialog-titlebar-close').click()
+      f('a.ui-dialog-titlebar-close').click
 
       # also for failed job
       filter_jobs(FlavorTags::FAILED)
       wait_for_ajax_requests
-      fj('#jobs-grid .slick-row .l0.r0').click()
-      expect(fj('#job-id').text).to eq @failed_job.id.to_s
-      fj('#job-handler-show').click()
+      f('#jobs-grid .slick-row .l0.r0').click
+      expect(f('#job-id').text).to eq @failed_job.id.to_s
+      f('#job-handler-show').click
       wait_for_ajax_requests
       expect(get_value('#job-handler')).to eq @failed_job.handler
     end
@@ -195,7 +195,7 @@ describe "site admin jobs ui" do
         f("#jobs-refresh").click
         wait_for_ajax_requests
         expect(ff("#jobs-grid .slick-row").count).to eq 1
-        expect(f("#jobs-grid .r1").text).to include_text "String#downcase"
+        expect(f("#jobs-grid .r1")).to include_text "String#downcase"
       end
 
       it "should confirm that clicking on delete button should delete all future jobs" do

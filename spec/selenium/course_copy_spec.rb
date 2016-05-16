@@ -45,7 +45,7 @@ describe "course copy" do
 
         keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
 
-        keep_trying_until { expect(f('#copy_results > h2')).to include_text('Copy Succeeded') }
+        expect(f('#copy_results > h2')).to include_text('Copy Succeeded')
 
         @new_course = Course.last
         get "/courses/#{@new_course.id}"

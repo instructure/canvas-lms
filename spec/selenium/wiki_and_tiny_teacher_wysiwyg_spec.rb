@@ -327,7 +327,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       submit_form("#new_page_drop_down")
 
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce p a').attribute('href')).to include_text title
+        expect(f('#tinymce p a').attribute('href')).to include title
       end
 
       select_all_wiki

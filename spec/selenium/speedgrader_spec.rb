@@ -136,17 +136,17 @@ describe 'Speedgrader' do
       end
 
       it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
-        expect(ff('#update_history_form .alert')[0].text).to include_text('The following questions need review:')
+        expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
       end
 
       it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         questions_to_grade = ff('#questions_needing_review li a')
-        expect(questions_to_grade[0].text).to include_text('Question 2')
-        expect(questions_to_grade[1].text).to include_text('Question 3')
+        expect(questions_to_grade[0]).to include_text('Question 2')
+        expect(questions_to_grade[1]).to include_text('Question 3')
       end
 
       it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
-        expect(ff('#update_history_form .alert')[0].text).not_to include_text('Question 4')
+        expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
       end
     end
 
@@ -161,7 +161,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(0 / 0)')
+        expect(f('#grade_container label')).to include_text('(0 / 0)')
       end
 
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
@@ -169,7 +169,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(1 / 1)')
+        expect(f('#grade_container label')).to include_text('(1 / 1)')
       end
     end
 

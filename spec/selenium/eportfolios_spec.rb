@@ -86,7 +86,7 @@ describe "eportfolios" do
       submit_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
-      expect(@eportfolio.name).to include_text("new ePortfolio name1")
+      expect(@eportfolio.name).to include("new ePortfolio name1")
     end
 
     it "should validate time stamp on ePortfolio", priority: "2" do
@@ -165,8 +165,7 @@ describe "eportfolios" do
                       '.publish_step' => "Ready to get started?"}
       options_text.each do |option, text|
         f(option).click
-        wait_for_animations
-        expect(f('.wizard_details .details').text).to include_text text
+        expect(f('.wizard_details .details')).to include_text text
       end
     end
 

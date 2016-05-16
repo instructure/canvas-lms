@@ -63,9 +63,8 @@ describe "account admin courses tab" do
       name = name.split(" ")
       f("#course_name").send_keys(name[0])
       f("#course_name").send_keys(" "+name[1])
-      ff(".ui-menu-item .ui-corner-all").count > 0
-      keep_trying_until { expect(fj(".ui-menu-item .ui-corner-all:visible").text).to include_text(course.name) }
-      expect_new_page_load { fj("#new_course button").click }
+      expect(fj(".ui-menu-item .ui-corner-all:visible")).to include_text(course.name)
+      expect_new_page_load { f("#new_course button").click }
       expect(f("#crumb_course_#{course.id}")).to be_displayed
     end
 

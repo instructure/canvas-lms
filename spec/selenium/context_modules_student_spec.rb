@@ -236,7 +236,7 @@ describe "context modules" do
     it "should lock module until a given date", priority: "1", test_id: 126741 do
       mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
       go_to_modules
-      expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).to include_text 'Will unlock'
+      expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).to include_text 'Will unlock'
     end
 
     it "should allow a student view student to progress through module content" do
@@ -658,14 +658,14 @@ describe "context modules" do
     go_to_modules
     # for a11y there is a hidden header now that gets read as part of the text hence the regex matching
     expect(f("#context_modules").text).to match(/module\s*module/)
-    expect(f("#context_modules").text).not_to include_text "module_1"
+    expect(f("#context_modules")).not_to include_text "module_1"
   end
 
   it "should unlock module after a given date", priority: "1", test_id: 126746 do
     mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.ago
     user_session(@student)
     go_to_modules
-    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).not_to include_text 'Will unlock'
+    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).not_to include_text 'Will unlock'
   end
 
   it "should mark locked but visible assignments/quizzes/discussions as read" do

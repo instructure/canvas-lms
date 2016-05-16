@@ -115,25 +115,25 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       root_folders = @tree1.find_elements(:css, 'li.folder')
       expect(root_folders.length).to eq 1
-      expect(root_folders.first.find_element(:css, '.name').text).to include_text('course files')
+      expect(root_folders.first.find_element(:css, '.name')).to include_text('course files')
 
       root_folders.first.find_element(:css, '.sign.plus').click
       wait_for_ajaximations
 
       sub_folders = root_folders.first.find_elements(:css, 'li.folder')
       expect(sub_folders.length).to eq 1
-      expect(sub_folders.first.find_element(:css, '.name').text).to include_text('subfolder')
+      expect(sub_folders.first.find_element(:css, '.name')).to include_text('subfolder')
 
       text_file = root_folders.first.find_elements(:css, 'li.file.text')
       expect(text_file.length).to eq 1
-      expect(text_file.first.find_element(:css, '.name').text).to include_text('text_file.txt')
+      expect(text_file.first.find_element(:css, '.name')).to include_text('text_file.txt')
 
       sub_folders.first.find_element(:css, '.sign.plus').click
       wait_for_ajaximations
 
       sub_sub_folders = sub_folders.first.find_elements(:css, 'li.folder')
       expect(sub_sub_folders.length).to eq 1
-      expect(sub_sub_folders.first.find_element(:css, '.name').text).to include_text('subsubfolder')
+      expect(sub_sub_folders.first.find_element(:css, '.name')).to include_text('subsubfolder')
 
     end
 
@@ -176,8 +176,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
         end
       end
       wiki_page_tools_upload_file('#sidebar_upload_file_form', :text)
-      wait_for_ajaximations
-      keep_trying_until { expect(f('.file_list')).to include_text('testfile') }
+      expect(f('.file_list')).to include_text('testfile')
     end
 
     it "should show uploaded files in file tree and add them to the rce" do
@@ -292,7 +291,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expand_root_folder
       wait_for_ajaximations
       expect(ff('li.folder li.folder').count).to eq 2
-      expect(f('li.folder li.folder .name').text).to include_text("visible subfolder")
+      expect(f('li.folder li.folder .name')).to include_text("visible subfolder")
     end
 
     it "should show sub-folder in the sidebar if it is hidden" do

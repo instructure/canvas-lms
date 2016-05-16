@@ -226,11 +226,7 @@ describe "context modules" do
       f('.delete_item_link').click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      keep_trying_until do
-        expect(f('.context_module_items')).not_to include_text(@assignment.title)
-        true
-      end
+      expect(f('.context_module_items')).not_to include_text(@assignment.title)
     end
 
     it "should edit a module item and validate the changes stick", priority: "1", test_id: 126737 do
@@ -1274,7 +1270,7 @@ describe "context modules" do
       go_to_modules
       verify_persistence('Graded Unpublished Discussion')
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
     it 'should add a graded published discussion to a module', priority: "1", test_id: 126715 do
@@ -1285,7 +1281,7 @@ describe "context modules" do
       go_to_modules
       verify_persistence('Graded Published Discussion')
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
     it 'should add a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
@@ -1299,7 +1295,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
       expect(f('.due_date_display').text).not_to be_blank
       expect(f('.due_date_display').text).to eq date_string(@due_at, :no_words)
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
     end
   end
   context 'edit inline items on module page' do
