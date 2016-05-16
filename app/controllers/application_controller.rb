@@ -1336,6 +1336,8 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
+    elsif tag.content_type == 'AssessmentQuestionBank'
+      redirect_to named_context_url(context, :context_question_bank_url, tag.content_id, url_params)
     elsif tag.content_type == 'Lti::MessageHandler'
       url_params[:module_item_id] = params[:module_item_id] if params[:module_item_id]
       url_params[:resource_link_fragment] = "ContentTag:#{tag.id}"

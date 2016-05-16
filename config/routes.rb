@@ -594,6 +594,7 @@ CanvasRails::Application.routes.draw do
     resources :outcomes do
       get 'results' => 'outcomes#outcome_results'
       get 'results/:id' => 'outcomes#outcome_result', as: :result
+      get 'alignments/:id' => 'outcomes#alignment_redirect', as: :alignment_redirect
       get :details
       collection do
         get :list

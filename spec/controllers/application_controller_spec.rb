@@ -398,6 +398,62 @@ describe ApplicationController do
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
+    it 'redirects for an assignment' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Assignment')
+      controller.expects(:named_context_url).with(Account.default, :context_assignment_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a quiz' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: true, content_type: 'Quizzes::Quiz')
+      controller.expects(:named_context_url).with(Account.default, :context_quiz_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a discussion topic' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'DiscussionTopic')
+      controller.expects(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a wikipage' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'WikiPage', content: {})
+      controller.expects(:polymorphic_url).with([Account.default, tag.content], {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a rubric' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Rubric')
+      controller.expects(:named_context_url).with(Account.default, :context_rubric_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a question bank' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'AssessmentQuestionBank')
+      controller.expects(:named_context_url).with(Account.default, :context_question_bank_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for an attachment' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Attachment')
+      controller.expects(:named_context_url).with(Account.default, :context_file_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
     context 'ContextExternalTool' do
 
       let(:course){ course_model }
