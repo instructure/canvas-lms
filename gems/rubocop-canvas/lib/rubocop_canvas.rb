@@ -15,7 +15,6 @@ require 'rubocop_canvas/helpers/migration_tags'
 # cops
 ## datafixup
 require 'rubocop_canvas/cops/datafixup/eager_load'
-require 'rubocop_canvas/cops/datafixup/find_ids'
 ## lint
 require 'rubocop_canvas/cops/lint/freeze_constants'
 require 'rubocop_canvas/cops/lint/no_file_utils_rm_rf'

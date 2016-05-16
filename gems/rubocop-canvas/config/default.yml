@@ -4,9 +4,6 @@ Datafixup/EagerLoad: &Datafixup
     - "**/db/migrate/*.rb"
     - "**/lib/data_fixup/*.rb"
 
-Datafixup/FindIds:
-  <<: *Datafixup
-
 Lint/FreezeConstants:
   Enabled: true
 
