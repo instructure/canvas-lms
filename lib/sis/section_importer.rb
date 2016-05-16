@@ -74,10 +74,10 @@ module SIS
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank?
         raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless status =~ /\Aactive|\Adeleted/i
 
-        course = @root_account.all_courses.where(sis_source_id: course_id).first
+        course = @root_account.all_courses.where(sis_source_id: course_id).take
         raise ImportError, "Section #{section_id} references course #{course_id} which doesn't exist" unless course
 
-        section = @root_account.course_sections.where(sis_source_id: section_id).first
+        section = @root_account.course_sections.where(sis_source_id: section_id).take
         section ||= course.course_sections.where(sis_source_id: section_id).first_or_initialize
         section.root_account = @root_account
         # this is an easy way to load up the cache with data we already have

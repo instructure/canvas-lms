@@ -49,13 +49,13 @@ module SIS
         account = nil
         if account_id.present?
           account = @accounts_cache[account_id]
-          account ||= @root_account.all_accounts.where(sis_source_id: account_id).first
+          account ||= @root_account.all_accounts.where(sis_source_id: account_id).take
           raise ImportError, "Parent account didn't exist for #{account_id}" unless account
           @accounts_cache[account.sis_source_id] = account
         end
         account ||= @root_account
 
-        group = @root_account.all_groups.where(sis_source_id: group_id).first
+        group = @root_account.all_groups.where(sis_source_id: group_id).take
         unless group
           raise ImportError, "No name given for group #{group_id}, skipping" if name.blank?
           raise ImportError, "Improper status \"#{status}\" for group #{group_id}, skipping" unless status =~ /\A(available|closed|completed|deleted)/i
