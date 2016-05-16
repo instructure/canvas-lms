@@ -91,36 +91,4 @@ describe BrandConfigHelpers do
     end
   end
 
-  describe "get_descendant_configs_by_account_id" do
-    before :once do
-      setup_account_family_with_configs
-    end
-    it "return hash with both children and grand children with new md5s" do
-      @new_parent_config = BrandConfig.for(
-        variables: {"ic-brand-primary" => "purple"},
-        js_overrides: nil,
-        css_overrides: nil,
-        mobile_js_overrides: nil,
-        mobile_css_overrides: nil,
-        parent_md5: nil
-      )
-      @new_parent_config.save!
-      new_parent_config_md5 = @new_parent_config.md5
-      @parent_account.brand_config_md5 = new_parent_config_md5
-      @parent_account.save!
-
-      new_configs = @parent_account.get_descendant_configs_by_account_id(new_parent_config_md5, is_base_theme: true, base_md5: new_parent_config_md5)
-
-      # expect(new_configs.keys.include?(@parent_account.id)).to be_truthy
-      expect(new_configs.keys.include?(@child_account.id)).to be_truthy
-      expect(new_configs.keys.include?(@grand_child_account.id)).to be_truthy
-
-      equivalent_child_md5 = get_equivalent_md5(@child_config, new_parent_config_md5)
-      equivalent_grand_child_md5 = get_equivalent_md5(@grand_child_config, equivalent_child_md5)
-
-      # expect(new_configs[@parent_account.id].md5).to eq(new_parent_config_md5)
-      expect(new_configs[@child_account.id].md5).to eq(equivalent_child_md5)
-      expect(new_configs[@grand_child_account.id].md5).to eq(equivalent_grand_child_md5)
-    end
-  end
 end

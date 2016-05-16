@@ -72,10 +72,18 @@ class BrandConfig < ActiveRecord::Base
     @ancestor_configs ||= [self] + (parent && parent.chain_of_ancestor_configs).to_a
   end
 
+  def clone_with_new_parent(new_parent_md5)
+    attrs = self.attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
+    attrs[:parent_md5] = new_parent_md5
+    BrandConfig.for(attrs)
+  end
+
+  def dup?
+    BrandConfig.where(md5: self.md5).exists?
+  end
+
   def save_unless_dup!
-    unless BrandConfig.where(md5: self.md5).exists?
-      self.save!
-    end
+    self.save! unless dup?
   end
 
   def to_scss
@@ -167,10 +175,19 @@ class BrandConfig < ActiveRecord::Base
 
   def sync_to_s3_and_save_to_account!(progress, account_id)
     save_and_sync_to_s3!(progress)
-    act = Account.find(account_id)
-    old_md5 = act.brand_config_md5
-    act.brand_config_md5 = md5
-    act.save!
+    account = Account.find(account_id)
+    old_md5 = account.brand_config_md5
+    account.brand_config_md5 = md5
+    account.save!
+    BrandConfig.destroy_if_unused(old_md5)
+  end
+
+  def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_id)
+    save_and_sync_to_s3!(progress)
+    shared_brand_config = SharedBrandConfig.find(shared_brand_config_id)
+    old_md5 = shared_brand_config.brand_config_md5
+    shared_brand_config.brand_config_md5 = md5
+    shared_brand_config.save!
     BrandConfig.destroy_if_unused(old_md5)
   end
 

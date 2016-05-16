@@ -132,16 +132,12 @@ class BrandConfigsController < ApplicationController
     old_md5 = @account.brand_config_md5
     new_md5 = session.delete(:brand_config_md5).presence
     new_brand_config = new_md5 && BrandConfig.find(new_md5)
-
-    @account.brand_config = new_brand_config
-    @account.save!
-
-    sub_account_progresses = @account.recompile_descendant_brand_configs(@current_user)
+    regenerator = BrandConfigRegenerator.new(@account, @current_user, new_brand_config)
 
     BrandConfig.destroy_if_unused(old_md5)
 
     render json: {
-      subAccountProgresses: sub_account_progresses.map{|p| progress_json(p, @current_user, session)}
+      subAccountProgresses: regenerator.progresses.map{|p| progress_json(p, @current_user, session)}
     }
   end
 
