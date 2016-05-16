@@ -44,13 +44,17 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_css('.this-should-be-gone')
   def f(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    (scope || driver).find_element :css, selector
+    stale_element_protection do
+      (scope || driver).find_element :css, selector
+    end
   end
 
   # short for find with link
   def fln(link_text, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    (scope || driver).find_element :link, link_text
+    stale_element_protection do
+      (scope || driver).find_element :link, link_text
+    end
   end
 
   # find an element via fake-jquery-css selector
@@ -68,7 +72,9 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     raise 'need to do a get to use find' unless @click_ready
-    keep_trying_until { find_with_jquery selector, scope }
+    stale_element_protection do
+      keep_trying_until { find_with_jquery selector, scope }
+    end
   rescue Selenium::WebDriver::Error::TimeOutError
     raise Selenium::WebDriver::Error::NoSuchElementError
   end
@@ -437,7 +443,44 @@ module CustomSeleniumActions
   ensure
     driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
   end
+
+  def stale_element_protection
+    element = yield
+    element.finder_proc = Proc.new
+    element
+  end
 end
+
+module StaleElementProtection
+  attr_accessor :finder_proc
+
+  (
+    Selenium::WebDriver::Element.instance_methods(false) +
+    Selenium::WebDriver::SearchContext.instance_methods -
+    %i[
+      initialize
+      inspect
+      ==
+      eql?
+      hash
+      ref
+      to_json
+      as_json
+    ]
+  ).each do |method|
+    define_method(method) do |*args|
+      begin
+        super(*args)
+      rescue Selenium::WebDriver::Error::StaleElementReferenceError
+        raise unless finder_proc
+        $stderr.puts "WARNING: StaleElementReferenceError at #{$ERROR_INFO.backtrace.detect{ |l| l !~ /gems|remote server|common_helper_methods/}.sub(Rails.root.to_s + "/", "")}, attempting to recover..."
+        @id = finder_proc.call.ref
+        retry
+      end
+    end
+  end
+end
+Selenium::WebDriver::Element.prepend(StaleElementProtection)
 
 # assert the presence (or absence) of something inside the element via css
 # selector. will return as soon as the expectation is met, e.g.
