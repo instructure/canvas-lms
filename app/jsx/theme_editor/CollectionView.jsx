@@ -180,7 +180,7 @@ define([
                     type="button"
                     className="Button Button--icon-action"
                     data-tooltip='{"tooltipClass":"popover popover-padded", "position":"left"}'
-                    title={I18n.t('Default templates cannot be deleted from this library. Use them as starting points for your own themes by saving them under a new name.')}
+                    title={I18n.t('Default templates are used as starting points for new themes and cannot be deleted.')}
                   >
                     <i className="icon-question" aria-hidden="true" />
                   </button>
