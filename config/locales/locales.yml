@@ -1,55 +1,60 @@
-en:
-  locales:
-    en: English (US)
-  bigeasy_locale: en_US
-es:
-  locales:
-    es: Español
-  bigeasy_locale: es_ES
-de:
-  locales:
-    de: Deutsch
-  bigeasy_locale: de_DE
-ru:
-  locales:
-    ru: pу́сский
-  bigeasy_locale: ru_RU
-fr:
-  locales:
-    fr: Français
-  bigeasy_locale: fr_FR
-pl:
-  locales:
-    pl: Polski
-  bigeasy_locale: pl_PL
-zh-Hans:
-  locales:
-    zh-Hans: 简体中文
-  bigeasy_locale: zh_CN
-  fullcalendar_locale: zh-cn
-  moment_locale: zh-cn
-zh-Hant:
-  locales:
-    zh-Hant: 繁體中文
-  bigeasy_locale: zh_HK
-  fullcalendar_locale: zh-cn
-  moment_locale: zh-tw
 ar:
   locales:
     ar: العربية
   bigeasy_locale: ar_SA
   moment_locale: ar-sa
-pt:
+da:
   locales:
-    pt: Português
-  bigeasy_locale: pt_PT
-pt-BR:
+    da: Dansk
+  bigeasy_locale: da_DK
+de:
   locales:
-    pt-BR: Português do Brasil
+    de: Deutsch
+  bigeasy_locale: de_DE
+en:
+  locales:
+    en: English (US)
+  bigeasy_locale: en_US
+en-AU:
+  locales:
+    en-AU: English (Australia)
+en-GB:
+  locales:
+    en-GB: English (United Kingdom)
+es:
+  locales:
+    es: Español
+  bigeasy_locale: es_ES
+fa:
+  locales:
+    fa: فارسی (crowd-sourced)
+  bigeasy_locale: fa_IR
+  crowdsourced: true
+fr:
+  locales:
+    fr: Français
+  bigeasy_locale: fr_FR
+he:
+  locales:
+    he: עברית (crowd-sourced)
+  bigeasy_locale: he_IL
+  crowdsourced: true
+hy:
+  locales:
+    hy: Հայերեն (crowd-sourced)
+  bigeasy_locale: hy_AM
+  fullcalendar_locale: en
+  moment_locale: hy-am
+  crowdsourced: true
 ja:
   locales:
     ja: 日本語
   bigeasy_locale: ja_JP
+ko:
+  locales:
+    ko: 한국말 (crowd-sourced)
+  bigeasy_locale: ko_KR
+  crowdsourced: true
 mi:
   locales:
     mi: Reo Māori (Aotearoa)
@@ -65,44 +70,39 @@ nb:
   locales:
     nb: Norwegian (Bokmål)
   bigeasy_locale: nb_NO
-ko:
+pl:
   locales:
-    ko: 한국말 (crowd-sourced)
-  bigeasy_locale: ko_KR
-  crowdsourced: true
-en-GB:
+    pl: Polski
+  bigeasy_locale: pl_PL
+pt:
   locales:
-    en-GB: English (United Kingdom)
-en-AU:
+    pt: Português
+  bigeasy_locale: pt_PT
+pt-BR:
   locales:
-    en-AU: English (Australia)
+    pt-BR: Português do Brasil
+ru:
+  locales:
+    ru: pу́сский
+  bigeasy_locale: ru_RU
+sv:
+  locales:
+    sv: Svenska
+  bigeasy_locale: sv_SE
 tr:
   locales:
     tr: Türkçe (crowd-sourced)
   bigeasy_locale: tr_TR
   crowdsourced: true
-fa:
+zh-Hans:
   locales:
-    fa: فارسی (crowd-sourced)
-  bigeasy_locale: fa_IR
-  crowdsourced: true
-da:
+    zh-Hans: 简体中文
+  bigeasy_locale: zh_CN
+  fullcalendar_locale: zh-cn
+  moment_locale: zh-cn
+zh-Hant:
   locales:
-    da: Dansk
-  bigeasy_locale: da_DK
-hy:
-  locales:
-    hy: Հայերեն (crowd-sourced)
-  bigeasy_locale: hy_AM
-  fullcalendar_locale: en
-  moment_locale: hy-am
-  crowdsourced: true
-sv:
-  locales:
-    sv: Svenska
-  bigeasy_locale: sv_SE
-he:
-  locales:
-    he: עברית (crowd-sourced)
-  bigeasy_locale: he_IL
-  crowdsourced: true
+    zh-Hant: 繁體中文
+  bigeasy_locale: zh_HK
+  fullcalendar_locale: zh-cn
+  moment_locale: zh-tw
