@@ -107,7 +107,7 @@ class MediaObject < ActiveRecord::Base
           JSON.parse(entry[:originalId]).with_indifferent_access
         rescue JSON::ParserError
           Rails.logger.error("Failed to parse kaltura partner info: #{entry[:originalId]}")
-          {}
+          Rack::Utils.parse_nested_query(entry[:originalId]).with_indifferent_access
         end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
