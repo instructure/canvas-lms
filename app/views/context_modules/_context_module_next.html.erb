@@ -7,7 +7,7 @@
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
-  idx = 0
+  @idx ||= 0
 %>
 <% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user, @context) do %>
 
@@ -72,8 +72,8 @@
       </span>
 
       <% if show_page_mapper %>
-        <% idx += 1 %>
-        <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>&amp;module_sequence=<%= idx %>">See All Pages</a>
+        <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>&amp;module_sequence=<%= @idx %>">See All Pages</a>
+        <% @idx += 1 %>
       <% end %>
       <% if editable %>
         <span
