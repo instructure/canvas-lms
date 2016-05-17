@@ -14,6 +14,9 @@ define [
   fixed.setSeconds(0)
   fixed.setMilliseconds(0)
 
+  tomorrow = new Date(fixed)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
   module 'initial coupling',
     setup: ->
       @$start = $('<input type="text">')
@@ -61,6 +64,16 @@ define [
     coupleTimeFields(@$start, @$end)
     equal @$end.val(), 'invalid'
     equal @end.invalid, true
+
+  test 'interprets time as occurring on date', ->
+    @$date= $('<input type="text">')
+    @date = new DatetimeField(@$date, dateOnly: true)
+    @date.setDate(tomorrow)
+    @start.setTime(fixed)
+    @end.setTime(fixed)
+    coupleTimeFields(@$start, @$end, @$date)
+    equal @start.datetime.getDate(), tomorrow.getDate()
+    equal @end.datetime.getDate(), tomorrow.getDate()
 
   module 'post coupling',
     setup: ->
@@ -131,3 +144,23 @@ define [
     @end.setTime(new Date(+@start.datetime + 3600000))
     @$end.trigger('blur')
     equal @$start.val(), '7'
+
+  module 'with date field',
+    setup: ->
+      @$start = $('<input type="text">')
+      @$end = $('<input type="text">')
+      @$date= $('<input type="text">')
+      @start = new DatetimeField(@$start, timeOnly: true)
+      @end = new DatetimeField(@$end, timeOnly: true)
+      @date = new DatetimeField(@$date, dateOnly: true)
+      coupleTimeFields(@$start, @$end, @$date)
+ 
+  test 'interprets time as occurring on date', ->
+    @date.setDate(tomorrow)
+    @$date.trigger('blur')
+    @start.setTime(fixed)
+    @start.parseValue()
+    @end.setTime(fixed)
+    @end.parseValue()
+    equal @start.datetime.getDate(), tomorrow.getDate()
+    equal @end.datetime.getDate(), tomorrow.getDate()

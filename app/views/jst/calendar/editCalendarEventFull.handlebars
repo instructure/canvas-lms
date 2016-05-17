@@ -49,7 +49,7 @@
               </label>
               <input type="text"
                      name="start_date"
-                     class="date_field"
+                     class="date_field start_date"
                      value="{{tDateToString start_at "medium"}}"
                      placeholder="{{#t "date"}}Date{{/t}}"
                      aria-labelledby='calendar_event_date_accessible_label'
@@ -64,7 +64,7 @@
               </label>
               <input type="text"
                      name="start_time"
-                     class="time_field"
+                     class="time_field start_time"
                      {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
                      placeholder="{{#t "start_time"}}Start Time{{/t}}"
                      aria-labelledby='calendar_event_start_time_accessible_label'
@@ -80,7 +80,7 @@
               </label>
               <input type="text"
                      name="end_time"
-                     class="time_field"
+                     class="time_field end_time"
                      {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
                      placeholder="{{#t "end_time"}}End Time{{/t}}"
                      aria-labelledby='calendar_event_end_time_accessible_label'
@@ -154,7 +154,7 @@
           <input type="text"
                  id="section_{{id}}_start_date"
                  name="child_event_data[{{id}}][start_date]"
-                 class="date_field"
+                 class="date_field start_date"
                  value="{{tDateToString event.start_at "medium"}}"
                  aria-label="{{#t "date"}}Date{{/t}}"
                  placeholder="{{#t "date"}}Date{{/t}}" />
@@ -162,7 +162,7 @@
         <td>
           <input type="text"
                  name="child_event_data[{{id}}][start_time]"
-                 class="time_field"
+                 class="time_field start_time"
                  {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}}
                  aria-label="{{#t "start_time"}}Start Time{{/t}}"
                  placeholder="{{#t "start_time"}}Start Time{{/t}}" />
@@ -173,7 +173,7 @@
         <td>
           <input type="text"
                  name="child_event_data[{{id}}][end_time]"
-                 class="time_field"
+                 class="time_field end_time"
                  {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}}
                  aria-label="{{#t "end_time"}}End Time{{/t}}"
                  placeholder="{{#t "end_time"}}End Time{{/t}}" />

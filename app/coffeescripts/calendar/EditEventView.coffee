@@ -10,7 +10,8 @@ define [
   'compiled/object/unflatten'
   'compiled/util/deparam'
   'compiled/views/editor/KeyboardShortcuts'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts) ->
+  'compiled/util/coupleTimeFields'
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts, coupleTimeFields) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -73,6 +74,12 @@ define [
 
       @$(".date_field").date_field()
       @$(".time_field").time_field()
+      @$(".date_start_end_row").each (_, row) =>
+        date = $('.start_date', row).first()
+        start = $('.start_time', row).first()
+        end = $('.end_time', row).first()
+        coupleTimeFields(start, end, date)
+
       $textarea = @$('textarea')
       RichContentEditor.initSidebar()
       RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true })
