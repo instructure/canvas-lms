@@ -5,15 +5,20 @@ describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
 
+  before :once do
+    @course = course_model.tap(&:offer!)
+    @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
+    @student = student_in_course(course: @course, name: 'student', active_all: true).user
+  end
+
   context "as a student, with multiple modules", priority: "1" do
-    before(:each) do
+    before :once do
       @locked_icon = 'icon-lock'
       @completed_icon = 'icon-check'
       @in_progress_icon = 'icon-minimize'
       @open_item_icon = 'icon-mark-as-read'
       @no_icon = 'no-icon'
 
-      course_with_student_logged_in
       #initial module setup
       @module_1 = create_context_module('Module One')
       @assignment_1 = @course.assignments.create!(:title => "assignment 1")
@@ -36,6 +41,10 @@ describe "context modules" do
       @module_1.save!
       @module_2.save!
       @module_3.save!
+    end
+
+    before :each do
+      user_session(@student)
     end
 
     it "should validate that course modules show up correctly" do
@@ -232,7 +241,8 @@ describe "context modules" do
 
     it "should allow a student view student to progress through module content" do
       skip_if_chrome('breaks because of masquerade_bar')
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      # course_with_teacher_logged_in(:course => @course, :active_all => true)
+      user_session(@teacher)
       @fake_student = @course.student_view_student
 
       enter_student_view
@@ -272,7 +282,7 @@ describe "context modules" do
       end
 
       def module_setup
-        course_with_teacher_logged_in(:active_all => true)
+
         @module = @course.context_modules.create!(:name => "module")
 
         #create module items
@@ -314,7 +324,11 @@ describe "context modules" do
         @module.add_item :type => 'assignment', :id => @assignment3.id
       end
 
-      before(:each) do
+      before :each do
+        user_session(@teacher)
+      end
+
+      before :once do
         module_setup
       end
 
@@ -458,12 +472,12 @@ describe "context modules" do
         @module_1.save!
       end
 
-      it "should show a pill message that says 'Complete All Items'" do
+      it "should show a pill message that says 'Complete All Items'", priority: "1", test_id: 250296 do
         go_to_modules
         vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
       end
 
-      it "should show a pill message that says 'Complete One Item'" do
+      it "should show a pill message that says 'Complete One Item'", priority: "1", test_id: 250295 do
         make_module_1_complete_one
         go_to_modules
 
@@ -480,7 +494,7 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 
-      it "should show a completed icon when module is complete for 'Complete One Item' requirement" do
+      it "should show a completed icon when module is complete for 'Complete One Item' requirement", priority: "1", test_id: 250542 do
         create_additional_assignment_for_module_1
         make_module_1_complete_one
         go_to_modules
@@ -490,12 +504,12 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 
-      it "should show a locked icon when module is locked" do
+      it "should show a locked icon when module is locked", priority:"1", test_id: 250541 do
         go_to_modules
         validate_context_module_status_icon(@module_2.id, @locked_icon)
       end
 
-      it "should show a warning in-progress icon when module has been started" do
+      it "should show a warning in-progress icon when module has been started", priority: "1", test_id: 250543 do
         create_additional_assignment_for_module_1
         go_to_modules
 
@@ -503,7 +517,7 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @in_progress_icon)
       end
 
-      it "should not show an icon when module has not been started" do
+      it "should not show an icon when module has not been started", priority: "1", test_id: 250540 do
         go_to_modules
         validate_context_module_status_icon(@module_1.id, @no_icon)
       end
@@ -535,18 +549,18 @@ describe "context modules" do
         @assignment_4.grade_student(@user, :grade => score)
       end
 
-      it "should show a completed icon when module item is completed" do
+      it "should show a completed icon when module item is completed", priority: "1", test_id: 250546 do
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
         validate_context_module_item_icon(@tag_1.id, @completed_icon)
       end
 
-      it "should show an incomplete circle icon when module item is requirement but not complete" do
+      it "should show an incomplete circle icon when module item is requirement but not complete", priority: "1", test_id: 250544 do
         go_to_modules
         validate_context_module_item_icon(@tag_1.id, @open_item_icon)
       end
 
-      it "should not show an icon when module item is not a requirement" do
+      it "should not show an icon when module item is not a requirement", priority: "1", test_id: 250545 do
         add_non_requirement
         go_to_modules
         validate_context_module_item_icon(@tag_4.id, @no_icon)
@@ -569,7 +583,7 @@ describe "context modules" do
         validate_context_module_item_icon(tag.id, @open_item_icon)
       end
 
-      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment" do
+      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment", priority: "1", test_id: 250547 do
         add_min_score_assignment
         grade_assignment(50)
         go_to_modules
@@ -616,8 +630,6 @@ describe "context modules" do
   end
 
   it "should fetch locked module prerequisites" do
-    course_with_teacher(:active_all => true)
-    student_in_course(:course => @course, :active_all => true)
     @module = @course.context_modules.create!(:name => "module", :require_sequential_progress => true)
     @assignment = @course.assignments.create!(:title => "assignment")
     @assignment2 = @course.assignments.create!(:title => "assignment2")
@@ -638,8 +650,6 @@ describe "context modules" do
   end
 
   it "should validate that a student can see published and not see unpublished context module", priority: "1", test_id: 126744 do
-    course_with_teacher(active_all: true)
-    student_in_course(course: @course, active_all: true)
     @module = @course.context_modules.create!(name: "module")
     @module_1 = @course.context_modules.create!(name: "module_1")
     @module_1.workflow_state = 'unpublished'
@@ -652,8 +662,6 @@ describe "context modules" do
   end
 
   it "should unlock module after a given date", priority: "1", test_id: 126746 do
-    course_with_teacher(active_all: true)
-    student_in_course(course: @course, active_all: true)
     mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.ago
     user_session(@student)
     go_to_modules
@@ -664,7 +672,6 @@ describe "context modules" do
     # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
     # they just can't be submitted to anymore
 
-    course_with_student_logged_in(:active_all => true)
     mod = @course.context_modules.create!(:name => "module")
 
     asmt = @course.assignments.create!(:title => "assmt", :lock_at => 1.day.ago)
@@ -697,7 +704,7 @@ describe "context modules" do
   end
 
   it "should not lock a page module item on first load" do
-    course_with_student_logged_in(:active_all => true)
+    user_session(@student)
     page = @course.wiki.wiki_pages.create!(:title => "some page", :body => "some body")
     page.set_as_front_page!
 
