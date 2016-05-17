@@ -21,8 +21,9 @@ require "selenium-webdriver"
 require "socket"
 require "timeout"
 require 'coffee-script'
-require File.expand_path(File.dirname(__FILE__) + '/test_setup/custom_selenium_rspec_matchers')
-require File.expand_path(File.dirname(__FILE__) + '/test_setup/selenium_driver_setup')
+require_relative 'test_setup/custom_selenium_rspec_matchers'
+require_relative 'test_setup/selenium_driver_setup'
+require_relative 'test_setup/selenium_extensions'
 
 if ENV["TESTRAIL_RUN_ID"] || ENV["TESTRAIL_ENTRY_RUN_ID"]
   require 'testrailtagging'
@@ -101,6 +102,7 @@ shared_context "in-process server selenium tests" do
 
   prepend_before :each do
     SeleniumDriverSetup.allow_requests!
+    driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
 
   prepend_before :all do

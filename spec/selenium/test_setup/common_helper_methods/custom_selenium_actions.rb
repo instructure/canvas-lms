@@ -13,22 +13,18 @@ module CustomSeleniumActions
   end
 
   def find(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find(css)
   end
 
   def find_all(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find_all(css)
   end
 
   def not_found(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.not_found(css)
   end
 
   def find_radio_button_by_value(value, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     fj("input[type=radio][value=#{value}]", scope)
   end
 
@@ -43,7 +39,6 @@ module CustomSeleniumActions
   #
   #   expect(f('#content')).not_to contain_css('.this-should-be-gone')
   def f(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     stale_element_protection do
       (scope || driver).find_element :css, selector
     end
@@ -51,7 +46,6 @@ module CustomSeleniumActions
 
   # short for find with link
   def fln(link_text, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     stale_element_protection do
       (scope || driver).find_element :link, link_text
     end
@@ -71,7 +65,6 @@ module CustomSeleniumActions
   #
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     stale_element_protection do
       keep_trying_until { find_with_jquery selector, scope }
     end
@@ -84,7 +77,6 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     result = (scope || driver).find_elements :css, selector
     raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
     result
@@ -95,7 +87,6 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     result = nil
     keep_trying_until do
       result = find_all_with_jquery(selector, scope)
@@ -107,12 +98,10 @@ module CustomSeleniumActions
   end
 
   def find_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
   def find_all_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
@@ -450,37 +439,6 @@ module CustomSeleniumActions
     element
   end
 end
-
-module StaleElementProtection
-  attr_accessor :finder_proc
-
-  (
-    Selenium::WebDriver::Element.instance_methods(false) +
-    Selenium::WebDriver::SearchContext.instance_methods -
-    %i[
-      initialize
-      inspect
-      ==
-      eql?
-      hash
-      ref
-      to_json
-      as_json
-    ]
-  ).each do |method|
-    define_method(method) do |*args|
-      begin
-        super(*args)
-      rescue Selenium::WebDriver::Error::StaleElementReferenceError
-        raise unless finder_proc
-        $stderr.puts "WARNING: StaleElementReferenceError at #{$ERROR_INFO.backtrace.detect{ |l| l !~ /gems|remote server|common_helper_methods/}.sub(Rails.root.to_s + "/", "")}, attempting to recover..."
-        @id = finder_proc.call.ref
-        retry
-      end
-    end
-  end
-end
-Selenium::WebDriver::Element.prepend(StaleElementProtection)
 
 # assert the presence (or absence) of something inside the element via css
 # selector. will return as soon as the expectation is met, e.g.

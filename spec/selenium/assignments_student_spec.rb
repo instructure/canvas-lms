@@ -100,7 +100,6 @@ describe "assignments" do
 
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments"
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
@@ -112,7 +111,6 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'locked assignment',
                                                :due_at => 5.days.ago,
                                                :lock_at => 3.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
@@ -124,7 +122,6 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
                                                :unlock_at => 3.days.from_now)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css(".student-assignment-overview")

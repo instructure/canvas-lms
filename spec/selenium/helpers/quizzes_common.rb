@@ -758,7 +758,7 @@ module QuizzesCommon
   end
 
   def verify_quiz_show_page_due_date(due_date)
-    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    open_quiz_show_page
     expect(f('#quiz_show')).to include_text due_date
   end
 
