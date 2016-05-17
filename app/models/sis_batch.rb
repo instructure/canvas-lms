@@ -279,6 +279,7 @@ class SisBatch < ActiveRecord::Base
       current_row += 1
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
+    self.data[:counts][:batch_courses_deleted] = current_row
     current_row
   end
 
@@ -291,13 +292,16 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_non_batch_sections(sections, total_rows, current_row)
+    section_count = 0
     current_row = 0 unless current_row
     # delete sections who weren't in this batch, whose course was in the selected term
     sections.find_each do |section|
       section.destroy
+      section_count += 1
       current_row += 1
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
+    self.data[:counts][:batch_sections_deleted] = section_count
     current_row
   end
 
@@ -310,13 +314,16 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
+    enrollment_count = 0
     current_row = 0 unless current_row
     # delete enrollments for courses that weren't in this batch, in the selected term
     enrollments.find_each do |enrollment|
       enrollment.destroy
+      enrollment_count += 1
       current_row += 1
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
+    self.data[:counts][:batch_enrollments_deleted] = enrollment_count
   end
 
   def remove_previous_imports

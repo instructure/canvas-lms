@@ -91,6 +91,21 @@
 #         "grade_publishing_results": {
 #           "example": 0,
 #           "type": "integer"
+#         },
+#         "batch_courses_deleted": {
+#           "description": "the number of courses that were removed because they were not included in the batch for batch_mode imports. Only included if courses were deleted",
+#           "example": 11,
+#           "type": "integer"
+#         },
+#         "batch_sections_deleted": {
+#           "description": "the number of sections that were removed because they were not included in the batch for batch_mode imports. Only included if sections were deleted",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "batch_enrollments_deleted": {
+#           "description": "the number of enrollments that were removed because they were not included in the batch for batch_mode imports. Only included if enrollments were deleted",
+#           "example": 150,
+#           "type": "integer"
 #         }
 #       }
 #     }
