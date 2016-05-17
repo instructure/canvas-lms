@@ -423,10 +423,15 @@ class ExternalToolsController < ApplicationController
         selected_html: params[:selection]
     }
     opts = default_opts.merge(opts)
-    assignment = selection_type == 'homework_submission' && @context.assignments.active.find(params[:assignment_id])
+
+    assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
 
     adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignment: assignment, tool: tool), opts)
-    lti_launch.params = assignment ? adapter.generate_post_payload_for_homework_submission(assignment) : adapter.generate_post_payload
+    lti_launch.params = if selection_type == 'homework_submission' && assignment
+                          adapter.generate_post_payload_for_homework_submission(assignment)
+                        else
+                          adapter.generate_post_payload
+                        end
 
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
