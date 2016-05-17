@@ -83,3 +83,7 @@ function bzRetainedInfoSetup() {
   }
 }
 
+if(window != window.top) {
+  // we are in an iframe... strip off magic
+  document.getElementsByTagName("html")[0].className += " bz-in-iframe";
+}
