@@ -442,13 +442,13 @@ define([
                       <div className="Theme__editor-upload-overrides">
 
                         <div className="Theme__editor-upload-overrides_header">
-                          { I18n.t('File(s) will be included when user content is displayed within Canvas iOS or Android apps.') }
+                          { I18n.t('File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.') }
                         </div>
 
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Mobile CSS file')}
+                            label={I18n.t('Mobile app CSS file')}
                             accept=".css"
                             name="mobile_css_overrides"
                             currentValue={this.props.brandConfig.mobile_css_overrides}
@@ -457,7 +457,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Mobile JavaScript file')}
+                            label={I18n.t('Mobile app JavaScript file')}
                             accept=".js"
                             name="mobile_js_overrides"
                             currentValue={this.props.brandConfig.mobile_js_overrides}

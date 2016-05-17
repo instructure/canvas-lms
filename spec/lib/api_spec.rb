@@ -659,22 +659,39 @@ describe Api do
       expect(res).to eq html
     end
 
-    it 'prepends mobile css' do
-      student_in_course
-      account = @course.root_account
-      account.enable_feature!(:use_new_styles)
-      bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
-      account.brand_config_md5 = bc.md5
-      account.save!
+    context "mobile css/js" do
+      before(:each) do
+        student_in_course
+        account = @course.root_account
+        account.enable_feature!(:use_new_styles)
+        bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
+        account.brand_config_md5 = bc.md5
+        account.save!
 
-      html = "<p>a</p><p>b</p>"
+        @html = "<p>a</p><p>b</p>"
 
-      k = klass.new
-      k.stubs(:mobile_device?).returns(true)
-      res = k.api_user_content(html, @course, @student)
-      expect(res).to eq <<-HTML.strip
-<link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
-      HTML
+        @k = klass.new
+      end
+
+      it 'prepends mobile css when not coming from a web browser' do
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq <<-HTML.strip
+  <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+        HTML
+      end
+
+      it 'does not prepend mobile css when coming from a web browser' do
+        @k.stubs(:in_app?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
+
+      it 'does not prepend mobile css when coming from a web browser, even if it is a mobile browser' do
+        @k.stubs(:in_app?).returns(true)
+        @k.stubs(:mobile_device?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
     end
   end
 
