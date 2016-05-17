@@ -56,11 +56,12 @@ class KalturaMediaFileHandler
       partner_data[:context_code] = [attachment.context_type, attachment.context_id].join("_").underscore
     end
 
-    partner_data.merge({
+    partner_data.merge!({
       attachment_id: attachment.id.to_s,
       context_source: "file_upload",
       root_account_id: Shard.global_id_for(attachment.root_account_id).to_s,
-    }).to_json
+    })
+    Rack::Utils.build_nested_query(partner_data)
   end
 
   def handle_bulk_upload_response(res, client, wait_for_completion, attachments, root_account_id)
