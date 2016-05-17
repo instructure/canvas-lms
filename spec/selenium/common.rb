@@ -58,7 +58,6 @@ end
 
 shared_context "in-process server selenium tests" do
   include SeleniumDriverSetup
-  include CustomSeleniumRspecMatchers
   include OtherHelperMethods
   include CustomSeleniumActions
   include CustomAlertActions

@@ -66,7 +66,7 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     stale_element_protection do
-      keep_trying_until { find_with_jquery selector, scope }
+      wait_for(method: :fj) { find_with_jquery selector, scope }
     end
   rescue Selenium::WebDriver::Error::TimeOutError
     raise Selenium::WebDriver::Error::NoSuchElementError
@@ -88,7 +88,7 @@ module CustomSeleniumActions
   # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
     result = nil
-    keep_trying_until do
+    wait_for(method: :ffj) do
       result = find_all_with_jquery(selector, scope)
       result.present?
     end
@@ -426,111 +426,9 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
-  def disable_implicit_wait
-    driver.manage.timeouts.implicit_wait = 0
-    yield
-  ensure
-    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
-  end
-
   def stale_element_protection
     element = yield
     element.finder_proc = Proc.new
     element
-  end
-end
-
-# assert the presence (or absence) of something inside the element via css
-# selector. will return as soon as the expectation is met, e.g.
-#
-#   expect(f('#courses')).to contain_css("#course_123")
-#   f('#delete_course').click
-#   expect(f('#courses')).not_to contain_css("#course_123")
-#
-RSpec::Matchers.define :contain_css do |selector|
-  match do |element|
-    begin
-      # rely on implicit_wait
-      f(selector, element)
-      true
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      false
-    end
-  end
-
-  match_when_negated do |element|
-    disable_implicit_wait do # so find_element calls return ASAP
-      begin
-        keep_trying_until do
-          begin
-            f(selector, element)
-            false
-          rescue Selenium::WebDriver::Error::NoSuchElementError
-            true
-          end
-        end
-      rescue Selenium::WebDriver::Error::TimeOutError
-        false
-      end
-    end
-  end
-end
-
-# assert the presence (or absence) of something inside the element via
-# fake-jquery-css selector. will return as soon as the expectation is met,
-# e.g.
-#
-#   expect(f('#weird-ui')).to contain_css(".something:visible")
-#   f('#hide-things').click
-#   expect(f('#weird-ui')).not_to contain_css(".something:visible")
-#
-RSpec::Matchers.define :contain_jqcss do |selector|
-  match do |element|
-    begin
-      keep_trying_until { find_with_jquery(selector, element) }
-      true
-    rescue Selenium::WebDriver::Error::TimeOutError
-      false
-    end
-  end
-
-  match_when_negated do |element|
-    begin
-      keep_trying_until { !find_with_jquery(selector, element) }
-    rescue Selenium::WebDriver::Error::TimeOutError
-      false
-    end
-  end
-end
-
-# assert the presence (or absence) of a link with certain text inside the
-# element. will return as soon as the expectation is met, e.g.
-#
-#   expect(f('#weird-ui')).to contain_link("Click Here")
-#   f('#hide-things').click
-#   expect(f('#weird-ui')).not_to contain_link("Click Here")
-#
-RSpec::Matchers.define :contain_link do |text|
-  match do |element|
-    begin
-      # rely on implicit_wait
-      fln(text, element)
-      true
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      false
-    end
-  end
-
-  match_when_negated do |element|
-    disable_implicit_wait do # so find_element calls return ASAP
-      keep_trying_until do
-        begin
-          fln(text, element)
-          false
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          true
-        end
-      end
-    end
   end
 end

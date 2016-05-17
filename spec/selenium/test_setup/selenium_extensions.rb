@@ -1,3 +1,5 @@
+require_relative "../../support/call_stack_utils"
+
 module SeleniumExtensions
   module StaleElementProtection
     attr_accessor :finder_proc
@@ -21,7 +23,8 @@ module SeleniumExtensions
           super(*args)
         rescue Selenium::WebDriver::Error::StaleElementReferenceError
           raise unless finder_proc
-          $stderr.puts "WARNING: StaleElementReferenceError at #{$ERROR_INFO.backtrace.detect{ |l| l !~ /gems|remote server|common_helper_methods/}.sub(Rails.root.to_s + "/", "")}, attempting to recover..."
+          location = CallStackUtils.best_line_for($ERROR_INFO.backtrace, /test_helper/)
+          $stderr.puts "WARNING: StaleElementReferenceError at #{location}, attempting to recover..."
           @id = finder_proc.call.ref
           retry
         end
@@ -56,7 +59,6 @@ module SeleniumExtensions
     end
   end
 end
-
 
 Selenium::WebDriver::Element.prepend(SeleniumExtensions::StaleElementProtection)
 Selenium::WebDriver::Driver.prepend(SeleniumExtensions::PreventEarlyInteraction)

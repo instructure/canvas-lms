@@ -118,21 +118,15 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
-    @__in_keep_trying_until = true
-    frd_error = nil
-    Selenium::WebDriver::Wait.new(timeout: seconds).until do
+    frd_error = Selenium::WebDriver::Error::TimeOutError
+    wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
-        frd_error = nil
         yield
       rescue StandardError, RSpec::Expectations::ExpectationNotMetError
         frd_error = $ERROR_INFO
         nil
       end
-    end
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise frd_error || $ERROR_INFO
-  ensure
-    @__in_keep_trying_until = false
+    end or raise frd_error
   end
 
   # pass in an Element pointing to the textarea that is tinified.
@@ -149,5 +143,35 @@ module CustomWaitMethods
       end
     }
     tiny_frame
+  end
+
+  def disable_implicit_wait
+    driver.manage.timeouts.implicit_wait = 0
+    yield
+  ensure
+    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
+  end
+
+  # little wrapper around Selenium::WebDriver::Wait, notably it:
+  # * is less verbose
+  # * returns false (rather than raising) if the block never returns true
+  # * doesn't rescue :allthethings: like keep_trying_until
+  def wait_for(timeout: SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT, method: nil, ignore: nil)
+    # TODO: method will be used for the error message once we start
+    # detecting/preventing nested waiting
+    Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
+      yield
+    end
+  rescue Selenium::WebDriver::Error::TimeOutError
+    false
+  end
+
+  def wait_for_no_such_element(method: nil)
+    wait_for(method: method, ignore: []) do
+      yield
+      false
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    true
   end
 end
