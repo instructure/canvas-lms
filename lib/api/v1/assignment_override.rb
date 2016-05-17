@@ -42,7 +42,7 @@ module Api::V1::AssignmentOverride
   end
 
   def assignment_overrides_json(overrides, user = nil)
-    visible_users_ids = AssignmentOverride.visible_users_for(overrides, user).map(&:id)
+    visible_users_ids = ::AssignmentOverride.visible_users_for(overrides, user).map(&:id)
     overrides.map{ |override| assignment_override_json(override, visible_users_ids) }
   end
 
