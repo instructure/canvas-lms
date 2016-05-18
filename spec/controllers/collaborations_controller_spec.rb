@@ -24,6 +24,8 @@ describe CollaborationsController do
     plugin_setting.save!
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
+
+    group_model(:context => @course)
   end
 
   describe "GET 'index'" do
@@ -114,11 +116,17 @@ describe CollaborationsController do
 
   end
   describe "GET 'lti_index" do
-    it "should require authorization" do
+    it "should require authorization for the course" do
       get 'lti_index', :course_id => @course.id
       assert_unauthorized
     end
+
+    it "should require authorization for the group" do
+      get 'lti_index', :group_id => @group.id
+      assert_unauthorized
+    end
   end
+
 
   describe "GET 'show'" do
     let(:collaboration) do

@@ -498,6 +498,7 @@ CanvasRails::Application.routes.draw do
     concerns :media
 
     resources :collaborations
+    get 'lti_collaborations' => 'collaborations#lti_index'
     get 'calendar' => 'calendars#show2', as: :old_calendar
 
     resources :external_tools do
