@@ -207,7 +207,10 @@ module Api
 
   def self.relation_for_sis_mapping(relation, sis_mapping, ids, sis_root_account, current_user = nil)
     relation_for_sis_mapping_and_columns(relation,
-                                         sis_parse_ids(ids, sis_mapping[:lookups], current_user),
+                                         sis_parse_ids(ids,
+                                                       sis_mapping[:lookups],
+                                                       current_user,
+                                                       root_account: sis_root_account),
                                          sis_mapping,
                                          sis_root_account)
   end

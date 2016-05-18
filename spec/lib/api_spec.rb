@@ -483,7 +483,7 @@ describe Api do
   context 'relation_for_sis_mapping' do
     it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
-      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything).returns({"users.id" => [4,5,6]})
+      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything, root_account: root_account).returns({"users.id" => [4,5,6]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(User, {"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).returns("params")
       expect(Api.relation_for_sis_mapping(User, {:lookups => "lookups"}, [1,2,3], root_account)).to eq "params"
     end
