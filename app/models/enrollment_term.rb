@@ -34,7 +34,7 @@ class EnrollmentTerm < ActiveRecord::Base
   validate :check_if_deletable
 
   before_validation :verify_unique_sis_source_id
-  before_save :update_courses_later_if_necessary
+  after_save :update_courses_later_if_necessary
   before_update :destroy_orphaned_grading_period_group
 
   include StickySisFields
@@ -51,7 +51,9 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def update_courses_later_if_necessary
-    self.update_courses_later if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+    if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
+      self.update_courses_and_states_later
+    end
   end
 
   # specifically for use in specs
@@ -60,13 +62,16 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def touch_all_courses
-    return if new_record?
     self.courses.touch_all
   end
 
-  def update_courses_later
+  def update_courses_and_states_later(enrollment_type=nil)
+    return if new_record?
+
     self.send_later_if_production(:touch_all_courses) unless @touched_courses
     @touched_courses = true
+
+    EnrollmentState.send_later_if_production(:invalidate_states_for_term, self, enrollment_type)
   end
 
   def self.i18n_default_term_name

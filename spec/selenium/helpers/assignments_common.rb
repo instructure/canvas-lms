@@ -135,7 +135,7 @@ module AssignmentsCommon
     # 2 course sections, student in second section.
     @section1 = @course.course_sections.create!(:name => 'Section A')
     @section2 = @course.course_sections.create!(:name => 'Section B')
-    @course.student_enrollments.scope.delete_all # get rid of existing student enrollments, mess up section enrollment
+    @course.student_enrollments.each(&:destroy_permanently!) # get rid of existing student enrollments, mess up section enrollment
     # Overridden lock dates for 2nd section - different dates, but still in future
     @override = assignment_override_model(
       :assignment => @assignment,

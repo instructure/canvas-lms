@@ -221,7 +221,6 @@ class Account < ActiveRecord::Base
   end
 
   def settings=(hash)
-    @invalidate_settings_cache = true
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
@@ -409,7 +408,10 @@ class Account < ActiveRecord::Base
 
   def settings
     result = self.read_attribute(:settings)
-    return result if result
+    if result
+      @old_settings ||= result.dup
+      return result
+    end
     return write_attribute(:settings, {}) unless frozen?
     {}.freeze
   end
@@ -544,7 +546,12 @@ class Account < ActiveRecord::Base
 
   def invalidate_caches_if_changed
     @invalidations ||= []
-    @invalidations += Account.inheritable_settings if @invalidate_settings_cache
+    if @old_settings
+      Account.inheritable_settings.each do |key|
+        @invalidations << key if @old_settings[key] != settings[key] # only invalidate if needed
+      end
+      @old_settings = nil
+    end
     if @invalidations.present?
       shard.activate do
         @invalidations.each do |key|
@@ -563,6 +570,11 @@ class Account < ActiveRecord::Base
         keys.each do |key|
           Rails.cache.delete([key, global_id].cache_key)
         end
+      end
+
+      access_keys = keys & [:restrict_student_future_view, :restrict_student_past_view]
+      if access_keys.any?
+        EnrollmentState.invalidate_access_for_accounts([parent_account.id] + account_ids, access_keys)
       end
     end
   end

@@ -47,9 +47,9 @@ describe "account" do
     it "should be able to create a new course when no other courses exist" do
       Account.default.courses.each do |c|
         c.course_account_associations.scope.delete_all
-        c.enrollments.scope.delete_all
+        c.enrollments.each(&:destroy_permanently!)
         c.course_sections.scope.delete_all
-        c.destroy_permanently!
+        c.reload.destroy_permanently!
       end
 
       get "/accounts/#{Account.default.to_param}"

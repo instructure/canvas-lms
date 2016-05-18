@@ -232,7 +232,7 @@ describe AssignmentGroupsController, type: :request do
     it "should only return visible assignments when differentiated assignments is on" do
       setup_groups
       setup_four_assignments(only_visible_to_overrides: true)
-      @user.enrollments.each(&:delete)
+      @user.enrollments.each(&:destroy_permanently!)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @user)
       # make a1 and a3 visible

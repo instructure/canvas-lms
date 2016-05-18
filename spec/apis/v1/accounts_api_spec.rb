@@ -483,7 +483,7 @@ describe "Accounts API", type: :request do
       Time.use_zone(@user.time_zone) do
         @me = @user
         @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
-        @c1.enrollments.delete_all
+        @c1.enrollments.each(&:destroy_permanently!)
         @c2 = course_model(:name => 'c2', :account => @a2, :root_account => @a1, :sis_source_id => 'sis2')
         @c2.course_sections.create!
         @c2.course_sections.create!
