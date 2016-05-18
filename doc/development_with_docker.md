@@ -191,6 +191,15 @@ $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 Changes you're making are not showing up? See the Caveats section below.
 Ctrl-C your `docker-compose up` window and restart.
 
+## Debugging
+
+By default, you won't be able to interact with a debugger using this setup. if
+you need to debug, stop your `docker-compose up` and instead run:
+
+```
+$ docker-compose run -e VIRTUAL_PORT=3000 --rm --service-ports web bundle exec rails server --bind 0.0.0.0
+```
+
 ## Cassandra
 
 If you're using the analytics package, you'll also need Cassandra. The
