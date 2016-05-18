@@ -126,7 +126,7 @@ END
 This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'on' : 'allowed',
       root_opt_in: true
     },
     'epub_export' =>
