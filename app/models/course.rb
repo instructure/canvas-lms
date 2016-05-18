@@ -2294,7 +2294,7 @@ class Course < ActiveRecord::Base
         :id => TAB_COLLABORATIONS_NEW,
         :label => t('#tabs.collaborations', "Collaborations"),
         :css_class => 'collaborations',
-        :href => :course_collaborations_path # change to :course_lti_collaborations_path after merge of PLAT-1552
+        :href => :course_lti_collaborations_path
       }, {
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),

@@ -338,6 +338,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :collaborations
+    get 'lti_collaborations' => 'collaborations#lti_index'
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do

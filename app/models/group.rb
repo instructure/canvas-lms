@@ -643,8 +643,7 @@ class Group < ActiveRecord::Base
     if user && self.grants_right?(user, :read)
       available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path }
       available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path }
-      # change below href to :group_lti_collaborations_path after PLAT-1552 is merged
-      available_tabs << { :id => TAB_COLLABORATIONS_NEW, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path }
+      available_tabs << { :id => TAB_COLLABORATIONS_NEW, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :course_lti_collaborations_path }
     end
 
     if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, :manage)

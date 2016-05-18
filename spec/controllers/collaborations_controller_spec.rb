@@ -113,6 +113,12 @@ describe CollaborationsController do
     end
 
   end
+  describe "GET 'lti_index" do
+    it "should require authorization" do
+      get 'lti_index', :course_id => @course.id
+      assert_unauthorized
+    end
+  end
 
   describe "GET 'show'" do
     let(:collaboration) do
