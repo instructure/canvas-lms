@@ -1453,9 +1453,9 @@ CanvasRails::Application.routes.draw do
       delete "users/self/favorites/courses/:id", action: :remove_favorite_course, as: :remove_favorite_course
       delete "users/self/favorites/courses", action: :reset_course_favorites
       get "users/self/favorites/groups", action: :list_favorite_groups, as: :list_favorite_groups
-      post "users/self/favorites/groups/:id", action: :add_favorite_groups, as: :add_favorite_groups
-      delete "users/self/favorites/groups/:id", action: :remove_favorite_groups, as: :remove_favorite_groups
-      delete "users/self/favorites/groups", action: :reset_groups_favorites
+      post "users/self/favorites/groups/:id", action: :add_favorite_group, as: :add_favorite_group
+      delete "users/self/favorites/groups/:id", action: :remove_favorite_group, as: :remove_favorite_group
+      delete "users/self/favorites/groups", action: :reset_group_favorites
     end
 
     scope(controller: :wiki_pages_api) do

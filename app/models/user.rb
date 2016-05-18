@@ -1666,7 +1666,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = self.shard.activate do
-        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment2', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
+        result = Rails.cache.fetch([self, 'courses_with_primary_enrollment3', association, options, ApplicationController.region].cache_key, :expires_in => 15.minutes) do
 
           # Set the actual association based on if its asking for favorite courses or not.
           actual_association = association == :favorite_courses ? :current_and_invited_courses : association
@@ -1675,12 +1675,9 @@ class User < ActiveRecord::Base
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
-            ids = self.favorite_context_ids("Course")
-            if ids.empty?
-              scope = scope.none
-            else
-              shards = shards & ids.map { |id| Shard.shard_for(id) }
-              scope = scope.where(id: ids)
+            ids = self.hidden_context_ids("Course")
+            unless ids.empty?
+              scope = scope.where.not(id: ids)
             end
           end
 
@@ -2442,24 +2439,26 @@ class User < ActiveRecord::Base
     }
   end
 
-  # Public: Returns a unique list of favorite context type ids relative to the active shard.
+  # Public: Returns a unique list of the ids of contexts of the specified type
+  # that this user has hidden with Favorite.set_favorite(u, c, false). IDs
+  # will be given relative to the active shard.
   #
   # Examples
   #
-  #   favorite_context_ids("Course")
+  #   hidden_context_ids("Course")
   #   # => [1, 2, 3, 4]
   #
-  # Returns an array of unique global ids.
-  def favorite_context_ids(context_type)
-    @favorite_context_ids ||= {}
+  # Returns an array of unique relative ids.
+  def hidden_context_ids(context_type)
+    @hidden_context_ids ||= {}
 
-    context_ids = @favorite_context_ids[context_type]
+    context_ids = @hidden_context_ids[context_type]
     unless context_ids
       # Only get the users favorites from their shard.
       self.shard.activate do
         # Get favorites and map them to their global ids.
-        context_ids = self.favorites.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
-        @favorite_context_ids[context_type] = context_ids
+        context_ids = self.favorites.hidden.where(context_type: context_type).pluck(:context_id).map { |id| Shard.global_id_for(id) }
+        @hidden_context_ids[context_type] = context_ids
       end
     end
 
@@ -2472,12 +2471,7 @@ class User < ActiveRecord::Base
   def menu_courses(enrollment_uuid = nil)
     return @menu_courses if @menu_courses
 
-    favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
-    if favorites.length > 0
-      @menu_courses = favorites
-    else
-      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
-    end
+    @menu_courses = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid).first(12)
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
