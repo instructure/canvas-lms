@@ -208,8 +208,8 @@ describe "assignments" do
           replace_content(f("#ag_#{group.id}_assignment_due_at"), due_at)
           replace_content(f("#ag_#{group.id}_assignment_points"), points)
           expect_new_page_load { f('.more_options').click }
-          expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
-          expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
+          expect(f('#assignment_name').attribute(:value)).to include(expected_text)
+          expect(f('#assignment_points_possible').attribute(:value)).to include(points)
           due_at_field = fj(".date_field:first[data-date-type='due_at']")
           expect(due_at_field.attribute(:value)).to eq due_at
           click_option('#assignment_submission_type', 'No Submission')

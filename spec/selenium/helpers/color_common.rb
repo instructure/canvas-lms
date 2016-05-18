@@ -5,7 +5,7 @@ module ColorCommon
     # handle styling wih hex and rbg
     color_text_field_array.each_with_index do |x, index|
       if !color_box_array[index].attribute(:style).include?('rgb')
-        expect(color_box_array[index].attribute(:style)).to include_text(x.attribute(:placeholder))
+        expect(color_box_array[index].attribute(:style)).to include(x.attribute(:placeholder))
       else
         # convert to rgb
         hex = x.attribute(:placeholder)[1..-1]
