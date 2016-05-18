@@ -492,6 +492,17 @@ describe Course do
       end
     end
 
+    context "as a 'student view' student" do
+      it "should grant read rights for unpublished courses" do
+        course
+        test_student = @course.student_view_student
+
+        expect(@course.grants_right?(test_student, :read)).to be_truthy
+        expect(@course.grants_right?(test_student, :read_grades)).to be_truthy
+        expect(@course.grants_right?(test_student, :read_forum)).to be_truthy
+      end
+    end
+
     context "as a student" do
       let_once :c do
         course_with_student(:active_user => 1)
@@ -3309,7 +3320,7 @@ describe Course, "section_visibility" do
       @admin = account_admin_user
 
       @course.enroll_user(@admin, "ObserverEnrollment")
-      
+
       visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
