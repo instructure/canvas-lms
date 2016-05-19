@@ -134,7 +134,10 @@
 #           "type": "array",
 #           "items": { "type": "boolean" }
 #         },
-#         "created_source": "manual|sis|api"
+#         "created_source": {
+#           "example": "manual|sis|api",
+#           "type": "string"
+#         }
 #       }
 #     }
 #
