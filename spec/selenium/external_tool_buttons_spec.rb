@@ -47,18 +47,6 @@ describe "external tool buttons" do
     expect(f("body")).not_to contain_jqcss("#external_tool_button_dialog:visible")
   end
 
-  it "should work with groups" do
-    group(:context => @course)
-    load_selection_test_tool("#oembed_link", @group)
-
-    expect(editor_html).to match(/ZB8T0193/)
-  end
-
-  it "should allow inserting oembed content from external tool buttons" do
-    load_selection_test_tool("#oembed_link")
-    expect(editor_html).to match(/ZB8T0193/)
-  end
-
   it "should allow inserting basic lti links from external tool buttons" do
     load_selection_test_tool("#basic_lti_link")
     html = editor_html
