@@ -455,6 +455,38 @@ describe "Pages API", type: :request do
         expect(page.body).to eq 'hello front page'
       end
 
+      it "should error when creating a front page using PUT with no value in title", priority: "3", test_id: 126814 do
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                        { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => '', :body => 'hello front page' }},
+                        {}, {:expected_status => 400})
+        error = json["errors"].first
+        # As error is represented as array of arrays
+        expect(error[0]).to eq('title')
+        expect(error[1][0]["message"]).to eq("Title can't be blank")
+      end
+
+      it "should create front page with published set to true using PUT", priority: "3", test_id: 126821 do
+        front_page_url = 'new-wiki-front-page'
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                        { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => 'New Wiki Front Page!', :published => true}})
+        expect(json['url']).to eq front_page_url
+        page = @course.wiki.wiki_pages.where(url: front_page_url).first!
+        expect(page.published?).to eq(true)
+      end
+
+      it "should error when creating  front page with published set to false using PUT", priority: "3", test_id: 126822 do
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                        { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => 'New Wiki Front Page!', :published => false}},
+                        {}, {:expected_status => 400})
+        error = json["errors"].first
+        # As error is represented as array of arrays
+        expect(error[0]).to eq('published')
+        expect(error[1][0]["message"]).to eq("The front page cannot be unpublished")
+      end
+
       it 'should process body with process_incoming_html_content' do
         WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
 
@@ -600,7 +632,7 @@ describe "Pages API", type: :request do
         expect(page.title).to eq new_title
       end
 
-      it "should set as front page" do
+      it "should set as front page", priority:"3", test_id: 126813 do
         wiki = @course.wiki
         expect(wiki.unset_front_page!).to eq true
 
