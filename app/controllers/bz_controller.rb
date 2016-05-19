@@ -64,12 +64,12 @@ class BzController < ApplicationController
     if module_sequence.nil?
       # view the entire course
       items = []
-      Course.find(@course_id.to_i).context_modules.each do |ms|
+      Course.find(@course_id.to_i).context_modules.not_deleted.each do |ms|
         items += ms.content_tags_visible_to(@current_user)
       end
     else
       # view just one module inside a course
-      items = Course.find(@course_id.to_i).context_modules[module_sequence.to_i].content_tags_visible_to(@current_user)
+      items = Course.find(@course_id.to_i).context_modules.not_deleted[module_sequence.to_i].content_tags_visible_to(@current_user)
     end
     @pages = []
     items.each do |item|
