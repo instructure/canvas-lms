@@ -246,11 +246,14 @@ describe "dashboard" do
 
         get "/"
 
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        expect(fj('#courses_menu_item')).to include_text('My Courses')
-        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_courses_link').click
+          expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
+        else
+          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
+          expect(fj('#courses_menu_item')).to include_text('My Courses')
+          expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+        end
       end
     end
   end

@@ -78,11 +78,23 @@ module LoginAndSessionMethods
     end
     get "/login"
     expect_new_page_load { fill_in_login_form(username, password) }
-    expect(driver.current_url).to include("login_success=1")
+    expect_logout_link_present
   end
 
   def masquerade_as(user)
     get "/users/#{user.id}/masquerade"
     f('.masquerade_button').click
+  end
+
+
+  def expect_logout_link_present
+    logout_element = if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#global_nav_profile_link').click
+      fj('.ReactTray-profile-header-logout-form button:contains("Logout")')
+    else
+      f('#identity .logout')
+    end
+    expect(logout_element).to be_present
+    logout_element
   end
 end

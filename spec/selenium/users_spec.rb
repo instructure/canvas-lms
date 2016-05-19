@@ -157,7 +157,7 @@ describe "users" do
       wait_for_ajaximations
       expect_new_page_load { f('.button-secondary').click }
       wait_for_ajaximations
-      expect(f('#courses_menu_item')).to be_displayed
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to be_displayed
       expect(@student_1.workflow_state).to eq 'registered'
       expect(@student_2.workflow_state).to eq 'registered'
     end
@@ -255,7 +255,7 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
       expect(User.last.initial_enrollment_type).to eq 'student'
     end
 
@@ -280,7 +280,7 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 
@@ -299,7 +299,8 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
+
       expect(User.last.initial_enrollment_type).to eq 'observer'
     end
   end
@@ -310,13 +311,24 @@ describe "users" do
       user_with_pseudonym(:active_user => true, :name => 'The Student')
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
-      wait_for_ajaximations
-      expect(f('#identity .user_name')).to include_text 'The Student'
+
+      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        f('#global_nav_profile_link').click
+        expect(f('#global_nav_profile_display_name')).to include_text 'The Student'
+      else
+        expect(f('#identity .user_name')).to include_text 'The Student'
+      end
+
       bar = f('#masquerade_bar')
       expect(bar).to include_text 'You are currently masquerading'
       bar.find_element(:css, '.stop_masquerading').click
-      wait_for_ajaximations
-      expect(f('#identity .user_name')).to include_text 'The Admin'
+
+      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        f('#global_nav_profile_link').click
+        expect(f('#global_nav_profile_display_name')).to include_text 'The Admin'
+      else
+        expect(f('#identity .user_name')).to include_text 'The Admin'
+      end
     end
   end
 end

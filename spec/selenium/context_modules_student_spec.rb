@@ -277,8 +277,8 @@ describe "context modules" do
 
       def verify_next_and_previous_buttons_display
         wait_for_ajaximations
-        expect(f('.module-sequence-footer a.pull-left')).to be_displayed
-        expect(f('.module-sequence-footer a.pull-right')).to be_displayed
+        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')).to be_displayed
+        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')).to be_displayed
       end
 
       def module_setup

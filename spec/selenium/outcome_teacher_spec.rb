@@ -141,12 +141,9 @@ describe "outcomes as a teacher" do
       outcome = outcome_model
       group = outcome_group_model
       get outcome_url
-      wait_for_ajaximations
       f('.outcomes-sidebar .outcome-link').click
-      wait_for_ajaximations
 
       f(".move_button").click()
-      wait_for_ajaximations
 
       # should show modal tree
       expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move first new outcome?"
@@ -154,21 +151,18 @@ describe "outcomes as a teacher" do
 
       # move the outcome
       f('.treeLabel').click
-      wait_for_ajaximations
       ff('[role=treeitem] a span')[1].click
-      wait_for_ajaximations
       f('.form-controls .btn-primary').click
-      wait_for_ajaximations
 
       keep_trying_until do
-        message = f('.ic-flash-success').text
+        message = fj('.ic-flash-success:last').text
         expect(message).to include "Successfully moved #{outcome.title} to #{group.title}"
       end
 
 
+      scroll_page_to_top
       # check for proper updates in outcome group columns on page
-      fj('.outcomes-sidebar .outcome-level:first li').click
-      wait_for_ajaximations
+      fj('.outcomes-sidebar .outcome-level:first a').click
       expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
       expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
 
@@ -177,16 +171,13 @@ describe "outcomes as a teacher" do
 
       #confirm that error appears if moving into parent group it already belongs to
       f('.outcomes-sidebar .outcome-link').click
-      wait_for_ajaximations
       f(".move_button").click()
-      wait_for_ajaximations
 
       f('.treeLabel').click
       wait_for_ajaximations
 
       ff('[role=treeitem] a span')[1].click
       f('.form-controls .btn-primary').click
-      wait_for_ajaximations
 
       expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"
     end

@@ -12,7 +12,7 @@ describe "communication channel selenium tests" do
       expect_new_page_load {
         f('#registration_confirmation_form').submit
       }
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
     end
 
     it "should require the terms if configured to do so" do
@@ -49,7 +49,7 @@ describe "communication channel selenium tests" do
         f('#registration_confirmation_form').submit
       }
 
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
     end
 
     it 'should show the bounce count reset button when a siteadmin is masquerading' do
