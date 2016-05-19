@@ -113,25 +113,6 @@ describe "gradebook2 - concluded courses and enrollments" do
 
       expect(ff('.student-name').count).to eq @course.students.count
     end
-
-    it "should not throw an error when setting the default grade when concluded enrollments exist" do
-      skip("bug 7413 - Error assigning default grade when one student's enrollment has been concluded.")
-      conclude_and_unconclude_course
-      3.times { student_in_course }
-
-      get "/courses/#{@course.id}/gradebook2"
-
-
-      # TODO: when show concluded enrollments fix goes in we probably have to add that code right here
-      # for the test to work correctly
-
-      set_default_grade(2, 5)
-      grade_grid = f('#gradebook_grid')
-      @course.student_enrollments.each_with_index do |e, n|
-        next if e.completed?
-        expect(find_slick_cells(n, grade_grid)[2].text).to eq 5
-      end
-    end
   end
 
   context "concluded course" do

@@ -41,34 +41,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       expect(ff('.img', @image_list)).to have_size(2)
     end
 
-    it "adds a tabindex to flickr search results" do
-      skip "flickr outage"
-      wiki_page_tools_file_tree_setup
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-      f('.find_new_image_link').click
-      f('#image_search_form input[type=text]').send_keys('dog')
-      f('#image_search_form button[type=submit]').click
-      wait_for_animations
-      results = f('.results .image_link[tabindex="0"]')
-      expect(results).not_to be_nil
-
-    end
-
-    it "inserts a flickr image when you hit enter" do
-      skip "flickr outage"
-      wiki_page_tools_file_tree_setup
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-      f('.find_new_image_link').click
-      f('#image_search_form input[type=text]').send_keys('dog')
-      f('#image_search_form button[type=submit]').click
-      wait_for_animations
-      results = fj('.results .image_link[tabindex="0"]:first')
-      results.send_keys(:return)
-      in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce img')).to be_displayed
-      end
-    end
-
     it "should infini-scroll images" do
       wiki_page_tools_file_tree_setup
       90.times do |i|
@@ -118,35 +90,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
     end
 
-    it "should show uploaded images in image list and add the image to the rce" do
-      skip "check image broken"
-      wiki_page_tools_file_tree_setup
-      wait_for_tiny(f("form.edit-form .edit-content"))
-      fj('a.switch_views:visible').click
-      clear_wiki_rce
-      fj('a.switch_views:visible').click
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
-      wait_for_ajax_requests
-
-      expect(@image_list.find_elements(:css, '.img').length).to eq 2
-      f('#editor_tabs_4 .image_list .img').click
-      in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce img')).to be_displayed
-      end
-
-      f('form.edit-form button.submit').click
-      wait_for_ajax_requests
-
-      check_image(f('#wiki_page_show img'))
-    end
-
-    it "should be able to upload an image and add the image to the rce" do
-      skip "check_image broken"
-
-      add_image_to_rce
-      check_image(f('#wiki_page_show img'))
-    end
-
     it "should add image via url" do
       get "/courses/#{@course.id}/pages/blank"
       wait_for_ajaximations
@@ -173,14 +116,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         f('form.edit-form button.submit').click
         expect(f('#wiki_page_show')).to be_displayed
         check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
-      end
-
-      it "should add a user image" do
-        skip('testbot fragile')
-        add_canvas_image(driver, 'My files', 'teacher.jpg')
-        submit_form("#edit_wiki_page_#{@blank_page.id}")
-        expect(f('#wiki_page_show')).to be_displayed
-        check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@teacher_attachment.id}/, :alt => 'teacher.jpg')
       end
     end
 

@@ -196,19 +196,8 @@ describe "course settings" do
       expect(ff('#sections > .section')[0]).to include_text(edit_text)
     end
 
-    it "should move a nav item to disabled" do
-      skip('fragile')
-      get "/courses/#{@course.id}/settings#tab-navigation"
-      body = f('body')
-      expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')
-      disabled_div = f('#nav_disabled_list')
-      announcements_nav = f('#nav_edit_tab_id_14')
-      driver.action.click_and_hold(announcements_nav).
-          move_to(disabled_div).
-          release(disabled_div).
-          perform
-      expect(f('#nav_disabled_list')).to include_text(announcements_nav.text)
-    end
+    # TODO reimplement per CNVS-29605, but make sure we're testing at the right level
+    it "should move a nav item to disabled"
   end
 
   context "right sidebar" do

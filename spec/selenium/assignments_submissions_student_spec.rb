@@ -289,21 +289,7 @@ describe "submissions" do
     end
 
 
-    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029 do
-      skip "BUG 6783 - Coming Up assignments update error"
-      @assignment.update_attributes(:submission_types => 'online_url')
-      @submission = @assignment.submit_homework(@student)
-      @submission.submission_type = "online_url"
-      @submission.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(f('.details .header')).to include_text('Turned In!')
-      get "/courses/#{@course.id}"
-      driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
-      tooltip_text_elements = ff('.tooltip_text > span')
-      expect(f('.tooltip_text')).to be_displayed
-      expect(tooltip_text_elements[1].text).to eq 'submitted'
-    end
+    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029
 
     context 'with Canvadocs enabled' do
       before(:once) do

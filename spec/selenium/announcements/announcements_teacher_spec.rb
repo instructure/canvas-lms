@@ -248,19 +248,8 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "should have a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
-      skip "delayed jobs"
-      create_announcement
-      get [@course, @announcement]
-
-      f('#content .add_entry_link').click
-      entry_text = 'new entry text'
-      type_in_tiny('textarea[name=message]', entry_text)
-      expect_new_page_load { submit_form('.form-actions') }
-      expect(f('#entry_list .discussion_entry .content')).to include_text(entry_text)
-      f('#left-side .announcements').click
-      expect(f('.topic_reply_count').text).to eq '1'
-    end
+    # TODO reimplement per CNVS-29612, but make sure we're testing at the right level
+    it "should have a teacher add a new entry to its own announcement", priority: "1", test_id: 220372
 
     it "should show announcements to student view student", priority: "1", test_id: 220373 do
       create_announcement

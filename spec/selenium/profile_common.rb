@@ -81,43 +81,6 @@ shared_examples 'user settings change pic cancel' do |context|
   end
 end
 
-
-
-shared_examples 'user settings profile pic gravatar link' do |context|
-  it 'opens the Gravatar homepage', priority: "1", test_id: pick_test_id(context, student: 69159, teacher: 403055, admin: 403056) do
-    skip "depends on external service"
-    enable_avatars
-    get '/profile/settings'
-    f('.avatar.profile_pic_link.none').click
-    wait_for_ajaximations
-
-    fln('From Gravatar', f('.nav.nav-pills')).click
-    wait_for_ajaximations
-
-    # get a handle on current window
-    original_window = driver.window_handle
-
-    # Make sure driver is looking at the current window
-    expect(driver.title).to eq 'User Settings: nobody@example.com'
-
-    # Click the link to the Gravatar site
-    fln('Gravatar').click
-    wait_for_ajaximations
-
-    # gather all windows
-    all_windows = driver.window_handles
-    # assign a var to the new window -- the one that is not the old window
-    new_window = all_windows.select { |this_window| this_window != original_window }
-
-    # switch driver to act on new window
-    driver.switch_to.window(new_window)
-
-    # Ensure new window opened as expected
-    expect(driver.title).to eq 'Gravatar - Globally Recognized Avatars'
-  end
-end
-
-
 # ======================================================================================================================
 # Helper Methods
 # ======================================================================================================================

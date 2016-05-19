@@ -79,16 +79,7 @@ describe "quiz taking" do
     expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
   end
 
-  it "should not restrict whitelisted ip addresses", priority: "1", test_id: 338082 do
-    skip('might fail Jenkins due to ip address conflicts')
-    @quiz.ip_filter = "10.0.9.249"
-    @quiz.save!
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load{f('#take_quiz_link').click}
-    expect(driver.current_url).to include_text("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
-    expect(f("#content .quiz-header").text).to include('Test Quiz')
-    expect(f('#submit_quiz_form')).to be_present
-  end
+  it "should not restrict whitelisted ip addresses", priority: "1", test_id: 338082
 
   it "should account for question group settings", priority: "1", test_id: 140591 do
     skip_if_chrome('research')

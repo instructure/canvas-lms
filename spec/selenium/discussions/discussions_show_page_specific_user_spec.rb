@@ -258,7 +258,6 @@ describe "discussions" do
       end
 
       it "should reply as a student and validate teacher can see reply", priority: "1", test_id: 150479 do
-        skip "figure out delayed jobs"
         entry = topic.discussion_entries.create!(:user => student, :message => 'new entry from student')
         get url
         expect(f("#entry-#{entry.id}")).to include_text('new entry from student')

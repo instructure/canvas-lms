@@ -115,29 +115,9 @@ describe 'dashcards' do
       expect(f("#content")).not_to contain_css('a.discussions .unread_count')
     end
 
-    it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413 do
-      skip('Notifications does not work for assignments as of now in dashcards')
-      @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
-      get '/'
-      expect(f('a.assignments .unread_count').text).to include('1')
-      # The notifications should go away after visiting the show page of assignments
-      expect_new_page_load{f('a.assignments').click}
-      expect_new_page_load{fln('assignment 1').click}
-      get '/'
-      expect(f("#content")).not_to contain_css('a.assignments .unread_count')
-    end
+    it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413
 
-    it 'should show files created notifications in dashcard', priority: "1", test_id: 238414 do
-      skip('Notifications does not work for files as of now in dashcards')
-      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
-      get '/'
-      expect(f('a.files .unread_count').text).to include('1')
-      # The notifications should go away after visiting the show page of files
-      expect_new_page_load{f('a.files').click}
-      expect_new_page_load{fln('example.pdf').click}
-      get '/'
-      expect(f("#content")).not_to contain_css('a.files .unread_count')
-    end
+    it 'should show files created notifications in dashcard', priority: "1", test_id: 238414
 
     context "course name and code display" do
       before :each do

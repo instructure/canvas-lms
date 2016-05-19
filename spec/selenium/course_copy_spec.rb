@@ -30,29 +30,8 @@ describe "course copy" do
       expect(@new_course.wiki.wiki_pages.count).to eq 1
     end
 
-    it "should copy the course with different settings" do
-      skip("killing thread with intermittent failures")
-      enable_cache do
-        course_with_admin_logged_in
-        5.times { |i| @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}") }
-
-        get "/courses/#{@course.id}/copy"
-        expect_new_page_load { f('button[type="submit"]').click }
-        submit_form('#copy_context_form')
-        wait_for_ajaximations
-        f('#copy_everything').click
-        wait_for_ajaximations
-
-        keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
-
-        expect(f('#copy_results > h2')).to include_text('Copy Succeeded')
-
-        @new_course = Course.last
-        get "/courses/#{@new_course.id}"
-        expect(f(".no-recent-messages")).to include_text("No Recent Messages")
-        expect(@new_course.wiki.wiki_pages.count).to eq 5
-      end
-    end
+    # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
+    it "should copy the course with different settings"
 
     it "should set the course name and code correctly" do
       course_with_admin_logged_in

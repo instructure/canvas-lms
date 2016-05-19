@@ -205,37 +205,10 @@ describe "speed grader submissions" do
       expect(f("#criterion_#{@rubric.criteria[1][:id]} input.criterion_points")).to have_attribute("value", "5")
     end
 
-    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1", test_id: 283502 do
-      skip('upgrade')
-      student_submission
-      create_and_enroll_students(1)
+    it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
+       test_id: 283502
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(f('#speedgrader_iframe')).to be_displayed
-
-      #check for assignment title
-      expect(f('#assignment_url')).to include_text(@assignment.title)
-      expect(ff("#students_selectmenu-menu li")[0]).to have_class("not_submitted")
-      expect(ff("#students_selectmenu-menu li")[1]).to have_class("not_graded")
-    end
-
-    it "should display image submission in browser", priority: "1", test_id: 283503 do
-      skip('broken')
-      filename, fullpath, data = get_file("graded.png")
-      create_and_enroll_students(1)
-      @assignment.submission_types ='online_upload'
-      @assignment.save!
-
-      add_attachment_student_assignment(filename, @students[0], fullpath)
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(f('#speedgrader_iframe')).to be_displayed
-
-      in_frame("speedgrader_iframe") do
-        #validates the image\attachment is inside the iframe as expected
-        expect(f(".decoded").attribute("src")).to include_text("download")
-      end
-    end
+    it "should display image submission in browser", priority: "1", test_id: 283503
 
     context "turnitin" do
       before(:each) do

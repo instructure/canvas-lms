@@ -14,18 +14,6 @@ module FilesCommon
     end
   end
 
-  # This method downloads the file from top toolbar in New Files
-  def download_from_toolbar(row_selected = 0)
-    ff('.ef-item-row')[row_selected].click
-    f('.btn-download').click
-  end
-
-  # This method downloads the file using the Download option on Cog menu button
-  def download_from_cog_icon(row_selected = 0)
-    ff('.al-trigger')[row_selected].click
-    ff('.al-options .ui-menu-item')[0].click
-  end
-
   def edit_name_from_cog_icon(file_name_new, row_selected = 0)
     ff('.al-trigger-gray')[row_selected].click
     fln("Rename").click
@@ -33,12 +21,6 @@ module FilesCommon
     file_name_textbox_el = f('.input-block-level')
     replace_content(file_name_textbox_el, file_name_new)
     file_name_textbox_el.send_keys(:return)
-  end
-
-  # This method downloads the file from the file preview
-  def download_from_preview
-    fln("example.pdf").click
-    f('.icon-download').click
   end
 
   def delete(row_selected = 0, delete_using = :cog_icon)

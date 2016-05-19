@@ -25,29 +25,14 @@ describe "calendar2" do
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
       end
 
-      it "should render assignments due just before midnight" do
-        skip("fails on event count validation")
-        assignment_model(:course => @course,
-                         :title => "super important",
-                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
-        calendar_events = @teacher.calendar_events_for_calendar.last
-
-        expect(calendar_events.title).to eq "super important"
-        expect(@assignment.due_date).to eq((Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date)
-
-        load_week_view
-        events = ff('.fc-event')
-        keep_trying_until do
-          # shows on monday night and tuesday morning
-          expect(events.count { |e| e.text =~ /due.*super important/ }).to eq 2
-        end
-      end
+      # TODO reimplement per CNVS-29592, but make sure we're testing at the right level
+      it "should render assignments due just before midnight"
 
       it 'should show manual assignment event due saturday after 6pm', priority: "1", test_id: 486894 do
         load_week_view
-        fj('#create_new_event_link').click
+        f('#create_new_event_link').click
         wait_for_ajaximations
-        event_dialog = fj('#edit_event_tabs')
+        event_dialog = f('#edit_event_tabs')
         event_dialog.find('.edit_assignment_option').click
         wait_for_ajaximations
         event_dialog.find('#assignment_title').send_keys('saturday assignment')

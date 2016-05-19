@@ -270,16 +270,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(ff('li.folder').count).to eq 1
     end
 
-    it "should show root folder in the sidebar if the files navigation tab is hidden" do
-      skip('broken')
-      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
-      @course.save!
-
-      get "/courses/#{@course.id}/discussion_topics/new"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      expect(ff('li.folder').count).to eq 1
-    end
-
     it "should show sub-folder in the sidebar if it is locked" do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
 

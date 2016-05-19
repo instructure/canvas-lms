@@ -370,16 +370,12 @@ describe "people" do
       expect(f('.ui-state-error')).to include_text('Unauthorized')
     end
 
-    it "should validate that a TA cannot rename a teacher" do
-      skip('bug 7106 - do not allow TA to edit teachers name')
-      teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
-      get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
-      expect(f('.edit_user_link')).to_not be_displayed
-    end
+    # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
+    it "should validate that a TA cannot rename a teacher"
   end
 
   context "course with multiple sections", priority: "2" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       @section2 = @course.course_sections.create!(name: 'section2')
     end

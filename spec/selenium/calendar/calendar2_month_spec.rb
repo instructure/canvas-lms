@@ -46,14 +46,6 @@ describe "calendar2" do
         end
       end
 
-      it "should drag and drop an event" do
-        skip('drag and drop not working correctly')
-        create_middle_day_event
-        driver.action.drag_and_drop(find('.calendar .fc-event'), find('.calendar .fc-week:nth-child(2) .fc-last')).perform
-        wait_for_ajaximations
-        expect(CalendarEvent.last.start_at.strftime('%d')).to eq find('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
-      end
-
       it "should create an assignment by clicking on a calendar day" do
         create_middle_day_assignment
       end

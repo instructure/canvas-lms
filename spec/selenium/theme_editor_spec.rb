@@ -98,12 +98,7 @@ describe 'Theme Editor' do
     expect(f('.ic-Form-message--error')).to include_text "'#xxxxx!' is not a valid color."
   end
 
-  it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001 do
-    skip("Skipped because the K12 template option does not appear in selenium tests")
-    Account.default.enable_feature!(:k12)
-    open_theme_editor(Account.default.id)
-    expect(f('#brand_config[variables][ic-brand-primary]').attribute(:placeholder)).to include('#E66135')
-  end
+  it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001
 
   it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
     open_theme_editor(Account.default.id)

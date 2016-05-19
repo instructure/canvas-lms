@@ -331,37 +331,8 @@ describe "scheduler" do
       f('.scheduler_done_button').click
     end
 
-    it "should allow me to create a course with multiple contexts" do
-      skip('fragile')
-      course1 = @course
-      course_with_teacher(:user => @teacher, :active_all => true)
-      get "/calendar2"
-      click_scheduler_link
-      fill_out_appointment_group_form('multiple contexts')
-      f('.ag_contexts_selector').click
-      ff('.ag_sections_toggle').last.click
-      f("[value=#{course1.asset_string}]").click
-
-      # sections should get checked by their parent
-      section_box = f("[value=#{@course.course_sections.first.asset_string}]")
-      expect(section_box[:checked]).to be_truthy
-
-      # unchecking all sections should uncheck their parent
-      course_box = f("[value=#{@course.asset_string}]")
-      section_box.click
-      expect(course_box[:checked]).to be_falsey
-
-      # checking all sections should check parent
-      section_box.click
-      expect(course_box[:checked]).to be_truthy
-
-      f('.ui-dialog-buttonset .btn-primary').click
-      wait_for_ajaximations
-      ag = AppointmentGroup.first
-      expect(ag.contexts).to include course1
-      expect(ag.contexts).to include @course
-      expect(ag.sub_contexts).to eq []
-    end
+    # TODO reimplement per CNVS-29591, but make sure we're testing at the right level
+    it "should allow me to create a course with multiple contexts"
 
     it "should allow me to override the participant limit on a slot-by-slot basis" do
       create_appointment_group :participants_per_appointment => 2

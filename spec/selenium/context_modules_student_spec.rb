@@ -403,25 +403,8 @@ describe "context modules" do
         expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
       end
 
-      it "should show module navigation for group assignment discussions" do
-        skip('intermittently fails')
-        group_assignment_discussion(:course => @course)
-        @group.users << @student
-        assignment_model(:course => @course)
-        @module = ContextModule.create!(:context => @course)
-        @page = wiki_page_model(:course => @course)
-        i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
-        i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
-        i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
-        @module2 = ContextModule.create!(:context => @course, :name => 'second module')
-        get "/courses/#{@course.id}/modules/items/#{i2.id}"
-
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i1.id}"
-
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i3.id}"
-      end
+      # TODO reimplement per CNVS-29600, but make sure we're testing at the right level
+      it "should show module navigation for group assignment discussions"
     end
 
     context 'mark as done' do

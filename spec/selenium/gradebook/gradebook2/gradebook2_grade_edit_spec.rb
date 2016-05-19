@@ -211,27 +211,6 @@ describe "editing grades" do
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq '0'
   end
 
-  it "should correctly set default grades for a specific section"  do
-      skip("intermittently fails")
-      open_section_menu_and_click ->(menu_item_css) do
-        f('#section_to_show').click
-        section_menu = f('#section-to-show-menu')
-        expect(section_menu).to be_displayed
-        section_menu.find_element(:css, menu_item_css).click
-      end
-
-      expected_grade = "45"
-      gradebook_row_1 = '#gradebook_grid .container_1 .slick-row:nth-child(2)'
-      get "/courses/#{@course.id}/gradebook"
-      wait_for_ajaximations
-
-      open_section_menu_and_click.call('#section-to-show-menu-1')
-      set_default_grade(2, expected_grade)
-      open_section_menu_and_click.call('#section-to-show-menu-0')
-      expect(f(gradebook_row_1)).to be_displayed
-      expect(f("#{gradebook_row_1} .r2").text).to eq '-'
-  end
-
   it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')

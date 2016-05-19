@@ -249,21 +249,6 @@ describe "better_file_browsing" do
     end
   end
 
-  context "File Downloads" do
-    it "should download a file from top toolbar successfully" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_toolbar
-    end
-    it "should download a file from cog" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_cog_icon
-    end
-    it "should download a file from file preview successfully" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_preview
-    end
-  end
-
   context "Publish Cloud Dialog" do
     before(:each) do
       course_with_teacher_logged_in

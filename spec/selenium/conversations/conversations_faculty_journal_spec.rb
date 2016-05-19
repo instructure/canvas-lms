@@ -83,17 +83,7 @@ describe "conversations new" do
       expect(f('.creator_name')).to include_text(time)
     end
 
-    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518 do
-      skip('Currently Broken CNVS-12522')
-      get student_user_notes_url
-      f('#new_user_note_button').click
-      replace_content(f('#user_note_title'),'FJ Title')
-      replace_content(f('textarea'),'FJ Body text')
-      f('.cancel_button').click
-      f('#new_user_note_button').click
-      expect(f('#user_note_title').text).to eq ''
-      expect(f('textarea').text).to eq ''
-    end
+    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518
   end
 
   context "Faculty Journal" do
