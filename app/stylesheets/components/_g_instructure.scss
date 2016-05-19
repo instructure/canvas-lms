@@ -137,7 +137,9 @@
   }
 }
 
-.user_content iframe {
+.user_content iframe,
+.user_content video
+ {
   border: 0;
   padding: 0;
   margin: 0;
