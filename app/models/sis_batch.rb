@@ -351,9 +351,9 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def remove_non_batch_courses(courses, total_rows)
+  def remove_non_batch_courses(courses, total_rows, current_row)
     # delete courses that weren't in this batch, in the selected term
-    current_row = 0
+    current_row ||= 0
     courses.find_each do |course|
       course.clear_sis_stickiness(:workflow_state)
       course.skip_broadcasts = true
@@ -384,7 +384,7 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_sections(sections, total_rows, current_row)
     section_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
     sections.find_each do |section|
       section.destroy
@@ -411,15 +411,24 @@ class SisBatch < ActiveRecord::Base
 
   def remove_non_batch_enrollments(enrollments, total_rows, current_row)
     enrollment_count = 0
-    current_row = 0 unless current_row
+    current_row ||= 0
     # delete enrollments for courses that weren't in this batch, in the selected term
-    enrollments.find_each do |enrollment|
-      enrollment.destroy
-      enrollment_count += 1
-      current_row += 1
+    enrollments.find_in_batches do |batch|
+      if account.feature_enabled?(:sis_imports_refactor)
+        count = Enrollment::BatchStateUpdater.destroy_batch(batch)
+        enrollment_count += count
+        current_row += count
+      else
+        batch.each do |enrollment|
+          enrollment.destroy
+          enrollment_count += 1
+          current_row += 1
+        end
+      end
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
     self.data[:counts][:batch_enrollments_deleted] = enrollment_count
+    current_row
   end
 
   def remove_previous_imports
@@ -437,9 +446,9 @@ class SisBatch < ActiveRecord::Base
       enrollments = non_batch_enrollments_scope
 
       count = detect_changes(count, courses, enrollments, sections)
-      row = remove_non_batch_courses(courses, count) if courses
+      row = remove_non_batch_enrollments(enrollments, count, row) if enrollments
       row = remove_non_batch_sections(sections, count, row) if sections
-      remove_non_batch_enrollments(enrollments, count, row) if enrollments
+      remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
       return self.reload
     end
