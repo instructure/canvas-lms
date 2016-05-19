@@ -177,7 +177,7 @@ define [
     @formatter: (row, col, submission, assignment, student) ->
       innerContents = if submission.excused
         "EX"
-      else if submission.score
+      else if submission.score?
         "#{htmlEscape submission.grade}<span class='letter-grade-points'>#{htmlEscape submission.score}</span>"
       else
         submission.grade
