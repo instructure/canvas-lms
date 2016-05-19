@@ -31,21 +31,20 @@
           <button href="#" id="revert-all-to-actual-score" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t("Revert to Actual Score") %></button>
         </div>
     <% end %>
-    <div id="student-grades-show-all" class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
+    <div id="student-grades-show-all" class="show_all_details">
       <button type="button" class="Button" id="show_all_details_button"><%= t("Show All Details") %></button>
     </div>
-    <div id="assignments-not-weighted" style="margin-top: 10px;">
+    <div id="assignments-not-weighted">
       <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
       <% unless @presenter.no_calculations? %>
-        <div id="only_consider_graded_assignments_wrapper">
-          <label class="checkbox" for="only_consider_graded_assignments"><%= t('labels.only_graded', "Calculate based only on graded assignments") %>
-            <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>
-          </label>
+        <div id="only_consider_graded_assignments_wrapper" class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="only_consider_graded_assignments" checked="true"/>
+          <label class="ic-Label" for="only_consider_graded_assignments"><%= t('labels.only_graded', "Calculate based only on graded assignments") %></label>
         </div>
       <% end %>
     </div>
     <% if @presenter.editable? %>
-      <div id="whatif-score-description" style="margin-top: 10px;">
+      <div id="whatif-score-description">
         <%= t(:change_score_instructions, "Click any score and enter a new value to see how the change will affect your total.") %>
       </div>
     <% end %>
