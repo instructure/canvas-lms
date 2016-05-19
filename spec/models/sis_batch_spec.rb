@@ -174,6 +174,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
     end
   end
 
+  shared_examples_for 'sis_import_feature' do
   describe "batch mode" do
     it "should not remove anything if no term is given" do
       @subacct = @account.sub_accounts.create(:name => 'sub1')
@@ -475,6 +476,21 @@ s2,test_1,section2,active},
           :batch_mode => true, :batch_mode_term => @term1)
       expect(@section1.reload).to be_deleted
       expect(@section2.reload).not_to be_deleted
+    end
+  end
+  end
+
+  context 'sis_import_feature on' do
+    include_examples 'sis_import_feature'
+    before do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(true)
+    end
+  end
+
+  context 'sis_import_feature off' do
+    include_examples 'sis_import_feature'
+    before do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:sis_imports_refactor).and_return(false)
     end
   end
 
