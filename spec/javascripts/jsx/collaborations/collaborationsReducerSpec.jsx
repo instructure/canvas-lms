@@ -1,5 +1,5 @@
 define([
-  'jsx/collaborations/reducers/collaborationsReducer',
+  'jsx/collaborations/reducers/listCollaborationsReducer',
   'jsx/collaborations/actions/collaborationsActions'
 ], (reducer, actions) => {
   module('collaborationsReducer');

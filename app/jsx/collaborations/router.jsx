@@ -6,14 +6,14 @@ define([
   'jsx/collaborations/CollaborationsApp',
   'jsx/collaborations/actions/collaborationsActions',
   'jsx/collaborations/store/store'
-], function (React, page, qs, redux, CollaborationsApp, collaborationsActions, store) {
-  let unsubscribe
-  let actions = redux.bindActionCreators(collaborationsActions, store.dispatch)
+], function (React, page, qs, redux, CollaborationsApp, actions, store) {
+  let unsubscribe = null;
 
   /**
    * Route Handlers
    */
   function renderShowCollaborations (ctx) {
+    store.dispatch(actions.getLTICollaborators(ctx.params.context, ctx.params.contextId));
     let view = () => {
       let state = store.getState();
       React.render(<CollaborationsApp applicationState={state} actions={actions} />, document.getElementById('content'));

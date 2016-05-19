@@ -1,6 +1,8 @@
 define([
-  'react'
-], (React) => {
+  'react',
+  'jsx/collaborations/GettingStartedCollaborations',
+  'jsx/collaborations/CollaborationsNavigation'
+], (React, GettingStartedCollaborations, CollaborationsNavigation) => {
   class CollaborationsApp extends React.Component {
     static propTypes: {
       applicationState: React.PropTypes.object,
@@ -9,8 +11,11 @@ define([
 
     render () {
       return (
-        <div className='CollaborationsApp'>
-          We've got ourselves a placeholder
+        <div className="CollaborationsApp">
+          <div id="wrapperCollaborations">
+            <CollaborationsNavigation ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
+            <GettingStartedCollaborations ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
+          </div>
         </div>
       );
     }
