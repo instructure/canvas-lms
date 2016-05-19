@@ -45,7 +45,7 @@
         <% if use_new_styles? && course_color.present? %>
           <span aria-hidden="true" class="course-color-block" style="<%= "color: #{course_color};" %>" ></span>
         <% end %>
-        <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
+        <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>" title="<%= current_enrollment.course.name %>"><% end %>
         <span class="name">
           <%= current_enrollment.course.name %>
         </span>
