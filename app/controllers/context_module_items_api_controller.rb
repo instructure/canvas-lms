@@ -421,6 +421,18 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@tag.context_module, @current_user, :update)
       return render :json => {:message => "missing module item parameter"}, :status => :bad_request unless params[:module_item]
 
+      if params[:section_restrict_any]
+        if params[:section_restrict_any] == "yes"
+          ContentTagSectionRestriction.where(:content_tag_id => @tag.id).delete_all
+          params[:section_restrict].each do |sr|
+            ContentTagSectionRestriction.create(
+              :content_tag_id => @tag.id,
+              :section_id => sr
+            )
+          end
+        end
+      end
+
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]
       @tag.indent = params[:module_item][:indent] if params[:module_item][:indent]

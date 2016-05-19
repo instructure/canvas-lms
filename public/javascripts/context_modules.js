@@ -851,15 +851,98 @@ define([
       }, function(data) {
       });
     });
+
+    var bzPostSuccessHook;
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
       var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var $item = $(this).parents(".context_module_item");
-      var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
+      var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab', 'section_restrictions']});
       data.indent = modules.currentIndent($item);
+      var section_restrictions = JSON.parse(data.section_restrictions);
+      data.section_restrictions = null;
       $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
+      var vth = document.getElementById("visible_to_holder");
+      vth.innerHTML = "";
+
+      var hasAnyRestrictions = false;
+      for(id in section_restrictions) {
+        if(section_restrictions[id].checked) {
+          hasAnyRestrictions = true;
+          break;
+        }
+      }
+
+      var allChecks = [];
+      function uncheckAllSections() {
+        for(var a = 0; a < allChecks.length; a++)
+          allChecks[a].checked = false;
+      }
+
+      var lbl = document.createElement("label");
+      var restrictNone = document.createElement("input");
+      restrictNone.type = "radio";
+      restrictNone.name = "section_restrict_any";
+      restrictNone.checked = !hasAnyRestrictions;
+      restrictNone.value = "no";
+      lbl.appendChild(restrictNone);
+      restrictNone.onclick = uncheckAllSections;
+      var spn = document.createElement("span");
+      spn.textContent = "Everybody";
+      lbl.appendChild(spn);
+      vth.appendChild(lbl);
+      vth.appendChild(document.createElement("br"));
+
+      var lbl = document.createElement("label");
+      var restrictAny = document.createElement("input");
+      restrictAny.type = "radio";
+      restrictAny.name = "section_restrict_any";
+      restrictAny.checked = hasAnyRestrictions;
+      restrictAny.value = "yes";
+      lbl.appendChild(restrictAny);
+      var spn = document.createElement("span");
+      spn.textContent = "Only these sections:";
+      lbl.appendChild(spn);
+      vth.appendChild(lbl);
+      vth.appendChild(document.createElement("br"));
+
+      for(id in section_restrictions) {
+        var lbl = document.createElement("label");
+        var check = document.createElement("input");
+        allChecks.push(check);
+        check.type = "checkbox";
+        check.name = "section_restrict[]";
+        check.checked = section_restrictions[id].checked;
+        check.value = id;
+        lbl.appendChild(check);
+        var spn = document.createElement("span");
+        spn.textContent = section_restrictions[id].name;
+        lbl.appendChild(spn);
+        vth.appendChild(lbl);
+        vth.appendChild(document.createElement("br"));
+      }
+
+      bzPostSuccessHook = function() {
+        if(restrictNone.checked)
+          $(".bz_section_restrictions", $item).html("");
+        else {
+          var str = "Only for: ";
+          var anySet = false;
+          for(var a = 0; a < allChecks.length; a++) {
+            if(allChecks[a].checked) {
+              if(anySet) str += ", ";
+              str += section_restrictions[allChecks[a].value].name;
+              anySet = true;
+            }
+            section_restrictions[allChecks[a].value].checked = allChecks[a].checked;
+          }
+          $(".bz_section_restrictions", $item).html(str);
+          $(".section_restrictions", $item).text(JSON.stringify(section_restrictions));
+        }
+      };
+
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
         open: function(){
@@ -879,6 +962,10 @@ define([
         $(this).loadingImage();
       },
       success: function(data) {
+        if(bzPostSuccessHook) {
+          bzPostSuccessHook();
+          bzPostSuccessHook = null;
+        }
         $(this).loadingImage('remove');
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);

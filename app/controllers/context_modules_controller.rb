@@ -392,6 +392,21 @@ class ContextModulesController < ApplicationController
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
       @tag.save
+
+
+      if params[:section_restrict_any]
+        ContentTagSectionRestriction.where(:content_tag_id => @tag.id).delete_all
+        if params[:section_restrict_any] == "yes"
+          params[:section_restrict].each do |sr|
+            ContentTagSectionRestriction.create(
+              :content_tag_id => @tag.id,
+              :section_id => sr
+            )
+          end
+        end
+      end
+
+
       @tag.update_asset_name! if params[:content_tag][:title]
       render :json => @tag
     end

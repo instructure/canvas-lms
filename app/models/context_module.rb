@@ -353,9 +353,9 @@ class ContextModule < ActiveRecord::Base
         tags = filter_tags_for_da(tags, user, opts)
       end
 
-      #if !is_teacher
+      if !is_teacher
         tags = filter_tags_per_section(tags, user, opts)
-      #end
+      end
 
       tags
     end
