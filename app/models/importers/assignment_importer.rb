@@ -172,6 +172,11 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
+      if item.turnitin_enabled
+        settings = JSON.parse(hash[:turnitin_settings]).with_indifferent_access
+        item.turnitin_settings = settings
+      end
+
       migration.add_imported_item(item)
 
       if migration.date_shift_options
