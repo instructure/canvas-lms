@@ -606,6 +606,11 @@ ActiveRecord::Relation.class_eval do
     raise "Use preload or eager_load instead of includes"
   end
 
+  def where!(*args)
+    raise "where!.not doesn't work in Rails 4.2" if args.empty?
+    super
+  end
+
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
     selects = select_values.flat_map{|sel| sel.to_s.split(",").map(&:strip) }
