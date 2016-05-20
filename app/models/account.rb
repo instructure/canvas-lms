@@ -21,7 +21,7 @@ require 'atom'
 class Account < ActiveRecord::Base
   include Context
   attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
-    :turnitin_host, :turnitin_comments, :turnitin_pledge,
+    :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
@@ -1244,6 +1244,14 @@ class Account < ActiveRecord::Base
       self.turnitin_comments
     else
       self.parent_account.try(:closest_turnitin_comments)
+    end
+  end
+
+  def closest_turnitin_originality
+    if self.turnitin_originality && !self.turnitin_originality.empty?
+      self.turnitin_originality
+    else
+      self.parent_account.try(:turnitin_originality)
     end
   end
 

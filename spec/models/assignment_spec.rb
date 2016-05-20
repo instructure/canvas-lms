@@ -2506,6 +2506,14 @@ describe Assignment do
       assignment.reload
       expect(assignment.turnitin_settings[:current]).to be_nil
     end
+
+    it "should use default originality setting from account" do
+      assignment = @assignment
+      account = assignment.course.account
+      account.turnitin_originality = "after_grading"
+      account.save!
+      expect(assignment.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
+    end
   end
 
   context "generate comments from submissions" do

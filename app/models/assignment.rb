@@ -366,7 +366,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings
-    super.empty? ? Turnitin::Client.default_assignment_turnitin_settings : super
+    if super.empty?
+      settings = Turnitin::Client.default_assignment_turnitin_settings
+      default_originality = course.turnitin_originality if course
+      settings[:originality_report_visibility] = default_originality if default_originality
+      settings
+    else
+      super
+    end
   end
 
   def turnitin_settings=(settings)

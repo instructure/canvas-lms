@@ -1790,6 +1790,10 @@ class Course < ActiveRecord::Base
     self.account.closest_turnitin_pledge
   end
 
+  def turnitin_originality
+    self.account.closest_turnitin_originality
+  end
+
   def all_turnitin_comments
     comments = self.account.closest_turnitin_comments || ""
     if self.turnitin_comments && !self.turnitin_comments.empty?

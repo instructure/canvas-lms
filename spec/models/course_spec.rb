@@ -712,6 +712,14 @@ describe Course do
       expect(course.all_group_categories.count).to eq 2
     end
   end
+
+  context "turnitin" do
+    it "should return turnitin_originality" do
+      @course.account.turnitin_originality = "after_grading"
+      @course.account.save!
+      expect(@course.turnitin_originality).to eq("after_grading")
+    end
+  end
 end
 
 describe Course do
