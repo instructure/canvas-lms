@@ -12,18 +12,22 @@ module CustomWaitMethods
   end
 
   def wait_for_dom_ready
-    driver.execute_async_script(<<-JS)
+    result = driver.execute_async_script(<<-JS)
       var callback = arguments[arguments.length - 1];
       if (document.readyState === "complete") {
-        callback();
+        callback(0);
       } else {
+        var leftPageBeforeDomReady = callback.bind(null, -1);
+        window.addEventListener("beforeunload", leftPageBeforeDomReady);
         document.onreadystatechange = function() {
           if (document.readyState === "complete") {
-            callback();
+            window.removeEventListener("beforeunload", leftPageBeforeDomReady);
+            callback(0);
           }
         }
       };
     JS
+    raise "left page before domready" if result != 0
   end
 
   def wait_for_ajax_requests(wait_start = 0)
