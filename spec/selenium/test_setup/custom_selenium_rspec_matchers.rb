@@ -49,17 +49,31 @@ RSpec::Matchers.define :include_text do |text|
   end
 end
 
+# assert the presence (or absence) of certain text within the
+# element's value attribute. will return as soon as the
+# expectation is met, e.g.
+#
+#   expect(f('#name_input')).to have_value('Bob')
+#
 RSpec::Matchers.define :have_value do |value_attribute|
   match do |element|
-    !!element.attribute('value').match(value_attribute)
+    wait_for(method: :have_value) do
+      element.attribute('value').match(value_attribute)
+    end
+  end
+
+  match_when_negated do |element|
+    wait_for(method: :have_value) do
+      !element.attribute('value').match(value_attribute)
+    end
   end
 
   failure_message do |element|
-    "expected #{element.inspect} to have value #{value_attribute}, actual class names: #{element.attribute('value')}"
+    "expected #{element.inspect} to have value #{value_attribute}, actual value: #{element.attribute('value')}"
   end
 
   failure_message_when_negated do |element|
-    "expected #{element.inspect} to NOT have value #{value_attribute}, actual value names: #{element.attribute('value')}"
+    "expected #{element.inspect} to NOT have value #{value_attribute}, actual value: #{element.attribute('value')}"
   end
 end
 

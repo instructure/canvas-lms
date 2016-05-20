@@ -318,7 +318,7 @@ describe 'Excuse an Assignment' do
       f('a.gradebook-cell-comment').click
       wait_for_ajaximations
 
-      expect(f("#student_grading_#{assignment.id}").attribute 'value').to eq 'EX'
+      expect(f("#student_grading_#{assignment.id}")).to have_value 'EX'
     end
 
     it 'assignments can be excused from grading modal', priority: "1", test_id: 217594 do

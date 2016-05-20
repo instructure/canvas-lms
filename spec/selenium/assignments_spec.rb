@@ -230,7 +230,7 @@ describe "assignments" do
           expect(f('#assignment_name').attribute(:value)).to include(expected_text)
           expect(f('#assignment_points_possible').attribute(:value)).to include(points)
           due_at_field = fj(".date_field:first[data-date-type='due_at']")
-          expect(due_at_field.attribute(:value)).to eq due_at
+          expect(due_at_field).to have_value due_at
           click_option('#assignment_submission_type', 'No Submission')
           submit_assignment_form
           expect(@course.assignments.count).to eq 1

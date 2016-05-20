@@ -56,9 +56,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'complete'
+      expect(f('#grading-box-extended')).to have_value 'complete'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'incomplete'
+      expect(f('#grading-box-extended')).to have_value 'incomplete'
     end
 
     it 'should display letter grades correctly', priority: "1", test_id: 164015 do
@@ -70,9 +70,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'A'
+      expect(f('#grading-box-extended')).to have_value 'A'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'C'
+      expect(f('#grading-box-extended')).to have_value 'C'
 
       clear_grade_and_validate
     end
@@ -86,9 +86,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq '75'
+      expect(f('#grading-box-extended')).to have_value '75'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq '50'
+      expect(f('#grading-box-extended')).to have_value '50'
 
       clear_grade_and_validate
     end
@@ -102,9 +102,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq '15'
+      expect(f('#grading-box-extended')).to have_value '15'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq '10'
+      expect(f('#grading-box-extended')).to have_value '10'
 
       clear_grade_and_validate
     end
@@ -118,9 +118,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'A'
+      expect(f('#grading-box-extended')).to have_value 'A'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'D'
+      expect(f('#grading-box-extended')).to have_value 'D'
 
       clear_grade_and_validate
     end
@@ -199,8 +199,8 @@ describe 'Speedgrader' do
       end
 
       it 'in speedgrader', priority: "1", test_id: 164016 do
-        expect(f('#grading-box-extended').attribute('value')).to eq '15'
-        expect(f('#grading span.rubric_total').text).to eq '15'
+        expect(f('#grading-box-extended')).to have_value '15'
+        expect(f('#grading span.rubric_total')).to include_text '15'
       end
 
       it 'in assignment page ', priority: "1", test_id: 217611 do
@@ -215,15 +215,15 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
 
-        expect(f('#criterion_crit1 input.criterion_points').attribute 'value').to eq '10'
-        expect(f('#criterion_crit2 input.criterion_points').attribute 'value').to eq '5'
+        expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
+        expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
 
         replace_content f('#criterion_crit1 input.criterion_points'), '5'
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
         el = f("#student_grading_#{@assignment.id}")
-        keep_trying_until { expect(el.attribute 'value').to eq '10' }
+        expect(el).to have_value '10'
       end
     end
     context 'Using a rubric to grade' do

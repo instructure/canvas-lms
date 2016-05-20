@@ -86,7 +86,7 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
     f('.toggle_full_rubric').click
     wait_for_ajaximations
-    expect(f('.rubric_container .criterion_points').attribute(:value)).to eq('')
+    expect(f('.rubric_container .criterion_points')).to have_value('')
   end
 
   it "ignores rubric lines for grading", priority: "1", test_id: 283989 do

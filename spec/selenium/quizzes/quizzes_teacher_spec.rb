@@ -219,7 +219,7 @@ describe "quizzes" do
         # preserve values between moderation invocations
         expect(f('.extra_time_allowed').text).to eq 'gets 13 extra minutes on each attempt'
         f('.moderate_student_link').click
-        expect(f('#extension_extra_time').attribute('value')).to eq '13'
+        expect(f('#extension_extra_time')).to have_value '13'
       end
 
     end

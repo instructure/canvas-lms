@@ -15,7 +15,7 @@ describe "editing grades" do
       wait_for_ajaximations
       open_comment_dialog(0, 0)
       grade_box = f("form.submission_details_grade_form input.grading_value")
-      expect(grade_box.attribute('value')).to eq @assignment_1_points
+      expect(grade_box).to have_value @assignment_1_points
       set_value(grade_box, 7)
       f("form.submission_details_grade_form button").click
       wait_for_ajax_requests

@@ -129,7 +129,7 @@ describe "Screenreader Gradebook" do
     get srgb
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', a1.name
-    expect(f('#student_and_assignment_grade').attribute 'value').to eq grades[0]
+    expect(f('#student_and_assignment_grade')).to have_value grades[0]
     expect(f('#student_information .total-grade').text).to eq "75% (#{grades[0]} / 20 points)"
 
     click_option '#assignment_select', a2.name
