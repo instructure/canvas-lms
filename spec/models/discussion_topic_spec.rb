@@ -1592,7 +1592,7 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      expect { @topic.reply_from(:user => @teacher, :text => "entry") }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      expect { @topic.reload.reply_from(:user => @teacher, :text => "entry") }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should prefer html to text" do
