@@ -78,7 +78,7 @@ module LoginAndSessionMethods
     end
     get "/login"
     expect_new_page_load { fill_in_login_form(username, password) }
-    expect(f('#identity .logout')).to be_present
+    expect(driver.current_url).to include("login_success=1")
   end
 
   def masquerade_as(user)
