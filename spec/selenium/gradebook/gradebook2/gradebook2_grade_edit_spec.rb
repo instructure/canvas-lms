@@ -155,16 +155,16 @@ describe "editing grades" do
     assignment_2_sel= '#gradebook_grid .container_1 .slick-row:nth-child(1) .l4'
     a1 = f(assignment_1_sel)
     a2 = f(assignment_2_sel)
-    expect(a1['class']).to include 'dropped'
-    expect(a2['class']).not_to include 'dropped'
+    expect(a1).to have_class 'dropped'
+    expect(a2).not_to have_class 'dropped'
 
     a2.click
     grade_input = a2.find_element(:css, '.grade')
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajaximations
-    expect(f(assignment_1_sel)['class']).not_to include 'dropped'
-    expect(f(assignment_2_sel)['class']).to include 'dropped'
+    expect(f(assignment_1_sel)).not_to have_class 'dropped'
+    expect(f(assignment_2_sel)).to have_class 'dropped'
   end
 
   it "should update a grade when clicking outside of slickgrid", priority: "1", test_id: 220319 do

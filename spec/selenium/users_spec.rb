@@ -22,7 +22,7 @@ describe "users" do
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
-      new_login = ff('.login').find { |e| e.attribute(:class) !~ /blank/ }
+      new_login = f('.login:not(.blank)')
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first

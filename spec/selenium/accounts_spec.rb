@@ -86,7 +86,7 @@ describe "account" do
       f('.editing_term .general_dates .start_date .edit_term input').send_keys("2011-07-01")
       f('.editing_term .general_dates .end_date .edit_term input').send_keys("2011-07-31")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
           :student_enrollment => ["term start", "term end"],
@@ -102,7 +102,7 @@ describe "account" do
       f('.editing_term .student_enrollment_dates .start_date .edit_term input').send_keys("2011-07-02")
       f('.editing_term .student_enrollment_dates .end_date .edit_term input').send_keys("2011-07-30")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["Jul 2", "Jul 30"],
@@ -118,7 +118,7 @@ describe "account" do
       f('.editing_term .teacher_enrollment_dates .start_date .edit_term input').send_keys("2011-07-03")
       f('.editing_term .teacher_enrollment_dates .end_date .edit_term input').send_keys("2011-07-29")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],
@@ -134,7 +134,7 @@ describe "account" do
       f('.editing_term .ta_enrollment_dates .start_date .edit_term input').send_keys("2011-07-04")
       f('.editing_term .ta_enrollment_dates .end_date .edit_term input').send_keys("2011-07-28")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],

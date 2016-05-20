@@ -792,16 +792,12 @@ describe "context modules" do
         wait_for_ajaximations(1000)
         context_module_items[0].send_keys("i")
         item = f('.context_module_item')
-        keep_trying_until do
-          expect(item).to have_class('indent_1')
-        end
+        expect(item).to have_class('indent_1')
 
         wait_for_ajaximations(1000)
         ff('.context_module_item a.title')[0].send_keys("o")
         item = f('.context_module_item')
-        keep_trying_until do
-          expect(item).to have_class('indent_0')
-        end
+        expect(item).to have_class('indent_0')
 
         # Test Delete key
         wait_for_ajaximations(1000)
@@ -911,8 +907,8 @@ describe "context modules" do
 
       # make sure the completion criterion was preserved
       module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item.attribute('class').split).to include 'must_submit_requirement'
-      expect(f('.criterion', module_item).attribute('class').split).to include 'defined'
+      expect(module_item).to have_class 'must_submit_requirement'
+      expect(f('.criterion', module_item)).to have_class 'defined'
       expect(driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()")).to eq "must_submit"
     end
 

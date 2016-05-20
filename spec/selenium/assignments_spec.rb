@@ -492,22 +492,14 @@ describe "assignments" do
 
       it "should allow publishing from the show page", priority: "1", test_id: 647851 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
 
-        def speedgrader_hidden?
-          driver.execute_script(
-              "return $('#assignment-speedgrader-link').hasClass('hidden')"
-          )
-        end
-
-        expect(speedgrader_hidden?).to eq true
+        expect(f("#assignment-speedgrader-link")).to have_class("hidden")
 
         f("#assignment_publish_button").click
-        wait_for_ajaximations
 
         expect(@assignment.reload).to be_published
-        expect(f("#assignment_publish_button").text).to match "Published"
-        expect(speedgrader_hidden?).to eq false
+        expect(f("#assignment_publish_button")).to include_text("Published")
+        expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
       end
 
       it "should show publishing status on the edit page", priority: "2", test_id: 647852 do
@@ -531,15 +523,10 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments"
 
           f("#assignment_#{@assignment.id} .publish-icon").click
-          wait_for_ajaximations
           keep_trying_until { @assignment.reload.published? }
 
           # need to make sure buttons
-          keep_trying_until do
-            driver.execute_script(
-                "return !$('#assignment_#{@assignment.id} .publish-icon').hasClass('disabled')"
-            )
-          end
+          expect(f("#assignment_#{@assignment.id} .publish-icon")).not_to have_class("disabled")
 
           f("#assignment_#{@assignment.id} .publish-icon").click
           wait_for_ajaximations

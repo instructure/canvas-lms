@@ -1,6 +1,21 @@
+# assert the presence (or absence) of a css class on an element.
+# will return as soon as the expectation is met, e.g.
+#
+#   headers = ff(".enhanceable_content.accordion .ui-accordion-header")
+#   expect(headers[0]).to have_class('ui-state-active')
+#   headers[1].click
+#   expect(headers[0]).to have_class('ui-state-default')
 RSpec::Matchers.define :have_class do |class_name|
   match do |element|
-    !!element.attribute('class').match(class_name)
+    wait_for(method: :have_class) do
+      element.attribute('class').match(class_name)
+    end
+  end
+
+  match_when_negated do |element|
+    wait_for(method: :have_class) do
+      !element.attribute('class').match(class_name)
+    end
   end
 
   failure_message do |element|

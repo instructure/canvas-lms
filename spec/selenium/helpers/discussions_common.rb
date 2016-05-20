@@ -217,14 +217,8 @@ module DiscussionsCommon
   end
 
   def wait_for_subscription_icon_to_load(expected_class)
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until do
-      f(".subscription-toggler").present?
-    end
+    expect(f(".subscription-toggler")).to be
     driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-    wait.until do
-      f(".subscription-toggler").attribute("class").include?(expected_class) &&
-      f(".#{expected_class}").present?
-    end
+    expect(f(".subscription-toggler")).to have_class(expected_class)
   end
 end

@@ -243,7 +243,7 @@ describe "dashboard" do
     context "course menu customization" do
 
       it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+        course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
 
         get "/"
 
@@ -251,9 +251,10 @@ describe "dashboard" do
           f('#global_nav_courses_link').click
           expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
         else
-          driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-          expect(fj('#courses_menu_item')).to include_text('My Courses')
-          expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+          course_menu_item = f("#courses_menu_item")
+          hover(course_menu_item)
+          expect(course_menu_item).to include_text('My Courses')
+          expect(course_menu_item).to include_text('View All or Customize')
         end
       end
     end
