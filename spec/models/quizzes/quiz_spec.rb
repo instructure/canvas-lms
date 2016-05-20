@@ -1444,59 +1444,88 @@ describe Quizzes::Quiz do
   end
 
   describe "#restrict_answers_for_concluded_course?" do
-    let(:account){Account.new}
-    let(:enrollment_term){EnrollmentTerm.new}
-    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term, restrict_enrollments_to_course_dates: true)}
-    let(:quiz){Quizzes::Quiz.new(context: course)}
+    let(:account) { Account.default }
+    let(:course){ Course.create!(root_account: account) }
+    let(:quiz) { course.quizzes.create! }
 
-    before {account.settings[:restrict_quiz_questions] = restrict_quiz_settings}
-    before {enrollment_term.stubs(root_account: account)}
-    before {course.stubs(root_account: account)}
+    subject { quiz.restrict_answers_for_concluded_course? }
 
-    context 'When account setting is true' do
-      let(:restrict_quiz_settings){true}
+    before do
+      account.settings[:restrict_quiz_questions] = restrict_quiz_settings
+      account.save!
+    end
 
-      context 'and the course has concluded' do
-        let(:conclude_at){10.minutes.ago}
+    context 'account setting is true' do
+      let(:restrict_quiz_settings) { true }
 
-        it "should be true" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+      context 'course has not concluded' do
+        it { is_expected.to be(false) }
+
+        context 'concluded enrollment_term' do
+          let(:enrollment_term) { account.enrollment_terms.create!(end_at: 10.minutes.ago) }
+
+          before do
+            course.enrollment_term = enrollment_term
+            course.save!
+          end
+
+          it { is_expected.to be(true) }
         end
       end
 
-      context 'and the course has not concluded' do
-        let(:conclude_at){10.minutes.from_now}
+      context 'the course has soft-concluded' do
+        before do
+          course.conclude_at = 10.minutes.ago
+          course.save!
+        end
 
-        it "should be false" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
+        it { is_expected.to be(false) }
+
+        context 'course settings is true' do
+          before do
+            course.restrict_enrollments_to_course_dates = true
+            course.save!
+          end
+
+          it { is_expected.to be(true) }
+
+          context 'student in a section with extended time' do
+            let(:section_end_at) { 10.minutes.from_now }
+            let(:section_start_at) { 10.minutes.ago }
+            let(:section) do
+              course.course_sections.create!(
+                start_at: section_start_at,
+                end_at: section_end_at,
+                restrict_enrollments_to_section_dates: true)
+            end
+            let(:student) { student_in_section(section) }
+
+            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
+
+            it { is_expected.to be(false) }
+          end
         end
       end
 
-      context 'and the course is hard-concluded' do
-        let(:conclude_at){10.minutes.from_now}
-        it "should be true" do
-          course.workflow_state = 'completed'
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+      context 'course is hard-concluded' do
+        before do
+          course.complete!
         end
-      end
 
-      context 'and the course does not have a conclude_at date but has a concluded enrollment_term' do
-        let(:enrollment_term){EnrollmentTerm.new(end_at: 10.minutes.ago)}
-        let(:conclude_at){nil}
-
-        it "should be true" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
-        end
+        it { is_expected.to be(true) }
       end
     end
 
-    context 'When account setting is false and the course has concluded' do
-      let(:restrict_quiz_settings){false}
-      let(:conclude_at){10.minutes.ago}
+    context 'account setting is false' do
+      let(:restrict_quiz_settings) { false }
 
-      it "should be false" do
-        expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
-      end
+      it { is_expected.to be(false) }
+    end
+
+    context 'account setting is nil' do
+      let(:restrict_quiz_settings) { nil }
+
+      it { is_expected.to be(false) }
     end
   end
 

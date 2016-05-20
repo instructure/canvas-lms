@@ -342,14 +342,22 @@ class Quizzes::Quiz < ActiveRecord::Base
     return true if self.one_time_results
 
     # Are we past the date the correct answers should no longer be shown after?
-    return false if hide_at.present? && Time.now > hide_at
+    return false if hide_at.present? && Time.zone.now > hide_at
 
-    show_at.present? ? Time.now > show_at : true
+    show_at.present? ? Time.zone.now > show_at : true
   end
 
-  def restrict_answers_for_concluded_course?
+  def restrict_answers_for_concluded_course?(user: nil)
     course = self.context
-    course.concluded? && course.root_account.settings[:restrict_quiz_questions]
+    return false unless course.root_account.settings[:restrict_quiz_questions]
+
+    if user.present?
+      quiz_eligibility = Quizzes::QuizEligibility.new(course: course, user: user)
+      user_in_active_section = quiz_eligibility.section_dates_currently_apply?
+      return false if user_in_active_section
+    end
+
+    !!course.concluded?
   end
 
   def update_existing_submissions

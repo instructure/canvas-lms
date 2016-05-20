@@ -960,58 +960,132 @@ describe Quizzes::QuizSubmission do
     end
 
     describe "#results_visible?" do
-      it "return true if no quiz" do
-        qs = Quizzes::QuizSubmission.new
-        expect(qs.results_visible?).to be_truthy
+      let(:quiz_submission) { @quiz.generate_submission(@student) }
+
+      subject { quiz_submission.results_visible? }
+
+      it { is_expected.to be(true) }
+
+      context 'no quiz' do
+        let(:quiz_submission) { Quizzes::QuizSubmission.new }
+
+        it { is_expected.to be(true) }
       end
 
-      it "returns false if quiz restricts answers for concluded courses" do
-        quiz = Quizzes::Quiz.new
-        quiz.stubs(:restrict_answers_for_concluded_course? => true)
+      context 'quiz restricts answers for concluded courses' do
+        before do
+          @course.root_account.settings[:restrict_quiz_questions] = true
+          @course.root_account.save!
+        end
 
-        qs = Quizzes::QuizSubmission.new(:quiz => quiz)
-        expect(qs.results_visible?).to be_falsey
+        context 'course is concluded' do
+          before do
+            @course.complete!
+          end
+
+          it { is_expected.to be(false) }
+
+          context 'is a user who can review grades' do
+            subject { quiz_submission.results_visible?(user: @teacher) }
+
+            before do
+              course_with_teacher(course: @course, active_all: true)
+            end
+
+            it { is_expected.to be(true) }
+          end
+        end
       end
 
-      it "returns true if quiz doesn't restrict answers for concluded courses" do
-        quiz = Quizzes::Quiz.new
-        quiz.stubs(:restrict_answers_for_concluded_course? => false)
+      context 'results are locked down' do
+        before do
+          @quiz.one_time_results = true
+          @quiz.save
+        end
 
-        qs = Quizzes::QuizSubmission.new(:quiz => quiz)
-        expect(qs.results_visible?).to be_truthy
+        context 'has not yet seen results' do
+          before do
+            quiz_submission.has_seen_results = false
+            quiz_submission.save!
+          end
+
+          it { is_expected.to be(true) }
+        end
+
+        context 'has seen results' do
+          before do
+            quiz_submission.has_seen_results = true
+            quiz_submission.save!
+          end
+
+          it { is_expected.to be(false) }
+        end
       end
 
-      it "returns false if results are locked down" do
-        quiz = Quizzes::Quiz.new
-        quiz.stubs(:restrict_answers_for_concluded_course? => false)
-        quiz.stubs(:one_time_results => true)
+      context 'results are always hidden' do
+        before do
+          @quiz.hide_results = 'always'
+          @quiz.save!
+        end
 
-        qs = Quizzes::QuizSubmission.new(:quiz => quiz)
-        expect(qs.results_visible?).to be_truthy
-
-        qs.stubs(:has_seen_results => true)
-        expect(qs.results_visible?).to be_falsey
-      end
-    end
-
-    describe '#results_visible_for_user' do
-      before(:once) do
-        course_with_teacher(active_all: true)
-        course_quiz(course: @course)
-        student_in_course(course: @course)
-        @course.account.settings[:restrict_quiz_questions] = true
-        @course.account.save!
-        @course.enrollment_term.end_at = 1.day.ago
-        @course.enrollment_term.save!
-        @quiz_submission = Quizzes::QuizSubmission.new(:quiz => @quiz)
+        it { is_expected.to be(false) }
       end
 
-      it "returns true if quiz restricts answers for concluded courses and the user is a grader" do
-        expect(@quiz_submission.results_visible_for_user?(@teacher)).to be_truthy
-      end
+      context 'results are hidden until after last attempt' do
+        before do
+          @quiz.hide_results = 'until_after_last_attempt'
+          @quiz.save!
+        end
 
-      it "returns false if quiz restricts answers for concluded courses and the user is not a grader" do
-        expect(@quiz_submission.results_visible_for_user?(@student)).to be_falsey
+        context 'there are unlimited attempts' do
+          before do
+            @quiz.allowed_attempts = -1
+            @quiz.save!
+          end
+
+          it { is_expected.to be(true) }
+        end
+
+        context 'allows multiple attempts' do
+          let(:allowed_attempts) { 2 }
+          let(:second_quiz_submission) do
+            quiz_submission
+            @quiz.generate_submission(@student)
+          end
+
+          before do
+            @quiz.allowed_attempts = allowed_attempts
+            @quiz.save!
+          end
+
+          context 'not last attempt' do
+            it { is_expected.to be(false) }
+          end
+
+          context 'the last attempt' do
+            subject { second_quiz_submission.results_visible? }
+
+            context 'completed' do
+              before do
+                second_quiz_submission.complete!
+              end
+
+              it { is_expected.to be(true) }
+            end
+          end
+
+          context 'an extra attempt' do
+            let(:extra_attempt) do
+              quiz_submission
+              second_quiz_submission
+              @quiz.generate_submission(@student)
+            end
+
+            subject { extra_attempt.results_visible? }
+
+            it { is_expected.to be(true) }
+          end
+        end
       end
     end
 
