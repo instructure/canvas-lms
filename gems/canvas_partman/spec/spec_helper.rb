@@ -14,6 +14,7 @@ require 'support/active_record'
 require 'support/schema_helper'
 require 'fixtures/zoo'
 require 'fixtures/animal'
+require 'fixtures/trail'
 
 if RUBY_VERSION =~ /^1.9/
   require 'debugger'
@@ -24,6 +25,7 @@ end
 RSpec.configure do |config|
   Zoo = CanvasPartmanTest::Zoo
   Animal = CanvasPartmanTest::Animal
+  Trail = CanvasPartmanTest::Trail
 
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
@@ -44,18 +46,18 @@ RSpec.configure do |config|
   end
 
   config.before :all do
-    [ Zoo, Animal ].each(&:create_schema)
+    [ Zoo, Animal, Trail ].each(&:create_schema)
   end
 
   config.after :all do
-    [ Zoo, Animal ].each(&:drop_schema)
+    [ Zoo, Animal, Trail ].each(&:drop_schema)
   end
 
   config.after :each do
-    connection.tables.grep(/^partman_animals_/).each do |partition_table_name|
+    connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       begin
         SchemaHelper.drop_table(partition_table_name)
-      rescue Exception => e
+      rescue StandardError => e
         puts "[WARN] Partition table dropping failed: #{e.message}"
       end
     end
