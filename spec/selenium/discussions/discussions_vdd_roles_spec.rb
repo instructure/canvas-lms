@@ -40,11 +40,9 @@ describe "discussions" do
     user_session(student2)
     find_vdd_time(@override)
     get "/courses/#{@course.id}/discussion_topics"
-    keep_trying_until do
-      expect(f("#open-discussions .discussion-date-available").text).
-                                                              to include("Not available until #{format_date_for_view(@override.unlock_at, :short)}")
-      expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
-    end
+    expect(f("#open-discussions .discussion-date-available")).
+      to include_text("Not available until #{format_date_for_view(@override.unlock_at, :short)}")
+    expect(f("#open-discussions .discussion-due-date")).to include_text("Due #{@due_at_time}")
     expect_new_page_load{f('#open-discussions .discussion-title').click}
     expect(f("#content")).not_to contain_css('.discussion-reply-action')
     expect(f('.discussion-fyi').text).to include("This topic is locked until #{@unlock_at_time}")

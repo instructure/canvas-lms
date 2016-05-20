@@ -25,7 +25,7 @@ module CollaborationsCommon
     f(".collaboration_#{collaboration.id} .delete_collaboration_link").click
 
     if type == 'google_docs'
-      keep_trying_until { expect(f('#delete_collaboration_dialog .delete_button')).to be_displayed }
+      expect(f('#delete_collaboration_dialog .delete_button')).to be_displayed
       f('#delete_collaboration_dialog .delete_button').click
     end
     expect(f("#content")).not_to contain_css(".collaboration_#{collaboration.id} .delete_collaboration_link")
@@ -78,10 +78,10 @@ module CollaborationsCommon
 
     get "/courses/#{@course.id}/collaborations"
 
-    fj('#collaboration_title').send_keys(collaboration_name)
+    f('#collaboration_title').send_keys(collaboration_name)
 
     fj('.available-users:visible a').click
-    keep_trying_until { expect(ffj('.members-list li').length).to eq 1 }
+    expect(ff('.members-list li')).to have_size(1)
 
     f('button[type="submit"]').click
   end

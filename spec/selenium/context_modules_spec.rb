@@ -76,10 +76,8 @@ describe "context modules" do
       js_drag_and_drop(selector2, selector1)
       wait_for_ajaximations
       list_post_drag = ff("a.title").map(&:text)
-      keep_trying_until do
-        expect(list_prior_drag[0]).to eq list_post_drag[1]
-        expect(list_prior_drag[1]).to eq list_post_drag[0]
-      end
+      expect(list_prior_drag[0]).to eq list_post_drag[1]
+      expect(list_prior_drag[1]).to eq list_post_drag[0]
     end
 
     it "should rearrange child object to new module", priority: "1", test_id: 126734 do
@@ -127,16 +125,12 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules"
 
-      keep_trying_until do
-        f('.ig-header-admin  .al-trigger').click
-        hover_and_click('#context_modules .edit_module_link')
-        wait_for_ajax_requests
-        expect(f('#add_context_module_form')).to be_displayed
-      end
-      assignment_picker = keep_trying_until do
-        f('.add_completion_criterion_link').click
-        fj('.assignment_picker:visible')
-      end
+      f('.ig-header-admin  .al-trigger').click
+      hover_and_click('#context_modules .edit_module_link')
+      wait_for_ajax_requests
+      expect(f('#add_context_module_form')).to be_displayed
+      f('.add_completion_criterion_link').click
+      assignment_picker = fj('.assignment_picker:visible')
 
       assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
       requirement_picker = fj('.assignment_requirement_picker:visible')
@@ -384,11 +378,8 @@ describe "context modules" do
       f('.ig-header-admin .al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
-      keep_trying_until do
-        replace_content(f('#sub_header_title'), header_text)
-        true
-      end
-      fj('.add_item_button.ui-button').click
+      replace_content(f('#sub_header_title'), header_text)
+      f('.add_item_button.ui-button').click
       wait_for_ajaximations
       tag = ContentTag.last
       module_item = f("#context_module_item_#{tag.id}")
@@ -423,11 +414,9 @@ describe "context modules" do
       wait_for_ajaximations
       f('.add_module_item_link').click
       wait_for_ajaximations
-      keep_trying_until do
-        select_module_item('#add_module_item_select', 'External Tool')
-        fj('.add_item_button.ui-button').click
-        expect(ff('.alert.alert-error').length).to eq 1
-      end
+      select_module_item('#add_module_item_select', 'External Tool')
+      f('.add_item_button.ui-button').click
+      expect(ff('.alert.alert-error').length).to eq 1
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
@@ -647,7 +636,9 @@ describe "context modules" do
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        keep_trying_until { ff('.cancel_button.ui-button')[1] }.click
+        cancel_buttons = ff('.cancel_button.ui-button')
+        expect(cancel_buttons).to have_size(2)
+        cancel_buttons[1].click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
@@ -800,14 +791,16 @@ describe "context modules" do
 
         wait_for_ajaximations(1000)
         context_module_items[0].send_keys("i")
+        item = f('.context_module_item')
         keep_trying_until do
-          expect(ff('.context_module_item')[0]).to have_class('indent_1')
+          expect(item).to have_class('indent_1')
         end
 
         wait_for_ajaximations(1000)
         ff('.context_module_item a.title')[0].send_keys("o")
+        item = f('.context_module_item')
         keep_trying_until do
-          expect(ff('.context_module_item')[0]).to have_class('indent_0')
+          expect(item).to have_class('indent_0')
         end
 
         # Test Delete key
@@ -815,10 +808,8 @@ describe "context modules" do
         new_first_module_item = ff('.context_module_item')[1]
         ff('.context_module_item')[0].send_keys("d")
         driver.switch_to.alert.accept
-        keep_trying_until do
-          expect(ff('.context_module_item')[0]).to eq(new_first_module_item)
-        end
-
+        expect(ff('.context_module_item')).to have_size(3) # wait for draggy clone to disappear
+        expect(f('.context_module_item')).to eq(new_first_module_item)
       end
     end
 
@@ -1142,12 +1133,9 @@ describe "context modules" do
       title_input = fj('input[name="title"]:visible')
       replace_content(title_input, 'some title')
 
-      fj('.add_item_button.ui-button').click
-      wait_for_ajaximations
+      f('.add_item_button.ui-button').click
 
-      keep_trying_until do
-        expect(ff('.errorBox').any?(&:displayed?)).to be_truthy
-      end
+      expect(f('.errorBox:not(#error_box_template)')).to be_displayed
 
       expect(f("#select_context_content_dialog")).to be_displayed
     end

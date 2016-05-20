@@ -49,10 +49,8 @@ describe "gradebook2" do
     wait_for_ajaximations
 
     # make sure it's on the other student's submission
-    comment = keep_trying_until do
-      open_comment_dialog(3, 1)
-      fj(".submission_details_dialog:visible .comment")
-    end
+    open_comment_dialog(3, 1)
+    comment = fj(".submission_details_dialog:visible .comment")
     expect(comment).to include_text(comment_text)
   end
 end

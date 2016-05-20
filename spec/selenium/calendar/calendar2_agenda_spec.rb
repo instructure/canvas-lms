@@ -232,7 +232,7 @@ describe "calendar2" do
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 
         load_agenda_view
-        keep_trying_until { expect(ff('.ig-row').length).to eq 3 }
+        expect(ff('.ig-row')).to have_size(3)
 
         # Verify Titles include section name
         agenda_array = ff('.ig-row')
@@ -307,7 +307,7 @@ describe "calendar2" do
 
           # Verify edited title, description, and date
           load_agenda_view
-          keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
+          expect(ff('.ig-row')).to have_size(1)
           f('.ig-row').click
           wait_for_ajaximations
           expect(f('.view_event_link')).to include_text(test_title)

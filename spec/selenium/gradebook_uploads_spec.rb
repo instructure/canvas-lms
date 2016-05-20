@@ -38,7 +38,7 @@ describe "gradebook uploads" do
     @upload_form.submit
     run_jobs
     wait_for_ajaximations
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     submit_form('#gradebook_grid_form')
     accept_alert
     wait_for_ajaximations
@@ -91,7 +91,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     run_jobs
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -130,7 +130,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     run_jobs
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -157,7 +157,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     run_jobs
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -167,7 +167,7 @@ describe "gradebook uploads" do
 
     submit_form('#gradebook_importer_resolution_section')
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#no_changes_detected')).not_to be_displayed
 
     expect(ff('.slick-header-column.assignment').length).to eq 1
@@ -186,7 +186,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     run_jobs
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -213,7 +213,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     run_jobs
 
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -241,7 +241,7 @@ describe "gradebook uploads" do
     @upload_form.submit
     wait_for_ajaximations
     run_jobs
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_highlighted
   end
@@ -258,7 +258,7 @@ describe "gradebook uploads" do
     @upload_form.submit
     wait_for_ajaximations
     run_jobs
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_highlighted
   end
@@ -275,7 +275,7 @@ describe "gradebook uploads" do
     @upload_form.submit
     wait_for_ajaximations
     run_jobs
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_not_highlighted
   end
@@ -292,7 +292,7 @@ describe "gradebook uploads" do
     @upload_form.submit
     wait_for_ajaximations
     run_jobs
-    keep_trying_until { !f("#spinner").displayed? }
+    expect(f("#spinner")).not_to be_displayed
 
     assert_assignment_is_not_highlighted
   end

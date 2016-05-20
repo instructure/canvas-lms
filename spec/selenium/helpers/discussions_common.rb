@@ -71,10 +71,8 @@ module DiscussionsCommon
 
     submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))
     wait_for_ajaximations
-    keep_trying_until do
-      id = DiscussionEntry.last.id
-      @last_entry = f "#entry-#{id}"
-    end
+    id = DiscussionEntry.last.id
+    @last_entry = f "#entry-#{id}"
   end
 
   def get_all_replies
@@ -82,9 +80,7 @@ module DiscussionsCommon
   end
 
   def validate_entry_text(discussion_entry, text)
-    keep_trying_until do
-      f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
-    end
+    expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)

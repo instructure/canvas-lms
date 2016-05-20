@@ -124,11 +124,9 @@ module FilesCommon
     course_with_teacher_logged_in
     get "/files"
     wait_for_ajaximations
-    keep_trying_until do
-      f(".add_folder_link").click
-      wait_for_ajaximations
-      expect(f("#files_content .add_folder_form #folder_name")).to be_displayed
-    end
+    f(".add_folder_link").click
+    wait_for_ajaximations
+    expect(f("#files_content .add_folder_form #folder_name")).to be_displayed
     f("#files_content .add_folder_form #folder_name").send_keys("my folder\n")
     wait_for_ajaximations
     expect(f(".node.folder span")).to have_class('ui-droppable')
@@ -140,12 +138,9 @@ module FilesCommon
   def should_show_students_link_to_download_zip_of_folder
     course_with_student_logged_in
     get "/courses/#{@course.id}/files"
-    link = keep_trying_until do
-      link = f(".links a.download_zip_link")
-      wait_for_ajaximations
-      expect(link).to be_displayed
-      link
-    end
+    link = f(".links a.download_zip_link")
+    wait_for_ajaximations
+    expect(link).to be_displayed
     expect(link.attribute('href')).to match(%r"/courses/#{@course.id}/folders/\d+/download")
   end
 
@@ -168,10 +163,8 @@ module FilesCommon
   end
 
   def click_new_folder_button
-    keep_trying_until do
-      f(".btn-add-folder").click
-      wait_for_ajaximations
-    end
+    f(".btn-add-folder").click
+    wait_for_ajaximations
   end
 
   def create_new_folder

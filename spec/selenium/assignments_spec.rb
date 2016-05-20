@@ -475,7 +475,8 @@ describe "assignments" do
         f("#assignment_#{@assignment.id} .publish-icon").click
         wait_for_ajaximations
         expect(@assignment.reload).to be_published
-        keep_trying_until { expect(f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label')).to include("Published") }
+        icon = f("#assignment_#{@assignment.id} .publish-icon")
+        keep_trying_until { expect(icon.attribute('aria-label')).to include("Published") }
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do

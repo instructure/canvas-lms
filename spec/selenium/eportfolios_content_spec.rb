@@ -19,7 +19,7 @@ describe "add content box" do
 
   it "should click on the How Do I..? button" do
     f(".wizard_popup_link").click
-    keep_trying_until { expect(f("#wizard_box .wizard_options_list")).to be_displayed }
+    expect(f("#wizard_box .wizard_options_list")).to be_displayed
   end
 
   it "should add rich text content" do
@@ -32,7 +32,7 @@ describe "add content box" do
   end
 
   it "should add a user file" do
-    keep_trying_until { expect(f('.add_file_link')).to be_displayed }
+    expect(f('.add_file_link')).to be_displayed
     f('.add_file_link').click
     wait_for_ajaximations
     fj('.file_list:visible .sign:visible').click

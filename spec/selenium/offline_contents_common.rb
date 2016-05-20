@@ -50,11 +50,9 @@ shared_examples 'generate and download ePub' do |context|
     f('.ig-admin .Button').click
     wait_for_ajaximations
     run_jobs
-    keep_trying_until do
-      expect(f('.ig-details').text).to include('Generated')
-      expect(f('.icon-download')).to be_present
-      expect(f('.ig-admin .Button').text).to include('Regenerate ePub')
-    end
+    expect(f('.ig-details')).to include_text('Generated')
+    expect(f('.icon-download')).to be_present
+    expect(f('.ig-admin .Button')).to include_text('Regenerate ePub')
   end
 end
 

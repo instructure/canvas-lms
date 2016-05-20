@@ -92,11 +92,8 @@ describe "discussions overrides" do
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do
         get "/courses/#{@course.id}/assignments"
         hover_text = "Everyone else\n#{@default_due}\nNew Section\n#{@override_due}"
-        driver.mouse.move_to f('.assignment-date-due .vdd_tooltip_link')
-        wait_for_ajaximations
-        keep_trying_until do
-          expect(f('.ui-tooltip-content').text).to eq(hover_text)
-        end
+        hover f('.assignment-date-due .vdd_tooltip_link')
+        expect(f('.ui-tooltip-content')).to include_text(hover_text)
       end
 
       it "should list discussions in the syllabus", priority: "2", test_id: 114321 do

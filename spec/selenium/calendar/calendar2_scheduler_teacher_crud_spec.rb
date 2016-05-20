@@ -38,7 +38,7 @@ describe "scheduler" do
       expect(f('.ag-x-of-x-signed-up')).to include_text('unpublished')
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
-      keep_trying_until { expect(edit_form).to be_displayed }
+      expect(edit_form).to be_displayed
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       new_appointment_group.reload

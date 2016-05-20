@@ -126,6 +126,8 @@ module CustomWaitMethods
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield
+      rescue SeleniumExtensions::Error # don't keep trying, abort ASAP
+        raise
       rescue StandardError, RSpec::Expectations::ExpectationNotMetError
         frd_error = $ERROR_INFO
         nil
@@ -160,11 +162,12 @@ module CustomWaitMethods
   # * is less verbose
   # * returns false (rather than raising) if the block never returns true
   # * doesn't rescue :allthethings: like keep_trying_until
+  # * prevents nested waiting, cuz that's terrible
   def wait_for(timeout: SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT, method: nil, ignore: nil)
-    # TODO: method will be used for the error message once we start
-    # detecting/preventing nested waiting
-    Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
-      yield
+    driver.prevent_nested_waiting(method) do
+      Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
+        yield
+      end
     end
   rescue Selenium::WebDriver::Error::TimeOutError
     false

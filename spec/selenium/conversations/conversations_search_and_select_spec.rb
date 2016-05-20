@@ -24,7 +24,7 @@ describe "conversations index page" do
       conversations
       name = @s2.name
       f('[role=main] header [role=search] input').send_keys(name)
-      keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
+      fj(".ac-result:contains('#{name}')").click
       expect(conversation_elements.length).to eq 1
     end
   end
@@ -75,7 +75,7 @@ describe "conversations index page" do
       conversations
       select_conversations
       click_unread_toggle_menu_item
-      keep_trying_until { expect(ffj('.read-state[aria-checked=false]').count).to eq 3 }
+      expect(ff('.read-state[aria-checked=false]')).to have_size(3)
     end
 
     it "should mark multiple conversations as unread" do
@@ -83,7 +83,7 @@ describe "conversations index page" do
       conversations
       select_conversations
       click_read_toggle_menu_item
-      keep_trying_until { expect(ffj('.read-state[aria-checked=true]').count).to eq 3 }
+      expect(ff('.read-state[aria-checked=true]')).to have_size(3)
     end
 
     it "should star multiple conversations" do

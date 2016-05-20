@@ -84,10 +84,8 @@ describe 'Screenreader Gradebook grading' do
       tab_out_of_input(main_grade_input)
       submission_details_button.click
 
-      keep_trying_until do
-        expect(f('.submission_details_dialog .assignment-name')).to include_text(assignment_1.name)
-        expect(f('.submission_details_grade_form input')).to have_value('8')
-      end
+      expect(f('.submission_details_dialog .assignment-name')).to include_text(assignment_1.name)
+      expect(fj('.submission_details_grade_form input:visible')).to have_value('8')
     end
 
     it 'updates grade in submission details modal', priority: "2", test_id: 949577 do

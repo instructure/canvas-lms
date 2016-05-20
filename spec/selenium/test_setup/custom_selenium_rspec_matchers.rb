@@ -129,3 +129,34 @@ RSpec::Matchers.define :contain_link do |text|
     end
   end
 end
+
+# assert whether or not an element is displayed. will wait up to
+# IMPLICIT_WAIT_TIMEOUT seconds
+RSpec::Matchers.define :be_displayed do
+  match do |element|
+    wait_for(method: :be_displayed) { element.displayed? }
+  end
+
+  match_when_negated do |element|
+    wait_for(method: :be_displayed) { !element.displayed? }
+  end
+end
+
+# assert the size of the collection. will wait up to IMPLICIT_WAIT_TIMEOUT
+# seconds, and will reload the collection if it can (i.e. if it's the
+# result of a ff/ffj call)
+RSpec::Matchers.define :have_size do |size|
+  match do |collection|
+    wait_for(method: :have_size) do
+      collection.reload! if collection.size != size && collection.respond_to?(:reload!)
+      collection.size == size
+    end
+  end
+
+  match_when_negated do |collection|
+    wait_for(method: :have_size) do
+      collection.reload! if collection.size == size && collection.respond_to?(:reload!)
+      collection.size != size
+    end
+  end
+end

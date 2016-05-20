@@ -46,7 +46,8 @@ describe "user_content" do
       expect(f("body")).not_to contain_css(".user_content_iframe")
       f('.fc-event').click
       wait_for_ajaximations
-      name = keep_trying_until { ff(".user_content_iframe").first.attribute('name') }
+      el = f(".user_content_iframe")
+      name = keep_trying_until { el.attribute('name') }
       in_frame(name) do
         keep_trying_until do
           html = Nokogiri::HTML(driver.page_source)

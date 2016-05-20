@@ -222,7 +222,8 @@ describe 'Speedgrader' do
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
-        keep_trying_until { expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10' }
+        el = f("#student_grading_#{@assignment.id}")
+        keep_trying_until { expect(el.attribute 'value').to eq '10' }
       end
     end
     context 'Using a rubric to grade' do
@@ -387,7 +388,7 @@ describe 'Speedgrader' do
 
       # see first student
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-      keep_trying_until { f(selectedStudent).text.include?(@students[0].name) }
+      expect(f(selectedStudent)).to include_text(@students[0].name)
     end
 
     let(:selectedStudent) {'span.ui-selectmenu-item-header'}

@@ -43,7 +43,7 @@ describe "calendar2" do
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
         title = edit_event_form.find('#calendar_event_title')
-        keep_trying_until { title.displayed? }
+        expect(title).to be_displayed
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
         expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/  # passed in ISO format, not localized
@@ -69,7 +69,7 @@ describe "calendar2" do
         fj("a:contains('#{event_title}')").click
         wait_for_ajaximations
 
-        keep_trying_until(5) {expect(fj('.event-details-header:visible')).to be_displayed}
+        expect(fj('.event-details-header:visible')).to be_displayed
         expect(f('.view_event_link')).to include_text(event_title)
       end
 

@@ -73,7 +73,7 @@ describe "announcements" do
 
       it "should filter by unread", priority: "1", test_id: 220363 do
         what_to_create.last.change_read_state('unread', @user)
-        refresh_and_filter(:css, '#onlyUnread', 'new 004')
+        refresh_and_filter(:css, '#discussionsFilter', 'new 004')
       end
     end
 

@@ -47,22 +47,24 @@ module CustomValidators
     end
   end
 
-  def expect_flash_message(type = :warning, message_regex = nil)
+  def expect_flash_message(type = :warning, message = nil)
+    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
     disable_implicit_wait do
-      wait_for method: :expect_flash_message do
+      wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
-        message_regex ? !!text.match(message_regex) : messages.present?
+        message ? !!text.match(message) : messages.present?
       end
     end
   end
 
-  def expect_no_flash_message(type = :warning, message_regex = nil)
+  def expect_no_flash_message(type = :warning, message = nil)
+    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
     disable_implicit_wait do
-      wait_for method: :expect_no_flash_message do
+      wait_for method: :expect_no_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
-        message_regex ? !text.match(message_regex) : messages.empty?
+        message ? !text.match(message) : messages.empty?
       end
     end
   end

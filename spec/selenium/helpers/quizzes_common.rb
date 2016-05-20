@@ -370,9 +370,7 @@ module QuizzesCommon
   def submit_quiz
     expect_new_page_load(true) { f('#submit_quiz_button').click }
 
-    keep_trying_until do
-      expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
-    end
+    expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
   end
 
   def preview_quiz(submit=true)
@@ -385,7 +383,8 @@ module QuizzesCommon
   end
 
   def wait_for_quiz_publish_button_to_populate
-    keep_trying_until { f('#quiz-publish-link').text.present? }
+    link = f('#quiz-publish-link')
+    keep_trying_until { link.text.present? }
   end
 
   # @argument answer_chooser [#call]

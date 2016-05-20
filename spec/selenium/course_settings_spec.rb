@@ -156,10 +156,8 @@ describe "course settings" do
       get "/courses/#{@course.id}/settings#tab-sections"
 
       section_input = nil
-      keep_trying_until do
-        section_input = f('#course_section_name')
-        expect(section_input).to be_displayed
-      end
+      section_input = f('#course_section_name')
+      expect(section_input).to be_displayed
       replace_content(section_input, section_name)
       submit_form('#add_section_form')
       wait_for_ajaximations
@@ -175,11 +173,8 @@ describe "course settings" do
       expect(body).to include_text('Delete Section')
 
       f('.delete_section_link').click
-      keep_trying_until do
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        true
-      end
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(ff('#sections > .section').count).to eq 1
     end
@@ -194,7 +189,7 @@ describe "course settings" do
 
       f('.edit_section_link').click
       section_input = f('#course_section_name_edit')
-      keep_trying_until { expect(section_input).to be_displayed }
+      expect(section_input).to be_displayed
       replace_content(section_input, edit_text)
       section_input.send_keys(:return)
       wait_for_ajaximations
@@ -335,10 +330,8 @@ describe "course settings" do
       wait_for_ajaximations
       run_jobs
 
-      keep_trying_until do
-        wait_for_ajaximations
-        expect(f("#all-results")).to be_displayed
-      end
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 17 unresponsive links")
 
@@ -383,10 +376,8 @@ describe "course settings" do
       wait_for_ajaximations
       run_jobs
 
-      keep_trying_until do
-        wait_for_ajaximations
-        expect(f("#all-results")).to be_displayed
-      end
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
       syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}

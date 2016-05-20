@@ -17,7 +17,7 @@ describe "content exports" do
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
       @export.export_without_send_later
-      new_download_link = keep_trying_until { f("#export_files a") }
+      new_download_link = f("#export_files a")
       url = new_download_link.attribute 'href'
       expect(url).to match(%r{/files/\d+/download\?verifier=})
     end

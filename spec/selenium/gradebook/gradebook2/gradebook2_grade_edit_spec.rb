@@ -137,10 +137,8 @@ describe "editing grades" do
     wait_for_ajaximations
 
     first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-    grade_input = keep_trying_until do
-      first_cell.click
-      first_cell.find_element(:css, '.grade')
-    end
+    first_cell.click
+    grade_input = first_cell.find_element(:css, '.grade')
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajax_requests
@@ -159,10 +157,8 @@ describe "editing grades" do
     expect(a1['class']).to include 'dropped'
     expect(a2['class']).not_to include 'dropped'
 
-    grade_input = keep_trying_until do
-      a2.click
-      a2.find_element(:css, '.grade')
-    end
+    a2.click
+    grade_input = a2.find_element(:css, '.grade')
     set_value(grade_input, 3)
     grade_input.send_keys(:tab)
     wait_for_ajaximations
@@ -175,10 +171,8 @@ describe "editing grades" do
     wait_for_ajaximations
 
     first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-    grade_input = keep_trying_until do
-      first_cell.click
-      first_cell.find_element(:css, '.grade')
-    end
+    first_cell.click
+    grade_input = first_cell.find_element(:css, '.grade')
     set_value(grade_input, 3)
     ff('body')[0].click
     wait_for_ajax_requests
@@ -196,12 +190,7 @@ describe "editing grades" do
     curve_form = f('#curve_grade_dialog')
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
-    keep_trying_until do
-      expect(driver.switch_to.alert).not_to be_nil
-      driver.switch_to.alert.dismiss
-      true
-    end
-    driver.switch_to.default_content
+    dismiss_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
 
@@ -215,16 +204,10 @@ describe "editing grades" do
     open_assignment_options(0)
     f('[data-action="curveGrades"]').click
 
-    fj('#assign_blanks').click
+    f('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click
 
-    keep_trying_until do
-      expect(driver.switch_to.alert).not_to be_nil
-      driver.switch_to.alert.dismiss
-      true
-    end
-
-    driver.switch_to.default_content
+    dismiss_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq '0'
   end
 

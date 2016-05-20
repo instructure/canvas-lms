@@ -390,9 +390,7 @@ describe "better_file_browsing" do
         f('.icon-publish').click
         wait_for_ajaximations
         f('.form-controls .btn-primary').click
-        keep_trying_until do
-           expect(f('.errorBox')).to be_present
-        end
+        expect(f('.errorBox')).to be_present
       end
     end
 

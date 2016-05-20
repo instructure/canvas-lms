@@ -110,11 +110,8 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
-      keep_trying_until do
-        f('li.folder span.plus').click
-        wait_for_ajaximations
-        expect(ff('li.folder li.file').count).to eq 1
-      end
+      f('li.folder span.plus').click
+      expect(ff('li.folder li.file')).to have_size(1)
       expect(f('li.folder li.file .name')).to include_text("foo.txt")
     end
   end

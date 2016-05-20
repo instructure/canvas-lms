@@ -25,7 +25,6 @@ describe "speed grader submissions" do
       @submission_2 = @assignment.submit_homework(@student_2, :body => 'second student submission text')
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@submission.student.id}%7D"
-      keep_trying_until { f('#speedgrader_iframe') }
 
       #check for assignment title
       expect(f('#assignment_url')).to include_text(@assignment.title)
@@ -78,19 +77,15 @@ describe "speed grader submissions" do
       #add comment
       f('#add_a_comment > textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
-      keep_trying_until { expect(f('#comments > .comment')).to be_displayed }
-
-      # the ajax from that add comment form comes back without a submission_history, the js should mimic it.
-      expect(driver.execute_script('return jsonData.studentsWithSubmissions[0].submission.submission_history.length')).to eq 1
+      expect(f('#comments > .comment')).to be_displayed
     end
 
     it "should display submission late notice message", priority: "1", test_id: 283279 do
-      @assignment.due_at = Time.now - 2.days
+      @assignment.due_at = Time.zone.now - 2.days
       @assignment.save!
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      keep_trying_until { f('#speedgrader_iframe') }
 
       expect(f('#submission_late_notice')).to be_displayed
     end
@@ -105,7 +100,6 @@ describe "speed grader submissions" do
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      keep_trying_until { f('#speedgrader_iframe') }
 
       expect(f('#submission_late_notice')).not_to be_displayed
     end
@@ -117,10 +111,7 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      keep_trying_until do
-        include_text(I18n.t('headers.no_submission', "This student does not have a submission for this assignment"))
-        expect(fj('#this_student_does_not_have_a_submission')).to be_displayed
-      end
+      expect(f('#this_student_does_not_have_a_submission')).to be_displayed
     end
 
     it "should handle versions correctly", priority: "2", test_id: 283500 do
@@ -181,9 +172,8 @@ describe "speed grader submissions" do
       student_submission(:username => "student1@example.com")
       student_submission(:username => "student2@example.com")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
-      keep_trying_until { expect(f('.toggle_full_rubric')).to be_displayed }
+      expect(f('.toggle_full_rubric')).to be_displayed
       f('.toggle_full_rubric').click
       wait_for_ajaximations
       rubric = f('#rubric_full')
@@ -221,7 +211,7 @@ describe "speed grader submissions" do
       create_and_enroll_students(1)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      keep_trying_until { expect(f('#speedgrader_iframe')).to be_displayed }
+      expect(f('#speedgrader_iframe')).to be_displayed
 
       #check for assignment title
       expect(f('#assignment_url')).to include_text(@assignment.title)
@@ -239,7 +229,7 @@ describe "speed grader submissions" do
       add_attachment_student_assignment(filename, @students[0], fullpath)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      keep_trying_until { expect(f('#speedgrader_iframe')).to be_displayed }
+      expect(f('#speedgrader_iframe')).to be_displayed
 
       in_frame("speedgrader_iframe") do
         #validates the image\attachment is inside the iframe as expected

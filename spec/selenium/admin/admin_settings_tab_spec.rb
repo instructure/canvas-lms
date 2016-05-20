@@ -502,8 +502,9 @@ describe "admin settings tab" do
     expect(f("#account_settings_sis_app_token")).to be_displayed
     f("#account_settings_sis_app_token").send_keys(sis_token)
     f(".btn-primary").click
+    token = f("#account_settings_sis_app_token")
     keep_trying_until{
-      expect(f("#account_settings_sis_app_token").attribute("value")).to eq sis_token
+      expect(token.attribute("value")).to eq sis_token
     }
     go_to_feature_options(Account.default.id)
     move_to_click("label[for=ff_off_post_grades]")

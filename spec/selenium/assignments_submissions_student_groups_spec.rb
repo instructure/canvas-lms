@@ -17,9 +17,7 @@ describe 'submissions' do
         create_assignment_for_group('online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
-        keep_trying_until do
-          expect(f('.ui-state-highlight')).to include_text('Keep in mind, this submission will count for')
-        end
+        expect(f('.ui-state-highlight')).to include_text('Keep in mind, this submission will count for')
       end
 
       it 'Submitting Group Assignments - File Upload', priority: "1", test_id: 238164 do

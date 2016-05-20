@@ -59,7 +59,7 @@ describe "outcome gradebook" do
 
         fj('.section-select-button:visible').click
         wait_for_ajaximations
-        keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
+        expect(fj('.section-select-menu:visible')).to be_displayed
         f("label[for='section_option_']").click
         expect(fj('.section-select-button:visible')).to include_text "All Sections"
 

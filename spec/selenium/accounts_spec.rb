@@ -176,10 +176,8 @@ describe "account" do
       get "/accounts/#{Account.default.id}"
       f('#course_name').send_keys(@course_name.chop)
 
-      keep_trying_until do
-        ui_auto_complete = f('.ui-autocomplete')
-        expect(ui_auto_complete).to be_displayed
-      end
+      ui_auto_complete = f('.ui-autocomplete')
+      expect(ui_auto_complete).to be_displayed
 
       elements = ff('.ui-autocomplete li:first-child a div')
       expect(elements[0].text).to eq @course_name

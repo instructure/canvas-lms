@@ -149,7 +149,7 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
        f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
        wait_for_ajaximations
-       keep_trying_until { expect(driver.find_elements(:css, 'ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li').count).to eq 15 }
+       expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
      end
   end
 end

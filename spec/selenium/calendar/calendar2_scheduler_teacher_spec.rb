@@ -255,7 +255,7 @@ describe "scheduler" do
 
       wait_for_ajaximations
 
-      keep_trying_until { expect(ffj('#attendees li').size).to eq 1 }
+      expect(ff('#attendees li')).to have_size(1)
 
       expect(f('.event-details-content')).to include_text "this is important"
     end
@@ -275,28 +275,21 @@ describe "scheduler" do
 
 
       f(".appointment-group-item:nth-child(1) .view_calendar_link").click
-      wait_for_ajaximations
-      sleep 1
 
-      #driver.execute_script("$('.fc-event-title').hover().click()")
-      #
+      f('.agenda-event .ig-row').click
 
-      fj('.agenda-event .ig-row').click
-
-      wait_for_ajaximations
-
-      keep_trying_until { expect(ffj('#attendees li').size).to eq 2 }
+      expect(ff('#attendees li')).to have_size(2)
 
       # delete the first appointment
-      driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
+      fj('.cancel_appointment_link:eq(1)').click
       wait_for_ajaximations
-      driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
+      f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
-      expect(ff('#attendees li').size).to eq 1
+      expect(ff('#attendees li')).to have_size(1)
 
-      fj('.agenda-event .ig-row').click
+      f('.agenda-event .ig-row').click
 
-      keep_trying_until { expect(ff('#attendees li').size).to eq 1 }
+      expect(ff('#attendees li')).to have_size(1)
       f('.scheduler_done_button').click
     end
 

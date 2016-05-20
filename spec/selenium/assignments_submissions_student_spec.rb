@@ -93,10 +93,8 @@ describe "submissions" do
       f('#submission_comment').send_keys("hello comment")
       expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until do
-        expect(f('#sidebar_content .header')).to include_text "Turned In!"
-        expect(f('.details .file-big')).to include_text "testfile1"
-      end
+      expect(f('#sidebar_content .header')).to include_text "Turned In!"
+      expect(f('.details .file-big')).to include_text "testfile1"
       @submission = @assignment.reload.submissions.where(user_id: @student).first
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
@@ -369,28 +367,15 @@ describe "submissions" do
         wait_for_ajaximations
 
         # traverse the tree
-        begin
-          keep_trying_until do
-            f('#uploaded_files > ul > li.folder > .sign').click
-            wait_for_ajaximations
-            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-          end
-          f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_ajaximations
-        rescue => err
-          # prevent the confirm dialog that pops up when you navigate away
-          # from the page from showing.
-          # TODO: actually figure out why the spec intermittently fails.
-          driver.execute_script "window.onbeforeunload = null;"
-          raise err
-        end
+        f('#uploaded_files > ul > li.folder > .sign').click
+        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
+        f('#uploaded_files > ul > li.folder .file .name').click
+        wait_for_ajaximations
 
         expect_new_page_load { f('#submit_file_button').click }
 
-        keep_trying_until do
-          expect(f('.details .header')).to include_text "Turned In!"
-          expect(f('.details .file-big')).to include_text "html-editing-test.html"
-        end
+        expect(f('.details .header')).to include_text "Turned In!"
+        expect(f('.details .file-big')).to include_text "html-editing-test.html"
       end
 
       it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
@@ -417,23 +402,11 @@ describe "submissions" do
         wait_for_ajaximations
 
         # traverse the tree
-        begin
-          keep_trying_until do
-            f('#uploaded_files > ul > li.folder > .sign').click
-            wait_for_ajaximations
-            # How does it know which name we're looking for?
-            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-          end
-          f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_ajaximations
-          f('#submit_file_button').click
-        rescue => err
-          # prevent the confirm dialog that pops up when you navigate away
-          # from the page from showing.
-          # TODO: actually figure out why the spec intermittently fails.
-          driver.execute_script "window.onbeforeunload = null;"
-          raise err
-        end
+        f('#uploaded_files > ul > li.folder > .sign').click
+        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
+        f('#uploaded_files > ul > li.folder .file .name').click
+        wait_for_ajaximations
+        f('#submit_file_button').click
 
         # Make sure the flash message is being displayed
         expect_flash_message :error

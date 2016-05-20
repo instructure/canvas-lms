@@ -142,16 +142,15 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
 
       select = f('#attachment_folder_id')
-      expect(select.find_elements(:css, 'option').length).to eq 1
+      expect(ff('option', select)).to have_size(1)
 
       f('.upload_new_file_link').click
-      keep_trying_until { select.find_elements(:css, 'option').length > 1 }
-      expect(select.find_elements(:css, 'option').length).to eq 3
+      expect(ff('option', select)).to have_size(3)
     end
 
     it "should be able to upload a file when nothing has been loaded" do
       wiki_page_tools_file_tree_setup
-      keep_trying_until { expect(f("form.edit-form .edit-content")).to be_displayed }
+      expect(f("form.edit-form .edit-content")).to be_displayed
 
       clear_wiki_rce
       switch_editor_views(wiki_page_body)
@@ -181,7 +180,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
     it "should show uploaded files in file tree and add them to the rce" do
       wiki_page_tools_file_tree_setup
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
       clear_wiki_rce
       f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       f('.upload_new_file_link').click
@@ -206,12 +205,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
     it "should not show uploaded files in image list" do
       wiki_page_tools_file_tree_setup
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.upload_new_image_link').click
       wiki_page_body = clear_wiki_rce
-      wait_for_ajaximations
-      keep_trying_until { expect(@image_list.find_elements(:css, 'img.img').length).to eq 2 }
+      expect(ff('img.img', @image_list)).to have_size(2)
 
       wiki_page_tools_upload_file('#sidebar_upload_image_form', :text)
 
@@ -232,12 +230,12 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       wait_for_ajaximations
       expect(root_folders.first.find_elements(:css, '.file.text').length).to eq 1
 
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.upload_new_image_link').click
       wiki_page_body = clear_wiki_rce
       wait_for_ajaximations
-      keep_trying_until { expect(@image_list.find_elements(:css, 'img.img').length).to eq 2 }
+      expect(ff('img.img', @image_list)).to have_size(2)
 
       wiki_page_tools_upload_file('#sidebar_upload_image_form', :text)
 
@@ -313,13 +311,10 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
-      keep_trying_until do
-        expand_root_folder
-        wait_for_ajaximations
-        expect(ff('li.folder li.file').count).to eq 2
-      end
+      expand_root_folder
+      expect(ff('li.folder li.file')).to have_size 2
     end
 
     it "should show file in the sidebar if it is locked" do
@@ -330,13 +325,10 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      fj('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
+      f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
       wait_for_ajaximations
-      keep_trying_until do
-        expand_root_folder
-        wait_for_ajaximations
-        expect(ff('li.folder li.file').count).to eq 2
-      end
+      expand_root_folder
+      expect(ff('li.folder li.file')).to have_size 2
     end
   end
 

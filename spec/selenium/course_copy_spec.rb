@@ -21,7 +21,7 @@ describe "course copy" do
       get "/courses/#{@course.id}/copy"
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = Course.last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -131,7 +131,7 @@ describe "course copy" do
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = subaccount.courses.where("id <>?", @course.id).last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -158,7 +158,7 @@ describe "course copy" do
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = @account.courses.where("id <>?", @course.id).last
       expect(@new_course.enrollment_term).to eq @account.default_enrollment_term
@@ -173,14 +173,15 @@ describe "course copy" do
       replace_content(f('#course_start_at'), 'Aug 15, 2012')
       replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
 
+      button = f('button.btn-primary')
       keep_trying_until do
-        expect(f('button.btn-primary').attribute('disabled')).to be_present
+        expect(button.attribute('disabled')).to be_present
       end
 
       replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
 
       keep_trying_until do
-        expect(f('button.btn-primary').attribute('disabled')).to be_blank
+        expect(button.attribute('disabled')).to be_blank
       end
     end
   end

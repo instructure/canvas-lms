@@ -109,7 +109,8 @@ describe "conversations new" do
       # Click on the address book
       f('.recipient-finder .icon-address-book').click
       wait_for_ajaximations
-      keep_trying_until { expect(f('.paginatedLoadingIndicator')['style']).to include('none') }
+      indicator = f('.paginatedLoadingIndicator')
+      keep_trying_until { expect(indicator['style']).to include('none') }
 
       # Verify the names of the course and all students and teachers appear
       expect(f('.ac-result-contents .context .result-name')).to include_text(@course.name)

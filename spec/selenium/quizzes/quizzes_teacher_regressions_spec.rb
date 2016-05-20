@@ -55,9 +55,7 @@ describe 'quizzes regressions' do
       in_frame f('.essay_question iframe')[:id] do
         f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
       end
-      sleep 1
-      wait_for_ajaximations
-      keep_trying_until { expect(ff('#question_list .answered').size).to eq 1 }
+      expect(ff('#question_list .answered')).to have_size 1
 
       expect(input).to have_attribute(:value, '1.0000')
     end

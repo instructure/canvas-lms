@@ -7,7 +7,7 @@ describe "profile" do
   def click_edit
     f('.edit_settings_link').click
     edit_form = f('#update_profile_form')
-    keep_trying_until { expect(edit_form).to be_displayed }
+    expect(edit_form).to be_displayed
     edit_form
   end
 
@@ -109,8 +109,7 @@ describe "profile" do
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
-      keep_trying_until { expect(confirmation_dialog).to be_displayed }
-      expect(driver.execute_script("return INST.errorCount;")).to eq 0
+      expect(confirmation_dialog).to be_displayed
       submit_dialog(confirmation_dialog, '.cancel_button')
       expect(confirmation_dialog).not_to be_displayed
       expect(f('.email_channels')).to include_text(test_email)
@@ -136,7 +135,7 @@ describe "profile" do
       replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
+      expect(f('.full_name')).to include_text new_user_name
     end
 
     it "should edit display name and validate" do
@@ -147,7 +146,7 @@ describe "profile" do
       submit_form(edit_form)
       wait_for_ajaximations
       refresh_page
-      keep_trying_until { expect(f('#topbar li.user_name').text).to eq new_display_name }
+      expect(f('#topbar li.user_name')).to include_text new_display_name
     end
 
     it "should change the language" do
@@ -304,7 +303,7 @@ describe "profile" do
       image_src = ''
 
       get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
+      f(".profile_pic_link").click
       dialog = f("#profile_pic_dialog")
       expect(dialog).to be_displayed
       dialog.find_element(:css, ".add_pic_link").click
@@ -320,18 +319,16 @@ describe "profile" do
 
       FilesController._process_action_callbacks.pop
 
+      uploaded_image = ff("#profile_pic_dialog .profile_pic_list span.img img").last
       keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
         image_src = uploaded_image.attribute('src')
         expect(image_src).to match %r{/images/thumbnails/}
         expect(new_image.attribute('alt')).to match /graded/
       end
       dialog.find_element(:css, '.select_button').click
       wait_for_ajaximations
+      profile_pic = f('.profile_pic_link img')
       keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
         expect(profile_pic).to have_attribue('src', image_src)
       end
       expect(Attachment.last.folder).to eq @user.profile_pics_folder
@@ -369,7 +366,7 @@ describe "profile" do
       image_src = ''
 
       get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
+      f(".profile_pic_link").click
       dialog = f("#profile_pic_dialog")
       expect(dialog).to be_displayed
       dialog.find_element(:css, ".add_pic_link").click
@@ -385,18 +382,16 @@ describe "profile" do
 
       FilesController._process_action_callbacks.pop
 
+      uploaded_image = ff("#profile_pic_dialog .profile_pic_list span.img img").last
       keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
         image_src = uploaded_image.attribute('src')
         expect(image_src).to match %r{/images/thumbnails/}
         expect(new_image.attribute('alt')).to match /graded/
       end
       dialog.find_element(:css, '.select_button').click
       wait_for_ajaximations
+      profile_pic = f('.profile_pic_link img')
       keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
         expect(profile_pic).to have_attribue('src', image_src)
       end
       expect(Attachment.last.folder).to eq @user.profile_pics_folder

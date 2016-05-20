@@ -95,10 +95,8 @@ describe "content migrations", :non_parallel do
       submit
       run_migration
 
-      keep_trying_until do
-        visit_page
-        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
-      end
+      visit_page
+      expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
 
       # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
       expect(@course.attachments.count).to eq 10
@@ -116,10 +114,10 @@ describe "content migrations", :non_parallel do
       migration_types.each do |type|
         select_migration_type(type)
 
-        keep_trying_until { expect(ffj("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq true }
+        expect(f("#content")).to contain_jqcss("input[type=\"submit\"]:visible")
 
         select_migration_type('none')
-        expect(ff("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq false
+        expect(f("#content")).not_to contain_jqcss("input[type=\"submit\"]:visible")
       end
 
       select_migration_type
@@ -373,10 +371,8 @@ describe "content migrations", :non_parallel do
 
       # search bar
       f('#courseSearchField').send_keys("cop")
-      keep_trying_until do
-        ui_auto_complete = f('.ui-autocomplete')
-        expect(ui_auto_complete).to be_displayed
-      end
+      ui_auto_complete = f('.ui-autocomplete')
+      expect(ui_auto_complete).to be_displayed
 
       el = f('.ui-autocomplete li a')
       divs = ff('div', el)
@@ -589,9 +585,7 @@ describe "content migrations", :non_parallel do
       ff('[name=selective_import]')[0].click
       submit
       run_jobs
-      keep_trying_until do
-        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
-      end
+      expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
       @course.reload
       expect(@course.announcements.last.locked).to be_truthy
       expect(@course.lock_all_announcements).to be_truthy
@@ -665,14 +659,14 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type(import_tool.asset_string)
       f("button#externalToolLaunch").click
-      tool_iframe = keep_trying_until { f(".tool_launch") }
+      tool_iframe = f(".tool_launch")
       expect(f('.ui-dialog-title').text).to eq import_tool.label_for(:migration_selection)
 
       driver.switch_to.frame(tool_iframe)
-      keep_trying_until { f("#basic_lti_link") }.click
+      f("#basic_lti_link").click
 
       driver.switch_to.default_content
-      file_name_elt = keep_trying_until { expect(f("#converter .file_name").text).to eq "lti embedded link" }
+      expect(f("#converter .file_name")).to include_text "lti embedded link"
     end
 
     it "should have content selection option" do

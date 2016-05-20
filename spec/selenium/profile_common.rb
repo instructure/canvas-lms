@@ -44,26 +44,24 @@ shared_examples 'user settings page change pic window' do |context|
     f('.avatar.profile_pic_link.none').click
     wait_for_ajaximations
 
-    keep_trying_until(3) do
-      # There is a window with title "Select Profile Picture"
-      expect(f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')).to be_truthy
-      expect(f('.ui-dialog-title')).to be_truthy
-      expect(f('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')).to include_text('Select Profile Picture')
+    # There is a window with title "Select Profile Picture"
+    expect(f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')).to be_truthy
+    expect(f('.ui-dialog-title')).to be_truthy
+    expect(f('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')).to include_text('Select Profile Picture')
 
-      # There is a default gray image placeholder for picture
-      expect(f('.avatar-content .active .select-photo-link')).to include_text('choose a picture')
+    # There is a default gray image placeholder for picture
+    expect(f('.avatar-content .active .select-photo-link')).to include_text('choose a picture')
 
-      # There are 'Upload Picture' and 'From Gravatar' buttons
-      expect(f('.nav.nav-pills .active')).to include_text('Upload a Picture')
-      expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text('From Gravatar')
-      # Firefox and Chrome: There is a 'Take a Picture' button
-      expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text('Take a Picture')
+    # There are 'Upload Picture' and 'From Gravatar' buttons
+    expect(f('.nav.nav-pills .active')).to include_text('Upload a Picture')
+    expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text('From Gravatar')
+    # Firefox and Chrome: There is a 'Take a Picture' button
+    expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text('Take a Picture')
 
-      # There are 'X', Save, and Cancel buttons
-      expect(f('.ui-icon.ui-icon-closethick')).to be_truthy
-      expect(fj('.ui-button :contains("Cancel")')).to be_truthy
-      expect(fj('.ui-button :contains("Save")')).to be_truthy
-    end
+    # There are 'X', Save, and Cancel buttons
+    expect(f('.ui-icon.ui-icon-closethick')).to be_truthy
+    expect(fj('.ui-button :contains("Cancel")')).to be_truthy
+    expect(fj('.ui-button :contains("Save")')).to be_truthy
   end
 end
 

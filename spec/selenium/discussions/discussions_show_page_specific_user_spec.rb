@@ -234,7 +234,7 @@ describe "discussions" do
           new_points = get_value(".criterion_points")
           dialog = fj(".ui-dialog:visible")
 
-          keep_trying_until { expect(fj(".grading_rubric_checkbox:visible")).to be_displayed }
+          expect(fj(".grading_rubric_checkbox:visible")).to be_displayed
           set_value fj(".grading_rubric_checkbox:visible", dialog), true
 
           fj(".save_button:visible", dialog).click

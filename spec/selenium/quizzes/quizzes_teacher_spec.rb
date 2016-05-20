@@ -83,7 +83,7 @@ describe "quizzes" do
 
       add_question_to_group
       click_settings_tab
-      keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "3" }
+      expect(f("#quiz_display_points_possible .points_possible")).to include_text "3"
 
       click_questions_tab
       group_form.find_element(:css, '.edit_group_link').click
@@ -93,7 +93,7 @@ describe "quizzes" do
       submit_form(group_form)
       expect(group_form.find_element(:css, '.group_display.name')).to include_text('renamed')
       click_settings_tab
-      keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
+      expect(f("#quiz_display_points_possible .points_possible")).to include_text "2"
     end
 
     it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
@@ -174,7 +174,7 @@ describe "quizzes" do
         f('.add_question_group_link').click
 
         f('.find_bank_link').click
-        keep_trying_until { fj('#find_bank_dialog .bank:visible') }.click
+        fj('#find_bank_dialog .bank:visible').click
         submit_dialog('#find_bank_dialog', '.submit_button')
         submit_form('.quiz_group_form')
         wait_for_ajaximations
@@ -396,7 +396,7 @@ describe "quizzes" do
           wait_for_ajaximations
         end
         # not marked as answered
-        keep_trying_until { expect(ff('#question_list .answered')).to be_empty }
+        expect(f('#question_list')).not_to have_css('.answered')
 
         # fully answer each question
         dropdowns.each do |d|
@@ -407,7 +407,7 @@ describe "quizzes" do
         end
 
         # marked as answer
-        keep_trying_until { expect(ff('#question_list .answered').size).to eq 2 }
+        expect(ff('#question_list .answered')).to have_size 2
         wait_for_ajaximations
 
         fln('Quizzes').click
@@ -419,13 +419,9 @@ describe "quizzes" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         fln("Resume Quiz").click
 
-        # there's some initial setTimeout stuff that happens, so things won't
-        # be ready right when the page loads
-        keep_trying_until do
-          dropdowns = ff('a.ui-selectmenu.question_input')
-          expect(dropdowns.size).to eq 6
-          expect(dropdowns.map(&:text)).to eq %w{orange green east east east east}
-        end
+        dropdowns = ff('a.ui-selectmenu.question_input')
+        expect(dropdowns).to have_size(6)
+        expect(dropdowns.map(&:text)).to eq %w{orange green east east east east}
         expect(ff('#question_list .answered').size).to eq 2
       end
     end
@@ -447,7 +443,6 @@ describe "quizzes" do
       q.time_limit = 10
       q.save!
 
-      # This user action has to be done as a student
       user_session(@student)
       get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       f("#take_quiz_link").click
@@ -459,31 +454,30 @@ describe "quizzes" do
       answer_one.click
       wait_for_ajaximations
 
-      # restore user state, assuming specs aren't independent
-      user_session(@user)
-
-      # add time as a the moderator. this code replicates what happens in
+      # add time. this code replicates what happens in
       # QuizSubmissions#extensions when a moderator extends a student's
       # quiz time.
 
       quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
-      keep_trying_until do
-        submission = Quizzes::QuizSubmission.last
-        submission.end_at = Time.zone.now + 20.minutes
-        submission.save!
-        expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
-        expect(f('.time_running').text).to match /19 Minutes/
-      end
+      submission = Quizzes::QuizSubmission.last
+      submission.end_at = Time.zone.now + 20.minutes
+      submission.save!
+      expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
+
+      # answer a question to force a quicker UI sync (so we don't have to
+      # wait ~15 seconds). need to wait 1 sec cuz updateSubmission :'(
+      sleep 1
+      f("#question_#{question.id}_answer_2").click
+
+      expect(f('.time_running')).to include_text "19 Minutes"
     end
 
     def upload_attachment_answer
-      fj('input[type=file]').send_keys @fullpath
+      f('input[type=file]').send_keys @fullpath
       wait_for_ajaximations
-      keep_trying_until do
-        fj('.file-uploaded').text
-        fj('.list_question, .answered').text
-      end
-      fj('.upload-label').click
+      expect(f('.file-uploaded').text).to be
+      expect(f('.list_question, .answered').text).to be
+      f('.upload-label').click
       wait_for_ajaximations
     end
 
@@ -543,10 +537,9 @@ describe "quizzes" do
       end
       wait_for_ajaximations
       attachment = file_upload_attachment
-      expect(fj('.file-upload-box').text).to include attachment.display_name
+      expect(f('.file-upload-box')).to include_text attachment.display_name
       f('#submit_quiz_button').click
-      wait_for_ajaximations
-      keep_trying_until { expect(fj('.selected_answer').text).to include attachment.display_name }
+      expect(f('.selected_answer')).to include_text attachment.display_name
       user_session(@user)
     end
 

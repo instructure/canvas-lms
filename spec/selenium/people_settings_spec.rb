@@ -18,7 +18,7 @@ describe "course people" do
   def add_user(email, type, section_name=nil)
     get "/courses/#{@course.id}/users"
     add_button = f('#addUsers')
-    keep_trying_until { expect(add_button).to be_displayed }
+    expect(add_button).to be_displayed
     add_button.click
     wait_for_ajaximations
 

@@ -99,13 +99,11 @@ module QuizQuestionsCommon
   end
 
   def it_should_be_on_question(which_question)
-    keep_trying_until(3) do
-      body = f('body')
-      expect(body).to include_text which_question
-      questions = ['first question', 'second question', 'third question'] - [which_question]
-      questions.each do |question|
-        expect(body).not_to include_text question
-      end
+    body = f('body')
+    expect(body).to include_text which_question
+    questions = ['first question', 'second question', 'third question'] - [which_question]
+    questions.each do |question|
+      expect(body).not_to include_text question
     end
   end
 
@@ -242,6 +240,6 @@ module QuizQuestionsCommon
     click_next_button
     answer_the_question_correctly
     submit_finished_quiz
-    keep_trying_until { it_should_show_two_correct_answers }
+    it_should_show_two_correct_answers
   end
 end

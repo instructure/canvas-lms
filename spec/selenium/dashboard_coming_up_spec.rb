@@ -71,7 +71,6 @@ describe "dashboard" do
       @assignment.save!
 
       get "/"
-      keep_trying_until { expect(ffj(".events_list .event-details").size).to be > 0 }
       expect(f('.events_list .event-details')).to include_text '10 points'
     end
   end

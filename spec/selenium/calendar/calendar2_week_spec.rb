@@ -33,13 +33,13 @@ describe "calendar2" do
         calendar_events = @teacher.calendar_events_for_calendar.last
 
         expect(calendar_events.title).to eq "super important"
-        expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
+        expect(@assignment.due_date).to eq((Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date)
 
         load_week_view
+        events = ff('.fc-event')
         keep_trying_until do
-          events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
           # shows on monday night and tuesday morning
-          expect(events.size).to eq 2
+          expect(events.count { |e| e.text =~ /due.*super important/ }).to eq 2
         end
       end
 
@@ -124,8 +124,8 @@ describe "calendar2" do
 
         load_week_view
         quick_jump_to_date('Jan 1, 2015')
-        keep_trying_until { expect(ffj('.fc-event').length).to eq 2 }
-        events = ffj('.fc-event')
+        expect(ff('.fc-event')).to have_size(2)
+        events = ff('.fc-event')
 
         # Scroll the elements into view
         events[0].location_once_scrolled_into_view
@@ -235,8 +235,8 @@ describe "calendar2" do
 
       # Drag and drop event resizer from first event onto assignment icon
       load_week_view
-      keep_trying_until { expect(ffj('.fc-view-container .icon-calendar-month').length).to eq 1 }
-      drag_and_drop_element(fj('.fc-end-resizer'), fj('.icon-assignment'))
+      expect(ff('.fc-view-container .icon-calendar-month')).to have_size(1)
+      drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
 
       # Verify Event now ends at assignment start time + 30 minutes
       expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
@@ -253,8 +253,8 @@ describe "calendar2" do
 
       # Drag object event onto target event using calendar icons
       load_week_view
-      keep_trying_until { expect(ffj('.fc-view-container .icon-calendar-month').length).to eq 2 }
-      icon_array = ffj('.fc-view-container .icon-calendar-month')
+      expect(ff('.fc-view-container .icon-calendar-month')).to have_size(2)
+      icon_array = ff('.fc-view-container .icon-calendar-month')
       drag_and_drop_element(icon_array[1], icon_array[0])
       wait_for_ajaximations
 

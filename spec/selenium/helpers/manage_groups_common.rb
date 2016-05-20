@@ -2,10 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module ManageGroupsCommon
   def add_category(course, name, opts={})
-    keep_trying_until do
-      f(".add_category_link").click
-      wait_for_ajaximations
-    end
+    f(".add_category_link").click
+    wait_for_ajaximations
     form = f("#add_category_form")
     input = form.find_element(:css, "input[type=text]")
     replace_content input, name
@@ -31,10 +29,10 @@ module ManageGroupsCommon
       form.find_element(:css, "#category_no_groups").click
     end
     submit_form(form)
-    keep_trying_until { expect(find_with_jquery("#add_category_form:visible")).to be_nil }
+    expect(f("#add_category_form")).not_to be_displayed
     category = course.group_categories.where(name: name).first
     expect(category).not_to be_nil
-    keep_trying_until { fj("#category_#{category.id} .student_links:visible") }
+    expect(fj("#category_#{category.id} .student_links:visible")).to be_displayed
     category
   end
 

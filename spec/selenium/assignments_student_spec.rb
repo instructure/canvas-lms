@@ -191,14 +191,12 @@ describe "assignments" do
         submission_input = f('.submission_attachment input')
         ext_error = f('.bad_ext_msg')
 
-        keep_trying_until do
-          submission_input.send_keys(fullpath_txt)
-          expect(ext_error).not_to be_displayed
-          expect(submit_file_button['disabled']).to be_nil
-          submission_input.send_keys(fullpath_zip)
-          expect(ext_error).to be_displayed
-          expect(submit_file_button).to have_attribute(:disabled, "true")
-        end
+        submission_input.send_keys(fullpath_txt)
+        expect(ext_error).not_to be_displayed
+        expect(submit_file_button['disabled']).to be_nil
+        submission_input.send_keys(fullpath_zip)
+        expect(ext_error).to be_displayed
+        expect(submit_file_button).to have_attribute(:disabled, "true")
       end
     end
 

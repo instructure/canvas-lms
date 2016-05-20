@@ -55,8 +55,8 @@ module Calendar2Common
 
   def open_edit_event_dialog
     f('.fc-event').click
-    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
-    driver.execute_script("$('.edit_event_link').trigger('click')")
+    expect(f('.edit_event_link')).to be_displayed
+    f('.edit_event_link').click
     wait_for_ajaximations
   end
 
@@ -151,7 +151,7 @@ module Calendar2Common
     publish_toggle = edit_assignment_form.find('#assignment_published')
     move_to_click('label[for=assignment_published]') if publish
     submit_form(edit_assignment_form)
-    expect(f('.fc-month-view .fc-title')).to include_text(assignment_title)
+    expect(f('.fc-month-view .fc-event:not(.event_pending) .fc-title')).to include_text(assignment_title)
   end
 
   # Creates event from clicking on the mini calendar

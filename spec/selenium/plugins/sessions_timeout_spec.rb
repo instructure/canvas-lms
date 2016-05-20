@@ -14,7 +14,7 @@ describe "Sessions Timeout" do
         get "/plugins/sessions"
         if !f("#plugin_setting_disabled").displayed?
           f("#accounts_select option:nth-child(2)").click
-          keep_trying_until { f("#plugin_setting_disabled").displayed? }
+          expect(f("#plugin_setting_disabled")).to be_displayed
         end
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')

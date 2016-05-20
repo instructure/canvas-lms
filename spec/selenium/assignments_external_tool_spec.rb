@@ -38,15 +38,13 @@ describe "external tool assignments" do
     f('#assignment_name').send_keys('test1')
     click_option('#assignment_submission_type', 'External Tool')
     f('#assignment_external_tool_tag_attributes_url_find').click
-    keep_trying_until do
-      fj('#context_external_tools_select td .tools .tool:first-child:visible').click
-      wait_for_ajaximations
-      expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
-    end
-    keep_trying_until do
-      ff('#context_external_tools_select td .tools .tool')[1].click
-      expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t2.url)
-    end
+
+    fj('#context_external_tools_select td .tools .tool:first-child:visible').click
+    wait_for_ajaximations
+    expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
+
+    ff('#context_external_tools_select td .tools .tool')[1].click
+    expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t2.url)
 
     f('.add_item_button.ui-button').click
 

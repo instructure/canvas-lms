@@ -16,24 +16,15 @@ describe "equation editor" do
     wait_for_tiny(f("#quiz_description"))
     type_in_tiny 'textarea#quiz_description', 'foo'
 
-    equation_editor = keep_trying_until do
-      f(equation_selector).click
-      wait_for_ajaximations
-      equation_editor = fj(".mathquill-editor:visible")
-      expect(equation_editor).not_to be_nil
-      equation_editor
-    end
+    f(equation_selector).click
+    equation_editor = fj(".mathquill-editor:visible")
+    expect(equation_editor).not_to be_nil
 
     fj('.ui-dialog-titlebar-close:visible').click
     type_in_tiny 'textarea#quiz_description', 'bar'
     f('.save_quiz_button').click
 
-    description = keep_trying_until do
-      f('.description')
-    end
-
-    expect(description.text).to eq 'foobar'
-
+    expect(f('.description')).to include_text 'foobar'
   end
 
   it "should support multiple equation editors on the same page" do

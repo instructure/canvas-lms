@@ -129,7 +129,7 @@ describe 'editing a quiz' do
 
     it 'changes the quiz\'s description', priority: "1", test_id: 210057 do
       wait_for_ajaximations
-      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
+      expect(f('#quiz_description_ifr')).to be_displayed
 
       test_text = 'changed description'
       type_in_tiny '#quiz_description', test_text

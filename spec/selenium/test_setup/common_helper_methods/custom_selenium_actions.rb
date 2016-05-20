@@ -20,10 +20,6 @@ module CustomSeleniumActions
     driver.find_all(css)
   end
 
-  def not_found(css)
-    driver.not_found(css)
-  end
-
   def find_radio_button_by_value(value, scope = nil)
     fj("input[type=radio][value=#{value}]", scope)
   end
@@ -66,10 +62,10 @@ module CustomSeleniumActions
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
     stale_element_protection do
-      wait_for(method: :fj) { find_with_jquery selector, scope }
+      wait_for(method: :fj) do
+        find_with_jquery selector, scope
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
     end
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise Selenium::WebDriver::Error::NoSuchElementError
   end
 
   # same as `f`, but returns all matching elements
@@ -77,7 +73,9 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
-    result = (scope || driver).find_elements :css, selector
+    result = reloadable_collection do
+      (scope || driver).find_elements :css, selector
+    end
     raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
     result
   end
@@ -87,14 +85,14 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
-    result = nil
-    wait_for(method: :ffj) do
-      result = find_all_with_jquery(selector, scope)
-      result.present?
+    reloadable_collection do
+      result = nil
+      wait_for(method: :ffj) do
+        result = find_all_with_jquery(selector, scope)
+        result.present?
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      result
     end
-    result
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise Selenium::WebDriver::Error::NoSuchElementError
   end
 
   def find_with_jquery(selector, scope = nil)
@@ -122,11 +120,14 @@ module CustomSeleniumActions
   end
 
   def in_frame(id)
+    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
     saved_window_handle = driver.window_handle
     driver.switch_to.frame(id)
-    yield
-  ensure
-    driver.switch_to.window saved_window_handle
+    begin
+      yield
+    ensure
+      driver.switch_to.window saved_window_handle
+    end
   end
 
   def is_checked(css_selector)
@@ -426,9 +427,38 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
+  def dismiss_flash_messages
+    ff("#flash_message_holder li").each(&:click)
+  end
+
+  def scroll_into_view(selector)
+    driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
+  end
+
+  # see public/javascripts/vendor/jquery.scrollTo.js
+  # target can be:
+  #  - A number position (will be applied to all axes).
+  #  - A string position ('44', '100px', '+=90', etc ) will be applied to all axes
+  #  - A string selector, that will be relative to the element to scroll ( 'li:eq(2)', etc )
+  #  - A hash { top:x, left:y }, x and y can be any kind of number/string like above.
+  #  - A percentage of the container's dimension/s, for example: 50% to go to the middle.
+  #  - The string 'max' for go-to-end.
+  def scroll_element(selector, target)
+    driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
+  end
+
   def stale_element_protection
     element = yield
-    element.finder_proc = Proc.new
+    element.finder_proc = proc do
+      disable_implicit_wait { yield }
+    end
     element
+  end
+
+  def reloadable_collection
+    collection = yield
+    SeleniumExtensions::ReloadableCollection.new(collection, proc do
+      disable_implicit_wait { yield }
+    end)
   end
 end
