@@ -27,7 +27,7 @@ define([
   'jquery.instructure_forms' /* errorBox */,
   'jquery.instructure_misc_helpers' /* /\.detect/ */,
   'jquery.templateData' /* fillTemplateData */
-], function(I18n, $, _, htmlEscape, waitForProcessing, processGradebookUpload, SlickGrid) {
+], function(I18n, $, _, htmlEscape, waitForProcessing, ProcessGradebookUpload, SlickGrid) {
 
   var GradebookUploader = {
     createGeneralFormatter: function(attribute) {
@@ -149,7 +149,7 @@ define([
           $gradebookGridForm.submit(function(e){
             e.preventDefault();
             $gradebookGridForm.disableWhileLoading(
-              processGradebookUpload(uploadedGradebook)
+              ProcessGradebookUpload.upload(uploadedGradebook)
             );
           }).show();
 

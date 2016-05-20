@@ -118,6 +118,42 @@ describe "gradebook uploads" do
 
   end
 
+  it "should create an assignment with no grades", priority: "1", test_id: 209971 do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    _filename, fullpath, _data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 2,Assignment 1",
+          "User,#{@student.id},,,10")
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
+
+    expect(f('#gradebook_importer_resolution_section')).to be_displayed
+
+    expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
+    expect(f('.assignment_section #assignment_resolution_template .title').text).to eq 'Assignment 2'
+
+    click_option('.assignment_section #assignment_resolution_template select', 'new', :value)
+
+    submit_form('#gradebook_importer_resolution_section')
+
+    expect(f('#no_changes_detected')).not_to be_displayed
+
+    expect(ff('.slick-header-column.assignment').length).to eq 1
+
+    assignment_count = @course.assignments.count
+    submit_form('#gradebook_grid_form')
+    wait_for_ajaximations
+    run_jobs
+    expect(@course.assignments.count).to eql (assignment_count + 1)
+    assignment = @course.assignments.order(:created_at).last
+    expect(assignment.name).to eq "Assignment 2"
+    expect(assignment.submissions.count).to eql 0
+    expect(f('#gradebook_wrapper')).to be_displayed
+  end
+
   it "should say no changes if no changes after matching assignment" do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, :grade => 10)
