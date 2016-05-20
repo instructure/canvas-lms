@@ -76,7 +76,7 @@ describe "submissions" do
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
-      expect(f('#media_comment_submit_button')).to have_attribute('disabled', 'true')
+      expect(f('#media_comment_submit_button')).to be_disabled
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f('#section-tabs .home').click
       driver.switch_to.alert.accept

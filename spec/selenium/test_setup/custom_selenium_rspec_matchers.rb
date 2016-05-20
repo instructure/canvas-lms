@@ -77,17 +77,57 @@ RSpec::Matchers.define :have_value do |value_attribute|
   end
 end
 
+# assert the presence (or absence) of a value within an element's
+# attribute. will return as soon as the expectation is met, e.g.
+#
+#   expect(f('.fc-event .fc-time')).to have_attribute('data-start', '11:45')
+#
 RSpec::Matchers.define :have_attribute do |attribute, attribute_value|
   match do |element|
-    !!element.attribute(attribute).match(attribute_value)
+    wait_for(method: :have_attribute) do
+      element.attribute(attribute).match(attribute_value)
+    end
+  end
+
+  match_when_negated do |element|
+    wait_for(method: :have_attribute) do
+      !element.attribute(attribute).match(attribute_value)
+    end
   end
 
   failure_message do |element|
-    "expected #{element.inspect} to have attribute #{attribute_value}, actual attribute type: #{element.attribute('#{attribute.to_s}')}"
+    "expected #{element.inspect}'s #{attribute} attribute to have value of #{attribute_value}, actual #{attribute} attribute value: #{element.attribute("#{attribute.to_s}")}"
   end
 
   failure_message_when_negated do |element|
-    "expected #{element.inspect} to NOT have attribute #{attribute_value}, actual attribute type: #{element.attribute('#{attribute.to_s}')}"
+    "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{attribute_value}, actual #{attribute} attribute type: #{element.attribute("#{attribute.to_s}")}"
+  end
+end
+
+# assert whether or not an element is disabled.
+# will return as soon as the expectation is met, e.g.
+#
+#   expect(f("#assignment_group_category_id")).to be_disabled
+#
+RSpec::Matchers.define :be_disabled do
+  match do |element|
+    wait_for(method: :be_disabled) do
+      element.attribute(:disabled) == "true"
+    end
+  end
+
+  match_when_negated do |element|
+    wait_for(method: :be_disabled) do
+      element.attribute(:disabled) != "true"
+    end
+  end
+
+  failure_message do |element|
+    "expected #{element.inspect}'s disabled attribute to be true, actual disabled attribute value: #{element.attribute(:disabled)}"
+  end
+
+  failure_message_when_negated do |element|
+    "expected #{element.inspect}'s disabled attribute to NOT be true, actual disabled attribute type: #{element.attribute(:disabled)}"
   end
 end
 

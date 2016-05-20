@@ -372,14 +372,14 @@ describe "courses" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should only display active tools" do

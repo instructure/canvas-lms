@@ -159,7 +159,8 @@ describe "context modules" do
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       check_element_has_focus f("#add_context_module_form .assignment_picker")
-      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
+      # be_disabled
+      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]')).to be_disabled
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
 
@@ -327,7 +328,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
 
-      expect(locked_title[0].attribute(:title)).to eq text_header
+      expect(locked_title[0]).to have_attribute("title", text_header)
     end
 
     it "should not rename every text header when you rename one" do

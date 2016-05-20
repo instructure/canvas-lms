@@ -195,7 +195,8 @@ describe "assignments" do
       wait_for_ajaximations
       hover_and_click(".edit_assignment")
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
-      expect(f('.multiple_due_dates input').attribute('disabled')).to be_present
+      # be_disabled
+      expect(f('.multiple_due_dates input')).to be_disabled
       assignment_title = f("#assign_#{@assignment.id}_assignment_name")
       assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
       replace_content(assignment_title, "VDD Test Assignment Updated")
@@ -339,7 +340,8 @@ describe "assignments" do
       it "should not allow group set to be changed if there are submissions", priority: "1", test_id: 626907 do
         get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
         wait_for_ajaximations
-        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+        # be_disabled
+        expect(f("#assignment_group_category_id")).to be_disabled
       end
 
       it "should still show deleted group set only on an attached assignment with " +
@@ -361,7 +363,7 @@ describe "assignments" do
 
         expect(get_value("#assignment_group_category_id")).to eq @assignment1.group_category.id.to_s
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
-        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+        expect(f("#assignment_group_category_id")).to be_disabled
       end
 
       it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "2", test_id: 627150 do
@@ -476,7 +478,7 @@ describe "assignments" do
         wait_for_ajaximations
         expect(@assignment.reload).to be_published
         icon = f("#assignment_#{@assignment.id} .publish-icon")
-        keep_trying_until { expect(icon.attribute('aria-label')).to include("Published") }
+        expect(icon).to have_attribute('aria-label', 'Published')
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do

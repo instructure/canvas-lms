@@ -136,7 +136,7 @@ describe "speed grader - quiz submissions" do
       submit_form('#update_history_form')
     end
     input = f('#grade_container input')
-    keep_trying_until { expect(input).to have_attribute('value', expected_points) }
+    expect(input).to have_attribute('value', expected_points)
   end
 
   it "properly displays student quiz results when the teacher also " \

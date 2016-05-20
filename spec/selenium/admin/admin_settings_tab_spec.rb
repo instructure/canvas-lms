@@ -94,7 +94,7 @@ describe "admin settings tab" do
       f("#account_default_time_zone option[value='Lima']").click
       click_submit
       expect(Account.default.default_time_zone.name).to eq "Lima"
-      expect(f("#account_default_time_zone option[value='Lima']").attribute("selected")).to be_truthy
+      expect(f("#account_default_time_zone option[value='Lima']")).to have_attribute("selected", "true")
     end
 
     describe "allow self-enrollment" do

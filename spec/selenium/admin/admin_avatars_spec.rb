@@ -30,7 +30,7 @@ describe "admin avatars" do
       f(opts.keys[0]).click
     end
     expect(f("#avatars .name")).to include_text user.name
-    expect(f(".avatar").attribute('style')).to match(/http/)
+    expect(f(".avatar")).to have_attribute('style', /http/)
   end
 
   def lock_avatar(user, element)

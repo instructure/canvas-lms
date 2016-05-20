@@ -42,7 +42,6 @@ describe "speed grader - rubrics" do
     expect(f('#rubric_summary_container > .rubric_container')).to be_displayed
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
     expect(f('#rubric_summary_container .rubric_total')).to include_text('8')
-    wait_for_ajaximations
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 

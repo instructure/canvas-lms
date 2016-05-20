@@ -183,17 +183,13 @@ describe "eportfolios file upload" do
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }
     f("#right-side .edit_content_link").click
-    wait_for_ajaximations
-    driver.execute_script "$('.add_file_link').click()"
+    f('.add_file_link').click
     fj(".file_upload:visible").send_keys(fullpath)
-    wait_for_ajaximations
     f(".upload_file_button").click
-    wait_for_ajaximations
     submit_form(".form_content")
-    wait_for_ajax_requests
     download = f("a.eportfolio_download")
     expect(download).to be_displayed
-    expect(download.attribute('href')).not_to be_nil
+    expect(download).to have_attribute("href", /files/)
     #cannot test downloading the file, will check in the future
     #check_file(download)
   end

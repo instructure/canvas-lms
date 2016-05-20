@@ -151,7 +151,7 @@ describe "Screenreader Gradebook" do
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.student_assignment.editable').attribute 'data-muted').to eq 'true'
+    expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
 
     get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
@@ -170,7 +170,7 @@ describe "Screenreader Gradebook" do
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.student_assignment.editable').attribute 'data-muted').to eq 'false'
+    expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
 
     get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to_not have_class 'muted'

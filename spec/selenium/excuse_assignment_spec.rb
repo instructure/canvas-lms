@@ -243,8 +243,8 @@ describe 'Excuse an Assignment' do
 
       expect(grade_row).to have_class '.excused'
       expect(grade).to eq 'EX'
-      expect(grade_row.attribute 'title').to eq 'This assignment is excused ' \
-       'and will not be considered in the total calculation'
+      expect(grade_row).to have_attribute('title', 'This assignment is excused ' \
+       'and will not be considered in the total calculation')
     end
 
     ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|

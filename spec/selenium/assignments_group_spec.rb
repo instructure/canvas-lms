@@ -345,9 +345,9 @@ describe "assignment groups" do
         # title isn't locked, should allow editing
         f('#assignment_name').send_keys(' edit')
 
-        expect(f('#assignment_group_id').attribute('disabled')).to be_nil
-        expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
-        expect(f('#assignment_description').attribute('disabled')).to be_nil
+        expect(f('#assignment_group_id')).not_to be_disabled
+        expect(f('#assignment_peer_reviews')).not_to be_disabled
+        expect(f('#assignment_description')).not_to be_disabled
         click_option('#assignment_group_id', "other")
       end
 

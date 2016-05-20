@@ -303,10 +303,10 @@ describe "calendar2" do
         expect(header_text).to include('February 2012')
         first_wednesday = '.fc-day-number.fc-wed:first'
         expect(fj(first_wednesday).text).to eq('1')
-        expect(fj(first_wednesday).attribute('data-date')).to eq('2012-02-01')
+        expect(fj(first_wednesday)).to have_attribute('data-date', '2012-02-01')
         last_thursday = '.fc-day-number.fc-thu:last'
         expect(fj(last_thursday).text).to eq('1')
-        expect(fj(last_thursday).attribute('data-date')).to eq('2012-03-01')
+        expect(fj(last_thursday)).to have_attribute('data-date', '2012-03-01')
       end
 
       it "should correctly display previous month on arrow press", priority: "1", test_id: 419290 do
@@ -318,10 +318,10 @@ describe "calendar2" do
         expect(header_text).to include('December 2011')
         first_thursday = '.fc-day-number.fc-thu:first'
         expect(fj(first_thursday).text).to eq('1')
-        expect(fj(first_thursday).attribute('data-date')).to eq('2011-12-01')
+        expect(fj(first_thursday)).to have_attribute('data-date', '2011-12-01')
         last_saturday = '.fc-day-number.fc-sat:last'
         expect(fj(last_saturday).text).to eq('31')
-        expect(fj(last_saturday).attribute('data-date')).to eq('2011-12-31')
+        expect(fj(last_saturday)).to have_attribute('data-date', '2011-12-31')
       end
 
       it "should fix up the event's date for events after 11:30pm" do

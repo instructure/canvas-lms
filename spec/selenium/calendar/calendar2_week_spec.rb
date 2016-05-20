@@ -66,11 +66,11 @@ describe "calendar2" do
 
         load_week_view
 
-        expect(f('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
+        expect(f('.fc-event .fc-time')).to have_attribute('data-start', '11:45')
       end
 
       it "should stagger pseudo-overlapping short events", priority: "2", test_id: 768980 do
-        noon = Time.now.at_beginning_of_day + 12.hours
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
         second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
@@ -130,7 +130,7 @@ describe "calendar2" do
         load_week_view
 
         elt = fj('.fc-event:visible')
-        expect(elt.attribute('title')).to match(/12:00.*12:05/)
+        expect(elt).to have_attribute('title', /12:00.*12:05/)
       end
     end
 

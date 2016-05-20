@@ -377,7 +377,7 @@ describe "dashboard" do
       get "/"
       wait_for_ajaximations
 
-      expect(f('.recent_feedback a').attribute('href')).to match /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/
+      expect(f('.recent_feedback a')).to have_attribute("href", /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/)
       f('.recent_feedback a').click
       wait_for_ajaximations
 

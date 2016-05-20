@@ -251,7 +251,7 @@ describe "conversations new" do
 
       select_view('sent')
       click_message(0)
-      expect(f('#archive-btn').attribute('disabled')).to be_present
+      expect(f('#archive-btn')).to be_disabled
     end
 
     it "should not be able to archive a sent message via the cog dropdown" do

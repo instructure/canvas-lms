@@ -201,7 +201,7 @@ describe "context modules" do
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
       nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
-      expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}"
+      expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}")
 
       # Should redirect to the published item
       get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
@@ -382,15 +382,15 @@ describe "context modules" do
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
         prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
         prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
         nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after2.id}"
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
 
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
@@ -406,9 +406,9 @@ describe "context modules" do
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
 
       # TODO reimplement per CNVS-29600, but make sure we're testing at the right level
