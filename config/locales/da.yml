@@ -1644,6 +1644,7 @@ da:
   assignment_976578a8: Opgave
   assignment_comments_e43ed898: Opgavekommentarer
   assignment_created_assignment_name_course_name_324a5639: "Opgave oprettet - %{assignment_name}, %{course_name}"
+  assignment_d8387b78: opgave
   assignment_details: 
     no_graded_submissions: "Ingen bedømte opgaver"
   assignment_details_bc488179: Opgaveoplysninger
@@ -2221,6 +2222,7 @@ da:
       labels: 
         syllabus_body: Kursusbeskrivelse
       links: 
+        edit_syllabus_description: Rediger
         jump_to_today: "Spring til i dag"
       titles: 
         course_syllabus: Kursusbeskrivelse
@@ -3524,10 +3526,10 @@ da:
         access_report: "Adgangsrapport for %{user}"
         cant_delete: "Kan ikke slette"
         conclude_enrollment: "Afslut denne tilmelding"
-        delete_enrollment: "Slet denne tilmelding"
+        delete_enrollment: Slet
         faculty_journal: "Fakultetsjournal for %{user}"
         link_enrollment: "Link denne tilmeldelse"
-        restore_enrollment: "Gendan denne tilmelding"
+        restore_enrollment: Gendan
         student_teacher_activity: "Din rapport over interaktioner med %{user}"
         teacher_activity: "Rapport over studerendes interaktioner med %{user}"
         title: 
@@ -5397,6 +5399,7 @@ da:
     atom_no_author: "Ingen forfatter"
     default_title: "Ingen overskrift"
     empty_message: "Ingen besked"
+  discussion_topic_a7bf935: "diskussions emne"
   discussion_topic_dc85ad4c: Diskussionsemne
   discussion_topic_menu_3d4684c6: Diskussionsemnemenu
   discussion_topic_will_be_available_starting_at_46aa7477: "Diskussionsemne vil være tilgængeligt fra"
@@ -5541,6 +5544,10 @@ da:
       due_date: "forfalden %{date}"
       peer_review_alert: "Du er blevet udpeget til et peer review for %{person}"
     points_possible_number: "Mulige points skal være et tal"
+    published_button: 
+      buttons: 
+        not_published: "Ikke offentliggjort"
+        published: Offentliggjort
     reply_count_tooltip: 
       one: "1 svar."
       other: "%{count} svar."
@@ -11478,6 +11485,9 @@ da:
       name: PandaPub
     pv4: 
       description: "Sidevisninger 4"
+    pv4_settings: 
+      labels: 
+        page_view_method: Sidevisningsmetode
     qti_converter_settings: 
       labels: 
         enabled: Aktiveret
@@ -11665,7 +11675,7 @@ da:
     crumb: "%{user}s indstillinger"
     crumbs: 
       observees: Observerer
-      settings_frd: "%{user}s indstillinger"
+      settings_frd: "%{user}'s Profil"
     done_resending: "Færdig! Levering af besked kan tage få minutter."
     email_select: 
       default_email_option: "[Vælg e-mail]"
@@ -11911,7 +11921,7 @@ da:
         remove_email_address_aria_label: "Slet e-mailadressen"
       validations: 
         should_be_10_digits: "skal være et tal på 10 cifre"
-    ways_to_contact_me: "Sådan kan du kontakte mig"
+    ways_to_contact_me: Kontakt
     yo_select: 
       yo: Halløjsa!
     you_have_no_services: "Du har ikke registreret nogen tjenester. Du kan tilføje nogen på siden *indstillinger*."
@@ -12147,6 +12157,7 @@ da:
       regrade_options: "Vælg en ombedømmelsesmulighed for studerende, som allerede har taget quizzen. Canvas ombedømmer alle dine afleveringer, efter du gemmer quizzen (studerendes scores påvirkes muligvis)."
       some_scores_reduced: "Tildel kun points for det korrekte svar (*visse af de studerendes scores reduceres muligvis*)"
       update_question_without_regrading: "Opdater spørgsmål uden ombedømmelse"
+  quiz_40ee61b1: quiz
   quiz_e0dcce8f: Quiz
   quiz_log_auditing: 
     buttons: 
@@ -14480,7 +14491,7 @@ da:
         main: Hovednavigation
     profile: 
       add_link_field: "Opret et nyt link"
-      bio: Bio
+      bio: Biografi
       cancel: Annuller
       know_this_person_as: "Du kender denne person som en ..."
       links: Links
@@ -14499,8 +14510,9 @@ da:
       title: Titel
       titles: 
         click_to_change_profile_pic: "Klik for at ændre profilbillede"
+      user_enrolled: Tilmeldinger
       user_has_no_bio: "%{user} har ikke tilføjet en bio"
-      ways_to_contact_user: "Måder til at kontakte %{name}"
+      ways_to_contact_user: Kontakt
     recent_activity: 
       date_column: Dato
       message_column: Besked
@@ -16169,6 +16181,7 @@ da:
         last_login: "Sidste login"
         last_request: "Sidste anmodning"
         password: Adgangskode
+        password_confirmation: "Bekræft adgangskode"
         sis_id: SIS-id
         sis_user_id: SIS-id
         unique_id: Login
@@ -16318,7 +16331,9 @@ da:
   view_app_center_6c89a3fe: "Vis App Center"
   view_app_configurations_52b52441: "Vis app-konfigurationer"
   view_ba339f93: Vis
+  view_conditional_content_settings_a2dca270: "Se betinget indholdsindstillinger"
   view_course_analytics_eefe6b2: "Vis kursusstatistik"
+  view_faculty_journals_ad0e8c8f: "Ses Fakultetsjournaler"
   view_file_8a1c62e5: "Vis fil"
   view_grades_8d3bae6c: "Vis karakterer"
   view_grading_history_e64bb8fe: "Vis bedømmelsesoversigt"
@@ -16326,17 +16341,20 @@ da:
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_next_file_a8a4a885: "Vis næste fil"
   view_previous_file_b846db4f: "Vis forrige fil"
+  view_prior_enrollments_9b519b25: "Se tidligere tilmeldinger"
   view_question_banks_188a9e0f: "Vis spørgsmålsbanker"
   view_rubric_evaluation_b1b0db2a: "Vis Rubric-evaluering"
   view_student_analytics_6b8ccd42: "Se analyser for studerende"
   view_the_assignment_e61ca4fc: "Vis opgaven"
   view_toolname_placements_4a5724d1: "Vis %{toolName} placeringer"
+  view_user_groups_538f22b4: "Se brugergrupper"
   view_user_groups_d2bfa855: "Vis brugergrupper"
   viewed_6b75c21e: Vist
   viewing_folders_is_not_available_798a15e1: "Visning af mapper er ikke tilgængelig"
   visit_864b4060: "Gå ind på"
   visit_group_group_name_7a816081: "Gå ind i gruppen %{group_name}"
   warning_6576b5b8: Advarsel
+  warning_aacb8c24: Advarsel
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Advarsel: Crocodoc har begrænsninger, når den bruges i Firefox. Kommentarer gemmes ikke."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: Brug indstillingen Flyt til dialog. som findes i menuen for forbedret tilgængelighed, når der flyttes filer."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Advarsel: Klik på Individuel visning af karakterbog for forbedret tilgængelighed."
