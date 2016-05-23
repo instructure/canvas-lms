@@ -83,7 +83,7 @@ define [
           @props.toggleSelected() unless @props.isSelected
           @props.dndOptions.onItemDragStart arguments...
 
-      if @props.model instanceof Folder
+      if @props.model instanceof Folder && !@props.model.get('for_submissions')
         toggleActive = (setActive) =>
           @setState({isActiveDragTarget: setActive}) if @state.isActiveDragTarget isnt setActive
         attrs.onDragEnter = attrs.onDragOver = (event) =>

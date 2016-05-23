@@ -88,7 +88,7 @@ define [
           </a>
         """).append(@$labelInner).prependTo(@$el)
 
-        if @dndOptions
+        if @dndOptions && !@model.get('for_submissions')
           toggleActive = (makeActive) ->
             return -> $label.toggleClass('activeDragTarget', makeActive)
           $label.on

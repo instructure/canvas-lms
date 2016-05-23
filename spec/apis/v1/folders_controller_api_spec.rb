@@ -382,6 +382,24 @@ describe "Folders API", type: :request do
                {},
                :expected_status => 400)
     end
+
+    it "should fail to create in a submissions folder (user context)" do
+      sub_folder = @user.submissions_folder
+      api_call(:post, "/api/v1/users/#{@user.id}/folders",
+               @folders_path_options.merge(:user_id => @user.to_param),
+               { :name => 'booga', :parent_folder_id => sub_folder.to_param },
+               {},
+               :expected_status => 401)
+    end
+
+    it "should fail to create in a submissions folder (folder context)" do
+      sub_folder = @user.submissions_folder
+      api_call(:post, "/api/v1/folders/#{sub_folder.id}/folders",
+               @folders_path_options.merge(:folder_id => sub_folder.to_param),
+               { :name => 'booga' },
+               {},
+               :expected_status => 401)
+    end
   end
 
   describe "#update" do
@@ -411,6 +429,13 @@ describe "Folders API", type: :request do
     it "should not allow moving to different context" do
       user_root = Folder.root_folders(@user).first
       api_call(:put, @update_url, @folders_path_options, {:name => "new name", :parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
+    end
+
+    it "should not move a folder into a submissions folder" do
+      sub_folder = @user.submissions_folder
+      source_folder = @user.folders.create! :name => "hello"
+      api_call(:put, "/api/v1/folders/#{source_folder.id}", @folders_path_options.merge(:id => source_folder.to_param),
+               {:parent_folder_id => sub_folder.to_param}, {}, {:expected_status => 401})
     end
   end
 
@@ -615,6 +640,14 @@ describe "Folders API", type: :request do
                         {}, {}, {expected_status: 400})
         expect(json['message']).to eq 'source folder may not contain destination folder'
       end
+
+      it "should refuse to copy a folder into a submissions folder" do
+        sub_folder = @user.submissions_folder
+        source_folder = @user.folders.create! name: 'source'
+        api_call(:post, "/api/v1/folders/#{sub_folder.id}/copy_folder?source_folder_id=#{source_folder.id}",
+                 @params_hash.merge(dest_folder_id: sub_folder.to_param, source_folder_id: source_folder.to_param),
+                 {}, {}, {expected_status: 401})
+      end
     end
   end
 
@@ -719,6 +752,13 @@ describe "Folders API", type: :request do
         expect(file.display_name).to eq(json['display_name'])
         expect(file.display_name).not_to eq(@file.display_name)
       end
+    end
+
+    it "should refuse to copy a file into a submissions folder" do
+      sub_folder = @user.submissions_folder
+      api_call(:post, "/api/v1/folders/#{sub_folder.id}/copy_file?source_file_id=#{@source_file.id}",
+               @params_hash.merge(dest_folder_id: sub_folder.to_param, source_file_id: @source_file.to_param),
+               {}, {}, {expected_status: 401})
     end
   end
 
