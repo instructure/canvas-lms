@@ -6,11 +6,13 @@
         <span id="searchTermDescription" class="screenreader-only">
           {{#t}}As you type in this field, the list of results will be automatically updated.{{/t}}
         </span>
+        <label class="screenreader-only" for="searchTerm">
+          {{t "Search title, body, or author"}}
+        </label>
         <input id="searchTerm"
               aria-describedby="searchTermDescription"
               class="ic-Input"
               placeholder="{{t "Search title, body, or author"}}"
-              aria-label="{{t "Search title, body, or author"}}"
               value="{{searchTerm}}"
               type="search">
         <span id="discussionsFilter">

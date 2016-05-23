@@ -260,10 +260,12 @@
         <div class="headerBar" data-sticky>
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
+              <label class="screenreader-only" for="discussion-search">
+                <%= t("Search entries or author") %>
+              </label>
               <input
                 id               = "discussion-search"
-                type             = "text"
-                aria-label       = "<%= t("Search entries or author") %>"
+                type             = "search"
                 placeholder      = "<%= t("Search entries or author") %>"
                 size             = 50
               >
