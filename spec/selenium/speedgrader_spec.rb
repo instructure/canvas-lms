@@ -490,14 +490,20 @@ describe 'Speedgrader' do
       )
     end
 
-    it 'displays keyboard shortcut modal when clicking blue info icon', priority: "2", test_id: 759319 do
+    it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      keyboard_shortcut_icon = f('#keyboard-shortcut-info-icon')
+      keyboard_modal = f('#keyboard_navigation')
+      expect(keyboard_shortcut_icon).to be_displayed
 
-      shortcut_modal = f('#keyboard_navigation')
-      f('#keyboard-shortcut-info-icon').click
+      # Open shortcut modal
+      keyboard_shortcut_icon.click
+      expect(keyboard_modal).to be_displayed
 
-      expect(shortcut_modal).to be_displayed
+      # Close shortcut modal
+      f('.ui-resizable .ui-dialog-titlebar-close').click
+      expect(keyboard_modal).not_to be_displayed
     end
   end
 end
