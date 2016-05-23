@@ -121,6 +121,18 @@ describe Submission do
     @submission.save!
   end
 
+  it "should log excused submissions" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.excused = true
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
+  end
+
   context "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model
