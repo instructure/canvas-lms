@@ -449,6 +449,9 @@ module QuizzesCommon
   end
 
   def select_different_correct_answer(index_of_new_correct_answer)
+    # wait for success flash_message to go away
+    expect_no_flash_message :success
+
     new_correct_answer = fj('.select_answer_link', question_answers[index_of_new_correct_answer])
     hover(new_correct_answer)
     new_correct_answer.click
