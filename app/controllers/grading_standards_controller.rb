@@ -26,19 +26,24 @@ class GradingStandardsController < ApplicationController
       js_env({
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
         :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
+        :GRADING_PERIOD_SETS_URL => api_v1_account_grading_period_sets_url(@context),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
         :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard,
         :CONTEXT_SETTINGS_URL => context_url(@context, :context_settings_url)
       })
+
       @standards = GradingStandard.for(@context).sorted.limit(100)
+      view_path = @context.is_a?(Account) ? 'account_index' : 'index'
       respond_to do |format|
-        format.html { }
-        format.json {
+        format.html { render view_path }
+        format.json do
           standards_json = @standards.map do |s|
-            s.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user})
+            methods = [:display_name, :context_code, :assessed_assignment?, :context_name]
+            permissions = { user: @current_user }
+            s.as_json(methods: methods, permissions: permissions)
           end
           render :json => standards_json
-        }
+        end
       end
     end
   end
@@ -92,5 +97,4 @@ class GradingStandardsController < ApplicationController
   def default_data
     GradingStandard.default_grading_standard
   end
-
 end

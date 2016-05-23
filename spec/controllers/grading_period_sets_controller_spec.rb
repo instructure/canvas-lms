@@ -28,6 +28,19 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
         expect(json_parse.fetch('grading_period_sets').count).to eql 1
       end
+
+      it "includes grading periods" do
+        group = GradingPeriodGroup.create!(valid_attributes) do |set|
+          set.enrollment_terms << enrollment_term
+        end
+
+        period = Factories::GradingPeriodHelper.new.create_for_group(group)
+        get :index, {account_id: root_account.to_param}, valid_session
+        sets = json_parse.fetch('grading_period_sets')
+        periods = sets.first.fetch('grading_periods')
+        expect(periods.count).to eql 1
+        expect(periods.first.fetch('id').to_s).to eql period.id.to_s
+      end
     end
 
     describe "POST #create" do

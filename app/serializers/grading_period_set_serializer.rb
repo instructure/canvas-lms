@@ -6,5 +6,12 @@ class GradingPeriodSetSerializer < Canvas::APISerializer
              :title,
              :account_id,
              :course_id,
+             :grading_periods,
              :permissions
+
+  def grading_periods
+    @grading_periods ||= object.grading_periods.active.map do |period|
+      GradingPeriodSerializer.new(period, controller: @controller, scope: @scope, root: false)
+    end
+  end
 end

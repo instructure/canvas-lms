@@ -1,0 +1,108 @@
+@import "base/environment";
+
+.ItemGroup__header {
+  background-color: $lightBackground;
+  border: 1px solid $ic-border-light;
+  display: flex;
+  min-height: 30px;
+  padding: $ic-sp;
+  position: relative;
+}
+
+.ItemGroup__header__title {
+  display: inline-block;
+  flex: 1 1 auto;
+  font-weight: bold;
+  line-height: 20px;
+  margin: auto;
+  text-decoration: none;
+}
+
+.ItemGroup__header__admin {
+  align-self: center;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.header-bar.no-line {
+  border: none;
+}
+
+.ic-Form-actions.below-line {
+  border: none;
+  border-top: 1px solid $ic-border-light;
+  padding: $spacing-width 0 0 0;
+  background: none;
+}
+
+.Button + .Button {
+  margin-left: $ic-sp / 2;
+}
+
+// GRADING PERIOD SET
+
+.GradingPeriodSet--expanded,
+.GradingPeriodSet--collapsed {
+  border-radius: $baseBorderRadius;
+  margin-bottom: $ic-sp*2;
+}
+
+.GradingPeriodSet--expanded {
+  .ItemGroup__header {
+    border-radius: $baseBorderRadius $baseBorderRadius 0 0;
+  }
+}
+
+.GradingPeriodSet--collapsed {
+  .ItemGroup__header {
+    border-radius: $baseBorderRadius;
+  }
+}
+
+.GradingPeriodSet__title {
+  display: inline;
+  font-weight: bold;
+  @include fontSize($ic-font-size--small);
+}
+
+.GradingPeriodSet__toggle {
+  color: $ic-color-dark;
+}
+
+// GRADING PERIOD LIST
+
+.GradingPeriodList {
+  border-left: 1px solid $ic-border-light;
+  border-right: 1px solid $ic-border-light;
+}
+
+// GRADING PERIOD LIST -- PERIOD
+
+.GradingPeriodList__period {
+  border-bottom: 1px solid $ic-border-light;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin: 0;
+  padding: 14px;
+
+  &::last-child {
+    border-bottom: none;
+  }
+}
+
+.GradingPeriodList__period__attributes {
+  display: flex;
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.GradingPeriodList__period__attribute {
+  line-height: 20px;
+}
+
+.GradingPeriodList__period__actions {
+  display: flex;
+  flex: 0 0 auto;
+}
