@@ -8,6 +8,7 @@ describe 'quizzes question with html answers' do
   before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
+    driver.manage.window.maximize
   end
 
   def edit_first_html_answer(question_type=nil)
@@ -18,7 +19,7 @@ describe 'quizzes question with html answers' do
   end
 
   def close_first_html_answer
-    f('.edit_html_done').click
+    move_to_click('.btn.edit_html_done')
   end
 
   it 'allows HTML answers for multiple choice', priority: "1", test_id: 209356 do
