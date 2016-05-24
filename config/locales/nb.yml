@@ -7213,7 +7213,7 @@ nb:
   graded_survey_c0f0c395: "Vurdert undersøkelse"
   grades_a61eba0a: Vurderinger
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterene er nå satt tilbake til opprinnelig resultat"
-  grades_are_now_showing_what_if_scores_711a8be2: "Karakterene viser nå hva-om resultat"
+  grades_are_now_showing_what_if_scores_711a8be2: "Karakterene viser nå hva-hvis resultat"
   grading_box: 
     out_of_points_possible: "av %{assignment.points_possible}"
   grading_cell: 
@@ -8066,7 +8066,7 @@ nb:
       Funksjoner, innstillinger og stiler som gjør at mer fornuftig konkret i en K-12 miljø. For nå er, dette bare
       gjelder noen stil endringer, men flere K-12 spesifikke ting kan legges i fremtiden.
   k_2521301c: k
-  keep_submissions_anonymous_5cbaf419: "La innleveringer være anonyme"
+  keep_submissions_anonymous_5cbaf419: "Hold innleveringene anonyme"
   keyboard_nav_dialog: 
     esc_key_notification: "Vennligst trykk Esc-tasten før du bruker tastatursnarveier når du navigerer i karakterbok-nettverket."
   keyboard_shortcuts_ed1844bd: Tastatursnarveier
