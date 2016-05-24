@@ -33,6 +33,10 @@ module Api::V1::AccountAuthorizationConfig
       result[param] = aac.public_send(param)
     end
 
+    if aac.class.recognized_federated_attributes != []
+      result['federated_attributes'] = aac.federated_attributes_for_api
+    end
+
     # These settings were moved to the account settings level,
     # but we can't just change the API with no warning, so this keeps
     # them coming through in the JSON until we get appropriate notifications

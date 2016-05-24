@@ -24,9 +24,23 @@ describe "AuthenticationProviders API", type: :request do
     user_with_pseudonym(:active_all => true, :account => @account)
     @account.authentication_providers.scope.delete_all
     @account.account_users.create!(user: @user)
-    @cas_hash = {"auth_type" => "cas", "auth_base" => "127.0.0.1"}
-    @saml_hash = {'auth_type' => 'saml', 'idp_entity_id' => 'http://example.com/saml1', 'log_in_url' => 'http://example.com/saml1/sli', 'log_out_url' => 'http://example.com/saml1/slo', 'certificate_fingerprint' => '111222', 'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'}
-    @ldap_hash = {'auth_type' => 'ldap', 'auth_host' => '127.0.0.1', 'auth_filter' => 'filter1', 'auth_username' => 'username1', 'auth_password' => 'password1'}
+    @cas_hash = {"auth_type" => "cas",
+                 "auth_base" => "127.0.0.1",
+                 "jit_provisioning" => false}
+    @saml_hash = {'auth_type' => 'saml',
+                  'idp_entity_id' => 'http://example.com/saml1',
+                  'log_in_url' => 'http://example.com/saml1/sli',
+                  'log_out_url' => 'http://example.com/saml1/slo',
+                  'certificate_fingerprint' => '111222',
+                  'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+                  'federated_attributes' => {},
+                  'jit_provisioning' => false}
+    @ldap_hash = {'auth_type' => 'ldap',
+                  'auth_host' => '127.0.0.1',
+                  'auth_filter' => 'filter1',
+                  'auth_username' => 'username1',
+                  'auth_password' => 'password1',
+                  'jit_provisioning' => false}
   end
 
   context "/index" do
@@ -191,7 +205,6 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['login_attribute'] = 'nameid'
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
-      @saml_hash['jit_provisioning'] = false
       @saml_hash['metadata_uri'] = nil
       expect(json).to eq @saml_hash
     end
@@ -207,7 +220,6 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash['auth_over_tls'] = nil
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['position'] = 1
-      @ldap_hash['jit_provisioning'] = false
       expect(json).to eq @ldap_hash
     end
 
@@ -219,7 +231,6 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
       @cas_hash['unknown_user_url'] = nil
-      @cas_hash['jit_provisioning'] = false
       expect(json).to eq @cas_hash
     end
 
@@ -249,6 +260,17 @@ describe "AuthenticationProviders API", type: :request do
 
       aac.reload
       expect(aac.idp_entity_id).to eq 'hahahaha'
+    end
+
+    it "updates federated attributes" do
+      aac = @account.authentication_providers.create!(@saml_hash)
+      json = call_update(aac.id, 'auth_type' => 'saml',
+                         'federated_attributes' => { 'integration_id' => 'internal_id' })
+      # jit provisioning off; short form output
+      expect(json['federated_attributes']).to eq('integration_id' => 'internal_id')
+      aac.reload
+      expect(aac.federated_attributes).to eq('integration_id' => { 'attribute' => 'internal_id',
+                                                                   'provisioning_only' => false })
     end
 
     it "should work with rails form style params" do
@@ -496,4 +518,25 @@ describe "AuthenticationProviders API", type: :request do
     end
   end
 
+  describe "API JSON" do
+    describe 'federated_attributes' do
+      it 'excludes provisioning only attributes when jit_provisioning is off' do
+        aac = AccountAuthorizationConfig::SAML.new(
+          federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' },
+                                  'sis_user_id' => { 'attribute' => 'external_id',
+                                                     'provisioning_only' => true }})
+        expect(aac.federated_attributes_for_api).to eq('integration_id' => 'internal_id')
+      end
+
+      it 'uses full form when jit_provisioning is on' do
+        federated_attributes = { 'integration_id' => { 'attribute' => 'internal_id',
+                                                       'provisioning_only' => false },
+                                 'sis_user_id' => { 'attribute' => 'external_id',
+                                                    'provisioning_only' => true }}
+        aac = AccountAuthorizationConfig::SAML.new(federated_attributes: federated_attributes,
+                                                   jit_provisioning: true)
+        expect(aac.federated_attributes_for_api).to eq(federated_attributes)
+      end
+    end
+  end
 end

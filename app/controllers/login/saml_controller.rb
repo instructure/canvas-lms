@@ -79,6 +79,7 @@ class Login::SamlController < ApplicationController
       unique_id = response.saml_attributes["eduPersonPrincipalName"]
       unique_id = unique_id.split('@', 2)[0] if unique_id
     end
+    provider_attributes = response.saml_attributes
 
     logger.info "Attempting SAML login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
@@ -112,7 +113,11 @@ class Login::SamlController < ApplicationController
         reset_session_for_login
 
         pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
-        pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
+        if !pseudonym && aac.jit_provisioning?
+          pseudonym = aac.provision_user(unique_id, provider_attributes)
+        elsif pseudonym
+          aac.apply_federated_attributes(pseudonym, provider_attributes)
+        end
 
         if pseudonym
           # Successful login and we have a user

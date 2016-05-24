@@ -53,6 +53,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     [:change_password_url, :login_handle_name, :unknown_user_url].freeze
   end
 
+  def self.recognized_federated_attributes
+    # we allow any attribute
+    nil
+  end
+
   SENSITIVE_PARAMS = [:metadata].freeze
 
   before_validation :set_saml_defaults
