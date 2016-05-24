@@ -29,7 +29,7 @@ describe "Sessions Timeout" do
     plugin_setting.save!
     user_with_pseudonym({:active_user => true})
     login_as
-    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
 
     sleep 3
 

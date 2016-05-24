@@ -309,26 +309,15 @@ describe "users" do
     it "should masquerade as a user", priority: "1", test_id: 134743 do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
+
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
-
-      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        f('#global_nav_profile_link').click
-        expect(f('#global_nav_profile_display_name')).to include_text 'The Student'
-      else
-        expect(f('#identity .user_name')).to include_text 'The Student'
-      end
+      expect(displayed_username).to include('The Student')
 
       bar = f('#masquerade_bar')
       expect(bar).to include_text 'You are currently masquerading'
       bar.find_element(:css, '.stop_masquerading').click
-
-      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        f('#global_nav_profile_link').click
-        expect(f('#global_nav_profile_display_name')).to include_text 'The Admin'
-      else
-        expect(f('#identity .user_name')).to include_text 'The Admin'
-      end
+      expect(displayed_username).to eq('The Admin')
     end
   end
 end

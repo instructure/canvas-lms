@@ -216,8 +216,7 @@ describe "course settings" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
       f(".student_view_button").click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @fake_student.name
+      expect(displayed_username).to include(@fake_student.name)
     end
 
     it "should allow leaving student view" do
@@ -225,8 +224,7 @@ describe "course settings" do
       stop_link = f("#masquerade_bar .leave_student_view")
       expect(stop_link).to include_text "Leave Student View"
       stop_link.click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @teacher.name
+      expect(displayed_username).to eq(@teacher.name)
     end
 
     it "should allow resetting student view" do

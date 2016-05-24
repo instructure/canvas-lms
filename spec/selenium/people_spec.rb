@@ -117,7 +117,6 @@ describe "people" do
       enroll_ta(@test_ta)
 
       get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
     end
 
     it "should have tabs" do
@@ -172,9 +171,7 @@ describe "people" do
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
       f("#people-options .Button").click
       fln("Student Interactions Report").click
-      wait_for_ajaximations
-      user_name = f(".user_name").text
-      expect(f("h1").text).to eq "Teacher Activity Report for #{user_name}"
+      expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
     it "should not display Student Interaction button for a student", priority: "1", test_id: 244450  do

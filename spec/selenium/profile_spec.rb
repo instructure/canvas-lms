@@ -144,9 +144,8 @@ describe "profile" do
       edit_form = click_edit
       replace_content(edit_form.find_element(:id, 'user_short_name'), new_display_name)
       submit_form(edit_form)
-      wait_for_ajaximations
       refresh_page
-      expect(f('#topbar li.user_name')).to include_text new_display_name
+      expect(displayed_username).to eq(new_display_name)
     end
 
     it "should change the language" do

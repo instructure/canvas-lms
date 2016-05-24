@@ -32,20 +32,20 @@ describe "context modules" do
       modules[0].add_item({id: @assignment.id, type: 'assignment'})
       modules[0].add_item({id: @assignment2.id, type: 'assignment'})
       get "/courses/#{@course.id}/modules"
-      ff(".icon-mini-arrow-down")[1].click
+      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
       wait_for_ajaximations
     end
 
     it "should show all module items", priority: "1", test_id: 126743 do
       module_with_two_items
-      f(".icon-mini-arrow-right").click
-      wait_for_ajaximations
+      f(".expand_module_link").click
+      wait_for_animations
       expect(f('.context_module .content')).to be_displayed
     end
 
     it "should hide module items", priority: "1", test_id: 280415 do
       module_with_two_items
-      wait_for_ajaximations
+      wait_for_animations
       expect(f('.context_module .content')).not_to be_displayed
     end
 

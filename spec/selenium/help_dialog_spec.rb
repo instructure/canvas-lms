@@ -34,7 +34,7 @@ describe "help dialog" do
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      expect(ff('.help_dialog_trigger').length).to eq 2
+      expect(ff('.help_dialog_trigger').length).to eq(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 1 : 2)
       expect(f("body")).not_to contain_css('#help-dialog')
       f('.help_dialog_trigger').click
       wait_for_ajaximations
@@ -60,8 +60,7 @@ describe "help dialog" do
       # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      f("#footer-links a[href='#{support_url}']").click
-      wait_for_ajaximations
+      f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.ic-app-header__menu-list-link.support_url' : "#footer-links a[href='#{support_url}']").click
       expect(f("#help-dialog")).to be_displayed
     end
 
