@@ -94,13 +94,6 @@
     <% end %>
   <% end %>
 
-  <% if @context.feature_enabled?(:conditional_release) && can_do(@context, @current_user, :manage_content) %>
-    <%= link_to context_url(@context, :course_score_range_defaults_url), :class => 'btn button-sidebar-wide conditional-release-button' do %>
-      <i class="icon-group"></i>
-      <%= t('Conditional Release') %>
-    <% end %>
-  <% end %>
-
   <table class="summary">
     <caption>
       <h3><%= t('headings.current_users', 'Current Users') %></h3>

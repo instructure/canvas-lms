@@ -99,27 +99,5 @@ describe "courses/_settings_sidebar.html.erb" do
         expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
       end
     end
-
-    describe "conditional release" do
-      it "doesn't show button by default" do
-        render
-        expect(response.body).not_to match(/conditional-release/)
-      end
-
-      it "shows button when feature flag is set" do
-        @course.enable_feature!(:conditional_release)
-        render
-        expect(response.body).to match(/conditional-release/)
-      end
-
-      it "does not show button to user lacking manage content" do
-        @course.enable_feature!(:conditional_release)
-        RoleOverride.clear_cached_contexts # because something in the before block initializes a cache
-        @course.account.role_overrides.create!(permission: "manage_content", role: teacher_role, enabled: false)
-        render
-        expect(response.body).not_to match(/conditional-release/)
-      end
-    end
   end
-
 end
