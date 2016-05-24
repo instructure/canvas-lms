@@ -336,7 +336,7 @@ module GroupsCommon
   def move_file_to_folder(file_name,destination_name)
     move(file_name, 1, :toolbar_menu)
     wait_for_ajaximations
-    expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}\nClose"
+    expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}"
     # Click folder
     ff('.ef-name-col__text').first.click
     wait_for_ajaximations
@@ -358,7 +358,7 @@ module GroupsCommon
   def move_folder(folder_name)
     move(folder_name, 0, :toolbar_menu)
     wait_for_ajaximations
-    expect(f('#flash_message_holder').text).to eq "#{folder_name} moved to files\nClose"
+    expect(f('#flash_message_holder').text).to eq "#{folder_name} moved to files"
     expect(ff('.treeLabel span')[2].text).to eq folder_name
   end
 
