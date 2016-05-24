@@ -14,8 +14,9 @@ end
 
 def post(message)
   if ENV['GERRIT_PATCHSET_REVISION']
+    label = ENV['GERGICH_REVIEW_LABEL'] || "Lint-Review"
     `gergich message "#{message}"`
-    `gergich label "Code-Review" -1`
+    `gergich label "#{label}" -1`
   else
     pretty_comment("error", message)
   end
