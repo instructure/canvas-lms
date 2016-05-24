@@ -143,6 +143,7 @@ describe "outcomes as a teacher" do
 
       # move the outcome
       f('.treeLabel').click
+      wait_for_animations
       ff('[role=treeitem] a span')[1].click
       f('.form-controls .btn-primary').click
 
