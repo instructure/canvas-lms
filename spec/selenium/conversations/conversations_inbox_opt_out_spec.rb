@@ -43,7 +43,7 @@ describe "conversations new" do
         get "/profile/settings"
         f('#disable_inbox').click
 
-        expect(@teacher.reload.disabled_inbox?).to be_truthy
+        keep_trying_until { expect(@teacher.reload.disabled_inbox?).to be_truthy }
 
         get '/profile/communication'
         expect(f("#content")).not_to contain_css('td[data-category="conversation_message"]')
