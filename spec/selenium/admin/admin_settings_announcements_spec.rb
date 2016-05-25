@@ -28,8 +28,14 @@ describe "settings tabs" do
       expect(notification.subject).to include(subject)
       expect(notification.start_at.day).to eq 1
       expect(notification.end_at.day).to eq 15
-      login_text = f("#header .user_name").text
-      expect(f("#tab-announcements .announcement-details")).to include_text(login_text)
+      expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
+
+      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        # close the "user accout" reactTray that opened so we could read the displayed username
+        f('.ReactTray__closeBtn').click
+        expect(f('body')).not_to contain_css('.ReactTray__Overlay')
+      end
+
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
     end

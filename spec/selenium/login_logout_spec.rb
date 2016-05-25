@@ -21,7 +21,7 @@ describe "login logout test" do
   it "should login successfully with correct username and password", priority: "2" do
     user_with_pseudonym({:active_user => true})
     login_as
-    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
   end
 
   it "should show error message if wrong credentials are used", priority: "2" do
@@ -92,6 +92,6 @@ describe "login logout test" do
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
     driver.execute_script "$('[name=authenticity_token]').remove()"
     fill_in_login_form("nobody@example.com", 'asdfasdf')
-    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(displayed_username).to eq @user.primary_pseudonym.unique_id
   end
 end

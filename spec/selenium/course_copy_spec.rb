@@ -4,7 +4,7 @@ describe "course copy" do
   include_context "in-process server selenium tests"
 
   def validate_course_main_page
-    header = f('#section-tabs-header')
+    header = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')
     expect(header).to be_displayed
     expect(header.text).to eq @course.course_code
   end

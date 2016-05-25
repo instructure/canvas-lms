@@ -280,6 +280,10 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
+
+      # close the "check your email to confirm your account" dialog
+      f('.ui-dialog-titlebar-close').click
+      expect(displayed_username).to eq('teacher!')
       expect_logout_link_present
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
@@ -299,6 +303,9 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
+
+      # close the "check your email to confirm your account" dialog
+      f('.ui-dialog-titlebar-close').click
       expect_logout_link_present
 
       expect(User.last.initial_enrollment_type).to eq 'observer'

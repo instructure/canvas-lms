@@ -145,6 +145,8 @@ describe "admin settings tab" do
   end
 
   context "global includes" do
+    before { skip('global css/js happens in theme editor in newUI') if ENV['CANVAS_FORCE_USE_NEW_STYLES'] }
+
     it "should not have a global includes section by default" do
       expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
     end
