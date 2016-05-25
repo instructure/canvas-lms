@@ -10,6 +10,7 @@ describe "editing grades" do
 
   context 'submission details dialog', priority: "1", test_id: 220305 do
     it 'successfully grades a submission' do
+      skip_if_chrome('issue with set_value')
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
       open_comment_dialog(0, 0)
@@ -180,6 +181,7 @@ describe "editing grades" do
   end
 
   it "should validate curving grades option", priority: "1", test_id: 220320 do
+    skip_if_chrome('issue with set_value')
     curved_grade_text = "8"
 
     get "/courses/#{@course.id}/gradebook"
@@ -190,7 +192,7 @@ describe "editing grades" do
     curve_form = f('#curve_grade_dialog')
     set_value(curve_form.find_element(:css, '#middle_score'), curved_grade_text)
     fj('.ui-dialog-buttonset .ui-button:contains("Curve Grades")').click
-    dismiss_alert
+    accept_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
 
@@ -206,8 +208,7 @@ describe "editing grades" do
 
     f('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click
-
-    dismiss_alert
+    accept_alert
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq '0'
   end
 

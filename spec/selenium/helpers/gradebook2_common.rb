@@ -90,9 +90,7 @@ module Gradebook2Common
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)
     submit_dialog(dialog, '.ui-button')
-    expect(driver.switch_to.alert).not_to be_nil
-    driver.switch_to.alert.dismiss
-    driver.switch_to.default_content
+    accept_alert
   end
 
   def toggle_muting(assignment)
