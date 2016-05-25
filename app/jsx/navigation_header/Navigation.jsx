@@ -74,7 +74,7 @@ define([
 
     componentDidMount () {
       if (this.state.unread_count_attempts == 0) {
-        if (window.ENV.current_user_id && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
+        if (window.ENV.current_user_id && !ENV.current_user_disabled_inbox && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
           this.pollUnreadCount();
         }
       }

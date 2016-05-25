@@ -49,7 +49,7 @@ describe "conversations new" do
         expect(f("#content")).not_to contain_css('td[data-category="conversation_message"]')
         expect(policy.reload.frequency).to eq "immediately"
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-          expect(f('#header')).not_to contain_css("#global_nav_conversations_link")
+          expect(f("#global_nav_conversations_link .menu-item__badge")).to have_attribute('style', "display: none\;")
         else
           expect(f("body")).not_to contain_css('.unread-messages-count')
         end
