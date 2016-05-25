@@ -1,64 +1,6 @@
-<% content_for :stylesheets do %>
-<style>
-  .channel_list {
-    border-collapse: separate;
-  }
-  .channel_list .channel .default_link {
-    opacity: 0;
-    -moz-opacity: 0;
-    filter:alpha(opacity=0);
-  }
-  .channel_list.single .hidden_for_single {
-    display: none;
-  }
-  .channel_list .channel:hover .default_link {
-    display: block;
-    opacity: 0.5;
-  }
-  .channel_list .channel.unconfirmed .default_link {
-    display: none;
-  }
-  .channel_list .channel.default .default_link,
-  .channel_list .channel.default:hover .default_link {
-    display: block;
-    opacity: 1.0;
-    cursor: default;
-  }
-  .channel_list .channel.default .delete_channel_link {
-    display: none;
-  }
-  #right-side table.channel_list tr.channel.unconfirmed > td a {
-    color: #888;
-    font-style: italic;
-  }
-  .email_meta {
-    text-align: left;
-    width: 32px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  .email_actions {
-    text-align: right;
-    white-space: nowrap;
-    width: 100%;
-  }
-  .email_channel {
-    max-width: 140px;
-    font-size: 0.8em;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  #right-side p.email_channel {
-    margin: 0;
-    color: #0081bd;
-  }
-  .intl_rates_may_apply {
-    font-size: 0.8em
-  }
-</style>
-<% end %>
+<%
+  css_bundle :ways_to_contact
+%>
 
 <h2><%= t('headers.ways_to_contact', "Ways to Contact") %></h2>
 <div class="rs-margin-lr">
@@ -127,7 +69,7 @@
   </tr>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_email_link icon-add"><%= t('links.add_email_address', "Add Email Address") %></a>
+      <a href="#" class="add_email_link icon-add" title="<%= t("Add Email Address") %>" aria-label="<%= t("Add Email Address") %>"><%= t('links.add_email_address', "Email Address") %></a>
     </td>
   </tr>
 </table>
@@ -178,7 +120,7 @@
   <tfoot>
   <tr>
     <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_contact_link icon-add"><%= t('links.add_contact_method', "Add Contact Method") %></a>
+      <a href="#" class="add_contact_link icon-add" title="<%= t("Add Contact Method") %>" aria-label="<%= t("Add Contact Method") %>"><%= t('links.add_contact_method', "Contact Method") %></a>
     </td>
   </tr>
   </tfoot>
