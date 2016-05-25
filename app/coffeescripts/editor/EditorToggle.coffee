@@ -50,8 +50,14 @@ define [
       else
         @display()
 
-    rceOptions: ->
-      opts = {focus: true, tinyOptions: @options.tinyOptions || {}}
+    ##
+    # Compiles the options for the RichContentEditor
+    # @api private
+    getRceOptions: ->
+      opts = $.extend {
+          focus: true,
+          tinyOptions: @options.tinyOptions || {}
+        }, @options.rceOptions
       if @options.editorBoxLabel
         opts.tinyOptions.aria_label = @options.editorBoxLabel
       opts
@@ -71,9 +77,17 @@ define [
       $('<div/>', style: "clear: both").insertBefore @textArea
       @done.insertAfter @textArea
       RichContentEditor.initSidebar()
-      RichContentEditor.loadNewEditor(@textArea, @rceOptions())
+      RichContentEditor.loadNewEditor(@textArea, @getRceOptions())
       @editing = true
       @trigger 'edit'
+
+    replaceTextArea: ->
+      @el.insertBefore @textArea
+      RichContentEditor.destroyRCE(@textArea)
+      @textArea.detach()
+
+    renewTextAreaID: ->
+      @textArea.attr 'id', ''
 
     ##
     # Converts the editor to an element
@@ -83,14 +97,12 @@ define [
         @content = RichContentEditor.callOnRCE(@textArea, 'get_code')
         @textArea.val @content
         @el.html @content
-      @el.insertBefore @textArea
-      RichContentEditor.destroyRCE(@textArea)
-      @textArea.detach()
+      @replaceTextArea()
       @switchViews.detach() if @options.switchViews
       @infoIcon.detach()
       @done.detach()
       # so tiny doesn't hang on to this instance
-      @textArea.attr 'id', ''
+      @renewTextAreaID()
       @editing = false
       @trigger 'display'
 
@@ -130,7 +142,7 @@ define [
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
         .click preventDefault =>
           @display()
-          @editButton.focus()
+          @editButton?.focus()
       )
 
     ##
