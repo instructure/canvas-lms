@@ -2,16 +2,24 @@ define([
   'react',
   'page',
   'qs',
-  'jsx/collaborations/CollaborationsApp'
-], function (React, page, qs, CollaborationsApp) {
+  'redux',
+  'jsx/collaborations/CollaborationsApp',
+  'jsx/collaborations/actions/collaborationsActions',
+  'jsx/collaborations/store/store'
+], function (React, page, qs, redux, CollaborationsApp, collaborationsActions, store) {
+  let unsubscribe
+  let actions = redux.bindActionCreators(collaborationsActions, store.dispatch)
 
   /**
    * Route Handlers
    */
   function renderShowCollaborations (ctx) {
-    React.render(
-      <CollaborationsApp />
-    , document.getElementById('content'));
+    let view = () => {
+      let state = store.getState();
+      React.render(<CollaborationsApp applicationState={state} actions={actions} />, document.getElementById('content'));
+    };
+    unsubscribe = store.subscribe(view);
+    view();
   }
 
   /**
@@ -28,6 +36,7 @@ define([
    */
   page('*', parseQueryString); // Middleware to parse querystring to object
   page('/:context(courses|groups)/:contextId/lti_collaborations', renderShowCollaborations);
+  page.exit('*', unsubscribe)
 
   return {
     start () {
