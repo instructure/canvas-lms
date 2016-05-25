@@ -399,7 +399,6 @@ class Assignment < ActiveRecord::Base
     raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
-    self.grading_type = "pass_fail" if self.submission_types == "attendance"
 
     self.infer_all_day
 
@@ -682,6 +681,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def infer_grading_type
+    self.grading_type = "pass_fail" if self.submission_types == "attendance"
+    self.grading_type = "not_graded" if self.submission_types == "wiki_page"
     self.grading_type ||= "points"
   end
 

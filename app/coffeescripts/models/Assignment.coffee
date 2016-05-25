@@ -273,6 +273,12 @@ define [
       dateGroups = @get("all_dates")
       dateGroups && dateGroups.length > 1
 
+    hasDueDate: =>
+      !@isPage()
+
+    hasPointsPossible: =>
+      !@isQuiz() && !@isPage()
+
     nonBaseDates: =>
       dateGroups = @get("all_dates")
       return false unless dateGroups
@@ -309,8 +315,8 @@ define [
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
-        'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate',
-        'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
+        'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
+        'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
       ]
 
       hash = id: @get 'id'
@@ -372,6 +378,7 @@ define [
     # @api private
     _getAssignmentType: =>
       if @isDiscussionTopic() then 'discussion_topic'
+      else if @isPage() then 'wiki_page'
       else if @isQuiz() then 'online_quiz'
       else if @isExternalTool() then 'external_tool'
       else if @isNotGraded() then 'not_graded'
