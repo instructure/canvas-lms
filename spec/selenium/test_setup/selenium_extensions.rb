@@ -22,16 +22,20 @@ module SeleniumExtensions
       ]
     ).each do |method|
       define_method(method) do |*args|
-        begin
+        with_stale_element_protection do
           super(*args)
-        rescue Selenium::WebDriver::Error::StaleElementReferenceError
-          raise unless finder_proc
-          location = CallStackUtils.best_line_for($ERROR_INFO.backtrace, /test_helper/)
-          $stderr.puts "WARNING: StaleElementReferenceError at #{location}, attempting to recover..."
-          @id = finder_proc.call.ref
-          retry
         end
       end
+    end
+
+    def with_stale_element_protection
+      yield
+    rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      raise unless finder_proc
+      location = CallStackUtils.best_line_for($ERROR_INFO.backtrace, /test_setup/)
+      $stderr.puts "WARNING: StaleElementReferenceError at #{location}, attempting to recover..."
+      @id = finder_proc.call.ref
+      retry
     end
   end
 

@@ -126,7 +126,7 @@ module CustomWaitMethods
     wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
         yield
-      rescue SeleniumExtensions::Error # don't keep trying, abort ASAP
+      rescue SeleniumExtensions::Error, Selenium::WebDriver::Error::StaleElementReferenceError # don't keep trying, abort ASAP
         raise
       rescue StandardError, RSpec::Expectations::ExpectationNotMetError
         frd_error = $ERROR_INFO

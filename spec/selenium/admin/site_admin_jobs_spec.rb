@@ -213,6 +213,7 @@ describe "site admin jobs ui" do
           delete.click
           expect(driver.switch_to.alert).not_to be_nil
           driver.switch_to.alert.accept
+          true
         end
         wait_for_ajaximations
         expect(Delayed::Job.count).to eq num_of_jobs - 3

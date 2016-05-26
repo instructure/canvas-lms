@@ -58,6 +58,7 @@ describe 'quizzes students' do
         fj("input[type=radio][value=#{q[:answers][0][:id]}]").click
         expect(fj("input[type=radio][value=#{q[:answers][0][:id]}]").selected?).to be_truthy
 
+        scroll_into_view '#submit_quiz_form .btn-primary'
         f('#submit_quiz_form .btn-primary').click
 
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed

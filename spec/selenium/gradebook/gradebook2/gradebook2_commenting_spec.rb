@@ -46,7 +46,9 @@ describe "gradebook2" do
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     dialog.find_element(:id, "group_comment").click
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
-    wait_for_ajaximations
+
+    # wait for form submission to finish and dialog to close
+    expect(f(".submission_details_add_comment_form")).not_to be_displayed
 
     # make sure it's on the other student's submission
     open_comment_dialog(3, 1)

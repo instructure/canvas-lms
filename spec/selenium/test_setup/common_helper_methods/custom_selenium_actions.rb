@@ -264,7 +264,9 @@ module CustomSeleniumActions
   end
 
   def hover(element)
-    driver.action.move_to(element).perform
+    element.with_stale_element_protection do
+      driver.action.move_to(element).perform
+    end
   end
 
   def set_value(input, value)
