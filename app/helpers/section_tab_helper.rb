@@ -39,6 +39,8 @@ module SectionTabHelper
     def to_a
       return [] unless context.respond_to?(:tabs_available)
 
+      new_collaborations_enabled = @domain_root_account.feature_enabled?(:new_collaborations)
+
       Rails.cache.fetch(cache_key, expires_in: 1.hour) do
         context.tabs_available(current_user, {
           session: session,
@@ -46,9 +48,14 @@ module SectionTabHelper
         }).select { |tab|
           tab_has_required_attributes?(tab)
         }.reject { |tab|
-          (tab_is?(tab, 'TAB_COLLABORATIONS') &&
-           !Collaboration.any_collaborations_configured?(@context)) ||
-          (tab_is?(tab, 'TAB_CONFERENCES') && !WebConference.config)
+          if tab_is?(tab, 'TAB_COLLABORATIONS')
+            new_collaborations_enabled ||
+              !Collaboration.any_collaborations_configured?(@context)
+          elsif tab_is?(tab, 'TAB_COLLABORATIONS_NEW')
+            !new_collaborations_enabled
+          elsif tab_is?(tab, 'TAB_CONFERENCES')
+            !WebConference.config
+          end
         }
       end
     end

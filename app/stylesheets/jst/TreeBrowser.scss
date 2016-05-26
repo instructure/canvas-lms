@@ -25,7 +25,7 @@
       max-height: 100%;
     }
   }
-  .icon-folder:before {
+  .icon-folder:before, .icon-folder-locked:before {
     @include fontSize(11px);
   }
 

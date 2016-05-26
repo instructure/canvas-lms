@@ -89,7 +89,7 @@ module AccountReports
                            AND e.user_id = pseudonyms.user_id)")
 
       if @sis_format
-        users.where!.not(pseudonyms: {sis_batch_id: nil})
+        users = users.where.not(pseudonyms: {sis_batch_id: nil})
       end
 
       if @include_deleted
@@ -153,7 +153,7 @@ module AccountReports
         joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
 
       if @sis_format
-        accounts.where!.not(accounts: {sis_batch_id: nil})
+        accounts = accounts.where.not(accounts: {sis_batch_id: nil})
       end
 
       if @include_deleted
@@ -245,7 +245,7 @@ module AccountReports
       end
 
       courses = root_account.all_courses.preload(:account, :enrollment_term)
-      courses.where!.not(courses: {sis_batch_id: nil}) if @sis_format
+      courses = courses.where.not(courses: {sis_batch_id: nil}) if @sis_format
 
       if @include_deleted
         courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
@@ -337,7 +337,7 @@ module AccountReports
       end
 
       if @sis_format
-        sections.where!.not(course_sections: {sis_batch_id: nil})
+        sections = sections.where.not(course_sections: {sis_batch_id: nil})
       end
 
       sections = add_course_sub_account_scope(sections, 'rc')
@@ -434,7 +434,7 @@ module AccountReports
       end
 
       if @sis_format
-        enrol.where!.not(enrollments: {sis_batch_id: nil})
+        enrol = enrol.where.not(enrollments: {sis_batch_id: nil})
       end
 
       enrol = add_course_sub_account_scope(enrol)
@@ -490,7 +490,7 @@ module AccountReports
         joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id")
 
       if @sis_format
-        groups.where!.not(groups: {sis_batch_id: nil})
+        groups = groups.where.not(groups: {sis_batch_id: nil})
       end
 
       if @include_deleted
@@ -544,7 +544,7 @@ module AccountReports
                            AND e.user_id = pseudonyms.user_id)")
 
       if @sis_format
-        gm.where!.not(group_memberships: {sis_batch_id: nil})
+        gm = gm.where.not(group_memberships: {sis_batch_id: nil})
       end
 
       if @include_deleted
@@ -598,7 +598,7 @@ module AccountReports
         where("course_sections.nonxlist_course_id IS NOT NULL")
 
       if @sis_format
-        xl.where!.not(course_sections: {sis_batch_id: nil})
+        x1 = xl.where.not(course_sections: {sis_batch_id: nil})
       end
 
       if @include_deleted

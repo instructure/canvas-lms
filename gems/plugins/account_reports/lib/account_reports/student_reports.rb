@@ -316,6 +316,7 @@ module AccountReports
         potential_courses = add_course_sub_account_scope(potential_courses)
 
         students = students.where(enrollments: {course_id: potential_courses})
+        students = students.where.not(enrollments: { last_activity_at: nil })
 
         students.find_each do |u|
           row = []

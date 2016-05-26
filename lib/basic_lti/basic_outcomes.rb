@@ -124,6 +124,10 @@ module BasicLTI
         @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
       end
 
+      def result_data_launch_url
+        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
+      end
+
       def to_xml
         xml = LtiResponse.envelope.dup
         xml.at_css('imsx_POXHeader imsx_statusInfo imsx_codeMajor').content = code_major
@@ -186,7 +190,7 @@ module BasicLTI
 
       protected
 
-      def handle_replaceResult(tool, course, assignment, user)
+      def handle_replaceResult(_tool, _course, assignment, user)
         text_value = self.result_score
         new_score = Float(text_value) rescue false
         raw_score = Float(self.result_total_score) rescue false
@@ -196,9 +200,12 @@ module BasicLTI
         if text = result_data_text
           submission_hash[:body] = text
           submission_hash[:submission_type] = 'online_text_entry'
-        elsif url = result_data_url
+        elsif (url = result_data_url)
           submission_hash[:url] = url
           submission_hash[:submission_type] = 'online_url'
+        elsif (launch_url = result_data_launch_url)
+          submission_hash[:url] = launch_url
+          submission_hash[:submission_type] = 'basic_lti_launch'
         end
 
         old_submission = assignment.submissions.where(user_id: user.id).first

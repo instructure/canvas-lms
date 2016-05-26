@@ -16,7 +16,7 @@ define([
       return (
         <div className="ellipsis">
           {!!avatar_image_url &&
-            <span className="ic-avatar UserLink__Avatar" style={{width: 25, height: 25, margin: "-1px 10px 1px 0"}}>
+            <span className="ic-avatar UserLink__Avatar">
               <img src={avatar_image_url}  alt={`User avatar for ${display_name}`} />
             </span>
           }

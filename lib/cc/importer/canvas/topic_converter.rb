@@ -60,6 +60,7 @@ module CC::Importer::Canvas
         topic['position'] = get_int_val(meta_doc, 'position')
         wf_state = get_node_val(meta_doc, 'workflow_state')
         topic['workflow_state'] = wf_state if wf_state.present?
+        topic['group_category'] = get_node_val(meta_doc, 'group_category')
         %w(has_group_category allow_rating only_graders_can_rate sort_by_rating).each do |setting|
           get_bool_val(meta_doc, setting).tap { |val| topic[setting] = val unless val.nil? }
         end

@@ -87,10 +87,8 @@ describe "submissions" do
       f('.submission_attachment input').send_keys(fullpath)
       expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until do
-        expect(f('.details .header')).to include_text "Turned In!"
-        expect(f('.details .file-big')).to include_text "testfile1"
-      end
+      expect(f('.details .header')).to include_text "Turned In!"
+      expect(f('.details .file-big')).to include_text "testfile1"
     end
   end
 end

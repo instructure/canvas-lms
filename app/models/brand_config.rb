@@ -21,14 +21,8 @@ class BrandConfig < ActiveRecord::Base
 
   belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
+  has_many :shared_brand_configs, foreign_key: 'brand_config_md5'
 
-  scope :without_k12, lambda { where("md5 != ?", BrandConfig.k12_config) }
-
-  scope :shared, -> (account = nil) {
-    shared_scope = where(share: true)
-    shared_scope = shared_scope.without_k12 unless account && account.feature_enabled?(:k12)
-    shared_scope
-  }
 
   def self.for(attrs)
     attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
@@ -44,8 +38,9 @@ class BrandConfig < ActiveRecord::Base
     new
   end
 
+  MD5_OF_K12_CONFIG = 'a1f113321fa024e7a14cb0948597a2a4'
   def self.k12_config
-    BrandConfig.where(name: 'K12 Theme', share: true).first
+    find(MD5_OF_K12_CONFIG)
   end
 
   def default?
@@ -77,10 +72,18 @@ class BrandConfig < ActiveRecord::Base
     @ancestor_configs ||= [self] + (parent && parent.chain_of_ancestor_configs).to_a
   end
 
+  def clone_with_new_parent(new_parent_md5)
+    attrs = self.attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
+    attrs[:parent_md5] = new_parent_md5
+    BrandConfig.for(attrs)
+  end
+
+  def dup?
+    BrandConfig.where(md5: self.md5).exists?
+  end
+
   def save_unless_dup!
-    unless BrandConfig.where(md5: self.md5).exists?
-      self.save!
-    end
+    self.save! unless dup?
   end
 
   def to_scss
@@ -172,10 +175,19 @@ class BrandConfig < ActiveRecord::Base
 
   def sync_to_s3_and_save_to_account!(progress, account_id)
     save_and_sync_to_s3!(progress)
-    act = Account.find(account_id)
-    old_md5 = act.brand_config_md5
-    act.brand_config_md5 = md5
-    act.save!
+    account = Account.find(account_id)
+    old_md5 = account.brand_config_md5
+    account.brand_config_md5 = md5
+    account.save!
+    BrandConfig.destroy_if_unused(old_md5)
+  end
+
+  def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_id)
+    save_and_sync_to_s3!(progress)
+    shared_brand_config = SharedBrandConfig.find(shared_brand_config_id)
+    old_md5 = shared_brand_config.brand_config_md5
+    shared_brand_config.brand_config_md5 = md5
+    shared_brand_config.save!
     BrandConfig.destroy_if_unused(old_md5)
   end
 
@@ -197,7 +209,7 @@ class BrandConfig < ActiveRecord::Base
     unused_brand_config = BrandConfig.
       where(md5: md5).
       where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where("NOT share").
+      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       first
     if unused_brand_config
       unused_brand_config.destroy
@@ -208,7 +220,7 @@ class BrandConfig < ActiveRecord::Base
   def self.clean_unused_from_db!
     BrandConfig.
       where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where('NOT share').
+      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       # When someone is actively working in the theme editor, it just saves one
       # in their session, so only delete stuff that is more than a week old,
       # to not clear out a theme someone was working on.

@@ -173,9 +173,7 @@ describe "context modules" do
       wait_for_ajaximations
       user_session(@teacher)
       get "/courses/#{@course.id}/modules/progressions"
-      keep_trying_until(15){
-        expect(ff(".completed")[0]).to be_displayed
-      }
+      expect(f(".completed")).to be_displayed
       expect(fln("student_1")).to be_displayed
       user_session(@student)
       get "/courses/#{@course.id}/modules/"

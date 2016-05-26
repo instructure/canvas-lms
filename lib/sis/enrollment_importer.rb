@@ -155,9 +155,9 @@ module SIS
             end
 
             if !enrollment.user_integration_id.blank?
-              pseudo = root_account.pseudonyms.where(integration_id: enrollment.user_integration_id).first
+              pseudo = root_account.pseudonyms.where(integration_id: enrollment.user_integration_id).take
             else
-              pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
+              pseudo = root_account.pseudonyms.where(sis_user_id: user_id).take
             end
 
             unless pseudo
@@ -175,8 +175,8 @@ module SIS
               end
             end
 
-            @course ||= @root_account.all_courses.where(sis_source_id: course_id).first unless course_id.blank?
-            @section ||= @root_account.course_sections.where(sis_source_id: section_id).first unless section_id.blank?
+            @course ||= @root_account.all_courses.where(sis_source_id: course_id).take unless course_id.blank?
+            @section ||= @root_account.course_sections.where(sis_source_id: section_id).take unless section_id.blank?
             if @course.nil? && @section.nil?
               message = "Neither course nor section existed for user enrollment "
               message << "(Course ID: #{course_id}, Section ID: #{section_id}, User ID: #{user_id})"
@@ -245,7 +245,7 @@ module SIS
             role ||= Role.get_built_in_role(type)
 
             if associated_sis_user_id && type == 'ObserverEnrollment'
-              a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
+              a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).take
               if a_pseudo
                 associated_user_id = a_pseudo.user_id
               else
@@ -257,14 +257,13 @@ module SIS
             enrollment = @section.all_enrollments.where(user_id: user,
                                                         type: type,
                                                         associated_user_id: associated_user_id,
-                                                        role_id: role.id).first
+                                                        role_id: role.id).take
 
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new
               enrollment.root_account = @root_account
             end
             enrollment.user = user
-            enrollment.sis_source_id = [course_id, user_id, role.id, @section.name].compact.join(":")[0..254]
             enrollment.type = type
             enrollment.associated_user_id = associated_user_id
             enrollment.role = role

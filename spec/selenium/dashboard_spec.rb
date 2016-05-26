@@ -248,8 +248,9 @@ describe "dashboard" do
 
       get '/'
 
+      course_menu_item = f('#courses_menu_item a')
       keep_trying_until do
-        expect(f('#courses_menu_item a').attribute('href')).to include('courses')
+        expect(course_menu_item.attribute('href')).to include('courses')
       end
     end
 

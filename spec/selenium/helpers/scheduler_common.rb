@@ -4,8 +4,8 @@ module SchedulerCommon
   def fill_out_appointment_group_form(new_appointment_text, opts = {})
     f('.create_link').click
     edit_form = f('#edit_appointment_form')
-    keep_trying_until { expect(edit_form).to be_displayed }
-    replace_content(fj('input[name="title"]'), new_appointment_text)
+    expect(edit_form).to be_displayed
+    replace_content(f('input[name="title"]'), new_appointment_text)
     unless opts[:skip_contexts]
       f('.ag_contexts_selector').click
       f('.ag_sections_toggle').click
@@ -100,8 +100,8 @@ module SchedulerCommon
 
   def open_edit_appointment_group_event_dialog
     f('.agenda-event .ig-row').click
-    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
-    driver.execute_script("$('.edit_event_link').trigger('click')")
+    expect(f('.edit_event_link')).to be_displayed
+    f('.edit_event_link').click
     wait_for_ajaximations
   end
 end

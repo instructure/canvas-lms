@@ -92,8 +92,9 @@ describe 'developer keys' do
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
     wait_for_ajaximations
+    loading = f("#loading")
     keep_trying_until do
-      expect(f("#loading")).not_to have_class('loading')
+      expect(loading).not_to have_class('loading')
       true
     end
     expect(ff("#keys tbody tr").length).to eq 25

@@ -84,8 +84,8 @@ describe "quizzes log auditing" do
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        keep_trying_until { expect(f('#ic-EventStream')).to include_text('Session started') }
-        keep_trying_until { expect(f('#ic-EventStream')).to include_text('Viewed (and possibly read)') }
+        expect(f('#ic-EventStream')).to include_text('Session started')
+        expect(f('#ic-EventStream')).to include_text('Viewed (and possibly read)')
       end
 
       it 'should show that a question had been answered', priority: "2", test_id:605109 do
@@ -95,7 +95,7 @@ describe "quizzes log auditing" do
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        keep_trying_until { expect(f('#ic-EventStream')).to include_text('Answered question') }
+        expect(f('#ic-EventStream')).to include_text('Answered question')
       end
 
       it 'should take you to a question when you click on the question number', priority: "2", test_id:605111 do
@@ -104,9 +104,8 @@ describe "quizzes log auditing" do
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        keep_trying_until { expect(f('#ic-EventStream')).to include_text('#1') }
+        expect(f('#ic-EventStream')).to include_text('#1')
         fln('#1').click
-        wait_for_ajaximations
         expect(f('.ic-QuestionInspector__QuestionHeader')).to include_text('Question #1')
       end
     end

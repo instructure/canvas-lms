@@ -1504,12 +1504,6 @@ define([
           result = 0;
         }
 
-        // For some reason, assignments and other submissions fill the
-        // select dropdown with 0 based values. Quizzes started with 1.
-        if (jsonData.context.quiz && result > 0) {
-          result = result - 1;
-        }
-
         return result;
       };
 
@@ -1641,7 +1635,7 @@ define([
             var grade = s.grade;
           }
           return {
-            value: s.version || i,
+            value: i,
             late: s.late,
             selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
@@ -1728,7 +1722,6 @@ define([
         return jsonData.context.students.length;
       };
     },
-
     loadAttachmentInline: function(attachment){
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
@@ -1779,13 +1772,11 @@ define([
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
             crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
           }));
-        }
-        else if (attachment && attachment.canvadoc_url) {
+        } else if (attachment && attachment.canvadoc_url) {
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
             canvadoc_session_url: attachment.canvadoc_url
           }));
-        }
-        else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
+        } else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 
           var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
@@ -1794,32 +1785,31 @@ define([
                 return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
               },this)});
           $iframe_holder.show().loadDocPreview(previewOptions);
-	      }
-	      else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
-	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
-	                  .replace("{{attachmentId}}", attachment.id);
-	        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
-	      }
-	      else {
-	        //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-	        $iframe_holder.html($.raw(
+        } else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
+          var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
+            .replace("{{submissionId}}", this.currentStudent.submission.user_id)
+            .replace("{{attachmentId}}", attachment.id);
+          $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+        } else if (this.currentStudent.submission.external_tool_url) {
+          $iframe_holder.html(
+            $.raw('<iframe id="speedgrader_iframe" src="' +
+              htmlEscape(this.currentStudent.submission.external_tool_url) + '" class="tool_launch"></iframe>'
+            )
+          ).show();
+        } else {
+          //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
+          $iframe_holder.html($.raw(
             '<iframe id="speedgrader_iframe" src="' + htmlEscape('/courses/' + jsonData.context_id  +
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
-
-              this.currentStudent.submission &&
-              !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
-              this.currentStudent.submission.currentSelectedIndex != null ?
-              '&version=' + this.currentStudent.submission.currentSelectedIndex :
-              ''
+              SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)
             ) + (
               utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
             )) + '" frameborder="0"></iframe>'))
             .show();
-	      }
-  	  }
+        }
+      }
     },
 
     showRubric: function(){

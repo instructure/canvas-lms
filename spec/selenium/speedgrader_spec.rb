@@ -136,17 +136,17 @@ describe 'Speedgrader' do
       end
 
       it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
-        expect(ff('#update_history_form .alert')[0].text).to include_text('The following questions need review:')
+        expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
       end
 
       it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         questions_to_grade = ff('#questions_needing_review li a')
-        expect(questions_to_grade[0].text).to include_text('Question 2')
-        expect(questions_to_grade[1].text).to include_text('Question 3')
+        expect(questions_to_grade[0]).to include_text('Question 2')
+        expect(questions_to_grade[1]).to include_text('Question 3')
       end
 
       it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
-        expect(ff('#update_history_form .alert')[0].text).not_to include_text('Question 4')
+        expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
       end
     end
 
@@ -161,7 +161,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(0 / 0)')
+        expect(f('#grade_container label')).to include_text('(0 / 0)')
       end
 
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
@@ -169,7 +169,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(1 / 1)')
+        expect(f('#grade_container label')).to include_text('(1 / 1)')
       end
     end
 
@@ -222,7 +222,8 @@ describe 'Speedgrader' do
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
-        keep_trying_until { expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10' }
+        el = f("#student_grading_#{@assignment.id}")
+        keep_trying_until { expect(el.attribute 'value').to eq '10' }
       end
     end
     context 'Using a rubric to grade' do
@@ -387,7 +388,7 @@ describe 'Speedgrader' do
 
       # see first student
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-      keep_trying_until { f(selectedStudent).text.include?(@students[0].name) }
+      expect(f(selectedStudent)).to include_text(@students[0].name)
     end
 
     let(:selectedStudent) {'span.ui-selectmenu-item-header'}
@@ -489,14 +490,20 @@ describe 'Speedgrader' do
       )
     end
 
-    it 'displays keyboard shortcut modal when clicking blue info icon', priority: "2", test_id: 759319 do
+    it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      keyboard_shortcut_icon = f('#keyboard-shortcut-info-icon')
+      keyboard_modal = f('#keyboard_navigation')
+      expect(keyboard_shortcut_icon).to be_displayed
 
-      shortcut_modal = f('#keyboard_navigation')
-      f('#keyboard-shortcut-info-icon').click
+      # Open shortcut modal
+      keyboard_shortcut_icon.click
+      expect(keyboard_modal).to be_displayed
 
-      expect(shortcut_modal).to be_displayed
+      # Close shortcut modal
+      f('.ui-resizable .ui-dialog-titlebar-close').click
+      expect(keyboard_modal).not_to be_displayed
     end
   end
 end

@@ -74,8 +74,7 @@ describe "oauth2 flow" do
       @key.save!
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
       expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
-      expect(f('.icon_url')).not_to be_nil
-      expect(f('.icon_url')).to be_displayed
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.ic-Login-confirmation__auth-icon' : '.icon_url')).to be_displayed
     end
 
     it "should show remember authorization checkbox for scoped token requests" do

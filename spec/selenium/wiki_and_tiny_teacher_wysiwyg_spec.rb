@@ -14,7 +14,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     def wysiwyg_state_setup(text = "1\n2\n3", val: false, html: false)
       get "/courses/#{@course.id}/pages/front-page/edit"
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
 
       if val == true
         add_text_to_tiny(text)
@@ -181,7 +181,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      keep_trying_until { @image_list.find_elements(:css, '.img') }
 
       @image_list.find_element(:css, '.img_link').click
 
@@ -249,7 +248,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
         f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
         wait_for_ajaximations
-        keep_trying_until { @image_list.find_elements(:css, '.img') }
 
         @image_list.find_element(:css, '.img_link').click
 
@@ -319,15 +317,15 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       create_wiki_page(title, unpublished, edit_roles)
 
       get "/courses/#{@course.id}/pages/front-page/edit"
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
 
       f('#new_page_link').click
-      keep_trying_until { expect(f('#new_page_name')).to be_displayed }
+      expect(f('#new_page_name')).to be_displayed
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce p a').attribute('href')).to include_text title
+        expect(f('#tinymce p a').attribute('href')).to include title
       end
 
       select_all_wiki
@@ -534,7 +532,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajax_requests
       in_frame wiki_page_body_ifr_id do
-        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+        img = f('.equation_image')
+        keep_trying_until { expect(img.attribute('title')).to eq equation_text }
 
         # currently there's an issue where the equation is double-escaped in the
         # src, though it's correct after the redirect to codecogs. here we just
@@ -573,7 +572,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajax_requests
       in_frame wiki_page_body_ifr_id do
-        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+        img = f('.equation_image')
+        keep_trying_until { expect(img.attribute('title')).to eq equation_text }
 
         # currently there's an issue where the equation is double-escaped in the
         # src, though it's correct after the redirect to codecogs. here we just
@@ -628,7 +628,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       get "/courses/#{@course.id}/pages/front-page/edit"
 
       f("div[aria-label='Record/Upload Media'] button").click
-      keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
+      expect(f('#record_media_tab')).to be_displayed
       f('#media_comment_dialog a[href="#upload_media_tab"]').click
       expect(f('#media_comment_dialog #audio_upload')).to be_displayed
       close_visible_dialog

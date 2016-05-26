@@ -1,5 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
+def login
+  get "/login"
+  expect_new_page_load { fill_in_login_form("nobody@example.com", "asdfasdf") }
+end
 describe "terms of use test" do
   include_context "in-process server selenium tests"
 
@@ -8,7 +12,7 @@ describe "terms of use test" do
   end
 
   it "should not require a user to accept the terms if they haven't changed", priority: "1", test_id: 268275 do
-    login_as
+    login
     expect(f("#content")).not_to contain_css('.reaccept_terms')
   end
 
@@ -25,7 +29,7 @@ describe "terms of use test" do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
-    login_as
+    login
     form = f('.reaccept_terms')
     expect(form).to be_present
     expect_new_page_load {
@@ -39,7 +43,9 @@ describe "terms of use test" do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
-    login_as
+
+    login
+
     form = f('.reaccept_terms')
     expect(form).to be_present
     submit_form form
@@ -59,7 +65,7 @@ describe "terms of use test" do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
-    login_as
+    login
     # try to view a different page
     get "/profile/settings"
     expect(f('.reaccept_terms')).to be_present
@@ -79,7 +85,7 @@ describe "terms of use SOC2 compliance test" do
       @user.register!
     end
 
-    login_as
+    login
 
     # terms page should be displayed
     expect(f('.reaccept_terms')).to be_present
@@ -108,7 +114,7 @@ describe "terms of use SOC2 compliance test" do
       @user.register!
     end
 
-    login_as
+    login
 
     # terms page shouldn't be visible
     expect(f("#content")).not_to contain_css('.reaccept_terms')

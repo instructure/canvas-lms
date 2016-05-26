@@ -225,15 +225,19 @@ module Canvas
       end
 
       context "using catastrophic cache fallback" do
+        let!(:now) { Time.zone.now }
+
         before(:each) do
           stub_consul_with("rce.insops.com")
           DynamicSettings.from_cache(parent_key) # prime cache
-          Timecop.travel(Time.zone.now + 11.minutes)
         end
 
         after(:each) do
-          Timecop.return
           Canvas.unstub(:timeout_protection)
+        end
+
+        around do |example|
+          Timecop.freeze(now + 11.minutes, &example)
         end
 
         it "still returns old values if connection fails after timeout" do

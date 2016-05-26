@@ -46,10 +46,9 @@ describe "gradebook2" do
     # now verify that you can set it back
 
     fj('.section-select-button:visible').click
-    wait_for_ajaximations
-    keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
-    fj("label[for='section_option_#{''}']").click
-    keep_trying_until { expect(fj('.section-select-button:visible')).to include_text "All Sections" }
+    expect(fj('.section-select-menu:visible')).to be_displayed
+    f("label[for='section_option_']").click
+    expect(fj('.section-select-button:visible')).to include_text "All Sections"
 
     # validate all grades (i.e. submissions) were loaded
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '0'

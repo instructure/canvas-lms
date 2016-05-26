@@ -218,7 +218,7 @@ describe "discussions" do
 
           get url
 
-          keep_trying_until { expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed }
+          expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear

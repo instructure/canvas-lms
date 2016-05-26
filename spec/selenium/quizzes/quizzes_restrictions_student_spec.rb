@@ -49,7 +49,7 @@ describe 'quiz restrictions as a student' do
 
     it 'should not be accessible from invalid ip address', priority: "1", test_id: 338081 do
       begin_taking_quiz
-      expect(f('#content').text).to include_text 'This quiz is protected and is only available from certain locations.'\
+      expect(f('#content')).to include_text 'This quiz is protected and is only available from certain locations.'\
                   ' The computer you are currently using does not appear to be at a valid location for taking this quiz.'
       expect(f("#content")).not_to contain_css('#submit_quiz_form')
     end

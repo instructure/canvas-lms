@@ -64,6 +64,7 @@ define [
 
     showEditForm: ->
       @$el.addClass('editing').removeClass('not-editing')
+      $("#name_input").focus()
 
     initEdit: ->
       if @options.links?.length

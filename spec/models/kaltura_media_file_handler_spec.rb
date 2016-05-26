@@ -100,8 +100,8 @@ describe KalturaMediaFileHandler do
         it "always includes basic info about attachment and context" do
           KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
-          partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-          expect(partner_data_json).to eq({
+          partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
+          expect(partner_data).to eq({
             "attachment_id" => attachment.id.to_s,
             "context_source" => "file_upload",
             "root_account_id" => Shard.global_id_for(attachment.root_account_id).to_s,
@@ -114,8 +114,8 @@ describe KalturaMediaFileHandler do
           it "adds a context_code to the partner_data" do
             KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
-            partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-            expect(partner_data_json['context_code']).to eq "user_#{attachment_context.id}"
+            partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
+            expect(partner_data['context_code']).to eq "user_#{attachment_context.id}"
           end
 
           context "and the context has a root_account attached" do
@@ -132,8 +132,8 @@ describe KalturaMediaFileHandler do
               it "adds sis_user_id to partner_data" do
                 KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
-                partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-                expect(partner_data_json["sis_user_id"]).to eq "some_id_from_sis"
+                partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
+                expect(partner_data["sis_user_id"]).to eq "some_id_from_sis"
               end
             end
 
@@ -146,8 +146,8 @@ describe KalturaMediaFileHandler do
               it "adds sis_source_id to partner_data" do
                 KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)
 
-                partner_data_json = JSON.parse(files_sent_to_kaltura.first[:partner_data])
-                expect(partner_data_json["sis_source_id"]).to eq "gooboo"
+                partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
+                expect(partner_data["sis_source_id"]).to eq "gooboo"
               end
             end
           end

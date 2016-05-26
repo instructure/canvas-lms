@@ -47,22 +47,24 @@ module CustomValidators
     end
   end
 
-  def expect_flash_message(type = :warning, message_regex = nil)
+  def expect_flash_message(type = :warning, message = nil)
+    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
     disable_implicit_wait do
-      keep_trying_until do
+      wait_for method: :expect_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
-        message_regex ? !!text.match(message_regex) : messages.present?
+        message ? !!text.match(message) : messages.present?
       end
     end
   end
 
-  def expect_no_flash_message(type = :warning, message_regex = nil)
+  def expect_no_flash_message(type = :warning, message = nil)
+    message = Regexp.new(Regexp.escape(message)) if message.is_a?(String)
     disable_implicit_wait do
-      keep_trying_until do
+      wait_for method: :expect_no_flash_message, ignore: [Selenium::WebDriver::Error::StaleElementReferenceError] do
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
-        message_regex ? !text.match(message_regex) : messages.empty?
+        message ? !text.match(message) : messages.empty?
       end
     end
   end
@@ -91,14 +93,15 @@ module CustomValidators
   def expect_new_page_load(accept_alert = false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield
-    keep_trying_until do
+    wait_for do
       begin
-        driver.execute_script("return INST.still_on_old_page;") == nil
+        driver.execute_script("return window.INST && INST.still_on_old_page !== true;")
       rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
         raise unless accept_alert
         driver.switch_to.alert.accept
       end
     end
+    wait_for_dom_ready
     wait_for_ajaximations
   end
 end

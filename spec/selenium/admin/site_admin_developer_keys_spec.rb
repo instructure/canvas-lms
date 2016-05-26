@@ -67,7 +67,7 @@ describe "managing developer keys" do
     f("#keys tbody tr.key .delete_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying_until { ff("#keys tbody tr").length == 1 }
+    expect(ff("#keys tbody tr")).to have_size(1)
     expect(DeveloperKey.count).to eq 2
     expect(DeveloperKey.last).to be_deleted
   end
@@ -81,8 +81,9 @@ describe "managing developer keys" do
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
     wait_for_ajaximations
+    loading = f("#loading")
     keep_trying_until do
-      expect(f("#loading")).not_to have_class('loading')
+      expect(loading).not_to have_class('loading')
       true
     end
     expect(ff("#keys tbody tr").length).to eq count + 25

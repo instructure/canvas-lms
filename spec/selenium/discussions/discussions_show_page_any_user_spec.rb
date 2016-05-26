@@ -44,7 +44,7 @@ describe "discussions" do
           expect(f('.new-and-total-badge .new-items').text).to eq reply_count.to_s
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
+          scroll_into_view ".entry-content:last"
           expect(f("#content")).not_to contain_css('.discussion_entry.unread')
           expect(ff('.discussion_entry.read').length).to eq reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -64,8 +64,8 @@ describe "discussions" do
           expect(ff(".discussion_entry.unread").size).to eq 2
           expect(f('.new-and-total-badge .new-items').text).to eq '2'
 
-          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
-          keep_trying_until { ff('.discussion_entry.unread').size < 2 }
+          scroll_into_view '.entry-content:last'
+          expect(ff('.discussion_entry.unread')).to have_size(1)
           wait_for_ajaximations
           expect(ff(".discussion_entry.unread").size).to eq 1
         end
@@ -177,38 +177,29 @@ describe "discussions" do
         it "should show the appropriate replies from the search by option", priority: "1", test_id: 150487 do
           expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
           expect(f('#discussion-search')).to be_present
+
           replace_content(f('#discussion-search'), 'somebody')
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('somebody')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('somebody')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
+
           replace_content(f('#discussion-search'), 'Reply by')
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('teacher')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('teacher')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
         end
 
         it "should show unread replies on clicking the unread button", priority: "1", test_id: 150489 do
-          keep_trying_until do
-            expect(f('.new-and-total-badge .new-items').text).to eq('1')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
-          end
+          expect(f('.new-and-total-badge .new-items')).to include_text('1')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(2)
+
           # click unread button
           f('.ui-button').click
           wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('teacher')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('teacher')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
+
           # click unread button again
           f('.ui-button').click
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
-          end
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(2)
         end
 
         it "should collapse and expand multiple replies", priority: "1", test_id: 150490 do
@@ -236,7 +227,7 @@ describe "discussions" do
         form = f('form.user_content_post_form')
         expect(form).to be_present
         expect(form['target']).to eq iframe['name']
-        in_frame(iframe) do
+        in_frame(iframe[:name]) do
           keep_trying_until do
             src = driver.page_source
             doc = Nokogiri::HTML::DocumentFragment.parse(src)
@@ -320,10 +311,8 @@ describe "discussions" do
 
           last_entry = DiscussionEntry.last
           expect(last_entry.depth).to eq 2
-          expect(last_entry.message).to include_text(side_comment_text)
-          keep_trying_until do
-            expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
-          end
+          expect(last_entry.message).to include(side_comment_text)
+          expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
         end
 
         it "should create multiple side comments but only show 10 and expand the rest", priority: "1", test_id: 345489 do
@@ -331,11 +320,9 @@ describe "discussions" do
           side_comment_number.times { |i| topic.discussion_entries.create!(:user => student, :message => "new side comment #{i} from student", :parent_entry => entry) }
           get url
           expect(DiscussionEntry.last.depth).to eq 2
-          keep_trying_until do
-            expect(ff('.discussion-entries .entry').count).to eq 12 # +1 because of the initial entry
-          end
+          expect(ff('.discussion-entries .entry')).to have_size(12) # +1 because of the initial entry
           f('.showMore').click
-          expect(ff('.discussion-entries .entry').count).to eq(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
+          expect(ff('.discussion-entries .entry')).to have_size(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end
 
         it "should delete a side comment", priority: "1", test_id: 345490 do
@@ -350,9 +337,7 @@ describe "discussions" do
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
           expect(topic.discussion_entries.last.message).to eq text
           get url
-          keep_trying_until do
-            validate_entry_text(entry, text)
-          end
+          validate_entry_text(entry, text)
           edit_entry(entry, edit_text)
         end
 

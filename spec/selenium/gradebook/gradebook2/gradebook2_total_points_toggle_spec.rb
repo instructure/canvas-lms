@@ -46,7 +46,7 @@ describe "gradebook2 - total points toggle" do
     should_show_points
 
     group = AssignmentGroup.where(name: @group.name).first
-    set_group_weight(group, 50)
+    set_group_weight(group, 50, enable_scheme: true)
 
     disable_group_weight
     should_show_percentages

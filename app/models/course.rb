@@ -1229,7 +1229,7 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !e.admin?) || [:inactive, :completed].include?(e.state_based_on_date)}
+      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
@@ -1618,7 +1618,6 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil
-          e.sis_source_id = nil
         end
         e.attributes = {
           :course_section => section,
@@ -2209,6 +2208,7 @@ class Course < ActiveRecord::Base
   TAB_ANNOUNCEMENTS = 14
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
+  TAB_COLLABORATIONS_NEW = 17
 
   def self.default_tabs
     [{
@@ -2290,6 +2290,11 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.collaborations', "Collaborations"),
         :css_class => 'collaborations',
         :href => :course_collaborations_path
+      }, {
+        :id => TAB_COLLABORATIONS_NEW,
+        :label => t('#tabs.collaborations', "Collaborations"),
+        :css_class => 'collaborations',
+        :href => :course_lti_collaborations_path
       }, {
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),

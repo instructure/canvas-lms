@@ -113,6 +113,26 @@ describe NotificationMessageCreator do
       expect(channels).not_to include(a)
     end
 
+    it 'uses the default channel and the push channel if only the push channel has a policy' do
+      assignment_model
+      @user = user_model(:workflow_state => 'registered')
+      a = @user.communication_channels.create(:path => "a@example.com", :path_type => 'email')
+      a.confirm!
+      b = @user.communication_channels.create(:path => "b@example.com", :path_type => 'push')
+      b.confirm!
+      @n = Notification.create!(:name => "New notification", :category => 'TestImmediately')
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
+      channels = messages.collect(&:communication_channel)
+      expect(channels).to include(a)
+      expect(channels).not_to include(b)
+
+      b.notification_policies.create!(:notification => @n, :frequency => 'immediately')
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
+      channels = messages.collect(&:communication_channel)
+      expect(channels).to include(b)
+      expect(channels).to include(a)
+    end
+
     it "should not send dispatch messages for pre-registered users" do
       notification_model
       u1 = user_model(:name => "user 2")

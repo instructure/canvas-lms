@@ -38,6 +38,7 @@ shared_examples_for "settings basic tests" do |account_type|
 
     it "should delete an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249781, root_account: 251031) do
       admin_id = add_account_admin
+      scroll_page_to_top # to get the flash alert out of the way
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
       wait_for_ajax_requests

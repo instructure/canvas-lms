@@ -69,7 +69,7 @@
   <span class="message-notification" data-bind="messageNotification"></span>
   <div data-bind="message" class="message user_content">{{convertApiUserContent message}}</div>
   {{#if editor}}
-    <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a {{editor_href}}>{{editor.display_name}}</a> on {{edited_at}}{{/t}}</div>
+    <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a href="{{editor_href}}">{{editor.display_name}}</a> on {{edited_at}}{{/t}}</div>
   {{/if}}
   {{#if attachments}}
     <div class="comment_attachments">

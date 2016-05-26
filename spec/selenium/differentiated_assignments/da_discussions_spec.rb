@@ -44,7 +44,7 @@ describe "interaction with differentiated discussions" do
         @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested resource.") }
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.")
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics}
       end
       it "should show the discussion page with an override" do
@@ -116,7 +116,7 @@ describe "interaction with differentiated discussions" do
         @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested resource.") }
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.")
         expect(driver.current_url).to match %r{/courses/\d+/discussion_topics}
       end
       it "should show the discussion page with an override" do

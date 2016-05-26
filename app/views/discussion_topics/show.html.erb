@@ -139,7 +139,7 @@
                 <% end %>
 
                 <% unless @presenter.comments_disabled? %>
-                  <% if @locked %>
+                  <% if @topic.locked? %>
                     <% if can_do(@context, @current_user, :moderate_forum) %>
                       <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
                     <% end %>
@@ -206,7 +206,9 @@
         </header>
 
         <div class="discussion-section message_wrapper">
-          <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
+          <% unless @locked.is_a?(Hash) && !@locked[:can_view] && !can_do(@topic, @current_user, :update) %>
+            <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
+          <% end %>
           <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
             <div class="discussion-fyi">
               <%= t 'announcement_locked', 'The content of this announcement will not be visible to users until %{date}', :date => datetime_string(@unlock_at) %>
@@ -216,8 +218,8 @@
             <div class="discussion-fyi">
               <% if @topic.is_a? Announcement %>
                 <%= t 'announcement_closed', 'This announcement is closed for comments' %>
-              <% else %>
-                <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked, "This topic is closed for comments") %>
+              <% elsif @locked.is_a?(Hash) %>
+                <%= lock_explanation(@locked, 'topic', @context) %>
               <% end %>
             </div>
           <% end %>
@@ -258,10 +260,12 @@
         <div class="headerBar" data-sticky>
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
+              <label class="screenreader-only" for="discussion-search">
+                <%= t("Search entries or author") %>
+              </label>
               <input
                 id               = "discussion-search"
-                type             = "text"
-                aria-label       = "<%= t("Search entries or author") %>"
+                type             = "search"
                 placeholder      = "<%= t("Search entries or author") %>"
                 size             = 50
               >

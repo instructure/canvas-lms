@@ -38,7 +38,7 @@ describe "scheduler" do
       expect(f('.ag-x-of-x-signed-up')).to include_text('unpublished')
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
-      keep_trying_until { expect(edit_form).to be_displayed }
+      expect(edit_form).to be_displayed
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       new_appointment_group.reload
@@ -149,10 +149,10 @@ describe "scheduler" do
       click_scheduler_link
 
       # Index page should show correct elements for appointment groups
-      expect(f(".view_calendar_link").text).to include_text(title)
-      expect(f(".ag-context").text).to include @course.name.to_s #include context
-      expect(f(".ag-location").text).to include location
-      expect(f(".ag-x-of-x-signed-up").text).to include "people have signed up"
+      expect(f(".view_calendar_link")).to include_text(title)
+      expect(f(".ag-context")).to include_text @course.name.to_s
+      expect(f(".ag-location")).to include_text location
+      expect(f(".ag-x-of-x-signed-up")).to include_text "people have signed up"
       expect(f(".icon-settings")).not_to be_nil #Gear icon present
     end
   end

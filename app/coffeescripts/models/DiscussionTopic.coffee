@@ -84,6 +84,8 @@ define [
         reply_count_tooltip: @replyTooltip()
         assignment: json.assignment?.toJSON()
         defaultDates: @defaultDates().toJSON()
+      delete json.assignment.rubric if json.assignment
+      json
 
     toView: ->
       _.extend @toJSON(),

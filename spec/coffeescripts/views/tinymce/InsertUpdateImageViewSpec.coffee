@@ -4,9 +4,11 @@ define [
   'jsx/shared/rce/RceCommandShim'
 ], ($, InsertUpdateImageView, RceCommandShim) ->
   fakeEditor = undefined
+  moveToBookmarkSpy = undefined
 
   module "InsertUpdateImageView#update",
     setup: ->
+      moveToBookmarkSpy = sinon.spy()
       fakeEditor = {
         id: "someId"
         focus: ()->
@@ -15,7 +17,7 @@ define [
         }
         selection: {
           getBookmark: ()->
-          moveToBookmark: ()->
+          moveToBookmark: moveToBookmarkSpy
         }
       }
 
@@ -30,3 +32,15 @@ define [
     view.$editor = '$fakeEditor'
     view.update()
     ok RceCommandShim.send.calledWith('$fakeEditor', 'insert_code', view.generateImageHtml())
+
+  test "it restores caret on update", ->
+    view = new InsertUpdateImageView(fakeEditor, "<div></div>")
+    view.$editor = '$fakeEditor'
+    view.update()
+    ok moveToBookmarkSpy.called
+
+  test "it restores caret on close", ->
+    view = new InsertUpdateImageView(fakeEditor, "<div></div>")
+    view.$editor = '$fakeEditor'
+    view.close()
+    ok moveToBookmarkSpy.called

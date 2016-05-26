@@ -24,7 +24,7 @@ module ConditionalRelease
       enabled: false, # required
       host: nil,      # required
       protocol: nil,  # defaults to Canvas
-      edit_rule_path: "api/editor",
+      edit_rule_path: "ui/editor",
       create_account_path: 'api/account',
     }.freeze
 

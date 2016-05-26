@@ -287,5 +287,9 @@ iframe.tool_launch {
     width: auto;
     height: auto;
     z-index: 1;
+    outline: none;
+    & + .ic-app-header__main-navigation {
+      margin-top: 50px;
+    }
   }
 }

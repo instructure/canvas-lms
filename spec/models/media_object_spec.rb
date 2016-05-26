@@ -55,11 +55,13 @@ describe MediaObject do
       @a1 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a2 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a3 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
+      @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
           :entries => [
               { :entryId => "test", :originalId => %Q[{"context_code":"context", "attachment_id": "#{@a2.id}"} ]},
               { :entryId => "test2", :originalId => "#{@a1.id}" },
               { :entryId => "test3", :originalId => @a3.id },
+              { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
           ],
       }
       MediaObject.create!(:context => user, :media_id => "test")
@@ -71,6 +73,8 @@ describe MediaObject do
       media_object = MediaObject.where(attachment_id: @a2).first
       expect(media_object).not_to be_nil
       media_object = MediaObject.where(attachment_id: @a3).first
+      expect(media_object).not_to be_nil
+      media_object = MediaObject.where(attachment_id: @a4).first
       expect(media_object).not_to be_nil
     end
   end

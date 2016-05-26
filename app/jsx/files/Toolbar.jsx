@@ -25,11 +25,11 @@ define([
     page(`/search?search_term=${searchTerm}`);
   };
 
-  Toolbar.renderUploadAddFolderButtons = function () {
+  Toolbar.renderUploadAddFolderButtons = function (canManage) {
     var phoneHiddenSet = classnames({
       'hidden-phone' : this.showingButtons
     });
-    if (this.props.userCanManageFilesForContext) {
+    if (canManage) {
       return (
         <div className='ef-actions'>
           <button
@@ -54,8 +54,8 @@ define([
       );
     }
   }
-  Toolbar.renderDeleteButton = function () {
-    if (this.props.userCanManageFilesForContext) {
+  Toolbar.renderDeleteButton = function (canManage) {
+    if (canManage) {
       return (
         <button
           type= 'button'
@@ -93,8 +93,8 @@ define([
       );
     }
   }
-  Toolbar.renderCopyCourseButton = function () {
-    if (this.props.userCanManageFilesForContext) {
+  Toolbar.renderCopyCourseButton = function (canManage) {
+    if (canManage) {
       return (
         <button
           type='button'
@@ -159,8 +159,8 @@ define([
     }
   }
 
-  Toolbar.renderRestrictedAccessButtons = function () {
-    if (this.props.userCanManageFilesForContext){
+  Toolbar.renderRestrictedAccessButtons = function (canManage) {
+    if (canManage){
       return (
         <button
           type= 'button'
@@ -181,6 +181,11 @@ define([
     var selectedItemIsFolder = this.props.selectedItems.every(function(item) {
       return item instanceof Folder;
     });
+    var submissionsFolderSelected = this.props.currentFolder && this.props.currentFolder.get('for_submissions');
+    submissionsFolderSelected = submissionsFolderSelected || this.props.selectedItems.some(function(item) {
+      return item.get('for_submissions');
+    });
+    var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected;
 
     this.showingButtons = this.props.selectedItems.length
     if(!this.showingButtons || selectedItemIsFolder){
@@ -256,16 +261,16 @@ define([
               <i className= 'icon-eye' />
             </a>
 
-            { this.renderRestrictedAccessButtons() }
+            { this.renderRestrictedAccessButtons(canManage) }
             { this.renderDownloadButton() }
-            { this.renderCopyCourseButton() }
-            { this.renderManageUsageRightsButton() }
-            { this.renderDeleteButton() }
+            { this.renderCopyCourseButton(canManage) }
+            { this.renderManageUsageRightsButton(canManage) }
+            { this.renderDeleteButton(canManage) }
           </div>
           <span className= 'ef-selected-count hidden-tablet hidden-phone'>
             {I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: this.props.selectedItems.length})}
           </span>
-          { this.renderUploadAddFolderButtons() }
+          { this.renderUploadAddFolderButtons(canManage) }
         </div>
       </header>
     );

@@ -51,7 +51,7 @@ Rails.configuration.after_initialize do
     end
   end
 
-  Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * *' do
+  Delayed::Periodic.cron 'Reporting::CountsReport.process', '0 11 * * 0' do
     Reporting::CountsReport.process
   end
 

@@ -133,14 +133,14 @@ describe DiscussionTopicsController, type: :request do
     it "should check permissions" do
       @user = user(:active_all => true)
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "hai", :message => "test message" }, {}, :expected_status => 401)
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
     end
 
     it "should make a basic topic" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>" })
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>"})
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
@@ -155,8 +155,8 @@ describe DiscussionTopicsController, type: :request do
     it 'should process html content in message on create' do
       should_process_incoming_user_content(@course) do |content|
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-                 { :title => "test title", :message => content })
+                 {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+                 {:title => "test title", :message => content})
 
         @topic = @course.discussion_topics.order(:id).last
         @topic.message
@@ -165,8 +165,8 @@ describe DiscussionTopicsController, type: :request do
 
     it "should post an announcment" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :is_announcement => true, :published => true })
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>", :is_announcement => true, :published => true})
       @topic = @course.announcements.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
@@ -176,9 +176,9 @@ describe DiscussionTopicsController, type: :request do
       post_at = 1.month.from_now
       lock_at = 2.months.from_now
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :published => true,
-                 :delayed_post_at => post_at.as_json, :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1' })
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>", :discussion_type => "threaded", :published => true,
+                :delayed_post_at => post_at.as_json, :lock_at => lock_at.as_json, :podcast_has_student_posts => '1', :require_initial_post => '1'})
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
@@ -195,34 +195,34 @@ describe DiscussionTopicsController, type: :request do
     context "publishing" do
       it "should create a draft state topic" do
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-                 { :title => "test title", :message => "test <b>message</b>", :published => "false" })
+                 {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+                 {:title => "test title", :message => "test <b>message</b>", :published => "false"})
         @topic = @course.discussion_topics.order(:id).last
         expect(@topic.published?).to be_falsey
       end
 
       it "should not allow announcements to be draft state" do
         result = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-                 { :title => "test title", :message => "test <b>message</b>", :published => "false", :is_announcement => true },
-                 {}, {:expected_status => 400})
+                          {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+                          {:title => "test title", :message => "test <b>message</b>", :published => "false", :is_announcement => true},
+                          {}, {:expected_status => 400})
         expect(result["errors"]["published"]).to be_present
       end
 
       it "should require moderation permissions to create a draft state topic" do
         course_with_student_logged_in(:course => @course, :active_all => true)
         result = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-                 { :title => "test title", :message => "test <b>message</b>", :published => "false" },
-                 {}, {:expected_status => 400})
+                          {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+                          {:title => "test title", :message => "test <b>message</b>", :published => "false"},
+                          {}, {:expected_status => 400})
         expect(result["errors"]["published"]).to be_present
       end
 
       it "should allow non-moderators to set published" do
         course_with_student_logged_in(:course => @course, :active_all => true)
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-                 { :title => "test title", :message => "test <b>message</b>", :published => "true" })
+                 {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+                 {:title => "test title", :message => "test <b>message</b>", :published => "true"})
         @topic = @course.discussion_topics.order(:id).last
         expect(@topic.published?).to be_truthy
       end
@@ -232,8 +232,8 @@ describe DiscussionTopicsController, type: :request do
     it "should allow creating a discussion assignment" do
       due_date = 1.week.from_now
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>", :assignment => {:points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!"}})
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.assignment).to be_present
@@ -246,8 +246,8 @@ describe DiscussionTopicsController, type: :request do
 
     it "should not create an assignment on a discussion topic when set_assignment is false" do
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-               { :controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param },
-               { :title => "test title", :message => "test <b>message</b>", :assignment => { :set_assignment => 'false' } })
+               {:controller => "discussion_topics", :action => "create", :format => "json", :course_id => @course.to_param},
+               {:title => "test title", :message => "test <b>message</b>", :assignment => {:set_assignment => 'false'}})
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.assignment).to be_nil
@@ -262,60 +262,60 @@ describe DiscussionTopicsController, type: :request do
     end
 
     let(:response_json) do
-                 {"read_state"=>"read",
-                  "unread_count"=>0,
-                  "podcast_url"=>"/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
-                  "user_can_see_posts"=>@topic.user_can_see_posts?(@user),
-                  "subscribed"=>@topic.subscribed?(@user),
-                  "require_initial_post"=>nil,
-                  "title"=>"Topic 1",
-                  "discussion_subentry_count"=>0,
-                  "assignment_id"=>nil,
-                  "published"=>true,
-                  "can_unpublish"=>true,
-                  "delayed_post_at"=>nil,
-                  "lock_at"=>nil,
-                  "id"=>@topic.id,
-                  "user_name"=>@user.name,
-                  "last_reply_at"=>@topic.last_reply_at.as_json,
-                  "message"=>"<p>content here</p>",
-                  "posted_at"=>@topic.posted_at.as_json,
-                  "root_topic_id"=>nil,
-                  "pinned"=>false,
-                  "position"=>@topic.position,
-                  "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                  "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                  "podcast_has_student_posts" => nil,
-                  "attachments"=>[{"content-type"=>"unknown/unknown",
-                                   "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
-                                   "filename"=>"content.txt",
-                                   "display_name"=>"content.txt",
-                                   "id"=>@attachment.id,
-                                   "folder_id" => @attachment.folder_id,
-                                   "size"=>@attachment.size,
-                                   'unlock_at' => nil,
-                                   'locked' => false,
-                                   'hidden' => false,
-                                   'lock_at' => nil,
-                                   'locked_for_user' => false,
-                                   'hidden_for_user' => false,
-                                   'created_at' => @attachment.created_at.as_json,
-                                   'updated_at' => @attachment.updated_at.as_json,
-                                   'modified_at' => @attachment.updated_at.as_json,
-                                   'thumbnail_url' => @attachment.thumbnail_url,
-                  }],
-                  "topic_children"=>[@sub.id],
-                  "discussion_type" => 'side_comment',
-                  "locked"=>false,
-                  "can_lock"=>true,
-                  "locked_for_user"=>false,
-                  "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
-                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true },
-                  "group_category_id" => nil,
-                  "can_group" => true,
-                  "allow_rating" => nil,
-                  "only_graders_can_rate" => nil,
-                  "sort_by_rating" => nil,
+      {"read_state" => "read",
+       "unread_count" => 0,
+       "podcast_url" => "/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
+       "user_can_see_posts" => @topic.user_can_see_posts?(@user),
+       "subscribed" => @topic.subscribed?(@user),
+       "require_initial_post" => nil,
+       "title" => "Topic 1",
+       "discussion_subentry_count" => 0,
+       "assignment_id" => nil,
+       "published" => true,
+       "can_unpublish" => true,
+       "delayed_post_at" => nil,
+       "lock_at" => nil,
+       "id" => @topic.id,
+       "user_name" => @user.name,
+       "last_reply_at" => @topic.last_reply_at.as_json,
+       "message" => "<p>content here</p>",
+       "posted_at" => @topic.posted_at.as_json,
+       "root_topic_id" => nil,
+       "pinned" => false,
+       "position" => @topic.position,
+       "url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+       "html_url" => "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+       "podcast_has_student_posts" => nil,
+       "attachments" => [{"content-type" => "unknown/unknown",
+                          "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+                          "filename" => "content.txt",
+                          "display_name" => "content.txt",
+                          "id" => @attachment.id,
+                          "folder_id" => @attachment.folder_id,
+                          "size" => @attachment.size,
+                          'unlock_at' => nil,
+                          'locked' => false,
+                          'hidden' => false,
+                          'lock_at' => nil,
+                          'locked_for_user' => false,
+                          'hidden_for_user' => false,
+                          'created_at' => @attachment.created_at.as_json,
+                          'updated_at' => @attachment.updated_at.as_json,
+                          'modified_at' => @attachment.updated_at.as_json,
+                          'thumbnail_url' => @attachment.thumbnail_url,
+                         }],
+       "topic_children" => [@sub.id],
+       "discussion_type" => 'side_comment',
+       "locked" => false,
+       "can_lock" => true,
+       "locked_for_user" => false,
+       "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
+       "permissions" => {"delete" => true, "attach" => true, "update" => true},
+       "group_category_id" => nil,
+       "can_group" => true,
+       "allow_rating" => nil,
+       "only_graders_can_rate" => nil,
+       "sort_by_rating" => nil,
       }
     end
 
@@ -338,7 +338,7 @@ describe DiscussionTopicsController, type: :request do
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                          :search_term => 'topic'})
 
-        expect(json.map{|h| h['id']}.sort).to eq ids.sort
+        expect(json.map { |h| h['id'] }.sort).to eq ids.sort
       end
 
       it "should order topics by descending position by default" do
@@ -352,7 +352,7 @@ describe DiscussionTopicsController, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
-        expect(json.map {|j| j['id']}).to eq topics.map(&:id)
+        expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
       it "should order topics by descending last_reply_at when order_by parameter is specified" do
@@ -372,7 +372,7 @@ describe DiscussionTopicsController, type: :request do
         topics.unshift(@topic4)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?order_by=recent_activity",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :order_by => 'recent_activity'})
-        expect(json.map {|j| j['id']}).to eq topics.map(&:id)
+        expect(json.map { |j| j['id'] }).to eq topics.map(&:id)
       end
 
       it "should only include topics with a given scope when specified" do
@@ -386,7 +386,7 @@ describe DiscussionTopicsController, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
-                          :per_page => '10', :scope => 'unlocked'})
+                         :per_page => '10', :scope => 'unlocked'})
         expect(json.size).to eq 1
         links = response.headers['Link'].split(',')
         links.each do |link|
@@ -395,7 +395,7 @@ describe DiscussionTopicsController, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
-                          :per_page => '10', :scope => 'locked'})
+                         :per_page => '10', :scope => 'locked'})
         expect(json.size).to eq 3
         links = response.headers['Link'].split(',')
         links.each do |link|
@@ -428,7 +428,7 @@ describe DiscussionTopicsController, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=2&only_announcements=true&order_by=recent_activity&scope=unlocked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
-                          :per_page => '2', :order_by => 'recent_activity', :only_announcements => 'true', :scope => 'unlocked'})
+                         :per_page => '2', :order_by => 'recent_activity', :only_announcements => 'true', :scope => 'unlocked'})
         expect(json.size).to eq 2
         links = response.headers['Link'].split(',')
         links.each do |link|
@@ -500,22 +500,22 @@ describe DiscussionTopicsController, type: :request do
       it "should require authorization" do
         @user = user(:active_all => true)
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :title => "hai", :message => "test message" }, {}, :expected_status => 401)
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:title => "hai", :message => "test message"}, {}, :expected_status => 401)
       end
 
       it "should update the entry" do
         post_at = 1.month.from_now
         lock_at = 2.months.from_now
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :title => "test title",
-                   :message => "test <b>message</b>",
-                   :discussion_type => "threaded",
-                   :delayed_post_at => post_at.as_json,
-                   :lock_at => lock_at.as_json,
-                   :podcast_has_student_posts => '1',
-                   :require_initial_post => '1' })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:title => "test title",
+                  :message => "test <b>message</b>",
+                  :discussion_type => "threaded",
+                  :delayed_post_at => post_at.as_json,
+                  :lock_at => lock_at.as_json,
+                  :podcast_has_student_posts => '1',
+                  :require_initial_post => '1'})
         @topic.reload
         expect(@topic.title).to eq "test title"
         expect(@topic.message).to eq "test <b>message</b>"
@@ -537,8 +537,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :lock_at => new_lock_at.as_json })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:lock_at => new_lock_at.as_json})
         @topic.reload
         expect(@topic.lock_at.to_i).to eq new_lock_at.to_i
         expect(@topic).to be_locked
@@ -551,8 +551,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :delayed_post_at => post_at.as_json })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:delayed_post_at => post_at.as_json})
         @topic.reload
         expect(@topic.delayed_post_at.to_i).to eq post_at.to_i
         expect(@topic).to be_post_delayed
@@ -565,8 +565,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :lock_at => lock_at.as_json })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:lock_at => lock_at.as_json})
 
         @topic.reload
         expect(@topic.lock_at).to eq lock_at
@@ -582,8 +582,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :lock_at => new_lock_at.as_json })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:lock_at => new_lock_at.as_json})
 
         @topic.reload
         expect(@topic.lock_at.to_i).to eq new_lock_at.to_i
@@ -599,8 +599,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :lock_at => new_lock_at.as_json })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:lock_at => new_lock_at.as_json})
 
         @topic.reload
         expect(@topic.lock_at.to_i).to eq new_lock_at.to_i
@@ -613,8 +613,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.save!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :lock_at => '' })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:lock_at => ''})
 
         @topic.reload
         expect(@topic.lock_at).to be_nil
@@ -628,8 +628,8 @@ describe DiscussionTopicsController, type: :request do
           @topic.save!
           expect(@topic).not_to be_published
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "true"})
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:published => "true"})
           expect(@topic.reload).to be_published
         end
 
@@ -637,17 +637,17 @@ describe DiscussionTopicsController, type: :request do
           @topic.type = 'Announcement'
           @topic.save!
           result = api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "false" },
-                   {}, {:expected_status => 400})
+                            {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                            {:published => "false"},
+                            {}, {:expected_status => 400})
           expect(result["errors"]["published"]).to be_present
         end
 
 
         it "should allow a topic with no posts to set draft state" do
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "false"})
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:published => "false"})
           expect(@topic.reload).not_to be_published
         end
 
@@ -657,8 +657,8 @@ describe DiscussionTopicsController, type: :request do
 
           @user = @teacher
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "false"}, {}, {:expected_status => 400})
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:published => "false"}, {}, {:expected_status => 400})
           expect(@topic.reload).to be_published
         end
 
@@ -666,8 +666,8 @@ describe DiscussionTopicsController, type: :request do
           course_with_student_logged_in(:course => @course, :active_all => true)
           @topic = create_topic(@course, :user => @student)
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "false"}, {}, {:expected_status => 400})
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:published => "false"}, {}, {:expected_status => 400})
           expect(@topic.reload).to be_published
         end
 
@@ -675,8 +675,8 @@ describe DiscussionTopicsController, type: :request do
           course_with_student_logged_in(:course => @course, :active_all => true)
           @topic = create_topic(@course, :user => @student)
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :published => "true"})
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:published => "true"})
           expect(@topic.reload).to be_published
         end
       end
@@ -684,8 +684,8 @@ describe DiscussionTopicsController, type: :request do
       it 'should process html content in message on update' do
         should_process_incoming_user_content(@course) do |content|
           api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                   { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                   { :message => content })
+                   {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                   {:message => content})
 
           @topic.reload
           @topic.message
@@ -698,8 +698,8 @@ describe DiscussionTopicsController, type: :request do
         @course.enroll_teacher(@editing_user).accept
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :title => "edited by someone else"})
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:title => "edited by someone else"})
         @topic.reload
         expect(@topic.editor).to eql(@editing_user)
         expect(@topic.user).to eql(@original_user)
@@ -713,8 +713,8 @@ describe DiscussionTopicsController, type: :request do
         expected_time = user_tz.parse("Fri Aug 26, 2031 8:39AM")
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :delayed_post_at => expected_time.as_json})
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:delayed_post_at => expected_time.as_json})
 
         @topic.reload
         expect(@topic.delayed_post_at).to eq expected_time
@@ -723,8 +723,8 @@ describe DiscussionTopicsController, type: :request do
       it "should allow creating assignment on update" do
         due_date = 1.week.ago
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :assignment => { :points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!" } })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:assignment => {:points_possible => 15, :grading_type => "percent", :due_at => due_date.as_json, :name => "override!"}})
         @topic.reload
 
         expect(@topic.title).to eq "Topic 1"
@@ -743,8 +743,8 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.assignment).to be_present
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :assignment => { :set_assignment => false } })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:assignment => {:set_assignment => false}})
         @topic.reload
         @assignment.reload
 
@@ -766,8 +766,8 @@ describe DiscussionTopicsController, type: :request do
         enable_cache do
           Timecop.freeze do
             api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                     { :assignment => { :due_at => new_due_date.iso8601} })
+                     {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                     {:assignment => {:due_at => new_due_date.iso8601}})
             @topic.reload
           end
           expect(@topic.assignment.overridden_for(@user).due_at.iso8601).to eq new_due_date.iso8601
@@ -791,8 +791,8 @@ describe DiscussionTopicsController, type: :request do
         enable_cache do
           Timecop.freeze do
             api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                     { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                     { :assignment => { :due_at => new_due_date.iso8601} })
+                     {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                     {:assignment => {:due_at => new_due_date.iso8601}})
             @topic.reload
           end
           expect(@topic.assignment.overridden_for(@user).due_at.iso8601).to eq new_due_date.iso8601
@@ -804,8 +804,8 @@ describe DiscussionTopicsController, type: :request do
         group = group_category.groups.create!(:name => "group1", :context => @course)
         group.add_user(@user)
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :assignment => { :group_category_id => group_category.id } })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:assignment => {:group_category_id => group_category.id}})
         @topic.reload
 
         expect(@topic.title).to eq "Topic 1"
@@ -816,16 +816,16 @@ describe DiscussionTopicsController, type: :request do
 
       it "should allow pinning a topic" do
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
-                 { pinned: true })
+                 {controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param},
+                 {pinned: true})
         expect(@topic.reload).to be_pinned
       end
 
       it "should allow unpinning a topic" do
         @topic.update_attribute(:pinned, true)
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
-                 { pinned: false })
+                 {controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param},
+                 {pinned: false})
         expect(@topic.reload).not_to be_pinned
       end
 
@@ -833,8 +833,8 @@ describe DiscussionTopicsController, type: :request do
         @topic.lock!
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :locked => false})
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:locked => false})
 
         @topic.reload
         expect(@topic).not_to be_locked
@@ -843,21 +843,21 @@ describe DiscussionTopicsController, type: :request do
       it "should allow locking a topic after due date" do
         due_date = 1.week.ago
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :assignment => { :due_at => due_date.as_json } })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:assignment => {:due_at => due_date.as_json}})
         @topic.reload
         expect(@topic.assignment.due_at.to_i).to eq due_date.to_i
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :locked => true})
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:locked => true})
 
         @topic.reload
         expect(@topic).to be_locked
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :locked => false})
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:locked => false})
 
         @topic.reload
         expect(@topic).not_to be_locked
@@ -866,14 +866,14 @@ describe DiscussionTopicsController, type: :request do
       it "should not allow locking a topic before due date" do
         due_date = 1.week.from_now
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :assignment => { :due_at => due_date.as_json } })
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:assignment => {:due_at => due_date.as_json}})
         @topic.reload
         expect(@topic.assignment.due_at.to_i).to eq due_date.to_i
 
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
-                 { :locked => true}, {}, :expected_status => 500)
+                 {:controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
+                 {:locked => true}, {}, :expected_status => 500)
 
         @topic.reload
         expect(@topic).not_to be_locked
@@ -884,14 +884,14 @@ describe DiscussionTopicsController, type: :request do
       it "should require authorization" do
         @user = user(:active_all => true)
         api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 {:controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param},
                  {}, {}, :expected_status => 401)
         expect(@topic.reload).not_to be_deleted
       end
 
       it "should delete the topic" do
         api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { :controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param })
+                 {:controller => "discussion_topics", :action => "destroy", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param})
         expect(@topic.reload).to be_deleted
       end
     end
@@ -904,8 +904,8 @@ describe DiscussionTopicsController, type: :request do
       expect(JSON.parse(response.body).to_s).to include("#{topic.assignment.title}")
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
-      calls.reject!{|call| opts[:except].include?(call) }
-      calls.each{ |call| expect(self.send(call, topic).to_s).not_to eq "401"}
+      calls.reject! { |call| opts[:except].include?(call) }
+      calls.each { |call| expect(self.send(call, topic).to_s).not_to eq "401" }
     end
 
     def calls_do_not_show_topic(topic)
@@ -913,41 +913,41 @@ describe DiscussionTopicsController, type: :request do
       expect(JSON.parse(response.body).to_s).not_to include("#{topic.assignment.title}")
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
-      calls.each{ |call| expect(self.send(call, topic).to_s).to eq "401"}
+      calls.each { |call| expect(self.send(call, topic).to_s).to eq "401" }
     end
 
     def get_index(course)
       raw_api_call(:get, "/api/v1/courses/#{course.id}/discussion_topics.json",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => course.id.to_s})
+                   {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => course.id.to_s})
     end
 
     def get_show(topic)
       raw_api_call(:get, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}",
-                        {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s})
+                   {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s})
     end
 
     def get_entries(topic)
       url = "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries"
-      raw_api_call(:get, url, controller: 'discussion_topics_api',action: 'entries', format: 'json', course_id: topic.context.to_param, topic_id: topic.id.to_s)
+      raw_api_call(:get, url, controller: 'discussion_topics_api', action: 'entries', format: 'json', course_id: topic.context.to_param, topic_id: topic.id.to_s)
     end
 
     def get_replies(topic)
       raw_api_call(:get, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries/#{topic.discussion_entries.last.id}/replies",
-         { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s })
+                   {:controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s})
     end
 
     def add_entry(topic)
-      raw_api_call( :post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s },
-        { :message => "example entry"})
+      raw_api_call(:post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries.json",
+                   {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+                    :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s},
+                   {:message => "example entry"})
     end
 
     def add_reply(topic)
-      raw_api_call( :post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries/#{topic.discussion_entries.last.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
-          :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s },
-        { :message => "example reply" })
+      raw_api_call(:post, "/api/v1/courses/#{topic.context.id}/discussion_topics/#{topic.id}/entries/#{topic.discussion_entries.last.id}/replies.json",
+                   {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+                    :course_id => topic.context.id.to_s, :topic_id => topic.id.to_s, :entry_id => topic.discussion_entries.last.id.to_s},
+                   {:message => "example reply"})
     end
 
 
@@ -980,23 +980,23 @@ describe DiscussionTopicsController, type: :request do
 
     it "lets the teacher see all topics" do
       @user = @teacher
-      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      [@topic_with_restricted_access, @topic_visible_to_all].each { |t| calls_display_topic(t) }
     end
 
     it "lets students with visibility see topics" do
       @user = @student_with_override
-      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+      [@topic_with_restricted_access, @topic_visible_to_all].each { |t| calls_display_topic(t) }
     end
 
     it 'gives observers the same visibility as their student' do
       @user = @observer
-      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+      [@topic_with_restricted_access, @topic_visible_to_all].each { |t| calls_display_topic(t, except: [:add_entry, :add_reply]) }
     end
 
     it 'observers without students see all' do
       @observer_enrollment.update_attribute(:associated_user_id, nil)
       @user = @observer
-      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+      [@topic_with_restricted_access, @topic_visible_to_all].each { |t| calls_display_topic(t, except: [:add_entry, :add_reply]) }
     end
 
     it "restricts access to students without visibility" do
@@ -1029,7 +1029,7 @@ describe DiscussionTopicsController, type: :request do
       @topic ||= create_topic(@course, :title => "Topic 1", :message => user_content)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics",
-        { :controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s })
+        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
       expect(json.size).to eq 1
       json.first['message']
     end
@@ -1043,20 +1043,20 @@ describe DiscussionTopicsController, type: :request do
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+    expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
 
     # get the last page
     json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s, :page => '3', :per_page => '3'})
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+    expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
   end
 
   it "should work with groups" do
@@ -1069,52 +1069,52 @@ describe DiscussionTopicsController, type: :request do
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s}).first
     expected = {
-      "read_state"=>"read",
-      "unread_count"=>0,
-      "user_can_see_posts"=>true,
-      "subscribed"=>true,
-      "podcast_url"=>nil,
-      "podcast_has_student_posts"=>nil,
-      "require_initial_post"=>nil,
-      "title"=>"Group Topic 1",
-      "discussion_subentry_count"=>0,
-      "assignment_id"=>nil,
-      "published"=>true,
-      "can_unpublish"=>true,
-      "delayed_post_at"=>nil,
-      "lock_at"=>nil,
-      "id"=>gtopic.id,
-      "user_name"=>@user.name,
-      "last_reply_at"=>gtopic.last_reply_at.as_json,
-      "message"=>"<p>content here</p>",
-      "pinned"=>false,
-      "position"=>gtopic.position,
+      "read_state" => "read",
+      "unread_count" => 0,
+      "user_can_see_posts" => true,
+      "subscribed" => true,
+      "podcast_url" => nil,
+      "podcast_has_student_posts" => nil,
+      "require_initial_post" => nil,
+      "title" => "Group Topic 1",
+      "discussion_subentry_count" => 0,
+      "assignment_id" => nil,
+      "published" => true,
+      "can_unpublish" => true,
+      "delayed_post_at" => nil,
+      "lock_at" => nil,
+      "id" => gtopic.id,
+      "user_name" => @user.name,
+      "last_reply_at" => gtopic.last_reply_at.as_json,
+      "message" => "<p>content here</p>",
+      "pinned" => false,
+      "position" => gtopic.position,
       "url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
       "html_url" => "http://www.example.com/groups/#{group.id}/discussion_topics/#{gtopic.id}",
-      "attachments"=>
-              [{"content-type"=>"unknown/unknown",
-                "url"=>"http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
-                "filename"=>"content.txt",
-                "display_name"=>"content.txt",
-                "id" => attachment.id,
-                "folder_id" => attachment.folder_id,
-                "size" => attachment.size,
-                'unlock_at' => nil,
-                'locked' => false,
-                'hidden' => false,
-                'lock_at' => nil,
-                'locked_for_user' => false,
-                'hidden_for_user' => false,
-                'created_at' => attachment.created_at.as_json,
-                'updated_at' => attachment.updated_at.as_json,
-                'thumbnail_url' => attachment.thumbnail_url,
-                'modified_at' => attachment.updated_at.as_json
-              }],
-      "posted_at"=>gtopic.posted_at.as_json,
-      "root_topic_id"=>nil,
-      "topic_children"=>[],
+      "attachments" =>
+        [{"content-type" => "unknown/unknown",
+          "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
+          "filename" => "content.txt",
+          "display_name" => "content.txt",
+          "id" => attachment.id,
+          "folder_id" => attachment.folder_id,
+          "size" => attachment.size,
+          'unlock_at' => nil,
+          'locked' => false,
+          'hidden' => false,
+          'lock_at' => nil,
+          'locked_for_user' => false,
+          'hidden_for_user' => false,
+          'created_at' => attachment.created_at.as_json,
+          'updated_at' => attachment.updated_at.as_json,
+          'thumbnail_url' => attachment.thumbnail_url,
+          'modified_at' => attachment.updated_at.as_json
+         }],
+      "posted_at" => gtopic.posted_at.as_json,
+      "root_topic_id" => nil,
+      "topic_children" => [],
       "discussion_type" => 'side_comment',
-      "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
+      "permissions" => {"delete" => true, "attach" => true, "update" => true},
       "locked" => false,
       "can_lock" => true,
       "locked_for_user" => false,
@@ -1138,34 +1138,34 @@ describe DiscussionTopicsController, type: :request do
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
 
-      # get the last page
+    # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3",
                     {:controller => 'discussion_topics', :action => 'index', :format => 'json', :group_id => group.id.to_s, :page => '3', :per_page => '3'})
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+    expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
+    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
   end
 
   it "should fulfill module viewed requirements when marking a topic read" do
     @module = @course.context_modules.create!(:name => "some module")
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
-    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.completion_requirements = {tag.id => {:type => 'must_view'}}
     @module.save!
     course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
-                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
-                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                 {:controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                  :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
     expect(@module.evaluate_for(@user)).to be_completed
   end
 
@@ -1174,17 +1174,17 @@ describe DiscussionTopicsController, type: :request do
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
     course_with_student(:course => @course, :active_all => true)
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
-                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
-                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                 {:controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                  :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
 
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
-    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.completion_requirements = {tag.id => {:type => 'must_view'}}
     @module.save!
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
-                 { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
-                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                 {:controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                  :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
     expect(@module.evaluate_for(@user)).to be_completed
   end
 
@@ -1192,14 +1192,14 @@ describe DiscussionTopicsController, type: :request do
     @module = @course.context_modules.create!(:name => "some module")
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
-    @module.completion_requirements = { tag.id => {:type => 'must_view'} }
+    @module.completion_requirements = {tag.id => {:type => 'must_view'}}
     @module.save!
     course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
-                 { :controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
-                   :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                 {:controller => 'discussion_topics_api', :action => 'mark_all_read', :format => 'json',
+                  :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
     expect(@module.evaluate_for(@user)).to be_completed
   end
 
@@ -1212,9 +1212,9 @@ describe DiscussionTopicsController, type: :request do
     it "should allow creating an entry under a topic and create it correctly" do
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-        { :message => @message })
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message})
       expect(json).not_to be_nil
       expect(json['id']).not_to be_nil
       @entry = DiscussionEntry.where(id: json['id']).first
@@ -1229,42 +1229,42 @@ describe DiscussionTopicsController, type: :request do
       @topic.lock!
       student_in_course(:course => @course, :active_all => true)
       api_call(
-          :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-          { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-            :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-          { :message => @message }, {}, :expected_status => 401)
+        :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message}, {}, :expected_status => 401)
     end
 
     it "should return json representation of the new entry" do
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-        { :message => @message })
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message})
       @entry = DiscussionEntry.where(id: json['id']).first
       expect(json).to eq({
-        "id" => @entry.id,
-        "parent_id" => @entry.parent_id,
-        "user_id" => @user.id,
-        "user_name" => @user.name,
-        "user" => user_display_json(@user, @course).stringify_keys!,
-        "read_state" => "read",
-        "forced_read_state" => false,
-        "message" => @message,
-        "created_at" => @entry.created_at.utc.iso8601,
-        "updated_at" => @entry.updated_at.as_json,
-        "rating_sum" => nil,
-        "rating_count" => nil,
-      })
+                           "id" => @entry.id,
+                           "parent_id" => @entry.parent_id,
+                           "user_id" => @user.id,
+                           "user_name" => @user.name,
+                           "user" => user_display_json(@user, @course).stringify_keys!,
+                           "read_state" => "read",
+                           "forced_read_state" => false,
+                           "message" => @message,
+                           "created_at" => @entry.created_at.utc.iso8601,
+                           "updated_at" => @entry.updated_at.as_json,
+                           "rating_sum" => nil,
+                           "rating_count" => nil,
+                         })
     end
 
     it "should allow creating a reply to an existing top-level entry" do
       top_entry = create_entry(@topic, :message => 'top-level message')
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
-        { :message => @message })
+        {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s},
+        {:message => @message})
       @entry = DiscussionEntry.where(id: json['id']).first
       expect(@entry.parent_entry).to eq top_entry
     end
@@ -1273,9 +1273,9 @@ describe DiscussionTopicsController, type: :request do
       data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-        { :message => @message, :attachment => data })
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message, :attachment => data})
       @entry = DiscussionEntry.where(id: json['id']).first
       expect(@entry.attachment).not_to be_nil
       expect(@entry.attachment.context).to eql @user
@@ -1286,9 +1286,9 @@ describe DiscussionTopicsController, type: :request do
       data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
-        { :message => @message, :attachment => data })
+        {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s},
+        {:message => @message, :attachment => data})
       @entry = DiscussionEntry.where(id: json['id']).first
       expect(@entry.attachment).not_to be_nil
       expect(@entry.attachment.context).to eql @user
@@ -1298,9 +1298,9 @@ describe DiscussionTopicsController, type: :request do
       data = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-        { :message => @message, :attachment => data })
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message, :attachment => data})
       expect(json['attachment']).not_to be_nil
       expect(json['attachment']).not_to be_empty
       expect(json['attachment']['url']).to be_include 'verifier='
@@ -1315,9 +1315,9 @@ describe DiscussionTopicsController, type: :request do
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-        { :message => @message })
+        {:controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+        {:message => @message})
 
       @user.reload
       expect(@user.submissions.size).to eq 1
@@ -1335,9 +1335,9 @@ describe DiscussionTopicsController, type: :request do
 
       json = api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
-        { :message => @message })
+        {:controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s},
+        {:message => @message})
 
       @user.reload
       expect(@user.submissions.size).to eq 1
@@ -1356,8 +1356,8 @@ describe DiscussionTopicsController, type: :request do
     it "should return top level entries for a topic" do
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.size).to eq 1
       entry_json = json.first
       expect(entry_json['id']).to eq @entry.id
@@ -1366,8 +1366,8 @@ describe DiscussionTopicsController, type: :request do
     it "should return attachments on top level entries" do
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       entry_json = json.first
       expect(entry_json['attachment']).not_to be_nil
       expect(entry_json['attachment']['url']).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
@@ -1376,8 +1376,8 @@ describe DiscussionTopicsController, type: :request do
     it "should include replies on top level entries" do
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       entry_json = json.first
       expect(entry_json['recent_replies'].size).to eq 1
       expect(entry_json['has_more_replies']).to be_falsey
@@ -1390,8 +1390,8 @@ describe DiscussionTopicsController, type: :request do
       @newer_entry = create_entry(@topic, :message => "newer top-level entry", :created_at => Time.now + 1.minute)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.size).to eq 3
       expect(json.first['id']).to eq @newer_entry.id
       expect(json.last['id']).to eq @older_entry.id
@@ -1402,8 +1402,8 @@ describe DiscussionTopicsController, type: :request do
       @newer_reply = create_reply(@entry, :message => "newer reply", :created_at => Time.now + 1.minute)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.size).to eq 1
       reply_json = json.first['recent_replies']
       expect(reply_json.size).to eq 3
@@ -1414,49 +1414,49 @@ describe DiscussionTopicsController, type: :request do
     it "should paginate top-level entries" do
       # put in lots of entries
       entries = []
-      7.times{ |i| entries << create_entry(@topic, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
+      7.times { |i| entries << create_entry(@topic, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
 
       # first page
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json?per_page=3",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '3' })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '3'})
       expect(json.length).to eq 3
-      expect(json.map{ |e| e['id'] }).to eq entries.last(3).reverse.map{ |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq entries.last(3).reverse.map { |e| e.id }
       links = response.headers['Link'].split(",")
-      expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
 
       # last page
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json?page=3&per_page=3",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :page => '3', :per_page => '3' })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :page => '3', :per_page => '3'})
       expect(json.length).to eq 2
-      expect(json.map{ |e| e['id'] }).to eq [entries.first, @entry].map{ |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq [entries.first, @entry].map { |e| e.id }
       links = response.headers['Link'].split(",")
-      expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
     end
 
     it "should only include the first 10 replies for each top-level entry" do
       # put in lots of replies
       replies = []
-      12.times{ |i| replies << create_reply(@entry, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
+      12.times { |i| replies << create_reply(@entry, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
 
       # get entry
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.length).to eq 1
       reply_json = json.first['recent_replies']
       expect(reply_json.length).to eq 10
-      expect(reply_json.map{ |e| e['id'] }).to eq replies.last(10).reverse.map{ |e| e.id }
+      expect(reply_json.map { |e| e['id'] }).to eq replies.last(10).reverse.map { |e| e.id }
       expect(json.first['has_more_replies']).to be_truthy
     end
   end
@@ -1471,8 +1471,8 @@ describe DiscussionTopicsController, type: :request do
     it "should return replies for an entry" do
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
       expect(json.size).to eq 1
       expect(json.first['id']).to eq @reply.id
     end
@@ -1482,8 +1482,8 @@ describe DiscussionTopicsController, type: :request do
         @reply.update_attribute('message', user_content)
         json = api_call(
           :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
-          { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-            :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+          {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
         expect(json.size).to eq 1
         json.first['message']
       end
@@ -1494,8 +1494,8 @@ describe DiscussionTopicsController, type: :request do
       @newer_reply = create_reply(@entry, :message => "newer reply", :created_at => Time.now + 1.minute)
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
       expect(json.size).to eq 3
       expect(json.first['id']).to eq @newer_reply.id
       expect(json.last['id']).to eq @older_reply.id
@@ -1504,33 +1504,33 @@ describe DiscussionTopicsController, type: :request do
     it "should paginate replies" do
       # put in lots of replies
       replies = []
-      7.times{ |i| replies << create_reply(@entry, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
+      7.times { |i| replies << create_reply(@entry, :message => i.to_s, :created_at => Time.now + (i+1).minutes) }
 
       # first page
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json?per_page=3",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :per_page => '3' })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :per_page => '3'})
       expect(json.length).to eq 3
-      expect(json.map{ |e| e['id'] }).to eq replies.last(3).reverse.map{ |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq replies.last(3).reverse.map { |e| e.id }
       links = response.headers['Link'].split(",")
-      expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="next"/)}).to match /page=2&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
 
       # last page
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json?page=3&per_page=3",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :page => '3', :per_page => '3' })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :page => '3', :per_page => '3'})
       expect(json.length).to eq 2
-      expect(json.map{ |e| e['id'] }).to eq [replies.first, @reply].map{ |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq [replies.first, @reply].map { |e| e.id }
       links = response.headers['Link'].split(",")
-      expect(links.all?{ |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
-      expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1&per_page=3>/
-      expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3&per_page=3>/
+      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
+      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
     end
   end
 
@@ -1555,14 +1555,14 @@ describe DiscussionTopicsController, type: :request do
     describe "teacher" do
       before(:each) do
         @user = @teacher
-        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+        @url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
       end
 
       it "should see topic entries without posting" do
         @topic.reply_from(user: @student, text: 'hai')
         json = api_call(:get, @url, controller: 'discussion_topics_api',
-          action: 'entries', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                        action: 'entries', format: 'json', course_id: @course.to_param,
+                        topic_id: @topic.to_param)
 
         expect(json.length).to eq 1
       end
@@ -1572,20 +1572,20 @@ describe DiscussionTopicsController, type: :request do
       before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum dolor')
         @user = @student
-        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        @url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       end
 
       it "should see topic information before posting" do
         json = api_call(:get, @url, controller: 'discussion_topics_api',
-          action: 'show', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                        action: 'show', format: 'json', course_id: @course.to_param,
+                        topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
 
       it "should not see entries before posting" do
         raw_api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
-          action: 'entries', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                     action: 'entries', format: 'json', course_id: @course.to_param,
+                     topic_id: @topic.to_param)
         expect(response.body).to eq 'require_initial_post'
         expect(response.code).to eq '403'
       end
@@ -1593,8 +1593,8 @@ describe DiscussionTopicsController, type: :request do
       it "should see entries after posting" do
         @topic.reply_from(:user => @student, :text => 'hai')
         json = api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
-          action: 'entries', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                        action: 'entries', format: 'json', course_id: @course.to_param,
+                        topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
     end
@@ -1603,13 +1603,13 @@ describe DiscussionTopicsController, type: :request do
       before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum')
         @user = @observer
-        @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
+        @url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
       end
 
       it "should not see entries before posting" do
         raw_api_call(:get, @url, controller: 'discussion_topics_api',
-          action: 'entries', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                     action: 'entries', format: 'json', course_id: @course.to_param,
+                     topic_id: @topic.to_param)
         expect(response.body).to eq 'require_initial_post'
         expect(response.code).to eq '403'
       end
@@ -1617,8 +1617,8 @@ describe DiscussionTopicsController, type: :request do
       it "should see entries after posting" do
         @topic.reply_from(user: @student, text: 'Lorem ipsum dolor')
         json = api_call(:get, @url, controller: 'discussion_topics_api',
-          action: 'entries', format: 'json', course_id: @course.to_param,
-          topic_id: @topic.to_param)
+                        action: 'entries', format: 'json', course_id: @course.to_param,
+                        topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
     end
@@ -1633,26 +1633,26 @@ describe DiscussionTopicsController, type: :request do
     it "should 401 if the user can't update" do
       student_in_course(:course => @course, :user => user_with_pseudonym)
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 401)
+               {:controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {:message => 'haxor'}, {}, :expected_status => 401)
       expect(@entry.reload.message).to eq '<p>top-level entry</p>'
     end
 
     it "should 404 if the entry is deleted" do
       @entry.destroy
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 404)
+               {:controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {:message => 'haxor'}, {}, :expected_status => 404)
     end
 
     it "should update the message" do
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => '<p>i had a spleling error</p>' })
+               {:controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {:message => '<p>i had a spleling error</p>'})
       expect(@entry.reload.message).to eq '<p>i had a spleling error</p>'
     end
 
     it "should allow passing an plaintext message (undocumented)" do
       # undocumented but used by the dashboard right now (this'll go away eventually)
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :plaintext_message => 'i had a spleling error' })
+               {:controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {:plaintext_message => 'i had a spleling error'})
       expect(@entry.reload.message).to eq 'i had a spleling error'
     end
 
@@ -1666,7 +1666,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.editor).to be_nil
 
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => '<p>denied</p>' })
+               {:controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {:message => '<p>denied</p>'})
       expect(@entry.reload.message).to eq '<p>denied</p>'
       expect(@entry.editor).to eq @teacher
     end
@@ -1681,13 +1681,13 @@ describe DiscussionTopicsController, type: :request do
     it "should 401 if the user can't delete" do
       student_in_course(:course => @course, :user => user_with_pseudonym)
       api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 401)
+               {:controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {}, {}, :expected_status => 401)
       expect(@entry.reload).not_to be_deleted
     end
 
     it "should soft-delete the entry" do
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 204)
+                   {:controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {}, {}, :expected_status => 204)
       expect(response.body).to be_blank
       expect(@entry.reload).to be_deleted
     end
@@ -1702,7 +1702,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.editor).to be_nil
 
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
-               { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 204)
+                   {:controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s}, {}, {}, :expected_status => 204)
       expect(@entry.reload).to be_deleted
       expect(@entry.editor).to eq @teacher
     end
@@ -1715,8 +1715,8 @@ describe DiscussionTopicsController, type: :request do
       course_with_observer_logged_in(:course => @course)
       @course.offer
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
-                        :course_id => @course.id.to_s })
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+                       :course_id => @course.id.to_s})
 
       expect(json).not_to be_nil
       expect(json).not_to be_empty
@@ -1730,8 +1730,8 @@ describe DiscussionTopicsController, type: :request do
                            :role => observer_role, :enabled => false)
 
       expect { api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
-                        :course_id => @course.id.to_s }) }.to raise_error
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+                         :course_id => @course.id.to_s}) }.to raise_error
     end
   end
 
@@ -1744,55 +1744,55 @@ describe DiscussionTopicsController, type: :request do
 
     it "should immediately mark messages you write as 'read'" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
-                        :course_id => @course.id.to_s })
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+                       :course_id => @course.id.to_s})
       expect(json.first["read_state"]).to eq "read"
       expect(json.first["unread_count"]).to eq 0
 
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.first["read_state"]).to eq "read"
 
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
       expect(json.first["read_state"]).to eq "read"
     end
 
     it "should be unread by default for a new user" do
       student_in_course(:active_all => true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                      { :controller => 'discussion_topics', :action => 'index', :format => 'json',
-                        :course_id => @course.id.to_s })
+                      {:controller => 'discussion_topics', :action => 'index', :format => 'json',
+                       :course_id => @course.id.to_s})
       expect(json.first["read_state"]).to eq "unread"
       expect(json.first["unread_count"]).to eq 2
 
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
-        { :controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'entries', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
       expect(json.first["read_state"]).to eq "unread"
 
       json = api_call(
         :get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies.json",
-        { :controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
-          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+        {:controller => 'discussion_topics_api', :action => 'replies', :format => 'json',
+         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
       expect(json.first["read_state"]).to eq "unread"
     end
 
     def call_mark_topic_read(course, topic)
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/read.json",
-                      { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
-                        :course_id => course.id.to_s, :topic_id => topic.id.to_s })
+                   {:controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
+                    :course_id => course.id.to_s, :topic_id => topic.id.to_s})
     end
 
     def call_mark_topic_unread(course, topic)
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/read.json",
-                      { :controller => 'discussion_topics_api', :action => 'mark_topic_unread', :format => 'json',
-                        :course_id => course.id.to_s, :topic_id => topic.id.to_s })
+                   {:controller => 'discussion_topics_api', :action => 'mark_topic_unread', :format => 'json',
+                    :course_id => course.id.to_s, :topic_id => topic.id.to_s})
     end
 
     it "should set the read state for a topic" do
@@ -1827,14 +1827,14 @@ describe DiscussionTopicsController, type: :request do
 
     def call_mark_entry_read(course, topic, entry)
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json",
-                      { :controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
-                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s })
+                   {:controller => 'discussion_topics_api', :action => 'mark_entry_read', :format => 'json',
+                    :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s})
     end
 
     def call_mark_entry_unread(course, topic, entry)
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/read.json?forced_read_state=true",
-                      { :controller => 'discussion_topics_api', :action => 'mark_entry_unread', :format => 'json',
-                        :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s, :forced_read_state => "true" })
+                   {:controller => 'discussion_topics_api', :action => 'mark_entry_unread', :format => 'json',
+                    :course_id => course.id.to_s, :topic_id => topic.id.to_s, :entry_id => entry.id.to_s, :forced_read_state => "true"})
     end
 
     it "should set the read state for a entry" do
@@ -1874,8 +1874,8 @@ describe DiscussionTopicsController, type: :request do
     def call_mark_all_as_read_state(new_state, opts = {})
       method = new_state == 'read' ? :put : :delete
       url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
-      expected_params = { :controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
-                        :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }
+      expected_params = {:controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
+                         :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}
       if opts.has_key?(:forced)
         url << "?forced_read_state=#{opts[:forced]}"
         expected_params[:forced_read_state] = opts[:forced].to_s
@@ -1929,8 +1929,8 @@ describe DiscussionTopicsController, type: :request do
     def call_rate_entry(course, topic, entry, rating)
       raw_api_call(:post,
                    "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/rating.json",
-                   { controller: 'discussion_topics_api', action: 'rate_entry', format: 'json',
-                     course_id: course.id.to_s, topic_id: topic.id.to_s, entry_id: entry.id.to_s, rating: rating })
+                   {controller: 'discussion_topics_api', action: 'rate_entry', format: 'json',
+                    course_id: course.id.to_s, topic_id: topic.id.to_s, entry_id: entry.id.to_s, rating: rating})
     end
 
     it "should rate an entry" do
@@ -1951,13 +1951,13 @@ describe DiscussionTopicsController, type: :request do
     def call_subscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:put, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
-                   { :controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
+                   {:controller => "discussion_topics_api", :action => "subscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
     end
 
     def call_unsubscribe(topic, user, course=@course)
       @user = user
       raw_api_call(:delete, "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/subscribed",
-                   { :controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
+                   {:controller => "discussion_topics_api", :action => "unsubscribe_topic", :format => "json", :course_id => course.id.to_s, :topic_id => topic.id.to_s})
     end
 
     it "should allow subscription" do
@@ -2010,7 +2010,7 @@ describe DiscussionTopicsController, type: :request do
       @topic = create_topic(@course, :require_initial_post => true)
       student_in_course(:active_all => true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
-                      { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+                      {:controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s})
       expect(json[0]['subscription_hold']).to eql('initial_post_required')
     end
 
@@ -2019,8 +2019,8 @@ describe DiscussionTopicsController, type: :request do
       group_discussion_assignment
       @topic.publish if @topic.unpublished?
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
-                      { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
-      expect(json[0]['subscription_hold']).to  eql('not_in_group_set')
+                      {:controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s})
+      expect(json[0]['subscription_hold']).to eql('not_in_group_set')
     end
 
     it "should hold when the user isn't in a group" do
@@ -2030,7 +2030,7 @@ describe DiscussionTopicsController, type: :request do
       child = @topic.child_topics.first
       group = child.context
       json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics",
-                      { :controller => "discussion_topics", :action => "index", :format => "json", :group_id => group.id.to_s })
+                      {:controller => "discussion_topics", :action => "index", :format => "json", :group_id => group.id.to_s})
       expect(json[0]['subscription_hold']).to eql('not_in_group')
     end
   end
@@ -2050,13 +2050,13 @@ describe DiscussionTopicsController, type: :request do
     context "in the original API" do
       it "should respond with information on the threaded discussion" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { :controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s })
+                        {:controller => "discussion_topics", :action => "index", :format => "json", :course_id => @course.id.to_s})
         expect(json[0]['discussion_type']).to eq 'threaded'
       end
 
       it "should return nested discussions in a flattened format" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries",
-                 { :controller => "discussion_topics_api", :action => "entries", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                        {:controller => "discussion_topics_api", :action => "entries", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
         expect(json.size).to eq 2
         expect(json[0]['id']).to eq @entry2.id
         e1 = json[1]
@@ -2065,7 +2065,7 @@ describe DiscussionTopicsController, type: :request do
         expect(e1['recent_replies'].map { |r| r['parent_id'] }).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
-                 { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+                        {:controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
         expect(json.size).to eq 4
         expect(json.map { |r| r['id'] }).to eq [@side2.id, @sub3.id, @sub2.id, @sub1.id]
         expect(json.map { |r| r['parent_id'] }).to eq [@entry.id, @sub2.id, @sub1.id, @entry.id]
@@ -2073,14 +2073,14 @@ describe DiscussionTopicsController, type: :request do
 
       it "should allow posting a reply to a sub-entry" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@sub2.id}/replies",
-                 { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @sub2.id.to_s },
-                 { :message => "ohai" })
+                        {:controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @sub2.id.to_s},
+                        {:message => "ohai"})
         expect(json['parent_id']).to eq @sub2.id
         @sub4 = DiscussionEntry.order(:id).last
         expect(@sub4.id).to eq json['id']
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}/replies",
-                 { :controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s })
+                        {:controller => "discussion_topics_api", :action => "replies", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s})
         expect(json.size).to eq 5
         expect(json.map { |r| r['id'] }).to eq [@sub4.id, @side2.id, @sub3.id, @sub2.id, @sub1.id]
         expect(json.map { |r| r['parent_id'] }).to eq [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
@@ -2097,8 +2097,8 @@ describe DiscussionTopicsController, type: :request do
           entry = create_reply(entry)
         end
         json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{entry.id}/replies",
-                 { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => entry.id.to_s },
-                 { :message => "ohai" }, {}, {:expected_status => 400})
+                        {:controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => entry.id.to_s},
+                        {:message => "ohai"}, {}, {:expected_status => 400})
       end
     end
 
@@ -2106,8 +2106,8 @@ describe DiscussionTopicsController, type: :request do
       it "should return a paginated entry_list" do
         entries = [@entry2, @sub1, @side2]
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entry_list?per_page=2",
-                  { :controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '2' },
-                 { :ids => entries.map(&:id) })
+                        {:controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '2'},
+                        {:ids => entries.map(&:id)})
         expect(json.size).to eq 2
         # response order is by id
         expect(json.map { |e| e['id'] }).to eq [@sub1.id, @side2.id]
@@ -2117,8 +2117,8 @@ describe DiscussionTopicsController, type: :request do
       it "should return deleted entries, but with limited data" do
         @sub1.destroy
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entry_list",
-                  { :controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
-                 { :ids => @sub1.id })
+                        {:controller => "discussion_topics_api", :action => "entry_list", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s},
+                        {:ids => @sub1.id})
         expect(json.size).to eq 1
         expect(json.first['id']).to eq @sub1.id
         expect(json.first['deleted']).to eq true
@@ -2133,193 +2133,188 @@ describe DiscussionTopicsController, type: :request do
 
   context "materialized view API" do
     it "should respond with the materialized information about the discussion" do
-      begin
-        topic_with_nested_replies
-        # mark a couple entries as read
-        @user = @student
-        @root2.change_read_state("read", @user)
-        @reply3.change_read_state("read", @user)
-        # have the teacher edit one of the student's replies
-        @reply_reply1.editor = @teacher
-        @reply_reply1.update_attributes(:message => '<p>censored</p>')
+      topic_with_nested_replies
+      # mark a couple entries as read
+      @user = @student
+      @root2.change_read_state("read", @user)
+      @reply3.change_read_state("read", @user)
+      # have the teacher edit one of the student's replies
+      @reply_reply1.editor = @teacher
+      @reply_reply1.update_attributes(:message => '<p>censored</p>')
 
-        @all_entries.each &:reload
+      @all_entries.each &:reload
 
-        # materialized view jobs are now delayed
-        Timecop.travel(Time.now + 20.seconds)
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.zone.now + 20.seconds) do
         run_jobs
-
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
-                  { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
-
-        expect(json['unread_entries'].size).to eq 2 # two marked read, then ones this user wrote are never unread
-        expect(json['unread_entries'].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
-
-        expect(json['participants'].sort_by { |h| h['id'] }).to eq [
-          { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-          { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
-        ].sort_by { |h| h['id'] }
-
-        reply_reply1_attachment_json = {
-          "content-type"=>"application/loser",
-          "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
-          "filename"=>"unknown.loser",
-          "display_name"=>"unknown.loser",
-          "id" => @attachment.id,
-          "folder_id" => @attachment.folder_id,
-          "size" => 100,
-          'unlock_at' => nil,
-          'locked' => false,
-          'hidden' => false,
-          'lock_at' => nil,
-          'locked_for_user' => false,
-          'hidden_for_user' => false,
-          'created_at' => @attachment.created_at.as_json,
-          'updated_at' => @attachment.updated_at.as_json,
-          'thumbnail_url' => @attachment.thumbnail_url,
-          'modified_at' => @attachment.updated_at.as_json
-        }
-
-        v0 = json['view'][0]
-        expect(v0['id']).to         eq @root1.id
-        expect(v0['user_id']).to    eq @student.id
-        expect(v0['message']).to    eq 'root1'
-        expect(v0['parent_id']).to     be nil
-        expect(v0['created_at']).to eq @root1.created_at.as_json
-        expect(v0['updated_at']).to eq @root1.updated_at.as_json
-
-        v0_r0 = v0['replies'][0]
-        expect(v0_r0['id']).to         eq @reply1.id
-        expect(v0_r0['deleted']).to       be true
-        expect(v0_r0['parent_id']).to  eq @root1.id
-        expect(v0_r0['created_at']).to eq @reply1.created_at.as_json
-        expect(v0_r0['updated_at']).to eq @reply1.updated_at.as_json
-
-        v0_r0_r0 = v0_r0['replies'][0]
-        expect(v0_r0_r0['id']).to         eq @reply_reply2.id
-        expect(v0_r0_r0['user_id']).to    eq @student.id
-        expect(v0_r0_r0['message']).to    eq 'reply_reply2'
-        expect(v0_r0_r0['parent_id']).to  eq @reply1.id
-        expect(v0_r0_r0['created_at']).to eq @reply_reply2.created_at.as_json
-        expect(v0_r0_r0['updated_at']).to eq @reply_reply2.updated_at.as_json
-
-        v0_r1 = v0['replies'][1]
-        expect(v0_r1['id']).to         eq @reply2.id
-        expect(v0_r1['user_id']).to    eq @teacher.id
-
-        message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
-
-        a_tag = message.css("p a").first
-        expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-        expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@reply2_attachment.id}"
-        expect(a_tag["data-api-returntype"]).to eq "File"
-        expect(a_tag.inner_text).to eq "This is a file link"
-
-        video_tag = message.css("p video").first
-        expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
-        expect(video_tag["data-media_comment_type"]).to eq "video"
-        expect(video_tag["preload"]).to eq "none"
-        expect(video_tag["class"]).to eq "instructure_inline_media_comment"
-        expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
-        expect(video_tag["controls"]).to eq "controls"
-        expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
-        expect(video_tag.inner_text).to eq "link"
-
-        expect(v0_r1['parent_id']).to  eq @root1.id
-        expect(v0_r1['created_at']).to eq @reply2.created_at.as_json
-        expect(v0_r1['updated_at']).to eq @reply2.updated_at.as_json
-
-        v0_r1_r0 = v0_r1['replies'][0]
-        expect(v0_r1_r0['id']).to          eq @reply_reply1.id
-        expect(v0_r1_r0['user_id']).to     eq @student.id
-        expect(v0_r1_r0['editor_id']).to   eq @teacher.id
-        expect(v0_r1_r0['message']).to     eq '<p>censored</p>'
-        expect(v0_r1_r0['parent_id']).to   eq @reply2.id
-        expect(v0_r1_r0['created_at']).to  eq @reply_reply1.created_at.as_json
-        expect(v0_r1_r0['updated_at']).to  eq @reply_reply1.updated_at.as_json
-        expect(v0_r1_r0['attachment']).to  eq reply_reply1_attachment_json
-        expect(v0_r1_r0['attachments']).to eq [reply_reply1_attachment_json]
-
-        v1 = json['view'][1]
-        expect(v1['id']).to         eq @root2.id
-        expect(v1['user_id']).to    eq @student.id
-        expect(v1['message']).to    eq 'root2'
-        expect(v1['parent_id']).to     be nil
-        expect(v1['created_at']).to eq @root2.created_at.as_json
-        expect(v1['updated_at']).to eq @root2.updated_at.as_json
-
-        v1_r0 = v1['replies'][0]
-        expect(v1_r0['id']).to         eq @reply3.id
-        expect(v1_r0['user_id']).to    eq @student.id
-        expect(v1_r0['message']).to    eq 'reply3'
-        expect(v1_r0['parent_id']).to  eq @root2.id
-        expect(v1_r0['created_at']).to eq @reply3.created_at.as_json
-        expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
-      ensure
-        Timecop.return
       end
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                      {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+      expect(json['unread_entries'].size).to eq 2 # two marked read, then ones this user wrote are never unread
+      expect(json['unread_entries'].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
+
+      expect(json['participants'].sort_by { |h| h['id'] }).to eq [
+                                                                   {'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}"},
+                                                                   {'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}"},
+                                                                 ].sort_by { |h| h['id'] }
+
+      reply_reply1_attachment_json = {
+        "content-type" => "application/loser",
+        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+        "filename" => "unknown.loser",
+        "display_name" => "unknown.loser",
+        "id" => @attachment.id,
+        "folder_id" => @attachment.folder_id,
+        "size" => 100,
+        'unlock_at' => nil,
+        'locked' => false,
+        'hidden' => false,
+        'lock_at' => nil,
+        'locked_for_user' => false,
+        'hidden_for_user' => false,
+        'created_at' => @attachment.created_at.as_json,
+        'updated_at' => @attachment.updated_at.as_json,
+        'thumbnail_url' => @attachment.thumbnail_url,
+        'modified_at' => @attachment.updated_at.as_json
+      }
+
+      v0 = json['view'][0]
+      expect(v0['id']).to eq @root1.id
+      expect(v0['user_id']).to eq @student.id
+      expect(v0['message']).to eq 'root1'
+      expect(v0['parent_id']).to be nil
+      expect(v0['created_at']).to eq @root1.created_at.as_json
+      expect(v0['updated_at']).to eq @root1.updated_at.as_json
+
+      v0_r0 = v0['replies'][0]
+      expect(v0_r0['id']).to eq @reply1.id
+      expect(v0_r0['deleted']).to be true
+      expect(v0_r0['parent_id']).to eq @root1.id
+      expect(v0_r0['created_at']).to eq @reply1.created_at.as_json
+      expect(v0_r0['updated_at']).to eq @reply1.updated_at.as_json
+
+      v0_r0_r0 = v0_r0['replies'][0]
+      expect(v0_r0_r0['id']).to eq @reply_reply2.id
+      expect(v0_r0_r0['user_id']).to eq @student.id
+      expect(v0_r0_r0['message']).to eq 'reply_reply2'
+      expect(v0_r0_r0['parent_id']).to eq @reply1.id
+      expect(v0_r0_r0['created_at']).to eq @reply_reply2.created_at.as_json
+      expect(v0_r0_r0['updated_at']).to eq @reply_reply2.updated_at.as_json
+
+      v0_r1 = v0['replies'][1]
+      expect(v0_r1['id']).to eq @reply2.id
+      expect(v0_r1['user_id']).to eq @teacher.id
+
+      message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
+
+      a_tag = message.css("p a").first
+      expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+      expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@reply2_attachment.id}"
+      expect(a_tag["data-api-returntype"]).to eq "File"
+      expect(a_tag.inner_text).to eq "This is a file link"
+
+      video_tag = message.css("p video").first
+      expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
+      expect(video_tag["data-media_comment_type"]).to eq "video"
+      expect(video_tag["preload"]).to eq "none"
+      expect(video_tag["class"]).to eq "instructure_inline_media_comment"
+      expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
+      expect(video_tag["controls"]).to eq "controls"
+      expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+      expect(video_tag.inner_text).to eq "link"
+
+      expect(v0_r1['parent_id']).to eq @root1.id
+      expect(v0_r1['created_at']).to eq @reply2.created_at.as_json
+      expect(v0_r1['updated_at']).to eq @reply2.updated_at.as_json
+
+      v0_r1_r0 = v0_r1['replies'][0]
+      expect(v0_r1_r0['id']).to eq @reply_reply1.id
+      expect(v0_r1_r0['user_id']).to eq @student.id
+      expect(v0_r1_r0['editor_id']).to eq @teacher.id
+      expect(v0_r1_r0['message']).to eq '<p>censored</p>'
+      expect(v0_r1_r0['parent_id']).to eq @reply2.id
+      expect(v0_r1_r0['created_at']).to eq @reply_reply1.created_at.as_json
+      expect(v0_r1_r0['updated_at']).to eq @reply_reply1.updated_at.as_json
+      expect(v0_r1_r0['attachment']).to eq reply_reply1_attachment_json
+      expect(v0_r1_r0['attachments']).to eq [reply_reply1_attachment_json]
+
+      v1 = json['view'][1]
+      expect(v1['id']).to eq @root2.id
+      expect(v1['user_id']).to eq @student.id
+      expect(v1['message']).to eq 'root2'
+      expect(v1['parent_id']).to be nil
+      expect(v1['created_at']).to eq @root2.created_at.as_json
+      expect(v1['updated_at']).to eq @root2.updated_at.as_json
+
+      v1_r0 = v1['replies'][0]
+      expect(v1_r0['id']).to eq @reply3.id
+      expect(v1_r0['user_id']).to eq @student.id
+      expect(v1_r0['message']).to eq 'reply3'
+      expect(v1_r0['parent_id']).to eq @root2.id
+      expect(v1_r0['created_at']).to eq @reply3.created_at.as_json
+      expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
     end
 
     it "should include new entries if the flag is given" do
-      begin
-        course_with_teacher(:active_all => true)
-        student_in_course(:course => @course, :active_all => true)
-        @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
-        @root1 = @topic.reply_from(:user => @student, :html => "root1")
+      course_with_teacher(:active_all => true)
+      student_in_course(:course => @course, :active_all => true)
+      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+      @root1 = @topic.reply_from(:user => @student, :html => "root1")
 
-        # materialized view jobs are now delayed
-        Timecop.travel(Time.now + 20.seconds)
+      # materialized view jobs are now delayed
+      Timecop.travel(Time.now + 20.seconds) do
         run_jobs
 
         # make everything slightly in the past to test updating
         DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
         @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
         @reply2 = @root1.reply_from(:user => @teacher, :html => "reply2")
-
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
-                  { :controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }, { :include_new_entries => '1' })
-        expect(json['unread_entries'].size).to eq 2
-        expect(json['unread_entries'].sort).to eq [@reply1.id, @reply2.id]
-
-        expect(json['participants'].map { |h| h['id'] }.sort).to eq [@teacher.id, @student.id]
-
-        expect(json['view']).to eq [
-          'id' => @root1.id,
-          'parent_id' => nil,
-          'user_id' => @student.id,
-          'message' => 'root1',
-          'created_at' => @root1.created_at.as_json,
-          'updated_at' => @root1.updated_at.as_json,
-          'rating_sum' => nil,
-          'rating_count' => nil,
-        ]
-
-        # it's important that these are returned in created_at order
-        expect(json['new_entries']).to eq [
-          {
-            'id' => @reply1.id,
-            'created_at' => @reply1.created_at.as_json,
-            'updated_at' => @reply1.updated_at.as_json,
-            'message' => 'reply1',
-            'parent_id' => @root1.id,
-            'user_id' => @teacher.id,
-            'rating_sum' => nil,
-            'rating_count' => nil,
-          },
-          {
-            'id' => @reply2.id,
-            'created_at' => @reply2.created_at.as_json,
-            'updated_at' => @reply2.updated_at.as_json,
-            'message' => 'reply2',
-            'parent_id' => @root1.id,
-            'user_id' => @teacher.id,
-            'rating_sum' => nil,
-            'rating_count' => nil,
-          },
-        ]
-      ensure
-        Timecop.return
       end
+
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+                      {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+      expect(json['unread_entries'].size).to eq 2
+      expect(json['unread_entries'].sort).to eq [@reply1.id, @reply2.id]
+
+      expect(json['participants'].map { |h| h['id'] }.sort).to eq [@teacher.id, @student.id]
+
+      expect(json['view']).to eq [
+                                   'id' => @root1.id,
+                                   'parent_id' => nil,
+                                   'user_id' => @student.id,
+                                   'message' => 'root1',
+                                   'created_at' => @root1.created_at.as_json,
+                                   'updated_at' => @root1.updated_at.as_json,
+                                   'rating_sum' => nil,
+                                   'rating_count' => nil,
+                                 ]
+
+      # it's important that these are returned in created_at order
+      expect(json['new_entries']).to eq [
+                                          {
+                                            'id' => @reply1.id,
+                                            'created_at' => @reply1.created_at.as_json,
+                                            'updated_at' => @reply1.updated_at.as_json,
+                                            'message' => 'reply1',
+                                            'parent_id' => @root1.id,
+                                            'user_id' => @teacher.id,
+                                            'rating_sum' => nil,
+                                            'rating_count' => nil,
+                                          },
+                                          {
+                                            'id' => @reply2.id,
+                                            'created_at' => @reply2.created_at.as_json,
+                                            'updated_at' => @reply2.updated_at.as_json,
+                                            'message' => 'reply2',
+                                            'parent_id' => @root1.id,
+                                            'user_id' => @teacher.id,
+                                            'rating_sum' => nil,
+                                            'rating_count' => nil,
+                                          },
+                                        ]
+
     end
   end
 
@@ -2328,7 +2323,7 @@ describe DiscussionTopicsController, type: :request do
     @user = @student
     @student.enrollments.map(&:destroy_permanently!)
     @section = @course.course_sections.create! :name => "afternoon delight"
-    @course.enroll_user(@student,'StudentEnrollment',
+    @course.enroll_user(@student, 'StudentEnrollment',
                         :section => @section,
                         :enrollment_state => :active)
 
@@ -2346,7 +2341,7 @@ describe DiscussionTopicsController, type: :request do
     override.save!
 
     json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-              { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                    {:controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
     expect(json['assignment']).not_to be_nil
     expect(json['assignment']['due_at']).to eq override.due_at.iso8601.to_s
   end
@@ -2397,7 +2392,7 @@ describe DiscussionTopicsController, type: :request do
         ->(json) do
           expect(json["new_entries"]).not_to be_nil
           expect(json["new_entries"].count).to eq(2)
-          expect(json["new_entries"].first["user_id"]).to  eq(@student1.id)
+          expect(json["new_entries"].first["user_id"]).to eq(@student1.id)
           expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
         end
       }
@@ -2448,11 +2443,11 @@ describe DiscussionTopicsController, type: :request do
     course_with_teacher(:active_all => true)
     account_admin_user(account: @course.account) # sets @admin
 
-    ann_ids_ordered_by_posted_at  = 10.times.map do |i|
+    ann_ids_ordered_by_posted_at = 10.times.map do |i|
       ann = Announcement.create!({
-        context: @course,
-        message: "Test Message",
-      })
+                                   context: @course,
+                                   message: "Test Message",
+                                 })
       ann.posted_at = i.days.ago
       ann.position = 1
       ann.save!
@@ -2472,7 +2467,7 @@ describe DiscussionTopicsController, type: :request do
       {}
     )
 
-    expect(json.map{ |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
+    expect(json.map { |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
   end
 end
 

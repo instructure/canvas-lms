@@ -30,8 +30,7 @@ describe "cross-listing" do
     course_id.click
     course_id.clear
     course_id.send_keys([:control, 'a'], @course2.id.to_s, "\n")
-    keep_trying_until { course_name.text != "Confirming Course ID \"#{@course2.id}\"..." }
-    expect(course_name.text).to eq @course2.name
+    expect(course_name).to include_text(@course2.name)
     expect(form.find_element(:id, 'course_autocomplete_id')).to have_attribute(:value, @course.id.to_s)
     expect(submit_btn).not_to have_class('disabled')
     submit_form(form)
@@ -59,8 +58,7 @@ describe "cross-listing" do
     course_name = f('#course_autocomplete_name')
     course_id.click
     course_id.send_keys "-1\n"
-    keep_trying_until { course_name.text != 'Confirming Course ID "-1"...' }
-    expect(course_name.text).to eq 'Course ID "-1" not authorized for cross-listing'
+    expect(course_name).to include_text 'Course ID "-1" not authorized for cross-listing'
   end
 
 
@@ -85,15 +83,13 @@ describe "cross-listing" do
     # let's try and crosslist an invalid course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").send_keys("-1\n")
-    keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"-1\"..." }
-    expect(f("#course_autocomplete_name").text).to eq("Course ID \"-1\" not authorized for cross-listing")
+    expect(f("#course_autocomplete_name")).to include_text("Course ID \"-1\" not authorized for cross-listing")
 
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
     form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
-    keep_trying_until { f("#course_autocomplete_name").text != "Confirming Course ID \"#{other_course.id}\"..." }
-    expect(f("#course_autocomplete_name").text).to eq other_course.name
+    expect(f("#course_autocomplete_name")).to include_text other_course.name
     expect(form.find_element(:css, "#course_autocomplete_id")).to have_attribute(:value, other_course.id.to_s)
 
     # No idea why, but this next line can't seem to find the button correctly

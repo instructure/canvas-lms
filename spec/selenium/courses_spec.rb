@@ -117,7 +117,7 @@ describe "courses" do
       def go_to_checklist
         get "/courses/#{@course.id}"
         f(".wizard_popup_link").click()
-        keep_trying_until { expect(f(".ic-wizard-box")).to be_displayed }
+        expect(f(".ic-wizard-box")).to be_displayed
         wait_for_ajaximations(500)
       end
 
@@ -240,7 +240,6 @@ describe "courses" do
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
 
@@ -250,7 +249,6 @@ describe "courses" do
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"

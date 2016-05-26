@@ -21,10 +21,8 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
 
     # test opening and closing rubric
-    keep_trying_until do
-      f('.toggle_full_rubric').click
-      expect(f('#rubric_full')).to be_displayed
-    end
+    f('.toggle_full_rubric').click
+    expect(f('#rubric_full')).to be_displayed
     f('#rubric_holder .hide_rubric_link').click
     wait_for_ajaximations
     expect(f('#rubric_full')).not_to be_displayed
@@ -41,7 +39,7 @@ describe "speed grader - rubrics" do
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     expect(rubric.find_element(:css, '.rubric_total')).to include_text('8')
     f('#rubric_full .save_rubric_button').click
-    keep_trying_until { expect(f('#rubric_summary_container > .rubric_container')).to be_displayed }
+    expect(f('#rubric_summary_container > .rubric_container')).to be_displayed
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
     expect(f('#rubric_summary_container .rubric_total')).to include_text('8')
     wait_for_ajaximations
@@ -59,10 +57,8 @@ describe "speed grader - rubrics" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     to_comment = 'special rubric comment'
-    keep_trying_until do
-      f('.toggle_full_rubric').click
-      expect(f('#rubric_full')).to be_displayed
-    end
+    f('.toggle_full_rubric').click
+    expect(f('#rubric_full')).to be_displayed
     f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
     f('textarea.criterion_comments').send_keys(to_comment)
     f('#rubric_criterion_comments_dialog .save_button').click

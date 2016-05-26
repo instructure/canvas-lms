@@ -26,6 +26,34 @@ describe "interaction with multiple grading periods" do
       get "/courses/#{@course.id}/gradebook"
       expect(f('.grading-period-select-button')).to include_text(current_grading_period.title)
     end
+
+    it 'multiple grading period dropdown should filter assignments by selected grading period', priority: "1", test_id: 202330 do
+      get "/courses/#{@course.id}/gradebook"
+
+      # select future grading period
+      f('.grading-period-select-button').click
+      fj('.ui-menu-item label:contains("Course Period 1: future period")').click
+      wait_for_ajaximations
+      element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+      expect(element.first).to be_displayed
+
+      # select current grading period
+      f('.grading-period-select-button').click
+      fj('.ui-menu-item label:contains("Course Period 2: current period")').click
+      wait_for_ajaximations
+      element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+      expect(element.first).to be_displayed
+
+      # select all grading periods
+      f('.grading-period-select-button').click
+      fj('.ui-menu-item label:contains("All Grading Periods")').click
+      wait_for_ajaximations
+
+      element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+      expect(element.first).to be_displayed
+      element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+      expect(element.first).to be_displayed
+    end
   end
 
   context 'grading schemes' do

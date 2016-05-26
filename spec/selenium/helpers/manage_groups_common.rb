@@ -2,10 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module ManageGroupsCommon
   def add_category(course, name, opts={})
-    keep_trying_until do
-      f(".add_category_link").click
-      wait_for_ajaximations
-    end
+    f(".add_category_link").click
+    wait_for_ajaximations
     form = f("#add_category_form")
     input = form.find_element(:css, "input[type=text]")
     replace_content input, name
@@ -31,37 +29,11 @@ module ManageGroupsCommon
       form.find_element(:css, "#category_no_groups").click
     end
     submit_form(form)
-    keep_trying_until { expect(find_with_jquery("#add_category_form:visible")).to be_nil }
+    expect(f("#add_category_form")).not_to be_displayed
     category = course.group_categories.where(name: name).first
     expect(category).not_to be_nil
-    keep_trying_until { fj("#category_#{category.id} .student_links:visible") }
+    expect(fj("#category_#{category.id} .student_links:visible")).to be_displayed
     category
-  end
-
-  def edit_category(opts={})
-    keep_trying_until do
-      fj(".edit_category_link:visible").click
-      wait_for_ajaximations
-    end
-    form = f("#edit_category_form")
-    input_box = form.find_element(:css, "input[type=text]")
-    if opts[:new_name]
-      replace_content input_bopts[:new_name]
-    end
-
-    # click only if we're requesting a different state than current; if we're not
-    # specifying a state, leave as is
-    if opts.has_key?(:enable_self_signup)
-      enable_self_signup = form.find_element(:css, "#category_enable_self_signup")
-      enable_self_signup.click unless !!enable_self_signup.attribute('checked') == !!opts[:enable_self_signup]
-    end
-
-    if opts.has_key?(:restrict_self_signup)
-      restrict_self_signup = form.find_element(:css, "#category_restrict_self_signup")
-      restrict_self_signup.click unless !!restrict_self_signup.attribute('checked') == !!opts[:restrict_self_signup]
-    end
-    submit_form(form)
-    wait_for_ajaximations
   end
 
   def groups_student_enrollment(student_count=3, opts={})

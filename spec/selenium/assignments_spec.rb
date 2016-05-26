@@ -80,6 +80,25 @@ describe "assignments" do
       insert_file_from_rce
     end
 
+    it "should switch text editor context from RCE to HTML", priority: "1", test_id: 699624 do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      text_editor=f('.mce-tinymce')
+      expect(text_editor).to be_displayed
+      html_editor_link=fln('HTML Editor')
+      expect(html_editor_link).to be_displayed
+      type_in_tiny 'textarea[name=description]', 'Testing HTML- RCE Toggle'
+      html_editor_link.click
+      wait_for_ajaximations
+      rce_link=fln('Rich Content Editor')
+      rce_editor=f('#assignment_description')
+      expect(html_editor_link).not_to be_displayed
+      expect(rce_link).to be_displayed
+      expect(text_editor).not_to be_displayed
+      expect(rce_editor).to be_displayed
+      expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
+    end
+
     it "should edit an assignment", priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
@@ -123,7 +142,7 @@ describe "assignments" do
 
       #save changes
       submit_assignment_form
-      expect(driver.execute_script("return document.title")).to include_text(assignment_name + ' edit')
+      expect(driver.title).to include(assignment_name + ' edit')
     end
 
     it "should create an assignment using main add button", priority: "1", test_id: 132582 do
@@ -208,8 +227,8 @@ describe "assignments" do
           replace_content(f("#ag_#{group.id}_assignment_due_at"), due_at)
           replace_content(f("#ag_#{group.id}_assignment_points"), points)
           expect_new_page_load { f('.more_options').click }
-          expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
-          expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
+          expect(f('#assignment_name').attribute(:value)).to include(expected_text)
+          expect(f('#assignment_points_possible').attribute(:value)).to include(points)
           due_at_field = fj(".date_field:first[data-date-type='due_at']")
           expect(due_at_field.attribute(:value)).to eq due_at
           click_option('#assignment_submission_type', 'No Submission')
@@ -456,7 +475,8 @@ describe "assignments" do
         f("#assignment_#{@assignment.id} .publish-icon").click
         wait_for_ajaximations
         expect(@assignment.reload).to be_published
-        keep_trying_until { expect(f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label')).to include_text("Published") }
+        icon = f("#assignment_#{@assignment.id} .publish-icon")
+        keep_trying_until { expect(icon.attribute('aria-label')).to include("Published") }
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do

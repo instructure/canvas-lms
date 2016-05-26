@@ -151,6 +151,8 @@ $ignore-col-width: 50px;
 }
 
 .content_summary {
+  word-break: break-all;
+  word-wrap: break-word;
   display: block;
   color: inherit;
   @if $use_high_contrast {

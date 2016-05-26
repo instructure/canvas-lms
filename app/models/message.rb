@@ -459,10 +459,9 @@ class Message < ActiveRecord::Base
   # Returns message body
   def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
-
-      self.body = Erubis::Eruby.new(message_body_template,
-        bufvar: '@output_buffer', filename: filename).result(_binding)
-      self.html_body = apply_html_template(_binding) if path_type == 'email'
+    self.body = Erubis::Eruby.new(message_body_template,
+      bufvar: '@output_buffer', filename: filename).result(_binding)
+    self.html_body = apply_html_template(_binding) if path_type == 'email'
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'

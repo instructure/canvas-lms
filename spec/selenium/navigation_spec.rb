@@ -13,7 +13,6 @@ describe 'Global Navigation' do
       it 'should show the profile tray upon clicking' do
         get "/"
         f('#global_nav_profile_link').click
-        wait_for_ajaximations
         expect(f('#global_nav_profile_header')).to be_displayed
       end
 
@@ -21,9 +20,7 @@ describe 'Global Navigation' do
       # the display_name in the tray header
       it 'should populate the profile tray with the current user display_name' do
         get "/"
-        f('#global_nav_profile_link').click
-        wait_for_ajaximations
-        expect(ff('#global_nav_profile_display_name')).not_to be_empty
+        expect(displayed_username).to eq(@user.name)
       end
     end
 

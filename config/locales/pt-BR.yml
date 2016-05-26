@@ -1652,6 +1652,7 @@ pt-BR:
   assignment_976578a8: Tarefa
   assignment_comments_e43ed898: "Comentários da tarefa"
   assignment_created_assignment_name_course_name_324a5639: "Tarefa Criada - %{assignment_name}, %{course_name}"
+  assignment_d8387b78: atribuição
   assignment_details: 
     no_graded_submissions: "Nenhum envio avaliado"
   assignment_details_bc488179: "Detalhes da Tarefa"
@@ -2229,6 +2230,7 @@ pt-BR:
       labels: 
         syllabus_body: "Descrição do programa do curso"
       links: 
+        edit_syllabus_description: Editar
         jump_to_today: "Pular para hoje"
       titles: 
         course_syllabus: "Programa do curso"
@@ -3535,10 +3537,10 @@ pt-BR:
         access_report: "Acessar relatório para %{user}"
         cant_delete: "Não é possível excluir"
         conclude_enrollment: "Concluir esta inscrição"
-        delete_enrollment: "Excluir esta inscrição"
+        delete_enrollment: Excluir
         faculty_journal: "Diário da Faculdade para %{user}"
         link_enrollment: "Vincular esta inscrição"
-        restore_enrollment: "Restaurar esta inscrição"
+        restore_enrollment: Restaurar
         student_teacher_activity: "Seu relatório de interações com %{user}"
         teacher_activity: "Relatório de interações do aluno para %{user}"
         title: 
@@ -5552,6 +5554,9 @@ pt-BR:
       due_date: "entrega %{date}"
       peer_review_alert: "Você teve uma tarefa de revisão de ponto para %{person}"
     points_possible_number: "Pontos possíveis devem ser um número"
+    published_button: 
+      buttons: 
+        published: Publicado
     reply_count_tooltip: 
       one: "1 resposta."
       other: "%{count} respostas."
@@ -11929,7 +11934,7 @@ pt-BR:
         remove_email_address_aria_label: "Remover endereço de email"
       validations: 
         should_be_10_digits: "dever ser um número com 10 dígitos"
-    ways_to_contact_me: "Formas de entrar em contato comigo"
+    ways_to_contact_me: Contato
     yo_select: 
       yo: Yo
     you_have_no_services: "Você não registrou nenhum serviço. Você pode adicionar alguns na página *settings*."
@@ -12165,6 +12170,7 @@ pt-BR:
       regrade_options: "Escolha uma opção de reatribuição de notas para estudantes que já tenham tomado a quiz. Canvas vai atribuir novamente notas para todas as suas submissões depois de salvar o questionário (a pontuação dos alunos PODE ser afetada)."
       some_scores_reduced: "Somente dê pontos para a resposta correta (*algumas pontuações de alunos podem ser reduzidas*)"
       update_question_without_regrading: "Atualizar pergunta sem reavaliar"
+  quiz_40ee61b1: questionário
   quiz_e0dcce8f: Teste
   quiz_log_auditing: 
     buttons: 
@@ -14528,7 +14534,7 @@ pt-BR:
       titles: 
         click_to_change_profile_pic: "Clique para alterar a imagem do perfil"
       user_has_no_bio: "%{user} não adicionou uma biografia."
-      ways_to_contact_user: "Formas de entrar em contato com %{name}"
+      ways_to_contact_user: Contato
     recent_activity: 
       date_column: Data
       message_column: Mensagem

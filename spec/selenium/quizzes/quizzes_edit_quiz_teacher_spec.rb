@@ -42,8 +42,7 @@ describe 'editing a quiz' do
       it 'remains published after saving changes', priority: "1", test_id: 210059 do
         type_in_tiny('#quiz_description', 'changed description')
         click_save_settings_button
-        wait_for_ajax_requests
-        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Published'
+        expect(f('#quiz-publish-link')).to include_text 'Published'
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351921 do
@@ -78,7 +77,7 @@ describe 'editing a quiz' do
         # verify the student sees the changes
         user_session(@student)
         take_quiz do
-          expect(fj('.display_question.question.multiple_choice_question').text).to \
+          expect(f('.display_question.question.multiple_choice_question')).to \
             include_text question_description
         end
       end
@@ -115,9 +114,8 @@ describe 'editing a quiz' do
         expect_new_page_load do
           click_save_settings_button
         end
-        f('#quiz-publish-link').click
-        wait_for_ajax_requests
-        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Unpublish'
+        f('#quiz-publish-link.btn-publish').click
+        expect(f('#quiz-publish-link')).to include_text 'Unpublish'
       end
     end
 
@@ -131,7 +129,7 @@ describe 'editing a quiz' do
 
     it 'changes the quiz\'s description', priority: "1", test_id: 210057 do
       wait_for_ajaximations
-      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
+      expect(f('#quiz_description_ifr')).to be_displayed
 
       test_text = 'changed description'
       type_in_tiny '#quiz_description', test_text
@@ -191,7 +189,7 @@ describe 'editing a quiz' do
 
       it 'flashes a warning message', priority: "1", test_id: 140609 do
         message = 'Keep in mind, some students have already taken or started taking this quiz'
-        keep_trying_until(3) { expect(f('#flash_message_holder')).to include_text message }
+        expect(f('#flash_message_holder')).to include_text message
       end
 
       it 'deletes the quiz', priority: "1", test_id: 210073 do

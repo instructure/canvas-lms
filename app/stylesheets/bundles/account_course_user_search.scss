@@ -55,11 +55,56 @@
   }
 }
 
+.courses-list-search-bar-layout {
+  margin-bottom: $ic-sp/2;
+}
+
 .courses-list td {
   vertical-align: top;
 }
 .courses-list__published-icon {
   color: $ic-color-success;
+}
+
+.courses-user-list-header {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.courses-user-list-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.users-list-toolbar {
+  display: flex;
+}
+
+.users-list-toolbar-form {
+  flex: 1;
+  display: flex;
+
+  .ic-Form-control {
+    margin-bottom: 0;
+    flex: 1;
+  }
+}
+
+.users-list-toolbar-actions {
+  margin-top: $ic-sp;
+
+  @include breakpoint(tablet) {
+    text-align: right;
+    margin-top: 0;
+  }
+}
+
+.users-list-toolbar-actions__layout {
+
+  @include breakpoint(tablet) {
+    display: inline-block;
+    white-space: nowrap;
+  }
 }
 
 .ReactModalPortal .ReactModal__Content {
@@ -77,14 +122,15 @@
 }
 
 .UserListRow__Avatar {
-  width: 30px;
-  height: 30px;
-  margin: -1px 10px 1px 0;
+  width: 24px;
+  height: 24px;
+  margin-right: $ic-sp/2;
+  border: none;
 }
 
 .UserLink__Avatar {
-
-    img {
-        vertical-align: top;
-    }
+  width: 24px;
+  height: 24px;
+  margin-right: $ic-sp/2;
+  border: none;
 }

@@ -120,7 +120,7 @@ describe "conversations new" do
       select_message_course(@course)
       message_recipients_input.send_keys('student')
       driver.action.key_down(modifier).perform
-      keep_trying_until { fj(".ac-result:contains('first student')") }.click
+      fj(".ac-result:contains('first student')").click
       driver.action.key_up(modifier).perform
       fj(".ac-result:contains('second student')").click
       expect(ff('.ac-token').count).to eq 2
@@ -236,13 +236,9 @@ describe "conversations new" do
 
         # check for auto complete to fill in 'first student'
         f('.ac-input-cell .ac-input').send_keys('first st')
-        wait_for_ajaximations
-        keep_trying_until(5) do
-          expect(f('.result-name')).to include_text('first student')
-        end
+        expect(f('.result-name')).to include_text('first student')
 
         f('.result-name').click
-        wait_for_ajaximations
 
         expect(f('.ac-token')).to include_text('first student')
 
@@ -315,7 +311,7 @@ describe "conversations new" do
   end
 
   def assert_categories(container)
-    keep_trying_until(5) { fj(".ac-result-container .result-name:contains(#{container})").click }
+    fj(".ac-result-container .result-name:contains(#{container})").click
   end
 
   def goto_compose_modal

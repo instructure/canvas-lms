@@ -19,7 +19,7 @@ define([
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -142,7 +142,7 @@ define([
             />
 
             <IcSelect
-              label={I18n.t("Department")}
+              label={I18n.t("Subaccount")}
               value={data.account_id}
               onChange={onChange("account_id")}
             >

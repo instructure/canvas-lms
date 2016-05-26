@@ -8,8 +8,8 @@ development:
   # optional. default matches Canvas
   protocol: http
 
-  # optional. default is 'javascripts/edit_defaults.js'.
-  configure_defaults_app_path: javascripts/edit_defaults.js
+  # optional. default is 'ui/editor'
+  edit_rule_path: "ui/editor"
 
-  # optional. default is 'javascripts/edit_object_score_ranges.js'.
-  edit_object_score_ranges_path: javascripts/edit_object_score_ranges.js
+  # optional. default is 'api/account'
+  create_account_path: 'api/account'

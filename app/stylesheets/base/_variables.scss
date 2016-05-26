@@ -230,6 +230,14 @@ $ic-dim-helper-text:            darken($ic-color-neutral, 45);
 $ic-dim-helper-text:            darken($ic-color-neutral, 55);
 }
 
+// special handling for button--primary coloring
+$button--primary-text: $ic-brand-button--primary-text;
+$button--primary-bgd: $ic-brand-button--primary-bgd;
+@if $use_high_contrast {
+  $button--primary-bgd: $ic-brand-primary;
+  $button--primary-text: $ic-color-light;
+}
+
 // We don't use any of the Bootstrap glyph icons, But bootstrap's scss expects this variable to be defined.
 $iconSpritePath:  "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
 $iconWhiteSpritePath: $iconSpritePath !default;

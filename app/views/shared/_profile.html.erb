@@ -22,12 +22,12 @@
       <% if @user_data[:can_edit_name] %>
         <h2 class="hide-if-editing"><%= @user_data[:short_name] %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:
-          <input class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
+          <input aria-label="<%= t 'Name' %>" id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
         </label>
         <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
-            <input class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+            <input aria-label="<%= t 'Title' %>" class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
           </label>
         </p>
       <% else %>

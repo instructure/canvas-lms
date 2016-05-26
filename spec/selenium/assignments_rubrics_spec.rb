@@ -131,19 +131,13 @@ describe "assignment rubrics" do
       assignment_with_rubric(2.5)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajax_requests
-      full_rubric_button =
-          keep_trying_until do
-            full_rubric_button = fj('.toggle_full_rubric')
-            expect(full_rubric_button).to be_displayed
-            full_rubric_button
-          end
+      full_rubric_button = f('.toggle_full_rubric')
+      expect(full_rubric_button).to be_displayed
       full_rubric_button.click
       fj('#rubric_holder .criterion:visible .rating').click
       f('#rubric_holder .save_rubric_button').click
-      wait_for_ajaximations
 
-      expect(f('#rubric_summary_container .rubric_total').text).to eq '2.5'
+      expect(f('#rubric_summary_container .rubric_total')).to include_text '2.5'
     end
 
     it "should import rubric to assignment", priority: "1", test_id: 220317 do
@@ -239,9 +233,9 @@ describe "assignment rubrics" do
       f(".toggle_full_rubric").click
       wait_for_ajaximations
       f('#criterion_1 .long_description_link').click
-      keep_trying_until { expect(f('#rubric_long_description_dialog')).to be_displayed }
-      expect(f("#rubric_long_description_dialog div.displaying .long_description").
-          text).to eq "<b>This text should not be bold</b>"
+      expect(f('#rubric_long_description_dialog')).to be_displayed
+      expect(f("#rubric_long_description_dialog div.displaying .long_description")).
+          to include_text "<b>This text should not be bold</b>"
     end
 
     it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do

@@ -55,7 +55,7 @@ describe "conversations new" do
         select_view('submission_comments')
         name = @s2.name
         f('[role=main] header [role=search] input').send_keys(name)
-        keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
+        fj(".ac-result:contains('#{name}')").click
         expect(conversation_elements.length).to eq 1
       end
     end

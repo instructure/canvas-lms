@@ -166,9 +166,9 @@ describe "scheduler" do
       click_scheduler_link
 
       # Index page should show correct elements for appointment groups
-      expect(f(".view_calendar_link").text).to include_text(title)
-      expect(f(".ag-context").text).to include @course.name.to_s #include context
-      expect(f(".ag-location").text).to include_text(location)
+      expect(f(".view_calendar_link")).to include_text(title)
+      expect(f(".ag-context")).to include_text @course.name.to_s
+      expect(f(".ag-location")).to include_text(location)
     end
 
     context "when un-reserving appointments" do

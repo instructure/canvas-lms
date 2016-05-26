@@ -249,9 +249,9 @@ describe "Screenreader Gradebook" do
     it "switches to srgb", priority: "1", test_id: 615682 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder").click
-      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
+      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       refresh_page
-      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
+      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       f(".span12 a").click
       expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end

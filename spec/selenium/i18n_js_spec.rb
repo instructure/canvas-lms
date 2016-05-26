@@ -29,26 +29,25 @@ describe "i18n js" do
   context "locales" do
     it "should pull in core translations for all locales" do
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
-      keep_trying_until do
-        expect(driver.execute_script(<<-JS).sort).to eq I18n.available_locales.map(&:to_s).sort
-        var ary = [];
-        for (var locale in I18n.translations) {
-          if (I18n.translations.hasOwnProperty(locale)) {
-            var localeSet = I18n.translations[locale];
-            var hasItAll = true;
-            ['date', 'time', 'number', 'datetime', 'support'].forEach(function(key){
-              if(hasItAll){
-                hasItAll = localeSet[key] !== undefined && localeSet[key] !== null;
-              }
-            });
-            if(hasItAll){
-              ary.push(locale);
+      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+      core_keys = I18nTasks::Utils::CORE_KEYS
+      core_translations = Hash[I18n.available_locales.map(&:to_s).map do |locale|
+        [locale.to_s, I18n.backend.direct_lookup(locale).slice(*core_keys)]
+      end].deep_stringify_keys
+
+      expect(driver.execute_script(<<-JS)).to eq core_translations
+        var core = {};
+        var coreKeys = #{core_keys.map(&:to_s).inspect};
+        Object.keys(I18n.translations).forEach(function(locale) {
+          core[locale] = {};
+          coreKeys.forEach(function(key) {
+            if (I18n.translations[locale][key]) {
+              core[locale][key] = I18n.translations[locale][key];
             }
-          }
-        }
-        return ary;
-        JS
-      end
+          });
+        });
+        return core;
+      JS
     end
   end
 
@@ -56,13 +55,14 @@ describe "i18n js" do
     it "should use the scoped translations" do
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+
       (I18n.available_locales - [:en]).each do |locale|
         exec_cs("I18n.locale = '#{locale}'")
-        rb_value = I18n.t('dashboard.confirm.close', locale: locale)
+        rb_value = I18n.t('dashboard.confirm.close', 'fake en default', locale: locale)
         js_value = if CANVAS_WEBPACK
-          driver.execute_script("return I18n.scoped('dashboard').t('confirm.close');")
+          driver.execute_script("return I18n.scoped('dashboard').t('confirm.close', 'fake en default');")
         else
-          require_exec('i18n!dashboard', "i18n.t('confirm.close')")
+          require_exec('i18n!dashboard', "i18n.t('confirm.close', 'fake en default')")
         end
         expect(js_value).to eq(rb_value)
       end

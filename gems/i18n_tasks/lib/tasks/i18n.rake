@@ -76,7 +76,7 @@ namespace :i18n do
     require 'active_record'
     require 'will_paginate'
     I18n.load_path.unshift(*WillPaginate::I18n.load_path)
-    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')] if ENV['RAILS_LOAD_ALL_LOCALES'] && !ENV['RAILS_LOAD_LOCAL_LOCALES']
+    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
 
     require 'i18nema'
@@ -121,7 +121,7 @@ namespace :i18n do
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
-      content = I18nTasks::Utils.dump_js(translations, locales)
+      content = I18nTasks::Utils.dump_js(translations)
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w"){ |f| f.write content }
       end

@@ -1175,6 +1175,23 @@ describe CommunicationChannelsController do
     expect(assigns[:enrollment].messages_sent).not_to be_nil
   end
 
+  context "cross-shard user" do
+    specs_require_sharding
+    it "should re-send enrollment invitation for a cross-shard user" do
+      course(:active_all => true)
+      enrollment = nil
+      @shard1.activate do
+        user_with_pseudonym :active_cc => true
+        enrollment = @course.enroll_student(@user)
+      end
+      Notification.create(:name => 'Enrollment Invitation')
+      post 're_send_confirmation', :user_id => enrollment.user_id, :enrollment_id => enrollment.id
+      expect(response).to be_success
+      expect(assigns[:enrollment]).to eql(enrollment)
+      expect(assigns[:enrollment].messages_sent).not_to be_nil
+    end
+  end
+
   it "should uncache user's cc's when retiring a CC" do
     user_session(@user, @pseudonym)
     User.record_timestamps = false

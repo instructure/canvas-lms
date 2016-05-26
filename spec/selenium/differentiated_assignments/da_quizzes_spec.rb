@@ -41,7 +41,7 @@ describe "interaction with differentiated quizzes" do
       it "should redirect back to quizzes index from inaccessible quizzes" do
         create_section_override_for_assignment(@da_quiz.assignment, course_section: @section1)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.") }
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.")
         expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
       it "should show the quiz page with an override" do
@@ -63,10 +63,10 @@ describe "interaction with differentiated quizzes" do
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         # assure we get the no longer counted banner on the quiz page
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.") }
+        expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.")
         # assure we get the no longer counted banner on the quiz submission page
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}/submissions/#{@da_quiz.quiz_submissions.first!.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.") }
+        expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.")
       end
       it "should not allow you the quiz to be taken if visibility has been revoked" do
         create_section_override_for_assignment(@da_quiz)
@@ -132,7 +132,7 @@ describe "interaction with differentiated quizzes" do
       it "should redirect back to quizzes index from inaccessible quizzes" do
         create_section_override_for_assignment(@da_quiz.assignment, course_section: @section1)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.") }
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.")
         expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
       it "should show the quiz page with an override" do
@@ -154,10 +154,10 @@ describe "interaction with differentiated quizzes" do
         create_section_override_for_assignment(@da_quiz, course_section: @section1)
         # assure we get the no longer counted banner on the quiz page
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.") }
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.")
         # assure we get the no longer counted banner on the quiz submission page
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}/submissions/#{@da_quiz.quiz_submissions.first!.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.") }
+        expect(f("#flash_message_holder")).to include_text("This quiz will no longer count towards your grade.")
       end
     end
 

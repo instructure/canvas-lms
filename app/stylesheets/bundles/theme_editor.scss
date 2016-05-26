@@ -19,11 +19,13 @@
 * { box-sizing: border-box; }
 
 //// Suppress scroll on the body for Theme Editor
+
+html, body, #main { height: 100%; }
+
 body { overflow: hidden; }
 
 #main {
   max-width: 100% !important;
-  height: 100%;
   margin-bottom: 0;
   padding-bottom: 0;
 }
@@ -35,11 +37,13 @@ body { overflow: hidden; }
 
 //// Variables for theme editor
 ///////
-$te-bgd: $ic-color-neutral;
+$te-bgd: $ic-bg-light-neutral;
+$te-bgd-dark: lighten($ic-color-dark, 6);
 $te-content-bgd: $ic-color-light;
 $te-input-height: 30px;
 $te-border-color: $ic-border-light;
 $te-width: 300px;
+$te-footer-height: 72px;
 
 //// Layout for Theme editor
 ///////
@@ -55,7 +59,12 @@ $te-width: 300px;
 
 .Theme__layout {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - #{$te-footer-height});
+  overflow: hidden;
+  &.Theme__layout--is-active-theme {
+    border: 4px solid $ic-color-success;
+    border-bottom: none;
+  }
 }
 
 .Theme__editor {
@@ -63,14 +72,14 @@ $te-width: 300px;
   background: $te-bgd;
   overflow-y: auto;
   position: relative;
-  box-shadow: 2px 0 4px rgba(black, 0.2);
+  box-shadow: 2px 0 4px rgba(black, 0.3);
 }
 
 .Theme__preview { flex: 1; }
 
 .Theme__preview-overlay {
-  background: rgba(white, 0.7);
-  height: 100%;
+  background: rgba(black, 0.5);
+  height: calc(100% - #{$te-footer-height});
   width: calc(100% - #{$te-width});
   z-index: 8000;
   position: absolute;
@@ -78,6 +87,12 @@ $te-width: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
+  .Theme__layout--is-active-theme & {
+    top: 4px; left: $te-width + 4;
+    height: calc(100% - #{$te-footer-height + 4});
+    width: calc(100% - #{$te-width + 8});
+  }
+  .Button { border-color: rgba(black, 0.5); }
 }
 
 .Theme__preview-button-text {
@@ -88,53 +103,48 @@ $te-width: 300px;
   border: none;
   width: 100%;
   height: 100vh;
+  padding-bottom: $te-footer-height;
 }
+
 //// Theme Editor content
 ///////
 
-.Theme__editor-header {
-  background: $ic-color-dark;
-  padding: $ic-sp*.75;
+.Theme__header {
+  position: fixed;
+  left: 0; bottom: 0;
+  width: 100%;
+  background: $te-bgd-dark;
+  color: $ic-color-light;
+  .Button { border-color: darken($te-bgd-dark, 8); }
+  &.Theme__header--is-active-theme {
+    background: $ic-color-success;
+    .Button { border-color: darken($ic-color-success, 8); }
+  }
+}
+
+.Theme__header-layout {
+  height: $te-footer-height;
   display: flex;
   align-items: center;
-  position: relative;
+  padding: 0 $ic-sp*1.5;
 
-  .Theme__editor-header_title {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    @include overwrite-default-icon-size(18px);
-  }
+}
 
-  .Theme__editor-header_title-text {
-    color: $ic-color-light;
-    line-height: normal;
-    @include fontSize(16px);
-    font-weight: 300;
-    margin: 0 0 0 $ic-sp;
-    flex: 1;
-    line-height: 1.2;
-  }
+.Theme__header-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
 
-  .Theme__editor-header_title-icon {
-    line-height: 1;
-    color: #D5412F;
-  }
-
-  .Theme__editor-header_actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .Theme__editor-header_button {
-    margin-left: $ic-sp/2;
-  }
+.Theme__header-theme-name {
+  @include fontSize(16px);
+  margin: 0 0 0 $ic-sp*1.5;
 }
 
 .Theme__editor-shared-themes {
   text-align: center;
   color: $ic-color-light;
-  background: lighten($ic-color-dark, 20);
+  background: $te-bgd-dark;
   padding: $ic-sp;
   border-bottom: 1px solid $te-border-color;
 }
@@ -142,10 +152,9 @@ $te-width: 300px;
 //// Tabs for Theme Editor
 ///////
 .Theme__editor-tabs {
-  background: $gray-darker;
-
-  $te-tab-text-color: darken($ic-color-light, 10);
-  $te-tab-text-color-hover: $ic-color-light;
+  background: $te-bgd-dark;
+  $te-tab-text-color: $ic-color-light;
+  $te-tab-text-color-hover: darken($ic-color-light, 10);
 
   .Theme__editor-tabs_item {
     color: $te-tab-text-color;
@@ -175,7 +184,7 @@ $te-width: 300px;
       content: "";
       border: 8px transparent solid;
       width: 0; height: 0;
-      border-bottom-color: lighten($ic-color-dark, 20);
+      border-bottom-color: $te-content-bgd;
       position: absolute;
       bottom: -1px;
       left: 0; right: 0;
@@ -185,10 +194,6 @@ $te-width: 300px;
     &:hover {
       color: $te-tab-text-color;
     }
-  }
-
-  #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab:before {
-    border-bottom-color: $te-content-bgd;
   }
 
   #te-editor:checked ~ #te-upload-panel,
@@ -204,6 +209,7 @@ $te-width: 300px;
 .Theme__editor-tab-label-layout {
   display: flex;
   justify-content: space-around;
+  border-bottom: 1px solid $ic-color-light;
 }
 
 
@@ -398,7 +404,7 @@ $te-width: 300px;
     &.ui-accordion-content-active {
       overflow: visible !important;
       border-radius: 0;
-      box-shadow: inset 0px 0 5px lighten($ic-color-neutral, 0.2);
+      box-shadow: inset 0px 0 4px $ic-color-neutral;
     }
   }
 }

@@ -8,11 +8,11 @@ describe OverrideListPresenter do
     AssignmentOverrideApplicator.stubs(:assignment_overridden_for).
       with(assignment,nil).returns assignment
     assignment.stubs(:has_active_overrides?).returns true
-    Timecop.freeze(Time.local(2013,3,13,0,0))
   end
 
-  after { Timecop.return }
-
+  around do |example|
+    Timecop.freeze(Time.zone.local(2013,3,13,0,0), &example)
+  end
 
   let(:assignment) { Assignment.new :title => "Testing" }
   let(:user) { User.new :name => "Testing" }
