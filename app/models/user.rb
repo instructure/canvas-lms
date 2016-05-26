@@ -2081,7 +2081,7 @@ class User < ActiveRecord::Base
   # given user, i.e. courses and sections
   def appointment_context_codes(include_observers: false)
     @appointment_context_codes ||= {}
-    @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region, include_observers ].cache_key) do
+    @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region, include_observers ].cache_key, expires_in: 1.day) do
       ret = {:primary => [], :secondary => []}
       cached_current_enrollments(preload_dates: true).each do |e|
         next unless (e.student? || (include_observers && e.observer?)) && e.active?
@@ -2094,7 +2094,7 @@ class User < ActiveRecord::Base
   end
 
   def manageable_appointment_context_codes
-    @manageable_appointment_context_codes ||= Rails.cache.fetch([self, 'cached_manageable_appointment_codes', ApplicationController.region ].cache_key) do
+    @manageable_appointment_context_codes ||= Rails.cache.fetch([self, 'cached_manageable_appointment_codes', ApplicationController.region ].cache_key, expires_in: 1.day) do
       ret = {:full => [], :limited => [], :secondary => []}
       cached_current_enrollments(preload_dates: true).each do |e|
         next unless e.course.grants_right?(self, :manage_calendar)
