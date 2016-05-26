@@ -93,7 +93,7 @@ describe "context modules" do
       expect(context_modules[1].find_element(:css, '.due_date_display').text).not_to be_blank
     end
 
-    it "should move a student through context modules in sequential order" do
+    it "moves a student through context modules in sequential order", priority: "2", test_id: 126742 do
       go_to_modules
 
       #sequential normal validation
@@ -237,6 +237,14 @@ describe "context modules" do
       mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
       go_to_modules
       expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).to include_text 'Will unlock'
+    end
+
+    it "does not show the description of a discussion locked by module", priority: "1", test_id: 1426125 do
+      module1 = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
+      discussion = @course.discussion_topics.create!(title: 'discussion', message: 'discussion description')
+      module1.add_item type: 'discussion_topic', id: discussion.id
+      get "/courses/#{@course.id}/discussion_topics/#{discussion.id}?module_item_id=#{ContentTag.last.id}"
+      expect(f('.entry-content')).not_to contain_css('.discussion-section .message')
     end
 
     it "should allow a student view student to progress through module content" do
