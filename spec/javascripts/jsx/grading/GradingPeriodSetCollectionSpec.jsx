@@ -1,8 +1,9 @@
 define([
   'react',
+  'underscore',
   'axios',
   'jsx/grading/GradingPeriodSetCollection'
-], (React, axios, SetCollection) => {
+], (React, _, axios, SetCollection) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -28,7 +29,7 @@ define([
               grading_periods: []
             },
             {
-              id: 2,
+              id: "2",
               title: "Mambo Numero Cinco",
               grading_periods: [
                 { id: 9, title: "Febrero", start_date: "2014-06-08T15:44:25Z", end_date: "2014-07-08T15:44:25Z" },
@@ -63,7 +64,6 @@ define([
 
   asyncTest("deserializes sets and grading periods if the AJAX call is successful", function() {
     const success = this.stubAJAXSuccess();
-    let collection = this.renderComponent();
     const deserializedSet = {
       id: "2",
       title: "Mambo Numero Cinco",
@@ -81,10 +81,12 @@ define([
           endDate: new Date("2014-09-08T15:44:25Z")
         }
       ]
-    }
+    };
+
+    let collection = this.renderComponent();
 
     success.then(function() {
-      const set = collection.state.gradingPeriodSets[1];
+      const set = collection.state.sets[1];
       propEqual(set, deserializedSet);
       start();
     });
@@ -95,7 +97,75 @@ define([
     let collection = this.renderComponent();
 
     failure.catch(function() {
-      propEqual(collection.state.gradingPeriodSets, []);
+      propEqual(collection.state.sets, []);
+      start();
+    });
+  });
+
+  test("setAndGradingPeriodTitles returns an array of set and grading period title names", function() {
+    let set = { title: "Set!", gradingPeriods: [{ title: "Grading Period 1" }, { title: "Grading Period 2" }] };
+    let collection = this.renderComponent();
+    let titles = collection.setAndGradingPeriodTitles(set);
+    propEqual(titles, ["Set!", "Grading Period 1", "Grading Period 2"]);
+  });
+
+  test("setAndGradingPeriodTitles filters out empty, null, and undefined titles", function() {
+    let set = {
+      title: null,
+      gradingPeriods: [
+        { title: "Grading Period 1" },
+        {},
+        { title: "Grading Period 2" },
+        { title: "" }
+      ]
+    };
+
+    let collection = this.renderComponent();
+    let titles = collection.setAndGradingPeriodTitles(set);
+    propEqual(titles, ["Grading Period 1", "Grading Period 2"]);
+  });
+
+  test("searchTextMatchesTitles returns true if the search text exactly matches one of the titles", function() {
+    let titles = ["hello world", "goodbye friend"];
+    let collection = this.renderComponent();
+    collection.changeSearchText("hello world");
+    equal(collection.searchTextMatchesTitles(titles), true)
+  });
+
+  test("searchTextMatchesTitles returns true if the search text is a substring of one of the titles", function() {
+    let titles = ["hello world", "goodbye friend"];
+    let collection = this.renderComponent();
+    collection.changeSearchText("orl");
+    equal(collection.searchTextMatchesTitles(titles), true)
+  });
+
+  test("searchTextMatchesTitles returns false if the search text is a not a substring of any of the titles", function() {
+    let titles = ["hello world", "goodbye friend"];
+    let collection = this.renderComponent();
+    collection.changeSearchText("olr");
+    equal(collection.searchTextMatchesTitles(titles), false)
+  });
+
+  asyncTest("filterSetsBySearchText returns sets that match the search text", function() {
+    const success = this.stubAJAXSuccess();
+    let collection = this.renderComponent();
+
+    success.then(function() {
+      collection.changeSearchText("ma");
+      let filteredIDs = _.pluck(collection.filterSetsBySearchText(), "id");
+      propEqual(filteredIDs, ["1", "2"]);
+
+      collection.changeSearchText("rz");
+      filteredIDs = _.pluck(collection.filterSetsBySearchText(), "id");
+      propEqual(filteredIDs, ["2"]);
+
+      collection.changeSearchText("Mac");
+      filteredIDs = _.pluck(collection.filterSetsBySearchText(), "id");
+      propEqual(filteredIDs, ["1"]);
+
+      collection.changeSearchText("dora the explorer");
+      filteredIDs = _.pluck(collection.filterSetsBySearchText(), "id");
+      propEqual(collection.filterSetsBySearchText(), []);
       start();
     });
   });
