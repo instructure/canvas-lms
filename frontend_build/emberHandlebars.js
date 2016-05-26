@@ -7,7 +7,7 @@
 var Handlebars = require('handlebars');
 var EmberHandlebars = require('ember-template-compiler').EmberHandlebars;
 var ScopedHbsExtractor = require(__dirname + '/../gems/canvas_i18nliner/js/scoped_hbs_extractor');
-var PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor')['default'];
+var PreProcessor = require(__dirname + '/../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor');
 var fs = require('fs');
 var child_process = require('child_process');
 

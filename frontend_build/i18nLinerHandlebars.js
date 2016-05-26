@@ -8,9 +8,8 @@ import {pick} from 'lodash'
 import {EmberHandlebars} from 'ember-template-compiler'
 import ScopedHbsExtractor from './../gems/canvas_i18nliner/js/scoped_hbs_extractor'
 import {allFingerprintsFor} from 'brandable_css/lib/main'
-import _PreProcessor from './../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor'
-const PreProcessor = _PreProcessor.default
-import "./../gems/canvas_i18nliner/js/scoped_hbs_pre_processor";
+import PreProcessor from './../gems/canvas_i18nliner/node_modules/i18nliner-handlebars/dist/lib/pre_processor'
+import './../gems/canvas_i18nliner/js/scoped_hbs_pre_processor'
 
 const compileHandlebars = (data) => {
   const path = data.path

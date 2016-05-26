@@ -3,7 +3,7 @@ require 'spec_helper'
 module HandlebarsTasks
 
   expected_precompiled_template = <<-END
-define(["ember","compiled/ember/shared/helpers/common"], function(Ember) {
+define([\"ember\",\"compiled/ember/shared/helpers/common\"], function(Ember) {
   Ember.TEMPLATES['%s'] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
@@ -28,7 +28,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
         file.write "foo"
         file.close
         expected = strip_js(expected_precompiled_template % EmberHbs::parse_name(file.path))
-        strip_js(EmberHbs::compile_template(file.path)).should eq expected
+        expect(strip_js(EmberHbs::compile_template(file.path))).to eq(expected)
         file.unlink
       end
     end
@@ -36,9 +36,9 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
     describe "#parse_name" do
       it "parses the file path to the template name" do
         prefix = "app/coffeescripts/ember/inbox/templates"
-        EmberHbs::parse_name("#{prefix}/application.hbs").should == 'application'
-        EmberHbs::parse_name("#{prefix}/double/templates/foo_bar.hbs").should == 'double/templates/foo_bar'
-        EmberHbs::parse_name("#{prefix}/components/x-foo.hbs").should == 'components/x-foo'
+        expect(EmberHbs::parse_name("#{prefix}/application.hbs")).to eq('application')
+        expect(EmberHbs::parse_name("#{prefix}/double/templates/foo_bar.hbs")).to eq('double/templates/foo_bar')
+        expect(EmberHbs::parse_name("#{prefix}/components/x-foo.hbs")).to eq('components/x-foo')
       end
     end
 
@@ -46,7 +46,7 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
       it "parses the file path to the template name" do
         prefix = "app/coffeescripts/ember/inbox/templates"
         dest = "public/javascripts/compiled/ember/inbox/templates"
-        EmberHbs::parse_dest("#{prefix}/application.hbs").should == "#{dest}/application.js"
+        expect(EmberHbs::parse_dest("#{prefix}/application.hbs")).to eq("#{dest}/application.js")
       end
     end
   end

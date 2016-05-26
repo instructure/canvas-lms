@@ -3,14 +3,10 @@
   "license": "AGPL-3.0",
   "version": "0.0.0",
   "engines": {
-    "node": ">=0.12.5"
+    "node": "0.12 || >=6.2"
   },
   "dependencies": {
     "brandable_css": "0.0.67",
-
-    "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
-    "request": "2.73.0",
-    "tough-cookie": "2.2.2",
     "instructure-ui": "0.13.3"
   },
   "devDependencies": {
@@ -36,7 +32,7 @@
     "gulp-rev": "^7.0.0",
     "handlebars": "^1.3.0",
     "handlebars-loader": "^1.1.4",
-    "i18nliner-handlebars": "^0.1.1",
+    "i18nliner-handlebars": "^0.2.0",
     "istanbul-instrumenter-loader": "0.2.0",
     "js-yaml": "^3.4.3",
     "json-loader": "^0.5.3",

@@ -1,0 +1,5 @@
+{
+  "plugins": [
+    "i18nliner-handlebars"
+  ]
+}

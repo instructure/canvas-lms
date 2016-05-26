@@ -1,4 +1,4 @@
-var I18nliner = require("i18nliner")["default"];
+var I18nliner = require("i18nliner");
 var Commands = I18nliner.Commands;
 var Check = Commands.Check;
 var mkdirp = require("mkdirp");

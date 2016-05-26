@@ -115,6 +115,7 @@ namespace :canvas do
 
     if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
       log_time('Making sure node_modules are up to date') {
+        puts "node is: #{`which node`} #{`node -v`}"
         raise 'error running npm install' unless `npm install`
       }
     end
