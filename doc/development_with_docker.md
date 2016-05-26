@@ -193,11 +193,33 @@ Ctrl-C your `docker-compose up` window and restart.
 
 ## Debugging
 
-By default, you won't be able to interact with a debugger using this setup. if
-you need to debug, stop your `docker-compose up` and instead run:
+A byebug server is running in development mode on the web and job containers
+to allow you to remotely control any sessions where `byebug` has yielded
+execution. You can attach to the byebug server once the container is started:
+
+Debugging web:
 
 ```
-$ docker-compose run -e VIRTUAL_PORT=3000 --rm --service-ports web bundle exec rails server --bind 0.0.0.0
+docker-compose exec web bin/byebug-remote
+```
+
+Debugging jobs:
+
+```
+docker-compose exec jobs bin/byebug-remote
+```
+
+### Prefer pry?
+
+Unfortunately you can't start a pry session in a remote byebug session. What
+you can do instead is use `pry-remote`.
+
+1. Add `pry-remote` to your Gemfile
+2. Run `docker-compose run --rm web bundle install` to install `pry-remote`
+3. Add `binding.remote_pry` in code where you want execution to yield a pry REPL
+4. Launch pry-remote and have it wait for execution to yield to you:
+```
+docker-compose exec web pry-remote --wait
 ```
 
 ## Cassandra

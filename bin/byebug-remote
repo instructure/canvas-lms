@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'byebug/core'
+
+def connect
+  begin
+    Byebug.start_client
+  rescue Errno::ECONNREFUSED
+  end
+end
+
+while !connect do
+  sleep 0.5
+end
