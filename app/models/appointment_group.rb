@@ -39,7 +39,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def active_contexts
-    contexts.reject { |context| context.workflow_state == 'deleted' || context.concluded? }
+    contexts.reject { |context| context.workflow_state == 'deleted' }
   end
 
   def sub_contexts

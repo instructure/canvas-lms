@@ -328,10 +328,20 @@ describe AppointmentGroup do
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
     end
 
-    it "should ignore concluded courses when performing permissions checks" do
+    it "should give :manage permission even if some contexts are concluded" do
       @course3.complete!
-      expect(@g8.active_contexts).not_to include @course3
       expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_truthy
+    end
+
+    it "should not give :manage permission if all contexts are (hard-)concluded" do
+      @course2.complete!
+      @course3.complete!
+      expect(@g8.reload.grants_right?(@teacher2, :manage)).to be_falsey
+    end
+
+    it "should give :manage permission if a context is soft-concluded" do
+      @course.soft_conclude!
+      expect(@g1.reload.grants_right?(@teacher, :manage)).to be_truthy
     end
   end
 
