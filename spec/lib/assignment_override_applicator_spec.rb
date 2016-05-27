@@ -773,6 +773,25 @@ describe AssignmentOverrideApplicator do
       expect(@overridden.association(:rubric).loaded?).to eq @assignment.association(:rubric).loaded?
       @overridden.learning_outcome_alignments.loaded? == @assignment.learning_outcome_alignments.loaded?
     end
+
+    it "should be locked in between overrides" do
+      past_override = assignment_override_model(assignment: @assignment,
+                                                unlock_at: 2.months.ago,
+                                                lock_at: 1.month.ago)
+      future_override = assignment_override_model(assignment: @assignment,
+                                                  unlock_at: 2.months.from_now,
+                                                  lock_at: 1.month.from_now)
+      overridden = AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [past_override, future_override])
+      expect(overridden.locked_for?(@student)).to be_truthy
+    end
+
+    it "should not be locked when in an override" do
+      override = assignment_override_model(assignment: @assignment,
+                                           unlock_at: 2.months.ago,
+                                           lock_at: 2.months.from_now)
+      overridden = AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [override])
+      expect(overridden.locked_for?(@student)).to be(false)
+    end
   end
 
   describe "collapsed_overrides" do
@@ -1020,6 +1039,13 @@ describe AssignmentOverrideApplicator do
       @override.override_unlock_at(nil)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
       expect(unlock_at).to eq @override.unlock_at
+    end
+
+    it "should not include unlock_at for previous overrides that have already been locked" do
+      @override.override_unlock_at(10.days.ago)
+      @override.override_lock_at(5.days.ago)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
+      expect(unlock_at).to eq @assignment.unlock_at
     end
   end
 

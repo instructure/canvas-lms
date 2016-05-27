@@ -28,7 +28,7 @@ describe AssignmentOverride do
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
-    
+
     @override.destroy
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override.workflow_state).to eq 'deleted'
@@ -470,6 +470,49 @@ describe AssignmentOverride do
       expect(@override.lock_at).to be_nil
     end
 
+  end
+
+  describe '#availability_expired?' do
+    let(:override) { assignment_override_model }
+    subject { override.availability_expired? }
+
+    context 'without an overridden lock_at' do
+      before do
+        override.lock_at_overridden = false
+      end
+
+      it { is_expected.to be(false) }
+    end
+
+    context 'with an overridden lock_at' do
+      before do
+        override.lock_at_overridden = true
+      end
+
+      context 'never locks' do
+        before do
+          override.lock_at = nil
+        end
+
+        it { is_expected.to be(false) }
+      end
+
+      context 'not yet locked' do
+        before do
+          override.lock_at = 10.minutes.from_now
+        end
+
+        it { is_expected.to be(false) }
+      end
+
+      context 'already locked' do
+        before do
+          override.lock_at = 10.minutes.ago
+        end
+
+        it { is_expected.to be(true) }
+      end
+    end
   end
 
   describe "default_values" do

@@ -231,6 +231,12 @@ class AssignmentOverride < ActiveRecord::Base
     write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
   end
 
+  def availability_expired?
+    lock_at_overridden &&
+      lock_at.present? &&
+      lock_at <= Time.zone.now
+  end
+
   def as_hash
     { :title => title,
       :due_at => due_at,
