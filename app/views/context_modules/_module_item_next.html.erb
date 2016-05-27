@@ -58,6 +58,22 @@
         <span class="position" style="display: none;"><%= tag && tag.position %></span>
         <span class="url" style="display: none;"><%= tag.try(:url) if editable %></span>
         <span class="new_tab" style="display: none;"><%= tag.try(:new_tab) ? '1' : '0' if editable %></span>
+        <span class="section_restrictions" style="display: none;">
+        <%
+        if module_item
+          all_sections = {}
+          ctsr = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+          @context.course_sections.each do |cs|
+            has = false
+            ctsr.each do |c|
+              if c.section_id == cs.id
+                has = true
+                break
+              end
+            end
+            all_sections[cs.id] = { :name => cs.name, :checked => has }
+          end
+        %><%= all_sections.to_json if editable && module_item %><% end %></span>
       </span>
     </div>
     <div class="module_item_icons nobr">
@@ -110,6 +126,18 @@
           <div class='module-item-status-icon'></div> <%# going to set this in JS-land, not here %>
         <% end %>
       </div>
+      <div class="bz_section_restrictions">
+        <%
+          if module_item
+          restrictions = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+          if restrictions.any?
+        %> Only for: 
+        <% restrictions.each do |restriction| %>
+          <%= CourseSection.find(restriction.section_id).name %>
+        <% end end end %>
+      </div>
+      <div class="due_date_display"></div>
+      <div class="points_possible_display"></div>
     </div>
 
     <% if editable || module_item.nil? %>

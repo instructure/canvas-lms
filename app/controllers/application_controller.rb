@@ -19,6 +19,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
+require 'bz_debug'
+
 class ApplicationController < ActionController::Base
   attr_accessor :active_tab
   attr_reader :context
@@ -1131,6 +1133,13 @@ class ApplicationController < ActionController::Base
       message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
       message << "  " << exception.backtrace.join("\n  ")
       logger.fatal("#{message}\n\n")
+
+      # I want just a fraction of the info printed to my custom debug
+      # because I typically only care about our own modifications
+      BZDebug.log("#{exception.class} (#{exception.message}):")
+      BZDebug.log("  " + exception.backtrace[0])
+      BZDebug.log("  " + exception.backtrace[1])
+      BZDebug.log("  " + exception.backtrace[2])
     end
 
     if config.consider_all_requests_local

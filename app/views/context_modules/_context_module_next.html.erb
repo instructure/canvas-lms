@@ -3,10 +3,12 @@
   context_module_next ||= nil
   context_module = context_module_next
   editable ||= can_do(@context, @current_user, :manage_content)
+  show_page_mapper = editable
   workflow_state = context_module && context_module.workflow_state
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
+  @idx ||= 0
 %>
 <% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user, @context) do %>
 
@@ -108,6 +110,10 @@
         <% end %>
       <% end %>
 
+      <% if show_page_mapper %>
+        <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>&amp;module_sequence=<%= @idx %>">See All Pages</a>
+        <% @idx += 1 %>
+      <% end %>
       <% if editable %>
         <span
           data-module-type="module"

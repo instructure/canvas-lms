@@ -50,6 +50,7 @@ define([], function(){
       skin: "light",
       skin_url: "/vendor/tinymce_themes/light",
       plugins: "autolink,media,paste,table,textcolor,link,directionality",
+      paste_data_images: true, /* Needed for IMG hack to get retained data field working */
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
         "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
@@ -58,7 +59,8 @@ define([], function(){
         "instructure_equella": "/javascripts/tinymce_plugins/instructure_equella/plugin.js",
         "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js",
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js",
-        "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js"
+        "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js",
+        "bz_iframes":         "/javascripts/tinymce_plugins/bz_iframes/plugin.js"
       },
       language_load: false,
       relative_urls: false,
@@ -94,9 +96,9 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      valid_children: "+body[style|script|svg|textarea]",
+      valid_children: "+body[style|script|svg|textarea|img]",
 
-      content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url,
+      content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url + ",/bz_editor.css",
       non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
       browser_spellcheck: true
     };
@@ -191,7 +193,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe");
     return stuff;
   };
 

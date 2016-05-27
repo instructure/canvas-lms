@@ -7,8 +7,78 @@ require 'google/api_client/auth/storages/file_store'
 
 class BzController < ApplicationController
 
-  before_filter :require_user, :only => [:last_user_url]
-  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data]
+  before_filter :require_user
+  skip_before_filter :verify_authenticity_token, :only => [:last_user_url, :set_user_retained_data, :delete_user]
+
+  def accessibility_mapper
+    @items = []
+    WikiPage.all.each do |page|
+      doc = Nokogiri::HTML(page.body)
+      doc.css('img:not(.bz-magic-viewer)').each do |img|
+        if img.attributes["alt"].nil?
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Missing alt text', :fix => 'tag' }
+        elsif img.attributes["alt"].value == ""
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Empty alt text', :fix => 'tag' }
+        elsif img.attributes["alt"].value.ends_with?(".png")
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+        elsif img.attributes["alt"].value.ends_with?(".jpg")
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+        elsif img.attributes["alt"].value.ends_with?(".svg")
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+        elsif img.attributes["alt"].value.ends_with?(".gif")
+          @items << { :page => page, :html => img.to_xhtml, :problem => 'Poor alt text', :fix => 'tag' }
+        end
+      end
+      doc.css('iframe[src*="vimeo"]:not([data-bz-accessibility-ok])').each do |img|
+        orig = img.to_xhtml
+        img.set_attribute('data-bz-accessibility-ok', 'yes')
+        repl = img.to_xhtml
+        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+      end
+      doc.css('iframe[src*="youtu"]:not([data-bz-accessibility-ok])').each do |img|
+        orig = img.to_xhtml
+        img.set_attribute('data-bz-accessibility-ok', 'yes')
+        repl = img.to_xhtml
+        @items << { :page => page, :html => orig, :problem => 'Ensure video has CC', :fix => 'button', :fix_html => repl }
+      end
+    end
+  end
+
+  def save_html_changes
+    # FIXME: require admin user login properly
+    if @current_user.email != 'admin@beyondz.org'
+      raise "unauthorized"
+    end
+
+    page = WikiPage.find(params[:page_id])
+    page.body = page.body.gsub(params[:original_html], params[:new_html])
+    page.save
+
+    redirect_to bz_accessibility_mapper_path
+  end
+
+  def full_module_view
+    @course_id = params[:course_id]
+    module_sequence = params[:module_sequence]
+    items = nil
+    if module_sequence.nil?
+      # view the entire course
+      items = []
+      Course.find(@course_id.to_i).context_modules.not_deleted.each do |ms|
+        items += ms.content_tags_visible_to(@current_user)
+      end
+    else
+      # view just one module inside a course
+      items = Course.find(@course_id.to_i).context_modules.not_deleted[module_sequence.to_i].content_tags_visible_to(@current_user)
+    end
+    @pages = []
+    items.each do |item|
+      if item.content_type == "WikiPage"
+        wp = WikiPage.find(item.content_id)
+        @pages << wp
+      end
+    end
+  end
 
   def user_retained_data
     result = RetainedData.where(:user_id => @current_user.id, :name => params[:name])
@@ -101,6 +171,19 @@ class BzController < ApplicationController
     obj['link'] = event.hangout_link
     obj['gcal_id'] = event.id
     render :json => obj
+  end
+
+  # The official Canvas API doesn't offer user deletion but
+  # we want it, so I'm implementing myself (based on the code
+  # from the users_controller through the admin interface)
+  def delete_user
+    user = api_find(User, params[:id])
+    if user.allows_user_to_remove_from_account?(@domain_root_account, @current_user)
+      # this will not delete the record completely, but will mark it as deleted,
+      # same as if you manually hit the button in the admin page.
+      user.destroy
+    end
+    render :nothing => true
   end
 
 end

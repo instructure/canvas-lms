@@ -14,6 +14,11 @@ CanvasRails::Application.routes.draw do
   get 'bz/event_rsvps' => 'bz#event_rsvps'
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
+
+  get 'bz/accessibility_mapper' => 'bz#accessibility_mapper'
+  post 'bz/accessibility_mapper' => 'bz#save_html_changes'
+  get 'bz/full_module_view' => 'bz#full_module_view'
+  # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
   resources :epub_exports, only: [:index]
 
@@ -859,6 +864,9 @@ CanvasRails::Application.routes.draw do
   # the way ApiRouteSet works. For now we get around it by defining methods
   # inline in the routes file, but getting concerns working would rawk.
   ApiRouteSet::V1.draw(self) do
+    scope(controller: :bz) do
+      delete 'bz/delete_user/:id', action: :delete_user
+    end
     scope(controller: :courses) do
       get 'courses', action: :index, as: 'courses'
       put 'courses/:id', action: :update

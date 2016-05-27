@@ -1,0 +1,10 @@
+<div id="page-mapper-container">
+  <% @pages.each do |page| %>
+    <div class="page-mapper-page">
+      <h1 class="page-mapper-title page-title"><%= link_to page.title, "/courses/#{@course_id}/pages/#{page.id}" %></h1>
+      <div class="page-mapper-content">
+        <%= page.body.html_safe if page.body %>
+      </div>
+    </div>
+  <% end %>
+</div>

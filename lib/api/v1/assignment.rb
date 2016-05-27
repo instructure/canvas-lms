@@ -390,6 +390,15 @@ module Api::V1::Assignment
       update_params.delete('peer_reviews_assign_at')
     end
 
+    if update_params.include?(:description)
+      # Commented because we currently allow ALL users to do the same edit so
+      # designers and stuff don't break it (we trust them)
+      # unless BeyondZConfiguration.unrestricted_html_users.include?(@current_user.id)
+      unless @current_user && @context && @context.respond_to?(:grants_any_right?) && can_do(@context, @current_user, :manage)
+        update_params[:description] = Sanitize.clean(update_params[:description], CanvasSanitize::SANITIZE)
+      end
+    end
+
     if update_params["submission_types"].is_a? Array
       update_params["submission_types"] = update_params["submission_types"].map do |type|
         # TODO: remove. this was temporary backward support for a hotfix

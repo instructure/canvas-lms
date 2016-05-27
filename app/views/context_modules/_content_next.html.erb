@@ -22,6 +22,7 @@
 <div class="header-bar">
   <% if can_do(@context, @current_user, :manage_content) %>
     <div class="header-bar-right">
+      <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>">See All Together</a>
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <button class="btn btn-primary add_module_link">
         <i class="icon-plus" role="presentation"></i>
@@ -165,6 +166,10 @@ TEXT
             <%= f.check_box :new_tab %>
             <%= f.label :new_tab, :en => "Load in a new tab" %>
           </td>
+        </tr>
+        <tr>
+          <td>Restricted to:</td>
+          <td><div id="visible_to_holder"></div></td>
         </tr>
         <tr>
           <td colspan="2">
