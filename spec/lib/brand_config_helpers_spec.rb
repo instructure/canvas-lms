@@ -18,6 +18,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'delayed/testing'
 
 describe BrandConfigHelpers do
   def setup_account_family_with_configs
@@ -78,17 +79,18 @@ describe BrandConfigHelpers do
     it "should work when parent is a not root account" do
       expect(@grand_child_account.first_parent_brand_config).to eq @child_config
     end
-  end
 
-  def get_equivalent_md5(config, new_parent_config_md5)
-    config.instance_eval do
-      Digest::MD5.hexdigest([
-        variables.to_s,
-        css_overrides,
-        js_overrides,
-        new_parent_config_md5
-      ].join)
+    it "should work with site_admin" do
+      Account.site_admin.enable_feature!(:use_new_styles)
+      site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
+      site_admin_config.save!
+      regenerator = BrandConfigRegenerator.new(Account.site_admin, user, site_admin_config)
+
+      brandable_css_stub = BrandableCSS.stubs(:compile_brand!)
+      Delayed::Testing.drain
+
+      expect(@parent_account.first_parent_brand_config).to eq site_admin_config
+      expect(Account.site_admin.first_parent_brand_config).to be_nil
     end
   end
-
 end

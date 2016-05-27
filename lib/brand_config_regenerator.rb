@@ -19,8 +19,21 @@ class BrandConfigRegenerator
   def things_that_need_to_be_regenerated
     @things_that_need_to_be_regenerated ||= begin
       all_subaccounts = @account.sub_accounts_recursive(100000, nil)
-      branded_subaccounts = all_subaccounts.select(&:brand_config)
-      branded_subaccounts + SharedBrandConfig.where(account_id: all_subaccounts)
+      result = all_subaccounts.select(&:brand_config_md5)
+      result.concat(SharedBrandConfig.where(account_id: all_subaccounts))
+      if @account.site_admin?
+        # note: this is only root accounts on the same shard as site admin
+        @account.shard.activate do
+          root_scope = Account.root_accounts.active.where.not(id: @account)
+          result.concat(root_scope.select(&:brand_config_md5))
+          result.concat(SharedBrandConfig.where(account_id: root_scope))
+
+          sub_scope = Account.active.where(root_account_id: root_scope)
+          result.concat(sub_scope.select(&:brand_config_md5))
+          result.concat(SharedBrandConfig.where(account_id: sub_scope))
+        end
+      end
+      result
     end.freeze
   end
 

@@ -115,6 +115,7 @@ module Api
           })
           bc.parent = root_bc
           bc.save!
+          child_account.save!
 
           html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
           expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/root/account.css">' \
