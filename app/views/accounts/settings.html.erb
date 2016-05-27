@@ -331,7 +331,7 @@ TEXT
                     <%= settings.check_box :enable_alerts, :checked => @account.settings[:enable_alerts] %>
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
                   </div>
-                <% end %>
+                <% end %><%# end of site_admin? %>
                 <div id="global_includes_warning_message_wrapper">
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Custom CSS/JavaScript overrides" %>
@@ -347,13 +347,7 @@ TEXT
                       </p>
                     </div>
                   </div>
-                    <div>
-                      <%= settings.check_box :sub_account_includes,
-                        id: :account_settings_new_sub_account_includes,
-                        checked: @account.settings[:sub_account_includes]
-                      %>
-                      <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
-                  <% end %>
+                  <% end %><%# end of use_new_styles? %>
                 </div>
                 <div id="show_scheduler_checkbox">
                   <%= settings.check_box :show_scheduler, :checked => @account.settings[:show_scheduler] %>
@@ -363,7 +357,11 @@ TEXT
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
                   <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
                 </div>
-              <% end %>
+              <% end %><%# end of :manage_site_settings %>
+              <div>
+                <%= settings.check_box :sub_account_includes, checked: @account.settings[:sub_account_includes] %>
+                <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
+              </div>
               <% if @account.canvas_authentication? %>
                 <div>
                   <%= settings.check_box :open_registration, :checked => @account.open_registration? %>
