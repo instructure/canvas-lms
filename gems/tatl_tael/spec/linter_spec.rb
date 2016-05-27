@@ -47,7 +47,7 @@ describe TatlTael::Linter do
   COFFEE_SPEC_PATH       = "spec/coffeescripts/calendar/CalendarSpec.coffee"
 
   APP_JSX_PATH           = "app/jsx/dashboard_card/DashboardCardAction.jsx"
-  JSX_SPEC_PATH          = "spec/coffeescripts/jsx/dashboard_card/DashboardCardActionSpec.coffee"
+  JSX_SPEC_PATH          = "spec/javascripts/jsx/dashboard_card/DashboardCardActionSpec.coffee"
 
   APP_RB_PATH            = "app/controllers/accounts_controller.rb"
   APP_RB_SPEC_PATH       = "spec/controllers/accounts_controller_spec.rb"
@@ -55,8 +55,9 @@ describe TatlTael::Linter do
   LIB_RB_SPEC_PATH       = "spec/lib/reporting/counts_report_spec.rb"
 
   APP_ERB_PATH           = "app/views/announcements/index.html.erb"
-  PUBLIC_HTML_PATH       = "public/partials/_license_help.html"
-  PUBLIC_JS_PATH         = "public/javascripts/account_settings.js"
+  PUBLIC_JS_PATH         = "public/javascripts/eportfolios/eportfolio_section.js"
+  PUBLIC_JS_SPEC_PATH    = "spec/javascripts/jsx/eportfolios/eportfolioSectionSpec.jsx"
+
   PUBLIC_BOWER_JS_PATH   = "public/javascripts/bower/axios/dist/axios.amd.js"
   PUBLIC_ME_JS_PATH      = "public/javascripts/mediaelement/mep-feature-speed-instructure.js"
   PUBLIC_VENDOR_JS_PATH  = "public/javascripts/vendor/bootstrap/bootstrap-dropdown.js"
@@ -79,29 +80,29 @@ describe TatlTael::Linter do
                          :ensure_coffee_specs
       end
     end
+  end
 
-    context "js changes" do
-      include_examples "change combos",
-                       PUBLIC_JS_PATH,
-                       COFFEE_SPEC_PATH,
-                       :ensure_coffee_specs
+  describe "#ensure_public_js_specs" do
+    include_examples "change combos",
+                     PUBLIC_JS_PATH,
+                     PUBLIC_JS_SPEC_PATH,
+                     :ensure_public_js_specs
 
-      context "in excluded public sub dirs" do
-        context "bower" do
-          include_examples "does not yield",
-                           [{ path: PUBLIC_BOWER_JS_PATH, deleted?: false }],
-                           :ensure_coffee_specs
-        end
-        context "mediaelement" do
-          include_examples "does not yield",
-                           [{ path: PUBLIC_ME_JS_PATH, deleted?: false }],
-                           :ensure_coffee_specs
-        end
-        context "vendor" do
-          include_examples "does not yield",
-                           [{ path: PUBLIC_VENDOR_JS_PATH, deleted?: false }],
-                           :ensure_coffee_specs
-        end
+    context "in excluded public sub dirs" do
+      context "bower" do
+        include_examples "does not yield",
+                         [{ path: PUBLIC_BOWER_JS_PATH, deleted?: false }],
+                         :ensure_public_js_specs
+      end
+      context "mediaelement" do
+        include_examples "does not yield",
+                         [{ path: PUBLIC_ME_JS_PATH, deleted?: false }],
+                         :ensure_public_js_specs
+      end
+      context "vendor" do
+        include_examples "does not yield",
+                         [{ path: PUBLIC_VENDOR_JS_PATH, deleted?: false }],
+                         :ensure_public_js_specs
       end
     end
   end
@@ -131,6 +132,23 @@ describe TatlTael::Linter do
 
   describe "#ensure_no_unnecessary_selenium_specs" do
     context "has selenium specs" do
+      context "needs public js specs" do
+        context "has no public js specs" do
+          include_examples "yields",
+                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
+                            { path: PUBLIC_JS_PATH, deleted?: false }],
+                           :ensure_no_unnecessary_selenium_specs
+        end
+
+        context "has public js specs" do
+          include_examples "does not yield",
+                           [{ path: SELENIUM_SPEC_PATH, deleted?: false },
+                            { path: PUBLIC_JS_PATH, deleted?: false },
+                            { path: PUBLIC_JS_SPEC_PATH, deleted?: false }],
+                           :ensure_no_unnecessary_selenium_specs
+        end
+      end
+
       context "needs coffee specs" do
         context "has no coffee specs" do
           include_examples "yields",
@@ -192,7 +210,7 @@ describe TatlTael::Linter do
 
   describe "#ban_new_erb" do
     context "erb additions exist" do
-      let(:changes) { [double(path: "yarg.erb", added?: true)] }
+      let(:changes) { [double(path: APP_ERB_PATH, added?: true)] }
 
       it "yields" do
         expect { |b| subject.ban_new_erb(&b) }.to yield_with_no_args
@@ -200,7 +218,7 @@ describe TatlTael::Linter do
     end
 
     context "erb non additions exist" do
-      let(:changes) { [double(path: "yarg.erb", added?: false)] }
+      let(:changes) { [double(path: APP_ERB_PATH, added?: false)] }
 
       it "does not yield" do
         expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
@@ -208,7 +226,7 @@ describe TatlTael::Linter do
     end
 
     context "no erb changes exist" do
-      let(:changes) { [double(path: "yarg.js", added?: true)] }
+      let(:changes) { [double(path: PUBLIC_VENDOR_JS_PATH, added?: true)] }
 
       it "does not yield" do
         expect { |b| subject.ban_new_erb(&b) }.not_to yield_with_no_args
