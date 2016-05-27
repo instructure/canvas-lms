@@ -79,6 +79,13 @@ describe 'taking a quiz' do
             end
           end
         end
+
+        it 'does not prompt for access code for sidebar question navigation' do
+          verify_no_access_code_reprompts_during_oqaat_quiz do
+            select_question_from_column_links(@quiz.quiz_questions[0].id)
+            select_question_from_column_links(@quiz.quiz_questions[1].id)
+          end
+        end
       end
 
       context 'when the quiz has unlimited attempts' do
