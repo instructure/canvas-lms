@@ -464,6 +464,7 @@ describe "calendar2" do
     describe "main month calendar" do
 
       it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
+        skip "CNVS-29676"
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -486,6 +487,7 @@ describe "calendar2" do
       end
 
       it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
+        skip "CNVS-29676"
         date_due = Time.zone.now.utc + 2.days
         reply = 'Replying to discussion'
 
