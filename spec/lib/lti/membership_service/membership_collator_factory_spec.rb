@@ -25,9 +25,15 @@ module Lti::MembershipService
     end
 
     describe '.collator_instance' do
-      it 'returns and LisPersonCollator instance by default' do
+      it 'returns a LisPersonCollator instance by default' do
         collator = MembershipCollatorFactory.collator_instance(@course, @teacher, {})
         expect(collator.class).to eq Lti::MembershipService::LisPersonCollator
+      end
+
+      it 'returns a CourseGroupCollator instance when group role is supplied' do
+        role = [IMS::LIS::ContextType::URNs::Group, IMS::LIS::Roles::Context::URNs::TeachingAssistant]
+        collator = MembershipCollatorFactory.collator_instance(@course, @teacher, { role: role })
+        expect(collator.class).to eq Lti::MembershipService::CourseGroupCollator
       end
     end
   end
