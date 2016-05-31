@@ -7,10 +7,12 @@ define([
   'convert_case',
   'jsx/grading/GradingPeriodSet',
   'jsx/grading/SearchGradingPeriodsField',
-  'jsx/grading/EnrollmentTermsDropdown',
   'jsx/shared/helpers/searchHelpers',
-  'jsx/gradebook/grid/helpers/datesHelper'
-], function(React, _, $, axios, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, EnrollmentTermsDropdown, SearchHelpers, DatesHelper) {
+  'jsx/shared/helpers/dateHelper',
+  'jsx/grading/EnrollmentTermsDropdown',
+  'jsx/grading/NewGradingPeriodSetForm',
+  'jquery.instructure_misc_plugins'
+], function(React, _, $, axios, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm ) {
 
   const deserializeSets = function(sets) {
     return _.map(sets, function(set) {
@@ -41,10 +43,10 @@ define([
       if(newTerm.name) {
         newTerm.displayName = newTerm.name;
       } else if(_.isDate(newTerm.startAt)) {
-        let started = DatesHelper.formatDateForDisplay(newTerm.startAt);
+        let started = DateHelper.formatDateForDisplay(newTerm.startAt);
         newTerm.displayName = I18n.t("Term starting ") + started;
       } else {
-        let created = DatesHelper.formatDateForDisplay(newTerm.createdAt);
+        let created = DateHelper.formatDateForDisplay(newTerm.createdAt);
         newTerm.displayName = I18n.t("Term created ") + created;
       }
 
@@ -52,55 +54,72 @@ define([
     });
   };
 
-  const types = React.PropTypes;
+  const { bool, string, shape } = React.PropTypes;
 
   let GradingPeriodSetCollection = React.createClass({
+
     propTypes: {
-      readOnly: types.bool.isRequired,
-      urls: types.shape({
-        gradingPeriodSetsURL:    types.string.isRequired,
-        gradingPeriodsUpdateURL: types.string.isRequired,
-        enrollmentTermsURL:      types.string.isRequired,
-        deleteGradingPeriodURL:  types.string.isRequired
-      }).isRequired
+      readOnly: bool.isRequired,
+
+      urls: shape({
+        gradingPeriodSetsURL:    string.isRequired,
+        gradingPeriodsUpdateURL: string.isRequired,
+        enrollmentTermsURL:      string.isRequired,
+        deleteGradingPeriodURL:  string.isRequired
+      }).isRequired,
     },
 
     getInitialState() {
       return {
         enrollmentTerms: [],
         sets: [],
+        showNewSetForm: false,
         searchText: "",
         selectedTermID: 0
       };
     },
 
+    addGradingPeriodSet(sets) {
+      if(!this.props.readOnly) {
+        this.setState({
+          sets: this.state.sets.concat(deserializeSets(sets))
+        }, this.getTerms());
+      }
+    },
+
     componentWillMount() {
-      this.getTerms();
       this.getSets();
+      this.getTerms();
     },
 
     getSets() {
       axios.get(this.props.urls.gradingPeriodSetsURL)
-           .then((response) => {
-              this.setState({
-                sets: deserializeSets(response.data.grading_period_sets)
-              });
-            })
-            .catch((_) => {
-              $.flashError(I18n.t("An error occured while fetching grading period sets."));
-            });
+        .then((response) => {
+          this.setState({
+            sets: deserializeSets(response.data.grading_period_sets)
+          });
+        })
+        .catch((_) => {
+          $.flashError(I18n.t(
+                "An error occured while fetching grading period sets."
+          ));
+        });
     },
 
     getTerms() {
       axios.get(this.props.urls.enrollmentTermsURL)
-           .then((response) => {
-              const enrollmentTerms = deserializeEnrollmentTerms(response.data.enrollment_terms);
-              this.setState({ enrollmentTerms: enrollmentTerms });
-            })
-           .catch(function (response) {
-              $.flashError(I18n.t("An error occured while fetching enrollment terms."));
-            });
+        .then((response) => {
+           const enrollmentTerms =
+             deserializeEnrollmentTerms(response.data.enrollment_terms);
+           this.setState({ enrollmentTerms: enrollmentTerms });
+         })
+        .catch(function (response) {
+           $.flashError(I18n.t(
+                 "An error occured while fetching enrollment terms."
+           ));
+         });
      },
+
 
     setAndGradingPeriodTitles(set) {
       let titles = _.pluck(set.gradingPeriods, 'title');
@@ -110,7 +129,8 @@ define([
 
     searchTextMatchesTitles(titles) {
       return _.any(titles, (title) => {
-        return SearchHelpers.substringMatchRegex(this.state.searchText).test(title);
+        return SearchHelpers
+          .substringMatchRegex(this.state.searchText).test(title);
       });
     },
 
@@ -142,8 +162,13 @@ define([
     },
 
     getVisibleSets() {
-      let setsFilteredBySearchText = this.filterSetsBySearchText(this.state.sets, this.state.searchText);
-      let filterByTermArgs = [setsFilteredBySearchText, this.state.enrollmentTerms, this.state.selectedTermID];
+      let setsFilteredBySearchText =
+        this.filterSetsBySearchText(this.state.sets, this.state.searchText);
+      let filterByTermArgs = [
+        setsFilteredBySearchText,
+        this.state.enrollmentTerms,
+        this.state.selectedTermID
+      ];
       return this.filterSetsByActiveTerm(...filterByTermArgs);
     },
 
@@ -152,14 +177,25 @@ define([
       this.setState({ sets: newSets });
     },
 
-    renderSets: function() {
-      let urls = {
+    openNewSetForm() {
+      this.setState({ showNewSetForm: true });
+    },
+
+    closeNewSetForm() {
+      this.setState(
+        { showNewSetForm: false },
+        React.findDOMNode(this.refs.addSetFormButton).focus()
+      );
+    },
+
+    renderSets() {
+      const urls = {
         batchUpdateURL: this.props.urls.gradingPeriodsUpdateURL,
         gradingPeriodSetsURL: this.props.urls.gradingPeriodSetsURL,
         deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL
       };
-      let visibleSets = this.getVisibleSets();
-      return _.map(visibleSets, set => {
+
+      return _.map(this.getVisibleSets(), set => {
         return (
           <GradingPeriodSet key={set.id}
                             set={set}
@@ -173,6 +209,35 @@ define([
       });
     },
 
+    renderNewGradingPeriodSetForm() {
+      if(!this.state.showNewSetForm) return;
+      return (
+        <NewGradingPeriodSetForm
+          ref                 = "newSetForm"
+          closeForm           = {this.closeNewSetForm}
+          urls                = {this.props.urls}
+          enrollmentTerms     = {this.state.enrollmentTerms}
+          addGradingPeriodSet = {this.addGradingPeriodSet}
+        />
+      );
+    },
+
+    renderAddSetFormButton() {
+      if(this.props.readOnly) return;
+      return (
+        <button
+          ref       = 'addSetFormButton'
+          className = {this.state.showNewSetForm ? 'Button Button--primary disabled' : 'Button Button--primary'}
+          aria-disabled  = {this.state.showNewSetForm}
+          onClick   = {this.openNewSetForm}
+        >
+          <i className="icon-plus"/>
+          &nbsp;
+          {I18n.t("Set of Grading Periods")}
+        </button>
+      );
+    },
+
     render() {
       return (
         <div>
@@ -181,8 +246,12 @@ define([
               terms={this.state.enrollmentTerms}
               changeSelectedEnrollmentTerm={this.changeSelectedEnrollmentTerm} />
             <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
+            <div className="header-bar-right">
+              {this.renderAddSetFormButton()}
+            </div>
           </div>
-          <div>
+          {this.renderNewGradingPeriodSetForm()}
+          <div id="grading-period-sets">
             {this.renderSets()}
           </div>
         </div>

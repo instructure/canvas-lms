@@ -1,9 +1,11 @@
 define([
   'react',
+  'jquery',
+  'axios',
   'underscore',
   'jsx/grading/AccountTabContainer',
   'jqueryui/tabs'
-], (React, _, AccountTabContainer) => {
+], (React, $, axios, _, AccountTabContainer) => {
   const wrapper = document.getElementById('fixtures');
 
   module("AccountTabContainer", {
@@ -15,11 +17,17 @@ define([
           gradingPeriodsUpdateURL: "api/v1/grading_period_sets/%7B%7B%20set_id%20%7D%7D/grading_periods/batch_update",
           enrollmentTermsURL:      "api/v1/accounts/1/enrollment_terms",
           deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D"
-        }
+        },
       };
 
       const element = React.createElement(AccountTabContainer, _.defaults(props, defaults));
       return React.render(element, wrapper);
+    },
+    setup() {
+      const response = {};
+      const successPromise = new Promise(resolve => resolve(response));
+      this.stub(axios, 'get').returns(successPromise);
+      this.stub($, 'ajax', function(){ return {done: function(){}};});
     },
 
     teardown: function() {

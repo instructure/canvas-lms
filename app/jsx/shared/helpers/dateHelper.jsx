@@ -4,7 +4,7 @@ define([
   'timezone',
   'jquery.instructure_date_and_time'
 ], function (_, $, tz) {
-  var DatesHelper = {
+  var DateHelper = {
     parseDates: function(object, datesToParse) {
       _.each(datesToParse, (dateString) => {
         var propertyExists = !_.isUndefined(object[dateString]);
@@ -25,5 +25,5 @@ define([
       return tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE });
     }
   };
-  return DatesHelper;
+  return DateHelper;
 });

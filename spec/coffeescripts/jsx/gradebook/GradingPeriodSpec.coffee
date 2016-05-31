@@ -4,10 +4,10 @@ define [
   'underscore'
   'jsx/grading/gradingPeriod'
   'helpers/fakeENV'
-  'jsx/gradebook/grid/helpers/datesHelper'
+  'jsx/shared/helpers/dateHelper'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.rails_flash_notifications'
-], (React, $, _, GradingPeriod, fakeENV, DatesHelper) ->
+], (React, $, _, GradingPeriod, fakeENV, DateHelper) ->
 
   TestUtils = React.addons.TestUtils
 
@@ -78,7 +78,7 @@ define [
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'replaceInputWithDate calls formatDatetimeForDisplay', ->
-    formatDatetime = @stub(DatesHelper, 'formatDatetimeForDisplay')
+    formatDatetime = @stub(DateHelper, 'formatDatetimeForDisplay')
     fakeDateElement = { val: -> }
     @gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
     ok formatDatetime.calledOnce

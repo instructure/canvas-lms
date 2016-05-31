@@ -1,4 +1,5 @@
 @import "base/environment";
+@import "components/context_search";
 
 .ItemGroup__header {
   background-color: $lightBackground;
@@ -57,6 +58,14 @@
   width: 250px;
   display: inline-block;
   margin-bottom: 0px;
+}
+
+// GRADING PERIOD SET FORM
+
+.GradingPeriodSetForm {
+  background: darken($ic-color-light, 3%);
+  border: 1px solid $ic-border-light;
+  margin-bottom: $ic-sp*2;
 }
 
 // GRADING PERIOD SET

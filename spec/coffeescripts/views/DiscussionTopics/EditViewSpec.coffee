@@ -156,7 +156,6 @@ GroupCategorySelector, fakeENV) ->
     ENV.CONDITIONAL_RELEASE_ENV = conditionalReleaseEnv
     view = @editView({ withAssignment: true })
     view.loadConditionalRelease()
-    debugger
     stub = @stub(view.conditionalReleaseEditor, 'setProps')
     view.onChange()
     view.onChange()

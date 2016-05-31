@@ -4,9 +4,9 @@ define([
   'jquery',
   'i18n!external_tools',
   'underscore',
-  'jsx/gradebook/grid/helpers/datesHelper',
+  'jsx/shared/helpers/dateHelper',
   'jquery.instructure_date_and_time'
-], function(tz, React, $, I18n, _, DatesHelper) {
+], function(tz, React, $, I18n, _, DateHelper) {
 
   const types = React.PropTypes;
   let GradingPeriodTemplate = React.createClass({
@@ -112,13 +112,13 @@ define([
                  ref="startDate"
                  name="startDate"
                  className="input-grading-period-date date_field"
-                 defaultValue={DatesHelper.formatDatetimeForDisplay(this.props.startDate)}
+                 defaultValue={DateHelper.formatDatetimeForDisplay(this.props.startDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
         return (
           <div id={this.addIdToText("period_start_date_")} ref="startDate">
-            {DatesHelper.formatDatetimeForDisplay(this.props.startDate)}
+            {DateHelper.formatDatetimeForDisplay(this.props.startDate)}
           </div>
         );
       }
@@ -131,13 +131,13 @@ define([
                  className="input-grading-period-date date_field"
                  ref="endDate"
                  name="endDate"
-                 defaultValue={DatesHelper.formatDatetimeForDisplay(this.props.endDate)}
+                 defaultValue={DateHelper.formatDatetimeForDisplay(this.props.endDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
         return (
           <div id={this.addIdToText("period_end_date_")} ref="endDate">
-            {DatesHelper.formatDatetimeForDisplay(this.props.endDate)}
+            {DateHelper.formatDatetimeForDisplay(this.props.endDate)}
           </div>
         );
       }

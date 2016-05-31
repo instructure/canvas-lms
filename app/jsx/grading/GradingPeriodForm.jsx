@@ -3,9 +3,8 @@ define([
   'underscore',
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
-  'jsx/gradebook/grid/helpers/datesHelper',
   'jsx/shared/helpers/accessibleDateFormat'
-], function(React, _, I18n, DueDateCalendarPicker, DatesHelper, accessibleDateFormat) {
+], function(React, _, I18n, DueDateCalendarPicker, accessibleDateFormat) {
   const types = React.PropTypes;
 
   const buildPeriod = function(attr) {
@@ -155,7 +154,7 @@ define([
     },
 
     hackTheDatepickers: function() {
-      // When you write a better datepicker, you can replace this.
+      // This can be replaced when we have an extensible datepicker
       let $form = React.findDOMNode(this);
       let $appends = $form.querySelectorAll('.input-append');
       Array.prototype.forEach.call($appends, function($el) {

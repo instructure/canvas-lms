@@ -13,14 +13,19 @@ define([
         urls: {
           gradingPeriodSetsURL: "api/v1/accounts/1/grading_period_sets",
           enrollmentTermsURL: "api/v1/accounts/1/terms",
-          gradingPeriodsUpdateURL: "api/v1/accounts/1/grading_period_sets",
-          deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D"
+          deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D",
+          gradingPeriodsUpdateURL: "api/v1/accounts/1/grading_periods/batch_update"
         },
-        readOnly: false
+        readOnly: false,
       };
 
       const element = React.createElement(SetCollection, props);
       return React.render(element, wrapper);
+    },
+
+    stubAxios() {
+      const successPromise = new Promise(resolve => resolve());
+      this.stub(axios, 'get').returns(successPromise);
     },
 
     setsResponse() {
@@ -37,8 +42,8 @@ define([
               id: "2",
               title: "Mambo Numero Cinco",
               grading_periods: [
-                { id: 9, title: "Febrero", start_date: "2014-06-08T15:44:25Z", end_date: "2014-07-08T15:44:25Z" },
-                { id: 11, title: "Marzo", start_date: "2014-08-08T15:44:25Z", end_date: "2014-09-08T15:44:25Z" }
+                { id: "9", title: "Febrero", start_date: "2014-06-08T15:44:25Z", end_date: "2014-07-08T15:44:25Z" },
+                { id: "11", title: "Marzo", start_date: "2014-08-08T15:44:25Z", end_date: "2014-09-08T15:44:25Z" }
               ],
               permissions: { read: true, create: true, update: true, delete: true }
             }
@@ -337,5 +342,44 @@ define([
       propEqual(setIDs, ["2"]);
       start();
     });
+  });
+
+  test("doesn't show the new set form on initial load", function() {
+    this.stubAxios();
+    let collection = this.renderComponent();
+    notOk(collection.refs.newSetForm);
+  });
+
+  test("has the add new set button enabled on initial load", function() {
+    this.stubAxios();
+    let collection = this.renderComponent();
+    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
+    equal(addSetFormButton.getAttribute('aria-disabled'), 'false');
+    notOk(_.contains(addSetFormButton.classList, 'disabled'));
+  });
+
+  test("disables the add new set button after it is clicked", function() {
+    this.stubAxios();
+    let collection = this.renderComponent();
+    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
+    Simulate.click(addSetFormButton);
+    equal(addSetFormButton.getAttribute('aria-disabled'), 'true');
+    ok(_.contains(addSetFormButton.classList, 'disabled'));
+  });
+
+  test("shows the new set form when the add new set button is " +
+      "clicked", function() {
+    this.stubAxios();
+    let collection = this.renderComponent();
+    let addSetFormButton = React.findDOMNode(collection.refs.addSetFormButton);
+    Simulate.click(addSetFormButton);
+    ok(collection.refs.newSetForm);
+  });
+
+  test("closes the new set form when closeNewSetForm is called", function() {
+    this.stubAxios();
+    let collection = this.renderComponent();
+    collection.closeNewSetForm();
+    notOk(collection.refs.newSetForm);
   });
 });

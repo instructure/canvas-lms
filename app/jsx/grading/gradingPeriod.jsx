@@ -5,8 +5,8 @@ define([
   'i18n!external_tools',
   'underscore',
   'jsx/grading/gradingPeriodTemplate',
-  'jsx/gradebook/grid/helpers/datesHelper'
-], function(tz, React, $, I18n, _, GradingPeriodTemplate, DatesHelper) {
+  'jsx/shared/helpers/dateHelper'
+], function(tz, React, $, I18n, _, GradingPeriodTemplate, DateHelper) {
 
   var types = React.PropTypes;
   var GradingPeriod = React.createClass({
@@ -57,7 +57,7 @@ define([
         $date.data('unfudged-date') :
         new Date('invalid date');
 
-      if (dateType === "endDate" && DatesHelper.isMidnight(updatedDate)) {
+      if (dateType === "endDate" && DateHelper.isMidnight(updatedDate)) {
         updatedDate = tz.changeToTheSecondBeforeMidnight(updatedDate);
       }
 
@@ -71,7 +71,7 @@ define([
 
     replaceInputWithDate: function(dateType, dateElement) {
       var date = this.state[dateType];
-      dateElement.val(DatesHelper.formatDatetimeForDisplay(date));
+      dateElement.val(DateHelper.formatDatetimeForDisplay(date));
     },
 
     render: function () {

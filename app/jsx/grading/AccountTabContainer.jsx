@@ -5,18 +5,19 @@ define([
   'jquery',
   'i18n!grading_periods'
 ], function(React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) {
-  const types = React.PropTypes;
+  const { bool, string, shape } = React.PropTypes;
 
   let AccountTabContainer = React.createClass({
     propTypes: {
-      multipleGradingPeriodsEnabled: types.bool.isRequired,
-      readOnly: types.bool.isRequired,
-      urls: types.shape({
-        gradingPeriodSetsURL:    types.string.isRequired,
-        gradingPeriodsUpdateURL: types.string.isRequired,
-        enrollmentTermsURL:      types.string.isRequired,
-        deleteGradingPeriodURL:  types.string.isRequired
-      }).isRequired
+      multipleGradingPeriodsEnabled: bool.isRequired,
+      readOnly:                      bool.isRequired,
+
+      urls: shape({
+        gradingPeriodSetsURL:    string.isRequired,
+        gradingPeriodsUpdateURL: string.isRequired,
+        enrollmentTermsURL:      string.isRequired,
+        deleteGradingPeriodURL:  string.isRequired
+      }).isRequired,
     },
 
     componentDidMount: function() {
@@ -33,8 +34,10 @@ define([
                 <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
               </ul>
               <div ref="gradingPeriods" id="grading-periods-tab">
-                <GradingPeriodSetCollection urls={this.props.urls}
-                                            readOnly={this.props.readOnly} />
+                <GradingPeriodSetCollection
+                  urls        = {this.props.urls}
+                  readOnly    = {this.props.readOnly}
+                />
               </div>
               <div ref="gradingStandards" id="grading-standards-tab">
                 <GradingStandardCollection />

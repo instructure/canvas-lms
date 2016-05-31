@@ -70,29 +70,33 @@ define([
     return "edit-grading-period-" + period.id;
   };
 
-  const types = React.PropTypes;
+
+  const { shape, number, string, array, bool, func } = React.PropTypes;
 
   let GradingPeriodSet = React.createClass({
     propTypes: {
-      set: types.shape({
-        id: types.string,
-        title: types.string
+      gradingPeriods: array.isRequired,
+      terms:          array.isRequired,
+      readOnly:       bool.isRequired,
+      onDelete:       func.isRequired,
+
+      set: shape({
+        id:    string.isRequired,
+        title: string.isRequired
       }).isRequired,
-      gradingPeriods: types.array.isRequired,
-      terms: types.array.isRequired,
-      urls: types.shape({
-        batchUpdateURL: types.string.isRequired,
-        deleteGradingPeriodURL: types.string.isRequired,
-        gradingPeriodSetsURL: types.string.isRequired
+
+      urls: shape({
+        batchUpdateURL: string.isRequired,
+        deleteGradingPeriodURL: string.isRequired,
+        gradingPeriodSetsURL: string.isRequired
       }).isRequired,
-      readOnly: types.bool.isRequired,
-      permissions: types.shape({
-        read:   types.bool.isRequired,
-        create: types.bool.isRequired,
-        update: types.bool.isRequired,
-        delete: types.bool.isRequired
-      }).isRequired,
-      onDelete: types.func.isRequired
+
+      permissions: shape({
+        read:   bool.isRequired,
+        create: bool.isRequired,
+        update: bool.isRequired,
+        delete: bool.isRequired
+      }).isRequired
     },
 
     getInitialState() {

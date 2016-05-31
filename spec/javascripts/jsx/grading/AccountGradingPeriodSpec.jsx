@@ -17,6 +17,7 @@ define([
       startDate: new Date("2015-01-01T20:11:00+00:00"),
       endDate: new Date("2015-03-01T00:00:00+00:00")
     },
+    readOnly: false,
     onEdit: () => {},
     readOnly: false,
     permissions: allPermissions,

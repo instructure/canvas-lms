@@ -1,10 +1,10 @@
 define [
-  'jsx/gradebook/grid/helpers/datesHelper'
+  'jsx/shared/helpers/dateHelper'
   'underscore'
   'timezone'
   'vendor/timezone/America/Detroit'
   'vendor/timezone/America/Juneau'
-], (DatesHelper, _, tz, detroit, juneau) ->
+], (DateHelper, _, tz, detroit, juneau) ->
 
   defaultAssignment = ->
     {
@@ -14,12 +14,12 @@ define [
       updated_at: "2015-07-07T18:35:22Z"
     }
 
-  module 'DatesHelper#parseDates'
+  module 'DateHelper#parseDates'
 
   test 'returns a new object with specified dates parsed', ->
     assignment = defaultAssignment()
     datesToParse = ['created_at', 'due_at']
-    assignment = DatesHelper.parseDates(assignment, datesToParse)
+    assignment = DateHelper.parseDates(assignment, datesToParse)
 
     ok _.isDate(assignment.created_at)
     ok _.isDate(assignment.due_at)
@@ -29,7 +29,7 @@ define [
     assignment = defaultAssignment()
     assignment.due_at = null
     datesToParse = ['created_at', 'due_at']
-    assignment = DatesHelper.parseDates(assignment, datesToParse)
+    assignment = DateHelper.parseDates(assignment, datesToParse)
 
     ok _.isDate(assignment.created_at)
     ok _.isNull(assignment.due_at)
@@ -37,12 +37,12 @@ define [
   test 'gracefully handles undefined values', ->
     assignment = defaultAssignment()
     datesToParse = ['created_at', 'undefined_due_at']
-    assignment = DatesHelper.parseDates(assignment, datesToParse)
+    assignment = DateHelper.parseDates(assignment, datesToParse)
 
     ok _.isDate(assignment.created_at)
     ok _.isUndefined(assignment.undefined_due_at)
 
-  module 'DatesHelper#formatDatetimeForDisplay',
+  module 'DateHelper#formatDatetimeForDisplay',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->
@@ -51,14 +51,14 @@ define [
   test 'formats the date for display, adjusted for the timezone', ->
     assignment = defaultAssignment()
     tz.changeZone(detroit, 'America/Detroit')
-    formattedDate = DatesHelper.formatDatetimeForDisplay(assignment.due_at)
+    formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015 at 2:35pm"
 
     tz.changeZone(juneau, 'America/Juneau')
-    formattedDate = DatesHelper.formatDatetimeForDisplay(assignment.due_at)
+    formattedDate = DateHelper.formatDatetimeForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015 at 10:35am"
 
-  module 'DatesHelper#formatDateForDisplay',
+  module 'DateHelper#formatDateForDisplay',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->
@@ -67,14 +67,14 @@ define [
   test 'formats the date for display, adjusted for the timezone, excluding the time', ->
     assignment = defaultAssignment()
     tz.changeZone(detroit, 'America/Detroit')
-    formattedDate = DatesHelper.formatDateForDisplay(assignment.due_at)
+    formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015"
 
     tz.changeZone(juneau, 'America/Juneau')
-    formattedDate = DatesHelper.formatDateForDisplay(assignment.due_at)
+    formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
     equal formattedDate, "Jul 14, 2015"
 
-  module 'DatesHelper#isMidnight',
+  module 'DateHelper#isMidnight',
     setup: ->
       @snapshot = tz.snapshot()
     teardown: ->
@@ -83,7 +83,7 @@ define [
   test 'returns true if the time is midnight, adjusted for the timezone', ->
     date = "2015-07-14T04:00:00Z"
     tz.changeZone(detroit, 'America/Detroit')
-    ok DatesHelper.isMidnight(date)
+    ok DateHelper.isMidnight(date)
 
     tz.changeZone(juneau, 'America/Juneau')
-    notOk DatesHelper.isMidnight(date)
+    notOk DateHelper.isMidnight(date)

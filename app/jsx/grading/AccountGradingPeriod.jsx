@@ -3,9 +3,9 @@ define([
   'jquery',
   'axios',
   'i18n!grading_periods',
-  'jsx/gradebook/grid/helpers/datesHelper',
+  'jsx/shared/helpers/dateHelper',
   'jquery.instructure_misc_helpers'
-], function(React, $, axios, I18n, DatesHelper) {
+], function(React, $, axios, I18n, DateHelper) {
   const types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
@@ -90,10 +90,10 @@ define([
               <span tabIndex="0" ref="title">{this.props.period.title}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
-              <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {DatesHelper.formatDatetimeForDisplay(this.props.period.startDate)}</span>
+              <span tabIndex="0" ref="startDate">{I18n.t("Start Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.startDate)}</span>
             </div>
             <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
-              <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {DatesHelper.formatDatetimeForDisplay(this.props.period.endDate)}</span>
+              <span tabIndex="0" ref="endDate">{I18n.t("End Date:")} {DateHelper.formatDatetimeForDisplay(this.props.period.endDate)}</span>
             </div>
           </div>
           <div className="GradingPeriodList__period__actions">
