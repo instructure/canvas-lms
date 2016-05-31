@@ -43,6 +43,14 @@ describe "context modules" do
       expect(f('.context_module .content')).to be_displayed
     end
 
+    it "expands/collapses module with 0 items", priority: "2", test_id: 126731 do
+      modules = create_modules(1, true)
+      get "/courses/#{@course.id}/modules"
+      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
+      wait_for_ajaximations
+      expect(f('.icon-mini-arrow-down')).to be_displayed
+    end
+
     it "should hide module items", priority: "1", test_id: 280415 do
       module_with_two_items
       wait_for_animations
@@ -577,23 +585,32 @@ describe "context modules" do
     end
 
     it "should prompt relock when adding an unlock_at date" do
-      mod = @course.context_modules.create!(:name => "name")
-
+      lock_until=format_date_for_view(Time.zone.today + 2.days)
+      @course.context_modules.create!(name: "name")
       get "/courses/#{@course.id}/modules"
-
       f(".ig-header-admin .al-trigger").click
       f(".edit_module_link").click
       expect(f('#add_context_module_form')).to be_displayed
-
       edit_form = f('#add_context_module_form')
       lock_check_click(edit_form)
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
-      unlock_date.send_keys((Date.today + 2.days).to_s)
+      unlock_date.send_keys(lock_until)
       wait_for_ajaximations
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
       test_relock
+    end
+
+    it "validates module lock date picker format", priority: "2", test_id: 132519 do
+      unlock_date = format_time_for_view(Time.zone.today + 2.days)
+      @course.context_modules.create!(name: "name", unlock_at: unlock_date)
+      get "/courses/#{@course.id}/modules"
+      f(".ig-header-admin .al-trigger").click
+      f(".edit_module_link").click
+      edit_form = f('#add_context_module_form')
+      unlock_date_in_dialog = edit_form.find_element(:id, 'context_module_unlock_at')
+      expect(format_time_for_view(unlock_date_in_dialog.attribute("value"))).to eq unlock_date
     end
 
     it "should properly change indent of an item with arrows" do
@@ -1210,6 +1227,21 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
+    it 'edits available/until dates on a quiz in a module', priority: "2", test_id: 126722 do
+      available_from = 2.days.from_now
+      available_until = 4.days.from_now
+      @pub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Published Quiz')
+      @mod.add_item(type: 'quiz', id: @pub_quiz.id)
+      go_to_modules
+      fln('Published Quiz').click
+      f('.quiz-edit-button').click
+      f(".date_field[data-date-type='unlock_at']").send_keys(format_date_for_view(available_from))
+      f(".date_field[data-date-type='lock_at']").send_keys(format_date_for_view(available_until))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.due_date_display').text).to eq date_string(available_until, :no_words)
+    end
+
     it 'should add an unpublished assignment to a module', priority: "1", test_id: 126724 do
       @unpub_assignment = Assignment.create!(context: @course, title: 'Unpublished Assignment')
       @unpub_assignment.workflow_state = 'unpublished'
@@ -1269,7 +1301,7 @@ describe "context modules" do
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'should add a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
+    it 'adds a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
       @due_at = 3.days.from_now
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10, due_at: @due_at)
       @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion with Due Date')
@@ -1282,7 +1314,40 @@ describe "context modules" do
       expect(f('.due_date_display').text).to eq date_string(@due_at, :no_words)
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
+
+    it 'edits due date on a ungraded discussion in a module', priority: "2", test_id: 126717 do
+      due_at = 3.days.from_now
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
+      go_to_modules
+      fln('Non-graded Published Discussion').click
+      f('.edit-btn').click
+      make_full_screen
+      wait_for_ajaximations
+      f('input[type=checkbox][name="assignment[set_assignment]"]').click
+      expect(f('.DueDateInput')).to be_displayed
+      f(".date_field[data-date-type='due_at']").send_keys(format_date_for_view(due_at))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.due_date_display').text).to eq date_string(due_at, :no_words)
+    end
+
+    it 'edits available/until dates on a ungraded discussion in a module', priority: "2", test_id: 126718 do
+      available_from = 2.days.from_now
+      available_until = 4.days.from_now
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
+      go_to_modules
+      fln('Non-graded Published Discussion').click
+      f('.edit-btn').click
+      f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(available_from))
+      f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(available_until))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.context_module_item')).not_to include_text(available_from.to_s)
+    end
   end
+
   context 'edit inline items on module page' do
     before(:once) do
       course(:active_course => true)
