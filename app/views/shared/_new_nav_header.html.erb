@@ -116,10 +116,10 @@
                     :class => help_link_classes(["ic-app-header__menu-list-link"]),
                     :data => help_link_data do %>
                 <div class="menu-item-icon-container" role="presentation">
-                  <%= svg_icon :help %>
+                  <%= svg_icon help_link_icon %>
                 </div>
                 <div class="menu-item__text">
-                  <%= t('Help') %>
+                  <%= help_link_name %>
                 </div>
               <% end %>
             </li>

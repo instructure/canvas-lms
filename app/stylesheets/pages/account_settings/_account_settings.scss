@@ -64,6 +64,8 @@
 
 .custom_help_link {
   border-top: 1px solid #ccc;
+  padding-top: $ic-sp;
+
   .delete {
     float: right;
   }
@@ -137,7 +139,7 @@
 }
 
 #account_settings_tabs {
-  legend {
+  legend:not(.ic-Legend) {
     @include fontSize(15px);
     font-weight: bold;
   }

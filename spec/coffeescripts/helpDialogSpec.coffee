@@ -8,7 +8,9 @@ define [
 
   module 'HelpDialog',
     setup: ->
-      fakeENV.setup()
+      fakeENV.setup({
+        help_link_name: 'Links'
+      })
       helpDialog.animateDuration = 0
       @server = sinon.fakeServer.create()
       @server.respondWith '/help_links', '[]'
@@ -36,6 +38,7 @@ define [
     helpDialog.initTriggers()
     $tester.click()
     ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"
+    equal $('.ui-dialog-title').text().trim(), 'Links'
     $tester.remove()
 
   test 'teacher feedback', ->

@@ -117,6 +117,7 @@ class ApplicationController < ActionController::Base
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         use_new_styles: use_new_styles?,
         k12: k12?,
+        help_link_name: help_link_name,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),

@@ -1349,42 +1349,53 @@ select.ic-Input:not(*:root) {
   &.ic-Form-group--horizontal {
     @include breakpoint(tablet) {
 
-      .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
+      > .ic-Form-control {
 
-        .ic-Label {
-          margin-bottom: 0;
-          flex: 0 0 $ic-horizontal-form-offset;
-          padding-right: $ic-sp*2;
-        }
+        &:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
+          display: flex;
+          flex-wrap: wrap;
 
-        .ic-Input,
-        .ic-Input-group,
-        .ic-Multi-input { flex: 1; }
+          > .ic-Label {
+            margin-bottom: 0;
+            flex: 0 0 $ic-horizontal-form-offset;
+            padding-right: $ic-sp*2;
+          }
 
-        .ic-Form-message {
-          display: block;
-          margin-left: 0;
-          width: 100%;
-          .ic-Form-message__Layout {
-            margin-left: $ic-horizontal-form-offset + $ic-sp;
-            display: inline-flex;
+          > .ic-Input,
+          > .ic-Input-group,
+          > .ic-Multi-input,
+          > .ic-Forms-component { flex: 1; }
+
+          > .ic-Form-message {
+            display: block;
+            margin-left: 0;
+            width: 100%;
+            .ic-Form-message__Layout {
+              margin-left: $ic-horizontal-form-offset + $ic-sp;
+              display: inline-flex;
+            }
+          }
+
+          > .ic-Form-help-text {
+            padding-left: $ic-horizontal-form-offset;
           }
         }
 
-        .ic-Form-help-text {
-          padding-left: $ic-horizontal-form-offset;
+        &:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio):not(.ic-Form-control--top-align-label) {
+          align-items: center;
+        }
+
+        &.ic-Form-control--top-align-label > .ic-Label {
+          transform: translateY(2px);
         }
       }
 
-      .ic-Fieldset--radio-checkbox {
+      > .ic-Fieldset--radio-checkbox {
         position: relative;
         padding-left: $ic-horizontal-form-offset;
         min-height: 30px;
 
-        .ic-Legend {
+        > .ic-Legend {
           position: absolute;
           top: 5px; left: 0;
           width: $ic-horizontal-form-offset - ($ic-sp * 2);
@@ -1593,6 +1604,7 @@ form.ic-Form-group { margin: 0; }
   margin: 0 0 $ic-sp*1.5;
   padding: 0;
   border: none;
+  width: 100%;
 
   // when the fieldset contains a radio or checkbox group, use this class
   // to give the legend the appearance of a label
@@ -1693,6 +1705,57 @@ form.ic-Form-group { margin: 0; }
     }
   }
 
+  &.ic-Radio--icon-only {
+    height: 2.75rem;
+
+    .ic-Label {
+      transition: all 0.2s;
+      padding: 0.5rem;
+      background-color: $ic-color-light;
+      border: 2px solid transparent;
+      border-radius: $borderRadius;
+
+      &:hover {
+        border-color: $ic-border-light;
+      }
+
+      &:before {
+        display: none;
+      }
+
+      > svg {
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        fill: $ic-font-color-dark;
+      }
+    }
+
+    input[type="radio"] {
+      &:checked {
+        ~ .ic-Label {
+          border-color: $ic-brand-primary;
+          > svg {
+            fill: $ic-brand-primary;
+          }
+        }
+      }
+      &:focus {
+        ~ .ic-Label {
+
+          @if $use_high_contrast {
+            outline: 1px dotted $ic-color-dark;
+            outline-offset: -5px;
+          }
+          @else {
+            box-shadow:
+              inset 0 0 0 3px rgba($ic-brand-primary, 0.3);
+          }
+
+        }
+      }
+    }
+  }
 }
 
 .ic-Checkbox-group {

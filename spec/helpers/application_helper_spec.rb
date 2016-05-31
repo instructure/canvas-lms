@@ -736,6 +736,44 @@ describe ApplicationHelper do
     end
   end
 
+  describe "help link" do
+    before :once do
+      Setting.set('show_feedback_link', 'true')
+    end
+
+    it "should configure the help link to display the dialog by default" do
+      expect(helper.show_help_link?).to eq true
+      expect(helper.help_link_url).to eq '#'
+      expect(helper.help_link_classes).to eq 'help_dialog_trigger'
+    end
+
+    it "should override default help link with the configured support url" do
+      support_url = 'http://instructure.com'
+      Account.default.update_attribute(:settings, { :support_url => support_url })
+      Setting.set('show_feedback_link', 'false')
+
+      expect(helper.support_url).to eq support_url
+      expect(helper.show_help_link?).to eq true
+      expect(helper.help_link_url).to eq support_url
+      expect(helper.help_link_icon).to eq 'help'
+      expect(helper.help_link_classes).to eq 'support_url'
+    end
+
+    it "should return the configured icon" do
+      icon = 'inbox'
+      Account.default.update_attribute(:settings, { :help_link_icon => icon })
+
+      expect(helper.help_link_icon).to eq icon
+    end
+
+    it "should return the configured help link name" do
+      link_name = 'Links'
+      Account.default.update_attribute(:settings, { :help_link_name => link_name })
+
+      expect(helper.help_link_name).to eq link_name
+    end
+  end
+
   describe "hidden dialogs" do
     before do
       expect(hidden_dialogs).to be_empty

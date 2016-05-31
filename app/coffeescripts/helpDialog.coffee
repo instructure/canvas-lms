@@ -25,6 +25,7 @@ define [
     animateDuration: 100
 
     initDialog: ->
+      @defaultTitle = ENV.help_link_name || @defaultTitle
       @$dialog = $('<div style="padding:0; overflow: visible;" />').dialog
         resizable: false
         width: 400
@@ -48,7 +49,6 @@ define [
           url: window.location
           contextAssetString: ENV.context_asset_string
           userRoles: ENV.current_user_roles
-
 
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()
