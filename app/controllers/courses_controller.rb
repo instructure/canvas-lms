@@ -1600,7 +1600,7 @@ class CoursesController < ApplicationController
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
-    elsif @context.indexed
+    elsif @context.indexed && @context.available?
       render :description
     else
       # clear notices that would have been displayed as a result of processing

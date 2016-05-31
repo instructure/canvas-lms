@@ -23,7 +23,7 @@ colors = [
         <a href="/courses/<%= c.id %>"><%= c.name %></a>
       </h3>
       <p class="pad-box-mini"><%= c.public_description %></p>
-      <% if @current_user && c.open_enrollment %>
+      <% if @current_user && c.open_enrollment && c.self_enrollment_enabled? %>
         <p>
           <a class="btn course_enrollment_link" data-open-as-dialog="" href="/enroll/<%= c.self_enrollment_code %>">
             <i class="icon-user-add"></i>
