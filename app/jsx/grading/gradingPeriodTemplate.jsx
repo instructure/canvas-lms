@@ -112,13 +112,13 @@ define([
                  ref="startDate"
                  name="startDate"
                  className="input-grading-period-date date_field"
-                 defaultValue={DatesHelper.formatDateForDisplay(this.props.startDate)}
+                 defaultValue={DatesHelper.formatDatetimeForDisplay(this.props.startDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
         return (
           <div id={this.addIdToText("period_start_date_")} ref="startDate">
-            {DatesHelper.formatDateForDisplay(this.props.startDate)}
+            {DatesHelper.formatDatetimeForDisplay(this.props.startDate)}
           </div>
         );
       }
@@ -131,13 +131,13 @@ define([
                  className="input-grading-period-date date_field"
                  ref="endDate"
                  name="endDate"
-                 defaultValue={DatesHelper.formatDateForDisplay(this.props.endDate)}
+                 defaultValue={DatesHelper.formatDatetimeForDisplay(this.props.endDate)}
                  disabled={this.props.disabled}/>
         );
       } else {
         return (
           <div id={this.addIdToText("period_end_date_")} ref="endDate">
-            {DatesHelper.formatDateForDisplay(this.props.endDate)}
+            {DatesHelper.formatDatetimeForDisplay(this.props.endDate)}
           </div>
         );
       }

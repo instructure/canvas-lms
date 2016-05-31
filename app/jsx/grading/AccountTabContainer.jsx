@@ -11,9 +11,10 @@ define([
     propTypes: {
       multipleGradingPeriodsEnabled: types.bool.isRequired,
       readOnly: types.bool.isRequired,
-      URLs: types.shape({
+      urls: types.shape({
         gradingPeriodSetsURL:    types.string.isRequired,
-        gradingPeriodsUpdateURL: types.string.isRequired
+        gradingPeriodsUpdateURL: types.string.isRequired,
+        enrollmentTermsURL: types.string.isRequired
       }).isRequired
     },
 
@@ -31,7 +32,7 @@ define([
                 <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
               </ul>
               <div ref="gradingPeriods" id="grading-periods-tab">
-                <GradingPeriodSetCollection URLs={this.props.URLs}
+                <GradingPeriodSetCollection urls={this.props.urls}
                                             readOnly={this.props.readOnly} />
               </div>
               <div ref="gradingStandards" id="grading-standards-tab">

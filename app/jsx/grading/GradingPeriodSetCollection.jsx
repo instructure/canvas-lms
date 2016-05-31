@@ -7,8 +7,11 @@ define([
   'convert_case',
   'jsx/grading/GradingPeriodSet',
   'jsx/grading/SearchGradingPeriodsField',
-  'jsx/shared/helpers/searchHelpers'
-], function(React, _, $, axios, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers) {
+  'jsx/grading/EnrollmentTermsDropdown',
+  'jsx/shared/helpers/searchHelpers',
+  'jsx/gradebook/grid/helpers/datesHelper'
+], function(React, _, $, axios, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, EnrollmentTermsDropdown, SearchHelpers, DatesHelper) {
+
   const deserializeSets = function(sets) {
     return _.map(sets, function(set) {
       let newSet = ConvertCase.camelize(set);
@@ -28,31 +31,55 @@ define([
     });
   };
 
+  const deserializeEnrollmentTerms = function(enrollmentTerms) {
+    return _.map(enrollmentTerms, term => {
+      let newTerm = ConvertCase.camelize(term);
+      if(term.start_at) newTerm.startAt = new Date(term.start_at);
+      if(term.end_at) newTerm.endAt = new Date(term.end_at);
+      if(term.created_at) newTerm.createdAt = new Date(term.created_at);
+
+      if(newTerm.name) {
+        newTerm.displayName = newTerm.name;
+      } else if(_.isDate(newTerm.startAt)) {
+        let started = DatesHelper.formatDateForDisplay(newTerm.startAt);
+        newTerm.displayName = I18n.t("Term starting ") + started;
+      } else {
+        let created = DatesHelper.formatDateForDisplay(newTerm.createdAt);
+        newTerm.displayName = I18n.t("Term created ") + created;
+      }
+
+      return newTerm;
+    });
+  };
+
   const types = React.PropTypes;
 
   let GradingPeriodSetCollection = React.createClass({
     propTypes: {
       readOnly: types.bool.isRequired,
-      URLs: types.shape({
+      urls: types.shape({
         gradingPeriodSetsURL:    types.string.isRequired,
-        gradingPeriodsUpdateURL: types.string.isRequired
+        gradingPeriodsUpdateURL: types.string.isRequired,
+        enrollmentTermsURL: types.string.isRequired
       }).isRequired
     },
 
-    getInitialState: function() {
+    getInitialState() {
       return {
+        enrollmentTerms: [],
         sets: [],
-        showNewSetForm: false,
-        searchText: ""
+        searchText: "",
+        selectedTermID: 0
       };
     },
 
-    componentWillMount: function() {
+    componentWillMount() {
+      this.getTerms();
       this.getSets();
     },
 
-    getSets: function() {
-      axios.get(this.props.URLs.gradingPeriodSetsURL)
+    getSets() {
+      axios.get(this.props.urls.gradingPeriodSetsURL)
            .then((response) => {
               this.setState({
                 sets: deserializeSets(response.data.grading_period_sets)
@@ -63,17 +90,16 @@ define([
             });
     },
 
-    renderNewGradingPeriodSetForm: function() {
-      if(!this.state.showNewSetForm) return null;
-
-      return (
-        <NewGradingPeriodSetForm
-          ref="newSetForm"
-          closeForm={this.closeNewSetForm}
-          URLs={this.props.URLs}
-        />
-      );
-    },
+    getTerms() {
+      axios.get(this.props.urls.enrollmentTermsURL)
+           .then((response) => {
+              const enrollmentTerms = deserializeEnrollmentTerms(response.data.enrollment_terms);
+              this.setState({ enrollmentTerms: enrollmentTerms });
+            })
+           .catch(function (response) {
+              $.flashError(I18n.t("An error occured while fetching enrollment terms."));
+            });
+     },
 
     setAndGradingPeriodTitles(set) {
       let titles = _.pluck(set.gradingPeriods, 'title');
@@ -87,24 +113,42 @@ define([
       });
     },
 
-    filterSetsBySearchText: function() {
-      if (this.state.searchText === "") return this.state.sets;
+    filterSetsBySearchText(sets, searchText) {
+      if (searchText === "") return sets;
 
-      return _.filter(this.state.sets, (set) => {
+      return _.filter(sets, (set) => {
         let titles = this.setAndGradingPeriodTitles(set);
         return this.searchTextMatchesTitles(titles);
       });
     },
 
-    changeSearchText: function(searchText) {
+    changeSearchText(searchText) {
       if (searchText !== this.state.searchText) {
         this.setState({ searchText: searchText });
       }
     },
 
-    renderSets: function() {
-      let urls = { batchUpdateUrl: this.props.URLs.gradingPeriodsUpdateURL };
-      let visibleSets = this.filterSetsBySearchText();
+    filterSetsByActiveTerm(sets, terms, selectedTermID) {
+      if (selectedTermID === 0) return sets;
+
+      const activeTerm = _.findWhere(terms, { id: selectedTermID });
+      const setID = activeTerm.gradingPeriodGroupId;
+      return _.where(sets, { id: setID.toString() });
+    },
+
+    changeSelectedEnrollmentTerm(event) {
+      this.setState({ selectedTermID: parseInt(event.target.value) });
+    },
+
+    getVisibleSets() {
+      let setsFilteredBySearchText = this.filterSetsBySearchText(this.state.sets, this.state.searchText);
+      let filterByTermArgs = [setsFilteredBySearchText, this.state.enrollmentTerms, this.state.selectedTermID];
+      return this.filterSetsByActiveTerm(...filterByTermArgs);
+    },
+
+    renderSets() {
+      const urls = { batchUpdateUrl: this.props.urls.gradingPeriodsUpdateURL };
+      let visibleSets = this.getVisibleSets();
       return _.map(visibleSets, set => {
         return (
           <GradingPeriodSet key={set.id}
@@ -112,18 +156,20 @@ define([
                             gradingPeriods={set.gradingPeriods}
                             urls={urls}
                             readOnly={this.props.readOnly}
-                            permissions={set.permissions} />
+                            permissions={set.permissions}
+                            terms={this.state.enrollmentTerms} />
         );
       });
     },
 
-    render: function() {
+    render() {
       return (
         <div>
           <div className="GradingPeriodSets__toolbar header-bar no-line">
+            <EnrollmentTermsDropdown
+              terms={this.state.enrollmentTerms}
+              changeSelectedEnrollmentTerm={this.changeSelectedEnrollmentTerm} />
             <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
-            <div className="header-bar-right">
-            </div>
           </div>
           <div>
             {this.renderSets()}

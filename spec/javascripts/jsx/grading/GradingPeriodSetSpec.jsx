@@ -54,7 +54,8 @@ define([
     gradingPeriods: examplePeriods,
     readOnly: false,
     urls: urls,
-    permissions: allPermissions
+    permissions: allPermissions,
+    terms: []
   };
 
   module("GradingPeriodSet", {
@@ -101,7 +102,8 @@ define([
         gradingPeriods: [],
         urls: urls,
         permissions: _.defaults(permissions, allPermissions),
-        readOnly: readOnly
+        readOnly: readOnly,
+        terms: []
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);
@@ -157,7 +159,8 @@ define([
         gradingPeriods: [],
         urls: urls,
         readOnly: false,
-        permissions: allPermissions
+        permissions: allPermissions,
+        terms: []
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);

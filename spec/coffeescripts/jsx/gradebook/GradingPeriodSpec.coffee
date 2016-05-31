@@ -77,8 +77,8 @@ define [
     @gradingPeriod.onTitleChange(fakeEvent)
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
-  test 'replaceInputWithDate calls formatDateForDisplay', ->
-    formatDate = @stub(DatesHelper, 'formatDateForDisplay')
+  test 'replaceInputWithDate calls formatDatetimeForDisplay', ->
+    formatDatetime = @stub(DatesHelper, 'formatDatetimeForDisplay')
     fakeDateElement = { val: -> }
     @gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
-    ok formatDate.calledOnce
+    ok formatDatetime.calledOnce

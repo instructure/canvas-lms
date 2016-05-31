@@ -3,10 +3,21 @@
 .ItemGroup__header {
   background-color: $lightBackground;
   border: 1px solid $ic-border-light;
-  display: flex;
   min-height: 30px;
   padding: $ic-sp;
   position: relative;
+}
+
+.ItemGroup__header__toggle {
+  display: inline-block;
+  flex: 0 0 auto;
+  margin: auto;
+  text-decoration: none;
+}
+
+.ItemGroup__header__details {
+  display: flex;
+  flex: 1 1 auto;
 }
 
 .ItemGroup__header__title {
@@ -20,7 +31,8 @@
 
 .ItemGroup__header__admin {
   align-self: center;
-  display: flex;
+  float: right;
+  display: inline-block;
   flex: 0 0 auto;
 }
 
@@ -43,6 +55,9 @@
 
 .GradingPeriodSearchField {
   width: 250px;
+  display: inline-block;
+  padding-left: 12px;
+  margin-bottom: 0px;
 }
 
 // GRADING PERIOD SET

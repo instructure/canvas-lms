@@ -71,7 +71,7 @@ define([
 
     replaceInputWithDate: function(dateType, dateElement) {
       var date = this.state[dateType];
-      dateElement.val(DatesHelper.formatDateForDisplay(date));
+      dateElement.val(DatesHelper.formatDatetimeForDisplay(date));
     },
 
     render: function () {

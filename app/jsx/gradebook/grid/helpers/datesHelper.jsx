@@ -13,8 +13,12 @@ define([
       return object;
     },
 
-    formatDateForDisplay: function(date) {
+    formatDatetimeForDisplay: function(date) {
       return $.datetimeString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
+    },
+
+    formatDateForDisplay: function(date) {
+      return $.dateString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
     },
 
     isMidnight: function(date) {

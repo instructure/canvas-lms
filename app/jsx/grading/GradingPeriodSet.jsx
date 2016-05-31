@@ -65,6 +65,7 @@ define([
         title: types.string
       }).isRequired,
       gradingPeriods: types.array.isRequired,
+      terms: types.array.isRequired,
       urls:           types.shape({
         batchUpdateUrl: types.string.isRequired
       }).isRequired,
@@ -104,6 +105,17 @@ define([
       e.stopPropagation();
     },
 
+    setTerms() {
+      return _.filter(this.props.terms, (term) => {
+        return term.gradingPeriodGroupId === parseInt(this.props.set.id);
+      });
+    },
+
+    termNames() {
+      const names = _.pluck(this.setTerms(), "displayName");
+      return I18n.t("Terms: ") + names.join(", ");
+    },
+
     editSet(e) {
       e.stopPropagation();
     },
@@ -130,6 +142,8 @@ define([
     },
 
     renderSetBody() {
+      if(!this.state.expanded) return null;
+
       return (
         <div ref="setBody" className="ig-body">
           <div className="GradingPeriodList" ref="gradingPeriodList">
@@ -156,20 +170,25 @@ define([
           <div className="ItemGroup__header"
                ref="toggleSetBody"
                onClick={this.toggleSetBody}>
-            <div className="ItemGroup__header__title">
-              <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
-                      aria-expanded={this.state.expanded}
-                      aria-label="Toggle grading period visibility">
-                <i className={"icon-mini-arrow-" + arrow}/>
-              </button>
-              <span className="screenreader-only">{I18n.t("Grading period title")}</span>
-              <h2 tabIndex="0" className="GradingPeriodSet__title">
-                {this.props.set.title}
-              </h2>
+            <div>
+              <div className="ItemGroup__header__title">
+                <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
+                        aria-expanded={this.state.expanded}
+                        aria-label="Toggle grading period visibility">
+                  <i className={"icon-mini-arrow-" + arrow}/>
+                </button>
+                <span className="screenreader-only">{I18n.t("Grading period title")}</span>
+                <h2 tabIndex="0" className="GradingPeriodSet__title">
+                  {this.props.set.title}
+                </h2>
+              </div>
+              {this.renderEditAndDeleteIcons()}
             </div>
-            {this.renderEditAndDeleteIcons()}
+            <div className="EnrollmentTerms__list" tabIndex="0">
+              {this.termNames()}
+            </div>
           </div>
-          {this.state.expanded && this.renderSetBody()}
+          {this.renderSetBody()}
         </div>
       );
     },

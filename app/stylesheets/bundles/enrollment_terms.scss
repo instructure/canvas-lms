@@ -1,0 +1,11 @@
+@import "base/environment";
+
+.EnrollmentTerms__dropdown {
+  background-color: $lightBackground;
+  margin-bottom: 2px;
+}
+
+.EnrollmentTerms__list {
+  margin-left: 24px;
+  @include fontSize($ic-font-size--xsmall);
+}
