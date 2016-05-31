@@ -50,52 +50,33 @@ describe 'quizzes stats' do
         quiz_with_submission
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
       end
-      it 'should have a student analysis button tooltip', priority: "2", test_id: 270038 do
-        expect(f('.report-generator')).not_to include_text('Report has been generated')
 
-        # move mouse over button
-        driver.mouse.move_to f('.report-generator')
-        wait_for_ajaximations
-        expect(f('.report-generator')).to include_text('Generate student analysis report')
-      end
+      ['Student Analysis', 'Item Analysis'].each do |report_type|
+        it "should have a item #{report_type} button tooltip", priority: "2", test_id: 270040 do
+          expect(fj(".report-generator:contains('#{report_type}')")).not_to include_text('Report has been generated')
 
-      it 'should download a csv when pressing student analysis button ', priority: "1", test_id: 140638 do
-        f('.generate-report').click
-        wait_for_ajaximations
+          # move mouse over button
+          driver.mouse.move_to f('#header')
+          wait_for_ajaximations
+          expect(fj(".report-generator:contains('#{report_type}')")).to include_text("Generate #{report_type.downcase} report")
+        end
 
-        # our env never creates a csv so the best we can do is check for it attempting to download it
+        it 'should download a csv when pressing #{report_type} button ', priority: "1", test_id: 270039 do
+          button = fj(".generate-report:contains('#{report_type}')")
+          button.click
+          wait_for_ajaximations
 
-        # move away so the tooltip can be recreated
-        driver.mouse.move_to ff('.report-generator')[1]
-        wait_for_ajaximations
+          # our env never creates a csv so the best we can do is check for it attempting to download it
 
-        # move mouse back over button
-        driver.mouse.move_to f('.report-generator')
-        expect(f('.quiz-report-status')).to include_text('Report is being generated')
-      end
+          # move away so the tooltip can be recreated
+          driver.mouse.move_to f('#header')
+          wait_for_ajaximations
 
-      it 'should have a item analysis button tooltip', priority: "2", test_id: 270040 do
-        expect(ff('.report-generator')[1]).not_to include_text('Report has been generated')
-
-        # move mouse over button
-        driver.mouse.move_to ff('.report-generator')[1]
-        wait_for_ajaximations
-        expect(ff('.report-generator')[1]).to include_text('Generate item analysis report')
-      end
-
-      it 'should download a csv when pressing item analysis button ', priority: "1", test_id: 270039 do
-        ff('.generate-report')[1].click
-        wait_for_ajaximations
-
-        # our env never creates a csv so the best we can do is check for it attempting to download it
-
-        # move away so the tooltip can be recreated
-        driver.mouse.move_to ff('.report-generator')[0]
-        wait_for_ajaximations
-
-        # move mouse back over button
-        driver.mouse.move_to ff('.report-generator')[1]
-        expect(ff('.quiz-report-status')[1]).to include_text('Report is being generated')
+          # move mouse back over button
+          driver.mouse.move_to button
+          wait_for_ajaximations
+          expect(fj('.quiz-report-status:contains("Report is being generated")')).to be_present
+        end
       end
     end
   end

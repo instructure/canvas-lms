@@ -91,8 +91,8 @@ describe "scheduler" do
       fill_out_appointment_group_form("blah", :skip_contexts => true)
       f('.ag_contexts_selector').click
       expect(f('.ag_sections_toggle.ag-sections-expanded')).to_not be_nil # should already be expanded
-      expect(f('[name="context_codes[]"]').attribute("disabled")).to_not be_nil # course checkbox should be disabled
-      expect(ff("[name='sections[]']").count).to eq 1 # should only show one section
+      expect(f('[name="context_codes[]"]')).to be_disabled # course checkbox should be disabled
+      expect(ff("[name='sections[]']")).to have_size 1 # should only show one section
 
       f("[name='sections[]'][value='#{section.asset_string}']").click
       f('.ag_contexts_done').click

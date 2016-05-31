@@ -192,6 +192,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
       @saml_hash['jit_provisioning'] = false
+      @saml_hash['metadata_uri'] = nil
       expect(json).to eq @saml_hash
     end
 

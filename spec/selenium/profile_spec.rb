@@ -270,11 +270,9 @@ describe "profile" do
 
     it "should link back to profile/settings in oauth callbacks" do
       get "/profile/settings"
-      links = ffj('#unregistered_services .service .content a')
+      links = ff('#unregistered_services .service .content a')
       links.each do |l|
-        url = l.attribute('href')
-        query = URI.parse(url).query
-        expect(CGI.unescape(query)).to match /profile\/settings/
+        expect(l).to have_attribute('href', 'profile%2Fsettings')
       end
     end
   end

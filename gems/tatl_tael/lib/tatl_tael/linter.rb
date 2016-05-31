@@ -26,12 +26,17 @@ module TatlTael
       yield if needs_jsx_specs? && !jsx_specs?
     end
 
+    def ensure_public_js_specs
+      yield if needs_public_js_specs? && !public_js_specs
+    end
+
     def ensure_ruby_specs
       yield if needs_ruby_specs? && !ruby_specs?
     end
 
     def ensure_no_unnecessary_selenium_specs
       yield if selenium_specs? && (
+        needs_public_js_specs? && !public_js_specs ||
         needs_coffee_specs? && !coffee_specs? ||
         needs_jsx_specs? && !jsx_specs? ||
         needs_ruby_specs? && !ruby_specs?
@@ -50,13 +55,31 @@ module TatlTael
       end
     end
 
-    NEED_COFFEE_SPECS_REGEX = /(app\/coffeescripts\/.*\.coffee|public\/javascripts\/.*.js)$/
-    EXCLUDED_SUB_DIRS_REGEX = /(bundles|bower|mediaelement|shims|vendor)\//
+    NEED_SPEC_PUBLIC_JS_REGEX = /public\/javascripts\/.*.js$/
+    EXCLUDED_PUBLIC_SUB_DIRS_REGEX = /(bower|mediaelement|shims|vendor)\//
+    def needs_public_js_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ NEED_SPEC_PUBLIC_JS_REGEX &&
+          change.path !~ EXCLUDED_PUBLIC_SUB_DIRS_REGEX
+      end
+    end
+
+    PUBLIC_JS_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\//
+    def public_js_specs
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ PUBLIC_JS_SPEC_REGEX
+      end
+    end
+
+    NEED_COFFEE_SPECS_REGEX = /app\/coffeescripts\/.*\.coffee$/
+    EXCLUDED_COFFEE_SUB_DIRS_REGEX = /bundles\//
     def needs_coffee_specs?
       changes.any? do |change|
         !change.deleted? &&
           change.path =~ NEED_COFFEE_SPECS_REGEX &&
-          change.path !~ EXCLUDED_SUB_DIRS_REGEX
+          change.path !~ EXCLUDED_COFFEE_SUB_DIRS_REGEX
       end
     end
 
@@ -76,11 +99,11 @@ module TatlTael
       end
     end
 
-    JSX_SPEC_REGEX = /spec\/jsx\//
+    JSX_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\/jsx\//
     def jsx_specs?
       changes.any? do |change|
         !change.deleted? &&
-          change.path =~ COFFEE_SPEC_REGEX
+          change.path =~ JSX_SPEC_REGEX
       end
     end
 

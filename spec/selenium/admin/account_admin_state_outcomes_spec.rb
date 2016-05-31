@@ -50,19 +50,15 @@ describe "account admin outcomes" do
       import_state_standards_to_account(state_outcome)
       el1 = fj(".outcome-level:first .outcome-group .ellipsis")
       el2 = fj(".outcome-level:last .outcome-link .ellipsis")
-      keep_trying_until do
-        expect(el1).to have_attribute("title", 'Something else')
-        expect(el2).to have_attribute("title", '1.DD.1')
-      end
+      expect(el1).to have_attribute("title", 'Something else')
+      expect(el2).to have_attribute("title", '1.DD.1')
     end
 
     it "should import a state standard into account level", priority: "2", test_id: 56017 do
       outcome = ['NGA Center/CCSSO']
       import_state_standards_to_account(outcome)
       el = fj('.outcome-level:first .outcome-group .ellipsis')
-      keep_trying_until do
-        expect(el).to have_attribute("title", 'NGA Center/CCSSO')
-      end
+      expect(el).to have_attribute("title", 'NGA Center/CCSSO')
     end
 
     it "should import account outcomes into course", priority: "1", test_id: 56585 do
@@ -111,9 +107,7 @@ describe "account admin outcomes" do
 
         # make sure the last one is the Z guy
         last_el = ffj(".outcome-level:last .outcome-group .ellipsis").last
-        keep_trying_until do
-          expect(last_el).to have_attribute("title", 'Z is last')
-        end
+        expect(last_el).to have_attribute("title", 'Z is last')
       end
     end
   end

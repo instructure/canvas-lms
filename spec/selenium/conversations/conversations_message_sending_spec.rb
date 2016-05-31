@@ -194,13 +194,13 @@ describe "conversations new" do
         selector = "#bulk_message"
         bulk_cb = f(selector)
 
-        expect(bulk_cb.attribute('disabled')).to be_present
+        expect(bulk_cb).to be_disabled
         expect(is_checked(selector)).to be_truthy
 
         hover_and_click('.ac-token-remove-btn') # remove the token
         wait_for_ajaximations
 
-        expect(bulk_cb.attribute('disabled')).to be_blank
+        expect(bulk_cb).not_to be_disabled
         expect(is_checked(selector)).to be_falsey # should be unchecked
       end
 
@@ -217,9 +217,8 @@ describe "conversations new" do
         f("li.everyone").click # send to everybody in the course
         wait_for_ajaximations
         hover_and_click('.ac-token-remove-btn') # remove the token
-        wait_for_ajaximations
 
-        expect(bulk_cb.attribute('disabled')).to be_blank
+        expect(bulk_cb).not_to be_disabled
         expect(is_checked(selector)).to be_truthy # should still be checked
       end
 

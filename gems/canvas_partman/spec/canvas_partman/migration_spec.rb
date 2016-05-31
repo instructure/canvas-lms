@@ -18,7 +18,7 @@ describe CanvasPartman::Migration do
   end
 
   it 'should apply a migration on all partition tables' do
-    partman = CanvasPartman::PartitionManager.new(Animal)
+    partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 
     Animal.transaction do
@@ -33,7 +33,7 @@ describe CanvasPartman::Migration do
   end
 
   it 'should apply multiple migrations' do
-    partman = CanvasPartman::PartitionManager.new(Animal)
+    partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 
     Animal.transaction do
@@ -70,7 +70,7 @@ describe CanvasPartman::Migration do
   end
 
   it 'should apply multiple migrations on multiple partitions' do
-    partman = CanvasPartman::PartitionManager.new(Animal)
+    partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
     partman.create_partition(Time.new(2014, 12))
 
@@ -126,7 +126,7 @@ describe CanvasPartman::Migration do
   end
 
   it 'should accept an explicitly specified base class' do
-    partman = CanvasPartman::PartitionManager.new(CanvasPartmanTest::AnimalAlias)
+    partman = CanvasPartman::PartitionManager.create(CanvasPartmanTest::AnimalAlias)
     partman.create_partition(Time.new(2014, 11))
 
     Animal.transaction do
@@ -141,7 +141,7 @@ describe CanvasPartman::Migration do
   end
 
   it 'should add/remove indices just fine' do
-    partman = CanvasPartman::PartitionManager.new(Animal)
+    partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 
     Animal.transaction do

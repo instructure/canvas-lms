@@ -55,7 +55,7 @@ describe "help dialog" do
       get "/dashboard"
       link = f('.support_url')
       expect(link['href']).to eq support_url
-      expect(link['class']).not_to match 'help_dialog_trigger'
+      expect(link).not_to have_class 'help_dialog_trigger'
 
       # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
       Setting.set('show_feedback_link', 'true')

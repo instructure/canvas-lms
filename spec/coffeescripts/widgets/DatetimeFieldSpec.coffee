@@ -259,6 +259,13 @@ define [
     @field.parseValue()
     equal tz.format(@field.datetime, '%-l%P'), '1pm'
 
+  test 'interprets time-only fields as occurring on implicit date if set', ->
+    @field.showDate = false
+    @field.setDate(moonwalk)
+    @$field.val("12PM")
+    @field.parseValue()
+    equal tz.format(@field.datetime, '%F %T'), tz.format(moonwalk, '%F ') + '12:00:00'
+
   module 'updateData',
     setup: ->
       @snapshot = tz.snapshot()

@@ -22,7 +22,7 @@ You can tune several partitioning parameters which you can find in the concern's
 The next step is to set up our partitions so that we can start creating records.
 
 ```ruby
-partman = CanvasPartman::PartitionManager.new(Newsletter)
+partman = CanvasPartman::PartitionManager.create(Newsletter)
 
 # a partition for this month's data:
 partman.create_partition(Time.now)
@@ -138,6 +138,26 @@ class AddPublisherToNewsletters < ActiveRecord::Migration
     # Done! No need to worry about handling each partition,
     # pg inheritance will add this column to the master
     # table as well as the existing partition tables.
+  end
+end
+```
+
+### Migrating existing data to partitions
+
+If you already have a table full of data with indexes, you can gracefully switch to a partitioned scheme by writing a non-scoped migration like so:
+
+```ruby
+# db/migrate/20161115282318_migrate_versions_to_partitions.rb
+
+class MigrateVersionsToPartitions < ActiveRecord::Migration
+  def up
+    partman = CanvasPartman::PartitionManager.create(Version)
+
+    # create tables to hold the existing data
+    partman.create_initial_partitions
+    
+    # then move the data over
+    partman.migrate_data_to_partitions
   end
 end
 ```

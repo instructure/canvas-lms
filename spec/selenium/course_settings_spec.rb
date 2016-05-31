@@ -254,8 +254,8 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view').attribute('disabled')).to be_nil
-    expect(f('#course_restrict_student_future_view').attribute('disabled')).to_not be_nil
+    expect(f('#course_restrict_student_past_view')).not_to be_disabled
+    expect(f('#course_restrict_student_future_view')).to be_disabled
 
     expect(is_checked('#course_restrict_student_future_view')).to be_truthy
   end
@@ -271,7 +271,7 @@ describe "course settings" do
     get "/courses/#{@course.id}/settings"
 
     ffj("#tab-details input:visible").each do |input|
-      expect(input.attribute('disabled')).to be_present
+      expect(input).to be_disabled
     end
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end

@@ -74,18 +74,13 @@ describe "managing developer keys" do
 
   it "should show the first 10 by default, with pagination working" do
     count = DeveloperKey.count
-    25.times { |i| DeveloperKey.create!(:name => "tool #{i}") }
+    11.times { |i| DeveloperKey.create!(:name => "tool #{i}") }
     get '/developer_keys'
     expect(f("#loading")).not_to have_class('loading')
-    expect(ff("#keys tbody tr").length).to eq 10
+    expect(ff("#keys tbody tr")).to have_size(10)
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
-    wait_for_ajaximations
-    loading = f("#loading")
-    keep_trying_until do
-      expect(loading).not_to have_class('loading')
-      true
-    end
-    expect(ff("#keys tbody tr").length).to eq count + 25
+    expect(f("#loading")).not_to have_class('loading')
+    expect(ff("#keys tbody tr")).to have_size(count + 11)
   end
 end

@@ -7,7 +7,7 @@ class DropBrokenQuizSubmissionEventPartitions < ActiveRecord::Migration
   ]
 
   def up
-    partman = CanvasPartman::PartitionManager.new(Quizzes::QuizSubmissionEvent)
+    partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
 
     # This is a manual fix needed for the very first two partitions created
     # before canvas-partman supported real migrations for managing partition

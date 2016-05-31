@@ -159,7 +159,8 @@ describe "context modules" do
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       check_element_has_focus f("#add_context_module_form .assignment_picker")
-      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
+      # be_disabled
+      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]')).to be_disabled
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
 
@@ -327,7 +328,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
 
-      expect(locked_title[0].attribute(:title)).to eq text_header
+      expect(locked_title[0]).to have_attribute("title", text_header)
     end
 
     it "should not rename every text header when you rename one" do
@@ -792,16 +793,12 @@ describe "context modules" do
         wait_for_ajaximations(1000)
         context_module_items[0].send_keys("i")
         item = f('.context_module_item')
-        keep_trying_until do
-          expect(item).to have_class('indent_1')
-        end
+        expect(item).to have_class('indent_1')
 
         wait_for_ajaximations(1000)
         ff('.context_module_item a.title')[0].send_keys("o")
         item = f('.context_module_item')
-        keep_trying_until do
-          expect(item).to have_class('indent_0')
-        end
+        expect(item).to have_class('indent_0')
 
         # Test Delete key
         wait_for_ajaximations(1000)
@@ -911,8 +908,8 @@ describe "context modules" do
 
       # make sure the completion criterion was preserved
       module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item.attribute('class').split).to include 'must_submit_requirement'
-      expect(f('.criterion', module_item).attribute('class').split).to include 'defined'
+      expect(module_item).to have_class 'must_submit_requirement'
+      expect(f('.criterion', module_item)).to have_class 'defined'
       expect(driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()")).to eq "must_submit"
     end
 

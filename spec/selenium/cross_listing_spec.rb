@@ -21,7 +21,7 @@ describe "cross-listing" do
     form = f('#crosslist_course_form')
     submit_btn = form.find_element(:css, '.submit_button')
     expect(form).not_to be_nil
-    expect(form.find_element(:css, '.submit_button')).to have_attribute(:disabled,'true')
+    expect(form.find_element(:css, '.submit_button')).to be_disabled
 
     course_id   = form.find_element(:id, 'course_id')
     course_name = f('#course_autocomplete_name')
@@ -77,7 +77,7 @@ describe "cross-listing" do
     get "/courses/#{course.id}/sections/#{section.id}"
     f(".crosslist_link").click
     form = f("#crosslist_course_form")
-    expect(form.find_element(:css, ".submit_button")).to have_attribute(:disabled, "true")
+    expect(form.find_element(:css, ".submit_button")).to be_disabled
     expect(form).not_to be_nil
 
     # let's try and crosslist an invalid course

@@ -44,20 +44,16 @@ describe "better_file_browsing" do
       it "should unpublish and publish a file", priority: "1", test_id: 133096 do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        expect(driver.find_element(:class => 'unpublished')).to be_displayed
         set_item_permissions(:publish, :cloud_icon)
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(driver.find_element(:class => 'published')).to be_displayed
       end
       it "should make file available to student with link", priority: "1", test_id: 223504 do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
-        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
       it "should make file available to student within given timeframe", priority: "1", test_id: 223505 do
         set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
-        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
     end
 
@@ -69,20 +65,16 @@ describe "better_file_browsing" do
       it "should unpublish and publish a file", priority: "1", test_id: 223503 do
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        expect(driver.find_element(:class => 'unpublished')).to be_displayed
         set_item_permissions(:publish, :toolbar_menu)
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(driver.find_element(:class => 'published')).to be_displayed
       end
       it "should make file available to student with link from toolbar", priority: "1", test_id: 193158 do
         set_item_permissions(:restricted_access, :available_with_link, :toolbar_menu)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
-        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
       it "should make file available to student within given timeframe from toolbar", priority: "1", test_id: 193159 do
         set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
-        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
 
       it "should disable the file preview button when a folder is selected" do

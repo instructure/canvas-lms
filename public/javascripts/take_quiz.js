@@ -84,7 +84,7 @@ define([
       finalSubmitButtonClicked: false,
       clockInterval: 500,
       backupsDisabled: document.location.search.search(/backup=false/) > -1,
-      clearAccessCode: false,
+      clearAccessCode: true,
       updateSubmission: function(repeat, autoInterval) {
         /**
          * Transient: CNVS-9844
@@ -429,7 +429,6 @@ define([
       false)
 
       $(document).delegate('a', 'click', function(event) {
-        quizSubmission.clearAccessCode = true
         if($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) { return; }
 
         if($(this).hasClass('no-warning')) {
@@ -479,6 +478,9 @@ define([
             var relatedQuestion = $(this).data('relatedQuestion')
             relatedQuestion && relatedQuestion.removeClass('related');
           }
+        },
+        click: function(event) {
+          quizSubmission.clearAccessCode = false
         }
       });
 

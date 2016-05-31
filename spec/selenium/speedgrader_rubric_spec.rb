@@ -42,7 +42,6 @@ describe "speed grader - rubrics" do
     expect(f('#rubric_summary_container > .rubric_container')).to be_displayed
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
     expect(f('#rubric_summary_container .rubric_total')).to include_text('8')
-    wait_for_ajaximations
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
@@ -86,7 +85,7 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
     f('.toggle_full_rubric').click
     wait_for_ajaximations
-    expect(f('.rubric_container .criterion_points').attribute(:value)).to eq('')
+    expect(f('.rubric_container .criterion_points')).to have_value('')
   end
 
   it "ignores rubric lines for grading", priority: "1", test_id: 283989 do

@@ -44,7 +44,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       :idp_entity_id,
       :parent_registration,
       :jit_provisioning,
-      :metadata
+      :metadata,
+      :metadata_uri
     ].freeze
   end
 
@@ -55,6 +56,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   SENSITIVE_PARAMS = [:metadata].freeze
 
   before_validation :set_saml_defaults
+  before_validation :download_metadata
   validates_presence_of :entity_id
 
   def auth_provider_filter
@@ -68,6 +70,40 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+
+  def download_metadata
+    return unless metadata_uri.present?
+    return unless metadata_uri_changed? || idp_entity_id_changed?
+    # someone's trying to cheat; switch to our more efficient implementation
+    self.metadata_uri = InCommon::URN if metadata_uri == InCommon.endpoint
+
+    if metadata_uri == InCommon::URN
+      unless idp_entity_id.present?
+        errors.add(:idp_entity_id, :present)
+        return
+      end
+
+      begin
+        entity = InCommon.metadata[idp_entity_id]
+        unless entity
+          errors.add(:idp_entity_id, t("Entity %{entity_id} not found in InCommon Metadata", entity_id: idp_entity_id))
+          return
+        end
+        populate_from_metadata(entity)
+      rescue => e
+        ::Canvas::Errors.capture_exception(:incommon, e)
+        errors.add(:metadata_uri, e.message)
+      end
+      return
+    end
+
+    begin
+      populate_from_metadata_url(metadata_uri)
+    rescue => e
+      ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
+      errors.add(:metadata_uri, e.message)
+    end
   end
 
   def self.login_attributes
@@ -104,18 +140,23 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
   def populate_from_metadata_xml(xml)
     entity = SAML2::Entity.parse(xml)
+    raise "Invalid schema" unless entity.valid_schema?
+    if entity.is_a?(SAML2::Entity::Group) && idp_entity_id.present?
+      entity = entity.find { |e| e.entity_id == idp_entity_id }
+    end
     raise "Must be a single Entity" unless entity.is_a?(SAML2::Entity)
     populate_from_metadata(entity)
   end
   alias_method :metadata=, :populate_from_metadata_xml
 
   def populate_from_metadata_url(url)
-    response = ::Canvas.timeout_protection("saml_metadata_fetch") do
-      CanvasHttp.get(url)
+    ::Canvas.timeout_protection("saml_metadata_fetch") do
+      CanvasHttp.get(url) do |response|
+        # raise error unless it's a 2xx
+        response.value
+        populate_from_metadata_xml(response.body)
+      end
     end
-    # raise error unless it's a 2xx
-    response.value
-    populate_from_metadata_xml(response.body)
   end
 
   def saml_settings(current_host=nil)

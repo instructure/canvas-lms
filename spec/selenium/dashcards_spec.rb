@@ -177,11 +177,9 @@ describe 'dashcards' do
         rgb = convert_hex_to_rgb_color(new_color)
         get '/'
         hero = f('.ic-DashboardCard__header_hero')
-        keep_trying_until(5) do
-          expect(hero.attribute(:style)).to include(rgb)
-        end
+        expect(hero).to have_attribute("style", rgb)
         refresh_page
-        expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
+        expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
         expect(f('.ic-DashboardCard__header-title')).to include_text(@course1.name)
       end
 
@@ -196,9 +194,9 @@ describe 'dashcards' do
         expect(f('.ic-DashboardCard__header-title')).to include_text(@course1.name)
         if f('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
           rgb = convert_hex_to_rgb_color(hex)
-          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
+          expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
         else
-          expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(hex)
+          expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", hex)
         end
       end
     end
@@ -228,11 +226,9 @@ describe 'dashcards' do
         f('.ColorPicker__Container .Button--primary').click
         rgb = convert_hex_to_rgb_color(new_color)
         hero = f('.ic-DashboardCard__header_hero')
-        keep_trying_until(5) do
-          expect(hero.attribute(:style)).to include(rgb)
-        end
+        expect(hero).to have_attribute("style", rgb)
         refresh_page
-        expect(f('.ic-DashboardCard__header_hero').attribute(:style)).to include(rgb)
+        expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
       end
 
       it 'should initially focus the nickname input' do
@@ -245,13 +241,11 @@ describe 'dashcards' do
         replace_content(f("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         hero = f('.ic-DashboardCard__header_hero')
-        keep_trying_until(5) do
-          if hero.attribute(:style).include?('rgb')
-            rgb = convert_hex_to_rgb_color(hex)
-            expect(hero.attribute(:style)).to include(rgb)
-          else
-            expect(hero.attribute(:style)).to include(hex)
-          end
+        if hero.attribute(:style).include?('rgb')
+          rgb = convert_hex_to_rgb_color(hex)
+          expect(hero).to have_attribute("style", rgb)
+        else
+          expect(hero).to have_attribute("style", hex)
         end
       end
 

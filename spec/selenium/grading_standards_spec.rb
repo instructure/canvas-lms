@@ -55,7 +55,7 @@ describe "grading standards" do
 
       dialog.find_element(:css, ".find_grading_standard_link").click
       find_grading_standard = f(".find_grading_standard")
-      keep_trying_until { expect(find_grading_standard).to have_class("loaded") }
+      expect(find_grading_standard).to have_class("loaded")
       expect(dialog.find_element(:css, ".find_grading_standard")).to be_displayed
       expect(dialog.find_element(:css, ".display_grading_standard")).not_to be_displayed
       dialog.find_element(:css, ".cancel_find_grading_standard_link").click
@@ -96,7 +96,7 @@ describe "grading standards" do
 
       dialog.find_element(:css, ".find_grading_standard_link").click
       find_grading_standard = f(".find_grading_standard")
-      keep_trying_until { expect(find_grading_standard).to have_class("loaded") }
+      expect(find_grading_standard).to have_class("loaded")
       expect(dialog.find_elements(:css, ".grading_standard_select .title")[-1].text).to eq @standard.title
       dialog.find_elements(:css, ".grading_standard_select")[-1].click
       expect(standard_brief = dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).to be_displayed

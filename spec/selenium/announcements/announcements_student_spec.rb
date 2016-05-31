@@ -111,6 +111,7 @@ describe "announcements" do
         @student.enrollments.first.update_attribute(:workflow_state, 'active')
         @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         expect(ff('.title .count')[0].text).to eq '1'
         @student.enrollments.first.update_attribute(:workflow_state, 'deleted')
         get "/"

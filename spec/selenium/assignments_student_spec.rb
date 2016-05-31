@@ -196,7 +196,7 @@ describe "assignments" do
         expect(submit_file_button['disabled']).to be_nil
         submission_input.send_keys(fullpath_zip)
         expect(ext_error).to be_displayed
-        expect(submit_file_button).to have_attribute(:disabled, "true")
+        expect(submit_file_button).to be_disabled
       end
     end
 

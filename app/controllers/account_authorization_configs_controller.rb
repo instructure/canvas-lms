@@ -441,6 +441,17 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   An XML document to parse as SAML metadata, and automatically populate idp_entity_id,
   #   log_in_url, log_out_url, certificate_fingerprint, and identifier_format
   #
+  # - metadata_uri [Optional]
+  #
+  #   A URI to download the SAML metadata from, and automatically populate idp_entity_id,
+  #   log_in_url, log_out_url, certificate_fingerprint, and identifier_format. This URI
+  #   will also be saved, and the metadata periodically refreshed, automatically. If
+  #   the metadata contains multiple entities, also supply idp_entity_id to distinguish
+  #   which one you want (otherwise the only entity in the metadata will be inferred).
+  #   If you provide the URI 'urn:mace:incommon', the InCommon metadata aggregate will
+  #   be used instead, and additional validation checks will happen (including
+  #   validating that the metadata has been properly signed with the InCommon key).
+  #
   # - idp_entity_id
   #
   #   The SAML IdP's entity ID
@@ -557,10 +568,19 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
     update_deprecated_account_settings_data(aac_data, account_config)
 
+    unless account_config.save
+      respond_to do |format|
+        format.html do
+          flash[:error] = account_config.errors.full_messages
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json { raise ActiveRecord::RecordInvalid.new(account_config) }
+      end
+      return
+    end
+
     if position.present?
       account_config.insert_at(position.to_i)
-    else
-      account_config.save!
     end
 
     respond_to do |format|
@@ -599,7 +619,18 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
 
     deselect_parent_registration(data, aac)
-    aac.update_attributes(data)
+    aac.assign_attributes(data)
+
+    unless aac.save
+      respond_to do |format|
+        format.html do
+          flash[:error] = aac.errors.full_messages
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json { raise ActiveRecord::RecordInvalid.new(account_config) }
+      end
+      return
+    end
 
     if position.present?
       aac.insert_at(position.to_i)

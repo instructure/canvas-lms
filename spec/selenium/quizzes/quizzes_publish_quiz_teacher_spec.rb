@@ -25,7 +25,7 @@ describe 'publishing a quiz' do
         end
 
         it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do
-          driver.mouse.move_to f('#footer')
+          driver.mouse.move_to f('#header')
           expect(f('#quiz-publish-link')).to include_text 'Published'
         end
 

@@ -4,7 +4,7 @@ describe "course copy" do
   include_context "in-process server selenium tests"
 
   def validate_course_main_page
-    header = f('#section-tabs-header')
+    header = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')
     expect(header).to be_displayed
     expect(header.text).to eq @course.course_code
   end
@@ -153,15 +153,11 @@ describe "course copy" do
       replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
 
       button = f('button.btn-primary')
-      keep_trying_until do
-        expect(button.attribute('disabled')).to be_present
-      end
+      expect(button).to be_disabled
 
       replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
 
-      keep_trying_until do
-        expect(button.attribute('disabled')).to be_blank
-      end
+      expect(button).not_to be_disabled
     end
   end
 end

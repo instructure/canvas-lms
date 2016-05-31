@@ -94,7 +94,7 @@ describe "admin settings tab" do
       f("#account_default_time_zone option[value='Lima']").click
       click_submit
       expect(Account.default.default_time_zone.name).to eq "Lima"
-      expect(f("#account_default_time_zone option[value='Lima']").attribute("selected")).to be_truthy
+      expect(f("#account_default_time_zone option[value='Lima']")).to have_attribute("selected", "true")
     end
 
     describe "allow self-enrollment" do
@@ -135,16 +135,18 @@ describe "admin settings tab" do
       set_value f("#account_settings_trusted_referers"), trusted_referers
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to eq trusted_referers
-      expect(f("#account_settings_trusted_referers").attribute('value')).to eq trusted_referers
+      expect(f("#account_settings_trusted_referers")).to have_value trusted_referers
 
       set_value f("#account_settings_trusted_referers"), ''
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to be_nil
-      expect(f("#account_settings_trusted_referers").attribute('value')).to eq ''
+      expect(f("#account_settings_trusted_referers")).to have_value ''
     end
   end
 
   context "global includes" do
+    before { skip('global css/js happens in theme editor in newUI') if ENV['CANVAS_FORCE_USE_NEW_STYLES'] }
+
     it "should not have a global includes section by default" do
       expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
     end
@@ -459,7 +461,7 @@ describe "admin settings tab" do
       expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
       expect(f("#account_settings")).not_to contain_css("label[for='account_external_integration_keys_external_key2']")
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+      expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
       expect(f("#external_integration_keys span").text).to eq key_value
       expect(f("#account_settings")).not_to contain_css("#account_external_integration_keys_external_key2")
     end
@@ -468,12 +470,12 @@ describe "admin settings tab" do
       set_value f("#account_external_integration_keys_external_key0"), key_value
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+      expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
 
       set_value f("#account_external_integration_keys_external_key0"), ''
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq ''
+      expect(f("#account_external_integration_keys_external_key0")).to have_value ''
     end
   end
 

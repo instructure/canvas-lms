@@ -17,7 +17,7 @@ shared_examples 'profile_settings_page' do |context|
     # but are limited to assuming that with almost all popular browsers...
     # "The information is most often shown as a tooltip text when the mouse moves over the element."
     # ...as shown in HTML title attribute at http://www.w3schools.com/tags/att_global_title.asp
-    expect(f('.avatar.profile_pic_link.none').attribute('title')).to eq 'Click to change profile pic'
+    expect(f('.avatar.profile_pic_link.none')).to have_attribute('title', 'Click to change profile pic')
   end
 end
 
@@ -32,7 +32,7 @@ shared_examples 'profile_user_about_page' do |context|
 
     # We are checking the title in this tooltip like we do in the one above,
     # given the same limitation.
-    expect(f('.avatar.profile-link').attribute('title')).to eq 'Click to change profile pic'
+    expect(f('.avatar.profile-link')).to have_attribute('title', 'Click to change profile pic')
   end
 end
 
