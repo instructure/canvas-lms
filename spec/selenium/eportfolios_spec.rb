@@ -183,8 +183,10 @@ describe "eportfolios file upload" do
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }
     f("#right-side .edit_content_link").click
+    wait_for_ajaximations
     f('.add_file_link').click
     fj(".file_upload:visible").send_keys(fullpath)
+    wait_for_ajaximations
     f(".upload_file_button").click
     submit_form(".form_content")
     download = f("a.eportfolio_download")
