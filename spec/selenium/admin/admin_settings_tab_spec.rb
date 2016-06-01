@@ -533,7 +533,7 @@ describe "admin settings tab" do
     expect(f("#add_sis_app_token")).to be_displayed
     expect(f("#account_settings_sis_app_token")).to be_displayed
     f("#account_settings_sis_app_token").send_keys(sis_token)
-    f(".btn-primary").click
+    f(".Button--primary").click
     token = f("#account_settings_sis_app_token")
     keep_trying_until{
       expect(token.attribute("value")).to eq sis_token

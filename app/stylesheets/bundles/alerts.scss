@@ -13,23 +13,28 @@
   margin: 1px 2px 2px 2px;
   width: auto;
   padding: 20px 20px 6px 6px;
+  background-color: transparent; // added to override the alert creation form block that was throwing a golden background under admin alerts
   .alert-label {
     color: black;
     font-weight: bold;
-    marge-top: 5px;
+    margin-top: 5px;
   }
   .labelled_region{
     margin-bottom: 15px;
+    color: $ic-color-dark;
   }
   .links {
     float: right;
     opacity: 0.5;
+    color: $ic-color-dark;
     &:hover {
       opacity: 1.0;
     }
   }
   .repetition_group {
     margin-left: 40px;
+    color: $ic-color-dark;
+    font-weight: normal;
   }
   li {
     width: 400px;
@@ -41,7 +46,7 @@
   .add_criteria_line select, .add_recipients_line select, .repetition_group input[type="text"] {
     vertical-align: baseline;
   }
-  
+
 }
 
 .alert.blank {
@@ -57,5 +62,14 @@
 }
 
 .alert .form-actions {
-  background-color: $warningBackground;
+  background-color: transparent;
+}
+#new_alert .add_criterion_link,
+#new_alert .add_recipient_link {
+  color: $ic-link-color;
+  text-decoration: none;
+  font-weight: normal;
+  &:hover {
+    text-decoration: underline;
+  }
 }

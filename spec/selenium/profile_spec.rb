@@ -286,7 +286,7 @@ describe "profile" do
       site_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
       f('#account_services_avatars').click
-      f('.btn.btn-primary[type="submit"]').click
+      f('.Button.Button--primary[type="submit"]').click
       wait_for_ajaximations
       expect(is_checked('#account_services_avatars')).to be_truthy
     end

@@ -30,7 +30,7 @@ describe "conversations new" do
     it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
       get account_settings_url
       f('#account_enable_user_notes').click
-      f('.btn.btn-primary[type="submit"]').click
+      f('.Button.Button--primary[type="submit"]').click
       wait_for_ajaximations
       expect(is_checked('#account_enable_user_notes')).to be_truthy
     end
