@@ -1,8 +1,9 @@
 define([
   'react',
   'jsx/collaborations/GettingStartedCollaborations',
-  'jsx/collaborations/CollaborationsNavigation'
-], (React, GettingStartedCollaborations, CollaborationsNavigation) => {
+  'jsx/collaborations/CollaborationsNavigation',
+  './CollaborationsList'
+], (React, GettingStartedCollaborations, CollaborationsNavigation, CollaborationsList) => {
   class CollaborationsApp extends React.Component {
     static propTypes: {
       applicationState: React.PropTypes.object,
@@ -10,12 +11,14 @@ define([
     }
 
     render () {
+      let { list } = this.props.applicationState.listCollaborations;
       return (
         <div className="CollaborationsApp">
-          <div id="wrapperCollaborations">
-            <CollaborationsNavigation ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
-            <GettingStartedCollaborations ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
-          </div>
+          <CollaborationsNavigation ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
+          {list.length
+            ? <CollaborationsList collaborations={list} />
+            : <GettingStartedCollaborations ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
+          }
         </div>
       );
     }

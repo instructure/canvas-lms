@@ -20,17 +20,17 @@ define([
   actions.LIST_LTI_COLLABORATIONS_FAILED = 'LIST_LTI_COLLABORATIONS_FAILED'
   actions.listLTICollaborationsFailed = (error) => ({ type: actions.LIST_LTI_COLLABORATIONS_FAILED, payload: error, error:true })
 
-  actions.getCollaborations = () => {
-    actions.listCollaborationsStart();
+  actions.getCollaborations = (context, contextId) => {
+    return (dispatch) => {
+      dispatch(actions.listCollaborationsStart());
 
-    //do some async work
-
-    //on success
-    actions.listCollaborationsSuccessful(collaborations);
-
-    //on failure
-    actions.listCollaborationsFailed(error)
+      let url = `/api/v1/${context}/${contextId}/collaborations`;
+      $.getJSON(url)
+        .success((collaborations) => dispatch(actions.listCollaborationsSuccessful(collaborations)))
+        .fail((err) => dispatch(actions.listCollaborationsFailed(err)));
+    }
   }
+
   actions.getLTICollaborators = (context, contextId) => {
     return (dispatch) => {
       dispatch(actions.listLTICollaborationsStart());
