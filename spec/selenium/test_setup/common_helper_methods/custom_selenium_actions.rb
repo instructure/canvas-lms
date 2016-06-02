@@ -429,6 +429,11 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
+  def scroll_to(element)
+    element_location = "#{element.location['y']}"
+    driver.execute_script('window.scrollTo(0, ' + element_location + ');')
+  end
+
   def dismiss_flash_messages
     ff("#flash_message_holder li").each(&:click)
   end
