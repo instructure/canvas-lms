@@ -883,7 +883,7 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    return true unless self.grade_changed? || self.excused_changed?
+    return true unless (self.changed & %w(grade score excused)).present? || self.assignment_changed_not_sub
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 

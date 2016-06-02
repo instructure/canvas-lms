@@ -160,7 +160,7 @@ module Canvas::LiveEvents
     })
   end
 
-  def self.grade_changed(submission, old_grade)
+  def self.grade_changed(submission, old_submission=nil, old_assignment=submission.assignment)
     grader_id = nil
     if submission.grader_id && !submission.autograded?
       grader_id = submission.global_grader_id
@@ -170,7 +170,11 @@ module Canvas::LiveEvents
       submission_id: submission.global_id,
       assignment_id: submission.global_assignment_id,
       grade: submission.grade,
-      old_grade: old_grade,
+      old_grade: old_submission.try(:grade),
+      score: submission.score,
+      old_score: old_submission.try(:score),
+      points_possible: submission.assignment.points_possible,
+      old_points_possible: old_assignment.points_possible,
       grader_id: grader_id,
       student_id: submission.global_user_id,
       user_id: submission.global_user_id

@@ -133,6 +133,19 @@ describe Submission do
     @submission.save!
   end
 
+  it "should log submissions affected by assignment update" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).twice
+
+    # only graded submissions are updated by assignment
+    @submission.score = 111
+    @submission.save!
+
+    @assignment.points_possible = 999
+    @assignment.save!
+  end
+
   context "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model

@@ -140,6 +140,25 @@ describe Auditors::GradeChange do
     expect(@event.excused_after).to eql(false)
   end
 
+  it "records regraded submissions" do
+    @submission.score = 5
+    @submission.with_versioning(:explicit => true, &:save!)
+    @event = Auditors::GradeChange.record(@submission)
+
+    expect(@event.score_before).to eq 8
+    expect(@event.score_after).to eq 5
+  end
+
+  it "records grades affected by assignment update" do
+    @assignment.points_possible = 15
+    @assignment.save!
+    @submission.assignment_changed_not_sub = true
+    @event = Auditors::GradeChange.record(@submission)
+
+    expect(@event.points_possible_before).to eq 10
+    expect(@event.points_possible_after).to eq 15
+  end
+
   describe "options forwarding" do
     before do
       record = Auditors::GradeChange::Record.new(

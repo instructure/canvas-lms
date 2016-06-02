@@ -30,7 +30,11 @@ class Auditors::GradeChange
                :grader_id,
                :graded_anonymously,
                :excused_after,
-               :excused_before
+               :excused_before,
+               :score_after,
+               :score_before,
+               :points_possible_after,
+               :points_possible_before
 
     def self.generate(submission, event_type=nil)
       new(
@@ -55,14 +59,29 @@ class Auditors::GradeChange
       @submission ||= Submission.find(submission_id)
     end
 
+    def previous_submission
+      @previous_submission ||= submission.versions.previous.try(:model)
+    end
+
+    # Returns assignment referenced by the previous version of the submission.
+    # We use the assignment_changed_not_sub flag to be sure the assignment has
+    # been versioned along with the submission.
+    def previous_assignment
+      @previous_assignment ||= begin
+        if submission.assignment_changed_not_sub
+          model = submission.assignment.versions.previous.try(:model)
+        end
+        model || assignment
+      end
+    end
+
     def submission=(submission)
       @submission = submission
-      previous_version = @submission.versions.current.previous if @submission.versions.current
 
       attributes['submission_id'] = Shard.global_id_for(@submission)
       attributes['version_number'] = @submission.version_number
       attributes['grade_after'] = @submission.grade
-      attributes['grade_before'] = previous_version ? previous_version.model.grade : nil
+      attributes['grade_before'] = previous_submission.try(:grade)
       attributes['assignment_id'] = Shard.global_id_for(assignment)
       attributes['grader_id'] = grader ? Shard.global_id_for(grader) : nil
       attributes['graded_anonymously'] = @submission.graded_anonymously
@@ -71,7 +90,11 @@ class Auditors::GradeChange
       attributes['context_type'] = assignment.context_type
       attributes['account_id'] = Shard.global_id_for(context.account)
       attributes['excused_after'] = @submission.excused?
-      attributes['excused_before'] = previous_version.present? && previous_version.model.excused?
+      attributes['excused_before'] = !!previous_submission.try(:excused?)
+      attributes['score_after'] = @submission.score
+      attributes['score_before'] = previous_submission.try(:score)
+      attributes['points_possible_after'] = assignment.points_possible
+      attributes['points_possible_before'] = previous_assignment.points_possible
     end
 
     def root_account
@@ -160,7 +183,7 @@ class Auditors::GradeChange
     return unless submission
     submission.shard.activate do
       record = Auditors::GradeChange::Record.generate(submission, event_type)
-      Canvas::LiveEvents.grade_changed(submission, record.attributes['grade_before'])
+      Canvas::LiveEvents.grade_changed(submission, record.previous_submission, record.previous_assignment)
       Auditors::GradeChange::Stream.insert(record)
     end
   end

@@ -157,12 +157,12 @@ No extra data.
 #### `grade_changed`
 
 `grade_change` events are posted every time a grade changes. These can
-happen either as the result of a teacher changing a grade in the
-gradebook or speedgrader, or with a quiz being automatically scored. In
-the case of a quiz being scored, the `grade_change` event will be fired
-as the result of a student turning in a quiz, and the `user_id` in the
-message attributes will be of the student. In these cases, `grader_id`
-should be null in the body.
+happen as the result of a teacher changing a grade in the gradebook or
+speedgrader, a quiz being automatically scored, or changing an assignment's
+points possible or grade type. In the case of a quiz being scored, the
+`grade_change` event will be fired as the result of a student turning in a
+quiz, and the `user_id` in the message attributes will be of the student. In
+these cases, `grader_id` should be null in the body.
 
 | Field | Description |
 | ----- | ----------- |
@@ -170,6 +170,10 @@ should be null in the body.
 | `assignment_id` | The Canvas id of the assignment associated with the submission. |
 | `grade` | The new grade. |
 | `old_grade` | The previous grade, if there was one. |
+| `score` | The new score. |
+| `old_score` | The previous score. |
+| `points_possible` | The maximum points possible for the submission's assignment. |
+| `old_points_possible` | The maximum points possible for the previous grade. |
 | `grader_id` | The Canvas id of the user making the grade change. Null if this was the result of automatic grading. |
 | `user_id` | The Canvas id of the user associated with the submission with the change. |
 
