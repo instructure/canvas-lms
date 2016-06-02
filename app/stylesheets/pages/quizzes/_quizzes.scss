@@ -1277,6 +1277,8 @@ ul#quiz_versions {
     overflow-x: scroll;
   }
   #quiz_tabs {
+    margin-top: $ic-sp;
+
     #quiz_tabs_tab_list {
       display: flex;
       align-items: flex-end;

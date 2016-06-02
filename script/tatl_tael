@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require_relative "../gems/tatl_tael/lib/tatl_tael"
+require 'yaml'
 
 unless ENV['GERRIT_PATCHSET_REVISION']
   require 'colorize'
@@ -36,6 +37,13 @@ linter = TatlTael::Linter.new(git_dir: git_dir)
 if linter.wip?
   puts "WIP detected, TatlTael will not run."
   exit 0
+end
+
+user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
+if File.exists?(user_config_file)
+  config = YAML.load_file(user_config_file) || {}
+  user_list = config['only_report_errors'] || []
+  exit 0 if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
 end
 
 errors = []

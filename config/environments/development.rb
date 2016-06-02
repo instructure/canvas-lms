@@ -29,6 +29,10 @@ environment_configuration(defined?(config) && config) do |config|
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.0.0'
       require 'byebug'
+      unless STDIN.tty?
+        require 'byebug/core'
+        Byebug.start_server('0.0.0.0')
+      end
     else
       require "debugger"
     end

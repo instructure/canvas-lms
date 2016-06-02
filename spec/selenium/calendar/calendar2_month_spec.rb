@@ -464,7 +464,6 @@ describe "calendar2" do
     describe "main month calendar" do
 
       it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
-        skip "CNVS-29676"
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -487,7 +486,6 @@ describe "calendar2" do
       end
 
       it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
-        skip "CNVS-29676"
         date_due = Time.zone.now.utc + 2.days
         reply = 'Replying to discussion'
 
@@ -508,6 +506,19 @@ describe "calendar2" do
 
         # verify discussion has line-through
         expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should load events from adjacent months correctly" do
+        time = DateTime.parse("2016-04-01")
+        @course.calendar_events.create! title: 'aprilfools', start_at: time, end_at: time + 5.minutes
+
+        get '/calendar2'
+
+        quick_jump_to_date("2016-03-31") # jump to previous month
+        expect(find('.fc-title')).to include_text("aprilfools") # should show event at end of week
+
+        quick_jump_to_date("2016-04-01") # jump to next month
+        expect(find('.fc-title')).to include_text("aprilfools") # should still load cached event
       end
     end
   end

@@ -32,8 +32,9 @@ class Assignment
         :include_root => false
       )
 
-      # include :provisional here someday if we need to distinguish between provisional and real comments
-      # (also in SubmissionComment#serialization_methods)
+      # include :provisional here someday if we need to distinguish
+      # between provisional and real comments (also in
+      # SubmissionComment#serialization_methods)
       submission_comment_methods = []
       submission_comment_methods << :avatar_path if @avatars && !@assignment.grade_as_group?
 
@@ -94,18 +95,31 @@ class Assignment
       end
       res[:context][:quiz] = @assignment.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-      includes = [:versions, :quiz_submission, :user]
-      includes << (@grading_role == :grader ? :submission_comments : :all_submission_comments)
+      includes = [:versions, :quiz_submission, :user, :attachment_associations, :assignment]
+      key = @grading_role == :grader ? :submission_comments : :all_submission_comments
+      includes << {key => {submission: {assignment: { context: :root_account }}}}
       submissions = @assignment.submissions.where(:user_id => students).preload(*includes)
 
-      preloaded_prov_grades = case @grading_role
-      when :moderator
-        @assignment.provisional_grades.order(:id).to_a.group_by(&:submission_id)
-      when :provisional_grader
-        @assignment.provisional_grades.not_final.where(:scorer_id => @user).order(:id).to_a.group_by(&:submission_id)
-      else
-        {}
-      end
+      attachment_includes = [:crocodoc_document, :canvadoc, :root_attachment]
+      # Preload attachments for later looping
+      attachments_for_submission =
+        Submission.bulk_load_attachments_for_submissions(submissions, preloads: attachment_includes)
+
+      # Preloading submission history versioned attachments
+      submission_histories = submissions.map(&:submission_history).flatten
+      Submission.bulk_load_versioned_attachments(submission_histories,
+                                                 preloads: attachment_includes)
+
+      preloaded_prov_grades =
+        case @grading_role
+        when :moderator
+          @assignment.provisional_grades.order(:id).to_a.group_by(&:submission_id)
+        when :provisional_grader
+          @assignment.provisional_grades.not_final.where(:scorer_id => @user).order(:id).to_a.
+            group_by(&:submission_id)
+        else
+          {}
+        end
 
       preloaded_prov_selections = @grading_role == :moderator ? @assignment.moderated_grading_selections.index_by(&:student_id) : []
 
@@ -126,7 +140,6 @@ class Assignment
         end
 
         comments = (provisional_grade || sub).submission_comments
-        comments = comments.preload({submission: {assignment: {context: :root_account}}})
         if @assignment.grade_as_group?
           comments = comments.reject { |comment| comment.group_comment_id.nil? }
         end
@@ -136,9 +149,12 @@ class Assignment
           only: comment_fields
         )
 
-        json['attachments'] = sub.attachments.map{|att| att.as_json(
-            :only => [:mime_class, :comment_id, :id, :submitter_id ]
-        )}
+        # We get the attachments this way to avoid loading the
+        # attachments again via the submission method that creates a
+        # new query.
+        json['attachments'] = attachments_for_submission[sub].map do |att|
+          att.as_json(:only => [:mime_class, :comment_id, :id, :submitter_id ])
+        end
 
         sub_attachments = []
 
@@ -148,47 +164,43 @@ class Assignment
           sub.crocodoc_whitelist
         end
 
-        json['submission_history'] = if json['submission_history'] && (@assignment.quiz.nil? || too_many)
-                                       json['submission_history'].map do |version|
-                                         version.as_json(
-                                           :only => submission_fields,
-                                           :methods => [:versioned_attachments, :late]
-                                         ).tap do |version_json|
-                                           if version_json['submission'] && version_json['submission']['versioned_attachments']
-                                             version_json['submission']['versioned_attachments'].map! do |a|
-                                               if @grading_role == :moderator
-                                                  sub_attachments << a # we'll use to create custom crocodoc urls for each prov grade
-                                               end
-                                               a.as_json(
-                                                 :only => attachment_fields,
-                                                 :methods => [:view_inline_ping_url]
-                                               ).tap { |json|
-                                                 json[:attachment][:canvadoc_url] = a.canvadoc_url(@user)
-                                                 json[:attachment][:crocodoc_url] =  a.crocodoc_url(@user, crocodoc_user_ids)
-                                                 json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
-                                               }
-                                             end
-                                           end
-                                         end
-                                       end
-                                     elsif @assignment.quiz && sub.quiz_submission
-                                       qs_versions[sub.quiz_submission.id].map do |v|
-                                         qs = v.model
-                                         # copy already-loaded associations over to the
-                                         # model so we don't have to load them again
-                                         # when qs.late? gets called
-                                         qs.quiz = @assignment.quiz
-                                         qs.submission = sub
+        if json['submission_history'] && (@assignment.quiz.nil? || too_many)
+          json['submission_history'] = json['submission_history'].map do |version|
+            version.as_json(only: submission_fields,
+                            methods: [:versioned_attachments, :late]).tap do |version_json|
+              if version_json['submission'] && version_json['submission']['versioned_attachments']
+                version_json['submission']['versioned_attachments'].map! do |a|
+                  if @grading_role == :moderator
+                    # we'll use to create custom crocodoc urls for each prov grade
+                    sub_attachments << a
+                  end
+                  a.as_json(only: attachment_fields,
+                            methods: [:view_inline_ping_url]).tap do |json|
+                    json[:attachment][:canvadoc_url] = a.canvadoc_url(@user)
+                    json[:attachment][:crocodoc_url] = a.crocodoc_url(@user, crocodoc_user_ids)
+                    json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
+                  end
+                end
+              end
+            end
+          end
+        elsif @assignment.quiz && sub.quiz_submission
+          json['submission_history'] = qs_versions[sub.quiz_submission.id].map do |v|
+            qs = v.model
+            # copy already-loaded associations over to the model so we
+            # don't have to load them again when qs.late? gets called
+            qs.quiz = @assignment.quiz
+            qs.submission = sub
 
-                                         {submission: {
-                                           grade: qs.score,
-                                           show_grade_in_dropdown: true,
-                                           submitted_at: qs.finished_at,
-                                           late: qs.late?,
-                                           version: v.number,
-                                         }}
-                                       end
-                                     end
+            {submission: {
+                grade: qs.score,
+                show_grade_in_dropdown: true,
+                submitted_at: qs.finished_at,
+                late: qs.late?,
+                version: v.number,
+              }}
+          end
+        end
 
         if @grading_role == :moderator
           pgs = preloaded_prov_grades[sub.id] || []
@@ -197,15 +209,18 @@ class Assignment
             json['provisional_grades'] = []
             pgs.each do |pg|
               pg_json = pg.grade_attributes.tap do |json|
-                json[:rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.artifact_id == pg.id}.
-                  as_json(:methods => [:assessor_name], :include_root => false)
+                json[:rubric_assessments] =
+                  all_provisional_rubric_assmnts.select { |ra| ra.artifact_id == pg.id }.
+                    as_json(:methods => [:assessor_name], :include_root => false)
 
                 json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
-                json[:crocodoc_urls] = sub_attachments.map { |a| pg.crocodoc_attachment_info(@user, a) }
+                json[:crocodoc_urls] =
+                  sub_attachments.map { |a| pg.crocodoc_attachment_info(@user, a) }
                 json[:readonly] = !pg.final && (pg.scorer_id != @user.id)
-                json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
-                                                                            :methods => submission_comment_methods,
-                                                                            :only => comment_fields)
+                json[:submission_comments] =
+                  pg.submission_comments.as_json(include_root: false,
+                                                 methods: submission_comment_methods,
+                                                 only: comment_fields)
               end
 
               if pg.final

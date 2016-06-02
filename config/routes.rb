@@ -905,6 +905,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
       put 'accounts/:account_id/account_notifications/:id', action: :update, as: 'account_notification_update'
       get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
+      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end
 

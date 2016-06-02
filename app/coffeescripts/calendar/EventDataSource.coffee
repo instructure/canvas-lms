@@ -40,7 +40,7 @@ define [
       # Note that the appointmentGroups are not cached per context, as
       # we get them all in the same request (not scoped to contexts at
       # all.) This might end up being confusing.
-      
+
       $.subscribe "CommonEvent/eventDeleted", @eventDeleted
       $.subscribe "CommonEvent/eventSaved", @eventSaved
 
@@ -117,20 +117,23 @@ define [
 
       events = []
       for id, event of contextInfo.events
-        if !event.originalStart && !start
-          # want undated, have undated, include it
-          events.push event
-        else if !event.originalStart || !start
-          # want undated, have dated (or vice versa), skip it
-          continue
-        else
-          # want dated, have dated. but when comparing to the range, remember
-          # that we made start/end be unwrapped values (down in getEvents), so
-          # unwrap event.originalStart too before comparing
-          if start <= fcUtil.unwrap(event.originalStart) < end
-            events.push event
+        if @eventInRange(event, start, end)
+          events.push(event)
 
       events
+
+    eventInRange: (event, start, end) ->
+      if !event.originalStart && !start
+        # want undated, have undated, include it
+        true
+      else if !event.originalStart || !start
+        # want undated, have dated (or vice versa), skip it
+        false
+      else
+        # want dated, have dated. but when comparing to the range, remember
+        # that we made start/end be unwrapped values (down in getEvents), so
+        # unwrap event.originalStart too before comparing
+        start <= fcUtil.unwrap(event.originalStart) < end
 
     processNextRequest: (inFlightCheckKey='default') =>
       for [method, args, key], id in @pendingRequests
@@ -300,11 +303,14 @@ define [
         # only through the earliest page end date. note that it's an exclusive
         # upper bound, just as we treated end earlier. (this is so that it can
         # be an inclusive lower bound on the next request)
+
+        newEvents = []
+
         upperBounds = []
         for key, requestResult of requestResults
           dates = []
           for event in requestResult.events
-            @addEventToCache event
+            newEvents.push(event)
             if requestResult.next && event.originalStart
               dates.push(event.originalStart)
           if !_.isEmpty(dates)
@@ -318,6 +324,14 @@ define [
           nextPageDate = fcUtil.clone(_.min(upperBounds))
           end = fcUtil.unwrap(nextPageDate)
 
+        list = @getEventsFromCache(start, end, contexts)
+        datacb(list) if datacb? && list.length > 0
+
+        for event in newEvents
+          @addEventToCache event
+          if @eventInRange(event, start, end)
+            list.push(event)
+
         for context in contexts
           contextInfo = @cache.contexts[context]
           if contextInfo
@@ -326,7 +340,6 @@ define [
             else
               contextInfo.fetchedUndated = true
 
-        list = @getEventsFromCache(start, end, contexts)
         list.nextPageDate = nextPageDate
         list.requestID = options.requestID
         donecb list
@@ -360,7 +373,7 @@ define [
       @startFetch [
         ["/api/v1/appointment_groups/#{appointmentGroup.id}/#{type}", {registration_status: registrationStatus}]
       ], dataCB, doneCB
-    
+
     # Starts a paginated fetch of the url/param combinations in the array. This makes
     # situations where you need to do paginated fetches of data from N different endpoints
     # a little simpler. dataCB(data, url, params) is called on every request with the data,
