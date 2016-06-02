@@ -271,5 +271,25 @@ describe AccountAuthorizationConfig do
       expect(@user.sortable_name).to eq 'Cutrer, Cody'
       expect(@user.time_zone.tzinfo.name).to eq 'America/New_York'
     end
+
+    context 'locale' do
+      it 'translates _ to -' do
+        aac.apply_federated_attributes(@pseudonym, 'locale' => 'en_GB')
+        @user.reload
+        expect(@user.locale).to eq 'en-GB'
+      end
+
+      it 'follows fallbacks' do
+        aac.apply_federated_attributes(@pseudonym, 'locale' => 'en-US')
+        @user.reload
+        expect(@user.locale).to eq 'en'
+      end
+
+      it 'is case insensitive' do
+        aac.apply_federated_attributes(@pseudonym, 'locale' => 'en-gb')
+        @user.reload
+        expect(@user.locale).to eq 'en-GB'
+      end
+    end
   end
 end
