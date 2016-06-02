@@ -358,6 +358,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'id' (the default), or 'login'
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'email',
+  #   'id', 'login', and 'name'.
+  #
   # For Google, the additional recognized parameters are:
   #
   # - client_id [Required]
