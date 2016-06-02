@@ -153,55 +153,151 @@ describe 'account authentication' do
         expect(Account.default.authentication_providers.count).to eq 2
       end
 
-      it 'should start debug info', priority: "1", test_id: 250269 do
-        enable_cache do
-          start_saml_debug
-          wait_for_ajaximations
+      context 'debugging' do
+        it 'should start debug info', priority: "1", test_id: 250269 do
+          enable_cache do
+            start_saml_debug
+            wait_for_ajaximations
 
-          debug_info = f("#saml_debug_info")
-          expect(debug_info.text).to match('Waiting for attempted login')
+            debug_info = f("#saml_debug_info")
+            expect(debug_info.text).to match('Waiting for attempted login')
+          end
+        end
+
+        it 'should refresh debug info', priority: "1", test_id: 250270 do
+          enable_cache do
+            start_saml_debug
+            wait_for_ajaximations
+
+            aac = Account.default.authentication_providers.active.last
+            aac.debugging_keys.each_with_index do |key, i|
+              aac.debug_set(key, "testvalue#{i}")
+            end
+
+            refresh = f("#refresh_saml_debugging")
+            refresh.click
+            wait_for_ajaximations
+
+            debug_info = f("#saml_debug_info")
+
+            aac.debugging_keys.each_with_index do |_, i|
+              expect(debug_info.text).to match("testvalue#{i}")
+            end
+          end
+        end
+
+        it 'should stop debug info', priority: "1", test_id: 250271 do
+          enable_cache do
+            start_saml_debug
+            wait_for_ajaximations
+
+            stop = f("#stop_saml_debugging")
+
+            stop.click
+            wait_for_ajaximations
+
+            aac = Account.default.authentication_providers.active.last
+            expect(aac.debugging?).to eq false
+
+            aac.debugging_keys.each do |key|
+              expect(aac.debug_get(key)).to eq nil
+            end
+          end
         end
       end
 
-
-      it 'should refresh debug info', priority: "1", test_id: 250270 do
-        enable_cache do
-          start_saml_debug
-          wait_for_ajaximations
-
-          aac = Account.default.authentication_providers.active.last
-          aac.debugging_keys.each_with_index do |key, i|
-            aac.debug_set(key, "testvalue#{i}")
-          end
-
-          refresh = f("#refresh_saml_debugging")
-          refresh.click
-          wait_for_ajaximations
-
-          debug_info = f("#saml_debug_info")
-
-          aac.debugging_keys.each_with_index do |_, i|
-            expect(debug_info.text).to match("testvalue#{i}")
-          end
+      context 'federated attributes' do
+        let!(:ap) do
+          Account.default.authentication_providers.create!(auth_type: 'saml')
         end
-      end
 
-      it 'should stop debug info', priority: "1", test_id: 250271 do
-        enable_cache do
-          start_saml_debug
-          wait_for_ajaximations
-
-          stop = f("#stop_saml_debugging")
-
-          stop.click
-          wait_for_ajaximations
-
-          aac = Account.default.authentication_providers.active.last
-          expect(aac.debugging?).to eq false
-
-          aac.debugging_keys.each do |key|
-            expect(aac.debug_get(key)).to eq nil
+        it 'saves federated attributes' do
+          get "/accounts/self/authentication_providers"
+          click_option("select.canvas_attribute", "locale")
+          f(".add_federated_attribute_button").click
+          f("input[name='authentication_provider[federated_attributes][locale][attribute]']").send_keys("provider_locale")
+          saml_form = f("#edit_saml#{ap.id}")
+          expect_new_page_load do
+            saml_form.find("button[type='submit']").click
           end
+
+          ap.reload
+          expect(ap.federated_attributes).to eq({ 'locale' => { 'attribute' => 'provider_locale',
+                                                                 'provisioning_only' => false} })
+          expect(f("input[name='authentication_provider[federated_attributes][locale][attribute]']")[:value]).to eq 'provider_locale'
+        end
+
+        it 'shows and saves provisioning only checkboxes' do
+          get "/accounts/self/authentication_providers"
+          click_option("select.canvas_attribute", "locale")
+          f(".add_federated_attribute_button").click
+          f("input[name='authentication_provider[federated_attributes][locale][attribute]']").send_keys("provider_locale")
+          f('.jit_provisioning_checkbox').click
+          provisioning_only = f("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']")
+          expect(provisioning_only).to be_displayed
+          provisioning_only.click
+
+          saml_form = f("#edit_saml#{ap.id}")
+          expect_new_page_load do
+            saml_form.find("button[type='submit']").click
+          end
+
+          ap.reload
+          expect(ap.federated_attributes).to eq({ 'locale' => { 'attribute' => 'provider_locale',
+                                                                'provisioning_only' => true} })
+          expect(f("input[name='authentication_provider[federated_attributes][locale][attribute]']").attribute('value')).to eq 'provider_locale'
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq true
+        end
+
+        it 'hides provisioning only when jit provisioning is disabled' do
+          ap.update_attribute(:federated_attributes, { 'locale' => 'provider_locale' })
+          ap.update_attribute(:jit_provisioning, true)
+          get "/accounts/self/authentication_providers"
+
+          provisioning_only = "input[name='authentication_provider[federated_attributes][locale][provisioning_only]']"
+          expect(f(provisioning_only)).to be_displayed
+          f('.jit_provisioning_checkbox').click
+          expect(f(provisioning_only)).not_to be_displayed
+        end
+
+        it 'clears provisioning only when toggling jit provisioning' do
+          get "/accounts/self/authentication_providers"
+          click_option("select.canvas_attribute", "locale")
+          f(".add_federated_attribute_button").click
+          f("input[name='authentication_provider[federated_attributes][locale][attribute]']").send_keys("provider_locale")
+          f('.jit_provisioning_checkbox').click
+          provisioning_only = "input[name='authentication_provider[federated_attributes][locale][provisioning_only]']"
+          expect(f(provisioning_only)).to be_displayed
+          f(provisioning_only).click
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq true
+          f('.jit_provisioning_checkbox').click
+          f('.jit_provisioning_checkbox').click
+          expect(is_checked("input[name='authentication_provider[federated_attributes][locale][provisioning_only]']:visible")).to eq false
+        end
+
+        it 'hides the add attributes button when all are added' do
+          get "/accounts/self/authentication_providers"
+          AccountAuthorizationConfig::CANVAS_ALLOWED_FEDERATED_ATTRIBUTES.length.times do
+            f(".add_federated_attribute_button").click
+          end
+          expect(f(".add_federated_attribute_button")).not_to be_displayed
+
+          fj(".remove_federated_attribute:visible").click
+          expect(f(".add_federated_attribute_button")).to be_displayed
+          expect(ffj("select.canvas_attribute:visible option").length).to eq 1
+        end
+
+        it 'can remove all attributes' do
+          ap.update_attribute(:federated_attributes, { 'locale' => 'provider_locale' })
+          get "/accounts/self/authentication_providers"
+
+          fj(".remove_federated_attribute:visible").click
+          saml_form = f("#edit_saml#{ap.id}")
+          expect_new_page_load do
+            saml_form.find("button[type='submit']").click
+          end
+
+          expect(ap.reload.federated_attributes).to eq({})
         end
       end
     end

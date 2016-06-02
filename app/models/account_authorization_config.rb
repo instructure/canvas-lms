@@ -164,6 +164,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def federated_attributes=(value)
+    value = {} unless value.is_a?(Hash)
     settings_will_change! unless value == federated_attributes
     settings['federated_attributes'] = value
   end

@@ -1,0 +1,17 @@
+@import 'base/environment';
+
+.federated_attributes_none {
+  display: none;
+}
+.add_attribute {
+  display: flex;
+  justify-content:flex-end;
+  padding-top:$ic-sp;
+  padding-bottom:$ic-sp;
+}
+.federated_attributes_select {
+  max-width: 200px;
+}
+.add_federated_attribute_button {
+  margin-left: $ic-sp/2;
+}
