@@ -32,6 +32,8 @@ $modal_box_width: 623px;
 $modal_box_padding: 20px;
 $ic-Login-confirmation-bgd: #34444f;
 
+@if $use_new_styles {
+
 ////////////////////////////////////////
 // New Login Styles
 ////////////////////////////////////////
@@ -323,3 +325,4 @@ body.body--login-confirmation {
   vertical-align: middle;
   margin-right: $ic-sp;
 }
+}//end @if $use_new_styles

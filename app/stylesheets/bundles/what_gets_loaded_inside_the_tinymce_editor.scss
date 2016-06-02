@@ -1,15 +1,15 @@
 @import "base/environment";
 
 @import "vendor/bootstrap/reset";
-@if $use_new_styles {
+
+// because their contents are all wrapped in an @if (not) $use_new_styles,
+// effectively, only this will be loaded in new UI
 @import "components/ic-typography";
-}
-@else {
-@import "vendor/bootstrap/scaffolding";
-@import "vendor/bootstrap/type";
-@import "vendor/bootstrap/code";
-@import "base/bootstrap_overrides";
-}
+// and all of these are loaded if not $use_new_styles (oldUI)
+@import "vendor/bootstrap/scaffolding";//remove this line once $use_new_styles is turned on everywhere
+@import "vendor/bootstrap/type";//remove this line once $use_new_styles is turned on everywhere
+@import "vendor/bootstrap/code";//remove this line once $use_new_styles is turned on everywhere
+@import "base/bootstrap_overrides";//remove this line once $use_new_styles is turned on everywhere
 
 
 

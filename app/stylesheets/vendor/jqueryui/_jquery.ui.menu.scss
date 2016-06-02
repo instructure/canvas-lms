@@ -43,8 +43,8 @@
 $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
 $kyle-menu-carat-size: 8px;
-@if $use_new_styles { $kyle-menu-border-radius: $baseBorderRadius; }
-@else { $kyle-menu-border-radius: 4px; }
+$kyle-menu-border-radius: $baseBorderRadius;
+@if not $use_new_styles { $kyle-menu-border-radius: 4px; }
 
 
 

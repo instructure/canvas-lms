@@ -13,6 +13,7 @@
 @import "components/alerts";
 @import "components/buttons";
 @import "components/g_base";
+@import "components/ic-typography";
 @import "components/accordion";
 @import "components/g_instructure";
 @import "components/tables";
@@ -35,6 +36,3 @@
 @import "vendor/mediaelementplayer";
 @import "base/custom_mediaelementplayer";
 
-@if $use_new_styles {
-@import "components/ic-typography";
-}

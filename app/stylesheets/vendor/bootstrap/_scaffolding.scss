@@ -1,3 +1,4 @@
+@if not $use_new_styles {
 //
 // Scaffolding
 // --------------------------------------------------
@@ -59,3 +60,4 @@ a {
 .img-circle {
   @include border-radius(500px); // crank the border-radius so it works with most reasonably sized images
 }
+}//end @if not $use_new_styles
