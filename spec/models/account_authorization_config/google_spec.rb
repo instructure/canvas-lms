@@ -23,7 +23,7 @@ describe AccountAuthorizationConfig::Google do
     ap = AccountAuthorizationConfig::Google.new
     ap.hosted_domain = 'instructure.com'
     JWT.expects(:decode).returns([{'hd' => 'school.edu', 'sub' => '123'}])
-    token = stub('token', params: {})
+    token = stub('token', params: {}, options: {})
 
     expect { ap.unique_id(token) }.to raise_error
   end
@@ -32,7 +32,7 @@ describe AccountAuthorizationConfig::Google do
     ap = AccountAuthorizationConfig::Google.new
     ap.hosted_domain = 'instructure.com'
     JWT.expects(:decode).returns([{'sub' => '123'}])
-    token = stub('token', params: {})
+    token = stub('token', params: {}, options: {})
 
     expect { ap.unique_id(token) }.to raise_error
   end
@@ -42,7 +42,7 @@ describe AccountAuthorizationConfig::Google do
     # TODO: use JSON::JWT in AccountAuthorizationConfig::Google
     JWT.expects(:decode).once.returns([{'sub' => '123'}])
     JSON::JWT.expects(:decode).once.returns({'sub' => '123'})
-    token = stub('token', params: {})
+    token = stub('token', params: {}, options: {})
 
     expect(ap.unique_id(token)).to eq '123'
   end

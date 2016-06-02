@@ -380,6 +380,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'sub' (the default), or 'email'
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'email',
+  #   'family_name', 'given_name', 'locale', 'name', and 'sub'.
+  #
   # For LDAP, the additional recognized parameters are:
   #
   # - auth_host

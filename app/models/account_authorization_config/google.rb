@@ -43,8 +43,19 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   end
   validates :login_attribute, inclusion: login_attributes
 
+  def self.recognized_federated_attributes
+    [
+      'email'.freeze,
+      'family_name'.freeze,
+      'given_name'.freeze,
+      'locale'.freeze,
+      'name'.freeze,
+      'sub'.freeze,
+    ].freeze
+  end
+
   def unique_id(token)
-    id_token = JWT.decode(token.params['id_token'], nil, false).first
+    id_token = id_token(token)
     if hosted_domain && id_token['hd'] != hosted_domain
       # didn't make a "nice" exception for this, cause it should never happen.
       # either we got MITM'ed (on the server side), or Google's docs lied;
@@ -54,7 +65,19 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
     super
   end
 
+  def provider_attributes(token)
+    result = id_token(token).dup
+    if federated_attributes.any? { |(_k, v)| ['family_name', 'given_name', 'locale', 'name'].include?(v['attribute']) }
+      result.merge!(token.get("https://www.googleapis.com/oauth2/v3/userinfo").parsed)
+    end
+    result
+  end
+
   protected
+
+  def id_token(token)
+    token.options[:id_token] ||= JWT.decode(token.params['id_token'], nil, false).first
+  end
 
   def authorize_options
     result = { scope: scope_for_options }
@@ -63,7 +86,12 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   end
 
   def scope
-    'email'.freeze if login_attribute == 'email'.freeze || hosted_domain
+    scopes = []
+    scopes << 'email' if login_attribute == 'email'.freeze ||
+        hosted_domain ||
+        federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
+    scopes << 'profile' if federated_attributes.any? { |(_k, v)| v['attribute'] == 'name' }
+    scopes.join(' ')
   end
 
   def authorize_url
