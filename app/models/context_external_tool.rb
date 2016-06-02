@@ -169,6 +169,17 @@ class ContextExternalTool < ActiveRecord::Base
         settings[:text] || name || "External Tool"
   end
 
+  # This is not an accepted LTI standard for logos. It's a stop-gap until LTI
+  # provides a standard. As such, it could return nil if the settings don't
+  # contain the related attributes. This is handled in the view by rendering
+  # an svg of the Commons logo.
+  def logo_for(extension_type, selected = false)
+    if selected
+      logo = extension_setting(extension_type, :icon_selected_url)
+    end
+    logo || extension_setting(extension_type, :icon_url)
+  end
+
   def check_for_xml_error
     (@config_errors || []).each { |attr,msg|
       errors.add attr, msg
@@ -295,6 +306,7 @@ class ContextExternalTool < ActiveRecord::Base
   def icon_url
     settings[:icon_url]
   end
+
   def canvas_icon_class=(i_url)
     settings[:canvas_icon_class] = i_url
   end
