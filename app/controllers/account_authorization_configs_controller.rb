@@ -315,6 +315,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   'teacher_number'. Note that some fields may not be populated for
   #   all users at Clever.
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'id',
+  #   'sis_id', 'email', 'student_number', and 'teacher_number'.
+  #
   # For Facebook, the additional recognized parameters are:
   #
   # - app_id [Required]
