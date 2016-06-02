@@ -82,6 +82,13 @@ describe Wiki do
       expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
     end
 
+    it 'should not give read rights to unpublished public courses' do
+      @course.workflow_state = 'claimed'
+      @course.is_public = true
+      @course.save!
+      expect(@course.wiki.grants_right?(@user, :read)).to be_falsey
+    end
+
     it 'should give manage rights to teachers' do
       course_with_teacher
       expect(@course.wiki.grants_right?(@teacher, :manage)).to be_truthy
