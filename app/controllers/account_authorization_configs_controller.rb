@@ -484,6 +484,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   Microsoft. Oid will not be populated for personal Microsoft accounts.
   #   Defaults to 'sub'
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'email',
+  #   'name', 'preferred_username', 'oid', and 'sub'.
+  #
   # For OpenID Connect, the additional recognized parameters are:
   #
   # - client_id [Required]
