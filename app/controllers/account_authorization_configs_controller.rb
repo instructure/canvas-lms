@@ -440,6 +440,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'id' (the default), or 'emailAddress'
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'emailAddress',
+  #   'firstName', 'id', 'formattedName', and 'lastName'.
+  #
   # For Microsoft, the additional recognized parameters are:
   #
   # - application_id [Required]
