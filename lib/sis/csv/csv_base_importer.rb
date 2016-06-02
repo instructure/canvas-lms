@@ -56,6 +56,7 @@ module SIS
     
       def csv_rows(csv)
         ::CSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
+          next if row.to_hash.values.all?(&:nil?)
           yield row
         end
       end
