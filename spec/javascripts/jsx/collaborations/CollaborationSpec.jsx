@@ -7,35 +7,35 @@ define([
 
   module('Collaboration');
 
-  ENV.context_asset_string = 'courses_1'
-
-  let collaboration = {
-    title: 'Hello there',
-    description: 'Im here to describe stuff',
-    user_id: 1,
-    user_name: 'Say my name',
-    updated_at: (new Date(0)).toString()
+  let props = {
+    collaboration: {
+      title: 'Hello there',
+      description: 'Im here to describe stuff',
+      user_id: 1,
+      user_name: 'Say my name',
+      updated_at: (new Date(0)).toString()
+    }
   }
 
   test('renders the collaboration', () => {
     ENV.context_asset_string = 'courses_1'
 
-    let component = TestUtils.renderIntoDocument(<Collaboration collaboration={collaboration} />);
+    let component = TestUtils.renderIntoDocument(<Collaboration {...props} />);
     let title = TestUtils.findRenderedDOMComponentWithClass(component, 'Collaboration-title').getDOMNode().innerText;
     let description = TestUtils.findRenderedDOMComponentWithClass(component, 'Collaboration-description').getDOMNode().innerText;
     let author = TestUtils.findRenderedDOMComponentWithClass(component, 'Collaboration-author').getDOMNode().innerText;
     let updateDate = TestUtils.findRenderedDOMComponentWithClass(component, 'DatetimeDisplay').getDOMNode().innerText;
 
-    equal(title, collaboration.title);
-    equal(description, collaboration.description);
-    equal(author, `${collaboration.user_name},`);
+    equal(title, props.collaboration.title);
+    equal(description, props.collaboration.description);
+    equal(author, `${props.collaboration.user_name},`);
     ok(updateDate);
   });
 
   test('renders a link to the user who created the collaboration', () => {
     ENV.context_asset_string = 'courses_1'
 
-    let component = TestUtils.renderIntoDocument(<Collaboration collaboration={collaboration} />);
+    let component = TestUtils.renderIntoDocument(<Collaboration {...props} />);
     let link = TestUtils.findRenderedDOMComponentWithClass(component, 'Collaboration-author').getDOMNode();
     ok(link.href.includes('/users/1'));
   });
@@ -43,8 +43,26 @@ define([
   test('renders the date time in the correct format', () => {
     ENV.context_asset_string = 'courses_1'
 
-    let component = TestUtils.renderIntoDocument(<Collaboration collaboration={collaboration} />)
+    let component = TestUtils.renderIntoDocument(<Collaboration {...props} />)
     let dateString = TestUtils.findRenderedDOMComponentWithClass(component, 'DatetimeDisplay').getDOMNode().innerText;
-    equal(dateString, tz.format(collaboration.updated_at, '%b %d, %l:%M %p'));
-  })
+    equal(dateString, tz.format(props.collaboration.updated_at, '%b %d, %l:%M %p'));
+  });
+
+  test('when the user clicks the trash button it opens the delete confirmation', () => {
+    let component = TestUtils.renderIntoDocument(<Collaboration {...props} />);
+    let trashIcon = TestUtils.findRenderedDOMComponentWithClass(component, 'icon-trash').getDOMNode();
+    TestUtils.Simulate.click(trashIcon);
+    let deleteConfirmation = TestUtils.findRenderedDOMComponentWithClass(component, 'DeleteConfirmation');
+    ok(deleteConfirmation);
+  });
+
+  test('when the user clicks the cancel button on the delete confirmation it removes the delete confirmation', () => {
+    let component = TestUtils.renderIntoDocument(<Collaboration {...props} />);
+    let trashIcon = TestUtils.findRenderedDOMComponentWithClass(component, 'icon-trash').getDOMNode();
+    TestUtils.Simulate.click(trashIcon);
+    let cancelButton = TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[1].getDOMNode();
+    TestUtils.Simulate.click(cancelButton);
+    let deleteConfirmation = TestUtils.scryRenderedDOMComponentsWithClass(component, 'DeleteConfirmation');
+    equal(deleteConfirmation.length, 0);
+  });
 });

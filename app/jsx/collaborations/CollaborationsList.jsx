@@ -7,7 +7,7 @@ define([
       return (
         <div className='CollaborationsList'>
           {this.props.collaborations.map(c => (
-            <Collaboration key={c.id} collaboration={c} />
+            <Collaboration key={c.id} collaboration={c} deleteCollaboration={this.props.deleteCollaboration} />
           ))}
         </div>
       )
@@ -15,7 +15,8 @@ define([
   };
 
   CollaborationsList.propTypes = {
-    collaborations: React.PropTypes.array
+    collaborations: React.PropTypes.array,
+    deleteCollaboration: React.PropTypes.func
   };
 
   return CollaborationsList

@@ -1,13 +1,43 @@
 define([
   'react',
   'jsx/shared/DatetimeDisplay',
+  './DeleteConfirmation',
   'i18n!react_collaborations',
-  'compiled/str/splitAssetString'
-], (React, DatetimeDisplay, i18n, splitAssetString) => {
+  'compiled/str/splitAssetString',
+  'jsx/collaborations/store/store'
+], (React, DatetimeDisplay, DeleteConfirmation, i18n, splitAssetString, store) => {
   class Collaboration extends React.Component {
+    constructor (props) {
+      super(props);
+      this.state = { deleteConfirmationOpen: false };
+
+      this.openConfirmation = this.openConfirmation.bind(this);
+      this.closeConfirmation = this.closeConfirmation.bind(this);
+      this.deleteCollaboration = this.deleteCollaboration.bind(this);
+    }
+
+    openConfirmation () {
+      this.setState({
+        deleteConfirmationOpen: true
+      });
+    }
+
+    closeConfirmation () {
+      this.setState({
+        deleteConfirmationOpen: false
+      }, () => {
+        React.findDOMNode(this.refs.deleteButton).focus()
+      });
+    }
+
+    deleteCollaboration () {
+      let [context, contextId] = splitAssetString(ENV.context_asset_string);
+      store.dispatch(this.props.deleteCollaboration(context, contextId, this.props.collaboration.id));
+    }
+
     render () {
-      let { collaboration } = this.props
-      let [context, contextId] = splitAssetString(ENV.context_asset_string)
+      let { collaboration } = this.props;
+      let [context, contextId] = splitAssetString(ENV.context_asset_string);
 
       return (
         <div className='Collaboration'>
@@ -26,18 +56,22 @@ define([
             <a className='icon-edit'>
               <span className='screenreader-only'>{i18n.t('Edit Collaboration')}</span>
             </a>
-            <button className='btn btn-link'>
+            <button ref='deleteButton' className='btn btn-link' onClick={this.openConfirmation}>
               <i className='icon-trash'></i>
               <span className='screenreader-only'>{i18n.t('Delete Collaboration')}</span>
             </button>
           </div>
+          {this.state.deleteConfirmationOpen &&
+            <DeleteConfirmation collaboration={collaboration} onCancel={this.closeConfirmation} onDelete={this.deleteCollaboration} />
+          }
         </div>
       );
     }
   };
 
   Collaboration.propTypes = {
-    collaboration: React.PropTypes.object
+    collaboration: React.PropTypes.object,
+    deleteCollaboration: React.PropTypes.func
   };
 
   return Collaboration

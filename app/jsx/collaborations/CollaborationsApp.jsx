@@ -16,7 +16,7 @@ define([
         <div className="CollaborationsApp">
           <CollaborationsNavigation ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
           {list.length
-            ? <CollaborationsList collaborations={list} />
+            ? <CollaborationsList collaborations={list} deleteCollaboration={this.props.actions.deleteCollaboration} />
             : <GettingStartedCollaborations ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
           }
         </div>
