@@ -88,6 +88,14 @@ describe Login::CanvasController do
     expect(session[:sentinel]).to be_nil
   end
 
+  it "password auth should work for an explicit Canvas pseudonym" do
+    @pseudonym.update_attribute(:authentication_provider, Account.default.canvas_authentication_provider)
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+  end
+
   it "password auth should work with extra whitespace around unique id " do
     post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty'}
     expect(response).to be_redirect
@@ -134,6 +142,17 @@ describe Login::CanvasController do
       Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    end
+
+    it "works for a pseudonym explicitly linked to LDAP" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      @pseudonym.any_instantiation.expects(:valid_arbitrary_credentials?).returns(true)
+      @pseudonym.update_attribute(:authentication_provider, aac)
+      post 'create', :pseudonym_session => { :unique_id => '12345', :password => 'password'}
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym

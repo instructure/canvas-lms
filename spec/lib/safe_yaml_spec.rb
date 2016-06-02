@@ -181,4 +181,14 @@ YAML
     hash = {:blah => "42._"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
+
+  it "should dump whatever this is too" do
+    hash = {:blah => "4,2:0."}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should be able to dump and load Canvas:Plugin classes" do
+    plugin = Canvas::Plugin.find('canvas_cartridge_importer')
+    expect(YAML.unsafe_load(YAML.dump(plugin))).to eq plugin
+  end
 end
