@@ -587,6 +587,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   for use on parent registrations.  Only one service can be selected
   #   at a time so if set to true all others will be set to false
   #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Valid provider attributes are 'name',
+  #   'screen_name', 'time_zone', and 'user_id'.
+  #
   # @example_request
   #   # Create LDAP config
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers' \
