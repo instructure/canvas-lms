@@ -2,14 +2,13 @@ define([
   'react',
   'underscore',
   'jquery',
-  'convert_case',
   'axios',
   'i18n!grading_periods',
+  'convert_case',
   'jsx/grading/GradingPeriodSet',
   'jsx/grading/SearchGradingPeriodsField',
   'jsx/shared/helpers/searchHelpers'
-], function(React, _, $, ConvertCase, axios, I18n, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers) {
-
+], function(React, _, $, axios, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers) {
   const deserializeSets = function(sets) {
     return _.map(sets, function(set) {
       let newSet = ConvertCase.camelize(set);
@@ -29,10 +28,14 @@ define([
     });
   };
 
+  const types = React.PropTypes;
+
   let GradingPeriodSetCollection = React.createClass({
     propTypes: {
-      URLs: React.PropTypes.shape({
-        gradingPeriodSetsURL: React.PropTypes.string.isRequired
+      readOnly: types.bool.isRequired,
+      URLs: types.shape({
+        gradingPeriodSetsURL:    types.string.isRequired,
+        gradingPeriodsUpdateURL: types.string.isRequired
       }).isRequired
     },
 
@@ -55,7 +58,7 @@ define([
                 sets: deserializeSets(response.data.grading_period_sets)
               });
             })
-            .catch(() => {
+            .catch((_) => {
               $.flashError(I18n.t("An error occured while fetching grading period sets."));
             });
     },
@@ -100,12 +103,16 @@ define([
     },
 
     renderSets: function() {
+      let urls = { batchUpdateUrl: this.props.URLs.gradingPeriodsUpdateURL };
       let visibleSets = this.filterSetsBySearchText();
       return _.map(visibleSets, set => {
         return (
           <GradingPeriodSet key={set.id}
                             set={set}
-                            gradingPeriods={set.gradingPeriods}/>
+                            gradingPeriods={set.gradingPeriods}
+                            urls={urls}
+                            readOnly={this.props.readOnly}
+                            permissions={set.permissions} />
         );
       });
     },

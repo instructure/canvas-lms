@@ -39,6 +39,12 @@
   margin-left: $ic-sp / 2;
 }
 
+// GRADING PERIOD SEARCH FIELD
+
+.GradingPeriodSearchField {
+  width: 250px;
+}
+
 // GRADING PERIOD SET
 
 .GradingPeriodSet--expanded,
@@ -107,8 +113,33 @@
   flex: 0 0 auto;
 }
 
-// GRADING PERIOD SEARCH FIELD
+// GRADING PERIOD LIST -- NEW PERIOD
 
-.GradingPeriodSearchField {
-  width: 250px;
+.GradingPeriodList__new-period {
+  border-bottom-style: dashed;
+  border-color: $ic-border-light;
+  border-left-style: dashed;
+  border-right-style: dashed;
+  border-top-style: none;
+}
+
+.GradingPeriodList__new-period__add-button {
+  line-height: 20px;
+  margin: 10px 0;
+  padding: 2px 0;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.GradingPeriodList__new-period--editing {
+  border-left: 1px solid $ic-border-light;
+  border-right: 1px solid $ic-border-light;
+  border-bottom: 1px solid $ic-border-light;
+}
+
+// GRADING PERIOD FORM
+
+.GradingPeriodForm {
 }

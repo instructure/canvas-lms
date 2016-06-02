@@ -1,26 +1,99 @@
 define([
   'react',
+  'jquery',
   'underscore',
+  'convert_case',
   'i18n!grading_periods',
-  'jsx/grading/AccountGradingPeriod'
-], function(React, _, I18n, GradingPeriod) {
+  'jsx/grading/AccountGradingPeriod',
+  'jsx/grading/GradingPeriodForm',
+  'compiled/api/gradingPeriodsApi',
+  'jquery.instructure_misc_helpers'
+], function(React, $, _, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
   const types = React.PropTypes;
 
   const sortPeriods = function(periods) {
     return _.sortBy(periods, "startDate");
   };
 
+  const anyPeriodsOverlap = function(periods) {
+    if (_.isEmpty(periods)) {
+      return false;
+    }
+    let firstPeriod = _.first(periods);
+    let otherPeriods = _.rest(periods);
+    let overlapping = _.some(otherPeriods, function(otherPeriod) {
+      return otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate;
+    });
+    return overlapping || anyPeriodsOverlap(otherPeriods);
+  };
+
+  const isValidDate = function(date) {
+    return Object.prototype.toString.call(date) === "[object Date]" &&
+           !isNaN(date.getTime());
+  };
+
+  const validatePeriods = function(periods) {
+    if (_.any(periods, (period) => { return !period.title })) {
+      return [I18n.t('All grading periods must have a title')];
+    }
+
+    let validDates = _.all(periods, (period) => {
+      return isValidDate(period.startDate) && isValidDate(period.endDate);
+    });
+
+    if (!validDates) {
+      return [I18n.t('All dates fields must be present and formatted correctly')];
+    }
+
+    let orderedDates = _.all(periods, (period) => {
+      return period.startDate < period.endDate;
+    });
+
+    if (!orderedDates) {
+      return [I18n.t('All start dates must be before the end date')];
+    }
+
+    if (anyPeriodsOverlap(periods)) {
+      return [I18n.t('Grading periods must not overlap')];
+    }
+  };
+
   let GradingPeriodSet = React.createClass({
     propTypes: {
       set: types.shape({
         id: types.string,
-        title: types.string.isRequired
+        title: types.string
       }).isRequired,
-      gradingPeriods: types.array.isRequired
+      gradingPeriods: types.array.isRequired,
+      urls:           types.shape({
+        batchUpdateUrl: types.string.isRequired
+      }).isRequired,
+      readOnly: types.bool.isRequired,
+      permissions: types.shape({
+        read:   types.bool.isRequired,
+        create: types.bool.isRequired,
+        update: types.bool.isRequired,
+        delete: types.bool.isRequired
+      }).isRequired
     },
 
     getInitialState() {
-      return { expanded: true };
+      return {
+        title: this.props.set.title,
+        gradingPeriods: sortPeriods(this.props.gradingPeriods),
+        expanded: this.props.expanded,
+        newPeriod: {
+          period: null,
+          saving: false
+        },
+        batchUpdateUrl: $.replaceTags(this.props.urls.batchUpdateUrl, 'set_id', this.props.set.id)
+      };
+    },
+
+    componentDidUpdate(prevProps, prevState) {
+      if (prevState.newPeriod.period && !this.state.newPeriod.period) {
+        this.refs.addPeriodButton.getDOMNode().focus();
+      }
     },
 
     toggleSetBody() {
@@ -62,13 +135,13 @@ define([
           <div className="GradingPeriodList" ref="gradingPeriodList">
             {this.renderGradingPeriods()}
           </div>
+          {this.renderNewPeriod()}
         </div>
       );
     },
 
     renderGradingPeriods() {
-      const sortedPeriods = sortPeriods(this.props.gradingPeriods);
-      return _.map(sortedPeriods, function(period) {
+      return _.map(this.state.gradingPeriods, function(period) {
         return (
           <GradingPeriod key={period.id} period={period} />
         );
@@ -99,6 +172,79 @@ define([
           {this.state.expanded && this.renderSetBody()}
         </div>
       );
+    },
+
+    renderNewPeriod() {
+      if (this.props.permissions.create && !this.props.readOnly) {
+        if (this.state.newPeriod.period) {
+          return this.renderNewPeriodForm();
+        } else {
+          return this.renderNewPeriodButton();
+        }
+      }
+    },
+
+    renderNewPeriodButton() {
+      return (
+        <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
+          <button className='Button--link GradingPeriodList__new-period__add-button'
+                  ref='addPeriodButton'
+                  aria-label={I18n.t('Add Grading Period')}
+                  onClick={this.showNewPeriodForm}>
+            <i className='icon-plus GradingPeriodList__new-period__add-icon'/>
+            {I18n.t('Grading Period')}
+          </button>
+        </div>
+      );
+    },
+
+    renderNewPeriodForm() {
+      return (
+        <div className='GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box'>
+          <GradingPeriodForm key      = 'new-grading-period'
+                             ref      = 'newPeriodForm'
+                             disabled = {this.state.newPeriod.saving}
+                             onSave   = {this.saveNewPeriod}
+                             onCancel = {this.removeNewPeriodForm} />
+        </div>
+      );
+    },
+
+    showNewPeriodForm() {
+      this.setNewPeriod({period: {}});
+    },
+
+    saveNewPeriod(period) {
+      let periods = this.state.gradingPeriods.concat([period]);
+      let validations = validatePeriods(periods);
+      if (_.isEmpty(validations)) {
+        this.setNewPeriod({saving: true});
+        gradingPeriodsApi.batchUpdate(this.props.set.id, periods)
+             .then((periods) => {
+               $.flashMessage(I18n.t('All changes were saved'));
+               this.setState({
+                 gradingPeriods: sortPeriods(periods)
+               });
+               this.removeNewPeriodForm();
+             })
+             .catch((_) => {
+               $.flashError(I18n.t('There was a problem saving the grading period'));
+               this.setNewPeriod({saving: false});
+             });
+      } else {
+        _.each(validations, function(message) {
+          $.flashError(message);
+        });
+      }
+    },
+
+    removeNewPeriodForm() {
+      this.setNewPeriod({saving: false, period: null});
+    },
+
+    setNewPeriod(attr) {
+      let period = $.extend(true, {}, this.state.newPeriod, attr);
+      this.setState({newPeriod: period});
     }
   });
 

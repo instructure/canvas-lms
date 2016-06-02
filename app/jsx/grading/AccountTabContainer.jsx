@@ -4,12 +4,16 @@ define([
   'jsx/grading/GradingPeriodSetCollection',
   'jquery',
   'i18n!grading_periods'
- ], function(React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) {
-  var AccountTabContainer = React.createClass({
+], function(React, GradingStandardCollection, GradingPeriodSetCollection, $, I18n) {
+  const types = React.PropTypes;
+
+  let AccountTabContainer = React.createClass({
     propTypes: {
-      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired,
-      URLs: React.PropTypes.shape({
-        gradingPeriodSetsURL: React.PropTypes.string.isRequired,
+      multipleGradingPeriodsEnabled: types.bool.isRequired,
+      readOnly: types.bool.isRequired,
+      URLs: types.shape({
+        gradingPeriodSetsURL:    types.string.isRequired,
+        gradingPeriodsUpdateURL: types.string.isRequired
       }).isRequired
     },
 
@@ -27,7 +31,8 @@ define([
                 <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
               </ul>
               <div ref="gradingPeriods" id="grading-periods-tab">
-                <GradingPeriodSetCollection URLs={this.props.URLs} />
+                <GradingPeriodSetCollection URLs={this.props.URLs}
+                                            readOnly={this.props.readOnly} />
               </div>
               <div ref="gradingStandards" id="grading-standards-tab">
                 <GradingStandardCollection />

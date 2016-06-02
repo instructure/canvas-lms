@@ -23,17 +23,26 @@ class GradingStandardsController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :manage_grades)
-      js_env({
+      client_env = {
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
-        :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
         :GRADING_PERIOD_SETS_URL => api_v1_account_grading_period_sets_url(@context),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
         :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard,
         :CONTEXT_SETTINGS_URL => context_url(@context, :context_settings_url)
-      })
+      }
+
+      if @context.is_a?(Account)
+        client_env[:GRADING_PERIODS_UPDATE_URL] = api_v1_grading_period_set_periods_update_url("{{ set_id }}")
+        client_env[:GRADING_PERIODS_READ_ONLY] = !@context.root_account?
+        view_path = 'account_index'
+      else
+        client_env[:GRADING_PERIODS_URL] = context_url(@context, :api_v1_context_grading_periods_url)
+        view_path = 'index'
+      end
+
+      js_env(client_env)
 
       @standards = GradingStandard.for(@context).sorted.limit(100)
-      view_path = @context.is_a?(Account) ? 'account_index' : 'index'
       respond_to do |format|
         format.html { render view_path }
         format.json do

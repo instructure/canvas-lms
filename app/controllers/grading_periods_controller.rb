@@ -73,7 +73,11 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      # FIXME: This action will not be used with Accounts after CNVS-27101 is implemented
+      # FIXME: This action is no longer used with Accounts.
+      #
+      # Team question: What should we do if external clients are still
+      # potentially going to expect grading periods on accounts by calling
+      # to this endpoint?
       if @context.is_a? Account
         grading_periods = []
       else
@@ -162,9 +166,45 @@ class GradingPeriodsController < ApplicationController
   end
 
   def batch_update
-    return unless authorized_action(@context, @current_user, :manage)
+    if authorized_action(@context, @current_user, :manage_grades)
+      case @context
+      when Account
+        account_batch_update
+      when Course
+        course_batch_update
+      end
+    end
+  end
 
-    periods = find_or_build_periods_with_params(params[:grading_periods])
+  private
+
+  def account_batch_update
+    periods = find_or_build_periods_for_account(params[:grading_periods])
+    unless batch_update_rights?(periods)
+      return render_unauthorized_action
+    end
+
+    grading_period_group.grading_periods.transaction do
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
+
+      respond_to do |format|
+        if errors.present?
+          format.json do
+            render json: {errors: errors}, status: :unprocessable_entity
+          end
+        else
+          periods.each(&:save!)
+          format.json do
+            render json: unpaginated_json_api(periods)
+          end
+        end
+      end
+    end
+  end
+
+  def course_batch_update
+    periods = find_or_build_periods_for_course(params[:grading_periods])
     unless batch_update_rights?(periods)
       return render_unauthorized_action
     end
@@ -189,7 +229,12 @@ class GradingPeriodsController < ApplicationController
     end
   end
 
-  private
+  def get_context
+    return super unless params[:set_id].present?
+
+    term_subquery = EnrollmentTerm.select(:root_account_id).where(grading_period_group_id: params[:set_id])
+    @context = Account.active.where(id: term_subquery).take
+  end
 
   # model level validations
   def validation_errors(periods)
@@ -210,7 +255,16 @@ class GradingPeriodsController < ApplicationController
     sorted_periods.select { |period| period.errors.present? }.map(&:errors)
   end
 
-  def find_or_build_periods_with_params(periods_params)
+  def find_or_build_periods_for_account(periods_params)
+    periods_params.map do |period_params|
+      period = grading_period_group.grading_periods.find(period_params[:id]) if period_params[:id].present?
+      period ||= grading_period_group.grading_periods.build
+      period.assign_attributes(period_params.except(:id))
+      period
+    end
+  end
+
+  def find_or_build_periods_for_course(periods_params)
     periods_params.map do |period_params|
       period = GradingPeriod.context_find(@context, period_params[:id])
       period ||= context_grading_period_group.grading_periods.build
@@ -243,6 +297,18 @@ class GradingPeriodsController < ApplicationController
     [paginated_grading_periods, meta]
   end
 
+  def unpaginated_json_api(grading_periods)
+    grading_periods = Array.wrap(grading_periods)
+
+    Canvas::APIArraySerializer.new(grading_periods, {
+      each_serializer: GradingPeriodSerializer,
+      controller: self,
+      root: :grading_periods,
+      scope: @current_user,
+      include_root: false
+    }).as_json
+  end
+
   def serialize_json_api(grading_periods, meta = {})
     grading_periods = Array.wrap(grading_periods)
 
@@ -265,5 +331,9 @@ class GradingPeriodsController < ApplicationController
       can_create_grading_periods: can_create_grading_periods,
       can_toggle_grading_periods: can_toggle_grading_periods
     }.as_json
+  end
+
+  def grading_period_group
+    @grading_period_group ||= GradingPeriodGroup.active.find(params[:set_id]) if params[:set_id].present?
   end
 end

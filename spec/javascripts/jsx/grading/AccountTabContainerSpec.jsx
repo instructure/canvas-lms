@@ -9,9 +9,10 @@ define([
   module("AccountTabContainer", {
     renderComponent: function(props={}) {
       const defaults = {
+        readOnly: false,
         URLs: {
           gradingPeriodSetsURL:    "api/v1/accounts/1/grading_period_sets",
-          gradingPeriodsUpdateURL: "api/v1/grading_period_sets/1/grading_periods/batch_update",
+          gradingPeriodsUpdateURL: "api/v1/grading_period_sets/{{ set_id }}/grading_periods/batch_update",
           enrollmentTermsURL:      "api/v1/accounts/1/enrollment_terms"
         }
       };
