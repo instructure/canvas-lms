@@ -29,7 +29,7 @@ module Importers
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
       item ||= GradingStandard.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.grading_standards.new
+      item ||= context.grading_standards.temp_record
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title]

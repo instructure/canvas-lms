@@ -51,7 +51,7 @@ module Importers
         question_bank = bank_map[bank_mig_id]
 
         if !question_bank
-          question_bank = migration.context.assessment_question_banks.new
+          question_bank = migration.context.assessment_question_banks.temp_record
           if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == bank_mig_id}
             question_bank.title = bank_hash['title']
           end
