@@ -725,7 +725,7 @@ class CalendarEventsApiController < ApplicationController
       }
     end
 
-    render json: {contexts: Api.recursively_stringify_json_ids(contexts)}
+    render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}
   end
 
   def save_selected_contexts

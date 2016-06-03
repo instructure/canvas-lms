@@ -1731,7 +1731,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+    stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -1959,7 +1959,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)

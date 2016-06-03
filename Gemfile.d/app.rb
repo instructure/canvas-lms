@@ -104,6 +104,7 @@ gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '1.0.3'
 gem 'diplomat', '0.15.0', require: false
+gem 'gepub'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
@@ -141,7 +142,7 @@ gem 'diigo', path: 'gems/diigo'
 gem 'lti_outbound', path: 'gems/lti_outbound'
 gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'
+gem 'stringify_ids', path: 'gems/stringify_ids'
 gem 'twitter', path: 'gems/twitter'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
-gem 'gepub'
