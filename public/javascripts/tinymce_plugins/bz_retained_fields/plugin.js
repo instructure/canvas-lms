@@ -61,7 +61,7 @@ tinymce.create('tinymce.plugins.BZRetainedFields', {
         else if(type == "input")
           ed.selection.setContent('<input type="text" data-bz-retained="'+name+'" />');
         else if(type == "textarea")
-          ed.selection.setContent('<textarea data-bz-retained="'+name+'"></textarea>');
+          ed.selection.setContent('<textarea data-bz-retained="'+name+'">&#8291;</textarea>');
       });
     });
     ed.addCommand('bzRetainedFieldView', function() {
