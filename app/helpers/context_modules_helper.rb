@@ -27,7 +27,7 @@ module ContextModulesHelper
         # both user sections and course tags, both of which may change
         # at any time. By considering the list of tags as part of the key,
         # it will automatically invalidate if either changes.
-        cache_key_items << Digest::MD5.hexdigest(context_module.content_tags_visible_to(user).to_s)
+        cache_key_items << Digest::MD5.hexdigest(context_module.content_tags_visible_to(user).all.map(&:id).sort.to_s)
       end
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
