@@ -23,7 +23,7 @@ module Importers
       return nil if hash[:migration_id] && hash[:groups_to_import] && !hash[:groups_to_import][hash[:migration_id]]
       item ||= Group.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
       item ||= Group.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.groups.new
+      item ||= context.groups.temp_record
       migration.add_imported_item(item)
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]

@@ -176,7 +176,7 @@ describe "Importing assignments" do
     settings = assignment.turnitin_settings
     expect(settings["originality_report_visibility"]).to eq("after_due_date")
     expect(settings["exclude_value"]).to eq("5")
-    
+
     ["s_paper_check", "journal_check", "exclude_biblio", "exclude_type", "submit_papers_to", "s_view_report"].each do |field|
       expect(settings[field]).to eq("1")
     end
@@ -184,6 +184,24 @@ describe "Importing assignments" do
     ["internet_check", "exclude_quoted"].each do |field|
       expect(settings[field]).to eq("0")
     end
+  end
+  
+  it "should not explode if it tries to import negative points possible" do
+    course_model
+    assign_hash = {
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "workflow_state" => "published",
+      "title" => "weird negative assignment",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "points_possible" => -42
+    }
+    migration = @course.content_migrations.create!
+    migration.stubs(:date_shift_options).returns(true)
+    Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+    assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
+    expect(assignment.points_possible).to eq 0
   end
 
 end

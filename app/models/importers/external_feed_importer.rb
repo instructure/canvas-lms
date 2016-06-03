@@ -47,7 +47,7 @@ module Importers
         header_match: hash[:header_match].presence,
         verbosity: hash[:verbosity]
       ).first if hash[:url]
-      item ||= context.external_feeds.new
+      item ||= context.external_feeds.temp_record
       item
     end
   end
