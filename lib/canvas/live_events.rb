@@ -1,6 +1,11 @@
 module Canvas::LiveEvents
+  def self.post_event_stringified(event_name, payload)
+    StringifyIds.recursively_stringify_ids(payload)
+    LiveEvents.post_event(event_name, payload)
+  end
+
   def self.course_syllabus_updated(course, old_syllabus_body)
-    LiveEvents.post_event('syllabus_updated', {
+    post_event_stringified('syllabus_updated', {
       course_id: course.global_id,
       syllabus_body: LiveEvents.truncate(course.syllabus_body),
       old_syllabus_body: LiveEvents.truncate(old_syllabus_body)
@@ -20,11 +25,11 @@ module Canvas::LiveEvents
       })
     end
 
-    LiveEvents.post_event('discussion_entry_created', payload)
+    post_event_stringified('discussion_entry_created', payload)
   end
 
   def self.discussion_topic_created(topic)
-    LiveEvents.post_event('discussion_topic_created', {
+    post_event_stringified('discussion_topic_created', {
       discussion_topic_id: topic.global_id,
       is_announcement: topic.is_announcement,
       title: LiveEvents.truncate(topic.title),
@@ -33,7 +38,7 @@ module Canvas::LiveEvents
   end
 
   def self.group_membership_created(membership)
-    LiveEvents.post_event('group_membership_created', {
+    post_event_stringified('group_membership_created', {
       group_membership_id: membership.global_id,
       user_id: membership.global_user_id,
       group_id: membership.global_group_id,
@@ -44,14 +49,14 @@ module Canvas::LiveEvents
   end
 
   def self.group_category_created(group_category)
-    LiveEvents.post_event('group_category_created', {
+    post_event_stringified('group_category_created', {
       group_category_id: group_category.global_id,
       group_category_name: group_category.name
     })
   end
 
   def self.group_created(group)
-    LiveEvents.post_event('group_created', {
+    post_event_stringified('group_created', {
       group_category_id: group.global_group_category_id,
       group_category_name: group.group_category.try(:name),
       group_id: group.global_id,
@@ -89,41 +94,41 @@ module Canvas::LiveEvents
   end
 
   def self.assignment_created(assignment)
-    LiveEvents.post_event('assignment_created', get_assignment_data(assignment))
+    post_event_stringified('assignment_created', get_assignment_data(assignment))
   end
 
   def self.submission_created(submission)
-    LiveEvents.post_event('submission_created', get_submission_data(submission))
+    post_event_stringified('submission_created', get_submission_data(submission))
   end
 
   def self.assignment_updated(assignment)
-    LiveEvents.post_event('assignment_updated', get_assignment_data(assignment))
+    post_event_stringified('assignment_updated', get_assignment_data(assignment))
   end
 
   def self.submission_updated(submission)
-    LiveEvents.post_event('submission_updated', get_submission_data(submission))
+    post_event_stringified('submission_updated', get_submission_data(submission))
   end
 
   def self.logged_in(session)
-    LiveEvents.post_event('logged_in', {
+    post_event_stringified('logged_in', {
       redirect_url: session[:return_to]
     })
   end
 
   def self.logged_out
-    LiveEvents.post_event('logged_out', {})
+    post_event_stringified('logged_out', {})
   end
 
   def self.quiz_submitted(submission)
     # TODO: include score, for automatically graded portions?
-    LiveEvents.post_event('quiz_submitted', {
+    post_event_stringified('quiz_submitted', {
       submission_id: submission.global_id,
       quiz_id: submission.global_quiz_id
     })
   end
 
   def self.wiki_page_created(page)
-    LiveEvents.post_event('wiki_page_created', {
+    post_event_stringified('wiki_page_created', {
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title),
       body: LiveEvents.truncate(page.body)
@@ -145,11 +150,11 @@ module Canvas::LiveEvents
       payload[:old_body] = old_body
     end
 
-    LiveEvents.post_event('wiki_page_updated', payload)
+    post_event_stringified('wiki_page_updated', payload)
   end
 
   def self.wiki_page_deleted(page)
-    LiveEvents.post_event('wiki_page_deleted', {
+    post_event_stringified('wiki_page_deleted', {
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title)
     })
@@ -161,7 +166,7 @@ module Canvas::LiveEvents
       grader_id = submission.global_grader_id
     end
 
-    LiveEvents.post_event('grade_change', {
+    post_event_stringified('grade_change', {
       submission_id: submission.global_id,
       assignment_id: submission.global_assignment_id,
       grade: submission.grade,
@@ -181,7 +186,7 @@ module Canvas::LiveEvents
       asset_obj = asset
     end
 
-    LiveEvents.post_event('asset_accessed', {
+    post_event_stringified('asset_accessed', {
       asset_type: asset_obj.class.reflection_type_name,
       asset_id: asset_obj.global_id,
       asset_subtype: asset_subtype,

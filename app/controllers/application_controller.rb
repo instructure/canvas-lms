@@ -2089,6 +2089,7 @@ class ApplicationController < ActionController::Base
       ctx[:session_id] = tctx[:session_id]
     end
 
+    StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
   end
 

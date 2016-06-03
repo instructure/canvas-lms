@@ -35,14 +35,14 @@ event originated as part of a web request:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `user_id`    | Number | The Canvas id of the currently logged in user. |
-| `real_user_id` | Number | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
+| `user_id`    | String | The Canvas id of the currently logged in user. |
+| `real_user_id` | String | If the current user is being masqueraded, this is the Canvas id of the masquerading user. |
 | `user_login` | String | The login of the current user. |
 | `user_agent` | String | The User-Agent sent by the browser making the request. |
-| `root_account_id` | Number | The Canvas id of the root account associated with the current user. |
+| `root_account_id` | String | The Canvas id of the root account associated with the current user. |
 | `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
-| `context_id` | Number | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
+| `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
 | `request_id` | String | The identifier for this request. |
@@ -53,7 +53,7 @@ fields may be set:
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `job_id` | Number | The identifier for the asynchronous job. |
+| `job_id` | String | The identifier for the asynchronous job. |
 | `job_tag` | String | A string identifying the type of job being performed. |
 
 
@@ -62,7 +62,7 @@ fields may be set:
 The `body` object will have key/value pairs with information specific to
 each event, as described below.
 
-Note: All Canvas ids are "global" identifiers.
+Note: All Canvas ids are "global" identifiers, returned as strings.
 
 
 ### Supported Events
