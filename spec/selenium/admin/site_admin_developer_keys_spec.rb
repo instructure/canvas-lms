@@ -20,7 +20,6 @@ describe "managing developer keys" do
     expect(f("#edit_dialog")).to be_displayed
     f("#key_name").send_keys("Cool Tool")
     f("#email").send_keys("admin@example.com")
-    f("#tool_id").send_keys("cool_tool")
     f("#redirect_uri").send_keys("http://example.com")
     f("#icon_url").send_keys("/images/delete.png")
     submit_dialog("#edit_dialog", '.submit')
@@ -30,7 +29,6 @@ describe "managing developer keys" do
     expect(DeveloperKey.count).to eq 2
     key = DeveloperKey.last
     expect(key.name).to eq "Cool Tool"
-    expect(key.tool_id).to eq "cool_tool"
     expect(key.email).to eq "admin@example.com"
     expect(key.redirect_uri).to eq "http://example.com"
     expect(key.icon_url).to eq "/images/delete.png"
@@ -40,7 +38,6 @@ describe "managing developer keys" do
     expect(f("#edit_dialog")).to be_displayed
     replace_content(f("#key_name"),"Cooler Tool")
     replace_content(f("#email"), "admins@example.com")
-    replace_content(f("#tool_id"), "cooler_tool")
     replace_content(f("#redirect_uri"), "https://example.com")
     replace_content(f("#icon_url") ,"/images/add.png")
     submit_dialog("#edit_dialog", '.submit')
@@ -51,14 +48,12 @@ describe "managing developer keys" do
     key = DeveloperKey.last
     expect(key.name).to eq "Cooler Tool"
     expect(key.email).to eq "admins@example.com"
-    expect(key.tool_id).to eq "cooler_tool"
     expect(key.redirect_uri).to eq "https://example.com"
     expect(key.icon_url).to eq "/images/add.png"
     expect(ff("#keys tbody tr").length).to eq 2
 
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
-    f("#tool_id").send_keys([:backspace] * 20, [:delete] * 20)
     f("#icon_url").send_keys([:backspace] * 20, [:delete] * 20)
     submit_dialog("#edit_dialog", '.submit')
     wait_for_ajaximations
@@ -66,7 +61,6 @@ describe "managing developer keys" do
     expect(f("#edit_dialog")).not_to be_displayed
     expect(DeveloperKey.count).to eq 2
     key = DeveloperKey.last
-    expect(key.tool_id).to eq nil
     expect(key.icon_url).to eq nil
     expect(ff("#keys tbody tr").length).to eq 2
 

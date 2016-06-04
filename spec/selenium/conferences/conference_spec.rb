@@ -47,6 +47,12 @@ describe 'Web conferences' do
           verify_concluded_conference_list_includes(conference_title)
         end
       end
+
+      it 'should not treat the concluded conference as active', priority: "2", test_id: 1041396 do
+        end_first_conference_in_list
+        refresh_page
+        expect(f('#new-conference-list .emptyMessage').text).to include('There are no new conferences')
+      end
     end
 
     context 'as a TA invited to the conference' do

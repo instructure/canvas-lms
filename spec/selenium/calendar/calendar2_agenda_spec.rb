@@ -53,31 +53,30 @@ describe "calendar2" do
         event = @course.calendar_events.create!(title: "ohai",
                                                 start_at: start_date, end_at: start_date + 1.hour)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 1
+        expect(ff('.ig-row').length).to eq 1
         fj('.context-list-toggle-box:last').click
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should be navigable via the jump-to-date control" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 1
+        expect(ff('.ig-row').length).to eq 1
       end
 
       it "should be navigable via the minical" do
         yesterday = 1.day.ago
         event = make_event(start: yesterday)
         load_agenda_view
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
         f('.fc-prev-button').click
         f('#right-side .fc-day-number').click
-        wait_for_ajaximations
-        keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
+        expect(ff('.ig-row').length).to eq 1
       end
 
       it "should persist the start date across reloads" do
@@ -104,8 +103,8 @@ describe "calendar2" do
         tomorrow = 1.day.from_now
         event = make_event(start: tomorrow)
         load_agenda_view
-        expect(f('.navigation_title')).to include_text(Time.now.utc.strftime("%b %-d, %Y"))
-        expect(f('.navigation_title')).to include_text(tomorrow.utc.strftime("%b %-d, %Y"))
+        expect(f('.navigation_title')).to include_text(format_date_for_view(Time.zone.now, :medium))
+        expect(f('.navigation_title')).to include_text(format_date_for_view(tomorrow, :medium))
       end
 
       it "should not display a date range if no events are found" do
@@ -124,8 +123,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should allow deleting assignments", priority: "1", test_id: 138858 do
@@ -139,8 +137,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should allow deleting a quiz", priority: "1" do
@@ -153,8 +150,7 @@ describe "calendar2" do
         f('.event-details .delete_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
 
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
+        expect(f("#content")).not_to contain_css('.ig-row')
       end
 
       it "should display midnight assignments at 11:59" do
@@ -179,7 +175,7 @@ describe "calendar2" do
         change_calendar
 
         #Get the current date and make sure it is not in the header
-        date = Time.now.strftime("%b %-d, %Y")
+        date = format_date_for_view(Time.zone.now, :medium)
         expect(f('.navigation_title').text).not_to include(date)
 
         #Go the agenda view and click the today button
@@ -236,17 +232,17 @@ describe "calendar2" do
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 
         load_agenda_view
-        keep_trying_until { expect(ffj('.ig-row').length).to eq 3 }
+        keep_trying_until { expect(ff('.ig-row').length).to eq 3 }
 
         # Verify Titles include section name
-        agenda_array = ffj('.ig-row')
-        expect(fj('.ig-title', agenda_array[1]).text).to include_text('Section1')
-        expect(fj('.ig-title', agenda_array[2]).text).to include_text('Section2')
+        agenda_array = ff('.ig-row')
+        expect(f('.ig-title', agenda_array[1]).text).to include_text('Section1')
+        expect(f('.ig-title', agenda_array[2]).text).to include_text('Section2')
 
         # Verify Dates
-        date_array = ffj('.agenda-day')
-        expect(fj('.agenda-date', date_array[1]).text).to include_text(s1_date.strftime('%a, %b %-d'))
-        expect(fj('.agenda-date', date_array[2]).text).to include_text(s2_date.strftime('%a, %b %-d'))
+        date_array = ff('.agenda-day')
+        expect(f('.agenda-date', date_array[1]).text).to include_text(format_date_for_view(s1_date, :short_with_weekday))
+        expect(f('.agenda-date', date_array[2]).text).to include_text(format_date_for_view(s2_date, :short_with_weekday))
       end
 
       context "with a graded discussion created" do
@@ -262,8 +258,7 @@ describe "calendar2" do
           f('.event-details .delete_event_link').click
           fj('.ui-dialog:visible .btn-primary').click
 
-          wait_for_ajaximations
-          expect(ffj('.ig-row').length).to eq 0
+          expect(f("#content")).not_to contain_css('.ig-row')
         end
 
         it "should allow editing via modal", priority: "1", test_id: 138855 do
@@ -285,12 +280,12 @@ describe "calendar2" do
 
           # Verify edits
           expect(f('.ig-title')).to include_text(test_name)
-          expect(f('.agenda-date')).to include_text(test_date.strftime('%a, %b %-d'))
+          expect(f('.agenda-date')).to include_text(date_string(test_date, :short_with_weekday))
         end
 
         it "should allow editing via More Options", priority: "1", test_id: 420724 do
           skip('final load_agenda_view is fragile, needs analysis')
-          test_date = 2.days.from_now
+          test_date = 2.days.from_now.change(hours: 13, min: 59, sec: 0, usec: 0)
           test_title = 'Test Title'
           test_description = 'New Description'
           load_agenda_view
@@ -304,10 +299,10 @@ describe "calendar2" do
           wait_for_ajaximations
 
           # Edit title, description, and date
-          replace_content(fj('#discussion-title.input-block-level'), test_title + '1')
+          replace_content(f('#discussion-title.input-block-level'), test_title + '1')
           driver.execute_script "tinyMCE.activeEditor.setContent('#{test_description}')"
-          replace_content(fj('.DueDateInput'),(test_date).strftime('%b %-d, %Y at 1:59pm'))
-          fj('.form-actions.flush .btn.btn-primary').click
+          replace_content(f('.DueDateInput'), format_time_for_view(test_date))
+          f('.form-actions.flush .btn.btn-primary').click
           wait_for_ajaximations
 
           # Verify edited title, description, and date
@@ -317,7 +312,7 @@ describe "calendar2" do
           wait_for_ajaximations
           expect(f('.view_event_link')).to include_text(test_title)
           expect(f('.event-detail-overflow')).to include_text(test_description)
-          expect(f('.event-details-timestring')).to include_text((test_date).strftime('%b %-d at 1:59pm'))
+          expect(f('.event-details-timestring')).to include_text(format_time_for_view(test_date))
         end
       end
     end
@@ -338,7 +333,7 @@ describe "calendar2" do
 
       # click on the event and rxpect there not to be a delete button
       f('.ig-row').click
-      expect(f('.event-details .delete_event_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
   end
 end

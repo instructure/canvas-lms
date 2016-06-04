@@ -161,12 +161,25 @@ define [
         return lock_at
       @get('lock_at')
 
+    focusAfterMoving: ->
+      $el = $(".discussion[data-id='#{@get('id')}']")
+      $prev = $el.prev(".discussion")
+      if $prev.length
+        $(".title", $prev)
+      else
+        $el.closest(".discussion-list")
+
     updateBucket: (data) ->
+      $toFocus = @focusAfterMoving()
       _.defaults data,
         pinned: @get('pinned')
         locked: @get('locked')
       @set('position', null)
       @updatePartial(data)
+      # assign focus only if it was lost; a discussion in multiple categories might not have actually moved
+      if !document.activeElement? || document.activeElement.nodeName == "BODY"
+        $toFocus = $('.ig-header-title', $toFocus) if $toFocus.hasClass('discussion-list')
+        $toFocus.focus()
 
     groupCategoryId: (id) =>
       return @get( 'group_category_id' ) unless arguments.length > 0

@@ -57,7 +57,7 @@ describe "dashboard" do
 
       get "/"
 
-      expect(f('.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list')
       expect(f('.coming_up')).to_not include_text(assignment.title)
     end
 
@@ -74,11 +74,11 @@ describe "dashboard" do
       expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
       f('.to-do-list .disable_item_link').click
       wait_for_ajaximations
-      expect(f('.to-do-list > li')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list > li')
 
       get "/"
 
-      expect(f('.to-do-list')).to be_nil
+      expect(f("#content")).not_to contain_css('.to-do-list')
     end
 
   end

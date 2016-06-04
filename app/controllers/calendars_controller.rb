@@ -24,7 +24,11 @@ class CalendarsController < ApplicationController
     get_all_pertinent_contexts(include_groups: true, favorites_first: true)
     @manage_contexts = @contexts.select{|c| c.grants_right?(@current_user, session, :manage_calendar) }.map(&:asset_string)
     @feed_url = feeds_calendar_url((@context_enrollment || @context).feed_code)
-    @selected_contexts = params[:include_contexts].split(",") if params[:include_contexts]
+    if params[:include_contexts]
+      @selected_contexts = params[:include_contexts].split(",")
+    elsif @current_user.preferences[:selected_calendar_contexts]
+      @selected_contexts = @current_user.preferences[:selected_calendar_contexts]
+    end
     @wrap_titles = @domain_root_account && @domain_root_account.feature_enabled?(:wrap_calendar_event_titles)
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.

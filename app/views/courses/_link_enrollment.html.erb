@@ -2,7 +2,7 @@
 <div id="link_student_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_students_url) %>" class="student_url" style="display: none;">&nbsp;</a>
   <%= form_tag context_url(@context, :context_link_enrollment_url), {:id => "link_student_dialog_form"} do %>
-    <input type="hidden" name="enrollment_id" class="enrollment_id"/>
+    <input type="hidden" name="enrollment_id" class="enrollment_id ic-Input"/>
     <%= mt 'details', %{When an observer is linked to a student, they have access to that student's grades and course interactions. *Right now this observer is linked to the student, %{student}.*
 
 To link the course observer %{user} to a student, select the student's name from the list below.},
@@ -11,7 +11,7 @@ To link the course observer %{user} to a student, select the student's name from
             :user => '<b class="short_name">&nbsp;</b>'.html_safe %>
     <p class="loading_message"><%= t('loading', %{Loading Students...}) %></p>
     <p class="students_link" style="display: none;">
-      <label for="student_enrollment_link_option"><%= before_label('student', %{Student}) %></label>
+      <label for="student_enrollment_link_option" class="ic-Label"><%= before_label('student', %{Student}) %></label>
       <select name="student_id" class="student_options" id="student_enrollment_link_option">
         <option value="none" class="blank">[ <%= t('select_student', %{Select Student}) %> ]</option>
       </select>

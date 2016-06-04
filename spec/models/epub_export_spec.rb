@@ -222,4 +222,54 @@ describe EpubExport do
       end
     end
   end
+
+  describe '#set_locale' do
+    let_once(:cartridge_path) do
+      File.join(File.dirname(__FILE__), "/../fixtures/migration/unicode-filename-test-export.imscc")
+    end
+    let_once(:content_export) do
+      @course.content_exports.create({
+        user: @student
+      }).tap do |content_export|
+        content_export.create_attachment({
+          context: @course,
+          filename: File.basename(cartridge_path),
+          uploaded_data: File.open(cartridge_path)
+        })
+      end
+    end
+    let_once(:epub_export) do
+      @course.epub_exports.create({
+        user: @student,
+        content_export: content_export
+      })
+    end
+
+    it 'is called during export and resets locale after' do
+      epub_export.expects(:infer_locale).once
+        .with(context: @course, user: @student, root_account: @course.root_account)
+        .returns(:ru)
+      epub_export.convert_to_epub_without_send_later
+      expect(I18n.locale).to be :en
+    end
+
+    it 'sets locale based on user preference' do
+      @student.update_attribute(:locale, 'es')
+      epub_export.reload.send(:set_locale)
+      expect(I18n.locale).to eq :es
+    end
+
+    it 'sets locale based on course override' do
+      @course.update_attribute(:locale, 'da')
+      epub_export.reload.send(:set_locale)
+      expect(I18n.locale).to eq :da
+    end
+
+    it 'allows course locale to override user locale' do
+      @student.update_attribute(:locale, 'es')
+      @course.update_attribute(:locale, 'da')
+      epub_export.reload.send(:set_locale)
+      expect(I18n.locale).to eq :da
+    end
+  end
 end

@@ -562,9 +562,6 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
-      if Setting.get("notification_service_traffic", nil).present?
-        send(delivery_method)
-      end
       enqueue_to_sqs
     else
       send(delivery_method)
@@ -582,7 +579,7 @@ class Message < ActiveRecord::Base
         path_type,
         target
       )
-      complete_dispatch if Setting.get("notification_service_traffic", nil).nil?
+      complete_dispatch
     end
   rescue AWS::SQS::Errors::Base => e
     Canvas::Errors.capture(
@@ -591,12 +588,10 @@ class Message < ActiveRecord::Base
       to: to,
       object: inspect.to_s
     )
-    if Setting.get("notification_service_traffic", nil).nil?
-      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      self.transmission_errors = error_string
-      self.errored_dispatch
-      raise
-    end
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    self.transmission_errors = error_string
+    self.errored_dispatch
+    raise
   end
 
   class RemoteConfigurationError < StandardError; end

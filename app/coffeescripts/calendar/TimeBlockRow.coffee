@@ -3,6 +3,7 @@ define [
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
   'compiled/util/fcUtil'
+  'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 ], ($, I18n, timeBlockRowTemplate, fcUtil) ->
 
   class TimeBlockRow

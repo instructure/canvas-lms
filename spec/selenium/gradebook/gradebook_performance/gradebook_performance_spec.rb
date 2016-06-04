@@ -162,7 +162,7 @@ describe "gradebook performance" do
                           :role => role)
 
       get "/courses/#{@course.id}/gradebook"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
 
     it "displays for users with only :manage_grades permissions" do
@@ -177,7 +177,7 @@ describe "gradebook performance" do
                           :role => role)
 
       get "/courses/#{@course.id}/gradebook"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
 
     it "includes student view student for grading" do

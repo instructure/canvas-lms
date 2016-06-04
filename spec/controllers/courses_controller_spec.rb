@@ -488,8 +488,8 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @enrollment.uuid
       expect(response).to be_redirect
       expect(response).to redirect_to(course_url(@course.id))
-      expect(assigns[:pending_enrollment]).to eql(@enrollment)
-      expect(assigns[:pending_enrollment]).to be_active
+      expect(assigns[:context_enrollment]).to eql(@enrollment)
+      expect(assigns[:context_enrollment]).to be_active
     end
 
     it "should ask user to login for registered not-logged-in user" do

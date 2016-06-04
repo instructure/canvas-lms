@@ -51,6 +51,21 @@ describe SubmissionsController do
       expect(assigns[:submission][:submission_type]).to eql("online_upload")
     end
 
+    it "should copy attachments to the submissions folder if that feature is enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @course.root_account.enable_feature! :submissions_folder
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+      att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }
+      expect(response).to be_redirect
+      expect(assigns[:submission]).not_to be_nil
+      att_copy = Attachment.find(assigns[:submission].attachment_ids.to_i)
+      expect(att_copy).not_to eq att
+      expect(att_copy.root_attachment).to eq att
+      expect(att).not_to be_associated_with_submission
+      expect(att_copy).to be_associated_with_submission
+    end
+
     it "should reject illegal file extensions from submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
@@ -90,9 +105,11 @@ describe SubmissionsController do
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true)
-      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
+      att1 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/doc.doc", "application/msword", true))
+      att2 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id,
+           :submission => {:submission_type => "online_upload", :attachment_ids => [att1.id, att2.id].join(',')},
+           :attachments => {"0" => {:uploaded_data => "doc.doc"}, "1" => {:uploaded_data => "txt.txt"}}
       expect(response).to be_redirect
       expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].user_id).to eql(@user.id)
@@ -602,5 +619,42 @@ describe SubmissionsController do
       expect(response.response_code).to eq 400
     end
 
+  end
+
+  describe "copy_attachments_to_submissions_folder" do
+    before(:once) do
+      course_with_student
+      attachment_model(context: @student)
+    end
+
+    it "copies a user attachment into the user's submissions folder" do
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @student.submissions_folder(@course)
+    end
+
+    it "leaves files already in submissions folders alone" do
+      @attachment.folder = @student.submissions_folder(@course)
+      @attachment.save!
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts).to eq [@attachment]
+    end
+
+    it "copies a group attachment into the group submission folder" do
+      group_model(context: @course)
+      attachment_model(context: @group)
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @group.submissions_folder
+    end
+
+    it "leaves files in non user/group context alone" do
+      assignment_model(context: @course)
+      weird_file = @assignment.attachments.create! name: 'blah', uploaded_data: default_uploaded_data
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [weird_file])
+      expect(atts).to eq [weird_file]
+    end
   end
 end

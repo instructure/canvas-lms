@@ -127,7 +127,7 @@ module Calendar2Common
 
   def quick_jump_to_date(text)
     f('.navigation_title').click
-    date_input = keep_trying_until { f('.date_field') }
+    date_input = f('.date_field')
     date_input.send_keys(text + "\n")
     wait_for_ajaximations
   end
@@ -249,7 +249,7 @@ module Calendar2Common
   def assert_edit_modal_date(due_at)
     move_to_click('.fc-event')
     wait_for_ajaximations
-    expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %-d')}")
+    expect(f('.event-details-timestring')).to include_text(format_date_for_view(due_at))
   end
 
   def assert_title(title,agenda_view)
@@ -264,7 +264,7 @@ module Calendar2Common
   def assert_agenda_view(title,due)
     load_agenda_view
     assert_title(title,true)
-    expect(f('.navigation_title')).to include_text(due.utc.strftime("%b %-d, %Y"))
+    expect(f('.navigation_title')).to include_text(format_date_for_view(due))
   end
 
   def assert_week_view(title,due)

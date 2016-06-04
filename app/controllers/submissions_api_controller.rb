@@ -329,7 +329,7 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-          eager_load(:user).
+          eager_load(:user => :pseudonyms).
           where("users.id" => student_ids)
 
       submissions = if requested_assignment_ids.present?
@@ -457,7 +457,7 @@ class SubmissionsApiController < ApplicationController
     permission = :nothing if @user != @current_user
     # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false)
+      api_attachment_preflight(@user, request, :check_quota => false, :submission_context => @context)
     end
   end
 

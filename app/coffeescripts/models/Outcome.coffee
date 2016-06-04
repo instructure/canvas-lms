@@ -25,8 +25,6 @@ define [
 
   class Outcome extends Backbone.Model
     defaults:
-      calculation_method: "decaying_average"
-      calculation_int: 65
       mastery_points: 3
       points_possible: 5
       ratings: [
@@ -46,9 +44,16 @@ define [
     }[@get('calculation_method')]
 
     initialize: ->
+      @setDefaultCalcSettings() unless @get('calculation_method')
       @on 'change:calculation_method', (model, changedTo) =>
         model.set calculation_int: @defaultCalculiationInt()
       super
+
+    setDefaultCalcSettings: ->
+      @set {
+        calculation_method: 'decaying_average'
+        calculation_int: '65'
+      }
 
     calculationMethodContent: ->
       new CalculationMethodContent(@)

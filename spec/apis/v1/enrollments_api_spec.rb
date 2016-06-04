@@ -1421,7 +1421,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
-            'total_activity_time' => 0
+            'total_activity_time' => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -1673,7 +1678,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
-            'total_activity_time'                => 0
+            'total_activity_time'                => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           })
         end
 
@@ -1725,7 +1735,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
-            'total_activity_time'                => 0
+            'total_activity_time'                => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           })
         end
 

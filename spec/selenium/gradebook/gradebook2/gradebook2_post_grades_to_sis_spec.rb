@@ -16,7 +16,7 @@ describe "gradebook2 - post grades to SIS" do
 
   it "should not be visible by default", priority: "1", test_id: 244958 do
     get "/courses/#{@course.id}/gradebook2"
-    expect(ff('.post-grades-placeholder').length).to eq 0
+    expect(f("body")).not_to contain_css('.post-grades-placeholder')
   end
 
   it "should be visible when enabled on course with sis_source_id" do

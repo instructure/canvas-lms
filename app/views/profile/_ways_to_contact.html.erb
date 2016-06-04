@@ -287,11 +287,14 @@
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
-  <div id='sms_confirmation_instructions' style="text-align: center;"><%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
-    We sent a four-character confirmation code to %{sms_number}.
-    Enter the code below to activate this sms number.
+  <div id='sms_confirmation_instructions' style="text-align: center;">
+  <%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+    To activate SMS, enter the four-character confirmation code sent to %{sms_number}.
     TEXT
-  %></div>
+  %>
+  <br>
+  <%= t("Code is case sensitive.")%>
+  </div>
   <div style="text-align: center;">
     <label for="code" class="screenreader-only"><%= t("Confirmation code (required)") %></label>
     <input type="text" style="width: 100px; font-size: 1.5em;" name="code" id="code" aria-describedby='sms_confirmation_instructions' required="true"/><br/>

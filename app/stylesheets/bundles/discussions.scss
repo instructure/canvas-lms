@@ -710,7 +710,7 @@ $discussion-dark-text: $ic-color-dark;
   .sticky {
     position: fixed;
     top: 0; left: 0; right: 0;
-    z-index: 3;
+    z-index: 15; // increase for discussions sticky toolbar
     border-color: $ic-border-light;
     @if $use_new_styles {
       background: $lightBackground;

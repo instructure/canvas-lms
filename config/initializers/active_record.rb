@@ -551,6 +551,25 @@ class ActiveRecord::Base
     result
   end
 
+  def self.current_xlog_location
+    Shard.current(shard_category).database_server.unshackle do
+      Shackles.activate(:master) do
+        connection.select_value("SELECT pg_current_xlog_location()")
+      end
+    end
+  end
+
+  def self.wait_for_replication(start: nil)
+    return unless Shackles.activate(:slave) { connection.readonly? }
+
+    start ||= current_xlog_location
+    Shackles.activate(:slave) do
+      while connection.select_value("SELECT pg_last_xlog_replay_location()") < start
+        sleep 0.1
+      end
+    end
+  end
+
   # returns batch_size ids at a time, working through the primary key from
   # smallest to largest.
   #

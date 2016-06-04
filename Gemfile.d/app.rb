@@ -88,11 +88,11 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
-gem 'ruby-saml-mod', '0.2.7'
+gem 'ruby-saml-mod', '0.3.0'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
-gem 'sanitize', '2.0.6', require: false
+gem 'sanitize', '2.1.0', require: false
 gem 'shackles', '1.1.0'
 
 gem 'useragent', '0.10.0', require: false

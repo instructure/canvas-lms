@@ -278,9 +278,12 @@ define [
     equal data.submission_types, 'none'
 
   test 'validates due date against date range', ->
+    start_at = {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
+    end_at = {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+
     ENV.VALID_DATE_RANGE = {
-      start_at: {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
-      end_at: {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+      start_at: start_at
+      end_at: end_at
     }
     view = createView(@assignment3)
     data =
@@ -295,6 +298,9 @@ define [
     errors = view.validateBeforeSave(data, [])
     ok errors["due_at"]
     equal errors['due_at'][0]['message'], 'Due date cannot be before term start'
+
+    equal start_at, ENV.VALID_DATE_RANGE.start_at
+    equal end_at,   ENV.VALID_DATE_RANGE.end_at
 
   test 'validates due date for lock and unlock', ->
     view = createView(@assignment4)

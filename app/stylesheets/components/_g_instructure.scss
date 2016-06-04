@@ -97,50 +97,11 @@
   }
 }
 
-#unauthorized_message {
-  border: 1px solid #000;
-  margin: 4em auto;
-  width: 500px;
-  .ui-state-error, &.ui-state-error {
-    position: relative;
-    z-index: 1;
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.5);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 3px 3px -1px rgba(0, 0, 0, 0.25);
-    &:before {
-      content: " ";
-      background: transparent url(/images/warning_36.png) 0 4px no-repeat;
-      position: absolute;
-      top: 6px;
-      left: 22px;
-      width: 42px;
-      height: 42px;
-    }
-  }
-  h2, .h2 {
-    font-size: 1.5em;
-    &.ui-state-error {
-      padding: 15px;
-      margin: -1px;
-      color: #fff;
-      height: 60px;
-      line-height: 60px;
-      padding: 0 0 0 80px;
-    }
-  }
-  p {
-    font-size: 1.1em;
-    padding: 2em 3em;
-    font-weight: bold;
-    margin: 0;
-  }
-}
-
 .user_content, .mceContentBody {
   position: relative;
   min-height: 5px;
-// firefox max-width images break the parent container
+  max-width: 100%;
+  // firefox max-width images break the parent container
   @-moz-document url-prefix() {
     overflow-x: hidden;
   }
@@ -168,6 +129,7 @@
   border: 0;
   padding: 0;
   margin: 0;
+  max-width: 100%;
 }
 
 .reminder, .reminder-content {
@@ -192,27 +154,7 @@
   }
 }
 
-.Reminder__course-setup {
-  .Reminder__course-setup-title {
-    text-align: left;
-  }
-  .Reminder__course-setup-subttitle {
-    float: right;
-    @include fontSize(11px);
-    text-transform: capitalize;
-  }
-  .Reminder__course-setup-body {
-    text-align: center;
-    p {
-      @include fontSize(15px);
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    a {
-      margin: 0 0 10px 0;
-    }
-  }
-}
+
 
 #floating_reminders {
   cursor: move;
@@ -338,102 +280,6 @@
   }
   @if $use_new_styles {
     * + .events_list { margin-top: $ic-sp*2; }
-  }
-  table.assignments {
-    width: 100%;
-    td {
-      background-color: #ddd;
-      padding: 0.1em 0.5em;
-      font-size: 1.1em;
-      a {
-        color: #333;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-      &.grade {
-        width: 60px;
-        text-align: center;
-        font-weight: bold;
-        background-color: #aaa;
-        font-style: italic;
-        font-size: 0.6em;
-        padding-bottom: 3px;
-        &.graded {
-          background-color: #bbb;
-          color: #000;
-        }
-        .total {
-          margin: 0;
-          padding: 0;
-        }
-        .grade {
-          display: block;
-          line-height: 1;
-          margin: 0.3em 0px 0.1em 0px;
-          padding: 0;
-          font-size: 1.5em;
-          font-style: normal;
-        }
-      }
-      &.date {
-        width: 60px;
-        text-align: center;
-        font-weight: bold;
-        background-color: #333;
-        color: #aaa;
-        font-style: italic;
-        font-size: 0.6em;
-        padding-bottom: 3px;
-        .duedate {
-          display: block;
-          line-height: 1;
-          margin: 0.2em 0px 0.1em 0px;
-          padding: 0;
-          font-size: 1.5em;
-          color: #fff;
-          font-style: normal;
-        }
-      }
-      &.today {
-        background-color: #FBAD00;
-        color: #333;
-        .duedate {
-          background-color: #FBAD00;
-          color: #333;
-        }
-      }
-    }
-    .attachments {
-      width: 30px;
-      padding: 0;
-      vertical-align: middle;
-      text-align: center;
-      background-color: #aaa;
-    }
-    .long_text {
-      position: relative;
-      overflow: hidden;
-      &.show_context {
-        min-height: 1.7em;
-        .text {
-          line-height: 1em;
-        }
-      }
-      .text_holder {
-        position: absolute;
-        width: 500px;
-        top: 0;
-        left: 0;
-        .header {
-          font-size: 0.6em;
-          line-height: 1.2em;
-          color: #888;
-          padding-left: 20px;
-        }
-      }
-    }
   }
   .details {
     margin: 5px;
@@ -1684,63 +1530,6 @@ html > body .new_activity_message form textarea {
   }
 }
 
-#user_list_boxes {
-  position: relative;
-  min-height: 165px;
-  margin-top: 10px;
-  #user_list_textarea_container, #user_list_processing, #user_list_parsed {
-    min-height: 165px;
-    width: 100%;
-    background-color: white;
-    label {
-      font-size: 0.8em;
-    }
-  }
-  textarea {
-    width: 98%;
-    height: 108px;
-    margin: 0;
-  }
-  #user_lists_processed_people {
-    overflow: auto;
-    height: 126px;
-    .ui-widget {
-      margin: 0 8px 8px 0;
-    }
-    .person {
-      display: inline-block;
-      position: relative;
-      background: #FFF;
-      margin: 0 8px 8px 0;
-      padding: 4px;
-      @include fontSize(11px);
-      min-height: 21px;
-      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
-      div {
-        margin: 2px 0 0 33px;
-      }
-      .name::after {
-        content: " ";
-      }
-      .address, .login {
-        font-weight: normal;
-      }
-      &::before {
-        content: "";
-        display: block;
-        height: 100%;
-        background: url(/images/circle-plus.png) no-repeat center center;
-        position: absolute;
-        margin: -4px;
-        width: 33px;
-      }
-      &.existing-user::before {
-        background-image: url(/images/circle-check.png);
-      }
-    }
-  }
-}
-
 body > #ui-datepicker-div {
   display: none;
 }
@@ -1770,56 +1559,6 @@ body > #ui-datepicker-div {
 
 .communication_message .media_comment_thumbnail {
   margin: 3px 0;
-}
-
-table.side_tabs_table {
-  border-collapse: collapse;
-  td {
-    vertical-align: top;
-    &.left {
-      width: 25%;
-      border-right: 1px solid #ccc;
-      padding-right: 5px;
-    }
-    &.right {
-      width: 65%;
-      border-left: 1px solid #ccc;
-      padding-left: 5px;
-    }
-  }
-  ul.side_tabs {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    max-height: 300px;
-    overflow: auto;
-    min-width: 150px;
-    li {
-      padding: 2px 5px;
-      margin-bottom: 3px;
-      cursor: pointer;
-      &:hover {
-        background-color: #eee;
-      }
-      &.selected_side_tab {
-        font-weight: bold;
-        background-color: #ddd;
-      }
-      div.sub_content {
-        font-size: 0.8em;
-        padding-left: 10px;
-        color: #888;
-      }
-    }
-  }
-  div.side_tabs_content {
-    max-height: 300px;
-    overflow: auto;
-  }
-  div.side_tabs_content_with_room_for_button {
-    max-height: 252px;
-    overflow: auto;
-  }
 }
 
 .quoted_text_holder {

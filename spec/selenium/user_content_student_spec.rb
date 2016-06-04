@@ -43,7 +43,7 @@ describe "user_content" do
       get "/calendar2"
       wait_for_ajaximations
 
-      expect(ff(".user_content_iframe").size).to eq 0
+      expect(f("body")).not_to contain_css(".user_content_iframe")
       f('.fc-event').click
       wait_for_ajaximations
       name = keep_trying_until { ff(".user_content_iframe").first.attribute('name') }

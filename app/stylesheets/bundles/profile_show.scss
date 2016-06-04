@@ -12,6 +12,12 @@
     display: none !important;
   }
 }
+.profile .image-block {
+  flex-direction: column;
+  @include breakpoint(desktop) {
+    flex-direction: row;
+  }
+}
 
 .profile-avatar-wrapper {
   margin-right: 20px !important;
@@ -83,9 +89,7 @@
 
 #edit_links_table {
   width: 100%;
-  input {
-    width: 95%;
-  }
+
   td {
     text-align: center;
   }
@@ -99,21 +103,31 @@
   overflow: hidden;
 }
 
-#content {
-  .h1, .h2 {
-    line-height: 21px;
-  }
+.profileContent__Block {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
-
-#content h1 {
+.profileDetails {
+  margin-top: 0;
+}
+.profileEnrollment__Items {
+  padding: $ic-sp/2 0;
+}
+.profileLink {
   margin: 0;
 }
-
-#content h2 {
-  margin: 1em 0 0.5em 0;
-  color: $gray;
+.profileLink__Item {
+  list-style: none;
+  line-height: 2.0;
+  & a {
+    padding-left: $ic-sp/2;
+  }
 }
-
+.profileHeader {
+  padding: $ic-sp 0 0 0;
+  line-height: 1.25;
+}
 .stats {
   text-align: left;
   width: 100%;

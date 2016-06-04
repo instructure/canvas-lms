@@ -6,13 +6,13 @@ describe 'Grading quizzes' do
   include QuizzesCommon
 
   context 'as a teacher' do
-    before(:once) do
+    before(:each) do
       course_with_teacher(active_all: 1)
       student_in_course(active_all: 1)
       @quiz = seed_quiz_with_submission(1, student: @student)
-    end
 
-    before(:each) { user_session(@teacher) }
+      user_session(@teacher)
+    end
 
     context 'when on the course home page' do
       before(:each) { get "/courses/#{@course.id}" }
@@ -75,7 +75,7 @@ describe 'Grading quizzes' do
           ' because either an answer was removed or the question type was changed after a student' \
           ' completed a submission.'
 
-        expect(visible_regrade_options.count).to eq 0
+        expect(f("#content")).not_to contain_jqcss(".regrade_enabled label.checkbox:visible")
       end
     end
   end

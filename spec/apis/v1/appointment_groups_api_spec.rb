@@ -422,7 +422,7 @@ describe AppointmentGroupsController, type: :request do
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :registration_status => 'registered', :format => 'json'})
         expect(json.size).to eql 1
-        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants('registered').map(&:id)
+        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'registered').map(&:id)
       end
 
       it "should return unregistered #{type}" do
@@ -430,7 +430,7 @@ describe AppointmentGroupsController, type: :request do
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
                           :registration_status => 'unregistered', :format => 'json'})
         expect(json.size).to eql 1
-        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants('unregistered').map(&:id)
+        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'unregistered').map(&:id)
       end
 
       it "should not return non-#{type.singularize} participants" do

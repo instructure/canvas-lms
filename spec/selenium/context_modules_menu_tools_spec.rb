@@ -55,8 +55,7 @@ describe "context modules" do
         get "/courses/#{@course.id}/modules"
         gear = f("#context_module_#{@module1.id} .header .al-trigger")
         gear.click
-        link = f("#context_module_#{@module1.id} .header li a.menu_tool_link")
-        expect(link).to be_nil
+        expect(f("#context_module_#{@module1.id} .header")).not_to contain_css("li a.menu_tool_link")
       end
 
       it "should show tool launch links in the gear for exportable module items" do
@@ -73,7 +72,7 @@ describe "context modules" do
 
           type_to_tag.keys.each do |other_type|
             next if other_type == type
-            expect(f("#context_module_item_#{tag.id} li.#{other_type} a.menu_tool_link")).to be_nil
+            expect(f("#content")).not_to contain_css("#context_module_item_#{tag.id} li.#{other_type} a.menu_tool_link")
           end
 
           link = f("#context_module_item_#{tag.id} li.#{type} a.menu_tool_link")
@@ -86,8 +85,7 @@ describe "context modules" do
 
         gear = f("#context_module_item_#{@subheader_tag.id} .al-trigger")
         gear.click
-        link = f("#context_module_item_#{@subheader_tag.id} a.menu_tool_link")
-        expect(link).to be_nil
+        expect(f("#context_module_item_#{@subheader_tag.id}")).not_to contain_css("a.menu_tool_link")
       end
 
       it "should add links to newly created modules" do

@@ -338,7 +338,7 @@ END
     'course_card_images' =>
     {
       display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
-      description: -> {I18n.t('Allow course images to be assigned to a course and used on the dashcards.')},
+      description: -> {I18n.t('Allow course images to be assigned to a course and used on the dashboard cards.')},
       applies_to: 'Course',
       state: 'hidden',
       development: true,

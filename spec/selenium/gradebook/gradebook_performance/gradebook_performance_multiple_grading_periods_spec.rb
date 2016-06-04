@@ -4,7 +4,7 @@ describe "gradebook performance" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let(:uneditable_cells) { f('.cannot_edit') }
+  let(:uneditable_cells) { '.cannot_edit' }
   let(:gradebook_headers) { ff('#gradebook_grid .gradebook-header-column') }
   let(:header_titles) { gradebook_headers.map { |header| header.attribute('title') } }
 
@@ -61,7 +61,7 @@ describe "gradebook performance" do
 
           select_period_in_the_past
           expect(header_titles).to include 'past-due assignment'
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
 
         it "teachers cannot edit" do
@@ -72,7 +72,7 @@ describe "gradebook performance" do
 
           select_period_in_the_past
           expect(header_titles).to include 'past-due assignment'
-          expect(uneditable_cells).to be_present
+          expect(f("#content")).to contain_css(uneditable_cells)
         end
       end
 
@@ -85,7 +85,7 @@ describe "gradebook performance" do
           get "/courses/#{@course.id}/gradebook"
 
           expect(header_titles).to include "No Due Date"
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
 
         it "teachers can edit" do
@@ -94,7 +94,7 @@ describe "gradebook performance" do
           get "/courses/#{@course.id}/gradebook"
 
           expect(header_titles).to include "No Due Date"
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
       end
     end

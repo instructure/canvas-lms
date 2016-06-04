@@ -47,8 +47,8 @@ describe "discussions" do
         expect(f('.headerBar .admin-links')).not_to be_nil
         expect(f('.mark_all_as_read')).not_to be_nil
         #f('.mark_all_as_unread').should_not be_nil
-        expect(f('.delete_discussion')).to be_nil
-        expect(f('.discussion_locked_toggler')).to be_nil
+        expect(f("#content")).not_to contain_css('.delete_discussion')
+        expect(f("#content")).not_to contain_css('.discussion_locked_toggler')
       end
 
       it "should validate a group assignment discussion" do
@@ -115,7 +115,7 @@ describe "discussions" do
 
         it "should not show discussion creation time", priority: "2", test_id: 344536 do
           get url
-          expect(f("#discussion_topic time")).to be_nil
+          expect(f("#content")).not_to contain_css("#discussion_topic time")
         end
 
         context "locked discussions" do
@@ -130,7 +130,7 @@ describe "discussions" do
             sleep(5.seconds)
             refresh_page
             expect(f('#discussion_container').text).to include('This topic was locked')
-            expect(f('.discussion-reply-action')).to be_nil
+            expect(f("#content")).not_to contain_css('.discussion-reply-action')
           end
 
           it "should not let students reply for a locked group discussion", priority: "1", test_id: 150482 do
@@ -143,7 +143,7 @@ describe "discussions" do
             sleep(5.seconds)
             refresh_page
             expect(f('#discussion_container').text).to include('This topic was locked')
-            expect(f('.discussion-reply-action')).to be_nil
+            expect(f("#content")).not_to contain_css('.discussion-reply-action')
             topic.lock_at = nil
             topic.save!
             refresh_page
@@ -317,7 +317,7 @@ describe "discussions" do
         student_in_course(:course => @course, :active_all => true)
         user_session(@student)
         get url
-        expect(ff('.discussion-reply-action')).to be_empty
+        expect(f("#content")).not_to contain_css('.discussion-reply-action')
       end
 
       it "should validate reopening the discussion for comments", priority: "2", test_id: 344542 do
@@ -353,7 +353,7 @@ describe "discussions" do
           skip_if_chrome('Can not get to student view in Chrome')
           enter_student_view
           get url
-          expect(get_all_replies.count).to eq 0
+          expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
           add_reply
           expect(get_all_replies.count).to eq 1
         end

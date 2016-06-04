@@ -41,7 +41,7 @@ describe "context modules" do
     it "should validate that course modules show up correctly" do
       go_to_modules
       # shouldn't show the teacher's "show student progression" button
-      expect(ff('.module_progressions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
@@ -60,7 +60,7 @@ describe "context modules" do
       go_to_modules
 
       # shouldn't show the teacher's "show student progression" button
-      expect(ff('.module_progressions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
@@ -167,7 +167,7 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       expect(f('#content')).to include_text("is not available yet")
-      expect(f('#module_prerequisites_list')).to be_nil
+      expect(f("#content")).not_to contain_css('#module_prerequisites_list')
     end
 
     it "should validate that a student can't see an unpublished context module item", priority: "1", test_id: 126745 do
@@ -373,10 +373,8 @@ describe "context modules" do
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(prev).to be_nil
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(nxt).to be_nil
+        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-left')
+        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-right')
       end
 
       it "should show the nav when going straight to the item if there's only one tag" do

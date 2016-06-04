@@ -134,14 +134,14 @@ describe "threaded discussions" do
 
     edit_entry(reply, "Reply edited")
     reply.reload
-    edited_at = reply[:updated_at].to_time.utc.strftime('%b %-d at %-l:%M%P')
+    edited_at = format_time_for_view(reply.updated_at)
     displayed_edited_at = f('.discussion-fyi').text
 
     # Verify displayed edit time includes object update time
     expect(displayed_edited_at).to include(edited_at)
 
-    # Verify edit time is later than reply time
-    expect(replied_at).to be < (edited_at)
+    # Verify edit time is different than reply time
+    expect(replied_at).not_to eql(edited_at)
   end
 
   it "should delete a reply", priority: "1", test_id: 150515 do

@@ -2953,4 +2953,38 @@ describe User do
     @user.reload
     expect(@user.avatar_state).to eq :reported
   end
+
+  describe "submissions_folder" do
+    before(:once) do
+      student_in_course
+    end
+
+    it "creates the root submissions folder on demand" do
+      f = @user.submissions_folder
+      expect(@user.submissions_folders.where(parent_folder_id: Folder.root_folders(@user).first, name: 'Submissions').first).to eq f
+    end
+
+    it "finds the existing root submissions folder" do
+      f = @user.folders.build
+      f.parent_folder_id = Folder.root_folders(@user).first
+      f.name = 'blah'
+      f.submission_context_code = 'root'
+      f.save!
+      expect(@user.submissions_folder).to eq f
+    end
+
+    it "creates a submissions folder for a course" do
+      f = @user.submissions_folder(@course)
+      expect(@user.submissions_folders.where(submission_context_code: @course.asset_string, parent_folder_id: @user.submissions_folder, name: @course.name).first).to eq f
+    end
+
+    it "finds an existing submissions folder for a course" do
+      f = @user.folders.build
+      f.parent_folder_id = @user.submissions_folder
+      f.name = 'bleh'
+      f.submission_context_code = @course.asset_string
+      f.save!
+      expect(@user.submissions_folder(@course)).to eq f
+    end
+  end
 end

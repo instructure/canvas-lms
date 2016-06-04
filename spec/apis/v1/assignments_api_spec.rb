@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
-describe AssignmentsApiController, type: :request do
+describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
   include Api
   include Api::V1::Assignment
   include Api::V1::Submission
@@ -2554,6 +2554,49 @@ describe AssignmentsApiController, type: :request do
       course_with_teacher(:active_all => true)
       student_in_course(active_all: true)
       @assignment = @course.assignments.create!(:title => "some assignment")
+    end
+
+    it 'updates the external tool content_id' do
+      mh = create_message_handler(create_resource_handler(create_tool_proxy))
+      tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
+      tool_tag.context = @assignment
+      tool_tag.save!
+      params = {
+        "submission_types" => ["external_tool"],
+        "external_tool_tag_attributes" => {
+          "url" => "https://testvmserver.test.com/canvas/test/",
+          "content_type" => "lti/message_handler",
+          "content_id" => mh.id,
+          "new_tab" => "0"
+        }
+      }
+      assignment = update_from_params(@assignment, params, @user)
+      tag = assignment.external_tool_tag
+      expect(tag.content_id).to eq mh.id
+      expect(tag.content_type).to eq "Lti::MessageHandler"
+    end
+
+    it 'sets the context external tool type' do
+      tool = ContextExternalTool.new( name: 'test tool', consumer_key:'test',
+        shared_secret: 'shh', url: 'http://www.example.com')
+      tool.context = @course
+      tool.save!
+      tool_tag = ContentTag.new(url: 'http://www.example.com', new_tab: false, tag_type: 'context_module')
+      tool_tag.context = @assignment
+      tool_tag.save!
+      params = {
+        "submission_types" => ["external_tool"],
+        "external_tool_tag_attributes" => {
+          "url" => "https://testvmserver.test.com/canvas/test/",
+          "content_type" => "context_external_tool",
+          "content_id" => tool.id,
+          "new_tab" => "0"
+        }
+      }
+      assignment = update_from_params(@assignment, params, @user)
+      tag = assignment.external_tool_tag
+      expect(tag.content_id).to eq tool.id
+      expect(tag.content_type).to eq "ContextExternalTool"
     end
 
     it "does not update integration_data when lacking permission" do

@@ -3,8 +3,15 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "account" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_admin_logged_in
+  end
+
+  def verify_displayed_term_dates(term, dates)
+    dates.each do |en_type, date|
+      expect(term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text).to match(/#{date[0]}/)
+      expect(term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text).to match(/#{date[1]}/)
+    end
   end
 
   describe "course and term create/update" do
@@ -34,7 +41,7 @@ describe "account" do
 
       wait_for_ajaximations
       expect(f('#add_course_dialog')).not_to be_displayed
-      assert_flash_notice_message /Test Course successfully added/
+      assert_flash_notice_message(/Test Course successfully added/)
     end
 
     it "should be able to create a new course when no other courses exist" do
@@ -72,21 +79,13 @@ describe "account" do
       expect(term.end_at).to eq Date.parse("2011-07-31")
     end
 
-    it "should be able to update term dates" do
-
-      def verify_displayed_term_dates(term, dates)
-        dates.each do |en_type, dates|
-          expect(term.find_element(:css, ".#{en_type}_dates .start_date .show_term").text).to match /#{dates[0]}/
-          expect(term.find_element(:css, ".#{en_type}_dates .end_date .show_term").text).to match /#{dates[1]}/
-        end
-      end
-
+    it 'general term dates', priority: 1, test_id: 1621631 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
-      term.find_element(:css, ".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
-      submit_form(".enrollment_term_form")
+      f('.edit_term_link').click
+      f('.editing_term .general_dates .start_date .edit_term input').send_keys("2011-07-01")
+      f('.editing_term .general_dates .end_date .edit_term input').send_keys("2011-07-31")
+      f("button[type='submit']").click
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
@@ -94,47 +93,51 @@ describe "account" do
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'student enrollment dates', priority: 1, test_id: 1621632 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
-      term.find_element(:css, ".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
-      submit_form(".enrollment_term_form")
+      f('.edit_term_link').click
+      f('.editing_term .student_enrollment_dates .start_date .edit_term input').send_keys("2011-07-02")
+      f('.editing_term .student_enrollment_dates .end_date .edit_term input').send_keys("2011-07-30")
+      f("button[type='submit']").click
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
+          :general => ["whenever", "whenever"],
           :student_enrollment => ["Jul 2", "Jul 30"],
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'teacher enrollment dates', priority: 1, test_id: 1621633 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").send_keys("2011-07-03")
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
-      term.find_element(:css, ".editing_term .ta_enrollment_dates .start_date .edit_term input").send_keys("2011-07-04")
-      term.find_element(:css, ".editing_term .ta_enrollment_dates .end_date .edit_term input").send_keys("2011-07-28")
-      submit_form(".enrollment_term_form")
+      f('.edit_term_link').click
+      f('.editing_term .teacher_enrollment_dates .start_date .edit_term input').send_keys("2011-07-03")
+      f('.editing_term .teacher_enrollment_dates .end_date .edit_term input').send_keys("2011-07-29")
+      f("button[type='submit']").click
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
-          :student_enrollment => ["Jul 2", "Jul 30"],
+          :general => ["whenever", "whenever"],
+          :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["Jul 3", "Jul 29"],
-          :ta_enrollment => ["Jul 4", "Jul 28"]
+          :ta_enrollment => ["term start", "term end"]
       })
+    end
 
+    it 'ta enrollment dates', priority: 1, test_id: 1621934 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      term.find_element(:css, ".edit_term_link").click
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .start_date .edit_term input").clear
-      term.find_element(:css, ".editing_term .teacher_enrollment_dates .end_date .edit_term input").clear
-      submit_form(".enrollment_term_form")
+      f('.edit_term_link').click
+      f('.editing_term .ta_enrollment_dates .start_date .edit_term input').send_keys("2011-07-04")
+      f('.editing_term .ta_enrollment_dates .end_date .edit_term input').send_keys("2011-07-28")
+      f("button[type='submit']").click
       keep_trying_until { term.attribute(:class) !~ /editing_term/ }
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
-          :student_enrollment => ["Jul 2", "Jul 30"],
+          :general => ["whenever", "whenever"],
+          :student_enrollment => ["term start", "term end"],
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["Jul 4", "Jul 28"]
       })
@@ -152,7 +155,7 @@ describe "account" do
       end
     end
 
-    before (:each) do
+    before(:each) do
       @student_name = 'student@example.com'
       @course_name = 'new course'
       @error_text = 'No Results Found'
@@ -199,7 +202,7 @@ describe "account" do
       submit_input(find_course_form, '#course_name', 'some random course name that will not exist')
       wait_for_ajax_requests
       expect(f('#content')).to include_text(@error_text)
-      expect(f('#new_user').find_element(:id, 'user_name').text).to be_empty #verifies bug #5133 is fixed
+      expect(f('#new_user').find_element(:id, 'user_name').text).to be_empty # verifies bug #5133 is fixed
     end
 
     it "should behave correctly when searching for a user that does not exist" do
@@ -218,7 +221,7 @@ describe "account" do
       user_non_root = user
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
-      #verify user details displayed properly
+      # verify user details displayed properly
       expect(f('.accounts .unstyled_list li')).to include_text('sub_account')
     end
   end

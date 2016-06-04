@@ -27,7 +27,7 @@ module Api::V1::AssignmentOverride
     api_json(override, @current_user, session, :only => fields).tap do |json|
       case override.set_type
       when 'ADHOC'
-        students = if visible_users
+        students = if visible_users.present?
                      override.assignment_override_students.where(user_id: visible_users)
                    else
                      override.assignment_override_students
@@ -42,13 +42,8 @@ module Api::V1::AssignmentOverride
   end
 
   def assignment_overrides_json(overrides, user = nil)
-    visible_users = if user && !overrides.empty?
-                      override = overrides.first
-                      assignment_or_quiz = override.assignment || override.quiz
-                      context = assignment_or_quiz.context
-                      UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
-                    end
-    overrides.map{ |override| assignment_override_json(override, visible_users) }
+    visible_users_ids = AssignmentOverride.visible_users_for(overrides, user).map(&:id)
+    overrides.map{ |override| assignment_override_json(override, visible_users_ids) }
   end
 
   def assignment_override_collection(assignment, include_students=false)

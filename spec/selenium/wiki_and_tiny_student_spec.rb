@@ -45,7 +45,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/#{title}"
       wait_for_ajax_requests
 
-      expect(f('a.edit-wiki')).to be_nil
+      expect(f("#content")).not_to contain_css('a.edit-wiki')
     end
 
     it "should allow students to edit wiki if any option but teachers is selected" do
@@ -91,7 +91,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       get "/courses/#{@course.id}/pages/test_page/edit"
       wait_for_ajax_requests
 
-      expect(f('#new_page_link')).to be_nil
+      expect(f("#content")).not_to contain_css('#new_page_link')
 
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!

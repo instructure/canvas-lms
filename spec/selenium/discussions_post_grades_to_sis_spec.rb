@@ -28,7 +28,7 @@ describe "post grades to sis" do
     Account.default.set_feature_flag!('post_grades', 'off')
     get "/courses/#{@course.id}/discussion_topics/new"
     f('#use_for_grading').click
-    expect(f('#assignment_post_to_sis')).not_to be_present
+    expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
   end
 
   context "gradebook_post_grades" do
@@ -64,7 +64,7 @@ describe "post grades to sis" do
       due_at = Time.zone.now + 3.days
       get_post_grades_dialog
       expect(f('#assignment-errors').text).to include("1 Assignment with Errors")
-      fj(".assignment-due-at").send_keys(due_at.strftime('%b %-d, %y'))
+      f(".assignment-due-at").send_keys(format_date_for_view(due_at))
       f(' .form-dialog-content').click
       proceed_form('.form-controls')
       expect(f('.assignments-to-post-count').text).to include("You are ready to post 1 assignment")

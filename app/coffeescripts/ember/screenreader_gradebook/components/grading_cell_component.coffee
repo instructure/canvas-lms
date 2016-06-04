@@ -1,11 +1,12 @@
 define [
   'i18n!grading_cell'
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
+  'compiled/gradebook2/GradebookHelpers'
   'underscore'
   'ember'
   'jquery'
   'jquery.ajaxJSON'
-], (I18n, GRADEBOOK_TRANSLATIONS, _, Ember, $) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, _, Ember, $) ->
 
   GradingCellComponent = Ember.Component.extend
 
@@ -18,13 +19,7 @@ define [
     isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade')
     isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail')
     isInPastGradingPeriodAndNotAdmin: ( ->
-      return false unless ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
-      return false unless ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past
-      return false if ENV.current_user_roles.contains("admin")
-
-      latest_end_date = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
-
-      @assignment.due_at <= latest_end_date
+      GradebookHelpers.gradeIsLocked(@assignment, ENV)
     ).property('assignment')
     nilPointsPossible: Ember.computed.none('assignment.points_possible')
     isGpaScale: Ember.computed.equal('assignment.grading_type', 'gpa_scale')

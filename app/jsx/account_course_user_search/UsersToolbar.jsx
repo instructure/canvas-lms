@@ -66,7 +66,7 @@ define([
 
             {addUserButton}
 
-          <a id="peopleOptionsBtn" className="al-trigger btn" role="button" href="#" style={{"margin-left": "10px", "padding-left": "12px", "padding-right": "12px"}}>
+          <a id="peopleOptionsBtn" className="al-trigger btn" role="button" href="#" style={{"marginLeft": "10px", "paddingLeft": "12px", "paddingRight": "12px"}}>
             <i className="icon-more"></i>
             <span className="screenreader-only">{I18n.t('People Options')}</span>
           </a>

@@ -98,6 +98,11 @@
 #         "locked_for_user": {
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "for_submissions": {
+#           "example": false,
+#           "type": "boolean",
+#           "description": "If true, indicates this is a read-only folder containing files submitted to assignments"
 #         }
 #       }
 #     }
@@ -589,6 +594,7 @@ class FoldersController < ApplicationController
       return render :json => {:message => "source_file_id must be provided"}, :status => :bad_request
     end
     @dest_folder = Folder.find(params[:dest_folder_id])
+    return unless authorized_action(@dest_folder, @current_user, :manage_contents)
     @context = @dest_folder.context
     @source_file = Attachment.find(params[:source_file_id])
     unless @source_file.shard == @dest_folder.shard

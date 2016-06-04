@@ -25,7 +25,7 @@ module WikiAndTinyCommon
     f("#{form} .file_name").send_keys(path)
     wait_for_ajaximations
     f("#{form} button").click
-    keep_trying_until { ffj("#{form}:visible").empty? }
+    expect(f("body")).not_to contain_jqcss("#{form}:visible")
   end
 
   def wiki_page_tools_file_tree_setup

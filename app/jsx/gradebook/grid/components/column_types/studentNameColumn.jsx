@@ -47,8 +47,8 @@ define([
     renderStudentName() {
       var displayName = this.rowData().studentName;
 
-      return <a title={displayName}
-                href={this.rowData().student.html_url}>{displayName}</a>
+      return <a ref="gradesUrl" title={displayName}
+                href={this.rowData().student.grades.html_url}>{displayName}</a>
     },
 
     renderHiddenOrStudentName() {

@@ -202,7 +202,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
           Onelogin::Saml::Response.any_instance.stubs(:trusted_roots).returns([])
 
-          post '/saml_consume', :SAMLResponse => "foo"
+          post '/login/saml', :SAMLResponse => "foo"
         end
       end
 
@@ -863,8 +863,6 @@ describe "API Authentication", type: :request do
         'name' => 'User',
         'short_name' => 'User',
         'sortable_name' => 'User',
-        'sis_user_id' => '1234',
-        'sis_login_id' => 'blah@example.com',
         'login_id' => "blah@example.com",
         'integration_id' => nil,
         'bio' => nil,
@@ -892,8 +890,6 @@ describe "API Authentication", type: :request do
           'name' => 'User',
           'short_name' => 'User',
           'sortable_name' => 'User',
-          'sis_user_id' => '1234',
-          'sis_login_id' => 'blah@example.com',
           'login_id' => "blah@example.com",
           'integration_id' => '1234',
           'bio' => nil,

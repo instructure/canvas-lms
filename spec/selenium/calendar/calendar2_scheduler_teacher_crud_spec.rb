@@ -137,7 +137,7 @@ describe "scheduler" do
       driver.execute_script("$('.event-details .delete_event_link').trigger('click')")
       wait_for_ajaximations
       delete_appointment_group
-      keep_trying_until { expect(element_exists('.fc-event-bg')).to be_falsey }
+      expect(f("#content")).not_to contain_css('.fc-event-bg')
     end
 
     it "should check index page for correct element", priority: "1", test_id: 85949 do

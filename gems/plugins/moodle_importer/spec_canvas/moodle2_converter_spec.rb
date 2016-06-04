@@ -5,14 +5,10 @@ describe Moodle::Converter do
   before(:once) do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_2.zip')
-    unzipped_file_path = File.join(File.dirname(archive_file_path), "moodle_#{File.basename(archive_file_path, '.zip')}", 'oi')
+    unzipped_file_path = create_temp_dir!
     converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
-    converter.delete_unzipped_archive
-    if File.exist?(unzipped_file_path)
-      FileUtils::rm_rf(unzipped_file_path)
-    end
 
     @course_data = Marshal.load(Marshal.dump(@base_course_data))
     @course = Course.create(:name => "test course")

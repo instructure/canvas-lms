@@ -53,28 +53,31 @@ describe "better_file_browsing" do
 
       it "should not see upload file, add folder buttons and cloud icon", priority: "1", test_id: 327118 do
         student_goto_files
-        expect(f('.btn-upload')).not_to be_present
-        expect(f('.btn-add-folder')).not_to be_present
-        expect(f('.btn-link.published-status')).not_to be_present
+        content = f("#content")
+        expect(content).not_to contain_css('.btn-upload')
+        expect(content).not_to contain_css('.btn-add-folder')
+        expect(content).not_to contain_css('.btn-link.published-status')
       end
 
       it "should only see Download option on cog icon", priority: "1", test_id: 133105 do
         student_goto_files
+        content = f("#content")
         ff('.al-trigger-gray')[0].click
         expect(fln("Download")).to be_displayed
-        expect(fln("Rename")).not_to be_present
-        expect(fln("Move")).not_to be_present
-        expect(fln("Delete")).not_to be_present
+        expect(content).not_to contain_link("Rename")
+        expect(content).not_to contain_link("Move")
+        expect(content).not_to contain_link("Delete")
       end
 
       it "should only see View and Download options on toolbar menu", priority: "1", test_id: 133109 do
         student_goto_files
+        content = f("#content")
         ff('.ef-item-row')[0].click
         expect(f('.btn-download')).to be_displayed
         expect(f('.btn-view')).to be_displayed
-        expect(f('.btn-move')).not_to be_present
-        expect(f('.btn-restrict')).not_to be_present
-        expect(f('.btn-delete')).not_to be_present
+        expect(content).not_to contain_css('.btn-move')
+        expect(content).not_to contain_css('.btn-restrict')
+        expect(content).not_to contain_css('.btn-delete')
       end
 
       it "should see calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
@@ -119,9 +122,9 @@ describe "better_file_browsing" do
         wait_for_ajaximations
         file_preview_url = (driver.current_url).match(/\/files.*/)[0]
         student_goto_files
-        expect(fln("restricted_folder")).not_to be_present
+        expect(f("#content")).not_to contain_link("restricted_folder")
         get "/courses/#{@course.id}/files/folder/restricted_folder"
-        expect(fln("example.pdf")).not_to be_present
+        expect(f("#content")).not_to contain_link("example.pdf")
         get "/courses/#{@course.id}"+file_preview_url
         refresh_page
         wait_for_ajaximations

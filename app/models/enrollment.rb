@@ -103,7 +103,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def valid_role?
-    return true if role.built_in?
+    return true if self.deleted? || role.built_in?
 
     unless self.role.base_role_type == self.type
       self.errors.add(:role_id, "is not valid for the enrollment type")
@@ -660,7 +660,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
       calculated_state_based_on_date
     end
   end
@@ -1183,21 +1183,6 @@ class Enrollment < ActiveRecord::Base
 
   def self.cross_shard_invitations?
     false
-  end
-
-  # DO NOT TRUST
-  # This is only a convenience method to assist in identifying which enrollment
-  # goes to which user when users have accidentally been merged together
-  # This is the *only* reason the sis_source_id column has not been dropped
-  def sis_user_id
-    return @sis_user_id if @sis_user_id
-    sis_source_id_parts = sis_source_id ? sis_source_id.split(':') : []
-    if sis_source_id_parts.length == 4
-      @sis_user_id = sis_source_id_parts[1]
-    else
-      @sis_user_id = sis_source_id_parts[0]
-    end
-    @sis_user_id
   end
 
   def total_activity_time

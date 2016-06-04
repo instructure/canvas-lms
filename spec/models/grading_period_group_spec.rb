@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,39 +19,121 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingPeriodGroup do
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+
   describe "validation" do
-    it "should not be valid without a course or account" do
-      grading_period_group = GradingPeriodGroup.new
-      expect(grading_period_group).to_not be_valid
+    it "is valid with only an active enrollment term" do
+      enrollment_term = Account.default.enrollment_terms.create!
+      group = GradingPeriodGroup.new
+      group.enrollment_terms << enrollment_term
+      expect(group).to be_valid
     end
 
-    it "should not be valid with a course AND an account" do
+    it "is valid with an account" do
+      group = GradingPeriodGroup.new
+      group.account = Account.default
+      expect(group).to be_valid
+    end
+
+    it "is valid with a course" do
+      course = Course.create!(account: Account.default)
+      group = GradingPeriodGroup.new
+      group.course = course
+      expect(group).to be_valid
+    end
+
+    it "is valid with both an account and enrollment terms" do
+      term_1 = Account.default.enrollment_terms.create!
+      term_2 = Account.default.enrollment_terms.create!
+      group = GradingPeriodGroup.new
+      group.account = Account.default
+      group.enrollment_terms << term_1
+      group.enrollment_terms << term_2
+      expect(group).to be_valid
+    end
+
+    it "is not valid without an account, a course, or an enrollment term" do
+      group = GradingPeriodGroup.new
+      expect(group).not_to be_valid
+    end
+
+    it "is not valid with both an account and a course" do
+      course = Course.create!(account: Account.default)
+      group = GradingPeriodGroup.new
+      group.account = Account.default
+      group.course = course
+      expect(group).not_to be_valid
+    end
+
+    it "is valid with only deleted enrollment terms and is deleted" do
+      enrollment_term = Account.default.enrollment_terms.create!
+      enrollment_term.destroy
+      group = GradingPeriodGroup.new
+      group.enrollment_terms << enrollment_term
+      group.workflow_state = 'deleted'
+      expect(group).to be_valid
+    end
+
+    it "is not valid with only deleted enrollment terms and not deleted" do
+      enrollment_term = Account.default.enrollment_terms.create!
+      enrollment_term.destroy
+      group = GradingPeriodGroup.new
+      group.enrollment_terms << enrollment_term
+      expect(group).not_to be_valid
+    end
+
+    it "is not valid with only deleted enrollment terms and undeleted" do
+      enrollment_term = Account.default.enrollment_terms.create!
+      group = group_helper.create_for_enrollment_term(enrollment_term)
+      enrollment_term.destroy
+      group.reload
+      group.workflow_state = 'active'
+      expect(group).not_to be_valid
+    end
+
+    it "is not valid with an account and enrollment terms from different accounts" do
+      group = GradingPeriodGroup.new
+      group.account = Account.default
+      other_account = account_model
+      term = other_account.enrollment_terms.create!
+      group.enrollment_terms << term
+      expect(group).not_to be_valid
+    end
+
+    it "is not valid with enrollment terms associated with different accounts" do
+      account_1 = account_model
+      account_2 = account_model
+      term_1 = account_1.enrollment_terms.create!
+      term_2 = account_2.enrollment_terms.create!
+      group = GradingPeriodGroup.new
+      group.enrollment_terms << term_1
+      group.enrollment_terms << term_2
+      expect(group).not_to be_valid
+    end
+
+    it "is not valid with enrollment terms with different accounts and workflow states" do
+      account_1 = account_model
+      account_2 = account_model
+      term_1 = account_1.enrollment_terms.create!
+      term_2 = account_2.enrollment_terms.create!
+      term_2.destroy
+      group = GradingPeriodGroup.new
+      group.enrollment_terms << term_1
+      group.enrollment_terms << term_2
+      expect(group).not_to be_valid
+    end
+
+    it "is not able to mass-assign the account id" do
+      group = GradingPeriodGroup.new(account_id: Account.default.id)
+      expect(group.account_id).to be_nil
+      expect(group.account).to be_nil
+    end
+
+    it "is not able to mass-assign the course id" do
       course = course()
-      grading_period_group = course.grading_period_groups.new
-      grading_period_group.account = Account.default
-      expect(grading_period_group).to_not be_valid
-    end
-
-    it "should be valid with an account" do
-      grading_period_group = Account.default.grading_period_groups.new
-      expect(grading_period_group).to be_valid
-    end
-
-    it "should not be able to mass-assign the account id" do
-      grading_period_group = GradingPeriodGroup.new(account_id: Account.default.id)
-      expect(grading_period_group).to_not be_valid
-    end
-
-    it "should be valid with a course" do
-      course = course()
-      grading_period_group = course.grading_period_groups.new
-      expect(grading_period_group).to be_valid
-    end
-
-    it "should not be able to mass-assign the course id" do
-      course = course()
-      grading_period_group = GradingPeriodGroup.new(course_id: course.id)
-      expect(grading_period_group).to_not be_valid
+      group = GradingPeriodGroup.new(course_id: course.id)
+      expect(group.course_id).to be_nil
+      expect(group.course).to be_nil
     end
   end
 
@@ -271,6 +353,19 @@ describe GradingPeriodGroup do
           expect(@course_grading_period_group.rights_status(@admin, :read, :manage)).to eq({ read: false, manage: false })
         end
       end
+    end
+  end
+
+  describe "#enrollment_terms" do
+    it "returns the associated enrollment terms" do
+      account = Account.default
+      term_1 = account.enrollment_terms.create!
+      term_2 = account.enrollment_terms.create!
+      group = group_helper.create_for_enrollment_term(term_1)
+      term_2.update_attribute(:grading_period_group, group)
+      group.save!
+      group.reload
+      expect(group.enrollment_terms).to match_array([term_1, term_2])
     end
   end
 end

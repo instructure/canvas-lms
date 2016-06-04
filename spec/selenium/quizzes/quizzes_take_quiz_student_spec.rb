@@ -60,7 +60,7 @@ describe 'taking a quiz' do
         end
 
         def verify_no_access_code_prompt
-          expect(f('#quiz_access_code')).to be_falsey
+          expect(f("#content")).not_to contain_css('#quiz_access_code')
         end
 
         it 'only asks once for the access code', priority: "1", test_id: 522898 do
@@ -77,6 +77,13 @@ describe 'taking a quiz' do
               oqaat_quiz.save!
               oqaat_quiz.reload
             end
+          end
+        end
+
+        it 'does not prompt for access code for sidebar question navigation' do
+          verify_no_access_code_reprompts_during_oqaat_quiz do
+            select_question_from_column_links(@quiz.quiz_questions[0].id)
+            select_question_from_column_links(@quiz.quiz_questions[1].id)
           end
         end
       end
@@ -105,8 +112,12 @@ describe 'taking a quiz' do
 
         ensure
           # This prevents selenium from freezing when the dialog appears upon leaving the quiz
-          fln('Quizzes').click
-          driver.switch_to.alert.accept
+          begin
+            fln('Quizzes').click
+            driver.switch_to.alert.accept
+          rescue Selenium::WebDriver::Error::NoAlertOpenError
+            # Do nothing
+          end
         end
 
         def verify_access_code_prompt
@@ -114,7 +125,6 @@ describe 'taking a quiz' do
         end
 
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
-          skip('Known issue CNVS-24622')
           start_and_exit_quiz do
             expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
@@ -123,7 +133,6 @@ describe 'taking a quiz' do
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
-          skip('Known issue CNVS-24622')
           start_and_exit_quiz do
             expect_new_page_load { driver.navigate.back }
             verify_access_code_prompt

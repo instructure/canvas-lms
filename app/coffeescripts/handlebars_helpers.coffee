@@ -1,7 +1,6 @@
 define [
   'timezone'
   'compiled/util/enrollmentName'
-  'compiled/util/fcUtil'
   'handlebars'
   'i18nObj'
   'jquery'
@@ -16,7 +15,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, fcUtil, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->
@@ -143,16 +142,6 @@ define [
     tTimeToString : (date = '', i18n_format) ->
       return '' unless date
       I18n.l "time.formats.#{i18n_format}", date
-
-    # convert a moment to a string, using the given i18n format in the date.formats namespace
-    fcMomentToDateString : (date = '', i18n_format) ->
-      return '' unless date
-      tz.format(fcUtil.unwrap(date), "date.formats.#{i18n_format}")
-
-    # convert a moment to a time string, using the given i18n format in the time.formats namespace
-    fcMomentToString : (date = '', i18n_format) ->
-      return '' unless date
-      tz.format(fcUtil.unwrap(date), "time.formats.#{i18n_format}")
 
     tTimeHours : (date = '') ->
       if date.getMinutes() == 0 and date.getSeconds() == 0

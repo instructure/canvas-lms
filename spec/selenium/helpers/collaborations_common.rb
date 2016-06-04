@@ -4,8 +4,15 @@ module CollaborationsCommon
   # Public: Determine if a collaboration form is visible.
   #
   # Returns a boolean.
-  def form_visible?
-    ffj('.collaborator-picker:visible').length > 0
+  def expect_form_to_be_visible
+    expect(fj('.collaborator-picker:visible')).to be_present
+  end
+
+  # Public: Determine if a collaboration form is not visible.
+  #
+  # Returns a boolean.
+  def expect_form_not_to_be_visible
+    expect(f("#content")).not_to contain_jqcss('.collaborator-picker:visible')
   end
 
   # Public: Delete the given collaboration.
@@ -21,7 +28,7 @@ module CollaborationsCommon
       keep_trying_until { expect(f('#delete_collaboration_dialog .delete_button')).to be_displayed }
       f('#delete_collaboration_dialog .delete_button').click
     end
-    keep_trying_until { expect(f(".collaboration_#{collaboration.id} .delete_collaboration_link")).to be_nil }
+    expect(f("#content")).not_to contain_css(".collaboration_#{collaboration.id} .delete_collaboration_link")
   end
 
   # Public: Given an array of collaborations, verify their presence.
@@ -38,7 +45,7 @@ module CollaborationsCommon
       get url
 
       driver.execute_script 'window.confirm = function(msg) { return true; }' if execute_script
-      keep_trying_until { expect(form_visible?).to eq form_visible }
+      form_visible ? expect_form_to_be_visible : expect_form_not_to_be_visible
     end
   end
 

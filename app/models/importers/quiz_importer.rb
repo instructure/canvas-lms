@@ -175,7 +175,7 @@ module Importers
         end
       end
       item ||= context.quizzes.new
-      new_record = item.new_record?
+      new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date]
       hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]

@@ -50,6 +50,7 @@ define([
       buildButtonsToRender = (
         [
           <button
+            key='renameBtn'
             ref='renameBtn'
             className='btn btn-default'
             onClick={this.handleRenameClick}
@@ -58,6 +59,7 @@ define([
           </button>
          ,
           <button
+            key='replaceBtn'
             ref='replaceBtn'
             className='btn btn-primary'
             onClick={this.handleReplaceClick}
@@ -70,6 +72,7 @@ define([
       buildButtonsToRender = (
         [
           <button
+            key='backBtn'
             ref='backBtn'
             className='btn btn-default'
             onClick={this.handleBackClick}
@@ -78,6 +81,7 @@ define([
           </button>
         ,
           <button
+            key='commitChangeBtn'
             ref='commitChangeBtn'
             className='btn btn-primary'
             onClick={this.handleChangeClick}

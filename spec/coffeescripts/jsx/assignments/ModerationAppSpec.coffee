@@ -14,6 +14,7 @@ define [
         dispatch: sinon.spy()
         getState: -> {
           studentList: {
+            selectedCount: 0
             students: []
             sort: 'asc'
           },

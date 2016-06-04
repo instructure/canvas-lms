@@ -640,13 +640,12 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_sis => {
         :label => lambda { t('permissions.manage_sis', "Manage SIS data") },
-        :account_only => true,
+        :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :read_sis => {
         :label => lambda { t('permission.read_sis', "Read SIS data") },
-        :account_only => true,
         :true_for => %w(AccountAdmin TeacherEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment)
       },

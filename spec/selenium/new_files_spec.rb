@@ -31,7 +31,7 @@ describe "better_file_browsing" do
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
         wait_for_ajaximations
-        expect(fln("example.pdf")).not_to be_present
+        expect(f("#content")).not_to contain_link("example.pdf")
         expect(fln(file_rename_to)).to be_present
       end
       it "should delete file", priority: "1", test_id: 133128 do
@@ -320,7 +320,7 @@ describe "better_file_browsing" do
     end
 
     def react_modal_hidden
-      expect(f('.ReactModal__Content')).to eq(nil)
+      expect(f("body")).not_to contain_css('.ReactModal__Content')
     end
 
     before :each do
@@ -383,7 +383,7 @@ describe "better_file_browsing" do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
         set_value f('.UsageRightsSelectBox__select'), 'fair_use'
-        expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
+        expect(f('.UsageRightsSelectBox__container')).not_to contain_css('.UsageRightsSelectBox__creativeCommons')
       end
       it "should publish warning when usage rights is not selected", priority: "2", test_id: 133135 do
         expect(f('.icon-warning')).to be_present

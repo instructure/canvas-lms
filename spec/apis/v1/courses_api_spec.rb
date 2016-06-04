@@ -1334,7 +1334,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
 
@@ -1345,7 +1344,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
   end
@@ -2519,6 +2517,7 @@ describe CoursesController, type: :request do
         'id' => @course1.id,
         'name' => @course1.name,
         'account_id' => @course1.account_id,
+        'root_account_id' => @course1.root_account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
         'grading_standard_id' => nil,

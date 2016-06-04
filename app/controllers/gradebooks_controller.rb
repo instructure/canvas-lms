@@ -37,7 +37,9 @@ class GradebooksController < ApplicationController
 
   def grade_summary
     @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id], presenter_options)
-    # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
+    # do this as the very first thing, if the current user is a
+    # teacher in the course and they are not trying to view another
+    # user's grades, redirect them to the gradebook
     if @presenter.user_needs_redirection?
       return redirect_to polymorphic_url([@context, 'gradebook'])
     end
@@ -46,57 +48,63 @@ class GradebooksController < ApplicationController
       return render_unauthorized_action
     end
 
-    if authorized_action(@context, @current_user, :read) && authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
-      log_asset_access([ "grades", @context ], "grades", "other")
-      if @presenter.student
-        add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
+    return unless authorized_action(@context, @current_user, :read) &&
+      authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
 
-        gp_id = nil
-        if multiple_grading_periods?
-          set_current_grading_period
-          @grading_periods = active_grading_periods
-          gp_id = @current_grading_period_id unless view_all_grading_periods?
-        end
+    log_asset_access([ "grades", @context ], "grades", "other")
 
-        @exclude_total = exclude_total?(@context)
-        Shackles.activate(:slave) do
-          #run these queries on the slave database for speed
-          @presenter.assignments(grading_period_id: gp_id)
-          @presenter.groups_assignments = groups_as_assignments(
-            @presenter.groups,
-            :out_of_final => true,
-            :exclude_total => @exclude_total)
-          @presenter.submissions
-          @presenter.submission_counts
-          @presenter.assignment_stats
-        end
+    return render :grade_summary_list unless @presenter.student
 
-        submissions_json = @presenter.submissions.
-          select { |s| s.user_can_read_grade?(@current_user) }.
-          map do |s|
-            {
-              assignment_id: s.assignment_id,
-              score: s.score,
-              excused: s.excused?,
-              workflow_state: s.workflow_state,
-            }
-          end
+    add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url,
+                                                         @presenter.student_id))
 
-
-        ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
-        js_env submissions: submissions_json,
-               assignment_groups: ags_json,
-               group_weighting_scheme: @context.group_weighting_scheme,
-               show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
-               grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard,
-               grading_period: @grading_periods && @grading_periods.find { |period| period[:id] == gp_id },
-               exclude_total: @exclude_total,
-               student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
-               student_id: @presenter.student_id
-      else
-        render :grade_summary_list
-      end
+    gp_id = nil
+    if multiple_grading_periods?
+      set_current_grading_period
+      @grading_periods = active_grading_periods
+      gp_id = @current_grading_period_id unless view_all_grading_periods?
     end
+
+    @exclude_total = exclude_total?(@context)
+    Shackles.activate(:slave) do
+      # run these queries on the slave database for speed
+      @presenter.assignments(grading_period_id: gp_id)
+      @presenter.groups_assignments = groups_as_assignments(@presenter.groups,
+                                                            :out_of_final => true,
+                                                            :exclude_total => @exclude_total)
+      @presenter.submissions
+      @presenter.submission_counts
+      @presenter.assignment_stats
+    end
+
+    submissions_json = @presenter.submissions.
+      select { |s| s.user_can_read_grade?(@current_user) }.
+      map do |s|
+      {
+        assignment_id: s.assignment_id,
+        score: s.score,
+        excused: s.excused?,
+        workflow_state: s.workflow_state,
+      }
+    end
+
+    grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
+
+
+    ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
+
+    grading_scheme = @context.grading_standard.try(:data) ||
+                     GradingStandard.default_grading_standard
+
+    js_env(submissions: submissions_json,
+           assignment_groups: ags_json,
+           group_weighting_scheme: @context.group_weighting_scheme,
+           show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
+           grading_scheme: grading_scheme,
+           grading_period: grading_period,
+           exclude_total: @exclude_total,
+           student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
+           student_id: @presenter.student_id)
   end
 
   def save_assignment_order

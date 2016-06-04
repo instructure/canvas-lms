@@ -23,8 +23,8 @@ describe "gradebook uploads" do
   end
 
   def assert_assignment_is_not_highlighted
-    expect(ff('.left-highlight').length).to be 0
-    expect(ff('.right-highlight').length).to be 0
+    expect(f("#content")).not_to contain_css('.left-highlight')
+    expect(f("#content")).not_to contain_css('.right-highlight')
   end
 
   it "should correctly update grades for assignments with GPA Scale grading type",priority: "1", test_id: 209969 do

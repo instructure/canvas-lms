@@ -96,11 +96,9 @@ describe "context modules" do
       wait_for_ajaximations
       list_post_drag = ff("a.title").map(&:text)
       #validates the module 1 assignments are in the expected places and that module 2 context_module_items isn't present
-      keep_trying_until do
-        expect(list_post_drag[0]).to eq "assignment 2"
-        expect(list_post_drag[1]).to eq "assignment 1"
-        expect(fj('#context_modules .context_module:last-child .context_module_items .context_module_item')).to be_nil
-      end
+      expect(list_post_drag[0]).to eq "assignment 2"
+      expect(list_post_drag[1]).to eq "assignment 1"
+      expect(f("#content")).not_to contain_css('#context_modules .context_module:last-child .context_module_items .context_module_item')
     end
 
     it "should only display out-of on an assignment min score restriction when the assignment has a total" do
@@ -216,7 +214,7 @@ describe "context modules" do
       f('.edit_module_link').click
       edit_form = f('#add_context_module_form')
       expect(edit_form).to be_displayed
-      expect(ff('.completion_entry .delete_criterion_link:visible', edit_form)).to be_empty
+      expect(f('.completion_entry')).not_to contain_jqcss('.delete_criterion_link:visible')
     end
 
     it "should delete a module item", priority: "1", test_id: 126739 do

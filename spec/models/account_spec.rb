@@ -527,7 +527,7 @@ describe Account do
       @enrollment.accept!
 
       @shard1.activate do
-        expect(Account.default.grants_right?(@user, :read_sis)).to eq true
+        expect(@course.grants_right?(@user, :read_sis)).to eq true
       end
     end
   end
@@ -902,67 +902,6 @@ describe Account do
 
   context "permissions" do
     before(:once) { Account.default }
-
-    it "should grant :read_sis to teachers" do
-      user_with_pseudonym(:active_all => 1)
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
-      @course = Account.default.courses.create!
-      @course.enroll_teacher(@user).accept!
-      AdheresToPolicy::Cache.clear
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
-    end
-
-    it "should be able to disable :read_sis for custom teachers" do
-      user_with_pseudonym(:active_all => 1)
-      role = custom_teacher_role("teecher", :account => Account.default)
-
-      @course = Account.default.courses.create!
-      @course.enroll_teacher(@user, :role => role).accept!
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
-
-      Account.default.role_overrides.create!(:permission => "read_sis", :role => role, :enabled => false)
-      AdheresToPolicy::Cache.clear
-      RoleOverride.clear_cached_contexts
-
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
-    end
-
-    it "should be able to disable :read_sis for teacher-students if the account so desires" do
-      user_with_pseudonym(:active_all => 1)
-      a = Account.default
-
-      course1 = a.courses.create!
-      course1.enroll_teacher(@user).accept!
-      course2 = a.courses.create!
-      course2.offer!
-      course2.enroll_student(@user).accept!
-
-      expect(a.grants_right?(@user, :read_sis)).to be_truthy
-
-      AdheresToPolicy::Cache.clear
-      RoleOverride.clear_cached_contexts
-
-      a.settings[:strict_sis_check] = true
-      a.save!
-      expect(a.grants_right?(@user, :read_sis)).to be_falsey
-
-      @user.student_enrollments.each(&:destroy!)
-
-      AdheresToPolicy::Cache.clear
-      RoleOverride.clear_cached_contexts
-
-      expect(a.grants_right?(@user, :read_sis)).to be_truthy
-    end
-
-    it "should not break trying to check :read_sis for sub-account custom teachers" do
-      user_with_pseudonym(:active_all => 1)
-      sub_account = Account.default.sub_accounts.create!
-      role = custom_teacher_role("teecher", :account => sub_account)
-
-      @course = sub_account.courses.create!
-      @course.enroll_teacher(@user, :role => role).accept!
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
-    end
 
     it "should grant :read_global_outcomes to any user iff site_admin" do
       @site_admin = Account.site_admin

@@ -13,10 +13,10 @@
 // $link-color: ensure-contrast($primary-brand, $page-bg-color);
 // a { color: $link-color }
 @function ensure-contrast($desired-color, $background-color-it-will-be-used-on, $is-header: false) {
+  @if not $use_high_contrast { @return $desired-color; }
+
   $minumum-ratio: 4.5;
-  @if $is-header {
-    $minumum-ratio: 3;
-  }
+  @if $is-header { $minumum-ratio: 3; }
   $ratio: contrast-ratio($desired-color, $background-color-it-will-be-used-on);
 
   @if ($ratio < 1.9) {
@@ -27,7 +27,7 @@
   $possible-to-reach-contrast-by-going-lighter: contrast-ratio($desired-color, white) > $minumum-ratio;
   $should-lighten: $possible-to-reach-contrast-by-going-lighter and lightness($desired-color) > lightness($background-color-it-will-be-used-on);
   $i: 0;
-  @while ($i < 100 and $use_high_contrast and contrast-ratio($desired-color, $background-color-it-will-be-used-on) < $minumum-ratio) {
+  @while ($i < 100 and contrast-ratio($desired-color, $background-color-it-will-be-used-on) < $minumum-ratio) {
     $i: $i + 1;
     @if ($should-lighten) {
       $desired-color: lighten($desired-color, 1%);

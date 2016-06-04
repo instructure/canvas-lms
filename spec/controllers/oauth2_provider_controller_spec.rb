@@ -104,10 +104,22 @@ describe Oauth2ProviderController do
 
       it 'should redirect to the redirect uri if the user already has remember-me token' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
-        get :auth, client_id: key.id,
+        get :auth,
+            client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
-            scopes: '/auth/userinfo'
+            scope: '/auth/userinfo'
+        expect(response).to be_redirect
+        expect(response.location).to match(/https:\/\/example.com/)
+      end
+
+      it 'it accepts the deprecated name of scopes for scope param' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :auth,
+            client_id: key.id,
+            redirect_uri: 'https://example.com',
+            response_type: 'code',
+            scope: '/auth/userinfo'
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
@@ -126,7 +138,7 @@ describe Oauth2ProviderController do
         get :auth, client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
-            scopes: '/auth/userinfo'
+            scope: '/auth/userinfo'
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end

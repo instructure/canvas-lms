@@ -24,6 +24,8 @@ module Lti::MembershipService
     let(:base_url) { 'https://localhost:3000' }
     let(:presenter) { PagePresenter.new(@course, @teacher, base_url) }
     let(:hash) { presenter.as_json }
+    let(:group_presenter) { PagePresenter.new(@group, @student, base_url) }
+    let(:group_hash) { group_presenter.as_json }
 
     context 'course with single enrollment' do
       before(:each) do
@@ -87,6 +89,79 @@ module Lti::MembershipService
           expect(member.fetch(:resultSourcedId)).to be_nil
           expect(member.fetch(:sourcedId)).to be_nil
           expect(member.fetch(:userId)).to eq(@teacher.lti_context_id)
+        end
+      end
+    end
+
+    context 'group with single student' do
+      before(:each) do
+        course_with_teacher
+        @course.offer!
+        @student = user_model
+        @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
+
+        @group_category = @course.group_categories.create!(name: 'Membership')
+        @group = @course.groups.create!(name: 'Group 1', group_category: @group_category)
+        @group.add_user(@student)
+      end
+
+      describe '#as_json' do
+        it 'outputs the expected data in the expected format at the top level' do
+          expect(group_hash.keys.size).to eq(6)
+
+          expect(group_hash.fetch(:@id)).to be_nil
+          expect(group_hash.fetch(:@type)).to eq 'Page'
+          expect(group_hash.fetch(:@context)).to eq 'http://purl.imsglobal.org/ctx/lis/v2/MembershipContainer'
+          expect(group_hash.fetch(:differences)).to be_nil
+          expect(group_hash.fetch(:nextPage)).to be_nil
+          expect(group_hash.fetch(:pageOf)).not_to be_nil
+        end
+
+        it 'outputs the expected data in the expected format at the container level' do
+          container = group_hash[:pageOf]
+
+          expect(container.size).to eq 5
+          expect(container.fetch(:@id)).to be_nil
+          expect(container.fetch(:@type)).to eq 'LISMembershipContainer'
+          expect(container.fetch(:@context)).to eq 'http://purl.imsglobal.org/ctx/lis/v2/MembershipContainer'
+          expect(container.fetch(:membershipPredicate)).to eq 'http://www.w3.org/ns/org#membership'
+          expect(container.fetch(:membershipSubject)).not_to be_nil
+        end
+
+        it 'outputs the expected data in the expected format at the context level' do
+          context = group_hash[:pageOf][:membershipSubject]
+
+          expect(context.size).to eq 5
+          expect(context.fetch(:@id)).to be_nil
+          expect(context.fetch(:@type)).to eq 'Context'
+          expect(context.fetch(:name)).to eq @group.name
+          expect(context.fetch(:contextId)).to eq @group.lti_context_id
+          expect(context.fetch(:membership)).not_to be_nil
+        end
+
+        it 'outputs the expected data in the expected format at the membership level' do
+          memberships = group_hash[:pageOf][:membershipSubject][:membership]
+          @student.reload
+
+          expect(memberships.size).to eq 1
+
+          membership = memberships[0]
+
+          expect(membership.size).to eq 4
+          expect(membership.fetch(:@id)).to be_nil
+          expect(membership.fetch(:status)).to eq IMS::LIS::Statuses::SimpleNames::Active
+          expect(membership.fetch(:role)).to match_array([IMS::LIS::Roles::Context::URNs::Learner])
+
+          member = membership.fetch(:member)
+          expect(member.fetch(:@id)).to be_nil
+          expect(member.fetch(:name)).to eq @student.name
+          expect(member.fetch(:img)).to eq @student.avatar_image_url
+          expect(member.fetch(:email)).to eq @student.email
+          expect(member.fetch(:familyName)).to eq @student.last_name
+          expect(member.fetch(:givenName)).to eq @student.first_name
+          expect(member.fetch(:resultSourcedId)).to be_nil
+          expect(member.fetch(:sourcedId)).to be_nil
+          expect(member.fetch(:userId)).to eq(@student.lti_context_id)
         end
       end
     end

@@ -197,6 +197,19 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
+  def self.visible_users_for(overrides, user=nil)
+    return [] if overrides.empty? || user.nil?
+    override = overrides.first
+    override.visible_users_for(user)
+  end
+
+  def visible_users_for(user)
+    assignment_or_quiz = self.assignment || self.quiz
+    UserSearch.scope_for(assignment_or_quiz.context, user, {
+      force_users_visible_to: true
+    })
+  end
+
   override :due_at
   override :unlock_at
   override :lock_at

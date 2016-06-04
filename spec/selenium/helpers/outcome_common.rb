@@ -241,12 +241,12 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
     expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     # db
     expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ff('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
   def should_validate_mastery_points
@@ -471,11 +471,11 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
-    expect(fj('.outcomes-content .title').text).to eq "Setting up Outcomes"
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
+    expect(f('.outcomes-content .title').text).to eq "Setting up Outcomes"
     # db
     expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ffj('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 end

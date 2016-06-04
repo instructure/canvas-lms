@@ -110,9 +110,6 @@ define [
     htmlUrl: =>
       @get 'url'
 
-    togglePostToSISUrl: =>
-      @get 'toggle_post_to_sis_url'
-
     defaultDates: =>
       group = new DateGroup
         due_at:    @get("due_at")

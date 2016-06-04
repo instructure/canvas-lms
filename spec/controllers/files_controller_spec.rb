@@ -616,6 +616,12 @@ describe FilesController do
       expect(response.body).to include 'quota exceeded'
     end
 
+    it "refuses to create a file in a submissions folder" do
+      user_session(@student)
+      post 'create', :user_id => @student.id, :format => :json, :attachment => {:display_name => 'blah', :uploaded_data => io, :folder_id => @student.submissions_folder.id}
+      expect(response.status).to eq 401
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -672,6 +678,28 @@ describe FilesController do
       expect(@file.folder).to eql(@folder)
     end
 
+    context "submissions folder" do
+      before(:once) do
+        @student = user_model
+        @root_folder = Folder.root_folders(@student).first
+        @file = attachment_model(:context => @user, :uploaded_data => default_uploaded_data, :folder => @root_folder)
+        @sub_folder = @student.submissions_folder
+        @sub_file = attachment_model(:context => @user, :uploaded_data => default_uploaded_data, :folder => @sub_folder)
+      end
+
+      it "should not move a file into a submissions folder" do
+        user_session(@student)
+        put 'update', :user_id => @student.id, :id => @file.id, :attachment => { :folder_id => @sub_folder.id }, :format => 'json'
+        expect(response.status).to eq 401
+      end
+
+      it "should not move a file out of a submissions folder" do
+        user_session(@student)
+        put 'update', :user_id => @student.id, :id => @sub_file.id, :attachment => { :folder_id => @root_folder.id }, :format => 'json'
+        expect(response.status).to eq 401
+      end
+    end
+
     it "should replace content and update user_id" do
       course_with_teacher_logged_in(:active_all => true)
       course_file
@@ -724,6 +752,12 @@ describe FilesController do
         expect(assigns[:attachment]).to eql(@file)
         expect(assigns[:attachment].file_state).to eq 'deleted'
       end
+    end
+
+    it "refuses to delete a file in a submissions folder" do
+      file = @student.attachments.create! :display_name => 'blah', :uploaded_data => default_uploaded_data, :folder => @student.submissions_folder
+      delete 'destroy', :user_id => @student.id, :id => file.id
+      expect(response.status).to eq 401
     end
 
     context "file that has been submitted" do
@@ -874,6 +908,50 @@ describe FilesController do
       }}
       expect(response).to be_success
       expect(assigns[:attachment].locked).to be_truthy
+    end
+
+    it "refuses to create a file in a submissions folder" do
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @student.asset_string,
+        :filename => 'test.txt',
+        :folder_id => @student.submissions_folder.id
+      }}
+      expect(response.status).to eq 401
+    end
+
+    it "creates a file in the submissions folder if intent=='submit' and the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      assignment = @course.assignments.create!(:submission_types => 'online_upload')
+      post 'create_pending', {:attachment => {
+        :context_code => assignment.context_code,
+        :asset_string => assignment.asset_string,
+        :filename => 'test.txt',
+        :intent => 'submit'
+      }}
+      f = assigns[:attachment].folder
+      expect(f.submission_context_code).to eq @course.asset_string
+    end
+
+    it "uses a submissions folder for group assignments when the feature is enabled" do
+      @course.root_account.enable_feature! :submissions_folder
+      user_session(@student)
+      category = group_category
+      assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
+      group = category.groups.create(:context => @course)
+      group.add_user(@student)
+      user_session(@student)
+      post 'create_pending', {:attachment => {
+        :context_code => @course.asset_string,
+        :asset_string => assignment.asset_string,
+        :intent => 'submit',
+        :filename => "bob.txt"
+      }}
+      expect(response).to be_success
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].context).to eq group
+      expect(assigns[:attachment].folder).to be_for_submissions
     end
 
     context "sharding" do

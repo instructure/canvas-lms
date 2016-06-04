@@ -4,9 +4,8 @@ describe 'Account Grading Periods' do
   include_examples "in-process server selenium tests"
 
   let(:title) {'hi'}
-  let(:start_date) { 3.months.from_now.strftime('%b %-d') }
-  let(:end_date) { (4.months.from_now - 1.day).strftime('%b %-d') }
-  let(:date_time_format)  {'%b %-d, %Y at %-l:%M%P'}   # e.g. May 28, 2015 at 8:58pm
+  let(:start_date) { format_date_for_view(3.months.from_now) }
+  let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
 
   before(:each) do
     course_with_admin_logged_in
@@ -27,14 +26,14 @@ describe 'Account Grading Periods' do
     it 'does NOT show grading periods created by courses under this account', priority: "1", test_id: 240004 do
       course_grading_period = create_grading_periods_for(@course).first
       get "/accounts/#{@account.id}/grading_standards"
-      expect(f("#period_title_#{course_grading_period.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#period_title_#{course_grading_period.id}")
     end
 
     it 'add without saving does not create a grading period', priority: "1", test_id: 202308 do
       get "/accounts/#{@account.id}/grading_standards"
       f('#add-period-button').click
       refresh_page
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     it 'creates a grading period', priority: "1", test_id: 244001 do
@@ -46,10 +45,11 @@ describe 'Account Grading Periods' do
       f('#update-button').click
       refresh_page
       expect(ff('.grading-period').length).to eq(1)
-      id = GradingPeriod.where(title: title).first.id
+      new_grading_period = GradingPeriod.where(title: title).first
+      id = new_grading_period.id
       expect(f("#period_title_#{id}")).to have_value(title)
-      expect(f("#period_start_date_#{id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+      expect(f("#period_start_date_#{id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+      expect(f("#period_end_date_#{id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
     end
 
     it 'flashes error if missing info', priority: "1", test_id: 202310 do
@@ -101,14 +101,14 @@ describe 'Account Grading Periods' do
       f('#update-button').click
       wait_for_ajax_requests
 
-      # check UI
-      expect(f("#period_title_#{id}")).to have_value(title)
-      expect(f("#period_start_date_#{id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
-
       # check underlying object
       account_grading_period.reload
       expect(account_grading_period.title).to eq(title)
+
+      # check UI
+      expect(f("#period_title_#{id}")).to have_value(title)
+      expect(f("#period_start_date_#{id}")).to have_value(format_time_for_view(account_grading_period.start_date, :medium))
+      expect(f("#period_end_date_#{id}")).to have_value(format_time_for_view(account_grading_period.end_date, :medium))
     end
 
     it 'verifies with alert modal before deletion', priority: "1", test_id: 202313 do
@@ -117,8 +117,7 @@ describe 'Account Grading Periods' do
       ff('.icon-delete-grading-period').first.click
       expect(driver.switch_to.alert.text).to eq('Are you sure you want to delete this grading period?')
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     it 'deletes an unsaved grading period', priority: "1", test_id: 202314 do
@@ -126,8 +125,7 @@ describe 'Account Grading Periods' do
       f('#add-period-button').click
       expect(ff('.grading-period').length).to be(1)
       ff('.icon-delete-grading-period').first.click
-      wait_for_ajaximations
-      expect(ff('.grading-period').length).to be(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
     end
 
     # there is a lot of repeated code in the inheritance tests, since we are testing 3 roles on 3 pages
@@ -148,8 +146,8 @@ describe 'Account Grading Periods' do
           get "/accounts/#{sub_account.id}/grading_standards"
           expect(ff('.grading-period').length).to eq(1)
           expect(f("#period_title_#{@id}")).to have_value(@account_grading_period.title)
-          expect(f("#period_start_date_#{@id}")).to have_value(@account_grading_period.start_date.strftime(date_time_format))
-          expect(f("#period_end_date_#{@id}")).to have_value(@account_grading_period.end_date.strftime(date_time_format))
+          expect(f("#period_start_date_#{@id}")).to have_value(format_time_for_view(@account_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{@id}")).to have_value(format_time_for_view(@account_grading_period.end_date, :medium))
         end
 
         it 'is inherited by sub-account, editing from sub-account page creates a copy', priority: "1", test_id: 250248 do
@@ -175,8 +173,8 @@ describe 'Account Grading Periods' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
 
         it 'is inherited by course, reads account grading period', priority: "1", test_id: 250249 do
@@ -209,8 +207,8 @@ describe 'Account Grading Periods' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
       end # as admin
 
@@ -250,8 +248,8 @@ describe 'Account Grading Periods' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
 
         it 'is inherited by sub-account, deleting as sub-admin reverts to account grading period', priority: "1", test_id: 250257 do
@@ -303,8 +301,8 @@ describe 'Account Grading Periods' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
 
         it 'is inherited by course, deleting reverts to account grading period', priority: "1", test_id: 250259 do
@@ -350,7 +348,7 @@ describe 'Account Grading Periods' do
   context 'with Multiple Grading Periods feature off', priority: "1", test_id: 202305 do
     it 'does not contain a tab for grading periods' do
       get "/courses/#{@course.id}/grading_standards"
-      expect(f(".grading_periods_tab")).to be_nil
+      expect(f("#content")).not_to contain_css(".grading_periods_tab")
     end
   end # mgp feature off
 end  # account grading periods

@@ -4,14 +4,19 @@ module Gradebook2Common
   shared_context 'gradebook_components' do
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
+    let(:show_notes) { fj('li a:contains("Show Notes Column")') }
+    let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
-    let(:test_course) { course() }
+    let(:test_course) { course(active_course: true) }
     let(:teacher)     { user(active_all: true) }
     let(:student)     { user(active_all: true) }
+    let(:concluded_student) { user(name: 'Stewie Griffin', active_all: true) }
+    let(:observer)    { user(active_all: true) }
     let(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
     end
     let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
     let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
@@ -347,6 +352,22 @@ module Gradebook2Common
     fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
     expect(@course.reload.group_weighting_scheme).to eq 'percent'
+  end
+
+  def disable_group_weight
+    f('#gradebook_settings').click
+    f('[aria-controls="assignment_group_weights_dialog"]').click
+
+    dialog = f('#assignment_group_weights_dialog')
+    # expect(dialog).to be_displayed
+
+    group_check = dialog.find_element(:id, 'group_weighting_scheme')
+    keep_trying_until do
+      group_check.click
+      # expect(is_checked('#group_weighting_scheme')).to be_falsy
+    end
+    fj('.ui-button:contains("Save")').click
+    refresh_page
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)

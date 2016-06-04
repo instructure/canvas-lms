@@ -192,8 +192,9 @@ class SisBatch < ActiveRecord::Base
   end
 
   def fast_update_progress(val)
+    return true if val == self.progress
     self.progress = val
-    SisBatch.where(:id => self).update_all(:progress=>val)
+    SisBatch.where(id: self).update_all(progress: val)
   end
 
   def importing?

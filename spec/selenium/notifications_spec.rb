@@ -115,7 +115,7 @@ describe "Notifications" do
           @assignment.grade_student @student, grade: 2
 
           get "/users/#{@observer2.id}/messages"
-          expect(f('#content .messages .message')).to be_nil
+          expect(f("#content")).not_to contain_css('.messages .message')
         end
 
         it "should show submission comment notification to the observer", priority: "2", test_id: 1040563 do
@@ -136,7 +136,7 @@ describe "Notifications" do
           submission_comment_model({author: @teacher, submission: @assignment.find_or_create_submission(@student)})
 
           get "/users/#{@observer2.id}/messages"
-          expect(f('#content .messages .message')).to be_nil
+          expect(f("#content")).not_to contain_css('.messages .message')
         end
       end
     end

@@ -1,15 +1,14 @@
 define [
   'underscore'
   'i18n!react_files'
-  'react'
-  'react-router'
+  'react',
   'compiled/collections/FilesCollection'
   'compiled/react/shared/utils/withReactElement'
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
   '../utils/locationOrigin'
-], (_, I18n, React, ReactRouter, FilesCollection, withReactElement, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
+], (_, I18n, React, FilesCollection, withReactElement, customPropTypes, updateAPIQuerySortParams, getAllPages) ->
 
   SearchResults =
     displayName: 'SearchResults'

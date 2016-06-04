@@ -128,7 +128,6 @@ entries['vendor'] = [
   'moment',
   'react',
   'react-modal',
-  'react-router',
   'underscore',
   'vendor/backbone-identity-map',
   'vendor/backbone',

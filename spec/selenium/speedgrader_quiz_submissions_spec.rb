@@ -20,7 +20,7 @@ describe "speed grader - quiz submissions" do
   it "links to the quiz history page when there are too many quiz submissions", priority: "2", test_id: 283742 do
     Setting.set("too_many_quiz_submission_versions", 2)
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    expect(fj("#submission_to_view")).to be_nil
+    expect(f("#content")).not_to contain_css("#submission_to_view")
     uri = URI.parse(f(".see-all-attempts")[:href])
     expect(uri.path).to eq "/courses/#{@course.id}/quizzes/#{@quiz.id}/history"
     expect(uri.query).to eq "user_id=#{@student.id}"

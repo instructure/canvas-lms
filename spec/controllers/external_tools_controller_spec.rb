@@ -315,7 +315,7 @@ describe ExternalToolsController do
         expect(response).to be_success
       end
 
-      it "generates the resource_link_id correctly" do
+      it "generates the resource_link_id correctly for a course navigation launch" do
         user_session(@teacher)
         tool = @course.context_external_tools.new(:name => "bob",
                                                           :consumer_key => "bob",
@@ -328,7 +328,7 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
       end
 
-      it 'generates the correct resource_link_id for an assignment' do
+      it 'generates the correct resource_link_id for a homework submission' do
         user_session(@teacher)
         assignment = @course.assignments.create!(name: 'an assignment')
         assignment.save!
@@ -346,7 +346,6 @@ describe ExternalToolsController do
         lti_launch = assigns[:lti_launch]
         expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
       end
-
     end
   end
 
@@ -410,30 +409,123 @@ describe ExternalToolsController do
         expect(lti_launch.params['accept_media_types']).to eq 'application/vnd.ims.lti.v1.ltilink'
       end
 
-      it "sets proper return data for homework_submission" do
-        user_session(@teacher)
-        assignment = @course.assignments.create!(name: 'an assignment')
-        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
-        expect(response).to be_success
+      context "homework submission" do
 
-        lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params['accept_copy_advice']).to eq 'true'
-        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'none'
-        expect(lti_launch.params['accept_media_types']).to eq '*/*'
+        it "sets accept_copy_advice to true if submission_type includes online_upload" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.submission_types = 'online_upload'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id,
+            launch_type: 'homework_submission', assignment_id: assignment.id
+          expect(response).to be_success
+
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_copy_advice']).to eq 'true'
+        end
+
+        it "sets accept_copy_advice to false if submission_type does not include online_upload" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.submission_types = 'online_text_entry'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_copy_advice']).to eq 'false'
+        end
+
+        it "sets proper accept_media_types for homework_submission with extension restrictions" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.submission_types = 'online_upload'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          expect(response).to be_success
+
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_media_types']).to eq 'application/pdf,image/jpeg'
+        end
+
+        it "sends the ext_content_file_extensions paramter for restriced file types" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.submission_types = 'online_upload'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['ext_content_file_extensions']).to eq 'pdf,jpeg'
+        end
+
+        it "doesn't set the ext_content_file_extensions parameter if online_upload isn't accepted" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.submission_types = 'online_text_entry'
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params.key?('ext_content_file_extensions')).not_to be
+        end
+
+        it "sets the accept_media_types parameter to '*.*'' if online_upload isn't accepted" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          expect(response).to be_success
+
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_media_types']).to eq '*/*'
+        end
+
+        it "sets the accept_presentation_document_target to window if online_url is a submission type" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.submission_types = 'online_url'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_presentation_document_targets']).to include 'window'
+        end
+
+        it "doesn't add none to accept_presentation_document_target if online_upload isn't a submission_type" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.submission_types = 'online_url'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_presentation_document_targets']).not_to include 'none'
+        end
+
+        it "sets the mime type to */* if there is a online_url submission type" do
+          user_session(@teacher)
+          assignment = @course.assignments.new(name: 'an assignment')
+          assignment.allowed_extensions += ['pdf', 'jpeg']
+          assignment.submission_types = 'online_upload,online_url'
+          assignment.save!
+          get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
+            assignment_id: assignment.id
+          expect(response).to be_success
+
+          lti_launch = assigns[:lti_launch]
+          expect(lti_launch.params['accept_media_types']).to eq '*/*'
+        end
+
+
       end
-
-      it "sets proper accept_media_types for homework_submission with extension restrictions" do
-        user_session(@teacher)
-        assignment = @course.assignments.create!(name: 'an assignment')
-        assignment.allowed_extensions += ['pdf', 'jpeg']
-        assignment.save!
-        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
-        expect(response).to be_success
-
-        lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params['accept_media_types']).to eq 'application/pdf,image/jpeg'
-      end
-
 
       it "sets proper return data for editor_button" do
         user_session(@teacher)
@@ -459,26 +551,26 @@ describe ExternalToolsController do
   end
 
   describe "GET 'retrieve'" do
-      let :account do
-        Account.default
-      end
+    let :account do
+      Account.default
+    end
 
-      let :tool do
-        tool = account.context_external_tools.new(
-            name: "bob",
-            consumer_key: "bob",
-            shared_secret: "bob",
-            tool_id: 'some_tool',
-            privacy_level: 'public'
-        )
-        tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
-        tool.resource_selection = {
-            :url => "http://#{HostUrl.default_host}/selection_test",
-            :selection_width => 400,
-            :selection_height => 400}
-        tool.save!
-        tool
-      end
+    let :tool do
+      tool = account.context_external_tools.new(
+        name: "bob",
+        consumer_key: "bob",
+        shared_secret: "bob",
+        tool_id: 'some_tool',
+        privacy_level: 'public'
+      )
+      tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+      tool.resource_selection = {
+        :url => "http://#{HostUrl.default_host}/selection_test",
+        :selection_width => 400,
+        :selection_height => 400}
+      tool.save!
+      tool
+    end
 
     it "should require authentication" do
       user_model
@@ -515,14 +607,14 @@ describe ExternalToolsController do
     end
 
     it "should remove query params when post_only is set" do
-        u = user(:active_all => true)
-        account.account_users.create!(user: u)
-        user_session(@user)
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
 
-        tool.settings['post_only'] = 'true'
-        tool.save!
-        get :retrieve, {url: tool.url, account_id:account.id}
-        expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
+      tool.settings['post_only'] = 'true'
+      tool.save!
+      get :retrieve, {url: tool.url, account_id:account.id}
+      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
     end
 
     it "should not remove query params when post_only is not set" do
@@ -544,7 +636,6 @@ describe ExternalToolsController do
       get :retrieve, {url: tool.url, account_id: account.id, placement: 'collaboration'}
       expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
     end
-
   end
 
   describe "GET 'resource_selection'" do
@@ -984,6 +1075,36 @@ describe ExternalToolsController do
       expect(launch_settings['analytics_id']).to eq 'some_tool'
       expect(tool_settings['custom_canvas_course_id']).to eq @course.id.to_s
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
+    end
+
+    it "generates a sessionless launch for an external tool assignment" do
+      tool = new_valid_tool(@course)
+      user_session(@user)
+      assignment_model(:course => @course,
+                       :name => 'tool assignment',
+                       :submission_types => 'external_tool',
+                       :points_possible => 20,
+                       :grading_type => 'points')
+      tag = @assignment.build_external_tool_tag(:url => tool.url)
+      tag.content_type = 'ContextExternalTool'
+      tag.save!
+
+      get :generate_sessionless_launch, course_id: @course.id, launch_type: 'assessment', assignment_id: @assignment.id
+
+      expect(response).to be_success
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+      tool_settings = launch_settings['tool_settings']
+
+      expect(launch_settings['launch_url']).to eq 'http://www.example.com/basic_lti'
+      expect(launch_settings['tool_name']).to eq 'bob'
+      expect(launch_settings['analytics_id']).to eq 'some_tool'
+      expect(tool_settings['custom_canvas_course_id']).to eq @course.id.to_s
+      expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
+      expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
     end
   end
 

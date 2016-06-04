@@ -275,10 +275,12 @@
     </h1>
 
     <% if @submission && params[:preview] %>
-      <h3>
-        <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
-        <%= t('warnings.draft_version', "This is a preview of the draft version of the quiz") %>
-      </h3>
+      <p>
+        <div class="alert">
+          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <%= t 'This is a preview of the draft version of the quiz' %>
+        </div>
+      </p>
     <% end %>
 
     <div class="row-fluid">
@@ -294,7 +296,7 @@
       <% end %>
     </div>
 
-    <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+    <% if can_do(@quiz, @current_user, :update, :manage) && !can_do(@context, @current_user, :participate_as_student) %>
       <div class="preview_quiz_button">
         <%= link_to_preview_quiz('class' => "btn btn-primary", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>

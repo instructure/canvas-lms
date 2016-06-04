@@ -32,13 +32,13 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   }
 }
 
-.ef-main-buttons{
+.ef-main-buttons {
   .ui-buttonset, .ui-button {
     display: inline-block;
   }
 }
 
-.ef-header{
+.ef-header {
   @if $use_new_styles {
     padding: $ic-sp*2 0 $ic-sp;
     border-bottom: 1px solid $ic-border-light;
@@ -51,7 +51,17 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
     display: flex;
     align-items: center;
   }
-  .ui-buttonset { margin: 0; }
+  .ui-buttonset {
+    margin: 0;
+  }
+  & .ui-button:first-child {
+    border-top-left-radius: $borderRadius;
+    border-bottom-left-radius: $borderRadius;
+  }
+  & .ui-button:last-child {
+    border-top-right-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
+  }
 }
 
 .ef-search-form {
@@ -86,7 +96,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  > * { margin-left: $ic-sp/4; }
+  > * { margin-left: $ic-sp/3; }
 }
 
 .ef-main{

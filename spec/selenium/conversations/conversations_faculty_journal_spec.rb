@@ -46,7 +46,7 @@ describe "conversations new" do
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
-      time = format_time_for_view(Time.zone.now)
+      time = format_time_for_view(UserNote.last.updated_at)
       remove_user_session
       get student_user_notes_url
       expect(f('.subject').text).to include_text('Christmas')
@@ -76,7 +76,7 @@ describe "conversations new" do
       replace_content(f('textarea'),'FJ Body text 2')
       wait_for_ajaximations
       f('.send_button').click
-      time = format_time_for_view(Time.zone.now)
+      time = format_time_for_view(UserNote.last.updated_at)
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'
       expect(f('.user_content').text).to eq 'FJ Body text 2'
@@ -197,14 +197,14 @@ describe "conversations new" do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true
-      expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+      expect_flash_message :success, /Message sent!/
       # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
       #   still lets teacher know it was sent successfully.
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: false
       add_message_recipient(@s2)
       expect(is_checked('.user_note')).to be_truthy
       click_send
-      expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+      expect_flash_message :success, /Message sent!/
     end
   end
 end

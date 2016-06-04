@@ -314,6 +314,7 @@ CanvasRails::Application.routes.draw do
       resources :quiz_submissions, controller: 'quizzes/quiz_submissions', path: :submissions do
         collection do
           put :backup
+          post :backup
         end
         member do
           get :record_answer
@@ -509,6 +510,7 @@ CanvasRails::Application.routes.draw do
     get "settings#{full_path_glob}", action: :settings
     get :settings
     get :admin_tools
+    get 'search' => 'accounts#course_user_search', :as => :course_user_search
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
     delete 'account_users/:id' => 'accounts#remove_account_user', as: :remove_account_user
     resources :grading_standards, only: [:index, :create, :update, :destroy]
@@ -661,7 +663,7 @@ CanvasRails::Application.routes.draw do
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
   get 'saml_observee' => 'login/saml#observee_validation', as: :saml_observee
   post 'login/saml' => 'login/saml#create'
-  # deprecated alias
+  # deprecated alias; no longer advertised
   post 'saml_consume' => 'login/saml#create'
 
   # the callback URL for all OAuth1.0a based SSO
@@ -1328,11 +1330,13 @@ CanvasRails::Application.routes.draw do
       get 'calendar_events', action: :index, as: 'calendar_events'
       get 'users/:user_id/calendar_events', action: :user_index, as: 'user_calendar_events'
       post 'calendar_events', action: :create
+      get 'calendar_events/visible_contexts', action: :visible_contexts
       get 'calendar_events/:id', action: :show, as: 'calendar_event'
       put 'calendar_events/:id', action: :update
       delete 'calendar_events/:id', action: :destroy
       post 'calendar_events/:id/reservations', action: :reserve
       post 'calendar_events/:id/reservations/:participant_id', action: :reserve, as: 'calendar_event_reserve'
+      post 'calendar_events/save_selected_contexts', action: :save_selected_contexts
     end
 
     scope(controller: :appointment_groups) do
@@ -1859,7 +1863,8 @@ CanvasRails::Application.routes.draw do
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
 
     # Membership Service
-    get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :index, as: :course_membership_service
+    get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service
+    get "groups/:group_id/membership_service", controller: "lti/membership_service", action: :group_index, as: :group_membership_service
   end
 
   ApiRouteSet.draw(self, '/api/sis') do

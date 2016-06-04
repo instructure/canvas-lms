@@ -4,7 +4,7 @@ require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
+  desc 'run Karma as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
     app = nil if app == 'NA'
@@ -17,7 +17,7 @@ namespace :js do
         exit
       end
     end
-    Rake::Task['js:generate_runner'].invoke
+    build_runner
     exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
@@ -59,7 +59,7 @@ namespace :js do
 
     matcher = Canvas::RequireJs.matcher
     tests = Dir[
-      "public/javascripts/#{matcher}",
+      "public/javascripts/*[!bower]/#{matcher}",
       "spec/javascripts/compiled/#{matcher}",
       "spec/plugins/*/javascripts/compiled/#{matcher}"
     ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }

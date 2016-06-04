@@ -371,7 +371,7 @@ class CoursesController < ApplicationController
   #   - "favorites": Optional information to include with each Course.
   #     Indicates if the user has marked the course as a favorite course.
   #   - "teachers": Teacher information to include with each Course.
-  #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
+  #     Returns an array of hashes containing the {api:Users:UserDisplay UserDisplay} information
   #     for each teacher in the course.
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
@@ -1229,6 +1229,7 @@ class CoursesController < ApplicationController
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
         enrollment.accept!
+        @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
 
@@ -1974,6 +1975,10 @@ class CoursesController < ApplicationController
   #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument course[storage_quota_mb] [Integer]
+  #   Set the storage quota for the course, in megabytes. The caller must have
+  #   the "Manage storage quotas" account permission.
   #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students

@@ -93,7 +93,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
-      @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
+      @saml_settings.idp_cert_fingerprint = (certificate_fingerprint || '').split.presence
       @saml_settings.name_identifier_format = self.identifier_format
       @saml_settings.requested_authn_context = self.requested_authn_context
       @saml_settings.logger = logger
@@ -110,7 +110,6 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
     settings.assertion_consumer_service_url = domains.flat_map do |domain|
       [
-        "#{HostUrl.protocol}://#{domain}/saml_consume",
         "#{HostUrl.protocol}://#{domain}/login/saml"
       ]
     end
@@ -188,7 +187,9 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     saml_request = Onelogin::Saml::LogoutRequest.generate(
       session[:name_qualifier],
+      session[:sp_name_qualifer],
       session[:name_id],
+      session[:name_identifier_format],
       session[:session_index],
       settings
     )

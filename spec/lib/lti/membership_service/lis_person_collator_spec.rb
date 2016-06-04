@@ -237,5 +237,58 @@ module Lti::MembershipService
         expect(collator.next_page?).to eq(false)
       end
     end
+
+    context 'group with multiple students' do
+      before(:each) do
+        course_with_teacher
+        @course.offer!
+        @student1 = user_model
+        @course.enroll_user(@student1, 'StudentEnrollment', enrollment_state: 'active')
+        @student2 = user_model
+        @course.enroll_user(@student2, 'StudentEnrollment', enrollment_state: 'active')
+        @student3 = user_model
+        @course.enroll_user(@student3, 'StudentEnrollment', enrollment_state: 'active')
+
+        @group_category = @course.group_categories.create!(name: 'Membership')
+        @group = @course.groups.create!(name: 'Group 1', group_category: @group_category)
+        @group.add_user(@student1)
+        @group.add_user(@student2)
+        @group.add_user(@student3)
+      end
+
+      describe '#context' do
+        it 'returns the correct context' do
+          collator = LisPersonCollator.new(@group, @student1)
+
+          expect(collator.context).to eq(@group)
+        end
+      end
+
+      describe '#membership' do
+        it 'outputs the membership in a group' do
+          collator = LisPersonCollator.new(@group, @student1)
+
+          @student1.reload
+          @student2.reload
+          @student3.reload
+          memberships = collator.memberships
+          expect(memberships.size).to eq(3)
+
+          [@student1, @student2, @student3].each do |student|
+            membership = memberships.find { |m| m.member.user_id == student.lti_context_id }
+
+            expect(membership.status).to eq(IMS::LIS::Statuses::SimpleNames::Active)
+            expect(membership.role).to match_array([IMS::LIS::Roles::Context::URNs::Learner])
+            expect(membership.member.name).to eq(student.name)
+            expect(membership.member.given_name).to eq(student.first_name)
+            expect(membership.member.family_name).to eq(student.last_name)
+            expect(membership.member.img).to eq(student.avatar_image_url)
+            expect(membership.member.email).to eq(student.email)
+            expect(membership.member.result_sourced_id).to be_nil
+            expect(membership.member.sourced_id).to be_nil
+          end
+        end
+      end
+    end
   end
 end
