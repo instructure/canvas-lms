@@ -874,7 +874,7 @@ describe Submission do
     it "should be unread after submission is commented on by teacher" do
       @student = @user
       course_with_teacher(:course => @context, :active_all => true)
-      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 

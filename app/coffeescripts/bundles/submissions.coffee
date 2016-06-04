@@ -1,2 +1,5 @@
-require ['submissions']
+require [
+  'submissions'
+], (submissions) ->
 
+  submissions.setup()

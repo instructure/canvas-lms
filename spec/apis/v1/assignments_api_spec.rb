@@ -2618,7 +2618,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
 
     it "unmuting publishes hidden comments" do
       @assignment.mute!
-      @assignment.grade_student @student, comment: "blah blah blah"
+      @assignment.update_submission @student, comment: "blah blah blah", author: @teacher
       sub = @assignment.submission_for_student(@student)
       comment = sub.submission_comments.first
       expect(comment.hidden?).to eql true

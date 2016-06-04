@@ -364,7 +364,7 @@ describe Assignment::SpeedGrader do
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
 
       @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
-      @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
+      @assignment.update_submission(@student, :comment => 'real comment', :score => 1, :commenter => @student)
 
       selection = @assignment.moderated_grading_selections.create!(:student => @student)
 

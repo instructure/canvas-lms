@@ -437,22 +437,35 @@ class GradebooksController < ApplicationController
           submission[:comment_attachments] = attachments
         end
         begin
-          # if it's a percentage graded assignment, we need to ensure there's a
-          # percent sign on the end. eventually this will probably be done in
-          # the javascript.
-          if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
-            submission[:grade] = "#{submission[:grade]}%"
-          end
-
-          submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
-          submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
-          subs = @assignment.grade_student(@user, submission)
-          if submission[:provisional]
-            subs.each do |sub|
-              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+          if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+            # if it's a percentage graded assignment, we need to ensure there's a
+            # percent sign on the end. eventually this will probably be done in
+            # the javascript.
+            if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
+              submission[:grade] = "#{submission[:grade]}%"
             end
+
+            submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
+            submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
+            subs = @assignment.grade_student(@user, submission)
+            if submission[:provisional]
+              subs.each do |sub|
+                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+              end
+            end
+            @submissions += subs
           end
-          @submissions += subs
+          if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+            submission[:commenter] = @current_user
+            submission[:hidden] = @assignment.muted?
+            subs = @assignment.update_submission(@user, submission)
+            if submission[:provisional]
+              subs.each do |sub|
+                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+              end
+            end
+            @submissions += subs
+          end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           @error_message = e.to_s
@@ -485,9 +498,7 @@ class GradebooksController < ApplicationController
   def submissions_json
     @submissions.map do |s|
       json = s.as_json(Submission.json_serialization_full_parameters)
-      if pg_id = s.provisional_grade_id
-        json['submission']['provisional_grade_id'] = pg_id
-      end
+      json['submission']['provisional_grade_id'] = s.provisional_grade_id if s.provisional_grade_id
       json
     end
   end
