@@ -1210,6 +1210,32 @@ describe Submission do
         Submission.bulk_load_versioned_attachments([s])
         expect(s.versioned_attachments).to eq []
       end
+
+      it "handles submission histories with different attachments" do
+        student_in_course(active_all: true)
+        attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
+        Timecop.freeze(10.second.ago) do
+          @assignment.submit_homework(@student, submission_type: 'online_upload',
+                                      attachments: [attachments[0]])
+        end
+
+        attachments << attachment_model(filename: "submission-b.doc", :context => @student)
+        Timecop.freeze(5.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[1]]
+        end
+
+        attachments << attachment_model(filename: "submission-c.doc", :context => @student)
+        Timecop.freeze(1.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[2]]
+        end
+
+        submission = @assignment.submission_for_student(@student)
+        Submission.bulk_load_versioned_attachments(submission.submission_history)
+
+        submission.submission_history.each_with_index do |s, index|
+          expect(s.attachment_ids.to_i).to eq attachments[index].id
+        end
+      end
     end
 
     describe "#bulk_load_attachments_for_submissions" do
