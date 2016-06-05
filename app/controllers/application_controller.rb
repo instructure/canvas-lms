@@ -1063,8 +1063,7 @@ class ApplicationController < ActionController::Base
       if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
         @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
-        access_context = @context.is_a?(UserProfile) ? @context.user : @context
-        @access.log access_context, @accessed_asset
+        @access.log @context, @accessed_asset
 
         if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
           generate_page_view(user)
