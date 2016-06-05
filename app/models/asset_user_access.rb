@@ -218,11 +218,21 @@ class AssetUserAccess < ActiveRecord::Base
     name
   end
 
+  def get_correct_context(context)
+    if context.is_a?(UserProfile)
+      context.user
+    elsif context.is_a?(AssessmentQuestion)
+      context.context
+    else
+      context
+    end
+  end
+
   def log( kontext, accessed )
     self.asset_category ||= accessed[:category]
     self.asset_group_code ||= accessed[:group_code]
     self.membership_type ||= accessed[:membership_type]
-    self.context = kontext
+    self.context = get_correct_context(kontext)
     self.last_access = Time.now.utc
     self.display_name = self.asset_display_name
     log_action(accessed[:level])

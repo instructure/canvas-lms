@@ -40,6 +40,12 @@ describe AssetUserAccess do
     expect(@asset.display_name).to eq 'My changed Assignment'
   end
 
+  it "should work for assessment questions" do
+    question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
+    @asset.log question, { :level => 'view' }
+    expect(@asset.context).to eq @course
+  end
+
   describe "for_user" do
     it "should work with a User object" do
       expect(AssetUserAccess.for_user(@user)).to eq [@asset]
