@@ -516,10 +516,11 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          @account.settings[:custom_help_links] = custom_help_links.select{|k, h| h['state'] != 'deleted'}.sort.map do |index_with_hash|
+          sorted_help_links = custom_help_links.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort
+          @account.settings[:custom_help_links] = sorted_help_links.map do |index_with_hash|
             hash = index_with_hash[1]
             hash.delete('state')
-            hash.assert_valid_keys ["text", "subtext", "url", "available_to"]
+            hash.assert_valid_keys ["text", "subtext", "url", "available_to", "type"]
             hash
           end
         end
@@ -647,6 +648,8 @@ class AccountsController < ApplicationController
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       js_env({
+        CUSTOM_HELP_LINKS: @domain_root_account && @domain_root_account.help_links || [],
+        DEFAULT_HELP_LINKS: Canvas::Help.default_links,
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
         CONTEXT_BASE_URL: "/accounts/#{@context.id}",

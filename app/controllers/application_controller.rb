@@ -118,10 +118,12 @@ class ApplicationController < ActionController::Base
         use_new_styles: use_new_styles?,
         k12: k12?,
         help_link_name: help_link_name,
+        help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
-          eportfolios_enabled: @current_user.try(:eportfolios_enabled?)
+          eportfolios_enabled: @current_user.try(:eportfolios_enabled?),
+          show_feedback_link: show_feedback_link?
         }
       }
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view

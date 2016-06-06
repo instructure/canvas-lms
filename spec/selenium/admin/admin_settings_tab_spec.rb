@@ -366,6 +366,10 @@ describe "admin settings tab" do
     end
 
     it 'should add and delete custom help links' do
+      skip('this tests old ui') if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+
+      Account.default.disable_feature! :use_new_styles
+
       Setting.set('show_feedback_link', 'true')
       get "/accounts/#{Account.default.id}/settings"
 
