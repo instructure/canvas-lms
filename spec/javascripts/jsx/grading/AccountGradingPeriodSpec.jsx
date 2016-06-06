@@ -1,15 +1,16 @@
 define([
   'react',
+  'axios',
   'underscore',
   'jsx/grading/AccountGradingPeriod'
-], (React, _, GradingPeriod) => {
+], (React, axios, _, GradingPeriod) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
   const allPermissions = { read: true, create: true, update: true, delete: true };
   const noPermissions = { read: false, create: false, update: false, delete: false };
 
-  const props = {
+  const defaultProps = {
     period: {
       id: "1",
       title: "We did it! We did it! We did it! #dora #boots",
@@ -17,12 +18,15 @@ define([
       endDate: new Date("2015-03-01T00:00:00+00:00")
     },
     onEdit: () => {},
-    permissions: allPermissions
+    readOnly: false,
+    permissions: allPermissions,
+    deleteGradingPeriodURL: "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D",
+    onDelete: () => {}
   };
 
   module("AccountGradingPeriod", {
-    renderComponent(attr = {}) {
-      let attrs = _.extend({}, props, attr);
+    renderComponent(props = {}) {
+      let attrs = _.defaults(props, defaultProps);
       const element = React.createElement(GradingPeriod, attrs);
       return React.render(element, wrapper);
     },
@@ -75,5 +79,41 @@ define([
     let editButton = React.findDOMNode(period.refs.editButton);
     Simulate.click(editButton);
     ok(spy.calledOnce);
+  });
+
+  test("displays the delete button if the user has proper rights", function() {
+    let period = this.renderComponent();
+    ok(period.refs.deleteButton);
+  });
+
+  test("does not display the delete button if readOnly is true", function() {
+    let period = this.renderComponent({ readOnly: true });
+    notOk(period.refs.deleteButton);
+  });
+
+  test("does not display the delete button if the user does not have delete permissions", function() {
+    let period = this.renderComponent({ permissions: noPermissions });
+    notOk(period.refs.deleteButton);
+  });
+
+  test("does not delete the period if the user cancels the delete confirmation", function() {
+    this.stub(window, "confirm", () => false);
+    let period = this.renderComponent();
+    let deleteStub = this.stub(period.props, "onDelete");
+    Simulate.click(period.refs.deleteButton);
+    ok(deleteStub.notCalled);
+  });
+
+  asyncTest("calls onDelete if the user confirms deletion and the ajax call succeeds", function() {
+    const deletePromise = new Promise(resolve => resolve());
+    this.stub(axios, "delete").returns(deletePromise);
+    this.stub(window, "confirm", () => true);
+    let period = this.renderComponent();
+    let deleteStub = this.stub(period.props, "onDelete");
+    Simulate.click(period.refs.deleteButton);
+    deletePromise.then(function() {
+      ok(deleteStub.calledOnce);
+      start();
+    });
   });
 });

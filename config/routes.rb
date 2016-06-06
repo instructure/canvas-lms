@@ -1778,6 +1778,7 @@ CanvasRails::Application.routes.draw do
             action: :batch_update, as: :course_grading_period_batch_update
       put 'courses/:course_id/grading_periods/:id', action: :update, as: :course_grading_period_update
       delete 'courses/:course_id/grading_periods/:id', action: :destroy, as: :course_grading_period_destroy
+      delete 'accounts/:account_id/grading_periods/:id', action: :destroy, as: :account_grading_period_destroy
 
       patch 'grading_period_sets/:set_id/grading_periods/batch_update',
             action: :batch_update, as: :grading_period_set_periods_update

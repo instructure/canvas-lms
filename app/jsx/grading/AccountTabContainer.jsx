@@ -14,7 +14,8 @@ define([
       urls: types.shape({
         gradingPeriodSetsURL:    types.string.isRequired,
         gradingPeriodsUpdateURL: types.string.isRequired,
-        enrollmentTermsURL: types.string.isRequired
+        enrollmentTermsURL:      types.string.isRequired,
+        deleteGradingPeriodURL:  types.string.isRequired
       }).isRequired
     },
 

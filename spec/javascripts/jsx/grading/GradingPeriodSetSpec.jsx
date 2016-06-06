@@ -1,14 +1,17 @@
 define([
   'react',
   'underscore',
+  'axios',
   'jsx/grading/GradingPeriodSet',
   'compiled/api/gradingPeriodsApi'
-], (React, _, GradingPeriodSet, gradingPeriodsApi) => {
+], (React, _, axios, GradingPeriodSet, gradingPeriodsApi) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
   const urls = {
-    batchUpdateUrl: "api/v1/accounts/1/grading_period_sets"
+    batchUpdateURL: "api/v1/accounts/1/grading_period_sets",
+    deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D",
+    gradingPeriodSetsURL: "api/v1/accounts/1/grading_period_sets"
   };
 
   const allPermissions = {
@@ -51,6 +54,8 @@ define([
       id: "1",
       title: "Dora the Explorer Grading Period Set",
     },
+    terms: [],
+    onDelete: function(){},
     gradingPeriods: examplePeriods,
     readOnly: false,
     urls: urls,
@@ -62,6 +67,12 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       return React.render(element, wrapper);
+    },
+
+    stubDeleteSuccess() {
+      const successPromise = new Promise(resolve => resolve());
+      this.stub(axios, "delete").returns(successPromise);
+      return successPromise;
     },
 
     teardown() {
@@ -93,6 +104,27 @@ define([
     const periods = set.refs.gradingPeriodList.props.children;
     const startDates = _.map(periods, period => period.props.period.startDate);
     ok((startDates[0] < startDates[1]) && (startDates[1] < startDates[2]));
+  });
+
+  test("does not delete the set if the user cancels the delete confirmation", function() {
+    this.stub(axios, "delete");
+    this.stub(window, "confirm", () => false);
+    let set = this.renderComponent();
+    let onDeleteStub = this.stub(set.props, "onDelete");
+    Simulate.click(set.refs.deleteButton);
+    ok(onDeleteStub.notCalled);
+  });
+
+  asyncTest("deletes the set if the user confirms deletion", function() {
+    let deletePromise = this.stubDeleteSuccess();
+    this.stub(window, "confirm", () => true);
+    let set = this.renderComponent();
+    let onDeleteStub = this.stub(set.props, "onDelete");
+    Simulate.click(set.refs.deleteButton);
+    deletePromise.then(function() {
+      ok(onDeleteStub.calledOnce);
+      start();
+    });
   });
 
   module("GradingPeriodSet 'Edit Grading Period'", {
@@ -348,7 +380,9 @@ define([
         terms: [],
         urls: urls,
         permissions: _.defaults(permissions, allPermissions),
-        readOnly: readOnly
+        readOnly: readOnly,
+        terms: [],
+        onDelete: function(){}
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);
@@ -415,6 +449,24 @@ define([
     notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
+  module("GradingPeriodSet 'Remove Grading Period'", {
+    renderComponent() {
+      const element = React.createElement(GradingPeriodSet, props);
+      return React.render(element, wrapper);
+    },
+
+    teardown() {
+      React.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  test('removeGradingPeriod removes the grading period with the given id', function() {
+    let set = this.renderComponent();
+    set.removeGradingPeriod("1");
+    const periodIDs = _.pluck(set.state.gradingPeriods, "id");
+    propEqual(periodIDs, ["3", "2"]);
+  });
+
   module("GradingPeriodSet 'New Grading Period - onSave'", {
     renderComponent() {
       let set = {
@@ -423,7 +475,8 @@ define([
         urls: urls,
         readOnly: false,
         permissions: allPermissions,
-        terms: []
+        terms: [],
+        onDelete: function(){}
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);

@@ -26,7 +26,6 @@ class GradingStandardsController < ApplicationController
       client_env = {
         :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
         :GRADING_PERIOD_SETS_URL => api_v1_account_grading_period_sets_url(@context),
-        :ENROLLMENT_TERMS_URL => api_v1_enrollment_terms_url(@context),
         :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
         :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard,
         :CONTEXT_SETTINGS_URL => context_url(@context, :context_settings_url)
@@ -35,9 +34,11 @@ class GradingStandardsController < ApplicationController
       if @context.is_a?(Account)
         client_env[:GRADING_PERIODS_UPDATE_URL] = api_v1_grading_period_set_periods_update_url("{{ set_id }}")
         client_env[:GRADING_PERIODS_READ_ONLY] = !@context.root_account?
+        client_env[:ENROLLMENT_TERMS_URL] = api_v1_enrollment_terms_url(@context.root_account)
+        client_env[:DELETE_GRADING_PERIOD_URL] = api_v1_account_grading_period_destroy_url(@context, "{{ id }}")
         view_path = 'account_index'
       else
-        client_env[:GRADING_PERIODS_URL] = context_url(@context, :api_v1_context_grading_periods_url)
+        client_env[:GRADING_PERIODS_URL] = api_v1_course_grading_periods_url(@context)
         view_path = 'index'
       end
 

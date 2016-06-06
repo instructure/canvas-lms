@@ -8,7 +8,8 @@ require [
   urls =
     gradingPeriodSetsURL:    ENV.GRADING_PERIOD_SETS_URL
     gradingPeriodsUpdateURL: ENV.GRADING_PERIODS_UPDATE_URL
-    enrollmentTermsURL: ENV.ENROLLMENT_TERMS_URL
+    deleteGradingPeriodURL:  ENV.DELETE_GRADING_PERIOD_URL
+    enrollmentTermsURL:      ENV.ENROLLMENT_TERMS_URL
 
   React.render(
     TabContainerFactory(

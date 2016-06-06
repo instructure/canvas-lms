@@ -13,7 +13,8 @@ define([
         urls: {
           gradingPeriodSetsURL: "api/v1/accounts/1/grading_period_sets",
           enrollmentTermsURL: "api/v1/accounts/1/terms",
-          gradingPeriodsUpdateURL: "api/v1/accounts/1/grading_period_sets"
+          gradingPeriodsUpdateURL: "api/v1/accounts/1/grading_period_sets",
+          deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D"
         },
         readOnly: false
       };
@@ -324,5 +325,17 @@ define([
     filteredSets = collection.filterSetsByActiveTerm(sets, terms, selectedTermID);
     expectedSets = _.where(sets, { id: "1" });
     propEqual(filteredSets, expectedSets);
+  });
+
+  asyncTest("removeGradingPeriodSet removes the set from the collection", function() {
+    const success = this.stubAJAXSuccess();
+    let collection = this.renderComponent();
+
+    success.then(function() {
+      collection.removeGradingPeriodSet("1");
+      const setIDs = _.pluck(collection.state.sets, "id");
+      propEqual(setIDs, ["2"]);
+      start();
+    });
   });
 });

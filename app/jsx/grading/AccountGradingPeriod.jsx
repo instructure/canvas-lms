@@ -1,8 +1,11 @@
 define([
   'react',
+  'jquery',
+  'axios',
   'i18n!grading_periods',
-  'jsx/gradebook/grid/helpers/datesHelper'
-], function(React, I18n, DatesHelper) {
+  'jsx/gradebook/grid/helpers/datesHelper',
+  'jquery.instructure_misc_helpers'
+], function(React, $, axios, I18n, DatesHelper) {
   const types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
@@ -21,7 +24,30 @@ define([
         create: types.bool.isRequired,
         update: types.bool.isRequired,
         delete: types.bool.isRequired
-      }).isRequired
+      }).isRequired,
+      onDelete: types.func.isRequired,
+      deleteGradingPeriodURL: types.string.isRequired
+    },
+
+    promptDeleteGradingPeriod(event) {
+      event.stopPropagation();
+      const confirmMessage = I18n.t("Are you sure you want to delete this grading period?");
+      if (!window.confirm(confirmMessage)) return null;
+      const url = $.replaceTags(this.props.deleteGradingPeriodURL, 'id', this.props.period.id);
+
+      axios.delete(url)
+           .then(() => {
+             $.flashMessage(I18n.t('The grading period was deleted'));
+             this.props.onDelete(this.props.period.id);
+           })
+           .catch(() => {
+             $.flashError(I18n.t("An error occured while deleting the grading period"));
+           });
+    },
+
+    onEdit(e) {
+      e.stopPropagation();
+      this.props.onEdit(this.props.period);
     },
 
     renderEditButton() {
@@ -40,16 +66,19 @@ define([
     },
 
     renderDeleteButton() {
-      return (
-        <button className="Button Button--icon-action"
-                ref="deleteButton"
-                type="button"
-                disabled={this.props.actionsDisabled}
-                onClick={this.onDelete}>
-          <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
-          <i className="icon-trash" role="presentation"/>
-        </button>
-      );
+      if (this.props.permissions.delete && !this.props.readOnly) {
+        return (
+          <button ref="deleteButton"
+                  type="button"
+                  className="Button Button--icon-action"
+                  disabled={this.props.actionsDisabled}
+                  onClick={this.promptDeleteGradingPeriod}>
+            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
+            <i className="icon-trash" role="presentation"/>
+          </button>
+        );
+      }
+
     },
 
     render() {
@@ -75,14 +104,6 @@ define([
       );
     },
 
-    onEdit(e) {
-      e.stopPropagation();
-      this.props.onEdit(this.props.period);
-    },
-
-    onDelete(e) {
-      e.stopPropagation();
-    }
   });
 
   return AccountGradingPeriod;

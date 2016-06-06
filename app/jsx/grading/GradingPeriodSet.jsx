@@ -2,14 +2,14 @@ define([
   'react',
   'jquery',
   'underscore',
+  'axios',
   'convert_case',
   'i18n!grading_periods',
   'jsx/grading/AccountGradingPeriod',
   'jsx/grading/GradingPeriodForm',
   'compiled/api/gradingPeriodsApi',
   'jquery.instructure_misc_helpers'
-], function(React, $, _, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
-  const types = React.PropTypes;
+], function(React, $, _, axios, ConvertCase, I18n, GradingPeriod, GradingPeriodForm, gradingPeriodsApi) {
 
   const sortPeriods = function(periods) {
     return _.sortBy(periods, "startDate");
@@ -70,6 +70,8 @@ define([
     return "edit-grading-period-" + period.id;
   };
 
+  const types = React.PropTypes;
+
   let GradingPeriodSet = React.createClass({
     propTypes: {
       set: types.shape({
@@ -78,8 +80,10 @@ define([
       }).isRequired,
       gradingPeriods: types.array.isRequired,
       terms: types.array.isRequired,
-      urls:           types.shape({
-        batchUpdateUrl: types.string.isRequired
+      urls: types.shape({
+        batchUpdateURL: types.string.isRequired,
+        deleteGradingPeriodURL: types.string.isRequired,
+        gradingPeriodSetsURL: types.string.isRequired
       }).isRequired,
       readOnly: types.bool.isRequired,
       permissions: types.shape({
@@ -87,7 +91,8 @@ define([
         create: types.bool.isRequired,
         update: types.bool.isRequired,
         delete: types.bool.isRequired
-      }).isRequired
+      }).isRequired,
+      onDelete: types.func.isRequired
     },
 
     getInitialState() {
@@ -102,8 +107,7 @@ define([
         editPeriod: {
           id:     null,
           saving: false
-        },
-        batchUpdateUrl: $.replaceTags(this.props.urls.batchUpdateUrl, 'set_id', this.props.set.id)
+        }
       };
     },
 
@@ -120,8 +124,20 @@ define([
       this.setState({ expanded: !this.state.expanded });
     },
 
-    promptDeleteSet(e) {
-      e.stopPropagation();
+    promptDeleteSet(event) {
+      event.stopPropagation();
+      const confirmMessage = I18n.t("Are you sure you want to delete this grading period set?");
+      if (!window.confirm(confirmMessage)) return null;
+
+      const url = this.props.urls.gradingPeriodSetsURL + "/" + this.props.set.id;
+      axios.delete(url)
+           .then(() => {
+             $.flashMessage(I18n.t('The grading period set was deleted'));
+             this.props.onDelete(this.props.set.id);
+           })
+           .catch(() => {
+             $.flashError(I18n.t("An error occured while deleting the grading period set"));
+           });
     },
 
     setTerms() {
@@ -139,134 +155,9 @@ define([
       e.stopPropagation();
     },
 
-    renderEditAndDeleteIcons() {
-      return (
-        <div className="ItemGroup__header__admin">
-          <button ref="editButton"
-                  className="Button Button--icon-action edit_grading_period_set_button"
-                  type="button"
-                  onClick={this.editSet}>
-            <span className="screenreader-only">{I18n.t("Edit Grading Period Set")}</span>
-            <i className="icon-edit"/>
-          </button>
-          <button ref="deleteButton"
-                  className="Button Button--icon-action delete_grading_period_set_button"
-                  type="button"
-                  onClick={this.promptDeleteSet}>
-             <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
-            <i className="icon-trash"/>
-          </button>
-        </div>
-      );
-    },
-
-    renderSetBody() {
-      if(!this.state.expanded) return null;
-
-      return (
-        <div ref="setBody" className="ig-body">
-          <div className="GradingPeriodList" ref="gradingPeriodList">
-            {this.renderGradingPeriods()}
-          </div>
-          {this.renderNewPeriod()}
-        </div>
-      );
-    },
-
-    renderGradingPeriods() {
-      let actionsDisabled = !!(this.state.editPeriod.id || this.state.newPeriod.period);
-      return _.map(this.state.gradingPeriods, (period) => {
-        if (period.id === this.state.editPeriod.id) {
-          return (
-            <div key       = {"edit-grading-period-" + period.id}
-                 className = 'GradingPeriodList__period--editing pad-box'>
-              <GradingPeriodForm ref      = "editPeriodForm"
-                                 period   = {period}
-                                 disabled = {this.state.editPeriod.saving}
-                                 onSave   = {this.updatePeriod}
-                                 onCancel = {this.cancelEditPeriod} />
-            </div>
-          );
-        } else {
-          return (
-            <GradingPeriod key={"show-grading-period-" + period.id}
-                           ref={getShowGradingPeriodRef(period)}
-                           period={period}
-                           actionsDisabled={actionsDisabled}
-                           onEdit={this.editPeriod}
-                           readOnly={this.props.readOnly}
-                           permissions={this.props.permissions} />
-          );
-        }
-      });
-    },
-
-    render() {
-      const setStateSuffix = this.state.expanded ? "expanded" : "collapsed";
-      const arrow = this.state.expanded ? "down" : "right";
-      return (
-        <div className={"GradingPeriodSet--" + setStateSuffix}>
-          <div className="ItemGroup__header"
-               ref="toggleSetBody"
-               onClick={this.toggleSetBody}>
-            <div>
-              <div className="ItemGroup__header__title">
-                <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
-                        aria-expanded={this.state.expanded}
-                        aria-label="Toggle grading period visibility">
-                  <i className={"icon-mini-arrow-" + arrow}/>
-                </button>
-                <span className="screenreader-only">{I18n.t("Grading period title")}</span>
-                <h2 tabIndex="0" className="GradingPeriodSet__title">
-                  {this.props.set.title}
-                </h2>
-              </div>
-              {this.renderEditAndDeleteIcons()}
-            </div>
-            <div className="EnrollmentTerms__list" tabIndex="0">
-              {this.termNames()}
-            </div>
-          </div>
-          {this.renderSetBody()}
-        </div>
-      );
-    },
-
-    renderNewPeriod() {
-      if (this.props.permissions.create && !this.props.readOnly) {
-        if (this.state.newPeriod.period) {
-          return this.renderNewPeriodForm();
-        } else {
-          return this.renderNewPeriodButton();
-        }
-      }
-    },
-
-    renderNewPeriodButton() {
-      return (
-        <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
-          <button className='Button--link GradingPeriodList__new-period__add-button'
-                  ref='addPeriodButton'
-                  disabled={!!this.state.editPeriod.id}
-                  aria-label={I18n.t('Add Grading Period')}
-                  onClick={this.showNewPeriodForm}>
-            <i className='icon-plus GradingPeriodList__new-period__add-icon'/>
-            {I18n.t('Grading Period')}
-          </button>
-        </div>
-      );
-    },
-
-    renderNewPeriodForm() {
-      return (
-        <div className='GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box'>
-          <GradingPeriodForm key      = 'new-grading-period'
-                             ref      = 'newPeriodForm'
-                             disabled = {this.state.newPeriod.saving}
-                             onSave   = {this.saveNewPeriod}
-                             onCancel = {this.removeNewPeriodForm} />
-        </div>
-      );
+    removeGradingPeriod(idToRemove) {
+      let periods = _.reject(this.state.gradingPeriods, period => period.id === idToRemove);
+      this.setState({ gradingPeriods: periods });
     },
 
     showNewPeriodForm() {
@@ -344,6 +235,146 @@ define([
       let period = $.extend(true, {}, this.state.editPeriod, attr);
       this.setState({editPeriod: period});
     },
+
+    renderDeleteButton() {
+      if (this.props.readOnly || !this.props.permissions.delete) return null;
+
+      return (
+        <button ref="deleteButton"
+                className="Button Button--icon-action delete_grading_period_set_button"
+                type="button"
+                onClick={this.promptDeleteSet}>
+          <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
+          <i className="icon-trash"/>
+        </button>
+      );
+    },
+
+    renderEditAndDeleteButtons() {
+      return (
+        <div className="ItemGroup__header__admin">
+          <button ref="editButton"
+                  className="Button Button--icon-action edit_grading_period_set_button"
+                  type="button"
+                  onClick={this.editSet}>
+            <span className="screenreader-only">{I18n.t("Edit Grading Period Set")}</span>
+            <i className="icon-edit"/>
+          </button>
+          {this.renderDeleteButton()}
+        </div>
+      );
+    },
+
+    renderSetBody() {
+      if (!this.state.expanded) return null;
+
+      return (
+        <div ref="setBody" className="ig-body">
+          <div className="GradingPeriodList" ref="gradingPeriodList">
+            {this.renderGradingPeriods()}
+          </div>
+          {this.renderNewPeriod()}
+        </div>
+      );
+    },
+
+    renderGradingPeriods() {
+      let actionsDisabled = !!(this.state.editPeriod.id || this.state.newPeriod.period);
+      return _.map(this.state.gradingPeriods, (period) => {
+        if (period.id === this.state.editPeriod.id) {
+          return (
+            <div key       = {"edit-grading-period-" + period.id}
+                 className = 'GradingPeriodList__period--editing pad-box'>
+              <GradingPeriodForm ref      = "editPeriodForm"
+                                 period   = {period}
+                                 disabled = {this.state.editPeriod.saving}
+                                 onSave   = {this.updatePeriod}
+                                 onCancel = {this.cancelEditPeriod} />
+            </div>
+          );
+        } else {
+          return (
+            <GradingPeriod key={"show-grading-period-" + period.id}
+                           ref={getShowGradingPeriodRef(period)}
+                           period={period}
+                           actionsDisabled={actionsDisabled}
+                           onEdit={this.editPeriod}
+                           readOnly={this.props.readOnly}
+                           onDelete={this.removeGradingPeriod}
+                           deleteGradingPeriodURL={this.props.urls.deleteGradingPeriodURL}
+                           permissions={this.props.permissions} />
+          );
+        }
+      });
+    },
+
+    renderNewPeriod() {
+      if (this.props.permissions.create && !this.props.readOnly) {
+        if (this.state.newPeriod.period) {
+          return this.renderNewPeriodForm();
+        } else {
+          return this.renderNewPeriodButton();
+        }
+      }
+    },
+
+    renderNewPeriodButton() {
+      return (
+        <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
+          <button className='Button--link GradingPeriodList__new-period__add-button'
+                  ref='addPeriodButton'
+                  disabled={!!this.state.editPeriod.id}
+                  aria-label={I18n.t('Add Grading Period')}
+                  onClick={this.showNewPeriodForm}>
+            <i className='icon-plus GradingPeriodList__new-period__add-icon'/>
+            {I18n.t('Grading Period')}
+          </button>
+        </div>
+      );
+    },
+
+    renderNewPeriodForm() {
+      return (
+        <div className='GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box'>
+          <GradingPeriodForm key      = 'new-grading-period'
+                             ref      = 'newPeriodForm'
+                             disabled = {this.state.newPeriod.saving}
+                             onSave   = {this.saveNewPeriod}
+                             onCancel = {this.removeNewPeriodForm} />
+        </div>
+      );
+    },
+
+    render() {
+      const setStateSuffix = this.state.expanded ? "expanded" : "collapsed";
+      const arrow = this.state.expanded ? "down" : "right";
+      return (
+        <div className={"GradingPeriodSet--" + setStateSuffix}>
+          <div className="ItemGroup__header"
+               ref="toggleSetBody"
+               onClick={this.toggleSetBody}>
+            <div>
+              <div className="ItemGroup__header__title">
+                <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
+                        aria-expanded={this.state.expanded}
+                        aria-label="Toggle grading period visibility">
+                  <i className={"icon-mini-arrow-" + arrow}/>
+                </button>
+                <span className="screenreader-only">{I18n.t("Grading period title")}</span>
+                <h2 tabIndex="0" className="GradingPeriodSet__title">
+                  {this.props.set.title}
+                </h2>
+              </div>
+              {this.renderEditAndDeleteButtons()}
+            </div>
+            <div className="EnrollmentTerms__list" tabIndex="0">
+              {this.termNames()}
+            </div>
+          </div>
+          {this.renderSetBody()}
+        </div>
+      );
+    }
   });
 
   return GradingPeriodSet;

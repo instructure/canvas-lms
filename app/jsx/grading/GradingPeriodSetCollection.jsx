@@ -60,7 +60,8 @@ define([
       urls: types.shape({
         gradingPeriodSetsURL:    types.string.isRequired,
         gradingPeriodsUpdateURL: types.string.isRequired,
-        enrollmentTermsURL: types.string.isRequired
+        enrollmentTermsURL:      types.string.isRequired,
+        deleteGradingPeriodURL:  types.string.isRequired
       }).isRequired
     },
 
@@ -146,8 +147,17 @@ define([
       return this.filterSetsByActiveTerm(...filterByTermArgs);
     },
 
-    renderSets() {
-      const urls = { batchUpdateUrl: this.props.urls.gradingPeriodsUpdateURL };
+    removeGradingPeriodSet(setID) {
+      let newSets = _.reject(this.state.sets, set => set.id === setID);
+      this.setState({ sets: newSets });
+    },
+
+    renderSets: function() {
+      let urls = {
+        batchUpdateURL: this.props.urls.gradingPeriodsUpdateURL,
+        gradingPeriodSetsURL: this.props.urls.gradingPeriodSetsURL,
+        deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL
+      };
       let visibleSets = this.getVisibleSets();
       return _.map(visibleSets, set => {
         return (
@@ -157,7 +167,8 @@ define([
                             urls={urls}
                             readOnly={this.props.readOnly}
                             permissions={set.permissions}
-                            terms={this.state.enrollmentTerms} />
+                            terms={this.state.enrollmentTerms}
+                            onDelete={this.removeGradingPeriodSet} />
         );
       });
     },
