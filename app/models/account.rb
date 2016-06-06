@@ -1390,7 +1390,24 @@ class Account < ActiveRecord::Base
   end
 
   def help_links
-    Canvas::Help.default_links + (settings[:custom_help_links] || [])
+    links = settings[:custom_help_links]
+
+    # set the type to custom for any existing custom links that don't have a type set
+    # the new ui will set the type ('custom' or 'default') for any new custom links
+    # since we now allow reordering the links, the default links get stored in the settings as well
+    if !links.blank?
+      links.each do |link|
+        if link[:type].blank?
+          link[:type] = 'custom'
+        end
+      end
+    end
+
+    if feature_enabled?(:use_new_styles) || feature_enabled?(:k12)
+      links || Canvas::Help.default_links
+    else
+      Canvas::Help.default_links + (links || [])
+    end
   end
 
   def set_service_availability(service, enable)
