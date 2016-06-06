@@ -39,6 +39,9 @@ define([
             type: 'color',
             ovariable_name: 'Other Foo'
           }
+        },
+        baseBrandableVariables: {
+          foo: 'red'
         }
       }
     }
@@ -54,7 +57,11 @@ define([
 
     this.spy(c, 'brandVariableValue')
     const config = {variables: {}}
-    c.brandVariableValue(config, 'otherFoo')
+    equal(
+      c.brandVariableValue(config, 'otherFoo'),
+      props.baseBrandableVariables.foo,
+      'follows defaults that start with $ to actual value'
+    )
     ok(
       c.brandVariableValue.calledWith(config, 'foo'),
       'gets value for variable name'
@@ -62,16 +69,8 @@ define([
 
     equal(
       c.brandVariableValue(config, 'foo'),
-      props.brandableVariableDefaults.foo.default,
-      'gets default value'
-    )
-
-    const shared = props.sharedBrandConfigs[0].brand_config
-    config.parent_md5 = shared.md5
-    equal(
-      c.brandVariableValue(config, 'foo'),
-      shared.variables.foo,
-      'get value from parent'
+      props.baseBrandableVariables.foo,
+      'get value from baseBrandableVariables'
     )
   })
 

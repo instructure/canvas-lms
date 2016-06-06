@@ -24,7 +24,8 @@ define([
       sharedBrandConfigs: React.PropTypes.arrayOf(customTypes.sharedBrandConfig).isRequired,
       activeBrandConfig: customTypes.brandConfig.isRequired,
       accountID: React.PropTypes.string.isRequired,
-      brandableVariableDefaults: customTypes.brandableVariableDefaults
+      brandableVariableDefaults: customTypes.brandableVariableDefaults,
+      baseBrandableVariables: customTypes.variables
     },
 
     getInitialState () {
@@ -43,11 +44,7 @@ define([
       if (_default && _default[0] === '$') {
         return this.brandVariableValue(brandConfig, _default.substring(1))
       }
-      const parent = _.find(this.props.sharedBrandConfigs, sbc => sbc.brand_config.md5 === brandConfig.parent_md5)
-      if (parent) {
-        return this.brandVariableValue(parent.brand_config, variableName)
-      }
-      return _default
+      return this.props.baseBrandableVariables[variableName]
     },
 
     startFromBlankSlate() {

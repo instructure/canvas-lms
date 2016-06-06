@@ -12,11 +12,12 @@ define([
     propTypes: {
       name: React.PropTypes.string.isRequired,
       isActiveBrandConfig: React.PropTypes.bool.isRequired,
-      isDeleteable: React.PropTypes.bool.isRequired,
+      isDeletable: React.PropTypes.bool.isRequired,
       isBeingDeleted: React.PropTypes.bool.isRequired,
       startDeleting: React.PropTypes.func.isRequired,
-      cancelDelete: React.PropTypes.func.isRequired,
+      cancelDeleting: React.PropTypes.func.isRequired,
       onDelete: React.PropTypes.func.isRequired,
+      getVariable: React.PropTypes.func.isRequired
     },
 
     render () {
