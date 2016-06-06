@@ -3,8 +3,9 @@ define([
   'redux-thunk',
   '../reducers/ltiCollaboratorsReducer',
   '../reducers/listCollaborationsReducer',
-  '../reducers/deleteCollaborationReducer'
-], (Redux, ReduxThunk, ltiCollaboratorsReducer, listCollaborationsReducer, deleteCollaborationReducer) => {
+  '../reducers/deleteCollaborationReducer',
+  '../reducers/createCollaborationReducer'
+], (Redux, ReduxThunk, ltiCollaboratorsReducer, listCollaborationsReducer, deleteCollaborationReducer, createCollaborationReducer) => {
   const { createStore, applyMiddleware } = Redux;
 
   const createStoreWithMiddleware = applyMiddleware(
@@ -14,8 +15,9 @@ define([
   const collaboratorationsReducer = Redux.combineReducers({
     ltiCollaborators: ltiCollaboratorsReducer,
     listCollaborations: listCollaborationsReducer,
-    deleteCollaboration: deleteCollaborationReducer
-  })
+    deleteCollaboration: deleteCollaborationReducer,
+    createCollaboration: createCollaborationReducer
+  });
 
   return createStoreWithMiddleware(collaboratorationsReducer);
 });

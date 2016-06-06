@@ -1,7 +1,8 @@
 define([
-  'axios'
-], (axios) => {
-  const actions = {};
+  'axios',
+  'compiled/str/splitAssetString'
+], (axios, splitAssetString) => {
+  const actions = {}
 
   actions.LIST_COLLABORATIONS_START = 'LIST_COLLABORATIONS_START';
   actions.listCollaborationsStart = () => ({ type: actions.LIST_COLLABORATIONS_START });
@@ -29,6 +30,15 @@ define([
 
   actions.DELETE_COLLABORATION_FAILED = 'DELETE_COLLABORATION_FAILED';
   actions.deleteCollaborationFailed = (error) => ({ type: actions.DELETE_COLLABORATION_FAILED, payload: error, error: true });
+
+  actions.CREATE_COLLABORATION_START = 'CREATE_COLLABORATION_START'
+  actions.createCollaborationStart = () => ({ type: actions.CREATE_COLLABORATION_START })
+
+  actions.CREATE_COLLABORATION_SUCCESSFUL = 'CREATE_COLLABORATION_SUCCESSFUL'
+  actions.createCollaborationSuccessful = (collaboration) => ({ type: actions.CREATE_COLLABORATION_SUCCESSFUL, payload: collaboration })
+
+  actions.CREATE_COLLABORATION_FAILED = 'CREATE_COLLABORATION_FAILED'
+  actions.createCollaborationFailed = (error) => ({ type: actions.CREATE_COLLABORATION_FAILED, payload: error, error: true })
 
   actions.getCollaborations = (context, contextId) => {
     return (dispatch) => {
@@ -65,6 +75,36 @@ define([
           dispatch(actions.getCollaborations(context, contextId))
         })
         .catch((err) => dispatch(actions.deleteCollaborationFailed(err)));
+    }
+  }
+
+  actions.createCollaboration = (context, contextId, contentItems) => {
+    return (dispatch) => {
+      dispatch(actions.createCollaborationStart());
+      let url = `/${context}/${contextId}/collaborations`
+      axios.post(url, { contentItems }, { headers: {
+        'Accept': 'application/json'
+      }})
+        .then(({ data }) => {
+          dispatch(actions.createCollaborationSuccessful(data))
+          dispatch(actions.getCollaborations(context, contextId))
+        })
+        .catch(error => {
+          dispatch(actions.createCollaborationFailed(error))
+        })
+    }
+  },
+
+  actions.externalContentReady = (e, data) => {
+    return (dispatch) => {
+      let [context, contextId] = splitAssetString(ENV.context_asset_string);
+      let contentItems = JSON.stringify(data.contentItems);
+      if (data.service_id) {
+        dispatch(actions.updateCollaboration(context, contextId, contentItems));
+      }
+      else {
+        dispatch(actions.createCollaboration(context, contextId, contentItems));
+      }
     }
   }
 

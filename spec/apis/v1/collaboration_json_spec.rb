@@ -25,7 +25,7 @@ describe Api::V1::Collaboration do
     @current_user  = user_with_pseudonym(:active_all => true)
     @collaboration = Collaboration.new(:title => 'Test collaboration',
                                        :description => 'Let us collaborate',
-                                       :collaboration_type => 'external_tool_collaboration',
+                                       :type => 'ExternalToolCollaboration',
                                        :url => 'https://google.com',
                                        :user => @current_user)
     @collaboration.save!
@@ -45,9 +45,10 @@ describe Api::V1::Collaboration do
     expect(json['updated_at']).to eq @collaboration.updated_at
     expect(json['title']).to eq @collaboration.title
     expect(json['description']).to eq @collaboration.description
+    expect(json['type']).to eq @collaboration.type
 
     expect(json['data']).to eq nil
-    expect(json['deleted_at']).to eq nil 
+    expect(json['deleted_at']).to eq nil
   end
 
   it 'should includes the owning users name' do

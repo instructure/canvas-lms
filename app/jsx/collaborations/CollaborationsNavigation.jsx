@@ -6,10 +6,11 @@ define([
 ], (React, I18n, NewCollaborationsDropDown, splitAssetString) => {
   class CollaborationsNavigation extends React.Component {
 
-
     renderNewCollaborationsDropDown () {
       if(this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
-        return (<NewCollaborationsDropDown ltiCollaborators={this.props.ltiCollaborators.ltiCollaboratorsData}/>)
+        return (<NewCollaborationsDropDown
+                  ltiCollaborators={this.props.ltiCollaborators.ltiCollaboratorsData}
+                  onItemClicked={this.props.onItemClicked} />)
       }
     }
 

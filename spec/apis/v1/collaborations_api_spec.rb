@@ -32,12 +32,12 @@ describe CollaborationsController, type: :request do
       @course_collaboration = collaboration_model(
         :user => @student,
         :context => @course,
-        :collaboration_type => "external_tool_collaboration"
+        :type => "ExternalToolCollaboration"
       )
       @group_collaboration = collaboration_model(
         :user => @student,
         :context => @group,
-        :collaboration_type => "external_tool_collaboration"
+        :type => "ExternalToolCollaboration"
       )
       @user = @student
     end
@@ -86,10 +86,10 @@ describe CollaborationsController, type: :request do
       expect(json.count).to eq 0
     end
 
-    it 'only returns collaborations of type external_tool_collaboration' do
+    it 'only returns collaborations of type ExternalToolCollaboration' do
       json = api_call(:get, url, url_options)
       expect(json.count).to eq 1
-      expect(json[0]['collaboration_type']).to eq "external_tool_collaboration"
+      expect(json[0]['type']).to eq "ExternalToolCollaboration"
     end
 
     it 'returns the creating users name in the response' do

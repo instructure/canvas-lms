@@ -20,7 +20,7 @@ module Api::V1::Collaboration
   include Api::V1::Json
 
   def collaboration_json(collaboration, current_user, session)
-    attribute_whitelist = %w{id collaboration_type document_id user_id context_id context_type url created_at updated_at description title}
+    attribute_whitelist = %w{id collaboration_type document_id user_id context_id context_type url created_at updated_at description title type}
     api_json(collaboration, current_user, session, :only => attribute_whitelist).tap do |hash|
       hash['user_name'] = collaboration.user[:name]
     end

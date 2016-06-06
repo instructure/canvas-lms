@@ -96,7 +96,7 @@ class CollaborationsController < ApplicationController
 
     collaborations_query = @context.collaborations.active.
                              eager_load(:user).
-                             where(collaboration_type: 'external_tool_collaboration')
+                             where(type: 'ExternalToolCollaboration')
 
     unless @context.grants_right?(@current_user, session, :manage_content)
       collaborations_query = collaborations_query.
