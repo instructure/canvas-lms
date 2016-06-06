@@ -273,46 +273,4 @@ describe Quizzes::QuizQuestionBuilder do
       subject.shuffle_matches(question)
     end
   end
-
-  describe '.translate_question_number_text' do
-    before(:once) do
-      @question = Quizzes::QuizQuestion.new({
-        question_data: {
-          question_type: 'essay_question',
-          question_text: 'qq 1'
-        }
-      })
-    end
-
-    it 'does not translate the question_name when no locale is set' do
-      question_data = @question.question_data
-      Quizzes::QuizQuestionBuilder.translate_question_number_text(question_data, 3)
-
-      expect(question_data[:name]).to eq('Question 3')
-      expect(question_data[:name]).to eq(question_data[:question_name])
-    end
-
-    it 'translates the question_name to the current locale' do
-      {
-        es: 'Pregunta',
-        de: 'Frage'
-      }.each do |locale, translation|
-        I18n.locale = locale.to_s
-
-        question_data = @question.question_data
-        Quizzes::QuizQuestionBuilder.translate_question_number_text(question_data, 3)
-
-        expect(question_data[:name]).to eq("#{translation} 3")
-        expect(question_data[:name]).to eq(question_data[:question_name])
-      end
-    end
-
-    it 'handles nil positions' do
-      question_data = @question.question_data
-      Quizzes::QuizQuestionBuilder.translate_question_number_text(question_data, nil)
-
-      expect(question_data[:name]).to eq('Question ')
-      expect(question_data[:name]).to eq(question_data[:question_name])
-    end
-  end
 end

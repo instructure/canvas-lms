@@ -6,13 +6,13 @@ describe 'Grading quizzes' do
   include QuizzesCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before(:once) do
       course_with_teacher(active_all: 1)
       student_in_course(active_all: 1)
       @quiz = seed_quiz_with_submission(1, student: @student)
-
-      user_session(@teacher)
     end
+
+    before(:each) { user_session(@teacher) }
 
     context 'when on the course home page' do
       before(:each) { get "/courses/#{@course.id}" }
