@@ -106,7 +106,7 @@ class Quizzes::QuizQuestionBuilder
     end
   end
 
-  def self.translate_question_number_text(q, position)
+  def self.decorate_question_for_submission(q, position)
     question_name = t(
       '#quizzes.quiz.question_name_counter',
       "Question %{question_number}", {
@@ -114,11 +114,6 @@ class Quizzes::QuizQuestionBuilder
       })
 
     q[:position] = position
-    q[:name] = q[:question_name] = question_name
-  end
-
-  def self.decorate_question_for_submission(q, position)
-    translate_question_number_text(q, position)
 
     case q[:question_type]
     when ::Quizzes::QuizQuestion::Q_TEXT_ONLY
@@ -183,6 +178,7 @@ class Quizzes::QuizQuestionBuilder
       q[:question_text] = text
     end # case q[:question_type]
 
+    q[:name] = q[:question_name] = question_name
     q
   end
 
