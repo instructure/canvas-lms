@@ -1067,7 +1067,7 @@ pl:
       account_reports: 
         sis_export: 
           description: 
-            text: "Raport eksportu danych SIS: ten raport wyeksportuje wszystkie niezbędne pliki dla użytkowników, kont, terminów, kursów, zapisów, grup, członkostwa w grupie oraz udostępni import danych SIS w odpowiednich kategoriach."
+            text: "Raport eksportowy SIS: Ten raport eksportuje wszystkie pliki niezbędne dla Użytkowników, Kont, Warunków, Kursów, Sekcji, Zapisów, Grup, Członkostwa Grup i Wykazów Krzyżujących dla importu SIS w odpowiednich kategoriach. To zwróci tylko pozycje stworzone lub zmodyfikowane przez SIS."
     sis_export_csv_parameters: 
       account_reports: 
         default: 
