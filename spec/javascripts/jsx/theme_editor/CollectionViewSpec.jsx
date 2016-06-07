@@ -14,6 +14,8 @@ define([
       props = {
         sharedBrandConfigs: [{
           account_id: 123,
+          name: 'Account-shared Theme',
+          id: 123,
           brand_config: {
             md5: '00112233445566778899aabbccddeeff',
             variables: {
@@ -218,6 +220,30 @@ define([
     const card = c.renderCard(config)
     equal(card.type, ThemeCard, 'returns a theme card')
     equal(card.props.name, config.name, 'passes name prop')
+  })
+
+  test('renderCard properly indicates which theme is active', function () {
+    const systemTheme = {
+      account_id: null, // system themes have a 'null' account_id
+      name: 'System-shared Theme',
+      brand_config: {
+        md5: '00112233445566778899aabbccddeeff', // its md5 matches the "activeBrandConfig"
+        variables: {}
+      }
+    }
+    props.sharedBrandConfigs.unshift(systemTheme)
+
+    const c = new CollectionView(props)
+
+    ok(
+      c.renderCard(props.sharedBrandConfigs[1]).props.isActiveBrandConfig,
+      'Account-shared Theme is marked active since its md5 matches'
+    )
+
+    notOk(
+      c.renderCard(props.sharedBrandConfigs[0]).props.isActiveBrandConfig,
+      'does not mark system theme as active if there is an active account theme too'
+    )
   })
 })
 
