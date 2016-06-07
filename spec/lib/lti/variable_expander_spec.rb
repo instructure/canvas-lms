@@ -66,11 +66,11 @@ module Lti
 
     it 'registers expansions' do
       before_count = described_class.expansions.count
-      described_class.register_expansion('test_expan', ['a'], -> { @context })
+      described_class.register_expansion('abc123', ['a'], -> { @context })
       expansions = described_class.expansions
       expect(expansions.count - before_count).to eq 1
-      test_expan = expansions[:"$test_expan"]
-      expect(test_expan.name).to eq 'test_expan'
+      test_expan = expansions[:"$abc123"]
+      expect(test_expan.name).to eq 'abc123'
       expect(test_expan.permission_groups).to eq ['a']
     end
 
@@ -728,8 +728,9 @@ module Lti
         end
 
         it 'has substitution for ToolConsumerProfile.url' do
+          expander = described_class.new(root_account, account, controller, current_user: user, tool: ToolProxy.new)
           exp_hash = {test: '$ToolConsumerProfile.url'}
-          subject.expand_variables!(exp_hash)
+          expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 'url'
         end
       end

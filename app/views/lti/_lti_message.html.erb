@@ -23,7 +23,7 @@
       data-tool-path="<%= @lti_launch.resource_path %>"
       data-message-type="<%= @lti_launch.analytics_message_type %>">
     <% @lti_launch.params.each do |key, value| %>
-        <%= hidden_field_tag key, value %>
+        <%= hidden_field_tag key, value.to_s %>
     <% end %>
     <div style="margin-bottom: 20px;">
         <div class="load_tab">
