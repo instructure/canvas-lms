@@ -12,9 +12,9 @@ group :test do
   gem 'thin', '1.6.3'
     gem 'eventmachine', '1.0.4', require: false
 
-  gem 'rspec', '3.2.0'
-  gem 'rspec-rails', '3.2.3'
-  gem 'rspec-legacy_formatters', '1.0.0'
+  gem 'rspec', '3.4.0'
+  gem 'rspec-rails', '3.4.1'
+  gem 'rspec-legacy_formatters', '1.0.1'
   gem 'rspec-collection_matchers', '1.1.2'
   gem 'shoulda-matchers', '2.8.0'
 
