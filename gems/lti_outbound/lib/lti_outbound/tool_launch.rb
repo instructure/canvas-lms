@@ -39,7 +39,6 @@ module LtiOutbound
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
       @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
-      @post_only = options[:disable_lti_post_only]
 
       @hash = {}
     end
@@ -127,7 +126,7 @@ module LtiOutbound
       hash['oauth_callback'] = 'about:blank'
 
       @variable_expander.expand_variables!(hash)
-      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret, disable_lti_post_only: @post_only)
+      hash
     end
 
     private
@@ -163,54 +162,5 @@ module LtiOutbound
       end
     end
 
-    def self.generate_params(params, url, key, secret, feature_flags = {})
-      uri = URI.parse(url)
-
-      if uri.port == uri.default_port
-        host = uri.host
-      else
-        host = "#{uri.host}:#{uri.port}"
-      end
-
-      consumer = OAuth::Consumer.new(key, secret, {
-                                            :site => "#{uri.scheme}://#{host}",
-                                            :signature_method => 'HMAC-SHA1'
-                                        })
-
-      path = uri.path
-      path = '/' if path.empty?
-      unless feature_flags[:disable_lti_post_only]
-        if uri.query && uri.query != ''
-          CGI.parse(uri.query).each do |query_key, query_values|
-            unless params[query_key]
-              params[query_key] = query_values.first
-            end
-          end
-        end
-      end
-      options = {
-          :scheme           => 'body',
-          :timestamp        => @timestamp,
-          :nonce            => @nonce
-      }
-
-      request = consumer.create_signed_request(:post, path, nil, options, stringify_hash(params))
-
-      # the request is made by a html form in the user's browser, so we
-      # want to revert the escapage and return the hash of post parameters ready
-      # for embedding in a html view
-      hash = {}
-      request.body.split(/&/).each do |param|
-        key, val = param.split(/=/).map{|v| CGI.unescape(v) }
-        hash[key] = val
-      end
-      hash
-    end
-
-    def self.stringify_hash(hash)
-      hash.dup.tap do |new_hash|
-        new_hash.keys.each { |k| new_hash[k.to_s] = new_hash.delete(k) unless k.is_a?(String) }
-      end
-    end
   end
 end

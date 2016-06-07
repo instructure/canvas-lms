@@ -467,8 +467,13 @@ class ExternalToolsController < ApplicationController
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
-    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret,
-                                                                disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only))
+    lti_launch.params = Lti::Security.signed_post_params(
+      params,
+      lti_launch.resource_url,
+      tool.consumer_key,
+      tool.shared_secret,
+      @context.root_account.feature_enabled?(:disable_lti_post_only)
+    )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id
 
@@ -545,8 +550,13 @@ class ExternalToolsController < ApplicationController
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = opts[:launch_url]|| tool.extension_setting(placement, :url)
-    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret,
-                                                                disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only))
+    lti_launch.params = Lti::Security.signed_post_params(
+      params,
+      lti_launch.resource_url,
+      tool.consumer_key,
+      tool.shared_secret,
+      @context.root_account.feature_enabled?(:disable_lti_post_only)
+    )
     lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
     lti_launch.analytics_id = tool.tool_id
 
