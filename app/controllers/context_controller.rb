@@ -230,7 +230,7 @@ class ContextController < ApplicationController
       end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context
-        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }
+        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.uniq }
       end
     end
 
