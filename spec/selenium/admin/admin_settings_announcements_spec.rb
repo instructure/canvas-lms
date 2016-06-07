@@ -32,7 +32,9 @@ describe "settings tabs" do
 
       if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         # close the "user accout" reactTray that opened so we could read the displayed username
-        f('.ReactTray__closeBtn').click
+        if tray_close = f('.ReactTray__closeBtn')
+         tray_close.click
+        end
         expect(f('body')).not_to contain_css('.ReactTray__Overlay')
       end
 
