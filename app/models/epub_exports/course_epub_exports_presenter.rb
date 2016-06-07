@@ -24,7 +24,7 @@ module EpubExports
         'enrollments.type IN (?) AND enrollments.user_id = ?',
         [StudentEnrollment, TeacherEnrollment],
         current_user
-      )
+      ).to_a
     end
 
     def courses_with_feature_enabled
