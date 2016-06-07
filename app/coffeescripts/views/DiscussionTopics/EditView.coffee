@@ -50,8 +50,7 @@ ConditionalRelease) ->
       'click .removeAttachment' : 'removeAttachment'
       'click .save_and_publish': 'saveAndPublish'
       'click .cancel_button' : 'handleCancel'
-      'change #use_for_grading' : 'toggleAvailabilityOptions'
-      'change #use_for_grading' : 'toggleConditionalReleaseTab'
+      'change #use_for_grading' : 'toggleGradingDependentOptions'
       'change #discussion_topic_assignment_points_possible' : 'handlePointsChange'
       'change' : 'onChange'
     )
@@ -327,6 +326,10 @@ ConditionalRelease) ->
       # see getFormValues in DueDateView.coffee
       delete errors.assignmentOverrides
       super(errors)
+
+    toggleGradingDependentOptions: ->
+      @toggleAvailabilityOptions()
+      @toggleConditionalReleaseTab()
 
     toggleAvailabilityOptions: ->
       if @$useForGrading.is(':checked')
