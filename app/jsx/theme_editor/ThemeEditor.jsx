@@ -284,7 +284,7 @@ define([
       let tooltipForWhyApplyIsDisabled = null
       if (this.somethingHasChanged()) {
         tooltipForWhyApplyIsDisabled = I18n.t('You need to "Preview Changes" before you can apply this to your account')
-      } else if (!this.displayedMatchesSaved()) {
+      } else if (this.props.brandConfig.md5 && !this.displayedMatchesSaved()) {
         tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
       }
 

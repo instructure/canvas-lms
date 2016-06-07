@@ -53,12 +53,17 @@ define([
     },
 
     render() {
-      let disableMessage = null
+      let disable = false
+      let disableMessage
       if (this.props.userNeedsToPreviewFirst) {
+        disable = true
         disableMessage = I18n.t('You need to "Preview Changes" before saving')
       } else if (this.props.sharedBrandConfigBeingEdited &&
                  this.props.sharedBrandConfigBeingEdited.brand_config_md5 === this.props.brandConfigMd5) {
+        disable = true
         disableMessage = I18n.t('There are no unsaved changes')
+      } else if (!this.props.brandConfigMd5) {
+        disable = true
       }
 
       return (
@@ -70,7 +75,7 @@ define([
           <button
             type="button"
             className="Button Button--primary"
-            disabled={!!disableMessage}
+            disabled={disable}
             onClick={this.save}
           >
             {I18n.t('Save theme')}

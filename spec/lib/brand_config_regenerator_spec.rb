@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'delayed/testing'
 
 describe BrandConfigRegenerator do
+  let(:new_brand_config) { BrandConfig.for(variables: {"ic-brand-primary" => "green"}) }
   def setup_account_family_with_configs
     @parent_account = Account.default
     @parent_account.enable_feature!(:use_new_styles)
@@ -12,8 +13,7 @@ describe BrandConfigRegenerator do
       name: 'parent theme',
       brand_config_md5: @parent_config.md5
     )
-    
-    
+
     @child_account = Account.create!(parent_account: @parent_account, name: 'child')
     @child_account.brand_config = @child_config = BrandConfig.for(variables: {"ic-brand-global-nav-bgd" => "white"}, parent_md5: @parent_config.md5)
     @child_config.save!
@@ -43,7 +43,6 @@ describe BrandConfigRegenerator do
       brand_config_md5: second_config.md5
     )
 
-    new_brand_config = BrandConfig.for(variables: {"ic-brand-primary" => "green"})
     regenerator = BrandConfigRegenerator.new(@parent_account, user, new_brand_config)
 
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(5)
@@ -55,7 +54,7 @@ describe BrandConfigRegenerator do
     expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
     # make sure the shared brand configs in the child account are all based this new config
     expect(@child_shared_config.reload.brand_config.parent).to eq(new_brand_config)
-    # make sure the child'd active theme still is the same as it's SharedBrandConfig named 'child theme'
+    # make sure the child'd active theme still is the same as its SharedBrandConfig named 'child theme'
     expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)
 
     # make sure the same for the grandchild account.
@@ -66,6 +65,48 @@ describe BrandConfigRegenerator do
 
     # check the extra SavedBrandConfig in the grandchild to make sure it got regerated too
     expect(@second_shared_config.reload.brand_config.parent).to eq(@child_account.brand_config)
+  end
+
+  it "handles orphan themes that were not decendant of @parent_account" do
+    setup_account_family_with_configs
+
+    bogus_config = BrandConfig.for(variables: {"ic-brand-primary" => "brown"})
+    bogus_config.save!
+
+    @child_account.brand_config = child_config = BrandConfig.for(
+      variables: {"ic-brand-primary" => "brown"},
+      parent_md5: bogus_config.md5
+    )
+    child_config.save!
+    @child_account.save!
+
+    regenerator = BrandConfigRegenerator.new(@parent_account, user, new_brand_config)
+
+    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
+    Delayed::Testing.drain
+    expect(brandable_css_stub).to be_verified
+    expect(regenerator.progresses.count).to eq(4)
+
+    expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
+  end
+
+  it "handles reverting to default (nil) theme correctly" do
+    setup_account_family_with_configs
+
+    regenerator = BrandConfigRegenerator.new(@parent_account, user, nil)
+
+    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(4)
+    Delayed::Testing.drain
+    expect(brandable_css_stub).to be_verified
+    expect(regenerator.progresses.count).to eq(4)
+
+    expect(@child_account.reload.brand_config.parent).to eq(nil)
+    expect(@child_shared_config.reload.brand_config.parent).to eq(nil)
+    expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)
+
+    expect(@grand_child_account.reload.brand_config.parent).to eq(@child_account.brand_config)
+    expect(@grand_child_shared_config.reload.brand_config.parent).to eq(@child_account.brand_config)
+    expect(@grand_child_shared_config.brand_config).to eq(@grand_child_account.brand_config)
   end
 
 end
