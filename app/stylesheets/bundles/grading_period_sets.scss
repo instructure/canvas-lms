@@ -99,6 +99,15 @@
 
 // GRADING PERIOD LIST -- PERIOD
 
+.GradingPeriodList__period,
+.GradingPeriodList__period--editing {
+  border-bottom: 1px solid $ic-border-light;
+
+  &::last-child {
+    border-bottom: none;
+  }
+}
+
 .GradingPeriodList__period {
   border-bottom: 1px solid $ic-border-light;
   box-sizing: border-box;
@@ -107,10 +116,6 @@
   flex-wrap: nowrap;
   margin: 0;
   padding: 14px;
-
-  &::last-child {
-    border-bottom: none;
-  }
 }
 
 .GradingPeriodList__period__attributes {
@@ -152,9 +157,4 @@
   border-left: 1px solid $ic-border-light;
   border-right: 1px solid $ic-border-light;
   border-bottom: 1px solid $ic-border-light;
-}
-
-// GRADING PERIOD FORM
-
-.GradingPeriodForm {
 }

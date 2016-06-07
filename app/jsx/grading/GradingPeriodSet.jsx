@@ -58,6 +58,18 @@ define([
     }
   };
 
+  const setFocus = function(ref) {
+    React.findDOMNode(ref).focus();
+  };
+
+  const getShowGradingPeriodRef = function(period) {
+    return "show-grading-period-" + period.id;
+  };
+
+  const getEditGradingPeriodRef = function(period) {
+    return "edit-grading-period-" + period.id;
+  };
+
   let GradingPeriodSet = React.createClass({
     propTypes: {
       set: types.shape({
@@ -87,13 +99,20 @@ define([
           period: null,
           saving: false
         },
+        editPeriod: {
+          id:     null,
+          saving: false
+        },
         batchUpdateUrl: $.replaceTags(this.props.urls.batchUpdateUrl, 'set_id', this.props.set.id)
       };
     },
 
     componentDidUpdate(prevProps, prevState) {
       if (prevState.newPeriod.period && !this.state.newPeriod.period) {
-        this.refs.addPeriodButton.getDOMNode().focus();
+        setFocus(this.refs.addPeriodButton);
+      } else if (prevState.editPeriod.id && !this.state.editPeriod.id) {
+        let period = {id: prevState.editPeriod.id};
+        setFocus(this.refs[getShowGradingPeriodRef(period)].refs.editButton);
       }
     },
 
@@ -155,10 +174,30 @@ define([
     },
 
     renderGradingPeriods() {
-      return _.map(this.state.gradingPeriods, function(period) {
-        return (
-          <GradingPeriod key={period.id} period={period} />
-        );
+      let actionsDisabled = !!(this.state.editPeriod.id || this.state.newPeriod.period);
+      return _.map(this.state.gradingPeriods, (period) => {
+        if (period.id === this.state.editPeriod.id) {
+          return (
+            <div key       = {"edit-grading-period-" + period.id}
+                 className = 'GradingPeriodList__period--editing pad-box'>
+              <GradingPeriodForm ref      = "editPeriodForm"
+                                 period   = {period}
+                                 disabled = {this.state.editPeriod.saving}
+                                 onSave   = {this.updatePeriod}
+                                 onCancel = {this.cancelEditPeriod} />
+            </div>
+          );
+        } else {
+          return (
+            <GradingPeriod key={"show-grading-period-" + period.id}
+                           ref={getShowGradingPeriodRef(period)}
+                           period={period}
+                           actionsDisabled={actionsDisabled}
+                           onEdit={this.editPeriod}
+                           readOnly={this.props.readOnly}
+                           permissions={this.props.permissions} />
+          );
+        }
       });
     },
 
@@ -208,6 +247,7 @@ define([
         <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
           <button className='Button--link GradingPeriodList__new-period__add-button'
                   ref='addPeriodButton'
+                  disabled={!!this.state.editPeriod.id}
                   aria-label={I18n.t('Add Grading Period')}
                   onClick={this.showNewPeriodForm}>
             <i className='icon-plus GradingPeriodList__new-period__add-icon'/>
@@ -264,7 +304,46 @@ define([
     setNewPeriod(attr) {
       let period = $.extend(true, {}, this.state.newPeriod, attr);
       this.setState({newPeriod: period});
-    }
+    },
+
+    editPeriod(period) {
+      this.setEditPeriod({id: period.id, saving: false});
+    },
+
+    updatePeriod(period) {
+      let periods = _.reject(this.state.gradingPeriods, function(_period) {
+        return period.id === _period.id;
+      }).concat([period]);
+      let validations = validatePeriods(periods);
+      if (_.isEmpty(validations)) {
+        this.setEditPeriod({ saving: true });
+        gradingPeriodsApi.batchUpdate(this.props.set.id, periods)
+             .then((periods) => {
+               $.flashMessage(I18n.t('All changes were saved'));
+               this.setEditPeriod({ id: null, saving: false });
+               this.setState({
+                 gradingPeriods: sortPeriods(periods)
+               });
+             })
+             .catch((_) => {
+               $.flashError(I18n.t('There was a problem saving the grading period'));
+               this.setNewPeriod({saving: false});
+             });
+      } else {
+        _.each(validations, function(message) {
+          $.flashError(message);
+        });
+      }
+    },
+
+    cancelEditPeriod() {
+      this.setEditPeriod({ id: null, saving: false });
+    },
+
+    setEditPeriod(attr) {
+      let period = $.extend(true, {}, this.state.editPeriod, attr);
+      this.setState({editPeriod: period});
+    },
   });
 
   return GradingPeriodSet;

@@ -13,12 +13,18 @@ define([
       id:        attr.id,
       title:     attr.title,
       startDate: attr.startDate || new Date(''),
-      endDate:   attr.endDate || new Date(''),
+      endDate:   attr.endDate || new Date('')
     };
   };
 
   let GradingPeriodForm = React.createClass({
     propTypes: {
+      period:   types.shape({
+        id:        types.string.isRequired,
+        title:     types.string.isRequired,
+        startDate: types.instanceOf(Date).isRequired,
+        endDate:   types.instanceOf(Date).isRequired
+      }),
       disabled: types.bool.isRequired,
       onSave:   types.func.isRequired,
       onCancel: types.func.isRequired
@@ -26,7 +32,7 @@ define([
 
     getInitialState: function() {
       return {
-        period: buildPeriod(this.props)
+        period: buildPeriod(this.props.period || {})
       };
     },
 
@@ -49,6 +55,7 @@ define([
                          ref='title'
                          className='ic-Input'
                          title={I18n.t('Grading Period Title')}
+                         defaultValue={this.state.period.title}
                          onChange={this.changeTitle}
                          type='text'/>
                 </div>

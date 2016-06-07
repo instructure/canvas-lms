@@ -95,15 +95,260 @@ define([
     ok((startDates[0] < startDates[1]) && (startDates[1] < startDates[2]));
   });
 
+  module("GradingPeriodSet 'Edit Grading Period'", {
+    renderComponent(permissions = allPermissions, readOnly = false) {
+      const element = React.createElement(GradingPeriodSet, props);
+      let component = React.render(element, wrapper);
+      Simulate.click(component.refs.toggleSetBody);
+      return component;
+    },
+
+    teardown() {
+      React.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  test("renders the 'GradingPeriodForm' when 'edit grading period' is clicked", function() {
+    let set = this.renderComponent();
+    notOk(set.refs.editPeriodForm);
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    ok(set.refs.editPeriodForm);
+  });
+
+  test("disables all grading period actions while open", function() {
+    let set = this.renderComponent();
+    notOk(set.refs.editPeriodForm);
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    ok(set.refs.addPeriodButton.props.disabled);
+    ok(set.refs["show-grading-period-2"].props.actionsDisabled);
+    ok(set.refs["show-grading-period-3"].props.actionsDisabled);
+  });
+
+  test("'onCancel' removes the 'edit grading period' form", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    set.refs.editPeriodForm.props.onCancel();
+    notOk(!!set.refs.editPeriodForm);
+  });
+
+  test("'onCancel' focuses on the 'edit grading period' button", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    set.refs.editPeriodForm.props.onCancel();
+    let editButton = React.findDOMNode(set.refs["show-grading-period-1"].refs.editButton);
+    equal(document.activeElement, editButton);
+  });
+
+  test("'onCancel' re-enables all grading period actions", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    set.refs.editPeriodForm.props.onCancel();
+    notOk(set.refs.addPeriodButton.props.disabled);
+    notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
+    notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
+    notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
+  });
+
+  module("GradingPeriodSet 'Edit Grading Period - onSave'", {
+    renderComponent() {
+      const element = React.createElement(GradingPeriodSet, props);
+      let component = React.render(element, wrapper);
+      Simulate.click(component.refs.toggleSetBody);
+      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      return component;
+    },
+
+    callOnSave(component) {
+      return component.refs.editPeriodForm.props.onSave(examplePeriods[0]);
+    },
+
+    teardown() {
+      React.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  asyncTest("updates the given grading period in the set", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      equal(set.refs.gradingPeriodList.props.children.length, 3);
+      start();
+    });
+  });
+
+  asyncTest("ensures sorted grading periods", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      let periods = set.refs.gradingPeriodList.props.children;
+      let periodIds = _.map(periods, period => period.props.period.id);
+      propEqual(periodIds, ["3", "1", "2"]);
+      start();
+    });
+  });
+
+  asyncTest("disables the 'edit period form'", function() {
+    let success = new Promise(() => {});
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      ok(set.refs.editPeriodForm.props.disabled);
+      start();
+    });
+  });
+
+  asyncTest("removes the 'edit period form' upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      notOk(set.refs.editPeriodForm);
+      start();
+    });
+  });
+
+  asyncTest("focuses on the grading period 'edit button' upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      equal(document.activeElement, React.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
+      start();
+    });
+  });
+
+  asyncTest("re-enables all grading period actions upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      notOk(set.refs.addPeriodButton.props.disabled);
+      notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
+      notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
+      notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
+      start();
+    });
+  });
+
+  module("GradingPeriodSet 'Edit Grading Period - validations'", {
+    stubUpdate() {
+      let failure = new Promise(_, reject => { throw("FAIL") });
+      this.stub(gradingPeriodsApi, "batchUpdate").returns(failure);
+    },
+
+    renderComponent() {
+      const element = React.createElement(GradingPeriodSet, props);
+      let component = React.render(element, wrapper);
+      Simulate.click(component.refs.toggleSetBody);
+      Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
+      return component;
+    },
+
+    callOnSave(component, period) {
+      return component.refs.editPeriodForm.props.onSave(period);
+    },
+
+    teardown() {
+      React.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  test('does not save a grading period without a title', function() {
+    let period = {
+      id: "1",
+      title: "",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period without a valid startDate', function() {
+    let period = {
+      title: "Period without Start Date",
+      startDate: undefined,
+      endDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period without a valid endDate', function() {
+    let period = {
+      title: "Period without End Date",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: null
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with overlapping startDate', function() {
+    let period = {
+      title: "Period with Overlapping Start Date",
+      startDate: new Date("2015-04-30T20:11:00+00:00"),
+      endDate: new Date("2015-05-30T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with overlapping endDate', function() {
+    let period = {
+      title: "Period with Overlapping End Date",
+      startDate: new Date("2014-12-30T20:11:00+00:00"),
+      endDate: new Date("2015-01-30T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
+  test('does not save a grading period with endDate before startDate', function() {
+    let period = {
+      title: "Overlapping Period",
+      startDate: new Date("2015-03-03T00:00:00+00:00"),
+      endDate: new Date("2015-03-02T20:11:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
   module("GradingPeriodSet 'Add Grading Period'", {
     renderComponent(permissions = allPermissions, readOnly = false) {
       let set = {
         set: { id: "1", title: "Example Set" },
-        gradingPeriods: [],
+        gradingPeriods: examplePeriods,
+        terms: [],
         urls: urls,
         permissions: _.defaults(permissions, allPermissions),
-        readOnly: readOnly,
-        terms: []
+        readOnly: readOnly
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);
@@ -123,12 +368,12 @@ define([
 
   test("does not show the 'add grading period' button when 'create' is not permitted", function() {
     let set = this.renderComponent({ create: false });
-    notOk(set.refs.addPeriodButton);
+    notOk(!!set.refs.addPeriodButton);
   });
 
   test("does not show the 'add grading period' button when 'read only'", function() {
     let set = this.renderComponent({ create: true }, true);
-    notOk(set.refs.addPeriodButton);
+    notOk(!!set.refs.addPeriodButton);
   });
 
   test("renders the 'GradingPeriodForm' when 'add grading period' is clicked", function() {
@@ -136,6 +381,14 @@ define([
     notOk(set.refs.newPeriodForm);
     Simulate.click(set.refs.addPeriodButton);
     ok(set.refs.newPeriodForm);
+  });
+
+  test("disables all grading period actions while open", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs.addPeriodButton);
+    ok(set.refs["show-grading-period-1"].props.actionsDisabled);
+    ok(set.refs["show-grading-period-2"].props.actionsDisabled);
+    ok(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
   test("'onCancel' removes the 'new period form'", function() {
@@ -149,7 +402,17 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs.addPeriodButton);
     set.refs.newPeriodForm.props.onCancel();
-    equal(set.refs.addPeriodButton.getDOMNode(), document.activeElement);
+    equal(document.activeElement, React.findDOMNode(set.refs.addPeriodButton));
+  });
+
+  test("'onCancel' re-enables all grading period actions", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs.addPeriodButton);
+    set.refs.newPeriodForm.props.onCancel();
+    notOk(set.refs.addPeriodButton.props.disabled);
+    notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
+    notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
+    notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
   module("GradingPeriodSet 'New Grading Period - onSave'", {
@@ -222,6 +485,20 @@ define([
     this.callOnSave(set);
     requestAnimationFrame(() => {
       notOk(set.refs.newPeriodForm);
+      start();
+    });
+  });
+
+  asyncTest("re-enables all grading period actions upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      notOk(set.refs.addPeriodButton.props.disabled);
+      notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
+      notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
+      notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
       start();
     });
   });
