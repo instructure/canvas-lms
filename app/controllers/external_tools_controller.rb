@@ -728,8 +728,13 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :update)
+      external_tool_params = params[:external_tool] || params
       @tool = @context.context_external_tools.new
-      set_tool_attributes(@tool, params[:external_tool] || params)
+      if request.content_type == 'application/x-www-form-urlencoded'
+        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+      end
+      set_tool_attributes(@tool, external_tool_params)
       respond_to do |format|
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
@@ -758,8 +763,13 @@ class ExternalToolsController < ApplicationController
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update)
+      external_tool_params = params[:external_tool] || params
+      if request.content_type == 'application/x-www-form-urlencoded'
+        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+      end
       respond_to do |format|
-        set_tool_attributes(@tool, params[:external_tool] || params)
+        set_tool_attributes(@tool, external_tool_params)
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
           if api_request?
