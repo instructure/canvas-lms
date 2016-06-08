@@ -780,6 +780,10 @@ class Submission < ActiveRecord::Base
     Hash[attachments_by_submission]
   end
 
+  def includes_attachment?(attachment)
+    self.versions.map(&:model).any? { |v| (v.attachment_ids || "").split(',').map(&:to_i).include?(attachment.id) }
+  end
+
   def <=>(other)
     self.updated_at <=> other.updated_at
   end

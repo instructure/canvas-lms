@@ -388,6 +388,11 @@ class FilesController < ApplicationController
   # @API Get public inline preview url
   # Determine the URL that should be used for inline preview of the file.
   #
+  # @argument submission_id [Optional, Integer]
+  #   The id of the submission the file is associated with.  Provide this argument to gain access to a file
+  #   that has been submitted to an assignment (Canvas will verify that the file belongs to the submission
+  #   and the calling user has rights to view the submission).
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/files/1/public_url' \
@@ -404,7 +409,7 @@ class FilesController < ApplicationController
     # submission.
     @submission = Submission.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
-    return render_unauthorized_action if @submission && !@submission.attachments.where(:id => params[:id]).any?
+    return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
       render :json  => { :public_url => @attachment.authenticated_s3_url(:secure => request.ssl?) }
     end

@@ -1114,6 +1114,16 @@ describe FilesController do
         get "public_url", :id => otherfile, :submission_id => @submission.id
         assert_unauthorized
       end
+
+      it "allows downloading an attachment to a previous version" do
+        old_file = @attachment
+        new_file = attachment_model(:context => @student)
+        @assignment.submit_homework @student, :attachments => [new_file]
+        get "public_url", :id => old_file.id, :submission_id => @submission.id
+        expect(response).to be_success
+        data = json_parse
+        expect(data).to eq({ "public_url" => old_file.authenticated_s3_url })
+      end
     end
   end
 end
