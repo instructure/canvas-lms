@@ -354,14 +354,14 @@ class ContextModule < ActiveRecord::Base
       end
 
       if !is_teacher
-        tags = filter_tags_per_section(tags, user, opts)
+        tags = ContextModule.filter_tags_per_section(tags, user, opts)
       end
 
       tags
     end
   end
 
-  def filter_tags_per_section(tags, user, opts={})
+  def self.filter_tags_per_section(tags, user, opts={})
     filtered = []
 
     user_section_ids = []
