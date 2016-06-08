@@ -47,7 +47,7 @@ define([
             onItemClicked={this.openModal} />
 
           {list.length
-            ? <CollaborationsList collaborationsState={this.props.applicationState.listCollaborations} getCollaborations={this.props.actions.getCollaborations} deleteCollaboration={this.props.actions.deleteCollaboration} />
+            ? <CollaborationsList collaborationsState={this.props.applicationState.listCollaborations} getCollaborations={this.props.actions.getCollaborations} deleteCollaboration={this.props.actions.deleteCollaboration} openModal={this.openModal} />
             : <GettingStartedCollaborations ltiCollaborators={this.props.applicationState.ltiCollaborators}/>
           }
           <Modal

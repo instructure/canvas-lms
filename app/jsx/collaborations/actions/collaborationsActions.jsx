@@ -43,6 +43,15 @@ define([
   actions.CREATE_COLLABORATION_FAILED = 'CREATE_COLLABORATION_FAILED'
   actions.createCollaborationFailed = (error) => ({ type: actions.CREATE_COLLABORATION_FAILED, payload: error, error: true })
 
+  actions.UPDATE_COLLABORATION_START = 'UPDATE_COLLABORATION_START'
+  actions.updateCollaborationStart = () => ({ type: actions.UPDATE_COLLABORATION_START })
+
+  actions.UPDATE_COLLABORATION_SUCCESSFUL = 'UPDATE_COLLABORATION_SUCCESSFUL'
+  actions.updateCollaborationSuccessful = (collaboration) => ({ type: actions.UPDATE_COLLABORATION_SUCCESSFUL, payload: collaboration })
+
+  actions.UPDATE_COLLABORATION_FAILED = 'UPDATE_COLLABORATION_FAILED'
+  actions.updateCollaborationFailed = (error) => ({ type: actions.UPDATE_COLLABORATION_FAILED, payload: error, error: true })
+
   actions.getCollaborations = (url) => {
     return (dispatch, getState) => {
       dispatch(actions.listCollaborationsStart());
@@ -91,7 +100,7 @@ define([
     return (dispatch) => {
       dispatch(actions.createCollaborationStart());
       let url = `/${context}/${contextId}/collaborations`
-      axios.post(url, { contentItems }, { headers: {
+      axios.post(url, { contentItems: JSON.stringify(contentItems) }, { headers: {
         'Accept': 'application/json'
       }})
         .then(({ data }) => {
@@ -102,17 +111,32 @@ define([
           dispatch(actions.createCollaborationFailed(error))
         })
     }
-  },
+  }
+
+  actions.updateCollaboration = (context, contextId, contentItems) => {
+    return (dispatch) => {
+      dispatch(actions.updateCollaborationStart());
+      let url = `/${context}/${contextId}/collaborations/${contentItems.id}`
+      axios.put(url, { contentItems: JSON.stringify(contentItems) }, { headers: {
+        'Accept': 'application/json'
+      }})
+        .then(({ collaboration }) => {
+          dispatch(actions.updateCollaborationSuccessful(collaboration))
+        })
+        .catch(error => {
+          dispatch(actions.updateCollaborationFailed(error))
+        })
+    }
+  }
 
   actions.externalContentReady = (e, data) => {
     return (dispatch) => {
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
-      let contentItems = JSON.stringify(data.contentItems);
       if (data.service_id) {
-        dispatch(actions.updateCollaboration(context, contextId, contentItems));
+        dispatch(actions.updateCollaboration(context, contextId, data.contentItems));
       }
       else {
-        dispatch(actions.createCollaboration(context, contextId, contentItems));
+        dispatch(actions.createCollaboration(context, contextId, data.contentItems));
       }
     }
   }

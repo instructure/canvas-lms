@@ -24,7 +24,7 @@ define([
             hasMore={!!this.props.collaborationsState.nextPage}
             loadMore={this.loadMoreCollaborations} >
             {this.props.collaborationsState.list.map((c, index) => (
-              <Collaboration ref={`collaboration-${index}`} key={c.id} collaboration={c} deleteCollaboration={this.props.deleteCollaboration} />
+              <Collaboration ref={`collaboration-${index}`} key={c.id} collaboration={c} deleteCollaboration={this.props.deleteCollaboration} openModal={this.props.openModal} />
             ))}
           </LoadMore>
         </div>
@@ -35,7 +35,8 @@ define([
   CollaborationsList.propTypes = {
     collaborationsState: React.PropTypes.object.isRequired,
     deleteCollaboration: React.PropTypes.func.isRequired,
-    getCollaborations: React.PropTypes.func.isRequired
+    getCollaborations: React.PropTypes.func.isRequired,
+    openModal: React.PropTypes.func
   };
 
   return CollaborationsList;
