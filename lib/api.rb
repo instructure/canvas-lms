@@ -291,10 +291,12 @@ module Api
 
   # Returns collection as the first return value, and the meta information hash
   # as the second return value
-  def self.jsonapi_paginate(collection, controller, base_url, pagination_args={})
+  def self.jsonapi_paginate(collection, controller, base_url, pagination_args = {})
     collection = paginate_collection!(collection, controller, pagination_args)
     meta = jsonapi_meta(collection, controller, base_url)
-
+    hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
+    links = build_links_from_hash(hash)
+    controller.response.headers["Link"] = links.join(',') if links.length > 0
     return collection, meta
   end
 
