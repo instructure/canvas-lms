@@ -328,7 +328,7 @@ module Lti
             expect(membership.size).to eq 4
             expect(membership.fetch(:@id)).to be_nil
             expect(membership.fetch(:status)).to eq IMS::LIS::Statuses::SimpleNames::Active
-            expect(membership.fetch(:role)).to match_array([IMS::LIS::Roles::Context::URNs::Learner])
+            expect(membership.fetch(:role)).to match_array([IMS::LIS::Roles::Context::URNs::Member])
 
             member = membership.fetch(:member)
             expect(member.fetch(:@id)).to be_nil

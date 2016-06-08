@@ -18,38 +18,29 @@
 
 module Lti
   module MembershipService
-    class LisPersonCollator
-      attr_reader :role, :per_page, :page, :context, :user, :memberships
+    class LisPersonCollatorBase
+      attr_reader :role, :per_page, :page
 
-      def initialize(context, user, opts={})
+      def initialize(opts={})
         @role = opts[:role]
         @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
         @page = [opts[:page].to_i - 1, 0].max
-        @context = context
-        @user = user
-        @memberships = collate_memberships
       end
 
       def next_page?
         users.length > @per_page
       end
 
-      private
-
-      def collate_memberships
-        users.slice(0, @per_page).map do |user|
+      def memberships
+        @memberships ||= users.slice(0, @per_page).map do |user|
           generate_membership(user)
         end
       end
 
+      private
+
       def users
-        options = {
-          enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student']
-        }
-        @users ||= UserSearch.scope_for(@context, @user, options)
-                             .preload(:communication_channels, :not_ended_enrollments)
-                             .offset(@page * @per_page)
-                             .limit(@per_page + 1)
+        []
       end
 
       def generate_member(user)
@@ -73,20 +64,7 @@ module Lti
       end
 
       def generate_roles(user)
-        user.not_ended_enrollments.map do |enrollment|
-          case enrollment.type
-          when 'TeacherEnrollment'
-            IMS::LIS::Roles::Context::URNs::Instructor
-          when 'TaEnrollment'
-            IMS::LIS::Roles::Context::URNs::TeachingAssistant
-          when 'DesignerEnrollment'
-            IMS::LIS::Roles::Context::URNs::ContentDeveloper
-          when 'StudentEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner
-          when 'ObserverEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
-          end
-        end.compact.uniq
+        []
       end
     end
   end
