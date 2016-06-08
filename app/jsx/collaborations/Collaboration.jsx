@@ -14,6 +14,7 @@ define([
       this.openConfirmation = this.openConfirmation.bind(this);
       this.closeConfirmation = this.closeConfirmation.bind(this);
       this.deleteCollaboration = this.deleteCollaboration.bind(this);
+      this.openModal = this.openModal.bind(this);
     }
 
     openConfirmation () {
@@ -35,9 +36,16 @@ define([
       store.dispatch(this.props.deleteCollaboration(context, contextId, this.props.collaboration.id));
     }
 
+    openModal (e, url) {
+      e.preventDefault()
+      this.props.openModal(url)
+    }
+
     render () {
       let { collaboration } = this.props;
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
+
+      let editUrl = `/${context}/${contextId}/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}`
 
       return (
         <div ref="wrapper" className='Collaboration'>
@@ -54,7 +62,7 @@ define([
             <DatetimeDisplay datetime={collaboration.updated_at} format='%b %d, %l:%M %p' />
           </div>
           <div className='Collaboration-actions'>
-            <a className='icon-edit'>
+            <a className='icon-edit' href={editUrl} rel='external' onClick={(e) => this.openModal(e, `${editUrl}&display=borderless`)}>
               <span className='screenreader-only'>{i18n.t('Edit Collaboration')}</span>
             </a>
             <button ref='deleteButton' className='btn btn-link' onClick={this.openConfirmation}>
