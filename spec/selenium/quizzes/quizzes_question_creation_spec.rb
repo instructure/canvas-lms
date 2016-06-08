@@ -266,6 +266,7 @@ describe 'quizzes question creation' do
 
     # Formula Question
     it 'creates a basic formula question', priority: "1", test_id: 201945 do
+      skip_if_chrome('CNVS-29843')
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
