@@ -52,7 +52,7 @@ class Account < ActiveRecord::Base
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
-  has_many :pseudonyms, -> { preload(:user) }
+  has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
