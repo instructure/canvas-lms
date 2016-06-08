@@ -36,7 +36,7 @@ end
 
 
 module DiscussionHelpers
-  module DiscussionHelpersClassMethods
+  module SetupContext
     def setup_student_context
       let(:context_user) do
         course_with_student(course: @course, active_all: true, name: 'student1')
@@ -79,52 +79,50 @@ module DiscussionHelpers
     end
   end
 
-  def create_discussion_topic(course, user, title, message, assignment = nil)
-    course.discussion_topics.create!(
-      user: user,
-      title: title,
-      message: message,
-      assignment: assignment
-    )
-  end
+  class << self
+    def create_discussion_topic(course, user, title, message, assignment = nil)
+      course.discussion_topics.create!(
+        user: user,
+        title: title,
+        message: message,
+        assignment: assignment
+      )
+    end
 
-  def disable_view_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'read_forum',
-                                                role: context_role,
-                                                enabled: false)
-  end
+    def disable_view_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'read_forum',
+                                                  role: context_role,
+                                                  enabled: false)
+    end
 
-  def disable_moderate_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'moderate_forum',
-                                                role: context_role,
-                                                enabled: false)
-  end
+    def disable_moderate_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'moderate_forum',
+                                                  role: context_role,
+                                                  enabled: false)
+    end
 
-  def disable_post_to_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'post_to_forum',
-                                                role: context_role,
-                                                enabled: false)
-  end
+    def disable_post_to_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'post_to_forum',
+                                                  role: context_role,
+                                                  enabled: false)
+    end
 
-  def enable_view_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'read_forum',
-                                                role: context_role,
-                                                enabled: true)
-  end
+    def enable_view_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'read_forum',
+                                                  role: context_role,
+                                                  enabled: true)
+    end
 
-  def enable_moderate_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'moderate_forum',
-                                                role: context_role,
-                                                enabled: true)
-  end
+    def enable_moderate_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'moderate_forum',
+                                                  role: context_role,
+                                                  enabled: true)
+    end
 
-  def enable_post_to_discussions(course, context_role)
-    course.root_account.role_overrides.create!(permission: 'post_to_forum',
-                                                role: context_role,
-                                                enabled: true)
-  end
-
-  def wait
-    Selenium::WebDriver::Wait.new(timeout: 5)
+    def enable_post_to_discussions(course, context_role)
+      course.root_account.role_overrides.create!(permission: 'post_to_forum',
+                                                  role: context_role,
+                                                  enabled: true)
+    end
   end
 end

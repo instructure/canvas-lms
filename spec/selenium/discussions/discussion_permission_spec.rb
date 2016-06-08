@@ -20,18 +20,19 @@ require_relative '../common'
 require_relative '../discussions/discussion_helpers'
 require_relative '../helpers/shared_examples_common'
 include SharedExamplesCommon
+include DiscussionHelpers
 
 
 describe "discussion permissions" do
   include_context "in-process server selenium tests"
   include_context "discussions_page_shared_context"
-  extend DiscussionHelpers::DiscussionHelpersClassMethods
-  include DiscussionHelpers
+  extend DiscussionHelpers::SetupContext
+
 
   context 'discussion created by teacher' do
     before :each do
       course_with_teacher(active_all: true, name: 'teacher1')
-      @discussion_topic = create_discussion_topic(
+      @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @teacher,
         'Discussion 1 Title',
@@ -43,9 +44,9 @@ describe "discussion permissions" do
 
     shared_examples 'no viewing discussion title, no discussion link' do |context|
       before :each do
-        disable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.disable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
@@ -85,9 +86,9 @@ describe "discussion permissions" do
 
     shared_examples 'no viewing discussion details' do |context|
       before :each do
-        disable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.disable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
@@ -117,16 +118,15 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
 
       it "allows discussion view, not edit or post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807077", ta: "807078", observer: "807079", designer: "807080") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
         expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
@@ -152,15 +152,14 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        enable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.enable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
       it "allows discussion view and post, not edit", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807081", teacher: "807082", ta: "807083", observer: "807084", designer: "807085") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
@@ -191,16 +190,15 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        enable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.enable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
 
       it "allows discussion view and edit, not post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807352", ta: "807354", observer: "807355", designer: "807356") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
         expect(f(discussion_edit_button)).to be_displayed
@@ -226,15 +224,14 @@ describe "discussion permissions" do
 
     shared_examples 'allow view, edit and post to discussions' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        enable_moderate_discussions(@course, context_role)
-        enable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.enable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.enable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
       it "allows discussion view, edit, and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807357", teacher: "807358", ta: "807359", observer: "807360", designer: "807361") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_edit_button)).to be_displayed
@@ -267,7 +264,7 @@ describe "discussion permissions" do
   context 'discussion created by student' do
     before :each do
       course_with_student(active_all: true, name: 'student1')
-      @discussion_topic = create_discussion_topic(
+      @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @student,
         'Student Discussion 1 Title',
@@ -279,9 +276,9 @@ describe "discussion permissions" do
 
     shared_examples 'no viewing discussion title' do |context|
       before :each do
-        disable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.disable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
@@ -316,9 +313,9 @@ describe "discussion permissions" do
 
     shared_examples 'no viewing discussion details' do |context|
       before :each do
-        disable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.disable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
@@ -348,16 +345,15 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
 
       it "allows viewing discussions, not edit or post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807637", ta: "807638", observer: "807639", designer: "807640") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
         expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
@@ -383,15 +379,14 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        enable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.enable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
       it "allows discussion view and post, not edit", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807641", ta: "807642", observer: "807643", designer: "807910") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
@@ -417,16 +412,15 @@ describe "discussion permissions" do
 
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        enable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.enable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
 
         user_session(context_user)
       end
 
       it "allows discussion view and edit, not post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, teacher: "807911", ta: "807912", observer: "807913", designer: "8079114") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
         expect(f(discussion_edit_button)).to be_displayed
@@ -452,15 +446,14 @@ describe "discussion permissions" do
 
     shared_examples 'allow view, edit and post to discussions' do |context|
       before :each do
-        enable_view_discussions(@course, context_role)
-        enable_moderate_discussions(@course, context_role)
-        enable_post_to_discussions(@course, context_role)
+        DiscussionHelpers.enable_view_discussions(@course, context_role)
+        DiscussionHelpers.enable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.enable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
       it "allows discussion view, edit and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "807915", teacher: "807916", ta: "807917", observer: "807918", designer: "807919") do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_edit_button)).to be_displayed
@@ -496,16 +489,14 @@ describe "discussion permissions" do
 
     shared_examples 'allow view, edit and post to own discussions with permissions off' do
       before :each do
-        disable_view_discussions(@course, context_role)
-        disable_moderate_discussions(@course, context_role)
-        disable_post_to_discussions(@course, context_role)
-
+        DiscussionHelpers.disable_view_discussions(@course, context_role)
+        DiscussionHelpers.disable_moderate_discussions(@course, context_role)
+        DiscussionHelpers.disable_post_to_discussions(@course, context_role)
         user_session(context_user)
       end
 
       it "allows own discussion view, edit, and post with permissions off", priority: "1", test_id: "807925" do
         get discussions_topic_detail_page
-        wait.until { fj(discussion_message).present? }
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
         expect(f(discussion_edit_button)).to be_displayed
