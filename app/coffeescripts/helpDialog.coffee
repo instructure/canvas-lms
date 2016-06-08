@@ -57,12 +57,12 @@ define [
       @dialogInited = true
 
     initTicketForm: ->
+      requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
+      requiredFields.push 'error[email]' if @showEmail()
+
       $form = @$dialog.find('#create_ticket').formSubmit
         disableWhileLoading: true
-        required: =>
-          requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
-          requiredFields.push 'error[email]' if @showEmail()
-          requiredFields
+        required: requiredFields
         success: =>
           @$dialog.dialog('close')
           $form.find(':input').val('')

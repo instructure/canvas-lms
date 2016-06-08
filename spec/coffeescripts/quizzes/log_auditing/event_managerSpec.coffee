@@ -5,51 +5,50 @@ define [
   'compiled/quizzes/log_auditing/event_tracker'
   'vendor/backbone'
 ], (K, QuizEvent, EventManager, EventTracker, Backbone) ->
-  evtManager = null
   module 'Quizzes::LogAuditing::EventManager',
     teardown: ->
-      evtManager.stop() if evtManager && evtManager.isRunning()
-
-  testEventFactory = new Backbone.Model()
-
-  class TestEventTracker extends EventTracker
-    eventType: 'test_event'
-
-    install: (deliver) ->
-      testEventFactory.on 'change', deliver
-
+      this.evtManager.stop() if this.evtManager && this.evtManager.isRunning()
 
   test '#start and #stop: should work', ->
-    evtManager = new EventManager()
-    evtManager.start()
-    ok evtManager.isRunning()
+    this.evtManager = new EventManager()
+    this.evtManager.start()
+    ok this.evtManager.isRunning()
 
-    evtManager.stop()
-    ok !evtManager.isRunning()
+    this.evtManager.stop()
+    ok !this.evtManager.isRunning()
 
   module 'Quizzes::LogAuditing::EventManager - Event delivery',
     setup: ->
       this.server = sinon.fakeServer.create()
 
+      specThis = this
+      class TestEventTracker extends EventTracker
+        eventType: 'test_event'
+
+        install: (deliver) ->
+          specThis.testEventFactory.on 'change', deliver
+      this.TestEventTracker = TestEventTracker
+      this.testEventFactory = new Backbone.Model()
+
     teardown: ->
       this.server.restore()
-      evtManager.stop() if evtManager && evtManager.isRunning()
+      this.evtManager.stop() if this.evtManager && this.evtManager.isRunning()
 
   test 'it should deliver events', ->
-    evtManager = new EventManager({
+    this.evtManager = new EventManager({
       autoDeliver: false,
       deliveryUrl: '/events'
     })
 
-    evtManager.registerTracker(TestEventTracker)
-    evtManager.start()
+    this.evtManager.registerTracker(this.TestEventTracker)
+    this.evtManager.start()
 
-    testEventFactory.trigger('change')
+    this.testEventFactory.trigger('change')
 
-    ok evtManager.isDirty(),
+    ok this.evtManager.isDirty(),
       'it correctly reports whether it has any events pending delivery'
 
-    evtManager.deliver()
+    this.evtManager.deliver()
 
     equal this.server.requests.length, 1
     equal this.server.requests[0].url, '/events',
@@ -63,23 +62,25 @@ define [
     equal payload.quiz_submission_events[0].event_type, 'test_event',
       'it includes the serialized events'
 
-    ok evtManager.isDelivering(),
+    ok this.evtManager.isDelivering(),
       'it correctly reports whether a delivery is in progress'
 
     this.server.requests[0].respond(204)
 
-    ok !evtManager.isDelivering(),
+    ok !this.evtManager.isDelivering(),
       "it untracks the delivery once it's synced with the server"
 
-    ok !evtManager.isDirty(),
+    ok !this.evtManager.isDirty(),
       "it flushes its buffer when sync is complete"
+
   test "it should drop trackers", ->
-    evtManager = new EventManager({
+    this.evtManager = new EventManager({
       autoDeliver: false,
       deliveryUrl: '/events'
     })
-    evtManager.registerTracker(TestEventTracker)
-    evtManager.unregisterAllTrackers()
-    testEventFactory.trigger("change")
+    this.evtManager.start()
+    this.evtManager.registerTracker(this.TestEventTracker)
+    this.evtManager.unregisterAllTrackers()
+    this.testEventFactory.trigger("change")
 
-    ok !evtManager.isDirty(), "it doesn't have any active trackers"
+    ok !this.evtManager.isDirty(), "it doesn't have any active trackers"

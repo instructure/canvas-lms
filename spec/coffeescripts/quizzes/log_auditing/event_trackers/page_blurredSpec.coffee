@@ -24,10 +24,10 @@ define [
     capture = @stub()
     tracker.install(capture)
 
-    document.activeElement = {tagName: "IFRAME"}
+    iframe = $('<iframe>').appendTo('body').focus()
     $(window).blur()
-
-    ok capture.notCalled, 'it doesnt mark iframe focus as page blur'
+    ok capture.notCalled, 'it does not mark iframe focus as page blur'
+    iframe.remove()
 
   test 'capturing: it throttles captures', ->
     capture = @spy()

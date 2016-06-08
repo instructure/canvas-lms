@@ -1,9 +1,7 @@
 define [
   'compiled/quizzes/log_auditing/event'
 ], (QuizEvent) ->
-  module 'Quizzes::LogAuditing::QuizEvent',
-    setup: ->
-    teardown: ->
+  module 'Quizzes::LogAuditing::QuizEvent'
 
   test '#constructor', ->
     ok !!(new QuizEvent('some_event_type')),
@@ -26,7 +24,7 @@ define [
     }
 
     event = QuizEvent.fromJSON(descriptor)
-    ok (event.recorded_at == descriptor.client_timestamp)
+    equal event.recordedAt.toJSON(), descriptor.client_timestamp
 
     equal event.type, descriptor.event_type,
       'it parses the type'
@@ -34,5 +32,5 @@ define [
     propEqual event.data, descriptor.event_data,
       'it parses the custom data'
 
-    deepEqual event.recordedAt, new Date(descriptor.created_at),
+    deepEqual event.recordedAt, new Date(descriptor.client_timestamp),
       'it parses the recording timestamp'

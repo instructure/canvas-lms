@@ -30,6 +30,7 @@ define([
         return this.props.itemsToShow.slice(0, MAX_THUMBNAILS_TO_SHOW).map((model, index) => {
           return (
             <i
+              key={model.cid}
               className='media-object ef-big-icon FilesystemObjectThumbnail mimeClass-file DialogPreview__thumbnail'
               style={{
                 left: (10 * index),

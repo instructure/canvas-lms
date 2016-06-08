@@ -86,12 +86,12 @@ define([], function(){
    * @private
    * @return {String} comma delimited set of external buttons
    */
-  EditorConfig.prototype.external_buttons = function(){
+  EditorConfig.prototype.external_buttons = function() {
     var externals = "";
-    for(var idx in this.extraButtons) {
-      if(this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
+    for (var idx = 0; this.extraButtons && (idx < this.extraButtons.length); idx++) {
+      if (this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
         externals = externals + ",instructure_external_button_" + this.extraButtons[idx].id;
-      } else if(!externals.match(/instructure_external_button_clump/)) {
+      } else if (!externals.match(/instructure_external_button_clump/)) {
         externals = externals + ",instructure_external_button_clump";
       }
     }

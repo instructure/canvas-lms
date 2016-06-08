@@ -23,7 +23,12 @@ define [
     equal(editor.getEditor().data('value'), '42')
 
   test "shipping a new link to the editor instance", ->
-    jqueryEditor = {editorBox: (()->) }
+    jqueryEditor = {
+      editorBox: ->
+      data: (arg) ->
+        false if arg is 'remoteEditor'
+        true if arg is 'rich_text'
+    }
     editor = new LinkableEditor(rawEditor, jqueryEditor)
     text = "Link HREF"
     classes = ""
@@ -36,14 +41,19 @@ define [
     edMock.expects("editorBox").withArgs('create_link', expectedOpts)
     editor.createLink(text, classes)
 
-  test "pulling out text content from a text node", ->
+  # this file wasn't running in jenkins because this file was named _spec.coffee instead of Spec.coffee
+  # but these 2 specs were testing something that doesn't exist: LinkableEditor::extractTextContent
+  # if that is something that actually should exist (but under a different name maybe),
+  # we should rewrite these 2 test so there is coverage for it, othewise we should
+  # remove these 2 skipped specs.
+  QUnit.skip "pulling out text content from a text node", ->
     editor = new LinkableEditor(rawEditor)
     extractedText = editor.extractTextContent({
       getContent: ((opts)-> "Plain Text")
     })
     equal(extractedText, "Plain Text")
 
-  test "extracting text from an IMG node with firefox api", ->
+  QUnit.skip "extracting text from an IMG node with firefox api", ->
     editor = new LinkableEditor(rawEditor)
     extractedText = editor.extractTextContent({
       getContent: ((opts)->
