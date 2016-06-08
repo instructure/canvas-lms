@@ -245,6 +245,10 @@ require 'atom'
 #         "assignment": {
 #           "description": "The full assignment JSON data (See the Assignments API)",
 #           "$ref": "Assignment"
+#         },
+#         "assignment_overrides": {
+#           "description": "The list of AssignmentOverrides that apply to this event (See the Assignments API). This information is useful for determining which students or sections this assignment-due event applies to.",
+#           "$ref": "AssignmentOverride"
 #         }
 #       }
 #     }
