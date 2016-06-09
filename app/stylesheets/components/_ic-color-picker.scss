@@ -118,6 +118,10 @@
 
 .ColorPicker__ColorPreview {
   width: $ic-sp*3;
+  i[class*=icon-], i[class^=icon-] { 
+    margin: 0 auto;
+    color: $ic-color-alert; 
+  }
 }
 
 .ColorPicker__Actions {
