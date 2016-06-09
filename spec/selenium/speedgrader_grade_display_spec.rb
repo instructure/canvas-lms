@@ -27,7 +27,7 @@ describe "speed grader - grade display" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    expect(f("#x_of_x_graded")).to include_text("1 / 2 Graded")
+    expect(f("#x_of_x_graded")).to include_text("1/2")
   end
 
   it "displays average submission grade for total assignment submissions", priority: "1", test_id: 283995

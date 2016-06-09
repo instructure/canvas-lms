@@ -39,7 +39,7 @@ describe "speed grader" do
     it "lists the correct number of students", priority: "2", test_id: 283737 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-      expect(f("#x_of_x_students")).to include_text("1 of 1")
+      expect(f("#x_of_x_students_frd")).to include_text("1/1")
       expect(ff("#students_selectmenu-menu li").count).to eq 1
     end
   end
@@ -336,7 +336,7 @@ describe "speed grader" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
       wait_for_ajaximations
-      expect(f("#section-menu .ui-menu")).to include_text("Show all sections")
+      expect(f("#section-menu .ui-menu")).to include_text("Show All Sections")
     end
 
     it "should list all course sections", priority: "2", test_id: "588914" do

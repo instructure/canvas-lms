@@ -57,7 +57,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'complete'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'incomplete'
     end
 
@@ -71,7 +71,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'A'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'C'
 
       clear_grade_and_validate
@@ -87,7 +87,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value '75'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value '50'
 
       clear_grade_and_validate
@@ -103,7 +103,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value '15'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value '10'
 
       clear_grade_and_validate
@@ -119,7 +119,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'A'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'D'
 
       clear_grade_and_validate

@@ -14,118 +14,166 @@ $gradebook_header_height: 52px;
   overflow: hidden;
 }
 
-#gradebook_header a.ui-selectmenu:hover,
-#gradebook_header a.ui-selectmenu:focus {
-  background-color: white;
-  text-decoration: none;
-}
-
-.ui-selectmenu-menu a:focus {
-  background-color: inherit;
-}
-
 #speed_grader_loading {
   padding: 5px;
   @include fontSize(24px);
 }
 
 #gradebook_header {
-  form {
-    margin: 0;
-  }
-  @if $use_high_contrast {
-    background-color: $ic-color-dark;
+  @if $use_new_styles {
+    background-color: $ic-brand-global-nav-bgd;
+    color: $ic-brand-global-nav-menu-item__text-color;
   }
   @else {
-    background-color: #4b5662;
+    background-color: $ic-color-dark;
+    color: $ic-color-light;
   }
-  padding: 12px 25px 12px 12px;
+
+  padding: $ic-sp/2 $ic-sp;
   @include fontSize(11px);
-  text-align: center;
-  color: $ic-color-light;
-  line-height: 15px;
-  position: relative;
   min-width: 960px;
   .ui-icon {
     background-image: $iconsActive;
   }
   a {
-    color: #fff;
-    font-weight: bold;
-  }
-  #avatar {
-    width: 32px;
-    display: block;
-    float: left;
-    margin-top: -3px;
-    #avatar_image {
-      height: 30px;
-      max-width: 30px;
-      padding-right: 2px;
+    @if $use_new_styles {
+      color: $ic-brand-global-nav-menu-item__text-color;
+    }
+    @else {
+      color: $ic-color-light;
     }
   }
+
   #combo_box_container {
-    color: #333;
     text-align: left;
+    background: transparent;
     select {
       width: 230px;
-    }
-  }
-  .right {
-    float: right;
-    div {
-      clear: right;
-    }
-  }
-  .center {
-    white-space: nowrap;
-    overflow: hidden;
-    padding-left: 5px;
-    padding-right: 5px;
-    .due_at {
-      margin-top: -3px;
-    }
-  }
-  #assignment_url {
-    font-size: 1.2em;
-  }
-  .left {
-    float: left;
-    #combo_box_container {
-      float: left;
-    }
-    #x_of_x_students {
-      float: left;
-      padding-left: 8px;
-    }
-    .prev, .next {
-      display: block;
-      background: url("/images/back_forward.png") no-repeat top left;
-      text-indent: -1000px;
-      width: 27px;
-      height: 23px;
-      float: left;
-      outline: none;
-      &:hover, &:focus {
-        background-position: left -31px;
-      }
-      &:focus { @include button-focus-light; }
-      &:active {
-        background-position: bottom left;
-      }
-    }
-    .next {
-      background-position: top right;
-      &:hover, &:focus {
-        background-position: right -31px;
-      }
-      &:active {
-        background-position: bottom right;
-      }
+      z-index: 100;
     }
   }
 }
+.subheadContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.subheadContent--flex-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+// little trick to make the icon-font and the icon svg match in size
+$icon-size: 1.4rem;
 
+.gradebookActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-right: $ic-sp;
+
+  // sizes the icon font
+  .gradebookActions__Button {
+    @include overwrite-default-icon-size($icon-size);
+    margin-right: $ic-sp/3;
+    color: $ic-brand-global-nav-ic-icon-svg-fill;
+  }
+
+  // sizes the svg
+  .gradebookActions__Svg {
+    width: $icon-size;
+    height: $icon-size;
+    display: block; // removes extra inline spacing
+  }
+}
+
+.assignmentDetails {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding-left: 20px;
+  border-left: 1px dotted $ic-brand-global-nav-menu-item__text-color;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.assignmentDetails__Title {
+  flex: 1;
+  min-width: 0;
+  @include fontSize(16px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
+}
+.assignmentDetails__Info{
+  @include fontSize(11px);
+  font-weight: $ic-font-weight;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
+}
+.subheadContent--flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.statsMetric {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-right: $ic-sp;
+  border-right: 1px dotted $ic-brand-global-nav-menu-item__text-color;
+}
+.statsMetric__Item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  white-space: nowrap;
+  text-align: center;
+  margin-right: $ic-sp*2;
+  &:last-of-type {
+    margin-right: $ic-sp;
+  }
+}
+.statsMetric__Item-value {
+  @include fontSize(16px);
+}
+.statsMetric__Item-label {
+  @include fontSize(11px);
+  font-weight: $ic-font-weight;
+}
+.studentSelection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  margin-left: $ic-sp;
+}
+.gradebookMoveToNext {
+  padding: 0 $ic-sp;
+  i {
+    color: $ic-brand-global-nav-menu-item__text-color;
+  }
+}
+.gradebookAvatar {
+  height: 30px;
+  max-width: 30px;
+  border-radius: 30px; //match size of avatar width
+  overflow: hidden;
+  margin-right: $ic-sp;
+}
 #eg-canvas-logo {
   background: url(/images/canvas/header_canvas_logo.png) no-repeat;
   position: absolute;
@@ -227,12 +275,11 @@ $gradebook_header_height: 52px;
   ul {
     background: $white;
     height: $gradebook_header_height - 1px;
-    border-bottom: none;
     li {
       height: $gradebook_header_height;
       min-width: 275px;
       &.ui-state-active {
-        background: #f2f2f2;
+        background: $ic-bg-light-neutral;
         button {
           float: right;
           margin: 6px 14px;
@@ -555,11 +602,11 @@ html > body #add_a_comment textarea {
 
 body .ui-selectmenu-dropdown {
   border-radius: 0;
-  color: #222 !important;
+  color: $ic-brand-global-nav-ic-icon-svg-fill !important;
   height: 21px;
-  background-color: #fff;
+  background-color: transparent;;
   background-image: none;
-  border: 1px solid #B5B8C8;
+  border: none;
   font-weight: normal !important;
   &:hover {
     text-decoration: none !important;
@@ -572,16 +619,19 @@ body .ui-selectmenu-dropdown {
     height: 21px;
     .ui-icon {
       top: 3px !important;
+      &:after {
+        content: "\f15c";
+      }
     }
   }
   .ui-selectmenu-icon {
     width: 17px;
     height: 22px;
     border: 0;
-    background-image: url("/images/inst_combo/trigger.gif") !important;
+    background-image: none;
     background-position: 0 0;
     cursor: pointer;
-    border-bottom: 1px solid #B5B8C8;
+    border: none;
     position: absolute;
     top: -1px;
     right: -1px;
@@ -591,35 +641,47 @@ body .ui-selectmenu-dropdown {
 
 body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .ui-selectmenu-icon {
   background-position: (-17px) 0;
+  color: $ic-brand-global-nav-ic-icon-svg-fill;
+;
+
 }
 
-.ui-selectmenu-menu {
-  z-index: 10;
+#students_selectmenu-menu {
   max-height: 400px;
-  margin-top: 1px;
-  li a, .ui-selectmenu-status {
-    padding-top: 0.1em !important;
-    padding-bottom: 0 !important;
+  margin-top: 14px; //to get the dropdown line items to line up with the bottom of the header bar
+
+  ul {
+    margin-top: 14px; //needed to position the dropdown to fall at the exact height of the headerbar
+    border-color: $ic-border-dark;
   }
+
   li {
+    padding: 8px 6px;
+    margin-bottom: 0;
+    border-bottom: 1px solid $ic-border-light;
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
     .ui-selectmenu-item-header {
       font-weight: normal;
     }
-    .ui-selectmenu-item-footer {
-      margin: 1px 0 1px;
-      margin-top: -1px;
-      @include fontSize(10px);
-      line-height: 1em;
-      opacity: 0;
-    }
   }
-  .ui-selectmenu-item-focus .ui-selectmenu-item-footer {
-    opacity: 0.9;
+  .ui-state-hover {
+    text-decoration: underline;
+    background-color: $ic-bg-light-neutral;
+    border-bottom: 1px solid $ic-border-light;
   }
 }
 
+// override the status icon color for the first item in the dropdown
+#students_selectmenu-button .ui-selectmenu-item-icon.speedgrader-selectmenu-icon:first-of-type {
+  color: $ic-brand-global-nav-ic-icon-svg-fill;
+}
+
 .ui-selectmenu-item-icon {
-  top: 2px !important;
+  top: 6px !important;
   margin-top: 0 !important;
   left: -3px;
 }
@@ -641,14 +703,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
   .not_gradeable & {
     font-size: 1.7em;
-    color: $grayLight;
+    color: lighten($ic-color-dark, 50%);
   }
   .graded & {
-    color: $green;
+    color: $ic-color-success;
     i {
       width: 14px;
       height: 14px;
-      line-height: 14px;
+
       &:before {
         font-size: 14px;
       }
@@ -657,16 +719,24 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 .ui-selectmenu-item-header {
+  color: $ic-color-dark;
+
   .not_submitted & {
     @if $use_high_contrast {
       color: lighten($ic-color-dark, 20%);
     }
     @else {
-      color: $grayLight;
+      color: lighten($ic-color-dark, 50%);
     }
   }
   .ui-selectmenu-status & {
     margin-top: 1px;
+    @if $use_new_styles {
+      color: $ic-brand-global-nav-menu-item__text-color;
+    }
+    @else {
+      color: $ic-color-light;
+    }
   }
 }
 
@@ -767,37 +837,54 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   }
 }
 
+/// this is for a sub-dropdown menu for course sections
 #section-menu {
   position: absolute;
   overflow: visible;
+  border: 1px solid $ic-border-dark;
+  margin-top: 14px; // to make it align properly with the student select dropdown
   #section-menu-link {
     display: block;
-    height: 20px;
-    line-height: 19px;
-    padding-left: 8px;
-    background: url("/images/arrow_right.png") no-repeat center right;
+    height: 19px;
+    margin-left: 8px;
+    padding-left: 29px;
+    background: url("/images/arrow_left.png") no-repeat center left;
     overflow: hidden;
     white-space: nowrap;
+    color: $ic-color-dark;
+    font-weight: bold;
+    @include fontSize(12px);
   }
   #section_currently_showing {
     display: inline;
   }
   ul {
     position: absolute;
-    right: -215px;
-    width: 215px;
-    top: 0;
-    background-color: #fff;
+    top:0;
+    right: 220px;
+    width: 200px;
+    background-color: $ic-color-light;
     padding: 0;
     border-radius: 0;
     li {
-      padding: 0;
       margin: 0;
-      border: 0 none;
+      @include fontSize(12px);
+      &:first-of-type {
+        border-bottom: 1px solid $ic-border-light;
+      }
+
       a {
-        line-height: 21px;
+        line-height: 24px;
+        color: $ic-color-dark;
         &.selected {
           font-weight: bold;
+        }
+        &:hover {
+          background: $ic-bg-light-neutral;
+          text-decoration: underline;
+        }
+        &.ui-state-focus {
+          background: $ic-bg-light-neutral;
         }
       }
     }
@@ -862,4 +949,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #settings_form .icon-info {
   vertical-align: -4px;
   color: $linkColor;
+}
+
+.gradebook-icon-link:hover {
+  text-decoration: none;
 }

@@ -185,6 +185,6 @@ describe "speed grader - quiz submissions" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    expect(f("#x_of_x_graded").text).to eq "1 / 2 Graded"
+    expect(f("#x_of_x_graded").text).to eq "1/2"
   end
 end

@@ -881,6 +881,7 @@ define([
           .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
+          .not(".exclude_external_icon")
           .addClass('external')
           .children("span.ui-icon-extlink").remove().end()
           .html('<span>' + $(this).html() + '</span>')

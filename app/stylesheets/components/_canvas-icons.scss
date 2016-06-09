@@ -311,6 +311,9 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-masquerade"></i> icon-masquerade</span>
   <span class="span3"><i class="icon-table"></i> icon-table</span>
 </div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-keyboard-shortcuts"></i> icon-keyboard-shortcuts</span>
+</div>
 */
 
 
@@ -488,6 +491,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-info:before { content: "\f14d"; }
 .icon-instructure:before { content: "\f14e"; }
 .icon-invitation:before { content: "\f14f"; }
+.icon-keyboard-shortcuts:before { content: "\f1bd"; }
 .icon-like:before { content: "\f150"; }
 .icon-link:before { content: "\f151"; }
 .icon-linkedin:before { content: "\f152"; }
@@ -596,4 +600,3 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 // icon, but since we don't control the markup it adds, we can't tell it to use .icon-check
 // instead, we just have .icon-ok copy .icon-check's styles here
 .icon-ok {@extend .icon-check}
-

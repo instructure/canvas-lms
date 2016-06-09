@@ -922,16 +922,16 @@ module ApplicationHelper
 
   def translated_due_date(assignment)
     if assignment.multiple_due_dates_apply_to?(@current_user)
-      t('#due_dates.multiple_due_dates', 'due: Multiple Due Dates')
+      t('Due: Multiple Due Dates')
     else
       assignment = assignment.overridden_for(@current_user)
 
       if assignment.due_at
-        t('#due_dates.due_at', 'due: %{assignment_due_date_time}', {
-          :assignment_due_date_time => datetime_string(force_zone(assignment.due_at))
-        })
+        t('Due: %{assignment_due_date_time}',
+          assignment_due_date_time: datetime_string(force_zone(assignment.due_at))
+        )
       else
-        t('#due_dates.no_due_date', 'due: No Due Date')
+        t('Due: No Due Date')
       end
     end
   end

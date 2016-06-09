@@ -64,7 +64,7 @@ module SpeedGraderCommon
 
     refresh_page
     expect(f('#grading-box-extended')).to have_value ''
-    f('a.next').click
+    f('#next-student-button').click
     expect(f('#grading-box-extended')).to have_value ''
   end
 

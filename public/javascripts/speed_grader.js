@@ -50,8 +50,6 @@ define([
   'vendor/jquery.elastic' /* elastic */,
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.spin' /* /\.spin/ */,
-  'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
@@ -112,7 +110,7 @@ define([
       $grade_container = $("#grade_container"),
       $grade = $grade_container.find("input, select"),
       $score = $grade_container.find(".score"),
-      $average_score_wrapper = $("#average_score_wrapper"),
+      $average_score_wrapper = $("#average-score-wrapper"),
       $submission_details = $("#submission_details"),
       $multiple_submissions = $("#multiple_submissions"),
       $submission_late_notice = $("#submission_late_notice"),
@@ -374,18 +372,12 @@ define([
   header = {
     elements: {
       mute: {
-        icon: $('#mute_link .ui-icon'),
+        icon: $('#mute_link i'),
         label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
-      nav: $gradebook_header.find('.prev, .next'),
-      spinner: new Spinner({
-        length: 2,
-        radius: 3,
-        trail: 25,
-        width: 1
-      }),
+      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
       settings: {
         form: $('#settings_form'),
         link: $('#settings_link')
@@ -400,7 +392,6 @@ define([
       this.muted = this.elements.mute.link.data('muted');
       this.addEvents();
       this.createModals();
-      this.addSpinner();
       return this;
     },
     addEvents: function(){
@@ -409,9 +400,6 @@ define([
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
       this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
-    },
-    addSpinner: function(){
-      this.elements.mute.link.append(this.elements.spinner.el);
     },
     createModals: function(){
       this.elements.settings.form.dialog({
@@ -447,7 +435,12 @@ define([
 
     toAssignment: function(e){
       e.preventDefault();
-      EG[e.target.getAttribute('class')]();
+      var classes = e.target.getAttribute("class").split(" ");
+      if (_.contains(classes, "prev")) {
+        EG.prev();
+      } else if (_.contains(classes, "next")) {
+        EG.next();
+      }
     },
 
     keyboardShortcutInfoModal: function(e) {
@@ -486,13 +479,6 @@ define([
       return '/courses/' + this.courseId + '/assignments/' + this.assignmentId + '/mute';
     },
 
-    spinMute: function(){
-      this.elements.spinner.spin();
-      $(this.elements.spinner.el)
-        .css({ left: 9, top: 6})
-        .appendTo(this.elements.mute.link);
-    },
-
     toggleMute: function(){
       this.muted = !this.muted;
       var label = this.muted ? I18n.t('unmute_assignment', 'Unmute Assignment') : I18n.t('mute_assignment', 'Mute Assignment'),
@@ -500,29 +486,17 @@ define([
           actions = {
         /* Mute action */
         mute: function(){
-          this.elements.mute.icon.css('visibility', 'hidden');
-          this.spinMute();
+          this.elements.mute.icon.removeClass("icon-unmuted").addClass("icon-muted");
           $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
-            this.elements.spinner.stop();
             this.elements.mute.label.text(label);
-            this.elements.mute.icon
-              .removeClass('ui-icon-volume-off')
-              .addClass('ui-icon-volume-on')
-              .css('visibility', 'visible');
           }, this));
         },
 
         /* Unmute action */
         unmute: function(){
-          this.elements.mute.icon.css('visibility', 'hidden');
-          this.spinMute();
+          this.elements.mute.icon.removeClass("icon-muted").addClass("icon-unmuted");
           $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
-            this.elements.spinner.stop();
             this.elements.mute.label.text(label);
-            this.elements.mute.icon
-              .removeClass('ui-icon-volume-on')
-              .addClass('ui-icon-volume-off')
-              .css('visibility', 'visible');
           }, this));
         }
       };
@@ -1661,12 +1635,12 @@ define([
 
     updateStatsInHeader: function(){
       $x_of_x_students.text(
-        I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
-          gradee: gradeeLabel,
+        I18n.t('%{x}/%{y}', {
           x: EG.currentIndex() + 1,
           y: this.totalStudentCount()
         })
       );
+      $("#gradee").text(gradeeLabel);
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
         return (s.submission_state == 'graded' || s.submission_state == 'not_gradeable');
@@ -1698,7 +1672,7 @@ define([
       }
 
       $grded_so_far.text(
-        I18n.t('portion_graded', '%{x} / %{y} Graded', {
+        I18n.t('portion_graded', '%{x}/%{y}', {
           x: gradedStudents.length,
           y: jsonData.context.students.length
         })
@@ -2112,8 +2086,6 @@ define([
         $query
           .removeClass(submissionStates)
           .addClass(className.raw)
-          .find(".ui-selectmenu-item-footer")
-            .text(className.formatted);
 
         $status = $(".ui-selectmenu-status");
         $statusIcon = $status.find(".speedgrader-selectmenu-icon");

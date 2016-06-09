@@ -276,8 +276,7 @@ describe "speed grader" do
       grade = f('#grading-box-extended')
       expect(grade['disabled']).to be_nil
       expect(grade['value']).to eq "3"
-
-      replace_content f('#grading-box-extended'), "8", tab_out: true
+      replace_content grade, "8", tab_out: true
 
       wait_for_ajax_requests(500)
       f('#speedgrader_comment_textarea').send_keys('srsly')
@@ -459,7 +458,7 @@ describe "speed grader" do
         expect(f('#moderation_tabs')).to_not be_displayed
 
         # go to next student
-        f('#gradebook_header a.next').click
+        f('#next-student-button').click
         wait_for_ajaximations
 
         Timecop.freeze(original_sub.updated_at) do
@@ -468,20 +467,20 @@ describe "speed grader" do
         end
 
         # go back
-        f('#gradebook_header a.prev').click
+        f('#prev-student-button').click
         wait_for_ajaximations
 
         # should still not have loaded the new provisional grades
         expect(f('#moderation_tabs')).to_not be_displayed
 
-        f('#gradebook_header a.next').click
+        f('#next-student-button').click
         wait_for_ajaximations
 
         Timecop.freeze(5.minutes.from_now) do
           original_sub.touch # now touch the submission as it would have been in the first place
         end
 
-        f('#gradebook_header a.prev').click
+        f('#prev-student-button').click
         wait_for_ajaximations
 
         expect(f('#moderation_tabs')).to be_displayed
@@ -519,7 +518,7 @@ describe "speed grader" do
         expect(icons[1]).to_not be_displayed
         expect(icons[2]).to_not be_displayed
 
-        f('#gradebook_header a.next').click
+        f('#next-student-button').click
         wait_for_ajaximations
 
         Timecop.freeze(5.minutes.from_now) do
@@ -528,7 +527,7 @@ describe "speed grader" do
           original_sub.touch
         end
 
-        f('#gradebook_header a.prev').click
+        f('#prev-student-button').click
         wait_for_ajaximations
 
         expect(icons[0]).to_not be_displayed
@@ -543,17 +542,17 @@ describe "speed grader" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         f('#speedgrader_iframe')
 
-        f('#gradebook_header a.next').click
+        f('#next-student-button').click
         wait_for_ajaximations
 
         expect(f('#this_student_does_not_have_a_submission')).to be_displayed
 
-        f('#gradebook_header a.prev').click
+        f('#prev-student-button').click
         wait_for_ajaximations
 
         @assignment.grade_student(other_student, grade: 5, grader: @moderator, provisional: true)
 
-        f('#gradebook_header a.next').click
+        f('#next-student-button').click
         wait_for_ajaximations
 
         expect(f('#moderation_tabs')).to_not be_displayed # still should not show any tabs, since they own the one grade
@@ -709,14 +708,14 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to_not be_displayed
 
       # go to next student
-      f('#gradebook_header a.next').click
+      f('#next-student-button').click
       wait_for_ajaximations
 
       # create a mark for the first student
       original_sub.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
 
       # go back
-      f('#gradebook_header a.prev').click
+      f('#prev-student-button').click
       wait_for_ajaximations
 
       # should be locked now
