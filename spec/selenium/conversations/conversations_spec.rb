@@ -184,7 +184,7 @@ describe "conversations new" do
       select_message(0)
       reply_to_message
       expect(f('.message-count')).to include_text('2')
-
+      dismiss_flash_messages
       reply_to_message
       expect(f('.message-count')).to include_text('3')
     end

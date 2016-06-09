@@ -22,6 +22,12 @@ describe 'quizzes question with html answers' do
     move_to_click('.btn.edit_html_done')
   end
 
+  def check_for_no_edit_button(option)
+    click_option('.question_form:visible .question_type', option)
+    driver.execute_script "$('.answer').addClass('hover');"
+    expect(f("#content")).not_to contain_jqcss('.edit_html:visible')
+  end
+
   it 'allows HTML answers for multiple choice', priority: "1", test_id: 209356 do
     quiz_with_new_questions
     click_questions_tab
@@ -44,12 +50,6 @@ describe 'quizzes question with html answers' do
     edit_first_html_answer
     close_first_html_answer
     check_element_has_focus(fj('.edit_html:visible'))
-  end
-
-  def check_for_no_edit_button(option)
-    click_option('.question_form:visible .question_type', option)
-    driver.execute_script "$('.answer').addClass('hover');"
-    expect(f("#content")).not_to contain_jqcss('.edit_html:visible')
   end
 
   it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers', priority: "1", test_id: 209358 do
