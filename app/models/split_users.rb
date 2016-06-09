@@ -175,7 +175,7 @@ class SplitUsers
     def restore_worklow_states_from_records(records)
       records.each do |r|
         c = r.context
-        next unless c.class.columns_hash.key?('workflow_state')
+        next unless c && c.class.columns_hash.key?('workflow_state')
         c.workflow_state = r.previous_workflow_state
         c.save! if c.changed?
       end
