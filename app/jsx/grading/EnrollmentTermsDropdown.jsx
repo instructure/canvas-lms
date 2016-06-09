@@ -10,10 +10,6 @@ define([
       changeSelectedEnrollmentTerm: React.PropTypes.func.isRequired
     },
 
-    termsBelongingToSets(terms) {
-      return _.select(terms, term => term.gradingPeriodGroupId);
-    },
-
     sortedTerms(terms) {
       const dated = _.select(terms, term => term.startAt);
       const datedTermsSortedByStart = _.sortBy(dated, term => term.startAt).reverse();
@@ -25,8 +21,7 @@ define([
 
     termOptions(terms) {
       const allTermsOption = (<option key={0} value={0}>{I18n.t("All Terms")}</option>);
-      const termsWithSets = this.termsBelongingToSets(terms);
-      let options = _.map(this.sortedTerms(termsWithSets), function(term) {
+      let options = _.map(this.sortedTerms(terms), function(term) {
         return (<option key={term.id} value={term.id}>{term.displayName}</option>);
       });
 

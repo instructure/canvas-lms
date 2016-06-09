@@ -7,13 +7,15 @@ define [
 
   deserializeTerms = (data) ->
     _.map data.enrollment_terms, (term) ->
+      groupID = term.grading_period_group_id
+      newGroupID = if _.isNumber(groupID) then groupID.toString() else groupID
       {
-        id: term.id
+        id: term.id.toString()
         name: term.name
         startAt: if term.start_at then new Date(term.start_at) else null
         endAt: if term.end_at then new Date(term.end_at) else null
         createdAt: if term.created_at then new Date(term.created_at) else null
-        gradingPeriodGroupId: term.grading_period_group_id
+        gradingPeriodGroupId: newGroupID
       }
 
   list: (terms) ->

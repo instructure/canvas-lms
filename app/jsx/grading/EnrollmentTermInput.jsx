@@ -42,7 +42,8 @@ define([
     },
 
     handleSelect(value, _combobox) {
-      if(!_.contains(['active', 'undated', 'future', 'past'], value)) {
+      const termIDs = _.pluck(this.props.enrollmentTerms, "id");
+      if(_.contains(termIDs, value)) {
         const selectedIDs = _.uniq(this.props.selectedIDs.concat([value]));
         this.handleChange(selectedIDs);
       }
@@ -55,8 +56,12 @@ define([
       this.handleChange(selectedTermIDs);
     },
 
+    selectableTerms() {
+      return _.reject(this.props.enrollmentTerms, term => _.contains(this.props.selectedIDs, term.id));
+    },
+
     filteredTagsForType(type) {
-      const groupedTags = groupByTagType(this.props.enrollmentTerms);
+      const groupedTags = groupByTagType(this.selectableTerms());
       return (groupedTags && groupedTags[type]) || [];
     },
 
@@ -70,18 +75,22 @@ define([
     selectableOption(term) {
       return(
         <ComboboxOption key={term.id} value={term.id}>
-          {term.name}
+          {term.displayName}
         </ComboboxOption>
       );
     },
 
     optionsForAllTypes() {
-      return _.union(
-        this.optionsForType('active'),
-        this.optionsForType('undated'),
-        this.optionsForType('future'),
-        this.optionsForType('past'),
-      );
+      if (_.isEmpty(this.selectableTerms())) {
+        return [this.headerOption('none')];
+      } else {
+        return _.union(
+          this.optionsForType('active'),
+          this.optionsForType('undated'),
+          this.optionsForType('future'),
+          this.optionsForType('past'),
+        );
+      }
     },
 
     optionsForType(optionType) {
@@ -95,7 +104,8 @@ define([
         'active': I18n.t('Active'),
         'undated': I18n.t('Undated'),
         'future': I18n.t('Future'),
-        'past': I18n.t('Past')
+        'past': I18n.t('Past'),
+        'none': I18n.t('No unassigned terms')
       }[heading];
       return(
         <ComboboxOption
@@ -117,7 +127,10 @@ define([
 
     selectedEnrollmentTerms() {
       return _.map(this.props.selectedIDs, (id) => {
-        return _.findWhere(this.props.enrollmentTerms, { id: id });
+        let term = _.findWhere(this.props.enrollmentTerms, { id: id });
+        let termForDisplay = _.extend({}, term);
+        termForDisplay.name = term.displayName;
+        return termForDisplay;
       });
     },
 
@@ -136,14 +149,14 @@ define([
                         onChange        = {this.handleChange}
                         onSelect        = {this.handleSelect}
                         onRemove        = {this.handleRemove}
+                        onInput         = {function(){}}
                         value           = {true}
                         showListOnFocus = {true}
-                        ref             = 'EnrollmentTermInput' />
+                        ref             = 'input' />
           </div>
         </div>
       );
     }
   });
-
   return EnrollmentTermInput;
 });

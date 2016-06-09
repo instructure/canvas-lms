@@ -59,9 +59,9 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
         it "returns a json representation of a new set" do
           post_create
-          set_json = json_parse.fetch('grading_period_sets')
+          set_json = json_parse.fetch('grading_period_set')
           expect(response.status).to eql Rack::Utils.status_code(:created)
-          expect(set_json.count).to eql 1
+          expect(set_json["title"]).to eql "A Set! Wow!"
         end
       end
 

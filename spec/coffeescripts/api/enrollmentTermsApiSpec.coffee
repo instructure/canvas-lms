@@ -5,26 +5,26 @@ define [
 ], (axios, fakeENV, api) ->
   deserializedTerms = [
     {
-      id: 1,
+      id: "1",
       name: "Fall 2013 - Art",
       startAt: new Date("2013-06-03T02:57:42Z"),
       endAt: new Date("2013-12-03T02:57:53Z"),
       createdAt: new Date("2015-10-27T16:51:41Z"),
-      gradingPeriodGroupId: 2
+      gradingPeriodGroupId: "2"
     },{
-      id: 3,
+      id: "3",
       name: null,
       startAt: new Date("2014-01-03T02:58:36Z"),
       endAt: new Date("2014-03-03T02:58:42Z"),
       createdAt: new Date("2013-06-02T17:29:19Z"),
-      gradingPeriodGroupId: 2
+      gradingPeriodGroupId: "2"
     },{
-      id: 4,
+      id: "4",
       name: null,
       startAt: null,
       endAt: null,
       createdAt: new Date("2014-05-02T17:29:19Z"),
-      gradingPeriodGroupId: 1
+      gradingPeriodGroupId: "1"
     }
   ]
 

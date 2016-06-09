@@ -15,24 +15,6 @@ define([
   'compiled/api/enrollmentTermsApi',
   'jquery.instructure_misc_plugins'
 ], function(React, _, $, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, setsApi, termsApi) {
-  const deserializeSets = function(sets) {
-    return _.map(sets, function(set) {
-      let newSet = ConvertCase.camelize(set);
-      newSet.id = set.id.toString();
-      newSet.gradingPeriods = deserializePeriods(set.grading_periods);
-      return newSet;
-    });
-  };
-
-  const deserializePeriods = function(periods) {
-    return _.map(periods, function(period) {
-      let newPeriod = ConvertCase.camelize(period);
-      newPeriod.id = period.id.toString();
-      newPeriod.startDate = new Date(period.start_date);
-      newPeriod.endDate = new Date(period.end_date);
-      return newPeriod;
-    });
-  };
 
   const presentEnrollmentTerms = function(enrollmentTerms) {
     return _.map(enrollmentTerms, term => {
@@ -84,7 +66,7 @@ define([
         sets: [],
         showNewSetForm: false,
         searchText: "",
-        selectedTermID: 0,
+        selectedTermID: "0",
         editSet: {
           id:          null,
           saving:      false,
@@ -101,12 +83,26 @@ define([
       }
     },
 
-    addGradingPeriodSet(sets) {
-      if (!this.props.readOnly) {
-        this.setState({
-          sets: this.state.sets.concat(deserializeSets(sets))
-        }, this.getTerms());
-      }
+    addGradingPeriodSet(set, termIDs) {
+      this.setState({
+        sets: [set].concat(this.state.sets),
+        enrollmentTerms: this.associateTermsWithSet(set.id, termIDs),
+        showNewSetForm: false
+      }, () => {
+        React.findDOMNode(this.refs.addSetFormButton).focus();
+      });
+    },
+
+    associateTermsWithSet(setID, termIDs) {
+      return _.map(this.state.enrollmentTerms, function(term) {
+        if (_.contains(termIDs, term.id)) {
+          let newTerm = _.extend({}, term);
+          newTerm.gradingPeriodGroupId = setID;
+          return newTerm;
+        } else {
+          return term;
+        }
+      });
     },
 
     componentWillMount() {
@@ -143,15 +139,26 @@ define([
     },
 
     onSetsLoaded(sets) {
-      this.setState({ sets: sets });
+      const sortedSets = _.sortBy(sets, "createdAt").reverse()
+      this.setState({ sets: sortedSets });
     },
 
     onSetUpdated(updatedSet) {
       let sets = _.map(this.state.sets, (set) => {
         return (set.id === updatedSet.id) ? _.extend({}, set, updatedSet) : set;
       });
-      this.setState({ sets: sets });
-      this.getTerms();
+
+      let terms = _.map(this.state.enrollmentTerms, function(term) {
+        if (_.contains(updatedSet.enrollmentTermIDs, term.id)) {
+          return _.extend({}, term, { gradingPeriodGroupId: updatedSet.id });
+        } else if (term.gradingPeriodGroupId === updatedSet.id) {
+          return _.extend({}, term, { gradingPeriodGroupId: null });
+        } else {
+          return term;
+        }
+      });
+
+      this.setState({ sets: sets, enrollmentTerms: terms });
       $.flashMessage(I18n.t("The grading period set was updated successfully."));
     },
 
@@ -183,16 +190,16 @@ define([
       }
     },
 
-    filterSetsByActiveTerm(sets, terms, selectedTermID) {
-      if (selectedTermID === 0) return sets;
+    filterSetsBySelectedTerm(sets, terms, selectedTermID) {
+      if (selectedTermID === "0") return sets;
 
       const activeTerm = _.findWhere(terms, { id: selectedTermID });
       const setID = activeTerm.gradingPeriodGroupId;
-      return _.where(sets, { id: setID.toString() });
+      return _.where(sets, { id: setID });
     },
 
     changeSelectedEnrollmentTerm(event) {
-      this.setState({ selectedTermID: parseInt(event.target.value) });
+      this.setState({ selectedTermID: event.target.value });
     },
 
     getVisibleSets() {
@@ -203,7 +210,7 @@ define([
         this.state.enrollmentTerms,
         this.state.selectedTermID
       ];
-      return this.filterSetsByActiveTerm(...filterByTermArgs);
+      return this.filterSetsBySelectedTerm(...filterByTermArgs);
     },
 
     editGradingPeriodSet(set) {
@@ -221,8 +228,10 @@ define([
         if (set.id === setID) {
           return _.extend({}, set, { gradingPeriods: gradingPeriods });
         }
+
         return set;
       });
+
       this.setState({ sets: newSets });
     },
 
@@ -231,10 +240,26 @@ define([
     },
 
     closeNewSetForm() {
-      this.setState(
-        { showNewSetForm: false },
-        React.findDOMNode(this.refs.addSetFormButton).focus()
-      );
+      this.setState({ showNewSetForm: false }, () => {
+        React.findDOMNode(this.refs.addSetFormButton).focus();
+      });
+    },
+
+    termsBelongingToActiveSets() {
+      const setIDs = _.pluck(this.state.sets, "id");
+      return _.filter(this.state.enrollmentTerms, function(term) {
+        const setID = term.gradingPeriodGroupId;
+        return setID && _.contains(setIDs, setID);
+      });
+    },
+
+    termsNotBelongingToActiveSets() {
+      return _.difference(this.state.enrollmentTerms, this.termsBelongingToActiveSets());
+    },
+
+    selectableTermsForEditSetForm(setID) {
+      const termsBelongingToThisSet = _.where(this.termsBelongingToActiveSets(), { gradingPeriodGroupId: setID });
+      return _.union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet);
     },
 
     closeEditSetForm(id) {
@@ -266,7 +291,7 @@ define([
           key             = {set.id}
           ref             = {getEditGradingPeriodSetRef(set)}
           set             = {set}
-          enrollmentTerms = {this.state.enrollmentTerms}
+          enrollmentTerms = {this.selectableTermsForEditSetForm(set.id)}
           disabled        = {this.state.editSet.saving}
           onCancel        = {cancelCallback}
           onSave          = {saveCallback} />
@@ -311,7 +336,8 @@ define([
             ref                 = "newSetForm"
             closeForm           = {this.closeNewSetForm}
             urls                = {this.props.urls}
-            enrollmentTerms     = {this.state.enrollmentTerms}
+            enrollmentTerms     = {this.termsNotBelongingToActiveSets()}
+            readOnly            = {this.props.readOnly}
             addGradingPeriodSet = {this.addGradingPeriodSet}
           />
         );
@@ -327,10 +353,11 @@ define([
             className      = {disable ? 'Button Button--primary disabled' : 'Button Button--primary'}
             aria-disabled  = {disable}
             onClick        = {this.openNewSetForm}
+            aria-label     = {I18n.t("Add Set of Grading Periods")}
           >
             <i className="icon-plus"/>
             &nbsp;
-            {I18n.t("Set of Grading Periods")}
+            <span aria-hidden="true">{I18n.t("Set of Grading Periods")}</span>
           </button>
         );
       }
@@ -341,7 +368,7 @@ define([
         <div>
           <div className="GradingPeriodSets__toolbar header-bar no-line">
             <EnrollmentTermsDropdown
-              terms={this.state.enrollmentTerms}
+              terms={this.termsBelongingToActiveSets()}
               changeSelectedEnrollmentTerm={this.changeSelectedEnrollmentTerm} />
             <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
             <div className="header-bar-right">

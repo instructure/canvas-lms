@@ -36,7 +36,8 @@ define([
         endDate: new Date("2015-12-31T12:00:00Z")
       }
     ],
-    permissions: { read: true, create: true, update: true, delete: true }
+    permissions: { read: true, create: true, update: true, delete: true },
+    createdAt: new Date("2015-08-27T16:51:41Z")
   };
 
   const exampleSets = [
@@ -45,32 +46,36 @@ define([
       id: "2",
       title: "Spring 2016",
       gradingPeriods: [],
-      permissions: { read: true, create: true, update: true, delete: true }
+      permissions: { read: true, create: true, update: true, delete: true },
+      createdAt: new Date("2015-06-27T16:51:41Z")
     }
   ];
 
   const exampleTerms = [
     {
-      id: 1,
+      id: "1",
       name: "Fall 2013 - Art",
       startAt: new Date("2013-06-03T02:57:42Z"),
       endAt: new Date("2013-12-03T02:57:53Z"),
       createdAt: new Date("2015-10-27T16:51:41Z"),
-      gradingPeriodGroupId: 2
+      gradingPeriodGroupId: "2",
+      displayName: "Fall 2013 - Art"
     },{
-      id: 3,
+      id: "3",
       name: null,
       startAt: new Date("2014-01-03T02:58:36Z"),
       endAt: new Date("2014-03-03T02:58:42Z"),
       createdAt: new Date("2013-06-02T17:29:19Z"),
-      gradingPeriodGroupId: 2
+      gradingPeriodGroupId: "22",
+      displayName: "Term starting Jan 3, 2014"
     },{
-      id: 4,
+      id: "4",
       name: null,
       startAt: null,
       endAt: null,
       createdAt: new Date("2014-05-02T17:29:19Z"),
-      gradingPeriodGroupId: 1
+      gradingPeriodGroupId: "1",
+      displayName: "Term created May 2, 2014"
     }
   ];
 
@@ -318,23 +323,45 @@ define([
     });
   });
 
-  test("filterSetsByActiveTerm returns all the sets if 'All Terms' is selected", function() {
-    const ALL_TERMS_ID = 0;
+  asyncTest("deserializes enrollment terms if the AJAX call is successful", function() {
+    const deserializedTerm = exampleTerms[0];
+    let collection = this.renderComponent();
+
+    Promise.all([this.terms, this.sets]).then(function() {
+      const term = collection.state.enrollmentTerms[0];
+      propEqual(term, deserializedTerm);
+      start();
+    });
+  });
+
+  asyncTest("uses the name, start date (if no name), or creation date (if no start) for the display name", function() {
+    const expectedNames = _.pluck(exampleTerms, "displayName");
+    let collection = this.renderComponent();
+
+    Promise.all([this.terms, this.sets]).then(function() {
+      const names = _.pluck(collection.state.enrollmentTerms, "displayName");
+      propEqual(names, expectedNames);
+      start();
+    });
+  });
+
+  test("filterSetsBySelectedTerm returns all the sets if 'All Terms' is selected", function() {
+    const ALL_TERMS_ID = "0";
     const selectedTermID = ALL_TERMS_ID;
     let collection = this.renderComponent();
-    const filteredSets = collection.filterSetsByActiveTerm(exampleSets, exampleTerms, selectedTermID);
+    const filteredSets = collection.filterSetsBySelectedTerm(exampleSets, exampleTerms, selectedTermID);
     propEqual(filteredSets, exampleSets);
   });
 
-  test("filterSetsByActiveTerm filters to only show the set that the selected term belongs to", function() {
-    let selectedTermID = 3;
+  test("filterSetsBySelectedTerm filters to only show the set that the selected term belongs to", function() {
+    let selectedTermID = "1";
     let collection = this.renderComponent();
-    let filteredSets = collection.filterSetsByActiveTerm(exampleSets, exampleTerms, selectedTermID);
+    let filteredSets = collection.filterSetsBySelectedTerm(exampleSets, exampleTerms, selectedTermID);
     let expectedSets = _.where(exampleSets, { id: "2" });
     propEqual(filteredSets, expectedSets);
 
-    selectedTermID = 4;
-    filteredSets = collection.filterSetsByActiveTerm(exampleSets, exampleTerms, selectedTermID);
+    selectedTermID = "4";
+    filteredSets = collection.filterSetsBySelectedTerm(exampleSets, exampleTerms, selectedTermID);
     expectedSets = _.where(exampleSets, { id: "1" });
     propEqual(filteredSets, expectedSets);
   });
@@ -540,6 +567,30 @@ define([
     requestAnimationFrame(() => {
       ok(collection.refs["edit-grading-period-set-1"]);
       notOk(!!collection.refs["show-grading-period-set-1"]);
+      start();
+    });
+  });
+
+  asyncTest("termsBelongingToActiveSets only includes terms that belong to active (non-deleted) sets", function() {
+    let collection = this.renderComponent();
+
+    requestAnimationFrame(() => {
+      const expectedTerms = _.map(exampleTerms, term => term);
+      expectedTerms.splice(1, 1);
+      expectedTerms.splice(2, 1);
+      propEqual(collection.termsBelongingToActiveSets(), expectedTerms);
+      start();
+    });
+  });
+
+  asyncTest("termsNotBelongingToActiveSets only includes terms that do not belong to active (non-deleted) sets", function() {
+    let collection = this.renderComponent();
+
+    requestAnimationFrame(() => {
+      const expectedTerms = _.map(exampleTerms, term => term);
+      expectedTerms.splice(0, 1);
+      expectedTerms.splice(1, 1);
+      propEqual(collection.termsNotBelongingToActiveSets(), expectedTerms);
       start();
     });
   });

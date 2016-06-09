@@ -23,7 +23,14 @@ class GradingPeriodSetsController < ApplicationController
 
     respond_to do |format|
       if grading_period_set.save
-        format.json { render json: serialize_json_api(grading_period_set), status: :created }
+        serialized_set = GradingPeriodSetSerializer.new(
+          grading_period_set,
+          controller: self,
+          scope: @current_user,
+          root: true
+        )
+
+        format.json { render json: serialized_set, status: :created }
       else
         format.json { render json: grading_period_set.errors, status: :unprocessable_entity }
       end
@@ -85,8 +92,6 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def serialize_json_api(grading_period_sets, meta = {})
-    grading_period_sets = Array.wrap(grading_period_sets)
-
     Canvas::APIArraySerializer.new(grading_period_sets, {
       each_serializer: GradingPeriodSetSerializer,
       controller: self,
@@ -94,6 +99,6 @@ class GradingPeriodSetsController < ApplicationController
       meta: meta,
       scope: @current_user,
       include_root: false
-    }).as_json
+    })
   end
 end

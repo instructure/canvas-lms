@@ -2,32 +2,55 @@ define([
   'react',
   'jquery',
   'underscore',
+  'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/NewGradingPeriodSetForm'
-], (React, $, _, NewSetForm) => {
+], (React, $, _, setsApi, NewSetForm) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
+  const exampleSet = {
+    grading_period_set: {
+      id: "81",
+      title: "Example Set!",
+      grading_periods: [],
+      permissions: { read: true, update: true, delete: true, create: true },
+      created_at: "2013-06-03T02:57:42Z"
+    }
+  };
 
   module('NewGradingPeriodSetForm', {
-    renderComponent(opts={}) {
-      const defaults = {
+    renderComponent(props={}) {
+      const defaultProps = {
         enrollmentTerms: [],
         closeForm(){},
-        addGradingPeriodSet(){},
+        addGradingPeriodSet: this.stub(),
         urls: {
           gradingPeriodSetsURL: "api/v1/accounts/1/grading_period_sets",
           enrollmentTermsURL: "api/v1/accounts/1/enrollment_terms"
-        }
+        },
+        readOnly: false
       };
-      const element = React.createElement(NewSetForm, _.defaults(opts, defaults));
+      const element = React.createElement(NewSetForm, _.defaults(props, defaultProps));
       return React.render(element, wrapper);
     },
+
+    stubCreateSuccess(){
+      const success = new Promise(resolve => resolve(exampleSet));
+      this.stub(setsApi, 'create').returns(success);
+      return success;
+    },
+
+    stubCreateFailure(){
+      const failure = new Promise((_, reject) => reject("FAIL"));
+      this.stub(setsApi, 'create').returns(failure);
+      return failure;
+    },
+
     teardown() {
       React.unmountComponentAtNode(wrapper);
     }
   });
 
   test('initially renders with the create button not disabled', function() {
-    this.stub($, 'ajax');
     let form = this.renderComponent();
     let createButton = React.findDOMNode(form.refs.createButton);
     equal(createButton.getAttribute('aria-disabled'), 'false');
@@ -35,7 +58,6 @@ define([
   });
 
   test('initially renders with the cancel button not disabled', function() {
-    this.stub($, 'ajax');
     let form = this.renderComponent();
     let cancelButton = React.findDOMNode(form.refs.cancelButton);
     equal(cancelButton.getAttribute('aria-disabled'), 'false');
@@ -43,67 +65,60 @@ define([
   });
 
   test('disables the create button when it is clicked', function() {
-    this.stub($, 'ajax');
+    this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', function(){ return true; });
+    this.stub(form, 'isValid', () => true);
     let createButton = React.findDOMNode(form.refs.createButton);
-    Simulate.click(React.findDOMNode(createButton));
+    Simulate.click(createButton);
     equal(createButton.getAttribute('aria-disabled'), 'true');
     ok(_.contains(React.findDOMNode(createButton).classList, 'disabled'));
   });
 
   test('disables the cancel button when the create button is clicked', function() {
-    this.stub($, 'ajax');
+    this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', function(){ return true; });
+    this.stub(form, 'isValid', () => true);
     let cancelButton = React.findDOMNode(form.refs.cancelButton);
     Simulate.click(form.refs.createButton);
     equal(cancelButton.getAttribute('aria-disabled'), 'true');
     ok(_.contains(React.findDOMNode(cancelButton).classList, 'disabled'));
   });
 
-  test('re-enables the cancel button when the ajax call succeeds', function() {
+  asyncTest('puts the new set in an "expanded" state upon creation', function() {
+    const success = this.stubCreateSuccess();
     let form = this.renderComponent();
-    this.stub(form, 'isValid', function(){ return true; });
-    let cancelButton = React.findDOMNode(form.refs.cancelButton);
-    this.stub($, 'ajax', function(xhr) {
-      xhr.success(xhr.data);
-    });
+    this.stub(form, 'isValid', () => true);
     Simulate.click(form.refs.createButton);
-    equal(cancelButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(cancelButton.classList, 'disabled'));
-  });
-
-  test('re-enables the create button when the ajax call succeeds', function() {
-    let form = this.renderComponent();
-    let createButton = React.findDOMNode(form.refs.createButton);
-    this.stub($, 'ajax', function(xhr) {
-      xhr.success(xhr.data);
+    success.then(function() {
+      const newSet = form.props.addGradingPeriodSet.args[0][0];
+      equal(newSet.expanded, true);
+      start();
     });
-    Simulate.click(createButton);
-    equal(createButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(createButton.classList, 'disabled'));
   });
 
-  test('re-enables the cancel button when the ajax call fails', function() {
+  asyncTest('re-enables the cancel button when the ajax call fails', function() {
+    this.stubCreateFailure();
     let form = this.renderComponent();
+    this.stub(form, 'isValid', () => true);
     let cancelButton = React.findDOMNode(form.refs.cancelButton);
-    this.stub($, 'ajax', function(xhr) {
-      xhr.error();
-    });
     Simulate.click(form.refs.createButton);
-    equal(cancelButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(cancelButton.classList, 'disabled'));
+    requestAnimationFrame(function() {
+      equal(cancelButton.getAttribute('aria-disabled'), 'false');
+      notOk(_.contains(cancelButton.classList, 'disabled'));
+      start();
+    });
   });
 
-  test('re-enables the create button when the ajax call fails', function() {
+  asyncTest('re-enables the create button when the ajax call fails', function() {
+    this.stubCreateFailure();
     let form = this.renderComponent();
+    this.stub(form, 'isValid', () => true);
     let createButton = React.findDOMNode(form.refs.createButton);
-    this.stub($, 'ajax', function(xhr) {
-      xhr.error();
-    });
     Simulate.click(createButton);
-    equal(createButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(createButton.classList, 'disabled'));
+    requestAnimationFrame(function() {
+      equal(createButton.getAttribute('aria-disabled'), 'false');
+      notOk(_.contains(createButton.classList, 'disabled'));
+      start();
+    });
   });
 });

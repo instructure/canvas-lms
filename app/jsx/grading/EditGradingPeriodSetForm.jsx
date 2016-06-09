@@ -43,15 +43,12 @@ define([
 
     getInitialState() {
       let setId = parseInt(this.props.set.id, 10);
-      let associatedEnrollmentTerms = _.filter(this.props.enrollmentTerms, (term) => {
-        return term.gradingPeriodGroupId === setId;
-      });
+      let associatedEnrollmentTerms = _.where(this.props.enrollmentTerms, { gradingPeriodGroupId: this.props.set.id });
       let set = _.extend({}, this.props.set, {
         enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, "id")
       });
-      return {
-        set: buildSet(set)
-      };
+
+      return { set: buildSet(set) };
     },
 
     componentDidMount() {
@@ -61,13 +58,13 @@ define([
     changeTitle(e) {
       let set = _.clone(this.state.set);
       set.title = e.target.value;
-      this.setState({set: set});
+      this.setState({ set: set });
     },
 
     changeEnrollmentTermIDs(termIDs) {
       let set = _.clone(this.state.set);
       set.enrollmentTermIDs = termIDs;
-      this.setState({set: set});
+      this.setState({ set: set });
     },
 
     triggerSave: function(e) {
@@ -87,7 +84,7 @@ define([
     triggerCancel: function(e) {
       e.preventDefault();
       if (this.props.onCancel) {
-        this.setState({set: buildSet()}, this.props.onCancel);
+        this.setState({ set: buildSet() }, this.props.onCancel);
       }
     },
 

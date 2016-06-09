@@ -20,29 +20,28 @@ define [
   deserializePeriods = (periods) =>
     _.map periods, (period) ->
       {
-        id: period.id
+        id: period.id.toString()
         title: period.title
         startDate: new Date(period.start_date)
         endDate: new Date(period.end_date)
       }
 
-  deserializeSet = (set) ->
+  baseDeserializeSet = (set) ->
     {
-      id: set.id
+      id: set.id.toString()
       title: set.title
-      enrollmentTermIDs: set.enrollment_term_ids
       gradingPeriods: deserializePeriods(set.grading_periods)
       permissions: set.permissions
+      createdAt: new Date(set.created_at)
     }
 
+  deserializeSet = (set) ->
+    newSet = baseDeserializeSet(set)
+    newSet.enrollmentTermIDs = set.enrollment_term_ids
+    newSet
+
   deserializeSets = (data) ->
-    _.map data.grading_period_sets, (set) ->
-      {
-        id: set.id
-        title: set.title
-        gradingPeriods: deserializePeriods(set.grading_periods)
-        permissions: set.permissions
-      }
+    _.map data.grading_period_sets, (set) -> baseDeserializeSet(set)
 
   list: () ->
     promise = new Promise (resolve, reject) =>

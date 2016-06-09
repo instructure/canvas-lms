@@ -84,7 +84,8 @@ define([
 
       set: shape({
         id:    string.isRequired,
-        title: string.isRequired
+        title: string.isRequired,
+        expanded: bool
       }).isRequired,
 
       urls: shape({
@@ -105,7 +106,7 @@ define([
       return {
         title: this.props.set.title,
         gradingPeriods: sortPeriods(this.props.gradingPeriods),
-        expanded: this.props.expanded,
+        expanded: !!this.props.set.expanded,
         newPeriod: {
           period: null,
           saving: false
@@ -121,7 +122,7 @@ define([
       if (prevState.newPeriod.period && !this.state.newPeriod.period) {
         setFocus(this.refs.addPeriodButton);
       } else if (prevState.editPeriod.id && !this.state.editPeriod.id) {
-        let period = {id: prevState.editPeriod.id};
+        let period = { id: prevState.editPeriod.id };
         setFocus(this.refs[getShowGradingPeriodRef(period)].refs.editButton);
       }
     },
@@ -147,9 +148,7 @@ define([
     },
 
     setTerms() {
-      return _.filter(this.props.terms, (term) => {
-        return term.gradingPeriodGroupId === parseInt(this.props.set.id);
-      });
+      return _.where(this.props.terms, { gradingPeriodGroupId: this.props.set.id });
     },
 
     termNames() {
@@ -174,7 +173,7 @@ define([
     },
 
     showNewPeriodForm() {
-      this.setNewPeriod({period: {}});
+      this.setNewPeriod({ period: {} });
     },
 
     saveNewPeriod(period) {
@@ -190,7 +189,7 @@ define([
              })
              .catch((_) => {
                $.flashError(I18n.t('There was a problem saving the grading period'));
-               this.setNewPeriod({saving: false});
+               this.setNewPeriod({ saving: false });
              });
       } else {
         _.each(validations, function(message) {
@@ -200,16 +199,16 @@ define([
     },
 
     removeNewPeriodForm() {
-      this.setNewPeriod({saving: false, period: null});
+      this.setNewPeriod({ saving: false, period: null });
     },
 
     setNewPeriod(attr) {
       let period = $.extend(true, {}, this.state.newPeriod, attr);
-      this.setState({newPeriod: period});
+      this.setState({ newPeriod: period });
     },
 
     editPeriod(period) {
-      this.setEditPeriod({id: period.id, saving: false});
+      this.setEditPeriod({ id: period.id, saving: false });
     },
 
     updatePeriod(period) {
@@ -242,7 +241,7 @@ define([
 
     setEditPeriod(attr) {
       let period = $.extend(true, {}, this.state.editPeriod, attr);
-      this.setState({editPeriod: period});
+      this.setState({ editPeriod: period });
     },
 
     renderEditButton() {

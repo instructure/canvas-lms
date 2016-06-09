@@ -448,7 +448,7 @@ define([
 
   module("GradingPeriodSet 'Add Grading Period'", {
     renderComponent(permissions = allPermissions, readOnly = false) {
-      let set = {
+      let setProps = {
         set: { id: "1", title: "Example Set" },
         gradingPeriods: examplePeriods,
         terms: [],
@@ -460,7 +460,7 @@ define([
         onDelete: function(){},
         onPeriodsChange: function(){}
       };
-      const element = React.createElement(GradingPeriodSet, set);
+      const element = React.createElement(GradingPeriodSet, setProps);
       let component = React.render(element, wrapper);
       Simulate.click(component.refs.toggleSetBody);
       return component;
@@ -544,9 +544,20 @@ define([
   });
 
   module("GradingPeriodSet 'New Grading Period - onSave'", {
-    renderComponent(opts = {}) {
-      let attrs = _.extend({}, props, opts);
-      const element = React.createElement(GradingPeriodSet, attrs);
+    renderComponent(props = {}) {
+      let defaultProps = {
+        set: { id: "1", title: "Example Set" },
+        gradingPeriods: [],
+        urls: urls,
+        readOnly: false,
+        permissions: allPermissions,
+        terms: [],
+        onEdit: function(){},
+        onDelete: function(){},
+        onPeriodsChange: function(){}
+      };
+
+      const element = React.createElement(GradingPeriodSet, _.defaults(props, defaultProps));
       let component = React.render(element, wrapper);
       Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs.addPeriodButton);

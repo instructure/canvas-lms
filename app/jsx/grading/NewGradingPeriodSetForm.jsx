@@ -3,15 +3,17 @@ define([
   'underscore',
   'jquery',
   'i18n!grading_periods',
+  'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/EnrollmentTermInput',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, I18n, EnrollmentTermInput) {
+], function(React, _, $, I18n, setsApi, EnrollmentTermInput) {
 
   let NewGradingPeriodSetForm = React.createClass({
     propTypes: {
       enrollmentTerms:         React.PropTypes.array.isRequired,
       closeForm:               React.PropTypes.func.isRequired,
       addGradingPeriodSet:     React.PropTypes.func.isRequired,
+      readOnly:                React.PropTypes.bool.isRequired,
       urls:                    React.PropTypes.shape({
         gradingPeriodSetsURL:  React.PropTypes.string.isRequired
       }).isRequired
@@ -23,6 +25,10 @@ define([
         title: "",
         selectedEnrollmentTermIDs: []
       };
+    },
+
+    componentDidMount() {
+      React.findDOMNode(this.refs.titleInput).focus();
     },
 
     setSelectedEnrollmentTermIDs(termIDs) {
@@ -50,34 +56,29 @@ define([
     },
 
     isValid() {
-      return this.isTitlePresent() && this.anySelectedEnrollmentTerms();
+      return !this.props.readOnly && this.isTitlePresent() && this.anySelectedEnrollmentTerms();
     },
 
     submit(event) {
       event.preventDefault();
-      this.setState({ buttonsDisabled: true });
-      if(this.isValid()) {
-        $.ajax({
-          url: this.props.urls.gradingPeriodSetsURL,
-          type: "POST",
-          dataType: "json",
-          data: {
-            enrollment_term_ids: this.state.selectedEnrollmentTermIDs,
-            grading_period_set: { title: this.state.title.trim() }
-          },
-          success: this.submitSucceeded,
-          error: this.submitFailed
-        });
-      } else {
-        this.setState({ buttonsDisabled: false });
-      }
+      this.setState({ buttonsDisabled: true }, () => {
+        if(this.isValid()) {
+          let set = { title: this.state.title.trim() };
+          set.enrollmentTermIDs = this.state.selectedEnrollmentTermIDs;
+          setsApi.create(set)
+                 .then(this.submitSucceeded)
+                 .catch(this.submitFailed);
+        } else {
+          this.setState({ buttonsDisabled: false });
+        }
+      });
     },
 
-    submitSucceeded(data) {
-      this.props.addGradingPeriodSet(data.grading_period_sets);
+    submitSucceeded(set) {
+      let newSet = _.extend({}, set);
+      newSet.expanded = true;
       $.flashMessage(I18n.t("Successfully created a set"));
-      this.props.closeForm();
-      this.setState({ buttonsDisabled: false });
+      this.props.addGradingPeriodSet(newSet, this.state.selectedEnrollmentTermIDs);
     },
 
     submitFailed() {

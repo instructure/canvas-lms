@@ -20,12 +20,14 @@ define [
           endDate: new Date("2015-12-31T12:00:00Z")
         }
       ],
-      permissions: { read: true, create: true, update: true, delete: true }
+      permissions: { read: true, create: true, update: true, delete: true },
+      createdAt: new Date("2015-12-29T12:00:00Z")
     },{
       id: "2",
       title: "Spring 2016",
       gradingPeriods: [],
-      permissions: { read: true, create: true, update: true, delete: true }
+      permissions: { read: true, create: true, update: true, delete: true },
+      createdAt: new Date("2015-11-29T12:00:00Z")
     }
   ]
 
@@ -47,13 +49,15 @@ define [
             end_date: new Date("2015-12-31T12:00:00Z")
           }
         ],
-        permissions: { read: true, create: true, update: true, delete: true }
+        permissions: { read: true, create: true, update: true, delete: true },
+        created_at: "2015-12-29T12:00:00Z"
       },
       {
         id: "2",
         title: "Spring 2016",
         grading_periods: [],
-        permissions: { read: true, create: true, update: true, delete: true }
+        permissions: { read: true, create: true, update: true, delete: true },
+        created_at: "2015-11-29T12:00:00Z"
       }
     ]
   }
@@ -95,7 +99,8 @@ define [
     title: "Fall 2015",
     gradingPeriods: [],
     enrollmentTermIDs: [ "1", "2" ],
-    permissions: { read: true, create: true, update: true, delete: true }
+    permissions: { read: true, create: true, update: true, delete: true },
+    createdAt: new Date("2015-12-31T12:00:00Z")
   }
 
   serializedSetCreating = {
@@ -109,7 +114,8 @@ define [
       title: "Fall 2015",
       enrollment_term_ids: [ "1", "2" ],
       grading_periods: [],
-      permissions: { read: true, create: true, update: true, delete: true }
+      permissions: { read: true, create: true, update: true, delete: true },
+      created_at: "2015-12-31T12:00:00Z"
     }
   }
 
