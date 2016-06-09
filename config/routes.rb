@@ -1836,6 +1836,10 @@ CanvasRails::Application.routes.draw do
     scope(controller: :gradebook_settings) do
       put 'courses/:course_id/gradebook_settings', action: :update, as: :course_gradebook_settings_update
     end
+
+    scope(controller: :announcements_api) do
+      get 'announcements', action: :index, as: :announcements
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
