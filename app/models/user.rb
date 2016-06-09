@@ -1614,7 +1614,7 @@ class User < ActiveRecord::Base
 
   # this finds the reverse account chain starting at in_root_account and ending
   # at the lowest account such that all of the accounts to which the user is
-  # associated which descend from in_root_account, descend from one of the
+  # associated with, which descend from in_root_account, descend from one of the
   # accounts in the chain.  In other words, if the users associated accounts
   # made a tree, it would be the chain between the root and the first branching
   # point.
@@ -1631,8 +1631,18 @@ class User < ActiveRecord::Base
       hash
     end
 
+    enrollment_account_ids = in_root_account.
+      all_enrollments.
+      current_and_concluded.
+      where(user_id: self).
+      joins(:course).
+      uniq.
+      pluck(:account_id)
+
     longest_chain = [in_root_account]
     while true
+      break if enrollment_account_ids.include?(longest_chain.last.id)
+
       next_children = children[longest_chain.last.id]
       break unless next_children.present? && next_children.count == 1
       longest_chain << next_children.first

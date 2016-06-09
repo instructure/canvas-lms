@@ -640,7 +640,7 @@ describe ApplicationHelper do
             expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
           end
 
-          it "should work using common_account_chain starting from lowest common account context" do
+          it "should work using common_account_chain starting from lowest common account context with enrollments" do
             course1 = @child_account.courses.create!
             course1.offer!
             course2 = @grandchild_account.courses.create!
@@ -651,7 +651,7 @@ describe ApplicationHelper do
             @current_user = @user
             output = helper.include_account_css
             expect(output).to have_tag 'link'
-            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child']]
           end
 
           it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
