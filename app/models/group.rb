@@ -257,23 +257,12 @@ class Group < ActiveRecord::Base
   end
 
   workflow do
-    state :available do
-      event :complete, :transitions_to => :completed
-      event :close, :transitions_to => :closed
-    end
-
-    # Closed to new entrants
-    state :closed do
-      event :complete, :transitions_to => :completed
-      event :open, :transitions_to => :available
-    end
-
-    state :completed
+    state :available
     state :deleted
   end
 
   def active?
-    self.available? || self.closed?
+    self.available?
   end
 
   alias_method :destroy_permanently!, :destroy

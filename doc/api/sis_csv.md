@@ -531,7 +531,7 @@ the root account.</td>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. available, closed, completed, deleted</td>
+<td><b>Required field</b>. available, deleted</td>
 </tr>
 </table>
 
