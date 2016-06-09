@@ -5739,7 +5739,7 @@ de:
   due_assignment_due_date_time_607f2e1d: "fällig am: %{assignment_due_date_time}"
   due_at_5d7d2fa: "Fällig am"
   due_at_5e18eeac: "Fällig am:"
-  due_at_time_fa41cf6c: "Fällig am: %{time}"
+  due_at_time_fa41cf6c: "Fällig um: %{time}"
   due_by_c263dc10: "Fällig am"
   due_date_5d0a953c: "Abgabetermin:"
   due_date_6a281fe3: "Fällig am: %{date}"
