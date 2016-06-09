@@ -143,7 +143,7 @@
   background-color: transparent;
   border-bottom: none;
   padding: auto;
-  color: #3d454c;
+  color: $ic-font-color-dark;
 }
 .sortable-handle a, .draggable-handle a {
   color: #b4b7ba;
@@ -179,12 +179,6 @@
 
 .context_module_item .type_icon i {
   color: inherit;
-}
-
-.context_module_item .item_name .title {
-  padding: 0;
-  color: inherit;
-  @include fontSize(13px);
 }
 
 .context_module_placeholder {

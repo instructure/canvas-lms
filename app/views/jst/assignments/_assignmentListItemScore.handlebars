@@ -1,4 +1,4 @@
-<span class="non-screenreader" aria-hidden=true>
+<span class="non-screenreader" aria-hidden="true">
   {{#unless hideGrade}}
     {{#ifAll submission submission.excused}}
       {{#t}}Excused{{/t}}
@@ -8,36 +8,41 @@
         {{#with submission}}
           {{#if notYetGraded}}
 
-            <span class="score-display text-right ellipsis">
+            <span class="score-display">
             {{#t "empty_points_possible"}}
             -/{{pointsPossible}} pts
             {{/t}}
             </span>
-            <span class="grade-display text-left ellipsis">
+            &nbsp;&#124;&nbsp;
+            <span class="grade-display">
             {{#t "not_yet_graded"}}
               <em>Not Yet Graded</em>
             {{/t}}
             </span>
 
           {{else}}
-
-            <span class="score-display text-right ellipsis">
+            <span class="score-display">
                 {{#t "score_with_points_possible"}}
                 <b>{{score}}</b>/{{pointsPossible}} pts
                 {{/t}}
             </span>
-            <span class="grade-display text-left ellipsis">
-              <strong>
-                {{gradeDisplay}}
-              </strong>
-            </span>
+            {{#ifAll gradeDisplay pointsPossible}}
+              &nbsp;&#124;&nbsp;
+            {{/ifAll}}
+            {{#if gradeDisplay}}
+              <span class="grade-display">
+                <strong>
+                  {{gradeDisplay}}
+                </strong>
+              </span>
+            {{/if}}
 
           {{/if}}
         {{/with}}
 
       {{else}}
 
-        <span data-tooltip="" class="score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
+        <span data-tooltip="" class="score-display" title='{{#t "no_submission"}}No Submission{{/t}}'>
           {{#t "empty_points_possible"}}
           -/{{pointsPossible}} pts
           {{/t}}

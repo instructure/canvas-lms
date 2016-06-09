@@ -25,13 +25,18 @@
     <li>
       <div class="ig-row">
         <div class="ig-row__layout">
-          <a href="#" class="ig-title ellipses">
-            <i class="icon-assignment"></i> Some Assignment
-          </a>
-          <div class="ig-details">
-            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-            <div class="ellipses"><b>Available</b> Nov 1</div>
-            <div class="ellipses">10 pts</div>
+          <div class="ig-type-icon" aria-hidden="true">
+            <i class="icon-assignment" aria-hidden="true"></i>
+          </div>
+          <div class="ig-info">
+            <a href="#" class="ig-title">
+               Some Assignment
+            </a>
+            <div class="ig-details">
+              <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+              <div class="ig-details__item"><b>Available</b> Nov 1</div>
+              <div class="ig-details__item">10 pts</div>
+            </div>
           </div>
           <div class="ig-admin">
             <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -62,13 +67,18 @@
     <li>
       <div class="ig-row ig-published ig-indent1">
         <div class="ig-row__layout">
-          <a href="#" class="ig-title ellipses">
-            <i class="icon-assignment"></i> Some Assignment
-          </a>
-          <div class="ig-details">
-            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-            <div class="ellipses"><b>Available</b> Nov 1</div>
-            <div class="ellipses">10 pts</div>
+          <div class="ig-type-icon" aria-hidden="true">
+            <i class="icon-assignment"></i>
+          </div>
+          <div class="ig-info">
+            <a href="#" class="ig-title">
+               Some Assignment
+            </a>
+            <div class="ig-details">
+              <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+              <div class="ig-details__item"><b>Available</b> Nov 1</div>
+              <div class="ig-details__item">10 pts</div>
+            </div>
           </div>
           <div class="ig-admin">
             <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -105,13 +115,18 @@
     <li>
       <div class="ig-row">
         <div class="ig-row__layout">
-          <a href="#" class="ig-title ellipses">
-            <i class="icon-assignment"></i> Some Assignment
-          </a>
-          <div class="ig-details">
-            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
-            <div class="ellipses"><b>Available</b> Nov 1</div>
-            <div class="ellipses">10 pts</div>
+          <div class="ig-type-icon" aria-hidden="true">
+            <i class="icon-assignment"></i>
+          </div>
+          <div class="ig-info">
+            <a href="#" class="ig-title">
+              Some Assignment
+            </a>
+            <div class="ig-details">
+              <div class="ig-details__item"><b>Due</b> Nov 4, 2012</div>
+              <div class="ig-details__item"><b>Available</b> Nov 1</div>
+              <div class="ig-details__item">10 pts</div>
+            </div>
           </div>
           <div class="ig-admin">
             <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
@@ -256,10 +271,20 @@
   position: relative;
 }
 
+.ig-info {
+  flex: 1;
+  min-width: 1px; // firefox flex breaks the parent container
+  margin: 0 $ic-sp;
+  @include breakpoint(desktop) {
+    margin-left: $ic-sp*1.5;
+    margin-right: $ic-sp*2;
+  }
+}
+
 .ig-list .ig-row {
   position: relative;
   display: block;
-  padding: $ic-sp;
+  padding: $ic-sp $ic-sp/2 $ic-sp ($ic-sp/2 + 4); // add 4px for width of published-state border
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   color: $ic-font-color--subdued;
@@ -274,8 +299,14 @@
   }
 
   a.ig-title {
-    color: $ic-font-color--subdued;
-    text-decoration: none;
+    color: $ic-font-color-dark;
+
+    @if $use-high-contrast == false {
+      text-decoration: none;
+      &:hover, &:focus {
+        text-decoration: underline;
+      }
+    }
   }
 
   .ellipses {
@@ -290,17 +321,25 @@
     background-color: $ic-list-item-background--hover;
   }
 
-  &:before {
-    position: relative;
-    top: -2px;
-  }
+  &.ig-published {
 
-  &.ig-published .ig-title {
-    color: #33802a;
-  }
+    &:before {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 0.25rem;
+      height: calc(100% + 2px);
+      background-color: $ic-color-success;
+      border-top: 1px solid darken($ic-color-success, 8%);
+      border-bottom: 1px solid darken($ic-color-success, 8%);
+    }
 
-  &.ig-published.student-view .ig-title {
-    color: #4d4d4d;
+    &.student-view .ig-title {
+      color: $ic-font-color-dark;
+    }
+
   }
 
   &.ig-row-empty {
@@ -325,39 +364,57 @@
   }
 }
 
+.ig-type-icon {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $ic-font-color--subdued;
+  color: $ic-color-light;
+
+  .ig-published & {
+    background-color: $ic-color-success;
+  }
+}
+
+.ig-handle {
+  + .ig-type-icon {
+    margin-left: $ic-sp*0.75;
+  }
+}
+
 .ig-title {
-  @include item-group-ellipses;
-  display: block;
-  flex: 1;
+  display: inline-block;
   box-sizing: border-box;
   padding-right: $ic-sp;
-  // firefox flex breaks the parent container
-  min-width: 1px;
-
-  @include breakpoint(desktop) { flex: 0 0 40%;}
+  line-height: $ic-label-line-height;
+  margin-bottom: $ic-sp/4;
+  min-width: 1px; // firefox flex breaks the parent container
   @if $use_new_styles { font-weight: 500; }
   @else { font-weight: bold; }
 }
 
 .ig-details {
-  @include fontSize(11px);
-  flex: 0.66;
-  line-height: 1.5;
+  @include fontSize(12px);
   box-sizing: border-box;
-  // firefox flex breaks the parent container
-  min-width: 1px;
+  display: flex;
+  flex-wrap: wrap;
+}
 
-  @include breakpoint(desktop) {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    > * {
-      box-sizing: border-box;
-      padding: 0 $ic-sp/2;
-      flex: 1;
-    }
-    @if $use_new_styles == false { body.ff & { @include item-group-ellipses; } }
+.ig-details__item {
+  white-space: nowrap;
+
+  &--wrap-text {
+    white-space: normal;
+  }
+
+  &:after {
+    content: "\00a0\00a0|\00a0\00a0";
+  }
+  &:last-of-type {
+    &:after { display: none; }
   }
 }
 
@@ -369,7 +426,6 @@
 
   .publish-icon {
     margin-right: $ic-sp/2;
-    @include breakpoint(desktop) { margin-right: $ic-sp; }
     i[class*=icon-]:before,
     i[class^=icon-]:before { @include fontSize(18px); }
   }

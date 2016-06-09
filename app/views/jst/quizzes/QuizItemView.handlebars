@@ -10,15 +10,29 @@
   {{/if}}
 >
   <div class="ig-row__layout">
-    <a href="{{url}}" class="ig-title ellipses">
-      <i class="icon-quiz"></i> {{title_label}}
-    </a>
 
-    <div class="ig-details">
-      <div class="ellipses date-available" data-view="date-available"></div>
-      <div class="ellipses date-due" data-view="date-due"></div>
-      <div class="ellipses">{{possible_points_label}}</div>
-      <div class="ellipses">{{question_count_label}}</div>
+    <div class="ig-type-icon">
+      <i class="icon-quiz" aria-hidden="true"></i>
+    </div>
+
+    <div class="ig-info">
+      <a href="{{url}}" class="ig-title">
+        {{title_label}}
+      </a>
+      <div class="ig-details">
+        {{#if showAvailability }}
+        <div class="ig-details__item date-available" data-view="date-available"></div>
+        {{/if}}
+        {{#if showDueDate }}
+        <div class="ig-details__item date-due" data-view="date-due"></div>
+        {{/if}}
+        {{#if possible_points_label}}
+          <div class="ig-details__item">{{possible_points_label}}</div>
+        {{/if}}
+        {{#if question_count_label}}
+          <div class="ig-details__item">{{question_count_label}}</div>
+        {{/if}}
+      </div>
     </div>
 
     {{#if can_update}}
@@ -46,5 +60,6 @@
       </div>
     </div>
     {{/if}}
+
   </div>
 </div>

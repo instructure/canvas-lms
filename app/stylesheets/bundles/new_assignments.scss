@@ -106,11 +106,6 @@
   }
 }
 
-.draggable-handle {
-  margin: 0 4px 0 -15px;
-  padding: 0 0px 0 10px;
-}
-
 .sortable-dropzone {
   height: 50px;
   background-color: #dce1e6;
@@ -119,10 +114,9 @@
 }
 
 .ui-sortable-helper {
-  background-color: #e8ecef;
-  border: 1px solid #c1c7cf !important;
-  border-radius: 3px;
-  box-shadow: 0px 1px 4px #b7b7b7;
+  background-color: $ic-color-light;
+  border: 1px solid $ic-border-dark !important;
+  box-shadow: 0px 1px 16px rgba(black, 0.3);
 }
 
 .draggable .ui-sortable-helper {
@@ -134,9 +128,9 @@
 
 .draggable-dropzone {
   height: 40px;
-  background-color: #dce1e6;
-  border-right: 1px dashed #c1c7cf;
-  border-left: 1px dashed #c1c7cf;
+  background-color: lighten($ic-color-dark, 15%);
+  border-right: 1px dashed $ic-border-dark;
+  border-left: 1px dashed $ic-border-dark;
 }
 
 .ag-header-controls .tooltip_link {
