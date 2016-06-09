@@ -55,8 +55,8 @@ define [
           start()
 
   asyncTest "rejects the promise upon errors", ->
-    successPromise = new Promise (_, reject) => reject("FAIL")
-    @stub(axios, "patch").returns(successPromise)
+    failurePromise = new Promise (_, reject) => reject("FAIL")
+    @stub(axios, "patch").returns(failurePromise)
     api.batchUpdate(123, deserializedPeriods).catch (error) =>
       equal error, "FAIL"
       start()

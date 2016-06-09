@@ -8,6 +8,20 @@ define([
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
+  const assertDisabled = function(component) {
+    let $el = React.findDOMNode(component);
+    ok($el, "expect element to exist");
+    equal($el.getAttribute('aria-disabled'), 'true');
+    ok(_.contains($el.classList, 'disabled'));
+  };
+
+  const assertEnabled = function(component) {
+    let $el = React.findDOMNode(component);
+    ok($el, "expect element to exist");
+    equal($el.getAttribute('aria-disabled'), 'false');
+    notOk(_.contains($el.classList, 'disabled'));
+  };
+
   const urls = {
     batchUpdateURL: "api/v1/accounts/1/grading_period_sets",
     deleteGradingPeriodURL:  "api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D",
@@ -55,8 +69,11 @@ define([
       title: "Dora the Explorer Grading Period Set",
     },
     terms: [],
+    onEdit: function(){},
     onDelete: function(){},
+    onPeriodsChange: function(){},
     gradingPeriods: examplePeriods,
+    actionsDisabled: false,
     readOnly: false,
     urls: urls,
     permissions: allPermissions,
@@ -64,8 +81,9 @@ define([
   };
 
   module("GradingPeriodSet", {
-    renderComponent() {
-      const element = React.createElement(GradingPeriodSet, props);
+    renderComponent(opts = {}) {
+      let attrs = _.extend({}, props, opts);
+      const element = React.createElement(GradingPeriodSet, attrs);
       return React.render(element, wrapper);
     },
 
@@ -82,7 +100,7 @@ define([
 
   test("initially renders as 'collapsed', showing the set body", function() {
     let set = this.renderComponent();
-    notOk(set.refs.setBody);
+    notOk(!!set.refs.setBody);
   });
 
   test("expands the set body when the toggle is clicked", function() {
@@ -91,11 +109,30 @@ define([
     ok(set.refs.setBody);
   });
 
+  test("disables action buttons when 'actionsDisabled' is true", function() {
+    let set = this.renderComponent({actionsDisabled: true});
+    assertDisabled(set.refs.editButton);
+    assertDisabled(set.refs.deleteButton);
+  });
+
+  test("disables the 'add grading period' button when 'actionsDisabled' is true", function() {
+    let set = this.renderComponent({actionsDisabled: true});
+    Simulate.click(set.refs.toggleSetBody);
+    assertDisabled(set.refs.addPeriodButton);
+  });
+
+  test("disables grading period action buttons when 'actionsDisabled' is true", function() {
+    let set = this.renderComponent({actionsDisabled: true});
+    Simulate.click(set.refs.toggleSetBody);
+    ok(set.refs["show-grading-period-2"].props.actionsDisabled);
+    ok(set.refs["show-grading-period-3"].props.actionsDisabled);
+  });
+
   test("re-collapses the set body when the toggle is clicked twice", function() {
     let set = this.renderComponent();
     Simulate.click(set.refs.toggleSetBody);
     Simulate.click(set.refs.toggleSetBody);
-    notOk(set.refs.setBody);
+    notOk(!!set.refs.setBody);
   });
 
   test("sorts grading periods by start date, ascending", function() {
@@ -104,6 +141,14 @@ define([
     const periods = set.refs.gradingPeriodList.props.children;
     const startDates = _.map(periods, period => period.props.period.startDate);
     ok((startDates[0] < startDates[1]) && (startDates[1] < startDates[2]));
+  });
+
+  test("calls the onEdit prop when the 'edit grading period set' button is clicked", function() {
+    let set = this.renderComponent();
+    let onEdit = this.stub(set.props, "onEdit");
+    Simulate.click(set.refs.editButton);
+    ok(onEdit.calledOnce);
+    equal(onEdit.args[0][0], set.props.set);
   });
 
   test("does not delete the set if the user cancels the delete confirmation", function() {
@@ -142,16 +187,16 @@ define([
 
   test("renders the 'GradingPeriodForm' when 'edit grading period' is clicked", function() {
     let set = this.renderComponent();
-    notOk(set.refs.editPeriodForm);
+    notOk(!!set.refs.editPeriodForm);
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
     ok(set.refs.editPeriodForm);
   });
 
   test("disables all grading period actions while open", function() {
     let set = this.renderComponent();
-    notOk(set.refs.editPeriodForm);
+    notOk(!!set.refs.editPeriodForm);
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
-    ok(set.refs.addPeriodButton.props.disabled);
+    assertDisabled(set.refs.addPeriodButton);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
@@ -175,15 +220,16 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
     set.refs.editPeriodForm.props.onCancel();
-    notOk(set.refs.addPeriodButton.props.disabled);
+    assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
   module("GradingPeriodSet 'Edit Grading Period - onSave'", {
-    renderComponent() {
-      const element = React.createElement(GradingPeriodSet, props);
+    renderComponent(opts = {}) {
+      let attrs = _.extend({}, props, opts);
+      const element = React.createElement(GradingPeriodSet, attrs);
       let component = React.render(element, wrapper);
       Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
@@ -229,7 +275,21 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      ok(set.refs.editPeriodForm.props.disabled);
+      assertDisabled(set.refs.addPeriodButton);
+      start();
+    });
+  });
+
+  asyncTest("calls the onPeriodsChange prop upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let spy = sinon.spy();
+    let set = this.renderComponent({onPeriodsChange: spy});
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      let sortedPeriods = _.sortBy(examplePeriods, "startDate");
+      ok(spy.calledOnce);
+      ok(spy.calledWith(props.set.id, sortedPeriods));
       start();
     });
   });
@@ -240,7 +300,7 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      notOk(set.refs.editPeriodForm);
+      notOk(!!set.refs.editPeriodForm);
       start();
     });
   });
@@ -262,7 +322,7 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      notOk(set.refs.addPeriodButton.props.disabled);
+      assertEnabled(set.refs.addPeriodButton);
       notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -396,7 +456,9 @@ define([
         permissions: _.defaults(permissions, allPermissions),
         readOnly: readOnly,
         terms: [],
-        onDelete: function(){}
+        onEdit: function(){},
+        onDelete: function(){},
+        onPeriodsChange: function(){}
       };
       const element = React.createElement(GradingPeriodSet, set);
       let component = React.render(element, wrapper);
@@ -426,7 +488,7 @@ define([
 
   test("renders the 'GradingPeriodForm' when 'add grading period' is clicked", function() {
     let set = this.renderComponent();
-    notOk(set.refs.newPeriodForm);
+    notOk(!!set.refs.newPeriodForm);
     Simulate.click(set.refs.addPeriodButton);
     ok(set.refs.newPeriodForm);
   });
@@ -443,7 +505,7 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs.addPeriodButton);
     set.refs.newPeriodForm.props.onCancel();
-    notOk(set.refs.newPeriodForm);
+    notOk(!!set.refs.newPeriodForm);
   });
 
   test("'onCancel' focuses on the 'add grading period' button", function() {
@@ -457,7 +519,7 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs.addPeriodButton);
     set.refs.newPeriodForm.props.onCancel();
-    notOk(set.refs.addPeriodButton.props.disabled);
+    assertEnabled(set.refs.addPeriodButton);
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
@@ -482,17 +544,9 @@ define([
   });
 
   module("GradingPeriodSet 'New Grading Period - onSave'", {
-    renderComponent() {
-      let set = {
-        set: { id: "1", title: "Example Set" },
-        gradingPeriods: [],
-        urls: urls,
-        readOnly: false,
-        permissions: allPermissions,
-        terms: [],
-        onDelete: function(){}
-      };
-      const element = React.createElement(GradingPeriodSet, set);
+    renderComponent(opts = {}) {
+      let attrs = _.extend({}, props, opts);
+      const element = React.createElement(GradingPeriodSet, attrs);
       let component = React.render(element, wrapper);
       Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs.addPeriodButton);
@@ -545,13 +599,27 @@ define([
     });
   });
 
+  asyncTest("calls the onPeriodsChange prop upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let spy = sinon.spy();
+    let set = this.renderComponent({onPeriodsChange: spy});
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      let sortedPeriods = _.sortBy(examplePeriods, "startDate");
+      ok(spy.calledOnce);
+      ok(spy.calledWith(props.set.id, sortedPeriods));
+      start();
+    });
+  });
+
   asyncTest("removes the 'new period form' upon completion", function() {
     let success = new Promise(resolve => resolve(examplePeriods));
     this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      notOk(set.refs.newPeriodForm);
+      notOk(!!set.refs.newPeriodForm);
       start();
     });
   });
@@ -562,7 +630,7 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      notOk(set.refs.addPeriodButton.props.disabled);
+      assertEnabled(set.refs.addPeriodButton);
       notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-3"].props.actionsDisabled);

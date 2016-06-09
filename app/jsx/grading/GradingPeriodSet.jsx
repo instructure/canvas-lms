@@ -70,15 +70,17 @@ define([
     return "edit-grading-period-" + period.id;
   };
 
-
   const { shape, number, string, array, bool, func } = React.PropTypes;
 
   let GradingPeriodSet = React.createClass({
     propTypes: {
-      gradingPeriods: array.isRequired,
-      terms:          array.isRequired,
-      readOnly:       bool.isRequired,
-      onDelete:       func.isRequired,
+      gradingPeriods:  array.isRequired,
+      terms:           array.isRequired,
+      readOnly:        bool.isRequired,
+      actionsDisabled: bool,
+      onEdit:          func.isRequired,
+      onDelete:        func.isRequired,
+      onPeriodsChange: func.isRequired,
 
       set: shape({
         id:    string.isRequired,
@@ -157,6 +159,13 @@ define([
 
     editSet(e) {
       e.stopPropagation();
+      this.props.onEdit(this.props.set);
+    },
+
+    changePeriods(periods) {
+      let sortedPeriods = sortPeriods(periods);
+      this.setState({ gradingPeriods: sortedPeriods });
+      this.props.onPeriodsChange(this.props.set.id, sortedPeriods);
     },
 
     removeGradingPeriod(idToRemove) {
@@ -176,10 +185,8 @@ define([
         gradingPeriodsApi.batchUpdate(this.props.set.id, periods)
              .then((periods) => {
                $.flashMessage(I18n.t('All changes were saved'));
-               this.setState({
-                 gradingPeriods: sortPeriods(periods)
-               });
                this.removeNewPeriodForm();
+               this.changePeriods(periods);
              })
              .catch((_) => {
                $.flashError(I18n.t('There was a problem saving the grading period'));
@@ -216,9 +223,7 @@ define([
              .then((periods) => {
                $.flashMessage(I18n.t('All changes were saved'));
                this.setEditPeriod({ id: null, saving: false });
-               this.setState({
-                 gradingPeriods: sortPeriods(periods)
-               });
+               this.changePeriods(periods);
              })
              .catch((_) => {
                $.flashError(I18n.t('There was a problem saving the grading period'));
@@ -240,30 +245,44 @@ define([
       this.setState({editPeriod: period});
     },
 
-    renderDeleteButton() {
-      if (this.props.readOnly || !this.props.permissions.delete) return null;
-
-      return (
-        <button ref="deleteButton"
-                className="Button Button--icon-action delete_grading_period_set_button"
-                type="button"
-                onClick={this.promptDeleteSet}>
-          <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
-          <i className="icon-trash"/>
-        </button>
-      );
-    },
-
-    renderEditAndDeleteButtons() {
-      return (
-        <div className="ItemGroup__header__admin">
+    renderEditButton() {
+      if (!this.props.readOnly && this.props.permissions.update) {
+        let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+        let baseClasses = 'Button Button--icon-action edit_grading_period_set_button';
+        return (
           <button ref="editButton"
-                  className="Button Button--icon-action edit_grading_period_set_button"
+                  className={baseClasses + (disabled ? " disabled" : "")}
+                  aria-disabled={disabled}
                   type="button"
                   onClick={this.editSet}>
             <span className="screenreader-only">{I18n.t("Edit Grading Period Set")}</span>
             <i className="icon-edit"/>
           </button>
+        );
+      }
+    },
+
+    renderDeleteButton() {
+      if (!this.props.readOnly && this.props.permissions.delete) {
+        let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+        let baseClasses = 'Button Button--icon-action delete_grading_period_set_button';
+        return (
+          <button ref="deleteButton"
+                  className={baseClasses + (disabled ? " disabled" : "")}
+                  aria-disabled={disabled}
+                  type="button"
+                  onClick={this.promptDeleteSet}>
+            <span className="screenreader-only">{I18n.t("Delete Grading Period Set")}</span>
+            <i className="icon-trash"/>
+          </button>
+        );
+      }
+    },
+
+    renderEditAndDeleteButtons() {
+      return (
+        <div className="ItemGroup__header__admin">
+          {this.renderEditButton()}
           {this.renderDeleteButton()}
         </div>
       );
@@ -283,7 +302,7 @@ define([
     },
 
     renderGradingPeriods() {
-      let actionsDisabled = !!(this.state.editPeriod.id || this.state.newPeriod.period);
+      let actionsDisabled = !!(this.props.actionsDisabled || this.state.editPeriod.id || this.state.newPeriod.period);
       return _.map(this.state.gradingPeriods, (period) => {
         if (period.id === this.state.editPeriod.id) {
           return (
@@ -323,11 +342,13 @@ define([
     },
 
     renderNewPeriodButton() {
+      let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+      let classList = 'Button Button--link GradingPeriodList__new-period__add-button' + (disabled ? " disabled" : "");
       return (
         <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
-          <button className='Button--link GradingPeriodList__new-period__add-button'
+          <button className={classList}
                   ref='addPeriodButton'
-                  disabled={!!this.state.editPeriod.id}
+                  aria-disabled={disabled}
                   aria-label={I18n.t('Add Grading Period')}
                   onClick={this.showNewPeriodForm}>
             <i className='icon-plus GradingPeriodList__new-period__add-icon'/>

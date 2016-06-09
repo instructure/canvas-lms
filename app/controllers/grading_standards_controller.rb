@@ -38,6 +38,7 @@ class GradingStandardsController < ApplicationController
       if @context.is_a?(Account)
         client_env[:GRADING_PERIODS_UPDATE_URL] = api_v1_grading_period_set_periods_update_url("{{ set_id }}")
         client_env[:GRADING_PERIODS_READ_ONLY] = !@context.root_account?
+        client_env[:GRADING_PERIOD_SET_UPDATE_URL] = api_v1_account_grading_period_set_url(@context, "{{ id }}")
         client_env[:ENROLLMENT_TERMS_URL] = api_v1_enrollment_terms_url(@context.root_account)
         client_env[:DELETE_GRADING_PERIOD_URL] = api_v1_account_grading_period_destroy_url(@context, "{{ id }}")
         view_path = 'account_index'
