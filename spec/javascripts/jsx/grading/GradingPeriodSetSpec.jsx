@@ -307,6 +307,20 @@ define([
     ok(set.refs.editPeriodForm, "form is still visible");
   });
 
+  test('does not save a grading period with a title of spaces only', function() {
+    let period = {
+      id: "1",
+      title: "    ",
+      startDate: new Date("2015-03-02T20:11:00+00:00"),
+      endDate: new Date("2015-03-03T00:00:00+00:00")
+    };
+    let update = this.stubUpdate();
+    let set = this.renderComponent();
+    this.callOnSave(set, period);
+    notOk(gradingPeriodsApi.batchUpdate.called, "does not call update");
+    ok(set.refs.editPeriodForm, "form is still visible");
+  });
+
   test('does not save a grading period without a valid startDate', function() {
     let period = {
       title: "Period without Start Date",

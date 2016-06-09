@@ -33,7 +33,7 @@ define([
   };
 
   const validatePeriods = function(periods) {
-    if (_.any(periods, (period) => { return !period.title })) {
+    if (_.any(periods, (period) => { return !(period.title || "").trim() })) {
       return [I18n.t('All grading periods must have a title')];
     }
 
