@@ -66,6 +66,7 @@ describe 'quizzes question with html answers' do
   end
 
   it 'restores normal input when html answer is empty', priority: "1", test_id: 209359 do
+    skip('CNVS-29570 - fragile because RCE is not being reactive')
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
