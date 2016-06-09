@@ -38,7 +38,7 @@ define([
 
     componentDidMount: function() {
       this.hackTheDatepickers();
-      this.refs.title.getDOMNode().focus();
+      React.findDOMNode(this.refs.title).focus();
     },
 
     render: function() {
@@ -156,7 +156,7 @@ define([
 
     hackTheDatepickers: function() {
       // When you write a better datepicker, you can replace this.
-      let $form = this.getDOMNode();
+      let $form = React.findDOMNode(this);
       let $appends = $form.querySelectorAll('.input-append');
       Array.prototype.forEach.call($appends, function($el) {
         $el.classList.add('ic-Input-group');

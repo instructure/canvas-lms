@@ -15,7 +15,7 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
     },
 
     componentDidMount: function() {
-      $(this.getDOMNode()).children(".ui-tabs-minimal").tabs();
+      $(React.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
     },
 
     render: function () {
