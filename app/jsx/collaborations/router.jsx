@@ -13,7 +13,7 @@ define([
    */
   function renderShowCollaborations (ctx) {
     store.dispatch(actions.getLTICollaborators(ctx.params.context, ctx.params.contextId));
-    store.dispatch(actions.getCollaborations(ctx.params.context, ctx.params.contextId));
+    store.dispatch(actions.getCollaborations(`/api/v1/${ctx.params.context}/${ctx.params.contextId}/collaborations`));
 
     let view = () => {
       let state = store.getState();

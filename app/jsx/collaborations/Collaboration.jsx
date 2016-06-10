@@ -40,11 +40,12 @@ define([
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
 
       return (
-        <div className='Collaboration'>
+        <div ref="wrapper" className='Collaboration'>
           <div className='Collaboration-body'>
             <a
               className='Collaboration-title'
               href={`/${context}/${contextId}/collaborations/${collaboration.id}`}
+              target="_blank"
             >
               {collaboration.title}
             </a>

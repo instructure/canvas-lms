@@ -1,14 +1,17 @@
 define([
+  'jquery',
+  'i18n!course_wizard',
   'axios',
-  'compiled/str/splitAssetString'
-], (axios, splitAssetString) => {
+  'compiled/str/splitAssetString',
+  'jsx/shared/parseLinkHeader'
+], ($, I18n, axios, splitAssetString, parseLinkHeader) => {
   const actions = {}
 
   actions.LIST_COLLABORATIONS_START = 'LIST_COLLABORATIONS_START';
   actions.listCollaborationsStart = () => ({ type: actions.LIST_COLLABORATIONS_START });
 
   actions.LIST_COLLABORATIONS_SUCCESSFUL = 'LIST_COLLABORATIONS_SUCCESSFUL';
-  actions.listCollaborationsSuccessful = (collaborations) => ({ type: actions.LIST_COLLABORATIONS_SUCCESSFUL, payload: collaborations });
+  actions.listCollaborationsSuccessful = (payload) => ({ type: actions.LIST_COLLABORATIONS_SUCCESSFUL, payload});
 
   actions.LIST_COLLABORATIONS_FAILED = 'LIST_COLLABORATIONS_FAILED';
   actions.listCollaborationsFailed = (error) => ({ type: actions.LIST_COLLABORATIONS_FAILED, error: true, payload: error });
@@ -40,14 +43,20 @@ define([
   actions.CREATE_COLLABORATION_FAILED = 'CREATE_COLLABORATION_FAILED'
   actions.createCollaborationFailed = (error) => ({ type: actions.CREATE_COLLABORATION_FAILED, payload: error, error: true })
 
-  actions.getCollaborations = (context, contextId) => {
-    return (dispatch) => {
+  actions.getCollaborations = (url) => {
+    return (dispatch, getState) => {
       dispatch(actions.listCollaborationsStart());
 
-      let url = `/api/v1/${context}/${contextId}/collaborations`;
-      $.getJSON(url)
-        .success((collaborations) => dispatch(actions.listCollaborationsSuccessful(collaborations)))
-        .fail((err) => dispatch(actions.listCollaborationsFailed(err)));
+      axios.get(url)
+        .then((response) => {
+          let {next} = parseLinkHeader(response.headers.link)
+          let payload = {next, collaborations: response.data}
+          if (getState().list.length != 0) {
+            $.screenReaderFlashMessageExclusive(I18n.t("Loaded More Collaborations."));
+          }
+          dispatch(actions.listCollaborationsSuccessful(payload))
+        })
+        .catch((err) => dispatch(actions.listCollaborationsFailed(err)));
     }
   };
 
@@ -72,7 +81,7 @@ define([
       axios.delete(url)
         .then((response) => {
           dispatch(actions.deleteCollaborationSuccessful(collaborationId))
-          dispatch(actions.getCollaborations(context, contextId))
+          dispatch(actions.getCollaborations(`/api/v1/${context}/${contextId}/collaborations`))
         })
         .catch((err) => dispatch(actions.deleteCollaborationFailed(err)));
     }
@@ -87,7 +96,7 @@ define([
       }})
         .then(({ data }) => {
           dispatch(actions.createCollaborationSuccessful(data))
-          dispatch(actions.getCollaborations(context, contextId))
+          dispatch(actions.getCollaborations(`/api/v1/${context}/${contextId}/collaborations`))
         })
         .catch(error => {
           dispatch(actions.createCollaborationFailed(error))
