@@ -80,6 +80,7 @@ describe 'quizzes question with html answers' do
   end
 
   it 'populates the editor and input elements properly', priority: "1", test_id: 209360 do
+    skip('CNVS-29570 - fragile because RCE is not being reactive')
     quiz_with_new_questions
     click_questions_tab
 
