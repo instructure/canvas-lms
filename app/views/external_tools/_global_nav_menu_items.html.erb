@@ -9,11 +9,13 @@
       <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %><% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
       <% if use_new_styles? %>
         <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
-          <% icon_url = tool.logo_for(:global_navigation, current_page?(tool_path)) %>
-          <% if icon_url %>
-            <img src="<%= icon_url %>" alt="<%= tool.label_for(:global_navigation) %>" />
+          <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
+          <% if svg_path %>
+            <svg version="1.1" class="ic-icon-svg ic-icon-svg--lti menu-item__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">
+              <path d="<%= svg_path %>"/>
+            </svg>
           <% else %>
-            <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
+            <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="" />
           <% end %>
           <div class="menu-item__text">
             <%= tool.label_for(:global_navigation) %>

@@ -101,7 +101,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[type] = {}.with_indifferent_access
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url, :canvas_icon_class,
-                      :selection_height, :selection_width, :text, :url, :message_type]
+                      :selection_height, :selection_width, :text, :url, :message_type, :icon_svg_path_64]
     if custom_keys = CUSTOM_EXTENSION_KEYS[type]
       extension_keys += custom_keys
     end
@@ -167,17 +167,6 @@ class ContextExternalTool < ActiveRecord::Base
     (default_labels && default_labels[lang]) ||
         (default_labels && lang && default_labels[lang.split('-').first]) ||
         settings[:text] || name || "External Tool"
-  end
-
-  # This is not an accepted LTI standard for logos. It's a stop-gap until LTI
-  # provides a standard. As such, it could return nil if the settings don't
-  # contain the related attributes. This is handled in the view by rendering
-  # an svg of the Commons logo.
-  def logo_for(extension_type, selected = false)
-    if selected
-      logo = extension_setting(extension_type, :icon_selected_url)
-    end
-    logo || extension_setting(extension_type, :icon_url)
   end
 
   def check_for_xml_error
