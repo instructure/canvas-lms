@@ -54,7 +54,7 @@ define([
   actions.getLTICollaborators = (context, contextId) => {
     return (dispatch) => {
       dispatch(actions.listLTICollaborationsStart());
-      $.getJSON(`/api/v1/${context}/${contextId}/external_tools?placement=collaboration`)
+      $.getJSON(`/api/v1/${context}/${contextId}/external_tools?placement=collaboration&include_parents=true`)
       .success(tools => {
         dispatch(actions.listLTICollaborationsSuccessful(tools));
       })

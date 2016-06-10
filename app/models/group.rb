@@ -156,6 +156,11 @@ class Group < ActiveRecord::Base
   def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
   end
+
+  def context_external_tools
+    ContextExternalTool.none
+  end
+
   private :group_category_limit_met?
 
   def student_organized?

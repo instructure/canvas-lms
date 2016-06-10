@@ -153,6 +153,13 @@ class CollaborationsController < ApplicationController
 
     add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))
 
+    if @context.instance_of? Group
+      parent_context = @context.context
+      js_env :PARENT_CONTEXT => {
+        :context_asset_string => parent_context.try(:asset_string)
+      }
+    end
+
     render :text => "".html_safe, :layout => true
   end
 

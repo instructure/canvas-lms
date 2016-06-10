@@ -5,8 +5,9 @@ define([
   'redux',
   'jsx/collaborations/CollaborationsApp',
   'jsx/collaborations/actions/collaborationsActions',
-  'jsx/collaborations/store/store'
-], function (React, page, qs, redux, CollaborationsApp, actions, store) {
+  'jsx/collaborations/store/store',
+  'compiled/str/splitAssetString'
+], function (React, page, qs, redux, CollaborationsApp, actions, store, splitAssetString) {
   /**
    * Route Handlers
    */
