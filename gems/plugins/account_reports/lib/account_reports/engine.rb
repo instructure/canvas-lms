@@ -133,6 +133,9 @@ module AccountReports
             :xlist => {
               :description => 'Get the Provisioning file for cross listed courses'
             },
+            :created_by_sis => {
+              :description => 'Only include objects that were created by sis'
+            },
             :include_deleted => {
               :description => 'Include deleted objects'
             }
@@ -184,6 +187,9 @@ module AccountReports
             },
             :xlist => {
               :description => 'Get the SIS file for cross listed courses'
+            },
+            :created_by_sis => {
+              :description => 'Only include objects that were created by sis'
             },
             :include_deleted => {
               :description => 'Include deleted objects'
