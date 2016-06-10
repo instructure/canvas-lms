@@ -19,6 +19,22 @@ describe 'Theme Editor' do
     expect(driver.title).to include 'Themes:'
   end
 
+  it 'theme index renders shared themes' do
+    brand_config = BrandConfig.create!(variables: {"ic-brand-primary" => "#321"})
+    shared_themes = 2.times.map do |i|
+      Account.default.shared_brand_configs.create!(
+        name: "shared theme #{i}",
+        brand_config_md5: brand_config.md5
+      )
+    end
+
+    get "/accounts/#{Account.default.id}"
+    f('#left-side #section-tabs .brand_configs').click
+    shared_themes.each do |shared_theme|
+      expect(fj(".ic-ThemeCard-main__name:contains('#{shared_theme.name}')")).to be_displayed
+    end
+  end
+
   it 'should open theme editor', priority: "1", test_id: 239980 do
     open_theme_editor(Account.default.id)
 
