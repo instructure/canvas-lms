@@ -2301,12 +2301,12 @@ pt-BR:
   attachment_deffe5a9: Anexo
   attendance: 
     options: 
-      clear_attendance_marks: "Limpar marcas de presença"
+      clear_attendance_marks: "Limpar marcas de frequência"
       edit_assignment: "Editar tarefa"
       mark_all_as_absent: "Marcar todos ausentes"
       mark_all_as_present: "Marcar todos presentes"
     titles: 
-      attendance_help: "Ajuda com presença"
+      attendance_help: "Ajuda com frequência"
   attention_aaca1f1d: Atenção!
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "O conteúdo de áudio não é suportado pelo seu dispositivo ou aplicativo."
   audio_dd489fcc: Áudio
@@ -6943,21 +6943,21 @@ pt-BR:
       student_question: "Aluno em questão"
   gradebooks: 
     attendance: 
-      attendance_info: "Nenhuma tarefa de presença foi criada."
-      edit_attendance_info: "Para editar os detalhes de uma tarefa de presença, clique no ícone suspenso abaixo do nome da tarefa e depois em \"Editar tarefa\"."
+      attendance_info: "Nenhuma tarefa de frequência foi criada."
+      edit_attendance_info: "Para editar os detalhes de uma tarefa de frequência, clique no ícone suspenso abaixo do nome da tarefa e depois em \"Editar tarefa\"."
       headers: 
-        attendance: Presença
-        edit_attendance: "Editar detalhes de presença"
-        loading_attendance: "Carregando tabela de presença...."
-        mark_attendance: "Marcar presença"
+        attendance: Frequência
+        edit_attendance: "Editar detalhes de frequência"
+        loading_attendance: "Carregando tabela de frequência...."
+        mark_attendance: "Marcar frequência"
       how_do_i: "Como eu faço para...?"
-      mark_attendance_info: "A tela de presença exibe uma tabela com os alunos listados abaixo à esquerda e as tarefas listadas ao longo da parte superior. Para marcar um aluno como presente ou ausente, clique na caixa correspondente até que ela mostre a marca correta (%{present_icon} para presente, %{absent_icon} para ausente). É possível também usar o menu suspenso de cada tarefa para definir todos como presentes ou ausentes."
-      page_title: Presença
+      mark_attendance_info: "A tela de frequência exibe uma tabela com os alunos listados abaixo à esquerda e as tarefas listadas ao longo da parte superior. Para marcar um aluno como presente ou ausente, clique na caixa correspondente até que ela mostre a marca correta (%{present_icon} para presente, %{absent_icon} para ausente). É possível também usar o menu suspenso de cada tarefa para definir todos como presentes ou ausentes."
+      page_title: Frequência
       titles: 
         click_to_change: "Clique para alterar"
     blank_submission: 
       no_submission: "Sem envio"
-    crumb: Comparecimento
+    crumb: Frequência
     errors: 
       missing_file: "Não foi possível localizar o arquivo para upload"
       not_allowed: "Este curso não permite uploads de pontuação."
@@ -7079,7 +7079,7 @@ pt-BR:
       other: "As pontuações não incluem %{groups}, pois elas não têm pontos possíveis"
     no_assignments_have_points_warning: "Não é possível computar a pontuação até uma tarefa ter pontos possíveis"
     notices: 
-      unauthorized: "Você não está autorizado a exibir as presenças deste curso"
+      unauthorized: "Você não está autorizado a exibir as frequências deste curso"
       updated: "Tarefa enviada atualizada com sucesso."
       uploaded: 
         one: "Arquivos e comentários criados para 1 envio"
@@ -7184,13 +7184,13 @@ pt-BR:
       headers: 
         assignment: Tarefa
         mark: Marca
-        no_attendance: Presença
-        student_attendance: "Presença para %{user}"
+        no_attendance: Frequência
+        student_attendance: "Frequência para %{user}"
       links: 
         grades: "Notas para %{user}"
         message_user: "Mensagem %{user}"
-      no_attendance_assignments: "Nenhuma tarefa de presença foi criada."
-      page_title: "Presença para %{user}"
+      no_attendance_assignments: "Nenhuma tarefa de frequência foi criada."
+      page_title: "Frequência para %{user}"
       titles: 
         absent: "Marcado como ausente, clique para obter mais detalhes"
         click_for_details: "Clique para obter mais detalhes"
