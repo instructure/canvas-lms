@@ -55,14 +55,6 @@ define([
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
-  // fire off the request to get the jsonData
-  window.jsonData = {};
-  $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
-    jsonData = json;
-    $(EG.jsonReady);
-  });
-  // ...and while we wait for that, get this stuff ready
-
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
   // so that the jquery selector does not have to be run every time.
@@ -364,7 +356,7 @@ define([
             .addClass('selected');
       }
 
-	$selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
+      $selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
         $selectmenu_list.find('li:first').css('margin-top', $selectmenu_list.find('li').height() + 'px');
         $menu.show().css({
           'left'   : $selectmenu_list.css('left'),
@@ -783,9 +775,9 @@ define([
 
         $(".rubric_summary").loadingImage('remove');
         EG.showGrade();
-    	  EG.showDiscussion();
-    	  EG.showRubric();
-    	  EG.updateStatsInHeader();
+        EG.showDiscussion();
+        EG.showRubric();
+        EG.updateStatsInHeader();
       });
     });
   }
@@ -2033,7 +2025,12 @@ define([
 
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
+      } else if (use_existing_score) {
+        // If we're resubmitting a score, pass it as a raw score not grade.
+        // This allows percentage grading types to be handled correctly.
+        formData["submission[score]"] = grade;
       } else {
+        // Any manually entered grade is a grade.
         formData["submission[grade]"] = grade;
       }
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
@@ -2163,9 +2160,21 @@ define([
     }
   };
 
-  //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
-  $(document).ready(function() {
-    EG.domReady();
-  });
+  return {
+    setup: function() {
+      // fire off the request to get the jsonData
+      window.jsonData = {};
+      $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
+        jsonData = json;
+        $(EG.jsonReady);
+      });
+
+      //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
+      $(document).ready(function() {
+        EG.domReady();
+      });
+    },
+    EG: EG
+  };
 
 });
