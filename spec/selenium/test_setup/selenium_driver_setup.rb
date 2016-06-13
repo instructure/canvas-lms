@@ -163,6 +163,7 @@ module SeleniumDriverSetup
     # TODO: we could try a random port here instead of relying on the default for retries
     # (or killing firefox may be the best move)
     driver = Selenium::WebDriver.for(:firefox,
+                                     profile: firefox_profile,
                                      desired_capabilities: desired_capabilities)
   rescue StandardError => e
     puts <<-ERROR
