@@ -28,7 +28,6 @@ class Login::CanvasController < ApplicationController
   def new
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
     flash.now[:error] = params[:message] if params[:message]
 
     maybe_render_mobile_login
@@ -141,6 +140,7 @@ class Login::CanvasController < ApplicationController
       )
       render :mobile_login, layout: 'mobile_auth', status: status
     else
+      @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
       render :new, status: status
     end
   end
