@@ -20,7 +20,13 @@ class AssignmentGroup < ActiveRecord::Base
 
   include Workflow
 
-  attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
+  attr_accessible :assignment_weighting_scheme,
+                  :default_assignment_name,
+                  :group_weight,
+                  :name,
+                  :position,
+                  :rules,
+                  :sis_source_id
 
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: [:course]
