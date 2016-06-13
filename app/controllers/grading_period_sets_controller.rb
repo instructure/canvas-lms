@@ -21,9 +21,9 @@ class GradingPeriodSetsController < ApplicationController
   end
 
   def create
-    grading_period_set = GradingPeriodGroup.new(set_params) do |set|
-      set.enrollment_terms = enrollment_terms
-    end
+    grading_period_sets = GradingPeriodGroup.for(@context)
+    grading_period_set = grading_period_sets.build(set_params)
+    grading_period_set.enrollment_terms = enrollment_terms
 
     respond_to do |format|
       if grading_period_set.save
@@ -63,6 +63,7 @@ class GradingPeriodSetsController < ApplicationController
   private
 
   def enrollment_terms
+    return [] unless params[:enrollment_term_ids]
     @context.enrollment_terms.active.find(params[:enrollment_term_ids])
   end
 

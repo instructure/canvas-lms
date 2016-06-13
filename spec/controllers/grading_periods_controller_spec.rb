@@ -153,8 +153,7 @@ describe GradingPeriodsController do
         end_date: 4.days.from_now(now).to_s
       }
     end
-    let(:term) { root_account.enrollment_terms.create! }
-    let(:group) { group_helper.create_for_enrollment_term(term) }
+    let(:group) { group_helper.create_for_account(root_account) }
     let(:period_1) { group.grading_periods.create!(period_1_params) }
     let(:period_2) { group.grading_periods.create!(period_2_params) }
 
@@ -255,7 +254,7 @@ describe GradingPeriodsController do
         end_date: 4.days.from_now(now).to_s
       }
     end
-    let(:group) { group_helper.create_for_course(course) }
+    let(:group) { group_helper.legacy_create_for_course(course) }
     let(:period_1) { group.grading_periods.create!(period_1_params) }
     let(:period_2) { group.grading_periods.create!(period_2_params) }
 

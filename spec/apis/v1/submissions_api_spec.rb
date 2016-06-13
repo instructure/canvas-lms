@@ -1664,7 +1664,7 @@ describe 'Submissions API', type: :request do
       @course.enroll_student(@student2).accept!
 
       @course.account.enable_feature!(:multiple_grading_periods)
-      gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
+      gpg = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
       @gp1 = gpg.grading_periods.create!(
         title: 'first',
         weight: 50,

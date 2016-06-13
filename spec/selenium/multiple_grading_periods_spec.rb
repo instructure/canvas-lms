@@ -97,7 +97,7 @@ describe "interaction with multiple grading periods" do
       let!(:enroll_teacher) { test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active') }
       let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
       let!(:enable_course_mgp_flag) { test_course.enable_feature!(:multiple_grading_periods) }
-      let!(:grading_period_group) { group_helper.create_for_course(test_course) }
+      let!(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
       let!(:course_grading_period_current) do
         grading_period_group.grading_periods.create!(
           title: 'Course Grading Period 1',
@@ -170,7 +170,7 @@ describe "interaction with multiple grading periods" do
     let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
     let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
     let!(:enable_course_mgp_flag) { test_course.enable_feature!(:multiple_grading_periods) }
-    let!(:grading_period_group) { group_helper.create_for_course(test_course) }
+    let!(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
     let!(:course_grading_period_1) do
       grading_period_group.grading_periods.create!(
         title: 'Course Grading Period 1',

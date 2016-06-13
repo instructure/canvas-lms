@@ -30,7 +30,6 @@ describe GradingPeriod, "permissions:" do
       course_with_teacher(account: @root_account, active_all: true)
       course_with_student(course: @course, active_all: true)
       @root_account_period = period_helper.create_with_group_for_account(@root_account)
-      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
       @course_period = period_helper.create_with_group_for_course(@course)
     end
 
@@ -43,17 +42,6 @@ describe GradingPeriod, "permissions:" do
       it "can read, create, update, and delete root-account level " \
        "grading periods" do
         expect(@root_account_period.
-          rights_status(@root_account_admin, *permissions)).to eq({
-          read:   true,
-          create: true,
-          update: true,
-          delete: true
-        })
-      end
-
-      it "can read, create, update, and delete sub-account level " \
-        "grading periods" do
-        expect(@sub_account_period.
           rights_status(@root_account_admin, *permissions)).to eq({
           read:   true,
           create: true,
@@ -91,18 +79,6 @@ describe GradingPeriod, "permissions:" do
         })
       end
 
-      it "can read, create, update, and delete sub-account level " \
-        "grading periods" do
-        expect(@sub_account_period.
-          rights_status(@sub_account_admin, *permissions)).to eq({
-          read:   true,
-          create: true,
-          update: true,
-          delete: true
-        })
-      end
-
-
       it "can NOT read, create, update, nor delete course level " \
         "grading periods, when the course is under the root-account" do
         expect(@course_period.
@@ -127,17 +103,6 @@ describe GradingPeriod, "permissions:" do
         })
       end
 
-      it "can NOT read, create, update, nor delete sub-account level " \
-        "grading periods" do
-        expect(@sub_account_period.
-          rights_status(@teacher, *permissions)).to eq({
-          read:   false,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-
       it "can read, update, and delete but NOT create course level " \
        "grading periods" do
         expect(@course_period.
@@ -156,17 +121,6 @@ describe GradingPeriod, "permissions:" do
         expect(@root_account_period.
           rights_status(@student, *permissions)).to eq({
           read:   true,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-
-      it "can NOT read, create, update, nor delete sub-account " \
-        "grading periods" do
-        expect(@sub_account_period.
-          rights_status(@student, *permissions)).to eq({
-          read:   false,
           create: false,
           update: false,
           delete: false
@@ -212,7 +166,6 @@ describe GradingPeriod, "permissions:" do
       course_with_teacher(account: @sub_account, active_all: true)
       course_with_student(course: @course, active_all: true)
       @root_account_period = period_helper.create_with_group_for_account(@root_account)
-      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
       @course_period = period_helper.create_with_group_for_course(@course)
     end
 
@@ -225,17 +178,6 @@ describe GradingPeriod, "permissions:" do
       it "can read, create, update, and delete root-account level " \
         "grading periods" do
         expect(@root_account_period.
-          rights_status(@root_account_admin, *permissions)).to eq({
-          read:   true,
-          create: true,
-          update: true,
-          delete: true
-        })
-      end
-
-      it "can read, create update, and delete sub-account level " \
-        "grading periods" do
-        expect(@sub_account_period.
           rights_status(@root_account_admin, *permissions)).to eq({
           read:   true,
           create: true,
@@ -273,17 +215,6 @@ describe GradingPeriod, "permissions:" do
         })
       end
 
-      it "can read, create, update, and delete sub-account level grading " \
-        "periods" do
-        expect(@sub_account_period.
-          rights_status(@sub_account_admin, *permissions)).to eq({
-          read:   true,
-          create: true,
-          update: true,
-          delete: true
-        })
-      end
-
       it "can NOT create course level grading periods when the course is " \
         "under the sub-account, but can read, update, and delete" do
         expect(@course_period.
@@ -308,17 +239,6 @@ describe GradingPeriod, "permissions:" do
         })
       end
 
-      it "can NOT create, update, nor delete sub-account level grading " \
-        "periods, but can read them" do
-        expect(@sub_account_period.
-          rights_status(@teacher, *permissions)).to eq({
-          read:   true,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-
       it "can read, update, and delete but NOT create course level " \
         "grading periods" do
         expect(@course_period.
@@ -335,17 +255,6 @@ describe GradingPeriod, "permissions:" do
       it "can read but NOT create, update, nor delete root-account level " \
         "grading periods" do
         expect(@root_account_period.
-          rights_status(@student, *permissions)).to eq({
-          read:   true,
-          create: false,
-          update: false,
-          delete: false
-        })
-      end
-
-      it "can read but NOT create, update, nor delete sub-account level " \
-        "grading periods" do
-        expect(@sub_account_period.
           rights_status(@student, *permissions)).to eq({
           read:   true,
           create: false,

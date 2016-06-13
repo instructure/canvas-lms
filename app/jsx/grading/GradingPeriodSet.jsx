@@ -155,7 +155,11 @@ define([
 
     termNames() {
       const names = _.pluck(this.setTerms(), "displayName");
-      return I18n.t("Terms: ") + names.join(", ");
+      if (names.length > 0) {
+        return I18n.t("Terms: ") + names.join(", ");
+      } else {
+        return I18n.t("No Associated Terms");
+      }
     },
 
     editSet(e) {

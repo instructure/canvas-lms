@@ -24,7 +24,7 @@ def grading_periods(options = {})
   course = options[:context] || @course || course()
   count = options[:count] || 2
 
-  grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_course(course)
+  grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
   now = Time.zone.now
   count.times.map do |n|
     grading_period_group.grading_periods.create!(
@@ -41,7 +41,7 @@ def create_grading_periods_for(course, opts={})
   course.root_account = Account.default if !course.root_account
   course.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
 
-  gp_group = Factories::GradingPeriodGroupHelper.new.create_for_course(course)
+  gp_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
   class_name = course.class.name.demodulize
   timeframes = opts[:grading_periods] || [:current]
   now = Time.zone.now
@@ -94,9 +94,7 @@ module Factories
     end
 
     def create_with_group_for_account(account, options = {})
-      group = GradingPeriodGroup.create!(title: "Group for #{account.name}") do |group|
-        group.enrollment_terms << account.enrollment_terms.create!
-      end
+      group = account.grading_period_groups.create!(title: "Group for #{account.name}")
       group.grading_periods.create!(grading_period_attrs(options))
     end
 

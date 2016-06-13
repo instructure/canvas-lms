@@ -23,8 +23,7 @@ describe GradingPeriodGrade do
     let(:student) { User.create.student_enrollments.create! course: course }
 
     let(:account) { Account.create }
-    let(:term) { account.enrollment_terms.create! }
-    let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_enrollment_term(term) }
+    let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_account(account) }
     let(:period) do
       group.grading_periods.create!(
         title: 'a period',

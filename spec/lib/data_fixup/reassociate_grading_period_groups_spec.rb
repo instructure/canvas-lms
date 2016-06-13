@@ -11,15 +11,16 @@ describe DataFixup::ReassociateGradingPeriodGroups do
 
   before(:each) do
     @root_account = Account.create(name: 'new account')
-    group = group_helper.legacy_create_for_account(@root_account)
+    group = group_helper.create_for_account(@root_account)
     period_helper.create_presets_for_group(group, :current)
     @root_account.enrollment_terms.create!
     @sub_account = @root_account.sub_accounts.create!
-    group = group_helper.legacy_create_for_account(@sub_account)
+    group = @sub_account.grading_period_groups.build(group_helper.valid_attributes)
+    group.save(validate: false)
     period_helper.create_presets_for_group(group, :future)
     @sub_account.enrollment_terms.create!
     course = @root_account.courses.create!
-    group = group_helper.create_for_course(course)
+    group = group_helper.legacy_create_for_course(course)
     period_helper.create_presets_for_group(group, :past)
   end
 

@@ -92,12 +92,4 @@ define([
     Simulate.click(saveButton);
     notOk(spy.called);
   });
-
-  test("does not call 'onSave' when the set has no enrollment term ids", function() {
-    let spy = sinon.spy();
-    let form = this.renderComponent({ onSave: spy, enrollmentTerms: [{ id: "2", gradingPeriodGroupId: "2" }] });
-    let saveButton = React.findDOMNode(form.refs.saveButton);
-    Simulate.click(saveButton);
-    notOk(spy.called);
-  });
 });

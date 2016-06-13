@@ -772,7 +772,7 @@ describe UsersController do
     let!(:student_enrollment) do
       course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
     end
-    let(:grading_period_group) { group_helper.create_for_course(test_course) }
+    let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
     let(:grading_period) do
       grading_period_group.grading_periods.create!(
         title: "Some Semester",
@@ -884,7 +884,7 @@ describe UsersController do
       let(:test_course) { course(active_all: true) }
       let(:student1) { user(active_all: true) }
       let(:student2) { user(active_all: true) }
-      let(:grading_period_group) { group_helper.create_for_course(test_course) }
+      let(:grading_period_group) { group_helper.legacy_create_for_course(test_course) }
       let!(:grading_period) do
         grading_period_group.grading_periods.create!(
           title: "Some Semester",

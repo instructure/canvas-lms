@@ -42,7 +42,7 @@ describe "gradebook performance" do
 
     describe 'with a current and past grading period' do
       let!(:create_period_group_and_default_periods) do
-        group = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
+        group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
         group.grading_periods.create(
           start_date: 4.months.ago,
           end_date:   2.months.ago,

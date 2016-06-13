@@ -32,10 +32,10 @@ class EnrollmentTerm < ActiveRecord::Base
 
   validates_presence_of :root_account_id, :workflow_state
   validate :check_if_deletable
+  validate :consistent_account_associations
 
   before_validation :verify_unique_sis_source_id
   after_save :update_courses_later_if_necessary
-  before_update :destroy_orphaned_grading_period_group
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
@@ -172,15 +172,10 @@ class EnrollmentTerm < ActiveRecord::Base
     save!
   end
 
-  def destroy_orphaned_grading_period_group
-    is_being_destroyed = workflow_state_changed? && deleted?
-    had_previous_group = grading_period_group_id_changed? && grading_period_group_id_was
-
-    if is_being_destroyed || had_previous_group
-      grading_period_group_criteria = { grading_period_group_id: grading_period_group_id_was }
-      remaining_terms = EnrollmentTerm.active.where(grading_period_group_criteria).where.not(id: self)
-      unless remaining_terms.exists?
-        GradingPeriodGroup.destroy(grading_period_group_id_was)
+  def consistent_account_associations
+    if read_attribute(:grading_period_group_id).present?
+      if root_account_id != grading_period_group.account_id
+        errors.add(:grading_period_group, t("cannot be associated with a different account"))
       end
     end
   end

@@ -19,16 +19,14 @@
 class GradingPeriodGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_readonly :account_id
-
   attr_accessible :title
+  belongs_to :root_account, inverse_of: :grading_period_groups, foreign_key: :account_id, class_name: "Account"
   belongs_to :course
   has_many :grading_periods, dependent: :destroy
   has_many :enrollment_terms, inverse_of: :grading_period_group
 
-  validate :associated_with_course_or_account_or_enrollment_term?
+  validate :associated_with_course_or_root_account, if: :active?
 
-  before_save :assign_account_id_from_enrollment_term
   after_destroy :dissociate_enrollment_terms
 
   set_policy do
@@ -60,74 +58,42 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   def self.for(account)
+    raise ArgumentError.new("account is not an Account") unless account.is_a?(Account)
     root_account = account.root_account? ? account : account.root_account
-    grading_period_group_ids = root_account
-      .active_enrollment_terms.select(:grading_period_group_id)
-    active.where(id: grading_period_group_ids)
+    root_account.grading_period_groups.active
   end
 
   def multiple_grading_periods_enabled?
-    (course || root_account).feature_enabled?(:multiple_grading_periods) ||
-      account_grading_period_allowed?
+    multiple_grading_periods_on_course? || multiple_grading_periods_on_account?
   end
 
   private
 
-  def root_account
-    @root_account ||= begin
-      return nil if enrollment_terms.count == 0
-      # TODO: take is broken here. it appears that loaded? is true
-      # but the @records is empty.
-      # enrollment_terms.take.root_account
-      enrollment_terms.limit(1).to_a.first.root_account
-    end
-  end
-
-  def associated_with_course_or_account_or_enrollment_term?
-    if enrollment_terms?
-      validate_with_enrollment_terms
-    elsif active?
-      validate_without_enrollment_terms
-    end
-  end
-
-  def enrollment_terms?
-    if enrollment_terms.loaded?
-      enrollment_terms.any?(&:active?)
-    else
-      enrollment_terms.active.exists?
-    end
-  end
-
-  def validate_without_enrollment_terms
+  def associated_with_course_or_root_account
     if course_id.blank? && account_id.blank?
-      errors.add(:enrollment_terms, t("cannot be empty when course_id is nil and account_id is nil"))
+      errors.add(:course_id, t("cannot be nil when account_id is nil"))
+      errors.add(:account_id, t("cannot be nil when course_id is nil"))
     elsif course_id.present? && account_id.present?
       errors.add(:course_id, t("cannot be present when account_id is present"))
       errors.add(:account_id, t("cannot be present when course_id is present"))
+    elsif root_account && !root_account.root_account?
+      errors.add(:account_id, t("must belong to a root account"))
+    elsif root_account && root_account.deleted?
+      errors.add(:account_id, t("must belong to an active root account"))
+    elsif course && course.deleted?
+      errors.add(:course_id, t("must belong to an active course"))
     end
   end
 
-  def validate_with_enrollment_terms
-    if enrollment_terms.loaded?
-      account_ids = enrollment_terms.map(&:root_account_id)
-    else
-      account_ids = enrollment_terms.pluck(:root_account_id)
-    end
-    account_ids << self.account_id if self.account_id.present?
-    if account_ids.uniq.count > 1
-      errors.add(:enrollment_terms, t("cannot be associated with different accounts"))
-    end
+  def multiple_grading_periods_on_account?
+    root_account.present? && (
+      root_account.feature_enabled?(:multiple_grading_periods) ||
+      root_account.feature_allowed?(:multiple_grading_periods)
+    )
   end
 
-  def account_grading_period_allowed?
-   root_account.present? && root_account.feature_allowed?(:multiple_grading_periods)
-  end
-
-  def assign_account_id_from_enrollment_term
-    if self.course_id.nil? && self.account_id.nil? && enrollment_terms.size > 0
-      self.account_id = enrollment_terms.first.root_account_id
-    end
+  def multiple_grading_periods_on_course?
+    course.present? && course.feature_enabled?(:multiple_grading_periods)
   end
 
   def dissociate_enrollment_terms
