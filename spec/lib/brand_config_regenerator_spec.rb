@@ -53,7 +53,7 @@ describe BrandConfigRegenerator do
 
     # make sure the child account's brand config is based on this new brand config
     expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
-    # make sure the shared brand configs in the child accout are all based this new config
+    # make sure the shared brand configs in the child account are all based this new config
     expect(@child_shared_config.reload.brand_config.parent).to eq(new_brand_config)
     # make sure the child'd active theme still is the same as it's SharedBrandConfig named 'child theme'
     expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)

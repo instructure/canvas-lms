@@ -31,8 +31,10 @@ describe "settings tabs" do
       expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
 
       if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        # close the "user accout" reactTray that opened so we could read the displayed username
-        f('.ReactTray__closeBtn').click
+        # close the "user account" reactTray that opened so we could read the displayed username
+        if tray_close = f('.ReactTray__closeBtn')
+         tray_close.click
+        end
         expect(f('body')).not_to contain_css('.ReactTray__Overlay')
       end
 
