@@ -32,7 +32,7 @@ describe "settings tabs" do
       dismiss_flash_messages
 
       if ENV['CANVAS_FORCE_USE_NEW_STYLES']
-        # close the "user accout" reactTray that opened so we could read the displayed username
+        # close the "user account" reactTray that opened so we could read the displayed username
         if tray_close = f('.ReactTray__closeBtn')
          tray_close.click
         end

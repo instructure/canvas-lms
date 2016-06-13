@@ -127,7 +127,7 @@ class BrandConfigsController < ApplicationController
   end
 
   # After someone is satisfied with the preview of how their session brand config looks,
-  # they POST to this action to save it to their accout so everyone else sees it.
+  # they POST to this action to save it to their account so everyone else sees it.
   def save_to_account
     old_md5 = @account.brand_config_md5
     new_md5 = session.delete(:brand_config_md5).presence
@@ -159,7 +159,7 @@ class BrandConfigsController < ApplicationController
   protected
 
   def visible_shared_brand_configs
-    # things shared in this accout, or globally (account_id is nil)
+    # things shared in this account, or globally (account_id is nil)
     SharedBrandConfig.where(account_id: [@account.id, nil])
   end
 

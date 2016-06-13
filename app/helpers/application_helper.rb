@@ -698,7 +698,7 @@ module ApplicationHelper
       else
         brand_config_for_account(opts)
       end
-      # If the accout does not have a brandConfig, or they explicitly chose to start from a blank
+      # If the account does not have a brandConfig, or they explicitly chose to start from a blank
       # slate in the theme editor, do one last check to see if we should actually use the k12 theme
       if !brand_config && k12?
         brand_config = BrandConfig.k12_config
