@@ -553,6 +553,9 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
       can :read_as_admin
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_sis)}
+      can :read_sis
     end
   end
 
