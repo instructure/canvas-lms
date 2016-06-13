@@ -9,9 +9,11 @@ module SeleniumDriverSetup
   MAX_FAILURES_TO_RECORD = 20
   IMPLICIT_WAIT_TIMEOUT = 15
 
-  def setup_selenium
-    browser = $selenium_config[:browser].try(:to_sym) || :firefox
+  def browser
+    $selenium_config[:browser].try(:to_sym) || :firefox
+  end
 
+  def setup_selenium
     path = $selenium_config[:paths].try(:[], browser)
     if path
       Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
@@ -144,7 +146,7 @@ module SeleniumDriverSetup
   end
 
   def desired_capabilities
-    caps = Selenium::WebDriver::Remote::Capabilities.send($selenium_config[:browser].try(:to_sym))
+    caps = Selenium::WebDriver::Remote::Capabilities.send(browser)
     caps.version = $selenium_config[:version] unless $selenium_config[:version].nil?
     caps.platform = $selenium_config[:platform] unless $selenium_config[:platform].nil?
     caps["tunnel-identifier"] = $selenium_config[:tunnel_id] unless $selenium_config[:tunnel_id].nil?
