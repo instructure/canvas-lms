@@ -867,6 +867,8 @@ define([
       var vth = document.getElementById("visible_to_holder");
       vth.innerHTML = "";
 
+      if(!$item.hasClass('quiz') && !$item.hasClass('assignment')) {
+
       var hasAnyRestrictions = false;
       for(id in section_restrictions) {
         if(section_restrictions[id].checked) {
@@ -942,6 +944,9 @@ define([
           $(".section_restrictions", $item).text(JSON.stringify(section_restrictions));
         }
       };
+      } else {
+        vth.innerHTML = 'Use the separate due dates feature to do per-section assignments and quizzes.';
+      }
 
       $("#edit_item_form").dialog({
         title: I18n.t('titles.edit_item', "Edit Item Details"),
