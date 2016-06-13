@@ -151,6 +151,8 @@ class CollaborationsController < ApplicationController
     js_bundle :react_collaborations
     css_bundle :react_collaborations
 
+    add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))
+
     render :text => "".html_safe, :layout => true
   end
 
