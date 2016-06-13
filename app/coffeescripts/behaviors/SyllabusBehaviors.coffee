@@ -44,11 +44,19 @@ define [
     if !$mini_month or !$syllabus
       return
 
-    $mini_month.find('.day.has_event').removeClass 'has_event'
+    events = $mini_month.find('.day.has_event')
+    events.removeClass 'has_event'
+    wrapper = events.find('.day_wrapper')
+    wrapper.removeAttr 'role'
+    wrapper.removeAttr 'tabindex'
 
     $syllabus.find('tr.date:visible').each ->
       date = $(this).find('.day_date').attr('data-date')
-      $mini_month.find("#mini_day_#{date}").addClass 'has_event'
+      events = $mini_month.find("#mini_day_#{date}")
+      events.addClass 'has_event'
+      wrapper = events.find('.day_wrapper')
+      wrapper.attr 'role', 'link'
+      wrapper.attr 'tabindex', '0'
 
   # Sets highlighting on a given date
   #    Removes all highlighting then highlights the given
@@ -116,7 +124,7 @@ define [
     todayString = $.datepicker.formatDate 'yy_mm_dd', new Date
     highlightDate todayString
 
-  selectRow = ($row, e) ->
+  selectRow = ($row) ->
     if $row.length > 0
       $('tr.selected').removeClass('selected')
       $row.addClass('selected')
@@ -132,26 +140,29 @@ define [
     $mini_month = $('.mini_month')
 
     prev_next_links = $mini_month.find('.next_month_link, .prev_month_link')
-    prev_next_links.on 'click', false
-    prev_next_links.on 'mousedown', (ev) ->
+    prev_next_links.on 'click', (ev) ->
       ev.preventDefault()
       calendarMonths.changeMonth $mini_month, if $(this).hasClass('next_month_link') then 1 else -1
       highlightDaysWithEvents()
 
-    $mini_month.on 'click', '.mini_calendar_day', (ev) ->
+    miniCalendarDayClick = (ev) ->
       ev.preventDefault()
-      date = this.id.slice(9)
+      date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9)
       [year, month, day] = date.split('_')
-
       calendarMonths.changeMonth $mini_month, "#{month}/#{day}/#{year}"
       highlightDaysWithEvents()
       selectDate(date)
-
       $(".events_#{date}").ifExists ($events) ->
-        selectRow($events, ev)
+        setTimeout (=> selectRow($events)), 0 # focus race condition hack. why do you do this to me, IE?
 
-    $mini_month.on 'mouseover mouseout', '.mini_calendar_day', (ev) ->
-      date = this.id.slice(9) unless ev.type == 'mouseout'
+    $mini_month.on 'keypress', '.day_wrapper', (ev) ->
+      if ev.which == 13 || ev.which == 32
+        miniCalendarDayClick(ev)
+
+    $mini_month.on 'click', '.day_wrapper', miniCalendarDayClick
+
+    $mini_month.on 'focus blur mouseover mouseout', '.day_wrapper', (ev) ->
+      date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9) unless ev.type == 'mouseout' or ev.type == 'blur'
       highlightDate date
 
     $('.jump_to_today_link').on 'click', (ev) ->
@@ -168,7 +179,7 @@ define [
 
       $lastBefore ||= $('tr.date:first')
       selectDate(todayString)
-      selectRow($lastBefore, ev)
+      selectRow($lastBefore)
 
   # Binds to edit syllabus dom events
   bindToEditSyllabus = ->
