@@ -535,8 +535,9 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
-  # @API Conclude or deactivate an enrollment
-  # Delete, conclude or deactivate an enrollment.
+  # @API Conclude, deactivate, or delete an enrollment
+  # Conclude, deactivate, or delete an enrollment. If the +task+ argument isn't given, the enrollment
+  # will be concluded.
   #
   # @argument task [String, "conclude"|"delete"|"inactivate"|"deactivate"]
   #   The action to take on the enrollment.
