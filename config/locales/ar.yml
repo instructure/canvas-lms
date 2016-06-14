@@ -6598,6 +6598,7 @@ ar:
   excuse_this_assignment_for_the_selected_student_af04e132: "إعفاء الطالب المحدد من القيام بهذه المهمة"
   excused_5877183c: "ليس إجباري!"
   excused_cf8792eb: "ليس إجباري"
+  exit_d0c7b013: خروج
   exit_theme_editor_9ddd41bb: "الخروج من محرر النسق"
   expand_collapse_title_outcome_group_239f0a9d: "توسيع/طي مجموعة نتائج %{title}"
   expand_group_53765272: "توسيع المجموعة"
