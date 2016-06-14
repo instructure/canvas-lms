@@ -126,6 +126,7 @@
           <div class='module-item-status-icon'></div> <%# going to set this in JS-land, not here %>
         <% end %>
       </div>
+      <% if editable %>
       <div class="bz_section_restrictions">
         <%
           if module_item
@@ -136,6 +137,7 @@
           <%= CourseSection.find(restriction.section_id).name %>
         <% end end end %>
       </div>
+      <% end %>
       <div class="due_date_display"></div>
       <div class="points_possible_display"></div>
     </div>

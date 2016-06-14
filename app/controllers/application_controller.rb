@@ -2141,9 +2141,14 @@ class ApplicationController < ActionController::Base
           reject { |item| item.content_type == 'ContextModuleSubHeader' }.
           sort_by { |item| [item.module_position.to_i, item.module_id, item.position || CanvasSort::Last] }
 
+      is_teacher = @context.grants_right?(@current_user, :manage_content)
+
       # find content tags to include
       tag_indices = []
       if asset_type == 'ContentTag'
+        if !is_teacher
+          tags = ContextModule.filter_tags_per_section(tags, @current_user)
+        end
         tag_ix = tags.each_index.detect { |ix| tags[ix].id == asset_id.to_i }
         tag_indices << tag_ix if tag_ix
       else
@@ -2164,6 +2169,10 @@ class ApplicationController < ActionController::Base
         if asset_type == 'DiscussionTopic'
           asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
           associated_assignment_id = asset.assignment_id if asset
+        end
+
+        if !is_teacher
+          tags = ContextModule.filter_tags_per_section(tags, @current_user)
         end
 
         # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)

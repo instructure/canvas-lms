@@ -96,7 +96,7 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      valid_children: "+body[style|script|svg|textarea|img]",
+      valid_children: "+body[style|script|svg|textarea|img],+p[textarea|input]",
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css + "," + window.bz_custom_css_url + ",/bz_editor.css",
       non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",

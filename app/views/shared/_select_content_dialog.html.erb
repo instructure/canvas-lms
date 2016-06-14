@@ -7,7 +7,16 @@
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
       <a href="<%= context_url(@context, :context_external_tool_resource_selection_url, "{{ id }}") %>" id="select_content_resource_selection_url" style="display: none;">&nbsp;</a>
       <% ot :add_to_module, "Add %{item} to *module*", :item => capture { %>
-      <select style="margin-bottom: 0px" id="add_module_item_select" aria-label="<%= t 'select_item_type_label', "Select the type of content to add." %>">
+      <select style="margin-bottom: 0px" id="add_module_item_select" aria-label="<%= t 'select_item_type_label', "Select the type of content to add." %>" onchange="
+          var i = document.getElementById('section_restrict_div');
+          if(i) {
+             var a = this.options[this.selectedIndex].value;
+             if(a == 'quiz' || a == 'assignment')
+                i.style.display = 'none';
+             else
+                i.style.display = '';
+          }
+      ">
         <% if !only || only.include?(:assignments) %>
         <option value="assignment"><%= t :assignment_item, "Assignment" %></option>
         <% end %>
@@ -277,7 +286,7 @@
         </select>
       </div>
       <% end %>
-      <div class="context_module_content">
+      <div id="section_restrict_div" class="context_module_content">
         <%= before_label :restriction, "Show to" %>
         <div style="padding-left: 1em;">
           <label><input type="radio" name="show_to" value="everybody" checked /> Everybody</label><br />
