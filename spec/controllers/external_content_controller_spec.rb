@@ -166,6 +166,25 @@ describe ExternalContentController do
       expect(data.first.placement_advice.display_height).to eq(600)
       expect(data.first.placement_advice.display_width).to eq(800)
     end
+
+    it "uses the default url if one isn't provided" do
+      c = course
+      json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items_2.json')))
+      json['@graph'][0].delete('url')
+      launch_url = 'http://example.com/launch'
+      post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+           lti_version: 'LTI-1p0',
+           data: Canvas::Security.create_jwt({default_launch_url: launch_url}),
+           content_items: json.to_json,
+           lti_msg: '',
+           lti_log: '',
+           lti_errormsg: '',
+           lti_errorlog: '')
+
+      data = controller.js_env[:retrieved_data]
+      expect(data.first.canvas_url).to include "http%3A%2F%2Fexample.com%2Flaunch"
+    end
+
   end
 
 end

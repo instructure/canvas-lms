@@ -705,6 +705,18 @@ describe ExternalToolsController do
       expect(json_data[:oauth_consumer_key]).to eq tool.consumer_key
     end
 
+    it 'adds to the data element the default launch url' do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      data = assigns[:lti_launch].params['data']
+      json_data = Canvas::Security.decode_jwt(data)
+      expect(json_data[:default_launch_url]).to eq tool.url
+    end
+
   end
 
   describe "GET 'resource_selection'" do

@@ -488,18 +488,21 @@ class ExternalToolsController < ApplicationController
     accept_unsigned= true
     auto_create= false
     return_url_opts = {service: 'external_tool_dialog'}
+    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+    data_hash = {default_launch_url: launch_url}
     if opts[:content_item_id]
-      extra_params[:data] = Canvas::Security.create_jwt(
-        {
-          content_item_id: opts[:content_item_id],
-          oauth_consumer_key: tool.consumer_key
-        }
-      )
+        data_hash.merge!(
+          {
+            content_item_id: opts[:content_item_id],
+            oauth_consumer_key: tool.consumer_key
+          }
+        )
       return_url_opts[:id] = opts[:content_item_id]
       return_url = polymorphic_url([@context, :external_content_update], return_url_opts)
     else
       return_url = polymorphic_url([@context, :external_content_success], return_url_opts)
     end
+    extra_params[:data] = Canvas::Security.create_jwt(data_hash)
     # choose accepted return types based on placement
     # todo, make return types configurable at installation?
     case placement
@@ -549,7 +552,7 @@ class ExternalToolsController < ApplicationController
     }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
-    lti_launch.resource_url = opts[:launch_url]|| tool.extension_setting(placement, :url)
+    lti_launch.resource_url = launch_url
     lti_launch.params = Lti::Security.signed_post_params(
       params,
       lti_launch.resource_url,
