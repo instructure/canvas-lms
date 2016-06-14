@@ -22,6 +22,13 @@ module ContextModulesHelper
       visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(context) : []
       cache_key_items = ['context_module_render_11_', context_module.cache_key, editable, true, Time.zone]
       cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments
+      if user
+        # Our per-section things also needs to be checked in the cache -
+        # both user sections and course tags, both of which may change
+        # at any time. By considering the list of tags as part of the key,
+        # it will automatically invalidate if either changes.
+        cache_key_items << Digest::MD5.hexdigest(context_module.content_tags_visible_to(user).map(&:id).sort.to_s)
+      end
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache(cache_key, nil, &block)

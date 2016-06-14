@@ -353,8 +353,36 @@ class ContextModule < ActiveRecord::Base
         tags = filter_tags_for_da(tags, user, opts)
       end
 
+      if !is_teacher
+        tags = ContextModule.filter_tags_per_section(tags, user, opts)
+      end
+
       tags
     end
+  end
+
+  def self.filter_tags_per_section(tags, user, opts={})
+    filtered = []
+
+    user_section_ids = []
+    user.enrollments.active.each do |e|
+      user_section_ids << e.course_section_id
+    end
+
+    tags.each do |tag|
+      restrictions = ContentTagSectionRestriction.where(:content_tag_id => tag.id)
+      if restrictions.empty?
+        # no restrictions = content available to everyone
+        filtered << tag
+      else
+        # if it is restricted to one of the user sections, we cool.
+        unless restrictions.where(:section_id => user_section_ids).empty?
+          filtered << tag
+        end
+      end
+    end
+
+    filtered
   end
 
   def filter_tags_for_da(tags, user, opts={})
@@ -487,6 +515,17 @@ class ContextModule < ActiveRecord::Base
       added_item.save
       added_item
     end
+
+    if params[:section_restrict]
+      params[:section_restrict].each do |r|
+        ContentTagSectionRestriction.create(
+          :content_tag_id => added_item.id,
+          :section_id => r
+        )
+      end
+    end
+
+    added_item
   end
 
   def update_for(user, action, tag, points=nil)

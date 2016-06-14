@@ -59,7 +59,8 @@ define([], function(){
         "instructure_equella": "/javascripts/tinymce_plugins/instructure_equella/plugin.js",
         "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js",
         "instructure_record": "/javascripts/tinymce_plugins/instructure_record/plugin.js",
-        "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js"
+        "bz_retained_fields": "/javascripts/tinymce_plugins/bz_retained_fields/plugin.js",
+        "bz_iframes":         "/javascripts/tinymce_plugins/bz_iframes/plugin.js"
       },
       language_load: false,
       relative_urls: false,
@@ -93,7 +94,7 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      valid_children: "+body[style|script|svg|textarea|img]",
+      valid_children: "+body[style|script|svg|textarea|img],+p[textarea|input]",
 
       content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url + ",/bz_editor.css",
       browser_spellcheck: true
@@ -189,7 +190,7 @@ define([], function(){
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
     var stuff = this.balanceButtons(instructure_buttons);
-    stuff[0] += (",bz_retained_field,bz_retained_field_view");
+    stuff[0] += (",bz_retained_field,bz_retained_field_view,bz_iframe");
     return stuff;
   };
 

@@ -1,5 +1,4 @@
 <%
-  idx ||= 0
   module_item_next ||= nil
   module_item = module_item_next
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
@@ -63,6 +62,22 @@
         <span class="position" style="display: none;"><%= tag && tag.position %></span>
         <span class="url" style="display: none;"><%= tag.try(:url) if editable %></span>
         <span class="new_tab" style="display: none;"><%= tag.try(:new_tab) ? '1' : '0' if editable %></span>
+        <span class="section_restrictions" style="display: none;">
+        <%
+        if module_item
+          all_sections = {}
+          ctsr = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+          @context.course_sections.each do |cs|
+            has = false
+            ctsr.each do |c|
+              if c.section_id == cs.id
+                has = true
+                break
+              end
+            end
+            all_sections[cs.id] = { :name => cs.name, :checked => has }
+          end
+        %><%= all_sections.to_json if editable && module_item %><% end %></span>
       </span>
     </div>
     <div class="requirement-description">
@@ -103,13 +118,23 @@
       <span class="graded" style="display: none;"><%= tag && tag.graded? ? '1' : '0' %></span>
     </div>
     <div class="ig-details">
+      <% if editable %>
+      <div class="bz_section_restrictions">
+        <%
+          if module_item
+          restrictions = ContentTagSectionRestriction.where(:content_tag_id => module_item.id).all
+          if restrictions.any?
+        %> Only for: 
+        <% restrictions.each do |restriction| %>
+          <%= CourseSection.find(restriction.section_id).name %>
+        <% end end end %>
+      </div>
+      <% end %>
       <div class="due_date_display"></div>
       <div class="points_possible_display"></div>
     </div>
 
     <% if editable || module_item.nil? %>
-      <% idx += 1 %>
-      <a class="btn" href="/bz/full_module_view?course_id=<%=@context.id%>&amp;module_sequence=<%= idx %>">See All Pages</a>
       <div class="ig-admin">
         <span
           data-module-type="<%= module_item && module_item.content_type_class %>"

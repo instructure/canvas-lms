@@ -353,6 +353,7 @@ class ContextModuleItemsApiController < ApplicationController
       end
 
       item_params[:url] = params[:module_item][:external_url]
+      item_params[:section_restrict] = params[:section_restrict]
 
       if (@tag = @module.add_item(item_params)) && set_position && set_completion_requirement
         @tag.workflow_state = 'unpublished'
@@ -419,6 +420,18 @@ class ContextModuleItemsApiController < ApplicationController
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       return render :json => {:message => "missing module item parameter"}, :status => :bad_request unless params[:module_item]
+
+      if params[:section_restrict_any]
+        if params[:section_restrict_any] == "yes"
+          ContentTagSectionRestriction.where(:content_tag_id => @tag.id).delete_all
+          params[:section_restrict].each do |sr|
+            ContentTagSectionRestriction.create(
+              :content_tag_id => @tag.id,
+              :section_id => sr
+            )
+          end
+        end
+      end
 
       @tag.title = params[:module_item][:title] if params[:module_item][:title]
       @tag.url = params[:module_item][:external_url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:module_item][:external_url]

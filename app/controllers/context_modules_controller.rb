@@ -359,7 +359,9 @@ class ContextModulesController < ApplicationController
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      @tag = @module.add_item(params[:item])
+      prms = params[:item]
+      prms[:section_restrict] = params[:section_restrict]
+      @tag = @module.add_item(prms)
       json = @tag.as_json
       json['content_tag'].merge!(
           publishable: module_item_publishable?(@tag),
@@ -390,6 +392,21 @@ class ContextModulesController < ApplicationController
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
       @tag.save
+
+
+      if params[:section_restrict_any]
+        ContentTagSectionRestriction.where(:content_tag_id => @tag.id).delete_all
+        if params[:section_restrict_any] == "yes"
+          params[:section_restrict].each do |sr|
+            ContentTagSectionRestriction.create(
+              :content_tag_id => @tag.id,
+              :section_id => sr
+            )
+          end
+        end
+      end
+
+
       @tag.update_asset_name! if params[:content_tag][:title]
       render :json => @tag
     end
