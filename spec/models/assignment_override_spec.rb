@@ -780,7 +780,7 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.only_visible_to' do
+  describe '.visible_students_only' do
     specs_require_sharding
 
     it "references tables correctly for an out of shard query" do
@@ -788,6 +788,13 @@ describe AssignmentOverride do
       # but the query executes on a different shard, but it should still be
       # well-formed (especially with qualified names)
       AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
+    end
+
+    it "should not duplicate adhoc overrides containing multiple students" do
+      @override = assignment_override_model
+      students = Array.new(2) { @override.assignment_override_students.create(user: student_in_course.user) }
+
+      expect(AssignmentOverride.visible_students_only(students.map(&:user_id)).count).to eq 1
     end
   end
 

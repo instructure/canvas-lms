@@ -282,8 +282,16 @@ describe AssignmentOverrideApplicator do
       end
 
       describe 'for teachers' do
+        before { teacher_in_course(:active_all => true) }
+
         it "works" do
-          teacher_in_course(:active_all => true)
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
+          expect(overrides).to eq [@override]
+        end
+
+        it "should not duplicate adhoc overrides" do
+          @override_student = @override.assignment_override_students.create(user: student_in_course.user)
+
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
           expect(overrides).to eq [@override]
         end

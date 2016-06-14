@@ -126,7 +126,8 @@ class AssignmentOverride < ActiveRecord::Base
     joins(:assignment_override_students).
     where(
       assignment_override_students: { user_id: visible_ids },
-    )
+    ).
+    distinct
   end
 
   before_validation :default_values
