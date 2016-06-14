@@ -1,0 +1,31 @@
+# these are things that selinimum can safely ignore when deciding whether
+# the current commit needs to run all specs or just a subset
+
+*.txt
+*.md
+*.png
+*.jpg
+*.gif
+*.ico
+*.svg
+*.html
+*.yml
+
+/bin
+/doc
+/gems/rubocop-canvas
+/gems/selinimum
+/guard
+/public/javascripts/translations/_core_en.js
+/script
+
+# ignore all specs and spec-related things, except selenium specs and things
+# that can affect them
+/spec/*
+!/spec/factories
+!/spec/helpers
+!/spec/selenium
+!/spec/support
+!/spec/*.rb
+# ** so we unignore previously ignored .txt, etc.
+!/spec/fixtures/**
