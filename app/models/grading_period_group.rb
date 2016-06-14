@@ -28,6 +28,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_account_or_enrollment_term?
 
+  before_save :assign_account_id_from_enrollment_term
   after_destroy :dissociate_enrollment_terms
 
   set_policy do
@@ -121,6 +122,12 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   def account_grading_period_allowed?
    root_account.present? && root_account.feature_allowed?(:multiple_grading_periods)
+  end
+
+  def assign_account_id_from_enrollment_term
+    if self.course_id.nil? && self.account_id.nil? && enrollment_terms.size > 0
+      self.account_id = enrollment_terms.first.root_account_id
+    end
   end
 
   def dissociate_enrollment_terms

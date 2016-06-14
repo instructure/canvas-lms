@@ -131,10 +131,38 @@ describe GradingPeriodGroup do
   end
 
   describe "#save" do
+    let(:account) { Account.default }
+
+    it "associates with the account of a related enrollment term" do
+      term_1 = account.enrollment_terms.create!
+      term_2 = account.enrollment_terms.create!
+      group = group_helper.create_for_enrollment_term(term_1)
+      group.enrollment_terms = [term_1, term_2]
+      expect(group.reload.account_id).to eql(account.id)
+    end
+
+    it "preserves account_id when dissociating from an enrollment term" do
+      term_1 = account.enrollment_terms.create!
+      term_2 = account.enrollment_terms.create!
+      group = group_helper.create_for_enrollment_term(term_1)
+      group.enrollment_terms = [term_1, term_2]
+      group.destroy
+      expect(group.reload.account_id).to eql(account.id)
+    end
+
+    it "does not associate the account when already associated with a course" do
+      course = account.courses.create!
+      term = account.enrollment_terms.create!
+      group = group_helper.create_for_course(course)
+      group.enrollment_terms << term
+      group.save
+      expect(group.account_id).to be_nil
+    end
+
     it "deletes orphaned grading period groups" do
-      term_1 = Account.default.enrollment_terms.create!
+      term_1 = account.enrollment_terms.create!
       group_1 = group_helper.create_for_enrollment_term(term_1)
-      term_2 = Account.default.enrollment_terms.create!
+      term_2 = account.enrollment_terms.create!
       group_2 = GradingPeriodGroup.new valid_attributes
       group_2.enrollment_terms.concat([term_1, term_2])
       group_2.save!
