@@ -28,6 +28,8 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   validate :associated_with_course_or_account_or_enrollment_term?
 
+  after_destroy :dissociate_enrollment_terms
+
   set_policy do
     given do |user|
       multiple_grading_periods_enabled? &&
@@ -119,5 +121,9 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   def account_grading_period_allowed?
    root_account.present? && root_account.feature_allowed?(:multiple_grading_periods)
+  end
+
+  def dissociate_enrollment_terms
+    enrollment_terms.update_all(grading_period_group_id: nil)
   end
 end

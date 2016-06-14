@@ -111,14 +111,6 @@ describe GradingPeriodGroup do
       expect(group).not_to be_valid
     end
 
-    it "is not valid with only deleted enrollment terms and undeleted" do
-      group = group_helper.create_for_enrollment_term(enrollment_term)
-      enrollment_term.destroy
-      group.reload
-      group.workflow_state = 'active'
-      expect(group).not_to be_valid
-    end
-
     it "is not valid with enrollment terms with different accounts and workflow states" do
       account_1 = account_model
       account_2 = account_model
@@ -187,6 +179,32 @@ describe GradingPeriodGroup do
     let(:course) { Course.create!(account: account) }
     let(:creation_arguments) { {title: "A title"} }
     subject { course.grading_period_groups }
+  end
+
+  describe "deletion" do
+    let(:account) { Account.default }
+    let(:term_1)  { account.enrollment_terms.create! }
+    let(:term_2)  { account.enrollment_terms.create! }
+    let(:group)   { group_helper.create_for_enrollment_term(term_1) }
+
+    it "removes associations from related enrollment terms" do
+      group.enrollment_terms = [term_1, term_2]
+      expect(term_1.reload.grading_period_group).to eql group
+      expect(term_2.reload.grading_period_group).to eql group
+      group.destroy
+      expect(term_1.reload.grading_period_group).to be_nil
+      expect(term_2.reload.grading_period_group).to be_nil
+    end
+
+    it "removes associations from soft-deleted enrollment terms" do
+      group.enrollment_terms = [term_1, term_2]
+      term_1.destroy
+      expect(term_1.reload.grading_period_group).to eql group
+      expect(term_2.reload.grading_period_group).to eql group
+      group.destroy
+      expect(term_1.reload.grading_period_group).to be_nil
+      expect(term_2.reload.grading_period_group).to be_nil
+    end
   end
 
   describe "permissions" do
