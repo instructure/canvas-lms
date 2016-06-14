@@ -1,5 +1,5 @@
 define [
-  'axios',
+  'axios'
   'helpers/fakeENV',
   'compiled/api/gradingPeriodSetsApi'
 ], (axios, fakeENV, api) ->
@@ -64,30 +64,35 @@ define [
 
   module "list",
     setup: ->
+      @server = sinon.fakeServer.create()
+      @fakeHeaders =
+        link: '<http://some_url>; rel="last"'
       fakeENV.setup()
       ENV.GRADING_PERIOD_SETS_URL = 'api/grading_period_sets'
     teardown: ->
       fakeENV.teardown()
+      @server.restore()
 
   test "calls the resolved endpoint", ->
-    apiSpy = @stub(axios, "get").returns(new Promise(->))
+    @stub($, 'ajaxJSON').returns(new Promise(->))
     api.list()
-    ok axios.get.calledWith('api/grading_period_sets')
+    ok $.ajaxJSON.calledWith('api/grading_period_sets')
 
   asyncTest "deserializes returned grading period sets", ->
-    successPromise = new Promise (resolve) => resolve({ data: serializedSets })
-    @stub(axios, "get").returns(successPromise)
+    @server.respondWith "GET", /grading_period_sets/, [200, {"Content-Type":"application/json", "Link": @fakeHeaders}, JSON.stringify serializedSets]
     api.list()
        .then (sets) =>
           deepEqual sets, deserializedSets
           start()
+    @server.respond()
 
-  asyncTest "rejects the promise upon errors", ->
-    failurePromise = new Promise (_, reject) => reject("FAIL")
-    @stub(axios, "get").returns(failurePromise)
-    api.list().catch (error) =>
-      equal error, "FAIL"
-      start()
+  # no fail for CheatDepaginator
+  # asyncTest "SKIPPED: rejects the promise upon errors", ->
+  #   @server.respondWith "GET", /grading_period_sets/, [500, {"Content-Type":"application/json"}, "FAIL"]
+  #   api.list().catch (error) =>
+  #     equal error, "FAIL"
+  #     start()
+  #   @server.respond()
 
   deserializedSetCreating = {
     title: "Fall 2015",

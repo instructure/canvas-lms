@@ -14,7 +14,7 @@ define([
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi',
   'jquery.instructure_misc_plugins'
-], function(React, _, $, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, setsApi, termsApi) {
+], function(React, _, $, I18n, ConvertCase, GradingPeriodSet, SearchGradingPeriodsField, SearchHelpers, DateHelper, EnrollmentTermsDropdown, NewGradingPeriodSetForm, EditGradingPeriodSetForm, SetsApi, TermsApi) {
 
   const presentEnrollmentTerms = function(enrollmentTerms) {
     return _.map(enrollmentTerms, term => {
@@ -111,10 +111,8 @@ define([
     },
 
     getSets() {
-      setsApi.list()
-        .then((sets) => {
-          this.onSetsLoaded(sets);
-        })
+      SetsApi.list()
+        .then((sets) => { this.onSetsLoaded(sets); })
         .catch((_) => {
           $.flashError(I18n.t(
             "An error occured while fetching grading period sets."
@@ -123,10 +121,8 @@ define([
     },
 
     getTerms() {
-      termsApi.list()
-        .then((terms) => {
-          this.onTermsLoaded(terms);
-        })
+      TermsApi.list()
+        .then((terms) => { this.onTermsLoaded(terms); })
         .catch((_) => {
            $.flashError(I18n.t(
              "An error occured while fetching enrollment terms."
@@ -274,7 +270,7 @@ define([
       let saveCallback = (set) => {
         let editSet = _.extend({}, this.state.editSet, {saving: true});
         this.setState({editSet: editSet});
-        setsApi.update(set)
+        SetsApi.update(set)
                .then((updated) => {
                  this.onSetUpdated(updated);
                  this.closeEditSetForm(set.id);

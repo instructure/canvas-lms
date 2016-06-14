@@ -8,8 +8,12 @@ class GradingPeriodSetsController < ApplicationController
   before_action :check_read_rights, except: [:update, :create, :destroy]
 
   def index
-    grading_period_sets = GradingPeriodGroup.for(@context)
-    paginated_sets, meta = paginate_for(grading_period_sets)
+    paginated_sets = Api.paginate(
+      GradingPeriodGroup.for(@context),
+      self,
+      api_v1_account_grading_period_sets_url
+    )
+    meta = Api.jsonapi_meta(paginated_sets, self, api_v1_account_grading_period_sets_url)
 
     respond_to do |format|
       format.json { render json: serialize_json_api(paginated_sets, meta) }

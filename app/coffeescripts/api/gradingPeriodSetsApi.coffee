@@ -2,8 +2,9 @@ define [
   'jquery'
   'underscore'
   'axios'
+  'jsx/gradebook2/CheatDepaginator'
   'jquery.instructure_misc_helpers'
-], ($, _, axios) ->
+], ($, _, axios, Depaginate) ->
   listUrl = () =>
     ENV.GRADING_PERIOD_SETS_URL
 
@@ -40,15 +41,16 @@ define [
     newSet.enrollmentTermIDs = set.enrollment_term_ids
     newSet
 
-  deserializeSets = (data) ->
-    _.map data.grading_period_sets, (set) -> baseDeserializeSet(set)
+  deserializeSets = (setGroups) ->
+    _.flatten _.map setGroups, (group) ->
+      _.map group.grading_period_sets, (set) -> baseDeserializeSet(set)
 
   list: () ->
     promise = new Promise (resolve, reject) =>
-      axios.get(listUrl())
+      Depaginate(listUrl())
            .then (response) ->
-             resolve(deserializeSets(response.data))
-           .catch (error) ->
+             resolve(deserializeSets(response))
+           .fail (error) ->
              reject(error)
     promise
 
