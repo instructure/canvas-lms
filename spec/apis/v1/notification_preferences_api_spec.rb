@@ -36,6 +36,11 @@ describe NotificationPreferencesController, type: :request do
     @params = { user_id: 'self', type: @cc.path_type, address: @cc.path, controller: 'notification_preferences', format: 'json' }
   end
 
+  def by_category
+    @prefix = "/api/v1/users/self/communication_channels/#{@cc.id}/notification_preference_categories"
+    @params = { user_id: 'self', communication_channel_id: @cc.to_param, controller: 'notification_preferences', format: 'json' }
+  end
+
   describe "index" do
     def list_preferences
       json = api_call(:get, @prefix, @params.merge(action: 'index'))
@@ -60,6 +65,19 @@ describe NotificationPreferencesController, type: :request do
       by_address
       list_preferences
       list_preferences
+    end
+  end
+
+  describe "category_index" do
+    it "should list categories" do
+      Notification.create!(name: 'Announcement Created By You', category: 'Announcement Created By You')
+      by_category
+      json = api_call(:get, @prefix, @params.merge(action: 'category_index'))
+      assert_jsonapi_compliance(json, 'categories')
+      categories = json['categories']
+      expect(categories.length).to eq 3
+      expect(categories).to eq ["announcements", "registration", "announcement_created_by_you"]
+      expect(@cc.notification_policies.count).to eq 3
     end
   end
 
@@ -122,6 +140,46 @@ describe NotificationPreferencesController, type: :request do
       @params.delete(:user_id)
       json = api_call(:put, "#{@prefix}/new_announcement",
                       @params.merge(action: 'update', notification: 'new_announcement'),
+                      'notification_preferences' => [{ 'frequency' => 'never' }])
+      assert_jsonapi_compliance(json, 'notification_preferences')
+      expect(json['notification_preferences']).to eq [{
+                                                      'notification' => 'new_announcement',
+                                                      'category' => 'announcements',
+                                                      'frequency' => 'never'
+                                                  }]
+      expect(@cc.notification_policies.count).to eq 1
+    end
+  end
+
+  describe "update_preferences_by_category" do
+    def update_preferences_by_category(category, notification = category)
+      # self is the only possible one
+      @params.delete(:user_id)
+      json = api_call(:put, "#{@prefix}/#{category}?notification_preferences[frequency]=never",
+                      @params.merge(action: 'update_preferences_by_category', category: category,
+                      notification_preferences: { 'frequency' => 'never' }))
+      assert_jsonapi_compliance(json, 'notification_preferences')
+      expect(json['notification_preferences']).to eq [{
+                                                      'notification' => notification,
+                                                      'category' => category,
+                                                      'frequency' => 'never'
+                                                  }]
+      expect(@cc.notification_policies.count).to eq 1
+    end
+
+    it "should update preferences by id and category" do
+      Notification.create!(name: 'Announcement Created By You', category: 'Announcement Created By You')
+      by_category
+      update_preferences_by_category('announcement_created_by_you')
+      update_preferences_by_category('announcement_created_by_you')
+    end
+
+    it "should update preferences by category JSON API style" do
+      by_category
+      # self is the only possible one
+      @params.delete(:user_id)
+      json = api_call(:put, "#{@prefix}/announcements",
+                      @params.merge(action: 'update_preferences_by_category', category: 'announcements'),
                       'notification_preferences' => [{ 'frequency' => 'never' }])
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{

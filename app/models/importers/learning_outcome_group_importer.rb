@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class LearningOutcomeGroupImporter < Importer
 
@@ -29,6 +31,19 @@ module Importers
       item.low_grade = hash[:low_grade]
       item.high_grade = hash[:high_grade]
 
+      # For some reason the top level authority for the United Kingdom
+      # gets returned back from Academic Benchmarks with a GUID of
+      # "ENG", with no title and no description.  Because of this, our
+      # model validation fails that requires a title.  Since "ENG" is
+      # always from the UK, we can safely set the title here to avoid
+      # the breakage and make imports of UK standards work again
+      unless item.title
+        if item.vendor_guid == "ENG"
+          item.title = "United Kingdom"
+          item.description = "United Kingdom Authority"
+        end
+      end
+
       item.save!
       if hash[:parent_group]
         hash[:parent_group].adopt_outcome_group(item)
@@ -36,7 +51,7 @@ module Importers
         root_outcome_group.adopt_outcome_group(item)
       end
 
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
 
       if hash[:outcomes]
         hash[:outcomes].each do |child|

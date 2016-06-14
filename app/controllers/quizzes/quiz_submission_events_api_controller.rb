@@ -40,8 +40,8 @@
 #       }
 #     }
 class Quizzes::QuizSubmissionEventsApiController < ApplicationController
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user,
     :require_context,

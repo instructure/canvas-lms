@@ -27,7 +27,8 @@ describe "differentiated_assignments" do
       only_visible_to_overrides: opts[:ovto],
       points_possible: rand(1000),
       submission_types: "online_text_entry",
-      title: "yes_due_date"
+      title: "yes_due_date",
+      group_category: opts[:group_category]
     })
     @assignment.publish
     @assignment.save!
@@ -45,6 +46,11 @@ describe "differentiated_assignments" do
     make_assignment({date: Time.now, ovto: nil})
   end
 
+  def group_assignment_with_true_only_visible_to_overrides(opts={})
+    group_category = opts[:group_category] || @course.group_categories.first
+    make_assignment({date: nil, ovto: true, group_category: group_category})
+  end
+
   def student_in_course_with_adhoc_override(assignment, opts={})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course)
@@ -54,6 +60,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     ao.set_type = "ADHOC"
     ao.save!
+    assignment.reload
     override_student = ao.assignment_override_students.build
     override_student.user = @user
     override_student.save!
@@ -71,10 +78,26 @@ describe "differentiated_assignments" do
     StudentEnrollment.create!(:user => @user, :course => @course, :course_section => @section_bar)
   end
 
+  def enroll_user_in_group(group, opts={})
+    @user = opts[:user] || user_model
+    group.add_user(@user, 'accepted', true)
+  end
+
+  def enroller_user_in_both_groups(opts={})
+    @user = opts[:user] || user_model
+    @group_foo.add_user(@user, 'accepted', true)
+    @group_bar.add_user(@user, 'accepted', true)
+  end
+
   def add_multiple_sections
     @default_section = @course.default_section
     @section_foo = @course.course_sections.create!(:name => 'foo')
     @section_bar = @course.course_sections.create!(:name => 'bar')
+  end
+
+  def add_multiple_groups
+    @group_foo = @course.groups.create!(:name => 'foo group')
+    @group_bar = @course.groups.create!(:name => 'bar group')
   end
 
   def create_override_for_assignment(assignment, &block)
@@ -84,6 +107,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     block.call(ao)
     ao.save!
+    assignment.reload
   end
 
   def give_section_due_date(assignment, section)
@@ -93,15 +117,23 @@ describe "differentiated_assignments" do
     end
   end
 
+  def give_group_due_date(assignment, group)
+    assignment.group_category = group.group_category
+    create_override_for_assignment(assignment) do |ao|
+      ao.set = group
+      ao.due_at = 3.weeks.from_now
+    end
+  end
+
   def ensure_user_does_not_see_assignment
-    visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
-    expect(visibile_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
+    visible_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
+    expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsey
     expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).not_to include(@assignment.id)
   end
 
   def ensure_user_sees_assignment
-    visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
-    expect(visibile_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
+    visible_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:assignment_id)
+    expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_truthy
     expect(AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@assignment.id)
   end
 
@@ -144,7 +176,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
-    context "assignment only visibile to overrides" do
+    context "assignment only visible to overrides" do
 
       context "ADHOC overrides" do
         before { assignment_with_true_only_visible_to_overrides }
@@ -169,8 +201,79 @@ describe "differentiated_assignments" do
 
         it "should not return a visibility if ADHOC override is deleted" do
           student_in_course_with_adhoc_override(@assignment)
-          @assignment.assignment_overrides.all.each(&:destroy)
+          @assignment.assignment_overrides.each(&:destroy)
           ensure_user_does_not_see_assignment
+        end
+      end
+
+      context "group overrides" do
+        before do
+          add_multiple_groups
+          group_assignment_with_true_only_visible_to_overrides(group_category: @group_foo.group_category)
+          give_group_due_date(@assignment, @group_foo)
+        end
+
+        context "user in group with override who then changes groups" do
+          before do
+            enroll_user_in_group(@group_foo, {user: @user})
+          end
+          it "should keep the assignment visible if there is a grade" do
+            @assignment.grade_student(@user, {grade: 10})
+            @user.group_memberships.each(&:destroy!)
+            enroll_user_in_group(@group_bar, {user: @user})
+            ensure_user_sees_assignment
+          end
+
+          it "should not keep the assignment visible if there is no grade" do
+            @assignment.grade_student(@user, {grade: nil})
+            @user.group_memberships.each(&:destroy!)
+            enroll_user_in_group(@group_bar, {user: @user})
+            ensure_user_does_not_see_assignment
+          end
+
+          it "should keep the assignment visible if the grade is zero" do
+            @assignment.grade_student(@user, {grade: 0})
+            @user.group_memberships.each(&:destroy!)
+            enroll_user_in_group(@group_bar, {user: @user})
+            ensure_user_sees_assignment
+          end
+        end
+
+        context "user not in group with override" do
+          it "should hide the assignment from the user" do
+            # user not yet in group
+            ensure_user_does_not_see_assignment
+          end
+        end
+
+        context "user in group with override" do
+          before do
+            enroll_user_in_group(@group_foo, {user: @user})
+          end
+
+          it "should update when enrollments change" do
+            ensure_user_sees_assignment
+            @user.group_memberships.each(&:destroy!)
+            ensure_user_does_not_see_assignment
+          end
+          it "should update when the override is deleted" do
+            ensure_user_sees_assignment
+            @assignment.assignment_overrides.each(&:destroy!)
+            ensure_user_does_not_see_assignment
+          end
+          it "should not return duplicate visibilities with multiple visible sections" do
+            enroll_user_in_group(@group_bar, {user: @user})
+            give_group_due_date(@assignment, @group_bar)
+            visible_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
+            expect(visible_assignment_ids.count).to eq 1
+          end
+        end
+
+        context "user in groups with and without override" do
+          before { enroller_user_in_both_groups(user: @user) }
+          it "should show the assignment to the user" do
+            ensure_user_sees_assignment
+          end
         end
       end
 
@@ -183,21 +286,21 @@ describe "differentiated_assignments" do
           before{enroller_user_in_section(@section_foo)}
           it "should keep the assignment visible if there is a grade" do
             @assignment.grade_student(@user, {grade: 10})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_sees_assignment
           end
 
           it "should not keep the assignment visible if there is no grade" do
             @assignment.grade_student(@user, {grade: nil})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_does_not_see_assignment
           end
 
           it "should keep the assignment visible if the grade is zero" do
             @assignment.grade_student(@user, {grade: 0})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_sees_assignment
           end
@@ -221,19 +324,19 @@ describe "differentiated_assignments" do
           it "should update when enrollments change" do
             ensure_user_sees_assignment
             enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
-            enrollments.each(&:destroy!)
+            enrollments.each(&:destroy_permanently!)
             ensure_user_does_not_see_assignment
           end
           it "should update when the override is deleted" do
             ensure_user_sees_assignment
-            @assignment.assignment_overrides.all.each(&:destroy!)
+            @assignment.assignment_overrides.each(&:destroy_permanently!)
             ensure_user_does_not_see_assignment
           end
           it "should not return duplicate visibilities with multiple visible sections" do
             enroller_user_in_section(@section_bar, {user: @user})
             give_section_due_date(@assignment, @section_bar)
-            visibile_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
-            expect(visibile_assignment_ids.count).to eq 1
+            visible_assignment_ids = AssignmentStudentVisibility.where(user_id: @user.id, course_id: @course.id)
+            expect(visible_assignment_ids.count).to eq 1
           end
         end
         context "user in section with no override" do

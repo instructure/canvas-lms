@@ -5,6 +5,7 @@ ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 # We avoid loading the whole rails environment here, so that commands like
 # `status` and `start` return much faster.
 require 'bundler/setup'
+require_relative '../lib/canvas_yaml'
 require 'delayed_job'
 
 Delayed::Pool.new.run()

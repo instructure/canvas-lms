@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1p1.xsd"
+                identifier="res_-FGM_FL15E_CAR_G08U2M5QB_004" title="-FGM_FL15E_CAR_G08U2M5QB_004" adaptive="false"
+                timeDependent="false">
+  <responseDeclaration baseType="string" cardinality="single" identifier="RESPONSE"/>
+  <outcomeDeclaration identifier="FEEDBACK" cardinality="single" baseType="identifier"/>
+  <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float"/>
+  <itemBody>
+    <div/>
+    <extendedTextInteraction responseIdentifier="RESPONSE" expectedLength="600">
+      <prompt>What is the difference between a tree?</prompt>
+    </extendedTextInteraction>
+  </itemBody>
+</assessmentItem>

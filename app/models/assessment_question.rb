@@ -19,12 +19,6 @@
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :question_data, :form_question_data
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :question_data, :context_id, :context_type, :workflow_state,
-    :created_at, :updated_at, :assessment_question_bank_id, :deleted_at, :position
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :attachments, :context, :assessment_question_bank]
 
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context
@@ -45,7 +39,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_dropdowns_question", "calculated_question",
                         "essay_question", "true_false_question", "file_upload_question"]
 
-  serialize :question_data
+  serialize_utf8_safe :question_data
 
   set_policy do
     given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
@@ -79,14 +73,55 @@ class AssessmentQuestion < ActiveRecord::Base
     end
   end
 
+  def translate_link_regex
+    @regex ||= Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
+  end
+
+  def file_substitutions
+    @file_substitutions ||= {}
+  end
+
+  def translate_file_link(link, match_data=nil)
+    match_data ||= link.match(translate_link_regex)
+    return link unless match_data
+
+    id = match_data[1]
+    path = match_data[2]
+    id_or_path = id || path
+
+    if !file_substitutions[id_or_path]
+      if id
+        file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
+      elsif path
+        path = URI.unescape(id_or_path)
+        file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
+      end
+      begin
+        new_file = file.try(:clone_for, self)
+      rescue => e
+        new_file = nil
+        er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
+        logger.error("Error while cloning attachment during"\
+                           " AssessmentQuestion#translate_links: "\
+                           "id: #{self.id} error_report: #{er_id}")
+      end
+      new_file.save if new_file
+      file_substitutions[id_or_path] = new_file
+    end
+    if sub = file_substitutions[id_or_path]
+      query_rest = match_data[3] ? "&#{match_data[3]}" : ''
+      "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
+    else
+      link
+    end
+  end
+
   def translate_links
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank && assessment_question_bank.context
 
     # This either matches the id from a url like: /courses/15395/files/11454/download
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
-    regex = Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
-    file_substitutions = {}
 
     deep_translate = lambda do |obj|
       if obj.is_a?(Hash)
@@ -94,33 +129,8 @@ class AssessmentQuestion < ActiveRecord::Base
       elsif obj.is_a?(Array)
         obj.map {|v| deep_translate.call(v) }
       elsif obj.is_a?(String)
-        obj.gsub(regex) do |match|
-          id_or_path = $1 || $2
-          if !file_substitutions[id_or_path]
-            if $1
-              file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
-            elsif $2
-              path = URI.unescape(id_or_path)
-              file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
-            end
-            begin
-              new_file = file.clone_for(self)
-            rescue => e
-              new_file = nil
-              er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
-              logger.error("Error while cloning attachment during"\
-                           " AssessmentQuestion#translate_links: "\
-                           "id: #{self.id} error_report: #{er_id}")
-            end
-            new_file.save if new_file
-            file_substitutions[id_or_path] = new_file
-          end
-          if sub = file_substitutions[id_or_path]
-            query_rest = $3 ? "&#{$3}" : ''
-            "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
-          else
-            match
-          end
+        obj.gsub(translate_link_regex) do |match|
+          translate_file_link(match, $~)
         end
       else
         obj
@@ -173,7 +183,8 @@ class AssessmentQuestion < ActiveRecord::Base
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
-        data = write_attribute(:question_data, data.with_indifferent_access)
+         write_attribute(:question_data, data.with_indifferent_access)
+         data = read_attribute(:question_data)
       end
     end
 
@@ -214,7 +225,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def find_or_create_quiz_question(quiz_id, exclude_ids=[])
-    query = quiz_questions.where(quiz_id: quiz_id)
+    query = quiz_questions.where(quiz_id: quiz_id).order(:id)
     query = query.where('id NOT IN (?)', exclude_ids) if exclude_ids.present?
 
     if qq = query.first
@@ -231,7 +242,7 @@ class AssessmentQuestion < ActiveRecord::Base
     text
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.save

@@ -101,7 +101,7 @@ describe CanvasPartman::Concerns::Partitioned do
   end
 
   describe 'removing records' do
-    it 'works using #destroy! or scope#destroy_all' do
+    it 'works using #destroy_permanently! or scope#destroy_all' do
       subject.create_partition(Time.new(2014, 11, 1))
       subject.create_partition(Time.new(2014, 12, 1))
 

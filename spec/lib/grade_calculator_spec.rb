@@ -690,5 +690,22 @@ describe GradeCalculator do
         end
       end
     end
+
+    context "excused assignments" do
+      before :once  do
+        student_in_course(active_all: true)
+        @a1 = @course.assignments.create! points_possible: 10
+        @a2 = @course.assignments.create! points_possible: 90
+      end
+
+      it "works" do
+        enrollment = @student.enrollments.first
+        @a1.grade_student(@student, grade: 10)
+        expect(enrollment.reload.computed_final_score).to eql(10.0)
+
+        @a2.grade_student(@student, excuse: 1)
+        expect(enrollment.reload.computed_final_score).to eql(100.0)
+      end
+    end
   end
 end

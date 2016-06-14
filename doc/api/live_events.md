@@ -218,3 +218,62 @@ by `asset_type` and `asset_id`.
 | `asset_type` | The type of asset being accessed. |
 | `asset_id` | The Canvas id of the asset. |
 | `asset_subtype` | See above. |
+
+
+#### `assignment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_id` | The Canvas id of the new assignment. |
+| `title` | The title of the assignment (possibly truncated). |
+| `description` | The description of the assignment (possibly truncated). |
+| `due_at` | The due date for the assignment. |
+| `unlock_at` | The unlock date (assignment is unlocked after this date) |
+| `lock_at` | The lock date (assignment is locked after this date) |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `points_possible` | The maximum points possible for the assignment |
+
+
+#### `assignment_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_id` | The Canvas id of the new assignment. |
+| `title` | The title of the assignment (possibly truncated). |
+| `description` | The description of the assignment (possibly truncated). |
+| `due_at` | The due date for the assignment. |
+| `unlock_at` | The unlock date (assignment is unlocked after this date) |
+| `lock_at` | The lock date (assignment is locked after this date) |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `points_possible` | The maximum points possible for the assignment |
+
+
+#### `submission_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_id` | The Canvas id of the new submission. |
+| `assignment_id` | The Canvas id of the assignment being submitted. |
+| `submitted_at` | The timestamp when the assignment was submitted. |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `score` | The raw score |
+| `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
+| `submission_type` | The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording') |
+| `body` | The content of the submission, if it was submitted directly in a text field.  (possibly truncated)|
+| `url` | The URL of the submission (for 'online_url' submissions) |
+| `attempt` | This is the submission attempt number.|
+
+#### `submission_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `submission_id` | The Canvas id of the new submission. |
+| `assignment_id` | The Canvas id of the assignment being submitted. |
+| `submitted_at` | The timestamp when the assignment was submitted. |
+| `updated_at` | The time at which this assignment was last modified in any way |
+| `score` | The raw score |
+| `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
+| `submission_type` | The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording') |
+| `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
+| `url` | The URL of the submission (for 'online_url' submissions) |
+| `attempt` | This is the submission attempt number.|

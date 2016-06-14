@@ -2,7 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignments_commo
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_assignments')
 
 describe "interaction with differentiated assignments on the dashboard and calendar" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include DifferentiatedAssignments
+  include AssignmentsCommon
 
   context "Student" do
     before :each do
@@ -25,7 +27,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        expect(f("#not_right_side .no-recent-messages")).to include_text("No Recent Messages")
+        expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity items are not being generated"
@@ -55,12 +57,12 @@ describe "interaction with differentiated assignments on the dashboard and calen
         create_section_override_for_assignment(@da_assignment, course_section: @section1, :due_at => Time.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-title should be nil
-        expect(f(".fc-view-month")).not_to include_text(@da_assignment.title)
+        expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
       it "should show assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
-        expect(f(".fc-view-month")).to include_text(@da_assignment.title)
+        expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
         @da_assignment.grade_student(@student, {:grade => 10})
@@ -93,7 +95,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        expect(f("#not_right_side .no-recent-messages")).to include_text("No Recent Messages")
+        expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity is not working currently in these tests"
@@ -123,12 +125,12 @@ describe "interaction with differentiated assignments on the dashboard and calen
         create_section_override_for_assignment(@da_assignment, course_section: @section1, :due_at => Time.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-month should be nil
-        expect(f(".fc-view-month")).not_to include_text(@da_assignment.title)
+        expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
       it "should show assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
-        expect(f(".fc-view-month")).to include_text(@da_assignment.title)
+        expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
       it "should show assignments with a graded submission" do
         @da_assignment.grade_student(@student, {:grade => 10})

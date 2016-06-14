@@ -20,12 +20,6 @@ class AssessmentRequest < ActiveRecord::Base
   include Workflow
   include SendToStream
   attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :comments, :rubric_association, :assessor
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :rubric_assessment_id, :user_id, :asset_id, :asset_type, :assessor_asset_id, :assessor_asset_type,
-    :comments, :workflow_state, :created_at, :updated_at, :uuid, :rubric_association_id, :assessor_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :asset, :assessor_asset, :submission, :submission_comments, :rubric_assessment]
 
   belongs_to :user
   belongs_to :asset, :polymorphic => true
@@ -63,16 +57,36 @@ class AssessmentRequest < ActiveRecord::Base
     }
   end
 
-  scope :incomplete, where(:workflow_state => 'assigned')
+  scope :incomplete, -> { where(:workflow_state => 'assigned') }
   scope :for_assessee, lambda { |user_id| where(:user_id => user_id) }
-  scope :for_assignment, lambda { |assignment_id| includes(:submission).where(:submissions => { :assignment_id => assignment_id})}
-  scope :for_course, lambda { |course_id| includes(:submission).where(:submissions => { :context_code => "course_#{course_id}"})}
-  scope :for_context_codes, lambda { |context_codes| includes(:submission).where(:submissions => { :context_code =>context_codes })}
+  scope :for_assessor, lambda { |assessor_id| where(:assessor_id => assessor_id) }
+  scope :for_asset, lambda { |asset_id| where(:asset_id => asset_id)}
+  scope :for_assignment, lambda { |assignment_id| eager_load(:submission).where(:submissions => { :assignment_id => assignment_id})}
+  scope :for_course, lambda { |course_id| eager_load(:submission).where(:submissions => { :context_code => "course_#{course_id}"})}
+  scope :for_context_codes, lambda { |context_codes| eager_load(:submission).where(:submissions => { :context_code =>context_codes })}
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='AssessmentRequest' AND asset_id=assessment_requests.id AND user_id=? AND purpose=?)",
-          user, purpose)
+    where("NOT EXISTS (?)",
+          Ignore.where("asset_id=assessment_requests.id").
+              where(asset_type: 'AssessmentRequest', user_id: user, purpose: purpose))
   }
+
+  set_policy do
+    given {|user, session|
+      self.can_read_assessment_user_name?(user, session)
+    }
+    can :read_assessment_user
+  end
+
+  def can_read_assessment_user_name?(user, session)
+    !self.considered_anonymous? ||
+        self.user_id == user.id ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
+  end
+
+  def considered_anonymous?
+    self.submission.assignment.anonymous_peer_reviews?
+  end
 
   def send_reminder!
     @send_reminder = true

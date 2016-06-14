@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!external_tools',
   'jquery',
@@ -54,7 +52,7 @@ define([
       var appId = 'app_' + this.props.app.id;
 
       return (
-        <a role="button" tabIndex="0" aria-label={I18n.t("View %{name} app", { name: this.props.app.name})} className="app"
+        <a role="button" tabIndex="0" aria-label={I18n.t("View %{name} app", { name: this.props.app.name})} aria-describedby={appId + "-desc"} className="app"
             onMouseEnter={this.showDetails} onMouseLeave={this.hideDetails} onClick={this.handleClick} onKeyDown={this.handleKeyDown}>
           <div id={appId}>
             {this.installedRibbon()}
@@ -63,7 +61,7 @@ define([
             <div ref="details" className="details">
               <div className="content">
                 <span className="name">{this.props.app.name}</span>
-                <div className="desc">{this.props.app.short_description}</div>
+                <div id={appId + "-desc"} className="desc">{this.props.app.short_description}</div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-<% jammit_css :quizzes %>
+<% css_bundle :quizzes %>
 <%= t :score_out_of, "You got %{score} out of %{points_possible}", :score => @submission.score, :points_possible => @quiz.points_possible %>
 <% submission_data = @submission.data %>
 <div id="questions" class="assessment_results <%= (show_correct_answers? ? 'show_correct_answers' : 'suppress_correct_answers') %>">

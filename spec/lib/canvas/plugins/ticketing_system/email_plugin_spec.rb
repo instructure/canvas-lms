@@ -7,7 +7,12 @@ module Canvas::Plugins::TicketingSystem
       let(:plugin){ EmailPlugin.new(ticketing) }
       let(:email_address){ "to-address@example.com" }
       let(:config){ {email_address: email_address} }
-      let(:report){ stub(email: "from-address@example.com", to_document: {}, raw_report: stub()) }
+      let(:report){ stub(
+        email: "from-address@example.com",
+        to_document: {},
+        raw_report: stub(),
+        account_id: nil )
+      }
 
       it "sends an email to the address in the configuration" do
         Message.expects(:create!).with(has_entry(to: email_address))
@@ -25,7 +30,15 @@ module Canvas::Plugins::TicketingSystem
         Message.expects(:create!).with(has_entry(context: raw_report))
         plugin.export_error(wrapped_report, config)
       end
+
+      it "carries through the account if the error report has one" do
+        raw_report = ErrorReport.new
+        account = Account.create!
+        raw_report.account = account
+        wrapped_report = CustomError.new(raw_report)
+        message = plugin.export_error(wrapped_report, config)
+        expect(message.root_account).to eq(account)
+      end
     end
   end
 end
-

@@ -15,18 +15,30 @@
 
 <div class="index-content-container">
   <div class="index-content">
+  {{#if ENV.use_new_styles}}
+    <table class="ic-Table ic-Table--condensed ic-Table--striped ic-Table--hover-row" role="grid">
+  {{else}}
     <table class="table" role="grid">
-      <thead><tr class="header-row" role="row">
-        <th width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}52%{{else}}56%{{/if}}{{else}}60%{{/if}}" role="columnheader">
-          <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
-        </th>
-        <th width="20%" role="columnheader">
-          <a href="#" data-sort-field="created_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.creation_date'}}Creation date{{/t}} <i></i></a>
-        </th>
-        <th width="20%" role="columnheader">
-          <a href="#" data-sort-field="updated_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.last_edit'}}Last edit{{/t}} <i></i></a>
-        </th>
-      </tr></thead>
+  {{/if}}
+      <thead>
+        <tr class="header-row" role="row">
+          <th width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
+            <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
+          </th>
+          <th width="20%" role="columnheader">
+            <a href="#" data-sort-field="created_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.creation_date'}}Creation date{{/t}} <i></i></a>
+          </th>
+          <th width="20%" role="columnheader">
+            <a href="#" data-sort-field="updated_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.last_edit'}}Last edit{{/t}} <i></i></a>
+          </th>
+          <th width="5%" role="columnheader">
+            <span class="screenreader-only">{{#t}}Publish{{/t}}</span>
+          </th>
+          <th width="5%" role="columnheader">
+            <span class="screenreader-only">{{#t}}Manage{{/t}}</span>
+          </th>
+        </tr>
+      </thead>
       <tbody class="collectionViewItems">
         {{#if fetched}}
           {{#unless collection.length}}

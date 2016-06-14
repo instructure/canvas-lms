@@ -1,6 +1,12 @@
 @import "mixins/blue";
+@if $use_new_styles {
+@import "components/ic-typography";
+// Because we're not loading in /scaffold or /type for new ui anymore
+// this needs to be explicitly called out here because common.scss doesn't
+// load everywhere... and we need typography everywhere (^_^)
+}
 
-$body-bg-color:                     $ic-color-light; 
+$body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
 $embedded-footer-bg:                $ic-color-neutral;
 $embedded-footer-border-color:      $ic-border-color;
@@ -10,11 +16,11 @@ $layout-modal-font-color:           $ic-color-dark;
 $footer-links-color:                lighten($ic-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-@if $use_new_styles { 
-  body { 
+@if $use_new_styles {
+  body {
     min-height: 100vh;
     min-width: 768px;
-  } 
+  }
 }
 @else { body, html { height: 100%; } }
 
@@ -22,31 +28,21 @@ body {
   @if $use_new_styles == false { min-width: $min_main_width; }
   @if $use_high_contrast { background: white; }
   @else {
-    @if $is-k12 { background: white; }
-    @else if $use_new_styles { 
+    @if $use_new_styles {
       background: $ic-color-light;
       font-weight: 300;
     }
     @else { background-color: $ic-body-background-color; }
   }
   &.no-headers, &.embedded {
-    #header, #topbar, #left-side, #breadcrumbs {
-      display: none !important;
+    #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
+    @if $use_new_styles {
+      .ic-app-nav-toggle-and-crumbs { display: none; }
     }
-    @if $is-k12 {
-      .canvas-header {
-        display: none !important;
-      }
-    }
-    #footer {
-      display: none;
-    }
+    #footer { display: none; }
     #wrapper {
       margin: 0;
-      @if $use_new_styles == false {
-        min-width: 400px;  
-      }
-      
+      @if $use_new_styles == false { min-width: 400px; }
     }
     #main {
       margin: 0;
@@ -70,7 +66,7 @@ body {
     }
     h2, .h2 {
       @include ui-widget-header-bg-and-text;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       font-weight: bold;
       margin: (-0.95em) -0.95em 1em;
       padding: 0.4em 1em;
@@ -123,22 +119,17 @@ body {
     @include breakpoint(wide) { margin-left: $ic-header-primary-width; }
     body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
     body.no-headers & { margin-left: 0; }
-  }  
+  }
 }
 
-#wrapper {
-  @if $use_new_styles {
-    // leave for now
-  }
-  @else {
-    @include pie-clearfix;
-  }
+@if $use_new_styles == false {
+  #wrapper { @include pie-clearfix; }
 }
 
 #main {
   position: relative;
   z-index: 10;
-  
+
   @if $use_new_styles == false {
     background-color: $body-bg-color;
     border: none;
@@ -150,39 +141,33 @@ body {
 }
 
 #content {
-  @if $use_new_styles { 
-    padding: $ic-sp*2;
-    @include breakpoint(desktop) { 
-      body.with-left-side & { padding-left: $ic-sp; }
-      body.with-right-side & { padding-right: $ic-sp; } 
-    }
+  @if $use_new_styles { padding: $ic-sp*2; }
+  @else {
+    padding: 1em;
+    overflow: hidden;
   }
-  @else { padding: 1em; }
-  overflow: hidden;
 }
 
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
 
-@if $use_new_styles == false {
-  .padless-content #content, #content.padless {
-    padding: 0;
-  }
+@if $use_new_styles {
+  body.ic-framed-lti-tool #content { padding: 0 $ic-sp*2; }
+  body.ic-full-screen-lti-tool #content { padding: 0; }
+}
+
+@else {
+  .padless-content #content,
+  #content.padless { padding: 0; }
 }
 
 .with-left-side {
-  @if $use_new_styles {
-    #left-side {
-      @include breakpoint(desktop) { display: block; }
-    }  
-  }
-  
-  @else {
+  #left-side { display: block; }
+  @if $use_new_styles == false {
     min-width: $left_side_width + $min_main_width;
-    #left-side { display: block; }
     #footer { margin-left: $left_side_width; }
     #wrapper { margin-left: 0; }
-    #main { margin-left: $left_side_width; }  
+    #main { margin-left: $left_side_width; }
     #header-inner { max-width: $left_side_width + $max_main_width; }
   }
 }
@@ -190,11 +175,11 @@ body {
 .with-right-side {
   @if $use_new_styles == false { min-width: $right_side_width + $min_main_width; }
   #right-side-wrapper {
-    display: block;    
+    display: block;
     @if $use_new_styles == false {
       float: right;
       position: absolute;
-      top: 0;  
+      top: 0;
     }
   }
   @if $use_new_styles == false {
@@ -232,10 +217,10 @@ body {
 #footer {
   @if $use_new_styles == false {
     color: #5c5c5c;
-    font-size: 11px;
-    margin: 0 15px 34px;  
+    @include fontSize(11px);
+    margin: 0 15px 34px;
   }
-  
+
   .footer-logo {
     @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 140px, 10px);
     display: inline-block;

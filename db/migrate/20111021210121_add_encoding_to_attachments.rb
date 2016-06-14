@@ -1,4 +1,6 @@
 class AddEncodingToAttachments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :attachments, :encoding, :string
   end

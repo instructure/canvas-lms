@@ -1,4 +1,4 @@
-<% comment = page_comment || nil; read_only ||= false %>
+<% page_comment ||= nil; comment = page_comment || nil; read_only ||= false %>
 <div class="comment" id="comment_<%= comment ? comment.id : "{{ blank }}" %>" style="<%= hidden unless comment %> border: 0px solid #aaa; margin-bottom: 10px;">
   <div style="float: left;" class="user_name"><%= comment.user_name rescue nbsp %></div>
   <div style="float: right;">
@@ -6,7 +6,7 @@
     <% if !read_only && can_do(@portfolio, @current_user, :update) %>
       <a href="<%= eportfolio_entry_page_comment_path(@portfolio.id, @page.id, comment ? comment.id : "{{ id }}") %>" class="delete_comment_link no-hover"><i class="icon-trash standalone-icon"></i></a>
     <% end %>
-  </div>     
+  </div>
   <div class="clear" style="border-top: 1px solid #ccc;"></div>
   <div class="message message-eportfolios"><%= comment.message rescue nbsp %></div>
 </div>

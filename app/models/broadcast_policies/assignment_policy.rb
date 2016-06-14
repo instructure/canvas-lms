@@ -26,7 +26,9 @@ module BroadcastPolicies
 
     def should_dispatch_assignment_created?
       return false unless context_sendable?
-      published_on_create? || just_published?
+
+      published_on_create? || just_published? ||
+        (prior_version && prior_version.workflow_state != assignment.workflow_state && assignment.published?)
     end
 
     def should_dispatch_assignment_unmuted?

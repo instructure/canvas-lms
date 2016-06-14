@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
 describe "discussions" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include DiscussionsCommon
 
   let(:course) { course_model.tap{|course| course.offer!} }
   let(:default_section) { course.default_section }
@@ -30,7 +31,7 @@ describe "discussions" do
         user_session(teacher)
       end
 
-      it "should add an attachment to a new topic" do
+      it "should add an attachment to a new topic", priority: "1", test_id: 150466 do
         topic_title = 'new topic with file'
         get url
         replace_content(f('input[name=title]'), topic_title)
@@ -38,7 +39,7 @@ describe "discussions" do
         expect(DiscussionTopic.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "should create a podcast enabled topic" do
+      it "should create a podcast enabled topic", priority: "1", test_id: 150467 do
         get url
         replace_content(f('input[name=title]'), "This is my test title")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
@@ -52,7 +53,7 @@ describe "discussions" do
       end
 
       context "graded" do
-        it "should allow creating multiple due dates" do
+        it "should allow creating multiple due dates", priority: "1", test_id: 150468 do
           assignment_group
           group_category
           new_section
@@ -89,7 +90,7 @@ describe "discussions" do
           expect(other_override.due_at.strftime('%b %-d, %y')).to eq due_at2.to_date.strftime('%b %-d, %y')
         end
 
-        it "should validate that a group category is selected" do
+        it "should validate that a group category is selected", priority: "1", test_id: 150469 do
           assignment_group
           get url
 
@@ -98,10 +99,38 @@ describe "discussions" do
           close_visible_dialog
           f('.btn-primary[type=submit]').click
           wait_for_ajaximations
-
+          keep_trying_until do
+            expect(driver.execute_script(
+              "return $('.errorBox').filter('[id!=error_box_template]')"
+            )).to be_present
+          end
           errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
           visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
           expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+        end
+      end
+
+      context "post to sis default setting" do
+        before do
+          @account = @course.root_account
+          @account.enable_feature!(:bulk_sis_grade_export)
+        end
+
+        it "should default to post grades if account setting is enabled" do
+          @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+          @account.save!
+
+          get url
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          expect(is_checked('#assignment_post_to_sis')).to be_truthy
+        end
+
+        it "should not default to post grades if account setting is not enabled" do
+          get url
+          f('input[type=checkbox][name="assignment[set_assignment]"]').click
+
+          expect(is_checked('#assignment_post_to_sis')).to be_falsey
         end
       end
     end
@@ -111,7 +140,30 @@ describe "discussions" do
         user_session(student)
       end
 
-      it "should not show file attachment if allow_student_forum_attachments is not true" do
+      it "should create a delayed discussion", priority: "1", test_id: 150470 do
+        get url
+        replace_content(f('input[name=title]'), "Student Delayed")
+        type_in_tiny('textarea[name=message]', 'This is the discussion description.')
+        target_time = 1.day.from_now
+        unlock_text = format_time_for_view(target_time)
+        unlock_text_index_page = target_time.strftime('%b %-d')
+        f('#delayed_post_at').send_keys(unlock_text)
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('.entry-content').text).to include("This topic is locked until #{unlock_text}")
+        expect_new_page_load{f('#section-tabs .discussions').click}
+        expect(f(' .discussion').text).to include("Not available until #{unlock_text_index_page}")
+      end
+
+      it "should allow a student to create a discussion", priority: "1", test_id: 150471 do
+        get url
+        replace_content(f('input[name=title]'), "Student Discussion")
+        type_in_tiny('textarea[name=message]', 'This is the discussion description.')
+        expect_new_page_load {submit_form('.form-actions')}
+        expect(f('.discussion-title').text).to eq "Student Discussion"
+        expect(f('#topic_publish_button')).not_to be_present
+      end
+
+      it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223507 do
         # given
         get url
         expect(f('#disussion_attachment_uploaded_data')).to be_nil
@@ -126,7 +178,7 @@ describe "discussions" do
       context "in a group" do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
-        it "should not show file attachment if allow_student_forum_attachments is not true" do
+        it "should not show file attachment if allow_student_forum_attachments is not true", priority: "2", test_id: 223508 do
           # given
           get url
           expect(f('label[for=discussion_attachment_uploaded_data]')).to be_nil

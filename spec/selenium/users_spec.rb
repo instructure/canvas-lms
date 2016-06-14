@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "users" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "logins" do
     it "should allow setting passwords for new pseudonyms" do
@@ -191,13 +191,26 @@ describe "users" do
 
   context "registration" do
     before :each do
-      a = Account.default
-      a.settings = {:self_registration => true}
-      a.save!
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
-    it "should not require terms if not configured to do so" do
+    it "should not require terms if globally not configured to do so" do
       Setting.set('terms_required', 'false')
+
+      get '/register'
+
+      %w{teacher student parent}.each do |type|
+        f("#signup_#{type}").click
+        form = fj('.ui-dialog:visible form')
+        expect(f('input[name="user[terms_of_use]"]', form)).to be_nil
+        fj('.ui-dialog-titlebar-close:visible').click
+      end
+    end
+
+    it "should not require terms if account not configured to do so" do
+      default_account = Account.default
+      default_account.settings[:account_terms_required] = false
+      default_account.save!
 
       get '/register'
 
@@ -292,19 +305,18 @@ describe "users" do
   end
 
   context "masquerading" do
-    it "should masquerade as a user" do
-      skip('testbot fragile')
-      site_admin_logged_in(:name => "The Admin")
-      user_with_pseudonym(:active_user => true, :name => "The Student")
+    it "should masquerade as a user", priority: "1", test_id: 134743 do
+      site_admin_logged_in(:name => 'The Admin')
+      user_with_pseudonym(:active_user => true, :name => 'The Student')
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
       wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text "The Student"
-      bar = f("#masquerade_bar")
-      expect(bar).to include_text "You are currently masquerading"
-      bar.find_element(:css, ".stop_masquerading").click
+      expect(f('#identity .user_name')).to include_text 'The Student'
+      bar = f('#masquerade_bar')
+      expect(bar).to include_text 'You are currently masquerading'
+      bar.find_element(:css, '.stop_masquerading').click
       wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text "The Admin"
+      expect(f('#identity .user_name')).to include_text 'The Admin'
     end
   end
 end

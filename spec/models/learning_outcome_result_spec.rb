@@ -102,4 +102,13 @@ describe LearningOutcomeResult do
     end
 
   end
+
+  describe "active scope" do
+    it "doesn't return deleted outcomes" do
+      expect(LearningOutcomeResult.active.count).to eq(1), "precondition"
+      learning_outcome_result.alignment.workflow_state = 'deleted'
+      learning_outcome_result.alignment.save!
+      expect(LearningOutcomeResult.active.count).to eq 0
+    end
+  end
 end

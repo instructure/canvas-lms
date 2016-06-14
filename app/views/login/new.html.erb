@@ -1,11 +1,17 @@
 <% content_for :page_title do %>
-    <%= t 'Failed to Log In' %>
+  <%= t 'Failed to Log In' %>
 <% end %>
 
 <div id="unauthorized_holder">
   <div id="unauthorized_message">
-    <h2 class="ui-state-error"><%= t 'Failed to Log In' %></h2>
-    <p><%= flash[:delegated_message] %></p>
-    <p><%= t "You can try to *log in again*.", wrapper: link_to('\1', login_url) %></p>
+    <h2 class="ui-state-error">
+      <%= t 'Failed to Log In' %>
+    </h2>
+    <p>
+      <%= flash[:delegated_message] %>
+    </p>
+    <p>
+      <%= t "You can try to *log in again*.", wrapper: link_to('\1', login_url) %>
+    </p>
   </div>
 </div>

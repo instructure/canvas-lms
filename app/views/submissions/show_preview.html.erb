@@ -1,5 +1,5 @@
-<% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : context_user_name(@context, @submission.user) %>
-<% content_for :page_title do %><%= join_title @assignment.title, context_user_name(@context, @submission.user) %><% end %>
+<% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
+<% content_for :page_title do %><%= join_title @assignment.title, submission_author_name_for(@assessment_request) %><% end %>
 
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
@@ -44,15 +44,23 @@
     <% image = @submission.attachment if @submission.processed? %>
     <%= t('external_url_submission', 'This submission was a URL to an external page.') %>
     <% if image %>
-      <%= t('entry_with_image', "We've included a snapshot of what the page looked like when it was submitted. Or you can click to view the original submission.")  %>
+      <%= t('entry_with_image', "We've included a snapshot of what the page looked like when it was submitted.")  %>
     <% else %>
       <%= t('entry_no_image', 'Keep in mind that this page may have changed since the submission originally occurred.') %>
     <% end %>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external"><%= t('view_original_submission', 'View the Original Submission for %{user}', :user => user_name) %></a>
+      <%= link_to @submission.url,
+                  @submission.url,
+                  class: "not_external" %>
     </div>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external"><%= @submission.url %></a>
+      <%= link_to t('view_in_a_new_tab', '(View in a new tab)'),
+                  @submission.url,
+                  class: "open_in_a_new_tab",
+                  target: "_blank" %>
+
+      <span style="display: inline-block;" class="ui-icon ui-icon-extlink ui-icon-inline"
+        title="<%= t('titles.external_link', 'Links to an external site.') %>"/>
     </div>
   </div>
   <div style="text-align: center;">
@@ -107,7 +115,7 @@
           </div>
 
           <div class="col-xs-5 align-right">
-            <% if attachment.crocodoc_available? %>
+            <% if attachment.crocodoc_available? || attachment.canvadoc.try(:has_annotations?) %>
               <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
                  button_text = t('view_feedback_button', 'View Feedback')
               %>
@@ -117,7 +125,7 @@
               %>
             <% end %>
             <% if attachment.crocodoc_available? || attachment.canvadocable? %>
-              <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
+              <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment, crocodoc_ids: @crocodoc_ids) %>><%= button_text %></a>
             <% end %>
           </div>
 

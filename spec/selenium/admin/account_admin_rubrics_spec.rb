@@ -1,15 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/rubrics_common')
-require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "account shared rubric specs" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include RubricsCommon
 
   let(:rubric_url) { "/accounts/#{Account.default.id}/rubrics" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
 
-  before (:each) do
+  before(:each) do
     resize_screen_to_normal
     course_with_admin_logged_in
   end
@@ -24,7 +24,6 @@ describe "account shared rubric specs" do
   it "should allow fractional points" do
     should_allow_fractional_points
   end
-
 
   it "should round to 2 decimal places" do
     should_round_to_2_decimal_places

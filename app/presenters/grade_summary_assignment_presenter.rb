@@ -18,7 +18,9 @@ class GradeSummaryAssignmentPresenter
   end
 
   def graded?
-    submission && submission.grade && !assignment.muted?
+    submission &&
+      (submission.grade || submission.excused?) &&
+      !assignment.muted?
   end
 
   def is_letter_graded?
@@ -81,8 +83,24 @@ class GradeSummaryAssignmentPresenter
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
   end
 
+  def classes
+    classes = ["student_assignment"]
+    classes << "assignment_graded" if graded?
+    classes << special_class
+    classes << "excused" if excused?
+    classes.join(" ")
+  end
+
+  def excused?
+    submission.try(:excused?)
+  end
+
   def published_grade
-    is_letter_graded_or_gpa_scaled? ? "(#{submission.published_grade})" : ''
+    if is_letter_graded_or_gpa_scaled? && !submission.published_grade.nil?
+      "(#{submission.published_grade})"
+    else
+      ''
+    end
   end
 
   def display_score
@@ -95,12 +113,10 @@ class GradeSummaryAssignmentPresenter
 
   def turnitin
     t = if is_text_entry?
-      submission.turnitin_data[submission.asset_string]
-    elsif is_online_upload? && file
-      submission.turnitin_data[file.asset_string]
-    else
-      nil
-    end
+          submission.turnitin_data[submission.asset_string]
+        elsif is_online_upload? && file
+          submission.turnitin_data[file.asset_string]
+        end
     t.try(:[], :state) ? t : nil
   end
 

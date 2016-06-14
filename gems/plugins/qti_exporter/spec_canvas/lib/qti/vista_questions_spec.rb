@@ -81,8 +81,8 @@ describe "Converting Blackboard Vista qti" do
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::TRUE_FALSE2
   end
-  
-  it "should convert image reference" do 
+
+  it "should convert image reference" do
     hash = get_question_hash(vista_question_dir, 'mc', delete_answer_ids=true, opts={})
     expect(hash[:question_text]).to match %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
   end
@@ -98,7 +98,7 @@ describe "Converting Blackboard Vista qti" do
     hash = get_question("ID_4609865577341")
     expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::TRUE_FALSE
   end
-  
+
   it "should convert multiple choice questions with multiple correct answers (multiple answer)" do
     hash = get_question("ID_4609865392341")
     expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::MULTIPLE_ANSWER
@@ -147,7 +147,7 @@ describe "Converting Blackboard Vista qti" do
     hash = get_question("ID_4609885376341")
     expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::COMBINATION
   end
-  
+
   it "should convert fill in multiple blanks questions" do
     hash = get_question("ID_4609842630341")
     expect(hash.reject{|k,v| KEYS_TO_IGNORE.include?(k.to_s)}).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
@@ -209,7 +209,7 @@ module VistaExpected
                          {:text=>"False", :weight=>0, :migration_id=>"false"}],
                 :question_type=>"true_false_question",
                 :migration_id=>"ID_4609865577341"}.with_indifferent_access
-  
+
   TRUE_FALSE2 = {:correct_comments=>"",
                 :points_possible=>1,
                 :question_name=>"True/False",
@@ -260,7 +260,7 @@ module VistaExpected
            :question_name=>"Essay Question"}.with_indifferent_access
 
   # removed ids on the answers
-  SHORT_ANSWER = {:question_text=>"We all live in what?<br>",
+  SHORT_ANSWER = {:question_text=>"We all live in what?<br>\n<br/>\n<div class=\"html\">1. </div>",
                   :incorrect_comments=>"",
                   :question_type=>"short_answer_question",
                   :answers=>

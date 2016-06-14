@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="36px" height="37px" class="ic-icon-svg ic-icon-svg--dashboard" viewBox="0 0 36 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.2 (12043) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-inbox</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="_svg_icon_inbox" sketch:type="MSLayerGroup" fill="#000000">
+            <g id="Page-2" sketch:type="MSShapeGroup">
+                <g id="1--Courses-Art-History-Modules">
+                    <path d="M3,17.961538 L3,0 L33,0 L33,17.961538 L23.7990761,23.977527 L20.5115598,21.808817 C19.1227655,20.892657 16.8755364,20.893777 15.4884402,21.808817 L12.2009239,23.977527 L3,17.961538 L3,17.961538 Z M0,35 L16.3388672,24.107422 C17.2562855,23.49581 18.750521,23.500347 19.6611328,24.107422 L36,35 L36,37 L0,37 L0,35 L0,35 Z M36,19 L36,32 L26,25.5 L36,19 L36,19 Z M0,19 L0,32 L10,25.5 L0,19 L0,19 Z M8,6 C8,5.447715 8.4556644,5 8.9953976,5 L17.0046024,5 C17.5543453,5 18,5.443865 18,6 C18,6.552285 17.5443356,7 17.0046024,7 L8.9953976,7 C8.4456547,7 8,6.556135 8,6 L8,6 Z M8,11 C8,10.447715 8.4553056,10 8.9918031,10 L27.0081969,10 C27.5559546,10 28,10.443865 28,11 C28,11.552285 27.5446944,12 27.0081969,12 L8.9918031,12 C8.4440454,12 8,11.556135 8,11 L8,11 Z M8,16 C8,15.447715 8.4553056,15 8.9918031,15 L27.0081969,15 C27.5559546,15 28,15.443865 28,16 C28,16.552285 27.5446944,17 27.0081969,17 L8.9918031,17 C8.4440454,17 8,16.556135 8,16 L8,16 Z" id="icon-inbox"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

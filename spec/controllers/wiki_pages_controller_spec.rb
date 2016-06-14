@@ -26,6 +26,16 @@ describe WikiPagesController do
       expect(response).to be_redirect
       expect(response.location).to match(%r{/courses/#{@course.id}/pages})
     end
+
+    it "sets up js_env for view_all_pages link" do
+      course_with_teacher_logged_in(active_all: true)
+      wiki = @course.wiki
+      front_page = wiki.wiki_pages.create!(title: "ponies4ever")
+      wiki.set_front_page_url!(front_page.url)
+      get 'front_page', course_id: @course.id
+      expect(response).to be_success
+      expect(assigns[:js_env][:DISPLAY_SHOW_ALL_LINK]).to be(true)
+    end
   end
 
   describe "GET 'show_redirect'" do

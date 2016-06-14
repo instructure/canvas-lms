@@ -77,7 +77,7 @@ def test_selective_content(source_course=nil)
 end
 
 describe "content migrations", :non_parallel do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "common cartridge importing" do
     before :each do
@@ -312,7 +312,7 @@ describe "content migrations", :non_parallel do
   end
 
   context "course copy" do
-    before :all do
+    before :once do
       #the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
       #  you run it with the whole suite
@@ -452,7 +452,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{enrolled_course.id}\"]")).not_to be_nil
     end
 
-    it "should copy all content from a course" do
+    it "should copy all content from a course", priority: "1", test_id: 126677 do
       skip unless Qti.qti_enabled?
       visit_page
 
@@ -473,7 +473,7 @@ describe "content migrations", :non_parallel do
       expect(@course.quizzes.first.quiz_questions.count).to eq 11
     end
 
-    it "should selectively copy content" do
+    it "should selectively copy content", priority: "1", test_id: 126682 do
       skip unless Qti.qti_enabled?
       visit_page
 
@@ -665,5 +665,56 @@ describe "content migrations", :non_parallel do
       select_migration_type(import_tool.asset_string)
       expect(ff('input[name=selective_import]').size).to eq 2
     end
+  end
+
+  it "should be able to selectively import common cartridge submodules" do
+    course_with_teacher_logged_in
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'common_cartridge_importer'
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_full_test.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.filename = "file.zip"
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    visit_page
+
+    f('.migrationProgressItem .selectContentBtn').click
+    wait_for_ajaximations
+    f('li.top-level-treeitem[data-type="context_modules"] a.checkbox-caret').click
+    wait_for_ajaximations
+
+    submod = f('li.top-level-treeitem[data-type="context_modules"] li.normal-treeitem')
+    expect(submod).to include_text("1 sub-module")
+    submod.find_element(:css, "a.checkbox-caret").click
+    wait_for_ajaximations
+
+    expect(submod.find_element(:css, ".module_options")).to_not be_displayed
+
+    sub_submod = submod.find_element(:css, "li.normal-treeitem")
+    expect(sub_submod).to include_text("Study Guide")
+
+    sub_submod.find_element(:css, 'input[type="checkbox"]').click
+    wait_for_ajaximations
+
+    expect(submod.find_element(:css, ".module_options")).to be_displayed # should show the module option now
+    submod.find_element(:css, '.module_options input[value="separate"]').click # select to import submodules individually
+
+    f(".selectContentDialog input[type=submit]").click
+    wait_for_ajaximations
+
+    run_jobs
+
+    expect(@course.context_modules.count).to eq 1
+    expect(@course.context_modules.first.name).to eq "Study Guide"
   end
 end

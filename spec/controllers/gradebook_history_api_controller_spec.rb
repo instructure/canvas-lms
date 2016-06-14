@@ -97,4 +97,22 @@ describe GradebookHistoryApiController do
       expect(json_body.first['versions'].first['score']).to eq 100
     end
   end
+
+  describe 'GET feed' do
+    context 'deleted submissions' do
+      before :each do
+        @submission1.destroy
+        get 'feed', course_id: @course.id, format: 'json'
+      end
+
+      it 'does not return an error' do
+        expect(response).to be_ok
+      end
+
+      it 'excludes deleted submissions in the response' do
+        response_ids = json_body.map { |sub| sub['id'] }
+        expect(response_ids).to_not include @submission1.id
+      end
+    end
+  end
 end

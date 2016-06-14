@@ -17,7 +17,7 @@
       float: left;
     }
     .changes {
-      font-size: 10px;
+      @include fontSize(10px);
       width: 65px;
       float: left;
       text-align: center;

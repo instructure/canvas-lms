@@ -42,7 +42,7 @@ module ReportSpecHelper
     a = report.attachment
     if a.content_type == 'application/zip'
       parsed = {}
-      Zip::ZipInputStream::open(a.open) do |io|
+      Zip::InputStream::open(a.open) do |io|
         while (entry = io.get_next_entry)
           parsed[entry.name] = parse_csv(io.read, options)
         end

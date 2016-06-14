@@ -27,7 +27,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
-  has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
+  has_many :discussion_subentries, -> { order(:created_at) }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
@@ -41,9 +41,6 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
 
-  EXPORTABLE_ATTRIBUTES = [:id, :message, :discussion_topic_id, :user_id, :parent_id, :created_at, :updated_at, :attachment_id, :workflow_state, :deleted_at, :editor_id, :root_entry_id, :depth]
-  EXPORTABLE_ASSOCIATIONS = [:discussion_subentries, :discussion_entry_participants, :discussion_topic, :user, :parent_entry, :root_entry, :attachment, :editor, :external_feed_entry]
-
   before_create :infer_root_entry_id
   after_save :update_discussion
   after_save :context_module_action_later
@@ -52,6 +49,7 @@ class DiscussionEntry < ActiveRecord::Base
   validates_presence_of :discussion_topic_id
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
+  validate :discussion_not_deleted, on: :create
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
@@ -132,8 +130,13 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def discussion_not_deleted
+    errors.add(:base, "Requires non-deleted discussion topic") if self.discussion_topic.deleted?
+  end
+
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
+    raise IncomingMail::Errors::ReplyToDeletedDiscussion if self.discussion_topic.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -184,7 +187,7 @@ class DiscussionEntry < ActiveRecord::Base
     truncate_html(self.message, :max_length => length)
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
@@ -202,7 +205,7 @@ class DiscussionEntry < ActiveRecord::Base
         dt = dt.root_topic
         break if dt.blank?
       end
-      connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
+      self.class.connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
     end
   end
 
@@ -282,7 +285,10 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update and can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :read_forum) && self.discussion_topic.visible_for?(user) }
+    given { |user, session| self.discussion_topic.is_announcement && self.context.grants_right?(user, session, :read_announcements) && self.discussion_topic.visible_for?(user) }
+    can :read
+
+    given { |user, session| !self.discussion_topic.is_announcement && self.context.grants_right?(user, session, :read_forum) && self.discussion_topic.visible_for?(user) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked_for?(user) && self.discussion_topic.visible_for?(user) }
@@ -364,8 +370,12 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  after_commit :subscribe_author, on: :create
+  def subscribe_author
+    discussion_topic.subscribe(user) unless discussion_topic.subscription_hold(user, nil, nil)
+  end
+
   def create_participants
-    subscription_hold = self.discussion_topic.subscription_hold(self.user, nil, nil)
     transaction do
       scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
       scope = scope.where("user_id<>?", self.user) if self.user
@@ -382,7 +392,6 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
         end
-        self.discussion_topic.subscribe(self.user) unless subscription_hold
       end
     end
   end

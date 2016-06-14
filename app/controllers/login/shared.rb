@@ -1,11 +1,18 @@
 module Login::Shared
   def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id, :masquerade_return_to)
+    reset_session_saving_keys(:return_to,
+                              :oauth,
+                              :oauth2,
+                              :confirm,
+                              :enrollment,
+                              :expected_user_id,
+                              :masquerade_return_to,
+                              :oauth2_nonce)
   end
 
   def successful_login(user, pseudonym, otp_passed = false)
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
-    Auditors::Authentication.record(@current_pseudonym, 'login')
+    Auditors::Authentication.record(pseudonym, 'login')
 
     # Since the user just logged in, we'll reset the context to include their info.
     setup_live_events_context
@@ -15,7 +22,7 @@ module Login::Shared
 
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     unless otp_passed
-      mfa_settings = user.mfa_settings
+      mfa_settings = user.mfa_settings(pseudonym_hint: @current_pseudonym)
       if (user.otp_secret_key && mfa_settings == :optional) ||
           mfa_settings == :required
         session[:pending_otp] = true

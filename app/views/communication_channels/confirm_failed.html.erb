@@ -1,12 +1,20 @@
 <%
-  jammit_css :login
+  css_bundle :login_confirm
   @headers = false
-  @body_classes << "modal"
+  @body_classes << "modal body--login-confirmation"
   content_for :page_title, t(:page_title, "Registration Confirmation Failed")
 %>
 
-<div id="modal-box">
-  <h2><%= t 'titles.problems_with_registration', "Problem with Registration" %></h2>
+<div id="modal-box"<% if use_new_styles? %> class="ic-Login-confirmation"<% end %>>
+  <% if use_new_styles? %>
+  <header class="ic-Login-confirmation__header">
+    <%= image_tag("login/canvas-logo@2x.png", class:"ic-Login-confirmation__logo", alt:"Canvas by Instructure") %>
+  </header>
+  <div class="ic-Login-confirmation__content">
+  <% end %>
+    <h2<% if use_new_styles? %> class="ic-Login-confirmation__headline"<% end %>>
+      <%= t 'titles.problems_with_registration', "Problem with Registration" %>
+    </h2>
     <p><%= t :details, %{It looks like you may have already confirmed your registration.  Try
     *logging in*
     with the email address and password you registered.  If you can't remember
@@ -18,4 +26,5 @@
       or to let us know what's going on.} %>
     <% end %>
     </p>
+  <% if use_new_styles? %></div><% end %>
 </div>

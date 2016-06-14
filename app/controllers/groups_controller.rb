@@ -125,8 +125,8 @@ require 'atom'
 #         },
 #         "permissions": {
 #           "description": "optional: the permissions the user has for the group. returned only for a single group and include[]=permissions",
-#           "example": "{\"create_discussion_topic\"=>true,\"create_announcement\"=>true}",
-#           "type": "map",
+#           "example": {"create_discussion_topic": true, "create_announcement": true},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
 #         }
@@ -135,7 +135,7 @@ require 'atom'
 #
 class GroupsController < ApplicationController
   before_filter :get_context
-  before_filter :require_user, :only => %w[index]
+  before_filter :require_user, :only => %w[index accept_invitation]
 
   include Api::V1::Attachment
   include Api::V1::Group
@@ -197,24 +197,29 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
+    includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
-        @groups = groups_scope.with_each_shard{ |scope|
-          scope = scope.by_name
-          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.includes(:group_category)
-        }
+        groups_scope = groups_scope.by_name
+        groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
+        groups_scope = groups_scope.preload(:group_category)
+
+        groups = groups_scope.shard(@current_user).to_a
+
+        # Split the groups out into those in concluded courses and those not in concluded courses
+        @current_groups, @previous_groups = groups.partition do |group|
+          group.context_type != 'Course' || !group.context.concluded?
+        end
       end
 
       format.json do
         @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
-          scope = scope.scoped
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.includes(:group_category)
+          scope.preload(:group_category)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
+        render :json => (@groups.map { |g| group_json(g, @current_user, session,includes) })
       end
     end
   end
@@ -235,7 +240,7 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
     @groups      = all_groups = @context.groups.active
                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-                                  .includes(:group_category)
+                                  .eager_load(:group_category)
 
     unless api_request?
       if @context.is_a?(Account)
@@ -262,7 +267,7 @@ class GroupsController < ApplicationController
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
             categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
-            uncategorized = @context.groups.uncategorized.all
+            uncategorized = @context.groups.active.uncategorized.to_a
             if uncategorized.present?
               json = group_category_json(GroupCategory.uncategorized, @current_user, session)
               json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
@@ -291,7 +296,7 @@ class GroupsController < ApplicationController
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 
         if value_to_boolean(params[:only_own_groups])
-          all_groups = all_groups.merge(@current_user.current_groups.scoped)
+          all_groups = all_groups.merge(@current_user.current_groups)
         end
 
         @paginated_groups = Api.paginate(all_groups, self, path)
@@ -431,7 +436,7 @@ class GroupsController < ApplicationController
 
     attrs = api_request? ? params : params[:group]
     attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
-    @group = @context.groups.scoped.new(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+    @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
       respond_to do |format|
@@ -528,7 +533,7 @@ class GroupsController < ApplicationController
         end
 
         if !@group.errors.any?
-          @group.users.update_all(updated_at: Time.now.utc)
+          @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
@@ -595,7 +600,6 @@ class GroupsController < ApplicationController
   end
 
   def accept_invitation
-    require_user
     find_group
     @membership = @group.group_memberships.where(:uuid => params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)

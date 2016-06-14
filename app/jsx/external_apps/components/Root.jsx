@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'react-router'

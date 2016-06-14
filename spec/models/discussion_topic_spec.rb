@@ -428,10 +428,17 @@ describe DiscussionTopic do
     end
 
     it "shouldn't send to streams on creation or update if it's delayed" do
-      topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
+      topic = @course.discussion_topics.create!(
+        title: "this should not be delayed",
+        message: "content here"
+      )
       expect(topic.stream_item).not_to be_nil
 
-      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
+      topic = delayed_discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        delayed_post_at: 1.day.from_now
+      )
       expect(topic.stream_item).to be_nil
 
       topic.message = "content changed!"
@@ -439,15 +446,31 @@ describe DiscussionTopic do
       expect(topic.stream_item).to be_nil
     end
 
-    it "should send to streams on update from delayed to active" do
-      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
-      expect(topic.workflow_state).to eq 'post_delayed'
+    it "should send to streams on update from unpublished to active" do
+      topic = discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        workflow_state: "unpublished"
+      )
+      expect(topic.workflow_state).to eq 'unpublished'
       expect(topic.stream_item).to be_nil
 
-      topic.delayed_post_at = nil
-      topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
       topic.save!
+      expect(topic.stream_item).not_to be_nil
+    end
+
+    it "doesn't rely on broadcast policy when sending to stream" do
+      topic = discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        workflow_state: "unpublished"
+      )
+      expect(topic.workflow_state).to eq 'unpublished'
+      expect(topic.stream_item).to be_nil
+
+      topic.workflow_state = 'active'
+      topic.save_without_broadcasting!
       expect(topic.stream_item).not_to be_nil
     end
 
@@ -597,6 +620,24 @@ describe DiscussionTopic do
       group = @course.groups.create!(:name => "group 1", :group_category => group_category)
       expect(topic.reload.child_topics.size).to eq 1
       expect(group.reload.discussion_topics.size).to eq 1
+    end
+
+    it "should delete child topics when group category is removed" do
+      group_category = @course.group_categories.create!(:name => "category")
+      group = @course.groups.create!(:name => "group 1", :group_category => group_category)
+
+      topic = @course.discussion_topics.build(:title => "topic")
+      topic.group_category = group_category
+      topic.save!
+
+      expect(topic.reload.child_topics.active.count).to eq 1
+      expect(group.reload.discussion_topics.active.count).to eq 1
+
+      topic.group_category = nil
+      topic.save!
+
+      expect(topic.reload.child_topics.active.count).to eq 0
+      expect(group.reload.discussion_topics.active.count).to eq 0
     end
 
     context "in a group discussion" do
@@ -809,6 +850,18 @@ describe DiscussionTopic do
 
     it "shouldn't allow student (and observer) who hasn't posted to see" do
       expect(@topic.user_can_see_posts?(@student)).to eq false
+    end
+
+    it "should not allow participation in deleted discussions" do
+      @topic.destroy
+      expect {@topic.discussion_entries.create!(:message => "second message", :user => @student)}.to raise_error(ActiveRecord::RecordInvalid)
+      expect {@topic.discussion_entries.create!(:message => "second message", :user => @teacher)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should throw incomingMail error when reply to deleted discussion" do
+      @topic.destroy
+      expect { @topic.reply_from(:user => @teacher, :text => "hai") }.to raise_error(IncomingMail::Errors::ReplyToDeletedDiscussion)
+      expect { @topic.reply_from(:user => @student, :text => "hai") }.to raise_error(IncomingMail::Errors::ReplyToDeletedDiscussion)
     end
 
     it "should allow student (and observer) who has posted to see" do
@@ -1189,6 +1242,39 @@ describe DiscussionTopic do
       @topic.ensure_submission(@student)
       expect(@submission.reload.workflow_state).to eq 'graded'
     end
+
+    it "should associate attachments with graded discussion submissions" do
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save!
+      @topic.reload
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      entry = @topic.reply_from(:user => @student, :text => "entry")
+      entry.attachment = @attachment
+      entry.save!
+
+      @topic.ensure_submission(@student)
+      sub = @assignment.submissions.where(:user_id => @student).first
+      expect(sub.attachments.to_a).to eq [@attachment]
+    end
+  end
+
+  describe "#unread_count" do
+    let(:topic) do
+      @course.discussion_topics.create!(:title => "title", :message => "message")
+    end
+
+    it "returns 0 for a nil user" do
+      topic.discussion_entries.create!
+      expect(topic.unread_count(nil)).to eq 0
+    end
+
+    it "returns the default_unread_count if the user has no discussion_topic_participant" do
+      topic.discussion_entries.create!
+      student_in_course
+      expect(topic.unread_count(@student)).to eq 1
+    end
   end
 
   context "read/unread state" do
@@ -1485,24 +1571,23 @@ describe DiscussionTopic do
   end
 
   context "restore" do
-    before(:once) { group_discussion_assignment }
-
     it "should restore the assignment and associated child topics" do
+      group_discussion_assignment
       @topic.destroy
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
       @topic.restore
-      expect(@topic.reload).to be_active
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_active }
+      expect(@topic.reload).to be_unpublished
+      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
+      expect(@topic.assignment).to be_unpublished
     end
 
-    it "should restore to unpublished state if draft mode is enabled" do
-      @topic.destroy
+    it "should restore an announcement to active state" do
+      ann = @course.announcements.create!(:title => "something", :message => "somethingelse")
+      ann.destroy
 
-      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
-      @topic.restore
-      expect(@topic.reload).to be_post_delayed
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_post_delayed }
+      ann.restore
+      expect(ann.reload).to be_active
     end
   end
 
@@ -1588,7 +1673,7 @@ describe DiscussionTopic do
   describe "context_module_action" do
     context "group discussion" do
       before :once do
-        group_assignment_discussion
+        group_assignment_discussion(course: @course)
         @module = @course.context_modules.create!
         @topic_tag = @module.add_item(type: 'discussion_topic', id: @root_topic.id)
         @module.completion_requirements = { @topic_tag.id => { type: 'must_contribute' } }
@@ -1683,6 +1768,44 @@ describe DiscussionTopic do
           end
           expect(c.announcements.by_posted_at).to eq(anns)
         end
+      end
+    end
+  end
+
+  context "notifications" do
+    before :once do
+      user_with_pseudonym(:active_all => true)
+      course_with_teacher(:user => @user, :active_enrollment => true)
+      n = Notification.create!(:name => "New Discussion Topic", :category => "TestImmediately")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    end
+
+    it "should send a message for a published course" do
+      @course.offer!
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+    end
+
+    it "should not send a message for an unpublished course" do
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+    end
+
+    context "group discussions" do
+      before :once do
+        group_model(:context => @course)
+        @group.add_user(@user)
+      end
+
+      it "should send a message for a group discussion in a published course" do
+        @course.offer!
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+      end
+
+      it "should not send a message for a group discussion in an unpublished course" do
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"]).to be_blank
       end
     end
   end

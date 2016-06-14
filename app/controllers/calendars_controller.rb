@@ -44,7 +44,7 @@ class CalendarsController < ApplicationController
         end
       end
       info = {
-        :name => context.name,
+        :name => context.nickname_for(@current_user),
         :asset_string => context.asset_string,
         :id => context.id,
         :url => named_context_url(context, :context_url),

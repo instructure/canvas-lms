@@ -88,6 +88,7 @@ module CC::Importer::Standard
       assignment["migration_id"] ||= get_node_att(meta_doc, 'assignment', 'identifier') || meta_doc['identifier']
       assignment["assignment_group_migration_id"] = get_node_val(meta_doc, "assignment_group_identifierref")
       assignment["grading_standard_migration_id"] = get_node_val(meta_doc, "grading_standard_identifierref")
+      assignment["group_category"] = get_node_val(meta_doc, "group_category")
       assignment["grading_standard_id"] = get_node_val(meta_doc, "grading_standard_external_identifier")
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")
       assignment["rubric_id"] = get_node_val(meta_doc, "rubric_external_identifier")
@@ -108,8 +109,8 @@ module CC::Importer::Standard
       end
       ["turnitin_enabled", "peer_reviews",
        "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
-       "grade_group_students_individually", "external_tool_new_tab",
-       "rubric_use_for_grading", "rubric_hide_score_total", "muted"].each do |bool_val|
+       "grade_group_students_individually", "external_tool_new_tab", "moderated_grading",
+       "rubric_use_for_grading", "rubric_hide_score_total", "muted", "has_group_category"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end

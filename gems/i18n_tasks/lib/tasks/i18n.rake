@@ -1,5 +1,6 @@
 require 'i18n_tasks'
 require 'i18n_extraction'
+require 'shellwords'
 
 namespace :i18n do
   desc "Verifies all translation calls"
@@ -58,8 +59,7 @@ namespace :i18n do
     Bundler.setup
     # for consistency in how canvas does json ... this way our specs can
     # verify _core_en is up to date
-    ActiveSupport::JSON.backend = :oj
-    MultiJson.dump_options = {:escape_mode => :xss_safe}
+    require 'config/initializers/json'
 
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller'
@@ -86,6 +86,14 @@ namespace :i18n do
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales += ENV['LOCALES'].split(',').map(&:to_sym) if ENV['LOCALES']
     all_translations = I18n.backend.direct_lookup
+
+    # copy "real" translations from deprecated locales
+    I18n.available_locales.each do |locale|
+      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
+        all_translations[locale] = all_translations[deprecated_for.to_sym]
+      end
+    end
+
     flat_translations = all_translations.flatten_keys
 
     if locales.empty?
@@ -404,7 +412,7 @@ HEADER
 
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
-    userpass = "#{user}:#{password}"
+    userpass = "#{user}:#{Shellwords.escape(password)}"
     languages.each do |lang|
       if lang.is_a?(Array)
         lang, transifex_lang = *lang

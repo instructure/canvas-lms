@@ -8,7 +8,7 @@ define [
   # use this to change the api url of the collection
   updateAPIQuerySortParams = (collection, queryParams) ->
     newParams =
-      include: ['user', 'usage_rights', 'enhanced_preview_url']
+      include: ['user', 'usage_rights', 'enhanced_preview_url', 'context_asset_string']
       per_page: 20
       sort: queryParams.sort || ''
       order: queryParams.order || ''

@@ -1,7 +1,7 @@
 module DataFixup::CopyRoleOverrides
   def self.run(old_permission, new_permission)
     RoleOverride.where(:permission => old_permission.to_s).find_in_batches do |old_role_overrides|
-      possible_new_role_overrides = RoleOverride.where(permission: new_permission.to_s, context_id: old_role_overrides.map(&:context_id)).all
+      possible_new_role_overrides = RoleOverride.where(permission: new_permission.to_s, context_id: old_role_overrides.map(&:context_id)).to_a
 
       old_role_overrides.each do |old_role_override|
         unless old_role_override.invalid? || possible_new_role_overrides.detect{|ro|

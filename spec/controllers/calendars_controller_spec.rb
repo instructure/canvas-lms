@@ -85,16 +85,6 @@ describe CalendarEventsApiController do
       expect(assigns[:events][0]).to eql(@event)
     end
 
-    it "should use the relevant event for that section" do
-      s2 = @course.course_sections.create!(:name => 's2')
-      c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
-      c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
-      get 'public_feed', :feed_code => "user_#{@user.uuid}", :format => 'ics'
-      expect(response).to be_success
-      expect(assigns[:events]).to be_present
-      expect(assigns[:events]).to eq [c1]
-    end
-
     it "should use the relevant event for that section, in the course feed" do
       skip "requires changing the format of the course feed url to include user information"
       s2 = @course.course_sections.create!(:name => 's2')
@@ -106,25 +96,56 @@ describe CalendarEventsApiController do
       expect(assigns[:events]).to eq [c1]
     end
 
-    it "should require authorization" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
-      expect(response).to render_template('shared/unauthorized_feed')
-    end
+    context "for a user context" do
+      it "should use the relevant event for that section" do
+        s2 = @course.course_sections.create!(:name => 's2')
+        c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
+        c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
+        get 'public_feed', :feed_code => "user_#{@user.uuid}", :format => 'ics'
+        expect(response).to be_success
+        expect(assigns[:events]).to be_present
+        expect(assigns[:events]).to eq [c1]
+      end
 
-    it "should include absolute path for rel='self' link" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
-    end
+      it "should require authorization" do
+        get 'public_feed', :format => 'atom', :feed_code => @user.feed_code + 'x'
+        expect(response).to render_template('shared/unauthorized_feed')
+      end
 
-    it "should include an author for each entry" do
-      get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
-      feed = Atom::Feed.load_feed(response.body) rescue nil
-      expect(feed).not_to be_nil
-      expect(feed.entries).not_to be_empty
-      expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+      it "should include absolute path for rel='self' link" do
+        get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+        feed = Atom::Feed.load_feed(response.body) rescue nil
+        expect(feed).not_to be_nil
+        expect(feed.links.first.rel).to match(/self/)
+        expect(feed.links.first.href).to match(/http:\/\//)
+      end
+
+      it "should include an author for each entry" do
+        get 'public_feed', :format => 'atom', :feed_code => @user.feed_code
+        feed = Atom::Feed.load_feed(response.body) rescue nil
+        expect(feed).not_to be_nil
+        expect(feed.entries).not_to be_empty
+        expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+      end
+
+      it "should include description in event for unlocked assignment" do
+        assignment = @course.assignments.create!({
+          title: "assignment event test",
+          description: "foo",
+          due_at: Time.zone.now + (60 * 5)})
+        get 'public_feed', :format => 'ics', :feed_code => @user.feed_code
+        expect(response.body).to include("DESCRIPTION:#{assignment.description}")
+      end
+
+      it "should not include description in event for locked assignment" do
+        assignment = @course.assignments.create!({
+          title: "assignment event test",
+          description: "foo",
+          due_at: Time.zone.now + (60 * 10),
+          unlock_at: Time.zone.now + (60 * 5)})
+        get 'public_feed', :format => 'ics', :feed_code => @user.feed_code
+        expect(response.body).not_to include("DESCRIPTION:#{assignment.description}")
+      end
     end
   end
 end

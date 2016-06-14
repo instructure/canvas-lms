@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_com
 require 'thread'
 
 describe "account admin manage groups" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include ManageGroupsCommon
 
   def add_account_category (account, name)
     f(".add_category_link").click
@@ -15,7 +16,7 @@ describe "account admin manage groups" do
     category
   end
 
-  before (:each) do
+  before(:each) do
     skip
 		#course_with_admin_logged_in
     #@admin_account = Account.default
@@ -45,7 +46,7 @@ describe "account admin manage groups" do
   end
 
   context "single category" do
-    before (:each) do
+    before(:each) do
       @courses_group_category = @admin_account.group_categories.create(:name => "Existing Category")
       groups_student_enrollment 1
     end
@@ -140,7 +141,7 @@ describe "account admin manage groups" do
       confirm_dialog.accept
       wait_for_ajaximations
       expect(driver.find_elements(:css, ".left_side .group")).to be_empty
-      expect(@admin_account.group_categories.all.count).to eq 0
+      expect(@admin_account.group_categories.count).to eq 0
     end
 
     it "should edit an individual group" do

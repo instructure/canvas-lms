@@ -11,7 +11,7 @@
         <% Collaboration.collaboration_types.each do |collab_type| %>
           <% next if collab_type['type'] == 'etherpad' && @sunsetting_etherpad %>
           <% if collab_type['type'] == 'google_docs' %>
-            <% if @domain_root_account && feature_and_service_enabled?(:google_docs) %>
+            <% if @domain_root_account && feature_and_service_enabled?(:google_drive) %>
               <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
             <% end %>
           <% elsif (Collaboration.collaboration_class(collab_type['type'].titleize.gsub(/\s/, "")).config rescue false) %>
@@ -20,7 +20,7 @@
         <% end %>
       </select>
     </td>
-  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @google_docs_authorized%>">
+  </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @user_has_google_drive %>">
     <td colspan="2" style="padding: 5px 20px 10px">
       <%= image_tag "google_docs_icon.png", :style => "float: right; margin-left: 15px;" %>
       <%= mt 'descriptions.google_docs', "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations." %>
@@ -57,20 +57,14 @@ HEREDOC
         </div>
       </div>
       <div id="collaborate_authorize_google_docs" class="collaboration_authorization" style="display: none; margin: 20px;">
-        <% if @google_drive_upgrade %>
+        <% if !@user_has_google_drive %>
           <%= t '#instructions.authorize_google_drive', "Before you can collaborate on documents, you need to authorize Canvas
             to access your Google Drive account:" %>
           <div class="button-container">
             <a class="btn button-default-action" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_drive', "Authorize Google Drive Access" %></a>
             <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
           </div>
-        <% else %>
-          <%= t '#instructions.authorize_google_docs', "Before you can collaborate on documents, you need to authorize Canvas
-            to access your Google Docs account:" %>
-          <div class="button-container">
-            <a class="btn button-default-action" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#add_collaboration")) %>"><%= t '#buttons.authorize_google_docs', "Authorize Google Docs Access" %></a>
-            <button type="button" class="btn button-secondary cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          </div>
+
         <% end %>
       </div>
     </td>

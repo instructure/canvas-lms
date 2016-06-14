@@ -21,9 +21,6 @@ class UserObserver < ActiveRecord::Base
   belongs_to :observer, :class_name => 'User'
   attr_accessible
 
-  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :observer_id]
-  EXPORTABLE_ASSOCIATIONS = [:user, :observer]
-
   after_create :create_linked_enrollments
 
   validate :not_same_user, :if => lambda { |uo| uo.changed? }

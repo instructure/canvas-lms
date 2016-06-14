@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module WikiAndTinyCommon
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:css, 'textarea.body')
     wiki_page_body.clear
@@ -69,6 +70,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wiki_page = @course.wiki.wiki_pages.create(:title => title, :editing_roles => edit_roles, :notify_of_update => true)
     wiki_page.unpublish! if unpublished
     wiki_page
+  end
+
+  def manually_create_wiki_page(title,body)
+    f('.new_page').click
+    wait_for_ajaximations
+    replace_content(f('#title'),title)
+    add_text_to_tiny(body)
+    expect_new_page_load { f('form.edit-form button.submit').click }
+    expect(f('.page-title')).to include_text(title)
+    expect(f('.show-content')).to include_text(body)
   end
 
   def select_all_wiki
@@ -166,3 +177,4 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def wiki_page_editor_id
     f('textarea.body')['id']
   end
+end

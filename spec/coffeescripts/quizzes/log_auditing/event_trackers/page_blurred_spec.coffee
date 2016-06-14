@@ -13,14 +13,24 @@ define [
 
   test 'capturing: it works', ->
     tracker = new Subject()
-    capture = sinon.stub()
+    capture = @stub()
     tracker.install(capture)
 
     $(window).blur()
-    ok capture.called, 'it captures page focus'
+    ok capture.called, 'it captures page blur'
+
+  test 'capturing: it doesnt send events if in iframe (for RCE focusing)', ->
+    tracker = new Subject()
+    capture = @stub()
+    tracker.install(capture)
+
+    document.activeElement = {tagName: "IFRAME"}
+    $(window).blur()
+
+    ok capture.notCalled, 'it doesnt mark iframe focus as page blur'
 
   test 'capturing: it throttles captures', ->
-    capture = sinon.spy()
+    capture = @spy()
 
     tracker = new Subject()
     tracker.install(capture)

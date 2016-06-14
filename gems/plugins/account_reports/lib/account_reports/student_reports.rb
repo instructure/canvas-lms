@@ -26,6 +26,7 @@ module AccountReports
     def initialize(account_report)
       @account_report = account_report
       @account_report.parameters ||= {}
+      include_deleted_objects
     end
 
     def start_and_end_times
@@ -106,16 +107,16 @@ module AccountReports
                   courses.sis_source_id AS course_sis_id, cs.id AS section_id,
                   cs.sis_source_id AS section_sis_id, cs.name AS section_name,
                   e.workflow_state AS enrollment_state").
-          joins("INNER JOIN enrollments e ON e.course_id = courses.id
+          joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = courses.id
                    AND e.root_account_id = courses.root_account_id
                    AND e.type = 'StudentEnrollment'
-                 INNER JOIN course_sections cs ON cs.id = e.course_section_id
-                 INNER JOIN pseudonyms p ON e.user_id = p.user_id
+                 INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = e.course_section_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} p ON e.user_id = p.user_id
                    AND courses.root_account_id = p.account_id
-                 INNER JOIN users u ON u.id = p.user_id").
+                 INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id").
           where("NOT EXISTS (SELECT s.user_id
-                             FROM submissions s
-                             INNER JOIN assignments a ON s.assignment_id = a.id
+                             FROM #{Submission.quoted_table_name} s
+                             INNER JOIN #{Assignment.quoted_table_name} a ON s.assignment_id = a.id
                                AND a.context_type = 'Course'
                              WHERE s.user_id = p.user_id
                                AND a.context_id = courses.id
@@ -177,14 +178,14 @@ module AccountReports
                   c.name AS course_name, s.id AS section_id,
                   s.sis_source_id AS section_sis_id, s.name AS section_name,
                   p.user_id, p.sis_user_id, u.sortable_name").
-          joins("INNER JOIN courses c ON c.id = enrollments.course_id
+          joins("INNER JOIN #{Course.quoted_table_name} c ON c.id = enrollments.course_id
                    AND c.workflow_state = 'available'
-                 INNER JOIN course_sections s ON s.id = enrollments.course_section_id
+                 INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = enrollments.course_section_id
                    AND s.workflow_state = 'active'
-                 INNER JOIN pseudonyms p ON p.user_id = enrollments.user_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = enrollments.user_id
                    AND p.account_id = enrollments.root_account_id
                    AND p.workflow_state = 'active'
-                 INNER JOIN users u ON u.id = p.user_id").
+                 INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id").
           where("enrollments.type = 'StudentEnrollment'
                  AND enrollments.workflow_state = 'active'")
 
@@ -199,7 +200,7 @@ module AccountReports
 
         data = data.
           where("NOT EXISTS (SELECT user_id, context_id
-                             FROM asset_user_accesses aua
+                             FROM #{AssetUserAccess.quoted_table_name} aua
                              WHERE aua.user_id = enrollments.user_id
                                AND aua.context_id = enrollments.course_id
                                AND aua.context_type = 'Course'
@@ -247,27 +248,33 @@ module AccountReports
       file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
-        students = root_account.pseudonyms.active.
+        students = root_account.pseudonyms.
           select('pseudonyms.last_request_at, pseudonyms.user_id,
                   pseudonyms.sis_user_id, users.sortable_name,
                   pseudonyms.current_login_ip').
-          joins('INNER JOIN users ON users.id = pseudonyms.user_id')
+          joins(:user)
 
         students = add_user_sub_account_scope(students)
 
         if term
           students = students.
-            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
-                   INNER JOIN courses c on c.id = e.course_id')
+            joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id")
           students = add_term_scope(students, 'c')
         end
 
         if course
           students = students.
-            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
-                   INNER JOIN courses c on c.id = e.course_id').
+            joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id").
             where('c.id = ?', course)
         end
+
+        if course || term
+          students = students.where('e.workflow_state <> ?', "deleted") unless @include_deleted
+        end
+
+        students = students.active unless @include_deleted
 
         headers = []
         headers << I18n.t('#account_reports.report_header_user_id', 'user id')
@@ -296,5 +303,103 @@ module AccountReports
       send_report(file)
     end
 
+
+    # shows last_activity_at on enrollments for users with
+    # enrollments in this account
+
+    # note: activity on other root accounts' enrollments will not show
+    def last_enrollment_activity
+      report_extra_text
+      file = AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        headers = []
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_last_activity_at', 'last activity at')
+
+        csv << headers
+
+        students = User.joins(:enrollments).
+          select(["users.id", :last_activity_at, :sortable_name]).
+          order("users.id, sortable_name, last_activity_at DESC").
+          distinct_on("users.id, sortable_name")
+
+        students = add_user_sub_account_scope(students)
+
+        potential_courses = Course.where(root_account_id: root_account)
+        potential_courses = potential_courses.where(enrollment_term_id: term) if term
+        potential_courses = potential_courses.where(id: course) if course
+        potential_courses = add_course_sub_account_scope(potential_courses)
+
+        students = students.where(enrollments: {course_id: potential_courses})
+
+        Shackles.activate(:slave) do
+          students.find_each do |u|
+            row = []
+            row << u.id
+            row << u.sortable_name
+            row << default_timezone_format(u.last_activity_at)
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
+
+    def user_access_tokens
+      file = AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        headers = []
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_token_hint', 'token hint')
+        headers << I18n.t('#account_reports.report_header_expiration', 'expiration')
+        headers << I18n.t('#account_reports.report_header_token_last_used', 'last used')
+        headers << I18n.t('#account_reports.report_header_token_dev_key_id', 'dev key id')
+        headers << I18n.t('#account_reports.report_header_token_dev_key_name', 'dev key name')
+        csv << headers
+
+        columns = []
+        columns << 'access_tokens.user_id'
+        columns << 'users.sortable_name'
+        columns << 'access_tokens.token_hint'
+        columns << 'access_tokens.expires_at'
+        columns << 'access_tokens.last_used_at'
+        columns << 'access_tokens.developer_key_id'
+
+        user_tokens = AccessToken
+                        .select(columns)
+                        .joins(user: {pseudonym: :account})
+                        .where("accounts.id = ? OR accounts.root_account_id = ?", root_account, root_account)
+                        .order("users.id, sortable_name, last_used_at DESC")
+
+        user_tokens = add_user_sub_account_scope(user_tokens)
+
+
+        Shackles.activate(:slave) do
+          user_tokens.each do |token|
+            dev_key = developer_key(token[:developer_key_id])
+
+            row = []
+            row << token[:user_id]
+            row << token[:sortable_name]
+            row << token[:token_hint]
+            row << (token[:expires_at] ? default_timezone_format(token[:expires_at]) : 'never')
+            row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : 'never')
+            row << token[:developer_key_id]
+            row << dev_key.name
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
+
+    def developer_key(dev_key_id)
+      @dev_keys ||= {}
+      @dev_keys[dev_key_id] ||= DeveloperKey.find(dev_key_id)
+    end
   end
 end

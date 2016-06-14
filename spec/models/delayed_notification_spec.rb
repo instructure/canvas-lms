@@ -19,24 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DelayedNotification do
-  describe '.asset_type' do
-    it 'returns the correct representation of a quiz' do
-      qs = quiz_model.quiz_submissions.create!
-      notification = DelayedNotification.create! asset: qs, notification: Notification.create!(notification_valid_attributes)
-
-      expect(notification.asset_type).to eq 'Quizzes::QuizSubmission'
-
-      DelayedNotification.where(id: notification).update_all(asset_type: 'QuizSubmission')
-
-      expect(DelayedNotification.find(notification.id).asset_type).to eq 'Quizzes::QuizSubmission'
-    end
-
-    it 'returns the content type attribute if not a quiz' do
-      notification = DelayedNotification.create! asset: assignment_model, notification: Notification.create!(notification_valid_attributes)
-      expect(notification.asset_type).to eq 'Assignment'
-    end
-  end
-
   describe '#process' do
     let(:group_user) { user_with_communication_channel(active_all: true) }
     let(:group_membership) { group_with_user(user: group_user, active_all: true) }

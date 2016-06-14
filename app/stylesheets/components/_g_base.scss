@@ -2,7 +2,6 @@
 @import "base/layout";
 @if $use_new_styles { @import "base/ic_app_layout"; }
 @import "base/#header";
-@if $is-k12 { @import "base/canvas-header"; }
 @if $use_new_styles { @import "base/ic_app_header"; }
 @import "base/#left-side";
 @import "base/#right-side";

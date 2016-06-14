@@ -3,7 +3,7 @@ define [
   'underscore'
   'react'
   'react-modal'
-  'jsx/calendar/ColorPicker'
+  'jsx/shared/ColorPicker'
   'compiled/userSettings'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
@@ -71,6 +71,9 @@ define [
 
   return sidebar = (contexts, selectedContexts, dataSource) ->
 
+    if selectedContexts
+      userSettings.set('checked_calendar_codes', selectedContexts)
+
     $holder   = $('#context-list-holder')
     $skipLink = $('.skip-to-calendar')
     $colorPickerBtn = $('.ContextList__MoreBtn')
@@ -91,6 +94,9 @@ define [
         left: $(this).offset().left - $(window).scrollLeft()
 
       assetString = $(this).closest('li').data('context')
+
+      # ensures previously picked color clears
+      React.unmountComponentAtNode($('#color_picker_holder')[0]);
 
       React.render(ColorPicker({
         isOpen: true

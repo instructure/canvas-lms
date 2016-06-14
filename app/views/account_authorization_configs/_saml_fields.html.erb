@@ -1,70 +1,47 @@
-<%= fields_for(:account_authorization_config, aac) do |f| %>
-  <%= f.hidden_field :auth_type, value: 'saml' %>
-  <%= f.hidden_field :id %>
-  <table class="formtable" style="margin-left: 20px;">
-    <%= render partial: "form_header",
-               locals: { auth_type: t("SAML"), presenter: presenter, aac: aac } %>
-
-    <tr>
-      <td><%= f.blabel :idp_entity_id, en: "IdP Entity ID" %></td>
-      <td><%= f.text_field :idp_entity_id, class: "input-xlarge" %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :log_in_url, en: "Log On URL" %></td>
-      <td><%= f.text_field :log_in_url, class: "input-xlarge", style: "width: 300px;" %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :log_out_url, en: "Log Out URL" %></td>
-      <td><%= f.text_field :log_out_url, class: "input-xlarge", style: "width: 300px;" %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :certificate_fingerprint, en: "Certificate Fingerprint" %></td>
-      <td><%= f.text_field :certificate_fingerprint, class: "input-xlarge" %></td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :login_attribute, en: "Login Attribute" %></td>
-      <td>
-        <%= f.select(:login_attribute,
-                     presenter.saml_login_attributes,
-                     {},
-                     {class: "input-xlarge"}) %>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :identifier_format, en: "Identifier Format" %></td>
-      <td>
-        <%= f.select(:identifier_format,
-                      presenter.saml_identifiers,
-                      {},
-                      {class: "input-xlarge"}) %>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <%= f.blabel :requested_authn_context, en: "Authentication Context" %>
-      </td>
-      <td>
-        <%= f.select(:requested_authn_context,
-                     presenter.saml_authn_contexts,
-                     {},
-                     {class: "input-xlarge"}) %>
-      </td>
-    </tr>
-    <tr>
-      <td><%= f.blabel :unknown_user_url, en: "Unknown User Url" %></td>
-      <td>
-        <%= f.text_field(:unknown_user_url,
-                         class: "input-xlarge",
-                         placeholder: login_url) %>
-        <span class="auth_form" style="font-size: smaller;">
-          <br/>
-          <%= t(:unknown_user_url_description,
-                "The url to redirect to when an authenticated user is not "\
-                "found in Canvas.") %>
-        </span>
-      </td>
-    </tr>
-    <%= render partial: "form_footer",
-               locals: { presenter: presenter, account: account, aac: aac, f: f } %>
-  </table>
+<% css_bundle :saml_fields %>
+<div class="ic-Form-control">
+  <%= f.label :idp_entity_id, t('IdP Entity ID'), class: 'ic-Label' %>
+  <%= f.text_field :idp_entity_id, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :log_in_url, t('Log On URL'), class: 'ic-Label' %>
+  <%= f.text_field :log_in_url, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :log_out_url, t('Log Out URL'), class: 'ic-Label' %>
+  <%= f.text_field :log_out_url, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :certificate_fingerprint, t('Certificate Fingerprint'), class: 'ic-Label' %>
+  <%= f.text_field :certificate_fingerprint, class: 'ic-Input' %>
+</div>
+<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
+<div class="ic-Form-control">
+  <%= f.label :identifier_format, 'Identifier Format', class: 'ic-Label' %>
+  <%= f.select(:identifier_format,
+               presenter.saml_identifiers,
+               {},
+               class: 'ic-Input') %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :requested_authn_context, 'Authentication Context', class: 'ic-Label' %>
+  <%= f.select(:requested_authn_context,
+               presenter.saml_authn_contexts,
+               {},
+               class: 'ic-Input') %>
+</div>
+<% if @account.self_registration? %>
+    <div id="parent_reg_selected" data-parent-reg-selected="<%= presenter.parent_reg_selected %>"></div>
+    <div class="ic-Form-control">
+      <%= f.label :parent_registration, "Parent Registration", class: 'ic-Label' %>
+      <%= f.check_box :parent_registration, class: "parent_reg_warning" %>
+      <span class="SAML_parent_default" ><%= t "Use this configuration for parent/observer registration" %></span>
+      <div class="parent_form_message">
+        <div class="parent_form_message_layout">
+          <i class="parent_icon_warning"></i>
+          <span class="parent_warning_message"></span>
+        </div>
+      </div>
+    </div>
 <% end %>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

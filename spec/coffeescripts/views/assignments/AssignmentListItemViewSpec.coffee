@@ -182,30 +182,50 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
-    group_stub = sinon.stub(view, 'visibleAssignments', -> [])
-    confirm_stub = sinon.stub(window, "confirm", -> true )
-    delete_spy = sinon.spy view, "delete"
+    @stub(view, 'visibleAssignments', -> [])
+    @stub(window, "confirm", -> true )
+    @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
 
-    ok confirm_stub.called
-    ok delete_spy.called
-
-    confirm_stub.restore()
-    delete_spy.restore()
-    group_stub.restore()
+    ok window.confirm.called
+    ok view.delete.called
 
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = "course_1"
 
     view = createView(@model)
-    sinon.spy view.model, "destroy"
+    @spy view.model, "destroy"
 
     view.delete()
     ok view.model.destroy.called
-    view.model.destroy.restore()
 
+    ENV.context_asset_string = old_asset_string
+
+  test "delete calls screenreader message", ->
+
+    old_asset_string = ENV.context_asset_string
+    ENV.context_asset_string = "course_1"
+    server = sinon.fakeServer.create()
+    server.respondWith('DELETE', '/api/v1/courses/1/assignments/1',
+      [200, { 'Content-Type': 'application/json' }, JSON.stringify({
+      "description":"",
+      "due_at":null,
+      "grade_group_students_individually":false,
+      "grading_standard_id":null,
+      "grading_type":"points",
+      "group_category_id":null,
+      "id":"1",
+      "unpublishable":true,
+      "only_visible_to_overrides":false,
+      "locked_for_user":false})])
+
+    view = createView(@model)
+    view.delete()
+    @spy($, 'screenReaderFlashMessage')
+    server.respond()
+    equal $.screenReaderFlashMessage.callCount, 1
     ENV.context_asset_string = old_asset_string
 
   test "show score if score is set", ->
@@ -309,16 +329,14 @@ define [
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[1]}") != -1
 
   test 'render score template with permission', ->
-    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    spy = @spy(AssignmentListItemView.prototype, 'updateScore')
     createView(@model, canManage: false, canReadGrades: true)
     ok spy.called
-    AssignmentListItemView.prototype.updateScore.restore()
 
   test 'does not render score template without permission', ->
-    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    spy = @spy(AssignmentListItemView.prototype, 'updateScore')
     createView(@model, canManage: false, canReadGrades: false)
     equal spy.callCount, 0
-    AssignmentListItemView.prototype.updateScore.restore()
 
   test "renders lockAt/unlockAt with locale-appropriate format string", ->
     tz.changeLocale(french, 'fr_FR')
@@ -388,6 +406,13 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader screen text'
     ok nonScreenreaderText().match('90%')[0], 'sets non-screenreader grade text'
 
+  test "excused score and grade outputs", ->
+    @submission.set 'excused': true
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
+
+    ok screenreaderText().match('This assignment has been excused.')
+    ok nonScreenreaderText().match('Excused')
 
   module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
     setup: ->

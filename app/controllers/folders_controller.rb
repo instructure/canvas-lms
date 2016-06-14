@@ -129,10 +129,10 @@ class FoldersController < ApplicationController
   def api_index
     folder = Folder.find(params[:id])
     if authorized_action(folder, @current_user, :read_contents)
-      can_manage_files = folder.context.grants_right?(@current_user, session, :manage_files)
+      can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
 
       scope = folder.active_sub_folders
-      unless can_manage_files
+      unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
       if params[:sort_by] == 'position'
@@ -141,7 +141,7 @@ class FoldersController < ApplicationController
         scope = scope.by_name
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
-      render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
+      render :json => folders_json(@folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files)
     end
   end
 
@@ -158,12 +158,12 @@ class FoldersController < ApplicationController
   # @returns [Folder]
   def list_all_folders
     if authorized_action(@context, @current_user, :read)
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
 
       url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
 
       scope = @context.active_folders
-      unless can_manage_files
+      unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
       if params[:sort_by] == 'position'
@@ -173,7 +173,7 @@ class FoldersController < ApplicationController
       end
 
       folders = Api.paginate(scope, self, url)
-      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+      render json: folders_json(folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files)
     end
   end
 
@@ -193,11 +193,11 @@ class FoldersController < ApplicationController
   #
   # @returns [Folder]
   def resolve_path
-    if authorized_action(@context, @current_user, :read)
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
-      folders = Folder.resolve_path(@context, params[:full_path], can_manage_files)
+    if authorized_action(@context, @current_user, [:read, :manage_files])
+      can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
+      folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
-      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+      render json: folders_json(folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files)
     end
   end
 
@@ -241,9 +241,9 @@ class FoldersController < ApplicationController
       else
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_files_url, :folder_id => @folder.id) }
-          can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+          can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
 
-          files = if can_manage_files
+          files = if can_view_hidden_files
             @folder.active_file_attachments.by_position_then_display_name
           else
             @folder.visible_file_attachments.not_hidden.not_locked.by_position_then_display_name
@@ -251,7 +251,7 @@ class FoldersController < ApplicationController
           files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :filename, :workflow_state]}
           folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
           sub_folders_scope = @folder.active_sub_folders
-          unless can_manage_files
+          unless can_view_hidden_files
             sub_folders_scope = sub_folders_scope.not_hidden.not_locked
           end
           res = {
@@ -286,10 +286,10 @@ class FoldersController < ApplicationController
           where("file_state<>'deleted'").
           order(:created_at).to_a
       @attachment = @attachments.pop
-      @attachments.each{|a| a.destroy! }
+      @attachments.each{|a| a.destroy_permanently! }
       last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max
       if @attachment && last_date && @attachment.created_at < last_date
-        @attachment.destroy!
+        @attachment.destroy_permanently!
         @attachment = nil
       end
 
@@ -488,7 +488,7 @@ class FoldersController < ApplicationController
           end
         else
           format.html { render :new }
-          format.json { render :json => @folder.errors }
+          format.json { render :json => @folder.errors, :status => :bad_request }
         end
       end
     end
@@ -556,7 +556,7 @@ class FoldersController < ApplicationController
     @context = @folder.context
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request, :check_quota => true)
+      api_attachment_preflight(@context, request, params: params, check_quota: true)
     end
   end
 

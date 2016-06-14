@@ -21,7 +21,6 @@ define [
   """)
 
   module 'autocomplete',
-
     teardown: ->
       $el.remove()
       $('#fixtures').empty()
@@ -31,6 +30,5 @@ define [
     createAutocompletes()
     keys = (key for key of $('#autocomplete-box').data())
 
-    ok _.include(keys, 'autocomplete')
-    equal typeof $('#non-autocomplete-box').data('autocomplete'), 'undefined'
-
+    ok _.include(keys, 'autocomplete'), 'hi'
+    equal typeof $('#non-autocomplete-box').data('autocomplete'), 'undefined', 'there'

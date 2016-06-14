@@ -18,7 +18,7 @@ define [
 
   test 'QuizEvent.fromJSON', ->
     descriptor = {
-      created_at: (new Date()).toJSON(),
+      client_timestamp: (new Date()).toJSON(),
       event_type: 'some_type',
       event_data: {
         foo: 'bar'
@@ -26,6 +26,7 @@ define [
     }
 
     event = QuizEvent.fromJSON(descriptor)
+    ok (event.recorded_at == descriptor.client_timestamp)
 
     equal event.type, descriptor.event_type,
       'it parses the type'

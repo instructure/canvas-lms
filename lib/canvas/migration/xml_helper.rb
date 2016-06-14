@@ -100,7 +100,12 @@ module XMLHelper
     if doc.encoding != 'UTF-8'
       begin
         doc.at_css('*')
+      rescue ArgumentError => e
+        # ruby 2.2
+        raise unless e.message =~ /^invalid byte sequence/
+        doc.encoding = 'UTF-8'
       rescue Encoding::CompatibilityError
+        # ruby 2.1
         doc.encoding = 'UTF-8'
       end
     end

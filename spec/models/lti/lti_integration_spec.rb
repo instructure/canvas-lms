@@ -405,7 +405,7 @@ describe "LTI integration tests" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, { current_user: @user, assignment: @assignment })
       adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
-      adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url")
+      adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url", "another/test/url")
     end
 
     it "should include assignment outcome service params for student" do

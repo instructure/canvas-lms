@@ -20,10 +20,20 @@ require 'nokogiri'
 
 module BasicLTI
   module BasicOutcomes
-    class Unauthorized < Exception;
+    class Unauthorized < StandardError
+      def response_status
+        401
+      end
     end
 
-    class InvalidSourceId < Exception;
+
+    class InvalidRequest < StandardError
+      def response_status
+        415
+      end
+    end
+
+    class InvalidSourceId < StandardError
     end
 
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
@@ -33,8 +43,10 @@ module BasicLTI
         md = sourceid.match(SOURCE_ID_REGEX)
         raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        return false unless Canvas::Security.verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
-        return false unless tool.id == md[1].to_i
+        raise InvalidSourceId, 'Invalid signature' unless Canvas::Security.
+            verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+        
+        raise InvalidSourceId, 'Tool is invalid' unless tool.id == md[1].to_i
         course = Course.active.where(id: md[2]).first
         raise InvalidSourceId, 'Course is invalid' unless course
 
@@ -45,7 +57,8 @@ module BasicLTI
         raise InvalidSourceId, 'Assignment is invalid' unless assignment
 
         tag = assignment.external_tool_tag if assignment
-        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.
+            matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
 
         return course, assignment, user
       end
@@ -56,6 +69,7 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end
@@ -65,6 +79,7 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Legacy request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end
@@ -130,8 +145,8 @@ module BasicLTI
               <imsx_codeMajor></imsx_codeMajor>
               <imsx_severity>status</imsx_severity>
               <imsx_description></imsx_description>
-              <imsx_messageRefIdentifier></imsx_messageRefIdentifier> 
-              <imsx_operationRefIdentifier></imsx_operationRefIdentifier> 
+              <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
+              <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
             </imsx_statusInfo>
           </imsx_POXResponseHeaderInfo>
         </imsx_POXHeader>
@@ -182,6 +197,8 @@ module BasicLTI
           submission_hash[:submission_type] = 'online_url'
         end
 
+        old_submission = assignment.submissions.where(user_id: user.id).first
+
         if raw_score
           submission_hash[:grade] = raw_score
         elsif new_score
@@ -193,11 +210,10 @@ module BasicLTI
         elsif !text && !url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
-
         if error_message
           self.code_major = 'failure'
           self.description = error_message
-        elsif assignment.points_possible.nil?
+        elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil?)
 
           unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
             submission = Submission.create!(submission_hash.merge(:user => user,
@@ -215,10 +231,14 @@ to because the assignment has no points possible.
           end
 
           if new_score || raw_score
+            submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
-          unless @submission
+          if @submission
+            @submission.submission_type = old_submission.submission_type if old_submission
+            @submission.save
+          else
             self.code_major = 'failure'
             self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
           end

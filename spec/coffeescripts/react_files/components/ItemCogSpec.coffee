@@ -1,9 +1,10 @@
 define [
+  '../mockFilesENV'
   'react'
   'jquery'
-  'compiled/react_files/components/ItemCog'
+  'jsx/files/ItemCog'
   'compiled/models/Folder'
-], (React, $, ItemCog, Folder) ->
+], (mockFilesENV, React, $, ItemCog, Folder) ->
 
   Simulate = React.addons.TestUtils.Simulate
 
@@ -43,26 +44,23 @@ define [
         'move': true
         'deleteLink': true
 
-      @itemCog = React.render(ItemCog(@sampleProps(true)), $('<div>').appendTo('#fixtures')[0])
+      @itemCog = React.render(React.createElement(ItemCog, @sampleProps(true)), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
       $("#fixtures").empty()
 
   test 'deletes model when delete link is pressed', ->
-    ajaxSpy = sinon.spy($, 'ajax')
-    sinon.stub(window, 'confirm').returns(true)
+    ajaxSpy = @spy($, 'ajax')
+    @stub(window, 'confirm').returns(true)
 
     Simulate.click(@itemCog.refs.deleteLink.getDOMNode())
 
     ok window.confirm.calledOnce, 'confirms before deleting'
     ok ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url'
 
-    window.confirm.restore()
-    ajaxSpy.restore()
-
   test 'only shows download button for limited users', ->
-    readOnlyItemCog = React.render(ItemCog(@sampleProps(false)), $('<div>').appendTo('#fixtures')[0])
+    readOnlyItemCog = React.render(React.createElement(ItemCog, @sampleProps(false)), $('<div>').appendTo('#fixtures')[0])
     ok @buttonsEnabled(readOnlyItemCog, @readOnlyConfig), 'only download button is shown'
 
   test 'shows all buttons for users with manage_files permissions', ->

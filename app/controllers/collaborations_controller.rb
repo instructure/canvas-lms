@@ -68,20 +68,8 @@ class CollaborationsController < ApplicationController
     @collaborations = @context.collaborations.active
     log_asset_access([ "collaborations", @context ], "collaborations", "other")
 
-    safe_token_valid = lambda do |service|
-      begin
-        self.send(service).verify_access_token
-      rescue => e
-        Canvas::Errors.capture(e, { source: 'rescue nil' })
-        false
-      end
-    end
-
-    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
-      (!logged_in_user.user_services.where(service: 'google_drive').first ||
-      !safe_token_valid.call(:google_drive_connection))
-
-    @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
+    # this will set @user_has_google_drive
+    user_has_google_drive
 
     @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
     @has_etherpad_collaborations = @collaborations.any? {|c| c.collaboration_type == 'EtherPad'}
@@ -103,20 +91,22 @@ class CollaborationsController < ApplicationController
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
           redirect_to @collaboration.url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
-          redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
+          redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
         else
           flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
-      rescue GoogleDocs::DriveConnectionException => drive_exception
+      rescue GoogleDrive::ConnectionException => drive_exception
         Canvas::Errors.capture(drive_exception)
+        flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
+        redirect_to named_context_url(@context, :context_collaborations_url)
       end
     end
   end
 
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create)
-    users     = User.where(:id => Array(params[:user])).all
+    users     = User.where(:id => Array(params[:user])).to_a
     group_ids = Array(params[:group])
     params[:collaboration][:user] = @current_user
     @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
@@ -139,20 +129,36 @@ class CollaborationsController < ApplicationController
   def update
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
-    users     = User.where(:id => Array(params[:user])).all
-    group_ids = Array(params[:group])
-    params[:collaboration].delete :collaboration_type
-    @collaboration.attributes = params[:collaboration]
-    @collaboration.update_members(users, group_ids)
-    respond_to do |format|
-      if @collaboration.save
-        format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-        format.json { render :json => @collaboration.as_json(:methods => [:collaborator_ids], :permissions => {:user => @current_user, :session => session}) }
-      else
-        flash[:error] = t 'errors.update_failed', "Collaboration update failed"
-        format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
-        format.json { render :json => @collaboration.errors, :status => :bad_request }
+    begin
+      users     = User.where(:id => Array(params[:user])).to_a
+      group_ids = Array(params[:group])
+      params[:collaboration].delete :collaboration_type
+      @collaboration.attributes = params[:collaboration]
+      @collaboration.update_members(users, group_ids)
+      respond_to do |format|
+        if @collaboration.save
+          format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
+          format.json { render :json => @collaboration.as_json(
+                                 :methods => [:collaborator_ids],
+                                 :permissions => {
+                                   :user => @current_user,
+                                   :session => session
+                                 }
+                               )}
+        else
+          flash[:error] = t 'errors.update_failed', "Collaboration update failed"
+          format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
+          format.json { render :json => @collaboration.errors, :status => :bad_request }
+        end
       end
+    rescue GoogleDrive::ConnectionException => error
+      Rails.logger.warn error
+      flash[:error] = t 'errors.update_failed', "Collaboration update failed" # generic failure message
+      if error.message.include?('File not found')
+        flash[:error] = t 'google_drive.file_not_found', "Collaboration file not found"
+      end
+      raise error unless error.message.include?('File not found')
+      redirect_to named_context_url(@context, :context_collaborations_url)
     end
   end
 
@@ -179,7 +185,7 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
-    collaborators = @collaboration.collaborators.includes(:group, :user)
+    collaborators = @collaboration.collaborators.preload(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)

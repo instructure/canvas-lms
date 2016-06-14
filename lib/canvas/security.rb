@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'jwt'
+require 'json/jwt'
 
 module Canvas::Security
   class InvalidToken < RuntimeError
@@ -41,7 +41,7 @@ module Canvas::Security
   def self.config
     @config ||= (YAML.load_file(Rails.root+"config/security.yml")[Rails.env] rescue nil)
   end
-  
+
   def self.encrypt_password(secret, key)
     require 'base64'
     c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
@@ -52,7 +52,7 @@ module Canvas::Security
     e << c.final
     [Base64.encode64(e), Base64.encode64(iv)]
   end
-  
+
   def self.decrypt_password(secret, salt, key, encryption_key = nil)
     require 'base64'
     encryption_keys = Array(encryption_key) + self.encryption_keys
@@ -73,7 +73,7 @@ module Canvas::Security
     end
     raise last_error
   end
-  
+
   def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest.new('sha1'), (encryption_key || self.encryption_key), str
@@ -104,7 +104,26 @@ module Canvas::Security
     if expires
       jwt_body = jwt_body.merge({ exp: expires.to_i })
     end
-    JWT.encode(jwt_body, key || encryption_key)
+    raw_jwt = JSON::JWT.new(jwt_body)
+    return raw_jwt.to_s if key == :unsigned
+    raw_jwt.sign(key || encryption_key, :HS256).to_s
+  end
+
+  # Creates an encrypted JWT token string
+  #
+  # This is a token that will be used for identifying the user to
+  # canvas on API calls and to other canvas-ecosystem services.
+  #
+  # payload (hash) - The data you want in the token
+  # signing_secret (big string) - The shared secret for signing
+  # encryption_secret (big string) - The shared key for symmetric key encryption.
+  #
+  # Returns the token as a string.
+  def self.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+    jwt = JSON::JWT.new(payload)
+    jws = jwt.sign(signing_secret, :HS256)
+    jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
+    jwe.to_s
   end
 
   # Verifies and decodes a JWT token
@@ -122,17 +141,42 @@ module Canvas::Security
 
     keys.each do |key|
       begin
-        body = JWT.decode(token, key)[0]
+        body = JSON::JWT.decode(token, key)
+        verify_jwt(body)
         return body.with_indifferent_access
-      rescue JWT::ExpiredSignature
-        raise Canvas::Security::TokenExpired
-      rescue JWT::DecodeError
+      rescue JSON::JWS::VerificationFailed
         # Keep looping, to try all the keys. If none succeed,
         # we raise below.
+      rescue Canvas::Security::TokenExpired => expired_exception
+        raise expired_exception
+      rescue => e
+        raise Canvas::Security::InvalidToken, e
       end
     end
 
     raise Canvas::Security::InvalidToken
+  end
+
+  def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil)
+    signing_secret ||= Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
+    encryption_secret ||= Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
+    begin
+      signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
+      raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, signing_secret)
+      verify_jwt(raw_jwt)
+      raw_jwt.with_indifferent_access
+    rescue JSON::JWS::VerificationFailed
+      raise Canvas::Security::InvalidToken
+    end
+  end
+
+  def self.base64_encode(token_string)
+    Base64.encode64(token_string).encode('utf-8').delete("\n")
+  end
+
+  def self.base64_decode(token_string)
+    utf8_string = token_string.force_encoding(Encoding::UTF_8)
+    Base64.decode64(utf8_string.encode('ascii-8bit'))
   end
 
   def self.validate_encryption_key(overwrite = false)
@@ -140,7 +184,11 @@ module Canvas::Security
     return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash}
 
     if db_hash.nil? || overwrite
-      Setting.set("encryption_key_hash", Digest::SHA1.hexdigest(encryption_key))
+      begin
+        Setting.set("encryption_key_hash", Digest::SHA1.hexdigest(encryption_key))
+      rescue ActiveRecord::StatementInvalid
+        # the db may not exist yet
+      end
     else
       abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`"
     end
@@ -254,5 +302,20 @@ module Canvas::Security
 
   def self.login_attempts_key(pseudonym)
     "login_attempts:#{pseudonym.global_id}"
+  end
+
+  private
+
+  def self.verify_jwt(body)
+    if body[:exp].present?
+      if timestamp_is_exipred?(body[:exp])
+        raise Canvas::Security::TokenExpired
+      end
+    end
+  end
+
+  def self.timestamp_is_exipred?(exp_val)
+    now = Time.zone.now
+    (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
   end
 end

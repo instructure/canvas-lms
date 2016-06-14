@@ -1,0 +1,39 @@
+<div class="form-dialog-content pad-box form-inline group-category-clone">
+{{#if displayCautionOptions}}
+  <fieldset class="pad-box dotted-separator">
+    <p>
+      {{#t}}
+      Careful! Changes to group membership will apply to groups that already have assignment submissions. Group assignment submissions may not align as a result. Would you like to create a new group set for future assignments?
+      {{/t}}
+    </p>
+    <div class="controls">
+      <label class="radio">
+        <input type="radio" class="clone-options-toggle" name="clone_option" id="option_clone_group_set" value="clone" checked>
+        {{#t}}
+          New Group Set
+        {{/t}}
+      </label>
+    </div>
+    <div class="controls">
+      <label class="radio">
+        <input type="radio" class="clone-options-toggle" name="clone_option" id="option_change_groups" value="do_not_clone">
+        {{#t}}
+          Change Groups
+        {{/t}}
+      </label>
+    </div>
+  </fieldset>
+{{/if}}
+<fieldset>
+  <label class="pad-box cloned_category_name_option" aria-hidden="false">
+    {{#t}}Group Set Name{{/t}}
+    <input type="text" id="cloned_category_name" name="name" value="(Clone) {{name}}">
+  </label>
+</fieldset>
+</div>
+
+<div class="form-controls">
+  <button type="button" class="btn dialog_closer">{{#t "cancel"}}Cancel{{/t}}</button>
+  <button type="submit" class="btn btn-primary" id="clone_category_submit_button">
+  {{#t}}Submit{{/t}}</button>
+</div>

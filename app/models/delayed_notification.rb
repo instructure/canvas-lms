@@ -35,9 +35,6 @@ class DelayedNotification < ActiveRecord::Base
 
   serialize :recipient_keys
 
-  include PolymorphicTypeOverride
-  override_polymorphic_types asset_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
-
   workflow do
     state :to_be_processed do
       event :do_process, :transitions_to => :processed
@@ -81,7 +78,7 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [:user] if klass == CommunicationChannel
-      res += klass.where(:id => ids).includes(includes).all rescue []
+      res += klass.where(:id => ids).preload(includes).to_a rescue []
     end
     @to_list = res.uniq
   end

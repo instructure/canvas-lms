@@ -60,7 +60,7 @@ module CC::Importer::Canvas
         topic['position'] = get_int_val(meta_doc, 'position')
         wf_state = get_node_val(meta_doc, 'workflow_state')
         topic['workflow_state'] = wf_state if wf_state.present?
-
+        get_bool_val(meta_doc, 'has_group_category').tap { |val| topic['has_group_category'] = val unless val.nil? }
         if asmnt_node = meta_doc.at_css('assignment')
           topic['assignment'] = parse_canvas_assignment_data(asmnt_node)
         end

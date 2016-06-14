@@ -13,7 +13,7 @@ module Canvas::Oauth
     end
 
     def has_valid_key?
-      key.present?
+      key.present? && key.active?
     end
 
     def client_id_is_valid?
@@ -58,6 +58,12 @@ module Canvas::Oauth
 
     def token_for(code)
       Token.new(key, code)
+    end
+
+    def token_for_refresh_token(refresh_token)
+      access_token = AccessToken.authenticate_refresh_token(refresh_token)
+      return nil unless access_token
+      Token.new(key, nil, access_token)
     end
 
     def app_name
@@ -111,6 +117,6 @@ module Canvas::Oauth
       I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
     end
 
-   
+
   end
 end

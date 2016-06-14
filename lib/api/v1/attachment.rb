@@ -22,6 +22,10 @@ module Api::V1::Attachment
   include Api::V1::User
   include Api::V1::UsageRights
 
+  def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
+    context.grants_any_right?(user, session, :manage_files, :read_as_admin)
+  end
+
   def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
       attachment_json(f, user, url_options, options)
@@ -29,6 +33,14 @@ module Api::V1::Attachment
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
+    hash = {
+      'id' => attachment.id,
+      'folder_id' => attachment.folder_id,
+      'display_name' => attachment.display_name,
+      'filename' => attachment.filename,
+    }
+    return hash if options[:only] && options[:only].include?('names')
+
     options.reverse_merge!(submission_attachment: false)
     includes = options[:include] || []
 
@@ -44,10 +56,10 @@ module Api::V1::Attachment
                         false
                       elsif !attachment.hidden?
                         false
-                      elsif options.has_key?(:can_manage_files)
-                        options[:can_manage_files]
+                      elsif options.has_key?(:can_view_hidden_files)
+                        options[:can_view_hidden_files]
                       else
-                        !attachment.grants_right?(user, :update)
+                        !can_view_hidden_files?(attachment.context, user)
                       end
 
     downloadable = !attachment.locked_for?(user, check_policies: true)
@@ -69,12 +81,8 @@ module Api::V1::Attachment
       ''
     end
 
-    hash = {
-      'id' => attachment.id,
-      'folder_id' => attachment.folder_id,
+    hash.merge!(
       'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
       'url' => url,
       'size' => attachment.size,
       'created_at' => attachment.created_at,
@@ -85,7 +93,8 @@ module Api::V1::Attachment
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_download_url,
-    }
+      'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at
+    )
     locked_json(hash, attachment, user, 'file')
 
     if includes.include? 'user'
@@ -102,6 +111,9 @@ module Api::V1::Attachment
     end
     if includes.include? 'usage_rights'
       hash['usage_rights'] = usage_rights_json(attachment.usage_rights, user)
+    end
+    if includes.include? "context_asset_string"
+      hash['context_asset_string'] = attachment.context.try(:asset_string)
     end
 
     hash
@@ -123,6 +135,7 @@ module Api::V1::Attachment
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
     @attachment.user = @current_user
+    @attachment.modified_at = Time.now.utc
     @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]
@@ -206,7 +219,6 @@ module Api::V1::Attachment
   end
 
   def context_files_url
-    # change if context_api_index route is expanded to other contexts besides courses
-    api_v1_course_files_url(@context)
+    polymorphic_url([:api_v1, @context, :files])
   end
 end

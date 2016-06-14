@@ -19,4 +19,4 @@
   <%= render :partial => 'shared/wiki_sidebar' %>
 <% end %>
 
-<%= render :partial => 'full_calendar_event', :object => @event %>
+<%= render :partial => 'full_calendar_event', :locals => {:calendar_event => @event} %>

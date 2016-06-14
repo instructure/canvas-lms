@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 describe "canvas_stringex" do
 
   it "requires the syck yaml parsers" do
-    expect(YAML::ENGINE.yamler).to eq 'syck'
+    expect(YAML).to eq Syck
   end
 
 end

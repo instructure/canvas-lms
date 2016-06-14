@@ -7,9 +7,10 @@ define [
   'compiled/views/groups/manage/RandomlyAssignMembersView'
   'compiled/views/groups/manage/GroupCreateView'
   'compiled/views/groups/manage/GroupCategoryEditView'
+  'compiled/views/groups/manage/GroupCategoryCloneView'
   'compiled/models/Group'
   'jst/groups/manage/groupCategoryDetail'
-], (I18n, $, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, Group, template) ->
+], (I18n, $, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, GroupCategoryCloneView, Group, template) ->
 
   class GroupCategoryDetailView extends View
 
@@ -22,6 +23,7 @@ define [
       'click .edit-category': 'editCategory'
       'click .delete-category': 'deleteCategory'
       'click .add-group': 'addGroup'
+      'click .clone-category' : 'cloneCategory'
 
     els:
       '.randomly-assign-members': '$randomlyAssignMembersLink'
@@ -77,6 +79,18 @@ define [
         model: @model
         trigger: @$editGroupCategoryLink
       @editCategoryView.open()
+
+    cloneCategory: (e) ->
+      e.preventDefault()
+      @cloneCategoryView = new GroupCategoryCloneView
+        model: @model
+        openedFromCaution: false
+      @cloneCategoryView.open()
+      @cloneCategoryView.on "close", =>
+        if @cloneCategoryView.cloneSuccess
+          window.location.reload()
+        else
+          $("#group-category-#{@model.id}-actions").focus()
 
     messageAllUnassigned: (e) ->
       e.preventDefault()

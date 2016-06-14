@@ -1,7 +1,7 @@
 define(function(require) {
   var quizStatistics = require('../stores/statistics');
   var quizReports = require('../stores/reports');
-  var notifications = require('canvas_quizzes/stores/notifications');
+  var notifications = require('../stores/notifications');
   var config = require('../config');
   var update;
 

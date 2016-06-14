@@ -35,9 +35,8 @@ class CourseProgress
   end
 
   def module_progressions
-    @_module_progressions ||= user.context_module_progressions
-                                  .where("context_module_id IN (?)", modules.map(&:id))
-                                  .shard(course)
+    @_module_progressions ||= course.context_module_progressions.
+                                  where(user_id: user, context_module_id: modules)
   end
 
   def current_position
@@ -47,7 +46,15 @@ class CourseProgress
 
   def current_content_tag
     return unless in_progress?
-    current_module.content_tags_visible_to(user).where(:position => current_position).first
+    @current_content_tag ||= begin
+      tags = current_module.content_tags.where(:position => current_position)
+      if tags.any?
+        opts = current_module.visibility_for_user(user)
+        tags.detect{|tag| tag.visible_to_user?(user, opts)}
+      else
+        nil
+      end
+    end
   end
 
   def requirements
@@ -101,7 +108,7 @@ class CourseProgress
   end
 
   def to_json
-    if course.module_based? && course.user_is_student?(user)
+    if course.module_based? && course.user_is_student?(user, include_future: true)
       {
         requirement_count: requirement_count,
         requirement_completed_count: requirement_completed_count,

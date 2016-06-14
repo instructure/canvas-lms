@@ -24,7 +24,7 @@
   background: $ic-color-light;
   padding: 5px 0px;
   max-height: 600px;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   width: 100%;
   box-sizing: border-box;
 }
@@ -54,7 +54,7 @@
   outline: none;
   top: 2px;
   right: 6px;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   cursor: default;
 }
 
@@ -113,14 +113,14 @@ $ic-token-padding: 3px 15px;
   border-radius: 3px;
   padding: 0;
   margin: 2px;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   display: inline-flex;
 }
 .ic-token-label {
   padding: $ic-token-padding;
 }
 .ic-token-delete-button {
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   padding: $ic-token-padding;
   cursor: pointer;
   order: 2; // makes it come after the words

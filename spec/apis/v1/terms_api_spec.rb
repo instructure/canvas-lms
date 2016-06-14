@@ -23,7 +23,7 @@ describe TermsApiController, type: :request do
     before :once do
       @account = Account.create(name: 'new')
       account_admin_user(account: @account)
-      @account.enrollment_terms.scoped.delete_all
+      @account.enrollment_terms.scope.delete_all
       @term1 = @account.enrollment_terms.create(name: "Term 1")
       @term2 = @account.enrollment_terms.create(name: "Term 2")
     end
@@ -66,6 +66,13 @@ describe TermsApiController, type: :request do
         names = json.map{ |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).to include(@term2.name)
+      end
+
+      it "should not blow up for invalid state parameters" do
+        json = get_terms(workflow_state: {all: nil})
+        names = json.map { |t| t['name'] }
+        expect(names).to include(@term1.name)
+        expect(names).not_to include(@term2.name)
       end
 
       it "should list all terms, active and deleted, with state=[all]" do
@@ -143,7 +150,7 @@ describe TermsController, type: :request do
   before :once do
     @account = Account.create(name: 'new')
     account_admin_user(account: @account)
-    @account.enrollment_terms.scoped.delete_all
+    @account.enrollment_terms.scope.delete_all
     @term1 = @account.enrollment_terms.create(name: "Term 1")
   end
 

@@ -23,26 +23,26 @@ Instructions
 
 Here is an example of the minimum JSON that would log 3 minutes of activity for `http://example.com`:
 
-<pre>
+```json
 {
-  id: "12345678-1234-5678-1234-567812345678",
-  actor: {
-    account: {
-      homePage: "http://www.instructure.com/",
-      name: "unique_name_for_user_of_some_kind_maybe_lti_user_id"
+  "id": "12345678-1234-5678-1234-567812345678",
+  "actor": {
+    "account": {
+      "homePage": "http://www.instructure.com/",
+      "name": "unique_name_for_user_of_some_kind_maybe_lti_user_id"
     }
   },
-  verb: {
-    id: "http://adlnet.gov/expapi/verbs/interacted",
-    display: {
-      "en-US" => "interacted"
+  "verb": {
+    "id": "http://adlnet.gov/expapi/verbs/interacted",
+    "display": {
+      "en-US": "interacted"
     }
   },
-  object: {
-    id: "http://example.com/"
+  "object": {
+    "id": "http://example.com/"
   },
-  result: {
-    duration: "PT3M0S"
+  "result": {
+    "duration": "PT3M0S"
   }
 }
-</pre>
+```

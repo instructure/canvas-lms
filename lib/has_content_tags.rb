@@ -23,7 +23,7 @@ module HasContentTags
   end
   
   def update_associated_content_tags
-    ContentTag.update_for(self)
+    ContentTag.update_for(self) if @associated_content_tags_need_updating
   end
   
   def check_if_associated_content_tags_need_updating

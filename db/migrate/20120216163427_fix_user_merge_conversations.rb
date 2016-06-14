@@ -8,9 +8,9 @@ class FixUserMergeConversations < ActiveRecord::Migration
     # (which may merge it with another conversation)
     ConversationParticipant.find_by_sql(<<-SQL).
       SELECT conversation_participants.*
-      FROM conversation_participants, (
+      FROM #{ConversationParticipant.quoted_table_name}, (
         SELECT MIN(id) AS id, user_id, conversation_id
-        FROM conversation_participants
+        FROM #{ConversationParticipant.quoted_table_name}
         GROUP BY user_id, conversation_id
         HAVING COUNT(*) > 1
         ORDER BY conversation_id
@@ -29,8 +29,7 @@ class FixUserMergeConversations < ActiveRecord::Migration
     # in sql alone (unless you have a sha1 method for postgres and sqlite), so
     # we just walk them all out of band and make sure they're right (this may
     # also merge some private conversations in the process)
-    Conversation.connection.select_all("SELECT id FROM conversations WHERE private_hash IS NOT NULL").
-    map{ |r| r["id"] }.each_slice(1000) do |ids|
+    Conversation.where("private_hash IS NOT NULL").pluck(:id).each_slice(1000) do |ids|
       Conversation.send_later_if_production_enqueue_args(:batch_regenerate_private_hashes!, {
         :priority => Delayed::LOWER_PRIORITY,
         :max_attempts => 1,

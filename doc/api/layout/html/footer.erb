@@ -14,15 +14,6 @@
     var link = $('<a/>').attr('href', '#'+$(el).attr('name')).append($.trim($a[0].innerHTML));
     $row.find('td').append(link);
   });
-
-  SyntaxHighlighter.defaults['gutter'] = false;
-  SyntaxHighlighter.defaults['toolbar'] = false;
-  SyntaxHighlighter.defaults['auto-links'] = false;
-  $('#content pre.code.javascript code').each(function(i, el) {
-    $(el).parent().addClass('brush: js');
-    $(el).replaceWith(el.innerHTML);
-  });
-  SyntaxHighlighter.all();
 </script>
 <div id="footer">
   &copy; Instructure, Inc. Generated on <%= Time.now.strftime("%c") %><br>

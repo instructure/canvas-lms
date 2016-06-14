@@ -24,7 +24,7 @@ describe ContextModuleProgression do
     @module = @course.context_modules.create!(:name => "some module")
 
     @user = User.create!(:name => "some name")
-    @course.enroll_student(@user)
+    @course.enroll_student(@user).accept!
   end
 
   def setup_modules
@@ -163,14 +163,14 @@ describe ContextModuleProgression do
   context "optimistic locking" do
     def stale_progression
       progression = @user.context_module_progressions.create!(context_module: @module)
-      ContextModuleProgression.find(progression.id).save!
+      ContextModuleProgression.find(progression.id).update_attribute(:updated_at, 10.seconds.ago)
       progression
     end
 
     it "raises a stale object error during save" do
       progression = stale_progression
-      expect { progression.save }.to raise_error(ActiveRecord::StaleObjectError)
-      expect { progression.reload.save }.to_not raise_error
+      expect { progression.update_attribute(:updated_at, 10.seconds.from_now) }.to raise_error(ActiveRecord::StaleObjectError)
+      expect { progression.reload.update_attribute(:updated_at, 10.seconds.from_now) }.to_not raise_error
     end
 
     it 'raises a stale object error during evaluate' do
@@ -215,5 +215,24 @@ describe ContextModuleProgression do
     progression3.reload
     expect(progression2).to be_locked
     expect(progression3).to be_locked
+  end
+
+  describe "#uncomplete_requirement" do
+    it "should uncomplete the requirement" do
+      setup_modules
+      @module.publish!
+      progression = @tag.context_module_action(@user, :read)
+      progression.uncomplete_requirement(@tag.id)
+      expect(progression.requirements_met.length).to be(0)
+
+    end
+
+    it "should not change anything when given an ID that does not exist" do
+      setup_modules
+      @module.publish!
+      progression = @tag.context_module_action(@user, :read)
+      progression.uncomplete_requirement(-1)
+      expect(progression.requirements_met.length).to be(1)
+    end
   end
 end

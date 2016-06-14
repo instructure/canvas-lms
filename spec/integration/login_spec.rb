@@ -38,7 +38,7 @@ describe 'login' do
 
     def stubby(stub_response)
       @cas_client = CASClient::Client.new(
-        cas_base_url: @account.account_authorization_config.auth_base,
+        cas_base_url: @account.authentication_providers.first.auth_base,
         encode_extra_attributes_as: :raw
       )
       @cas_client.instance_variable_set(:@stub_response, stub_response)
@@ -61,7 +61,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
 
@@ -76,7 +76,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -90,7 +90,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -101,7 +101,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       get login_url
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -109,16 +109,15 @@ describe 'login' do
 
     it "should redirect to a custom url if the user CAS account doesn't exist" do
       redirect_url = 'http://google.com/'
-      aac = Account.default.account_authorization_config
-      aac.unknown_user_url = redirect_url
-      aac.save
+      Account.default.unknown_user_url = redirect_url
+      Account.default.save!
 
       stubby("yes\nnonexistentuser\n")
 
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(redirect_url)
     end
 
@@ -130,7 +129,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
     end
@@ -145,7 +144,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq cas_ticket
 
@@ -167,7 +166,7 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get 'login/cas', ticket: 'ST-abcd'
+        get '/login/cas', ticket: 'ST-abcd'
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
@@ -194,7 +193,7 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get 'login/cas', ticket: 'ST-abcd'
+        get '/login/cas', ticket: 'ST-abcd'
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
@@ -252,7 +251,7 @@ describe 'login' do
       account.auth_discovery_url = discovery_url
       account.save!
 
-      get account_account_authorization_configs_url(account)
+      get account_authentication_providers_url(account)
       redirect_until(discovery_url)
     end
   end
@@ -266,5 +265,17 @@ describe 'login' do
 
     post canvas_login_url, pseudonym_session: { unique_id: @pseudonym.unique_id, password: 'qwerty' }
     expect(response).to redirect_to jobs_url
+  end
+
+  it "loads custom js 'raw' on mobile login screen", type: :request do
+    js_url = 'https://example.com/path/to/some/file.js'
+    Account.default.settings[:global_includes] = true
+    Account.default.settings[:global_javascript] = js_url
+    Account.default.save!
+
+    get '/login/canvas', {}, { 'HTTP_USER_AGENT' => 'iphone' }
+    # match /optimized/vendor/jquery-1.7.2.js?1440111591 or /optimized/vendor/jquery-1.7.2.js
+    assert_tag(tag: 'script', attributes: { src: /^\/optimized\/vendor\/jquery-1.7.2.js(\?\d+)*$/})
+    assert_tag(tag: 'script', attributes: { src: js_url})
   end
 end

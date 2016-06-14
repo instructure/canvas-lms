@@ -111,12 +111,12 @@ h3 .tally {
     <td><%= f.blabel :name, :en => "Section Name" %></td>
     <td><%= f.text_field :name %></td>
   </tr>
-  <% if @section.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
+  <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context, @current_user, :manage_sis) %>
     <tr>
       <td><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
       <td>
         <span class="course_form">
-          <% if can_do(@context.root_account, @current_user, :manage_sis) %>
+          <% if can_do(@context, @current_user, :manage_sis) %>
             <%= f.text_field :sis_source_id, :style => "width: 50px;", :title => "SIS ID", :value => @section.sis_source_id %>
           <% else %>
             <%= @section.sis_source_id %>
@@ -126,12 +126,40 @@ h3 .tally {
     </tr>
   <% end %>
   <tr>
-    <td><%= f.blabel :start_at, :en => "Starts" %></td>
-    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;', :"aria-label" => t("Starts on Date") %></td>
+    <td>
+      <%= f.blabel :start_at, en: "Starts" %>
+      <label class="screenreader-only" id="section_starts_at_label">
+        <%= t("Section starts at") %>
+        <%= datepicker_screenreader_prompt %>
+      </label>
+    </td>
+    <td>
+      <%= f.text_field :start_at,
+                       class: "datetime_field",
+                       value: datetime_string(@section.start_at),
+                       style: 'width: 120px;',
+                       "aria-labelledby" => "section_starts_at_label",
+                       "data-tooltip" => "",
+                       title: accessible_date_format %>
+    </td>
   </tr>
   <tr>
-    <td><%= f.blabel :end_at, :en => "Ends" %></td>
-    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;', :"aria-label" => t("Ends on Date") %></td>
+    <td>
+      <%= f.blabel :end_at, en: "Ends" %>
+      <label class="screenreader-only" id="section_ends_at_label">
+        <%= t("Section ends at") %>
+        <%= datepicker_screenreader_prompt %>
+      </label>
+    </td>
+    <td>
+      <%= f.text_field :end_at,
+                       class: "datetime_field",
+                       value: datetime_string(@section.end_at),
+                       style: 'width: 120px;',
+                       "aria-labelledby" => "section_ends_at_label",
+                       "data-tooltip" => "",
+                       title: accessible_date_format %>
+    </td>
   </tr>
   <tr>
     <td colspan="2">
@@ -173,7 +201,7 @@ h3 .tally {
     <% end %>
     </table>
   </div>
-  <% if @section && ( @section.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis))%>
+  <% if @section && ( @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context, @current_user, :manage_sis))%>
     <div><%= before_label('sis_id', "SIS ID") %> <span class="sis_source_id"><%= @section.sis_source_id %></span></div>
   <% end %>
   <% if @section.start_at || @section.end_at %>

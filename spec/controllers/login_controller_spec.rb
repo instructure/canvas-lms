@@ -43,6 +43,17 @@ describe LoginController do
       expect(response).to redirect_to('https://google.com/')
     end
 
+    it "passes delegated message on to discovery url" do
+      Account.default.auth_discovery_url = 'https://google.com/'
+      Account.default.save!
+
+      flash_hash = ActionDispatch::Flash::FlashHash.new
+      flash_hash[:delegated_message] = 'hi'
+      controller.stubs(:flash).returns(flash_hash)
+      get 'new'
+      expect(response).to redirect_to('https://google.com/?message=hi')
+    end
+
     it "handles legacy canvas_login=1 param" do
       account_with_cas(account: Account.default)
 
@@ -56,7 +67,7 @@ describe LoginController do
       Account.default.save!
 
       account_with_saml(account: Account.default)
-      aac = Account.default.account_authorization_configs.first
+      aac = Account.default.authentication_providers.first
       get 'new', id: aac
       expect(response).to redirect_to(saml_login_url(aac))
     end
@@ -71,6 +82,30 @@ describe LoginController do
 
       get 'new'
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
+    end
+
+    it "redirects to Facebook if it's the default" do
+      Account.default.authentication_providers.create!(auth_type: 'facebook')
+      Account.default.authentication_providers.first.move_to_bottom
+
+      get 'new'
+      expect(response).to redirect_to(facebook_login_url)
+    end
+
+    it "redirects based on authentication_provider param" do
+      Account.default.authentication_providers.create!(auth_type: 'facebook')
+      account_with_cas(account: Account.default)
+
+      get 'new', authentication_provider: 'cas'
+      expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
+    end
+
+    it "redirects based on authentication_provider id param" do
+      ap2 = Account.default.authentication_providers.create!(auth_type: 'cas')
+      account_with_cas(account: Account.default)
+
+      get 'new', authentication_provider: ap2.id
+      expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new, id: ap2.id))
     end
   end
 
@@ -91,7 +126,7 @@ describe LoginController do
 
     it "follows SAML logout redirect to IdP" do
       account_with_saml(account: Account.default, saml_log_out_url: 'https://www.google.com/')
-      session[:login_aac] = Account.default.account_authorization_configs.last
+      session[:login_aac] = Account.default.authentication_providers.first
       delete 'destroy'
       expect(response.status).to eq 302
       expect(response.location).to match(%r{^https://www.google.com/\?SAMLRequest=})
@@ -99,7 +134,7 @@ describe LoginController do
 
     it "follows CAS logout redirect to CAS server" do
       account_with_cas(account: Account.default)
-      session[:login_aac] = Account.default.account_authorization_configs.last
+      session[:login_aac] = Account.default.authentication_providers.first
       delete 'destroy'
       expect(response.status).to eq 302
       expect(response.location).to match(%r{localhost/cas/})

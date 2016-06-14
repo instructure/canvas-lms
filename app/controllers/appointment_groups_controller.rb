@@ -93,19 +93,19 @@
 #         },
 #         "reserved_times": {
 #           "description": "The start and end times of slots reserved by the current user as well as the id of the calendar event for the reservation (see include[] argument)",
-#           "example": "[{\"id\"=>987, \"start_at\"=>\"2012-07-20T15:00:00-06:00\", \"end_at\"=>\"2012-07-20T15:00:00-06:00\"}]",
+#           "example": [{"id": 987, "start_at": "2012-07-20T15:00:00-06:00", "end_at": "2012-07-20T15:00:00-06:00"}],
 #           "type": "array",
 #           "items": {"$ref": "Appointment"}
 #         },
 #         "context_codes": {
 #           "description": "The context codes (i.e. courses) this appointment group belongs to. Only people in these courses will be eligible to sign up.",
-#           "example": "[course_123]",
+#           "example": ["course_123"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
 #         "sub_context_codes": {
 #           "description": "The sub-context codes (i.e. course sections and group categories) this appointment group is restricted to",
-#           "example": "[course_section_234]",
+#           "example": ["course_section_234"],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
@@ -133,13 +133,13 @@
 #         },
 #         "appointments": {
 #           "description": "Calendar Events representing the time slots (see include[] argument) Refer to the Calendar Events API for more information",
-#           "example": "[]",
+#           "example": [],
 #           "type": "array",
 #           "items": {"$ref": "CalendarEvent"}
 #         },
 #         "new_appointments": {
 #           "description": "Newly created time slots (same format as appointments above). Only returned in Create/Update responses where new time slots have been added",
-#           "example": "[]",
+#           "example": [],
 #           "type": "array",
 #           "items": {"$ref": "CalendarEvent"}
 #         },
@@ -257,7 +257,7 @@ class AppointmentGroupsController < ApplicationController
       api_v1_appointment_groups_url(:scope => params[:scope])
     )
     if params[:include]
-      ActiveRecord::Associations::Preloader.new(groups,
+      ActiveRecord::Associations::Preloader.new.preload(groups,
                             [{:appointments =>
                                [:parent_event,
                                 {:context =>
@@ -270,9 +270,9 @@ class AppointmentGroupsController < ApplicationController
                                      [:parent_event,
                                       :context]}]}]},
                              {:appointment_group_contexts => :context},
-                             :appointment_group_sub_contexts]).run
+                             :appointment_group_sub_contexts])
     end
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
+    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
   end
 
   # @API Create an appointment group
@@ -333,17 +333,17 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups.json' \
-  #        -X POST \ 
-  #        -F 'appointment_group[context_codes][]=course_123' \ 
-  #        -F 'appointment_group[sub_context_codes][]=course_section_234' \ 
-  #        -F 'appointment_group[title]=Final Presentation' \ 
+  #        -X POST \
+  #        -F 'appointment_group[context_codes][]=course_123' \
+  #        -F 'appointment_group[sub_context_codes][]=course_section_234' \
+  #        -F 'appointment_group[title]=Final Presentation' \
   #        -F 'appointment_group[participants_per_appointment]=1' \
   #        -F 'appointment_group[min_appointments_per_participant]=1' \
   #        -F 'appointment_group[max_appointments_per_participant]=1' \
-  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T21:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T22:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T22:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \ 
+  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T21:00:00Z' \
+  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T22:00:00Z' \
+  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T22:00:00Z' \
+  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
     contexts = get_contexts
@@ -441,7 +441,7 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        -F 'appointment_group[publish]=1' \
   #        -H "Authorization: Bearer <token>"
   def update
@@ -460,7 +460,7 @@ class AppointmentGroupsController < ApplicationController
 
   # @API Delete an appointment group
   #
-  # Delete an appointment group (and associated time slots and reservations) 
+  # Delete an appointment group (and associated time slots and reservations)
   # and return the deleted group
   #
   # @argument cancel_reason [String]
@@ -469,8 +469,8 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
-  #        -X DELETE \ 
-  #        -F 'cancel_reason=El Tigre Chino got fired' \ 
+  #        -X DELETE \
+  #        -F 'cancel_reason=El Tigre Chino got fired' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     if authorized_action(@group, @current_user, :delete)

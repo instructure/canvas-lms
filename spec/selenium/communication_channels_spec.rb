@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "communication channel selenium tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "confirm" do
     it "should register the user" do
@@ -50,6 +50,39 @@ describe "communication channel selenium tests" do
       }
 
       expect(f('#identity .logout')).to be_present
+    end
+
+    it 'should show the bounce count reset button when a siteadmin is masquerading' do
+      u = user_with_pseudonym(active_all: true)
+      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      site_admin_logged_in
+      masquerade_as(u)
+
+      get '/profile/settings'
+
+      expect(f('.reset_bounce_count_link')).to be_present
+    end
+
+    it 'should not show the bounce count reset button when an account admin is masquerading' do
+      u = user_with_pseudonym(active_all: true)
+      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      admin_logged_in
+      masquerade_as(u)
+
+      get '/profile/settings'
+
+      expect(f('.reset_bounce_count_link')).to be_nil
+    end
+
+    it 'should not show the bounce count reset button when the channel is not bouncing' do
+      u = user_with_pseudonym(active_all: true)
+      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      site_admin_logged_in
+      masquerade_as(u)
+
+      get '/profile/settings'
+
+      expect(f('.reset_bounce_count_link')).to be_nil
     end
   end
 end

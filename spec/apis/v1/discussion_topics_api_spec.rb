@@ -68,6 +68,7 @@ describe Api::V1::DiscussionTopics do
     expect(data[:permissions][:attach]).to eq false # students can't attach by default
 
     @topic.context.update_attribute(:allow_student_forum_attachments, true)
+    AdheresToPolicy::Cache.clear
     data = @test_api.discussion_topic_api_json(@topic, @topic.context, @student, nil)
     expect(data[:permissions][:attach]).to eq true
   end
@@ -304,6 +305,7 @@ describe DiscussionTopicsController, type: :request do
                                    'hidden_for_user' => false,
                                    'created_at' => @attachment.created_at.as_json,
                                    'updated_at' => @attachment.updated_at.as_json,
+                                   'modified_at' => @attachment.updated_at.as_json,
                                    'thumbnail_url' => @attachment.thumbnail_url,
                   }],
                   "topic_children"=>[@sub.id],
@@ -1131,6 +1133,7 @@ describe DiscussionTopicsController, type: :request do
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
                 'thumbnail_url' => attachment.thumbnail_url,
+                'modified_at' => attachment.updated_at.as_json
               }],
       "posted_at"=>gtopic.posted_at.as_json,
       "root_topic_id"=>nil,
@@ -1182,7 +1185,7 @@ describe DiscussionTopicsController, type: :request do
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
@@ -1194,7 +1197,7 @@ describe DiscussionTopicsController, type: :request do
   it "should fulfill module viewed requirements when re-marking a topic read" do
     @module = @course.context_modules.create!(:name => "some module")
     @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read",
                  { :controller => 'discussion_topics_api', :action => 'mark_topic_read', :format => 'json',
                    :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
@@ -1216,7 +1219,7 @@ describe DiscussionTopicsController, type: :request do
     tag = @module.add_item(:id => @topic.id, :type => 'discussion_topic')
     @module.completion_requirements = { tag.id => {:type => 'must_view'} }
     @module.save!
-    course_with_student(:course => @course)
+    course_with_student(:course => @course, :active_all => true)
 
     expect(@module.evaluate_for(@user)).to be_unlocked
     raw_api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all",
@@ -2198,6 +2201,7 @@ describe DiscussionTopicsController, type: :request do
           'created_at' => @attachment.created_at.as_json,
           'updated_at' => @attachment.updated_at.as_json,
           'thumbnail_url' => @attachment.thumbnail_url,
+          'modified_at' => @attachment.updated_at.as_json
         }
 
         v0 = json['view'][0]
@@ -2346,7 +2350,7 @@ describe DiscussionTopicsController, type: :request do
   it "returns due dates as they apply to the user" do
     course_with_student(:active_all => true)
     @user = @student
-    @student.enrollments.map(&:destroy!)
+    @student.enrollments.map(&:destroy_permanently!)
     @section = @course.course_sections.create! :name => "afternoon delight"
     @course.enroll_user(@student,'StudentEnrollment',
                         :section => @section,

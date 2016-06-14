@@ -13,7 +13,7 @@
   </label>
 {{/if}}
 <div class="discussion-column image-block">
-  <div class="image-block-image">
+  <div class="image-block-image" aria-hidden="true">
     {{>avatar author}}
   </div>
   <div class="image-block-content">
@@ -28,14 +28,14 @@
           {{#if locked}}
             <li>
               <a href="#" class="icon-lock">
-                {{#t "open_to_comments"}}Open to comments{{/t}}
+                {{#t "open_to_comments"}}Open to Comments{{/t}}
               </a>
             </li>
           {{else}}
             {{#if can_lock}}
               <li>
                 <a href="#" class="icon-lock">
-                  {{#t "close_for_comments"}}Close for comments{{/t}}
+                  {{#t "close_for_comments"}}Close for Comments{{/t}}
                 </a>
               </li>
             {{/if}}

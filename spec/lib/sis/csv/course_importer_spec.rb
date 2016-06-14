@@ -247,11 +247,23 @@ describe SIS::CSV::CourseImporter do
       expect(course.restrict_enrollments_to_course_dates).to be_truthy
       expect(course.start_at).to eq DateTime.parse("2011-04-14 00:00:00")
       expect(course.conclude_at).to eq DateTime.parse("2011-05-14 00:00:00")
-      course.restrict_enrollments_to_course_dates = false
-      course.start_at = DateTime.parse("2010-04-14 00:00:00")
-      course.conclude_at = DateTime.parse("2010-05-14 00:00:00")
+      course.restrict_enrollments_to_course_dates = false # should be able to change this without stickying dates
       course.save!
     end
+
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
+      "test4,TC 104,Test Course 4,,,active,2012-04-14 00:00:00,2012-05-14 00:00:00"
+    )
+    @account.courses.where(sis_source_id: "test4").first.tap do |course|
+      expect(course.restrict_enrollments_to_course_dates).to be_falsey
+      expect(course.start_at).to eq DateTime.parse("2012-04-14 00:00:00")
+      expect(course.conclude_at).to eq DateTime.parse("2012-05-14 00:00:00")
+      course.start_at = DateTime.parse("2010-04-14 00:00:00")
+      course.conclude_at = DateTime.parse("2010-05-14 00:00:00") # now get sticky
+      course.save!
+    end
+
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"

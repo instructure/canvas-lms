@@ -10,7 +10,6 @@ define [
     """
 
   module 'PaginatedList',
-
     setup: ->
       # server response
       @response = [200, { 'Content-Type': 'application/json' }, '[{ "value": "one" }, { "value": "two" }]']

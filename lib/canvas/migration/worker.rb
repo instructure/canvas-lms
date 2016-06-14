@@ -20,6 +20,15 @@ require 'action_controller_test_process'
 
 module Canvas::Migration::Worker
 
+  class Base < Struct.new(:migration_id)
+    def on_permanent_failure(error)
+      if migration_id
+        cm = ContentMigration.where(id: migration_id).first
+        cm.fail_with_error!(error) if cm
+      end
+    end
+  end
+
   def self.get_converter(settings)
     Canvas::Migration::Archive.new(settings).get_converter
   end

@@ -30,15 +30,15 @@ module Api
         content.modified_html
       end
 
-      def self.rewrite_outgoing(html, url_helper)
+      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false)
         return html if html.blank?
-        self.new(html).rewritten_html(url_helper)
+        self.new(html, account, include_mobile: include_mobile).rewritten_html(url_helper)
       end
 
       attr_reader :html
 
-      def initialize(html_string)
-        @html = html_string
+      def initialize(html_string, account = nil, include_mobile: false)
+        @account, @html, @include_mobile = account, html_string, include_mobile
       end
 
       def might_need_modification?
@@ -79,22 +79,46 @@ module Api
           apply_user_content_attributes(node, uc)
         end
 
+        UserContent.find_equation_images(parsed_html) do |node|
+          apply_mathml(node)
+        end
+
         UrlAttributes.each do |tag, attributes|
           parsed_html.css(tag).each do |element|
             url_helper.rewrite_api_urls(element, attributes)
           end
         end
+
+        add_css_and_js_overrides
         parsed_html.to_s
       end
 
+      def add_css_and_js_overrides
+        if @include_mobile && @account.root_account.feature_enabled?(:use_new_styles) && @account.effective_brand_config
+          overrides = @account.effective_brand_config.css_and_js_overrides
+          if (mobile_css_overrides = overrides[:mobile_css_overrides])
+            mobile_css_overrides.reverse_each do |url|
+              tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
+              parsed_html.prepend_child(tag)
+            end
+          end
+          if (mobile_js_overrides = overrides[:mobile_js_overrides])
+            mobile_js_overrides.each do |url|
+              tag = parsed_html.document.create_element('script', src: url)
+              parsed_html.add_child(tag)
+            end
+          end
+        end
+        parsed_html
+      end
 
       private
 
-      APPLICABLE_ATTRS = %w{href src}
+      APPLICABLE_ATTRS = %w{href src}.freeze
 
       def scrub_links!(node)
         APPLICABLE_ATTRS.each do |attr|
-          if link = node[attr]
+          if (link = node[attr])
             node[attr] = corrected_link(link)
           end
         end
@@ -114,6 +138,17 @@ module Api
         node['data-uc_height'] = user_content.height
         node['data-uc_snippet'] = user_content.node_string
         node['data-uc_sig'] = user_content.node_hmac
+      end
+
+      def apply_mathml(node)
+        self.class.apply_mathml(node)
+      end
+
+      def self.apply_mathml(node)
+        mathml = UserContent.latex_to_mathml(node['alt'])
+        return if mathml.blank?
+
+        node['data-mathml'] = mathml
       end
     end
   end

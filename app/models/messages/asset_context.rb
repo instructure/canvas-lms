@@ -8,7 +8,7 @@ module Messages
 
     def from_name
       return nil unless has_named_source?
-      source_user.short_name
+      anonymized_user
     end
 
     def reply_to_name
@@ -17,6 +17,14 @@ module Messages
     end
 
     private
+
+    def anonymized_user
+      if is_anonymized_asset?
+        asset.can_read_author?(asset.recipient, nil) ? source_user.short_name : I18n.t(:anonymous_user, 'Anonymous User')
+      else
+        source_user.short_name
+      end
+    end
 
     def source_user
       if is_author_asset?
@@ -41,6 +49,14 @@ module Messages
       "Assignment Submitted",
       "Assignment Resubmitted"
     ]
+
+    ANONYMIZED_NOTIFICATIONS = [
+      "Submission Comment"
+    ]
+
+    def is_anonymized_asset?
+      ANONYMIZED_NOTIFICATIONS.include?(notification_name) && asset.respond_to?(:recipient)
+    end
 
     def is_author_asset?
       SOURCE_AUTHOR_NOTIFICATIONS.include?(notification_name)

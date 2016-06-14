@@ -22,22 +22,11 @@ module Auditors
       stream.raise_on_error = Rails.env.test?
 
       stream.on_insert do |record|
-        Auditors.logger.info "[AUDITOR:INFO] #{identifier}:insert #{record.to_json}"
+        Canvas::EventStreamLogger.info('AUDITOR', identifier, 'insert', record.to_json)
       end
 
       stream.on_error do |operation, record, exception|
-        message = exception.message.to_s
-        Auditors.logger.error "[AUDITOR:ERROR] #{identifier}:#{operation} #{record.to_json} [#{message}]"
-        CanvasStatsd::Statsd.increment("event_stream_failure.stream.#{CanvasStatsd::Statsd.escape(identifier)}")
-        if message.blank?
-          CanvasStatsd::Statsd.increment("event_stream_failure.exception.blank")
-        elsif message.include?("No live servers")
-          CanvasStatsd::Statsd.increment("event_stream_failure.exception.no_live_servers")
-        elsif message.include?("Unavailable")
-          CanvasStatsd::Statsd.increment("event_stream_failure.exception.unavailable")
-        else
-          CanvasStatsd::Statsd.increment("event_stream_failure.exception.other")
-        end
+        Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
       end
     end
   end

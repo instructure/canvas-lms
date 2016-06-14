@@ -1,6 +1,8 @@
 define([
   'i18n!account_settings',
   'jquery', // $
+  'jsx/shared/rce/loadNewRCE',
+  'jsx/shared/rce/preloadRCE',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
   'jquery.instructure_forms', // formSubmit, getFormData, validateForm
@@ -13,19 +15,43 @@ define([
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
   'jqueryui/tabs' // /\.tabs/
-], function(I18n, $) {
+], function(I18n, $, loadNewRCE, preloadRCE) {
+
+  // optimization so user isn't waiting on RCS to
+  // respond when they hit announcements
+  preloadRCE()
 
   $(document).ready(function() {
+    checkFutureListingSetting = function() {
+
+      if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
+        $('.future_listing').show();
+      } else {
+        $('.future_listing').hide();
+      }
+    };
+    checkFutureListingSetting();
+    $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting);
+
     $("#account_settings").submit(function() {
       var $this = $(this);
+      var remove_ip_filters = true;
       $(".ip_filter .value").each(function() {
         $(this).removeAttr('name');
       }).filter(":not(.blank)").each(function() {
         var name = $.trim($(this).parents(".ip_filter").find(".name").val().replace(/\[|\]/g, '_'));
         if(name) {
+          remove_ip_filters = false;
           $(this).attr('name', 'account[ip_filters][' + name + ']');
         }
       });
+
+      if (remove_ip_filters) {
+        $this.append("<input class='remove_ip_filters' type='hidden' name='account[remove_ip_filters]' value='1'/>");
+      } else {
+        $this.find('.remove_ip_filters').remove(); // just in case it's left over after a failed validation
+      }
+
       var validations = {
         object_name: 'account',
         required: ['name'],
@@ -41,14 +67,10 @@ define([
       }
     });
     $(".datetime_field").datetime_field();
-    $("#add_notification_form textarea").editorBox().width('100%');
-    $("#add_notification_form .datetime_field").bind('blur change', function() {
-      var date = Date.parse($(this).val());
-      if(date) {
-        date = date.toString($.datetime.defaultFormat);
-      }
-      $(this).val(date);
-    });
+
+    $("#add_notification_form textarea").width('100%');
+    loadNewRCE($("#add_notification_form textarea"))
+
     $("#add_notification_form").submit(function(event) {
       var $this = $(this);
       var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');
@@ -294,11 +316,9 @@ define([
       $('#self_registration_type_radios').toggle(this.checked);
     }).trigger('change');
 
-
-    $('.branding_section_toggler').on('change', function(){
-      $(this).prevAll('.branding_section').last().toggle(!this.checked)
-    })
-
+    $('#account_settings_global_includes').change(function() {
+      $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
+    }).trigger('change');
   });
 
 });

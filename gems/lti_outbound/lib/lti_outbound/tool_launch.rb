@@ -22,7 +22,8 @@ module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
                 :resource_type, :consumer_instance, :hash, :assignment,
-                :outgoing_email_address, :selected_html, :variable_expander
+                :outgoing_email_address, :selected_html, :variable_expander,
+                :post_only
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
@@ -38,17 +39,19 @@ module LtiOutbound
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
       @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
+      @post_only = options[:disable_lti_post_only]
 
       @hash = {}
     end
 
-    def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
+    def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       @assignment = assignment
       hash['lis_result_sourcedid'] = assignment.source_id if user.learner?
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = assignment.return_types.join(',')
       hash['ext_outcome_result_total_score_accepted'] = true
+      hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
       add_assignment_substitutions!(assignment)
     end
@@ -124,8 +127,7 @@ module LtiOutbound
       hash['oauth_callback'] = 'about:blank'
 
       @variable_expander.expand_variables!(hash)
-
-      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
+      self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret, disable_lti_post_only: @post_only)
     end
 
     private
@@ -161,7 +163,7 @@ module LtiOutbound
       end
     end
 
-    def self.generate_params(params, url, key, secret)
+    def self.generate_params(params, url, key, secret, feature_flags = {})
       uri = URI.parse(url)
 
       if uri.port == uri.default_port
@@ -177,10 +179,12 @@ module LtiOutbound
 
       path = uri.path
       path = '/' if path.empty?
-      if uri.query && uri.query != ''
-        CGI.parse(uri.query).each do |query_key, query_values|
-          unless params[query_key]
-            params[query_key] = query_values.first
+      unless feature_flags[:disable_lti_post_only]
+        if uri.query && uri.query != ''
+          CGI.parse(uri.query).each do |query_key, query_values|
+            unless params[query_key]
+              params[query_key] = query_values.first
+            end
           end
         end
       end

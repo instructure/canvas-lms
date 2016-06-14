@@ -97,7 +97,8 @@ describe "Files API", type: :request do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
-        'thumbnail_url' => nil
+        'thumbnail_url' => nil,
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.file_state).to eq 'available'
     end
@@ -129,14 +130,24 @@ describe "Files API", type: :request do
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
-        'thumbnail_url' => nil
+        'thumbnail_url' => nil,
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.reload.file_state).to eq 'available'
+    end
+
+    it "should store long-ish non-ASCII filenames (local storage)" do
+      local_storage!
+      @attachment.update_attribute(:filename, "Качество образования-1.txt")
+      upload_data
+      expect { call_create_success }.not_to raise_error
+      expect(@attachment.reload.open.read).to eq "test file"
     end
 
     it "should render the response as text/html when in app" do
       s3_storage!
       FilesController.any_instance.stubs(:in_app?).returns(true)
+      FilesController.any_instance.stubs(:verified_request?).returns(true)
 
       AWS::S3::S3Object.any_instance.expects(:head).returns({
                                           :content_type => 'text/plain',
@@ -145,7 +156,7 @@ describe "Files API", type: :request do
 
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
-      expect(response.headers["content-type"]).to eq "text/html; charset=utf-8"
+      expect(response.headers[content_type_key]).to eq "text/html; charset=utf-8"
       expect(response.body).not_to include 'verifier='
     end
 
@@ -234,14 +245,23 @@ describe "Files API", type: :request do
     it "should not list locked file if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
-      expect(json.any?{|f|f[:id] == @a2.id}).to eq false
+      expect(json.any?{|f|f['id'] == @a2.id}).to be_falsey
     end
 
     it "should not list hidden files if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
-      expect(json.any?{|f|f[:id] == @a3.id}).to eq false
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_falsey
+    end
+
+    it "should list hidden files with :read_as_admin rights" do
+      course_with_ta(:course => @course, :active_all => true)
+      user_session(@user)
+      @course.account.role_overrides.create!(:permission => :manage_files, :enabled => false, :role => ta_role)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_truthy
     end
 
     it "should not list locked folder if not authed" do
@@ -272,6 +292,13 @@ describe "Files API", type: :request do
       expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
       expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
       expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    end
+
+    it "should only return names if requested" do
+      json = api_call(:get, @files_path, @files_path_options, {:only => ['names']})
+      res = json.map{|f|f['display_name']}
+      expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      expect(json.any?{|f| f['url']}).to be_falsey
     end
 
     context "content_types" do
@@ -542,6 +569,7 @@ describe "Files API", type: :request do
       account_admin_user
       json = api_call(:get, "/api/v1/groups/#{@group.id}/files", { controller: "files", action: "api_index", format: "json", group_id: @group.to_param })
       expect(json.map{|r| r['id']}).to eql [@attachment.id]
+      expect(response.headers['Link']).to include "/api/v1/groups/#{@group.id}/files"
     end
 
     it "should operate on users" do
@@ -549,6 +577,7 @@ describe "Files API", type: :request do
       attachment_model display_name: 'foo', content_type: 'text/plain', context: @user, folder: Folder.root_folders(@user).first
       json = api_call(:get, "/api/v1/users/#{@user.id}/files", { controller: "files", action: "api_index", format: "json", user_id: @user.to_param })
       expect(json.map{|r| r['id']}).to eql [@attachment.id]
+      expect(response.headers['Link']).to include "/api/v1/users/#{@user.id}/files"
     end
   end
 
@@ -578,7 +607,8 @@ describe "Files API", type: :request do
               'hidden_for_user' => false,
               'created_at' => @att.created_at.as_json,
               'updated_at' => @att.updated_at.as_json,
-              'thumbnail_url' => @att.thumbnail_url
+              'thumbnail_url' => @att.thumbnail_url,
+              'modified_at' => @att.updated_at.as_json
       })
     end
 
@@ -765,6 +795,8 @@ describe "Files API", type: :request do
 
     it "should omit verifier in-app" do
       FilesController.any_instance.stubs(:in_app?).returns(true)
+      FilesController.any_instance.stubs(:verified_request?).returns(true)
+
       new_params = {:locked => 'true'}
       json = api_call(:put, @file_path, @file_path_options, new_params)
       expect(json['url']).not_to include 'verifier='

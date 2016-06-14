@@ -109,16 +109,19 @@ define [
 
       acollection = new SyllabusCollection collections
 
-      _.map collections, (collection) ->
+      _.map collections, (collection) =>
         error = ->
           ok false, 'ajax call failed'
 
-        success = ->
+        success = =>
           if collection.canFetch 'next'
             collection.fetch
               page: 'next'
               success: success
               error: error
+
+            # need to manually respond to calls made during a previous response
+            @server.respond()
 
         collection.fetch
           data:

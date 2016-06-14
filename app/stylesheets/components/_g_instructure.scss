@@ -140,6 +140,11 @@
 .user_content, .mceContentBody {
   position: relative;
   min-height: 5px;
+// firefox max-width images break the parent container
+  @-moz-document url-prefix() {
+    overflow-x: hidden;
+  }
+
   h3, .h3 {
     margin-top: 1em;
     margin-bottom: 1em;
@@ -193,13 +198,13 @@
   }
   .Reminder__course-setup-subttitle {
     float: right;
-    font-size: 11px;
+    @include fontSize(11px);
     text-transform: capitalize;
   }
   .Reminder__course-setup-body {
     text-align: center;
     p {
-      font-size: 15px;
+      @include fontSize(15px);
       margin-bottom: 0;
       padding-bottom: 0;
     }
@@ -297,15 +302,37 @@
       }
     }
   }
+  .events_list, .to-do-list {
+    li.event, li.todo {
+      i[class*=icon-], i[class^=icon-] {
+        color: lighten( $grayDark, 15% );
+        vertical-align: top;
+        margin-top: 8px;
+      }
+      i.icon-check {
+        @if $use_new_styles { color: $ic-color-success; }
+        @else { color: #33802a; }
+      }
+      .todo-badge {
+        @include ic-badge-maker(18px);
+        vertical-align: top;
+        margin-top: 2px;
+      }
+    }
+    div.event-details, div.todo-details {
+      display: inline-block;
+      margin-left: 5px;
+    }
+  }
   .events_list {
     @if $use_new_styles { margin-bottom: $ic-sp*2; }
     @else { margin-bottom: 20px; }
     .event-list-view-calendar {
       float: right;
-      font-size: 10px;
+      @include fontSize(10px);
       font-weight: normal;
       &[class*=icon-]:before, &[class^=icon-]:before {
-        font-size: 16px;
+        @include fontSize($ic-font-size--medium);
         vertical-align: middle;
       }
     }
@@ -497,7 +524,7 @@ table.formtable td {
     color: #888;
   }
   .details {
-    color: #888;
+    color: #555;
     font-size: 0.8em;
     margin: 0 0 0 10px;
   }
@@ -508,7 +535,7 @@ table.formtable td {
     .links {
       color: #eee;
       a {
-        color: #bbb;
+        color: #767676;
       }
     }
   }
@@ -525,7 +552,7 @@ table.formtable td {
       .links {
         color: #ccc;
         a {
-          color: #666;
+          color: #444;
         }
       }
     }
@@ -533,7 +560,7 @@ table.formtable td {
 }
 
 span.hint {
-  color: #666;
+  color: #444;
   font-size: 0.8em;
 }
 
@@ -604,8 +631,8 @@ body .disabled_link {
 
 .datetime_suggest {
   font-size: 0.8em;
-  color: #888;
   padding-left: 10px;
+  color: $ic-dim-helper-text;
 }
 
 #submission_preview {
@@ -638,7 +665,7 @@ ul.group_list {
 }
 
 $wizard-icon-size: 120px;
-$wizard-bg-color: $ic-brand-secondary;
+$wizard-bg-color: $ic-color-dark;
 $wizard-highlight-color: $ic-brand-primary;
 
 @keyframes icon-slide-down {
@@ -747,7 +774,7 @@ $wizard-highlight-color: $ic-brand-primary;
         }
         a[class*=icon-], a[class^=icon-] {
           &:before {
-            font-size: 16px;
+            @include fontSize($ic-font-size--medium);
             line-height: 16px;
             vertical-align: text-top;
             color: #555;
@@ -794,7 +821,7 @@ $wizard-highlight-color: $ic-brand-primary;
       i[class^=icon-] {
         width: ($wizard-icon-size + $ic-sp * 4) / 2;
         height: ($wizard-icon-size + $ic-sp * 4) / 2;
-        background: $ic-brand-secondary;
+        background: $wizard-bg-color;
         border-radius: 100%;
         font-size: $wizard-icon-size / 2;
         &:before {
@@ -896,7 +923,7 @@ $wizard-highlight-color: $ic-brand-primary;
           border-radius: 0;
           font-weight: normal;
           @include breakpoint(desktop) {
-            font-size: 15px;
+            @include fontSize(15px);
           }
 
           &.selected {
@@ -1000,7 +1027,7 @@ $wizard-highlight-color: $ic-brand-primary;
         p {
           line-height: 1.5;
           @include breakpoint(desktop) {
-            font-size: 15px;
+            @include fontSize(15px);
           }
 
           &:last-of-type {
@@ -1057,6 +1084,9 @@ $wizard-highlight-color: $ic-brand-primary;
 
 #keyboard_navigation {
   display: none;
+}
+
+#keyboard_navigation, .keyboard_navigation {
   ul.navigation_list {
     padding: 0;
     margin: 0;
@@ -1122,7 +1152,7 @@ $wizard-highlight-color: $ic-brand-primary;
         font-size: 1em;
         font-weight: bold;
         // :color #444
-     
+
       }
       .sub_title {
         margin-left: 30px;
@@ -1682,7 +1712,7 @@ html > body .new_activity_message form textarea {
       background: #FFF;
       margin: 0 8px 8px 0;
       padding: 4px;
-      font-size: 11px;
+      @include fontSize(11px);
       min-height: 21px;
       box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
       div {
@@ -1830,7 +1860,8 @@ body.padless-content #content, #content.padless {
 }
 
 #sequence_footer {
-  padding-top: 15px;
+  @if $use_new_styles { padding-top: $ic-sp*2; }
+  @else { padding-top: 15px; }
   .next, .prev {
     width: 150px;
     overflow: hidden;
@@ -1936,10 +1967,6 @@ body.padless-content #content, #content.padless {
   }
 }
 
-.custom_search_results_link {
-  font-size: 1.2em;
-}
-
 h2.h-margin-top, h3.h-margin-top, .h2.h-margin-top, .h3.h-margin-top {
   margin-top: 20px;
 }
@@ -1999,12 +2026,12 @@ form.user_content_post_form {
   display: none;
 }
 
-#change_gradebook_version_link_holder, #change_calendar_version_link_holder {
+#change_calendar_version_link_holder {
   float: right !important;
   background: none !important;
 }
 
-#change_gradebook_version_link_holder a, #change_calendar_version_link_holder a, .dashboard-toggle a {
+#change_calendar_version_link_holder a, .dashboard-toggle a {
   margin-right: 10px;
   padding: 1px 10px;
   border-radius: 3px;
@@ -2014,7 +2041,7 @@ form.user_content_post_form {
     border-color: #165A92;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   }
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   font-family: GillSans, Calibri, Trebuchet, sans-serif;
   border: 1px solid #1e7eca;
   color: white !important;
@@ -2038,41 +2065,21 @@ form.user_content_post_form {
 
 .with-fixed-bottom #wrapper-container {
   padding-bottom: 60px;
+  @if $use_new_styles { box-sizing: border-box; }
 }
 
 #fixed_bottom {
   bottom: 0;
-  i {
-    vertical-align: middle;
-    margin-right: 10px;
-  }
-  b {
-    line-height: 28px;
-    vertical-align: middle;
-  }
-  #masquerade_bar {
-    padding: 15px;
-    .buttons {
-      float: right;
-      .btn {
-        margin-left: 10px;
-      }
-      .btn-primary {
-        color: white;
-      }
+  // The styles below are no longer needed for the masquerading or student view;
+  // however, we need to keep them for other fixed warnings
+  >*:not(.ic-alert-masquerade-student-view) {
+    i {
+      vertical-align: middle;
+      margin-right: 10px;
     }
-    .button-explanation {
-      float: right;
-      font-size: 10px;
-      text-align: right;
-    }
-    .masquerading_avatar {
-      float: left;
-      .avatar {
-        margin: (-9px) 10px 0 0;
-        width: 44px;
-        height: 44px;
-      }
+    b {
+      line-height: 28px;
+      vertical-align: middle;
     }
   }
   .fixed_warning {
@@ -2102,11 +2109,7 @@ form.user_content_post_form {
 }
 
 .nav-badge {
-  border-radius: 30px;
-  background-color: $ic-brand-primary;
-  padding: 0 8px;
-  font-size: 9px;
-  color: #fff;
+  @include ic-badge-maker;
   float: right;
 }
 

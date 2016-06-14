@@ -19,6 +19,8 @@
       <i class="icon-search"></i>
       <span class="ui-button-text">{{#t "links.find"}}Find{{/t}}</span>
     </a>
+    {{/if}}
+    {{#if canManageRubrics }}
     <a href="{{contextUrlRoot}}/rubrics" class="manage_rubrics ui-button ui-widget ui-state-default ui-corner-all" role="button">
       <i class="icon-rubric"></i>
       <span class="ui-button-text">{{#t "#buttons.manage_rubrics"}}Manage Rubrics{{/t}}</span>

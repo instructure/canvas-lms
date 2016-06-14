@@ -28,21 +28,20 @@ describe Announcement do
 
   describe "locking" do
     it "should lock if its course has the lock_all_announcements setting" do
-      course = Course.new
-      course.lock_all_announcements = true
-      course.save!
-      student_in_course(:course => course)
-      announcement = course.announcements.create!(valid_announcement_attributes)
+      course_with_student(:active_all => true)
+
+      @course.lock_all_announcements = true
+      @course.save!
+      announcement = @course.announcements.create!(valid_announcement_attributes)
 
       expect(announcement).to be_locked
       expect(announcement.grants_right?(@student, :reply)).to be_falsey
     end
 
     it "should not lock if its course does not have the lock_all_announcements setting" do
-      course = Course.create!
-      student_in_course(:course => course)
+      course_with_student(:active_all => true)
 
-      announcement = course.announcements.create!(valid_announcement_attributes)
+      announcement = @course.announcements.create!(valid_announcement_attributes)
 
       expect(announcement).not_to be_locked
       expect(announcement.grants_right?(@student, :reply)).to be_truthy
@@ -79,8 +78,22 @@ describe Announcement do
       group_with_user(:active_user => 1)
       expect(Announcement.context_allows_user_to_create?(@group, @user, {})).to be_truthy
     end
+
+    it 'allows announcements to be viewed without :read_forum' do
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(permission: 'read_forum', role: student_role, enabled: false)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      expect(a.grants_right?(@user, :read)).to be(true)
+    end
+
+    it 'does not allow announcements to be viewed without :read_announcements' do
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      expect(a.grants_right?(@user, :read)).to be(false)
+    end
   end
-  
+
   context "broadcast policy" do
     context "sanitization" do
       before :once do

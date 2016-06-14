@@ -27,7 +27,8 @@ class Auditors::GradeChange
                :assignment_id,
                :context_id,
                :context_type,
-               :grader_id
+               :grader_id,
+               :graded_anonymously
 
     def self.generate(submission, event_type=nil)
       new(
@@ -62,6 +63,7 @@ class Auditors::GradeChange
       attributes['grade_before'] = previous_version ? previous_version.model.grade : nil
       attributes['assignment_id'] = Shard.global_id_for(assignment)
       attributes['grader_id'] = grader ? Shard.global_id_for(grader) : nil
+      attributes['graded_anonymously'] = @submission.graded_anonymously
       attributes['student_id'] = Shard.global_id_for(student)
       attributes['context_id'] = Shard.global_id_for(context)
       attributes['context_type'] = assignment.context_type

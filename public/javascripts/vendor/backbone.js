@@ -7,8 +7,7 @@ define(['underscore','jquery'],function(_, $) {
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
-
-(function(){
+var backboneReference = (function(){
 
   // Initial Setup
   // -------------
@@ -747,7 +746,7 @@ define(['underscore','jquery'],function(_, $) {
         }
         if (sort || (order && order.length)) this.trigger('sort', this, options);
       }
-      
+
       // Return the added (or merged) model (or models).
       return singular ? models[0] : models;
     },
@@ -1580,7 +1579,8 @@ define(['underscore','jquery'],function(_, $) {
     };
   };
 
+  return Backbone;
 }).call(this);
 
-  return Backbone;
-}); 
+  return backboneReference;
+});

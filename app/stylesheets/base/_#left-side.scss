@@ -1,17 +1,8 @@
 #left-side {
   display: none;
   @if $use_new_styles == false {
-    @if $is-k12 {
-      float: left;
-      width: $left_side_width - 1;
-      border-right: 1px solid #ddd;
-      border-bottom-color: #ddd;
-      padding-bottom: $k12-sp;
-    }
-    @else {
-      float: left;
-      width: $left_side_width;
-    }
+    float: left;
+    width: $left_side_width;
   }
 }
 

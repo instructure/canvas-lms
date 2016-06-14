@@ -1,27 +1,41 @@
-require_relative "../common"
+module QuizzesCommon
 
-shared_examples_for "quizzes selenium tests" do
-  include_examples "in-process server selenium tests"
-
-  def create_quiz_with_default_due_dates
-    due_at = Time.zone.now
-    unlock_at = Time.zone.now.advance(days:-2)
-    lock_at = Time.zone.now.advance(days:4)
-    @context = @course
+  def create_quiz_with_due_date(opts={})
+    @context = opts.fetch(:course, @course)
     @quiz = quiz_model
     @quiz.generate_quiz_data
-    @quiz.due_at = due_at
-    @quiz.lock_at = lock_at
-    @quiz.unlock_at = unlock_at
+    @quiz.due_at = opts.fetch(:due_at, default_time_for_due_date(Time.zone.now))
+    @quiz.lock_at = opts.fetch(:lock_at, default_time_for_lock_date(Time.zone.now.advance(days:4)))
+    @quiz.unlock_at = opts.fetch(:unlock_at, default_time_for_unlock_date(Time.zone.now.advance(days:-2)))
     @quiz.save!
     @quiz
   end
 
-  def create_multiple_choice_question
+  # The default time for a quiz due date is 11:59pm
+  def default_time_for_due_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz lock date is 11:59pm
+  def default_time_for_lock_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz unlock date is 12am
+  def default_time_for_unlock_date(date)
+    date.change({ hour: 0, min: 0 })
+  end
+
+  def assign_quiz_to_no_one
+    f('.ContainerDueDate .ic-token-delete-button').click
+  end
+
+  def create_multiple_choice_question(opts={})
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
-    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
+    question_description = opts.fetch(:description, 'Hi, this is a multiple choice question.')
+    type_in_tiny ".question_form:visible textarea.question_content", question_description
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     expect(answers.length).to eq 4
@@ -101,24 +115,89 @@ shared_examples_for "quizzes selenium tests" do
     expect(f(".points_possible").text).to eq @points_total.to_s
   end
 
+  def quiz_with_multiple_type_questions(goto_edit=true)
+    @context = @course
+    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    @quiz = quiz_model
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
+    c = bank.assessment_questions.create!
+    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: a
+    )
+
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_text: 'What is 5+5?',
+        question_type: 'numerical_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: b
+    )
+
+    @quest3 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'third question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: c
+    )
+
+    yield bank, @quiz if block_given?
+
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
+  end
+
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
-    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-    @q = quiz_model
+    bank = @context.assessment_question_banks.create!(title: 'Test Bank')
+    @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
 
-    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+    answers = [ {id: 1}, {id: 2}, {id: 3} ]
 
-    @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: a
+    )
 
-    @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
-    yield bank, @q if block_given?
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: b
+    )
 
-    @q.generate_quiz_data
-    @q.save!
-    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit" if goto_edit
-    @q
+    yield bank, @quiz if block_given?
+
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
   end
 
   def click_settings_tab
@@ -177,57 +256,120 @@ shared_examples_for "quizzes selenium tests" do
 
   def start_quiz_question
     get "/courses/#{@course.id}/quizzes"
-    expect_new_page_load {
-      f('.new-quiz-link').click
-    }
+    expect_new_page_load { f('.new-quiz-link').click }
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations
     Quizzes::Quiz.last
   end
 
+  def select_question_from_column_links(question_id)
+    f("#list_question_#{question_id} > a:nth-child(1)").click
+    wait_for_ajaximations
+  end
+
+  def answer_question(question_answer_id)
+    fj("input[type=radio][value=#{question_answer_id}]").click
+    wait_for_js
+  end
+
   def take_quiz
     @quiz ||= quiz_with_new_questions(!:goto_edit)
-
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { f("#take_quiz_link").click }
-
-    # sleep because display is updated on timer, not ajax callback
-    sleep 1
+    begin_quiz
 
     yield
   ensure
-    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    # This step is to prevent selenium from freezing when the dialog appears when leaving the page
     fln('Quizzes').click
-    driver.switch_to.alert.accept
+    driver.switch_to.alert.accept if alert_present?
+  end
+
+  def take_and_answer_quiz(opts={})
+    @quiz = opts[:quiz] if opts.fetch(:quiz, false)
+    submit = opts.fetch(:submit, true)
+    access_code = opts.fetch(:access_code, nil)
+
+    begin_quiz(access_code)
+    complete_and_submit_quiz(submit)
+  end
+
+  def begin_quiz(access_code=nil)
+    get take_quiz_url
+
+    if access_code.nil?
+      expect_new_page_load { f('#take_quiz_link').click }
+    else
+      f('#quiz_access_code').send_keys(access_code)
+      expect_new_page_load { fj('.btn', '#main').click }
+    end
+
+    wait_for_quiz_to_begin
+  end
+
+  # uses sleep() because the display is updated on a timer, not an ajax callback
+  def wait_for_quiz_to_begin
+    sleep 1
+  end
+
+  def submit_quiz
+    expect_new_page_load(true) { f('#submit_quiz_button').click }
+
+    keep_trying_until do
+      expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
+    end
+  end
+
+  def preview_quiz(submit=true)
+    open_quiz_show_page
+
+    expect_new_page_load { f('#preview_quiz_button').click }
+    wait_for_quiz_to_begin
+
+    complete_and_submit_quiz(submit)
+  end
+
+  def wait_for_quiz_publish_button_to_populate
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until do
+      f('#quiz-publish-link').present? &&
+      f('#quiz-publish-link').text.present? &&
+      f('#quiz-publish-link').text.strip!.split("\n") != []
+    end
   end
 
   # @argument answer_chooser [#call]
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def take_and_answer_quiz(submit=true)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { fln('Take the Quiz').click }
-
-    answer = if block_given?
-      yield(@quiz.stored_questions[0][:answers])
-    else
-      @quiz.stored_questions[0][:answers][0][:id]
-    end
-
-    if answer
-      fj("input[type=radio][value=#{answer}]").click
-      wait_for_js
-    end
-
-    if submit
-      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
-
-      keep_trying_until do
-        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
+  def complete_and_submit_quiz(submit=true)
+    answer =
+      if block_given?
+        yield(@quiz.stored_questions[0][:answers])
+      else
+        @quiz.stored_questions[0][:answers][0][:id]
       end
+
+    answer_question(answer) if answer
+
+    submit_quiz if submit
+  end
+
+  def answer_questions_and_submit(quiz, num_questions, submit = true)
+    num_questions.times do |o|
+     question = quiz.stored_questions[o][:id]
+     case quiz.stored_questions[o][:question_type]
+     when "multiple_choice_question"
+       fj("input[type=radio][name= 'question_#{question}']").click
+       wait_for_js
+     when "essay_question"
+       type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
+     when "numerical_question"
+       fj("input[type=text][name= 'question_#{question}']").send_keys('10')
+       wait_for_js
+     end
     end
+
+    submit_quiz if submit
   end
 
   def set_answer_comment(answer_num, text)
@@ -242,9 +384,51 @@ shared_examples_for "quizzes selenium tests" do
     type_in_tiny(".question_form:visible #{selector} textarea", text)
   end
 
+  def question_answers
+    ffj('.answer', '.form_answers')
+  end
+
+  def delete_possible_answer(question_answer_index)
+    question_answer = question_answers[question_answer_index]
+    hover(question_answer)
+
+    delete_question_link = fj('.delete_answer_link', question_answer)
+    hover(delete_question_link)
+    delete_question_link.click
+  end
+
+  def select_different_correct_answer(index_of_new_correct_answer)
+    new_correct_answer = fj('.select_answer_link', question_answers[index_of_new_correct_answer])
+    hover(new_correct_answer)
+    new_correct_answer.click
+    wait_for_ajaximations
+  end
+
   def hover_first_question
     question = f('.display_question')
-    driver.action.move_to(question).perform
+    hover(question)
+  end
+
+  def select_regrade_option(option_index=0)
+    visible_regrade_options[option_index].click
+    fj('.ui-dialog:visible .btn-primary').click
+    wait_for_ajaximations
+  end
+
+  def visible_regrade_options
+    ffj('label.checkbox:visible', '.regrade_enabled')
+  end
+
+  # clicks |Okay, got it|
+  def close_regrade_tooltip
+    fj('.btn.usher-close').click
+    wait_for_ajaximations
+  end
+
+  # clicks |Okay, fine|
+  def close_times_up_dialog
+    times_up_dialog = fj('div#times_up_dialog:visible')
+    fj('button.submit_quiz_button', times_up_dialog).click unless times_up_dialog.nil?
   end
 
   def edit_first_question
@@ -268,10 +452,17 @@ shared_examples_for "quizzes selenium tests" do
   end
 
   def edit_quiz
-    expect_new_page_load {
+    expect_new_page_load do
       wait_for_ajaximations
       f('.quiz-edit-button').click
-    }
+    end
+  end
+
+  def cancel_quiz_edit
+    expect_new_page_load do
+      fj('#cancel_button', 'div#quiz_edit_actions').click
+      wait_for_ajaximations
+    end
   end
 
   def edit_first_multiple_choice_answer(text)
@@ -323,9 +514,9 @@ shared_examples_for "quizzes selenium tests" do
       if el['class'].match(/question_holder/)
         id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
         question = {
-            :id => id.to_i,
-            :el => el,
-            :type => 'question'
+          :id => id.to_i,
+          :el => el,
+          :type => 'question'
         }
 
         if last_group_id
@@ -340,10 +531,10 @@ shared_examples_for "quizzes selenium tests" do
       elsif el['class'].match(/group_top/)
         last_group_id = el['id'].gsub(/group_top_/, '').to_i
         data << {
-            :id => last_group_id,
-            :questions => [],
-            :type => 'group',
-            :el => el
+          :id => last_group_id,
+          :questions => [],
+          :type => 'group',
+          :el => el
         }
 
         # group ended
@@ -431,5 +622,185 @@ shared_examples_for "quizzes selenium tests" do
     source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
+  end
+
+  def quiz_create(opts={})
+    course = opts.fetch(:course, @course)
+    @quiz = course.quizzes.create
+
+    answers = [
+      { weight: 100, answer_text: 'A', answer_comments: '', id: 1490 },
+      { weight: 0, answer_text: 'B', answer_comments: '', id: 1020 },
+      { weight: 0, answer_text: 'C', answer_comments: '', id: 7051 }
+    ]
+    data = {
+      question_name: 'Question 1',
+      points_possible: 1,
+      question_text: 'This is a multiple choice question',
+      answers: answers,
+      question_type: 'multiple_choice_question'
+    }
+
+    @quiz.quiz_questions.create!(question_data: data)
+
+    @quiz.allowed_attempts = -1 if opts.fetch(:unlimited_attempts, false)
+    @quiz.lock_at = opts.fetch(:lock_at, nil)
+    @quiz.due_at = opts.fetch(:due_at, nil)
+    @quiz.unlock_at = opts.fetch(:unlock_at, nil)
+
+    @quiz.generate_quiz_data
+    @quiz.publish!
+    @quiz.save!
+    @quiz
+  end
+
+  def seed_quiz_with_submission(num=1, opts={})
+    quiz_data = [
+      {
+        question_name: 'Multiple Choice',
+        points_possible: 10,
+        question_text: 'Pick wisely...',
+        answers: [
+          { weight: 100, answer_text: 'Correct', id: 1 },
+          { weight: 0, answer_text: 'Wrong', id: 2 },
+          { weight: 0, answer_text: 'Wrong', id: 3 }
+        ],
+        question_type: 'multiple_choice_question'
+      },
+      {
+        question_name: 'File Upload',
+        points_possible: 5,
+        question_text: 'Upload a file',
+        question_type: 'file_upload_question'
+      },
+      {
+        question_name: 'Short Essay',
+        points_possible: 20,
+        question_text: 'Write an essay',
+        question_type: 'essay_question'
+      },
+      {
+        question_name: 'Text (no question)',
+        question_text: 'This is just text',
+        question_type: 'text_only_question'
+      }
+    ]
+
+    quiz = @course.quizzes.create title: 'Quiz Me!'
+
+    num.times do
+      quiz_data.each do |question|
+        quiz.quiz_questions.create! question_data: question
+      end
+    end
+
+    quiz.workflow_state = 'available'
+    quiz.save!
+
+    submission = quiz.generate_submission opts[:student] || @students[0]
+    submission.workflow_state = 'complete'
+    submission.save!
+
+    quiz
+  end
+
+  def verify_quiz_show_page_due_date(due_date)
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(f('#quiz_show')).to include_text due_date
+  end
+
+  def verify_quiz_is_locked
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(fj('.lock_explanation')).to include_text 'This quiz was locked'
+  end
+
+  def verify_quiz_is_submitted
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(fj('.quiz-submission')).to include_text 'Submitted'
+  end
+
+  def verify_quiz_submission_is_late
+    verify_quiz_submission_late_status(:late)
+  end
+
+  def verify_quiz_submission_is_not_late
+    verify_quiz_submission_late_status(!:late)
+  end
+
+  def open_quiz_show_page
+    get quiz_show_page_url
+  end
+
+  def open_student_quiz_submission
+    get quiz_student_submission_url
+  end
+
+  def verify_quiz_submission_is_late_in_speedgrader
+    verify_quiz_submission_status_in_speedgrader(:late)
+  end
+
+  def verify_quiz_submission_is_not_late_in_speedgrader
+    verify_quiz_submission_status_in_speedgrader(!:late)
+  end
+
+  def open_quiz_in_speedgrader
+    user_session(@teacher)
+    get quiz_submission_speedgrader_url
+  end
+
+  def open_quiz_edit_form
+    get quiz_edit_form_url
+  end
+
+  private
+
+  def quiz_show_page_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+  end
+
+  def quiz_edit_form_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+  end
+
+  def quiz_student_submission_url
+    "/courses/#{@course.id}/assignments/#{@quiz.assignment_id}/submissions/#{@student.id}"
+  end
+
+  def quiz_submission_speedgrader_url
+    "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@quiz.assignment_id}"
+  end
+
+  def take_quiz_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+  end
+
+  def verify_quiz_submission_late_status(late)
+    open_student_quiz_submission
+    submission_page_info = fj('.submission_details', '#not_right_side')
+    late_status = '(late)'
+
+    if late
+      expect(submission_page_info).to include_text late_status
+    else
+      expect(submission_page_info).not_to include_text late_status
+    end
+  end
+
+  def verify_quiz_submission_status_in_speedgrader(late)
+    open_quiz_in_speedgrader
+    speedgrader_submission_details = fj('#submission_details', '.right_side_content')
+    late_note = 'Note: This submission was LATE'
+
+    if late
+      expect(speedgrader_submission_details).to include_text late_note
+    else
+      expect(speedgrader_submission_details).not_to include_text late_note
+    end
+  end
+
+  def generate_and_save_submission(quiz, student)
+    submission = quiz.generate_submission student
+    submission.workflow_state = 'complete'
+    submission.save!
   end
 end

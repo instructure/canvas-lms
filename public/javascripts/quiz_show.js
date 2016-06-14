@@ -37,7 +37,13 @@ define([
 
 
   $(document).ready(function () {
-    QuizLogAuditingEventDumper(true);
+    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
+      QuizLogAuditingEventDumper(true);
+    }
+
+    $('#preview_quiz_button').click(function(e){
+      $('#js-sequential-warning-dialogue div a').attr('href',$('#preview_quiz_button').attr('href'));
+    });
 
     function ensureStudentsLoaded(callback) {
       if ($('#quiz_details').length) {
@@ -150,6 +156,8 @@ define([
         return false;
       });
 
+      var $lock_at = $(this).find('.datetime_field');
+
       $unlock_for_how_long_dialog.dialog({
         autoOpen: false,
         modal: true,
@@ -157,16 +165,16 @@ define([
         width: 400,
         buttons: {
           'Unlock' : function(){
-            var dateString = $(this).find('.datetime_suggest').text();
-
             $('#quiz_unlock_form')
               // append this back to the form since it got moved to be a child of body when we called .dialog('open')
               .append($(this).dialog('destroy'))
-              .find('#quiz_lock_at').val(dateString).end()
+              .find('#quiz_lock_at').val($lock_at.data('iso8601')).end()
               .submit();
           }
         }
-      }).find('.datetime_field').datetime_field();
+      });
+
+      $lock_at.datetime_field();
     });
 
     $('#lock_this_quiz_now_link').ifExists(function($link) {

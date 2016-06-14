@@ -95,7 +95,7 @@
 #         },
 #         "users": {
 #           "description": "Array of user ids that are participants in the conference",
-#           "example": "[1, 7, 8, 9, 10]",
+#           "example": [1, 7, 8, 9, 10],
 #           "type": "array",
 #           "items": { "type": "integer"}
 #         },
@@ -111,10 +111,8 @@
 #         },
 #         "user_settings": {
 #           "description": "A collection of settings specific to the conference type",
-#           "example": "{}",
-#           "type": "map",
-#           "key": { "type": "string" },
-#           "value": { "type": "string" }
+#           "example": {"record": true},
+#           "type": "object"
 #         },
 #         "recordings": {
 #           "description": "A List of recordings for the conference",
@@ -188,7 +186,7 @@ class ConferencesController < ApplicationController
     if @context.respond_to?(:participating_typical_users)
       scope = @context.participating_typical_users
     end
-    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).all.uniq
+    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
@@ -197,6 +195,7 @@ class ConferencesController < ApplicationController
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
     )
+    flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
   end
   protected :web_index
 
@@ -215,7 +214,7 @@ class ConferencesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.web_conferences.scoped.new, @current_user, :create)
+    if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
       params[:web_conference].try(:delete, :long_running)
       @conference = @context.web_conferences.build(params[:web_conference])
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
@@ -334,7 +333,7 @@ class ConferencesController < ApplicationController
   def destroy
     if authorized_action(@conference, @current_user, :delete)
       @conference.transaction do
-        @conference.web_conference_participants.scoped.delete_all
+        @conference.web_conference_participants.scope.delete_all
         @conference.destroy
       end
       respond_to do |format|
@@ -355,15 +354,22 @@ class ConferencesController < ApplicationController
 
   def get_new_members
     members = [@current_user]
+
     if params[:user] && params[:user][:all] != '1'
       ids = []
       params[:user].each do |id, val|
         ids << id.to_i if val == '1'
       end
-      members += @context.users.where(id: ids)
     else
-      members += @context.users.to_a
+      ids = @context.user_ids
     end
+
+    if @context.is_a? Course
+      members += @context.participating_users(ids).to_a
+    else
+      members += @context.participating_users_in_context(ids).to_a
+    end
+
     members - @conference.invitees
   end
 

@@ -24,7 +24,7 @@ define([], function() {
         return true;
       if (maybeOptions)
         return true;
-      if (typeof keyOrDefault === 'string' && keyOrDefault.match(this.keyPattern))
+      if (typeof keyOrDefault === 'string' && keyOrDefault.match(KEY_PATTERN))
         return true;
       return false;
     },
@@ -49,6 +49,7 @@ define([], function() {
       var t = function() {
         var args = i18n.inferArguments([].slice.call(arguments));
         var defaultValue = args[0];
+        defaultValue = defaultValue || "";
         var options = args[1] || {};
         var countKey;
 
@@ -68,9 +69,19 @@ define([], function() {
         return ''+value;
       };
 
+      var beforeLabel = function(text) {
+        return this.t("#before_label_wrapper", "%{text}:", {'text': text});
+      };
+      
+      var lookup = function(scope, options) {
+        return ["hello", "goodbye"];
+      };
+      
       onLoad({
         t: t,
-        l: l
+        l: l,
+        beforeLabel: beforeLabel,
+        lookup: lookup
       });
     }
   };

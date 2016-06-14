@@ -19,6 +19,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+def new_valid_tool(course)
+  tool = course.context_external_tools.new(
+      name: "bob",
+      consumer_key: "bob",
+      shared_secret: "bob",
+      tool_id: 'some_tool',
+      privacy_level: 'public'
+  )
+  tool.url = "http://www.example.com/basic_lti"
+  tool.resource_selection = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400}
+  tool.save!
+  tool
+end
+
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
@@ -164,6 +181,15 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       expect(response).to be_success
+    end
+
+    it "should not show external tools in a group context" do
+      group_with_user_logged_in(:group_context => Account.default)
+      new_valid_tool(@course)
+      user_file
+      @file.context = @group
+      get 'index', :group_id => @group.id
+      expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
     end
 
     describe 'across shards' do
@@ -367,6 +393,14 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to eql(:completed)
       end
 
+      it "should mark media files viewed when rendering html with file_preview" do
+        @file = attachment_model(:context => @course, :uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :format => :html
+        @module.reload
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+      end
+
       it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
         owned_file = course_file
         owned_file.display_name = 'holla'
@@ -389,12 +423,24 @@ describe FilesController do
         expect(assigns(:attachment)).to eq new_file
       end
 
-      it "doesnt leak the name of unowned deleted files" do
+      it "does not leak the name of unowned deleted files" do
         unowned_file = @file
         unowned_file.display_name = 'holla'
         unowned_file.save
         unowned_file.destroy
 
+        get 'show', :course_id => @course.id, :id => unowned_file.id
+        expect(response.status).to eq(404)
+        expect(assigns(:not_found_message)).to eq("This file has been deleted")
+      end
+
+      it "does not blow up for logged out users" do
+        unowned_file = @file
+        unowned_file.display_name = 'holla'
+        unowned_file.save
+        unowned_file.destroy
+
+        remove_user_session
         get 'show', :course_id => @course.id, :id => unowned_file.id
         expect(response.status).to eq(404)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
@@ -521,6 +567,14 @@ describe FilesController do
       expect(assigns[:attachment].display_name).to eql("bob")
     end
 
+    it "should create unpublished files if usage rights required" do
+      @course.account.allow_feature! :usage_rights_required
+      @course.enable_feature! :usage_rights_required
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :attachment => {:display_name => "wat", :uploaded_data => io}
+      expect(assigns[:attachment]).to be_locked
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -611,20 +665,43 @@ describe FilesController do
   end
 
   describe "DELETE 'destroy'" do
-    before :once do
-      course_file
+    context "authorization" do
+      before :once do
+        course_file
+      end
+
+      it "should require authorization" do
+        delete 'destroy', :course_id => @course.id, :id => @file.id
+        expect(response.body).to eql("{\"message\":\"Unauthorized to delete this file\"}")
+        expect(assigns[:attachment].file_state).to eq 'available'
+      end
+
+      it "should delete file" do
+        user_session(@teacher)
+        delete 'destroy', :course_id => @course.id, :id => @file.id
+        expect(response).to be_redirect
+        expect(assigns[:attachment]).to eql(@file)
+        expect(assigns[:attachment].file_state).to eq 'deleted'
+      end
     end
 
-    it "should require authorization" do
-      delete 'destroy', :course_id => @course.id, :id => @file.id
-    end
+    context "file that has been submitted" do
+      def submit_file
+        assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+        @file = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
+        assignment.submit_homework(@student, :attachments => [@file])
+      end
 
-    it "should delete file" do
-      user_session(@teacher)
-      delete 'destroy', :course_id => @course.id, :id => @file.id
-      expect(response).to be_redirect
-      expect(assigns[:attachment]).to eql(@file)
-      expect(assigns[:attachment].file_state).to eq 'deleted'
+      before :once do
+        user_session(@student)
+        submit_file
+      end
+
+      it "should not delete" do
+        delete 'destroy', :id => @file.id
+        expect(response.body).to eql("{\"message\":\"Cannot delete a file that has been submitted as part of an assignment\"}")
+        expect(assigns[:attachment].file_state).to eq 'available'
+      end
     end
   end
 
@@ -844,7 +921,7 @@ describe FilesController do
     end
 
     it "should reject an expired policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60)
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60.seconds)
       post "api_create", params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end

@@ -6,7 +6,7 @@ class DropWikiNamespaces < ActiveRecord::Migration
   end
 
   def self.recreate_namespace(c)
-    connection.execute(["INSERT INTO wiki_namespaces (namespace, context_type, context_id) VALUES ('default',?,?)", c.class.to_s, c.id])
+    connection.execute(["INSERT INTO #{connection.quote_table_name('wiki_namespaces')} (namespace, context_type, context_id) VALUES ('default',?,?)", c.class.to_s, c.id])
   end
 
   def self.down

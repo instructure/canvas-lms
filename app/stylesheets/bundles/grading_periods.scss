@@ -21,13 +21,10 @@
     padding: 9px 0px;
     cursor: pointer;
     height: 20px;
-    font-size: 20px;
+    @include fontSize(20px);
   }
   .icon-delete-grading-period {
     width: 20px;
-  }
-  .update-button {
-    width: 98px;
   }
   .buttons-grid-row {
     width: 250px;
@@ -44,10 +41,10 @@
   border-left-style: dashed;
   border-top-style: none;
   border-width: 2px;
-  font-size: 16px;
+  @include fontSize(16px);
 
   #add-period-button {
-    font-size: 16px;
+    @include fontSize(16px);
     &:hover {
       text-decoration: none;
     }

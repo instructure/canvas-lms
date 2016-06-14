@@ -22,6 +22,8 @@
 module Lti
   class VariableExpander
 
+    SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze #matches only the stuff inside `${}`
+
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
@@ -42,6 +44,7 @@ module Lti
     USER_GUARD = -> { @current_user }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
+    ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
@@ -69,15 +72,17 @@ module Lti
 
     def [](key)
       k = (key[0] == '$' && key) || "$#{key}"
-      if expansion = self.class.expansions[k.respond_to?(:to_sym) && k.to_sym]
+      if (expansion = self.class.expansions[k.respond_to?(:to_sym) && k.to_sym])
         expansion.expand(self)
       end
     end
 
     def expand_variables!(var_hash)
       var_hash.update(var_hash) do |_, v|
-        if expansion = v.respond_to?(:to_sym) && self.class.expansions[v.to_sym]
+        if (expansion = v.respond_to?(:to_sym) && self.class.expansions[v.to_sym])
           expansion.expand(self)
+        elsif v.respond_to?(:to_s) && v.to_s =~ SUBSTRING_REGEX
+          expand_substring_variables(v)
         else
           v
         end
@@ -110,7 +115,14 @@ module Lti
                                                           @tool.id, include_host:true) },
                        LTI1_GUARD
 
+    register_expansion 'Canvas.css.common', [],
+                       -> { URI.parse(@request.url)
+                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
+    register_expansion 'Canvas.shard.id', [],
+                       -> { Shard.current.id }
+    register_expansion 'Canvas.root_account.global_id', [],
+                       -> { @root_account.global_id }
     ##### Deprecated Substitutions #####
 
     register_expansion 'Canvas.root_account.id', [],
@@ -146,7 +158,7 @@ module Lti
 
     register_expansion 'Canvas.membership.roles', [],
                        -> { lti_helper.current_canvas_roles },
-                       COURSE_GUARD
+                       ROLES_GUARD
 
     #This is a list of IMS LIS roles should have a different key
     register_expansion 'Canvas.membership.concludedRoles', [],
@@ -204,6 +216,10 @@ module Lti
     register_expansion 'Canvas.xuser.allRoles', [],
                        -> { lti_helper.all_roles }
 
+    register_expansion 'Canvas.user.globalId', [],
+                       -> { @current_user.global_id},
+                       USER_GUARD
+
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
@@ -218,6 +234,10 @@ module Lti
 
     register_expansion 'Canvas.user.sisSourceId', [],
                        -> { sis_pseudonym.sis_user_id },
+                       PSEUDONYM_GUARD
+
+    register_expansion 'Canvas.user.sisIntegrationId', [],
+                       -> { sis_pseudonym.integration_id },
                        PSEUDONYM_GUARD
 
     register_expansion 'Person.sourcedId', [],
@@ -255,11 +275,15 @@ module Lti
                        ENROLLMENT_GUARD
 
     register_expansion 'Canvas.module.id', [],
-                       -> { @content_tag.context_module_id },
+                       -> {
+                         @content_tag.context_module_id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.moduleItem.id', [],
-                       -> { @content_tag.id },
+                       -> {
+                         @content_tag.id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.assignment.id', [],
@@ -273,18 +297,32 @@ module Lti
     register_expansion 'Canvas.assignment.pointsPossible', [],
                        -> { @assignment.points_possible },
                        ASSIGNMENT_GUARD
-
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.unlockAt', [],
                        -> { @assignment.unlock_at },
                        ASSIGNMENT_GUARD
 
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.lockAt', [],
                        -> { @assignment.lock_at },
                        ASSIGNMENT_GUARD
 
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.dueAt', [],
                        -> { @assignment.due_at },
                        ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.unlockAt.iso8601', [],
+                       -> { @assignment.unlock_at.utc.iso8601 },
+                       -> {@assignment && @assignment.unlock_at.present?}
+
+    register_expansion 'Canvas.assignment.lockAt.iso8601', [],
+                       -> { @assignment.lock_at.utc.iso8601 },
+                       -> {@assignment && @assignment.lock_at.present?}
+
+    register_expansion 'Canvas.assignment.dueAt.iso8601', [],
+                       -> { @assignment.due_at.utc.iso8601 },
+                       -> {@assignment && @assignment.due_at.present?}
 
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
@@ -299,7 +337,7 @@ module Lti
                        -> { @tool_setting_proxy_id }
 
     register_expansion 'ToolConsumerProfile.url', [],
-                       -> { @controller.named_context_url(@tool.context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true )},
+                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
                        -> { @tool }
 
     register_expansion 'Canvas.file.media.id', [],
@@ -338,6 +376,13 @@ module Lti
 
     def sis_pseudonym
       @sis_pseudonym ||= @current_user.find_pseudonym_for_account(@root_account) if @current_user
+    end
+
+    def expand_substring_variables(value)
+      value.to_s.scan(SUBSTRING_REGEX).inject(value) do |v, match|
+        substring = "${#{match}}"
+        v.gsub(substring, (self[match] || substring).to_s)
+      end
     end
 
   end

@@ -1,0 +1,87 @@
+{
+  "kind": "drive#fileList",
+  "etag": "\"XTBboRWlttiWhZ_feOHVV3sFYJs/NldWXgcoxpDGqwSjdu9I3zgzcmU\"",
+  "selfLink": "https://www.googleapis.com/drive/v2/files?q=trashed%3Dfalse",
+  "nextPageToken": "fake_token",
+  "nextLink": "https://www.googleapis.com/drive/v2/files?pageToken=fake_token&q=trashed%3Dfalse",
+  "items": [
+    {
+      "kind": "drive#file",
+      "id": "1p0*******************MYS-kJYhmhvfw8",
+      "etag": "\"XTBboRWlttiWhZ_feOHVV3sFYJs/MTQ1MjcyMTI4NDUwOA\"",
+      "selfLink": "https://www.googleapis.com/drive/v2/files/1p0*******************MYS-kJYhmhvfw8",
+      "alternateLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drivesdk",
+      "embedLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/htmlembed",
+      "openWithLinks": {
+        "1083656409722": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web"
+      },
+      "defaultOpenWithLink": "https://docs.google.com/a/instructure.com/spreadsheets/d/1p0*******************MYS-kJYhmhvfw8/edit?usp=drive_web",
+      "iconLink": "https://ssl.gstatic.com/docs/doclist/images/icon_11_spreadsheet_list.png",
+      "thumbnailLink": "https://docs.google.com/a/instructure.com/feeds/vt?gd=true&id=1p0*******************MYS-kJYhmhvfw8&v=0&s=AMedNn****************MCMDEc&sz=s220",
+      "title": "Top Secret Documents",
+      "mimeType": "application/vnd.google-apps.spreadsheet",
+      "labels": {
+        "starred": false,
+        "hidden": false,
+        "trashed": false,
+        "restricted": false,
+        "viewed": true
+      },
+      "createdDate": "2014-07-07T20:11:17.079Z",
+      "modifiedDate": "2016-01-13T21:41:24.508Z",
+      "modifiedByMeDate": "2015-01-16T21:20:07.945Z",
+      "lastViewedByMeDate": "2015-01-16T21:20:07.945Z",
+      "markedViewedByMeDate": "1970-01-01T00:00:00.000Z",
+      "version": "459452",
+      "parents": [],
+      "exportLinks": {
+        "text/csv": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=csv",
+        "application/x-vnd.oasis.opendocument.spreadsheet": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=ods",
+        "application/zip": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=zip",
+        "application/pdf": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=pdf",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "https://docs.google.com/spreadsheets/export?id=1p0*******************MYS-kJYhmhvfw8&exportFormat=xlsx"
+      },
+      "userPermission": {
+        "kind": "drive#permission",
+        "etag": "\"XTBboRWlttiWhZ_feOHVV3sFYJs/fAeh6NlrWb23aHSXwPR-vOdwE0o\"",
+        "id": "me",
+        "selfLink": "https://www.googleapis.com/drive/v2/files/1p0*******************MYS-kJYhmhvfw8/permissions/me",
+        "role": "writer",
+        "type": "user"
+      },
+      "quotaBytesUsed": "0",
+      "ownerNames": [
+        "Montgomery Montgomery"
+      ],
+      "owners": [
+        {
+          "kind": "drive#user",
+          "displayName": "Montgomery Montgomery",
+          "picture": {
+            "url": "https://lh6.googleusercontent.com/-x0Cip_5Wrw0/AAAAAAAAAAI/AAAAAAAAAGM/**********/s64/photo.jpg"
+          },
+          "isAuthenticatedUser": false,
+          "permissionId": "0024957*******0999547",
+          "emailAddress": "montgomery@nowhere.com"
+        }
+      ],
+      "lastModifyingUserName": "Frank Frank",
+      "lastModifyingUser": {
+        "kind": "drive#user",
+        "displayName": "Frank Frank",
+        "isAuthenticatedUser": false,
+        "permissionId": "0701907*******5319074",
+        "emailAddress": "frank@nowhere.com"
+      },
+      "editable": true,
+      "copyable": true,
+      "writersCanShare": true,
+      "shared": true,
+      "explicitlyTrashed": false,
+      "appDataContents": false,
+      "spaces": [
+        "drive"
+      ]
+    }
+  ]
+}

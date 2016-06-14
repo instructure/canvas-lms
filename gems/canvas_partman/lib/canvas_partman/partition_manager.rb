@@ -52,7 +52,6 @@ module CanvasPartman
     # @return [String]
     #  The name of the newly created partition table.
     def create_partition(date, options={})
-      master_table = base_class.table_name
       partition_table = generate_name_for_partition(date)
 
       if options[:graceful] == true
@@ -66,7 +65,7 @@ module CanvasPartman
 
       base_class.transaction do
         execute <<-SQL
-          CREATE TABLE #{partition_table} (
+          CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
             CONSTRAINT #{partition_table}_pkey PRIMARY KEY (id),
             CHECK (
               #{constraint_field} >= TIMESTAMP '#{constraint_range[0]}'
@@ -74,7 +73,7 @@ module CanvasPartman
               #{constraint_field} < TIMESTAMP '#{constraint_range[1]}'
             )
           )
-          INHERITS (#{master_table});
+          INHERITS (#{base_class.quoted_table_name});
         SQL
 
         find_and_load_migrations.each do |migration|

@@ -129,7 +129,7 @@ define [
     equal $('#canvas_app_name').val(), app.get('name'),
       'Name is pre-populated from app'
 
-    equal $('fieldset .control-group').size(), 8,
+    equal $('#add_app_form fieldset .control-group').size(), 8,
       'All fields are present (6 plus key/secret)'
 
 #  Causing an intermitent spec failure

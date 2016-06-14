@@ -1,21 +1,21 @@
 <% conference = scheduled_conference %>
 <% if conference.scheduled? && can_do(conference, @current_user, :join) %>
-    <div class="global-message image-block conference">
-        <div class="image-block-image">
-            <i class="information-icon"></i>
-    <span class="hidden-inline-text">
-      <%= accessible_message_icon_text("information") %>
-    </span>
-        </div>
-        <div class="image-block-content">
-            <div class="message">
-                <p><%=
-                    mt(:current_conference_text, "You have been invited to join %{conference}. It starts on %{starts_at}.", {
-                            :conference => conference.title,
-                            :starts_at => datetime_string(conference.scheduled_date)
-                    })
-                %></p>
-            </div>
-        </div>
+  <div class="ic-notification conference">
+    <div class="ic-notification__icon" role="presentation">
+      <i class="icon-invitation"></i>
+      <span class="screenreader-only">
+        <%= accessible_message_icon_text("invitation") %>
+      </span>
     </div>
+    <div class="ic-notification__content">
+      <div class="ic-notification__message notification_message">
+        <%=
+          mt(:current_conference_text, "You have been invited to join %{conference}. It starts on %{starts_at}.", {
+                  :conference => conference.title,
+                  :starts_at => datetime_string(conference.scheduled_date)
+          })
+        %>
+      </div>
+    </div>
+  </div>
 <% end %>

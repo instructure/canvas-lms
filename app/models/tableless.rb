@@ -35,9 +35,13 @@ class Tableless < ActiveRecord::Base
   def save(validate = true)
     validate ? valid? : true
   end
-  
+
   def self.tableless?
     true
+  end
+
+  def self.sharded_primary_key?
+    false
   end
 
   def self.find_by_sql(*args); []; end

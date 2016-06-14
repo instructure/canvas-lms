@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
 
 
 describe "account admin question bank" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before(:each) do
     admin_logged_in
@@ -60,6 +60,10 @@ describe "account admin question bank" do
     (1..3).each do |i|
       expect(answers[i][:weight]).to eq 0
     end
+    assessment_question_id = driver.execute_script(
+      "return $('#question_#{question.id} .assessment_question_id').text()"
+    )
+    expect(assessment_question_id).to be_present
     expect(f("#question_#{question.id}")).to include_text name
     expect(f("#question_#{question.id}")).to include_text question_text
     question
@@ -193,7 +197,7 @@ describe "account admin question bank" do
     def move_questions_validation(bank_name, questions)
       new_question_bank = AssessmentQuestionBank.where(title: bank_name).first
       expect(new_question_bank).to be_present
-      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).all
+      new_questions = AssessmentQuestion.where(:assessment_question_bank_id => new_question_bank).to_a
       expect(new_questions).to be_present
       expect(new_questions).to match_array questions
     end

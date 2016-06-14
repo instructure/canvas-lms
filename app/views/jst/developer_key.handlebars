@@ -1,8 +1,9 @@
-<tr class='key'>
+<tr class='key{{#if inactive}} inactive{{/if}}'>
     <td class="name">
-        <img class="icon" src="{{ icon_url }}">
-        {{name}} 
+        <img class="icon" alt="" src="{{ icon_url }}">
+        {{name}}
         {{#if tool_id}}<br/>( {{ tool_id }} ){{/if}}
+        {{#if inactive }}<br/><i>inactive</i>{{/if}}
     </td>
     <td>
         <div>
@@ -48,6 +49,11 @@
     </td>
     <td class='links'>
         <a href="#" class="edit_link" title="{{#t "edit_key"}}Edit this key{{/t}}"><i class="icon-edit standalone-icon"></i></a>
+        {{#if inactive}}
+          <a href="#" class="activate_link" title="{{#t}}Activate this key{{/t}}"><i class="icon-unlock standalone-icon"></i></a>
+        {{else}}
+          <a href="#" class="deactivate_link" title="{{#t}}Deactivate this key{{/t}}"><i class="icon-lock standalone-icon"></i></a>
+        {{/if}}
         <a href="#" class="delete_link" title="{{#t "delete_key"}}Delete this key{{/t}}"><i class="icon-trash standalone-icon"></i></a>
     </td>
 </tr>

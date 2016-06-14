@@ -30,7 +30,7 @@ define [
 
   test 'delete works for an un-saved assignment', ->
     view = editHeaderView()
-    cb = sinon.stub(view, 'onDeleteSuccess')
+    cb = @stub(view, 'onDeleteSuccess')
 
     view.delete()
     equal cb.called, true, 'onDeleteSuccess was called'

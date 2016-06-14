@@ -1,5 +1,5 @@
 shared_examples_for "statistics basic tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def item_lists
     ff('.item_list')

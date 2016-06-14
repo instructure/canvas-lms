@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "Accounts API", type: :request do
   before :once do
@@ -70,31 +71,83 @@ describe "Accounts API", type: :request do
       ]
     end
 
+    it "doesn't include deleted accounts" do
+      @a2.destroy
+      json = api_call(:get, "/api/v1/accounts.json",
+                      { :controller => 'accounts', :action => 'index', :format => 'json' })
+
+      expect(json.sort_by { |a| a['id'] }).to eq [
+        {
+          'id' => @a1.id,
+          'name' => 'root',
+          'root_account_id' => nil,
+          'parent_account_id' => nil,
+          'default_time_zone' => 'Etc/UTC',
+          'default_storage_quota_mb' => 123,
+          'default_user_storage_quota_mb' => 45,
+          'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
+        },
+      ]
+    end
+
     it "should return accounts found through admin enrollments with the account list (but in limited form)" do
       course_with_teacher(:user => @user, :account => @a1)
       course_with_teacher(:user => @user, :account => @a1)# don't find it twice
       course_with_teacher(:user => @user, :account => @a2)
 
       json = api_call(:get, "/api/v1/course_accounts",
-                      { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
+        { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
       expect(json.sort_by { |a| a['id'] }).to eq [
-          {
+            {
               'id' => @a1.id,
               'name' => 'root',
               'root_account_id' => nil,
               'parent_account_id' => nil,
               'workflow_state' => 'active',
               'default_time_zone' => 'Etc/UTC',
-          },
-          {
+            },
+            {
               'id' => @a2.id,
               'name' => 'subby',
               'root_account_id' => @a1.id,
               'parent_account_id' => @a1.id,
               'workflow_state' => 'active',
               'default_time_zone' => 'America/Juneau',
-          },
-      ]
+            },
+          ]
+    end
+
+    describe "with sharding" do
+      specs_require_sharding
+      it "should include cross-shard accounts in course_accounts" do
+        course_with_teacher(:user => @user, :account => @a1)
+        @shard1.activate do
+          @a5 = account_model(:name => "crossshard", :default_time_zone => 'UTC')
+          course_with_teacher(:user => @user, :account => @a5)
+        end
+
+        json = api_call(:get, "/api/v1/course_accounts",
+                        { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
+        expect(json.sort_by { |a| a['id'] }).to eq [
+            {
+                'id' => @a1.id,
+                'name' => 'root',
+                'root_account_id' => nil,
+                'parent_account_id' => nil,
+                'workflow_state' => 'active',
+                'default_time_zone' => 'Etc/UTC',
+            },
+            {
+                'id' => @a5.global_id,
+                'name' => 'crossshard',
+                'root_account_id' => nil,
+                'parent_account_id' => nil,
+                'workflow_state' => 'active',
+                'default_time_zone' => 'Etc/UTC',
+            },
+        ]
+      end
     end
   end
 
@@ -122,17 +175,19 @@ describe "Accounts API", type: :request do
 
     it "should add sub account" do
       previous_sub_count = @a1.sub_accounts.size
-      json = api_call(:post,
+      api_call(:post,
         "/api/v1/accounts/#{@a1.id}/sub_accounts",
          {:controller=>'sub_accounts', :action=>'create',
           :account_id => @a1.id.to_s, :format => 'json'},
          {:account => { 'name' => 'New sub-account',
+                        'sis_account_id' => '567',
                         'default_storage_quota_mb' => 123,
                         'default_user_storage_quota_mb' => 456,
                         'default_group_storage_quota_mb' => 147 }})
       expect(@a1.sub_accounts.size).to eq previous_sub_count + 1
       sub = @a1.sub_accounts.detect{|a| a.name == "New sub-account"}
       expect(sub).not_to be_nil
+      expect(sub.sis_source_id).to eq '567'
       expect(sub.default_storage_quota_mb).to eq 123
       expect(sub.default_user_storage_quota_mb).to eq 456
       expect(sub.default_group_storage_quota_mb).to eq 147
@@ -455,6 +510,7 @@ describe "Accounts API", type: :request do
 
     it "should honor the includes[]" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      @a1.account_users.create!(user: @user)
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :include => ['storage_quota_used_mb'] }, {})
       expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
@@ -462,6 +518,7 @@ describe "Accounts API", type: :request do
 
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
+      @a1.account_users.create!(user: @user)
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=term",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :include => ['term'] })
       expect(json[0].has_key?('term')).to be_truthy
@@ -576,6 +633,7 @@ describe "Accounts API", type: :request do
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
         end
 
+        @c2.start_at = 2.weeks.ago
         @c2.conclude_at = 1.week.ago
         @c2.save!
 

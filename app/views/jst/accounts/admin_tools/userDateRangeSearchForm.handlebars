@@ -24,20 +24,52 @@
 </div>
 
 <div class="pad-box border border-trbl search-controls">
-  <h4>{{#t "generate_activity_username"}}Generate Activity for <span data-bind="name">{{user}}</span>{{/t}}</h4>
-  <h5>{{#t "generate_activity_userid"}}User ID: <span data-bind="id">{{user_id}}</span>{{/t}}</h5>
+  <h4>
+    {{#t "generate_activity_username"}}Generate Activity for <span data-bind="name">{{user}}</span>{{/t}}
+  </h4>
+  <h5>
+    {{#t "generate_activity_userid"}}User ID: <span data-bind="id">{{user_id}}</span>{{/t}}
+  </h5>
   <hr>
 
   <div class="control-group">
-    <label class="control-label" for="{{formName}}-dateStartSearchField">{{#t "message_date_from"}}From Date{{/t}}</label>
+    <label class="control-label" for="{{formName}}-dateStartSearchField">
+      {{#t "message_date_from"}}From Date{{/t}}
+    </label>
+    <label class="screenreader-only" id="search_start_date_label">
+      {{#t}}Limit search to activity after{{/t}}
+      {{datepickerScreenreaderPrompt}}
+    </label>
     <div class="controls">
-      <input type="text" id="{{formName}}-dateStartSearchField" class="dateStartSearchField" name="start_time" placeholder="{{#t "message_date_from"}}From Date{{/t}}" maxlength="50" />
+      <input type="text"
+             id="{{formName}}-dateStartSearchField"
+             class="dateStartSearchField"
+             name="start_time"
+             placeholder="{{#t "message_date_from"}}From Date{{/t}}"
+             maxlength="50"
+             aria-labelledby="search_start_date_label"
+             data-tooltip='{"position":"top","force_position":"true"}'
+             title="{{accessibleDateFormat}}"/>
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="{{formName}}-dateEndSearchField">{{#t "message_date_to"}}To Date{{/t}}</label>
+    <label class="control-label" for="{{formName}}-dateEndSearchField">
+      {{#t "message_date_to"}}To Date{{/t}}
+    </label>
+    <label class="screenreader-only" id="search_end_date_label">
+      {{#t}}Limit search to activity before{{/t}}
+      {{datepickerScreenreaderPrompt}}
+    </label>
     <div class="controls">
-      <input type="text" id="{{formName}}-dateEndSearchField" class="dateEndSearchField" name="end_time" placeholder="{{#t "message_date_to"}}To Date{{/t}}" maxlength="50" />
+      <input type="text"
+             id="{{formName}}-dateEndSearchField"
+             class="dateEndSearchField"
+             name="end_time"
+             placeholder="{{#t "message_date_to"}}To Date{{/t}}"
+             maxlength="50"
+             aria-labelledby="search_end_date_label"
+             data-tooltip='{"position":"top","force_position":"true"}'
+             title="{{accessibleDateFormat}}" />
     </div>
   </div>
 

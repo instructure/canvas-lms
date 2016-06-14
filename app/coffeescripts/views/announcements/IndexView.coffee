@@ -55,12 +55,34 @@ define [
         new UserSettingsView()
       @settingsView.toggle()
 
+    screenreaderSearchResultCount: _.debounce ->
+      # if count < page limit and we've got the last page, then we've got all the results
+      text = ''
+
+      if Object.keys(@activeFilters()).length == 0
+        text = I18n.t('Showing all announcements')
+      else if !@lastPageFetched
+        text = I18n.t({one: 'One result displayed', other: '%{count} results displayed'}, {count: @resultCount})
+      else
+        text = I18n.t({one: 'One result', other: '%{count} results'}, {count: @resultCount})
+      @$('#searchResultCount').text(text)
+    , 1000
+
     renderList: =>
       $list = @$('.discussionTopicIndexList').empty()
-      nothingMatched = not _.any @collection.map @addDiscussionTopicToList
-      @$('.nothingMatchedFilter').toggle nothingMatched && !@collection.fetchingNextPage
-      makeSortable = !nothingMatched &&
-                     !@activeFilters.length &&
+      fetching = @collection.fetchingNextPage
+      # this is kinda weird. we map with the side effecting add function and use the results, which are either jquery
+      # objects or null i think, to determine how many results we have since the add function applies the filter.
+      @resultCount = _.filter(@collection.map(@addDiscussionTopicToList), Boolean).length
+      gotSomething = @resultCount > 0
+      noResults = !gotSomething && !fetching
+      filtering = Object.keys(@activeFilters()).length > 0
+
+      @screenreaderSearchResultCount()
+      @$('.nothingMatchedFilter').toggle noResults
+
+      makeSortable = gotSomething &&
+                     !filtering &&
                      !@isShowingAnnouncements() &&
                      @options.permissions.moderate
       if makeSortable
@@ -154,8 +176,6 @@ define [
         @[input.id] = val
         @renderList()
         @collection.trigger 'aBogusEventToCauseYouToFetchNextPageIfNeeded'
-        @resultsUpdatedAccessibleAlert()
-        
 
     filters:
       onlyGraded: -> @get 'assignment_id'
@@ -186,7 +206,3 @@ define [
         showingAnnouncements: @isShowingAnnouncements()
         lastPageFetched: @lastPageFetched
       , filterProps, collectionProps
-
-    resultsUpdatedAccessibleAlert: _.debounce(->
-      $.screenReaderFlashMessage I18n.t 'The list of results has been updated.'
-    , 1000)

@@ -166,6 +166,14 @@ describe WikiPage do
     it "should allow teachers to read" do
       expect(@page.can_read_page?(@teacher)).to eq true
     end
+
+    it "allows account admins with :manage_wiki rights to read" do
+      account = @course.root_account
+      role = custom_account_role('CustomAccountUser', :account => account)
+      RoleOverride.manage_role_override(account, role, 'manage_wiki', :override => true)
+      admin = account_admin_user(:account => account, :role => role, :active_all => true)
+      expect(@page.can_read_page?(admin)).to eq true
+    end
   end
 
   describe '#can_edit_page?' do
@@ -206,8 +214,17 @@ describe WikiPage do
       expect(page.can_edit_page?(student)).to be_truthy
     end
 
-    it 'is true for users who are not in the course' do
+    it 'is not true for users who are not in the course (if it is not public)' do
       course(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
+      user(:active_all => true)
+      expect(page.can_edit_page?(@user)).to be_falsey
+    end
+
+    it 'is true for users who are not in the course (if it is public)' do
+      course(:active_all => true)
+      @course.is_public = true
+      @course.save!
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
       user(:active_all => true)
       expect(page.can_edit_page?(@user)).to be_truthy

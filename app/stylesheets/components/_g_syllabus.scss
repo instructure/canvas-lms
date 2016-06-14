@@ -75,7 +75,7 @@
         }
       }
       .dates {
-        font-size: 10px;
+        @include fontSize(10px);
         text-align: right;
         @if $use_high_contrast {
           color: #333;
@@ -132,7 +132,7 @@
   }
   .special_date_title {
     color: #999;
-    font-size: 11px;
+    @include fontSize(11px);
     font-weight: normal;
   }
 }

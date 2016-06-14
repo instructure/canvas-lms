@@ -12,5 +12,4 @@
 <%= t('course_group', "Your request to join the group %{group_name} for the course %{course_name} has been rejected.", :group_name => asset.group.name, :course_name => asset.group.context.name) %>
 <% end %>
 
-<%= before_label('click_below', 'You can check out other groups by clicking the link below') %>
-<%= content :link %>
+<%= t('You can check out other groups by clicking this link: %{link}', link: content(:link)) %>

@@ -2,11 +2,6 @@
 
 require "spec_helper"
 
-if RUBY_VERSION >= '2.0.0'
-  require 'syck'
-end
-YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
-
 describe "Unidecoder" do
   # Silly phrases courtesy of Frank da Cruz
   # http://www.columbia.edu/kermit/utf8.html
@@ -82,13 +77,13 @@ describe "Unidecoder" do
     end
   end
   
-  it "unidecoder_in_yaml_file" do
+  it "unidecoder_in_json_file" do
     {
-      "A" => "x00.yml (line 67)",
-      "π" => "x03.yml (line 194)",
-      "Я" => "x04.yml (line 49)"
+      "A" => "x00.json (line 67)",
+      "π" => "x03.json (line 194)",
+      "Я" => "x04.json (line 49)"
     }.each do |character, output|
-      expect(output).to eq LuckySneaks::Unidecoder.in_yaml_file(character)
+      expect(output).to eq LuckySneaks::Unidecoder.in_json_file(character)
     end
   end
 end

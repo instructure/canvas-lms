@@ -30,6 +30,7 @@ class CreateContextExternalToolPlacements < ActiveRecord::Migration
             VALUES ('#{type}', NEW.id)
           SQL_ACTIONS
         end
+        connection.set_search_path_on_function("tool_after_insert_#{type}_is_true__tr")
 
         create_trigger("tool_after_update_#{type}_is_true__tr", :generated => true).
             on("context_external_tools").
@@ -43,6 +44,8 @@ class CreateContextExternalToolPlacements < ActiveRecord::Migration
             )
           SQL_ACTIONS
         end
+        connection.set_search_path_on_function("tool_after_update_#{type}_is_true__tr")
+
 
         create_trigger("tool_after_update_#{type}_is_false__tr", :generated => true).
             on("context_external_tools").
@@ -52,6 +55,7 @@ class CreateContextExternalToolPlacements < ActiveRecord::Migration
             DELETE FROM context_external_tool_placements WHERE placement_type = '#{type}' AND context_external_tool_id = NEW.id
           SQL_ACTIONS
         end
+        connection.set_search_path_on_function("tool_after_update_#{type}_is_false__tr")
       end
     end
 

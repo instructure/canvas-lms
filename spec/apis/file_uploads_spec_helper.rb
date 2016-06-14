@@ -40,6 +40,7 @@ shared_examples_for "file uploads api" do
       'hidden_for_user' => false,
       'created_at' => attachment.created_at.as_json,
       'updated_at' => attachment.updated_at.as_json,
+      'modified_at' => attachment.modified_at.as_json,
       'thumbnail_url' => attachment.thumbnail_url
     }
 
@@ -94,7 +95,8 @@ shared_examples_for "file uploads api" do
         'hidden_for_user' => false,
         'created_at' => attachment.created_at.as_json,
         'updated_at' => attachment.updated_at.as_json,
-        'thumbnail_url' => attachment.thumbnail_url
+        'thumbnail_url' => attachment.thumbnail_url,
+        'modified_at' => attachment.modified_at.as_json
     }
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course)

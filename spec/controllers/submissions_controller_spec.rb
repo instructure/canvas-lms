@@ -197,17 +197,38 @@ describe SubmissionsController do
       end
 
       it "should not send a comment to the entire group by default" do
-        post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'online_text_entry', :body => 'blah', :comment => "some comment"}
+        post(
+          'create',
+          :course_id => @course.id,
+          :assignment_id => @assignment.id,
+          :submission => {
+            :submission_type => 'online_text_entry',
+            :body => 'blah',
+            :comment => "some comment"
+          }
+        )
+
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.all.sum{ |s| s.submission_comments.size }).to eql 1
+        expect(subs.to_a.sum{ |s| s.submission_comments.size }).to eql 1
       end
 
       it "should send a comment to the entire group if requested" do
-        post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'online_text_entry', :body => 'blah', :comment => "some comment", :group_comment => '1'}
+        post(
+          'create',
+          :course_id => @course.id,
+          :assignment_id => @assignment.id,
+          :submission => {
+            :submission_type => 'online_text_entry',
+            :body => 'blah',
+            :comment => "some comment",
+            :group_comment => '1'
+          }
+        )
+
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.all.sum{ |s| s.submission_comments.size }).to eql 2
+        expect(subs.to_a.sum{ |s| s.submission_comments.size }).to eql 2
       end
     end
 
@@ -226,12 +247,13 @@ describe SubmissionsController do
         flag.save!
         mock_user_service = mock()
         @user.stubs(:user_services).returns(mock_user_service)
-        mock_user_service.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "token", secret: "secret")))
+        mock_user_service.expects(:where).with(service: "google_drive").
+          returns(stub(first: mock(token: "token", secret: "secret")))
       end
 
       it "should not save if domain restriction prevents it" do
         google_docs = mock
-        GoogleDocs::Connection.expects(:new).returns(google_docs)
+        GoogleDrive::Connection.expects(:new).returns(google_docs)
 
         google_docs.expects(:download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
         post(:create, course_id: @course.id, assignment_id: @assignment.id,
@@ -241,7 +263,7 @@ describe SubmissionsController do
       end
     end
   end
-  
+
   describe "PUT update" do
     it "should require authorization" do
       course_with_student(:active_all => true)
@@ -250,7 +272,7 @@ describe SubmissionsController do
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id, :submission => {:comment => "some comment"}
       assert_unauthorized
     end
-    
+
     it "should require the right student" do
       course_with_student_logged_in(:active_all => true)
       @user2 = User.create!(:name => "some user")
@@ -260,7 +282,7 @@ describe SubmissionsController do
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @user2.id, :submission => {:comment => "some comment"}
       assert_unauthorized
     end
-    
+
     it "should allow updating homework to add comments" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -319,7 +341,7 @@ describe SubmissionsController do
         expect(s.submission_comments.first.author).to eq @u1
       end
     end
-    
+
     it "should allow attaching files to the comment" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -338,7 +360,8 @@ describe SubmissionsController do
 
     it "should allow setting 'student_entered_grade'" do
       course_with_student_logged_in(:active_all => true)
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @assignment = @course.assignments.create!(:title => "some assignment",
+                                                :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
       put 'update', {
         :course_id => @course.id,
@@ -353,7 +376,8 @@ describe SubmissionsController do
 
     it "should round 'student_entered_grade'" do
       course_with_student_logged_in(:active_all => true)
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @assignment = @course.assignments.create!(:title => "some assignment",
+                                                :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
       put 'update', {
         :course_id => @course.id,
@@ -364,6 +388,47 @@ describe SubmissionsController do
         }
       }
       expect(@submission.reload.student_entered_score).to eq 2.0
+    end
+
+    context "moderated grading" do
+      before :once do
+        course_with_student(:active_all => true)
+        @assignment = @course.assignments.create!(:title => "some assignment",
+          :submission_types => "online_url,online_upload", :moderated_grading => true)
+        @submission = @assignment.submit_homework(@user)
+      end
+
+      before :each do
+        user_session @teacher
+      end
+
+      it "should create a provisional comment" do
+        put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
+            :submission => {:comment => "provisional!", :provisional => true}
+
+        @submission.reload
+        expect(@submission.submission_comments.first).to be_nil
+        expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
+
+        json = JSON.parse response.body
+        expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+      end
+
+      it "should create a final provisional comment" do
+        @submission.find_or_create_provisional_grade!(scorer: @teacher)
+        put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
+          :submission => {:comment => "provisional!", :provisional => true, :final => true}
+
+        expect(response).to be_success
+        @submission.reload
+        expect(@submission.submission_comments.first).to be_nil
+        pg = @submission.provisional_grade(@teacher, final: true)
+        expect(pg.submission_comments.first.comment).to eq 'provisional!'
+        expect(pg.final).to be_truthy
+
+        json = JSON.parse response.body
+        expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+      end
     end
   end
 

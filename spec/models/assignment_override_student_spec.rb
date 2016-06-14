@@ -81,7 +81,45 @@ describe AssignmentOverrideStudent do
     expect(@override_student.assignment_id).to eq @override2.assignment_id
   end
 
-  describe "default_values" do    
+  def adhoc_override_with_student
+    student_in_course
+    @assignment = assignment_model(:course => @course)
+    @ao = AssignmentOverride.new()
+    @ao.assignment = @assignment
+    @ao.title = "ADHOC OVERRIDE"
+    @ao.workflow_state = "active"
+    @ao.set_type = "ADHOC"
+    @ao.save!
+    @override_student = @ao.assignment_override_students.build
+    @override_student.user = @user
+    @override_student.save!
+  end
+
+  it "should call destroy its override if its the only student and is deleted" do
+    adhoc_override_with_student
+
+    expect(@ao.workflow_state).to eq("active")
+    @override_student.destroy
+    @ao.reload
+
+    expect(@ao.workflow_state).to eq("deleted")
+  end
+
+  describe "clean_up_for_assignment" do
+    it "if callbacks arent run clean_up_for_assignment should delete invalid overrides" do
+      adhoc_override_with_student
+      #no callbacks
+      @user.enrollments.delete_all
+
+      expect(@ao.workflow_state).to eq("active")
+      AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
+      @ao.reload
+
+      expect(@ao.workflow_state).to eq("deleted")
+    end
+  end
+
+  describe "default_values" do
     let(:override_student) { AssignmentOverrideStudent.new }
     let(:override) { AssignmentOverride.new }
     let(:quiz_id) { 1 }

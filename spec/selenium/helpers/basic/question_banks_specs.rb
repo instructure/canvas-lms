@@ -1,5 +1,5 @@
 shared_examples_for "question bank basic tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   before (:each) do
     admin_logged_in
     get url
@@ -32,10 +32,11 @@ shared_examples_for "question bank basic tests" do
 
   it "should un-bookmark a question bank" do
     question_bank = add_question_bank
-    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark")
+    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark')
+    expect(fj(".bookmark_bank_link img:visible")['src']).to_not include('bookmark_gray')
     fj(".bookmark_bank_link:visible").click
     wait_for_ajaximations
-    expect(fj(".bookmark_bank_link img:visible")).to have_attribute(:alt, "Bookmark_gray")
+    expect(fj(".bookmark_bank_link img:visible")['src']).to include('bookmark_gray')
     question_bank.reload
     expect(question_bank.bookmarked_for?(User.last)).to be_falsey
   end
@@ -43,6 +44,7 @@ shared_examples_for "question bank basic tests" do
   it "should edit a question bank" do
     new_title = "bank 2"
     question_bank = add_question_bank
+    wait_for_ajaximations
     f("#questions .edit_bank_link").click
     wait_for_ajaximations
     f("#assessment_question_bank_title").send_keys(new_title, :return)

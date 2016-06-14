@@ -2,14 +2,12 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
-  'compiled/models/grade_summary/CalculationMethodContent'
+  'compiled/models/Outcome'
   'timezone'
-], (I18n, _, {Model, Collection}, CalculationMethodContent, tz) ->
+], (I18n, _, {Model, Collection}, Outcome, tz) ->
 
-  class Outcome extends Model
-    defaults:
-      calculation_method: "highest"
-
+  GradeSummary = {}
+  class GradeSummary.Outcome extends Outcome
     initialize: ->
       super
       @set 'friendly_name', @get('display_name') || @get('title')
@@ -62,9 +60,6 @@ define [
 
     masteryPercent: ->
       @get('mastery_points')/@get('points_possible') * 100
-
-    present: ->
-      _.extend({}, @toJSON(), new CalculationMethodContent(@).present())
 
     toJSON: ->
       _.extend super,

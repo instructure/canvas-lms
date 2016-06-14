@@ -1,4 +1,5 @@
 <% selected ||= false %>
+<% folder ||= nil %>
 <li id="folder_<%= folder ? folder.id.to_s : "blank" %>" title="<%= folder.name rescue "" %>" class="folder <%= 'folder_locked' if folder && !can_do(folder, @current_user, :read_contents) %> <%= 'currently_locked_folder' if folder && folder.currently_locked %>">
   <div class="folder_name <%= selected ? "selected" : "" %> nobr"><%= folder.name rescue "" %></div>
   <ul class="folder_list" style="display: none;"></ul>

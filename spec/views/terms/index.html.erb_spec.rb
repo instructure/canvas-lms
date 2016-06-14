@@ -25,6 +25,8 @@ describe "/terms/index" do
     term = Account.default.enrollment_terms.create!
     term.courses.create! { |c| c.workflow_state = 'deleted' }
     assigns[:terms] = Account.default.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse
+    assigns[:course_counts_by_term] = EnrollmentTerm.course_counts(assigns[:terms])
+    assigns[:user_counts_by_term] = EnrollmentTerm.user_counts(Account.default, assigns[:terms])
     render "terms/index"
     page = Nokogiri('<document>' + response.body + '</document>')
     expect(page.css(".delete_term_link")[0]['href']).to eq '#'

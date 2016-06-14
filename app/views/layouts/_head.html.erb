@@ -15,14 +15,8 @@
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
 
-  <link rel="icon" type="image/x-icon" href="<%=
-    @domain_root_account.settings[:favicon].presence ||
-    (Rails.env.development? && "/favicon-green.ico") ||
-    (Rails.env.test? && "/favicon-green.ico") ||
-    "/favicon.ico" %>"
-  />
-  <link rel="apple-touch-icon" href="<%= @domain_root_account.settings[:apple_touch_icon].presence || "/apple-touch-icon.png"  %>">
-
+  <%= favicon_link_tag(favicon) %>
+  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
 
   <%= yield :auto_discovery %>
   <%= yield :head %>
@@ -69,4 +63,3 @@
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700,300,600,400' rel='stylesheet' type='text/css'>
   <link href="/font/TradeGothicNo.20-CondBold.css" rel="stylesheet" type="text/css" />
 </head>
-

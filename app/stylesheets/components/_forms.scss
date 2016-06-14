@@ -66,7 +66,7 @@ input[type=text].loading {
 // Hint Text
 
 .hint-text {
-  font-size: 10px;
+  @include fontSize(10px);
   color: $ic-hint-text;
 }
 

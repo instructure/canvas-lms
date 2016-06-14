@@ -4,7 +4,7 @@ $kyle-blue: #0081e3;
 
 .accessibility-warning {
   @include accessibility-prompt;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
 }
 
 #minical {
@@ -20,9 +20,9 @@ $kyle-blue: #0081e3;
     @include user-select(none);
     h2, .h2 {
       // override styles from default fullcalendar.css
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       line-height: 35px;
-      
+
       background-color: transparent;
       margin: 0;
       //override default right side h2 styles
@@ -35,7 +35,7 @@ $kyle-blue: #0081e3;
     }
     .fc-button {
       padding: 0px 10px;
-      font-size: 13px;
+      @include fontSize(13px);
       line-height: 35px;
       background: none;
       border: none;
@@ -52,7 +52,7 @@ $kyle-blue: #0081e3;
   .fc-widget-header {
     border: none;
     border-bottom: 1px solid #bbbbbb;
-    font-size: 10px;
+    @include fontSize(10px);
     line-height: 20px;
     &.fc-first {
       border-left: 1px solid #bbbbbb;
@@ -60,6 +60,9 @@ $kyle-blue: #0081e3;
     &.fc-last {
       border-right: 1px solid #bbbbbb;
     }
+  }
+  .fc-toolbar .fc-button .fc-icon:after {
+    margin: 0; // override -1em margin to fix Edge bug
   }
   .fc-day-number {
     float: none;
@@ -107,10 +110,6 @@ $kyle-blue: #0081e3;
     @include vertical-gradient(#f6f6f6, #ebecec);
   }
   .fc-state-highlight {
-    @include vertical-gradient(#4aa0e2, #4596d4);
-    box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.5);
-    color: white;
-    text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.7);
     &.event .fc-day-content {
       border-color: transparent #f6f6f6 #f6f6f6 transparent;
     }

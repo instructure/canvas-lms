@@ -4,7 +4,7 @@ define [
 ], (ajax, Ember) ->
 
   clone = (obj) ->
-    Em.copy obj, true
+    Ember.copy obj, true
 
   default_grade_response = [{
     "submission": {

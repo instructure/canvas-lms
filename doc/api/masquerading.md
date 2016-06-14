@@ -10,8 +10,10 @@ all calls log both the calling user and the target user.
 To masquerade, add an as_user_id parameter to any request. It can be either a Canvas user ID, or an SIS user ID
 (as described in <a href="object_ids.html">SIS IDs</a>):
 
-    curl 'https://<canvas>/api/v1/users/self/activity_stream?as_user_id=sis_user_id:brian' \
-         -H "Authorization: Bearer <token>"
+```bash
+curl 'https://<canvas>/api/v1/users/self/activity_stream?as_user_id=sis_user_id:brian' \
+     -H "Authorization: Bearer <token>"
+```
 
 Masquerading could be useful in a number of use cases:
 

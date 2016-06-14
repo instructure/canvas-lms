@@ -12,20 +12,21 @@ define [
         getContent: (()-> return "Selection Content" )
       }
     teardown: ->
+      $(".ui-dialog").remove()
 
   test "buttonToImg builds an img tag", ->
     target =
       closest: (str)->
         attr: (str)->
           "some/img/url"
-    equal(EditorLinks.buttonToImg(target), "<img src='some/img/url'/>")
+    equal(EditorLinks.buttonToImg(target), "<img src='some&#x2F;img&#x2F;url'/>")
 
   test "buttonToImg is not vulnerable to XSS", ->
     target =
       closest: (str)->
         attr: (str)->
           "<script>alert('attacked');</script>"
-    equal(EditorLinks.buttonToImg(target), "<img src='&lt;script&gt;alert('attacked');&lt;/script&gt;'/>")
+    equal(EditorLinks.buttonToImg(target), "<img src='&lt;script&gt;alert(&#x27;attacked&#x27;);&lt;&#x2F;script&gt;'/>")
 
   test "prepEditorForDialog snapshots the current selection state", ->
     called = false
@@ -78,26 +79,19 @@ define [
     ok(!called)
 
   test "it closes the dialog box", ->
-    mock = sinon.mock(@box)
-    mock.expects("dialog").once().withArgs('close')
+    @mock(@box).expects("dialog").once().withArgs('close')
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
-    mock.verify()
-    mock.restore()
 
   test "it inserts the link properly", ->
-    mock = sinon.mock(@editor)
-    mock.expects("createLink").once().withArgs('promptValue', "classes")
+    @mock(@editor).expects("createLink").once().
+      withArgs('promptValue', "classes")
     called = false
     @box.on('submit', (()-> called = true))
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
-    mock.verify()
-    mock.restore()
 
-  module "InstructureLinks Tinymce Plugin: buildLinkClasses",
-    setup: ->
-    teardown: ->
+  module "InstructureLinks Tinymce Plugin: buildLinkClasses"
 
   test "it removes any existing link-specific classes", ->
     box = $("<div></div>")

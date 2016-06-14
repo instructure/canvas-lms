@@ -1,20 +1,20 @@
 define [
+  '../mockFilesENV'
   'jquery'
   'react'
   'react-router'
   'react-modal'
-  'compiled/bundles/roles'
-  'compiled/react_files/components/FilesApp'
+  'jsx/files/FilesApp'
   'compiled/react_files/modules/filesEnv'
-  'compiled/react_files/components/FilePreview'
+  'jsx/files/FilePreview'
   'compiled/models/Folder'
   'compiled/models/File'
   'compiled/collections/FilesCollection'
-  '../mockFilesENV'
+  'compiled/collections/FoldersCollection'
   '../TestLocation'
   '../../helpers/stubRouterContext'
-], ($, React, Router, Modal, RolesBundle, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
-
+  'vendor/date'
+], (mockFilesENV, $, React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, FoldersCollection, TestLocation, stubRouterContext) ->
   Simulate = React.addons.TestUtils.Simulate
   wrapper = null
 
@@ -74,6 +74,7 @@ define [
       Modal.setAppElement(@div)
 
       properties =
+        isOpen: true
         currentFolder: @currentFolder
         collection: @filesCollection
         query: {}
@@ -84,7 +85,7 @@ define [
         new TestLocation([ path ])
 
       routes = [
-        Router.Route path: filesEnv.baseUrl, handler: FilePreviewComponent, name: 'rootFolder'
+        React.createElement(Router.Route, path: filesEnv.baseUrl, handler: FilePreviewComponent, name: 'rootFolder')
       ]
 
       @runRouter = () ->
@@ -95,7 +96,7 @@ define [
           callback = arguments[0]
 
         Router.run routes, location(path), (Handler) =>
-          React.render Handler(properties), @div, ->
+          React.render React.createElement(Handler, properties), @div, ->
             callback.call(null)
 
 
@@ -130,3 +131,10 @@ define [
     @runRouter '/courses/1/files?preview=3',  =>
       ok $('.ef-file-preview-header-download').length, 'The download button was not shown'
       ok $('.ef-file-preview-header-download').attr('href').match(@file3.get('url')), 'The download button url is incorrect'
+
+  test 'opening file preview should aria-hide the appElement div only, not the body div', ->
+    equal $(@div).attr('aria-hidden'), null, "doesn't have an aria-hidden attribute"
+    @runRouter '/courses/1/files?preview=3',  =>
+      equal $(@div).attr('aria-hidden'), 'true', "adds the aria-hidden true attribute"
+      equal $(document.body).attr('aria-hidden'), null, "body doesn't have an aria-hidden attribute"
+

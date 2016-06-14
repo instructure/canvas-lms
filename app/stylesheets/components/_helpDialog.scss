@@ -61,7 +61,7 @@
     resize: none;
   }
   small {
-    font-size: 10px;
+    @include fontSize(10px);
     display: block;
     color: #555;
     margin-top: -6px;

@@ -1,7 +1,7 @@
 <%
   content_for :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
   @active_tab = "statistics"
-  jammit_css :statistics
+  css_bundle :statistics
   js_bundle :account_statistics
 %>
 <h1 class="screenreader-only"><%= t(:page_header_title, "Account Statistics") %></h1>

@@ -70,7 +70,7 @@ class TermsApiController < ApplicationController
   #
   # Return all of the terms in the account.
   #
-  # @argument workflow_state[] [String, 'active'| 'deleted'| 'all']
+  # @argument workflow_state[] [String, "active"|"deleted"|"all"]
   #   If set, only returns terms that are in the given state.
   #   Defaults to 'active'.
   #
@@ -79,7 +79,8 @@ class TermsApiController < ApplicationController
   def index
     terms = @context.enrollment_terms.order('start_at ASC, end_at ASC, id ASC')
 
-    state = params[:workflow_state] || 'active'
+    state = Array(params[:workflow_state])&['all', 'active', 'deleted']
+    state = 'active' if state == []
     state = nil if Array(state).include?('all')
     terms = terms.where(workflow_state: state) if state.present?
 

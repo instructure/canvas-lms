@@ -353,7 +353,7 @@ define([
         ed.addButton('instructure_links', {
           title: 'Link to URL',
           cmd: 'instructureLinks',
-          image: url + '/img/button.gif',
+          icon: 'link',
           onPostRender: function(){
             var btn = this;
             ed.on('NodeChange', function(event) {

@@ -1,4 +1,6 @@
 class DropDeletedUniqueIdFromPseudonyms < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     Pseudonym.where("deleted_unique_id IS NOT NULL AND workflow_state='deleted'").update_all('unique_id=deleted_unique_id')
     remove_column :pseudonyms, :deleted_unique_id

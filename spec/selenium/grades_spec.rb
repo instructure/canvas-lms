@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "grades" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher(:active_all => true)
@@ -98,13 +98,13 @@ describe "grades" do
         get '/grades'
       end
 
-      it "should validate courses display" do
+      it "should validate courses display", priority: "1", test_id: 222510 do
         course_details = f('.course_details')
         4.times { |i| expect(course_details).to include_text(@course_names[i].name) }
       end
     end
 
-    it "should show the student outcomes report if enabled" do
+    it "should show the student outcomes report if enabled", priority: "1", test_id: 229447 do
       @outcome_group ||= @course.root_outcome_group
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
       @outcome_group.add_outcome(@outcome)
@@ -117,7 +117,7 @@ describe "grades" do
     end
 
     context 'student view' do
-      it "should be available to student view student" do
+      it "should be available to student view student", priority: "1", test_id: 229448 do
         @fake_student = @course.student_view_student
         @fake_submission = @first_assignment.submit_homework(@fake_student, :body => 'fake student submission')
         @first_assignment.grade_student(@fake_student, :grade => 8)
@@ -135,13 +135,13 @@ describe "grades" do
       user_session(@student_1)
     end
 
-    it "should allow student to test modifying grades" do
+    it "should allow student to test modifying grades", priority: "1", test_id: 229660 do
       get "/courses/#{@course.id}/grades"
 
       Assignment.any_instance.expects(:find_or_create_submission).twice.returns(@submission)
 
       #check initial total
-      expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.3%'
+      expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.33%'
 
       edit_grade = lambda do |field, score|
         field.click
@@ -158,20 +158,20 @@ describe "grades" do
 
       # test changing existing scores
       first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
-      edit_grade.(first_row_grade, 4)
-      assert_grade.("40%")
+      edit_grade.call(first_row_grade, 4)
+      assert_grade.call("40%")
 
       #using find with jquery to avoid caching issues
 
       # test changing unsubmitted scores
       third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
-      edit_grade.(third_grade, 10)
-      assert_grade.("97%")
+      edit_grade.call(third_grade, 10)
+      assert_grade.call("96.97%")
 
       driver.execute_script '$("#grade_entry").blur()'
     end
 
-    it "should display rubric on assignment" do
+    it "should display rubric on assignment", priority: "1", test_id: 229661 do
       get "/courses/#{@course.id}/grades"
 
       #click rubric
@@ -184,7 +184,7 @@ describe "grades" do
       expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
     end
 
-    it "should not display rubric on muted assignment" do
+    it "should not display rubric on muted assignment", priority: "1", test_id: 229662 do
       get "/courses/#{@course.id}/grades"
 
       @first_assignment.muted = true
@@ -194,7 +194,7 @@ describe "grades" do
       expect(f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")).not_to be_displayed
     end
 
-    it "should not display letter grade score on muted assignment" do
+    it "should not display letter grade score on muted assignment", priority: "1", test_id: 229663 do
       get "/courses/#{@course.id}/grades"
 
       @another_assignment = assignment_model({
@@ -213,7 +213,7 @@ describe "grades" do
       expect(f('.score_value').text).to eq ''
     end
 
-    it "should display assignment statistics" do
+    it "should display assignment statistics", priority: "1", test_id: 229664 do
       5.times do
         s = student_in_course(:active_all => true).user
         @first_assignment.grade_student(s, :grade => 4)
@@ -229,7 +229,7 @@ describe "grades" do
       expect(score_row).to include_text('Low: 3')
     end
 
-    it "should display teacher comments" do
+    it "should display teacher comments", priority: "1", test_id: 229665 do
       get "/courses/#{@course.id}/grades"
 
       #check comment
@@ -238,7 +238,7 @@ describe "grades" do
       expect(comment_row).to include_text('submission comment')
     end
 
-    it 'should not display name of anonymous reviewer' do
+    it 'should not display name of anonymous reviewer', priority: "1", test_id: 229666 do
       get "/courses/#{@course.id}/grades"
 
       f('.toggle_comments_link').click
@@ -246,12 +246,14 @@ describe "grades" do
       expect(comment_row).to include_text('Anonymous User')
     end
 
-    it "should not show assignment statistics on assignments with less than 5 submissions" do
+    it "should not show assignment statistics on assignments with less than 5 submissions", 
+        priority: "1", test_id: 229667 do
       get "/courses/#{@course.id}/grades"
       expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
     end
 
-    it "should not show assignment statistics on assignments when it is diabled on the course" do
+    it "should not show assignment statistics on assignments when it is diabled on the course", 
+        priority: "1", test_id: 229668 do
       # get up to a point where statistics can be shown
       5.times do
         s = student_in_course(:active_all => true).user
@@ -265,7 +267,7 @@ describe "grades" do
       expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
     end
 
-    it "should show rubric even if there are no comments" do
+    it "should show rubric even if there are no comments", priority: "1", test_id: 229669 do
       @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
       @third_submission = @third_assignment.submissions.create!(:user => @student_1) # unsubmitted submission :/
 
@@ -304,7 +306,7 @@ describe "grades" do
         @outcome_group.add_outcome(@outcome)
       end
 
-      it "should show the outcome gradebook" do
+      it "should show the outcome gradebook", priority: "1", test_id: 229670 do
         get "/courses/#{@course.id}/grades/"
         expect(f('#navpills')).not_to be_nil
         f('a[href="#outcomes"]').click
@@ -313,7 +315,7 @@ describe "grades" do
         expect(ff('#outcomes li.outcome').count).to eq @course.learning_outcome_links.count
       end
 
-      it "should show the outcome gradebook if the student is in multiple sections" do
+      it "should show the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
         @other_section = @course.course_sections.create(:name => "the other section")
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
@@ -328,7 +330,7 @@ describe "grades" do
   end
 
   context "as an observer" do
-    it "should allow observers to see grades of all enrollment associations" do
+    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
       @obs = user_model(:name => "Observer")
       e1 = @course.observer_enrollments.create(:user => @obs, :workflow_state => "active")
       e1.associated_user = @student_1

@@ -236,7 +236,7 @@ describe UserMerge do
     end
 
     it "should remove conflicting module progressions" do
-      course1.enroll_user(user1)
+      course1.enroll_user(user1, 'StudentEnrollment', enrollment_state:'active')
       course1.enroll_user(user2, 'StudentEnrollment', enrollment_state:'active')
       assignment = course1.assignments.create!(title:"some assignment")
       assignment2 = course1.assignments.create!(title:"some second assignment")
@@ -518,7 +518,6 @@ describe UserMerge do
       qs1 = @quiz_submission
       quiz_with_graded_submission([], user: user2)
       qs2 = @quiz_submission
-      Version.where(:versionable_type => "Quizzes::QuizSubmission", :versionable_id => qs2).update_all(:versionable_type => "QuizSubmission")
 
       expect(qs1.versions).to be_present
       qs1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }
@@ -576,7 +575,8 @@ describe UserMerge do
       expect(user1).to be_deleted
       expect(p1.reload.user).to eq @user2
       expect(cc1.reload).to be_retired
-      expect(@user2.communication_channels.all.map(&:path).sort).to eq ['user1@example.com', 'user2@example.com']
+      @user2.reload
+      expect(@user2.communication_channels.to_a.map(&:path).sort).to eq ['user1@example.com', 'user2@example.com']
       expect(@user2.all_pseudonyms).to eq [@p2, p1]
       expect(@user2.associated_shards).to eq [@shard1, Shard.default]
     end

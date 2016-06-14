@@ -18,11 +18,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-
 describe OauthProxyController do
 
   it 'redirects to the url in the state' do
-    get :redirect_proxy, state: JWT.encode({redirect_uri: 'http://example.com'}, Canvas::Security.encryption_key)
+    get :redirect_proxy, state: Canvas::Security.create_jwt({redirect_uri: 'http://example.com'})
     expect(response.location).to match('example.com')
   end
 
@@ -37,14 +36,14 @@ describe OauthProxyController do
   end
 
   it 'filters out rails added params' do
-    get :redirect_proxy, state: JWT.encode({redirect_uri: 'http://example.com'}, Canvas::Security.encryption_key)
+    get :redirect_proxy, state: Canvas::Security.create_jwt({redirect_uri: 'http://example.com'})
     jwt = URI.decode_www_form(URI.parse(response.location).query).first.last
-    params = JWT.decode(jwt, Canvas::Security.encryption_key).first
+    params = Canvas::Security.decode_jwt(jwt)
     expect(params.keys & %w(controller action)).to be_empty
   end
 
   it 'handles redirect urls with an existing query' do
-    get :redirect_proxy, state: JWT.encode({redirect_uri: 'http://example.com/test?foo=bar'}, Canvas::Security.encryption_key)
+    get :redirect_proxy, state: Canvas::Security.create_jwt({redirect_uri: 'http://example.com/test?foo=bar'})
     keys = URI.decode_www_form(URI.parse(response.location).query).map {|a| a[0]}
     expect(keys).to eq %w(foo state)
   end

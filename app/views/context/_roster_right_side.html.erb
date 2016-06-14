@@ -2,26 +2,35 @@
   <% if @context.is_a?(Course) %>
     <% if can_do(@context, @current_user, :read_roster) %>
       <%= sidebar_button context_url(@context, :context_groups_url),
-                        t('links.view_user_groups', 'View User Groups'),
-                        'group' %>
+                         t('links.view_user_groups', 'View User Groups'),
+                         'group' %>
     <% end %>
 
     <% if can_do(@context, @current_user, :manage_students && @context.enable_user_notes) %>
       <%= sidebar_button course_user_notes_path(@context),
-                        t('links.view_faculty_journals', 'View Faculty Journals') %>
+                         t('links.view_faculty_journals', 'View Faculty Journals') %>
     <% end %>
 
     <% if can_do(@context, @current_user, :manage_admin_users, :manage_students, :read_prior_roster) %>
       <%= sidebar_button course_prior_users_path(@context),
-                        t('links.view_prior_enrollments', 'View Prior Enrollments'),
-                        'clock' %>
+                         t('links.view_prior_enrollments', 'View Prior Enrollments'),
+                         'clock' %>
     <% end %>
   <% end %>
 
   <% if can_do(@context, @current_user, :read_roster) %>
     <%= sidebar_button context_url(@context, :context_user_services_url),
-                      t('links.view_services', 'View Registered Services'),
-                      'link' %>
+                       t('links.view_services', 'View Registered Services'),
+                       'link' %>
   <% end %>
+
+  <% if @context.is_a?(Course) %>
+    <% if @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+      <%= sidebar_button user_course_teacher_activity_url(@current_user, @context),
+                         t('Student Interactions Report'),
+                         'user' %>
+    <% end %>
+  <% end %>
+
 </div>
 

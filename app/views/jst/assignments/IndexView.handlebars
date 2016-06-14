@@ -9,16 +9,27 @@
 {{/if}}
 
 <div class="header-bar">
-  <div class="header-bar-left form-inline">
-    <input
-      id="search_term"
-      name="search_term"
-      type="search"
-      value=""
-      disabled
-      placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
-      aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
-    >
+  <div class="header-bar-left ic-Form-control assignment-search">
+    <div class="ic-Multi-input">
+      {{#if ENV.MULTIPLE_GRADING_PERIODS_ENABLED}}
+        <select class="ic-Input" id="grading_period_selector" aria-label="{{#t}}Select a Grading Period{{/t}}">
+          <option value="all">{{#t}}All Grading Periods{{/t}}</option>
+          {{#each ENV.active_grading_periods}}
+            <option value="{{@index}}">{{title}}</option>
+          {{/each}}
+        </select>
+      {{/if}}
+      <input
+        class="ic-Input"
+        id="search_term"
+        name="search_term"
+        type="search"
+        value=""
+        disabled
+        placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+        aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
+      >
+    </div>
   </div>
 
   <div class="header-bar-right">

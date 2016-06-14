@@ -1,7 +1,7 @@
 require File.expand_path('spec/selenium/common')
 
 describe "Sessions Timeout" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   describe "Validations" do 
     context "when you are logged in as an admin" do 

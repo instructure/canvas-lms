@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "gradebook uploads" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     course_with_teacher_logged_in(:active_all => 1, :username => 'teacher@example.com')
@@ -27,7 +27,7 @@ describe "gradebook uploads" do
     expect(ff('.right-highlight').length).to be 0
   end
 
-  it "should correctly update grades for assignments with GPA Scale grading type" do
+  it "should correctly update grades for assignments with GPA Scale grading type",priority: "1", test_id: 209969 do
     assignment = @course.assignments.create!(:title => "GPA Scale Assignment",
       :grading_type => "gpa_scale", :points_possible => 5)
     assignment.grade_student(@student, :grade => "D")
@@ -46,7 +46,7 @@ describe "gradebook uploads" do
     expect(assignment.submissions.last.grade).to eq "B-"
   end
 
-  it "should say no changes if no changes" do
+  it "should say no changes if no changes", priority: "1", test_id: 209970 do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, :grade => 10)
 
@@ -61,7 +61,7 @@ describe "gradebook uploads" do
   expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
   end
 
-  it "should show only changed assignment" do
+  it "should show only changed assignment", priority: "1", test_id: 209972 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
@@ -82,7 +82,7 @@ describe "gradebook uploads" do
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
-  it "should show a new assignment" do
+  it "should show a new assignment", priority: "1", test_id: 209975 do
     filename, fullpath, data = gradebook_file("gradebook3.csv",
       "Student Name,ID,Section,New Assignment",
       "User,#{@student.id},,0")
@@ -108,6 +108,7 @@ describe "gradebook uploads" do
 
     assignment_count = @course.assignments.count
     submit_form('#gradebook_grid_form')
+    accept_alert
     wait_for_ajaximations
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
@@ -142,7 +143,7 @@ describe "gradebook uploads" do
     expect(f('#no_changes_detected')).to be_displayed
   end
 
-  it "should show assignment with changes after matching assignment" do
+  it "should show assignment with changes after matching assignment", priority: "1", test_id: 209977 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
@@ -173,7 +174,7 @@ describe "gradebook uploads" do
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
-  it "should say no changes after matching student" do
+  it "should say no changes after matching student", priority: "1", test_id: 209978  do
     assignment = @course.assignments.create!(:title => "Assignment 1")
     assignment.grade_student(@student, :grade => 10)
 
@@ -198,7 +199,7 @@ describe "gradebook uploads" do
     expect(f('#no_changes_detected')).to be_displayed
   end
 
-  it "should show assignment with changes after matching student" do
+  it "should show assignment with changes after matching student", priority: "1", test_id: 209979 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
     assignment2 = @course.assignments.create!(:title => "Assignment 2")
@@ -228,7 +229,7 @@ describe "gradebook uploads" do
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
-  it "should highlight scores if the original grade is more than the new grade" do
+  it "should highlight scores if the original grade is more than the new grade", priority: "1", test_id: 209981 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
 
@@ -245,7 +246,7 @@ describe "gradebook uploads" do
     assert_assignment_is_highlighted
   end
 
-  it "should highlight scores if the original grade is replaced by empty grade" do
+  it "should highlight scores if the original grade is replaced by empty grade", priority: "1", test_id: 209982 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
 
@@ -262,13 +263,30 @@ describe "gradebook uploads" do
     assert_assignment_is_highlighted
   end
 
-  it "should not highlight scores if the original grade is less than the new grade" do
+  it "should not highlight scores if the original grade is less than the new grade", priority: "1", test_id: 209983 do
     assignment1 = @course.assignments.create!(:title => "Assignment 1")
     assignment1.grade_student(@student, :grade => 10)
 
     filename, fullpath, data = gradebook_file("gradebook2.csv",
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,100")
+
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
+    keep_trying_until { !f("#spinner").displayed? }
+
+    assert_assignment_is_not_highlighted
+  end
+
+  it "should not highlight scores if the assignment is excused", priority: "1", test_id: 209983 do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    filename, fullpath, data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 1",
+          "User,#{@student.id},,EX")
 
     @upload_element.send_keys(fullpath)
     @upload_form.submit

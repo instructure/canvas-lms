@@ -166,9 +166,6 @@ describe GradesPresenter do
 
 end
 
-class StudentEnrollment; end
-class ObserverEnrollment; end
-
 class FakeShard
   def activate; yield; end
 end

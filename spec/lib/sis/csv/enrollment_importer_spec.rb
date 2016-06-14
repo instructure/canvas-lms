@@ -133,11 +133,31 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.observers.first.name).to eq "User Quatro"
     expect(course.observer_enrollments.first.associated_user_id).to eq course.students.first.id
     expect(course.observer_enrollments.first.sis_source_id).to eq "test_1:user_5:#{observer_role.id}:Sec1"
-    expect(course.designers.first.name).to eq "User Cinco"
+    expect(course.users.where(enrollments: { type: 'DesignerEnrollment' }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
     expect(siete.start_at).to eq DateTime.new(1985, 8, 24)
     expect(siete.end_at).to eq DateTime.new(2011, 8, 29)
+  end
+
+  it "should enroll users by integration id" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "course_sis_id,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,integration_id,login_id,first_name,last_name,email,status",
+      "user_1,user_1_int,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,user_integration_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "course_sis_id,user_1_int,teacher,,active,,,",
+    )
+    pseudonym = @account.pseudonyms.where(integration_id: "user_1_int").first
+    course = pseudonym.user.enrollments.first.course
+
+    expect(pseudonym.sis_user_id).to eq 'user_1'
+    expect(course.sis_source_id).to eq 'course_sis_id'
   end
 
   it "should support sis stickiness" do
@@ -477,7 +497,9 @@ describe SIS::CSV::EnrollmentImporter do
 
     @observer.reload
     expect(@observer.enrollments.count).to eq 1
-    expect(@observer.enrollments.first.workflow_state).to eq 'completed'
+    e = @observer.enrollments.first
+    expect(e.workflow_state).to eq 'completed'
+    expect(e.completed_at).to be_present
   end
 
   it "should only queue up one DueDateCacher job per course" do
@@ -786,4 +808,5 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_deleted
   end
+
 end

@@ -12,7 +12,7 @@
     ENV = <%= raw js_env.to_json %>;
   </script>
 
-  <% jammit_css :mobile_auth %>
+  <% css_bundle :mobile_auth %>
   <%= include_css_bundles %>
   <%= include_account_css %>
 </head>

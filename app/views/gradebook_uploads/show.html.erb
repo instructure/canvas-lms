@@ -1,8 +1,6 @@
-<% content_for :page_title do %><%= join_title t(:page_title, "Gradebook"), @context.name %><% end %>
-
 <%
-  jammit_css :slickgrid
-  jammit_css :gradebook_uploads
+  content_for :page_title, join_title(t(:page_title, "Gradebook"), @context.name)
+  css_bundle :slickgrid, :gradebook_uploads
   js_bundle :gradebook_uploads
 %>
 
@@ -87,6 +85,11 @@
     <span id="assignments_without_changes_alert" style="display:none; margin-left: 50px;"><%= t('notices.unchanged', "Note: You uploaded some assignments that had no grade changes detected. They have been hidden.") %></span>
   </div>
 <% end -%>
+
+<div id="assignments_outside_current_periods" class="hidden">
+  <h4><%= t('headers.past_grading_periods_prevent_editing', "The following assignments cannot be edited because they are not in a current grading period:") %></h4>
+</div>
+
 <style>
   /*keep this here because jquery.rule needs it to stick in dynamic styles for the slick.grid to keep all of the columns the same width*/
 </style>

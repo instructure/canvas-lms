@@ -1,45 +1,49 @@
 <span class="non-screenreader" aria-hidden=true>
   {{#unless hideGrade}}
-    {{#ifAll submission submission.submitted_or_graded}}
+    {{#ifAll submission submission.excused}}
+      {{#t}}Excused{{/t}}
+    {{else}}
+      {{#ifAll submission submission.submitted_or_graded}}
 
-      {{#with submission}}
-        {{#if notYetGraded}}
+        {{#with submission}}
+          {{#if notYetGraded}}
 
-          <span class="score-display text-right ellipsis">
+            <span class="score-display text-right ellipsis">
+            {{#t "empty_points_possible"}}
+            -/{{pointsPossible}} pts
+            {{/t}}
+            </span>
+            <span class="grade-display text-left ellipsis">
+            {{#t "not_yet_graded"}}
+              <em>Not Yet Graded</em>
+            {{/t}}
+            </span>
+
+          {{else}}
+
+            <span class="score-display text-right ellipsis">
+                {{#t "score_with_points_possible"}}
+                <b>{{score}}</b>/{{pointsPossible}} pts
+                {{/t}}
+            </span>
+            <span class="grade-display text-left ellipsis">
+              <strong>
+                {{gradeDisplay}}
+              </strong>
+            </span>
+
+          {{/if}}
+        {{/with}}
+
+      {{else}}
+
+        <span data-tooltip="" class="score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
           {{#t "empty_points_possible"}}
           -/{{pointsPossible}} pts
           {{/t}}
-          </span>
-          <span class="grade-display text-left ellipsis">
-          {{#t "not_yet_graded"}}
-            <em>Not Yet Graded</em>
-          {{/t}}
-          </span>
+        </span>
 
-        {{else}}
-
-          <span class="score-display text-right ellipsis">
-              {{#t "score_with_points_possible"}}
-              <b>{{score}}</b>/{{pointsPossible}} pts
-              {{/t}}
-          </span>
-          <span class="grade-display text-left ellipsis">
-            <strong>
-              {{gradeDisplay}}
-            </strong>
-          </span>
-
-        {{/if}}
-      {{/with}}
-
-    {{else}}
-
-      <span data-tooltip="" class="score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
-        {{#t "empty_points_possible"}}
-        -/{{pointsPossible}} pts
-        {{/t}}
-      </span>
-
+      {{/ifAll}}
     {{/ifAll}}
   {{/unless}}
 </span>
@@ -50,31 +54,36 @@
       This assignment will not be assigned a grade.
     {{/t}}
   {{else}}
-    {{#ifAll submission submission.submitted_or_graded}}
-
-      {{#with submission}}
-        {{#if notYetGraded}}
-
-          {{#t "assignment_not_yet_graded_screenreader"}}
-            Assignment not yet graded. {{pointsPossible}} points possible.
-          {{/t}}
-
-        {{else}}
-
-          {{#t "score_with_points_possible_screenreader"}}
-            Score: {{score}} out of {{pointsPossible}} points.
-          {{/t}}
-          {{gradeDisplayForScreenreader}}
-
-        {{/if}}
-
-      {{/with}}
-
+    {{#ifAll submission submission.excused}}
+      {{#t}}This assignment has been excused.{{/t}}
     {{else}}
+      {{#ifAll submission submission.submitted_or_graded}}
 
-      {{#t "no_submission_for_assignment_screenreader"}}
-        No submission for this assignment. {{pointsPossible}} points possible.
-      {{/t}}
+        {{#with submission}}
+          {{#if notYetGraded}}
+
+            {{#t "assignment_not_yet_graded_screenreader"}}
+              Assignment not yet graded. {{pointsPossible}} points possible.
+            {{/t}}
+
+          {{else}}
+
+            {{#t "score_with_points_possible_screenreader"}}
+              Score: {{score}} out of {{pointsPossible}} points.
+            {{/t}}
+            {{gradeDisplayForScreenreader}}
+
+          {{/if}}
+
+        {{/with}}
+
+      {{else}}
+
+        {{#t "no_submission_for_assignment_screenreader"}}
+          No submission for this assignment. {{pointsPossible}} points possible.
+        {{/t}}
+
+      {{/ifAll}}
 
     {{/ifAll}}
   {{/if}}

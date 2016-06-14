@@ -1,4 +1,7 @@
-<% entry = sub_entry || nil; hide_entry ||= false; entry_context ||= entry ? entry.context : parent_entry.context %>
+<%
+   hide_entry ||= false
+   entry_context ||= entry ? entry.context : parent_entry.context
+%>
 <div id="<%= "entry_#{entry.id}" if entry %>" style="<%= hidden unless entry %>" class="communication_sub_message <%= 'toggled_communication_sub_message' if hide_entry %> <%= 'blank' unless entry %> can_be_marked_as_read <%= entry ? entry.read_state(@current_user) : 'read' %>" data-mark-read-url="<%= entry && context_url(entry_context, :api_v1_context_discussion_topic_discussion_entry_mark_read_url, entry.discussion_topic, entry)%>">
   <div class="header">
     <div class="header_title">

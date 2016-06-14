@@ -6,6 +6,6 @@
 <%
   js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
   js_bundle :syllabus
-  jammit_css :tinymce
+  css_bundle :tinymce
 %>
 <%= render :partial => 'assignments/syllabus_content' %>

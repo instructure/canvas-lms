@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignments" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "peer reviews" do
 
-    it "allows deleting a peer review" do
+    it "allows deleting a peer review", priority: "2", test_id: 216382 do
       course_with_teacher_logged_in
       @student1 = student_in_course.user
       @student2 = student_in_course.user
@@ -29,7 +29,7 @@ describe "assignments" do
       expect(@assignment.submissions.map(&:assessment_requests).flatten.length).to eq 1
     end
 
-    it "allows an account admin who is also a student to submit a peer review" do
+    it "allows an account admin who is also a student to submit a peer review", priority: "2", test_id: 216383 do
       course(active_course: true)
       admin_logged_in(account: @course.root_account)
       student_in_course(user: @admin)
@@ -110,17 +110,17 @@ describe "assignments" do
     context 'when reviewed is logged in' do
       before(:each) { user_logged_in(user: reviewed) }
 
-      it 'should block reviewer name on assignments page' do
+      it 'should block reviewer name on assignments page', priority: "1", test_id: 216384 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}"
         expect(f("#comment-#{comment.id} .signature")).to include_text(t("Anonymous User"))
       end
 
-      it 'should hide comment reviewer name on submission page' do
+      it 'should hide comment reviewer name on submission page', priority: "1", test_id: 216385 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(t("Anonymous User"))
       end
 
-      it 'should hide comment reviewer name on rubric popup' do
+      it 'should hide comment reviewer name on rubric popup', priority: "1", test_id: 216386 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -131,12 +131,12 @@ describe "assignments" do
     context 'when reviewer is logged in' do
       before(:each) { user_logged_in(user: reviewer) }
 
-      it 'should show comment reviewer name on submission page' do
+      it 'should show comment reviewer name on submission page', priority: "1", test_id: 216387 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
 
-      it 'should show comment reviewer name on rubric popup' do
+      it 'should show comment reviewer name on rubric popup', priority: "1", test_id: 216388 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -147,12 +147,12 @@ describe "assignments" do
     context 'when teacher is logged in' do
       before(:each) { user_logged_in(user: teacher) }
 
-      it 'should show comment reviewer name on submission page' do
+      it 'should show comment reviewer name on submission page', priority: "1", test_id: 216389 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
 
-      it 'should show comment reviewer name on rubric popup' do
+      it 'should show comment reviewer name on rubric popup', priority: "1", test_id: 216391 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations

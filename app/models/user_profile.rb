@@ -25,9 +25,6 @@ class UserProfile < ActiveRecord::Base
 
   has_many :links, :class_name => 'UserProfileLink', :dependent => :destroy
 
-  EXPORTABLE_ATTRIBUTES = [:id, :bio, :title, :user_id]
-  EXPORTABLE_ASSOCIATIONS = [:user, :links]
-
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS, TAB_LOGOUT,
@@ -60,7 +57,7 @@ class UserProfile < ActiveRecord::Base
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
           @tabs << {
             :id => tool.asset_string,
-            :label => tool.label_for(:user_navigation, opts[:language]),
+            :label => tool.label_for(:user_navigation, opts[:language] || I18n.locale),
             :css_class => tool.asset_string,
             :href => :user_external_tool_path,
             :args => [user.id, tool.id]

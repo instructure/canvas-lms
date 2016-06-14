@@ -3,7 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
 describe "admin_tools" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include Calendar2Common
 
   def load_admin_tools_page
     get "/accounts/#{@account.id}/admin_tools"
@@ -332,7 +333,7 @@ describe "admin_tools" do
         @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
       end
 
-      @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher).first
+      @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher, graded_anonymously: true).first
 
       load_admin_tools_page
       click_view_tab "logging"
@@ -346,7 +347,7 @@ describe "admin_tools" do
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
 
       cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:last td')
-      expect(cols.size).to eq 8
+      expect(cols.size).to eq 9
 
       expect(cols[2].text).to eq "-"
       expect(cols[3].text).to eq "7"
@@ -354,6 +355,16 @@ describe "admin_tools" do
       expect(cols[5].text).to eq @student.name
       expect(cols[6].text).to eq @course.name
       expect(cols[7].text).to eq @assignment.title
+      expect(cols[8].text).to eq "n"
+    end
+
+    it "displays 'y' if graded anonymously" do
+      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
+      f('#loggingGradeChange button[name=gradeChange_submit]').click
+      wait_for_ajaximations
+
+      cols = ffj('#gradeChangeLoggingSearchResults table tbody tr:first td')
+      expect(cols[8].text).to eq "y"
     end
 
     it "should search by student name" do

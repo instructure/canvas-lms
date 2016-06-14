@@ -38,7 +38,7 @@ class PluginSetting < ActiveRecord::Base
   after_save :clear_cache
   after_destroy :clear_cache
   after_initialize :initialize_plugin_setting
-  
+
   def validate_uniqueness_of_name?
     true
   end
@@ -85,8 +85,10 @@ class PluginSetting < ActiveRecord::Base
           value = settings.delete(key)
           settings.delete("#{key}_dec".to_sym)
           if value == DUMMY_STRING  # no change, use what was there previously
-            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
-            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+            unless settings_was.nil? # we wont have setting_was if we are a new plugin
+              settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
+              settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+            end
           else
             settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
           end
@@ -94,38 +96,39 @@ class PluginSetting < ActiveRecord::Base
       end
     end
   end
-  
+
   def enabled?
     read_attribute(:disabled) != true
   end
 
   def self.cached_plugin_setting(name)
     plugin_setting = MultiCache.fetch(settings_cache_key(name)) do
-      PluginSetting.find_by_name(name.to_s) || :nil
+      PluginSetting.find_by_name(name.to_s)
     end
-    plugin_setting = nil if plugin_setting == :nil
     plugin_setting
   end
 
   def self.settings_for_plugin(name, plugin=nil)
-    if (plugin_setting = cached_plugin_setting(name)) && plugin_setting.valid_settings? && plugin_setting.enabled?
-      plugin_setting.plugin = plugin
-      settings = plugin_setting.settings
-    else
-      plugin ||= Canvas::Plugin.find(name.to_s)
-      raise Canvas::NoPluginError unless plugin
-      settings = plugin.default_settings
-    end
+    RequestCache.cache('settings_for_plugin', name) do
+      if (plugin_setting = cached_plugin_setting(name)) && plugin_setting.valid_settings? && plugin_setting.enabled?
+        plugin_setting.plugin = plugin
+        settings = plugin_setting.settings
+      else
+        plugin ||= Canvas::Plugin.find(name.to_s)
+        raise Canvas::NoPluginError unless plugin
+        settings = plugin.default_settings
+      end
 
-    settings
+      settings
+    end
   end
 
   def self.settings_cache_key(name)
-    ["settings_for_plugin2", name].cache_key
+    ["settings_for_plugin3", name].cache_key
   end
 
   def clear_cache
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       MultiCache.delete(PluginSetting.settings_cache_key(self.name))
     end
   end
@@ -141,4 +144,7 @@ class PluginSetting < ActiveRecord::Base
   def self.find_by_name(name)
     where(name: name).first
   end
+
+  # stub for plugins who want to do something fancy
+  def self.current_account=(_); end
 end

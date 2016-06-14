@@ -66,8 +66,7 @@ define [
       'Content-Type': 'application/json'
       JSON.stringify {}
     ]
-    confirmStub = sinon.stub window, 'confirm'
-    confirmStub.returns true
+    @stub window, 'confirm', -> true
 
     # when
     view.$('.delete-group').click()
@@ -76,4 +75,3 @@ define [
     ok not view.$el.hasClass('hidden'), 'group hidden'
 
     server.restore()
-    confirmStub.restore()

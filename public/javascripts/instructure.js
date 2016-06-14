@@ -52,8 +52,7 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
-  'vendor/jquery.placeholder',
-  'compiled/smartbanner'
+  'vendor/jquery.placeholder'
 ], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
@@ -214,20 +213,6 @@ define([
         event.preventDefault();
         $text.show();
         $(this).hide();
-      }
-    });
-
-    $(".custom_search_results_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#custom_search_results_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
-        width: 600,
-        height: 400
-      });
-      var control = $dialog.data('searchControl');
-      if(control) {
-        control.execute($("title").text());
       }
     });
 
@@ -868,14 +853,18 @@ define([
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message").last();
       var $prevItem = $(this).closest('.to-do-list > li').prev()
-      var toFocus = ($prevItem.find('.al-trigger').length && $prevItem.find('.al-trigger')) ||
+      var toFocus = ($prevItem.find('.disable-todo-item-link').length && $prevItem.find('.disable-todo-item-link')) ||
                     $('.event-list-view-calendar')
       var url = $(this).data('api-href');
+      var flashMessage = $(this).data('flash-message');
       function remove(delete_url) {
         $item.confirmDelete({
           url: delete_url,
           noMessage: true,
           success: function() {
+            if (flashMessage) {
+              $.flashMessage(flashMessage);
+            }
             $(this).slideUp(function() {
               $(this).remove();
               toFocus.focus();
@@ -893,6 +882,7 @@ define([
     setTimeout(function() {
       $("#content a:external,#content a.explicit_external_link").each(function(){
         $(this)
+          .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
           .addClass('external')

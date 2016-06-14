@@ -28,7 +28,7 @@ describe Moodle::Converter do
   end
 
   context "discussion topics" do
-    it "should convert discussion topics" do
+    it "should convert discussion topics and announcements" do
       expect(@course.discussion_topics.count).to eq 2
 
       dt = @course.discussion_topics.first
@@ -36,9 +36,9 @@ describe Moodle::Converter do
       expect(dt.message).to eq "<p>Description of hidden forum</p>"
       expect(dt.unpublished?).to eq true
 
-      dt2 = @course.discussion_topics.last
-      expect(dt2.title).to eq "News forum"
-      expect(dt2.message).to eq "<p>General news and announcements</p>"
+      ann = @course.announcements.first
+      expect(ann.title).to eq "News forum"
+      expect(ann.message).to eq "<p>General news and announcements</p>"
     end
   end
 
@@ -84,6 +84,18 @@ describe Moodle::Converter do
       expect(quiz.description).to match /Sumary/
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 10
+    end
+  end
+
+  context "modules" do
+    it "should convert modules and module items" do
+      expect(@course.context_modules.count).to eq 8
+      expect(@course.context_module_tags.where(:content_type => "Assignment", :title => "Assignment Name")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My Sample Page")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "ContextModuleSubHeader", :title => "This is some label text")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "DiscussionTopic", :title => "Hidden Forum")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "Quizzes::Quiz", :title => "Quiz Name")).to be_exists
+      expect(@course.context_module_tags.where(:content_type => "ExternalUrl", :title => "my sample url")).to be_exists
     end
   end
 end

@@ -1,30 +1,31 @@
+<% current_conference ||= nil %>
 <% conference = current_conference %>
 <% if conference.active? && can_do(conference, @current_user, :join) %>
-<div class="global-message image-block conference">
-  <div class="image-block-image">
-    <i class="information-icon"></i>
-    <span class="hidden-inline-text">
-      <%= accessible_message_icon_text("information") %>
+<div class="ic-notification conference">
+  <div class="ic-notification__icon" role="presentation">
+    <i class="icon-invitation"></i>
+    <span class="screenreader-only">
+      <%= accessible_message_icon_text("invitation") %>
     </span>
   </div>
-  <div class="image-block-content">
-    <div class="message">
-      <p><%=
-          mt(:current_conference_text, "You have been invited to join **[%{conference}](%{link_to_conference})**. It started at %{started_at} and has %{participant_count}.", {
-            :conference => conference.title,
-            :link_to_conference => context_url(@context, :context_conference_url, conference.id),
-            :started_at => time_string(conference.started_at),
-            :participant_count => t(:participant_count, "participant", :count => conference.added_users.length)
-          })
-        %></p>
+  <div class="ic-notification__content">
+    <div class="ic-notification__message notification_message">
+      <%=
+        mt(:current_conference_text, "You have been invited to join **[%{conference}](%{link_to_conference})**. It started at %{started_at} and has %{participant_count}.", {
+          :conference => conference.title,
+          :link_to_conference => context_url(@context, :context_conference_url, conference.id),
+          :started_at => time_string(conference.started_at),
+          :participant_count => t(:participant_count, "participant", :count => conference.added_users.length)
+        })
+      %>
     </div>
-    <div class="buttons">
+    <div class="ic-notification__actions">
       <% if can_do(conference, @current_user, :close) %>
         <a href="<%= context_url(@context, :context_conference_close_url, conference.id) %>" class="btn btn-small close_conference_link">
           <%= t('#conferences.show.buttons.close', "End it now") %>
         </a>
       <% end %>
-      <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, conference.id) %>" class="btn btn-small btn-primary join_conference_link">
+      <a target="_blank" href="<%= context_url(@context, :context_conference_join_url, conference.id) %>" class="Button Button--small Button--primary join_conference_link">
         <%= t('#conferences.show.buttons.join', "Join it now") %>
       </a>
     </div>

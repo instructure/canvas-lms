@@ -14,5 +14,8 @@ vendor
 /tinymce/jscripts/tiny_mce/utils
 /old_unsupported_dont_use_react.js
 
+# vendor package in analytics
+/plugins/analytics/react-bootstrap-table.js
+
 # need better hinting, skipping this atm due to false positives in vendor code
 /client_apps

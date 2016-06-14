@@ -59,6 +59,50 @@ module Canvas::LiveEvents
     })
   end
 
+  def self.get_assignment_data(assignment)
+    {
+      assignment_id: assignment.global_id,
+      title: LiveEvents.truncate(assignment.title),
+      description: LiveEvents.truncate(assignment.description),
+      due_at: assignment.due_at,
+      unlock_at: assignment.unlock_at,
+      lock_at: assignment.lock_at,
+      updated_at: assignment.updated_at,
+      points_possible: assignment.points_possible
+    }
+  end
+
+  def self.get_submission_data(submission)
+    {
+      submission_id: submission.global_id,
+      assignment_id: submission.global_assignment_id,
+      submitted_at: submission.submitted_at,
+      updated_at: submission.updated_at,
+      score: submission.score,
+      grade: submission.grade,
+      submission_type: submission.submission_type,
+      body: LiveEvents.truncate(submission.body),
+      url: submission.url,
+      attempt: submission.attempt
+    }
+  end
+
+  def self.assignment_created(assignment)
+    LiveEvents.post_event('assignment_created', get_assignment_data(assignment))
+  end
+
+  def self.submission_created(submission)
+    LiveEvents.post_event('submission_created', get_submission_data(submission))
+  end
+
+  def self.assignment_updated(assignment)
+    LiveEvents.post_event('assignment_updated', get_assignment_data(assignment))
+  end
+
+  def self.submission_updated(submission)
+    LiveEvents.post_event('submission_updated', get_submission_data(submission))
+  end
+
   def self.logged_in(session)
     LiveEvents.post_event('logged_in', {
       redirect_url: session[:return_to]

@@ -121,7 +121,7 @@ module AccountReports::ReportHelper
   def add_course_sub_account_scope(scope, table = 'courses')
     if account != root_account
       scope.where("EXISTS (SELECT course_id
-                           FROM course_account_associations caa
+                           FROM #{CourseAccountAssociation.quoted_table_name} caa
                            WHERE caa.account_id = ?
                            AND caa.course_id=#{table}.id
                            AND caa.course_section_id IS NULL)", account)
@@ -141,7 +141,7 @@ module AccountReports::ReportHelper
   def add_user_sub_account_scope(scope,table = 'users')
     if account != root_account
       scope.where("EXISTS (SELECT user_id
-                           FROM user_account_associations uaa
+                           FROM #{UserAccountAssociation.quoted_table_name} uaa
                            WHERE uaa.account_id = ?
                            AND uaa.user_id=#{table}.id)", account)
     else
@@ -194,7 +194,17 @@ module AccountReports::ReportHelper
     end
   end
 
-  def report_title(account_report )
+  def include_deleted_objects
+    if @account_report.has_parameter? "include_deleted"
+      @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
+
+      if @include_deleted
+        add_extra_text(I18n.t('Include Deleted Objects;'))
+      end
+    end
+  end
+
+  def report_title(account_report)
     AccountReports.available_reports[account_report.report_type].title
   end
 

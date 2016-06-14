@@ -95,6 +95,17 @@ hr {
     display: inline;
     padding-left: 0px;
   }
+  div.module_options {
+    display: inline-block;
+    margin: 5px 38px 5px;
+    padding: 5px;
+    background-color: $ic-bg-light-primary;
+    border: solid 1px $ic-brand-primary;
+
+    .ic-Form-control {
+      margin-bottom: 0;
+    }
+  }
   li.top-level-treeitem {
     margin: 10px 0px 10px 0px;
     border: 1px solid lightgray;
@@ -105,21 +116,23 @@ hr {
   }
   li.normal-treeitem {
     min-height: 32px;
+    padding-left: 33px;
   }
   li {
     list-style: none;
     > .treeitem-heading {
       padding: 5px;
-      padding-left: 33px;
       &:hover {
         background-color: $ic-bg-light-primary;
+      }
+      .sub_count {
+        font-style: italic;
       }
     }
   }
   li li li li li {
     > .treeitem-heading {
       padding: 5px;
-      padding-left: 63px;
     }
   }
   li.small-spacing {

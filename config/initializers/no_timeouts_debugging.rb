@@ -8,7 +8,7 @@ if (Rails.env.development? || Rails.env.test?) && RUBY_VERSION >= '2.1.'
   # block), or simply debug anything in canvas that has timeouts
   module NoRaiseTimeoutsWhileDebugging
     def raise(*args)
-      if args.first.is_a?(Timeout::ExitException) && defined?(Byebug) && Byebug.started?
+      if args.first.is_a?(Timeout::ExitException) && defined?(Byebug) && Byebug.respond_to?(:started?) && Byebug.started?
         return
       end
       super

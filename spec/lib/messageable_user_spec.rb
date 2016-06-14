@@ -50,7 +50,7 @@ describe "MessageableUser" do
         select(MessageableUser.build_select(
           :common_course_column => "'course'",
           :common_role_column => 'enrollments.type')).
-        joins('INNER JOIN enrollments ON enrollments.user_id=users.id').
+        joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id").
         where(:id => @ta.id).
         group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
         first
@@ -63,7 +63,7 @@ describe "MessageableUser" do
       group2 = group_with_user(:user => @user, :active_all => true).group
       messageable_user = MessageableUser.
         select(MessageableUser.build_select(:common_group_column => "group_memberships.group_id")).
-        joins('INNER JOIN group_memberships ON group_memberships.user_id=users.id').
+        joins("INNER JOIN #{GroupMembership.quoted_table_name} ON group_memberships.user_id=users.id").
         where(:id => @user).
         group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS)).
         first

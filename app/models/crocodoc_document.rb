@@ -22,7 +22,8 @@ class CrocodocDocument < ActiveRecord::Base
   attr_accessible :uuid, :process_state, :attachment_id
 
   belongs_to :attachment
-  has_many :crocodoc_annotations
+
+  has_and_belongs_to_many :submissions, -> { readonly(true) }, join_table: :canvadocs_submissions
 
   MIME_TYPES = %w(
     application/pdf
@@ -32,7 +33,7 @@ class CrocodocDocument < ActiveRecord::Base
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/excel
     application/vnd.ms-excel
-  )
+  ).freeze
 
   def upload
     return if uuid.present?
@@ -67,7 +68,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:user] = user.crocodoc_user
     end
 
-    opts.merge! permissions_for_user(user)
+    opts.merge! permissions_for_user(user, opts[:crocodoc_ids])
 
     unless annotations_on
       opts[:filter] = 'none'
@@ -81,7 +82,7 @@ class CrocodocDocument < ActiveRecord::Base
     end
   end
 
-  def permissions_for_user(user)
+  def permissions_for_user(user, whitelist = nil)
     opts = {
       :filter => 'none',
       :admin => false,
@@ -95,13 +96,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = user.crocodoc_id!
     end
 
-    submissions = attachment.attachment_associations.
-      where(:context_type => 'Submission').
-      includes(:context).
-      map(&:context)
-
-    return opts unless submissions
-
+    submissions = self.submissions.preload(:assignment)
     if submissions.any? { |s| s.grants_right? user, :read_grade }
       opts[:filter] = 'all'
 
@@ -110,7 +105,36 @@ class CrocodocDocument < ActiveRecord::Base
       end
     end
 
+    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
+      opts[:editable] = false
+      opts[:filter] = 'none'
+    end
+
+    apply_whitelist(user, opts, whitelist) if whitelist
+
     opts
+  end
+
+  def apply_whitelist(user, opts, whitelist)
+    whitelisted_users = case opts[:filter]
+    when 'all'
+      whitelist
+    when 'none'
+      []
+    else
+      opts[:filter].to_s.split(',').map(&:to_i) & whitelist
+    end
+
+    unless whitelisted_users.include?(user.crocodoc_id!)
+      opts[:admin] = false
+      opts[:editable] = false
+    end
+
+    opts[:filter] = if whitelisted_users.empty?
+      'none'
+    else
+      whitelisted_users.join(',')
+    end
   end
 
   def available?

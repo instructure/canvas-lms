@@ -1,13 +1,13 @@
 {
   "name": "react-router",
-  "version": "0.11.6",
+  "version": "0.13.4",
+  "description": "A complete routing library for React.js",
+  "main": "build/umd/ReactRouter.js",
   "homepage": "https://github.com/rackt/react-router",
   "authors": [
     "Ryan Florence",
     "Michael Jackson"
   ],
-  "description": "A complete routing library for React.js",
-  "main": "dist/react-router.js",
   "keywords": [
     "react",
     "router"
@@ -17,10 +17,10 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "specs",
+    "docs",
     "modules",
     "examples",
-    "script",
+    "scripts",
     "CONTRIBUTING.md",
     "karma.conf.js",
     "package.json",

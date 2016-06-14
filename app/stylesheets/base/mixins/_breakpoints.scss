@@ -6,6 +6,9 @@
   @else if $breakpoint == tablet {
     @media only screen and (min-width: 768px) { @content; }
   }
+  @else if $breakpoint == large-tablet {
+    @media only screen and (min-width: 880px) { @content; }
+  }
   @else if $breakpoint == desktop {
     @media only screen and (min-width: 992px) { @content; }
   }

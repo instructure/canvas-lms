@@ -8,6 +8,7 @@ define [
   # among other things, tells you where it positioned it relative to the target. we use it to add some
   # css classes that handle putting the pointer triangle (aka: caret) back to the trigger.
   using = ( position, feedback ) ->
+    position.top = 0 if position.top < 0
     $( this )
       .css( position )
       .toggleClass('carat-bottom', feedback.vertical == 'bottom')

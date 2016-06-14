@@ -19,36 +19,37 @@
 module Lti
   class MessageHandler < ActiveRecord::Base
 
-    BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'
+    BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'.freeze
+    TOOL_PROXY_REREGISTRATION_REQUEST = 'ToolProxyRegistrationRequest'.freeze
 
-    attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource_handler, :links
+    attr_accessible :message_type, :placements, :launch_path, :capabilities, :parameters, :resource_handler, :links
     attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
-    has_many :links, :class_name => 'Lti::LtiLink'
 
-    has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
+    has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
+
+    has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'").preload(context_module: :content_tags) }, as: :content, class_name: 'ContentTag'
 
     serialize :capabilities
     serialize :parameters
 
     validates_presence_of :message_type, :resource_handler, :launch_path
 
-    scope :by_message_types, lambda { |*message_types| where('lti_message_handlers.message_type IN (?)', message_types) }
+    scope :by_message_types, lambda { |*message_types| where(message_type: message_types) }
 
     scope :for_context, lambda { |context|
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)
-      joins(:resource_handler).where('lti_resource_handlers.tool_proxy_id' => tool_proxies)
+      joins(:resource_handler).where(lti_resource_handlers: { tool_proxy_id: tool_proxies })
     }
 
     scope :has_placements, lambda { |*placements|
-      where('EXISTS (
-              SELECT * FROM lti_resource_placements
-              WHERE lti_message_handlers.resource_handler_id = lti_resource_placements.resource_handler_id
-              AND lti_resource_placements.placement IN (?) )', placements)
+      where('EXISTS (?)',
+            Lti::ResourcePlacement.where(placement: placements).
+                where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
     }
 
-    def self.lti_apps_tabs(context, placements, opts)
+    def self.lti_apps_tabs(context, placements, _opts)
       apps = Lti::MessageHandler.for_context(context).
         has_placements(*placements).
         by_message_types(Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST).to_a

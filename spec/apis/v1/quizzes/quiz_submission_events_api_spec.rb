@@ -63,9 +63,9 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
-      expect(scope.count).to eq 0
+      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
       api_create({raw:true}, {"quiz_submission_events" => events_data })
-      expect(scope.count).to eq 2
+      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
 
       scope.where(event_type: 'question_answered').first.tap do |event|
         expect(event.event_type).to eq('question_answered')
@@ -81,9 +81,9 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
-      expect(scope.count).to eq 0
+      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
       api_create({raw:true}, {"quiz_submission_events" => events_data })
-      expect(scope.count).to eq 2
+      expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
 
       scope.where(event_type: 'question_answered').first.tap do |event|
         expect(event.client_timestamp == events_data.first["client_timestamp"]).to be_truthy
@@ -154,8 +154,10 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
 
         it 'should work' do
           api_index({ attempt: 1 })['quiz_submission_events'].tap do |events|
-            expect(events.count).to eq(1)
-            expect(events[0]['event_type']).to eq('a')
+            expect(events.count).to eq(2)
+            expect(events[0]['event_type']).to eq('submission_created')
+            expect(events[1]['event_type']).to eq('a')
+
           end
 
           api_index({ attempt: 2 })['quiz_submission_events'].tap do |events|

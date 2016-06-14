@@ -21,6 +21,10 @@
       display: none
     }
   }
+  .data_description {
+    font-size: 0.8em;
+    color: $ic-color-dark;
+  }
 }
 
 #user_bio {
@@ -56,6 +60,10 @@
       height: 30px;
     }
   }
+}
+
+li[id$=service_google_docs] {
+  display: none;
 }
 
 #unregistered_services {
@@ -175,7 +183,7 @@
 
 .select-photo-link {
   display: block;
-  font-size: 18px;
+  @include fontSize(18px);
   font-weight: bold;
   padding: 0 0 16px 0;
   text-align: center;
@@ -260,4 +268,8 @@
   border: 2px solid #D3D9D9;
   box-sizing: border-box;
   margin: -2px;
+}
+
+#disable_inbox {
+  vertical-align: top;
 }

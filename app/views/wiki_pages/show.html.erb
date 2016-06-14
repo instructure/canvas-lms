@@ -1,6 +1,37 @@
 <%
   content_for :page_title, join_title(@page.title.to_s, @context.name)
   js_bundle :wiki_page_show
+  css_bundle :wiki_page
 %>
 
+<script>
+  function bzRetainedInfoSetup() {
+    var textareas = document.querySelectorAll("[data-bz-retained]");
+    for(var i = 0; i < textareas.length; i++) {
+      (function(ta) {
+        var name = ta.getAttribute("data-bz-retained");
+
+        var save = function() {
+          var http = new XMLHttpRequest();
+          http.open("POST", "/bz/user_retained_data", true);
+          var data = "name=" + encodeURIComponent(name) + "&value=" + encodeURIComponent(ta.value);
+          http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          http.send(data);
+        };
+
+        ta.addEventListener("change", save);
+
+        var http = new XMLHttpRequest();
+        http.onload = function() {
+            // cut off json p stuff
+            ta.value = http.responseText.substring(9);
+        };
+        http.open("GET", "/bz/user_retained_data?name=" + encodeURIComponent(name), true);
+        http.send();
+      })(textareas[i]);
+    }
+  }
+</script>
+
+<%= render "shared/mark_as_done" %>
 <div id="wiki_page_show"></div>

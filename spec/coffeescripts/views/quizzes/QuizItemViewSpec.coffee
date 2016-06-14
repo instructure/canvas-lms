@@ -49,11 +49,10 @@ define [
     view = createView(quiz)
     quiz.destroy = -> true
 
-    confirmed = false
-    window.confirm = -> confirmed = true
+    @stub(window, "confirm", -> true )
 
     view.$('.delete-item').simulate 'click'
-    ok confirmed
+    ok window.confirm.called
 
   test 'confirm delete destroys model', ->
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true)
@@ -61,6 +60,7 @@ define [
 
     destroyed = false
     quiz.destroy = ->  destroyed = true
+    @stub(window, "confirm", -> true )
 
     view.$('.delete-item').simulate 'click'
     ok destroyed

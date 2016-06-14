@@ -41,7 +41,7 @@ define [
       dimensions = ""
       if tagType is 'video'
         dimensions = " width='#{width}' height='#{height}'"
-      html = "<#{tagType} #{dimensions} preload='none' controls>#{st_tags}</#{tagType}>"
+      html = "<#{tagType} #{dimensions} preload='metadata' controls>#{st_tags}</#{tagType}>"
       $(html)
   }
 

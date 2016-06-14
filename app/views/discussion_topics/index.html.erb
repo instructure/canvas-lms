@@ -7,5 +7,5 @@
   content_for :auto_discovery, auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), {:title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed")})
 
   js_bundle :discussion_topics_index
-  jammit_css :discussions_list
+  css_bundle :discussions_list
 %>

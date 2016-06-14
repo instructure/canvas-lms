@@ -18,16 +18,12 @@
 
 # On click of the given element, display the profile picture picker dialog.
 
-define ['jquery', 'compiled/util/ProximityLoader'], ($, ProximityLoader) ->
+define ['jquery', 'compiled/views/profiles/AvatarDialogView'], ($, AvatarDialogView) ->
 
   class AvatarWidget
 
-    # Internal: Number of attempts to display widget before script has loaded.
-    _attemptedLoads: 0
-
     constructor: (el) ->
       @$el = $(el)
-      @_initializeLoader()
       @_attachEvents()
 
     # Internal: Add click event to @$el to open widget.
@@ -36,22 +32,6 @@ define ['jquery', 'compiled/util/ProximityLoader'], ($, ProximityLoader) ->
     _attachEvents: ->
       @$el.on('click', @_openAvatarDialog)
 
-    # Internal: Create a new ProximityLoader to handle script loading.
-    #
-    # Returns nothing.
-    _initializeLoader: ->
-      @loader = new ProximityLoader @$el,
-        callback: @_initializeDialog
-        dependencies: ['compiled/views/profiles/AvatarDialogView']
-
-    # Internal: Create/cache an instance of AvatarDialogView.
-    #
-    # AvatarDialogView - The AvatarDialogView class.
-    #
-    # Returns an AvatarDialogView.
-    _initializeDialog: (AvatarDialogView) =>
-      @avatarDialog = new AvatarDialogView
-
     # Internal: Attempt to open the avatar widget.
     #
     # e - Event object.
@@ -59,20 +39,5 @@ define ['jquery', 'compiled/util/ProximityLoader'], ($, ProximityLoader) ->
     # Returns nothing.
     _openAvatarDialog: (e) =>
       e?.preventDefault()
-
-      if typeof @avatarDialog isnt 'undefined'
-        @avatarDialog.show()
-      else
-        @_pollScriptLoad()
-
-    # Internal: Determine how long we've waited for the Avatar scripts to load.
-    #
-    # Returns nothing (or throws exception at 2s mark).
-    _pollScriptLoad: ->
-      @loader.deferred.resolve()
-
-      if @_attemptedLoads < 20
-        @_attemptedLoads++
-        setTimeout(@_openAvatarDialog, 100)
-      else
-        throw new Error('Failed to load AvatarDialogView')
+      @avatarDialog = new AvatarDialogView
+      @avatarDialog.show()

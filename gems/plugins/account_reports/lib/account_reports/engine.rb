@@ -26,6 +26,7 @@ module AccountReports
       require 'account_reports/report_helper'
       require 'account_reports/sis_exporter'
       require 'account_reports/student_reports'
+      require 'account_reports/lti_reports'
 
       AccountReports.configure_account_report 'Default', {
         'grade_export_csv' => {
@@ -46,7 +47,7 @@ module AccountReports
         'last_user_access_csv' => {
           :title => proc { I18n.t(:last_user_access_title, 'Last User Access') },
           :description_partial => true,
-          :parameters_partial => 'term_selector_parameters',
+          :parameters_partial => 'grade_export_csv_parameters',
           :parameters => {
             :enrollment_term_id => {
               :required => false,
@@ -55,6 +56,25 @@ module AccountReports
             :course_id => {
               :required => false,
               :description => 'The course to report on'
+            },
+            :include_deleted => {
+              :required => false,
+              :description => 'Include deleted objects'
+            }
+          }
+        },
+        'last_enrollment_activity_csv' => {
+          :title => proc { I18n.t('Last Enrollment Activity') },
+          :description_partial => true,
+          :parameters_partial => 'term_selector_parameters',
+          :parameters => {
+            :enrollment_term_id => {
+              :required => false,
+              :description => 'The canvas id of the term\'s courses to get activity from'
+            },
+            :course_id => {
+              :required => false,
+              :description => 'The course\'s enrollments to report on'
             }
           }
         },
@@ -267,6 +287,16 @@ module AccountReports
               :description => 'The course to report on'
             }
           }
+        },
+        'user_access_tokens_csv' => {
+          :title => proc { I18n.t(:user_access_tokens_title, 'User Access Tokens') },
+          :description_partial => true,
+          :parameters => {
+          }
+        },
+        'lti_report_csv' => {
+          :title => proc { I18n.t('LTI Report') },
+          :description_partial => true
         }
       }
     end

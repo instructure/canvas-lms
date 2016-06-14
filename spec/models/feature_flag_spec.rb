@@ -59,15 +59,6 @@ describe FeatureFlag do
       flag = t_sub_account.feature_flags.build(feature: 'root_account_feature')
       expect(flag).not_to be_valid
     end
-
-    it "should validate the locking account is in the chain" do
-      flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: t_sub_account)
-      expect(flag).to be_valid
-
-      other_account = account_model
-      flag = t_course.feature_flags.build(feature: 'course_feature', state: 'on', locking_account: other_account)
-      expect(flag).not_to be_valid
-    end
   end
 
   describe "locked?" do
@@ -86,27 +77,6 @@ describe FeatureFlag do
 
       it "should be true in a lower context" do
         expect(t_flag.locked?(t_sub_account)).to be_truthy
-      end
-
-      describe "locking_account" do
-        before do
-          t_flag.locking_account = Account.site_admin
-          t_flag.save!
-        end
-
-        it "should be false if the user has privileges" do
-          site_admin_user
-          expect(t_flag.locked?(t_root_account, @user)).to be_falsey
-        end
-
-        it "should be true if the user does not have privileges" do
-          account_admin_user account: t_root_account
-          expect(t_flag.locked?(t_root_account, @user)).to be_truthy
-        end
-
-        it "should be true if the user is unspecified" do
-          expect(t_flag.locked?(t_root_account)).to be_truthy
-        end
       end
     end
   end

@@ -36,4 +36,17 @@ describe "page views" do
     expect(pv.action).to eq 'add_entry'
   end
 
+  describe "update" do
+    it "should set the canvas meta header on interaction_seconds update" do
+      course_with_teacher_logged_in(:active_all => 1)
+      page_view = PageView.new
+      page_view.request_id = rand(10000000).to_s
+      page_view.user = @user
+      page_view.save
+
+      xhr :put, "/page_views/#{page_view.id}", :page_view_token => page_view.token, :interaction_seconds => 42
+      expect(response).to be_success
+      expect(response['X-Canvas-Meta']).to match(/r=#{page_view.request_id}\|#{page_view.created_at.iso8601(2)}\|42;/)
+    end
+  end
 end

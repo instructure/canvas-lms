@@ -1,8 +1,7 @@
 class GradingPeriodGroup < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
-  attr_accessible
-
+  attr_accessible # None of this model's attributes are mass-assignable
   belongs_to :course
   belongs_to :account
   has_many :grading_periods, dependent: :destroy
@@ -20,22 +19,8 @@ class GradingPeriodGroup < ActiveRecord::Base
     can :manage
   end
 
-  workflow do
-    state :active
-    state :deleted
-  end
-
-  scope :active, -> { where workflow_state: "active" }
-
   def multiple_grading_periods_enabled?
     (course || account).feature_enabled?(:multiple_grading_periods) || account_grading_period_allowed?
-  end
-
-  alias_method :destroy!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    save!
-    run_callbacks :destroy
   end
 
   private

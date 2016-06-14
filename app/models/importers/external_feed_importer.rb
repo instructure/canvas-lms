@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class ExternalFeedImporter < Importer
 
@@ -17,7 +19,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_feeds_to_import] && !hash[:external_feeds_to_import][hash[:migration_id]]
       item ||= find_or_initialize_from_migration(hash, context)
@@ -28,7 +30,7 @@ module Importers
       item.header_match = hash[:header_match] unless hash[:header_match].blank?
 
       item.save!
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item
     end
 

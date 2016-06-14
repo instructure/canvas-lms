@@ -29,7 +29,7 @@ class CalendarEvent < ActiveRecord::Base
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
-      :remove_child_events, :all_day
+      :remove_child_events, :all_day, :comments
   attr_accessor :cancel_reason, :imported
 
   EXPORTABLE_ATTRIBUTES = [
@@ -50,11 +50,12 @@ class CalendarEvent < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'AppointmentGroup', 'CourseSection']
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
-  has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :parent_event
+  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -354,12 +355,12 @@ class CalendarEvent < ActiveRecord::Base
     if args.first
       where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
     else
-      scoped
+      all
     end
   }
 
-  scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
-  scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
+  scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
+  scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
 
   def validate_context!
     @validate_context = true
@@ -489,7 +490,7 @@ class CalendarEvent < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy(update_context_or_parent=true)
     transaction do
       kill_google_calendar
@@ -542,9 +543,9 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors }
     whenever {
-      user && appointment_group && parent_event &&
+      @updating_user && appointment_group && parent_event &&
       just_created &&
-      context == appointment_group.participant_for(user)
+      context == appointment_group.participant_for(@updating_user)
     }
     data { {:updating_user => @updating_user} }
 
@@ -636,6 +637,7 @@ class CalendarEvent < ActiveRecord::Base
       event.updating_user = user
       event.context = participant
       event.workflow_state = :locked
+      event.comments = options[:comments]
       event.save!
       if active?
         self.workflow_state = 'locked'
@@ -697,8 +699,10 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 
-  def to_ics(in_own_calendar=true)
-    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
+  def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil)
+    CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar:       in_own_calendar,
+                                              preloaded_attachments: preloaded_attachments,
+                                              include_description:   true)
   end
 
   def self.max_visible_calendars
@@ -748,7 +752,7 @@ class CalendarEvent < ActiveRecord::Base
     def location
     end
 
-    def to_ics(in_own_calendar)
+    def to_ics(in_own_calendar:, preloaded_attachments: {}, include_description: false)
       cal = Icalendar::Calendar.new
       # to appease Outlook
       cal.custom_property("METHOD","PUBLISH")
@@ -778,8 +782,8 @@ class CalendarEvent < ActiveRecord::Base
 
       event.summary = @event.title
 
-      if @event.is_a?(CalendarEvent) && @event.description
-        html = api_user_content(@event.description, @event.context)
+      if @event.description && include_description
+        html = api_user_content(@event.description, @event.context, nil, preloaded_attachments)
         event.description html_to_text(html)
         event.x_alt_desc(html, { 'FMTTYPE' => 'text/html' })
       end
@@ -838,4 +842,3 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 end
-

@@ -28,6 +28,7 @@ module Lti
         'teacher' => LtiOutbound::LTIRoles::Institution::INSTRUCTOR,
         'student' => LtiOutbound::LTIRoles::Institution::STUDENT,
         'admin' => LtiOutbound::LTIRoles::Institution::ADMIN,
+        'observer' => LtiOutbound::LTIRoles::Context::OBSERVER,
         AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
 
         StudentEnrollment => LtiOutbound::LTIRoles::Context::LEARNER,
@@ -95,7 +96,7 @@ module Lti
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << role_map['siteadmin']
         end
-        (context_roles + institution_roles).uniq.sort.join(',')
+        (context_roles + institution_roles).compact.uniq.sort.join(',')
       else
         [role_none]
       end
@@ -165,9 +166,9 @@ module Lti
 
     def previous_course_ids_and_context_ids
       return [] unless @context.is_a?(Course)
-      @previous_ids ||= Course.where(ContentMigration.where(context_id: @context.id, workflow_state: :imported)
-                                     .where("content_migrations.source_course_id = courses.id").exists)
-                                     .select("id, lti_context_id")
+      @previous_ids ||= Course.where(
+        "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
+      ).select("id, lti_context_id")
     end
 
   end

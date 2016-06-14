@@ -2,12 +2,12 @@ define [
   'jquery'
   'react'
   'react-router'
-  'compiled/react_files/components/BreadcrumbCollapsedContainer'
+  'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
   '../mockFilesENV'
   '../../helpers/stubRouterContext'
-], ($, React, ReactRouter, BreadcrumbCollapsedContainerComponent, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
+], ($, React, ReactRouter, BreadcrumbCollapsedContainer, Folder, filesEnv, mockFilesENV, stubRouterContext) ->
   simulate = React.addons.TestUtils.Simulate
   simulateNative = React.addons.TestUtils.SimulateNative
   TestUtils = React.addons.TestUtils
@@ -18,9 +18,8 @@ define [
       folder.url = -> "stupid"
       props = foldersToContain: [folder]
 
-      bcc = stubRouterContext(BreadcrumbCollapsedContainerComponent, props)
-      BreadcrumbCollapsedContainer = React.createFactory(bcc)
-      @bcc = TestUtils.renderIntoDocument(BreadcrumbCollapsedContainer(props))
+      bcc = stubRouterContext(BreadcrumbCollapsedContainer, props)
+      @bcc = TestUtils.renderIntoDocument(React.createElement(bcc))
 
     teardown: ->
       React.unmountComponentAtNode(@bcc.getDOMNode().parentNode)
@@ -41,17 +40,19 @@ define [
     $node = $(@bcc.getDOMNode())
     simulateNative.mouseOut(@bcc.getDOMNode())
     clock.tick(200)
-    equal $node.find('.undefined').length, 1, "should have class of undefined"
+    equal $node.find('.closed').length, 1, "should have class of closed"
 
     clock.restore()
 
   test 'BCC: closes breadcrumbs on blur', ->
     clock = sinon.useFakeTimers()
-    $node = $(@bcc.getDOMNode())
     simulate.blur(@bcc.getDOMNode())
     clock.tick(200)
 
-    equal $node.find('.undefined').length, 1, "should have class of undefined"
+    $node = $(@bcc.getDOMNode())
+    simulateNative.mouseOut(@bcc.getDOMNode())
+    clock.tick(200)
+    equal $node.find('.closed').length, 1, "should have class of closed"
 
     clock.restore()
 

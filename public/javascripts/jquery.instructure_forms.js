@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
+  'jsx/shared/rce/callOnRCE',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
@@ -32,7 +33,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
+], function(callOnRCE, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -680,12 +681,11 @@ define([
       if ((inputType == "radio" || inputType == 'checkbox') && !$input.attr('checked')) return;
       var val = $input.val();
       if ($input.hasClass('datetime_field_enabled')) {
-        var suggestText = $input.parent().children(".datetime_suggest").text();
-        if (suggestText) val = suggestText;
+        val = $input.data('iso8601');
       }
       try {
         if($input.data('rich_text')) {
-          val = $input.editorBox('get_code', false);
+          val = callOnRCE($input, "get_code", false);
         }
       } catch(e) {}
       var attr = $input.prop('name') || '';
@@ -810,7 +810,7 @@ define([
   //  numbers: list of strings, elements that must be blank or a valid number
   //  property_validations: hash, where key names are form element names
   //    and key values are functions to call on the given data.  The function
-  //    should return true if valid, false otherwise.
+  //    should return nothing if valid, an error message for display otherwise.
   $.fn.validateForm = function(options) {
     if (this.length === 0) {
       return false;
@@ -843,7 +843,7 @@ define([
     if(options.date_fields) {
       $.each(options.date_fields, function(i, name) {
         var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
-        if($item.length && $item.parent().children(".datetime_suggest").hasClass('invalid_datetime')) {
+        if ($item.length && $item.data('invalid')) {
           if (!errors[name]) {
             errors[name] = [];
           }
@@ -1025,7 +1025,14 @@ define([
       }).fadeIn('fast');
 
       var cleanup = function() {
+        var $screenReaderErrors = $("#flash_screenreader_holder").find("span");
+        var srError = _.find($screenReaderErrors, function(node){
+          return $(node).text() == $box.text();
+        });
         $box.remove();
+        if(srError){
+          $(srError).remove();
+        };
         $obj.removeData('associated_error_box');
         $obj.removeData('associated_error_object');
       };
@@ -1094,6 +1101,7 @@ define([
   $.fn.hideErrors = function(options) {
     if(this.length) {
       var $oldBox = this.data('associated_error_box');
+      var $screenReaderErrors = $("#flash_screenreader_holder").find("span");
       if($oldBox) {
         $oldBox.remove();
         this.data('associated_error_box', null);
@@ -1104,6 +1112,12 @@ define([
         if($oldBox) {
           $oldBox.remove();
           $obj.data('associated_error_box', null);
+          srError = _.find($screenReaderErrors, function(node){
+            return $(node).text() == $oldBox.text();
+          });
+          if(srError){
+            $(srError).remove();
+          };
         }
       });
     }

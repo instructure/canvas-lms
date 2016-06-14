@@ -1,4 +1,6 @@
 class QuestionDataLength < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     return unless %w{MySQL Mysql2}.include?(connection.adapter_name) # postgres/sqlite have no limit
     change_column :quiz_questions, :question_data, :text, :limit => 2**20

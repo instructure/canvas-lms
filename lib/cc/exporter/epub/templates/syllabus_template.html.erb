@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= I18n.t("Syllabus") %></title>
+  <%= style %>
+</head>
+  <body>
+    <h1><%= I18n.t("Syllabus") %></h1>
+    <ul>
+      <% content.group_by {|item| item['due_at']}.each do |due_date, item_group| %>
+        <h4><%= due_date.present? ? I18n.t("Due %{time}",{time: friendly_date(due_date)}) : "No due date" %></h4>
+        <% item_group.each do |item| %>
+          <li>
+            <%= link_to_content_item(item) %>
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+    <hr/>
+    <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
+    <div style="page-break-before:always;"></div>
+  </body>
+</html>
+

@@ -2,23 +2,6 @@ require 'spec_helper'
 
 module Users
   describe CreationNotifyPolicy do
-    describe "#should_notify?" do
-      it "is true when send_confirmation is enabled" do
-        policy = CreationNotifyPolicy.new(true, {send_confirmation: true})
-        expect(policy.should_notify?).to be(true)
-      end
-
-      it "is false when send_confirmation is missing" do
-        policy = CreationNotifyPolicy.new(true, {})
-        expect(policy.should_notify?).to be(false)
-      end
-
-      it "is overridden by self registration" do
-        policy = CreationNotifyPolicy.new(true, {force_self_registration: true})
-        expect(policy.should_notify?).to be(true)
-      end
-    end
-
     describe "#is_self_registration?" do
       it "is true when forced" do
         policy = CreationNotifyPolicy.new(false, {force_self_registration: '1'})

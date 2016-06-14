@@ -18,17 +18,19 @@
 
 class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   def self.sti_name
-    'ldap'
+    'ldap'.freeze
   end
 
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
   def self.recognized_params
-    [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+    [ :auth_host, :auth_port, :auth_over_tls, :auth_base,
       :auth_filter, :auth_username, :auth_password,
-      :identifier_format, :position ]
+      :identifier_format, :jit_provisioning ].freeze
   end
+
+  SENSITIVE_PARAMS = [ :auth_password ].freeze
 
   def clear_last_timeout_failure
     unless self.last_timeout_failure_changed?
@@ -98,6 +100,10 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     return nil
   end
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   def test_ldap_connection
     begin
       timeout(5) do
@@ -163,7 +169,7 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   end
 
   def failure_wait_time
-    Canvas.timeout_protection_error_ttl("ldap:#{self.global_id}")
+    ::Canvas.timeout_protection_error_ttl("ldap:#{self.global_id}")
   end
 
   def ldap_bind_result(unique_id, password_plaintext)
@@ -172,15 +178,22 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     default_timeout = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
-    Canvas.timeout_protection("ldap:#{self.global_id}", timeout_options) do
+    result = ::Canvas.timeout_protection("ldap:#{self.global_id}", timeout_options) do
       ldap = self.ldap_connection
       filter = self.ldap_filter(unique_id)
       ldap.bind_as(base: ldap.base, filter: filter, password: password_plaintext)
     end
+
+    CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}")
+
+    result
   rescue => e
-    Canvas::Errors.capture(e, type: :ldap, account: self.account)
+    ::Canvas::Errors.capture(e, type: :ldap, account: self.account)
     if e.is_a?(Timeout::Error)
+      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout")
       self.update_attribute(:last_timeout_failure, Time.zone.now)
+    else
+      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_error")
     end
     return nil
   end

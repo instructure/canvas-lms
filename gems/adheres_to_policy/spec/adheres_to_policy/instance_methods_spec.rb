@@ -66,6 +66,52 @@ describe AdheresToPolicy::InstanceMethods do
     actor.rights_status(3, :read, :manage, :set_permissions).should == {:read => false, :manage => true, :set_permissions => true}
   end
 
+  it 'should check parent conditions' do
+    actor_class = Class.new do
+      extend AdheresToPolicy::ClassMethods
+      set_policy do
+        given { |value| value[0] == true }
+        use_additional_policy do
+          given { |value| value[1] == true }
+          can :do_stuff
+        end
+      end
+    end
+
+    actor = actor_class.new
+    expect(actor.rights_status([false, false])).to eq(:do_stuff => false)
+    expect(actor.rights_status([false, true])).to eq(:do_stuff => false)
+    expect(actor.rights_status([true, false])).to eq(:do_stuff => false)
+    expect(actor.rights_status([true, true])).to eq(:do_stuff => true)
+  end
+
+  it 'should check deeply nested parent conditions' do
+    actor_class = Class.new do
+      extend AdheresToPolicy::ClassMethods
+      set_policy do
+        given { |value| value[0] == true }
+        use_additional_policy do
+          given { |value| value[1] == true }
+          can :do_stuff
+          use_additional_policy do
+            given { |value| value[2] == true }
+            can :do_things
+          end
+        end
+      end
+    end
+
+    actor = actor_class.new
+    expect(actor.rights_status([false, false, false])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([false, false, true])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([false, true, false])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([false, true, true])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([true, false, false])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([true, false, true])).to eq(:do_stuff => false, :do_things => false)
+    expect(actor.rights_status([true, true, false])).to eq(:do_stuff => true, :do_things => false)
+    expect(actor.rights_status([true, true, true])).to eq(:do_stuff => true, :do_things => true)
+  end
+
   it "should execute all conditions when searching for all rights" do
     actor_class = Class.new do
       attr_accessor :total

@@ -23,10 +23,13 @@ define [
     events:
       'click': 'clickRow'
       'click .delete-item': 'onDelete'
+      'click .post-to-sis-status': 'togglePostToSIS'
 
     messages:
       confirm: I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
       multipleDates: I18n.t('multiple_due_dates', 'Multiple Dates')
+      deleteSuccessful: I18n.t('flash.removed', 'Quiz successfully deleted.')
+      deleteFail: I18n.t('flash.fail', 'Quiz deletion failed.')
 
     initialize: (options) ->
       @initializeChildViews()
@@ -63,8 +66,14 @@ define [
 
     # delete quiz item
     delete: ->
-      @model.destroy()
-      @$el.remove()
+      @$el.hide()
+      @model.destroy
+        success : =>
+          @$el.remove()
+          $.flashMessage @messages.deleteSuccessful
+        error : =>
+          @$el.show()
+          $.flashError @messages.deleteFail
 
     observeModel: ->
       @model.on('change:published', @updatePublishState)
@@ -72,6 +81,25 @@ define [
 
     updatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
+
+    togglePostToSIS: (e) =>
+      c = @model.postToSIS()
+      @model.postToSIS(!c)
+      e.preventDefault()
+      $t = $(e.currentTarget)
+      @model.save({}, { type: 'POST', url: @model.togglePostToSISUrl(),
+      success: =>
+        if c
+          $t.removeClass('post-to-sis-status enabled')
+          $t.addClass('post-to-sis-status disabled')
+          $t.find('.icon-post-to-sis').prop('title', I18n.t("Post grade to SIS disabled. Click to toggle."))
+          $t.find('.screenreader-only').text(I18n.t("The grade for this assignment will not sync to the student information system. Click here to toggle this setting."))
+        else
+          $t.removeClass('post-to-sis-status disabled')
+          $t.addClass('post-to-sis-status enabled')
+          $t.find('.icon-post-to-sis').prop('title', I18n.t("Post grade to SIS enabled. Click to toggle."))
+          $t.find('.screenreader-only').text(I18n.t("The grade for this assignment will sync to the student information system. Click here to toggle this setting."))
+      })
 
     canManage: ->
       ENV.PERMISSIONS.manage

@@ -18,20 +18,17 @@ define [
     ok @outcomeDialogView.outcomeLineGraphView instanceof OutcomeLineGraphView
 
   test 'afterRender', ->
-    setElementSpy = sinon.stub(@outcomeDialogView.outcomeLineGraphView, 'setElement')
-    renderSpy = sinon.stub(@outcomeDialogView.outcomeLineGraphView, 'render')
+    setElementSpy = @stub(@outcomeDialogView.outcomeLineGraphView, 'setElement')
+    renderSpy = @stub(@outcomeDialogView.outcomeLineGraphView, 'render')
 
     @outcomeDialogView.render()
 
     ok setElementSpy.called, 'should set linegraph element'
     ok renderSpy.called, 'should render line graph'
 
-    @outcomeDialogView.outcomeLineGraphView.setElement.restore()
-    @outcomeDialogView.outcomeLineGraphView.render.restore()
-
   test '#show', ->
-    renderSpy = sinon.stub(@outcomeDialogView, 'render')
-    dialogSpy = sinon.stub(@outcomeDialogView.$el, 'dialog')
+    renderSpy = @stub(@outcomeDialogView, 'render')
+    dialogSpy = @stub(@outcomeDialogView.$el, 'dialog')
 
     @outcomeDialogView.show(@e('mouseenter'))
     ok !renderSpy.called, 'should not render on any event'
@@ -58,9 +55,6 @@ define [
     ok dialogSpy.called, "should open dialog with click"
     renderSpy.reset()
     dialogSpy.reset()
-
-    @outcomeDialogView.render.restore()
-    @outcomeDialogView.$el.dialog.restore()
 
   test 'toJSON', ->
     ok @outcomeDialogView.toJSON()['dialog'], 'should include dialog key'

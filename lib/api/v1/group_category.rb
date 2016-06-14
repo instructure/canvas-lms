@@ -52,7 +52,7 @@ module Api::V1::GroupCategory
         hash['groups_count'] = group_category.groups.active.size
       end
       if includes.include?('unassigned_users_count')
-        hash['unassigned_users_count'] = group_category.unassigned_users.count
+        hash['unassigned_users_count'] = group_category.unassigned_users.count(:all)
       end
     end
     hash

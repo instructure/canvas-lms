@@ -2,7 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignments_commo
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_assignments')
 
 describe "interaction with differentiated discussions" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include DifferentiatedAssignments
+  include AssignmentsCommon
 
   context "Student" do
     before :each do
@@ -39,7 +41,7 @@ describe "interaction with differentiated discussions" do
       it "should redirect back to discussion index from inaccessible discussions" do
         create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
-        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }
@@ -111,7 +113,7 @@ describe "interaction with differentiated discussions" do
       it "should redirect back to discussion index from inaccessible discussions" do
         create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
-        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }

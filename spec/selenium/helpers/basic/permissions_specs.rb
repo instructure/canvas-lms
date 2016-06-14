@@ -1,14 +1,16 @@
 shared_examples_for "permission tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in
   end
 
   def select_permission_option(permission_name, role, index)
-    driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_id=\"#{role.id}\"] a').click()")
+    fj("td[data-permission_name='#{permission_name}'].[data-role_id='#{role.id}'] a").click
+    # driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_id=\"#{role.id}\"] a').click()")
     wait_for_ajaximations
-    driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_id=\"#{role.id}\"] label')[#{index}].click()")
+    ffj("td[data-permission_name='#{permission_name}'].[data-role_id='#{role.id}'] label")[index].click
+    # driver.execute_script("$('td[data-permission_name=\"#{permission_name}\"].[data-role_id=\"#{role.id}\"] label')[#{index}].click()")
     wait_for_ajaximations #Every select needs to wait for for the request to finish
   end
 
@@ -233,8 +235,8 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled.nil?).to be_truthy
-          expect(role_override.locked).to be_truthy
+          expect(role_override.enabled).to eq true
+          expect(role_override.locked).to eq true
         end
       end
     end
@@ -245,8 +247,8 @@ shared_examples_for "permission tests" do
       let!(:role) { add_new_course_role role_name }
 
       before do
-        f("#course_role_link").click
         get url
+        f("#course_role_link").click
       end
 
       it "enables a permission" do
@@ -310,8 +312,25 @@ shared_examples_for "permission tests" do
 
         keep_trying_until do
           role_override = RoleOverride.where(:role_id => role.id).first
-          expect(role_override.enabled.nil?).to be_truthy
-          expect(role_override.locked).to be_truthy
+          expect(role_override.enabled).to eq true
+          expect(role_override.locked).to eq true
+        end
+      end
+
+      context "when using the keyboard" do
+        it "opens the menu on enter keypress" do
+          button = fj("td[data-permission_name='#{permission_name}'].[data-role_id='#{role.id}'] a")
+          button.send_keys(:enter)
+          expect(f('.btn-group.open')).to be_displayed
+        end
+
+        it "returns focus back to the button activated upon close" do
+          button = fj("td[data-permission_name='#{permission_name}'].[data-role_id='#{role.id}'] a")
+          button.send_keys(:enter)
+          expect(f('.btn-group.open')).to be_displayed # it opened
+          button.send_keys(:escape)
+          expect(f('.btn-group.open')).to be_falsey # it closed
+          check_element_has_focus(button)
         end
       end
     end

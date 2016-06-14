@@ -73,16 +73,6 @@
   .alert {
     color: #666;
   }
-  .subject {
-    font-size: 13px;
-    font-weight: bold;
-    img {
-      padding-right: 5px;
-    }
-  }
-  .message {
-    font-size: 11px;
-  }
   .announcement-details {
     margin-top: 10px;
   }
@@ -92,7 +82,8 @@
   margin-left: 1.5em;
 }
 
-#account_settings, .account_settings {
+#account_settings,
+.account_settings {
   .unbreakable {
     white-space: nowrap;
   }
@@ -121,13 +112,24 @@
       vertical-align: -3px;
     }
   }
+  .account_settings__help-text {
+    font-size: 90%;
+    color: $ic-font-color--subdued;
+  }
 }
 
 #account_settings_tabs {
   legend {
-    font-size: 15px;
+    @include fontSize(15px);
     font-weight: bold;
   }
+  .alert {
+    padding-top: 0;
+    margin-left: -5px;
+  }
+}
+#global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message {
+  display: none;
 }
 
 #survey_announcement_field {

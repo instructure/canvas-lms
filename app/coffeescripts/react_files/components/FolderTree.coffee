@@ -6,11 +6,10 @@ define [
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-  'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes, withReactElement) ->
+], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
-  FolderTree = React.createClass
+  FolderTree =
     displayName: 'FolderTree'
 
     propTypes:
@@ -77,7 +76,3 @@ define [
         folder.expand(false, {onlyShowSubtrees: true}).then ->
           expandFolder(folderIndex + 1)
       expandFolder(0)
-
-
-    render: withReactElement ->
-      div( {className:"ef-folder-list", ref: 'FolderTreeHolder'})

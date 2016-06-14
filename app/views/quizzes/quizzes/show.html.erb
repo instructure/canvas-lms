@@ -94,7 +94,7 @@
 <% end %>
 
 <% js_bundle :quiz_show %>
-<% jammit_css :quizzes, :learning_outcomes %>
+<% css_bundle :quizzes, :learning_outcomes %>
 
 <div id="quiz_show">
   <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
@@ -105,10 +105,7 @@
           class='btn quiz-publish-button <%= "disabled" unless @quiz.can_unpublish? %>'
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
-
-        <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn',role: "button", :id => 'preview_quiz_button' do %>
-          <%= t('links.preview', "Preview") %>
-        <% end %>
+        <%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>
 
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
@@ -155,9 +152,19 @@
                       <%= f.label('do_lock_at_false', :no_time_limit, :en => 'No time limit') %>
                     </label>
                     <label id="how_long_to_unlock_wrapper" style="float: left; margin-left: 30px;" for="until">
-                      <%= f.radio_button('do_lock_at', true, :checked => false) %>
-                      <%= f.label('do_lock_at', :available_until, :en => 'Until', :value => true) %>
-                      <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 150px;", :value => unlocalized_datetime_string(@quiz.lock_at), :"aria-label" => t("Available Until Date") %>
+                      <%= f.radio_button('do_lock_at', true, checked: false) %>
+                      <%= f.label('do_lock_at', :available_until, en: 'Until', value: true) %>
+                      <label class="screenreader-only" id="quiz_lock_at_label">
+                        <%= t("Available Until Date") %>
+                        <%= datepicker_screenreader_prompt %>
+                      </label>
+                      <%= f.text_field :lock_at,
+                                       class: "datetime_field",
+                                       style: "width: 150px;",
+                                       value: datetime_string(@quiz.lock_at),
+                                       "aria-labelledby" => "quiz_lock_at_label",
+                                       "data-tooltip" => "",
+                                       title: accessible_date_format %>
                     </label>
                   </div>
                 <% end %>
@@ -210,15 +217,7 @@
                 <i class="icon-trash"><span class="screenreader-only"><%= admin_delete_title %></span></i> <%= admin_delete_title %>
               </a>
             </li>
-
-            <% (@quiz_menu_tools || []).each do |tool_hash| %>
-              <li role="presentation">
-                <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&quizzes[]=<%= @quiz.id %>" tabindex="-1" role="menuitem">
-                  <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
-                  <%= tool_hash[:title] %>
-                </a>
-              </li>
-            <% end %>
+            <%= external_tools_menu_items((@quiz_menu_tools || []), {link_class: "menu_tool_link", settings_key: :quiz_menu, in_list: true, url_params: {:quizzes => [@quiz.id]}}) %>
           </ul>
         </div>
 
@@ -260,7 +259,7 @@
                            method: :put do |f| %>
 
                 <%= hidden_field_tag 'quizzes[]', @quiz.id %>
-                <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' />
+                <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' alt=""/>
                 <%= f.submit 'Save It Now', class: 'btn btn-primary' %>
               <% end %>
 
@@ -295,32 +294,48 @@
       <% end %>
     </div>
 
-    <% if @quiz.available? %>
-      <% if @can_take && @quiz.context.soft_concluded? %>
-        <div class="alert alert-danger lock_explanation" role="alert">
-          <%= t(:course_concluded_notice,
-            "This quiz is no longer available as the course has been concluded.")
-          %>
-        </div>
-      <% elsif !@submission || !@submission.completed? || @quiz.unlimited_attempts? || (@submission.completed? && @submission.attempts_left > 0) %>
-        <% if @locked && !can_do(@quiz, @current_user, :update) %>
-          <div class="lock_explanation">
-            <%= lock_explanation(@locked_reason, 'quiz', @context) %>
-          </div>
-        <% elsif !@current_user && @quiz.graded? %>
-          <div class="lock_explanation">
-            <%= t(:only_registered_users, "Only registered, enrolled users can take graded quizzes") %>
-          </div>
-        <% elsif @submission && @submission.untaken? %>
+    <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>
+      <div class="preview_quiz_button">
+        <%= link_to_preview_quiz('class' => "btn btn-primary", 'id' => "preview_quiz_button", 'preview' => 1) %>
+      </div>
+    <% elsif @quiz.available? %>
+      <% if @can_take %>
+        <% if @submission && @submission.untaken? %>
           <div class="take_quiz_button">
             <%= link_to_resume_poll('class' => "btn btn-primary") %>
+          </div>
+        <% elsif @assignment && @assignment.submission_for_student(@current_user).excused? %>
+          <div class="lock_explanation">
+            <%= t "This quiz has been excused" %>
           </div>
         <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
           <div class="take_quiz_button">
             <%= link_to_take_or_retake_poll('class' => "btn btn-primary", 'id' => "take_quiz_link") %>
           </div>
         <% end %>
+      <% else %>
+        <% if !@current_user && @quiz.graded? %>
+          <div class="lock_explanation">
+            <%= t(:only_registered_users, "Only registered, enrolled users can take graded quizzes") %>
+          </div>
+        <% elsif @locked && !can_do(@quiz, @current_user, :update) %>
+          <div class="lock_explanation">
+            <%= lock_explanation(@locked_reason, 'quiz', @context) %>
+          </div>
+        <% elsif @quiz.context.soft_concluded? %>
+          <div class="alert alert-danger lock_explanation" role="alert">
+            <%= t(:course_concluded_notice,
+              "This quiz is no longer available as the course has been concluded.")
+            %>
+          </div>
+        <% end %>
       <% end %>
+    <% elsif !can_do(@quiz, @current_user, :update) %>
+      <div class="alert alert-danger lock_explanation" role="alert">
+        <%= t(:course_concluded_notice,
+          "This quiz is no longer available as the course has been concluded.")
+        %>
+      </div>
     <% end %>
 
     <div id="quiz-submission-version-table"></div>

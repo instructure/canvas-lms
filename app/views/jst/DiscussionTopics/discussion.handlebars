@@ -99,14 +99,14 @@
           {{#if locked}}
             <li>
               <a href="#" class="icon-lock">
-                {{#t "open_for_comments"}}Open for comments{{/t}}
+                {{#t "open_for_comments"}}Open for Comments{{/t}}
               </a>
             </li>
           {{else}}
             {{#if can_lock}}
               <li>
                 <a href="#" class="icon-lock">
-                  {{#t "close_for_comments"}}Close for comments{{/t}}
+                  {{#t "close_for_comments"}}Close for Comments{{/t}}
                 </a>
               </li>
             {{/if}}
@@ -133,14 +133,7 @@
             {{/if}}
           {{/if}}
           {{#if ENV.permissions.manage_content}}
-            {{#each discussion_topic_menu_tools}}
-              <li>
-                <a class="menu_tool_link" href="{{url}}">
-                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
-                  {{title}}
-                </a>
-              </li>
-            {{/each}}
+            {{>ExternalTools/external_tools_menu discussion_topic_menu_tools}}
           {{/if}}
         </ul>
       {{/if}}

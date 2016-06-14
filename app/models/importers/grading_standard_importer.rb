@@ -1,7 +1,16 @@
+require_dependency 'importers'
+
 module Importers
   class GradingStandardImporter < Importer
 
     self.item_class = GradingStandard
+
+    def self.select_course_grading_standard(data, migration)
+      return unless migration.import_object?('course_settings', '')
+      return unless data[:course] && data[:course][:grading_standard_enabled]
+      gs_id = data[:course][:grading_standard_identifier_ref]
+      migration.import_object!('grading_standards', gs_id) if gs_id
+    end
 
     def self.process_migration(data, migration)
       standards = data['grading_standards'] || []
@@ -16,7 +25,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
       item ||= GradingStandard.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
@@ -31,7 +40,7 @@ module Importers
       end
 
       item.save!
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item
     end
   end

@@ -17,12 +17,13 @@ def enroll_many_students
   end
 end
 
-describe "large enrollments", :priority => "2" do
-  include_examples "in-process server selenium tests"
+describe "large enrollments", priority: "2" do
+  include_context "in-process server selenium tests"
+  include Gradebook2Common
 
   context "page links" do
 
-    before (:each) do
+    before(:each) do
       enroll_many_students
     end
 

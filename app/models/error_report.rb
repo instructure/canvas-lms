@@ -21,9 +21,9 @@ require 'iconv'
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
-  serialize :http_env
+  serialize_utf8_safe :http_env
   # misc key/value pairs with more details on the error
-  serialize :data, Hash
+  serialize_utf8_safe :data, Hash
 
   before_save :guess_email
 
@@ -73,9 +73,9 @@ class ErrorReport < ActiveRecord::Base
 
     def create_error_report(opts)
       Shackles.activate(:master) do
-        report = ErrorReport.new
-        report.assign_data(opts)
         begin
+          report = ErrorReport.new
+          report.assign_data(opts)
           report.save!
           Rails.logger.info("Created ErrorReport ID #{report.global_id}")
         rescue => e
@@ -89,6 +89,15 @@ class ErrorReport < ActiveRecord::Base
         report
       end
     end
+  end
+
+  def self.configure_to_ignore(error_classes)
+    @classes_to_ignore ||= []
+    @classes_to_ignore += error_classes
+  end
+
+  def self.configured_to_ignore?(class_name)
+    (@classes_to_ignore || []).include?(class_name)
   end
 
   # returns the new error report
@@ -111,10 +120,12 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.log_exception_from_canvas_errors(exception, data)
+    return nil if configured_to_ignore?(exception.class.to_s)
     tags = data.fetch(:tags, {})
+    extras = data.fetch(:extra, {})
     account_id = tags[:account_id]
     domain_root_account = account_id ? Account.where(id: account_id).first : nil
-    error_report_info = tags.merge(data[:extra])
+    error_report_info = tags.merge(extras)
     type = tags.fetch(:type, :default)
 
     if domain_root_account
@@ -126,13 +137,14 @@ class ErrorReport < ActiveRecord::Base
     end
   end
 
+  PROTECTED_FIELDS = [:id, :created_at, :updated_at, :data].freeze
 
   # assigns data attributes to the column if there's a column with that name,
   # otherwise goes into the general data hash
   def assign_data(data = {})
     self.data ||= {}
     data.each do |k,v|
-      if respond_to?(:"#{k}=")
+      if respond_to?(:"#{k}=") && !ErrorReport::PROTECTED_FIELDS.include?(k.to_sym)
         self.send(:"#{k}=", v)
       else
         # dup'ing because some strings come in from Rack as frozen sometimes,
@@ -180,7 +192,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.categories
-    distinct('category')
+    distinct_values('category')
   end
 
   # Send the error report based on configuration either via a POST or email to an external location.

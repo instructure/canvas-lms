@@ -27,18 +27,72 @@
 
     <div class="dateShiftContent" style="display:none">
       <div class="control-group">
-        <label class="control-label"><strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong></label>
+        <label class="control-label">
+          <strong>{{#t "beginning_date"}}Beginning date{{/t}}</strong>
+        </label>
         <div class="controls">
-          <div class="pull-left"><input type="text" name="date_shift_options[old_start_date]" id="oldStartDate" class="span2" title="{{#t "old_start_date_title"}}Beginning date{{/t}}" aria-label="{{#t "old_start_date_label"}}Beginning date{{/t}}"></div>
-          <div class="pull-left">&nbsp; {{#t "beginning_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_start_date]" id="newStartDate" class="span2" title="{{#t "new_start_date_title"}}Change beginning date to{{/t}}" aria-label="{{#t "new_start_date_label"}}Change beginning date to{{/t}}"></div>
+          <div class="pull-left">
+            <label class="screenreader-only" id="old_start_date_label">
+              {{#t}}Beginning date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input type="text"
+                   name="date_shift_options[old_start_date]"
+                   id="oldStartDate"
+                   class="span2"
+                   title="{{accessibleDateFormat}}"
+                   aria-labelledby="old_start_date_label"
+                   data-tooltip='{"position":"top"}' />
+          </div>
+          <div class="pull-left">
+            &nbsp; {{#t "beginning_change_to"}}change to{{/t}}
+            <label class="screenreader-only" id="new_start_date_label">
+              {{#t}}Change beginning date to{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input type="text"
+                   name="date_shift_options[new_start_date]"
+                   id="newStartDate"
+                   class="span2"
+                   title="{{accessibleDateFormat}}"
+                   aria-labelledby="new_start_date_label"
+                   data-tooltip='{"position":"top"}' />
+          </div>
         </div>
       </div>
 
       <div class="control-group">
-        <label class="control-label"><strong>{{#t "ending_date"}}Ending date{{/t}}</strong></label>
+        <label class="control-label">
+          <strong>{{#t "ending_date"}}Ending date{{/t}}</strong>
+        </label>
         <div class="controls">
-          <div class="pull-left"><input type="text" name="date_shift_options[old_end_date]" id="oldEndDate" class="span2" title="{{#t "old_end_date_title"}}Ending date{{/t}}" aria-label="{{#t "old_end_date_label"}}Ending date{{/t}}"></div>
-          <div class="pull-left">&nbsp; {{#t "ending_change_to"}}change to{{/t}} <input type="text" name="date_shift_options[new_end_date]" id="newEndDate" class="span2" title="{{#t "new_end_date_title"}}Change ending date to{{/t}}" aria-label="{{#t "new_end_date_label"}}Change ending date to{{/t}}"></div>
+          <div class="pull-left">
+            <label class="screenreader-only" id="old_end_date_label">
+              {{#t}}Ending date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input type="text"
+                   name="date_shift_options[old_end_date]"
+                   id="oldEndDate"
+                   class="span2"
+                   title="{{accessibleDateFormat}}"
+                   aria-labelledby="old_end_date_label"
+                   data-tooltip='{"position":"top"}' />
+          </div>
+          <div class="pull-left">
+            &nbsp; {{#t "ending_change_to"}}change to{{/t}}
+            <label class="screenreader-only" id="new_end_date_label">
+              {{#t}}Change ending date to{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input type="text"
+                   name="date_shift_options[new_end_date]"
+                   id="newEndDate"
+                   class="span2"
+                   title="{{accessibleDateFormat}}"
+                   aria-labelledby="new_end_date_label"
+                   data-tooltip='{"position":"top"}' />
+          </div>
         </div>
       </div>
 

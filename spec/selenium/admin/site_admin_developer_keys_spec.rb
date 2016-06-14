@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "managing developer keys" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before :each do
     account_admin_user(:account => Account.site_admin)
@@ -9,9 +9,12 @@ describe "managing developer keys" do
   end
 
   it "should allow creating, editing and deleting a developer key" do
+    # make sure this key is generated
+    DeveloperKey.default
+
     get '/developer_keys'
     wait_for_ajaximations
-    expect(ff("#keys tbody tr").length).to eq 0
+    expect(ff("#keys tbody tr").length).to eq 1
 
     f(".add_key").click
     expect(f("#edit_dialog")).to be_displayed
@@ -24,14 +27,14 @@ describe "managing developer keys" do
     wait_for_ajaximations
 
     expect(f("#edit_dialog")).not_to be_displayed
-    expect(DeveloperKey.count).to eq 1
+    expect(DeveloperKey.count).to eq 2
     key = DeveloperKey.last
     expect(key.name).to eq "Cool Tool"
     expect(key.tool_id).to eq "cool_tool"
     expect(key.email).to eq "admin@example.com"
     expect(key.redirect_uri).to eq "http://example.com"
     expect(key.icon_url).to eq "/images/delete.png"
-    expect(ff("#keys tbody tr").length).to eq 1
+    expect(ff("#keys tbody tr").length).to eq 2
 
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
@@ -44,14 +47,14 @@ describe "managing developer keys" do
     wait_for_ajaximations
 
     expect(f("#edit_dialog")).not_to be_displayed
-    expect(DeveloperKey.count).to eq 1
+    expect(DeveloperKey.count).to eq 2
     key = DeveloperKey.last
     expect(key.name).to eq "Cooler Tool"
     expect(key.email).to eq "admins@example.com"
     expect(key.tool_id).to eq "cooler_tool"
     expect(key.redirect_uri).to eq "https://example.com"
     expect(key.icon_url).to eq "/images/add.png"
-    expect(ff("#keys tbody tr").length).to eq 1
+    expect(ff("#keys tbody tr").length).to eq 2
 
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
@@ -61,17 +64,18 @@ describe "managing developer keys" do
     wait_for_ajaximations
 
     expect(f("#edit_dialog")).not_to be_displayed
-    expect(DeveloperKey.count).to eq 1
+    expect(DeveloperKey.count).to eq 2
     key = DeveloperKey.last
     expect(key.tool_id).to eq nil
     expect(key.icon_url).to eq nil
-    expect(ff("#keys tbody tr").length).to eq 1
+    expect(ff("#keys tbody tr").length).to eq 2
 
     f("#keys tbody tr.key .delete_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying_until { ff("#keys tbody tr").length == 0 }
-    expect(DeveloperKey.count).to eq 0
+    keep_trying_until { ff("#keys tbody tr").length == 1 }
+    expect(DeveloperKey.count).to eq 2
+    expect(DeveloperKey.last).to be_deleted
   end
 
   it "should show the first 10 by default, with pagination working" do

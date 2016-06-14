@@ -1,12 +1,15 @@
 <% @context ||= @current_user %>
 <% cache(['wiki_sidebar_render_3', @context.cache_key, @current_user, @context.feature_enabled?(:usage_rights_required)].cache_key.to_s) do %>
 <% load_wiki_sidebar %>
+<% show_files_tab = @wiki_sidebar_data[:root_folders].any?{|rf| rf.grants_right?(@current_user, session, :read_contents)} %>
 <div id="editor_tabs" class="ui-tabs--mini" style="display: none;">
 
   <span class="wiki-sidebar-header" role="heading" aria-level="2"><%= t('headings.insert_content', %{Insert Content into the Page}) %></span>
   <ul>
     <li><a href="#editor_tabs_2"><%= t('tabs.links', %{Links}) %></a></li>
-    <li><a href="#editor_tabs_3"><%= t('tabs.files', %{Files}) %></a></li>
+    <% if show_files_tab %>
+      <li><a href="#editor_tabs_3"><%= t('tabs.files', %{Files}) %></a></li>
+    <% end %>
     <li><a href="#editor_tabs_4"><%= t('tabs.images', %{Images}) %></a></li>
   </ul>
   <div id="editor_tabs_2" role="application">
@@ -32,7 +35,7 @@
               <% end %>
             </ul>
             <% if can_do(@wiki, @current_user, :create_page) %>
-              <%= link_to t('links.new_page', "Link to a New Page"), polymorphic_url([@context, :wiki_page], action: :new), :id => 'new_page_link', :class => "add" %>
+              <%= link_to t('links.new_page', "Link to a New Page"), "#", :id => 'new_page_link', :class => "add" %>
               <form id="new_page_drop_down" style="display:none; margin: 5px;">
                 <div class="row-fluid">
                   <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
@@ -154,6 +157,7 @@
     </div>
 
   </div>
+  <% if show_files_tab %>
   <div id="editor_tabs_3">
     <%= t('files_tab', %{Click any file to insert a download link for that file.}) %>
     <div id="wiki_sidebar_file_uploads" class="uploading_file_list" style="display: none;">
@@ -220,6 +224,7 @@
       <% end %>
     <% end %>
   </div>
+  <% end %>
   <div aria-atomic="true" id="editor_tabs_4">
     <%= t('images_tab', %{Click any image to embed the image in the page.}) %>
     <% if can_do(@context, @current_user, :manage_files) %>

@@ -2,6 +2,7 @@
 @import "components/ui.selectmenu";
 @import "vendor/_xflex.scss";
 
+
 #content {
   padding: 0;
 }
@@ -25,7 +26,7 @@ $gradebook_header_height: 52px;
 
 #speed_grader_loading {
   padding: 5px;
-  font-size: 24px;
+  @include fontSize(24px);
 }
 
 #gradebook_header {
@@ -39,7 +40,7 @@ $gradebook_header_height: 52px;
     background-color: #4b5662;
   }
   padding: 12px 25px 12px 12px;
-  font-size: 11px;
+  @include fontSize(11px);
   text-align: center;
   color: $ic-color-light;
   line-height: 15px;
@@ -145,6 +146,7 @@ $gradebook_header_height: 52px;
 
 #main {
   position: static;
+  @if $use_new_styles { z-index: 1; }
 }
 
 #full_width_container {
@@ -154,6 +156,9 @@ $gradebook_header_height: 52px;
   left: 0;
   right: 0;
   min-width: 960px;
+  &.with_moderation_tabs {
+    top: $gradebook_header_height * 2 + 3;
+  }
 }
 
 .full_width {
@@ -172,6 +177,11 @@ $gradebook_header_height: 52px;
   }
 }
 
+.full_height {
+  height: 100%;
+  overflow-x: scroll;
+}
+
 .media_comments_visible {
   #left_side {
     width: 100%;
@@ -182,6 +192,76 @@ $gradebook_header_height: 52px;
   }
   #right_side {
     width: 329px;
+  }
+}
+
+#moderation_bar {
+  display: none;
+  width: 100%;
+  border-bottom: 1px solid $ic-border-light;
+
+  #moderation_bar_content {
+    display: flex;
+    align-items: center;
+
+    #new_mark_container {
+      padding-left: 5px;
+    }
+  }
+}
+
+#moderation_tabs {
+  #dummy_container {
+    height: 0px;
+    padding: 0px;
+  }
+  ul {
+    background: $white;
+    height: $gradebook_header_height - 1px;
+    border-bottom: none;
+    li {
+      height: $gradebook_header_height;
+      min-width: 275px;
+      &.ui-state-active {
+        background: #f2f2f2;
+        button {
+          float: right;
+          margin: 6px 14px;
+          display: inline-block;
+        }
+        &.selected button, &.pending button {
+          display: none;
+        }
+      }
+      &.ui-state-focus .mark_title {
+        text-decoration: underline;
+      }
+      &.selected .selected_icon {
+        display: inline-block;
+        color: $ic-brand-primary;
+        padding-right: 6px;
+      }
+      a {
+        padding: 14px 12px;
+        text-decoration: none;
+        span {
+          padding: 0 8px;
+          &.mark_title {
+            font-weight: bold;
+          }
+        }
+      }
+      .selected_icon, button {
+        display: none;
+      }
+    }
+    #new_mark_container {
+      height: $gradebook_header_height - 2px;
+      border: none;
+    }
+    #new_mark_dropdown_link {
+      width: 150px;
+    }
   }
 }
 
@@ -240,7 +320,7 @@ $gradebook_header_height: 52px;
   right: 0;
   background-color: #f2f2f2;
   color: #444;
-  font-size: 12px;
+  @include fontSize(12px);
   .bold {
     font-weight: bold;
   }
@@ -258,7 +338,7 @@ $gradebook_header_height: 52px;
   }
   div.comment {
     padding: 8px;
-    font-size: 12px;
+    @include fontSize(12px);
     border-top: 1px dashed $ic-border-light;
     background: $ic-color-light;
     &:first-of-type {
@@ -302,6 +382,11 @@ $gradebook_header_height: 52px;
     @extend %flex-1;
     overflow-y: auto;
   }
+  #not_gradeable_message {
+    padding: 20px;
+    font-size: 1.2em;
+    display: none;
+  }
 }
 
 .right_side_content {
@@ -320,14 +405,14 @@ $gradebook_header_height: 52px;
 }
 
 #rubric_full {
+  background-color: $ic-color-light;
+  border-bottom: 7px solid #bbb;
+  border-bottom-left-radius: 5px;
+  border-left: 7px solid #bbb;
   position: absolute;
   right: 1px;
   top: 0px;
-  border-left: 7px solid #bbb;
-  border-bottom: 7px solid #bbb;
-  border-bottom-left-radius: 5px;
-  z-index: 1000;
-  background-color: $ic-color-light;
+  width: 100%;
   .content_box {
     padding-right: 24px;
   }
@@ -386,7 +471,7 @@ $gradebook_header_height: 52px;
   }
   #teachers_and_submitter_will_be_notified {
     color: #888;
-    font-size: 10px;
+    @include fontSize(10px);
   }
   label {
     font-weight: bold;
@@ -416,26 +501,10 @@ $gradebook_header_height: 52px;
       font-weight: bold;
       line-height: 24px;
       padding-right: 4px;
-    }
-    li {
       float: left;
-      margin-right: 1px;
-      &:last-of-type {
-        margin-right: 0;
-      }
-      .icon {
-        display: block;
-        border: 1px solid #F0F0F0;
-        padding: 2px 3px;
-        border-radius: 2px;
-        img {
-          vertical-align: bottom;
-        }
-      }
-      a:hover .icon, a:focus .icon {
-        background: url(/images/h2_bg.png) repeat-x 0 -15px;
-        border-color: #888;
-      }
+    }
+    button {
+      float: left;
     }
   }
   #group_comment_wrapper {
@@ -455,7 +524,7 @@ $gradebook_header_height: 52px;
       width: 85%;
       // this is a hack  because windows based browsers do not allow me to set the width of a file input.
       // so I just have to make it smaller font so that it fits.
-      font-size: 8.5px;
+      @include fontSize(8.5px);
     }
     a {
       display: block;
@@ -465,7 +534,7 @@ $gradebook_header_height: 52px;
   textarea {
     border-radius: $baseBorderRadius;
     max-height: 200px;
-    font-size: 13px;
+    @include fontSize(13px);
   }
 }
 
@@ -486,7 +555,7 @@ body .ui-selectmenu-dropdown {
     text-decoration: none !important;
   }
   .ui-selectmenu-status {
-    font-size: 14px;
+    @include fontSize(14px);
     padding: 0 20px 0;
     padding: 0 0 0 20px;
     margin: 0 20px 0 0;
@@ -529,7 +598,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     .ui-selectmenu-item-footer {
       margin: 1px 0 1px;
       margin-top: -1px;
-      font-size: 10px;
+      @include fontSize(10px);
       line-height: 1em;
       opacity: 0;
     }
@@ -559,6 +628,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   .resubmitted & {
     font-size: 1.7em;
     color: $orange;
+  }
+  .not_gradeable & {
+    font-size: 1.7em;
+    color: $grayLight;
   }
   .graded & {
     color: $green;
@@ -600,7 +673,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #submission_details {
   border-bottom: 1px solid $ic-border-light;
   a {
-    font-size: 12px;
+    @include fontSize(12px);
   }
   .on_time {
     color: #004B00;
@@ -617,6 +690,9 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   #submission_not_newest_notice {
     color: #EB9A00;
     font-weight: bold;
+  }
+  .submission_attachment_viewed_at {
+    display: inline;
   }
   .see-all-attempts {
     display: block;
@@ -639,12 +715,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         right: 20px;
       }
       .turnitin_similarity_score {
-        font-size: 9px;
+        @include fontSize(12px);
         &.submission_error, &.submission_pending {
           padding: 1px;
         }
         &:hover {
-          font-size: 9px;
+          @include fontSize(12px);
         }
       }
       .submission-file-download {
@@ -657,6 +733,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         top: 0;
         right: 1px;
         text-indent: -9999px;
+      }
+      a.display_name {
+        display: block;
+        margin-right: 40px;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-all;
+        word-break: break-word;
       }
       &:hover {
         background-color: #DCECFB;
@@ -756,4 +840,16 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #grading-box-extended {
   width: 35px;
   margin-bottom: 0;
+  &.pass_fail_grading_type {
+    width: 105px;
+  }
+}
+
+#settings_form input[type=checkbox][disabled] + label {
+  opacity: 0.5;
+}
+
+#settings_form .icon-info {
+  vertical-align: -4px;
+  color: $linkColor;
 }

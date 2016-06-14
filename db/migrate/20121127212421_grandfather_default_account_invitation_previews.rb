@@ -3,6 +3,8 @@ class GrandfatherDefaultAccountInvitationPreviews < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
+    Account.connection.schema_cache.clear!
+    Account.reset_column_information
     return unless Account.default && Shard.current == Account.default.shard
     account = Account.default
     account.settings[:allow_invitation_previews] = true

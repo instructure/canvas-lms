@@ -19,8 +19,9 @@ define(["jquery"], function($){
    *   that can be found in normal circumstances by calling "getEditor"
    */
   var LinkableEditor = function(editor, $editorEl){
+
     this.id = editor.id;
-    this.selectedContent = editor.selection.getContent({format: "text"});
+    this.selectedContent = editor.selection.getContent();
     this.$editorEl = $editorEl;
 
     /**

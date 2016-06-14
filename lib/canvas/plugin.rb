@@ -135,16 +135,16 @@ module Canvas
     # add any errors that it would like.
     def validate_settings(plugin_setting, settings)
       if validator
-        validator_module = Canvas::Plugins::Validators.const_defined?(validator) && Canvas::Plugins::Validators.const_get(validator)
-        if validator_module && validator_module.respond_to?(:validate)
-          res = validator_module.validate(settings, plugin_setting)
-          if res.is_a?(Hash)
-            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
-          else
-            false
-          end
-        else
+        begin
+          validator_module = Canvas::Plugins::Validators.const_get(validator)
+        rescue NameError
           plugin_setting.errors.add(:base, "provided validator #{validator} failed to load")
+          return false
+        end
+        res = validator_module.validate(settings, plugin_setting)
+        if res.is_a?(Hash)
+          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+        else
           false
         end
       else
@@ -178,8 +178,8 @@ module Canvas
 
     def self.value_to_boolean(value)
       if value.is_a?(String) || value.is_a?(Symbol)
-        return true if ["yes", "true", "on"].include?(value.to_s.downcase)
-        return false if ["no", "false", "off"].include?(value.to_s.downcase)
+        return true if ["yes", "y", "true", "t", "on", "1"].include?(value.to_s.downcase)
+        return false if ["no", "n", "false", "f", "off", "0"].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
       return value.to_i != 0

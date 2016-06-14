@@ -3,7 +3,6 @@ class CreateMigrationIssues < ActiveRecord::Migration
 
   def self.up
     create_table :migration_issues do |t|
-      t.integer :id, :limit => 8
       t.integer :content_migration_id, :limit => 8
       t.string :description
       t.string :workflow_state

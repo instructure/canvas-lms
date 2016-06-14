@@ -45,6 +45,8 @@ require [
     course: course
     params:
       include: includes
+      exclude_descriptions: true
+      exclude_rubrics: true
       override_assignment_dates: !ENV.PERMISSIONS.manage
     courseSubmissionsURL: ENV.URLS.course_student_submissions_url
 
@@ -89,6 +91,7 @@ require [
 
   # kick it all off
   assignmentGroups.fetch(reset: true).then ->
+    app.filterResults() if ENV.MULTIPLE_GRADING_PERIODS_ENABLED
     if ENV.PERMISSIONS.manage
       assignmentGroups.loadModuleNames()
     else

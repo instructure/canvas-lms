@@ -1,0 +1,26 @@
+<% if aacs.present? %>
+  <div class="ic-Login__sso">
+    <% unless use_new_styles? %>
+      <h4 class="ic-Login__sso-divider" role="presentation">
+        <%= t('OR') %>
+      </h4>
+    <% end %>
+    <ul class="ic-Login__sso-list">
+      <% aacs.each do |aac| %>
+        <% only_one = aacs.size < 2 %>
+        <li class="ic-Login__sso-list__item">
+          <a href="/login/<%= aac.auth_type %>"
+             class="Button Button--primary <%= only_one ? 'ic-Login__sso-button--has-text ' : '' %>ic-Login__sso-button ic-Login__sso-button--<%= aac.auth_type %>">
+              <%= render partial: "shared/auth_type_icon",
+                         locals: {
+                           auth_type: aac.auth_type,
+                           sr_message: only_one ? nil : t("Login with %{provider}", provider: aac.auth_type),
+                           with_login_text: only_one
+                         } %>
+          </a>
+
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

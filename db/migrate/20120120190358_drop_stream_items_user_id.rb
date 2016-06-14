@@ -1,4 +1,6 @@
 class DropStreamItemsUserId < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     # it's been a long, long time since StreamItems were tied to users, that happens through StreamItemInstance now
     remove_column :stream_items, :user_id

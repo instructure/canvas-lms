@@ -14,7 +14,7 @@ class AssessmentTestConverter
     @href = File.join(@base_dir, @manifest_node['href'])
     @converted_questions = opts[:converted_questions]
     @opts = opts
-    
+
     @quiz = {
             :questions=>[],
             :quiz_type=>nil,
@@ -54,7 +54,7 @@ class AssessmentTestConverter
       doc = Nokogiri::XML(File.open(@href))
       parse_quiz_data(doc)
       parse_instructure_metadata(doc)
-      
+
       if @quiz[:quiz_type] == 'assignment'
         grading = {}
         grading[:migration_id] = @quiz[:migration_id]
@@ -66,13 +66,13 @@ class AssessmentTestConverter
         @quiz[:grading] = grading
       end
     rescue
-      @quiz[:qti_error] = "Error converting QTI quiz: #{$!}: #{$!.backtrace.join("\n\t")}" 
+      @quiz[:qti_error] = "Error converting QTI quiz: #{$!}: #{$!.backtrace.join("\n\t")}"
       @log.error "Error converting QTI quiz: #{$!}: #{$!.backtrace.join("\n\t")}"
     end
 
     @quiz
   end
-  
+
   def parse_instructure_metadata(doc)
     if meta = doc.at_css('instructureMetadata')
       if password = get_node_att(meta, 'instructureField[name=password]',  'value')
@@ -107,7 +107,7 @@ class AssessmentTestConverter
 
       process_section(part)
     else
-      @quiz[:qti_error] = "Instructure doesn't support QTI importing from this source." 
+      @quiz[:qti_error] = "Instructure doesn't support QTI importing from this source."
       @log.error "Attempted to convert QTI from non-supported source. (it wasn't run through the python conversion tool.)"
     end
   end
@@ -132,14 +132,14 @@ class AssessmentTestConverter
   def process_section(section)
     group = nil
     questions_list = @quiz[:questions]
-    
+
     if shuffle = get_node_att(section, 'ordering','shuffle')
       @quiz[:shuffle_answers] = true if shuffle =~ /true/i
     end
     if select = section.children.find {|child| child.name == "selection"}
       select = select['select'].to_i
       if select > 0
-        group = {:questions=>[], :pick_count => select, :question_type => 'question_group'}
+        group = {:questions=>[], :pick_count => select, :question_type => 'question_group', :title => section['title']}
         if weight = get_node_att(section, 'weight','value')
           group[:question_points] = convert_weight_to_points(weight)
         end
@@ -165,7 +165,7 @@ class AssessmentTestConverter
         @quiz[:questions] << {:question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id}
       end
     end
-    
+
     section.children.each do |child|
       if child.name == "assessmentSection"
         process_section(child)
@@ -190,10 +190,10 @@ class AssessmentTestConverter
     group && group[:question_points] ||= DEFAULT_POINTS_POSSIBLE
 
     @quiz[:questions] << group if group and (!group[:questions].empty? || group[:question_bank_migration_id])
-    
+
     questions_list
   end
-  
+
   def process_question(item_ref, questions_list)
     question = {:question_type => 'question_reference'}
     questions_list << question
@@ -208,7 +208,7 @@ class AssessmentTestConverter
       question[:points_possible] = convert_weight_to_points(weight)
     end
   end
-  
+
   # the weight from a webct system is represented as a float like 0.05,
   # but the point value for that float is actually 5. So if it's from
   # webct multiply it by 100
@@ -216,7 +216,7 @@ class AssessmentTestConverter
     begin
       weight = weight.to_f
       if @opts[:flavor] == Qti::Flavors::WEBCT
-        weight = weight * 100 
+        weight = weight * 100
       end
     rescue
       weight = DEFAULT_POINTS_POSSIBLE

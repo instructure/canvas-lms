@@ -7,36 +7,144 @@ way to get started developing Canvas.
 
 ### Dependencies
 
+#### OS X
+
 On OS X, make sure you have the following installed:
 
-#### VMWare Fusion
+##### VMWare Fusion
 
-Preferred over VirtualBox for performance reasons.
+Preferred over VirtualBox for performance reasons. (although Virtualbox 5 is
+pretty close, about 90% of VMWare fusion in basic testing)
 
-#### Vagrant (with VMWare Fusion plugin)
+##### Dinghy
 
-Required for Dinghy to work with VMWare Fusion.
-
-#### Dinghy
+You'll want to walk through https://github.com/codekitchen/dinghy#install, but
+when you run create, you may want to increase the system resources you give the
+VM, like so:
 
 ```
-$ brew install https://github.com/codekitchen/dinghy/raw/latest/dinghy.rb
-$ dinghy up --memory=4096 --cpus=4 --provider=vmware_fusion --proxy
+$ dinghy create --memory=4096 --cpus=4 --provider=vmware_fusion
 ```
 
 Type `docker ps` in your terminal to make sure your Docker environment
 is happy.
 
-Dinghy currently requires OS X Yosemite.
+Dinghy currently requires OS X Yosemite. Make sure you're using the most recent
+Dinghy release, or else you'll probably have a bad time.
+
+#### Linux
+
+In Linux you can run docker natively, as long as you are using
+a 64-bit kernel that is version 3.10 or higher.
+
+##### Install the package
+
+###### Arch Linux
+
+```
+$ pacman -S docker
+```
+
+###### Fedora
+
+```
+$ dnf install docker
+```
+
+###### Ubuntu
+
+```
+$ apt-get install docker.io
+```
+
+##### Start and optionally enable the docker service
+
+In order to use docker, the docker service must be running.  You can start the
+service using systemd:
+
+```
+systemctl start docker.service
+```
+
+You can optionally enable the docker service, which will cause it to
+start automatically at boot time:
+
+```
+systemctl enable docker.service
+```
+
+##### Avoid requiring sudo to run the docker command (optional)
+
+Because docker itelf runs with root privileges, you must be root
+in order to command it.  Unfortunately, this is very
+inconvenient and super annoying.  Fortunately, there is an elegant
+work-around that simply involves creating a 'docker' group and
+adding any users to that group that should have permission to
+run docker.  First, add the docker group:
+
+```
+groupadd docker
+```
+
+Now add your user to that group:
+
+```
+usermod -a -G docker $(whoami)
+```
+
+Now you can run the docker command without root or sudo.
+Note that you _will_ need to log out and back in for the group
+addition to take effect.
+
+NOTE: Adding non-privileged users to the docker group can be
+a security risk.  Don't add users to this group that shouldn't
+have root privileges.  Dev responsibly my friends.
 
 #### Docker-Compose
+
+##### OS X
 
 ```
 $ brew install docker-compose --without-boot2docker
 ```
 
+##### Linux
+
+###### Arch Linux
+
+Install docker-compose from the AUR using your preferred method.  For example with aura:
+
+```
+aura -A docker-compose
+```
+
+###### Fedora
+
+In Fedora 22 and later, docker-compose is in the repos:
+
+```
+$ dnf install docker-compose
+```
+
+###### Ubuntu and others
+
+If you have [python pip](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed, you can use it to install docker-compose:
+
+```
+$ pip install docker-compose
+```
+
 ### Bootstrapping
 
+#### In a hurry?
+These commands should get you going?
+
+```bash
+cp docker-compose/config/* config/
+docker-compose run --rm web script/docker_first_time_setup.sh
+```
+
+#### Not in a hurry. Or I want to see whats happening
 With those dependencies installed, go to your Canvas directory and run
 the following:
 
@@ -64,8 +172,8 @@ $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 $ docker-compose up
 ```
 
-Now you can open Canvas at http://canvas.docker/
-
+If on OS X and using dinghy, you can now open Canvas at http://canvas.docker/.
+If on Linux, canvas is listening and available on localhost port 3000 (http://localhost:3000)
 
 ## Normal Usage
 
@@ -83,6 +191,12 @@ $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 Changes you're making are not showing up? See the Caveats section below.
 Ctrl-C your `docker-compose up` window and restart.
 
+## Cassandra
+
+If you're using the analytics package, you'll also need Cassandra. The
+Cassandra configuration is commented out in the docker-compose file; uncomment
+it and also uncomment the Cassandra configuration in cassandra.yml. Also follow
+the directions in cassandra.yml.example.
 
 ## Running tests
 
@@ -92,21 +206,47 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ### Selenium
 
-When selenium tests run, you can open a vnc window to the container
-running firefox with:
+The container used to run the selenium browser is commented out of the
+docker-compose file by default. To run selenium, just uncomment those lines,
+rerun `docker-compose build`, and when you run your tests you can watch
+the browser:
 
 ```
 $ open vnc://secret:secret@selenium.docker/
 ```
 
+## Troubleshooting
 
-## Caveats
+If you are having trouble running the `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
 
-Filesystem notification events don't get propagated to your docker
-images, so spring doesn't know to reload classes and guard doesn't work
-well. (It tries to poll, but there are so many files to poll for
-changes, it can take awhile). Until we can figure out how to remedy,
-you'll be stopping/starting for awhile to restart services.
+```
+chown -R 1000:1000 canvas-lms
+```
 
-See https://github.com/codekitchen/dinghy/issues/9 to track progress on
-getting inotify events into the docker containers with Dinghy.
+Or the permissions change (which will make docker work, but causes the git working directory to become filthy):
+
+```
+chmod a+rwx -R canvas-lms
+```
+
+If your distro is equipped with selinux, make sure it is not interfering.
+
+```
+$ sestatus
+...
+Current mode:                   disabled
+...
+
+```
+
+If so, it can be disabled temporarily with:
+
+```
+sudo setenforce 0
+```
+
+Or it can be disabled permanently by editing `/etc/selinux/config` thusly:
+
+```
+SELINUX=disabled
+```

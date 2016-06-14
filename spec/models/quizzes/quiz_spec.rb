@@ -599,6 +599,96 @@ describe Quizzes::Quiz do
       expect(sub2.end_at).to eq deadline
     end
 
+    describe 'term.end_at when no enrollment_restrictions are present' do
+      before(:each) do
+        @deadline = 3.days.from_now
+        @course.conclude_at = 2.days.from_now
+        @course.save!
+        @course.enrollment_term.end_at = @deadline
+        @course.enrollment_term.save!
+
+        # Create a special time extension section
+        section = @course.course_sections.create!(end_at: 1.days.from_now)
+
+        # Create user and enroll them in our section
+        @user = User.create!(:name => "Fred Colon")
+        @enrollment = section.enroll_user(@user, "StudentEnrollment")
+        @enrollment.accept(:force)
+
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to the term end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+    end
+
+    describe 'course.end_at when course.restrict_enrollments_to_course_dates' do
+      before(:each) do
+        @deadline = 3.days.from_now
+        @course.restrict_enrollments_to_course_dates = true
+        @course.conclude_at = @deadline
+        @course.save!
+        @term_deadline = 1.day.from_now
+        @course.enrollment_term.end_at = @term_deadline
+        @course.enrollment_term.save!
+
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to the course end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+
+      it "should fall back onto the term end_dates if no course.end_at" do
+        @course.conclude_at = nil
+        @course.save!
+
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @term_deadline
+      end
+    end
+
+    describe 'section.end_at when section.restrict_enrollments_to_section_dates' do
+      before(:each) do
+        # when course.end_at or term.end_at doesn't exist
+        @deadline = 3.days.from_now
+        @start_at = 3.days.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.conclude_at = 2.days.from_now
+        @course.save!
+        @course.enrollment_term.end_at = 1.day.from_now
+        @course.enrollment_term.save!
+
+        # Create a special time extension section
+        section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline, start_at: @start_at)
+
+        # Create user and enroll them in our section
+        @user = User.create!(:name => "Fred Colon")
+        @enrollment = section.enroll_user(@user, "StudentEnrollment")
+        @enrollment.accept(:force)
+
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to section end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+
+      it 'should set end_at to time limit, if shorter than section.end_at dates' do
+          @q.time_limit = 1
+          @q.save!
+
+        Timecop.freeze do
+          sub = @q.generate_submission(@user)
+          expect(sub.end_at).to eq 1.minute.from_now
+        end
+      end
+    end
+
     it "should shuffle submission questions" do
       u1 = User.create!(:name => "user 1")
       u2 = User.create!(:name => "user 2")
@@ -722,7 +812,7 @@ describe Quizzes::Quiz do
     end
 
     it "should get the correct points possible" do
-      expect(@quiz.current_points_possible).to eq 15
+      expect(@quiz.current_points_possible).to eq 20 # actual_pick_count wasn't so actual after all
     end
 
     it "should omit top level questions when selecting from a question bank" do
@@ -810,6 +900,22 @@ describe Quizzes::Quiz do
     specify { expect(Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question")).to be_truthy }
   end
 
+  describe "shuffle_answers_for_user?" do
+    before do
+      @quiz = Quizzes::Quiz.create!(:context => @course, :shuffle_answers => true)
+    end
+
+    it "returns false for teachers" do
+      course_with_teacher(active_all: true, course: @course)
+      expect(@quiz.shuffle_answers_for_user?(@teacher)).to be_falsey
+    end
+
+    it "returns true for students" do
+      @student = student_in_course(course: @course).user
+      expect(@quiz.shuffle_answers_for_user?(@student)).to be_truthy
+    end
+  end
+
   describe '#has_student_submissions?' do
     before :once do
       course = Course.create!
@@ -833,7 +939,7 @@ describe Quizzes::Quiz do
     end
 
     it 'is false if there are no submissions' do
-      @quiz.quiz_submissions.scoped.delete_all
+      @quiz.quiz_submissions.scope.delete_all
       expect(@quiz.has_student_submissions?).to be_falsey
     end
 
@@ -904,7 +1010,7 @@ describe Quizzes::Quiz do
         quiz.save!
         override.reload
         override_student.reload
-        quiz.assignment.reload
+        quiz.reload
       end
 
       context "override" do
@@ -1047,6 +1153,25 @@ describe Quizzes::Quiz do
         expect(quiz.errors).to be_blank
         expect(quiz.hide_results).to eq 'invalid'
       end
+    end
+  end
+
+  describe "#question_types" do
+    before :once do
+      @quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+    end
+
+    it "returns an empty array when no quiz data" do
+      @quiz.stubs(:quiz_data).returns nil
+      expect(@quiz.question_types).to eq([])
+    end
+
+    it "returns quiz types of question in quiz groups" do
+      @quiz.stubs(:quiz_data).returns([
+        {"question_type" => "foo"},
+        {"entry_type" => "quiz_group", "questions" => [{"question_type" => "bar"},{"question_type" => "baz"}]}
+      ])
+      expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
     end
   end
 
@@ -1502,6 +1627,12 @@ describe Quizzes::Quiz do
       expect(@quiz.grants_right?(@student, :submit)).to eq true
       expect(@quiz.grants_right?(@teacher, :read)).to eq true
     end
+
+    it "doesn't let students submit quizzes that are excused" do
+      @quiz.assignment.grade_student(@student, excuse: true)
+      expect(@quiz.grants_right?(@student, :submit)).to eq false
+      expect(@quiz.grants_right?(@student, :read)).to eq true
+    end
   end
 
   describe "#available?" do
@@ -1568,39 +1699,6 @@ describe Quizzes::Quiz do
   describe '.class_names' do
     it 'returns an array of all acceptable class names' do
       expect(Quizzes::Quiz.class_names).to eq ['Quiz', 'Quizzes::Quiz']
-    end
-  end
-
-  context 'with versioning' do
-    let_once(:quiz) { @course.quizzes.create! title: 'Test Quiz' }
-    describe "#versions" do
-      it "finds the versions of both namespaced and non-namespaced quizzes" do
-        quiz.title = "Renamed Test Quiz"
-        quiz.save
-        expect(quiz.versions.count).to eq 2
-
-        Version.update_all("versionable_type='Quiz'","versionable_id=#{quiz.id} AND versionable_type='Quizzes::Quiz'")
-
-        expect(Quizzes::Quiz.find(quiz).versions.count).to eq 2
-      end
-    end
-  end
-
-  describe '#context_module_tags' do
-    it "finds both namespaced and non-namespaced content tags" do
-      quiz = @course.quizzes.create! title: 'Test Quiz'
-      mod = @course.context_modules.create! name: 'Test Module'
-      tag1 = mod.add_item id: quiz.id, type: 'quiz'
-      tag2 = mod.add_item id: quiz.id, type: 'quiz'
-      tag3 = mod.add_item id: quiz.id, type: 'quiz'
-      ContentTag.where(id: tag2).update_all(content_type: 'Quiz')
-      tag3.destroy
-      expect(quiz.context_module_tags.pluck(:id).sort).to eql [tag1.id, tag2.id].sort
-    end
-
-    it "should act like an association" do
-      quiz = @course.quizzes.create! title: 'Test Quiz'
-      expect { quiz.context_module_tags.loaded? }.not_to raise_error
     end
   end
 

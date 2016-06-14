@@ -404,6 +404,17 @@ describe ContentTag do
     expect(@tag2.workflow_state).to eq 'unpublished'
   end
 
+  it "publishes the linked file when the tag is published" do
+    file = attachment_model(:locked => true)
+    mod = @course.context_modules.create!(:name => "module")
+    tag = mod.add_item(:type => "attachment", :id => file.id)
+    expect(tag).to be_unpublished
+    tag.workflow_state = 'active'
+    tag.save!
+    tag.update_asset_workflow_state!
+    expect(file.reload).to be_published
+  end
+
   it "should publish content via publish!" do
     assignment_model
     @assignment.unpublish!

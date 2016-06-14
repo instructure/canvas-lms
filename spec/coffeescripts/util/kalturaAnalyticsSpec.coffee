@@ -14,9 +14,8 @@ define [
       $.cookie('kaltura_analytic_tracker', null, path: '/')
 
   test 'adds event listeners', ->
-    exp = sinon.mock(@player).expects('addEventListener').atLeast(6)
+    @mock(@player).expects('addEventListener').atLeast(6)
     kalturaAnalytics("1", @player, @pluginSettings)
-    exp.verify()
 
   test 'generate api url', ->
     ka = kalturaAnalytics("1", @player, @pluginSettings)

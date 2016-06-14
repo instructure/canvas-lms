@@ -36,12 +36,24 @@ module UserContent
       child.add_next_sibling(form)
     end
 
-    html.css('img.equation_image').each do |node|
-      mathml = Nokogiri::HTML::DocumentFragment.parse('<span class="hidden-readable">' + Ritex::Parser.new.parse(node.delete('alt').value) + '</span>') rescue next
-      node.add_next_sibling(mathml)
+    find_equation_images(html) do |node|
+      mathml = latex_to_mathml(node['alt'])
+      next if mathml.blank?
+
+      mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+        "<span class=\"hidden-readable\">#{mathml}</span>"
+      )
+      node.add_next_sibling(mathml_span)
     end
 
     html.to_s.html_safe
+  end
+
+  def self.latex_to_mathml(latex)
+    Ritex::Parser.new.parse(latex)
+  rescue Racc::ParseError, Ritex::LexError, Ritex::Error
+    # invalid LaTeX; leave alt alone, skip mathml
+    return ""
   end
 
   class Node < Struct.new(:width, :height, :node_string, :node_hmac)
@@ -73,6 +85,12 @@ module UserContent
       uc = Node.new(width, height, snippet, hmac)
 
       yield obj, uc
+    end
+  end
+
+  def self.find_equation_images(html)
+    html.css('img.equation_image').each do |node|
+      yield node
     end
   end
 
@@ -192,8 +210,8 @@ module UserContent
       return true unless user
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
-      @manage_content ||= context.grants_right?(user, :manage_content)
-      return true if @manage_content
+      @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
+      return true if @read_as_admin
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)

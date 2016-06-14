@@ -28,7 +28,7 @@ define [
     equal tracker.priority, K.EVT_PRIORITY_LOW
 
   test 'capturing: it works', ->
-    capture = sinon.stub()
+    capture = @stub()
     tracker = new Subject({
       questionSelector: '.question',
       questionMarkedClass: 'marked',

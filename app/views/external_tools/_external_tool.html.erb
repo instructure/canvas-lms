@@ -1,5 +1,6 @@
-<% 
-  tool ||= external_tool 
+<%
+  external_tool ||= nil
+  tool ||= external_tool
   classes = []
   if tool
     ContextExternalTool::EXTENSION_TYPES.each do |type|

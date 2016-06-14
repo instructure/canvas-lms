@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module SchedulerCommon
   def fill_out_appointment_group_form(new_appointment_text, opts = {})
     f('.create_link').click
     edit_form = f('#edit_appointment_form')
@@ -65,7 +66,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def click_appointment_link
     f('.view_calendar_link').click
-    expect(f('.scheduler-mode')).to be_displayed
+    expect(f('.agenda-wrapper.active')).to be_displayed
     wait_for_ajaximations
   end
 
@@ -97,3 +98,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
   end
 
+  def open_edit_appointment_group_event_dialog
+    f('.agenda-event .ig-row').click
+    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
+    driver.execute_script("$('.edit_event_link').trigger('click')")
+    wait_for_ajaximations
+  end
+end

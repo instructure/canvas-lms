@@ -41,16 +41,6 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
       end
     end
 
-    describe '[:is_range]' do
-      it 'should be true for range answers' do
-        stats = subject.run([])
-        stats[:answers].each do |answer|
-          # we have one range answer with id 6959
-          answer[:is_range].should == (answer[:id] == '6959')
-        end
-      end
-    end
-
     describe '[:text]' do
       it 'should read 12.00 for an exact answer with no margin' do
         subject.run([])[:answers][0][:text].should == '12.00'
@@ -62,6 +52,10 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
 
       it 'should read 1.50 for an exact answer with margin' do
         subject.run([])[:answers][3][:text].should == '1.50'
+      end
+      
+      it 'should read "1.1 (with precision: 2)" for a precision answer' do
+        subject.run([])[:answers][4][:text].should == "1.1 (with precision: 1)"
       end
     end
 

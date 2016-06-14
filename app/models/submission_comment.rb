@@ -25,21 +25,17 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :recipient, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, :polymorphic => true
+  belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
-  has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :comment, :submission_id, :recipient_id, :author_id, :author_name, :group_comment_id, :created_at, :updated_at, :attachment_ids, :assessment_request_id, :media_comment_id,
-    :media_comment_type, :context_id, :context_type, :cached_attachments, :anonymous, :teacher_only_comment, :hidden
-  ]
-  EXPORTABLE_ASSOCIATIONS = [:submission, :author, :recipient, :assessment_request, :context, :associated_attachments, :submission_comment_participants]
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 
-  attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id, :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request, :attachments, :anonymous, :hidden
+  attr_accessible :comment, :submission, :submission_id, :recipient, :recipient_id, :author, :context_id,
+                  :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request,
+                  :attachments, :anonymous, :hidden, :provisional_grade_id
 
   before_save :infer_details
   after_save :update_submission
@@ -50,21 +46,35 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
+  scope :visible, -> { where(:hidden => false) }
+  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
+  scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
+  scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
   scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
 
   def delete_other_comments_in_this_group
-    return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.for_assignment_id(submission.assignment_id).where(group_comment_id: self.group_comment_id).select{|c| c != self }.each do |comment|
+    return if !group_comment_id || skip_destroy_callbacks?
+
+    # grab comment ids first because the objects built off
+    # readonly attributes/objects are marked as readonly and
+    # therefore cannot be destroyed
+    comment_ids = SubmissionComment
+      .for_assignment_id(submission.assignment_id)
+      .where(group_comment_id: group_comment_id)
+      .where.not(id: id)
+      .pluck(:id)
+
+    SubmissionComment.find(comment_ids).each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
   end
 
-  def skip_destroy_callbacks!
-    @skip_destroy_callbacks = true
-  end
-
   has_a_broadcast_policy
+
+  def provisional
+    !!self.provisional_grade_id
+  end
 
   def media_comment?
     self.media_comment_id && self.media_comment_type
@@ -80,7 +90,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   on_create_send_to_streams do
-    if self.submission
+    if self.submission && self.provisional_grade_id.nil?
       if self.author_id == self.submission.user_id
         self.submission.context.instructors_in_charge_of(self.author_id)
       else
@@ -91,7 +101,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user,session| !self.teacher_only_comment && self.submission.grants_right?(user, session, :read_grade) && !self.hidden? }
+    given {|user,session| !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? }
     can :read
 
     given {|user| self.author == user}
@@ -101,10 +111,7 @@ class SubmissionComment < ActiveRecord::Base
     can :read and can :delete
 
     given { |user, session|
-      !self.anonymous? ||
-        self.author == user ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+        self.can_read_author?(user, session)
     }
     can :read_author
   end
@@ -114,6 +121,7 @@ class SubmissionComment < ActiveRecord::Base
     p.to { [submission.user] - [author] }
     p.whenever {|record|
       record.just_created &&
+      record.provisional_grade_id.nil? &&
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
       !record.submission.assignment.muted? &&
@@ -124,8 +132,16 @@ class SubmissionComment < ActiveRecord::Base
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever {|record|
       record.just_created &&
+      record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+  end
+
+  def can_read_author?(user, session)
+    (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+        self.author == user ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
   end
 
   def update_participants
@@ -152,7 +168,8 @@ class SubmissionComment < ActiveRecord::Base
         :recipient_id => self.recipient_id,
         :author => user,
         :context_id => self.context_id,
-        :context_type => self.context_type
+        :context_type => self.context_type,
+        :provisional_grade_id => self.provisional_grade_id
       })
     end
   end
@@ -192,21 +209,21 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def attachments
-    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
-    attachments = associated_attachments
-    attachments += submission.assignment.attachments rescue []
-    attachments.select { |a| ids.include?(a.id) }
+    return Attachment.none unless attachment_ids.present?
+    ids = attachment_ids.split(",").map(&:to_i)
+    attachments = submission.assignment.attachments.where(id: ids)
   end
 
   def self.preload_attachments(comments)
-    ActiveRecord::Associations::Preloader.new(comments, [:associated_attachments, :submission]).run
+    ActiveRecord::Associations::Preloader.new.preload(comments, [:submission])
     submissions = comments.map(&:submission).uniq
-    ActiveRecord::Associations::Preloader.new(submissions, :assignment => :attachments).run
+    ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment => :attachments)
   end
 
   def update_submission
-    return nil if hidden?
-    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false).count
+    return nil if hidden? || provisional_grade_id.present?
+    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false,
+                                             :provisional_grade_id => provisional_grade_id).count
     Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil
   end
 
@@ -229,18 +246,17 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def serialization_methods
-    context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
+    methods = []
+    methods << :avatar_path if context.root_account.service_enabled?(:avatars)
+    methods
   end
-
-  scope :visible, -> { where(:hidden => false) }
-
-  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
     if id_changed? || (hidden_changed? && !hidden?)
       return if submission.user_id == author_id
       return if submission.assignment.deleted? || submission.assignment.muted?
+      return if provisional_grade_id.present?
 
       ContentParticipation.create_or_update({
         :content => submission,
@@ -248,5 +264,15 @@ class SubmissionComment < ActiveRecord::Base
         :workflow_state => "unread",
       })
     end
+  end
+
+  protected
+  def skip_destroy_callbacks!
+    @skip_destroy_callbacks = true
+  end
+
+  private
+  def skip_destroy_callbacks?
+    !!@skip_destroy_callbacks
   end
 end

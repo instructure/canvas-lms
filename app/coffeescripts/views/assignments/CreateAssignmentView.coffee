@@ -109,8 +109,9 @@ define [
       errors
 
     _validateTitle: (data, errors) ->
-      frozenTitle = _.contains(@model.frozenAttributes(), "title")
-      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
+      return errors if _.contains(@model.frozenAttributes(), "title")
+
+      if !data.name or $.trim(data.name.toString()).length == 0
         errors["name"] = [
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
@@ -121,9 +122,9 @@ define [
       errors
 
     _validatePointsPossible: (data, errors) =>
-      frozenPoints = _.contains(@model.frozenAttributes(), "points_possible")
+      return errors if _.contains(@model.frozenAttributes(), "points_possible")
 
-      if !frozenPoints and data.points_possible and isNaN(parseFloat(data.points_possible))
+      if data.points_possible and isNaN(parseFloat(data.points_possible))
         errors["points_possible"] = [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]

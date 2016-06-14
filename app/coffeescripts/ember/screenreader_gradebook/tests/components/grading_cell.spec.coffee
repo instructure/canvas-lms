@@ -6,12 +6,11 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   setType = null
 
   module 'grading_cell',
     setup: ->
+      fixtures.create()
       App = startApp()
       @component = App.GradingCellComponent.create()
 
@@ -69,6 +68,7 @@ define [
     ok @component.get('isGpaScale')
 
   asyncTest "focusOut", ->
+    expect(1)
     stub = sinon.stub @component, 'boundUpdateSuccess'
     submissions = []
 
@@ -80,9 +80,7 @@ define [
 
     run =>
       @component.set('value', 'ohai')
-      @component.send('focusOut')
+      @component.send('focusOut', {target: {id: 'student_and_assignment_grade'}})
+      start()
 
-      requestStub.then ->
-        start()
-        ok stub.called
-
+    ok stub.called

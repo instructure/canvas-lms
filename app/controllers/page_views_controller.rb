@@ -64,7 +64,7 @@
 #         "interaction_seconds": {
 #           "description": "An approximation of how long the user spent on the page, in seconds",
 #           "example": "7.21",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "created_at": {
 #           "description": "When the request was made",
@@ -80,7 +80,7 @@
 #         "render_time": {
 #           "description": "How long the response took to render, in seconds",
 #           "example": "0.369",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "user_agent": {
 #           "description": "The user-agent of the browser or program that made the request",
@@ -104,8 +104,8 @@
 #         },
 #         "links": {
 #           "description": "The page view links to define the relationships",
-#           "type": "PageViewLinks",
-#           "example": "{}"
+#           "$ref": "PageViewLinks",
+#           "example": {"user": 1234, "account": 1234}
 #         }
 #       }
 #     }
@@ -203,9 +203,13 @@ class PageViewsController < ApplicationController
           user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
         }
 
-        header = Array(page_views.first.export_columns.to_csv)
-        rows   = Array(page_views.map { |view| view.to_row.to_csv })
-        csv    = (header + rows).join
+        if page_views.any?
+          header = Array(page_views.first.export_columns.to_csv)
+          rows   = Array(page_views.map { |view| view.to_row.to_csv })
+          csv    = (header + rows).join
+        else
+          csv    = ""
+        end
 
         send_data(csv, options)
       end

@@ -38,12 +38,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   belongs_to :assessment_question
   belongs_to :quiz_group, class_name: 'Quizzes::QuizGroup'
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :quiz_id, :quiz_group_id, :assessment_question_id, :question_data, :assessment_question_version,
-    :position, :created_at, :updated_at, :workflow_state
-  ].freeze
-  EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question, :quiz_group].freeze
-
   Q_TEXT_ONLY = 'text_only_question'
   Q_FILL_IN_MULTIPLE_BLANKS = 'fill_in_multiple_blanks_question'
   Q_MULTIPLE_DROPDOWNS = 'multiple_dropdowns_question'
@@ -55,7 +49,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   before_destroy :delete_assessment_question, unless: :generated?
   before_destroy :update_quiz
   validates_presence_of :quiz_id
-  serialize :question_data
+  serialize_utf8_safe :question_data
   after_save :update_quiz
 
   workflow do
@@ -119,8 +113,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
-        # TODO: a reader shouldn't write ?????????????????????
-        data = write_attribute(:question_data, data.with_indifferent_access)
+        write_attribute(:question_data, data.with_indifferent_access)
+        data = read_attribute(:question_data)
       end
     end
 
@@ -250,7 +244,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   def self.batch_migrate_file_links(ids)
-    questions = Quizzes::QuizQuestion.includes(:quiz, :assessment_question).where(:id => ids)
+    questions = Quizzes::QuizQuestion.preload(:quiz, :assessment_question).where(:id => ids)
     questions.each do |question|
       if question.migrate_file_links
         question.save
@@ -258,7 +252,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     end
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
 
   def destroy
     self.workflow_state = 'deleted'

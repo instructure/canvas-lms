@@ -21,12 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe "safe_yaml" do
   it "should be used by default" do
     yaml = <<-YAML
---- !ruby/object:ActionController::Base 
-real_format: 
+--- !ruby/object:ActionController::Base
+real_format:
 YAML
-    expect { YAML.load yaml }.to raise_error(SafeYAML::UnsafeTagError)
+    expect { YAML.load yaml }.to raise_error
     result = YAML.unsafe_load yaml
     expect(result.class).to eq ActionController::Base
+  end
+
+  it "doesn't allow deserialization of arbitrary classes" do
+    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
+  end
+
+  it "allows deserialization of arbitrary classes when unsafe_loading" do
+    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
   end
 
   it "should allow some whitelisted classes" do
@@ -37,45 +45,47 @@ hwia: !map:HashWithIndifferentAccess
   b: 2
 float: !float
   5.1
+float_with_exp: -1.7763568394002505e-15
+float_inf: .inf
 os: !ruby/object:OpenStruct
   modifiable: true
-  table: 
+  table:
     :a: 1
     :b: 2
     :sub: !ruby/object:OpenStruct
       modifiable: true
-      table: 
+      table:
         :c: 3
 str: !str
   hai
 mime: !ruby/object:Mime::Type
   string: png
-  symbol: 
+  symbol:
   synonyms: []
-http: !ruby/object:URI::HTTP 
-  fragment: 
+http: !ruby/object:URI::HTTP
+  fragment:
   host: example.com
-  opaque: 
-  parser: 
-  password: 
+  opaque:
+  parser:
+  password:
   path: /
   port: 80
-  query: 
-  registry: 
+  query:
+  registry:
   scheme: http
-  user: 
-https: !ruby/object:URI::HTTPS 
-  fragment: 
+  user:
+https: !ruby/object:URI::HTTPS
+  fragment:
   host: example.com
-  opaque: 
-  parser: 
-  password: 
+  opaque:
+  parser:
+  password:
   path: /
   port: 443
-  query: 
-  registry: 
+  query:
+  registry:
   scheme: https
-  user: 
+  user:
 ab: !ruby/object:Class AcademicBenchmark::Converter
 qt: !ruby/object:Class Qti::Converter
 verbose_symbol: !ruby/symbol blah
@@ -96,6 +106,12 @@ YAML
 
     float = verify(result, 'float', Float)
     expect(float).to eq 5.1
+
+    float_with_exp = verify(result, 'float_with_exp', Float)
+    expect(float_with_exp).to eq(-1.7763568394002505e-15)
+
+    float_inf = verify(result, 'float_inf', Float)
+    expect(float_inf).to eq(Float::INFINITY)
 
     os = verify(result, 'os', OpenStruct)
     expect(os.a).to eq 1

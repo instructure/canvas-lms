@@ -105,4 +105,46 @@ describe EnrollmentTerm do
     end
   end
 
+  describe "counts" do
+    before(:once) do
+      @t1 = Account.default.enrollment_terms.create!
+      course_with_teacher(active_course: true, active_enrollment: true)
+      @course.enrollment_term_id = @t1.id
+      @course.save!
+
+      @t2 = Account.default.enrollment_terms.create!
+      course_with_teacher(active_course: true, active_enrollment: true)
+      @course.enrollment_term_id = @t2.id
+      @course.save!
+
+      @t3 = Account.default.enrollment_terms.create!
+      course_with_teacher(active_course: true, active_enrollment: true)
+      @course.enrollment_term_id = @t3.id
+      @course.save!
+    end
+
+    describe ".users_counts" do
+      it "returns user counts" do
+        student_in_course(active_all: true, course: @t1.courses.first)
+
+        counts = {}
+        counts[@t1.id.to_s] = 2
+        counts[@t2.id.to_s] = 1
+        expect(EnrollmentTerm.user_counts(Account.default, [@t1, @t2])).to eq counts
+      end
+    end
+
+    describe ".courses_counts" do
+      it "returns course counts" do
+        course_with_teacher(active_all: true)
+        @course.enrollment_term_id = @t1.id
+        @course.save!
+
+        counts = {}
+        counts[@t1.id] = 2
+        counts[@t2.id] = 1
+        expect(EnrollmentTerm.course_counts([@t1, @t2])).to eq counts
+      end
+    end
+  end
 end

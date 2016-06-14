@@ -3,9 +3,13 @@ define([
   "underscore",
   "require",
   "vendor/timezone",
-  "i18nObj"
-], function($, _, require, tz, I18n) {
+  "i18nObj",
+  "moment",
+  "moment_formats",
+  "locale_converter"
+], function($, _, require, tz, I18n, moment, MomentFormats, LocaleConverter) {
   // start with the bare vendor-provided tz() function
+  var currentLocale = "en_US" // default to US locale
   var _tz = tz;
   var _preloadedData = {};
 
@@ -13,23 +17,104 @@ define([
   // version. each method is intended to act as a subset of bigeasy's generic
   // tz() functionality.
   tz = {
-    // parses a date value (string, integer, Date, date array, etc. -- see
-    // bigeasy's tz() docs). returns null on parse failure. otherwise returns a
-    // Date (rather than _tz()'s timestamp integer) because, when treated
-    // correctly, they are interchangeable but the Date is more convenient.
-    // note that tz('') will return null, rather than the epoch start that
-    // _tz('') returns.
+    // wrap's moment() for parsing datetime strings. assumes the string to be
+    // parsed is in the profile timezone unless if contains an offset string
+    // *and* a format token to parse it, and unfudges the result.
+    moment: function(input, format) {
+      // ensure first argument is a string and second is a format or an array
+      // of formats
+      if (!_.isString(input) || !(_.isString(format) || _.isArray(format)))
+        throw new Error("tz.moment only works on string+format(s). just use " +
+                        "moment() directly for any other signature");
+
+      // call out to moment, leaving the result alone if invalid
+      var localeToUse = LocaleConverter.convertToMoment(currentLocale)
+      var m = moment.apply(null, [input, format, localeToUse]);
+      if (m._pf.unusedTokens.length > 0) {
+        // we didn't use strict at first, because we want to accept when
+        // there's unused input as long as we're using all tokens. but if the
+        // best non-strict match has unused tokens, reparse with strict
+        m = moment.apply(null, [input, format, localeToUse, true]);
+      }
+      if (!m.isValid()) return m;
+
+      // unfudge the result unless an offset was both specified and used in the
+      // parsed string.
+      //
+      // using moment internals here because I can't come up with any better
+      // reliable way to test for this :( fortunately, both _f and
+      // _pf.unusedTokens are always set as long as format is explicitly
+      // specified as either a string or array (which we've already checked
+      // for).
+      //
+      // _f lacking a 'Z' indicates that no offset token was specified in the
+      // format string used in parsing. we check this instead of just format in
+      // case format is an array, of which one contains a Z and the other
+      // doesn't, and we don't know until after parsing which format would best
+      // match the input.
+      //
+      // _pf.unusedTokens having a 'Z' token indicates that even though the
+      // format used contained a 'Z' token (since the first condition wasn't
+      // false), that token was not used during parsing; i.e. the input string
+      // didn't provide a value for it.
+      //
+      if (!m._f.match(/Z/) || m._pf.unusedTokens.indexOf('Z') >= 0) {
+        var l = m.locale();
+        m = moment(tz.raw_parse(m.locale('en').format('YYYY-MM-DD HH:mm:ss')));
+        m.locale(l);
+      }
+
+      return m;
+    },
+
+    // interprets a date value (string, integer, Date, date array, etc. -- see
+    // bigeasy's tz() docs) according to _tz. returns null on parse failure.
+    // otherwise returns a Date (rather than _tz()'s timestamp integer)
+    // because, when treated correctly, they are interchangeable but the Date
+    // is more convenient.
+    raw_parse: function(value) {
+      var timestamp = _tz(value);
+      if (typeof timestamp === 'number') {
+        return new Date(timestamp);
+      }
+      return null;
+    },
+
+    // parses a date value but more robustly. returns null on parse failure. if
+    // the value is a string but does not look like an ISO8601 string
+    // (loosely), or otherwise fails to be interpreted by raw_parse(), then
+    // parsing will be attempted with tz.moment() according to the formats
+    // defined in MomentFormats.getFormats(). also note that raw_parse('') will
+    // return the epoch, but parse('') will return null.
     parse: function(value) {
-      // don't parse '' as 0, don't bother trying with null. but *do* accept 0
-      // as a value.
+      // hard code '' and null as unparseable
       if (value === '' || value == null) return null;
 
-      // try and parse the value. if it succeeds, _tz() will return a timestamp
-      // integer. otherwise, it'll assume we mean to curry and give back a
-      // (non-integer) function.
-      var timestamp = _tz(value);
-      if (typeof timestamp !== 'number') return null;
-      return new Date(timestamp);
+      if (!_.isString(value)) {
+        // try and understand the value through _tz. if it doesn't work, we
+        // don't know what else to do with it as a non-string
+        return tz.raw_parse(value);
+      }
+
+      // only try _tz with strings looking loosely like an ISO8601 value. in
+      // particular, we want to avoid parsing e.g. '2016' as 2,016 milliseconds
+      // since the epoch
+      if (value.match(/[-:]/)) {
+        var result = tz.raw_parse(value);
+        if (result) return result;
+      }
+
+      // _tz parsing failed or skipped. try moment parsing
+      var formats = MomentFormats.getFormats()
+      var cleanValue = this.removeUnwantedChars(value)
+      var m = tz.moment(cleanValue, formats)
+      return m.isValid() ? m.toDate() : null
+    },
+
+    removeUnwantedChars: function(value){
+      return _.isString(value) ?
+        value.replace(".","") :
+        value
     },
 
     // format a date value (parsing it if necessary). returns null for parse
@@ -74,7 +159,7 @@ define([
       // %P as an empty string. ("reverse, look-ahead, reverse" pattern for
       // same reason as above)
       format = format.split("").reverse().join("");
-      if (_tz(datetime, '%P') === '' &&
+      if (!tz.hasMeridian() &&
           ((format.match(/[lI][-_]?%(%%)*(?!%)/) &&
             format.match(/p%(%%)*(?!%)/i)) ||
            format.match(/r[-_]?%(%%)*(?!%)/))) {
@@ -95,6 +180,16 @@ define([
 
       if (typeof formatted !== 'string') return null;
       return formatted;
+    },
+
+    hasMeridian: function() {
+      return _tz(new Date(), '%P') !== '';
+    },
+
+    useMeridian: function() {
+      if (!this.hasMeridian()) return false;
+      var tiny = I18n.lookup('time.formats.tiny');
+      return tiny && tiny.match(/%-?l/);
     },
 
     // apply any number of non-format directives to the value (parsing it if
@@ -124,19 +219,22 @@ define([
     // allow snapshotting and restoration, and extending through the
     // vendor-provided tz()'s functional composition
     snapshot: function() {
-      return _tz;
+      return [_tz, currentLocale];
     },
 
     restore: function(snapshot) {
-      // we can't actually check that the snapshot is an appropriate function,
-      // but we can at least verify it's a function.
-      if (typeof snapshot !== 'function') throw 'invalid tz() snapshot';
-      _tz = snapshot;
+      // we can't actually check that the snapshot has appropriate values, but
+      // we can at least verify the shape of [function, string]
+      if (!_.isArray(snapshot)) throw new Error('invalid tz() snapshot');
+      if (typeof snapshot[0] !== 'function') throw new Error('invalid tz() snapshot');
+      if (!_.isString(snapshot[1])) throw new Error('invalid tz() snapshot');
+      _tz = snapshot[0];
+      currentLocale = snapshot[1];
     },
 
     extendConfiguration: function() {
       var extended = _tz.apply(null, arguments);
-      if (typeof extended !== 'function') throw 'invalid tz() extension';
+      if (typeof extended !== 'function') throw new Error('invalid tz() extension');
       _tz = extended;
     },
 
@@ -179,11 +277,34 @@ define([
         });
       }
       return promise;
+    },
+
+    changeLocale: function(){
+      currentLocale = arguments.length > 1 ?
+        arguments[1] :
+        arguments[0]
+      return this.applyFeature.apply(this, arguments);
+    },
+
+    isMidnight: function(date, options){
+      if (date == null) { return false };
+
+      var timezone = options && options.timezone;
+
+      if (typeof timezone == 'string' || timezone instanceof String) {
+        return tz.format(date, '%R', timezone) == '00:00';
+      } else {
+        return tz.format(date, '%R') == '00:00';
+      };
+    },
+
+    changeToTheSecondBeforeMidnight: function(date){
+      return tz.parse(tz.format(date, "%F 23:59:59"));
     }
   };
 
   // changing zone and locale are just aliases for applying a feature
-  tz.changeZone = tz.changeLocale = tz.applyFeature;
+  tz.changeZone = tz.applyFeature;
 
   return tz;
 });

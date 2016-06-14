@@ -19,13 +19,10 @@
 class Eportfolio < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :public, :user
-  
-  has_many :eportfolio_categories, :order => :position, :dependent => :destroy
+
+  has_many :eportfolio_categories, -> { order(:position) }, dependent: :destroy
   has_many :eportfolio_entries, :dependent => :destroy
   has_many :attachments, :as => :context
-
-  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :name, :public, :context_id, :context_type, :created_at, :updated_at, :uuid, :workflow_state, :deleted_at]
-  EXPORTABLE_ASSOCIATIONS = [:eportfolio_categories, :eportfolio_entries, :attachments]
 
   belongs_to :user
   validates_presence_of :user_id
@@ -35,14 +32,15 @@ class Eportfolio < ActiveRecord::Base
     state :active
     state :deleted
   end
-  
-  alias_method :destroy!, :destroy
+
+  alias_method :destroy_permanently!, :destroy
+
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     self.save
   end
-  
+
   scope :active, -> { where("eportfolios.workflow_state<>'deleted'") }
 
   before_create :assign_uuid
@@ -54,17 +52,17 @@ class Eportfolio < ActiveRecord::Base
   set_policy do
     given {|user| user && user.eportfolios_enabled? }
     can :create
-    
+
     given {|user| self.user == user && user.eportfolios_enabled? }
     can :read and can :manage and can :update and can :delete
-    
-    given {|user| self.public }
+
+    given {|_| self.public }
     can :read
-    
-    given {|user, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
+
+    given {|_, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
     can :read
   end
-  
+
   def ensure_defaults
     cat = self.eportfolio_categories.first
     cat ||= self.eportfolio_categories.create!(:name => t(:first_category, "Home"))

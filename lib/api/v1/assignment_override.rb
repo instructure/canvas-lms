@@ -43,7 +43,7 @@ module Api::V1::AssignmentOverride
   def assignment_override_collection(assignment, include_students=false)
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @current_user)
     if include_students
-      ActiveRecord::Associations::Preloader.new(overrides, :assignment_override_students).run
+      ActiveRecord::Associations::Preloader.new.preload(overrides, :assignment_override_students)
     end
     overrides
   end
@@ -62,9 +62,14 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def find_group(assignment, group_id)
+  def find_group(assignment, group_id, group_category_id=nil)
     scope = Group.active.where(:context_type => 'Course').where("group_category_id IS NOT NULL")
-    scope = scope.where(:context_id => assignment.context_id, :group_category_id => assignment.group_category_id) if assignment
+    if assignment
+      scope = scope.where(
+        context_id: assignment.context_id,
+        group_category_id: (group_category_id || assignment.group_category_id)
+      )
+    end
     group = scope.find(group_id)
     raise ActiveRecord::RecordNotFound unless group.grants_right?(@current_user, session, :read)
     group
@@ -98,7 +103,7 @@ module Api::V1::AssignmentOverride
         students = []
       else
         # look up the students
-        students = api_find_all(assignment.context.students_visible_to(@current_user), student_ids).uniq
+        students = api_find_all(assignment.context.students_visible_to(@current_user, true), student_ids).uniq
 
         # make sure they were all valid
         found_ids = students.map{ |s| [
@@ -115,15 +120,15 @@ module Api::V1::AssignmentOverride
     end
 
     if !set_type && data.has_key?(:group_id)
-      if !assignment.group_category_id
+      group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
+      if !group_category_id
         # don't recognize group_id for non-group assignments
         errors << "group_id is not valid for non-group assignments"
       else
         set_type = 'Group'
-
         # look up the group
         begin
-          group = find_group(assignment, data[:group_id])
+          group = find_group(assignment, data[:group_id], group_category_id)
         rescue ActiveRecord::RecordNotFound
           errors << "unknown group id #{data[:group_id].inspect}"
         end
@@ -232,7 +237,7 @@ module Api::V1::AssignmentOverride
     existing_overrides = assignment.assignment_overrides.active
 
     remaining_overrides = destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
-    ActiveRecord::Associations::Preloader.new(remaining_overrides, :assignment_override_students).run
+    ActiveRecord::Associations::Preloader.new.preload(remaining_overrides, :assignment_override_students)
 
     overrides = overrides_params.map do |override_params|
       override = get_override_from_params(override_params, assignment, remaining_overrides)
@@ -246,7 +251,6 @@ module Api::V1::AssignmentOverride
     end
 
     raise ActiveRecord::RecordInvalid.new(assignment) unless assignment.valid?
-
     overrides.each(&:save!)
   end
 

@@ -20,11 +20,13 @@ require 'securerandom'
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
+  before_filter :rich_content_service_config
+
   def create
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
-      
+
       page_names = @category.eportfolio_entries.map{|c| c.name}
       @page = @portfolio.eportfolio_entries.build(params[:eportfolio_entry])
       @page.eportfolio_category = @category
@@ -39,7 +41,7 @@ class EportfolioEntriesController < ApplicationController
       end
     end
   end
-  
+
   def show
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if params[:verifier] == @portfolio.uuid
@@ -66,7 +68,7 @@ class EportfolioEntriesController < ApplicationController
       render "eportfolios/show"
     end
   end
-  
+
   def update
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
@@ -88,8 +90,8 @@ class EportfolioEntriesController < ApplicationController
       end
     end
   end
-  
-  
+
+
   def destroy
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
@@ -104,7 +106,7 @@ class EportfolioEntriesController < ApplicationController
       end
     end
   end
-  
+
   def attachment
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :read)
@@ -119,7 +121,7 @@ class EportfolioEntriesController < ApplicationController
       end
     end
   end
-  
+
   def submission
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :read)
@@ -133,5 +135,10 @@ class EportfolioEntriesController < ApplicationController
       @headers = false
       render "submissions/show_preview"
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

@@ -4,7 +4,7 @@ define(function(require) {
   var I18n = require('i18n!quiz_reports');
   var K = require('../../../constants');
   var Descriptor = require('../../../models/quiz_report_descriptor');
-  // var Actions = require('../../../actions');
+  var Actions = require('../../../actions');
 
   var Status = React.createClass({
     propTypes: {

@@ -106,7 +106,7 @@ describe ContextModule do
       end
     end
   end
-  
+
   describe "progressing before job is run" do
     def progression_testing(progress_by_item_link)
       enable_cache do
@@ -158,7 +158,7 @@ describe ContextModule do
         @quiz_submission.save!
 
         # navigate to the second item (forcing update to progression)
-        next_link = progress_by_item_link ? 
+        next_link = progress_by_item_link ?
           "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
           "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
         get next_link
@@ -178,7 +178,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -189,7 +189,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -201,7 +201,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -213,7 +213,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
@@ -225,7 +225,7 @@ describe ContextModule do
         end
       end
     end
-    
+
     it "should progress to an attachment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|

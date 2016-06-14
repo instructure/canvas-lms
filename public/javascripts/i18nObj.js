@@ -15,7 +15,6 @@ I18n.lookup = function(scope, options) {
       locales.push(I18n.defaultLocale);
   }
   options = this.prepareOptions(options);
-
   if (typeof(scope) == "object") {
     scope = scope.join(this.defaultSeparator);
   }
@@ -279,4 +278,3 @@ if (I18n.translations) {
 return I18n;
 
 });
-

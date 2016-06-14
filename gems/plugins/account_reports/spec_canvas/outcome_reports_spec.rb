@@ -204,7 +204,7 @@ describe "Outcome Reports" do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
       parsed = parse_report(report)
 
       expect(parsed[1]).to eq [@user1.sortable_name, @user1.id.to_s, "user_sis_id_01",
@@ -373,7 +373,7 @@ describe "Outcome Reports" do
       param = {}
       param["include_deleted"] = true
       report = run_report(@type, {params: param})
-      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects: true;"
+      expect(report.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
     end
   end
 end
