@@ -2648,7 +2648,7 @@ sv:
       scheduler_explanation_teacher_paragraph_1: "Det här är ett schamläggningsvektyg. Du kan använda det för att skapa mötestider dina elever kan boka in sig på"
       scheduler_explanation_teacher_paragraph_2: "Till exempel, låt oss säga att du vill gå igenom ett kunskapstest med varje elev i din kurs. Då kan du skapa en mötesgrupp och specifiera tider och datum då du är tillgänglig, dela tiden i 15 minuters block och tillåta en elev per block."
       scheduler_explanation_teacher_paragraph_3: "Därefter meddelas eleverna och de ser att de måste boka in sig för en utav de specifierade blocken. De kommer se en kalender med de tillgängliga tidsblocken ovanför allt på deras kalender så att de kan välja en tid som passar dem."
-      scheduler_explanation_teacher_paragraph_4: "* Kom igång genom att tryck på \"Skapa en plan-grupp\"-knappen till höger. *"
+      scheduler_explanation_teacher_paragraph_4: "* Kom igång genom att klicka på \"Skapa en mötesgrupp\" knappen till höger. *"
       signed_up_for: "*%{title} mötesgruppen* som du registrerat dig för"
       x_groups_have_signed_up: "%{participant_count} har bokat in sig"
       x_people_have_signed_up: "%{participant_count} personer har bokat in sig"
