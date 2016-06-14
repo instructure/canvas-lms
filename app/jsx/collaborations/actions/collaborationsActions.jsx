@@ -51,7 +51,7 @@ define([
         .then((response) => {
           let {next} = parseLinkHeader(response.headers.link)
           let payload = {next, collaborations: response.data}
-          if (getState().list.length != 0) {
+          if (getState().listCollaborations.list.length !== 0) {
             $.screenReaderFlashMessageExclusive(I18n.t("Loaded More Collaborations."));
           }
           dispatch(actions.listCollaborationsSuccessful(payload))

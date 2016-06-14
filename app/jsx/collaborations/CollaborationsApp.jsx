@@ -39,8 +39,9 @@ define([
 
     render () {
       let { list } = this.props.applicationState.listCollaborations;
+
       return (
-        <div className="CollaborationsApp">
+        <div className='CollaborationsApp'>
           <CollaborationsNavigation
             ltiCollaborators={this.props.applicationState.ltiCollaborators}
             onItemClicked={this.openModal} />

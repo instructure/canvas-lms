@@ -1,3 +1,8 @@
+/* prevent double scroll bar when modal is open and the body is scrollable */
+.collaborations.ReactModal__Body--open {
+  overflow: hidden;
+}
+
 .GettingStartedCollaborations {
     width: 600px;
     margin: 0 auto;
@@ -31,6 +36,7 @@
   overflow: auto;
   outline: none;
   padding: 0;
+  overflow-y: hidden;
 }
 
 .Collaborations-iframe {
