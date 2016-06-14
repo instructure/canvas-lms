@@ -187,15 +187,17 @@ describe "people" do
       check_element_has_focus(fj('.group-categories-actions .btn-primary'))
     end
 
-    it "should make sure focus is set to the 'Done' button when adding users" do
+    it "should make sure focus is set to the X button each time the page changes" do
       f('#addUsers').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#user_list_textarea').send_keys('student2@test.com')
       f('#next-step').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#createUsersAddButton').click
       wait_for_ajaximations
-      check_element_has_focus(f('.dialog_closer'))
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
     end
 
     it "should validate the main page" do
