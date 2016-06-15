@@ -20,6 +20,7 @@ define([
   'i18n!quizzes.moderate',
   'jquery' /* $ */,
   'quiz_timing',
+  'jsx/quizzes/moderate/openModerateStudentDialog',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* fillFormData, getFormData */,
@@ -30,7 +31,7 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData */,
   'vendor/date' /* Date.parse */
-], function(I18n, $, timing) {
+], function(I18n, $, timing, openModerateStudentDialog) {
   var DIALOG_WIDTH = 490;
   /**
    * Updates the digit(s) in the "gets X extra minutes" message in a student's
@@ -237,11 +238,10 @@ define([
       $("#moderate_student_form").data('ids', [$student.attr('data-user-id')]);
       $("#moderate_student_form").find("button").attr('disabled', false);
       $("#moderate_student_dialog h2").text(I18n.t('extensions_for_student', "Extensions for %{student}", {'student': name}));
-      $("#moderate_student_dialog").dialog({
-        title: I18n.t('titles.student_extensions', "Student Extensions"),
-        width: DIALOG_WIDTH
-      }).fixDialogButtons();
+
+      openModerateStudentDialog($("#moderate_student_dialog"), DIALOG_WIDTH)
     });
+
     $(".reload_link").click(function(event) {
       event.preventDefault();
       updateSubmissions();
