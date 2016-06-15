@@ -41,11 +41,6 @@ require [
     else
       '#edit_assignment_header'
 
-  editHeaderView = new EditHeaderView
-    el: headerEl
-    model: assignment
-  editHeaderView.render()
-
   editView = new EditView
     el: '#edit_assignment_form'
     model: assignment
@@ -57,4 +52,11 @@ require [
       'js-assignment-overrides': new OverrideView
         model: dueDateList
         views: {}
-  editView.render()
+
+  editHeaderView = new EditHeaderView
+    el: headerEl
+    model: assignment
+    views:
+      'edit_assignment_form': editView
+
+  editHeaderView.render()

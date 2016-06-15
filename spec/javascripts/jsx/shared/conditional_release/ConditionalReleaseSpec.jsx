@@ -1,18 +1,47 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'jsx/shared/conditional_release/ConditionalRelease'
-], (React, $, ConditionalRelease) => {
+], (React, ReactDOM, $, ConditionalRelease) => {
 
   const TestUtils = React.addons.TestUtils;
+
   let component = null;
+  const createComponent = (submitCallback) => {
+    // prevent polluting with new tab from form submission
+    $(document).on('submit', '#conditional-release-editor-form', (event) => {
+      $(document).off('submit', '#conditional-release-editor-form');
+      if (submitCallback) { submitCallback() }
+      return false;
+    })
+    component = TestUtils.renderIntoDocument(
+      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
+    );
+  };
+
+  const connectComponent = () => {
+    const postMessage = sinon.spy()
+    component.connect({ postMessage: postMessage })
+    // connect call has [port] as third arg:
+    return postMessage.args[0][2][0];
+  };
+
+  const createMessage = (messageType, messageBody = null) => {
+    return {
+      context: 'conditional-release',
+      messageType,
+      messageBody
+    }
+  };
 
   module('Conditional Release component', {
     teardown: () => {
       if (component) {
-        const componentNode = React.findDOMNode(component);
+        component.disconnect();
+        const componentNode = ReactDOM.findDOMNode(component);
         if (componentNode) {
-          React.unmountComponentAtNode(componentNode.parentNode);
+          ReactDOM.unmountComponentAtNode(componentNode.parentNode);
         }
       }
       component = null;
@@ -23,74 +52,102 @@ define([
   const noAssignmentEnv = { edit_rule_url: 'about:blank', jwt: 'foo' }
   const assignmentNoIdEnv = { assignment: { foo: 'bar' }, edit_rule_url: 'about:blank', jwt: 'foo' }
 
-  test('it disables its button when no assignment', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={noAssignmentEnv} type='foo' />
-    );
-    const button = React.findDOMNode(component.refs.button);
-    equal(button.disabled, true)
+  module('load', () => {
+    test('it submits the hidden form when mounted', (assert) => {
+      const resolved = assert.async();
+      createComponent(() => {
+        expect(0);
+        resolved();
+      })
+    });
+
+    test('it removes the hidden form after submitting', () => {
+      createComponent();
+      notOk(document.contains($('#conditional-release-editor-form').get(0)))
+    });
   });
 
-  test('it shows the help text when no assignment', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={noAssignmentEnv} type='foo' />
-    );
-    ok(component.refs.saveDataMessage);
+  module('connect', () => {
+    test('it connects MessageChannel to target', () => {
+      createComponent();
+      const target = { postMessage: sinon.spy() };
+
+      component.connect(target);
+      ok(target.postMessage.calledOnce);
+      ok(target.postMessage.args[0][0].messageType === 'connect')
+    });
   });
 
-  test('it shows the help text when an assignment but no id', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentNoIdEnv} type='foo' />
-    );
-    ok(component.refs.saveDataMessage);
+  module('save', () => {
+    test('it returns success when iframe reports success', (assert) => {
+      createComponent();
+      const remotePort = connectComponent();
+      const resolved = assert.async();
+      remotePort.onmessage = (event) => {
+        ok(event.data.messageType === 'save')
+        remotePort.postMessage(createMessage('saveComplete'))
+      }
+      const promise = component.save();
+      promise.done(() => {
+        resolved();
+      })
+    });
+
+    test('it reports error when iframe reports error', (assert) => {
+      createComponent();
+      const remotePort = connectComponent();
+      const resolved = assert.async();
+      remotePort.onmessage = (event) => {
+        ok(event.data.messageType === 'save')
+        remotePort.postMessage(createMessage('saveError', 'foobarbaz'))
+      }
+      const promise = component.save();
+      promise.fail((reason) => {
+        ok(reason.match(/foobarbaz/));
+        resolved();
+      })
+    });
+
+    test('it times out', (assert) => {
+      createComponent();
+      const remotePort = connectComponent();
+      const resolved = assert.async();
+      const promise = component.save(2);
+      promise.fail((reason) => {
+        ok(reason.match(/timeout/));
+        resolved();
+      })
+    });
   });
 
-  test('it enabled its button when there is an assignment', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-    const button = React.findDOMNode(component.refs.button);
-    equal(button.disabled, false)
-  });
+  module('updateAssignment', () => {
+    test('it updates iframe', (assert) => {
+      createComponent();
+      const remotePort = connectComponent();
+      const resolved = assert.async();
+      remotePort.onmessage = (event) => {
+        ok(event.data.messageType === 'updateAssignment');
+        ok(event.data.messageBody.id === 'asdf');
+        resolved();
+      }
+      component.updateAssignment({ id: 'asdf' });
+    });
+  })
+  module('handleMessage', () => {
+    const sendMessage = (messageType, messageBody) => {
+      component.handleMessage({
+        data: createMessage(messageType, messageBody)
+      })
+    }
 
-  test('it does not show the help text when there is an assignment', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-    notOk(component.refs.saveDataMessage);
-  });
+    test('it can set and retrieve validation errors', () => {
+      createComponent();
 
-  test('it adds the hidden form when mounted', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-    ok(document.contains(component.hiddenContainer().get(0)))
-  });
+      sendMessage('validationError', 'foo');
+      ok(component.validateBeforeSave() == 'foo');
 
-  test('it removes the hidden form when unmounted', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-    const removed = React.unmountComponentAtNode(React.findDOMNode(component).parentNode);
-    ok(removed)
-    notOk(document.contains(component.hiddenContainer().get(0)))
-
-    component = null; // we've already removed, skip teardown
-  });
-
-  test('it pops up the modal when the button is clicked', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' />
-    );
-    sinon.spy(component, 'submitForm');
-    TestUtils.Simulate.click(component.refs.button);
-    ok(component.submitForm.called);
-  });
-
-  test('it disables when data is dirty', () => {
-    component = TestUtils.renderIntoDocument(
-      <ConditionalRelease.Editor env={assignmentEnv} type='foo' assignmentDirty={true} />
-    );
-    notOk(component.enabled());
+      sendMessage('validationError', null);
+      ok(component.validateBeforeSave() == null);
+    });
   });
 });
