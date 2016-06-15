@@ -101,7 +101,7 @@ class WikiPagesController < ApplicationController
         add_crumb(@page.title)
         log_asset_access(@page, 'wiki', @wiki)
         wiki_page_jsenv(@context)
-        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
       end
     end
