@@ -81,6 +81,11 @@ define [
     ok Sidebar.show.called
     Sidebar.show.restore()
 
+  test 'hides resize handle when called', ->
+    $resize = fixtures.create('<div class="mce-resizehandle"></div>')
+    RichContentEditor.loadNewEditor(@$target, {})
+    equal $resize.attr('aria-hidden'), "true"
+
   module 'RichContentEditor - callOnRCE',
     setup: ->
       fakeENV.setup()
