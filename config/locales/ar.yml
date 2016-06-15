@@ -5103,6 +5103,7 @@ ar:
     quiz_name: "اسم الاختبار"
     ungrded_survey: "استطلاع لم يتم تقييم درجاته"
     url: URL
+  create_theme_based_on_40651ed3: "إنشاء نسق بناءً على"
   create_users_view: 
     required: "الرجاء إدخال بعض عناوين البريد الإلكتروني"
   created_at_73839757: "تم الإنشاء في"
@@ -5489,6 +5490,7 @@ ar:
   default_grade_cannot_be_set_to_ex_723caa59: "يجب أن تكون الدرجة الافتراضية مختلفة عن %{ex}"
   default_question_name: السؤال
   default_question_text: "نص السؤال"
+  default_template_f2a759ed: "قالب افتراضي"
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "حدد النص الذي سيظهر قبل القائمة المنسدلة وبعدها وقم بتكوين مجموعة من الإجابات الممكنة."
   delay_posting_this_topic_until_aa483eec: "تأخير نشر هذا الموضوع إلى غاية"
   delete_a6efa79d: حذف
@@ -9761,6 +9763,7 @@ ar:
           body_teacher: "لقد تم تسجيلك في المساق %{course} بوصفك معلمًا."
           complete_registration_link: "انقر هنا لإكمال عملية التسجيل"
           email: "البريد الإلكتروني"
+          link: "انقر هنا لعرض صفحة المساق"
           name: الاسم
           none: بلا
           subject: "تسجيل المساق"
@@ -10623,6 +10626,7 @@ ar:
         subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
       twitter: 
         tweet: "تنبيه Canvas - التسجيل جاهز: %{title}، %{name}"
+  mexico_b2d7a271: المكسيك
   migration: 
     announcement_type: الإعلان
     assignment_group_type: "مجموعة المهام"
@@ -10652,6 +10656,8 @@ ar:
   minutes_per_slot_5b7169e5: "الدقائق لكل فترة"
   missing_1a256b3b: مفقود
   missing_percent_94534638: "المفقود: %{percent}"
+  mobile_app_css_file_abbf06bd: "ملف CSS لتطبيق الأجهزة المحمولة"
+  mobile_app_javascript_file_faea55d5: "ملف JavaScript لتطبيق الأجهزة المحمولة"
   mobile_css_file_b86ded7f: "ملف CSS للأجهزة المحمولة"
   mobile_homescreen_icon_f85d6b63: "أيقونة الشاشة الرئيسية للأجهزة المحمولة"
   mobile_javascript_file_c429158d: "ملف JavaScript للأجهزة المحمولة"
@@ -10922,6 +10928,7 @@ ar:
   near_mastery_f25174a4: "قريب من الإتقان"
   need_a_canvas_account_221d18ed: "هل تحتاج إلى حساب Canvas؟"
   need_help_setting_up_your_course_2b763141: "تحتاج لمساعدة لإعداد مساقك؟"
+  netherlands_14ca4f6d: هولندا
   new_13daf639: جديد
   new_account_role_6e5c4964: "دور حساب جديد"
   new_assignment_for_course_name_f71dd337: "مهمة جديدة لـ %{course_name}"
@@ -12499,6 +12506,7 @@ ar:
     new: 
       payment_info: "معلومات الدفع"
   purple_7678a9fc: أرجواني
+  qatar_d52a8d27: قطر
   qti_display: QTI
   qti_file_description: "ملف QTI مضغوط"
   qti_img_matching_question: "يشتمل سؤال المطابقة الذي تم استيراده على صور في كلا الجانبين، وهذا غير مدعوم"
@@ -14428,6 +14436,7 @@ ar:
   save_11a80ec3: حفظ
   save_changes_698abe77: "حفظ التغييرات"
   save_publish_36440725: "حفظ ونشر"
+  save_theme_f706116e: "حفظ النسق"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "احفظ %{type} الخاص بك للبدء في تحديد المحتوى الشرطي."
   saving_d55dd90e: "جارٍ الحفظ..."
   saving_recording_e111cb05: "جارِ حفظ التسجيلات..."
@@ -14705,6 +14714,7 @@ ar:
     titles: 
       add_item_to_module: "إضافة العنصر إلى الوحدة"
       find_links_using_service: "بحث عن ارتبطات باستخدام %{service}"
+  select_country_d21cb85a: "تحديد البلد"
   select_course_a_selection_is_required_before_recip_f622d9df: "تحديد دورة: التحديد مطلوب قبل أن يصبح الوصول إلى حقل المستلمين ممكناً"
   select_course_color_cad8e62b: "تحديد لون المساق"
   select_d70f31da: تحديد
@@ -14820,6 +14830,7 @@ ar:
         record_type: "نوع التسجيل"
         ret_val: "عنوان URL العودة"
   settings_5aa0fd0c: إعدادات
+  settings_for_assignment_name_c19565e1: "إعدادات المهمة %{name}"
   setup_checklist_eb8b00b8: "قائمة تحقق الإعداد"
   shared: 
     account_notification: 
@@ -15647,6 +15658,7 @@ ar:
   sorted_descending_d9aa3cf8: "تم الفرز تنازليًا."
   source_code_2395ca74: "رمز المصدر"
   space_ec476863: مسافة
+  spain_817a5961: إسبانيا
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "تحديد شفافية العلامة المائية للصورة الخلفية."
   speed_grader: 
     submissions_dropdown: 
@@ -15979,6 +15991,7 @@ ar:
       networking_academy_description: "عرض إجابات Cisco عن الأسئلة الشائعة."
       networking_academy_faqs: "الأسئلة الشائعة حول أكاديمية الشبكات"
       support_desk_livechat: "محادثة مباشرة مع مكتب الدعم"
+  sweden_1add8e79: السويد
   switch_style_checkbox_97a44345: "خانة اختيار نمط التحويل"
   switch_to_3f310557: "تبديل إلى"
   switch_to_graph_view_f1153fc1: "التبديل إلى عرض الرسم البياني"
@@ -15986,6 +15999,7 @@ ar:
   switch_to_percentage_295146ac: "تبديل إلى النسبة المئوية"
   switch_to_points_6a0a1eba: "تبديل إلى النقاط"
   switch_to_table_view_3aae9919: "التبديل إلى عرض الجدول"
+  switzerland_f4f7137c: سويسرا
   syllabus: "مناهج المساق"
   syllabus_f191f65b: المناهج
   system_default_language_28a1052d: "النظام الافتراضي (%{language})"
@@ -16034,6 +16048,7 @@ ar:
   teachers_52e2423f: المعلمون
   teal_f729a294: "أزرق مخضر"
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "أخبرنا كيف ومتى تريد أن يتم إعلامك بالأحداث في Canvas."
+  templates_4ca13d07: قوالب
   tenant_d2a41f78: الحائز
   term_e1c1d390: "الفصل الدراسي"
   terms: 
@@ -16239,6 +16254,7 @@ ar:
   this_student_s_responses_are_hidden_because_this_a_252e8335: "أجوبة هذا الطالب مخفية لأن هذه المهمة مجهولة الهوية."
   this_student_wrote_f1a3f22d: "كتب هذا الطالب:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "تم تقييم هذا الإرسال بالفعل وهو جاهز لتلقي الإشراف."
+  this_topic_is_closed_for_comments_3dd10c00: "هذا الموضوع مغلق للتعليقات."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "لهذا المستخدم عدة أدوار في المساق. إدخال تغييرات على دوره سيستبدل جميع تسجيلاته الحالية."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "لا يستطيع هذا لمستخدم الوصول إلى المساق حاليًا"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"لا يستطيع هذا لمستخدم الوصول إلى المساق حاليًا\""
@@ -17390,8 +17406,11 @@ ar:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "يجب تحديد مساق لنسخ المحتوى منه"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "يتعين التعيين على رقم أكبر من أو يساوي %{min}"
   you_must_specify_a_usage_right_5eb57f87: "يتعين عليك تعيين حقوق الاستخدام."
+  you_need_to_preview_changes_before_saving_85e60232: "تحتاج إلى \"معاينة التغييرات\" قبل الحفظ"
+  you_need_to_preview_changes_before_you_can_apply_t_c5eba588: "تحتاج إلى \"معاينة التغييرات\" قبل تطبيق ذلك على حسابك"
   you_need_to_preview_your_changes_before_applying_t_468d56e4: "تحتاج إلى \"معاينة تغييراتك\" قبل تطبيقها على الجميع."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "تحتاج إلى \"معاينة تغييراتك\" قبل تطبيقها على الجميع"
+  you_need_to_save_before_applying_to_this_account_7436a5ae: "تحتاج إلى \"الحفظ\" قبل التطبيق على هذا الحساب"
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "أنت تقوم بتحرير نسق Canvas الخاص بك! قم بتطبيق أو إلغاء التغييرات من خلال *محرر النسق*."
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "أنت تقوم بتحرير نسق Canvas الخاص بك! لم يتم تطبيق التغييرات بعد."
   you_scored_a_score_a5dd5561: "حصلت على %{score}."
