@@ -172,6 +172,7 @@ describe User do
     expect(@user.recent_stream_items.size).to eq 1
     @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
     @enrollment.save!
+    @user = User.find(@user.id)
     expect(@user.recent_stream_items.size).to eq 0
   end
 
