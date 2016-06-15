@@ -630,6 +630,39 @@ describe ApplicationController do
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
     end
   end
+
+  describe '#discard_flash_if_xhr' do
+    before do
+      flash[:notice] = 'A flash notice'
+    end
+    subject(:discard) do
+      flash.instance_variable_get('@discard')
+    end
+
+    it 'sets flash discard if request is xhr' do
+      controller.request.stubs(xhr?: true)
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to all(match(/^notice$/))
+    end
+
+    it 'sets flash discard if request format is text/plain' do
+      controller.request.stubs(xhr?: false, format: 'text/plain')
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to all(match(/^notice$/))
+    end
+
+    it 'leaves flash as is if conditions are not met' do
+      controller.request.stubs(xhr?: false, format: 'text/html')
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to be_empty
+    end
+  end
 end
 
 describe WikiPagesController do

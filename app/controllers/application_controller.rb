@@ -921,8 +921,6 @@ class ApplicationController < ActionController::Base
   def discard_flash_if_xhr
     if request.xhr? || request.format.to_s == 'text/plain'
       flash.discard
-    else
-      flash.keep
     end
   end
 
