@@ -49,22 +49,22 @@ define([
       var labelElement = label &&
         <label htmlFor={this.id} className="ic-Label">{label}</label>;
 
-      var hintElement = !!hint && <div className="hint-text">{hint}</div>
+      var hintElement = !!hint && <div className="ic-Form-help-text">{hint}</div>
 
       return (
         <div className={classnames("ic-Form-control", controlClassName, {"ic-Form-control--has-error": error})}>
           {!!label && !appendLabel && labelElement}
           {React.createElement(elementType, inputProps)}
           {!!label && appendLabel && labelElement}
-          {!!hint && hintElement}
           {!!error &&
-            <div className="ic-Form-message ic-Form-message--error" style={{position: "absolute"}}>
+            <div className="ic-Form-message ic-Form-message--error">
               <div className="ic-Form-message__Layout">
                 <i className="icon-warning" role="presentation"></i>
                 {error}
               </div>
             </div>
           }
+          {!!hint && hintElement}
         </div>
       );
     }

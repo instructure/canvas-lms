@@ -1,0 +1,37 @@
+.GettingStartedCollaborations {
+    width: 600px;
+    margin: 0 auto;
+}
+.Collaborations--GettingStarted {
+    text-align: center;
+}
+.create-collaborations-dropdown {
+    margin-left: 20px;
+}
+.image-collaborations-container {
+    background-color: $ic-color-neutral;
+    border-radius: 50%;
+    text-align: center;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    line-height: 100px;
+}
+
+.CollaborationsModal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  overflow: auto;
+  outline: none;
+  padding: 0;
+}
+
+.Collaborations-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}

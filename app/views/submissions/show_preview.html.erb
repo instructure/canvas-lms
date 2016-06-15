@@ -83,7 +83,7 @@
   </div>
 <% elsif @submission.submission_type == "online_upload" %>
 
-  <% if @submission.attachments.empty? %>
+  <% if @submission.versioned_attachments.empty? %>
     <div class="file-upload-submission">
       <span>
         <%= t('no_files', 'No files were uploaded for this submission') %>
@@ -91,7 +91,7 @@
     </div>
   <% else %>
 
-    <% @submission.attachments.each do |attachment| %>
+    <% @submission.versioned_attachments.each do |attachment| %>
       <div class="file-upload-submission">
 
         <div class="file-upload-submission-info">

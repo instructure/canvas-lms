@@ -6,19 +6,19 @@ define([
   'jsx/collaborations/CollaborationsApp',
   'jsx/collaborations/actions/collaborationsActions',
   'jsx/collaborations/store/store'
-], function (React, page, qs, redux, CollaborationsApp, collaborationsActions, store) {
-  let unsubscribe
-  let actions = redux.bindActionCreators(collaborationsActions, store.dispatch)
-
+], function (React, page, qs, redux, CollaborationsApp, actions, store) {
   /**
    * Route Handlers
    */
   function renderShowCollaborations (ctx) {
+    store.dispatch(actions.getLTICollaborators(ctx.params.context, ctx.params.contextId));
+    store.dispatch(actions.getCollaborations(ctx.params.context, ctx.params.contextId));
+
     let view = () => {
       let state = store.getState();
       React.render(<CollaborationsApp applicationState={state} actions={actions} />, document.getElementById('content'));
     };
-    unsubscribe = store.subscribe(view);
+    store.subscribe(view);
     view();
   }
 
@@ -36,7 +36,6 @@ define([
    */
   page('*', parseQueryString); // Middleware to parse querystring to object
   page('/:context(courses|groups)/:contextId/lti_collaborations', renderShowCollaborations);
-  page.exit('*', unsubscribe)
 
   return {
     start () {

@@ -52,7 +52,7 @@ class Account < ActiveRecord::Base
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
-  has_many :pseudonyms, -> { preload(:user) }
+  has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
@@ -155,7 +155,13 @@ class Account < ActiveRecord::Base
   add_setting :global_stylesheet, :condition => :allow_global_includes
   add_setting :sub_account_includes, :condition => :use_new_styles_or_allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
+
+  # Help link settings
   add_setting :custom_help_links, :root_only => true
+  add_setting :help_link_icon, :root_only => true
+  add_setting :help_link_name, :root_only => true
+  add_setting :support_url, :root_only => true
+
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
@@ -171,7 +177,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
-  add_setting :support_url, :root_only => true
+
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser

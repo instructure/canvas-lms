@@ -45,6 +45,7 @@ define([
       if (parent) {
         return this.brandVariableValue(parent.brand_config, variableName)
       }
+      return _default
     },
 
     startFromBlankSlate() {

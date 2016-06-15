@@ -82,7 +82,9 @@ $.widget( "ui.button", {
 
 		this.buttonElement
 			.addClass( baseClasses )
+			.not( ".no-button-role" )
 			.attr( "role", "button" )
+			.end()
 			.bind( "mouseenter" + this.eventNamespace, function() {
 				if ( options.disabled ) {
 					return;

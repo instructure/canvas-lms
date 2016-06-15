@@ -41,6 +41,7 @@ describe DiscussionTopicsController do
     end
 
     @topic.save
+    @topic.reload
     @topic
   end
 
@@ -688,7 +689,7 @@ describe DiscussionTopicsController do
 
     it "should not change the editor if only pinned was changed" do
       put('update', course_id: @course.id, topic_id: @topic.id,
-        format: 'json', pinned: true)
+        format: 'json', pinned: '1')
       @topic.reload
       expect(@topic.pinned).to be_truthy
       expect(@topic.editor).to_not eq @teacher

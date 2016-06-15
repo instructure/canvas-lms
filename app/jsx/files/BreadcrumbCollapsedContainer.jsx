@@ -59,7 +59,7 @@ define([
               <ul>
                 {this.props.foldersToContain.map((folder) => {
                   return (
-                    <li>
+                    <li key={folder.cid}>
                       <a
                         href={(folder.urlPath()) ? `${filesEnv.baseUrl}/folder/${folder.urlPath()}`: filesEnv.baseUrl}
                         activeClassName='active'

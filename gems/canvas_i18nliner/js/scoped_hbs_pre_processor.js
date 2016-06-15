@@ -23,6 +23,7 @@ PreProcessor.processStatement = function(statement) {
 }
 
 PreProcessor.injectScope = function(node) {
+  var pairs;
   if (!node.hash)
     node.hash = node.sexpr.hash = new HashNode([]);
   pairs = node.hash.pairs;

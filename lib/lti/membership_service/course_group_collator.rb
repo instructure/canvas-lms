@@ -18,49 +18,39 @@
 
 module Lti
   module MembershipService
-    class LisPersonCollator
+    class CourseGroupCollator
       attr_reader :role, :per_page, :page, :context, :user, :memberships
 
-      def initialize(context, user, opts={})
+      def initialize(context, opts={})
         @role = opts[:role]
         @per_page = [[opts[:per_page].to_i, Api.per_page].max, Api.max_per_page].min
         @page = [opts[:page].to_i - 1, 0].max
         @context = context
-        @user = user
         @memberships = collate_memberships
       end
 
       def next_page?
-        users.length > @per_page
+        groups.length > @per_page
       end
 
       private
 
       def collate_memberships
-        users.slice(0, @per_page).map do |user|
+        groups.slice(0, @per_page).map do |user|
           generate_membership(user)
         end
       end
 
-      def users
-        options = {
-          enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student']
-        }
-        @users ||= UserSearch.scope_for(@context, @user, options)
-                             .preload(:communication_channels, :not_ended_enrollments)
+      def groups
+        @groups ||= @context.groups.active
                              .offset(@page * @per_page)
                              .limit(@per_page + 1)
       end
 
-      def generate_member(user)
-        IMS::LTI::Models::MembershipService::LISPerson.new(
-          name: user.name,
-          given_name: user.first_name,
-          family_name: user.last_name,
-          img: user.avatar_image_url,
-          email: user.email,
-          result_sourced_id: nil,
-          user_id: Lti::Asset.opaque_identifier_for(user)
+      def generate_member(group)
+        IMS::LTI::Models::MembershipService::Context.new(
+          name: group.name,
+          context_id: Lti::Asset.opaque_identifier_for(group)
         )
       end
 
@@ -68,25 +58,8 @@ module Lti
         IMS::LTI::Models::MembershipService::Membership.new(
           status: IMS::LIS::Statuses::SimpleNames::Active,
           member: generate_member(user),
-          role: generate_roles(user)
+          role: [IMS::LIS::ContextType::URNs::Group]
         )
-      end
-
-      def generate_roles(user)
-        user.not_ended_enrollments.map do |enrollment|
-          case enrollment.type
-          when 'TeacherEnrollment'
-            IMS::LIS::Roles::Context::URNs::Instructor
-          when 'TaEnrollment'
-            IMS::LIS::Roles::Context::URNs::TeachingAssistant
-          when 'DesignerEnrollment'
-            IMS::LIS::Roles::Context::URNs::ContentDeveloper
-          when 'StudentEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner
-          when 'ObserverEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
-          end
-        end.compact.uniq
       end
     end
   end

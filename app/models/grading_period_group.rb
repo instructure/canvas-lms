@@ -72,12 +72,11 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   def root_account
     @root_account ||= begin
-      if enrollment_terms.loaded?
-        term_account_id = enrollment_terms.map(&:root_account_id).first
-        Account.find(term_account_id)
-      else
-        Account.find_by(id: enrollment_terms.select(:root_account_id))
-      end
+      return nil if enrollment_terms.count == 0
+      # TODO: take is broken here. it appears that loaded? is true
+      # but the @records is empty.
+      # enrollment_terms.take.root_account
+      enrollment_terms.limit(1).to_a.first.root_account
     end
   end
 

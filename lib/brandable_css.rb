@@ -7,9 +7,23 @@ require 'open3'
 # stuff take FOREVER in the webpack build.  That means for the time being,
 # changes here if they happen may need to be mirrored in that file.
 
-module BrandableCSS
-  extend ActionView::Helpers::AssetTagHelper
+# this is to get urls that always have the asset host on them,
+# it was fixed in rails 4.1 so is unneeded once we are using 4.1+
+# at that point we can just use ActionController::Base.helpers.image_url below
+# see: https://github.com/rails/rails/issues/10051#issuecomment-26967074
+if CANVAS_RAILS4_0
+  class DummyControllerWithCorrectAssetUrls < ActionController::Base
+    def self.helpers
+      @helper_proxy ||= begin
+        proxy = ActionView::Base.new
+        proxy.config = config.inheritable_copy
+        proxy.extend(_helpers)
+      end
+    end
+  end
+end
 
+module BrandableCSS
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
@@ -90,7 +104,11 @@ module BrandableCSS
     def variables_map_with_image_urls
       @variables_map_with_image_urls ||= variables_map.each_with_object({}) do |(key, config), memo|
         if config['type'] == 'image'
-          memo[key] = config.merge('default' => image_url(config['default']))
+          if CANVAS_RAILS4_0
+            memo[key] = config.merge('default' => DummyControllerWithCorrectAssetUrls.helpers.image_url(config['default']))
+          else
+            memo[key] = config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
+          end
         else
           memo[key] = config
         end

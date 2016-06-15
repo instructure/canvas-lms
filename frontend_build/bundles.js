@@ -59,7 +59,6 @@ entries['instructure-common'] = [
   'compiled/grade_calculator',
   'compiled/jquery/ModuleSequenceFooter',
   'compiled/jquery/serializeForm',
-  'compiled/license_help',
   'compiled/models/Assignment',
   'compiled/models/grade_summary/CalculationMethodContent',
   'compiled/models/AssignmentOverride',

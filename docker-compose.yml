@@ -46,9 +46,11 @@ web: &WEB
 #    - cassandra
 #    - selenium
     - kinesis
+    - mailcatcher
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
+    REMOTE_DEBUGGING_ENABLED: 'true'
 
 jobs:
   <<: *WEB
@@ -57,6 +59,12 @@ jobs:
 guard:
   <<: *WEB
   command: bundle exec guard -i
+
+mailcatcher:
+  image: instructure/mailcatcher
+  environment:
+    VIRTUAL_HOST: mail.canvas.docker
+    VIRTUAL_PORT: 8080
 
 # Uncomment this entry to run qunit tests built from webpack
 # js-tests:

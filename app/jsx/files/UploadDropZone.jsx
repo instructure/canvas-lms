@@ -80,7 +80,10 @@ define([
       },
 
       getParent: function () {
-        return this.getDOMNode().parentElement;
+        // We are actually returning the parent's parent here because that
+        // gives a much more consistently sized container to start displaying
+        // the drop zone overlay with.
+        return this.getDOMNode().parentElement.parentElement;
       },
 
       buildNonActiveDropZone: function () {

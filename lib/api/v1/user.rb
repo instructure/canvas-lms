@@ -300,8 +300,18 @@ module Api::V1::User
       context.groups.map(&:id)
   end
 
+  def sis_id_context(context)
+    case context
+    when Account, Course
+      context
+    when Group
+      context.context
+    else
+      @domain_root_account
+    end
+  end
+
   def user_can_read_sis_data?(user, context)
-    sis_id_context = (context.is_a?(Course) || context.is_a?(Account)) ? context : @domain_root_account
-    sis_id_context.grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
+    sis_id_context(context).grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
   end
 end

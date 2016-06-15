@@ -404,6 +404,29 @@ describe "admin settings tab" do
       ]
     end
 
+    it "should set custom help link text and icon" do
+      Account.default.enable_feature! :use_new_styles
+      Setting.set('show_feedback_link', 'true')
+
+      link_name = 'Links'
+      icon = 'cog'
+      help_link_name_input = '[name="account[settings][help_link_name]"]'
+      help_link_icon_option = '[data-icon-value="cog"]'
+
+      get "/accounts/#{Account.default.id}/settings"
+
+      f(help_link_name_input).send_keys(link_name)
+      f(help_link_icon_option).click
+
+      click_submit
+
+      expect(Account.default.settings[:help_link_name]).to eq link_name
+      expect(Account.default.settings[:help_link_icon]).to eq icon
+
+      expect(f(help_link_name_input)).to have_value link_name
+      expect(is_checked(f("#{help_link_icon_option} input"))).to be_truthy
+    end
+
     it "should not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
           {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}]

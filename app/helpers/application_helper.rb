@@ -392,6 +392,8 @@ module ApplicationHelper
 
   def license_help_link
     @include_license_dialog = true
+    css_bundle('license_help')
+    js_bundle('license_help')
     link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
   end
 
@@ -640,7 +642,7 @@ module ApplicationHelper
   end
 
   def show_help_link?
-    show_feedback_link? || support_url
+    show_feedback_link? || support_url.present?
   end
 
   def help_link_classes(additional_classes = [])
@@ -649,6 +651,16 @@ module ApplicationHelper
     css_classes << "help_dialog_trigger" if show_feedback_link?
     css_classes.concat(additional_classes) if additional_classes
     css_classes.join(" ")
+  end
+
+  def help_link_icon
+    (@domain_root_account && @domain_root_account.settings[:help_link_icon]) ||
+      (Account.default && Account.default.settings[:help_link_icon]) || 'help'
+  end
+
+  def help_link_name
+    (@domain_root_account && @domain_root_account.settings[:help_link_name]) ||
+      (Account.default && Account.default.settings[:help_link_name]) || I18n.t('Help')
   end
 
   def help_link_data
@@ -660,7 +672,7 @@ module ApplicationHelper
 
   def help_link
     if show_help_link?
-      link_content = t('Help')
+      link_content = help_link_name
       link_to link_content.html_safe, help_link_url,
         :class => help_link_classes,
         :data => help_link_data
@@ -686,7 +698,7 @@ module ApplicationHelper
       else
         brand_config_for_account(opts)
       end
-      # If the accout does not have a brandConfig, or they explicitly chose to start from a blank
+      # If the account does not have a brandConfig, or they explicitly chose to start from a blank
       # slate in the theme editor, do one last check to see if we should actually use the k12 theme
       if !brand_config && k12?
         brand_config = BrandConfig.k12_config
@@ -698,7 +710,7 @@ module ApplicationHelper
   def active_brand_config_json_url(opts={})
     path = active_brand_config(opts).try(:public_json_path)
     path ||= BrandableCSS.public_default_json_path
-    "/#{path}"
+    "#{Canvas::Cdn.config.host}/#{path}"
   end
 
   def brand_config_for_account(opts={})

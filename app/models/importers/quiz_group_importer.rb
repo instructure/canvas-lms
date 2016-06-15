@@ -8,7 +8,7 @@ module Importers
     def self.import_from_migration(hash, context, quiz, question_data, position = nil, migration = nil)
       hash = hash.with_indifferent_access
       item ||= Quizzes::QuizGroup.where(quiz_id: quiz, migration_id: hash[:migration_id].try(:to_s)).first
-      item ||= quiz.quiz_groups.new
+      item ||= quiz.quiz_groups.temp_record
       item.migration_id = hash[:migration_id]
       item.question_points = hash[:question_points]
       item.pick_count = hash[:pick_count]

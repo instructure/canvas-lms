@@ -730,15 +730,19 @@ class Submission < ActiveRecord::Base
   # submissions (avoids having O(N) attachment queries)
   # NOTE: all submissions must belong to the same shard
   def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
-    attachment_ids_by_submission = Hash[
-      submissions.map do |s|
-        attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-        attachment_ids << s.attachment_id if s.attachment_id
-        [s, attachment_ids]
-      end
-    ]
+    # The index of the submission is considered part of the key for
+    # the hash that is built. This is needed for bulk loading
+    # submission_histories where multiple submission histories will
+    # look equal to the Hash key and the attachments for the last one
+    # will cancel out the former ones.
+    submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
+      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+      attachment_ids << s.attachment_id if s.attachment_id
+      [[s, index], attachment_ids]
+    end
+    attachment_ids_by_submission_and_index = Hash[submissions_with_index_and_attachment_ids]
 
-    bulk_attachment_ids = attachment_ids_by_submission.values.flatten
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
@@ -748,9 +752,9 @@ class Submission < ActiveRecord::Base
                           .group_by(&:id)
     end
 
-    submissions.each do |s|
+    submissions.each_with_index do |s, index|
       s.versioned_attachments =
-        attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten
+        attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
     end
   end
 
@@ -774,6 +778,10 @@ class Submission < ActiveRecord::Base
       [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.uniq]
     end
     Hash[attachments_by_submission]
+  end
+
+  def includes_attachment?(attachment)
+    self.versions.map(&:model).any? { |v| (v.attachment_ids || "").split(',').map(&:to_i).include?(attachment.id) }
   end
 
   def <=>(other)

@@ -229,6 +229,13 @@ Cassandra configuration is commented out in the docker-compose file; uncomment
 it and also uncomment the Cassandra configuration in cassandra.yml. Also follow
 the directions in cassandra.yml.example.
 
+## Email
+
+Email is often sent through background jobs if you spin up the `jobs` container.
+If you would like to test or preview any notifications, simply trigger the email
+through it's normal actions, and it should immediately show up in the emulated
+webmail inbox available here: http://mail.canvas.docker/
+
 ## Running tests
 
 ```

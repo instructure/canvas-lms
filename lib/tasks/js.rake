@@ -129,8 +129,7 @@ namespace :js do
         end
         puts "--> executing browser tests with Karma"
         build_runner
-        karma_output = `./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter} 2>&1`
-        puts karma_output
+        system "./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter}"
 
         if $?.exitstatus != 0
           puts 'some specs failed'
@@ -367,14 +366,4 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
-
-  #def npm_run(command)
-    #puts "Running npm script `#{command}`"
-    #msg = `$(npm bin)/#{command} 2>&1`
-    #unless $?.success?
-      #raise msg
-    #end
-    #msg
-  #end
-
 end

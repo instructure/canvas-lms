@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
+require [
   'i18n!license_help'
   'jquery'
   'jqueryui/dialog'

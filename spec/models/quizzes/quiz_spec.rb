@@ -1669,6 +1669,13 @@ describe Quizzes::Quiz do
       expect(@quiz.grants_right?(@teacher, :read)).to eq true
     end
 
+    it "lets admins read quizzes that are unpublished even without management rights" do
+      @quiz.unpublish!.reload
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_assignments", :enabled => false)
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_grades", :enabled => false)
+      expect(@quiz.grants_right?(@teacher, :read)).to eq true
+    end
+
     it "does let students read/submit quizzes that are published" do
       @quiz.publish!
       expect(@quiz.grants_right?(@student, :read)).to eq true

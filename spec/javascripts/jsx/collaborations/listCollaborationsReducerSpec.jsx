@@ -1,5 +1,5 @@
 define([
-  'jsx/collaborations/reducers/collaborationsReducer',
+  'jsx/collaborations/reducers/listCollaborationsReducer',
   'jsx/collaborations/actions/collaborationsActions'
 ], (reducer, actions) => {
   module('collaborationsReducer');
@@ -7,8 +7,8 @@ define([
   const defaults = reducer(undefined, {})
 
   test('there are defaults', () => {
-    equal(Array.isArray(defaults.collaborations), true);
-    equal(defaults.collaborations.length, 0);
+    equal(Array.isArray(defaults.list), true);
+    equal(defaults.list.length, 0);
     equal(defaults.listCollaborationsPending, false);
     equal(defaults.listCollaborationsSuccessful, false);
     equal(defaults.listCollaborationsError, null);
@@ -32,7 +32,7 @@ define([
     let state = {
       listCollaborationsPending: true,
       listCollaborationsSuccessful: false,
-      collaborations: []
+      list: []
     };
     let collaborations = [{}];
 
@@ -40,7 +40,7 @@ define([
     let newState = reducer(state, action);
     equal(newState.listCollaborationsPending, false);
     equal(newState.listCollaborationsSuccessful, true);
-    equal(newState.collaborations, collaborations);
+    equal(newState.list, collaborations);
   });
 
   test('responds to listCollaborationsFailed', () => {

@@ -1022,8 +1022,10 @@ class DiscussionTopicsController < ApplicationController
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
   def process_pin_parameters(discussion_topic_hash)
-    return unless params.has_key?(:pinned) && params[:pinned] != @topic.pinned?
-    @topic.pinned = params[:pinned]
+    return unless params.key?(:pinned)
+    pinned = value_to_boolean(params[:pinned])
+    return unless pinned != @topic.pinned?
+    @topic.pinned = pinned
     @topic.position = nil
     @topic.add_to_list_bottom
   end

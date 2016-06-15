@@ -179,7 +179,7 @@ window.addEventListener('message', function(e) {
         break;
     }
   } catch(err) {
-    (console.error || console.log)('invalid message received from ', e.origin);
+    (console.error || console.log).call(console, 'invalid message received from');
   }
 });
 

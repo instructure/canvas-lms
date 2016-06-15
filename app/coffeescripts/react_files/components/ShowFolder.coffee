@@ -8,7 +8,7 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-  '../utils/forceScreenreaderToReparse'
+  'jsx/shared/helpers/forceScreenreaderToReparse'
 ], ($, React, page, _, I18n, filesEnv, getAllPages, updateAPIQuerySortParams, Folder, forceScreenreaderToReparse) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/

@@ -1161,6 +1161,28 @@ describe Submission do
     end
   end
 
+  describe "includes_attachment?" do
+    it "includes current attachments" do
+      spoiler = attachment_model(context: @student)
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(spoiler)).to eq false
+      expect(sub.includes_attachment?(@attachment)).to eq true
+    end
+
+    it "includes attachments to previous versions" do
+      old_attachment_1 = attachment_model(context: @student)
+      old_attachment_2 = attachment_model(context: @student)
+      sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(old_attachment_1)).to eq true
+      expect(sub.includes_attachment?(old_attachment_2)).to eq true
+    end
+  end
+
   context "bulk loading" do
     def ensure_attachments_arent_queried
       Attachment.expects(:where).never
@@ -1209,6 +1231,32 @@ describe Submission do
         s.update_attribute(:attachment_ids, '99999999')
         Submission.bulk_load_versioned_attachments([s])
         expect(s.versioned_attachments).to eq []
+      end
+
+      it "handles submission histories with different attachments" do
+        student_in_course(active_all: true)
+        attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
+        Timecop.freeze(10.second.ago) do
+          @assignment.submit_homework(@student, submission_type: 'online_upload',
+                                      attachments: [attachments[0]])
+        end
+
+        attachments << attachment_model(filename: "submission-b.doc", :context => @student)
+        Timecop.freeze(5.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[1]]
+        end
+
+        attachments << attachment_model(filename: "submission-c.doc", :context => @student)
+        Timecop.freeze(1.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[2]]
+        end
+
+        submission = @assignment.submission_for_student(@student)
+        Submission.bulk_load_versioned_attachments(submission.submission_history)
+
+        submission.submission_history.each_with_index do |s, index|
+          expect(s.attachment_ids.to_i).to eq attachments[index].id
+        end
       end
     end
 

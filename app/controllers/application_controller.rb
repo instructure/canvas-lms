@@ -112,10 +112,12 @@ class ApplicationController < ActionController::Base
         current_user_id: @current_user.try(:id),
         current_user: user_display_json(@current_user, :profile),
         current_user_roles: @current_user.try(:roles, @domain_root_account),
+        current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         use_new_styles: use_new_styles?,
         k12: k12?,
+        help_link_name: help_link_name,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
@@ -1072,8 +1074,7 @@ class ApplicationController < ActionController::Base
       if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
         @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
-        access_context = @context.is_a?(UserProfile) ? @context.user : @context
-        @access.log access_context, @accessed_asset
+        @access.log @context, @accessed_asset
 
         if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
           generate_page_view(user)
@@ -1740,7 +1741,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+    stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -1968,7 +1969,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
@@ -2098,6 +2099,7 @@ class ApplicationController < ActionController::Base
       ctx[:session_id] = tctx[:session_id]
     end
 
+    StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
   end
 

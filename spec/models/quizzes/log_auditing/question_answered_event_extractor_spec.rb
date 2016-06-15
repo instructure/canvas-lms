@@ -157,6 +157,16 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         expect(event2).to be_nil
       end
 
+      it 'should not explode on unknown question types' do
+        # This can happen on a failed QTI import
+        @quiz_submission.quiz_data[0]["question_type"] = "Error"
+        event1 = subject({
+          "attempt" => 1,
+          "question_1" => ""
+        })
+        expect(event1).to be_truthy
+      end
+
       describe '[integration] a quiz-taking scenario' do
         def answer_and_generate_event(submission_data, created_at)
           submission_data['attempt'] = @quiz_submission.attempt

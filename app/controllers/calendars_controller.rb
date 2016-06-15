@@ -81,7 +81,7 @@ class CalendarsController < ApplicationController
       end
       info
     end
-    Api.recursively_stringify_json_ids(@contexts_json)
+    StringifyIds.recursively_stringify_ids(@contexts_json)
   end
 
   def build_calendar_events

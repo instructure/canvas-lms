@@ -21,7 +21,7 @@ module Importers
         context = migration.context
         root_outcome_group = context.root_outcome_group
         item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-        item ||= context.learning_outcome_groups.new
+        item ||= context.learning_outcome_groups.temp_record
         item.context = context
       end
       item.migration_id = hash[:migration_id]

@@ -200,22 +200,14 @@ class PageViewsController < ApplicationController
       end
       format.csv do
         cancel_cache_buster
-        per_page = Setting.get('page_views_csv_export_rows', '300').to_i
-        page_views = @user.page_views.paginate(:page => 1, :per_page => per_page)
+
+        csv = PageView::CsvReport.new(@user).generate
+
         options = {
           type: 'text/csv',
           filename: t(:download_filename, 'Pageviews For %{user}',
           user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
         }
-
-        if page_views.any?
-          header = Array(page_views.first.export_columns.to_csv)
-          rows   = Array(page_views.map { |view| view.to_row.to_csv })
-          csv    = (header + rows).join
-        else
-          csv    = ""
-        end
-
         send_data(csv, options)
       end
     end

@@ -6,7 +6,7 @@ define([
     listCollaborationsPending: false,
     listCollaborationsSuccessful: false,
     listCollaborationsError: null,
-    collaborations: [],
+    list: [],
   }
 
   let collaborationsHandlers = {
@@ -23,7 +23,7 @@ define([
         ...state,
         listCollaborationsPending: false,
         listCollaborationsSuccessful: true,
-        collaborations: action.payload
+        list: action.payload
       }
     },
     [ACTION_NAMES.LIST_COLLABORATIONS_FAILED]: (state, action) => {

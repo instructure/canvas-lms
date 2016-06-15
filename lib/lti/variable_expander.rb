@@ -444,7 +444,7 @@ module Lti
 
     register_expansion 'ToolConsumerProfile.url', [],
                        -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
-                       -> { @tool }
+                       -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
     register_expansion 'Canvas.file.media.id', [],
                        -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },

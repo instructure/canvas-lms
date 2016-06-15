@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -38,5 +38,14 @@ module Lti
 
       TOOL_DISPLAY_TEMPLATES[display_type].dup
     end
+
+    def self.custom_params(raw_post)
+      form_pairs = URI.decode_www_form(raw_post)
+      form_pairs.each_with_object({}) do |(k,v), hash|
+        captures = k.match(/^external_tool\[custom_fields\[(.*)\]\]/).try(:captures)
+        hash[captures.first] = v if captures.present?
+      end
+    end
+
   end
 end

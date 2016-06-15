@@ -283,7 +283,7 @@ define([
     render() {
       let tooltipForWhyApplyIsDisabled = null
       if (this.somethingHasChanged()) {
-        tooltipForWhyApplyIsDisabled = I18n.t('You need to "Preview Changes" before you can apply this to your accout')
+        tooltipForWhyApplyIsDisabled = I18n.t('You need to "Preview Changes" before you can apply this to your account')
       } else if (!this.displayedMatchesSaved()) {
         tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
       }

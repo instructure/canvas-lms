@@ -1,7 +1,6 @@
 <%
   display_question ||= nil
   question = display_question
-  Quizzes::QuizQuestionBuilder.translate_question_number_text(question, question[:position]) if question.present?
   question_type = answer_type(question)
   user_answer ||= nil
   user_answer_hash ||= {}

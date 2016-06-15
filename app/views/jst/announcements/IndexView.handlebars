@@ -16,12 +16,13 @@
               value="{{searchTerm}}"
               type="search">
         <span id="discussionsFilter">
-          <span class="screenreader-only" id="onlyUnreadAccessibleLabel">{{t "filter announcements by unread"}}</span>
           <input type="checkbox"
                 id="onlyUnread"
-                aria-labelledby="onlyUnreadAccessibleLabel"
                 {{#if onlyUnread}}checked{{/if}} />
-          <label for="onlyUnread" aria-hidden="true">{{#t "unread"}}Unread{{/t}}</label>
+          <label for="onlyUnread" class="no-button-role">
+            <span aria-hidden="true">{{#t "unread"}}Unread{{/t}}</span>
+            <span class="screenreader-only">{{t "filter announcements by unread"}}</span>
+          </label>
         </span>
         <div id="searchResultCount" aria-live="polite" class="screenreader-only"></div>
       </div>

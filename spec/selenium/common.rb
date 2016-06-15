@@ -25,10 +25,15 @@ require_relative 'test_setup/custom_selenium_rspec_matchers'
 require_relative 'test_setup/selenium_driver_setup'
 require_relative 'test_setup/selenium_extensions'
 
-if ENV["TESTRAIL_RUN_ID"] || ENV["TESTRAIL_ENTRY_RUN_ID"]
+if ENV["TESTRAIL_RUN_ID"]
   require 'testrailtagging'
   RSpec.configure do |config|
     TestRailRSpecIntegration.register_rspec_integration(config,:canvas, add_formatter: false)
+  end
+elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
+  require "testrailtagging"
+  RSpec.configure do |config|
+    TestRailRSpecIntegration.add_rspec_callback(config, :canvas)
   end
 end
 

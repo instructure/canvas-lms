@@ -29,4 +29,3 @@ module Api::V1::Collaborator
     end
   end
 end
-

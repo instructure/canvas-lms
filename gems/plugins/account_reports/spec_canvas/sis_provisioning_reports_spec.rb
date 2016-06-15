@@ -41,7 +41,6 @@ describe "Default Account Reports" do
     @user4 = user_with_pseudonym(:active_all => true,:username => 'jason@donovan.com',
                                  :name => 'Jason Donovan',:account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_04"
-    @user.pseudonym.sis_batch_id = sis.id
     @user.pseudonym.save!
     @user5 = user_with_pseudonym(:name => 'James Brown',:account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_05"
@@ -303,13 +302,14 @@ describe "Default Account Reports" do
         parameters["enrollment_term"] = @default_term.id
         #term does not impact user report
         parameters["include_deleted"] = true
+        parameters["created_by_sis"] = true
         parameters["users"] = true
         parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
         headers = parsed.shift
         expect(headers).to eq ['user_id', 'login_id', 'password', 'first_name',
                                'last_name', 'full_name', 'sortable_name',
                                'short_name', 'email', 'status']
-        expect(parsed.length).to eq 5
+        expect(parsed.length).to eq 4
 
         expect(parsed[0]).to eq ["user_sis_id_01", "john@stclair.com", nil,
                                  "John St.", "Clair", "John St. Clair",
@@ -322,11 +322,7 @@ describe "Default Account Reports" do
         expect(parsed[2]).to eq ["user_sis_id_03", "rick@roll.com", nil, "Rick",
                                  "Astley", "Rick Astley", "Astley, Rick", nil,
                                  "rick@roll.com", "active"]
-        expect(parsed[3]).to eq ["user_sis_id_04", "jason@donovan.com", nil,
-                                 "Jason", "Donovan", "Jason Donovan",
-                                 "Donovan, Jason", nil, "jason@donovan.com",
-                                 "active"]
-        expect(parsed[4]).to eq ["user_sis_id_05", "nobody@example.com", nil,
+        expect(parsed[3]).to eq ["user_sis_id_05", "nobody@example.com", nil,
                                  "James", "Brown", "James Brown",
                                  "Brown, James", nil, nil, "deleted"]
       end
@@ -405,7 +401,7 @@ describe "Default Account Reports" do
         expect(parsed[5]).to eq [@user4.id.to_s, "user_sis_id_04",
                                  "jason@donovan.com", "Jason", "Donovan",
                                  "Jason Donovan", "Donovan, Jason", nil,
-                                 "jason@donovan.com", "active", "true"]
+                                 "jason@donovan.com", "active", "false"]
       end
 
       it "should run provisioning report including deleted users" do
@@ -414,32 +410,23 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["users"] = true
         parameters["include_deleted"] = true
+        parameters["created_by_sis"] = true
         parsed = read_report("provisioning_csv", {params: parameters, order: [1, 2]})
-        expect(parsed.length).to eq 7
+        expect(parsed.length).to eq 4
 
-        expect(parsed[0]).to eq [@user6.id.to_s, nil, "john@smith.com", "John",
-                                 "Smith", "John Smith", "Smith, John", nil,
-                                 "john@smith.com", "active", "false"]
-        expect(parsed[1]).to eq [@user7.id.to_s, nil, "jony@apple.com", "Jony",
-                                 "Ive", "Jony Ive", "Ive, Jony", nil,
-                                 "jony@apple.com", "active", "false"]
-        expect(parsed[2]).to eq [@user1.id.to_s, "user_sis_id_01",
+        expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
                                  "john@stclair.com", "John St.", "Clair",
                                  "John St. Clair", "Clair, John St.", nil,
                                  "john@stclair.com", "active", "true"]
-        expect(parsed[3]).to eq [@user2.id.to_s, "user_sis_id_02",
+        expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
                                  "micheal@michaelbolton.com", "Michael",
                                  "Bolton", "Michael Bolton", "Bolton, Michael",
                                  nil, "micheal@michaelbolton.com", "active", "true"]
-        expect(parsed[4]).to eq [@user3.id.to_s, "user_sis_id_03",
+        expect(parsed[2]).to eq [@user3.id.to_s, "user_sis_id_03",
                                  "rick@roll.com", "Rick", "Astley",
                                  "Rick Astley", "Astley, Rick", nil,
                                  "rick@roll.com", "active", "true"]
-        expect(parsed[5]).to eq [@user4.id.to_s, "user_sis_id_04",
-                                 "jason@donovan.com", "Jason", "Donovan",
-                                 "Jason Donovan", "Donovan, Jason", nil,
-                                 "jason@donovan.com", "active", "true"]
-        expect(parsed[6]).to eq [@user5.id.to_s, "user_sis_id_05",
+        expect(parsed[3]).to eq [@user5.id.to_s, "user_sis_id_05",
                                  "nobody@example.com", "James", "Brown",
                                  "James Brown", "Brown, James", nil, nil,
                                  "deleted", "true"]

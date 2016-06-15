@@ -340,10 +340,10 @@ describe 'Speedgrader' do
       expect(ff('.quiz-nav-li').length).to eq 40
 
       # check scrolling
-      first_left = wrapper.css_value('left')
+      first_left = wrapper.css_value('left').to_f
 
       f('#nav-link-next').click
-      second_left = wrapper.css_value('left')
+      second_left = wrapper.css_value('left').to_f
       expect(first_left).to be > second_left
 
       # check anchors

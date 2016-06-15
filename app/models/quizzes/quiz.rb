@@ -1013,6 +1013,9 @@ class Quizzes::Quiz < ActiveRecord::Base
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
     can :submit
 
+    given { |user, session| context.grants_right?(user, session, :read_as_admin) }
+    can :read
+
     given do |user, session|
       published? && context.grants_right?(user, session, :read)
     end

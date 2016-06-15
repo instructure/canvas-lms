@@ -667,6 +667,8 @@ CanvasRails::Application.routes.draw do
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
   get 'saml_observee' => 'login/saml#observee_validation', as: :saml_observee
   post 'login/saml' => 'login/saml#create'
+  # deprecated alias; no longer advertised
+  post 'saml_consume' => 'login/saml#create'
 
   # the callback URL for all OAuth1.0a based SSO
   get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback
@@ -874,6 +876,9 @@ CanvasRails::Application.routes.draw do
       put 'courses/:course_id/settings', action: :update_settings
       get 'courses/:course_id/recent_students', action: :recent_students, as: 'course_recent_students'
       get 'courses/:course_id/users', action: :users, as: 'course_users'
+      get 'courses/:course_id/collaborations', controller: :collaborations, action: :api_index, as: 'course_collaborations_index'
+      delete 'courses/:course_id/collaborations/:id', controller: :collaborations, action: :destroy
+
       # this api endpoint has been removed, it was redundant with just courses#users
       # we keep it around for backward compatibility though
       get 'courses/:course_id/search_users', action: :users
@@ -1366,6 +1371,8 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/activity_stream/summary', action: :activity_stream_summary, as: 'group_activity_stream_summary'
       put "groups/:group_id/followers/self", action: :follow
       delete "groups/:group_id/followers/self", action: :unfollow
+      get 'groups/:group_id/collaborations', controller: :collaborations, action: :api_index, as: 'group_collaborations_index'
+      delete 'groups/:group_id/collaborations/:id', controller: :collaborations, action: :destroy
 
       scope(controller: :group_memberships) do
         resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships

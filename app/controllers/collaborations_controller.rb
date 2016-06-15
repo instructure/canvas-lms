@@ -58,6 +58,7 @@ class CollaborationsController < ApplicationController
   before_filter { |c| c.active_tab = "collaborations" }
 
   include Api::V1::Collaborator
+  include Api::V1::Collaboration
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -78,6 +79,39 @@ class CollaborationsController < ApplicationController
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types
+  end
+
+  # @API List collaborations
+  # List collaborations the current user has access to in the context of the course
+  # provided in the url
+  #
+  #   curl https://<canvas>/api/v1/courses/1/collaborations/
+  #
+  # @returns [Collaboration]
+  def api_index
+    return unless authorized_action(@context, @current_user, :read) &&
+      (tab_enabled?(@context.class::TAB_COLLABORATIONS) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW))
+
+    url = @context.instance_of?(Course) ? api_v1_course_collaborations_index_url : api_v1_group_collaborations_index_url
+
+    collaborations_query = @context.collaborations.active.
+                             eager_load(:user).
+                             where(type: 'ExternalToolCollaboration')
+
+    unless @context.grants_right?(@current_user, session, :manage_content)
+      collaborations_query = collaborations_query.
+                                eager_load(:collaborators).
+                                where(Collaboration.arel_table[:user_id].eq(@current_user.id).
+                                or(Collaborator.arel_table[:user_id].eq(@current_user.id)))
+    end
+
+    collaborations = Api.paginate(
+      collaborations_query,
+      self,
+      url
+    )
+
+    render :json => collaborations.map { |c| collaboration_json(c, @current_user, session) }
   end
 
   def show
@@ -125,8 +159,7 @@ class CollaborationsController < ApplicationController
     content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     if content_item
       @collaboration = collaboration_from_content_item(content_item)
-      users = []
-      group_ids = []
+      users, group_ids = content_item_visibility(content_item)
     else
       users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
@@ -158,8 +191,7 @@ class CollaborationsController < ApplicationController
     begin
       if content_item
         @collaboration = collaboration_from_content_item(content_item, @collaboration)
-        users = []
-        group_ids = []
+        users, group_ids = content_item_visibility(content_item)
       else
         users     = User.where(:id => Array(params[:user])).to_a
         group_ids = Array(params[:group])
@@ -258,6 +290,15 @@ class CollaborationsController < ApplicationController
 
   def external_tool_launch_url(url)
     polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  end
+
+  def content_item_visibility(content_item)
+    visibility = content_item['ext_canvas_visibility']
+    lti_user_ids = visibility && visibility['users'] || []
+    lti_group_ids = visibility && visibility['groups'] || []
+    users = User.where(lti_context_id: lti_user_ids)
+    groups = Group.where(lti_context_id: lti_group_ids)
+    [users, groups]
   end
 
 end

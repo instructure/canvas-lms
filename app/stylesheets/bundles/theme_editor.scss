@@ -247,6 +247,7 @@ $te-footer-height: 72px;
 .ThemeEditorFileUpload__file-chooser {
   display: flex;
   flex: 1;
+  overflow: hidden;
 
   input[type="file"] {
     position: absolute;
@@ -259,6 +260,7 @@ $te-footer-height: 72px;
   color: $gray-light;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   display: inline-block;
   cursor: default;
 

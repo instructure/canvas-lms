@@ -266,6 +266,8 @@ class Message < ActiveRecord::Base
   def link_root_account
     @root_account ||= begin
       context = self.context
+      context = self.asset_context if context.is_a?(CommunicationChannel) && self.asset_context
+
       context = context.assignment if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
       context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group

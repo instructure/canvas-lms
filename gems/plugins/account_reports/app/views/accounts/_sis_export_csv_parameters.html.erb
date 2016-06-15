@@ -74,6 +74,14 @@
   </tr>
   <tr>
     <td>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[created_by_sis]"   %>
+        <%= t('Created by SIS') %>
+      </label>
+    </td>
+  </tr>
+  <tr>
+    <td>
       <label>
         <%= t('account_reports.sis_default.parameters.note', %{*Term settings only impact Courses, Sections, Enrollments, and X list CSV files.}) %>
       </label>

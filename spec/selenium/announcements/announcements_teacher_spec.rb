@@ -6,20 +6,28 @@ describe "announcements" do
   include AnnouncementsCommon
 
   context "announcements as a teacher" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before :once do
+      @teacher = user_with_pseudonym(active_user: true)
+      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+    end
+
+    before :each do
+      user_session(@teacher)
     end
 
     describe "shared bulk topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
 
-      before (:each) do
+      before :once do
         @context = @course
         5.times do |i|
           title = "new #{i.to_s.rjust(3, '0')}"
           what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => @user) : announcement_model(:title => title, :user => @user)
         end
+      end
+
+      before :each do
         get url
         @checkboxes = ff('.toggleSelected')
       end
@@ -81,7 +89,7 @@ describe "announcements" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
 
-      before (:each) do
+      before :once do
         @topic_title = 'new discussion'
         @context = @course
       end
@@ -248,8 +256,15 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    # TODO reimplement per CNVS-29612, but make sure we're testing at the right level
-    it "should have a teacher add a new entry to its own announcement", priority: "1", test_id: 220372
+    it "lets a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
+      create_announcement
+      get [@course, @announcement]
+      f('.discussion-reply-action').click
+      entry_text = 'new entry text'
+      type_in_tiny('textarea', entry_text)
+      fj("button[type=submit]").click
+      expect(DiscussionEntry.last.message).to include(entry_text)
+    end
 
     it "should show announcements to student view student", priority: "1", test_id: 220373 do
       create_announcement

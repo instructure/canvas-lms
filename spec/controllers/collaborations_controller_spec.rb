@@ -267,6 +267,26 @@ describe CollaborationsController do
         post 'create', :course_id => @course.id, :contentItems => content_items.to_json
       end
 
+      it "adds users if sent" do
+        user_session(@teacher)
+        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
+        lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
+        content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
+      end
+
+      it "adds groups if sent" do
+        user_session(@teacher)
+        group = group_model
+        group.add_user(@teacher, 'active')
+        content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+      end
+
     end
 
   end
@@ -329,6 +349,26 @@ describe CollaborationsController do
         content_item_util_stub.expects(:failure_callback)
         Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
         put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "adds users if sent" do
+        user_session(@teacher)
+        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
+        lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
+        content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
+      end
+
+      it "adds groups if sent" do
+        user_session(@teacher)
+        group = group_model
+        group.add_user(@teacher, 'active')
+        content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
       end
 
     end

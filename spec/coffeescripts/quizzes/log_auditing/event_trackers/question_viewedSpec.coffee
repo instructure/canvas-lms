@@ -52,7 +52,8 @@ define [
     ok !capture.called,
       'question should not be marked as viewed just yet'
 
-    $(window).scrollTop(offsetTop - wh + 1).scroll()
+    $fakeQuestion.scrollIntoView()
+    $(window).scroll()
     ok capture.called,
       'question should now be marked as viewed after scrolling it into viewport'
 
@@ -61,6 +62,7 @@ define [
     $(window).scrollTop(0).scroll()
     ok !capture.called
 
-    $(window).scrollTop(offsetTop - wh + 1).scroll()
+    $fakeQuestion.scrollIntoView()
+    $(window).scroll()
     ok !capture.called,
       'should not track the same question more than one time'

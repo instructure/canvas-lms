@@ -58,7 +58,7 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :wiki_pages, foreign_key: 'wiki_page', primary_key: 'wiki_page'
   has_many :web_conferences, :as => :context, :dependent => :destroy
-  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
+  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
@@ -553,6 +553,9 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
       can :read_as_admin
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_sis)}
+      can :read_sis
     end
   end
 

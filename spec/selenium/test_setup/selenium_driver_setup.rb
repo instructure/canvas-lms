@@ -9,11 +9,11 @@ module SeleniumDriverSetup
   MAX_FAILURES_TO_RECORD = 20
   IMPLICIT_WAIT_TIMEOUT = 15
 
+  def browser
+    $selenium_config[:browser].try(:to_sym) || :firefox
+  end
+
   def setup_selenium
-
-    browser = $selenium_config[:browser].try(:to_sym) || :firefox
-    host_and_port
-
     path = $selenium_config[:paths].try(:[], browser)
     if path
       Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
@@ -25,8 +25,10 @@ module SeleniumDriverSetup
                firefox_driver
              elsif browser == :chrome
                chrome_driver
-             elsif browser == :ie
+             elsif browser == :internet_explorer
                ie_driver
+             elsif browser == :safari
+               safari_driver
              end
 
     focus_viewport driver if run_headless?
@@ -102,44 +104,23 @@ module SeleniumDriverSetup
   end
 
   def ie_driver
-    require 'testingbot'
-    require 'testingbot/tunnel'
-
     puts "using IE driver"
+    selenium_remote_driver
+  end
 
-    caps = Selenium::WebDriver::Remote::Capabilities.ie
-    caps.version = "10"
-    caps.platform = :WINDOWS
-    caps[:unexpectedAlertBehaviour] = 'ignore'
-
-    Selenium::WebDriver.for(
-      :remote,
-      :url => "http://#{$selenium_config[:testingbot_key]}:" +
-                "#{$selenium_config[:testingbot_secret]}@hub.testingbot.com:4444/wd/hub",
-      :desired_capabilities => caps)
-
+  def safari_driver
+    puts "using safari driver"
+    selenium_remote_driver
   end
 
   def firefox_driver
     puts "using FIREFOX driver"
-    profile = firefox_profile
-    caps = Selenium::WebDriver::Remote::Capabilities.firefox(:unexpectedAlertBehaviour => 'ignore')
-
-    if $selenium_config[:host_and_port]
-      caps.firefox_profile = profile
-      stand_alone_server_firefox_driver(caps)
-    else
-      ruby_firefox_driver(profile: profile, desired_capabilities: caps)
-    end
+    selenium_url ? selenium_remote_driver : ruby_firefox_driver
   end
 
   def chrome_driver
     puts "using CHROME driver"
-    if $selenium_config[:host_and_port]
-      stand_alone_server_chrome_driver
-    else
-      ruby_chrome_driver
-    end
+    selenium_url ? selenium_remote_driver : ruby_chrome_driver
   end
 
   def ruby_chrome_driver
@@ -156,31 +137,34 @@ module SeleniumDriverSetup
     driver
   end
 
-  def stand_alone_server_chrome_driver
-    driver = nil
-    3.times do |times|
-      begin
-        driver = Selenium::WebDriver.for(
-          :remote,
-          :url => 'http://' + ($selenium_config[:host_and_port] || "localhost:4444") + '/wd/hub',
-          :desired_capabilities => :chrome
-        )
-        break
-      rescue StandardError => e
-        puts "Error attempting to start remote webdriver: #{e}"
-        raise e if times == 2
-      end
-    end
-    driver
+  def selenium_remote_driver
+    Selenium::WebDriver.for(
+      :remote,
+      :url => selenium_url,
+      :desired_capabilities => desired_capabilities
+    )
   end
 
-  def ruby_firefox_driver(options)
+  def desired_capabilities
+    caps = Selenium::WebDriver::Remote::Capabilities.send(browser)
+    caps.version = $selenium_config[:version] unless $selenium_config[:version].nil?
+    caps.platform = $selenium_config[:platform] unless $selenium_config[:platform].nil?
+    caps["tunnel-identifier"] = $selenium_config[:tunnel_id] unless $selenium_config[:tunnel_id].nil?
+    caps[:unexpectedAlertBehaviour] = 'ignore'
+    caps
+  end
+
+  def selenium_url
+    $selenium_config[:remote_url]
+  end
+
+  def ruby_firefox_driver
     try ||= 1
-    puts "Thread: provisioning selenium ruby firefox driver (#{options.inspect})"
-    # dup is necessary for retries because selenium deletes out of the options
     # TODO: we could try a random port here instead of relying on the default for retries
     # (or killing firefox may be the best move)
-    driver = Selenium::WebDriver.for(:firefox, options.dup)
+    driver = Selenium::WebDriver.for(:firefox,
+                                     profile: firefox_profile,
+                                     desired_capabilities: desired_capabilities)
   rescue StandardError => e
     puts <<-ERROR
     Thread #{THIS_ENV}
@@ -202,24 +186,6 @@ module SeleniumDriverSetup
     end
   end
 
-  def stand_alone_server_firefox_driver(caps)
-    driver = nil
-    3.times do |times|
-      begin
-        driver = Selenium::WebDriver.for(
-          :remote,
-          :url => 'http://' + ($selenium_config[:host_and_port] || "localhost:4444") + '/wd/hub',
-          :desired_capabilities => caps
-        )
-        break
-      rescue StandardError => e
-        puts "Error attempting to start remote webdriver: #{e}"
-        raise e if times == 2
-      end
-    end
-    driver
-  end
-
   def selenium_driver
     $selenium_driver ||= setup_selenium
   end
@@ -234,12 +200,6 @@ module SeleniumDriverSetup
       profile = Selenium::WebDriver::Firefox::Profile.from_name($selenium_config[:firefox_profile])
     end
     profile
-  end
-
-  def host_and_port
-    if $selenium_config[:host] && $selenium_config[:port] && !$selenium_config[:host_and_port]
-      $selenium_config[:host_and_port] = "#{$selenium_config[:host]}:#{$selenium_config[:port]}"
-    end
   end
 
   def set_native_events(setting)

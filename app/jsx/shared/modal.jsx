@@ -8,6 +8,22 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   const Modal = React.createClass({
 
     getInitialState() {
@@ -89,12 +105,13 @@ define([
       return (
         <div className="canvasModal">
           <ReactModal
-                 ariaHideApp={!!this.state.modalIsOpen}
-                 isOpen={!!this.state.modalIsOpen}
-                 onRequestClose={this.closeModal}
-                 className={this.props.className}
-                 overlayClassName={this.props.overlayClassName}
-                 appElement={this.getAppElement()}>
+            ariaHideApp={!!this.state.modalIsOpen}
+            isOpen={!!this.state.modalIsOpen}
+            onRequestClose={this.closeModal}
+            className={this.props.className}
+            style={modalOverrides}
+            overlayClassName={this.props.overlayClassName}
+            appElement={this.getAppElement()}>
             <div ref="modal" className="ReactModal__Layout">
 
               <div className="ReactModal__Header">
