@@ -434,7 +434,7 @@ END
     {
       display_name: -> { I18n.t("External Collaborations Tool") },
       description: -> { I18n.t("Use the new Collaborations external tool enabling more options for tools to use to collaborate") },
-      applies_to: 'RootAccount',
+      applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true
     }
