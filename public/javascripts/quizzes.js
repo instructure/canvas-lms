@@ -3468,9 +3468,9 @@ define([
         return params;
       }
     }
-    $(document).on('click keypress', ".draggable-handle", function(event) {
+    $(document).on('click keydown', ".draggable-handle", function(event) {
+      if (event.type == "keydown" && event.keyCode != 13 && event.keyCode != 32) { return; }
       event.preventDefault();
-      if (event.type == "keypress" && event.keyCode != 13) { return; }
 
       accessibleSortables.init(
         $(event.target), $("#questions"), $("#move_quiz_item_form")
