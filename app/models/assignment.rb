@@ -2015,11 +2015,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.with_student_submission_count
-    joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
-           s.assignment_id = assignments.id AND
-           s.submission_type IS NOT NULL")
-    .group("assignments.id")
-    .select("assignments.*, count(s.assignment_id) AS student_submission_count")
+    # need to make sure that Submission's table name is relative to the shard
+    # this query will execute on
+    all.primary_shard.activate do
+      joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
+             s.assignment_id = assignments.id AND
+             s.submission_type IS NOT NULL")
+      .group("assignments.id")
+      .select("assignments.*, count(s.assignment_id) AS student_submission_count")
+    end
   end
 
   def can_unpublish?
