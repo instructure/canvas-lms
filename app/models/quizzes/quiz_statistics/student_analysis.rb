@@ -276,9 +276,13 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           elsif question[:question_type] == 'multiple_dropdowns_question'
             blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
-            row << answer_ids.map { |id| (question[:answers].detect { |a| a[:id] == id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
+            row << answer_ids.map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
           elsif question[:question_type] == 'calculated_question'
-            list = question[:answers][0][:variables].map { |a| [a[:name], a[:value].to_s].map { |str| str.gsub(/\=>/, '\=>') }.join('=>') }
+            list = question[:answers].take(1).flat_map do |ans|
+              ans[:variables] && ans[:variables].map do |variable|
+                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/\=>/, '\=>') }.join('=>')
+              end
+            end
             list << answer[:text]
             row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
           elsif question[:question_type] == 'matching_question'
