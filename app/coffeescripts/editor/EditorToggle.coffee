@@ -50,6 +50,12 @@ define [
       else
         @display()
 
+    rceOptions: ->
+      opts = {focus: true, tinyOptions: @options.tinyOptions || {}}
+      if @options.editorBoxLabel
+        opts.tinyOptions.aria_label = @options.editorBoxLabel
+      opts
+
     ##
     # Converts the element to an editor
     # @api public
@@ -64,11 +70,8 @@ define [
       @infoIcon.insertAfter @switchViews
       $('<div/>', style: "clear: both").insertBefore @textArea
       @done.insertAfter @textArea
-      opts = {focus: true, tinyOptions: {}}
-      if @options.editorBoxLabel
-        opts.tinyOptions.aria_label = @options.editorBoxLabel
       RichContentEditor.initSidebar()
-      RichContentEditor.loadNewEditor(@textArea, opts)
+      RichContentEditor.loadNewEditor(@textArea, @rceOptions())
       @editing = true
       @trigger 'edit'
 

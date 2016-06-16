@@ -2113,7 +2113,19 @@ define([
 
       // create toggler instance on the first click
       if (!toggler) {
-        toggler = new EditorToggle($comment_html, {editorBoxLabel: $link.title });
+        var inputColumn = $comment.parents().find('.answer_type:visible')[0]
+
+        var rightMargin = parseInt($comment.css('marginRight')) || 0
+        var leftMargin = parseInt($comment.css('marginLeft')) || 0
+        var commentMargin = rightMargin + leftMargin
+
+        var rceWidth = inputColumn.offsetWidth - commentMargin
+
+        toggler = new EditorToggle($comment_html, {
+          editorBoxLabel: $link.title,
+          tinyOptions: {width: rceWidth}
+        });
+
         toggler.editButton = $link;
         toggler.on('display', function() {
 
@@ -4096,10 +4108,15 @@ define([
     event.preventDefault();
     var $this = $(this);
     var toggler = $this.data('editorToggle');
+    var inputColumn = $this.parents().find('.answer_type:visible')[0]
+    var rceWidth = inputColumn.offsetWidth
 
     // create toggler instance on the first click
     if (!toggler) {
-      toggler = new MultipleChoiceToggle($this, {editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area')});
+      toggler = new MultipleChoiceToggle($this, {
+        editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area'),
+        tinyOptions: {width: rceWidth}
+      });
       $this.data('editorToggle', toggler);
     }
 
