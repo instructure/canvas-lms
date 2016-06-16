@@ -446,6 +446,10 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> {@assignment && @assignment.due_at.present?}
 
+    register_expansion 'Canvas.assignment.status', [],
+                       -> { @assignment.workflow_state },
+                       ASSIGNMENT_GUARD
+
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
                        -> { @tool_setting_link_id }
