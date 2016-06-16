@@ -1180,9 +1180,10 @@ class Attachment < ActiveRecord::Base
     true
   end
 
-  def make_childless
-    child = children.take
+  def make_childless(preferred_child = nil)
+    child = preferred_child || children.take
     return unless child
+    raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
     child.filename ||= filename
     if Attachment.s3_storage?
