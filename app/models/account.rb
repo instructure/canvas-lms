@@ -137,7 +137,11 @@ class Account < ActiveRecord::Base
 
   def default_locale(recurse = false)
     result = read_attribute(:default_locale)
-    result ||= parent_account.default_locale(true) if recurse && parent_account
+    if recurse
+      result ||= Rails.cache.fetch(['default_locale', self.global_id].cache_key) do
+        parent_account.default_locale(true) if parent_account
+      end
+    end
     result = nil unless I18n.locale_available?(result)
     result
   end
@@ -539,19 +543,25 @@ class Account < ActiveRecord::Base
   def setup_cache_invalidation
     @invalidations = []
     unless self.new_record?
-      @invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
-      @invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+      invalidate_all = self.parent_account_id_changed?
+      # apparently, the try_rescues are because these columns don't exist on old migrations
+      @invalidations += ['default_storage_quota', 'current_quota'] if invalidate_all || self.try_rescue(:default_storage_quota_changed?)
+      @invalidations << 'default_group_storage_quota' if invalidate_all || self.try_rescue(:default_group_storage_quota_changed?)
+      @invalidations << 'default_locale' if invalidate_all || self.try_rescue(:default_locale_changed?)
     end
   end
 
   def invalidate_caches_if_changed
     @invalidations ||= []
-    if @old_settings
+    if self.parent_account_id_changed?
+      @invalidations += Account.inheritable_settings # invalidate all of them
+    elsif @old_settings
       Account.inheritable_settings.each do |key|
         @invalidations << key if @old_settings[key] != settings[key] # only invalidate if needed
       end
       @old_settings = nil
     end
+
     if @invalidations.present?
       shard.activate do
         @invalidations.each do |key|

@@ -1376,6 +1376,23 @@ describe Account do
         expect(subaccount.default_storage_quota).to eq 20.megabytes
       end
     end
+
+    it "should inherit from a new parent account's default_storage_quota if parent account changes" do
+      enable_cache do
+        account = account_model
+
+        account.default_storage_quota = 10.megabytes
+        account.save!
+
+        to_be_subaccount = Account.create!
+        expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
+
+        # should clear caches
+        to_be_subaccount.parent_account = account
+        to_be_subaccount.save!
+        expect(to_be_subaccount.default_storage_quota).to eq 10.megabytes
+      end
+    end
   end
 
   context "inheritable settings" do
