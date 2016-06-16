@@ -645,7 +645,7 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           @course.require_assignment_group rescue nil
           # offer updates the workflow state, saving the record without doing validation callbacks
-          if api_request? and params[:offer].present?
+          if api_request? and value_to_boolean(params[:offer])
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
