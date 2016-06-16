@@ -75,7 +75,7 @@ module Quizzes
                    when 'submitted' then submitted_students
                    else all_students
                    end
-      sender.load_messageable_users(recipients.pluck(:id))
+      sender.address_book.known_users(recipients)
     end
   end
 end

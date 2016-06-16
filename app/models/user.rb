@@ -2326,6 +2326,10 @@ class User < ActiveRecord::Base
     Conversation.initiate(users, private, options).conversation_participants.where(user_id: self).first
   end
 
+  def address_book
+    @address_book ||= AddressBook.for(self)
+  end
+
   def messageable_user_calculator
     @messageable_user_calculator ||= MessageableUser::Calculator.new(self)
   end

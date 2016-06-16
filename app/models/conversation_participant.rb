@@ -236,27 +236,24 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def participants(options = {})
-    options = {
-      :include_participant_contexts => false,
-      :include_indirect_participants => false
-    }.merge(options)
-
-    shard.activate do
-      Rails.cache.fetch([conversation, user, 'participants', options].cache_key) do
+    participants = shard.activate do
+      include_indirect_participants = options[:include_indirect_participants] || false
+      Rails.cache.fetch([conversation, user, 'participants', include_indirect_participants].cache_key) do
         participants = conversation.participants
-        if options[:include_indirect_participants]
+        if include_indirect_participants
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
-          participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).to_a }
+          participants += AddressBook.available(user_ids)
         end
-        if options[:include_participant_contexts]
-          # we do this to find out the contexts they share with the user
-          user.load_messageable_users(participants, :strict_checks => false)
-        else
-          participants
-        end
+        participants
       end
     end
+
+    if options[:include_participant_contexts]
+      user.address_book.preload_users(participants)
+    end
+
+    participants
   end
 
   def properties(latest = last_message)

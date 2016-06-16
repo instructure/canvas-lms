@@ -1029,32 +1029,33 @@ class ConversationsController < ApplicationController
 
   def normalize_recipients
     return unless params[:recipients]
+
     unless params[:recipients].is_a? Array
       params[:recipients] = params[:recipients].split ","
     end
 
-    recipient_ids = MessageableUser.individual_recipients(params[:recipients])
-    contexts      = MessageableUser.context_recipients(params[:recipients])
+    # unrecognized context codes are ignored
+    if AddressBook.valid_context?(params[:context_code])
+      context = Context.find_by_asset_string(params[:context_code])
+      if context.nil?
+        # recognized context code must refer to a valid course or group
+        return render json: { message: 'invalid context_code' }, status: :bad_request
+      end
+    end
 
-    if params[:context_code] =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
-      is_admin = Context.
-        find_by_asset_string(params[:context_code]).
-        grants_right?(@current_user, :read_as_admin)
-      @recipients = @current_user.
-        messageable_user_calculator.
-        messageable_users_in_context(
-          params[:context_code],
-          admin_context: is_admin
-        ).select { |user| recipient_ids.include? user.id }
+    users, contexts = AddressBook.partition_recipients(params[:recipients])
+    if context
+      user_ids = users.map{ |user| Shard.global_id_for(user) }.to_set
+      is_admin = context.grants_right?(@sender, :read_as_admin)
+      known = @current_user.address_book.
+        known_in_context(context.asset_string, is_admin).
+        select{ |user| user_ids.include?(user.global_id) }
     else
-      @recipients = @current_user.load_messageable_users(recipient_ids, conversation_id: params[:from_conversation_id])
+      known = @current_user.address_book.
+        known_users(users, conversation_id: params[:from_conversation_id])
     end
-
-    contexts.map do |context|
-      @recipients.concat @current_user.messageable_users_in_context(context)
-    end
-
-    @recipients.uniq!(&:id)
+    contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
+    @recipients = known.uniq(&:id)
   end
 
   def infer_tags

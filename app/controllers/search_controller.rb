@@ -130,10 +130,14 @@ class SearchController < ApplicationController
 
       recipients = []
       if params[:user_id]
-        recipient = @current_user.load_messageable_user(params[:user_id], :conversation_id => params[:from_conversation_id], :admin_context => @admin_context)
-        recipients << recipient if recipient
+        known = @current_user.address_book.known_user(
+          params[:user_id],
+          include_context: @admin_context,
+          conversation_id: params[:from_conversation_id])
+        recipients << known if known
       elsif params[:context] || params[:search]
         collections = []
+        exclude_users, exclude_contexts = AddressBook.partition_recipients(exclude)
 
         if types[:context]
           collections << ['contexts', search_messageable_contexts(
@@ -142,19 +146,19 @@ class SearchController < ApplicationController
             :synthetic_contexts => params[:synthetic_contexts],
             :include_inactive => params[:include_inactive],
             :messageable_only => params[:messageable_only],
-            :exclude_ids => MessageableUser.context_recipients(exclude),
+            :exclude_ids => exclude_contexts,
             :search_all_contexts => params[:search_all_contexts],
             :types => types[:context]
           )]
         end
 
         if types[:user] && !@skip_users
-          collections << ['participants', @current_user.search_messageable_users(
-            :search => params[:search],
-            :context => params[:context],
-            :admin_context => @admin_context,
-            :exclude_ids => MessageableUser.individual_recipients(exclude),
-            :strict_checks => !params[:skip_visibility_checks]
+          collections << ['participants', @current_user.address_book.search_users(
+            search: params[:search],
+            exclude_ids: exclude_users,
+            context: params[:context],
+            is_admin: @admin_context.present?,
+            weak_checks: params[:skip_visibility_checks]
           )]
         end
 
@@ -323,7 +327,7 @@ class SearchController < ApplicationController
         :name => context[:name],
         :avatar_url => avatar_url,
         :type => :context,
-        :user_count => @current_user.count_messageable_users_in_context(asset_string),
+        :user_count => @current_user.address_book.count_in_context(asset_string),
         :permissions => context[:permissions] || {}
       }
       if context[:type] == :section
@@ -357,13 +361,16 @@ class SearchController < ApplicationController
   end
 
   def synthetic_contexts_for(course, context)
+    # context is a string identifying a subset of the course
     @skip_users = true
     # TODO: move the aggregation entirely into the DB. we only select a little
     # bit of data per user, but this still isn't ideal
-    users = @current_user.messageable_users_in_context(context)
+    users = @current_user.address_book.known_in_context(context)
     enrollment_counts = {:all => users.size}
     users.each do |user|
-      user.common_courses[course[:id]].uniq.each do |role|
+      common_courses = @current_user.address_book.common_courses(user)
+      roles = common_courses[course[:id]].uniq
+      roles.each do |role|
         enrollment_counts[role] ||= 0
         enrollment_counts[role] += 1
       end

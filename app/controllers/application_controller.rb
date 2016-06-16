@@ -1937,30 +1937,37 @@ class ApplicationController < ActionController::Base
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
     data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
-    known_user = viewer.load_messageable_user(profile.user)
-    common_courses = []
-    common_groups = []
-    if viewer != profile.user
-      if known_user
-        common_courses = known_user.common_courses.map do |course_id, roles|
-          next if course_id.zero?
-          c = course_json(Course.find(course_id), @current_user, session, ['html_url'], false)
-          c[:roles] = roles.map { |role| Enrollment.readable_type(role) }
-          c
-        end.compact
-        common_groups = known_user.common_groups.map do |group_id, roles|
-          next if group_id.zero?
-          g = group_json(Group.find(group_id), @current_user, session, :include => ['html_url'])
-          # in the future groups will have more roles and we'll need soemthing similar to
-          # the roles.map above in courses
-          g[:roles] = [t('#group.memeber', "Member")]
-          g
-        end.compact
-      end
+    data[:known_user] = viewer.address_book.known_user(profile.user)
+    if data[:known_user] && viewer != profile.user
+      common_courses = viewer.address_book.common_courses(profile.user)
+      common_groups = viewer.address_book.common_groups(profile.user)
+    else
+      common_courses = {}
+      common_groups = {}
     end
-    data[:common_contexts] = [] + common_courses + common_groups
-    data[:known_user] = known_user
+    data[:common_contexts] = common_contexts(common_courses, common_groups, @current_user, session)
     data
+  end
+
+  def common_contexts(common_courses, common_groups, current_user, session)
+    courses = Course.where(id: common_courses.keys).to_a
+    groups = Group.where(id: common_groups.keys).to_a
+
+    common_courses = courses.map do |course|
+      course_json(course, current_user, session, ['html_url'], false).merge({
+        roles: common_courses[course.id].map { |role| Enrollment.readable_type(role) }
+      })
+    end
+
+    common_groups = groups.map do |group|
+      group_json(group, current_user, session, include: ['html_url']).merge({
+        # in the future groups will have more roles and we'll need soemthing similar to
+        # the roles.map above in courses
+        roles: [t('#group.memeber', "Member")]
+      })
+    end
+
+    common_courses + common_groups
   end
 
   def self.batch_jobs_in_actions(opts = {})

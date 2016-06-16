@@ -27,7 +27,6 @@ class Conversation < ActiveRecord::Base
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
-  # see also MessageableUser
   def participants(reload = false)
     if !@participants || reload
       Conversation.preload_participants([self])
@@ -649,10 +648,11 @@ class Conversation < ActiveRecord::Base
     shards = conversations.map(&:associated_shards).flatten.uniq
     Shard.with_each_shard(shards) do
       user_map = Shackles.activate(:slave) do
-        MessageableUser.select("#{MessageableUser.build_select}, last_authored_at, conversation_id").
+        User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.avatar_image_source, last_authored_at, conversation_id").
           joins(:all_conversations).
           where(:conversation_participants => { :conversation_id => conversations }).
-          order(Conversation.nulls(:last, :last_authored_at, :desc), Conversation.best_unicode_collation_key("COALESCE(short_name, name)")).group_by { |mu| mu.conversation_id.to_i }
+          order(Conversation.nulls(:last, :last_authored_at, :desc), Conversation.best_unicode_collation_key("COALESCE(short_name, name)")).
+          group_by { |u| u.conversation_id.to_i }
       end
       conversations.each do |conversation|
         participants[conversation.global_id].concat(user_map[conversation.id] || [])
