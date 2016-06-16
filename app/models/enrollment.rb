@@ -84,7 +84,7 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
   def self.not_yet_started(course)
-    collection = where(course_id: course)
+    collection = where(course_id: course).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(collection)
     collection.select do |enrollment|
       enrollment.effective_start_at > Time.zone.now

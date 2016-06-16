@@ -566,7 +566,7 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
         if @context && @current_user
-          context_enrollments = @context.enrollments.where(user_id: @current_user)
+          context_enrollments = @context.enrollments.where(user_id: @current_user).to_a
           Canvas::Builders::EnrollmentDateBuilder.preload(context_enrollments)
           @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
         end

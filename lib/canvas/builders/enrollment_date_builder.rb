@@ -29,6 +29,9 @@ class EnrollmentDateBuilder
   end
 
   def self.preload(enrollments, use_cache=true)
+    raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(ActiveRecord::Relation)
+    # if enrollments is still a relation, we'll be unnecessarily calling the query multiple times
+    # below with `enrollments.empty?` and `enrollments.first`
     return if enrollments.empty?
     preload_state(enrollments)
 
