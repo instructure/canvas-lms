@@ -1081,4 +1081,13 @@ describe Conversation do
       end
     end
   end
+
+  describe '.batch_regenerate_private_hashes!' do
+    it "doesn't asplode with a query error" do
+      # we don't even care if the conversation exists, or that it's correctly updated
+      # we just want to form the query and make sure it has a qualified name;
+      # so for this spec to be useful you need to have qualified names enabled
+      Conversation.batch_regenerate_private_hashes!(1)
+    end
+  end
 end
