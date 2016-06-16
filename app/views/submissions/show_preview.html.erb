@@ -148,6 +148,8 @@
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
   <% js_bundle 'legacy/submissions_show_preview_media' %>
+<% elsif @submission.submission_type == 'basic_lti_launch' %>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= @submission.external_tool_url %>; "/>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

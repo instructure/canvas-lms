@@ -30,6 +30,16 @@ describe "/submissions/show_preview" do
     expect(response).not_to be_nil
   end
 
+  it "should load an lti launch" do
+    course_with_student
+    view_context
+    a = @course.assignments.create!(:title => "external assignment", :submission_types => 'basic_lti_launch')
+    assigns[:assignment] = a
+    assigns[:submission] = a.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com'
+    render "submissions/show_preview"
+    expect(response.body).to match /(?=.*external_tools\/retrieve?)(?=.*www\.example\.com).*/
+  end
+
   it "should give a user-friendly explaination why there's no preview" do
     course_with_student
     view_context
