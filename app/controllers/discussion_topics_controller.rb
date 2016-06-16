@@ -490,7 +490,7 @@ class DiscussionTopicsController < ApplicationController
         else
           @groups = group_scope.to_a
         end
-        @groups.select!{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
+        @groups.select!{ |g| g.grants_any_right?(@current_user, session, :post_to_forum, :read_as_admin) }
         @groups.sort_by!(&:id)
 
         topics = @topic.child_topics.to_a
