@@ -195,7 +195,17 @@ Ctrl-C your `docker-compose up` window and restart.
 
 A byebug server is running in development mode on the web and job containers
 to allow you to remotely control any sessions where `byebug` has yielded
-execution. You can attach to the byebug server once the container is started:
+execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
+`docker-compose.override.yml` file in your app's root directory. If you don't have
+this file, you will need to create it and add the following:
+
+```
+web: &WEB
+  environment:
+    REMOTE_DEBUGGING_ENABLED: 'true'
+```
+
+You can attach to the byebug server once the container is started:
 
 Debugging web:
 
@@ -287,4 +297,14 @@ Or it can be disabled permanently by editing `/etc/selinux/config` thusly:
 
 ```
 SELINUX=disabled
+```
+
+If you are having performance or other issues with your web container
+starting up, you may try adding `DISABLE_SPRING: 1` to your
+`docker-compose.override.yml` file, like so:
+
+```
+web: &WEB
+  environment:
+    DISABLE_SPRING: 1
 ```
