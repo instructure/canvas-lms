@@ -172,6 +172,10 @@ module ContextModulesCommon
 
   def verify_persistence(title)
     refresh_page
+    verify_module_title(title)
+  end
+
+  def verify_module_title(title)
     expect(f('#context_modules')).to include_text(title)
   end
 
