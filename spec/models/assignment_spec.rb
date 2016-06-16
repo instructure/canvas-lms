@@ -3587,6 +3587,22 @@ describe Assignment do
       expect(touched).to eq true
     end
   end
+
+  describe '.with_student_submission_count' do
+    specs_require_sharding
+
+    it "doesn't reference multiple shards when accessed from a different shard" do
+      @assignment = @course.assignments.create! points_possible: 10
+      Assignment.connection.stubs(:use_qualified_names?).returns(true)
+      @shard1.activate do
+        Assignment.connection.stubs(:use_qualified_names?).returns(true)
+        sql = @course.assignments.with_student_submission_count.to_sql
+        expect(sql).to be_include(Shard.default.name)
+        expect(sql).not_to be_include(@shard1.name)
+      end
+    end
+  end
+
 end
 
 def setup_assignment_with_group
