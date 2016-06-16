@@ -307,6 +307,20 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         qs_json = json['quiz_submissions'][0]
         expect(qs_json['html_url']).to eq course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
       end
+
+      it 'should include results_url only when completed or needs_grading' do
+        json = qs_api_show
+        expect(json['quiz_submissions'][0].key?('result_url')).to be_truthy
+        expected_url = course_quiz_history_url(
+          @course, @quiz,
+          quiz_submission_id: @quiz_submission.id, version: @quiz_submission.version_number
+        )
+        expect(json['quiz_submissions'][0]['result_url']).to eq expected_url
+
+        @quiz_submission.update_attribute :workflow_state, 'in_progress'
+        json = qs_api_show
+        expect(json['quiz_submissions'][0].key?('result_url')).to be_falsey
+      end
     end
 
     context 'Links' do
