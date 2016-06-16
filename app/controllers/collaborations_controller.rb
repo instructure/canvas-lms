@@ -253,6 +253,12 @@ class CollaborationsController < ApplicationController
   #
   # List the collaborators of a given collaboration
   #
+  # @argument include[] [String, "collaborator_lti_id"|"avatar_image_url"]
+  #   - "collaborator_lti_id": Optional information to include with each member.
+  #     Represents an identifier to be used for the member in an LTI context.
+  #   - "avatar_image_url": Optional information to include with each member.
+  #     The url for the avatar of a collaborator with type 'user'.
+  #
   # @example_request
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
@@ -260,12 +266,13 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
+    options = {:include => params[:include]}
     collaborators = @collaboration.collaborators.preload(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)
 
-    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session) }
+    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
   end
 
   private
