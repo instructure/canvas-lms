@@ -177,7 +177,7 @@
           <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
             <option value="undecided">[<%= t('Select Country') %>]</option>
             <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
-              <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %> (+<%= numeric_code %>)</option>
+              <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %></option>
             <% end %>
           </select>
         </div>
