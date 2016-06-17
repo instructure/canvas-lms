@@ -41,6 +41,7 @@ describe 'quizzes question with html answers' do
     click_questions_tab
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
+    wait_for_ajaximations
     expect(html).to eq '<p>HTML</p>'
   end
 
@@ -49,6 +50,7 @@ describe 'quizzes question with html answers' do
     click_questions_tab
     edit_first_html_answer
     close_first_html_answer
+    wait_for_ajaximations
     check_element_has_focus(fj('.edit_html:visible'))
   end
 
