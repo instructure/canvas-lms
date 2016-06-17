@@ -5148,13 +5148,13 @@ ja:
       - 12月
     datepicker: 
       column_headings: 
-        - Su
-        - Mo
-        - Tu
-        - We
-        - Th
-        - Fr
-        - Sa
+        - 日
+        - 月
+        - 火
+        - 水
+        - 木
+        - 金
+        - 土
     day_names: 
       - 日曜日
       - 月曜日
