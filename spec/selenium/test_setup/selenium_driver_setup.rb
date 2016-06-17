@@ -138,11 +138,21 @@ module SeleniumDriverSetup
   end
 
   def selenium_remote_driver
-    Selenium::WebDriver.for(
-      :remote,
-      :url => selenium_url,
-      :desired_capabilities => desired_capabilities
-    )
+    driver = nil
+    begin
+      tries ||= 3
+      puts "Thread: provisioning saucelabs driver"
+      driver = Selenium::WebDriver.for(
+        :remote,
+        :url => selenium_url,
+        :desired_capabilities => desired_capabilities
+      )
+    rescue StandardError => e
+      puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
+      sleep 2
+      retry unless (tries -= 1).zero?
+    end
+    driver
   end
 
   def desired_capabilities
