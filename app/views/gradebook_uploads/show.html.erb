@@ -22,7 +22,7 @@
           <th class='name'><%= t(:student_example, "Some Guy") %></th>
           <td>
             <select name="student_-iterator-">
-              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value=""><%= t("-- Choose student --") %></option>
               <option value="ignore" class="ignore"><%= t(:ignore_student_option, "Not in my class, Ignore this row.") %></option>
             </select>
           </td>
@@ -44,13 +44,13 @@
           <th class='title'><%= t(:assignment_example, "Equity Indices Quiz") %></th>
           <td>
             <select name="assignment_-iterator-">
-              <option value=""><%= t(:choose_option, "-- Choose --") %></option>
+              <option value=""><%= t("-- Choose assignment --") %></option>
               <option value="new" class="new"><%= t(:new_assignment_option, "A new assignment") %></option>
               <option value="ignore" class="ignore"><%= t(:ignore_assignment_option, "Bogus, ignore it") %></option>
             </select>
             <span class="points_possible_section">
-              <label><%= t('labels.points_possible', "Points Possible") %></label>
-              <input type="text" class="points_possible" />
+              <label for="points_possible"><%= t("Points Possible") %></label>
+              <input id="points_possible" type="text" class="points_possible" />
             </span>
           </td>
         </tr>
