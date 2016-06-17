@@ -635,7 +635,7 @@ describe "context modules" do
 
       driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
       click_option("#content_tag_indent_select", "Indent 1 Level")
-      submit_form("#edit_item_form")
+      submit_dialog_form("#edit_item_form")
       wait_for_ajaximations
       expect(f("#context_module_item_#{tag.id}")).to have_class('indent_1')
 
@@ -727,7 +727,7 @@ describe "context modules" do
       # change indent from edit form
       driver.execute_script("$('#context_module_item_#{tag.id} .edit_item_link').hover().click()")
       click_option("#content_tag_indent_select", "Don't Indent")
-      submit_form("#edit_item_form")
+      submit_dialog_form("#edit_item_form")
       wait_for_ajaximations
 
       module_item = f("#context_module_item_#{tag.id}")

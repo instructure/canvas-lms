@@ -217,7 +217,7 @@ describe "manage groups" do
 
       it "should create a new group category with a 255 character name when creating groups manually" do
         replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
-        submit_form(@form)
+        submit_dialog_form(@form)
         wait_for_ajaximations
         expect(GroupCategory.where(name: max_length_name)).to be_exists
       end
@@ -225,7 +225,7 @@ describe "manage groups" do
       it "should not create a new group category if the generated group names will exceed 255 characters" do
         replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
         f('#category_split_groups').click
-        submit_form(@form)
+        submit_dialog_form(@form)
         wait_for_ajaximations
         expect(ff('.error_box').last.text).to eq 'Enter a shorter category name'
         expect(GroupCategory.where(name: max_length_name)).not_to be_exists

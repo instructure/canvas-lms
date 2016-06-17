@@ -81,7 +81,7 @@ describe "eportfolios" do
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name1"
       f('#edit_eportfolio_form #eportfolio_public').click
-      submit_form('#edit_eportfolio_form')
+      submit_dialog_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
       expect(@eportfolio.name).to include("new ePortfolio name1")
@@ -176,7 +176,7 @@ describe "eportfolios file upload" do
     wait_for_ajaximations
     f(".upload_file_button").click
     submit_form(".form_content")
-    download = f("a.eportfolio_download")
+    download = fj("a.eportfolio_download:visible")
     expect(download).to be_displayed
     expect(download).to have_attribute("href", /files/)
     #cannot test downloading the file, will check in the future

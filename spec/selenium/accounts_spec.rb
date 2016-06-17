@@ -37,7 +37,7 @@ describe "account" do
       f('.add_course_link').click
       f('#add_course_form input[type=text]:first-child').send_keys('Test Course')
       f('#course_course_code').send_keys('TEST001')
-      submit_form('#add_course_form')
+      submit_dialog_form('#add_course_form')
 
       wait_for_ajaximations
       expect(f('#add_course_dialog')).not_to be_displayed

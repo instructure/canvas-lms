@@ -166,7 +166,7 @@ module ContextModulesCommon
     module_item.find_element(:css, '.edit_item_link').click
     edit_form = f('#edit_item_form')
     yield edit_form
-    submit_form(edit_form)
+    submit_dialog_form(edit_form)
     wait_for_ajaximations
   end
 

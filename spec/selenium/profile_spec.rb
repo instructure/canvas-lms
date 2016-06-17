@@ -24,7 +24,7 @@ describe "profile" do
     f('.add_access_token_link').click
     access_token_form = f('#access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
-    submit_form(access_token_form)
+    submit_dialog_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = f('#token_details_dialog')
     expect(details_dialog).to be_displayed
