@@ -154,6 +154,9 @@ describe "speed grader" do
     end
 
     it "works for inactive students", test_id: 1407014, priority: "1" do
+      @teacher1.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
+      @teacher1.save
+
       student_submission(:username => 'inactivestudent@example.com')
       en = @student.student_enrollments.first
       en.deactivate
@@ -169,6 +172,9 @@ describe "speed grader" do
 
       submit_comment 'srsly'
       expect(@submission.submission_comments.first.comment).to eq 'srsly'
+
+      # Reactive student to not poison other tests
+      en.reactivate
     end
 
     describe 'deleting a comment' do
