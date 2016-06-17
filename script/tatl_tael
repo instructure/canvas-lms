@@ -64,7 +64,7 @@ end
 
 linter.ensure_coffee_specs do
   errors << "Your commit includes coffee changes,"\
-            " but does not include coffee specs."\
+            " but does not include coffee or jsx specs."\
             " Please add some to verify your changes."
 end
 
