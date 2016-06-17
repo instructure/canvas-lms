@@ -70,6 +70,12 @@ nb:
   locales:
     nb: Norsk (Bokmål)
   bigeasy_locale: nb_NO
+nn:
+  locales:
+    nn: Norsk (Nynorsk)
+  bigeasy_locale: nn_NO
+  fullcalendar_locale: nb
+  crowdsourced: true
 pl:
   locales:
     pl: Polski
