@@ -124,7 +124,6 @@ define([
       if ((this.props.selectedItems.length === 1) && this.props.selectedItems[0].get('url')) {
         return (
           <a
-            tabIndex= {this.tabIndex}
             className= 'ui-button btn-download'
             href= {this.props.selectedItems[0].get('url')}
             download= {true}
@@ -188,9 +187,6 @@ define([
     var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected;
 
     this.showingButtons = this.props.selectedItems.length
-    if(!this.showingButtons || selectedItemIsFolder){
-      this.tabIndex = -1;
-    }
 
     if (this.showingButtons === 1) {
       this.downloadTitle = I18n.t('Download');
@@ -256,7 +252,7 @@ define([
               dataTooltip= ''
               ariaDisabled= {!this.showingButtons || selectedItemIsFolder}
               disabled= {!this.showingButtons || selectedItemIsFolder}
-              tabIndex= {this.tabIndex}
+              tabIndex= {selectedItemIsFolder ? -1 : 0}
             >
               <i className= 'icon-eye' />
             </a>
