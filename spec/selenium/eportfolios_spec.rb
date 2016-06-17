@@ -87,19 +87,6 @@ describe "eportfolios" do
       expect(@eportfolio.name).to include("new ePortfolio name1")
     end
 
-    it "should validate time stamp on ePortfolio", priority: "2" do
-      # Freezes time to 2 days from today.
-      new_time = 2.days.from_now.utc.beginning_of_hour
-      Timecop.freeze(new_time) do
-        current_time = format_time_for_view(new_time)
-        # Saves an entry to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-      end
-    end
-
     it "should have a working flickr search dialog" do
       get "/eportfolios/#{@eportfolio.id}"
       f("#page_list a.page_url").click
