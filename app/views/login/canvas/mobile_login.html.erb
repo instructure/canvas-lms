@@ -3,7 +3,7 @@
     <div class="error"><%= flash[:error] %></div>
   <% end %>
   <div class="ic-Form-control">
-    <input class="ic-Input" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
+    <input class="ic-Input" type="text" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id)%>" placeholder="<%= @login_handle_name %>">
   </div>
   <div class="ic-Form-control">
     <input class="ic-Input" type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
@@ -20,7 +20,7 @@
 <%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
   <div class="ic-Form-control">
     <label for="pseudonym_session_unique_id_forgot" class="screenreader-only"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
-    <input class="ic-Input" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
+    <input class="ic-Input" type="text"<%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
   </div>
   <button type="submit" class="btn btn-primary btn-large" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
   <div class="forgotBlock">
