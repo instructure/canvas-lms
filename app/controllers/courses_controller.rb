@@ -1520,6 +1520,7 @@ class CoursesController < ApplicationController
     if @context && @current_user
       @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
       if @context_enrollment
+        @context_membership = @context_enrollment # for AUA
         @context_enrollment.course = @context
         @context_enrollment.user = @current_user
       end
