@@ -508,8 +508,7 @@ class ApplicationController < ActionController::Base
       format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
     end
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    set_no_cache_headers
   end
 
   # To be used as a before_filter, requires controller or controller actions
@@ -943,6 +942,10 @@ class ApplicationController < ActionController::Base
     # then the local cache is used when the user clicks the 'back' button.  I don't know how
     # to tell the browser to ALWAYS check back other than to disable caching...
     return true if @cancel_cache_buster || request.xhr? || api_request?
+    set_no_cache_headers
+  end
+
+  def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
