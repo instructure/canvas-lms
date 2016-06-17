@@ -113,7 +113,7 @@ describe "speed grader" do
       expect(f('#moderation_tabs')).to_not include_text("Add Review")
 
       grade = f('#grading-box-extended')
-      expect(grade['disabled']).to be_present
+      expect(grade['readonly']).to be_present
       expect(grade['value']).to eq "7"
       expect(f('#discussion span.comment').text).to be_include 'wat'
       expect(f('#add_a_comment')).to_not be_displayed
@@ -148,7 +148,7 @@ describe "speed grader" do
       expect(f('#new_mark_link')).to_not be_displayed
 
       grade = f('#grading-box-extended')
-      expect(grade['disabled']).to be_present
+      expect(grade['readonly']).to be_present
       expect(grade['value']).to eq "6"
       expect(f('#discussion span.comment').text).to be_include 'woo'
       expect(f('#add_a_comment')).to_not be_displayed
@@ -485,7 +485,7 @@ describe "speed grader" do
         expect(tab).to include_text("7/8")
 
         grade = f('#grading-box-extended')
-        expect(grade['disabled']).to be_present
+        expect(grade['readonly']).to be_present
         expect(grade['value']).to eq "7"
       end
 

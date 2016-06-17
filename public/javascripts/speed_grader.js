@@ -117,6 +117,7 @@ define([
       $submission_late_notice = $("#submission_late_notice"),
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
       $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
+      $enrollment_concluded_notice = $("#enrollment_concluded_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -514,6 +515,9 @@ define([
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
+      if ($(".media_comment_link").hasClass('ui-state-disabled')) {
+        return;
+      }
       $("#media_media_recording").show().find(".media_recording").mediaComment('create', 'any', function(id, type) {
         $("#media_media_recording").data('comment_id', id).data('comment_type', type);
         EG.addSubmissionComment();
@@ -540,6 +544,9 @@ define([
       }
       configureRecognition(recognition);
       $(".speech_recognition_link").click(function(){
+        if ($(".speech_recognition_link").hasClass('ui-state-disabled')) {
+          return false;
+        }
         $(speechRecognitionTemplate({
           message: messages.begin
         }))
@@ -573,9 +580,9 @@ define([
             }
           })
         return false;
-      })
+      });
         // show the div that contains the button because it is hidden from browsers that dont support speech
-      .closest('div.speech-recognition').show();
+      $(".speech_recognition_link").closest('div.speech-recognition').show();
 
       function processSpeech($this){
         if ($('#record_button').attr("recording") == "true"){
@@ -1116,7 +1123,11 @@ define([
 
     handleStudentChanged: function(){
       // Save any draft comments before loading the new student
-      EG.addSubmissionComment(true);
+      if ($add_a_comment_textarea.hasClass('ui-state-disabled')) {
+        $add_a_comment_textarea.val('');
+      } else {
+        EG.addSubmissionComment(true);
+      }
 
       var id = $selectmenu.jquerySelectMenu().val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
@@ -1134,10 +1145,11 @@ define([
         $(".speedgrader_alert").hide();
         $submission_not_newest_notice.hide();
         $submission_late_notice.hide();
-        $full_width_container.removeClass("with_enrollment_inactive_notice");
+        $full_width_container.removeClass("with_enrollment_notice");
         $enrollment_inactive_notice.hide();
+        $enrollment_concluded_notice.hide();
 
-        $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
+        EG.setGradeReadOnly(true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
           this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
         }
@@ -1400,9 +1412,17 @@ define([
       );
     },
 
+    setGradeReadOnly: function(readonly) {
+      if (readonly) {
+        $grade.addClass('ui-state-disabled').attr('readonly', true).attr('aria-disabled', true);
+      } else {
+        $grade.removeClass('ui-state-disabled').removeAttr('aria-disabled').removeAttr('readonly');
+      }
+    },
+
     setReadOnly: function(readonly) {
       if (readonly) {
-        $grade.attr('disabled', true);
+        EG.setGradeReadOnly(true);
         $comments.find(".delete_comment_link").hide();
         $add_a_comment.hide();
       } else {
@@ -1579,15 +1599,32 @@ define([
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
       $submission_late_notice.showIf(submission['late']);
-      $full_width_container.removeClass("with_enrollment_inactive_notice");
+      $full_width_container.removeClass("with_enrollment_notice");
       $enrollment_inactive_notice.showIf(
         _.any(jsonData.studentMap[this.currentStudent.id].enrollments, function(enrollment) {
           if(enrollment.workflow_state === 'inactive') {
-            $full_width_container.addClass("with_enrollment_inactive_notice");
+            $full_width_container.addClass("with_enrollment_notice");
             return true;
           }
         })
       );
+
+      var isConcluded = EG.isStudentConcluded(this.currentStudent.id);
+      $enrollment_concluded_notice.showIf(isConcluded);
+      SpeedgraderHelpers.setRightBarDisabled(isConcluded);
+      if (isConcluded) {
+        $full_width_container.addClass("with_enrollment_notice");
+      }
+    },
+
+    isStudentConcluded: function(student_id){
+      if (!jsonData.studentMap) {
+        return false;
+      }
+
+      return _.any(jsonData.studentMap[student_id].enrollments, function(enrollment) {
+        return enrollment.workflow_state === 'completed';
+      });
     },
 
     refreshSubmissionsToView: function(){
@@ -1881,12 +1918,16 @@ define([
 
         /* Submit a comment and Delete a comment listeners */
 
-        // this is really poorly decoupled but over in speed_grader.html.erb these rubricAssessment. variables are set.
-        // what this is saying is: if I am able to grade this assignment (I am administrator in the course) or if I wrote this comment...
-        var commentIsDeleteableByMe = ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
-            ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id;
-        var commentIsPublishableByMe = comment.draft === true &&
-            parseInt(comment.author_id) === parseInt(ENV.current_user_id);
+        // this is really poorly decoupled but over in
+        // speed_grader.html.erb these rubricAssessment. variables are
+        // set.  what this is saying is: if I am able to grade this
+        // assignment (I am administrator in the course) or if I wrote
+        // this comment... and if the student isn't concluded
+        var isConcluded = EG.isStudentConcluded(EG.currentStudent.id);
+        var commentIsDeleteableByMe = (ENV.RUBRIC_ASSESSMENT.assessment_type === "grading" ||
+            ENV.RUBRIC_ASSESSMENT.assessor_id === comment.author_id) && !isConcluded;
+        var commentIsPublishableByMe = (comment.draft === true &&
+            parseInt(comment.author_id) === parseInt(ENV.current_user_id)) && !isConcluded;
 
         $comment.find(".delete_comment_link").click(function(event) {
           $(this).parents(".comment").confirmDelete({
@@ -2094,6 +2135,11 @@ define([
     // should only be called from the anonymous function attached so
     // #submit_same_score.
     handleGradeSubmit: function(e, use_existing_score){
+      if (EG.isStudentConcluded(EG.currentStudent.id)) {
+        EG.showGrade();
+        return;
+      }
+
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
@@ -2136,9 +2182,10 @@ define([
       var submission = EG.currentStudent.submission;
       var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
-      $grade.val(grade)
-        .attr('disabled', typeof submission != "undefined" &&
-        submission.submission_type === 'online_quiz');
+      $grade.val(grade);
+      EG.setGradeReadOnly((typeof submission != "undefined" &&
+                           submission.submission_type === 'online_quiz') ||
+                          EG.isStudentConcluded(EG.currentStudent.id));
 
       $('#submit_same_score').hide();
       if (typeof submission != "undefined" && submission.score !== null) {
@@ -2227,10 +2274,16 @@ define([
     initComments: function(){
       $add_a_comment_submit_button.click(function(event) {
         event.preventDefault();
+        if ($add_a_comment_submit_button.hasClass('ui-state-disabled')) {
+          return;
+        }
         EG.addSubmissionComment();
       });
       $add_attachment.click(function(event) {
         event.preventDefault();
+        if (($add_attachment).hasClass('ui-state-disabled')) {
+          return;
+        }
         var $attachment = $comment_attachment_input_blank.clone(true);
         $attachment.find("input").attr('name', 'attachments[' + fileIndex + '][uploaded_data]');
         fileIndex++;

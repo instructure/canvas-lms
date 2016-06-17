@@ -16,7 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([], function() {
+define([
+  'jquery',
+  'underscore'
+], function($, _) {
   var speedgraderHelpers = {
 
     determineGradeToSubmit: function(use_existing_score, student, grade){
@@ -43,6 +46,24 @@ define([], function() {
         return select + currentSelectedIndex;
       }
       return select + version;
+    },
+
+    setRightBarDisabled: function(isDisabled){
+      var elements = ['#grading-box-extended', '#speedgrader_comment_textarea', '#add_attachment',
+                      '#media_comment_button', '#comment_submit_button',
+                      '#speech_recognition_button'];
+
+      _.each(elements, function(element){
+        if(isDisabled) {
+          $(element).addClass('ui-state-disabled');
+          $(element).attr('aria-disabled', true);
+          $(element).attr('readonly', true);
+        } else {
+          $(element).removeClass('ui-state-disabled');
+          $(element).removeAttr('aria-disabled');
+          $(element).removeAttr('readonly');
+        }
+      });
     }
   }
 

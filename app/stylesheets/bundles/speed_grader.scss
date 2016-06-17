@@ -207,7 +207,7 @@ $icon-size: 1.4rem;
   &.with_moderation_tabs {
     top: $gradebook_header_height * 2 + 3;
   }
-  &.with_enrollment_inactive_notice {
+  &.with_enrollment_notice {
     top: $gradebook_header_height + 46;
   }
 }
@@ -247,6 +247,12 @@ $icon-size: 1.4rem;
 }
 
 #enrollment_inactive_notice {
+  width: 100%;
+  border-bottom: 1px solid $ic-border-light;
+  text-align: center;
+}
+
+#enrollment_concluded_notice {
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
   text-align: center;

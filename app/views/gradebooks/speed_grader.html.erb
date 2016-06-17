@@ -137,6 +137,9 @@
 <div id="enrollment_inactive_notice" class="alert alert-info" style="display: none;">
   <span><%= t "Notice: Inactive Student" %></span>
 </div>
+<div id="enrollment_concluded_notice" class="alert alert-info" style="display: none;">
+  <span><%= t "Notice: Concluded Student" %></span>
+</div>
 <div id="full_width_container" style="display:none">
   <div id="left_side" class="full_height">
     <div id="left_side_inner">
@@ -317,7 +320,7 @@
                     </span>
                   </button>
                   <% if feature_enabled?(:kaltura) %>
-                    <button class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
+                    <button id="media_comment_button" class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
                       <i class="icon-media" aria-hidden="true"></i>
                       <span class="screenreader-only">
                         <%= t("Media Comment") %>
@@ -325,7 +328,7 @@
                     </button>
                   <% end %>
                   <div class="speech-recognition" style="display:none">
-                    <a title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
+                    <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
                       <i class="icon-audio"></i>
                       <span class="screenreader-only">
                         <%= t("Speech Recognition") %>
@@ -334,7 +337,7 @@
                   </div>
                 </div>
                 <div class="ic-Action-header__Secondary">
-                  <button class="Button Button--primary" type="submit"><%= t("Submit") %></button>
+                  <button id="comment_submit_button" class="Button Button--primary" type="submit"><%= t("Submit") %></button>
                 </div>
               </div>
             </form>

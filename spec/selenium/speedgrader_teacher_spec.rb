@@ -89,8 +89,9 @@ describe "speed grader" do
   end
 
   it "displays inactive students" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
+    @teacher.save
+
     student_submission(:username => 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
@@ -100,6 +101,21 @@ describe "speed grader" do
 
     expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
     expect(f('#enrollment_inactive_notice').text).to eq 'Notice: Inactive Student'
+  end
+
+  it "can grade and comment inactive students" do
+    skip "Skipped because this spec fails if not run in foreground\n"\
+      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
+    @teacher.save
+
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.deactivate
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
 
     replace_content f('#grading-box-extended'), "5", tab_out: true
     wait_for_ajaximations
@@ -112,6 +128,21 @@ describe "speed grader" do
     expect(@submission.submission_comments.first.comment).to eq 'srsly'
     # doesn't get inserted into the menu
     expect(f('#students_selectmenu')).not_to contain_css('#section-menu')
+  end
+
+  it "displays concluded students" do
+    @teacher.preferences = { gradebook_settings: { @course.id => { 'show_concluded_enrollments' => 'true' } } }
+    @teacher.save
+
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.conclude
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(f('#enrollment_concluded_notice').text).to eq 'Notice: Concluded Student'
   end
 
   context "multiple enrollments" do
