@@ -52,6 +52,8 @@ describe "assignment rubrics" do
        wait_for_ajaximations
        f('#criterion_2 .add_rating_link_after').click
        f('#criterion_2 tbody tr td:nth-of-type(2) .edit_rating_link').click
+
+       expect(f('#flash_screenreader_holder')).to have_attribute("textContent", "New Rating Created")
        set_value(f('.rating_description'), 'rating 1')
        f(' .ok_button').click
        submit_form('#edit_rubric_form')
