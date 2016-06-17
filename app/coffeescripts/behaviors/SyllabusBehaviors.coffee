@@ -197,6 +197,7 @@ define [
 
     $edit_course_syllabus_form.on 'edit', ->
       $edit_course_syllabus_form.show()
+      $edit_syllabus_link.hide()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
       $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
@@ -206,6 +207,7 @@ define [
 
     $edit_course_syllabus_form.on 'hide_edit', ->
       $edit_course_syllabus_form.hide()
+      $edit_syllabus_link.show()
       $course_syllabus.show()
       text = $.trim $course_syllabus.html()
       $course_syllabus_details.showIf not text
