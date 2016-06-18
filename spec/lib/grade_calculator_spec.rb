@@ -41,8 +41,8 @@ describe GradeCalculator do
       @assignment.points_possible = 5
       @assignment.save!
 
-      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
-      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
     end
 
     it "should recompute when an assignment group's weight changes'" do
