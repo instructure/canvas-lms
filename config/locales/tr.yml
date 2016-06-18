@@ -4684,7 +4684,7 @@ tr:
         previous_navigation_link: Aşağı
         toggle_navigation_dragging: Boşluk
       labels: 
-        account_id: Bölüm
+        account_id: "Alt hesap"
         allow_student_discussion_editing: "Öğrencilerin kendi tartışma gönderilerini silmesine ve düzenlemesine izin ver"
         allow_student_discussion_topics: "Öğrencilerin tartışma başlıkları oluşturmasına izin ver"
         allow_student_forum_attachments: "Öğrenciler tartışmalara dosya ekleyebilsin"
@@ -14751,6 +14751,7 @@ tr:
     sub_accounts_count: 
       one: "1 Alt Hesap"
       other: "%{count} Alt Hesap"
+  subaccount_91f4c279: "Alt hesap"
   subject_reply_to: "Ynt: %{subject}"
   submission: 
     atom_no_author: "Yazar Yok"
@@ -15023,6 +15024,7 @@ tr:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Belirtilen kullanıcı bu derste öğrenci değildir"
   the_state_parameter_is_required_ffadf213: "Bölge parametresi gereklidir"
   the_top_track_represents_days_on_which_the_student_2a347099: "Üst izleme dersin öğretim elemanına *öğrencinin mesaj gönderdiği* günleri göstermektedir. Alt izleme ise öğrenciye *öğretim elemanından gelen mesajlar* dır. "
+  themes_89bfe9c4: Temalar
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Listede 1 sonuç var"
     other: "Listede %{count} sonuç var"
