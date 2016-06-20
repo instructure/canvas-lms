@@ -295,23 +295,18 @@ define([
       var qNum = 1;
       var qArray = gradingForm.questions();
       var docScroll = $(document).scrollTop();
-      var maxScroll = $(document).height() - $('body').height();
-      if (docScroll >= maxScroll) {
-        qNum = qArray.length;
-        quizNavBar.activateLink(qNum);
-      } else {
-        $questions = $('.question')
-        for(var t = 0; t <= qArray.length; t++) {
-          $question = $($questions[t])
-          qNum = t + 1;
-          if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
-            parentWindow.set('active_question_index', qNum);
-            quizNavBar.activateLink(qNum);
-            $question.addClass('selected_single_question');
-          } else {
-            $('.q'+ qNum).removeClass('active');
-            $question.removeClass('selected_single_question');
-          }
+      $questions = $('.question')
+      for(var t = 0; t <= qArray.length; t++) {
+        $question = $($questions[t])
+        var currentQuestionNum = t + 1;
+        if ( (docScroll > qArray[t] && docScroll < qArray[t+1])  || ( t == (qArray.length - 1) && docScroll > qArray[t])) {
+          qNum = currentQuestionNum;
+          parentWindow.set('active_question_index', currentQuestionNum);
+          quizNavBar.activateLink(currentQuestionNum);
+          $question.addClass('selected_single_question');
+        } else {
+          $('.q'+ currentQuestionNum).removeClass('active');
+          $question.removeClass('selected_single_question');
         }
       }
       quizNavBar.setScrollWindowPosition(qNum);
