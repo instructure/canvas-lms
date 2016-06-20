@@ -3,7 +3,7 @@ class DropZipFileImports < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    drop_table :zip_file_imports
+    drop_table :zip_file_imports if connection.table_exists?(:zip_file_imports)
 
     if Attachment.where(:context_type => "ZipFileImport").exists?
       Attachment.where(:context_type => "ZipFileImport").

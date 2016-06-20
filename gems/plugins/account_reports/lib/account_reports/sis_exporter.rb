@@ -28,6 +28,7 @@ module AccountReports
       @account_report = account_report
       @reports = SIS_CSV_REPORTS & @account_report.parameters.select { |_k, v| value_to_boolean(v) }.keys
       @sis_format = params[:sis_format]
+      @created_by_sis = @account_report.parameters['created_by_sis']
       extra_text_term(@account_report)
       include_deleted_objects
     end
@@ -88,9 +89,8 @@ module AccountReports
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = pseudonyms.user_id)")
 
-      if @sis_format
-        users.where!.not(pseudonyms: {sis_batch_id: nil})
-      end
+      users = users.where.not(sis_user_id: nil) if @sis_format
+      users = users.where.not(pseudonyms: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
         users.where!("pseudonyms.workflow_state<>'deleted' OR pseudonyms.sis_user_id IS NOT NULL")
@@ -152,9 +152,8 @@ module AccountReports
                 pa.sis_source_id AS parent_sis_source_id").
         joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
 
-      if @sis_format
-        accounts.where!.not(accounts: {sis_batch_id: nil})
-      end
+      accounts = accounts.where.not(accounts: {sis_source_id: nil}) if @sis_format
+      accounts = accounts.where.not(accounts: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
         accounts.where!("accounts.workflow_state<>'deleted' OR accounts.sis_source_id IS NOT NULL")
@@ -197,10 +196,8 @@ module AccountReports
         headers << I18n.t('created_by_sis')
       end
       terms = root_account.enrollment_terms
-
-      if @sis_format
-        terms = terms.where.not(enrollment_terms: {sis_batch_id: nil})
-      end
+      terms = terms.where.not(sis_source_id: nil) if @sis_format
+      terms = terms.where.not(enrollment_terms: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
         terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
@@ -245,7 +242,8 @@ module AccountReports
       end
 
       courses = root_account.all_courses.preload(:account, :enrollment_term)
-      courses.where!.not(courses: {sis_batch_id: nil}) if @sis_format
+      courses = courses.where.not(courses: {sis_source_id: nil}) if @sis_format
+      courses = courses.where.not(courses: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
         courses.where!("(courses.workflow_state='deleted' AND courses.updated_at > ?)
@@ -337,9 +335,12 @@ module AccountReports
       end
 
       if @sis_format
-        sections.where!.not(course_sections: {sis_batch_id: nil})
+        sections = sections.where("course_sections.sis_source_id IS NOT NULL
+                                     AND (nxc.sis_source_id IS NOT NULL
+                                     OR rc.sis_source_id IS NOT NULL)")
       end
 
+      sections = sections.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
       sections = add_course_sub_account_scope(sections, 'rc')
       sections = add_term_scope(sections, 'rc')
 
@@ -434,9 +435,13 @@ module AccountReports
       end
 
       if @sis_format
-        enrol.where!.not(enrollments: {sis_batch_id: nil})
+        enrol = enrol.where("pseudonyms.sis_user_id IS NOT NULL
+                               AND enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
+                               AND (courses.sis_source_id IS NOT NULL
+                                 OR cs.sis_source_id IS NOT NULL)")
       end
 
+      enrol = enrol.where.not(enrollments: {sis_batch_id: nil}) if @created_by_sis
       enrol = add_course_sub_account_scope(enrol)
       enrol = add_term_scope(enrol)
 
@@ -489,9 +494,8 @@ module AccountReports
         select("groups.*, accounts.sis_source_id AS account_sis_id").
         joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id")
 
-      if @sis_format
-        groups.where!.not(groups: {sis_batch_id: nil})
-      end
+      groups = groups.where.not(groups: {sis_source_id: nil}) if @sis_format
+      groups = groups.where.not(groups: {sis_batch_id: nil}) if @created_by_sis
 
       if @include_deleted
         groups.where!("groups.workflow_state<>'deleted' OR groups.sis_source_id IS NOT NULL")
@@ -543,9 +547,7 @@ module AccountReports
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = pseudonyms.user_id)")
 
-      if @sis_format
-        gm.where!.not(group_memberships: {sis_batch_id: nil})
-      end
+      gm = gm.where.not(group_memberships: {sis_batch_id: nil}) if @sis_format || @created_by_sis
 
       if @include_deleted
         gm.where!("(groups.workflow_state<>'deleted'
@@ -597,9 +599,8 @@ module AccountReports
                INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id").
         where("course_sections.nonxlist_course_id IS NOT NULL")
 
-      if @sis_format
-        xl.where!.not(course_sections: {sis_batch_id: nil})
-      end
+      xl = xl.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
+      xl = xl.where.not(courses: {sis_source_id: nil}, course_sections: {sis_source_id: nil}) if @sis_format
 
       if @include_deleted
         xl.where!("(courses.workflow_state<>'deleted'
