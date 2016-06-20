@@ -2109,7 +2109,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'html_url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'attachments' => [],
-          'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
+          'permissions' => {'delete' => true, 'attach' => true, 'update' => true, 'reply' => true},
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,
