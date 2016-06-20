@@ -276,6 +276,9 @@ class SisBatch < ActiveRecord::Base
       course.clear_sis_stickiness(:workflow_state)
       course.skip_broadcasts = true
       course.destroy
+
+      Auditors::Course.record_deleted(course, self.user, :source => :sis, :sis_batch => self)
+
       current_row += 1
       self.fast_update_progress(current_row.to_f/total_rows * 100)
     end
