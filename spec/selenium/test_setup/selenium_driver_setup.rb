@@ -21,15 +21,27 @@ module SeleniumDriverSetup
 
     SeleniumDriverSetup.set_up_display_buffer if run_headless?
 
-    driver = if browser == :firefox
-               firefox_driver
-             elsif browser == :chrome
-               chrome_driver
-             elsif browser == :internet_explorer
-               ie_driver
-             elsif browser == :safari
-               safari_driver
-             end
+    failure_proc = -> {
+      # ensure we quit frd, cuz it's not going to work (otherwise rspec
+      # would keep retrying on subsequent groups/examples)
+      RSpec.world.wants_to_quit = true
+      raise "unable to initialize webdriver"
+    }
+
+    driver = with_retries failure_proc: failure_proc do
+      case browser
+      when :firefox
+        firefox_driver
+      when :chrome
+        chrome_driver
+      when :internet_explorer
+        ie_driver
+      when :safari
+        safari_driver
+      else
+        raise "unsupported browser #{browser}"
+      end
+    end
 
     focus_viewport driver if run_headless?
 
@@ -123,36 +135,35 @@ module SeleniumDriverSetup
     selenium_url ? selenium_remote_driver : ruby_chrome_driver
   end
 
-  def ruby_chrome_driver
-    driver = nil
+  def with_retries(how_many: 3, delay: 1, error_class: StandardError, failure_proc: nil)
     begin
-      tries ||= 3
-      puts "Thread: provisioning selenium chrome ruby driver"
-      driver = Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
-    rescue StandardError => e
-      puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
-      sleep 2
-      retry unless (tries -= 1).zero?
+      tries ||= 0
+      yield
+    rescue error_class => e
+      puts "Attempt #{tries += 1} got error: #{e}"
+      if tries >= how_many
+        $stderr.puts "Giving up"
+        failure_proc ? failure_proc.call : raise
+      else
+        sleep delay
+        retry
+      end
     end
-    driver
+  end
+  module_function :with_retries
+
+  def ruby_chrome_driver
+    puts "Thread: provisioning local chrome driver"
+    Selenium::WebDriver.for :chrome, switches: %w[--disable-impl-side-painting]
   end
 
   def selenium_remote_driver
-    driver = nil
-    begin
-      tries ||= 3
-      puts "Thread: provisioning saucelabs driver"
-      driver = Selenium::WebDriver.for(
-        :remote,
-        :url => selenium_url,
-        :desired_capabilities => desired_capabilities
-      )
-    rescue StandardError => e
-      puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
-      sleep 2
-      retry unless (tries -= 1).zero?
-    end
-    driver
+    puts "Thread: provisioning remote #{browser} driver"
+    Selenium::WebDriver.for(
+      :remote,
+      :url => selenium_url,
+      :desired_capabilities => desired_capabilities
+    )
   end
 
   def desired_capabilities
@@ -169,31 +180,10 @@ module SeleniumDriverSetup
   end
 
   def ruby_firefox_driver
-    try ||= 1
-    # TODO: we could try a random port here instead of relying on the default for retries
-    # (or killing firefox may be the best move)
-    driver = Selenium::WebDriver.for(:firefox,
-                                     profile: firefox_profile,
-                                     desired_capabilities: desired_capabilities)
-  rescue StandardError => e
-    puts <<-ERROR
-    Thread #{THIS_ENV}
-     try ##{try}
-    Error attempting to start remote webdriver: #{e}
-    ERROR
-
-    # according to https://code.google.com/p/selenium/issues/detail?id=6760,
-    # this could maybe be fixed by killing stale firefoxes?
-    system("ps aux")
-
-    if try <= 3
-      try += 1
-      sleep 2
-      retry
-    else
-      puts "GIVING UP"
-      raise
-    end
+    puts "Thread: provisioning local firefox driver"
+    Selenium::WebDriver.for(:firefox,
+                            profile: firefox_profile,
+                            desired_capabilities: desired_capabilities)
   end
 
   def selenium_driver
@@ -344,21 +334,22 @@ module SeleniumDriverSetup
   class ServerStartupError < RuntimeError; end
 
   def self.start_webserver(webserver)
-    attempts ||= 0
-    setup_host_and_port
-    case webserver
-    when 'thin'
-      self.start_in_process_thin_server
-    when 'webrick'
-      self.start_in_process_webrick_server
-    else
-      puts "no web server specified, defaulting to WEBrick"
-      self.start_in_process_webrick_server
+    with_retries(error_class: ServerStartupError) do
+      setup_host_and_port
+      case webserver
+      when 'thin'
+        self.start_in_process_thin_server
+      when 'webrick'
+        self.start_in_process_webrick_server
+      else
+        puts "no web server specified, defaulting to WEBrick"
+        self.start_in_process_webrick_server
+      end
     end
   rescue ServerStartupError
-    attempts += 1
-    retry if attempts <= 3
-    $stderr.puts "unable to start server, giving up :'("
+    # if this fails, it's before any specs run, so we can bail completely
+    # (if we don't, rspec's exit hooks will run/fail all examples in this
+    # group, meaning other workers won't pick them up)
     exit! 1
   end
 
