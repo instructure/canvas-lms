@@ -111,7 +111,7 @@ class SubAccountsController < ApplicationController
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
-  # @returns [Account]
+  # @returns Account
   def create
     if params[:account][:parent_account_id]
       parent_id = params[:account].delete(:parent_account_id)
