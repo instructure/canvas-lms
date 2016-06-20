@@ -40,6 +40,7 @@ define([
   'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
   'quiz_formula_solution',
+  'quiz_labels',
   'jsx/shared/rce/RichContentEditor',
   'jsx/shared/conditional_release/ConditionalRelease',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -61,8 +62,8 @@ define([
             Handlebars, DueDateOverrideView, Quiz,
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution, RichContentEditor,
-            ConditionalRelease){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution, addAriaDescription,
+            RichContentEditor, ConditionalRelease){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -2031,7 +2032,7 @@ define([
         $formQuestion.triggerHandler('recompute_variables', true);
       } else {
         // must use > in selector
-        $question.find(".text > .answers .answer").each(function() {
+        $question.find(".text > .answers .answer").each(function(index) {
           var answer = $(this).getTemplateData({
             textValues: data.textValues,
             htmlValues: data.htmlValues
@@ -2039,6 +2040,7 @@ define([
           answer.answer_type = data.answer_type;
           answer.question_type = data.question_type;
           var $answer = makeFormAnswer(answer);
+          addAriaDescription($answer, index+1);
           $form.find(".form_answers").append($answer);
         });
       }
