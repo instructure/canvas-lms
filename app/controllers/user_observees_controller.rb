@@ -178,11 +178,9 @@ class UserObserveesController < ApplicationController
 
   def add_observee(observee)
     @current_user.shard.activate do
-      UserObserver.unique_constraint_retry do
-        unless has_observee?(observee)
-          user.user_observees.create_or_restore(user_id: observee)
-          user.touch
-        end
+      unless has_observee?(observee)
+        user.user_observees.create_or_restore(user_id: observee)
+        user.touch
       end
     end
   end
