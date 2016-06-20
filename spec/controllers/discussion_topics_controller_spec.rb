@@ -367,6 +367,26 @@ describe DiscussionTopicsController do
         expect(assigns[:groups]).to eq([@group2])
       end
 
+      it "should redirect to group for student if DA applies to section" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        asmt = @topic.assignment
+        asmt.only_visible_to_overrides = true
+        override = asmt.assignment_overrides.build
+        override.set = @course.default_section
+        override.save!
+        asmt.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
+      end
+
       it "should redirect to the student's group" do
         user_session(@student)
         @group1.add_user(@student)

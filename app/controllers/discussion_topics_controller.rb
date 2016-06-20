@@ -487,6 +487,9 @@ class DiscussionTopicsController < ApplicationController
         group_scope = @topic.group_category.groups.active
         if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
           @groups = group_scope.where(:id => @topic.assignment.assignment_overrides.active.where(:set_type => "Group").pluck(:set_id)).to_a
+          if @groups.empty?
+            @groups = group_scope.to_a # revert to default if we're not using Group overrides
+          end
         else
           @groups = group_scope.to_a
         end
