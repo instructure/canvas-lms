@@ -67,12 +67,6 @@ thead th {
 }
 
 /* Column striping */
-.table-columns-striped tr {
-  td:nth-child(2n),
-  th:nth-child(2n) {
-    background: none repeat scroll 0 0 $stripeColor;
-  }
-}
 
 .notification-table-wrapper {
   @include transition(margin 0.3s ease);
@@ -88,21 +82,11 @@ thead th {
   .ui-button {
     margin-left: 0;
     margin-right: 0;
-    padding: 2px;
-    border-radius: 3px;
-    border: none;
-    background-image: none;
-    background: initial;
-  }
-  .ui-button.ui-state-hover {
-    background: $ic-bg-light-neutral;
+    padding: 2px; // fixes FF padding issues
   }
   .ui-buttonset {
     margin-left: 0;
     margin-right: 0;
-  }
-  .ui-state-active, .ui-state-active.ui-state-hover {
-    background: $ic-color-dark;
   }
   .grouping > td:first-child {
     min-width: 205px;
