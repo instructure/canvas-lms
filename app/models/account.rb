@@ -1574,4 +1574,9 @@ class Account < ActiveRecord::Base
   def parent_registration_aac
     authentication_providers.where(parent_registration: true).first
   end
+
+  def to_param
+    return 'site_admin' if site_admin?
+    super
+  end
 end
