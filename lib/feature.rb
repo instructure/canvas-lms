@@ -419,7 +419,7 @@ END
       applies_to: 'Course',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false,
     },
     'wrap_calendar_event_titles' =>
