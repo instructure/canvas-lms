@@ -211,8 +211,8 @@ module Lti
       context 'context is a group' do
         subject { described_class.new(root_account, group, controller, current_user: user) }
 
-        it 'has substitution for $Canvas.api.membershipServiceUrl when context is a group' do
-          exp_hash = { test: '$Canvas.api.membershipServiceUrl' }
+        it 'has substitution for $ToolProxyBinding.memberships.url when context is a group' do
+          exp_hash = { test: '$ToolProxyBinding.memberships.url' }
           group.stubs(:id).returns('1')
           controller.stubs(:polymorphic_url).returns("/api/lti/groups/#{group.id}/membership_service")
           subject.expand_variables!(exp_hash)
@@ -223,8 +223,8 @@ module Lti
       context 'context is a course' do
         subject { described_class.new(root_account, course, controller, current_user: user) }
 
-        it 'has substitution for $Canvas.api.membershipServiceUrl when context is a course' do
-          exp_hash = { test: '$Canvas.api.membershipServiceUrl' }
+        it 'has substitution for $ToolProxyBinding.memberships.url when context is a course' do
+          exp_hash = { test: '$ToolProxyBinding.memberships.url' }
           course.stubs(:id).returns('1')
           controller.stubs(:polymorphic_url).returns("/api/lti/courses/#{course.id}/membership_service")
           subject.expand_variables!(exp_hash)
@@ -356,6 +356,31 @@ module Lti
           exp_hash = {test: '$Canvas.externalTool.url'}
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "url"
+        end
+
+        it 'returns the opaque identifiers for the active groups the user is a part of' do
+          course.save!
+          user.save!
+
+          g1 = course.groups.new
+          g2 = course.groups.new
+
+          user.groups << g1
+          user.groups << g2
+
+          g1.save!
+          g2.save!
+
+          exp_hash = { test: '$Canvas.group.contextIds' }
+          subject.expand_variables!(exp_hash)
+
+          g1.reload
+          g2.reload
+
+          ids = exp_hash[:test].split(',')
+          expect(ids.size).to eq 2
+          expect(ids.include?(g1.lti_context_id)).to be true
+          expect(ids.include?(g2.lti_context_id)).to be true
         end
       end
 
@@ -563,7 +588,6 @@ module Lti
             expect(exp_hash[:test]).to eq 'false'
           end
         end
-
 
         context 'pseudonym' do
           let(:pseudonym) { Pseudonym.new }

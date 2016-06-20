@@ -223,6 +223,18 @@ describe 'Provisional Grades API', type: :request do
           expect(@submission.score).to eq 90
         end
       end
+
+      context "with partial provisional grades" do
+        it "publishes the selected provisional grade when the student is in the moderation set" do
+          @submission = @assignment.submit_homework(@student, :body => "hello")
+          @assignment.grade_student(@student, { :grader => @ta, :score => 100, :provisional => true })
+          @assignment.moderated_grading_selections.create!(:student => @student)
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@submission.reload.score).to eq 100
+        end
+      end
     end
   end
 end

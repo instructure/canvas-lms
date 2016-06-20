@@ -34,7 +34,7 @@ describe MarkDonePresenter do
   def create_presenter(tag)
     ctrl = stub('Controller', session: true)
     context = stub('Context', "grants_any_right?" => true)
-    MarkDonePresenter.new(ctrl, context, tag.id, @user)
+    MarkDonePresenter.new(ctrl, context, tag.id, @user, nil)
   end
 
   def add_mark_done_requirement(tag)

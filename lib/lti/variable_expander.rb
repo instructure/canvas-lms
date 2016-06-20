@@ -105,7 +105,12 @@ module Lti
     register_expansion 'Canvas.api.baseUrl', [],
                        -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" }
 
-    register_expansion 'Canvas.api.membershipServiceUrl', [],
+    # returns the URL for the membership service associated with the current context
+    # @example
+    #   ```
+    #   https://canvas.instructure.com/api/lti/courses/1/membership_service
+    #   ```
+    register_expansion 'ToolProxyBinding.memberships.url', [],
                        -> { @controller.polymorphic_url([@context, :membership_service]) },
                        -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
@@ -315,6 +320,17 @@ module Lti
     register_expansion 'Canvas.user.prefersHighContrast', [],
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
+
+    # returns the context ids for the groups the user belongs to in the course.
+    # @example
+    #   ```
+    #   1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
+    #   ```
+    register_expansion 'Canvas.group.contextIds', [],
+                       -> { @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
+                              Lti::Asset.opaque_identifier_for(g)
+                            end.join(',') },
+                       -> { @current_user && @context.is_a?(Course) }
 
     register_expansion 'Membership.role', [],
                        -> { lti_helper.all_roles('lis2') },

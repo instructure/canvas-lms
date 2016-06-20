@@ -25,6 +25,7 @@ describe ExternalToolsController, type: :request do
   describe "in a course" do
     before(:once) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      @group = group_model(:context => @course)
     end
 
     it "should show an external tool" do
@@ -200,12 +201,19 @@ describe ExternalToolsController, type: :request do
 
       end
     end
+
+    describe "in a group" do
+      it "should return course level external tools" do
+        group_index_call(@group)
+      end
+    end
   end
 
   describe "in an account" do
     before(:once) do
       account_admin_user(:active_all => true, :user => user_with_pseudonym)
       @account = @user.account
+      @group = group_model(:context => @account)
     end
 
     it "should show an external tool" do
@@ -272,6 +280,12 @@ describe ExternalToolsController, type: :request do
         end
       end
     end
+
+    describe "in a group" do
+      it "should return account level external tools" do
+        group_index_call(@group)
+      end
+    end
   end
 
 
@@ -288,6 +302,17 @@ describe ExternalToolsController, type: :request do
                  {:controller => 'external_tools', :action => 'show', :format => 'json',
                   :"#{type}_id" => context.id.to_s, :external_tool_id => "0"})
     assert_status(404)
+  end
+
+  def group_index_call(group)
+    et = tool_with_everything(group.context)
+
+    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools?include_parents=true",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json',
+                     :group_id => group.id.to_s, :include_parents => true})
+
+    expect(json.size).to eq 1
+    expect(HashDiff.diff(json.first, example_json(et))).to eq []
   end
 
   def index_call(context, type="course")

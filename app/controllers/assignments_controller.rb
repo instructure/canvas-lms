@@ -138,7 +138,7 @@ class AssignmentsController < ApplicationController
 
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
-      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
       respond_to do |format|
         format.html { render }

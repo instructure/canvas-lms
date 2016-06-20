@@ -162,7 +162,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def css_and_js_overrides
-    Rails.cache.fetch([self, 'css_and_js_overrides']) do
+    Rails.cache.fetch([self, 'css_and_js_overrides'].cache_key) do
       chain_of_ancestor_configs.each_with_object({}) do |brand_config, includes|
         BrandConfig::OVERRIDE_TYPES.each do |override_type|
           if brand_config[override_type].present?

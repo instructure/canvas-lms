@@ -84,10 +84,12 @@ module TatlTael
     end
 
     COFFEE_SPEC_REGEX = /spec\/coffeescripts\//
+    JSX_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\/jsx\//
     def coffee_specs?
       changes.any? do |change|
         !change.deleted? &&
-          change.path =~ COFFEE_SPEC_REGEX
+          (change.path =~ COFFEE_SPEC_REGEX ||
+           change.path =~ JSX_SPEC_REGEX)
       end
     end
 
@@ -99,7 +101,6 @@ module TatlTael
       end
     end
 
-    JSX_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\/jsx\//
     def jsx_specs?
       changes.any? do |change|
         !change.deleted? &&

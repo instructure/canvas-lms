@@ -34,13 +34,12 @@ define([
       listCollaborationsSuccessful: false,
       list: []
     };
-    let collaborations = [{}];
-
-    let action = actions.listCollaborationsSuccessful(collaborations);
+    let payload = {collaborations: []};
+    let action = actions.listCollaborationsSuccessful(payload);
     let newState = reducer(state, action);
     equal(newState.listCollaborationsPending, false);
     equal(newState.listCollaborationsSuccessful, true);
-    equal(newState.list, collaborations);
+    equal(newState.list.length, payload.collaborations.length);
   });
 
   test('responds to listCollaborationsFailed', () => {

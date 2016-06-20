@@ -1052,9 +1052,9 @@ class Submission < ActiveRecord::Base
 
   def add_comment(opts={})
     opts = opts.symbolize_keys
-    opts[:author] = opts.delete(:commenter) || opts.delete(:author) || opts.delete(:user) || self.user
+    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
-    opts[:attachments] ||= opts.delete :comment_attachments
+    opts[:attachments] ||= opts[:comment_attachments]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = t('media_comment', "This is a media comment.")
@@ -1062,8 +1062,8 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    if opts.delete(:provisional)
-      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts.delete(:final))
+    if opts[:provisional]
+      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts[:final])
       opts[:provisional_grade_id] = pg.id
     end
     if self.new_record?

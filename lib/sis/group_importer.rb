@@ -70,13 +70,15 @@ module SIS
         group.sis_source_id = group_id
         group.sis_batch_id = @batch.id if @batch
 
+        # closed and completed are no longer valid states. Leaving these for
+        # backwards compatibility. It is not longer a documented status
         case status
         when /available/i
           group.workflow_state = 'available'
         when /closed/i
-          group.workflow_state = 'closed'
+          group.workflow_state = 'available'
         when /completed/i
-          group.workflow_state = 'completed'
+          group.workflow_state = 'available'
         when /deleted/i
           group.workflow_state = 'deleted'
         end

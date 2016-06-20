@@ -115,7 +115,59 @@ describe CollaborationsController do
     end
 
   end
-  describe "GET 'lti_index" do
+
+  describe "GET 'members'" do
+    before(:each) do
+      @collab = @course.collaborations.create!(
+        title: "accessible",
+        user: @student,
+        url: 'http://www.example.com'
+      )
+      @collab.reload
+    end
+
+    it "should require authorization" do
+      get 'members', id: @collab.id
+      assert_unauthorized
+    end
+
+    context "with user access token" do
+      before(:each) do
+        pseudonym(@student)
+        @student.save!
+        token = @student.access_tokens.create!(purpose: 'test').full_token
+        @request.headers['Authorization'] = "Bearer #{token}"
+      end
+
+      it "should return back collaboration members" do
+        get 'members', id: @collab.id
+        hash = JSON.parse(@response.body).first
+
+        expect(hash['id']).to eq @collab.collaborators.first.id
+        expect(hash['type']).to eq 'user'
+        expect(hash['name']).to eq @student.sortable_name
+        expect(hash['collaborator_id']).to eq @student.id
+      end
+
+      it "should include collaborator_lti_id" do
+        get 'members', id: @collab.id, include: ['collaborator_lti_id']
+        @student.reload
+        hash = JSON.parse(@response.body).first
+
+        expect(hash['collaborator_lti_id']).to eq @student.lti_context_id
+      end
+
+      it "should include avatar_image_url" do
+        get 'members', id: @collab.id, include: ['avatar_image_url']
+        @student.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
+        hash = JSON.parse(@response.body).first
+
+        expect(hash['avatar_image_url']).to eq @student.lti_context_id
+      end
+    end
+  end
+
+  describe "GET 'lti_index'" do
     it "should require authorization for the course" do
       get 'lti_index', :course_id => @course.id
       assert_unauthorized

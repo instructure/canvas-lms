@@ -20,7 +20,6 @@ define([
       return (
         <div className="ic-Action-header">
           <div className="ic-Action-header__Secondary">
-            <a href={url}  rel="external" className="Button">{I18n.t('Past Collaborations')}</a>
             {this.renderNewCollaborationsDropDown()}
           </div>
         </div>

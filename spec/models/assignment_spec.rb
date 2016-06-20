@@ -346,13 +346,56 @@ describe Assignment do
     expect(@submission.graded_at).not_to eql original_graded_at
   end
 
-  it "should hide grading comments if assignment is muted" do
-    setup_assignment_with_homework
-    @assignment.mute!
-    @assignment.grade_student(@user, :comment => 'hi')
-    submission = @assignment.submissions.first
-    comment = submission.submission_comments.first
-    expect(comment).to be_hidden
+  describe "#update_submission" do
+    before :once do
+      setup_assignment_with_homework
+    end
+
+    it "should hide grading comments if assignment is muted and commenter is teacher" do
+      @assignment.mute!
+      @assignment.update_submission(@user, comment: 'hi', author: @teacher)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).to be_hidden
+    end
+
+    it "should not hide grading comments if assignment is not muted even if commenter is teacher" do
+      @assignment.update_submission(@user, comment: 'hi', author: @teacher)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).not_to be_hidden
+    end
+
+    it "should not hide grading comments if assignment is muted and commenter is student" do
+      @assignment.mute!
+      @assignment.update_submission(@user, comment: 'hi', author: @student1)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).not_to be_hidden
+    end
+
+    it "should not hide grading comments if assignment is muted and no commenter is provided" do
+      @assignment.mute!
+      @assignment.update_submission(@user, comment: 'hi')
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).not_to be_hidden
+    end
+
+    it "should hide grading comments if hidden is true" do
+      @assignment.update_submission(@user, comment: 'hi', hidden: true)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).to be_hidden
+    end
+
+    it "should not hide grading comments even if muted and posted by teacher if hidden is nil" do
+      @assignment.mute!
+      @assignment.update_submission(@user, comment: 'hi', author: @teacher, hidden: nil)
+      submission = @assignment.submissions.first
+      comment = submission.submission_comments.first
+      expect(comment).not_to be_hidden
+    end
   end
 
   describe "#infer_grading_type" do
@@ -752,13 +795,11 @@ describe Assignment do
           sub1, sub2 = @assignment.grade_student(
             @student1,
             excuse: true,
-            comment: "(This comment ensures that both submissions are returned)",
-            group_comment: true
           )
 
           expect(sub1.user).to eq @student1
           expect(sub1).to be_excused
-          expect(sub2).to_not be_excused
+          expect(sub2).to be_nil
         end
 
         context "when trying to grade and excuse simultaneously" do
@@ -780,12 +821,11 @@ describe Assignment do
             @student1,
             grade: 38,
             excuse: false,
-            comment: "(This comment ensures that both submissions are returned)",
-            group_comment: true
           )
 
           expect(sub1.user).to eq @student1
           expect(sub1.grade).to eq "38"
+          expect(sub2.user).to eq @student2
           expect(sub2.grade).to eq "38"
         end
 
@@ -793,8 +833,11 @@ describe Assignment do
           sub1 = @assignment.grade_student(@student1, excuse: true).first
           expect(sub1).to be_excused
 
-          sub2 = @assignment.grade_student(@student2, grade: 10).first
+          sub2, sub3 = @assignment.grade_student(@student2, grade: 10)
           expect(sub1.reload).to be_excused
+          expect(sub2.user).to eq @student2
+          expect(sub2.grade).to eq "10"
+          expect(sub3).to be_nil
         end
       end
 
@@ -1128,8 +1171,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map{|a| a.asset}).to be_include(s)
-          expect(res.map{|a| a.assessor_asset}).to be_include(s)
+          expect(res.map(&:asset)).to be_include(s)
+          expect(res.map(&:assessor_asset)).to be_include(s)
         end
       end
 
@@ -1140,8 +1183,8 @@ describe Assignment do
         @a.peer_review_count = 1
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
-        expect(res.map{|a| a.asset}).to_not be_include(fake_sub)
-        expect(res.map{|a| a.assessor_asset}).to_not be_include(fake_sub)
+        expect(res.map(&:asset)).not_to be_include(fake_sub)
+        expect(res.map(&:assessor_asset)).not_to be_include(fake_sub)
       end
 
       it "should assign when already graded" do
@@ -2185,7 +2228,8 @@ describe Assignment do
     end
 
     it "should add a submission comment for only the specified user by default" do
-      res = @a.grade_student(@u1, :comment => "woot")
+      @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you", :comment => "ohai teacher, we had so much fun working together", :group_comment => "1")
+      res = @a.update_submission(@u1, :comment => "woot")
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to eql(1)
@@ -2212,7 +2256,8 @@ describe Assignment do
     end
 
     it "should add a submission comment for all group members if specified" do
-      res = @a.grade_student(@u1, :comment => "woot", :group_comment => "1")
+      @a.submit_homework(@u1, :submission_type => "online_text_entry", :body => "Some text for you")
+      res = @a.update_submission(@u1, :comment => "woot", :group_comment => "1")
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to eql(2)
@@ -2231,6 +2276,7 @@ describe Assignment do
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to eql(1)
+      res = @a.update_submission(@u3, :comment => "woot", :group_comment => "1")
       comments = res.find{|s| s.user == @u3}.submission_comments
       expect(comments.size).to eq 1
       expect(comments[0].group_comment_id).to be_nil
@@ -3245,12 +3291,6 @@ describe Assignment do
       }.to raise_error "Student Required"
     end
 
-    it "raises an error if no submission is associated with the student" do
-      expect {
-        assignment.update_submission(@student)
-      }.to raise_error "No submission found for that student"
-    end
-
     context "when the student is not in a group" do
       let!(:associate_student_and_submission) {
         assignment.submissions.create user: @student
@@ -3547,6 +3587,22 @@ describe Assignment do
       expect(touched).to eq true
     end
   end
+
+  describe '.with_student_submission_count' do
+    specs_require_sharding
+
+    it "doesn't reference multiple shards when accessed from a different shard" do
+      @assignment = @course.assignments.create! points_possible: 10
+      Assignment.connection.stubs(:use_qualified_names?).returns(true)
+      @shard1.activate do
+        Assignment.connection.stubs(:use_qualified_names?).returns(true)
+        sql = @course.assignments.with_student_submission_count.to_sql
+        expect(sql).to be_include(Shard.default.name)
+        expect(sql).not_to be_include(@shard1.name)
+      end
+    end
+  end
+
 end
 
 def setup_assignment_with_group

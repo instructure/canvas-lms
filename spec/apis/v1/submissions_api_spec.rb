@@ -632,7 +632,8 @@ describe 'Submissions API', type: :request do
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
     media_object(:media_id => "3232", :media_type => "audio")
-    sub1 = a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher}).first
+    a1.update_submission(student1, {:comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher})
+    sub1 = a1.grade_student(student1, {:grade => '90%', :grader => @teacher}).first
     comment = sub1.submission_comments.first
 
     @user = student1
@@ -791,7 +792,8 @@ describe 'Submissions API', type: :request do
     }
 
     media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
-    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
+    a1.grade_student(student1, {:grade => '90%', :grader => @teacher})
+    a1.update_submission(student1, {:comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher})
     sub1.reload
     expect(sub1.submission_comments.size).to eq 1
     comment = sub1.submission_comments.first

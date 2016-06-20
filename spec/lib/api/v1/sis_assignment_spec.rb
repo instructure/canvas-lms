@@ -75,6 +75,16 @@ describe Api::V1::SisAssignment do
       course_sections.stubs(:association).returns(OpenStruct.new(:loaded? => true))
     end
 
+    it "assignment groups have name and sis_source_id" do
+      ag_name = 'chumba choo choo'
+      sis_source_id = "my super unique goo-id"
+      assignment_group = AssignmentGroup.new(name: ag_name, sis_source_id: sis_source_id)
+      assignment_1.stubs(:assignment_group).returns(assignment_group)
+      result = subject.sis_assignments_json([assignment_1])
+      expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
+      expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
+    end
+
     it "returns an empty hash for 0 assignments" do
       assignments = []
       expect(subject.sis_assignments_json(assignments)).to eq([])

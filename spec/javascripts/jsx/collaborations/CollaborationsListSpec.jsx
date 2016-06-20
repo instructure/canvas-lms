@@ -22,8 +22,15 @@ define([
     updated_at: (new Date(0)).toString()
   }];
 
+  let collaborationsState = {
+    nextPage: 'www.testurl.com',
+    listCollaborationsPending: 'true',
+    list: collaborations
+  };
+
   test('renders the list of collaborations', () => {
-    let component = TestUtils.renderIntoDocument(<CollaborationsList collaborations={collaborations} />);
+    ENV.context_asset_string = 'courses_1'
+    let component = TestUtils.renderIntoDocument(<CollaborationsList collaborationsState={collaborationsState}/>);
     let collaborationComponents = TestUtils.scryRenderedDOMComponentsWithClass(component, 'Collaboration');
     equal(collaborationComponents.length, 2);
   })

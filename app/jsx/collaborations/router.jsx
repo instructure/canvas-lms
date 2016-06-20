@@ -5,14 +5,15 @@ define([
   'redux',
   'jsx/collaborations/CollaborationsApp',
   'jsx/collaborations/actions/collaborationsActions',
-  'jsx/collaborations/store/store'
-], function (React, page, qs, redux, CollaborationsApp, actions, store) {
+  'jsx/collaborations/store/store',
+  'compiled/str/splitAssetString'
+], function (React, page, qs, redux, CollaborationsApp, actions, store, splitAssetString) {
   /**
    * Route Handlers
    */
   function renderShowCollaborations (ctx) {
     store.dispatch(actions.getLTICollaborators(ctx.params.context, ctx.params.contextId));
-    store.dispatch(actions.getCollaborations(ctx.params.context, ctx.params.contextId));
+    store.dispatch(actions.getCollaborations(`/api/v1/${ctx.params.context}/${ctx.params.contextId}/collaborations`));
 
     let view = () => {
       let state = store.getState();

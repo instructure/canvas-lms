@@ -207,7 +207,7 @@ describe "discussions" do
           topic.save!
           get "/courses/#{@course.id}/undelete"
           expect(f('#deleted_items_list').text).to include('teacher topic title')
-          f('.restore_link').click
+          hover_and_click('.restore_link')
           driver.switch_to.alert.accept
           wait_for_ajaximations
           get url

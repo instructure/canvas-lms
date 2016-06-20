@@ -25,7 +25,7 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_GROUP_JSON_OPTS = {
-    only: %i(id name).freeze
+    only: %i(id name sis_source_id).freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_COURSE_SECTION_JSON_OPTS = {

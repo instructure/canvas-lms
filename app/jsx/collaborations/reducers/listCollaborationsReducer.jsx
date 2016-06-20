@@ -19,11 +19,14 @@ define([
       };
     },
     [ACTION_NAMES.LIST_COLLABORATIONS_SUCCESSFUL]: (state, action) => {
+      let list = state.list.slice()
+      list.push(...action.payload.collaborations)
       return {
         ...state,
         listCollaborationsPending: false,
         listCollaborationsSuccessful: true,
-        list: action.payload
+        list,
+        nextPage: action.payload.next
       }
     },
     [ACTION_NAMES.LIST_COLLABORATIONS_FAILED]: (state, action) => {
@@ -31,6 +34,20 @@ define([
         ...state,
         listCollaborationsPending: false,
         listCollaborationsError: action.payload
+      }
+    },
+    [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+      return {
+        ...state,
+        list: [],
+        nextPage: null
+      }
+    },
+    [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+      return {
+        ...state,
+        list: [],
+        nextPage: null
       }
     }
   };

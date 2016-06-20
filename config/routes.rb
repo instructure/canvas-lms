@@ -1113,6 +1113,8 @@ CanvasRails::Application.routes.draw do
         put "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :update, as: "#{context}_external_tools_update"
         delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :destroy, as: "#{context}_external_tools_delete"
       end
+
+      get "groups/:group_id/external_tools", action: :index, as: "group_external_tools"
     end
 
     scope(controller: 'lti/lti_apps') do

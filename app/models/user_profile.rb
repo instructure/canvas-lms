@@ -27,13 +27,12 @@ class UserProfile < ActiveRecord::Base
 
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
-  TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS, TAB_LOGOUT,
-    TAB_HOME, TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
+  TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
+    TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
 
   def tabs_available(user=nil, opts={})
     unless @tabs
       @tabs = [
-        { :id => TAB_HOME, :label => I18n.t('#tabs.home', "Home"), :css_class => 'home', :href => :dashboard_path, :no_args => true },
         { :id => TAB_COMMUNICATION_PREFERENCES, :label => I18n.t('#user_profile.tabs.notifications', "Notifications"), :css_class => 'notifications', :href => :communication_profile_path, :no_args => true },
         { :id => TAB_FILES, :label => I18n.t('#tabs.files', "Files"), :css_class => 'files', :href => :files_path, :no_args => true },
         { :id => TAB_PROFILE_SETTINGS, :label => I18n.t('#user_profile.tabs.settings', 'Settings'), :css_class => 'profile_settings', :href => :settings_profile_path, :no_args => true },
@@ -44,14 +43,6 @@ class UserProfile < ActiveRecord::Base
 
       @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if user.eportfolios_enabled?
 
-      if opts[:root_account] && opts[:root_account].feature_enabled?(:use_new_styles)
-        @tabs << {
-          :id => TAB_LOGOUT,
-          :label => I18n.t('#tabs.logout', "Logout"),
-          :css_class => 'logout',
-          :href => :logout_path,
-          :no_args => true }
-      end
 
       if user && opts[:root_account]
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|

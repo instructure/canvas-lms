@@ -32,7 +32,7 @@ define([
     let component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...props} />);
     let button = TestUtils.findRenderedDOMComponentWithClass(component, 'Button').getDOMNode();
     TestUtils.Simulate.click(button);
-    let tool = TestUtils.findRenderedDOMComponentWithTag(component, 'a').getDOMNode();
+    let tool = TestUtils.findRenderedDOMComponentWithTag(component, 'Button').getDOMNode();
     TestUtils.Simulate.click(tool);
     ok(onItemClicked)
   })

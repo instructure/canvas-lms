@@ -320,15 +320,15 @@
           <div class="lock_explanation">
             <%= t(:only_registered_users, "Only registered, enrolled users can take graded quizzes") %>
           </div>
-        <% elsif @locked && !can_do(@quiz, @current_user, :update) %>
-          <div class="lock_explanation">
-            <%= lock_explanation(@locked_reason, 'quiz', @context) %>
-          </div>
         <% elsif @quiz.context.soft_concluded? %>
           <div class="alert alert-danger lock_explanation" role="alert">
             <%= t(:course_concluded_notice,
               "This quiz is no longer available as the course has been concluded.")
             %>
+          </div>
+        <% elsif @locked && !can_do(@quiz, @current_user, :update) %>
+          <div class="lock_explanation">
+            <%= lock_explanation(@locked_reason, 'quiz', @context) %>
           </div>
         <% end %>
       <% end %>

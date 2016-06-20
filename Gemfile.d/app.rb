@@ -25,7 +25,7 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.5.9'
+gem 'switchman', '1.5.10'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -88,7 +88,7 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
-gem 'ruby-saml-mod', '0.3.0'
+gem 'ruby-saml-mod', '0.3.1'
 gem 'saml2', '1.0.7', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '3236a249986413c6c399ef3477132a0af0410bb7'
 gem 'rubycas-client', '2.3.9', require: false

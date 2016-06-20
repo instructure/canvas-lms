@@ -156,6 +156,11 @@ class Group < ActiveRecord::Base
   def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
   end
+
+  def context_external_tools
+    ContextExternalTool.none
+  end
+
   private :group_category_limit_met?
 
   def student_organized?
@@ -257,23 +262,12 @@ class Group < ActiveRecord::Base
   end
 
   workflow do
-    state :available do
-      event :complete, :transitions_to => :completed
-      event :close, :transitions_to => :closed
-    end
-
-    # Closed to new entrants
-    state :closed do
-      event :complete, :transitions_to => :completed
-      event :open, :transitions_to => :available
-    end
-
-    state :completed
+    state :available
     state :deleted
   end
 
   def active?
-    self.available? || self.closed?
+    self.available?
   end
 
   alias_method :destroy_permanently!, :destroy

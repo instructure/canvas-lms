@@ -5183,13 +5183,13 @@ sv:
       - Dec
     datepicker: 
       column_headings: 
-        - Su
-        - Mo
-        - Tu
-        - We
-        - Th
-        - Fr
-        - Sa
+        - S
+        - M
+        - Ti
+        - O
+        - To
+        - F
+        - L
     day_names: 
       - Söndag
       - Måndag
