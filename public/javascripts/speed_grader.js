@@ -2034,21 +2034,10 @@ define([
         EG.showGrade();
       });
     },
-    showGrade: function() {
-      var submission;
-      var grade = EG.currentStudent.submission === undefined ?
-        "" :
-        EG.currentStudent.submission.grade;
 
-      if (EG.currentStudent.submission !== undefined) {
-        submission = EG.currentStudent.submission;
-        if (submission.excused) {
-          grade = "EX"
-        }
-        else if (submission.grade !== null && !isNaN(parseFloat(submission.grade))) {
-          grade = round(submission.grade, 2);
-        }
-      }
+    showGrade: function() {
+      var submission = EG.currentStudent.submission;
+      var grade = EG.getGradeToShow(submission, ENV.grading_role);
 
       $grade.val(grade)
         .attr('disabled', typeof submission != "undefined" &&
@@ -2116,6 +2105,26 @@ define([
         });
       });
 
+    },
+
+    getGradeToShow: function(submission, grading_role) {
+      var grade = '';
+
+      if (submission) {
+        if (submission.excused) {
+          grade = 'EX';
+        } else if (submission.score != null && (grading_role === 'moderator' || grading_role === 'provisional_grader')) {
+          grade = round(submission.score, 2).toString();
+        } else if (submission.grade != null) {
+          if (submission.grade !== '' && !isNaN(submission.grade)) {
+            grade = round(submission.grade, 2).toString();
+          } else {
+            grade = submission.grade;
+          }
+        }
+      }
+
+      return grade;
     },
 
     initComments: function(){

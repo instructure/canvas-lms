@@ -135,4 +135,78 @@ define([
     ok(srcUrl.indexOf(retrieveUrl) > -1)
     ok(srcUrl.indexOf(encodeURIComponent(url)) > -1)
   });
+
+  module('speed_grader#getGradeToShow');
+
+  test('returns an empty string if submission is null', () => {
+    let grade = speedGrader.EG.getGradeToShow(null, 'some_role');
+
+    equal(grade, '');
+  });
+
+  test('returns an empty string if the submission is undefined', () => {
+    let grade = speedGrader.EG.getGradeToShow(undefined, 'some_role');
+
+    equal(grade, '');
+  });
+
+  test('returns an empty string if a submission has no excused or grade', () => {
+    let grade = speedGrader.EG.getGradeToShow({}, 'some_role');
+
+    equal(grade, '');
+  });
+
+  test('returns excused if excused is true', () => {
+    let grade = speedGrader.EG.getGradeToShow({ excused: true }, 'some_role');
+
+    equal(grade, 'EX');
+  });
+
+  test('returns excused if excused is true and user is moderator', () => {
+    let grade = speedGrader.EG.getGradeToShow({ excused: true }, 'moderator');
+
+    equal(grade, 'EX');
+  });
+
+  test('returns excused if excused is true and user is provisional grader', () => {
+    let grade = speedGrader.EG.getGradeToShow({ excused: true }, 'provisional_grader');
+
+    equal(grade, 'EX');
+  });
+
+  test('returns grade if submission has no excused and grade is not a float', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 'some_grade' }, 'some_role');
+
+    equal(grade, 'some_grade');
+  });
+
+  test('returns score of submission if user is a moderator', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'moderator');
+
+    equal(grade, '25');
+  });
+
+  test('returns score of submission if user is a provisional grader', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'provisional_grader');
+
+    equal(grade, '25');
+  });
+
+  test('returns grade of submission if user is neither a moderator or provisional grader', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 15, score: 25 }, 'some_role');
+
+    equal(grade, '15');
+  });
+
+  test('returns grade of submission if user is moderator but score is null', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 15 }, 'moderator');
+
+    equal(grade, '15');
+  });
+
+  test('returns grade of submission if user is provisional grader but score is null', () => {
+    let grade = speedGrader.EG.getGradeToShow({ grade: 15 }, 'provisional_grader');
+
+    equal(grade, '15');
+  });
 });
