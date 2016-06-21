@@ -52,7 +52,8 @@ define [
 
     moveUser: (newGroupId) ->
       @collection.category.reassignUser(@model, @collection.get(newGroupId))
-      @hide()
+      @$el.detach()
+      @trigger("close", {"userMoved": true })
 
     toJSON: ->
       hasGroups = @collection.length > 0
