@@ -445,11 +445,11 @@ module Lti
           expect(exp_hash[:test]).to eq right_now.to_s
         end
 
-        it 'has substitution for $Canvas.assignment.status' do
-          assignment.stubs(:workflow_state).returns('hello')
-          exp_hash = {test: '$Canvas.assignment.status'}
+        it 'has substitution for $Canvas.assignment.published' do
+          assignment.stubs(:workflow_state).returns('published')
+          exp_hash = {test: '$Canvas.assignment.published'}
           subject.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq 'hello'
+          expect(exp_hash[:test]).to eq true
         end
 
         context 'iso8601' do

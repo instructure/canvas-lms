@@ -446,8 +446,8 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> {@assignment && @assignment.due_at.present?}
 
-    register_expansion 'Canvas.assignment.status', [],
-                       -> { @assignment.workflow_state },
+    register_expansion 'Canvas.assignment.published', [],
+                       -> { @assignment.workflow_state == 'published' },
                        ASSIGNMENT_GUARD
 
     register_expansion 'LtiLink.custom.url', [],
