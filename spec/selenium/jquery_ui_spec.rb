@@ -60,6 +60,7 @@ describe "jquery ui" do
 
   it "should capture shift-tabbing" do
     create_simple_modal
+    active.click # sometimes the viewport doesn't have focus
     expect(active.tag_name).to eq 'select'
     shift_tab
     expect(active.tag_name).to eq 'a'
