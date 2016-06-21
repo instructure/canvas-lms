@@ -122,6 +122,11 @@ define([
       c.isActiveBrandConfig({md5: 'foo'}),
       'false when there is no active brand config'
     )
+    const blankConfig = c.thingsToShow().globalThemes.find(t => t.name === 'Default Template')
+    ok(
+      c.isActiveBrandConfig(blankConfig.brand_config),
+      'the default template is marked active when there is no active brand config'
+    )
   })
 
   test('isDeletable', function () {

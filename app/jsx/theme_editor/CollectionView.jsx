@@ -74,8 +74,11 @@ define([
     },
 
     isActiveBrandConfig (brandConfig) {
-      return this.props.activeBrandConfig &&
-             this.props.activeBrandConfig.md5 === brandConfig.md5
+      if (this.props.activeBrandConfig) {
+        return brandConfig.md5 === this.props.activeBrandConfig.md5
+      } else {
+        return brandConfig === blankConfig.brand_config
+      }
     },
 
     isDeletable (sharedBrandConfig) {
@@ -114,7 +117,10 @@ define([
       }
 
       const isActiveEditableTheme = (sbc) =>
-        !isSystemTheme(sbc) && this.props.activeBrandConfig.md5 === sbc.brand_config.md5
+        !isSystemTheme(sbc) && (
+          this.props.activeBrandConfig &&
+          this.props.activeBrandConfig.md5 === sbc.brand_config.md5
+        )
 
       // even if this theme's md5 is active, don't mark it as active if it is a system theme
       // and there is an account-shared theme that also matches the active md5
