@@ -22,7 +22,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
     expiry = Time.zone.now + Setting.get('oauth2_client_timeout', 10.minutes.to_i).to_i
     jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce: nonce }, expiry)
-    redirect_to @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
+    redirect_to delegated_auth_redirect_uri(@aac.generate_authorize_url(oauth2_login_callback_url, jwt))
   end
 
   def create

@@ -23,6 +23,13 @@ describe Login::Oauth2Controller do
   before do
     aac
     Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+
+    # replace on just this instance. this allows the tests to look directly at
+    # response.location independent of any implementation plugins may add for
+    # this method.
+    def @controller.delegated_auth_redirect_uri(uri)
+      uri
+    end
   end
 
   describe "#new" do
@@ -31,6 +38,13 @@ describe Login::Oauth2Controller do
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
       expect(session[:oauth2_nonce]).to_not be_blank
+    end
+
+    it "wraps redirect in delegated_auth_redirect_uri" do
+      # needs the `returns` or it returns nil and causes a 500
+      @controller.expects(:delegated_auth_redirect_uri).once.returns('/')
+      get :new, auth_type: 'facebook'
+      expect(response).to be_redirect
     end
   end
 
