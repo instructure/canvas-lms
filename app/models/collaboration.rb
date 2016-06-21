@@ -226,15 +226,6 @@ class Collaboration < ActiveRecord::Base
     self.collaborators.pluck(:user_id).join(',')
   end
 
-  # Public: Return the title for this collaboration.
-  #
-  # Returns a title string.
-  def title
-    read_attribute(:title) || self.parse_data["title"]
-  rescue NoMethodError
-    t('#collaboration.default_title', 'Unnamed Collaboration')
-  end
-
   # Internal: Create the collaboration document in the remote service.
   #
   # Returns nothing.

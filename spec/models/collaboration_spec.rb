@@ -81,11 +81,6 @@ describe Collaboration do
       expect(ae['title']).to eql('Biology 100 Collaboration')
     end
 
-    it "should be able to get the title from the data" do
-      @collaboration.title = nil
-      expect(@collaboration.title).to eql('Biology 100 Collaboration')
-    end
-
     it "should have Google Docs as a default service name" do
       expect(@collaboration.service_name).to eql('Google Docs')
     end
