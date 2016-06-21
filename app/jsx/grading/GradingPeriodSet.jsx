@@ -344,7 +344,7 @@ define([
       let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
       let classList = 'Button Button--link GradingPeriodList__new-period__add-button' + (disabled ? " disabled" : "");
       return (
-        <div className='GradingPeriodList__new-period center-md border-rbl border-round-b'>
+        <div className='GradingPeriodList__new-period center-xs border-rbl border-round-b'>
           <button className={classList}
                   ref='addPeriodButton'
                   aria-disabled={disabled}
