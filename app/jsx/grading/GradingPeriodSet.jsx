@@ -128,7 +128,9 @@ define([
     },
 
     toggleSetBody() {
-      this.setState({ expanded: !this.state.expanded });
+      if (!this.state.editPeriod.id) {
+        this.setState({ expanded: !this.state.expanded });
+      }
     },
 
     promptDeleteSet(event) {

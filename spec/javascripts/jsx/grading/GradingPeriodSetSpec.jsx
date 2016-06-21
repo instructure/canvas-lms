@@ -201,6 +201,14 @@ define([
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
+  test("disables set toggling while open", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    ok(set.refs.setBody);
+    Simulate.click(set.refs.toggleSetBody);
+    ok(set.refs.setBody);
+  });
+
   test("'onCancel' removes the 'edit grading period' form", function() {
     let set = this.renderComponent();
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
@@ -224,6 +232,14 @@ define([
     notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
     notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
+  });
+
+  test("'onCancel' re-enables set toggling", function() {
+    let set = this.renderComponent();
+    Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
+    set.refs.editPeriodForm.props.onCancel();
+    Simulate.click(set.refs.toggleSetBody);
+    notOk(!!set.refs.setBody);
   });
 
   module("GradingPeriodSet 'Edit Grading Period - onSave'", {
@@ -326,6 +342,18 @@ define([
       notOk(set.refs["show-grading-period-1"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-2"].props.actionsDisabled);
       notOk(set.refs["show-grading-period-3"].props.actionsDisabled);
+      start();
+    });
+  });
+
+  asyncTest("re-enables set toggling upon completion", function() {
+    let success = new Promise(resolve => resolve(examplePeriods));
+    this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
+    let set = this.renderComponent();
+    this.callOnSave(set);
+    requestAnimationFrame(() => {
+      Simulate.click(set.refs.toggleSetBody);
+      notOk(!!set.refs.setBody);
       start();
     });
   });
