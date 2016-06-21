@@ -362,15 +362,22 @@ define([
     render() {
       return (
         <div>
-          <div className="GradingPeriodSets__toolbar header-bar no-line">
-            <EnrollmentTermsDropdown
-              terms={this.termsBelongingToActiveSets()}
-              changeSelectedEnrollmentTerm={this.changeSelectedEnrollmentTerm} />
-            <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
-            <div className="header-bar-right">
+          <div className="GradingPeriodSets__toolbar header-bar no-line ic-Form-action-box">
+            <div className="ic-Form-action-box__Form">
+              <div className="ic-Form-control">
+                <EnrollmentTermsDropdown
+                  terms={this.termsBelongingToActiveSets()}
+                  changeSelectedEnrollmentTerm={this.changeSelectedEnrollmentTerm} />
+              </div>
+
+              <SearchGradingPeriodsField changeSearchText={this.changeSearchText} />
+            </div>
+
+            <div className="ic-Form-action-box__Actions">
               {this.renderAddSetFormButton()}
             </div>
           </div>
+
           {this.renderNewGradingPeriodSetForm()}
           <div id="grading-period-sets">
             {this.renderSets()}

@@ -32,7 +32,7 @@ define([
     render() {
       return (
         <select
-          className="EnrollmentTerms__dropdown"
+          className="EnrollmentTerms__dropdown ic-Input"
           name="enrollment_term"
           data-view="termSelect"
           aria-label="Enrollment Term"
