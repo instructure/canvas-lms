@@ -254,13 +254,24 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ### Selenium
 
-The container used to run the selenium browser is commented out of the
-docker-compose file by default. To run selenium, just uncomment those lines,
-rerun `docker-compose build`, and when you run your tests you can watch
-the browser:
+The container used to run the selenium browser is only started when spinning up
+all docker-compose containers, or when specified explicitly. The selenium
+container needs to be started before running any specs that require selenium.
 
+```sh
+docker-compose up selenium
 ```
-$ open vnc://secret:secret@selenium.docker/
+
+With the container running, you should be able to open a VNC session:
+
+```sh
+open vnc://secret:secret@selenium.docker/
+```
+
+Now just run your choice of selenium specs:
+
+```sh
+docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
 ## Troubleshooting

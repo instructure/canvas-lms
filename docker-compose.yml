@@ -20,13 +20,12 @@ consul:
   environment:
     GOMAXPROCS: "2"
 
-# Uncomment the below lines to run selenium tests locally. Don't forget the
-# line in the `web` section below too.
-#
-#selenium:
-#  build: ./docker-compose/seleniumff
-#  ports:
-#    - "5900:5900"
+selenium:
+  build: ./docker-compose/seleniumff
+  ports:
+    - 5900:5900
+  environment:
+    VIRTUAL_HOST: selenium.docker
 
 kinesis:
   image: instructure/kinesalite
@@ -44,7 +43,6 @@ web: &WEB
     - postgres
     - redis
 #    - cassandra
-#    - selenium
     - kinesis
     - mailcatcher
   environment:
