@@ -117,6 +117,7 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
+      wait_for_ajaximations
       expect(f("#delete_eportfolio_form")).to be_displayed
       submit_form("#delete_eportfolio_form")
       f("#wrapper-container .eportfolios").click
