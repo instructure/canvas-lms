@@ -20,6 +20,16 @@ define([
     notOk(_.contains($el.classList, 'disabled'));
   };
 
+  const assertCollapsed = function(component, setId) {
+    let message = "set with id: " + setId + " is 'collapsed'";
+    equal(component.refs["show-grading-period-set-" + setId].props.expanded, false, message);
+  };
+
+  const assertExpanded = function(component, setId) {
+    let message = "set with id: " + setId + " is 'expanded'";
+    equal(component.refs["show-grading-period-set-" + setId].props.expanded, true, message);
+  };
+
   const exampleSet = {
     id: "1",
     title: "Fall 2015",
@@ -180,6 +190,31 @@ define([
     });
   });
 
+  asyncTest("initially renders each set as 'collapsed'", function() {
+    let collection = this.renderComponent();
+    Promise.all([this.terms, this.sets]).then(function() {
+      assertCollapsed(collection, "1");
+      assertCollapsed(collection, "2");
+      start();
+    });
+  });
+
+  asyncTest("each set's 'onToggleBody' property will toggle its 'expanded' state", function() {
+    let collection = this.renderComponent();
+    Promise.all([this.terms, this.sets]).then(function() {
+      collection.refs["show-grading-period-set-1"].props.onToggleBody();
+      assertExpanded(collection, "1");
+      assertCollapsed(collection, "2");
+      collection.refs["show-grading-period-set-2"].props.onToggleBody();
+      assertExpanded(collection, "1");
+      assertExpanded(collection, "2");
+      collection.refs["show-grading-period-set-1"].props.onToggleBody();
+      assertCollapsed(collection, "1");
+      assertExpanded(collection, "2");
+      start();
+    });
+  });
+
   test("doesn't show the new set form on initial load", function() {
     let collection = this.renderComponent();
     notOk(collection.refs.newSetForm);
@@ -323,6 +358,26 @@ define([
     });
   });
 
+  asyncTest("preserves each set's 'expanded' state", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.terms, this.sets]).then(function() {
+      collection.refs["show-grading-period-set-1"].props.onToggleBody();
+
+      collection.changeSearchText("201");
+      assertExpanded(collection, "1");
+      assertCollapsed(collection, "2");
+
+      // clear all sets from search results
+      collection.changeSearchText("does not match");
+
+      collection.changeSearchText("201");
+      assertExpanded(collection, "1");
+      assertCollapsed(collection, "2");
+      start();
+    });
+  });
+
   asyncTest("deserializes enrollment terms if the AJAX call is successful", function() {
     const deserializedTerm = exampleTerms[0];
     let collection = this.renderComponent();
@@ -364,6 +419,46 @@ define([
     filteredSets = collection.filterSetsBySelectedTerm(exampleSets, exampleTerms, selectedTermID);
     expectedSets = _.where(exampleSets, { id: "1" });
     propEqual(filteredSets, expectedSets);
+  });
+
+  module("GradingPeriodSetCollection - Add Set", {
+    setup() {
+      const setsSuccess = new Promise(resolve => resolve([]));
+      const termsSuccess = new Promise(resolve => resolve(exampleTerms));
+      this.sets = this.stub(setsApi, 'list').returns(setsSuccess);
+      this.terms = this.stub(termsApi, 'list').returns(termsSuccess);
+    },
+
+    renderComponent() {
+      const element = React.createElement(SetCollection, props);
+      return React.render(element, wrapper);
+    },
+
+    teardown() {
+      React.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  asyncTest("addGradingPeriodSet adds the set to the collection", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.sets, this.terms]).then(function() {
+      collection.addGradingPeriodSet(exampleSet);
+      ok(collection.refs["show-grading-period-set-1"], "the grading period set is visible");
+      const setIDs = _.pluck(collection.state.sets, "id");
+      propEqual(setIDs, ["1"]);
+      start();
+    });
+  });
+
+  asyncTest("addGradingPeriodSet renders the new set expanded", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.sets, this.terms]).then(function() {
+      collection.addGradingPeriodSet(exampleSet);
+      assertExpanded(collection, "1");
+      start();
+    });
   });
 
   module("GradingPeriodSetCollection - Delete Set", {
@@ -445,7 +540,7 @@ define([
   asyncTest("renders the 'edit grading period set' when 'edit grading period set' is clicked", function() {
     let set = this.renderComponent();
     Promise.all([this.sets, this.terms]).then(function() {
-      notOk(!!set.refs["edit-grading-period-set-1"], "the grading period set is visible");
+      notOk(!!set.refs["edit-grading-period-set-1"], "the edit grading period set form is not visible");
       Simulate.click(set.refs["show-grading-period-set-1"].refs.editButton);
       ok(set.refs["edit-grading-period-set-1"], "the edit form is visible");
       start();

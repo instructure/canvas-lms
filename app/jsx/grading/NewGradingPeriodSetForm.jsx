@@ -75,10 +75,8 @@ define([
     },
 
     submitSucceeded(set) {
-      let newSet = _.extend({}, set);
-      newSet.expanded = true;
       $.flashMessage(I18n.t("Successfully created a set"));
-      this.props.addGradingPeriodSet(newSet, this.state.selectedEnrollmentTermIDs);
+      this.props.addGradingPeriodSet(set, this.state.selectedEnrollmentTermIDs);
     },
 
     submitFailed() {

@@ -66,13 +66,15 @@ define([
   const props = {
     set: {
       id: "1",
-      title: "Dora the Explorer Grading Period Set",
+      title: "Example Set",
     },
     terms: [],
     onEdit: function(){},
     onDelete: function(){},
     onPeriodsChange: function(){},
+    onToggleBody: function(){},
     gradingPeriods: examplePeriods,
+    expanded: true,
     actionsDisabled: false,
     readOnly: false,
     urls: urls,
@@ -98,15 +100,21 @@ define([
     }
   });
 
-  test("initially renders as 'collapsed', showing the set body", function() {
-    let set = this.renderComponent();
+  test("renders without set body when the 'expanded' property is false", function() {
+    let set = this.renderComponent({ expanded: false });
     notOk(!!set.refs.setBody);
   });
 
-  test("expands the set body when the toggle is clicked", function() {
-    let set = this.renderComponent();
-    Simulate.click(set.refs.toggleSetBody);
+  test("renders with set body when the 'expanded' property is true", function() {
+    let set = this.renderComponent({ expanded: true });
     ok(set.refs.setBody);
+  });
+
+  test("expands the set body when the toggle is clicked", function() {
+    let spy = sinon.spy();
+    let set = this.renderComponent({ onToggleBody: spy });
+    Simulate.click(set.refs.toggleSetBody);
+    ok(spy.calledOnce);
   });
 
   test("disables action buttons when 'actionsDisabled' is true", function() {
@@ -117,27 +125,17 @@ define([
 
   test("disables the 'add grading period' button when 'actionsDisabled' is true", function() {
     let set = this.renderComponent({actionsDisabled: true});
-    Simulate.click(set.refs.toggleSetBody);
     assertDisabled(set.refs.addPeriodButton);
   });
 
   test("disables grading period action buttons when 'actionsDisabled' is true", function() {
     let set = this.renderComponent({actionsDisabled: true});
-    Simulate.click(set.refs.toggleSetBody);
     ok(set.refs["show-grading-period-2"].props.actionsDisabled);
     ok(set.refs["show-grading-period-3"].props.actionsDisabled);
   });
 
-  test("re-collapses the set body when the toggle is clicked twice", function() {
-    let set = this.renderComponent();
-    Simulate.click(set.refs.toggleSetBody);
-    Simulate.click(set.refs.toggleSetBody);
-    notOk(!!set.refs.setBody);
-  });
-
   test("sorts grading periods by start date, ascending", function() {
     let set = this.renderComponent();
-    Simulate.click(set.refs.toggleSetBody);
     const periods = set.refs.gradingPeriodList.props.children;
     const startDates = _.map(periods, period => period.props.period.startDate);
     ok((startDates[0] < startDates[1]) && (startDates[1] < startDates[2]));
@@ -173,11 +171,10 @@ define([
   });
 
   module("GradingPeriodSet 'Edit Grading Period'", {
-    renderComponent(permissions = allPermissions, readOnly = false) {
-      const element = React.createElement(GradingPeriodSet, props);
-      let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
-      return component;
+    renderComponent(opts = {}) {
+      let attrs = _.extend({}, props, opts);
+      const element = React.createElement(GradingPeriodSet, attrs);
+      return React.render(element, wrapper);
     },
 
     teardown() {
@@ -202,11 +199,11 @@ define([
   });
 
   test("disables set toggling while open", function() {
-    let set = this.renderComponent();
+    let spy = sinon.spy();
+    let set = this.renderComponent({ onToggleBody: spy });
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
-    ok(set.refs.setBody);
     Simulate.click(set.refs.toggleSetBody);
-    ok(set.refs.setBody);
+    notOk(spy.called);
   });
 
   test("'onCancel' removes the 'edit grading period' form", function() {
@@ -235,11 +232,12 @@ define([
   });
 
   test("'onCancel' re-enables set toggling", function() {
-    let set = this.renderComponent();
+    let spy = sinon.spy();
+    let set = this.renderComponent({ onToggleBody: spy });
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
     set.refs.editPeriodForm.props.onCancel();
     Simulate.click(set.refs.toggleSetBody);
-    notOk(!!set.refs.setBody);
+    ok(spy.calledOnce);
   });
 
   module("GradingPeriodSet 'Edit Grading Period - onSave'", {
@@ -247,7 +245,6 @@ define([
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
       let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
       return component;
     },
@@ -349,11 +346,12 @@ define([
   asyncTest("re-enables set toggling upon completion", function() {
     let success = new Promise(resolve => resolve(examplePeriods));
     this.stub(gradingPeriodsApi, "batchUpdate").returns(success);
-    let set = this.renderComponent();
+    let spy = sinon.spy();
+    let set = this.renderComponent({ onToggleBody: spy });
     this.callOnSave(set);
     requestAnimationFrame(() => {
       Simulate.click(set.refs.toggleSetBody);
-      notOk(!!set.refs.setBody);
+      ok(spy.calledOnce);
       start();
     });
   });
@@ -367,7 +365,6 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
       return component;
     },
@@ -476,22 +473,12 @@ define([
 
   module("GradingPeriodSet 'Add Grading Period'", {
     renderComponent(permissions = allPermissions, readOnly = false) {
-      let setProps = {
-        set: { id: "1", title: "Example Set" },
-        gradingPeriods: examplePeriods,
-        terms: [],
-        urls: urls,
-        permissions: _.defaults(permissions, allPermissions),
-        readOnly: readOnly,
-        terms: [],
-        onEdit: function(){},
-        onDelete: function(){},
-        onPeriodsChange: function(){}
-      };
-      const element = React.createElement(GradingPeriodSet, setProps);
-      let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
-      return component;
+      let updatedProps = _.extend({}, props, {
+        permissions: _.extend({}, allPermissions, permissions),
+        readOnly: readOnly
+      });
+      const element = React.createElement(GradingPeriodSet, updatedProps);
+      return React.render(element, wrapper);
     },
 
     teardown() {
@@ -572,22 +559,9 @@ define([
   });
 
   module("GradingPeriodSet 'New Grading Period - onSave'", {
-    renderComponent(props = {}) {
-      let defaultProps = {
-        set: { id: "1", title: "Example Set" },
-        gradingPeriods: [],
-        urls: urls,
-        readOnly: false,
-        permissions: allPermissions,
-        terms: [],
-        onEdit: function(){},
-        onDelete: function(){},
-        onPeriodsChange: function(){}
-      };
-
-      const element = React.createElement(GradingPeriodSet, _.defaults(props, defaultProps));
+    renderComponent(opts = {}) {
+      const element = React.createElement(GradingPeriodSet, _.defaults(opts, props));
       let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs.addPeriodButton);
       return component;
     },
@@ -686,7 +660,6 @@ define([
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
       let component = React.render(element, wrapper);
-      Simulate.click(component.refs.toggleSetBody);
       Simulate.click(component.refs.addPeriodButton);
       return component;
     },

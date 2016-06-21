@@ -64,13 +64,13 @@ define([
       return {
         enrollmentTerms: [],
         sets: [],
+        expandedSetIDs: [],
         showNewSetForm: false,
         searchText: "",
         selectedTermID: "0",
         editSet: {
-          id:          null,
-          saving:      false,
-          wasExpanded: false
+          id:     null,
+          saving: false
         }
       };
     },
@@ -78,7 +78,6 @@ define([
     componentDidUpdate(prevProps, prevState) {
       if (prevState.editSet.id && (prevState.editSet.id !== this.state.editSet.id)) {
         let set = {id: prevState.editSet.id};
-        this.refs[getShowGradingPeriodSetRef(set)].setState({expanded: prevState.editSet.wasExpanded});
         setFocus(this.refs[getShowGradingPeriodSetRef(set)].refs.editButton);
       }
     },
@@ -86,6 +85,7 @@ define([
     addGradingPeriodSet(set, termIDs) {
       this.setState({
         sets: [set].concat(this.state.sets),
+        expandedSetIDs: this.state.expandedSetIDs.concat([set.id]),
         enrollmentTerms: this.associateTermsWithSet(set.id, termIDs),
         showNewSetForm: false
       }, () => {
@@ -209,9 +209,17 @@ define([
       return this.filterSetsBySelectedTerm(...filterByTermArgs);
     },
 
+    toggleSetBody(setId) {
+      if (_.contains(this.state.expandedSetIDs, setId)) {
+        this.setState({ expandedSetIDs: _.without(this.state.expandedSetIDs, setId) });
+      } else {
+        this.setState({ expandedSetIDs: this.state.expandedSetIDs.concat([setId]) });
+      }
+    },
+
     editGradingPeriodSet(set) {
       let setComponent = this.refs[getShowGradingPeriodSetRef(set)];
-      this.setState({ editSet: {id: set.id, saving: false, wasExpanded: setComponent.state.expanded }});
+      this.setState({ editSet: {id: set.id, saving: false} });
     },
 
     removeGradingPeriodSet(setID) {
@@ -259,7 +267,7 @@ define([
     },
 
     closeEditSetForm(id) {
-      this.setState({ editSet: {id: null, saving: false, wasExpanded: false }});
+      this.setState({ editSet: {id: null, saving: false} });
     },
 
     renderEditGradingPeriodSetForm(set) {
@@ -316,9 +324,11 @@ define([
               readOnly        = {this.props.readOnly}
               permissions     = {set.permissions}
               terms           = {this.state.enrollmentTerms}
+              expanded        = {_.contains(this.state.expandedSetIDs, set.id)}
               onEdit          = {this.editGradingPeriodSet}
               onDelete        = {this.removeGradingPeriodSet}
               onPeriodsChange = {this.updateSetPeriods}
+              onToggleBody    = {() => { this.toggleSetBody(set.id) }}
             />
           );
         }

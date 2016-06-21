@@ -58,6 +58,10 @@ define([
     }
   };
 
+  const isEditingPeriod = function(state) {
+    return !!state.editPeriod.id;
+  };
+
   const setFocus = function(ref) {
     React.findDOMNode(ref).focus();
   };
@@ -77,15 +81,16 @@ define([
       gradingPeriods:  array.isRequired,
       terms:           array.isRequired,
       readOnly:        bool.isRequired,
+      expanded:        bool,
       actionsDisabled: bool,
       onEdit:          func.isRequired,
       onDelete:        func.isRequired,
       onPeriodsChange: func.isRequired,
+      onToggleBody:    func.isRequired,
 
       set: shape({
         id:    string.isRequired,
-        title: string.isRequired,
-        expanded: bool
+        title: string.isRequired
       }).isRequired,
 
       urls: shape({
@@ -106,7 +111,6 @@ define([
       return {
         title: this.props.set.title,
         gradingPeriods: sortPeriods(this.props.gradingPeriods),
-        expanded: !!this.props.set.expanded,
         newPeriod: {
           period: null,
           saving: false
@@ -121,15 +125,15 @@ define([
     componentDidUpdate(prevProps, prevState) {
       if (prevState.newPeriod.period && !this.state.newPeriod.period) {
         setFocus(this.refs.addPeriodButton);
-      } else if (prevState.editPeriod.id && !this.state.editPeriod.id) {
+      } else if (isEditingPeriod(prevState) && !isEditingPeriod(this.state)) {
         let period = { id: prevState.editPeriod.id };
         setFocus(this.refs[getShowGradingPeriodRef(period)].refs.editButton);
       }
     },
 
     toggleSetBody() {
-      if (!this.state.editPeriod.id) {
-        this.setState({ expanded: !this.state.expanded });
+      if (!isEditingPeriod(this.state)) {
+        this.props.onToggleBody();
       }
     },
 
@@ -248,7 +252,7 @@ define([
 
     renderEditButton() {
       if (!this.props.readOnly && this.props.permissions.update) {
-        let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+        let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
         let baseClasses = 'Button Button--icon-action edit_grading_period_set_button';
         return (
           <button ref="editButton"
@@ -265,7 +269,7 @@ define([
 
     renderDeleteButton() {
       if (!this.props.readOnly && this.props.permissions.delete) {
-        let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+        let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
         let baseClasses = 'Button Button--icon-action delete_grading_period_set_button';
         return (
           <button ref="deleteButton"
@@ -290,7 +294,7 @@ define([
     },
 
     renderSetBody() {
-      if (!this.state.expanded) return null;
+      if (!this.props.expanded) return null;
 
       return (
         <div ref="setBody" className="ig-body">
@@ -303,7 +307,7 @@ define([
     },
 
     renderGradingPeriods() {
-      let actionsDisabled = !!(this.props.actionsDisabled || this.state.editPeriod.id || this.state.newPeriod.period);
+      let actionsDisabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state) || this.state.newPeriod.period);
       return _.map(this.state.gradingPeriods, (period) => {
         if (period.id === this.state.editPeriod.id) {
           return (
@@ -343,7 +347,7 @@ define([
     },
 
     renderNewPeriodButton() {
-      let disabled = !!(this.props.actionsDisabled || this.state.editPeriod.id);
+      let disabled = !!(this.props.actionsDisabled || isEditingPeriod(this.state));
       let classList = 'Button Button--link GradingPeriodList__new-period__add-button' + (disabled ? " disabled" : "");
       return (
         <div className='GradingPeriodList__new-period center-xs border-rbl border-round-b'>
@@ -372,8 +376,8 @@ define([
     },
 
     render() {
-      const setStateSuffix = this.state.expanded ? "expanded" : "collapsed";
-      const arrow = this.state.expanded ? "down" : "right";
+      const setStateSuffix = this.props.expanded ? "expanded" : "collapsed";
+      const arrow = this.props.expanded ? "down" : "right";
       return (
         <div className={"GradingPeriodSet--" + setStateSuffix}>
           <div className="ItemGroup__header"
@@ -382,7 +386,7 @@ define([
             <div>
               <div className="ItemGroup__header__title">
                 <button className={"Button Button--icon-action GradingPeriodSet__toggle"}
-                        aria-expanded={this.state.expanded}
+                        aria-expanded={this.props.expanded}
                         aria-label="Toggle grading period visibility">
                   <i className={"icon-mini-arrow-" + arrow}/>
                 </button>

@@ -84,18 +84,6 @@ define([
     ok(_.contains(React.findDOMNode(cancelButton).classList, 'disabled'));
   });
 
-  asyncTest('puts the new set in an "expanded" state upon creation', function() {
-    const success = this.stubCreateSuccess();
-    let form = this.renderComponent();
-    this.stub(form, 'isValid', () => true);
-    Simulate.click(form.refs.createButton);
-    success.then(function() {
-      const newSet = form.props.addGradingPeriodSet.args[0][0];
-      equal(newSet.expanded, true);
-      start();
-    });
-  });
-
   asyncTest('re-enables the cancel button when the ajax call fails', function() {
     this.stubCreateFailure();
     let form = this.renderComponent();
