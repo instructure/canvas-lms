@@ -33,7 +33,6 @@ define [
       @on 'selectionChanged', (newSelection, oldSelection) =>
         oldSelection.model?.set('selected', false)
         newSelection.model?.set('selected', true)
-        newSelection.view.$el.focus()
 
       # reposition after rendering
       @on 'render renderItem', => @reposition()
