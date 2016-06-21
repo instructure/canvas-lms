@@ -254,6 +254,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
+      xml.css('resultScore').remove
       xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 

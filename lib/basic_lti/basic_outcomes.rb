@@ -218,7 +218,7 @@ module BasicLTI
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end
-        elsif !text && !url
+        elsif !text && !url && !launch_url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
         if error_message
