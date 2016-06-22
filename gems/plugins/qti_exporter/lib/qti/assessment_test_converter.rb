@@ -159,8 +159,12 @@ class AssessmentTestConverter
         if val = get_float_val(section, 'points_per_item')
           group[:question_points] = val
         end
-        if val = get_node_val(section, 'sourcebank_ref')
-          group[:question_bank_migration_id] = val
+        bank_refs = section.css('sourcebank_ref')
+        if bank_refs.count > 1
+          # multiple source banks for one section - duplicate the groups (see below)
+          group[:question_bank_migration_ids] = bank_refs.map{|br| translate_bank_id(br.text)}
+        elsif bank_refs.count == 1
+          group[:question_bank_migration_id] = translate_bank_id(bank_refs.first.text)
         end
         if val = get_node_val(section, 'sourcebank_context')
           group[:question_bank_context] = val
@@ -202,9 +206,29 @@ class AssessmentTestConverter
 
     group && group[:question_points] ||= DEFAULT_POINTS_POSSIBLE
 
-    @quiz[:questions] << group if group and (!group[:questions].empty? || group[:question_bank_migration_id])
+    if group
+      if group[:question_bank_migration_ids].present? && group[:questions].empty?
+        # multiple source banks for one section - duplicate the groups for each bank
+        group[:question_bank_migration_ids].each do |bank_ref_id|
+          copy = group.deep_dup
+          copy[:migration_id] = "#{group[:migration_id]}_#{bank_ref_id}"
+          copy[:question_bank_migration_id] = bank_ref_id
+          @quiz[:questions] << copy
+        end
+      elsif (!group[:questions].empty? || group[:question_bank_migration_id])
+        @quiz[:questions] << group
+      end
+    end
 
     questions_list
+  end
+
+  def translate_bank_id(bank_id)
+    if @opts[:alt_bank_id_map]
+      @opts[:alt_bank_id_map][bank_id] || bank_id
+    else
+      bank_id
+    end
   end
 
   def process_question(item_ref, questions_list)
