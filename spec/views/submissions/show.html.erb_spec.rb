@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/submissions/show" do
   before :once do
-    course_with_student
+    course_with_student(active_all: true)
   end
 
   it "should render" do
@@ -83,11 +83,27 @@ describe "/submissions/show" do
     context 'when current user is assessing student submission' do
       before :once do
         student_in_course(active_all: true)
+        @course.workflow_state = 'available'
+        @course.save!
         @assessment_request = @submission.assessment_requests.create!(
           assessor: @student,
           assessor_asset: @submission.user,
           user: @submission.user
         )
+      end
+
+      it 'shows the "Show Rubric" link after request is complete' do
+        @assessment_request.complete!
+
+        view_context(@course, @student)
+        assigns[:assignment] = @assignment
+        assigns[:submission] = @submission
+        assigns[:rubric_association] = @submission.rubric_association_with_assessing_user_id
+
+        render 'submissions/show'
+        html = Nokogiri::HTML.fragment(response.body)
+        rubric_link_text = html.css('.assess_submission_link')[0].text
+        expect(rubric_link_text).to match(/Show Rubric/)
       end
 
       it 'adds assessing class to rubric_container' do

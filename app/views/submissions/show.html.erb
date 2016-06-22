@@ -68,7 +68,12 @@
           <% end %>
         <% end %>
       <% end %>
-      <% if @rubric_association && (@submission.user_can_read_grade?(@current_user, session) || can_do(@rubric_association, @current_user, :assess)) %>
+      <% if @rubric_association && (
+           @submission.user_can_read_grade?(@current_user, session) ||
+           can_do(@rubric_association, @current_user, :assess) ||
+           can_do(@assignment.rubric, @current_user, :read)
+         )
+      %>
         <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;" tabindex='0'><%= t('show_rubric', 'Show Rubric') %></a>
       <% end %>
     </div>
