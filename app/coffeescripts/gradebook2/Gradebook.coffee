@@ -196,7 +196,7 @@ define [
         @gradingPeriodIsAdmin(gradingPeriod) && @gradingPeriodIsClosed(gradingPeriod)
 
     gradingPeriodIsAdmin: (gradingPeriod) ->
-      !gradingPeriod.permissions.manage
+      !gradingPeriod.permissions.update
 
     gradingPeriodIsClosed: (gradingPeriod) ->
       new Date(gradingPeriod.end_date) < new Date()

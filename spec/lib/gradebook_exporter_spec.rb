@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../spec_helper'
 
 require 'csv'
 
@@ -88,9 +88,7 @@ describe GradebookExporter do
 
       let(:assignments) { course.assignments }
 
-      let!(:group) do
-        course.grading_period_groups.create!
-      end
+      let!(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
 
       let!(:first_period) do
         args = {

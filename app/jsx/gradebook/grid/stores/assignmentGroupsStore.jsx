@@ -2,9 +2,9 @@ define([
   'bower/reflux/dist/reflux',
   'underscore',
   '../actions/assignmentGroupsActions',
-  '../helpers/datesHelper',
+  'jsx/shared/helpers/dateHelper',
   '../constants'
-], function (Reflux, _, AssignmentGroupsActions, DatesHelper, GradebookConstants) {
+], function (Reflux, _, AssignmentGroupsActions, DateHelper, GradebookConstants) {
   var AssignmentGroupsStore = Reflux.createStore({
     listenables: [AssignmentGroupsActions],
 
@@ -70,7 +70,7 @@ define([
     },
 
     formatAssignment(assignment, assignmentGroup) {
-      assignment = DatesHelper.parseDates(assignment, GradebookConstants.ASSIGNMENT_DATES);
+      assignment = DateHelper.parseDates(assignment, GradebookConstants.ASSIGNMENT_DATES);
       assignment.assignment_group_position = assignmentGroup.position;
       assignment.speedgrader_url = GradebookConstants.context_url + '/gradebook/speed_grader?assignment_id=' + assignment.id;
       assignment.submissions_downloads = 0;
@@ -79,7 +79,7 @@ define([
       if (assignment.has_overrides) {
         assignment.overrides = _.map(
           assignment.overrides,
-          override => DatesHelper.parseDates(override, GradebookConstants.OVERRIDE_DATES)
+          override => DateHelper.parseDates(override, GradebookConstants.OVERRIDE_DATES)
         );
       }
       return assignment;

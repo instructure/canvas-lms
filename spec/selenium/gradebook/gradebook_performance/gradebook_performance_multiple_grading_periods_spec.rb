@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015-2016 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../helpers/gradebook2_common'
 
 describe "gradebook performance" do
@@ -24,7 +42,7 @@ describe "gradebook performance" do
 
     describe 'with a current and past grading period' do
       let!(:create_period_group_and_default_periods) do
-        group = @course.root_account.grading_period_groups.create
+        group = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
         group.grading_periods.create(
           start_date: 4.months.ago,
           end_date:   2.months.ago,
@@ -46,7 +64,6 @@ describe "gradebook performance" do
         teacher_in_course
         user_session(@teacher)
       end
-
 
       context "assignments in past grading periods" do
         let!(:assignment_in_the_past) do

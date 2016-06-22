@@ -559,7 +559,6 @@ CanvasRails::Application.routes.draw do
     resources :users, only: [:index, :new, :edit, :show, :update]
     resources :account_notifications, only: [:create, :update, :destroy]
     concerns :announcements
-    resources :assignments
     resources :submissions
     delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
     put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
@@ -1772,18 +1771,27 @@ CanvasRails::Application.routes.draw do
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
 
+    scope(controller: :grading_period_sets) do
+      get 'accounts/:account_id/grading_period_sets', action: :index, as: :account_grading_period_sets
+      post 'accounts/:account_id/grading_period_sets', action: :create
+      patch 'accounts/:account_id/grading_period_sets/:id', action: :update, as: :account_grading_period_set
+      delete 'accounts/:account_id/grading_period_sets/:id', action: :destroy
+    end
+
     scope(controller: :grading_periods) do
-      %w(course account).each do |context|
-        content_prefix = "#{context.pluralize}/:#{context}_id"
-        prefix = "#{content_prefix}/grading_periods"
-        get prefix, action: :index, as: "#{context}_grading_periods"
-        get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
-        post prefix, action: :create, as: "#{context}_grading_period_create"
-        # FIXME: should be PATCH in upcoming Rails 4
-        put "#{prefix}/batch_update", action: :batch_update, as: "#{context}_grading_period_batch_update"
-        put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
-        delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
-      end
+      # FIXME: This route will be removed/replaced with CNVS-27101
+      get 'accounts/:account_id/grading_periods', action: :index, as: :account_grading_periods
+
+      get 'courses/:course_id/grading_periods', action: :index, as: :course_grading_periods
+      get 'courses/:course_id/grading_periods/:id', action: :show, as: :course_grading_period
+      patch 'courses/:course_id/grading_periods/batch_update',
+            action: :batch_update, as: :course_grading_period_batch_update
+      put 'courses/:course_id/grading_periods/:id', action: :update, as: :course_grading_period_update
+      delete 'courses/:course_id/grading_periods/:id', action: :destroy, as: :course_grading_period_destroy
+      delete 'accounts/:account_id/grading_periods/:id', action: :destroy, as: :account_grading_period_destroy
+
+      patch 'grading_period_sets/:set_id/grading_periods/batch_update',
+            action: :batch_update, as: :grading_period_set_periods_update
     end
 
     scope(controller: :usage_rights) do

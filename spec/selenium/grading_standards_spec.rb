@@ -177,12 +177,4 @@ describe "grading standards" do
       end
     end
   end
-
-  context "with Multiple Grading Periods enabled" do
-
-    it "should contain a tab for grading schemes and grading periods", priority: "1", test_id: 217602 do
-      course_with_teacher_logged_in
-      should_contain_a_tab_for_grading_schemes_and_periods("/courses/#{@course.id}/grading_standards")
-    end
-  end
 end

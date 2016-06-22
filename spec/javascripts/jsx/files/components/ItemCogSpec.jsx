@@ -75,6 +75,7 @@ define([
     Simulate.click(React.findDOMNode(itemCog.refs.deleteLink));
     ok(window.confirm.calledOnce, 'confirms before deleting');
     ok(ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url');
+    $.ajax.restore();
     window.confirm.restore();
   });
 

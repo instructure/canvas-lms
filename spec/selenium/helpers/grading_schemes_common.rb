@@ -96,17 +96,4 @@ module GradingSchemesCommon
     expect(@grading_standard.data[0][0]).to eq 'B'
     # TODO: check that changing upped limit of next row item changes to lower limit of line above
   end
-
-  def should_contain_a_tab_for_grading_schemes_and_periods(url)
-    @course.root_account.allow_feature!(:multiple_grading_periods)
-    @course.account.enable_feature!(:multiple_grading_periods)
-    get url
-    expect(f(".grading_periods_tab")).to be_displayed
-    f(".grading_periods_tab").click
-    expect(f(".new-grading-period")).to be_displayed
-
-    expect(f(".grading_standards_tab")).to be_displayed
-    f(".grading_standards_tab").click
-    expect(f(".add_standard_button")).to be_displayed
-  end
 end
