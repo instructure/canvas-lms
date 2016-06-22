@@ -9,6 +9,7 @@ define [
 
   module 'OutcomePopoverViewSpec',
     setup: ->
+      $(document.body).append('<div id="application"></div>')
       @popoverView = new OutcomePopoverView({
         el: $('<div><i></i></div>')
         model: new Outcome()
