@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,24 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradingPeriod
-  class AccountGradingPeriodFinder
-
-    def initialize(account)
-      @account = account
-    end
-
-    def grading_periods
-      grading_periods = GradingPeriod.active.grading_periods_by(account_id: account.id)
-      parent_account = account.parent_account
-      if grading_periods.present? || parent_account.blank?
-        grading_periods
-      else
-        AccountGradingPeriodFinder.new(parent_account).grading_periods
+module Factories
+  class EnrollmentTermHelper
+    def create_for_account_and_grading_period_group(account, group)
+      account.enrollment_terms.create! do |term|
+        term.grading_period_group = group
       end
     end
-
-    private
-    attr_reader :account
   end
 end

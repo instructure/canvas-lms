@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015-2016 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../helpers/gradebook2_common'
 require_relative '../../helpers/groups_common'
 
@@ -19,7 +37,9 @@ describe "gradebook2 - multiple grading periods" do
 
   context 'with a current and past grading period' do
     let!(:create_period_group_and_default_periods) do
-      group = @course.root_account.grading_period_groups.create
+      term = @course.root_account.enrollment_terms.create!
+      @course.update_attributes(enrollment_term: term)
+      group = Factories::GradingPeriodGroupHelper.new.create_for_enrollment_term(term)
       group.grading_periods.create(
         start_date: 4.months.ago,
         end_date:   2.months.ago,

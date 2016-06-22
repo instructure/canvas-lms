@@ -21,10 +21,10 @@
 # the grading_periods both have a weight of 1
 def grading_periods(options = {})
   Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-  context = options[:context] || @course || course
+  course = options[:context] || @course || course()
   count = options[:count] || 2
 
-  grading_period_group = context.grading_period_groups.create!
+  grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_course(course)
   now = Time.zone.now
   count.times.map do |n|
     grading_period_group.grading_periods.create!(
@@ -36,12 +36,13 @@ def grading_periods(options = {})
   end
 end
 
-def create_grading_periods_for(context, opts={})
+def create_grading_periods_for(course, opts={})
   opts = { mgp_flag_enabled: true }.merge(opts)
-  context.root_account = Account.default if !context.root_account
-  context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
-  gp_group = context.grading_period_groups.create!
-  class_name = context.class.name.demodulize
+  course.root_account = Account.default if !course.root_account
+  course.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
+
+  gp_group = Factories::GradingPeriodGroupHelper.new.create_for_course(course)
+  class_name = course.class.name.demodulize
   timeframes = opts[:grading_periods] || [:current]
   now = Time.zone.now
   period_fixtures = {
@@ -65,12 +66,65 @@ def create_grading_periods_for(context, opts={})
 end
 
 module Factories
-  class GradingPeriodGroupHelper
-    def create_for_enrollment_term(term)
-      grading_period_group = GradingPeriodGroup.new
-      grading_period_group.enrollment_terms << term
-      grading_period_group.save!
-      grading_period_group
+  class GradingPeriodHelper
+    def create_presets_for_group(group, *preset_names)
+      preset_names = [:current] if preset_names.empty?
+      preset_names.map.with_index(1) do |name, index|
+        period_params = period_presets.fetch(name).merge(title: "Period #{index}: #{name} period")
+        group.grading_periods.create!(period_params)
+      end
+    end
+
+    def create_with_weeks_for_group(group, start_weeks_ago, end_weeks_ago)
+      group.grading_periods.create!({
+        start_date: start_weeks_ago.weeks.ago,
+        end_date: end_weeks_ago.weeks.ago,
+        title: "Example Grading Period"
+      })
+    end
+
+    def create_for_group(group, options = {})
+      group.grading_periods.create!(grading_period_attrs(options))
+    end
+
+    def create_with_group_for_course(course, options = {})
+      group_title = options[:group_title] || "Group for Course Named '#{course.name}' and ID: #{course.id}"
+      group = course.grading_period_groups.create!(title: group_title)
+      create_for_group(group, options)
+    end
+
+    def create_with_group_for_account(account, options = {})
+      group = GradingPeriodGroup.create!(title: "Group for #{account.name}") do |group|
+        group.enrollment_terms << account.enrollment_terms.create!
+      end
+      group.grading_periods.create!(grading_period_attrs(options))
+    end
+
+    def grading_period_attrs(attrs = {})
+      {
+        weight: 1,
+        title: "Example Grading Period",
+        start_date: 5.days.ago,
+        end_date: 10.days.from_now
+      }.merge(attrs)
+    end
+
+    def period_presets
+      now = Time.zone.now
+      {
+        past: {
+          start_date: 5.months.ago(now),
+          end_date:   2.months.ago(now)
+        },
+        current: {
+          start_date: 2.months.ago(now),
+          end_date:   2.months.from_now(now)
+        },
+        future: {
+          start_date: 2.months.from_now(now),
+          end_date:   5.months.from_now(now)
+        }
+      }
     end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,23 +16,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradingPeriod
-  class CourseGradingPeriodFinder
+require 'spec_helper'
 
-    def initialize(course)
-      @course = course
+describe GradingPeriodsHelper do
+  describe '#grading_period_set_title' do
+    it 'uses the grading period set title when present' do
+      group = GradingPeriodGroup.new(title: "Example Set")
+      expect(helper.grading_period_set_title(group, "Account Name")).to eql("Example Set")
     end
 
-    def grading_periods
-      periods = GradingPeriod.active.grading_periods_by(course_id: course.id)
-      if periods.present?
-        periods
-      else
-        AccountGradingPeriodFinder.new(course.account).grading_periods
-      end
+    it 'uses the given account name when the set has no title' do
+      group = GradingPeriodGroup.new
+      expect(helper.grading_period_set_title(group, "Account Name")).to match(/Account Name/)
     end
-
-    private
-    attr_reader :course
   end
 end

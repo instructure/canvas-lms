@@ -53,13 +53,6 @@ describe "account admin grading schemes" do
       end
     end
   end
-
-  context "with Multiple Grading Periods enabled" do
-
-    it "should contain a tab for grading schemes and grading periods", priority: "1", test_id:202306 do
-      should_contain_a_tab_for_grading_schemes_and_periods(url)
-    end
-  end
 end
 
 describe "course grading schemes as account admin" do

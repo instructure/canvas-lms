@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -74,8 +74,6 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
   has_many :content_migrations, :as => :context
-  has_many :grading_period_groups, dependent: :destroy
-  has_many :grading_periods, through: :grading_period_groups
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -1107,8 +1105,8 @@ class Account < ActiveRecord::Base
       special_account_list.map { |key| send(key) }
     end
   end
-  define_special_account(:default, 'Default Account')
-  define_special_account(:site_admin)
+  define_special_account(:default, 'Default Account') # Account.default
+  define_special_account(:site_admin) # Account.site_admin
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache

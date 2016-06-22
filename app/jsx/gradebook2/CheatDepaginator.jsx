@@ -12,7 +12,11 @@ define(["jquery", "underscore", "jquery.ajaxJSON"], ($, _) => {
     const orderedConsumer = (response, page) => {
       if (page === wantedPage) {
         if (callback) callback(response);
-        data.push.apply(data, response);
+        if (_.isArray(response)) {
+          data.push.apply(data, response);
+        } else {
+          data.push(response);
+        }
         wantedPage += 1;
       } else {
         pendingResponses.push([response, page]);

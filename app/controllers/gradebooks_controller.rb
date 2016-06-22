@@ -61,7 +61,7 @@ class GradebooksController < ApplicationController
     gp_id = nil
     if multiple_grading_periods?
       set_current_grading_period
-      @grading_periods = active_grading_periods
+      @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
     end
 
@@ -279,18 +279,19 @@ class GradebooksController < ApplicationController
   end
 
   def active_grading_periods
-    @active_grading_periods ||= GradingPeriod.json_for(@context, @current_user)
+    @active_grading_periods ||= GradingPeriod.for(@context).sort_by(&:start_date)
+  end
+
+  def active_grading_periods_json
+    @agp_json ||= GradingPeriod.periods_json(active_grading_periods, @current_user)
   end
 
   def latest_end_date_of_admin_created_grading_periods_in_the_past
     periods = active_grading_periods.select do |period|
-      # false if current user is an admin
-      admin_created = period["permissions"]["manage"] == false
-      in_the_past = period["end_date"] <= Time.zone.now
-
-      admin_created && in_the_past
+      admin_created = period.account_group?
+      admin_created && period.end_date.past?
     end
-    periods.map { |period| period["end_date"] }.compact.sort.last
+    periods.map(&:end_date).compact.sort.last
   end
   private :latest_end_date_of_admin_created_grading_periods_in_the_past
 
@@ -349,7 +350,7 @@ class GradebooksController < ApplicationController
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :active_grading_periods => active_grading_periods,
+      :active_grading_periods => active_grading_periods_json,
       :latest_end_date_of_admin_created_grading_periods_in_the_past => latest_end_date_of_admin_created_grading_periods_in_the_past,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
