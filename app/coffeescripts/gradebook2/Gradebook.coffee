@@ -1085,10 +1085,6 @@ define [
       $settingsMenu = $('.gradebook_dropdown')
       showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
       showConcludedEnrollmentsEl.prop('checked', @showConcludedEnrollments).change (event) =>
-        if @options.course_is_concluded and @showConcludedEnrollments
-          showConcludedEnrollmentsEl.prop('checked', true)
-          $settingsMenu.menu("refresh")
-          return alert(I18n.t 'concluded_course_error_message', 'This is a concluded course, so only concluded enrollments are available.')
         @showConcludedEnrollments  = showConcludedEnrollmentsEl.is(':checked')
         @saveSettings(@showInactiveEnrollments, @showConcludedEnrollments, -> window.location.reload())
 

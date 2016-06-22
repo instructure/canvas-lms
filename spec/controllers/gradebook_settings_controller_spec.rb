@@ -1,12 +1,16 @@
 require 'spec_helper'
 
 RSpec.describe GradebookSettingsController, type: :controller do
-  let!(:account) { course_with_teacher; @teacher }
+  let!(:teacher) { course_with_teacher; @teacher }
+
   before do
-    user_session(account)
+    user_session(teacher)
+    request.accept = "application/json"
   end
 
   describe "PUT update" do
+    let(:json_response) { JSON.parse(response.body) }
+
     context "given valid params" do
       let(:show_settings) do
         {
@@ -22,27 +26,46 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       it "saves new gradebook_settings in preferences" do
-        request.accept = "application/json"
-        expect { put :update, valid_params }.to change {
-          account.preferences.fetch(:gradebook_settings, {})
-        }.from({}).to( @course.id => show_settings )
-
+        put :update, valid_params
         expect(response).to be_ok
-        json_response = JSON.parse(response.body)
-        expect(json_response["gradebook_settings"]).to eql({
-          @course.id => show_settings
-        }.as_json)
+
+        expected_settings = { @course.id => show_settings }
+        expect(teacher.preferences.fetch(:gradebook_settings, {})).to eq expected_settings
+        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
+      end
+
+      it "is allowed for courses in concluded enrollment terms" do
+        term = teacher.account.enrollment_terms.create!(start_at: 2.months.ago, end_at: 1.month.ago)
+        @course.enrollment_term = term # `update_attribute` with a term has unwanted side effects
+        @course.save!
+
+        put :update, valid_params
+        expect(response).to be_ok
+
+        expected_settings = { @course.id => show_settings }
+        expect(teacher.preferences.fetch(:gradebook_settings, {})).to eq expected_settings
+        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
+      end
+
+      it "is allowed for courses with concluded workflow state" do
+        @course.workflow_state = "concluded"
+        @course.save!
+
+        put :update, valid_params
+        expect(response).to be_ok
+
+        expected_settings = { @course.id => show_settings }
+        expect(teacher.preferences.fetch(:gradebook_settings, {})).to eq expected_settings
+        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
       end
     end
 
     context "given invalid params" do
-      let(:invalid_params) { { "course_id" => @course.id} }
       it "give an error response" do
-        request.accept = "application/json"
+        invalid_params = { "course_id" => @course.id }
         put :update, invalid_params
 
-        expect(response).to_not be_ok
-        json_response = JSON.parse(response.body)
+        expect(response).not_to be_ok
         expect(json_response).to include(
           "errors" => [{
             "message" => "gradebook_settings is missing"

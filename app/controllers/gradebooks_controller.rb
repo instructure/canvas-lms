@@ -195,6 +195,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if multiple_grading_periods?
       set_js_env
+      @course_is_concluded = @context.completed?
       @post_grades_tools = post_grades_tools
       gradebook_version = @context.feature_enabled?(:gradebook_performance) ? :react_gradebook : :gradebook2
 

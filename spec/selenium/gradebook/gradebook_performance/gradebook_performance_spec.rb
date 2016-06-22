@@ -82,13 +82,6 @@ describe "gradebook performance" do
 
       get "/courses/#{@course.id}/gradebook"
       expect(visible_students.count).to eq @course.all_students.count
-
-      # the checkbox should fire an alert rather than changing to not showing concluded
-      f('#gradebook_settings').click
-      expect_fired_alert do
-        f('label[for="show_concluded_enrollments"]').click
-      end
-      expect(visible_students.count).to eq @course.all_students.count
     end
 
     it "shows students sorted by their sortable_name" do

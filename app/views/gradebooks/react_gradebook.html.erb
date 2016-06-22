@@ -126,7 +126,7 @@
           <li>
             <a id="arrange_by_toggle" href="#"></a>
           </li>
-          <li>
+          <li class="<% if @course_is_concluded %>ui-state-disabled<% end %>">
             <a>
               <label>
                 <%= t('show_concluded_enrollments', "Show Concluded Enrollments") %>
