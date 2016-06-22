@@ -61,20 +61,12 @@ at_exit do
   end
 end
 
-shared_context "in-process server selenium tests" do
-  include SeleniumDriverSetup
-  include OtherHelperMethods
-  include CustomSeleniumActions
-  include CustomAlertActions
-  include CustomPageLoaders
-  include CustomScreenActions
-  include CustomValidators
-  include CustomWaitMethods
-  include CustomDateHelpers
-  include LoginAndSessionMethods
-
-  # set up so you can use rails urls helpers in your selenium tests
-  include Rails.application.routes.url_helpers
+module SeleniumErrorRecovery
+  # this gets called wherever an exception happens (example, before/after/around, each/all)
+  def set_exception(exception, *args)
+    maybe_recover_from_exception(exception)
+    super
+  end
 
   def maybe_recover_from_exception(exception)
     case exception
@@ -93,16 +85,24 @@ shared_context "in-process server selenium tests" do
     end
     false
   end
+end
+RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
-  around do |example|
-    begin
-      example.run
-    rescue # before/after/around ... always re-raise so the example fails
-      maybe_recover_from_exception $ERROR_INFO
-      raise
-    end
-    maybe_recover_from_exception example.example.exception
-  end
+shared_context "in-process server selenium tests" do
+  include SeleniumDriverSetup
+  include OtherHelperMethods
+  include CustomSeleniumActions
+  include CustomAlertActions
+  include CustomPageLoaders
+  include CustomScreenActions
+  include CustomValidators
+  include CustomWaitMethods
+  include CustomDateHelpers
+  include LoginAndSessionMethods
+  include SeleniumErrorRecovery
+
+  # set up so you can use rails urls helpers in your selenium tests
+  include Rails.application.routes.url_helpers
 
   prepend_before :each do
     SeleniumDriverSetup.allow_requests!
