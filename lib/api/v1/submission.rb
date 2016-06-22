@@ -180,6 +180,7 @@ module Api::V1::Submission
     hash = submission_attempt_json(attempt.submission, assignment, user, session, context)
     hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
     hash[:submission_data] = attempt[:submission_data]
+    hash[:submitted_at] = attempt[:finished_at]
     hash[:body] = nil
 
     # since it is graded automatically the graded_at date should be the last time the

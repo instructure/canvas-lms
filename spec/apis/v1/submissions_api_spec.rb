@@ -620,6 +620,25 @@ describe 'Submissions API', type: :request do
     expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
   end
 
+  it "should return the correct submitted_at date for each quiz submission" do
+    course_with_student(course: @course, active_all: true)
+    quiz_with_graded_submission([multiple_answers_question_data], { user: @student })
+    Timecop.travel(15.minutes.ago) do
+      qs = @quiz.generate_submission(@student)
+      qs.mark_completed
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+    end
+    course_with_teacher_logged_in(:course => @course, :active_all => true)
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@quiz.assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @quiz.assignment.id.to_s },
+          { :include => %w(submission_history) })
+    submission_dates = json.first['submission_history'].map { |hash| hash['submitted_at'] }
+    expect(submission_dates.first).not_to eq(submission_dates.last)
+  end
+
   it "should allow students to retrieve their own submission" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
