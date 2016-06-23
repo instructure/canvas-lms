@@ -3041,7 +3041,7 @@ tr:
       descriptions: 
         etherpad: |-
             EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.  
-              
+            
             **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
         google_docs: "Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
             **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
