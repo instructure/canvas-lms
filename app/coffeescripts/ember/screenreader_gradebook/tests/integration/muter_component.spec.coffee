@@ -24,11 +24,13 @@ define [
   checkChecked = (expectedBool) ->
     equal find('#assignment_muted_check').prop('checked'), expectedBool
 
-  closeDialog = (dialog) ->
-    click find('a', dialog)
+  checkDialogClosed = () ->
     dialog = find('.ui-dialog:visible', 'body')
     equal(dialog.length, 0, 'the dialog closes')
 
+  closeDialog = (dialog) ->
+    click find('a', dialog)
+    checkDialogClosed()
 
   module 'screenreader_gradebook assignment_muter_component: muted',
     setup: ->
@@ -43,12 +45,22 @@ define [
       @server.restore()
       Ember.run App, 'destroy'
 
+  test 'dialog cancels dialog without changes', ->
+    checkLabel(ariaMuted)
+    checkChecked(true)
+    click('#assignment_muted_check').then =>
+      dialog = find('.ui-dialog:visible', 'body')
+      click('[data-action="cancel"]', dialog)
+      checkDialogClosed()
+      checkChecked(true)
+      checkLabel(ariaMuted)
+
   test 'dialog opens and closes without changes', ->
     checkLabel(ariaMuted)
     checkChecked(true)
     click('#assignment_muted_check').then =>
       dialog = find('.ui-dialog:visible', 'body')
-      equal find('button', dialog).text(), dialogTitleMuted
+      equal find('[data-action="unmute"]', dialog).text(), dialogTitleMuted
       closeDialog(dialog)
       checkChecked(true)
       checkLabel(ariaMuted)
@@ -59,7 +71,7 @@ define [
     checkChecked(true)
     click('#assignment_muted_check').then =>
       dialog = find('.ui-dialog:visible', 'body')
-      click('button', dialog)
+      click('[data-action="unmute"]', dialog)
       sendSuccess(server, "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{@con.get('selectedAssignment.id')}/mute", false)
       andThen =>
         dialog = find('.ui-dialog:visible', 'body')
@@ -82,12 +94,22 @@ define [
       @server.restore()
       Ember.run App, 'destroy'
 
+  test 'dialog cancels dialog without changes', ->
+    checkLabel(ariaUnmuted)
+    checkChecked(false)
+    click('#assignment_muted_check').then =>
+      dialog = find('.ui-dialog:visible', 'body')
+      click('[data-action="cancel"]', dialog)
+      checkDialogClosed()
+      checkChecked(false)
+      checkLabel(ariaUnmuted)
+
   test 'dialog opens and closes without changes', ->
     checkLabel(ariaUnmuted)
     checkChecked(false)
     click('#assignment_muted_check').then =>
       dialog = find('.ui-dialog:visible', 'body')
-      equal find('button', dialog).text(), dialogTitleUnmuted
+      equal find('[data-action="mute"]', dialog).text(), dialogTitleUnmuted
       closeDialog(dialog)
       checkChecked(false)
       checkLabel(ariaUnmuted)
@@ -98,7 +120,7 @@ define [
     checkChecked(false)
     click('#assignment_muted_check').then =>
       dialog = find('.ui-dialog:visible', 'body')
-      click('button', dialog)
+      click('[data-action="mute"]', dialog)
       sendSuccess(server, "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{@con.get('selectedAssignment.id')}/mute", true)
       andThen =>
         dialog = find('.ui-dialog:visible', 'body')
