@@ -642,10 +642,42 @@ describe GradebooksController do
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end
 
+      it "includes the graded anonymously flag in the provisional grade object" do
+        submission = @assignment.submit_homework(@student, body: "hello")
+        post 'update_submission',
+          format: :json,
+          course_id: @course.id,
+          submission: { score: 100,
+                           comment: "provisional!",
+                           assignment_id: @assignment.id,
+                           user_id: @student.id,
+                           provisional: true,
+                           graded_anonymously: true }
+
+        submission.reload
+        pg = submission.provisional_grade(@teacher)
+        expect(pg.graded_anonymously).to eq true
+
+        submission = @assignment.submit_homework(@student, body: "hello")
+        post 'update_submission',
+          format: :json,
+          course_id: @course.id,
+          submission: { score: 100,
+                           comment: "provisional!",
+                           assignment_id: @assignment.id,
+                           user_id: @student.id,
+                           provisional: true,
+                           graded_anonymously: false }
+
+        submission.reload
+        pg = submission.provisional_grade(@teacher)
+        expect(pg.graded_anonymously).to eq false
+      end
+
       it "doesn't create a provisional grade when the student has one already (and isn't in the moderation set)" do
         submission = @assignment.submit_homework(@student, :body => "hello")
         other_teacher = teacher_in_course(:course => @course, :active_all => true).user
-        pg = submission.find_or_create_provisional_grade!(scorer: other_teacher)
+        submission.find_or_create_provisional_grade!(other_teacher)
 
         post 'update_submission', :format => :json, :course_id => @course.id,
           :submission => { :score => 100, :comment => "provisional!", :assignment_id => @assignment.id,
@@ -657,7 +689,7 @@ describe GradebooksController do
       it "should create a provisional grade even if the student has one but is in the moderation set" do
         submission = @assignment.submit_homework(@student, :body => "hello")
         other_teacher = teacher_in_course(:course => @course, :active_all => true).user
-        pg = submission.find_or_create_provisional_grade!(scorer: other_teacher)
+        submission.find_or_create_provisional_grade!(other_teacher)
 
         @assignment.moderated_grading_selections.create!(:student => @student)
 
@@ -670,7 +702,7 @@ describe GradebooksController do
       it "creates a final provisional grade" do
         submission = @assignment.submit_homework(@student, :body => "hello")
         other_teacher = teacher_in_course(:course => @course, :active_all => true).user
-        pg = submission.find_or_create_provisional_grade!(scorer: other_teacher) # create one so we can make a final
+        submission.find_or_create_provisional_grade!(other_teacher) # create one so we can make a final
 
         post 'update_submission',
           :format => :json,

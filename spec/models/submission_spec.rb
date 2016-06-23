@@ -1510,6 +1510,92 @@ describe Submission do
     end
   end
 
+  describe 'find_or_create_provisional_grade!' do
+    before(:once) do
+      submission_spec_model
+      @assignment.moderated_grading = true
+      @assignment.save!
+
+      @teacher2 = User.create(name: "some teacher 2")
+      @context.enroll_teacher(@teacher2)
+    end
+
+    it "properly creates a provisional grade with all default values but scorer" do
+      @submission.find_or_create_provisional_grade!(@teacher)
+
+      expect(@submission.provisional_grades.length).to eql 1
+
+      pg = @submission.provisional_grades.first
+
+      expect(pg.scorer_id).to eql @teacher.id
+      expect(pg.final).to eql false
+      expect(pg.graded_anonymously).to be_nil
+      expect(pg.grade).to be_nil
+      expect(pg.score).to be_nil
+      expect(pg.source_provisional_grade).to be_nil
+    end
+
+    it "properly amends information to an existing provisional grade" do
+      @submission.find_or_create_provisional_grade!(@teacher)
+      @submission.find_or_create_provisional_grade!(@teacher,
+        score: 15.0,
+        grade: "20",
+        graded_anonymously: true
+      )
+
+      expect(@submission.provisional_grades.length).to eql 1
+
+      pg = @submission.provisional_grades.first
+
+      expect(pg.scorer_id).to eql @teacher.id
+      expect(pg.final).to eql false
+      expect(pg.graded_anonymously).to eql true
+      expect(pg.grade).to eql "20"
+      expect(pg.score).to eql 15.0
+      expect(pg.source_provisional_grade).to be_nil
+    end
+
+    it "does not update grade or score if not given" do
+      @submission.find_or_create_provisional_grade!(@teacher, grade: "20", score: 12.0)
+
+      expect(@submission.provisional_grades.first.grade).to eql "20"
+      expect(@submission.provisional_grades.first.score).to eql 12.0
+
+      @submission.find_or_create_provisional_grade!(@teacher)
+
+      expect(@submission.provisional_grades.first.grade).to eql "20"
+      expect(@submission.provisional_grades.first.score).to eql 12.0
+    end
+
+    it "does not update graded_anonymously if not given" do
+      @submission.find_or_create_provisional_grade!(@teacher, graded_anonymously: true)
+
+      expect(@submission.provisional_grades.first.graded_anonymously).to eql true
+
+      @submission.find_or_create_provisional_grade!(@teacher)
+
+      expect(@submission.provisional_grades.first.graded_anonymously).to eql true
+    end
+
+    it "raises an exception if final is true and user is not allowed to moderate grades" do
+      expect{ @submission.find_or_create_provisional_grade!(@student, final: true) }
+        .to raise_error(Assignment::GradeError, "User not authorized to give final provisional grades")
+    end
+
+    it "raises an exception if grade is not final and student does not need a provisional grade" do
+      @submission.find_or_create_provisional_grade!(@teacher)
+
+      expect{ @submission.find_or_create_provisional_grade!(@teacher2, final: false) }
+        .to raise_error(Assignment::GradeError, "Student already has the maximum number of provisional grades")
+    end
+
+    it "raises an exception if the grade is final and no non-final provisional grades exist" do
+      expect{ @submission.find_or_create_provisional_grade!(@teacher, final: true) }
+        .to raise_error(Assignment::GradeError,
+          "Cannot give a final mark for a student with no other provisional grades")
+    end
+  end
+
   describe 'crocodoc_whitelist' do
     before(:once) do
       submission_spec_model
@@ -1526,7 +1612,7 @@ describe Submission do
         @assignment.moderated_grading = true
         @assignment.save!
         @submission.reload
-        @pg = @submission.find_or_create_provisional_grade!(scorer: @teacher, score: 1)
+        @pg = @submission.find_or_create_provisional_grade!(@teacher, score: 1)
       end
 
       context "grades not published" do

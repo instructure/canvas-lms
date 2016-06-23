@@ -3596,7 +3596,7 @@ describe Assignment do
       assignment_model(course: @course, moderated_grading: true)
       expect(@assignment).to be_moderated_grading
       submission = @assignment.submit_homework @student, body: "blah"
-      pg = submission.find_or_create_provisional_grade! scorer: @teacher, score: 0
+      submission.find_or_create_provisional_grade!(@teacher, score: 0)
       @assignment.moderated_grading = false
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present

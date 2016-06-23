@@ -118,7 +118,7 @@ describe "courses/_to_do_list.html.erb" do
                          moderated_grading: true,
                          needs_grading_count: 1)
         @submission = submission_model(assignment: @assignment, body: "my submission")
-        @submission.find_or_create_provisional_grade!(scorer: @teacher, grade: 5)
+        @submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!

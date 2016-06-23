@@ -1,7 +1,7 @@
 class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   include Canvas::GradeValidations
 
-  attr_accessible :grade, :score, :final
+  attr_accessible :grade, :score, :final, :graded_anonymously
   attr_writer :force_save
 
   belongs_to :submission, inverse_of: :provisional_grades
@@ -17,6 +17,9 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :scorer, presence: true
   validates :submission, presence: true
 
+  before_create :must_be_final_or_student_in_need_of_provisional_grade
+  before_create :must_have_non_final_provisional_grade_to_create_final
+
   after_create :touch_graders # to update grading counts
   after_save :touch_submission
   after_save :remove_moderation_ignores
@@ -24,6 +27,18 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
   scope :final, -> { where(:final => true)}
   scope :not_final, -> { where(:final => false)}
+
+  def must_be_final_or_student_in_need_of_provisional_grade
+    if !self.final && !self.submission.assignment.student_needs_provisional_grade?(self.submission.user)
+      raise(Assignment::GradeError, "Student already has the maximum number of provisional grades")
+    end
+  end
+
+  def must_have_non_final_provisional_grade_to_create_final
+    if self.final && !self.submission.provisional_grades.not_final.exists?
+      raise(Assignment::GradeError, "Cannot give a final mark for a student with no other provisional grades")
+    end
+  end
 
   def touch_graders
     submission.touch_graders
@@ -44,7 +59,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def grade_attributes
-    self.as_json(:only => [:grade, :score, :graded_at, :scorer_id, :final],
+    self.as_json(:only => [:grade, :score, :graded_at, :scorer_id, :final, :graded_anonymously],
                  :methods => [:provisional_grade_id, :grade_matches_current_submission],
                  :include_root => false)
   end
@@ -73,6 +88,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     previously_graded = submission.grade.present? || submission.excused?
     submission.grade = grade
     submission.score = score
+    submission.graded_anonymously = graded_anonymously
     submission.grader_id = scorer_id
     submission.graded_at = Time.now.utc
     submission.grade_matches_current_submission = true
@@ -82,12 +98,15 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def copy_to_final_mark!(scorer)
-    final_mark = submission.find_or_create_provisional_grade!(scorer: scorer,
-                                                              score: self.score,
-                                                              grade: grade,
-                                                              force_save: true,
-                                                              final: true,
-                                                              source_provisional_grade: self)
+    final_mark = submission.find_or_create_provisional_grade!(
+      scorer,
+      score: self.score,
+      grade: self.grade,
+      force_save: true,
+      graded_anonymously: self.graded_anonymously,
+      final: true,
+      source_provisional_grade: self
+    )
 
     final_mark.submission_comments.destroy_all
     copy_submission_comments!(final_mark)

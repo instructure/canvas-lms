@@ -1185,7 +1185,13 @@ class Assignment < ActiveRecord::Base
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
     if opts[:provisional]
-      submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true, final: opts[:final])
+      submission.find_or_create_provisional_grade!(grader,
+        grade: grade,
+        score: score,
+        force_save: true,
+        final: opts[:final],
+        graded_anonymously: opts[:graded_anonymously]
+      )
     end
 
     submission
@@ -1259,7 +1265,7 @@ class Assignment < ActiveRecord::Base
       if user
         sub = self.find_or_create_submission(user)
         if opts[:provisional_grader]
-          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader], :final => opts[:final]), user]
+          [sub.find_or_create_provisional_grade!(opts[:provisional_grader], final: opts[:final]), user]
         else
           [sub, user]
         end

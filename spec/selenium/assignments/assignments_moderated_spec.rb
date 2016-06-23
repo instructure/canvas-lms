@@ -16,7 +16,7 @@ describe "moderated grading assignments" do
 
   it "publishes grades from the moderate screen" do
     sub = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'hallo')
-    sub.find_or_create_provisional_grade! scorer: @user, score: 80
+    sub.find_or_create_provisional_grade!(@user, score: 80)
 
     course_with_teacher_logged_in course: @course
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"

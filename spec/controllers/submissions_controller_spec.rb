@@ -514,7 +514,7 @@ describe SubmissionsController do
       end
 
       it "should create a final provisional comment" do
-        @submission.find_or_create_provisional_grade!(scorer: @teacher)
+        @submission.find_or_create_provisional_grade!(@teacher)
         put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
           :submission => {:comment => "provisional!", :provisional => true, :final => true}
 
