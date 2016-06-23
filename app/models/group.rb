@@ -24,7 +24,7 @@ class Group < ActiveRecord::Base
   include CustomValidations
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb, :leader
-  validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
+  validates :context_id, :context_type, :account_id, :root_account_id, :workflow_state, :uuid, presence: true
   validates_allowed_transitions :is_public, false => true
 
   # use to skip queries in can_participate?, called by policy block
@@ -34,8 +34,7 @@ class Group < ActiveRecord::Base
   has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
   has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
@@ -52,14 +51,15 @@ class Group < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
+  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: 'context', class_name: 'Folder'
   has_many :collaborators
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
+  has_many :wiki_pages, foreign_key: 'wiki_page', primary_key: 'wiki_page'
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
-  has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
@@ -109,8 +109,9 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
-  def participating_users_in_context(user_ids = nil)
+  def participating_users_in_context(user_ids = nil, sort: false)
     users = participating_users(user_ids)
+    users = users.order_by_sortable_name if sort
     return users unless self.context.is_a? Course
     context.participating_users(users.pluck(:id))
   end
@@ -176,8 +177,12 @@ class Group < ActiveRecord::Base
   end
 
   def participants(include_observers=false)
-    # argument needed because #participants is polymorphic for contexts
-    participating_users.uniq
+    users = participating_users.uniq.all
+    if include_observers && self.context.is_a?(Course)
+      (users + User.observing_students_in_course(users, self.context)).flatten.uniq
+    else
+      users
+    end
   end
 
   def context_code
@@ -188,7 +193,7 @@ class Group < ActiveRecord::Base
     return false unless self.context
     case self.context
     when Course
-      self.context.available?
+      self.context.available? && (!self.context.respond_to?(:concluded?) || !self.context.concluded?)
     else
       true
     end
@@ -309,13 +314,17 @@ class Group < ActiveRecord::Base
       when 'parent_context_auto_join' then 'accepted'
       end
     attrs[:workflow_state] = new_record_state if new_record_state
-    if member = self.group_memberships.where(user_id: user).first
-      member.workflow_state = new_record_state unless member.active?
-      # only update moderator if true/false is explicitly passed in
-      member.moderator = moderator unless moderator.nil?
-      member.save if member.changed?
-    else
-      member = self.group_memberships.create(attrs)
+
+    member = nil
+    GroupMembership.unique_constraint_retry do
+      if member = self.group_memberships.where(user_id: user).first
+        member.workflow_state = new_record_state unless member.active?
+        # only update moderator if true/false is explicitly passed in
+        member.moderator = moderator unless moderator.nil?
+        member.save if member.changed?
+      else
+        member = self.group_memberships.create(attrs)
+      end
     end
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
@@ -557,13 +566,21 @@ class Group < ActiveRecord::Base
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
+      return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).any?(&:participating?)
     elsif self.context.is_a?(Account)
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
   private :can_participate?
+
+  def can_join?(user)
+    if self.context.is_a?(Course)
+      self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
+    else
+      can_participate?(user)
+    end
+  end
 
   def user_can_manage_own_discussion_posts?(user)
     return true unless self.context.is_a?(Course)
@@ -718,5 +735,13 @@ class Group < ActiveRecord::Base
   # as a favorite.
   def favorite_for_user?(user)
     user.favorites.where(:context_type => 'Group', :context_id => self).exists?
+  end
+
+  def submissions_folder(_course = nil)
+    return @submissions_folder if @submissions_folder
+    Folder.unique_constraint_retry do
+      @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
+        .first_or_create!(name: I18n.t('Submissions'))
+    end
   end
 end

@@ -202,7 +202,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
           Onelogin::Saml::Response.any_instance.stubs(:trusted_roots).returns([])
 
-          post '/saml_consume', :SAMLResponse => "foo"
+          post '/login/saml', :SAMLResponse => "foo"
         end
       end
 
@@ -353,14 +353,14 @@ describe "API Authentication", type: :request do
       it "should require the developer key to have a redirect_uri" do
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
         expect(response).to be_client_error
-        expect(response.body).to match /invalid redirect_uri/
+        expect(response.body).to match /redirect_uri/
       end
 
       it "should require the redirect_uri domains to match" do
         @key.update_attribute :redirect_uri, 'http://www.example2.com/oauth2response'
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
         expect(response).to be_client_error
-        expect(response.body).to match /invalid redirect_uri/
+        expect(response.body).to match /redirect_uri/
 
         @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
         get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response"
@@ -437,12 +437,14 @@ describe "API Authentication", type: :request do
               developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
 
               @user.access_tokens.create!(developer_key: developer_key)
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
+              expect(response).to be_redirect
+              expect(response.location).to match(/unauthorized_client/)
             end
           end
         end
@@ -511,8 +513,8 @@ describe "API Authentication", type: :request do
       course_with_teacher(user: user_obj)
     end
 
-    def wrapped_jwt_from_service
-      services_jwt = Canvas::Security::ServicesJwt.generate({sub: @user.global_id}, false)
+    def wrapped_jwt_from_service(payload={sub: @user.global_id})
+      services_jwt = Canvas::Security::ServicesJwt.generate(payload, false)
       payload = {
         iss: "some other service",
         user_token: services_jwt
@@ -525,7 +527,22 @@ describe "API Authentication", type: :request do
       get "/api/v1/courses", nil, {
         'HTTP_AUTHORIZATION' => "Bearer #{wrapped_jwt_from_service}"
       }
+      assert_status(200)
       expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "allows access for a JWT masquerading user" do
+      token = wrapped_jwt_from_service({
+        sub: @user.global_id,
+        masq_sub: User.first.global_id
+      })
+      get "/api/v1/courses", nil, {
+        'HTTP_AUTHORIZATION' => "Bearer #{token}"
+      }
+      assert_status(200)
+      expect(JSON.parse(response.body).size).to eq 1
+      expect(assigns['current_user']).to eq @user
+      expect(assigns['real_current_user']).to eq User.first
     end
 
     it "errors if the JWT is expired" do
@@ -846,8 +863,6 @@ describe "API Authentication", type: :request do
         'name' => 'User',
         'short_name' => 'User',
         'sortable_name' => 'User',
-        'sis_user_id' => '1234',
-        'sis_login_id' => 'blah@example.com',
         'login_id' => "blah@example.com",
         'integration_id' => nil,
         'bio' => nil,
@@ -875,8 +890,6 @@ describe "API Authentication", type: :request do
           'name' => 'User',
           'short_name' => 'User',
           'sortable_name' => 'User',
-          'sis_user_id' => '1234',
-          'sis_login_id' => 'blah@example.com',
           'login_id' => "blah@example.com",
           'integration_id' => '1234',
           'bio' => nil,

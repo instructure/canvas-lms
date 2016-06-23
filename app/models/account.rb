@@ -206,6 +206,9 @@ class Account < ActiveRecord::Base
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
+  add_setting :app_center_access_token
+
+  add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
 
   def use_new_styles_or_allow_global_includes?
     feature_enabled?(:use_new_styles) || allow_global_includes?
@@ -926,16 +929,6 @@ class Account < ActiveRecord::Base
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) && (!details[:if] || send(details[:if])) } }
       can permission
       can :create_courses if permission == :manage_courses
-
-      next unless details[:account_only]
-      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
-        given { |user|
-          user && RoleOverride.permission_for(self, permission, Role.get_built_in_role(role_name))[:enabled] &&
-          self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
-            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).first &&
-          (!details[:if] || send(details[:if])) }
-        can permission
-      end
     end
 
     given { |user| !self.account_users_for(user).empty? }
@@ -1204,22 +1197,8 @@ class Account < ActiveRecord::Base
     end
   end
 
-  # this will take an account and make it a sub_account of
-  # itself.  Also updates all it's descendant accounts to point to
-  # the correct root account, and updates the pseudonyms to
-  # points to the new root account as well.
-  def consume_account(account)
-    account.all_accounts.each do |sub_account|
-      sub_account.root_account = self.root_account
-      sub_account.save!
-    end
-    account.parent_account = self
-    account.root_account = self.root_account
-    account.save!
-    account.pseudonyms.each do |pseudonym|
-      pseudonym.account = self.root_account
-      pseudonym.save!
-    end
+  def update_all_update_account_associations
+    Account.root_accounts.active.find_each(&:update_account_associations)
   end
 
   def course_count
@@ -1320,7 +1299,13 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if root_account.site_admin?
       tabs = []
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      if user && self.grants_right?(user, :read_roster)
+        if feature_enabled?(:course_user_search)
+          tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_course_user_search_path }
+        else
+          tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
+        end
+      end
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
@@ -1347,7 +1332,10 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if self.root_account? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, :manage_sis)
+      if self.root_account? && self.allow_sis_import && user && self.grants_any_right?(user, :manage_sis, :import_sis)
+        tabs << { id: TAB_SIS_IMPORT, label: t('#account.tab_sis_import', "SIS Import"),
+                  css_class: 'sis_import', href: :account_sis_import_path }
+      end
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && root_account.grants_right?(user, :manage_developer_keys)
     end
     tabs += external_tool_tabs(opts)

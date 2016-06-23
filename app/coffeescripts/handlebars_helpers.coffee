@@ -1,7 +1,6 @@
 define [
   'timezone'
   'compiled/util/enrollmentName'
-  'compiled/util/fcUtil'
   'handlebars'
   'i18nObj'
   'jquery'
@@ -16,7 +15,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, fcUtil, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->
@@ -109,7 +108,12 @@ define [
       else
         timeTitle = htmlEscape $.datetimeString(datetime)
 
-      new Handlebars.SafeString "<time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>#{$.friendlyDatetime(fudged)}</time>"
+      new Handlebars.SafeString """
+        <time data-tooltip data-html-tooltip-title='#{htmlEscape timeTitle}' datetime='#{datetime.toISOString()}' #{$.raw('pubdate' if pubdate)}>
+          <span aria-hidden='true'>#{$.friendlyDatetime(fudged)}</span>
+          <span class='screenreader-only'>#{htmlEscape timeTitle}</span>
+        </time>
+      """
 
 
     fudge: (datetime) ->

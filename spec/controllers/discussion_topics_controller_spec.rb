@@ -88,7 +88,6 @@ describe DiscussionTopicsController do
           permission: 'view_group_pages',
           enabled: true
         )
-        @course.enable_feature!(:differentiated_assignments)
 
         group_discussion_assignment
         @child_topic = @topic.child_topics.first
@@ -142,7 +141,6 @@ describe DiscussionTopicsController do
         permission: 'view_group_pages',
         enabled: true
       )
-      @course.enable_feature!(:differentiated_assignments)
 
       group_category(context: @course)
       membership = group_with_user(group_category: @group_category, user: @student, context: @course)
@@ -198,6 +196,14 @@ describe DiscussionTopicsController do
         @override = assignment_override_model(:assignment => @topic.assignment,
                                   :due_at => Time.now,
                                   :set => @section)
+      end
+
+      it "doesn't show the topic to unassigned students" do
+        @topic.assignment.update_attribute(:only_visible_to_overrides, true)
+        user_session(@student)
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_redirect
+        expect(response.location).to eq course_discussion_topics_url @course
       end
 
       it "doesn't show overrides to students" do
@@ -341,6 +347,25 @@ describe DiscussionTopicsController do
         expect(assigns[:groups].size).to eql(2)
       end
 
+      it "should only show applicable groups if DA applies" do
+        user_session(@teacher)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        asmt = @topic.assignment
+        asmt.only_visible_to_overrides = true
+        override = asmt.assignment_overrides.build
+        override.set = @group2
+        override.save!
+        asmt.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_success
+        expect(assigns[:groups]).to eq([@group2])
+      end
+
       it "should redirect to the student's group" do
         user_session(@student)
         @group1.add_user(@student)
@@ -370,6 +395,22 @@ describe DiscussionTopicsController do
         get 'show', :course_id => @course.id, :id => @topic.id
         redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
         expect(response).to redirect_to redirect_path
+      end
+
+      it "should not change the name of the child topic when navigating to it" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        child_topic = @topic.child_topic_for(@student)
+        old_title = child_topic.title
+
+        get 'index', :group_id => @group1.id, :root_discussion_topic_id => @topic.id
+
+        expect(@topic.child_topic_for(@student).title).to eq old_title
       end
     end
 
@@ -445,6 +486,34 @@ describe DiscussionTopicsController do
       due_at = 1.day.from_now
       get 'new', course_id: @course.id, due_at: due_at.iso8601
       expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:assignment][:due_at]).to eq due_at.iso8601
+    end
+  end
+
+  describe "GET 'edit'" do
+    before(:once) do
+      course_topic
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context 'conditional-release' do
+      it 'should include environment variables if enabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env[:dummy]).to eq 'value'
+      end
+
+      it 'should not include environment variables when disabled' do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'value' })
+        get :edit, course_id: @course.id, id: @topic.id
+        expect(response).to have_http_status :success
+        expect(controller.js_env).not_to have_key :dummy
+      end
     end
   end
 
@@ -564,7 +633,6 @@ describe DiscussionTopicsController do
     it 'does not dispatch new topic notification when hidden by selective release' do
       notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
       @student.communication_channels.create!(path: 'student@example.com') {|cc| cc.workflow_state = 'active'}
-      @course.enable_feature!(:differentiated_assignments)
       new_section = @course.course_sections.create!
       obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{course_section_id: new_section.id}]))
       user_session(@teacher)
@@ -616,6 +684,14 @@ describe DiscussionTopicsController do
           locked: false)
       expect(@topic.reload).not_to be_locked
       expect(@topic.lock_at).not_to be_nil
+    end
+
+    it "should not change the editor if only pinned was changed" do
+      put('update', course_id: @course.id, topic_id: @topic.id,
+        format: 'json', pinned: true)
+      @topic.reload
+      expect(@topic.pinned).to be_truthy
+      expect(@topic.editor).to_not eq @teacher
     end
 
     it "should not clear delayed_post_at if published is not changed" do

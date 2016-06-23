@@ -20,7 +20,7 @@
       @show_left_side ||= (section_tabs.length > 0 || left_side_custom.try(:length))
     end
     @body_classes << "with-left-side" if @show_left_side
-    @body_classes << "course-menu-expanded" if @body_classes.include? "with-left-side"
+    @body_classes << "course-menu-expanded" if @body_classes.include?("with-left-side") && !@collapse_course_menu
     #we dont want to render a right side unless there is actually content in it.
     @body_classes << "with-right-side" if right_side and not right_side.strip.empty?
     @body_classes << "padless-content" if @padless
@@ -43,6 +43,15 @@
 -%>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(" ") %>">
+<%if @real_current_user && @real_current_user != @current_user %>
+  <div class="screenreader-only">
+    <% if @current_user.fake_student? %>
+        <%= t("You are currently logged into Student View") %>
+      <% else %>
+        <%= t("You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %>
+    <% end %>
+  </div>
+<% end %>
 <%# Flash messages must be outside of #application or they won't work in screenreaders with modals open. %>
 <%= render :partial => 'shared/static_notices' %>
 <%= render :partial => 'shared/flash_notices' %>
@@ -137,7 +146,9 @@
         </div>
       <% #End new styles div %>
       <% if use_new_styles? %></div><% end %>
-      <%= render :partial => 'shared/canvas_footer' %>
+      <% if (use_new_styles? && @show_footer) or !use_new_styles? %>
+        <%= render :partial => 'shared/canvas_footer' %>
+      <% end %>
     </div>
   </div>
 

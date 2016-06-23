@@ -56,7 +56,7 @@ describe "conversations index page" do
       select_conversations
       f('#archive-btn').click
       wait_for_ajaximations
-      expect(conversation_elements.count).to eq 0
+      expect(f('.messages')).not_to contain_css('li')
       run_progress_job
       @conversations.each { |c| expect(c.reload).to be_archived }
     end
@@ -67,7 +67,7 @@ describe "conversations index page" do
       f('#delete-btn').click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(conversation_elements.count).to eq 0
+      expect(f('.messages')).not_to contain_css('li')
     end
 
     it "should mark multiple conversations as unread" do

@@ -78,4 +78,12 @@ module AccountNotificationHelper
       I18n.t('#global_message_icons.warning', "warning")
     end
   end
+
+  def roles_message(account)
+    if account.root_account?
+      t "(If none are selected, send to everyone in the entire account)"
+    else
+      t "(If none are selected, send to everyone in the entire sub-account)"
+    end
+  end
 end

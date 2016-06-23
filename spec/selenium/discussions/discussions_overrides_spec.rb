@@ -72,7 +72,7 @@ describe "discussions overrides" do
       f('.form-actions button[type=submit]').click
       wait_for_ajaximations
       expect(f('.ui-dialog')).to be_present
-      expect(f('#ui-id-7').text).to include('Do you want to go back and select a due date?')
+      expect(f('#ui-id-7').text).to include('Not all sections will be assigned this item')
       f('.ui-dialog .ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       f('.toggle_due_dates').click
@@ -81,16 +81,12 @@ describe "discussions overrides" do
       expect(f('.discussion-topic-due-dates')).to be_present
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(1)').text).to include(@override_due_at_time)
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(2)').text).to include('New Section')
-      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(1)').text).
-                                                                                    not_to include(@default_due_at_time)
-      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(2)').text).
-                                                                                             to include('Everyone else')
     end
 
     context "outside discussions page" do
       before do
-        @default_due = Time.zone.now.advance(days:1).strftime('%b %-d')
-        @override_due = Time.zone.now.advance(days:2).strftime('%b %-d')
+        @default_due = format_date_for_view(Time.zone.now.advance(days:1))
+        @override_due = format_date_for_view(Time.zone.now.advance(days:2))
       end
 
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do
@@ -105,10 +101,10 @@ describe "discussions overrides" do
 
       it "should list discussions in the syllabus", priority: "2", test_id: 114321 do
         get "/courses/#{@course.id}/assignments/syllabus"
-        expect(f('#syllabus tbody tr th').text).to include(@default_due)
-        expect(f('#syllabus tbody tr td').text).to include(@discussion_topic.title)
-        expect(f('#syllabus tbody tr:nth-of-type(2) th').text).to include(@override_due)
-        expect(f('#syllabus tbody tr:nth-of-type(2) td').text).to include(@discussion_topic.title)
+        expect(f('#syllabus tbody tr:nth-of-type(1) .day_date').text).to include(@default_due)
+        expect(f('#syllabus tbody tr:nth-of-type(1) .details').text).to include(@discussion_topic.title)
+        expect(f('#syllabus tbody tr:nth-of-type(2) .day_date').text).to include(@override_due)
+        expect(f('#syllabus tbody tr:nth-of-type(2) .details').text).to include(@discussion_topic.title)
         expect(f('.detail_list tbody tr td .special_date_title').text).to include(@new_section.name)
       end
 

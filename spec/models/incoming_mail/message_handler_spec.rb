@@ -191,7 +191,7 @@ describe IncomingMail::MessageHandler do
             message = stub("original message without user", original_message_attributes.merge(:context => nil))
             Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
 
-            email_subject = "Message Reply Failed: some subject"
+            email_subject = "Undelivered message"
             body = <<-BODY.strip_heredoc.strip
             The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
@@ -223,7 +223,7 @@ describe IncomingMail::MessageHandler do
             Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
             context.expects(:reply_from).raises(IncomingMail::Errors::ReplyToLockedTopic.new)
 
-            email_subject = "Message Reply Failed: some subject"
+            email_subject = "Undelivered message"
             body = <<-BODY.strip_heredoc.strip
             The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
@@ -254,7 +254,7 @@ describe IncomingMail::MessageHandler do
             Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
             context.expects(:reply_from).raises(IncomingMail::Errors::UnknownAddress.new)
 
-            email_subject = "Message Reply Failed: some subject"
+            email_subject = "Undelivered message"
             body = <<-BODY.strip_heredoc.strip
             The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 

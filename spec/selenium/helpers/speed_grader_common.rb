@@ -67,4 +67,17 @@ module SpeedGraderCommon
     f('a.next').click
     expect(f('#grading-box-extended').attribute 'value').to eq ''
   end
+
+  def cycle_students_correctly(direction_string)
+    current_index = @students.index(@students.find { |l| l.name == f(selectedStudent).text })
+
+    f(direction_string).click
+
+    direction = direction_string.include?(next_) ? 1 : -1
+    new_index = (current_index + direction) % @students.length
+    student_X_of_X_string = "Student #{new_index + 1} of #{@students.length}"
+
+    f(selectedStudent).text.include?(@students[new_index].name) &&
+        f(studentXofXlabel).text.include?(student_X_of_X_string)
+  end
 end

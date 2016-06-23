@@ -1,12 +1,15 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
+require_relative 'helpers/shared_examples_common'
+include SharedExamplesCommon
 
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
 
 shared_examples 'show courses for ePub generation' do |context|
+  
   it "should show the courses the user is enrolled in and feature enabled in ePub exports page",
-                            priority: "1", test_id: pick_test_id(context, "417579", "498316") do
+                            priority: "1", test_id: pick_test_id(context, teacher: "417579", student: "498316") do
     @course2 = course_model(name: 'Second Course')
     @course2.offer!
     enroll_context_user(context)
@@ -22,16 +25,27 @@ shared_examples 'show courses for ePub generation' do |context|
     expect(f('.course-epub-exports-app li:nth-of-type(1) .ig-admin .Button').text).to include('Generate ePub')
     expect(f('.course-epub-exports-app li:nth-of-type(2) .ig-admin .Button').text).to include('Generate ePub')
   end
+
+  def enroll_context_user(context)
+    case context
+    when :student
+      @course2.enroll_student(@student1).accept!
+    when :teacher
+      @course2.enroll_teacher(@teacher1).accept!
+    else
+      raise('Error: Invalid context')
+    end
+  end
 end
 
 shared_examples 'generate and download ePub' do |context|
-  it "should show progress", priority: "1", test_id: pick_test_id(context, "417580", "498317") do
+  it "should show progress", priority: "1", test_id: pick_test_id(context, teacher: "417580", student: "498317") do
     get '/epub_exports'
     f('.ig-admin .Button').click
     expect(f('.progress-bar__bar')).to be_present
   end
 
-  it "should generate ePub file", priority: "1", test_id: pick_test_id(context, "588916", "588917") do
+  it "should generate ePub file", priority: "1", test_id: pick_test_id(context, teacher: "588916", student: "588917") do
     get '/epub_exports'
     f('.ig-admin .Button').click
     wait_for_ajaximations
@@ -44,24 +58,3 @@ shared_examples 'generate and download ePub' do |context|
   end
 end
 
-def pick_test_id(context, id1, id2)
-  case context
-  when 'teacher'
-    id1
-  when 'student'
-    id2
-  else
-    raise('Error: Invalid context')
-  end
-end
-
-def enroll_context_user(context)
-  case context
-  when 'student'
-    @course2.enroll_student(@student1).accept!
-  when 'teacher'
-    @course2.enroll_teacher(@teacher1).accept!
-  else
-    raise('Error: Invalid context')
-  end
-end

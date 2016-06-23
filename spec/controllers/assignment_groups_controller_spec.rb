@@ -25,6 +25,11 @@ describe AssignmentGroupsController do
   end
 
   describe 'GET index' do
+    let(:assignments_ids) do
+      json_response = json_parse(response.body)
+      json_response.first['assignments'].map { |assignment| assignment['id'] }
+    end
+
     describe 'filtering by grading period and overrides' do
       let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) do
@@ -75,18 +80,16 @@ describe AssignmentGroupsController do
         before(:once) do
           root_account.allow_feature!(:multiple_grading_periods)
           root_account.enable_feature!(:multiple_grading_periods)
-          root_account.enable_feature!(:differentiated_assignments)
           account_admin_user(account: root_account)
         end
 
         let(:index_params) do
-          { course_id: course.id, exclude_descriptions: true, format: :json,
-            include: ['assignments', 'assignment_visibility', 'overrides'] }
-        end
-
-        let(:assignments_ids) do
-          json_response = json_parse(response.body)
-          json_response.first['assignments'].map { |assignment| assignment['id'] }
+          {
+            course_id: course.id,
+            exclude_response_fields: ['description'],
+            format: :json,
+            include: ['assignments', 'assignment_visibility', 'overrides']
+          }
         end
 
         it 'when there is an assignment with overrides, filter grading periods by the override\'s due_at' do
@@ -135,6 +138,29 @@ describe AssignmentGroupsController do
       end
     end
 
+    describe 'filtering assignments by submission type' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @vanilla_assignment = @course.assignments.create!(name: "Boring assignment")
+        @discussion_assignment = @course.assignments.create!(
+          name: "Discussable assignment",
+          submission_types: "discussion_topic"
+        )
+      end
+
+      it 'should filter assignments by the submission_type' do
+        user_session(@teacher)
+        get :index, {
+          course_id: @course.id,
+          format: :json,
+          include: ['assignments'],
+          exclude_assignment_submission_types: ['discussion_topic']
+        }
+        expect(assignments_ids).to include @vanilla_assignment.id
+        expect(assignments_ids).not_to include @discussion_assignment.id
+      end
+    end
+
     context 'given a course with a teacher and a student' do
       before :once do
         course_with_teacher(active_all: true)
@@ -151,7 +177,6 @@ describe AssignmentGroupsController do
           user_session(@teacher)
           course_group
           @group = course_group
-          @course.enable_feature!(:differentiated_assignments)
           @assignment = @course.assignments.create!(
             title: 'assignment',
             assignment_group: @group,

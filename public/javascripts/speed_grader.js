@@ -125,6 +125,7 @@ define([
       $multiple_submissions = $("#multiple_submissions"),
       $submission_late_notice = $("#submission_late_notice"),
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
+      $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -170,21 +171,25 @@ define([
     }
   };
 
-  function mergeStudentsAndSubmission(){
+  function mergeStudentsAndSubmission() {
     jsonData.studentsWithSubmissions = jsonData.context.students;
     jsonData.studentMap = {};
-    $.each(jsonData.studentsWithSubmissions, function(i, student){
-      this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, i){
-          return enrollment.user_id === student.id;
+    $.each(jsonData.studentsWithSubmissions, function(_, student){
+      jsonData.studentMap[student.id] = student;
+      jsonData.studentMap[student.id].enrollments = [];
+      this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, _){
+          if(enrollment.user_id === student.id) {
+            jsonData.studentMap[student.id].enrollments.push(enrollment);
+            return true;
+          }
         }), function(enrollment){
         return enrollment.course_section_id;
       });
-      this.submission = $.grep(jsonData.submissions, function(submission, i){
+      this.submission = $.grep(jsonData.submissions, function(submission, _){
         return submission.user_id === student.id;
       })[0];
 
       this.submission_state = submissionState(this);
-      jsonData.studentMap[student.id] = student;
     });
 
     // handle showing students only in a certain section.
@@ -321,7 +326,7 @@ define([
     }).join("");
 
     $selectmenu = new SpeedgraderSelectMenu(optionsHtml, MENU_PARTS_DELIMITER);
-    $selectmenu.appendTo("#combo_box_container", function(e){
+    $selectmenu.appendTo("#combo_box_container", function(){
       EG.handleStudentChanged();
     });
 
@@ -392,6 +397,9 @@ define([
       settings: {
         form: $('#settings_form'),
         link: $('#settings_link')
+      },
+      keyinfo: {
+        icon: $('#keyboard-shortcut-info-icon')
       }
     },
     courseId: utils.getParam('courses'),
@@ -408,6 +416,7 @@ define([
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
+      this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
     },
     addSpinner: function(){
       this.elements.mute.link.append(this.elements.spinner.el);
@@ -447,6 +456,11 @@ define([
     toAssignment: function(e){
       e.preventDefault();
       EG[e.target.getAttribute('class')]();
+    },
+
+    keyboardShortcutInfoModal: function(e) {
+      var questionMarkKeyDown = $.Event('keydown', { keyCode: 191 });
+      $(document).trigger(questionMarkKeyDown);
     },
 
     submitSettingsForm: function(e){
@@ -1020,7 +1034,7 @@ define([
     },
 
     skipRelativeToCurrentIndex: function(offset){
-      var newIndex = (this.currentIndex() + offset+ jsonData.studentsWithSubmissions.length) % jsonData.studentsWithSubmissions.length;
+      var newIndex = (this.currentIndex() + offset + jsonData.studentsWithSubmissions.length) % jsonData.studentsWithSubmissions.length;
       this.goToStudent(jsonData.studentsWithSubmissions[newIndex].id);
     },
 
@@ -1108,7 +1122,7 @@ define([
 
       if (student) {
         $selectmenu.jquerySelectMenu().selectmenu("value", student.id);
-        //this is lame but I have to manually tell $selectmenu to fire its 'change' event if has changed.
+        // manually tell $selectmenu to fire the change event
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
           $selectmenu.jquerySelectMenu().change();
         }
@@ -1145,6 +1159,8 @@ define([
         $(".speedgrader_alert").hide();
         $submission_not_newest_notice.hide();
         $submission_late_notice.hide();
+        $full_width_container.removeClass("with_enrollment_inactive_notice");
+        $enrollment_inactive_notice.hide();
 
         $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1177,6 +1193,7 @@ define([
         this.showStudent();
       }
     },
+
     showStudent: function(){
       $rightside_inner.scrollTo(0);
       if (this.currentStudent.submission_state == 'not_gradeable' && ENV.grading_role == "provisional_grader") {
@@ -1193,6 +1210,7 @@ define([
         this.showSubmission();
       }
     },
+
     showSubmission: function(){
       this.showGrade();
       this.showDiscussion();
@@ -1201,6 +1219,7 @@ define([
       this.showSubmissionDetails();
       this.refreshFullRubric();
     },
+
     handleModerationTabs: function(index_to_load) {
       var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
       var final_grade = this.currentStudent.submission && this.currentStudent.submission.final_provisional_grade;
@@ -1286,6 +1305,7 @@ define([
         this.setReadOnly(false);
       }
     },
+
     updateModerationTabs: function() {
       if (!this.currentStudent.submission) return;
       var prov_grades = this.currentStudent.submission.provisional_grades;
@@ -1294,6 +1314,7 @@ define([
       this.updateModerationTab($moderation_tabs.eq(1), prov_grades && prov_grades[1]);
       this.updateModerationTab($moderation_tab_final, this.currentStudent.submission.final_provisional_grade);
     },
+
     updateModerationTab: function($tab, prov_grade) {
       var CHOSEN_GRADE_MESSAGE = I18n.t('This is the currently chosen grade for this student.');
       var $srMessage = $('<span class="selected_sr_message screenreader-only"></span>').text(CHOSEN_GRADE_MESSAGE);
@@ -1320,6 +1341,7 @@ define([
         $mark_grade.empty();
       }
     },
+
     showProvisionalGrade: function(idx) {
       if (this.current_prov_grade_index != idx) {
 
@@ -1342,6 +1364,7 @@ define([
         this.setReadOnly(prov_grade.readonly);
       }
     },
+
     newProvisionalGrade: function(type, index) {
       if (type == 'new')  {
         var new_mark = {
@@ -1379,6 +1402,7 @@ define([
         }
       }
     },
+
     selectProvisionalGrade: function(index) {
       var prov_grade, $tab;
       if (index == 'final') {
@@ -1400,6 +1424,7 @@ define([
         })
       );
     },
+
     setReadOnly: function(readonly) {
       if (readonly) {
         $grade.attr('disabled', true);
@@ -1411,6 +1436,7 @@ define([
         $add_a_comment.show();
       }
     },
+
     populateTurnitin: function(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent) {
       var $turnitinSimilarityScore = null;
 
@@ -1586,8 +1612,16 @@ define([
       // if there is any submissions after this one, show a notice that they are not looking at the newest
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
-      // if the submission was after the due date, mark it as late
       $submission_late_notice.showIf(submission['late']);
+      $full_width_container.removeClass("with_enrollment_inactive_notice");
+      $enrollment_inactive_notice.showIf(
+        _.any(jsonData.studentMap[this.currentStudent.id].enrollments, function(enrollment) {
+          if(enrollment.workflow_state === 'inactive') {
+            $full_width_container.addClass("with_enrollment_inactive_notice");
+            return true;
+          }
+        })
+      );
     },
 
     refreshSubmissionsToView: function(){

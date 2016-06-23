@@ -136,13 +136,11 @@ describe "profile communication settings" do
     get "/profile/communication"
     cell = find_frequency_cell(@sub_comment.category.underscore.gsub(/\s/, '_'), channel.id)
     # validate existing text is shown correctly (text display and button state)
-    expect(cell.text).to eq 'Daily'
+    expect(cell.find_element(:css, "input#cat_#{@sub_comment.id}_ch_#{channel.id}_daily")).to be_selected
 
-    mouse_enter_cell(@sub_comment.category, channel.id)
-    cell.find_element(:css, '.immediately-label').click
-    mouse_leave_cell(@sub_comment.category, channel.id)
+    cell.find_element(:css, 'label[data-value="immediately"]').click
     # Change to a different value and verify flash and the save. (click on the radio)
-    expect(cell.text).to eq 'ASAP'
+    expect(cell.find_element(:css, "input#cat_#{@sub_comment.id}_ch_#{channel.id}_immediately")).to be_selected
 
     wait_for_ajaximations
 
@@ -153,10 +151,5 @@ describe "profile communication settings" do
 
   context "accessibility usage" do
     it "should be navigable by keyboard only"
-  end
-
-  context "touch usage" do
-    it "should create a select with options instead of radio buttons"
-    it "should save the frequency change for select" #flash - test data
   end
 end

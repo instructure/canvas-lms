@@ -271,6 +271,27 @@ describe Enrollment do
       expect(e.messages_sent).to be_include("Enrollment Registration")
     end
 
+    it "should not send out invitations immediately if the course restricts future viewing" do
+      Notification.create!(:name => "Enrollment Registration")
+      course_with_teacher(:active_all => true)
+      @course.restrict_student_future_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.start_at = 1.day.from_now
+      @course.conclude_at = 3.days.from_now
+      @course.save!
+
+      user_with_pseudonym
+      e = @course.enroll_student(@user)
+      expect(e).to be_inactive
+      expect(e.messages_sent).to_not include("Enrollment Registration")
+
+      Timecop.freeze(2.days.from_now) do
+        expect(e).to be_invited
+        e.any_instantiation.expects(:re_send_confirmation!).once
+        run_jobs
+      end
+    end
+
     it "should not send out invitations to an observer if the student doesn't receive an invitation (e.g. sis import)" do
       Notification.create!(:name => "Enrollment Registration", :category => "Registration")
 
@@ -1895,14 +1916,6 @@ describe Enrollment do
     end
   end
 
-  describe "#sis_user_id" do
-    it "should work when sis_source_id is nil" do
-      course_with_student(:active_all => 1)
-      expect(@enrollment.sis_source_id).to be_nil
-      expect(@enrollment.sis_user_id).to be_nil
-    end
-  end
-
   describe "updating cached due dates" do
     before :once do
       course_with_student
@@ -1916,6 +1929,12 @@ describe Enrollment do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).with(@course)
       @course.enroll_student(user)
+    end
+
+    it "does not trigger a batch when enrollment is not student" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
+      @course.enroll_teacher(user)
     end
 
     it "triggers a batch when enrollment is deleted" do
@@ -1984,6 +2003,88 @@ describe Enrollment do
           expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(false)
         end
       end
+    end
+  end
+
+  describe ".not_yet_started" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it 'includes users for whom the enrollment has not yet started' do
+      Enrollment.any_instance.stubs(:effective_start_at).returns(1.month.from_now)
+      expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
+    end
+
+    it 'excludes users for whom the enrollment has started' do
+      @enrollment.stubs(:effective_start_at).returns(1.month.ago)
+      expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
+    end
+  end
+
+  describe "readable_state_based_on_date" do
+    before :once do
+      course(:active_all => true)
+      @enrollment = @course.enroll_student(user)
+      @enrollment.accept!
+    end
+
+    it "should return pending for future enrollments (even if view restricted)" do
+      @course.start_at = 1.month.from_now
+      @course.restrict_student_future_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      @enrollment.reload
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :pending
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :accepted
+      expect(@enrollment.readable_state_based_on_date).to eq :pending
+    end
+
+    it "should return completed for completed enrollments (even if view restricted)" do
+      @course.start_at = 2.months.ago
+      @course.conclude_at = 1.month.ago
+      @course.restrict_student_past_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      @enrollment.reload
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+
+      @course.complete!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :inactive
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+
+      @course.restrict_student_past_view = false
+      @course.save!
+
+      @enrollment = Enrollment.find(@enrollment.id)
+      expect(@enrollment.state_based_on_date).to eq :completed
+      expect(@enrollment.readable_state_based_on_date).to eq :completed
+    end
+  end
+
+  describe "update user account associations if necessary" do
+    it "should create a user_account_association when restoring a deleted enrollment" do
+      sub_account = Account.default.sub_accounts.create!
+      course = Course.create!(:account => sub_account)
+      @enrollment = course.enroll_student(user)
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
+
+      @enrollment.destroy
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq false
+
+      @enrollment.restore
+      expect(@user.user_account_associations.where(account: sub_account).exists?).to eq true
     end
   end
 end

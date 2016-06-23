@@ -49,7 +49,7 @@ describe Quizzes::QuizSubmissionFilesController, type: :request do
     end
 
     def has_query_exemption?
-      false
+      true
     end
   end
 

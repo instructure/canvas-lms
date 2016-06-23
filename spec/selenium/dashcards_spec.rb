@@ -101,7 +101,7 @@ describe 'dashcards' do
       expect_new_page_load{f('a.announcements').click}
       expect_new_page_load{fln('New Announcement').click}
       get '/'
-      expect(f('a.announcements .unread_count')).to be_nil
+      expect(f("#content")).not_to contain_css('a.announcements .unread_count')
     end
 
     it 'should show discussions created notifications in dashcard', priority: "1", test_id: 240009 do
@@ -112,7 +112,7 @@ describe 'dashcards' do
       expect_new_page_load{f('a.discussions').click}
       expect_new_page_load{fln('discussion 1').click}
       get '/'
-      expect(f('a.discussions .unread_count')).to be_nil
+      expect(f("#content")).not_to contain_css('a.discussions .unread_count')
     end
 
     it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413 do
@@ -124,7 +124,7 @@ describe 'dashcards' do
       expect_new_page_load{f('a.assignments').click}
       expect_new_page_load{fln('assignment 1').click}
       get '/'
-      expect(f('a.assignments .unread_count')).to be_nil
+      expect(f("#content")).not_to contain_css('a.assignments .unread_count')
     end
 
     it 'should show files created notifications in dashcard', priority: "1", test_id: 238414 do
@@ -136,7 +136,7 @@ describe 'dashcards' do
       expect_new_page_load{f('a.files').click}
       expect_new_page_load{fln('example.pdf').click}
       get '/'
-      expect(f('a.files .unread_count')).to be_nil
+      expect(f("#content")).not_to contain_css('a.files .unread_count')
     end
 
     context "course name and code display" do
@@ -330,7 +330,7 @@ describe 'dashcards' do
       user_session(@student)
       get '/'
       # need not check for announcements, assignments and files as we have not created any
-      expect(f(".ic-DashboardCard__action-container .discussions")).to be_nil
+      expect(f("#content")).not_to contain_css(".ic-DashboardCard__action-container .discussions")
     end
   end
 

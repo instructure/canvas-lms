@@ -218,7 +218,7 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
     given {|user, session| self.assignment.user_can_read_grades?(user, session) }
@@ -483,8 +483,8 @@ class Submission < ActiveRecord::Base
   end
 
   def touch_graders
-    if self.assignment && self.user && self.assignment.context.is_a?(Course)
-      self.class.connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
+      if self.assignment && self.user && self.assignment.context.is_a?(Course)
         self.assignment.context.touch_admins_later
       end
     end
@@ -560,10 +560,16 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          canvadocs << a.create_canvadoc unless a.canvadoc
+          a.create_canvadoc! unless a.canvadoc
+          unless canvadocs.exists?(attachment: a)
+            canvadocs << a.canvadoc
+          end
         elsif a.crocodocable?
           submit_to_canvadocs = true
-          crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
+          a.create_crocodoc_document! unless a.crocodoc_document
+          unless crocodoc_documents.exists?(attachment: a)
+            crocodoc_documents << a.crocodoc_document
+          end
         end
 
         if submit_to_canvadocs
@@ -648,17 +654,19 @@ class Submission < ActiveRecord::Base
   end
 
   def submission_history
-    res = []
-    last_submitted_at = nil
-    self.versions.sort_by(&:created_at).reverse_each do |version|
-      model = version.model
-      if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
-        res << model
-        last_submitted_at = model.submitted_at
+    @submission_histories ||= begin
+      res = []
+      last_submitted_at = nil
+      self.versions.sort_by(&:created_at).reverse_each do |version|
+        model = version.model
+        if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
+          res << model
+          last_submitted_at = model.submitted_at
+        end
       end
+      res = self.versions.to_a[0,1].map(&:model) if res.empty?
+      res.sort_by{ |s| s.submitted_at || CanvasSort::First }
     end
-    res = self.versions.to_a[0,1].map(&:model) if res.empty?
-    res.sort_by{ |s| s.submitted_at || CanvasSort::First }
   end
 
   def check_url_changed
@@ -714,30 +722,55 @@ class Submission < ActiveRecord::Base
   # use this method to pre-load the versioned_attachments for a bunch of
   # submissions (avoids having O(N) attachment queries)
   # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions)
-    attachment_ids_by_submission = Hash[
-      submissions.map { |s|
-        attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-        attachment_ids << s.attachment_id if s.attachment_id
-        [s, attachment_ids]
-      }
-    ]
+  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+    # The index of the submission is considered part of the key for
+    # the hash that is built. This is needed for bulk loading
+    # submission_histories where multiple submission histories will
+    # look equal to the Hash key and the attachments for the last one
+    # will cancel out the former ones.
+    submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
+      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+      attachment_ids << s.attachment_id if s.attachment_id
+      [[s, index], attachment_ids]
+    end
+    attachment_ids_by_submission_and_index = Hash[submissions_with_index_and_attachment_ids]
 
-    bulk_attachment_ids = attachment_ids_by_submission.values.flatten
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
       attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                          .preload(:thumbnail, :media_object)
+                          .preload(preloads)
                           .group_by(&:id)
     end
 
-    submissions.each { |s|
-      s.versioned_attachments = attachments_by_id.values_at(
-        *attachment_ids_by_submission[s]
-      ).flatten
-    }
+    submissions.each_with_index do |s, index|
+      s.versioned_attachments =
+        attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
+    end
+  end
+
+  # Avoids having O(N) attachment queries.  Returns a hash of
+  # submission to attachements.
+  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
+    submissions = Array(submissions)
+    attachment_ids_by_submission =
+      Hash[submissions.map { |s| [s, s.attachment_associations.map(&:attachment_id)] }]
+    bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
+
+    if bulk_attachment_ids.empty?
+      attachments_by_id = {}
+    else
+      attachments_by_id = Attachment.where(id: bulk_attachment_ids)
+      attachments_by_id = attachments_by_id.preload(*preloads) unless preloads.nil?
+      attachments_by_id = attachments_by_id.group_by(&:id)
+    end
+
+    attachments_by_submission = submissions.map do |s|
+      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.uniq]
+    end
+    Hash[attachments_by_submission]
   end
 
   def <=>(other)
@@ -779,14 +812,14 @@ class Submission < ActiveRecord::Base
     }
 
     p.dispatch :submission_graded
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
-    p.to { student }
+    p.to { [student] + User.observing_students_in_course(student, assignment.context) }
     p.whenever { |submission|
       BroadcastPolicies::SubmissionPolicy.new(submission).
         should_dispatch_submission_grade_changed?
@@ -842,7 +875,7 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    return true unless self.grade_changed?
+    return true unless self.grade_changed? || self.excused_changed?
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -1029,7 +1062,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :recipient, :provisional_grade_id]
+                  :anonymous, :hidden, :provisional_grade_id]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
@@ -1374,6 +1407,26 @@ class Submission < ActiveRecord::Base
     !self.has_submission? && !self.graded?
   end
 
+  def visible_rubric_assessments_for(viewing_user)
+    return [] if self.assignment.muted? && !grants_right?(viewing_user, :read_grade)
+    filtered_assessments = self.rubric_assessments.select do |a|
+      a.grants_right?(viewing_user, :read)
+    end
+    filtered_assessments.sort_by do |a|
+      if a.assessment_type == 'grading'
+        [CanvasSort::First]
+      else
+        [CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)]
+      end
+    end
+  end
+
+  def rubric_association_with_assessing_user_id
+    self.assignment.rubric_association.tap do |association|
+      association.assessing_user_id = self.user_id if association
+    end
+  end
+
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(:context => context, :tag => "submissions_update")
     progress.process_job(self, :process_bulk_update, {}, context, section, grader, grade_data)
@@ -1389,7 +1442,7 @@ class Submission < ActiveRecord::Base
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
 
-      scope = assignment.students_with_visibility(context.students_visible_to(grader))
+      scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
       if section
         scope = scope.where(:enrollments => { :course_section_id => section })
       end

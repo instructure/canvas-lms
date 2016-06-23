@@ -2,16 +2,16 @@ define [
   'jquery'
   'underscore'
   'Backbone'
-  'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
   'compiled/views/ValidatedFormView'
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
   'compiled/views/editor/KeyboardShortcuts'
-  'compiled/tinymce'
-  'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+], ($, _, Backbone, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -74,6 +74,9 @@ define [
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
       json.SHOW =
         COURSE_ROLES: json.contextName == "courses"
+
+      json.assignment = json.assignment?.toView()
+
       json
 
     onUnload: (ev) =>
@@ -85,13 +88,16 @@ define [
         (ev || window.event).returnValue = warning
         return warning
 
+    # separated out so we can easily stub it
+    scrollSidebar: $.scrollSidebar
+
     # After the page loads, ensure the that wiki sidebar gets initialized
     # correctly.
     # @api custom backbone override
     afterRender: ->
       super
-      @$wikiPageBody.editorBox()
-      @initWikiSidebar()
+      RichContentEditor.initSidebar(show: @scrollSidebar)
+      RichContentEditor.loadNewEditor(@$wikiPageBody, { focus: true, manageParent: true })
 
       @checkUnsavedOnLeave = true
       $(window).on 'beforeunload', @onUnload
@@ -116,22 +122,13 @@ define [
 
       @$helpDialog.html((new KeyboardShortcuts()).render().$el)
 
-
-    # Initialize the wiki sidebar
-    # @api private
-    initWikiSidebar: ->
-      unless wikiSidebar.inited
-        $wikiPageBody = @$wikiPageBody
-        $ ->
-          wikiSidebar.init()
-          $.scrollSidebar()
-          wikiSidebar.attachToEditor($wikiPageBody).show()
-      $ ->
-        wikiSidebar.show()
+    destroyEditor: ->
+      RichContentEditor.destroyRCE(@$wikiPageBody)
+      @$el.remove()
 
     switchViews: (event) ->
       event?.preventDefault()
-      @$wikiPageBody.editorBox('toggle')
+      RichContentEditor.callOnRCE(@$wikiPageBody, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()
@@ -152,7 +149,8 @@ define [
       errors
 
     hasUnsavedChanges: ->
-      dirty = @$wikiPageBody.editorBox('exists?') && @$wikiPageBody.editorBox('is_dirty')
+      hasEditor = RichContentEditor.callOnRCE(@$wikiPageBody, 'exists?')
+      dirty =  hasEditor && RichContentEditor.callOnRCE(@$wikiPageBody, 'is_dirty')
       if not dirty and @toJSON().CAN.EDIT_TITLE
         dirty = (@model.get('title') || '') isnt (@getFormData().title || '')
       dirty
@@ -180,9 +178,20 @@ define [
       super(xhr)
 
     getFormData: ->
-      data = super
-      data.published = true if @shouldPublish
-      data
+      page_data = super
+
+      assign_data = page_data.assignment
+
+      if assign_data?.set_assignment is '1'
+        assign_data.only_visible_to_overrides = true
+        page_data.assignment = @model.get('assignment') or @model.createAssignment()
+        page_data.assignment.set(assign_data)
+      else
+        page_data.assignment = @model.createAssignment(set_assignment: '0')
+      page_data.set_assignment = page_data.assignment.get('set_assignment')
+
+      page_data.published = true if @shouldPublish
+      page_data
 
     cancel: (event) ->
       event?.preventDefault()

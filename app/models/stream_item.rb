@@ -20,7 +20,7 @@ require 'open_object'
 require 'set'
 
 class StreamItem < ActiveRecord::Base
-  serialize_utf8_safe :data
+  serialize :data
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
@@ -71,6 +71,11 @@ class StreamItem < ActiveRecord::Base
       users = data.delete('participants')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.instance_variable_set(:@participants, users)
+    end
+
+    # unnecessary after old stream items have expired
+    if res.is_a?(Conversation) && !data.has_key?('updated_at')
+      data['updated_at'] = Time.now.utc
     end
 
     unless CANVAS_RAILS4_0

@@ -2,7 +2,9 @@ define [
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
-], (Ember, startApp, fixtures) ->
+  'compiled/gradebook2/GradebookHelpers'
+  'jsx/gradebook/grid/constants'
+], (Ember, startApp, fixtures, GradebookHelpers, GradebookConstants) ->
 
   {run} = Ember
 
@@ -51,7 +53,7 @@ define [
 
   asyncTest "focusOut", ->
     expect(1)
-    stub = sinon.stub @component, 'boundSaveSuccess'
+    stub = @stub @component, 'boundSaveSuccess'
 
     requestStub = null
     run =>
@@ -61,7 +63,7 @@ define [
         content: 'less content now'
       )
 
-    sinon.stub(@component, 'ajax').returns requestStub
+    @stub(@component, 'ajax').returns requestStub
 
     run =>
       @component.set('value', 'such success')
@@ -69,3 +71,27 @@ define [
       start()
 
     ok stub.called
+
+  test "textAreaInput does not flash an error if note length is exactly the max allowed length", ->
+    note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH)
+    noteInputEvent = {target: {value: note}}
+    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
+    @component.textAreaInput(noteInputEvent)
+    ok maxLengthError.notCalled
+
+  test "textAreaInput flashes an error if note length is greater than the max allowed length", ->
+    note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
+    noteInputEvent = {target: {value: note}}
+    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
+    @component.textAreaInput(noteInputEvent)
+    ok maxLengthError.calledOnce
+
+  test "textAreaInput does not flash an error if there is already an error showing,
+  even if note length is greater than the max allowed length", ->
+    note = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
+    noteInputEvent = {target: {value: note}}
+    maxLengthError = @spy(GradebookHelpers, 'flashMaxLengthError')
+    findStub = @stub($, 'find')
+    findStub.withArgs('.ic-flash-error').returns(['a non-empty error array'])
+    @component.textAreaInput(noteInputEvent)
+    ok maxLengthError.notCalled

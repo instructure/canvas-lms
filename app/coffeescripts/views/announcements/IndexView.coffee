@@ -55,7 +55,7 @@ define [
         new UserSettingsView()
       @settingsView.toggle()
 
-    screenreaderSearchResultCount: _.debounce ->
+    screenreaderSearchResultCount: ->
       # if count < page limit and we've got the last page, then we've got all the results
       text = ''
 
@@ -65,8 +65,10 @@ define [
         text = I18n.t({one: 'One result displayed', other: '%{count} results displayed'}, {count: @resultCount})
       else
         text = I18n.t({one: 'One result', other: '%{count} results'}, {count: @resultCount})
-      @$('#searchResultCount').text(text)
-    , 1000
+
+      if @$('#searchResultCount').text() != text
+        @$('#searchResultCount').text(text)
+
 
     renderList: =>
       $list = @$('.discussionTopicIndexList').empty()
@@ -181,10 +183,8 @@ define [
       onlyGraded: -> @get 'assignment_id'
       onlyUnread: -> (@get('read_state') is 'unread') or @get('unread_count')
       searchTerm: (term) ->
-        words = term.match(/\w+/ig)
-        pattern = "(#{_.uniq(words).join('|')})"
-        regexp = new RegExp(pattern, "igm")
-
+        return unless term
+        regexp = new RegExp(term, "ig")
         @get('author')?.display_name?.match(regexp) ||
           @get('title').match(regexp) ||
           @summary().match(regexp)

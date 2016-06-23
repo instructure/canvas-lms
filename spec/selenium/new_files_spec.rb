@@ -31,7 +31,7 @@ describe "better_file_browsing" do
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
         wait_for_ajaximations
-        expect(fln("example.pdf")).not_to be_present
+        expect(f("#content")).not_to contain_link("example.pdf")
         expect(fln(file_rename_to)).to be_present
       end
       it "should delete file", priority: "1", test_id: 133128 do
@@ -231,6 +231,7 @@ describe "better_file_browsing" do
       end
 
       it "should move a file to a destination if contexts are different" do
+        skip_if_chrome('research')
         get "/courses/#{@course.id}/files"
         folder_name = "destination_folder"
         add_folder(folder_name)
@@ -239,6 +240,7 @@ describe "better_file_browsing" do
       end
 
       it "should move a file to a destination if the contexts are the same" do
+        skip_if_chrome('research')
         get "/files"
         folder_name = "destination_folder"
         add_folder(folder_name)
@@ -281,6 +283,27 @@ describe "better_file_browsing" do
     end
   end
 
+  context "File Preview" do
+    before(:each) do
+      course_with_teacher_logged_in
+      add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
+               @course, "a_file.txt")
+      add_file(fixture_file_upload('files/b_file.txt', 'text/plain'),
+               @course, "b_file.txt")
+      get "/courses/#{@course.id}/files"
+    end
+
+    it "should switch files in preview when clicking the arrows" do
+      fln("a_file.txt").click
+      ff('.ef-file-preview-container-arrow-link')[0].click
+      wait_for_ajaximations
+      expect(f('.ef-file-preview-header-filename').text).to eq('b_file.txt')
+      ff('.ef-file-preview-container-arrow-link')[1].click
+      wait_for_ajaximations
+      expect(f('.ef-file-preview-header-filename').text).to eq('a_file.txt')
+    end
+  end
+
   context "Usage Rights Dialog" do
     def set_usage_rights_in_modal(rights = 'creative_commons')
       set_value f('.UsageRightsSelectBox__select'), rights
@@ -297,7 +320,7 @@ describe "better_file_browsing" do
     end
 
     def react_modal_hidden
-      expect(f('.ReactModal__Content')).to eq(nil)
+      expect(f("body")).not_to contain_css('.ReactModal__Content')
     end
 
     before :each do
@@ -360,7 +383,7 @@ describe "better_file_browsing" do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
         set_value f('.UsageRightsSelectBox__select'), 'fair_use'
-        expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
+        expect(f('.UsageRightsSelectBox__container')).not_to contain_css('.UsageRightsSelectBox__creativeCommons')
       end
       it "should publish warning when usage rights is not selected", priority: "2", test_id: 133135 do
         expect(f('.icon-warning')).to be_present

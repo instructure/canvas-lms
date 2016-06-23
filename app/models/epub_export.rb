@@ -1,5 +1,6 @@
 class EpubExport < ActiveRecord::Base
   include CC::Exporter::Epub::Exportable
+  include LocaleSelection
   include Workflow
 
   strong_params
@@ -120,7 +121,9 @@ class EpubExport < ActiveRecord::Base
 
   def convert_to_epub
     begin
+      set_locale
       file_paths = super
+      I18n.locale = :en
     rescue => e
       mark_as_failed
       raise e
@@ -159,5 +162,15 @@ class EpubExport < ActiveRecord::Base
 
   def sort_by_content_type?
     self.course.organize_epub_by_content_type
+  end
+
+  private
+
+  def set_locale
+    I18n.locale = infer_locale(
+      context:      course,
+      user:         user,
+      root_account: course.root_account
+    )
   end
 end

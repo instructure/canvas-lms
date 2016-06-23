@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AssignmentOverride do
   before :once do
@@ -24,12 +24,15 @@ describe AssignmentOverride do
   end
 
   it "should soft-delete" do
-    @override = assignment_override_model
-    @override.stubs(:assignment_override_students).once.returns stub(:destroy_all)
-    @override.expects(:save!).once
+    @override = assignment_override_model(:course => @course)
+    @override_student = @override.assignment_override_students.build
+    @override_student.user = @student
+    @override_student.save!
+    
     @override.destroy
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override.workflow_state).to eq 'deleted'
+    expect(AssignmentOverrideStudent.where(:id => @override_student).first).to be_nil
   end
 
   it "should default set_type to adhoc" do
@@ -142,6 +145,14 @@ describe AssignmentOverride do
 
     def invalid_id_for_model(model)
       (model.maximum(:id) || 0) + 1
+    end
+
+    it "should propagate student errors" do
+      student = student_in_course(course: @override.assignment.context, name: 'Johnny Manziel').user
+      @override.assignment_override_students.create(user: student)
+      @override.assignment_override_students.build(user: student)
+      expect(@override).not_to be_valid
+      expect(@override.errors[:assignment_override_students].first.type).to eq :taken
     end
 
     it "should reject non-nil set_id with an adhoc set" do
@@ -723,6 +734,86 @@ describe AssignmentOverride do
       @override_student.save!
 
       expect(@override.set_not_empty?).to eq true
+    end
+  end
+
+  describe '.only_visible_to' do
+    specs_require_sharding
+
+    it "references tables correctly for an out of shard query" do
+      # the critical thing is visible_students_only is called the default shard,
+      # but the query executes on a different shard, but it should still be
+      # well-formed (especially with qualified names)
+      AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
+    end
+  end
+
+  describe '.visible_users_for' do
+    before do
+      @override = assignment_override_model
+      @overrides = [@override]
+    end
+    subject(:visible_users) do
+      AssignmentOverride.visible_users_for(@overrides, @student)
+    end
+
+    it 'returns empty if provided an empty collection' do
+      @overrides = []
+      expect(visible_users).to be_empty
+    end
+
+    it 'returns empty if not provided a user' do
+      @student = nil
+      expect(visible_users).to be_empty
+    end
+
+    it 'delegates to #visible_users_for when collection & user are present' do
+      @override.expects(:visible_users_for).once
+      visible_users
+    end
+  end
+
+  describe '#visible_users_for' do
+    before do
+      @options = {}
+    end
+    let(:override) do
+      assignment_override_model(@options)
+    end
+    subject(:visible_users) do
+      override.visible_users_for(@student)
+    end
+
+    context 'when associated with an assignment' do
+      before do
+        assignment_model
+        @options = {
+          assignment: @assignment
+        }
+      end
+
+      it 'delegates to UserSearch' do
+        UserSearch.expects(:scope_for).with(@assignment.context, @student,
+          force_users_visible_to: true
+        )
+        subject
+      end
+    end
+
+    context 'when associated with a quiz' do
+      before do
+        quiz_model
+        @options = {
+          quiz: @quiz
+        }
+      end
+
+      it 'delegates to UserSearch' do
+        UserSearch.expects(:scope_for).with(@quiz.context, @student,
+          force_users_visible_to: true
+        )
+        subject
+      end
     end
   end
 end

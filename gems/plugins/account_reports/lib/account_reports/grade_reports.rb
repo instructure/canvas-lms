@@ -94,52 +94,45 @@ module AccountReports
       students = add_course_sub_account_scope(students, 'c')
       students = add_term_scope(students, 'c')
 
-      file = AccountReports.generate_file(@account_report)
-      CSV.open(file, "w") do |csv|
-        headers = []
+      headers = []
+      headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+      headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+      headers << I18n.t('#account_reports.report_header_student_sis', 'student sis')
+      headers << I18n.t('#account_reports.report_header_course', 'course')
+      headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+      headers << I18n.t('#account_reports.report_header_course_sis', 'course sis')
+      headers << I18n.t('#account_reports.report_header_section', 'section')
+      headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+      headers << I18n.t('#account_reports.report_header_section_sis', 'section sis')
+      headers << I18n.t('#account_reports.report_header_term', 'term')
+      headers << I18n.t('#account_reports.report_header_term_id', 'term id')
+      headers << I18n.t('#account_reports.report_header_term_sis', 'term sis')
+      headers << I18n.t('#account_reports.report_header_current_score', 'current score')
+      headers << I18n.t('#account_reports.report_header_final_score', 'final score')
+      headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
 
-        headers << I18n.t('#account_reports.report_header_student_name', 'student name')
-        headers << I18n.t('#account_reports.report_header_student_id', 'student id')
-        headers << I18n.t('#account_reports.report_header_student_sis', 'student sis')
-        headers << I18n.t('#account_reports.report_header_course', 'course')
-        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-        headers << I18n.t('#account_reports.report_header_course_sis', 'course sis')
-        headers << I18n.t('#account_reports.report_header_section', 'section')
-        headers << I18n.t('#account_reports.report_header_section_id', 'section id')
-        headers << I18n.t('#account_reports.report_header_section_sis', 'section sis')
-        headers << I18n.t('#account_reports.report_header_term', 'term')
-        headers << I18n.t('#account_reports.report_header_term_id', 'term id')
-        headers << I18n.t('#account_reports.report_header_term_sis', 'term sis')
-        headers << I18n.t('#account_reports.report_header_current_score', 'current score')
-        headers << I18n.t('#account_reports.report_header_final_score', 'final score')
-        headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
+      write_report headers do |csv|
 
-        csv << headers
-
-        Shackles.activate(:slave) do
-          students.find_each do |student|
-            arr = []
-            arr << student["user_name"]
-            arr << student["user_id"]
-            arr << student["sis_user_id"]
-            arr << student["course_name"]
-            arr << student["course_id"]
-            arr << student["course_sis_id"]
-            arr << student["section_name"]
-            arr << student["course_section_id"]
-            arr << student["section_sis_id"]
-            arr << student["term_name"]
-            arr << student["term_id"]
-            arr << student["term_sis_id"]
-            arr << student["computed_current_score"]
-            arr << student["computed_final_score"]
-            arr << student["enroll_state"]
-            csv << arr
-          end
+        students.find_each do |student|
+          arr = []
+          arr << student["user_name"]
+          arr << student["user_id"]
+          arr << student["sis_user_id"]
+          arr << student["course_name"]
+          arr << student["course_id"]
+          arr << student["course_sis_id"]
+          arr << student["section_name"]
+          arr << student["course_section_id"]
+          arr << student["section_sis_id"]
+          arr << student["term_name"]
+          arr << student["term_id"]
+          arr << student["term_sis_id"]
+          arr << student["computed_current_score"]
+          arr << student["computed_final_score"]
+          arr << student["enroll_state"]
+          csv << arr
         end
       end
-
-      send_report(file)
     end
   end
 end

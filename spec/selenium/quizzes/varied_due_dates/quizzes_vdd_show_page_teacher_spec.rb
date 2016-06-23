@@ -37,8 +37,8 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
         include_text("#{format_time_for_view(@lock_at_b)}")
     end
 
-    it 'does not allow taking the quiz', priority: "1", test_id: 282394 do
-      expect(ff('.take_quiz_button').size).to eq(0)
+    it 'allows previewing the quiz', priority: "1", test_id: 282394 do
+      expect(ff('#preview_quiz_button').count).to eq 2
     end
   end
 end

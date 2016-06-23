@@ -74,10 +74,12 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('grade_change', {
         submission_id: @quiz_submission.submission.global_id,
+        assignment_id: @quiz_submission.submission.global_assignment_id,
         grade: @quiz_submission.submission.grade,
         old_grade: 0,
         grader_id: nil,
-        student_id: @quiz_submission.user.global_id
+        student_id: @quiz_submission.user.global_id,
+        user_id: @quiz_submission.user.global_id
       })
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, 0)
@@ -89,15 +91,43 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('grade_change', {
         submission_id: submission.global_id,
+        assignment_id: submission.global_assignment_id,
         grade: '10',
         old_grade: 0,
         grader_id: @teacher.global_id,
-        student_id: @student.global_id
+        student_id: @student.global_id,
+        user_id: @student.global_id
       })
 
       submission.grader = @teacher
       submission.grade = '10'
       Canvas::LiveEvents.grade_changed(submission, 0)
+    end
+
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      LiveEvents.expects(:post_event).with('grade_change',
+        has_entries(
+          assignment_id: submission.global_assignment_id,
+          user_id: @student.global_id
+        ))
+      Canvas::LiveEvents.grade_changed(submission, 0)
+    end
+  end
+
+  describe ".submission_updated" do
+    it "should include the user_id and assignment_id" do
+      course_with_student_submissions
+      submission = @course.assignments.first.submissions.first
+
+      LiveEvents.expects(:post_event).with('submission_updated',
+        has_entries(
+          user_id: @student.global_id,
+          assignment_id: submission.global_assignment_id
+        ))
+      Canvas::LiveEvents.submission_updated(submission)
     end
   end
 

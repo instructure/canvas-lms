@@ -6,8 +6,8 @@ module CC::Exporter::Epub
 
     def convert_to_epub
       exporter = CC::Exporter::Epub::Exporter.new(content_cartridge.open, sort_by_content_type?)
-      epub = CC::Exporter::Epub::Book.new(exporter.templates)
-      files_directory = CC::Exporter::Epub::FilesDirectory.new(exporter.unsupported_files)
+      epub = CC::Exporter::Epub::Book.new(exporter)
+      files_directory = CC::Exporter::Epub::FilesDirectory.new(exporter)
       [ epub.create, files_directory.create ].compact
     end
 

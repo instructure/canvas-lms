@@ -10,10 +10,9 @@ if (typeof ENV != 'undefined'){
     var contextTimezoneData = reqTz("./" + ENV.CONTEXT_TIMEZONE + ".js");
     tz.preload(contextTimezoneData, ENV.CONTEXT_TIMEZONE);
   }
-  if (ENV && ENV.LOCALE) {
-    var localeName = ENV.LOCALE.replace('-', '_');
-    var localeData = reqTz("./" + localeName + ".js");
-    tz.applyFeature(localeData, localeName);
+  if (ENV && ENV.BIGEASY_LOCALE) {
+    var localeData = reqTz("./" + ENV.BIGEASY_LOCALE + ".js");
+    tz.applyFeature(localeData, ENV.BIGEASY_LOCALE);
   }
 }
 module.exports = tz;

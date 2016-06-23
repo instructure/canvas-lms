@@ -464,6 +464,49 @@ describe CalendarEventsApiController, type: :request do
         end
       end
 
+      it "returns signups in multi-context appointment groups in the student's context" do
+        @course1 = course_with_teacher(:active_all => true).course
+        @course2 = course_with_teacher(:user => @teacher, :active_all => true).course
+        @student1 = student_in_course(:course => @course1, :active_all => true).user
+        @student2 = student_in_course(:course => @course2, :active_all => true).user
+        ag = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 1,
+                                      :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                            ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
+                                      :contexts => [@course1, @course2])
+        ag.appointments.first.reserve_for(@student1, @teacher)
+        ag.appointments.last.reserve_for(@student2, @teacher)
+        json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{@course1.asset_string}&context_codes[]=#{@course2.asset_string}", {
+          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+          :context_codes => [@course1.asset_string, @course2.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
+        expect(json.map { |event| [event['context_code'], event['child_events'][0]['user']['id']] }).to match_array(
+          [[@course1.asset_string, @student1.id], [@course2.asset_string, @student2.id]]
+        )
+      end
+
+      it "excludes signups in courses the teacher isn't enrolled in" do
+        te1 = course_with_teacher(:active_all => true)
+        te2 = course_with_teacher(:active_all => true)
+        student1 = student_in_course(:course => te1.course, :active_all => true).user
+        student2 = student_in_course(:course => te2.course, :active_all => true).user
+        ag = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 1,
+                                      :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                            ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
+                                      :contexts => [te1.course, te2.course])
+        ag.appointments.first.reserve_for(student1, te1.user)
+        ag.appointments.last.reserve_for(student2, te2.user)
+        json = api_call_as_user(te1.user, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{te1.course.asset_string}", {
+          :controller => 'calendar_events_api', :action => 'index', :format => 'json',
+          :context_codes => [te1.course.asset_string], :start_date => '2012-01-01', :end_date => '2012-01-31'})
+
+        a1 = json.detect { |h| h['id'] == ag.appointments.first.id }
+        expect(a1['child_events_count']).to eq 1
+        expect(a1['child_events'][0]['user']['id']).to eq student1.id
+
+        a2 = json.detect { |h| h['id'] == ag.appointments.last.id }
+        expect(a2['child_events_count']).to eq 0
+        expect(a2['child_events']).to be_empty
+      end
+
       context "reservations" do
         def prepare(as_student = false)
           Notification.create! :name => 'Appointment Canceled By User', :category => "TestImmediately"
@@ -804,6 +847,24 @@ describe CalendarEventsApiController, type: :request do
         expect(json['hidden']).to be_falsey
       end
 
+      describe "visibility" do
+        before(:once) do
+          student_in_course(:course => @course, :active_all => true)
+        end
+
+        it "should include children of hidden events for teachers" do
+          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{event.id}",
+                    {:controller => 'calendar_events_api', :action => 'show', :id => event.to_param, :format => 'json'})
+          expect(json['child_events'].map { |e| e['id'] }).to match_array(event.child_events.map(&:id))
+        end
+
+        it "should omit children of hidden events for students" do
+          json = api_call_as_user(@student, :get, "/api/v1/calendar_events/#{event.id}",
+                    {:controller => 'calendar_events_api', :action => 'show', :id => event.to_param, :format => 'json'})
+          expect(json['child_events']).to be_empty
+        end
+      end
+
       it "allows media comments in the event description" do
         event.description = '<a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>'
         event.save!
@@ -1007,11 +1068,10 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    context 'differentiated assignments on' do
+    context 'differentiated assignments' do
       before :once do
         Timecop.travel(Time.utc(2015)) do
           course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
-          @course.enable_feature!(:differentiated_assignments)
 
           @student_in_overriden_section = User.create
           @student_in_general_section = User.create
@@ -1811,4 +1871,50 @@ describe CalendarEventsApiController, type: :request do
     end
   end
 
+  context 'save_selected_contexts' do
+    it 'persists contexts' do
+      json = api_call(:post, "/api/v1/calendar_events/save_selected_contexts", {
+          controller: 'calendar_events_api',
+          action: 'save_selected_contexts',
+          format: 'json',
+          selected_contexts: ['course_1', 'course_2', 'course_3']
+      })
+      expect(@user.reload.preferences[:selected_calendar_contexts]).to eq(['course_1', 'course_2', 'course_3'])
+    end
+  end
+
+  context 'visible_contexts' do
+    it 'includes custom colors' do
+      @user.custom_colors[@course.asset_string] = '#0099ff'
+      @user.save!
+      puts @user.inspect
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['asset_string'] == @course.asset_string
+      end
+      expect(context['color']).to eq('#0099ff')
+    end
+
+    it 'includes whether the context has been selected' do
+      @user.preferences[:selected_calendar_contexts] = [@course.asset_string];
+      @user.save!
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['asset_string'] == @course.asset_string
+      end
+      expect(context['selected']).to be(true)
+    end
+  end
 end

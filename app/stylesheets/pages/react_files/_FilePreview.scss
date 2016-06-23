@@ -188,7 +188,7 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
   }
   i {
     width: auto;
-    font-size: 30px;
+    @include fontSize(30px);
     line-height: normal;
     color: $preview-font-color;
     &:before {

@@ -22,6 +22,8 @@ module Lti
     let(:root_account) { Account.new }
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account) }
+    let(:group_category) { course.group_categories.new(name: 'Category') }
+    let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
     let(:substitution_helper) { stub_everything }
@@ -206,8 +208,28 @@ module Lti
         expect(exp_hash[:test]).to eq Shard.current.id
       end
 
+      context 'context is a group' do
+        subject { described_class.new(root_account, group, controller, current_user: user) }
+
+        it 'has substitution for $Canvas.api.membershipServiceUrl when context is a group' do
+          exp_hash = { test: '$Canvas.api.membershipServiceUrl' }
+          group.stubs(:id).returns('1')
+          controller.stubs(:polymorphic_url).returns("/api/lti/groups/#{group.id}/membership_service")
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "/api/lti/groups/1/membership_service"
+        end
+      end
+
       context 'context is a course' do
         subject { described_class.new(root_account, course, controller, current_user: user) }
+
+        it 'has substitution for $Canvas.api.membershipServiceUrl when context is a course' do
+          exp_hash = { test: '$Canvas.api.membershipServiceUrl' }
+          course.stubs(:id).returns('1')
+          controller.stubs(:polymorphic_url).returns("/api/lti/courses/#{course.id}/membership_service")
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "/api/lti/courses/1/membership_service"
+        end
 
         it 'has substitution for $Canvas.course.id' do
           course.stubs(:id).returns(123)
@@ -354,11 +376,27 @@ module Lti
           expect(exp_hash[:test]).to eq 'Buy as many ducks as you can'
         end
 
-        it 'has substitution for $Canvas.assignment.pointsPossible' do
-          assignment.stubs(:points_possible).returns(10)
-          exp_hash = {test: '$Canvas.assignment.pointsPossible'}
-          subject.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq 10
+        describe "$Canvas.assignment.pointsPossible" do
+          it 'has substitution for $Canvas.assignment.pointsPossible' do
+            assignment.stubs(:points_possible).returns(10.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq 10
+          end
+
+          it 'does not round if not whole' do
+            assignment.stubs(:points_possible).returns(9.5)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9.5"
+          end
+
+          it 'rounds if whole' do
+            assignment.stubs(:points_possible).returns(9.0)
+            exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+            subject.expand_variables!(exp_hash)
+            expect(exp_hash[:test].to_s).to eq "9"
+          end
         end
 
         it 'has substitution for $Canvas.assignment.unlockAt' do

@@ -127,7 +127,7 @@ describe "content migrations", :non_parallel do
       expect(cancel_btn).to be_displayed
       cancel_btn.click
 
-      expect(f('#migrationFileUpload')).not_to be_present
+      expect(f("#content")).not_to contain_css('#migrationFileUpload')
     end
 
     it "should submit, queue and list migrations" do
@@ -346,10 +346,6 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    after :all do
-      truncate_all_tables
-    end
-
     it "should show warning before self-copy" do
       visit_page
       select_migration_type
@@ -408,7 +404,7 @@ describe "content migrations", :non_parallel do
       wait_for_ajaximations
 
       expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
-      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
+      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
 
       admin_logged_in
 
@@ -429,7 +425,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      expect(f("option[value=\"#{new_course.id}\"]")).to be_nil
+      expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
       f('#include_completed_courses').click
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
@@ -580,6 +576,26 @@ describe "content migrations", :non_parallel do
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       expect(opts["remove_dates"]).to eq '1'
     end
+
+    it "should retain announcement content settings after course copy", priority: "2", test_id: 403057 do
+      @announcement = @copy_from.announcements.create!(:title => 'Migration', :message => 'Here is my message')
+      @copy_from.lock_all_announcements = true
+      @copy_from.save!
+
+      visit_page
+      select_migration_type
+      wait_for_ajaximations
+      click_option('#courseSelect', @copy_from.id.to_s, :value)
+      ff('[name=selective_import]')[0].click
+      submit
+      run_jobs
+      keep_trying_until do
+        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
+      end
+      @course.reload
+      expect(@course.announcements.last.locked).to be_truthy
+      expect(@course.lock_all_announcements).to be_truthy
+    end
   end
 
   context "importing LTI content" do
@@ -707,7 +723,9 @@ describe "content migrations", :non_parallel do
     wait_for_ajaximations
 
     expect(submod.find_element(:css, ".module_options")).to be_displayed # should show the module option now
-    submod.find_element(:css, '.module_options input[value="separate"]').click # select to import submodules individually
+    # select to import submodules individually
+    radio_to_click = submod.find_element(:css, 'input[type="radio"][value="separate"]')
+    move_to_click("label[for=#{radio_to_click['id']}]")
 
     f(".selectContentDialog input[type=submit]").click
     wait_for_ajaximations

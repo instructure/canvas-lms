@@ -131,6 +131,20 @@ describe ContentMigration do
       expect(copy.lock_at.to_i).to eq att.lock_at.to_i
     end
 
+    it "should preserve terrible folder names on export/import" do
+      root = Folder.root_folders(@copy_from).first
+      sub = root.sub_folders.create!(:name => ".sadness", :context => @copy_from)
+
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => sub, :context => @copy_from)
+
+      run_export_and_import
+
+      copy_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(copy_att.filename).to eq "1.txt"
+      copy_sub = copy_att.folder
+      expect(copy_sub.name).to eq ".sadness"
+    end
+
     it "should preserve module items for hidden files on course copy" do
       att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.hidden = true

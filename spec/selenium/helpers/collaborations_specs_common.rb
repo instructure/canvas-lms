@@ -30,7 +30,7 @@ module CollaborationsSpecsCommon
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
     # Negative check
-    expect(f('.edit_collaboration_link')).to be_nil
+    expect(f("#content")).not_to contain_css('.edit_collaboration_link')
   end
 
   def be_deletable(type, title)
@@ -68,6 +68,7 @@ module CollaborationsSpecsCommon
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
+    wait_for_ajaximations
 
     fj('.available-users:visible a').click
     keep_trying_until { expect(ffj('.members-list li').length).to eq 1 }
@@ -81,7 +82,7 @@ module CollaborationsSpecsCommon
 
     f('.edit_collaboration_link').click
     wait_for_ajaximations
-    fj("#groups-filter-btn-#{@collaboration.id}:visible").click
+    move_to_click("label[for=groups-filter-btn-#{@collaboration.id}]")
     wait_for_ajaximations
 
     groups = ffj('.available-groups:visible a')
@@ -105,10 +106,11 @@ module CollaborationsSpecsCommon
     @student.update_attribute(:name, 'Don Draper')
 
     get "/courses/#{@course.id}/collaborations"
-
+    wait_for_ajaximations
     fj('.available-users:visible a').click
-    fj('.members-list a').click
-    expect(ffj('.members-list li').length).to eq 0
+    wait_for_ajaximations
+    f('.members-list a').click
+    expect(f('.members-list')).not_to contain_css('li')
   end
 
   def select_collaborators_and_look_for_start(type)
@@ -127,7 +129,7 @@ module CollaborationsSpecsCommon
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
     # Negative check
-    expect(f('.edit_collaboration_link')).to be_nil
+    expect(f("#content")).not_to contain_css('.edit_collaboration_link')
   end
 
   def no_delete_with_no_access
@@ -135,7 +137,7 @@ module CollaborationsSpecsCommon
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 
     # Negative check
-    expect(f('.delete_collaboration_link')).to be_nil
+    expect(f("#content")).not_to contain_css('.delete_collaboration_link')
   end
 
   def not_display_new_form_if_none_exist(type, title)
@@ -159,7 +161,7 @@ module CollaborationsSpecsCommon
     create_collaboration!(type, title)
     validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
     delete_collaboration(@collaboration, type)
-    expect(form_visible?).to be_truthy
+    expect_form_to_be_visible
   end
 
   def not_display_new_form_when_penultimate_collaboration_is_deleted(type, title)
@@ -178,9 +180,9 @@ module CollaborationsSpecsCommon
 
     validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
     delete_collaboration(@collaboration1, type)
-    expect(form_visible?).to be_falsey
+    expect_form_not_to_be_visible
     delete_collaboration(@collaboration2, type)
-    expect(form_visible?).to be_truthy
+    expect_form_to_be_visible
   end
 
   def leave_new_form_open_when_last_is_deleted(type, title)
@@ -189,6 +191,6 @@ module CollaborationsSpecsCommon
                                        /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
     f('.add_collaboration_link').click
     delete_collaboration(@collaboration, type)
-    expect(form_visible?).to be_truthy
+    expect_form_to_be_visible
   end
 end

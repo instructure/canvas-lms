@@ -9,6 +9,8 @@
       <%= accessible_message_icon_text(notification_icon_type(notification)) %>
     </span>
   </div>
+
+<div class="notification_account_content">
   <div class="ic-notification__content">
     <div class="ic-notification__message">
       <h4 class="ic-notification__title">
@@ -27,4 +29,9 @@
       </a>
     </div>
   </div>
+  <span class="notification_account_content_text">
+    <%= t("This is a message for *%{name}*", name: notification.account.name, wrapper: '<b>\1</b>') %>
+  </span>
+</div>
+
 </div>

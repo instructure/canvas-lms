@@ -19,16 +19,15 @@
 define([
   'jquery',
   'str/htmlEscape',
-  'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/RceCommandShim',
   'media_comments'
-], function($, htmlEscape, callOnRCE) {
+], function($, htmlEscape, RceCommandShim) {
 
   var mediaEditorLoader = {
-    callOnRCE: callOnRCE,
     insertCode: function(ed, mediaCommentId, mediaType){
       var $editor = $("#" + ed.id);
       var linkCode = this.makeLinkHtml(mediaCommentId, mediaType)
-      this.callOnRCE($editor, 'insert_code', linkCode);
+      RceCommandShim.send($editor, 'insert_code', linkCode);
     },
 
     makeLinkHtml: function(mediaCommentId, mediaType) {

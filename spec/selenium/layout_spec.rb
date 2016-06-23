@@ -10,6 +10,7 @@ describe "layout" do
   end
 
   it "should auto-scroll the sidebar when $.scrollSidebar is called" do
+    skip if Account.default.feature_enabled?(:use_new_styles)
     exec_cs  <<-CS
       $("#content").height(10000)
       $("#right-side").height(5000)

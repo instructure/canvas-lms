@@ -838,15 +838,23 @@ describe "security" do
         add_permission :manage_students
 
         get "/courses/#{@course.id}/users"
+        assert_status(401)
+
+        get "/courses/#{@course.id}/groups"
+        assert_status(401)
+
+        add_permission :read_roster
+
+        get "/courses/#{@course.id}/users"
         expect(response).to be_success
-        expect(response.body).not_to match /View User Groups/
+        expect(response.body).to match /View User Groups/
         expect(response.body).to match /View Prior Enrollments/
 
         get "/courses/#{@course.id}/users/prior"
         expect(response).to be_success
 
         get "/courses/#{@course.id}/groups"
-        assert_status(401)
+        expect(response).to be_success
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_success
@@ -991,7 +999,14 @@ describe "security" do
         expect(response.body).to match /Copy this Course/
         expect(response.body).not_to match /Import Content into this Course/
         expect(response.body).to match /Export Course Content/
+        expect(response.body).to_not match /Delete this Course/
+
+        add_permission :change_course_state
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_success
         expect(response.body).to match /Delete this Course/
+
         html = Nokogiri::HTML(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
         expect(html.css('#course_enrollment_term_id')).not_to be_empty

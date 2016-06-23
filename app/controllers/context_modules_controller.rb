@@ -360,6 +360,9 @@ class ContextModulesController < ApplicationController
       prms = params[:item]
       prms[:section_restrict] = params[:section_restrict]
       @tag = @module.add_item(prms)
+      unless @tag.valid?
+        return render :json => @tag.errors, :status => :bad_request
+      end
       json = @tag.as_json
       json['content_tag'].merge!(
           publishable: module_item_publishable?(@tag),
@@ -389,8 +392,9 @@ class ContextModulesController < ApplicationController
       @tag.url = params[:content_tag][:url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
-      @tag.save
-
+      unless @tag.save
+        return render :json => @tag.errors, :status => :bad_request
+      end
 
       if params[:section_restrict_any]
         ContentTagSectionRestriction.where(:content_tag_id => @tag.id).delete_all
@@ -403,7 +407,6 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-
 
       @tag.update_asset_name! if params[:content_tag][:title]
       render :json => @tag

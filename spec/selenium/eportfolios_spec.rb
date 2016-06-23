@@ -81,31 +81,22 @@ describe "eportfolios" do
     it "should edit ePortfolio settings", priority: "2", test_id: 220021 do
       get "/eportfolios/#{@eportfolio.id}"
       f('#section_list_manage .portfolio_settings_link').click
-      replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name"
+      replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name1"
       f('#edit_eportfolio_form #eportfolio_public').click
       submit_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
-      expect(@eportfolio.name).to eq "new ePortfolio name"
+      expect(@eportfolio.name).to include_text("new ePortfolio name1")
     end
 
     it "should validate time stamp on ePortfolio", priority: "2" do
       # Freezes time to 2 days from today.
-      old_time = 2.days.from_now.utc.beginning_of_hour
-      Timecop.freeze(old_time) do
-        current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase
+      new_time = 2.days.from_now.utc.beginning_of_hour
+      Timecop.freeze(new_time) do
+        current_time = format_time_for_view(new_time)
         # Saves an entry to initiate an update.
         @eportfolio_entry.save!
         # Checks for correct time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-
-        # Freezes time to 3 days from previous date.
-        new_time = Timecop.freeze(Date.today + 3).utc
-        current_time = new_time.strftime('%b %-d at %-l') << new_time.strftime('%p').downcase
-        # Saves to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time, then unfreezes time.
         get "/dashboard/eportfolios"
         expect(f(".updated_at")).to include_text(current_time)
       end
@@ -156,11 +147,9 @@ describe "eportfolios" do
         f("#delete_eportfolio_form").displayed?
       }
       submit_form("#delete_eportfolio_form")
-      fj("#wrapper-container .eportfolios").click
-      keep_trying_until {
-        expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
-        expect(f("#portfolio_#{@eportfolio.id}")).to be_nil
-      }
+      f("#wrapper-container .eportfolios").click
+      expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
+      expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq 'deleted'
     end
 
@@ -213,7 +202,8 @@ describe "eportfolios file upload" do
     wait_for_ajaximations
     driver.execute_script "$('.add_file_link').click()"
     fj(".file_upload:visible").send_keys(fullpath)
-    fj(".upload_file_button").click
+    wait_for_ajaximations
+    f(".upload_file_button").click
     wait_for_ajaximations
     submit_form(".form_content")
     wait_for_ajax_requests

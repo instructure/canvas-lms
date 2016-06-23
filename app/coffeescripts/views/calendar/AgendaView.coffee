@@ -10,6 +10,7 @@ define [
   'compiled/collections/CalendarEventCollection'
   'compiled/calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
+  'compiled/calendar/fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
   'vendor/jquery.ba-tinypubsub'
 ], (I18n, $, moment, tz, fcUtil, calendarEventFilter, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 
@@ -61,7 +62,7 @@ define [
     _fetch: (start, callback) ->
       end = fcUtil.clone(start).year(3000)
       @lastRequestID = $.guid++
-      @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
+      @dataSource.getEvents start, end, @contexts, callback, undefined, {singlePage: true, requestID: @lastRequestID}
 
     refetch: =>
       return unless @startDate

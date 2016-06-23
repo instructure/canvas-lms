@@ -83,8 +83,8 @@ define([
       return (
         <div className="canvasModal">
           <ReactModal
-                 ariaHideApp={this.state.modalIsOpen}
-                 isOpen={this.state.modalIsOpen}
+                 ariaHideApp={!!this.state.modalIsOpen}
+                 isOpen={!!this.state.modalIsOpen}
                  onRequestClose={this.closeModal}
                  className={this.props.className}
                  overlayClassName={this.props.overlayClassName}

@@ -66,6 +66,7 @@ module LoginAndSessionMethods
     password_element = f('#pseudonym_session_password')
     password_element.send_keys(password)
     password_element.submit
+    wait_for_ajaximations
   end
 
   # don't use this unless you are actually testing the login/logout

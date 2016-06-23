@@ -1,9 +1,7 @@
 class DiscussionTopic::ScopedToUser < ScopeFilter
   def scope
     concat_scope do
-      if context.feature_enabled?(:differentiated_assignments)
-        scope_for_differentiated_assignments(@relation)
-      end
+      scope_for_differentiated_assignments(@relation)
     end
   end
 

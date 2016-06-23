@@ -80,5 +80,13 @@ describe Canvas::PasswordPolicy do
       @pseudonym.password = @pseudonym.password_confirmation = "dcba1234"
       expect(@pseudonym).to be_valid
     end
+
+    it "should reject passwords longer than 255 characters" do
+      pseudonym_with_policy({})
+      @pseudonym.password = @pseudonym.password_confirmation = "a" * 255
+      expect(@pseudonym).to be_valid
+      @pseudonym.password = @pseudonym.password_confirmation = "a" * 256
+      expect(@pseudonym).not_to be_valid
+    end
   end
 end

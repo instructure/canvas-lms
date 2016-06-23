@@ -25,11 +25,13 @@ define([
 ], function(I18n, $) {
 
   var $message_students_dialog = $("#message_students_dialog");
+  var $sendButton = $message_students_dialog.find(".send_button");
   var currentSettings = {};
   var checkSendable = function() {
-    $message_students_dialog.find(".send_button").attr("disabled",
-        $message_students_dialog.find("#body").val().length == 0 ||
-        $message_students_dialog.find(".student:not(.blank):visible").length == 0);
+    disableSend(
+      $message_students_dialog.find("#body").val().length == 0 ||
+      $message_students_dialog.find(".student:not(.blank):visible").length == 0
+    );
   }
 
   window.messageStudents = function(settings) {
@@ -97,6 +99,13 @@ define([
   };
 
   $(document).ready(function() {
+    $message_students_dialog.find("button").click(function(e) {
+      var btn = $(e.target);
+      if (btn.hasClass("disabled")) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
     $("#message_assignment_recipients").formSubmit({
       processData: function(data) {
         var ids = [];
@@ -108,15 +117,18 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
-        $(this).find(".button-container button").attr('disabled', true).filter(".send_button").text(I18n.t("buttons.sending_message", "Sending Message..."));
+        disableButtons(true)
+        $(this).find(".send_button").text(I18n.t("Sending Message..."));
       },
       success: function(data) {
         $.flashMessage(I18n.t("Message sent!"));
-        $(this).find(".button-container button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message", "Send Message"));
+        disableButtons(false);
+        $(this).find(".send_button").text(I18n.t("Send Message"));
         $("#message_students_dialog").dialog('close');
       },
       error: function(data) {
-        $(this).find(".button-container button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message_failed", "Sending Message Failed, please try again"));
+        disableButtons(false);
+        $(this).find(".send_button").text(I18n.t("Sending Message Failed, please try again"));
       }
     });
 
@@ -148,7 +160,7 @@ define([
       $message_students_dialog.find(".cutoff_holder").showIf(option.cutoff);
 
       $message_students_dialog.find(".student_list").toggleClass('show_score', !!(option.cutoff || option.score));
-      $message_students_dialog.find("button").attr('disabled', student_ids.length == 0);
+      disableButtons(student_ids.length === 0);
 
       var student_ids_hash = {};
       for(var idx in student_ids) {
@@ -181,6 +193,19 @@ define([
       .bind('change blur keyup', checkSendable);
     $message_students_dialog.find("#body").bind('change blur keyup', checkSendable);
   });
+
+  function disableButtons(disabled, buttons) {
+    if (buttons == null) {
+      buttons = $message_students_dialog.find("button");
+    }
+    buttons
+      .toggleClass("disabled", disabled)
+      .attr("aria-disabled", disabled);
+  }
+
+  function disableSend(disabled) {
+    disableButtons(disabled, $sendButton);
+  }
 
   return messageStudents;
 });

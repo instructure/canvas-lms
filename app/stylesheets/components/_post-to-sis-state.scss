@@ -6,6 +6,11 @@
   line-height: 17px;
   cursor: pointer;
 
+  input {
+    width: 16px;
+    height: 20px;
+  }
+
   &.enabled {
     font-weight: bold;
     @if $use_high_contrast { color: darken($ic-color-success, 4%); }

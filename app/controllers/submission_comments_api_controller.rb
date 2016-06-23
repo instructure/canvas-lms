@@ -36,7 +36,7 @@ class SubmissionCommentsApiController < ApplicationController
   # submission API to attach it to a comment
   def create_file
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    @user = api_find(@context.students_visible_to(@current_user),
+    @user = api_find(@context.students_visible_to(@current_user, include: :inactive),
                      params[:user_id])
 
     if authorized_action?(@assignment, @current_user,

@@ -63,35 +63,35 @@ describe Course do
       @course.reload
 
       # discussion topic tests
-      expect(@course.discussion_topics.length).to eql(3)
+      expect(@course.discussion_topics.length).to eq(3)
       migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
       added_migration_ids = @course.discussion_topics.map(&:migration_id).uniq.sort
-      expect(added_migration_ids).to eql(migration_ids)
+      expect(added_migration_ids).to eq(migration_ids)
       topic = @course.discussion_topics.where(migration_id: "1864019689002").first
       expect(topic).not_to be_nil
-      expect(topic.title).to eql("Post here for group events, etc.")
+      expect(topic.title).to eq("Post here for group events, etc.")
       expect(topic.discussion_entries).to be_empty
       topic = @course.discussion_topics.where(migration_id: "1865116155002").first
       expect(topic).not_to be_nil
       expect(topic.assignment).not_to be_nil
 
       # quizzes
-      expect(@course.quizzes.length).to eql(1)
+      expect(@course.quizzes.length).to eq(1)
       quiz = @course.quizzes.first
       quiz.migration_id = '1865116175002'
-      expect(quiz.title).to eql("Orientation Quiz")
+      expect(quiz.title).to eq("Orientation Quiz")
 
       # wiki pages tests
       migration_ids = ["1865116206002", "1865116207002"].sort
       added_migration_ids = @course.wiki.wiki_pages.map(&:migration_id).uniq.sort
-      expect(added_migration_ids).to eql(migration_ids)
-      expect(@course.wiki.wiki_pages.length).to eql(migration_ids.length)
+      expect(added_migration_ids).to eq(migration_ids)
+      expect(@course.wiki.wiki_pages.length).to eq(migration_ids.length)
       # front page
       page = @course.wiki.front_page
       expect(page).not_to be_nil
-      expect(page.migration_id).to eql("1865116206002")
+      expect(page.migration_id).to eq("1865116206002")
       expect(page.body).not_to be_nil
-      expect(page.body.scan(/<li>/).length).to eql(4)
+      expect(page.body.scan(/<li>/).length).to eq(4)
       expect(page.body).to match(/Orientation/)
       expect(page.body).to match(/Orientation Quiz/)
       file = @course.attachments.where(migration_id: "1865116527002").first
@@ -103,11 +103,11 @@ describe Course do
       @course.reload
       expect(@course.assignments.length).to eq 4
       expect(@course.assignments.map(&:migration_id).sort).to(
-        eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort))
+        eq(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort))
       # assignment with due date
       assignment = @course.assignments.where(migration_id: "1865116014002").first
       expect(assignment).not_to be_nil
-      expect(assignment.title).to eql("Concert Review Assignment")
+      expect(assignment.title).to eq("Concert Review Assignment")
       expect(assignment.description).to match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
       # The old due date (Fri Mar 27 23:55:00 -0600 2009) should have been adjusted to new time frame
       expect(assignment.due_at.year).to eq 2011
@@ -115,19 +115,19 @@ describe Course do
       # discussion topic assignment
       assignment = @course.assignments.where(migration_id: "1865116155002").first
       expect(assignment).not_to be_nil
-      expect(assignment.title).to eql("Introduce yourself!")
-      expect(assignment.points_possible).to eql(10.0)
+      expect(assignment.title).to eq("Introduce yourself!")
+      expect(assignment.points_possible).to eq(10.0)
       expect(assignment.discussion_topic).not_to be_nil
       # assignment with rubric
       assignment = @course.assignments.where(migration_id: "4469882339231").first
       expect(assignment).not_to be_nil
-      expect(assignment.title).to eql("Rubric assignment")
+      expect(assignment.title).to eq("Rubric assignment")
       expect(assignment.rubric).not_to be_nil
-      expect(assignment.rubric.migration_id).to eql("4469882249231")
+      expect(assignment.rubric.migration_id).to eq("4469882249231")
       # assignment with file
       assignment = @course.assignments.where(migration_id: "4407365899221").first
       expect(assignment).not_to be_nil
-      expect(assignment.title).to eql("new assignment")
+      expect(assignment.title).to eq("new assignment")
       file = @course.attachments.where(migration_id: "1865116527002").first
       expect(file).not_to be_nil
       expect(assignment.description).to match(Regexp.new("/files/#{file.id}/download"))
@@ -136,61 +136,61 @@ describe Course do
       expect(@course.calendar_events).to be_empty
 
       # rubrics
-      expect(@course.rubrics.length).to eql(1)
+      expect(@course.rubrics.length).to eq(1)
       rubric = @course.rubrics.first
-      expect(rubric.data.length).to eql(3)
+      expect(rubric.data.length).to eq(3)
       # Spelling
       criterion = rubric.data[0].with_indifferent_access
-      expect(criterion["description"]).to eql("Spelling")
-      expect(criterion["points"]).to eql(15.0)
-      expect(criterion["ratings"].length).to eql(3)
-      expect(criterion["ratings"][0]["points"]).to eql(15.0)
-      expect(criterion["ratings"][0]["description"]).to eql("Exceptional - fff")
-      expect(criterion["ratings"][1]["points"]).to eql(10.0)
-      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations - asdf")
-      expect(criterion["ratings"][2]["points"]).to eql(5.0)
-      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - rubric entry text")
+      expect(criterion["description"]).to eq("Spelling")
+      expect(criterion["points"]).to eq(15.0)
+      expect(criterion["ratings"].length).to eq(3)
+      expect(criterion["ratings"][0]["points"]).to eq(15.0)
+      expect(criterion["ratings"][0]["description"]).to eq("Exceptional - fff")
+      expect(criterion["ratings"][1]["points"]).to eq(10.0)
+      expect(criterion["ratings"][1]["description"]).to eq("Meet Expectations - asdf")
+      expect(criterion["ratings"][2]["points"]).to eq(5.0)
+      expect(criterion["ratings"][2]["description"]).to eq("Need Improvement - rubric entry text")
 
       # Grammar
       criterion = rubric.data[1]
-      expect(criterion["description"]).to eql("Grammar")
-      expect(criterion["points"]).to eql(15.0)
-      expect(criterion["ratings"].length).to eql(3)
-      expect(criterion["ratings"][0]["points"]).to eql(15.0)
-      expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
-      expect(criterion["ratings"][1]["points"]).to eql(10.0)
-      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
-      expect(criterion["ratings"][2]["points"]).to eql(5.0)
-      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - you smell")
+      expect(criterion["description"]).to eq("Grammar")
+      expect(criterion["points"]).to eq(15.0)
+      expect(criterion["ratings"].length).to eq(3)
+      expect(criterion["ratings"][0]["points"]).to eq(15.0)
+      expect(criterion["ratings"][0]["description"]).to eq("Exceptional")
+      expect(criterion["ratings"][1]["points"]).to eq(10.0)
+      expect(criterion["ratings"][1]["description"]).to eq("Meet Expectations")
+      expect(criterion["ratings"][2]["points"]).to eq(5.0)
+      expect(criterion["ratings"][2]["description"]).to eq("Need Improvement - you smell")
 
       # Style
       criterion = rubric.data[2]
-      expect(criterion["description"]).to eql("Style")
-      expect(criterion["points"]).to eql(15.0)
-      expect(criterion["ratings"].length).to eql(3)
-      expect(criterion["ratings"][0]["points"]).to eql(15.0)
-      expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
-      expect(criterion["ratings"][1]["points"]).to eql(10.0)
-      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
-      expect(criterion["ratings"][2]["points"]).to eql(5.0)
-      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement")
+      expect(criterion["description"]).to eq("Style")
+      expect(criterion["points"]).to eq(15.0)
+      expect(criterion["ratings"].length).to eq(3)
+      expect(criterion["ratings"][0]["points"]).to eq(15.0)
+      expect(criterion["ratings"][0]["description"]).to eq("Exceptional")
+      expect(criterion["ratings"][1]["points"]).to eq(10.0)
+      expect(criterion["ratings"][1]["description"]).to eq("Meet Expectations")
+      expect(criterion["ratings"][2]["points"]).to eq(5.0)
+      expect(criterion["ratings"][2]["description"]).to eq("Need Improvement")
 
       # groups
-      expect(@course.groups.length).to eql(2)
+      expect(@course.groups.length).to eq(2)
 
       # files
-      expect(@course.attachments.length).to eql(4)
+      expect(@course.attachments.length).to eq(4)
       @course.attachments.each do |f|
         expect(File).to be_exist(f.full_filename)
       end
       file = @course.attachments.where(migration_id: "1865116044002").first
       expect(file).not_to be_nil
-      expect(file.filename).to eql("theatre_example.htm")
-      expect(file.folder.full_name).to eql("course files/Writing Assignments/Examples")
+      expect(file.filename).to eq("theatre_example.htm")
+      expect(file.folder.full_name).to eq("course files/Writing Assignments/Examples")
       file = @course.attachments.where(migration_id: "1864019880002").first
       expect(file).not_to be_nil
-      expect(file.filename).to eql("dropbox.zip")
-      expect(file.folder.full_name).to eql("course files/Course Content/Orientation/WebCT specific and old stuff")
+      expect(file.filename).to eq("dropbox.zip")
+      expect(file.folder.full_name).to eq("course files/Course Content/Orientation/WebCT specific and old stuff")
     end
 
     def setup_import(import_course, filename, params, copy_options={})

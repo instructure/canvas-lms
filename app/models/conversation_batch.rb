@@ -4,8 +4,7 @@ class ConversationBatch < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :root_conversation_message, :class_name => 'ConversationMessage'
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
+  belongs_to :context, polymorphic: [:account, :course, { context_group: 'Group' }]
 
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery

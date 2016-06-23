@@ -44,22 +44,20 @@ module ContextModulesCommon
   end
 
   def validate_context_module_status_icon(module_id, icon_expected)
-    visible_icon = fj("#context_module_#{module_id} .completion_status i:visible")
     if icon_expected == 'no-icon'
-      expect(visible_icon).to eq nil
+      expect(fj("#context_module_#{module_id}")).not_to contain_jqcss(".completion_status i:visible")
     else
-      expect(visible_icon).not_to eq nil
+      expect(fj("#context_module_#{module_id} .completion_status i:visible")).to be_present
       context_modules_status = f("#context_module_#{module_id} .completion_status")
       expect(context_modules_status.find_element(:css, '.' + icon_expected)).to be_displayed
     end
   end
 
   def validate_context_module_item_icon(module_item_id, icon_expected)
-    item_icon = fj("#context_module_item_#{module_item_id} .module-item-status-icon i:visible")
     if icon_expected == 'no-icon'
-      expect(item_icon).to eq nil
+      expect(f("#context_module_item_#{module_item_id}")).not_to contain_jqcss(".module-item-status-icon i:visible")
     else
-      expect(item_icon).not_to eq nil
+      expect(fj("#context_module_item_#{module_item_id} .module-item-status-icon i:visible")).to be_present
       item_status = f("#context_module_item_#{module_item_id} .module-item-status-icon")
       expect(item_status.find_element(:css, '.' + icon_expected)).to be_displayed
     end
@@ -186,5 +184,25 @@ module ContextModulesCommon
     # context_modules.js has some setTimeout(..., 1000) calls
     # before it adds click handlers and drag/drop
     sleep 2
+  end
+
+   def verify_edit_item_form
+     f('.context_module_item .al-trigger').click
+     wait_for_ajaximations
+     f('.edit_item_link').click
+     wait_for_ajaximations
+     expect(f('#edit_item_form')).to be_displayed
+     expect(f('#content_tag_title')).to be_displayed
+     expect(f('#content_tag_indent_select')).to be_displayed
+   end
+
+  def lock_check_click(form)
+    move_to_click('label[for=unlock_module_at]')
+  end
+
+  # so terrible
+  def get(url)
+    super
+    wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
   end
 end

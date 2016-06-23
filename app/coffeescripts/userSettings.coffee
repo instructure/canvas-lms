@@ -18,8 +18,6 @@
 
 define [
   'underscore'
-
-  # used for $.capitalize
   'jquery'
   'jquery.instructure_misc_helpers'
 ], (_, $) ->

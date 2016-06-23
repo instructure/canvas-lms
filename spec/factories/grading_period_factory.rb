@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -64,3 +64,13 @@ def create_grading_periods_for(context, opts={})
   end
 end
 
+module Factories
+  class GradingPeriodGroupHelper
+    def create_for_enrollment_term(term)
+      grading_period_group = GradingPeriodGroup.new
+      grading_period_group.enrollment_terms << term
+      grading_period_group.save!
+      grading_period_group
+    end
+  end
+end

@@ -16,17 +16,11 @@ describe 'publishing a quiz' do
     context 'when on the quiz show page' do
       before(:each) do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        f('#quiz-publish-link').click
-      end
-
-      context 'before the ajax calls finish' do
-        it 'temporarily changes the button text to |Publishing...|', priority: "1", test_id: 398935 do
-          expect(fj('.publish-text', '#quiz-publish-link').text).to include_text 'Publishing...'
-        end
       end
 
       context 'after the ajax calls finish' do
         before(:each) do
+          f('#quiz-publish-link').click
           wait_for_ajaximations
           wait_for_quiz_publish_button_to_populate
         end
@@ -37,16 +31,17 @@ describe 'publishing a quiz' do
         end
 
         it 'changes the button text on hover to |Unpublish|', priority: "1", test_id: 398936 do
+          driver.mouse.move_to f('#quiz-publish-link')
           expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Unpublish'
         end
 
         it 'removes the \'This quiz is unpublished\' message', priority: "1", test_id: 398937 do
-          expect(fj('.unpublished_warning', '.alert')).to be_nil
+          expect(f("#content")).not_to contain_css('.alert .unpublished_warning')
         end
 
         it 'adds links to the right sidebar', priority: "1", test_id: 398938 do
           links_text = []
-          ffj('li', 'ul.page-action-list').each do |link|
+          ff('ul.page-action-list li').each do |link|
             # also remove the trademark (TM) unicode character
             links_text << link.text.split("\n")[0].delete("^\u{0000}-\u{007F}")
           end

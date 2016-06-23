@@ -13,7 +13,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
 %>
 
 <% if presenter.any_assignments? %>
-  <h2><%= t('headings.to_do', %{To Do}) %></h2>
+  <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
   <ul class="right-side-list to-do-list">
     <% presenter.needs_grading.each_with_index do |assignment, i| %>
       <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
@@ -36,7 +36,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
             <% end %>
             <p>
               <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: assignment.points_possible) %>
+                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
                 &bullet;
               <% end %>
               <%= assignment.formatted_due_date %>
@@ -63,7 +63,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
             <% end %>
             <p>
               <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: assignment.points_possible) %>
+                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
                 &bullet;
               <% end %>
               <%= assignment.formatted_due_date %>
@@ -90,7 +90,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
             <% end %>
             <p>
               <% if assignment.points_possible %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: assignment.points_possible) %>
+                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
                 &bullet;
               <% end %>
               <%= assignment.formatted_due_date %>
@@ -119,7 +119,7 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
             <% end %>
             <p>
               <% if assignment.try(:points_possible) %>
-                <%= t({one: '1 point', other: '%{count} points'}, count: assignment.points_possible) %>
+                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
                 &bullet;
               <% end %>
               <%= assignment.formatted_peer_review_due_date %>

@@ -40,16 +40,16 @@ define(function(require) {
 
         maxWidth: 150,
 
-        // animeDuration: 500
+        useAnswerBuckets: false
       };
     },
 
-    buildChartParams: function(answers) {
+    buildParams: function(answers) {
       return answers.map(function(answer) {
         return {
           id: ''+answer.id,
           count: answer.responses,
-          correct: answer.correct,
+          correct: answer.correct || answer.full_credit,
           special: SPECIAL_DATUM_IDS.indexOf(answer.id) > -1,
           answer: answer
         };
@@ -57,17 +57,18 @@ define(function(require) {
     },
 
     render: function() {
-      var data = this.buildChartParams(this.props.answers);
+      var data = this.buildParams(this.props.answers);
       var highest = d3.max(_.map(data, 'count'));
       var xScale = d3.scale.linear()
         .domain([ highest, 0 ])
         .range([ this.props.maxWidth, 0 ]);
       var visibilityThreshold = Math.max(this.props.visibilityThreshold, xScale(highest) / 100.0);
-      var graphParams = {
+      var globalParams = {
         xScale: xScale,
         visibilityThreshold: visibilityThreshold,
         maxWidth: this.props.maxWidth,
-        barHeight: this.props.barHeight
+        barHeight: this.props.barHeight,
+        useAnswerBuckets: this.props.useAnswerBuckets
       };
 
       return (
@@ -77,17 +78,18 @@ define(function(require) {
           </caption>
           {this.renderTableHeader()}
           <tbody>
-            {this.renderTableRows(data, graphParams)}
+            {this.renderTableRows(data, globalParams)}
           </tbody>
         </table>
       );
     },
 
     renderTableHeader: function() {
+      var firstColumnLabel = this.props.useAnswerBuckets ? I18n.t("Answer Description") : I18n.t("Answer Text");
       return (
         <thead className="screenreader-only">
           <tr>
-            <th scope="col">{I18n.t("Answer Text")}</th>
+            <th scope="col">{firstColumnLabel}</th>
             <th scope="col">{I18n.t("Number of Respondents")}</th>
             <th scope="col">{I18n.t("Percent of respondents selecting this answer")}</th>
             <th scope="col" aria-hidden>{I18n.t("Answer Distribution")}</th>
@@ -96,10 +98,10 @@ define(function(require) {
       );
     },
 
-    renderTableRows: function(data, graphParams) {
+    renderTableRows: function(data, globalParams) {
       return data.map(function(datum) {
         return (
-          <AnswerRow key={datum.id} datum={datum} graphSettings={graphParams} />
+          <AnswerRow key={datum.id} datum={datum} globalSettings={globalParams} />
         );
       });
     }

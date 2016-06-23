@@ -124,6 +124,9 @@ module CC
       doc.has_group_category topic.has_group_category?
       doc.workflow_state topic.workflow_state
       doc.module_locked topic.locked_by_module_item?(@user, true).present?
+      doc.allow_rating topic.allow_rating
+      doc.only_graders_can_rate topic.only_graders_can_rate
+      doc.sort_by_rating topic.sort_by_rating
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|

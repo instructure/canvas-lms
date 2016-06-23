@@ -24,6 +24,13 @@ require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/test_setup/custom_selenium_rspec_matchers')
 require File.expand_path(File.dirname(__FILE__) + '/test_setup/selenium_driver_setup')
 
+if ENV["TESTRAIL_RUN_ID"] || ENV["TESTRAIL_ENTRY_RUN_ID"]
+  require 'testrailtagging'
+  RSpec.configure do |config|
+    TestRailRSpecIntegration.register_rspec_integration(config,:canvas, add_formatter: false)
+  end
+end
+
 Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
 
 include I18nUtilities
@@ -31,7 +38,6 @@ include I18nUtilities
 $selenium_config = ConfigFile.load("selenium") || {}
 SERVER_IP = $selenium_config[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 BIND_ADDRESS = $selenium_config[:bind_address] || '0.0.0.0'
-SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 15
 
@@ -67,6 +73,10 @@ shared_context "in-process server selenium tests" do
 
   def maybe_recover_from_exception(exception)
     case exception
+    when Errno::ENOMEM
+      # no sense trying anymore, give up and hope that other nodes pick up the slack
+      puts "Error: got `#{exception}`, aborting"
+      RSpec.world.wants_to_quit = true
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
       if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
         puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
@@ -161,21 +171,24 @@ shared_context "in-process server selenium tests" do
   end
 
   before do |example|
-    SeleniumDriverSetup.note_recent_spec_run(example)
+    start_capturing_video
+    move_mouse_to_known_position
   end
 
   after(:each) do |example|
-    clear_timers!
-    # while disallow_requests! would generally get these, there's a small window
-    # between the ajax request starting up and the middleware actually processing it
     begin
+      clear_timers!
+      # while disallow_requests! would generally get these, there's a small window
+      # between the ajax request starting up and the middleware actually processing it
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
-      nil
+    ensure
+      exception = $ERROR_INFO || example.exception
+      SeleniumDriverSetup.note_recent_spec_run(example, exception)
+      record_errors(example, exception, Rails.logger.captured_messages)
+      SeleniumDriverSetup.disallow_requests!
+      truncate_all_tables unless self.use_transactional_fixtures
     end
-    record_errors(example, Rails.logger.captured_messages)
-    SeleniumDriverSetup.disallow_requests!
-    truncate_all_tables unless self.use_transactional_fixtures
   end
 end

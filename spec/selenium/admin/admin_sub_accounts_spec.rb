@@ -54,8 +54,7 @@ describe "admin sub accounts" do
       wait_for_ajaximations
     }.to change(Account.default.sub_accounts, :count).by(-1)
     check_element_has_focus f("#account_#{Account.default.id} > .header .name")
-    sub_accounts = ff('.sub_accounts .sub_account')
-    sub_accounts.each { |account| expect(account).not_to include_text(sub_account.name) }
+    expect(f('.sub_accounts')).not_to contain_css('.sub_account')
   end
 
   it "should edit a sub account" do

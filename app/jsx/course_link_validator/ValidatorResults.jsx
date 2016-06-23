@@ -17,7 +17,7 @@ define([
     },
 
     getDisplayMessage (number) {
-      return I18n.t({one: "Found 1 broken link", other: "Found %{count} broken links"}, {count: number});
+      return I18n.t({one: "Found 1 unresponsive link", other: "Found %{count} unresponsive links"}, {count: number});
     },
 
     render () {
@@ -25,7 +25,7 @@ define([
         alertMessage,
         numberofBrokenLinks = 0,
         errorMessage = I18n.t("An error occured. Please try again."),
-        noBrokenLinksMessage = I18n.t("No broken links found"),
+        noBrokenLinksMessage = I18n.t("No unresponsive links found"),
         showUnpublishedBox;
 
       if (this.props.error) {

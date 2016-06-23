@@ -32,7 +32,7 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_unmuted?
-      assignment.context.available? &&
+      context_sendable? &&
         assignment.recently_unmuted
     end
 

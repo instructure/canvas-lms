@@ -20,7 +20,7 @@ def account_model(opts={})
   @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
 
   # have New UI turned on by default on the canvas-sel-r21-hourly-p2-new-styles jenkins build
-  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES'] && @account.root_account?
   @account
 end
 
@@ -35,7 +35,7 @@ def account_with_cas(opts={})
   @account ||= Account.create!
 
   # have New UI turned on by default on the canvas-sel-r21-hourly-p2-new-styles jenkins build
-  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES'] && @account.root_account?
 
   config = AccountAuthorizationConfig::CAS.new
   cas_url = opts[:cas_url] || "https://localhost/cas"
@@ -52,7 +52,7 @@ def account_with_saml(opts={})
   @account ||= Account.create!
 
   # have New UI turned on by default on the canvas-sel-r21-hourly-p2-new-styles jenkins build
-  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+  @account.enable_feature!(:use_new_styles) if ENV['CANVAS_FORCE_USE_NEW_STYLES'] && @account.root_account?
 
   config = AccountAuthorizationConfig::SAML.new
   config.idp_entity_id = "saml_entity"

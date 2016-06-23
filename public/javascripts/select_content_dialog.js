@@ -92,8 +92,12 @@ define([
       }).fixDialogButtons();
 
       var visibleModuleItemSelect = $('#select_context_content_dialog .module_item_select:visible')[0];
-      if (visibleModuleItemSelect &&  visibleModuleItemSelect.selectedIndex != -1) {
-        $(".add_item_button").removeClass('disabled');
+      if (visibleModuleItemSelect) {
+        if (visibleModuleItemSelect.selectedIndex != -1) {
+          $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
+        } else {
+          $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
+        }
       }
       $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
     }
@@ -129,8 +133,12 @@ define([
         }
         item_data['item[url]'] = $("#content_tag_create_url").val();
         item_data['item[title]'] = $("#content_tag_create_title").val();
-        submit(item_data);
 
+        if (item_data['item[url]'] === '') {
+          $("#content_tag_create_url").errorBox(I18n.t("URL is required"));
+        } else {
+          submit(item_data);
+        }
       } else if(item_type == 'context_external_tool') {
 
         var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
@@ -332,9 +340,9 @@ define([
       var selectedOption = $(this).val();
       var doNotDisable = _.contains(['external_url', 'context_external_tool', 'context_module_sub_header'], selectedOption);
       if (doNotDisable) {
-        $(".add_item_button").removeClass('disabled');
+        $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
       } else {
-        $(".add_item_button").addClass('disabled');
+        $(".add_item_button").addClass('disabled').attr('aria-disabled', true);
       }
 
       $("#select_context_content_dialog .module_item_option").hide();
@@ -373,7 +381,7 @@ define([
     $('#select_context_content_dialog').on('change', '.module_item_select', function () {
       var currentSelectItem = $(this)[0];
       if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
-        $(".add_item_button").removeClass('disabled');
+        $(".add_item_button").removeClass('disabled').attr('aria-disabled', false);
       }
 
       if($(this).val() == "new") {

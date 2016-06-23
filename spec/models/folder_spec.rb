@@ -340,4 +340,39 @@ describe Folder do
       }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe "submissions folders" do
+    it "restricts valid contexts for submissions folders" do
+      student_in_course
+      group_model(:context => @course)
+
+      sf = Folder.new(name: 'test')
+      sf.submission_context_code = 'root'
+
+      sf.context = @user
+      expect(sf).to be_valid
+
+      sf.context = @group
+      expect(sf).to be_valid
+
+      sf.context = @course
+      expect(sf).not_to be_valid
+    end
+
+    it "ensures only one root submissions folder per user exists" do
+      user
+      @user.submissions_folder
+      dup = @user.folders.build(name: 'dup', parent_folder: Folder.root_folders(@user).first)
+      dup.submission_context_code = 'root'
+      expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
+    end
+
+    it "ensures only one course submissions subfolder exists" do
+      student_in_course
+      @user.submissions_folder(@course)
+      dup = @user.folders.build(name: 'dup', parent_folder: @user.submissions_folder)
+      dup.submission_context_code = @course.asset_string
+      expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
+    end
+  end
 end

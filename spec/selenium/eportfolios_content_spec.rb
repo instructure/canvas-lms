@@ -105,7 +105,7 @@ describe "add content box" do
       submit_form(".form_content")
       wait_for_ajaximations
       expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
-      expect(f("#edit_page_section_0")).to be_nil
+      expect(f("#content")).not_to contain_css("#edit_page_section_0")
     end
 
     it "should delete html comment" do
@@ -114,7 +114,7 @@ describe "add content box" do
       f(".delete_comment_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(f("#page_comments .message")).to be_nil
+      expect(f("#content")).not_to contain_css("#page_comments .message")
       expect(PageComment.count).to eq 0
     end
   end

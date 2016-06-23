@@ -1,7 +1,7 @@
 class MoveAccountMembershipTypes < ActiveRecord::Migration
   # run twice, to pick up any new csv-memberships created
   # after the predeploy migration but before the deploy
-  tag :predeploy, :postdeploy
+  tag :postdeploy
 
   def self.up
     # for proper security, we need the roles copied to the Roles table

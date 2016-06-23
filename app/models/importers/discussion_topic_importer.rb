@@ -78,7 +78,7 @@ module Importers
       # not seeing where this is used, so I'm commenting it out for now
       # options[:skip_replies] = true unless options.importable_entries?
       [:migration_id, :title, :discussion_type, :position, :pinned,
-       :require_initial_post].each do |attr|
+       :require_initial_post, :allow_rating, :only_graders_can_rate, :sort_by_rating].each do |attr|
         item.send("#{attr}=", options[attr])
       end
 
@@ -95,7 +95,7 @@ module Importers
       item.last_reply_at   = nil if item.new_record?
 
       if options[:workflow_state].present?
-        item.workflow_state = options[:workflow_state]
+        item.workflow_state = options[:workflow_state] if (options[:workflow_state] != 'unpublished') || item.new_record? || item.deleted?
       elsif item.should_not_post_yet
         item.workflow_state = 'post_delayed'
       else

@@ -147,7 +147,7 @@ define([
                  dispatch(this.selectedProvisionalGrade(response.data.student_id, response.data.selected_provisional_grade_id));
                })
                .catch((response) => {
-                 dispatch(this.selectingProvisionalGradesFailed(I18n.t('An error accurred selecting provisional grades')));
+                 dispatch(this.selectingProvisionalGradesFailed(I18n.t('An error occurred selecting provisional grades')));
                });
       };
 

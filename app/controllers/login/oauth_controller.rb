@@ -34,8 +34,6 @@ class Login::OauthController < Login::OauthBaseController
   end
 
   def create
-    reset_session_for_login
-
     @aac = @domain_root_account.authentication_providers.active.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth)
 
@@ -55,6 +53,8 @@ class Login::OauthController < Login::OauthBaseController
       token = request_token.get_access_token(opts)
       unique_id = @aac.unique_id(token)
     end
+
+    reset_session_for_login
 
     find_pseudonym(unique_id)
   end

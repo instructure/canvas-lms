@@ -9,9 +9,12 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
   'str/stripTags'
-  'tinymce.editor_box'
+  'jsx/shared/rce/RichContentEditor'
   'jquery.instructure_forms'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate,
+      preventDefault, KeyboardShortcuts, stripTags, RichContentEditor) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   class Reply
 
@@ -30,7 +33,7 @@ define [
       @form.find('.cancel_button').click @hide
       @form.on 'click', '.toggle-wrapper a', (e) =>
         e.preventDefault()
-        @textArea.editorBox('toggle')
+        RichContentEditor.callOnRCE(@textArea, 'toggle')
         # hide the clicked link, and show the other toggle link.
         # todo: replace .andSelf with .addBack when JQuery is upgraded.
         $(e.currentTarget).siblings('a').andSelf().toggle()
@@ -60,7 +63,14 @@ define [
     edit: ->
       @form.addClass 'replying'
       @discussionEntry.addClass 'replying'
-      @textArea.editorBox focus: true, tinyOptions: width: '100%'
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor(@textArea, {
+        focus: true,
+        manageParent: true,
+        tinyOptions: {
+          width: '100%'
+        }
+      })
       @editing = true
       @trigger 'edit', this
 
@@ -69,8 +79,8 @@ define [
     #
     # @api public
     hide: =>
-      @content = @textArea._justGetCode()
-      @textArea._removeEditor()
+      @content = RichContentEditor.callOnRCE(@textArea, 'get_code')
+      RichContentEditor.destroyRCE(@textArea)
       @form.removeClass 'replying'
       @discussionEntry.removeClass 'replying'
       @textArea.val @content
@@ -88,7 +98,7 @@ define [
     # @api private
     submit: =>
       @hide()
-      @textArea._setContentCode ''
+      RichContentEditor.callOnRCE(@textArea, 'set_code', '')
       @view.model.set 'notification', "<div class='alert alert-info'>#{htmlEscape I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,
@@ -168,4 +178,3 @@ define [
   _.extend Reply.prototype, Backbone.Events
 
   Reply
-

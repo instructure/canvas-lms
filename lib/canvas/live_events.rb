@@ -76,6 +76,7 @@ module Canvas::LiveEvents
     {
       submission_id: submission.global_id,
       assignment_id: submission.global_assignment_id,
+      user_id: submission.global_user_id,
       submitted_at: submission.submitted_at,
       updated_at: submission.updated_at,
       score: submission.score,
@@ -162,10 +163,12 @@ module Canvas::LiveEvents
 
     LiveEvents.post_event('grade_change', {
       submission_id: submission.global_id,
+      assignment_id: submission.global_assignment_id,
       grade: submission.grade,
       old_grade: old_grade,
       grader_id: grader_id,
-      student_id: submission.global_user_id
+      student_id: submission.global_user_id,
+      user_id: submission.global_user_id
     })
   end
 

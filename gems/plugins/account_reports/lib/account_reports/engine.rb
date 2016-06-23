@@ -133,6 +133,9 @@ module AccountReports
             :xlist => {
               :description => 'Get the Provisioning file for cross listed courses'
             },
+            :created_by_sis => {
+              :description => 'Only include objects that were created by sis'
+            },
             :include_deleted => {
               :description => 'Include deleted objects'
             }
@@ -184,6 +187,9 @@ module AccountReports
             },
             :xlist => {
               :description => 'Get the SIS file for cross listed courses'
+            },
+            :created_by_sis => {
+              :description => 'Only include objects that were created by sis'
             },
             :include_deleted => {
               :description => 'Include deleted objects'
@@ -255,6 +261,17 @@ module AccountReports
             :enrollment_term_id => {
               :required => false,
               :description => 'The canvas id of the term to get public courses from'
+            }
+          }
+        },
+        'course_storage_csv' => {
+          :title => proc { I18n.t('Course Storage') },
+          :description_partial => true,
+          :parameters_partial => 'term_selector_parameters',
+          :parameters => {
+            :enrollment_term_id => {
+              :required => false,
+              :description => 'The canvas id of the term to get courses from for storage report'
             }
           }
         },

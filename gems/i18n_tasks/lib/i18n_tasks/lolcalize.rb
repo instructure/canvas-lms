@@ -30,15 +30,20 @@ module I18nTasks
       result.join('')
     end
 
-    def i18n_lolcalize(str_or_hash)
-      if str_or_hash.is_a? String
-        let_there_be_lols(str_or_hash)
-      else
+    def i18n_lolcalize(default_thing)
+      case default_thing
+      when Array
+        default_thing.map { |item| i18n_lolcalize(item) }
+      when String
+        let_there_be_lols(default_thing)
+      when Hash
         result = {}
-        str_or_hash.each do |k,v|
+        default_thing.each do |k,v|
           result[k] = let_there_be_lols(v)
         end
         result
+      else
+        default_thing
       end
     end
 

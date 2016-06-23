@@ -37,7 +37,7 @@ describe "new account user search" do
 
     click_tab
 
-    expect(f('button.add_user')).to be_blank
+    expect(f("#content")).not_to contain_css('button.add_user')
   end
 
   it "should be able to create users" do
@@ -55,7 +55,9 @@ describe "new account user search" do
 
     email = 'someemail@example.com'
     f('input.user_email').send_keys(email)
-    f('input.user_send_confirmation').click
+
+    input = f('input.user_send_confirmation')
+    move_to_click("label[for=#{input['id']}]")
 
     f('.ReactModalPortal button[type="submit"]').click
     wait_for_ajaximations
@@ -84,7 +86,7 @@ describe "new account user search" do
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 11
-    expect(f(".load_more")).to be_nil
+    expect(f("#content")).not_to contain_css(".load_more")
   end
 
   it "should search by name" do

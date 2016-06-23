@@ -29,7 +29,7 @@ describe "communication channel selenium tests" do
       u1.preferences[:accepted_terms] = Time.now.utc
       u1.save
       get "/register/#{u1.communication_channel.confirmation_code}"
-      expect(f('input[name="user[terms_of_use]"]')).not_to be_present
+      expect(f("#content")).not_to contain_css('input[name="user[terms_of_use]"]')
     end
 
     it "should allow the user to edit the pseudonym if its already taken" do
@@ -71,7 +71,7 @@ describe "communication channel selenium tests" do
 
       get '/profile/settings'
 
-      expect(f('.reset_bounce_count_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.reset_bounce_count_link')
     end
 
     it 'should not show the bounce count reset button when the channel is not bouncing' do
@@ -82,7 +82,7 @@ describe "communication channel selenium tests" do
 
       get '/profile/settings'
 
-      expect(f('.reset_bounce_count_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.reset_bounce_count_link')
     end
   end
 end

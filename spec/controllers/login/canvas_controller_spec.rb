@@ -79,6 +79,17 @@ describe Login::CanvasController do
   end
 
   it "password auth should work" do
+    session[:sentinel] = true
+    post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
+    expect(response).to be_redirect
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    # session reset
+    expect(session[:sentinel]).to be_nil
+  end
+
+  it "password auth should work for an explicit Canvas pseudonym" do
+    @pseudonym.update_attribute(:authentication_provider, Account.default.canvas_authentication_provider)
     post 'create', :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwerty'}
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
@@ -94,9 +105,11 @@ describe Login::CanvasController do
 
   it "should re-render if authenticity token is invalid and referer is not trusted" do
     controller.expects(:verify_authenticity_token).raises(ActionController::InvalidAuthenticityToken)
+    session[:sentinel] = true
     post 'create', :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwerty' },
          :authenticity_token => '42'
     assert_status(400)
+    expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
     expect(flash[:error]).to match(/invalid authenticity token/i)
   end
@@ -129,6 +142,17 @@ describe Login::CanvasController do
       Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(assigns[:pseudonym_session].record).to eq @pseudonym
+    end
+
+    it "works for a pseudonym explicitly linked to LDAP" do
+      user_with_pseudonym(:username => '12345', :active_all => 1)
+      aac = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      @pseudonym.any_instantiation.expects(:valid_arbitrary_credentials?).returns(true)
+      @pseudonym.update_attribute(:authentication_provider, aac)
+      post 'create', :pseudonym_session => { :unique_id => '12345', :password => 'password'}
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(assigns[:pseudonym_session].record).to eq @pseudonym

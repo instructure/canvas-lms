@@ -27,8 +27,7 @@ class ConversationMessage < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
+  belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
   # we used to attach submission comments to conversations via this asset
@@ -199,6 +198,7 @@ class ConversationMessage < ActiveRecord::Base
   def recipients
     return [] unless conversation
     subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }.map{|x| x.becomes(User)}
+    ActiveRecord::Associations::Preloader.new.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end
@@ -265,6 +265,8 @@ class ConversationMessage < ActiveRecord::Base
     else
       shared_tags = author.conversation_context_codes(false)
       shared_tags &= recipient.conversation_context_codes(false)
+      shared_tags &= conversation.tags if conversation.tags.any?
+
       context_components = shared_tags.map{|t| ActiveRecord::Base.parse_asset_string(t)}
       context_names = Context.names_by_context_types_and_ids(context_components[0,2]).values
     end

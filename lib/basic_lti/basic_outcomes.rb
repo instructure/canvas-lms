@@ -40,12 +40,13 @@ module BasicLTI
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
+        raise InvalidSourceId, 'Invalid sourcedid' if sourceid.blank?
         md = sourceid.match(SOURCE_ID_REGEX)
         raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
         raise InvalidSourceId, 'Invalid signature' unless Canvas::Security.
             verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
-        
+
         raise InvalidSourceId, 'Tool is invalid' unless tool.id == md[1].to_i
         course = Course.active.where(id: md[2]).first
         raise InvalidSourceId, 'Course is invalid' unless course
@@ -85,6 +86,7 @@ module BasicLTI
     end
 
     class LtiResponse
+      include TextHelper
       attr_accessor :code_major, :severity, :description, :body
 
       def initialize(lti_request)
@@ -159,13 +161,15 @@ module BasicLTI
       end
 
       def handle_request(tool)
+        #check if we recognize the xml structure
+        return false unless operation_ref_identifier
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (course, assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
         source_id = self.sourcedid
 
         begin
-          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id) if source_id
+          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
@@ -203,7 +207,7 @@ module BasicLTI
           submission_hash[:grade] = raw_score
         elsif new_score
           if (0.0 .. 1.0).include?(new_score)
-            submission_hash[:grade] = "#{new_score * 100}%"
+            submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end

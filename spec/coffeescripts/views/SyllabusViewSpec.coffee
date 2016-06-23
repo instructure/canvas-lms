@@ -202,11 +202,11 @@ define [
       # context-sensitive datetime titles
       assignment_ts = $('.events_2012_01_01 .related-assignment_1 .dates > span:nth-child(1)')
       equal assignment_ts.text(), "10am", "assignment - local time in table"
-      equal assignment_ts.data('html-tooltip-title'), "Local: Jan 1 at 10:00am<br>Course: Jan 1 at 12:00pm", 'assignment - correct local and course times given'
+      equal assignment_ts.data('html-tooltip-title'), "Local: Jan 1 at 10am<br>Course: Jan 1 at 12pm", 'assignment - correct local and course times given'
 
       event_ts = $('.events_2012_01_01 .related-appointment_group_1 .dates > span:nth-child(1)')
       equal event_ts.text(), " 8am", "event - local time in table"
-      equal event_ts.data('html-tooltip-title'), "Local: Jan 1 at 8:00am<br>Course: Jan 1 at 10:00am", 'event - correct local and course times given'
+      equal event_ts.data('html-tooltip-title'), "Local: Jan 1 at 8am<br>Course: Jan 1 at 10am", 'event - correct local and course times given'
 
   test 'render (user public course)', ->
     @view.can_read = true # public course -- can read

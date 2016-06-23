@@ -2,7 +2,7 @@ define [
   'underscore'
   'i18n!react_files'
   'react'
-  'react-router'
+  'page'
   'jsx/files/UsageRightsDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
@@ -14,12 +14,10 @@ define [
   'classnames'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, UsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
+], (_, I18n, React, page, UsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
 
   Toolbar =
     displayName: 'Toolbar'
-
-    mixins: [Router.Navigation, Router.State]
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
@@ -29,11 +27,6 @@ define [
     componentWillMount: ->
       @downloadTitle = I18n.t('Download as Zip')
       @tabIndex = null
-
-    onSubmitSearch: (event) ->
-      event.preventDefault()
-      query = {search_term: @refs.searchTerm.getDOMNode().value}
-      @transitionTo 'search', {}, query
 
     addFolder: (event) ->
       event.preventDefault()
@@ -53,10 +46,6 @@ define [
 
     componentWillUpdate: (nextProps) ->
       @showingButtons = nextProps.selectedItems.length
-
-    componentDidUpdate: (prevProps) ->
-      if prevProps.selectedItems.length isnt @props.selectedItems.length
-        $.screenReaderFlashMessage(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: @props.selectedItems.length}))
 
     # Function Summary
     # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -95,7 +84,3 @@ define [
       })
 
       @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
-
-    openPreview: ->
-      FocusStore.setItemToFocus(@refs.previewLink.getDOMNode())
-      @transitionTo(@props.getPreviewRoute(), {splat: @props.currentFolder?.urlPath()}, @props.getPreviewQuery())

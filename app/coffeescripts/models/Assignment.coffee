@@ -37,6 +37,7 @@ define [
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
+    isPage: => @_hasOnlyType 'wiki_page'
     isExternalTool: => @_hasOnlyType 'external_tool'
     isNotGraded: => @_hasOnlyType 'not_graded'
     isAssignment: =>
@@ -199,9 +200,6 @@ define [
 
     canGroup: -> !@get('has_submitted_submissions')
 
-    differentiatedAssignmentsEnabled: ->
-      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false
-
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id
@@ -244,11 +242,13 @@ define [
     iconType: =>
       return 'quiz' if @isQuiz()
       return 'discussion' if @isDiscussionTopic()
+      return 'document' if @isPage()
       return 'assignment'
 
     objectType: =>
       return 'Quiz' if @isQuiz()
       return 'Discussion' if @isDiscussionTopic()
+      return 'WikiPage' if @isPage()
       return 'Assignment'
 
     htmlUrl: =>
@@ -310,10 +310,8 @@ define [
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate',
-        'moderatedGrading', 'postToSISEnabled'
+        'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
       ]
-      if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        fields.push 'isOnlyVisibleToOverrides'
 
       hash = id: @get 'id'
       for field in fields

@@ -19,25 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "safe_yaml" do
-  it "should be used by default" do
-    yaml = <<-YAML
---- !ruby/object:ActionController::Base
-real_format:
-YAML
-    expect { YAML.load yaml }.to raise_error
-    result = YAML.unsafe_load yaml
-    expect(result.class).to eq ActionController::Base
-  end
-
-  it "doesn't allow deserialization of arbitrary classes" do
-    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
-  end
-
-  it "allows deserialization of arbitrary classes when unsafe_loading" do
-    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
-  end
-
-  it "should allow some whitelisted classes" do
+  let(:test_yaml) {
     yaml = <<-YAML
 ---
 hwia: !map:HashWithIndifferentAccess
@@ -92,8 +74,29 @@ verbose_symbol: !ruby/symbol blah
 oo: !ruby/object:OpenObject
   table:
     :a: 1
+    YAML
+  }
+
+  it "should be used by default" do
+    yaml = <<-YAML
+--- !ruby/object:ActionController::Base
+real_format:
 YAML
-    result = YAML.load yaml
+    expect { YAML.load yaml }.to raise_error
+    result = YAML.unsafe_load yaml
+    expect(result.class).to eq ActionController::Base
+  end
+
+  it "doesn't allow deserialization of arbitrary classes" do
+    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
+  end
+
+  it "allows deserialization of arbitrary classes when unsafe_loading" do
+    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
+  end
+
+  it "should allow some whitelisted classes" do
+    result = YAML.load(test_yaml)
 
     def verify(result, key, klass)
       obj = result[key]
@@ -138,5 +141,54 @@ YAML
 
     oo = verify(result, 'oo', OpenObject)
     expect(oo.a).to eq 1
+  end
+
+  it "should allow some whitelisted classes through psych" do
+    old_result = YAML.load(test_yaml)
+    psych_yaml = YAML.dump(old_result)
+    expect(Psych.load(psych_yaml)).to eq old_result
+    expect(YAML.load(psych_yaml)).to eq old_result
+  end
+
+  it "should work with aliases" do
+    hash = {:a => 1}.with_indifferent_access
+    obj = {:blah => hash, :bloop => hash}.with_indifferent_access
+    yaml = Psych.dump(obj)
+    expect(YAML.load(yaml)).to eq obj
+  end
+
+  it "should dump whole floats correctly" do
+    expect(YAML.dump(1.0)).to include("1.0")
+  end
+
+  it "should dump freaky floaty-looking strings" do
+    str = "1.E+01"
+    expect(YAML.load(YAML.dump(str))).to eq str
+  end
+
+  it "should dump html-safe strings correctly" do
+    hash = {:blah => "42".html_safe}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should dump strings with underscores followed by an integer" do
+    # the ride never ends -_-
+    hash = {:blah => "_42"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should also dump floaat looking strings followed by an underscore" do
+    hash = {:blah => "42._"}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should dump whatever this is too" do
+    hash = {:blah => "4,2:0."}
+    expect(YAML.load(YAML.dump(hash))).to eq hash
+  end
+
+  it "should be able to dump and load Canvas:Plugin classes" do
+    plugin = Canvas::Plugin.find('canvas_cartridge_importer')
+    expect(YAML.unsafe_load(YAML.dump(plugin))).to eq plugin
   end
 end

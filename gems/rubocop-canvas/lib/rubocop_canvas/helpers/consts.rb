@@ -9,6 +9,7 @@ module RuboCop
           /\[\w+!=/,    # https://api.jquery.com/attribute-not-equal-selector/
           /:button/,    # https://api.jquery.com/button-selector/
           /:checkbox/,  # https://api.jquery.com/checkbox-selector/
+          /:contains/,  # https://api.jquery.com/contains-selector/
           /:eq\(/,      # https://api.jquery.com/eq-selector/
           /:even/,      # https://api.jquery.com/even-selector/
           /:file/,      # https://api.jquery.com/file-selector/

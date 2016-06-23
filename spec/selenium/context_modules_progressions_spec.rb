@@ -58,7 +58,7 @@ describe "context modules" do
 
       expect(f("#progression_student_#{@students[0].id}_module_#{@module1.id} .status").text).to include("Complete")
       expect(f("#progression_student_#{@students[0].id}_module_#{@module2.id} .status").text).to include("Locked")
-      expect(f("#progression_student_#{@students[0].id}_module_#{@module3.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#progression_student_#{@students[0].id}_module_#{@module3.id}")
 
       f("#progression_student_#{@students[1].id}").click
       wait_for_ajaximations
@@ -102,11 +102,11 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules/progressions"
 
-      expect(f("#progression_student_#{@students[1].id}")).to be_nil
-      expect(f("#progression_student_#{@students[3].id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#progression_student_#{@students[1].id}")
+      expect(f("#content")).not_to contain_css("#progression_student_#{@students[3].id}")
       expect(f("#progression_student_#{@students[0].id}_module_#{@module1.id} .status").text).to include("Complete")
       expect(f("#progression_student_#{@students[0].id}_module_#{@module2.id} .status").text).to include("Locked")
-      expect(f("#progression_student_#{@students[0].id}_module_#{@module3.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#progression_student_#{@students[0].id}_module_#{@module3.id}")
       f("#progression_student_#{@students[2].id}").click
       wait_for_ajaximations
       expect(f("#progression_student_#{@students[2].id}_module_#{@module1.id} .status").text).to include("In Progress")
@@ -151,7 +151,7 @@ describe "context modules" do
       @course.large_roster = true
       @course.save!
       get "/courses/#{@course.id}"
-      expect(f('.module_progressions_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
     end
   end
 
@@ -266,9 +266,8 @@ describe "context modules" do
       fln("Discuss!").click
       wait_for_ajaximations
       f('.discussion-reply-action').click
-      assignment_form = f('#submit_online_text_entry_form')
       type_in_tiny 'textarea', 'something to submit'
-      submit_form(assignment_form)
+      f('button[type="submit"]').click
       validate_access_to_module
     end
 

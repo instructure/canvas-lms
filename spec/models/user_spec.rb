@@ -1138,6 +1138,8 @@ describe User do
     end
 
     it "should return a useful avatar_fallback_url" do
+      HostUrl.stubs(:protocol).returns('https')
+
       expect(User.avatar_fallback_url).to eq(
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       )
@@ -1607,6 +1609,12 @@ describe User do
       expect(@user.communication_channels.map(&:path)).to eq ['john@example.com']
       expect(@user.email).to eq 'john@example.com'
     end
+
+    it "doesn't create channels with empty paths" do
+      @user = User.create!
+      expect(-> {@user.email = ''}).to raise_error("Validation failed: Path can't be blank")
+      expect(@user.communication_channels.any?).to be_falsey
+    end
   end
 
   describe "event methods" do
@@ -1672,6 +1680,17 @@ describe User do
         events = []
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2
+      end
+
+      it "doesn't include events for enrollments that are inactive due to date" do
+        @enrollment.start_at = 1.day.ago
+        @enrollment.end_at = 2.days.from_now
+        @enrollment.save!
+        event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
+        expect(@user.upcoming_events).to include(event)
+        Timecop.freeze(3.days.from_now) do
+          expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
+        end
       end
 
       context "after db section context_code filtering" do
@@ -1772,22 +1791,10 @@ describe User do
     end
 
     context "as student" do
-      context "differentiated_assignments on" do
-        before {@course.enable_feature!(:differentiated_assignments)}
-        it "should return assignments only when a student has overrides" do
-          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
-          expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
-        end
-      end
-
-      context "differentiated_assignments off" do
-        before {
-          @course.disable_feature!(:differentiated_assignments)
-        }
-        it "should return all assignments" do
-          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-        end
+      it "should return assignments only when a student has overrides" do
+        expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+        expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
+        expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
       end
     end
 
@@ -1803,44 +1810,21 @@ describe User do
         @observer = User.create
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
       end
-      context "differentiated_assignments on" do
-        before{@course.enable_feature!(:differentiated_assignments)}
-        context "observer watching student with visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
-        end
-        context "observer watching student without visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
-          it "should be false" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
-          end
-        end
-        context "observer watching a only section" do
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      context "observer watching student with visibility" do
+        before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+        it "should be true" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
-      context "differentiated_assignments off" do
-        before{@course.disable_feature!(:differentiated_assignments)}
-        context "observer watching student with visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      context "observer watching student without visibility" do
+        before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+        it "should be false" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
         end
-        context "observer watching student without visibility" do
-          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
-        end
-        context "observer watching a only section" do
-          it "should be true" do
-            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
-          end
+      end
+      context "observer watching a only section" do
+        it "should be true" do
+          expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
     end
@@ -1961,9 +1945,6 @@ describe User do
       @assignment.publish
       @quiz.due_at = 2.days.from_now
       @quiz.save!
-      if opts[:differentiated_assignments]
-        @course.enable_feature!(:differentiated_assignments)
-      end
       if opts[:override]
         create_section_override_for_assignment(@assignment, {course_section: section})
       end
@@ -1971,39 +1952,20 @@ describe User do
     end
 
     context "differentiated_assignments" do
-      context "feature flag on" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should not return the assignments without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
-        end
-
-        it "should return the assignments with an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
-        end
-
-        it "should not return the assignments without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
-        end
-
-        it "should return the assignments in both types of courses" do
-          assignment0 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
-          assignment1 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          assignment2 = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment0)).to be_truthy
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment1)).to be_falsey
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment2)).to be_truthy
-        end
+      before {@student = User.create!(name: "Test Student")}
+      it "should not return the assignments without an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
 
-      context "feature flag off" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should return the assignment without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
-          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
-        end
+      it "should return the assignments with an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: true, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
+      end
+
+      it "should not return the assignments without an override" do
+        assignment = create_course_with_assignment_needing_submitting({override: false, student: @student})
+        expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
       end
     end
   end
@@ -2423,12 +2385,7 @@ describe User do
       end
 
       it "should not include submissions from students without visibility" do
-        @course1.enable_feature!(:differentiated_assignments)
         expect(@teacher.assignments_needing_grading.length).to eq 2
-      end
-
-      it "should show all submissions with the feature flag off" do
-        expect(@teacher.assignments_needing_grading.length).to eq 3
       end
     end
 
@@ -2913,6 +2870,17 @@ describe User do
       expect(@student.visible_groups.size).to eq 0
     end
 
+    it 'excludes groups in courses with concluded enrollments' do
+      course_with_student
+      @course.conclude_at = Time.zone.now - 2.days
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @group = Group.create! context: @course, name: 'GroupOne'
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
     it "should include account groups" do
       account = account_model(:parent_account => Account.default)
       student = user active_all: true
@@ -2984,5 +2952,39 @@ describe User do
     @user.report_avatar_image!
     @user.reload
     expect(@user.avatar_state).to eq :reported
+  end
+
+  describe "submissions_folder" do
+    before(:once) do
+      student_in_course
+    end
+
+    it "creates the root submissions folder on demand" do
+      f = @user.submissions_folder
+      expect(@user.submissions_folders.where(parent_folder_id: Folder.root_folders(@user).first, name: 'Submissions').first).to eq f
+    end
+
+    it "finds the existing root submissions folder" do
+      f = @user.folders.build
+      f.parent_folder_id = Folder.root_folders(@user).first
+      f.name = 'blah'
+      f.submission_context_code = 'root'
+      f.save!
+      expect(@user.submissions_folder).to eq f
+    end
+
+    it "creates a submissions folder for a course" do
+      f = @user.submissions_folder(@course)
+      expect(@user.submissions_folders.where(submission_context_code: @course.asset_string, parent_folder_id: @user.submissions_folder, name: @course.name).first).to eq f
+    end
+
+    it "finds an existing submissions folder for a course" do
+      f = @user.folders.build
+      f.parent_folder_id = @user.submissions_folder
+      f.name = 'bleh'
+      f.submission_context_code = @course.asset_string
+      f.save!
+      expect(@user.submissions_folder(@course)).to eq f
+    end
   end
 end

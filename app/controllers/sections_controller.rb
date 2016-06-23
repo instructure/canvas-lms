@@ -108,9 +108,9 @@ class SectionsController < ApplicationController
       end
 
       includes = Array(params[:include])
-      result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }
 
-      render :json => result
+      render :json => sections_json(@context.active_course_sections,
+                                    @current_user, session, includes)
     end
   end
 
@@ -182,7 +182,7 @@ class SectionsController < ApplicationController
     # cross-listing should only be allowed within the same root account
     @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
-    allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage_admin_users)
+    allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
     res = {:allowed => !!allowed}
     if allowed
       @account = @new_course.account
@@ -228,7 +228,22 @@ class SectionsController < ApplicationController
   end
 
   # @API Edit a section
-  # Modify an existing section.  See the documentation for {api:SectionsController#create create API action}.
+  # Modify an existing section.
+  #
+  # @argument course_section[name] [String]
+  #   The name of the section
+  #
+  # @argument course_section[sis_section_id] [String]
+  #   The sis ID of the section
+  #
+  # @argument course_section[start_at] [DateTime]
+  #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
+  #
+  # @argument course_section[end_at] [DateTime]
+  #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the section.
   #
   # @returns Section
   def update

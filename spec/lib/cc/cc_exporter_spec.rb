@@ -468,7 +468,7 @@ describe "Common Cartridge exporting" do
       expect(assignment_xml_doc.at_css('text').text).to eq '<a href="%24IMS-CC-FILEBASE%24/unfiled/test.txt">what?</a>'
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
-      expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11'
+      expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'
       expect(assignment_xml_doc.css('submission_formats format').map{ |fmt| fmt.attribute('type').value }).to match_array %w(html file url)
 
       # validate presence of canvas extension node

@@ -74,10 +74,13 @@ require [
 
     edit: (conference) =>
       if typeof conference == 'string'
-        conference = @currentConferences.get(conference)
+        conference = @currentConferences.get(conference) || @concludedConferences.get(conference)
       return unless conference
-      @editConferenceId = conference.get('id')
-      @editView.show(conference)
+      if conference.get('permissions').update
+        @editConferenceId = conference.get('id')
+        @editView.show(conference)
+      else
+        $("#conf_#{conference.get('id')}")[0].scrollIntoView()
 
     close: (conference) =>
       @currentConferences.remove(conference)

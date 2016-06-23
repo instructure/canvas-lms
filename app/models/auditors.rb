@@ -26,6 +26,7 @@ module Auditors
       end
 
       stream.on_error do |operation, record, exception|
+        next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
         Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
       end
     end

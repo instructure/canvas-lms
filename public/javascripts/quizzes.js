@@ -27,7 +27,6 @@ define([
   'calcCmd',
   'str/htmlEscape',
   'str/pluralize',
-  'wikiSidebar',
   'compiled/handlebars_helpers',
   'compiled/views/assignments/DueDateOverride',
   'compiled/models/Quiz',
@@ -41,6 +40,8 @@ define([
   'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
   'quiz_formula_solution',
+  'jsx/shared/rce/RichContentEditor',
+  'jsx/shared/conditional_release/ConditionalRelease',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -52,20 +53,21 @@ define([
   'compiled/jquery.rails_flash_notifications',
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'supercalc' /* superCalc */,
-  'compiled/tinymce',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.placeholder' /* /\.placeholder/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
-            wikiSidebar, Handlebars, DueDateOverrideView, Quiz,
+            Handlebars, DueDateOverrideView, Quiz,
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution, RichContentEditor,
+            ConditionalRelease){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
+
+  RichContentEditor.preloadRemoteModule();
 
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
@@ -319,12 +321,16 @@ define([
 
     showFormQuestion: function($form) {
       if (!$form.attr('id')) {
-        // we show and then hide the form so that the layout for the editorBox is computed correctly
+        // we show and then hide the form so that the layout for the editor is computed correctly
         $form.show();
         $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
-        $form.find(".question_content").editorBox({tinyOptions: {aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')}});
+        RichContentEditor.loadNewEditor($form.find(".question_content"), {
+          tinyOptions: {
+            aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')
+          }
+        })
         $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
-        $form.find(".text_after_answers").editorBox();
+        RichContentEditor.loadNewEditor($form.find(".text_after_answers"))
         $form.hide();
       }
       return $form.show();
@@ -1472,6 +1478,16 @@ define([
     return result;
   }
 
+  function toggleConditionalReleaseTab(quizType) {
+    if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+      if (quizType == "assignment") {
+        $('#quiz_tabs').tabs("option", "disabled", false);
+      } else {
+        $('#quiz_tabs').tabs("option", "disabled", [2]);
+      }
+    }
+  }
+
   $(document).ready(function() {
     quiz.init().updateDisplayComments();
     correctAnswerVisibility.init();
@@ -1694,7 +1710,7 @@ define([
           return false;
         }
         data['quiz[title]'] = quiz_title;
-        data['quiz[description]'] = $("#quiz_description").editorBox('get_code');
+        data['quiz[description]'] = RichContentEditor.callOnRCE($("#quiz_description"), 'get_code');
         if ($("#quiz_notify_of_update").is(':checked')) {
           data['quiz[notify_of_update]'] = $("#quiz_notify_of_update").val();
         }
@@ -1706,9 +1722,7 @@ define([
         data.allowed_attempts = attempts;
         data['quiz[allowed_attempts]'] = attempts;
         var overrides = overrideView.getOverrides();
-        if (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED) {
-          data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
-        }
+        data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
         var validationData = {
           assignment_overrides: overrideView.getAllDates()
         };
@@ -1721,7 +1735,6 @@ define([
           var missingDateView = new MissingDateDialog({
             validationFn: function(){ return sections },
             labelFn: function( section ) { return section.get('name')},
-            da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED,
             success: function(){
               missingDateView.$dialog.dialog('close').remove();
               missingDateView.remove();
@@ -1878,6 +1891,10 @@ define([
       var url = $("#quiz_urls .update_quiz_url").attr('href');
       $("#quiz_title_input").val(quiz_title);
       $("#quiz_title_text").text(quiz_title);
+
+      if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+        toggleConditionalReleaseTab(event.target.value);
+      }
     }).change();
 
     $(".question_form :input").keycodes("esc", function(event) {
@@ -3652,39 +3669,37 @@ define([
       }
     });
 
-    if (wikiSidebar) {
-      wikiSidebar.init();
-      wikiSidebar.attachToEditor($("#quiz_description"));
-    }
+    RichContentEditor.initSidebar();
 
     var keyboardShortcutsView = new RCEKeyboardShortcuts();
 
-    $("#quiz_description").editorBox({tinyOptions: {aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')}});
+    RichContentEditor.loadNewEditor($("#quiz_description"), {
+      focus: true,
+      tinyOptions: {
+        aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
+      }
+    })
     keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
 
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
-      $("#quiz_description").editorBox('toggle');
+      RichContentEditor.callOnRCE($("#quiz_description"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_description_views_link").andSelf().toggle();
     });
 
     $(".toggle_question_content_views_link").click(function(event) {
       event.preventDefault();
-      $(this).parents(".question_form").find(".question_content").editorBox('toggle');
+      RichContentEditor.callOnRCE($(this).parents(".question_form").find(".question_content"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_question_content_views_link").andSelf().toggle();
     });
 
     $(".toggle_text_after_answers_link").click(function(event) {
       event.preventDefault();
-      $(this).parents(".question_form").find(".text_after_answers").editorBox('toggle');
+      RichContentEditor.callOnRCE($(this).parents(".question_form").find(".text_after_answers"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_text_after_answers_link").andSelf().toggle();
-    });
-
-    $(document).bind('editor_box_focus', function(event, $editor) {
-      wikiSidebar.attachToEditor($editor);
     });
 
     $("#calc_helper_methods").change(function() {
@@ -3704,6 +3719,20 @@ define([
         success: function() { window.location.replace(ENV.QUIZZES_URL); }
       });
     });
+
+    if (ENV['CONDITIONAL_RELEASE_SERVICE_ENABLED']) {
+      this.conditionalReleaseEditor = ConditionalRelease.attach(
+        $('#conditional-release-target').get(0),
+        I18n.t('quiz'),
+        ENV['CONDITIONAL_RELEASE_ENV']);
+
+      $('div.form').on('change', function(event) {
+        if (!this.assignmentDirty) {
+          this.assignmentDirty = true
+          this.conditionalReleaseEditor.setProps({ assignmentDirty: true });
+        }
+      });
+    }
   });
 
   $.fn.multipleAnswerSetsQuestion = function() {
@@ -3721,7 +3750,7 @@ define([
       if (question_type != 'multiple_dropdowns_question' && question_type != 'fill_in_multiple_blanks_question') {
         return;
       }
-      var text = $(this).editorBox('get_code');
+      var text = RichContentEditor.callOnRCE($(this), 'get_code');
       var matches = text.match(/\[[A-Za-z0-9_\-.]+\]/g);
       $select.find("option.shown_when_no_other_options_available").remove();
       $select.find("option").addClass('to_be_removed');
@@ -4014,7 +4043,7 @@ define([
       setTimeout(function() {$(event.target).triggerHandler('change')}, 50);
     });
     $question.find(".question_content").bind('change', function(event) {
-      var text = $(this).editorBox('get_code');
+      var text = RichContentEditor.callOnRCE($(this), 'get_code');
       var matches = text.match(/\[[A-Za-z][A-Za-z0-9]*\]/g);
       $question.find(".variables").find("tr.variable").addClass('to_be_removed');
       $question.find(".variables").showIf(matches && matches.length > 0);
@@ -4102,7 +4131,6 @@ define([
       if(!showCorrectAnswersLastAttempt) {
         $('#quiz_show_correct_answers_last_attempt').prop('checked', false);
       }
-
     }).triggerHandler('change');
   });
 });

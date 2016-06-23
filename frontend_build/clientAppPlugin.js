@@ -11,7 +11,7 @@ clientAppPlugin.prototype.apply = function(compiler){
   compiler.plugin("normal-module-factory", function(nmf) {
 
     nmf.plugin("before-resolve", function(result, callback) {
-      request = result.request;
+      let request = result.request;
 
       // the client apps use an old version of react and used requirejs aliases
       // to keep it seperate from the react version the rest of canvas uses.

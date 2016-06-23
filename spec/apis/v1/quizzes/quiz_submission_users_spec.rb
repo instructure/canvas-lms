@@ -129,7 +129,6 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       it "only returns submissions of students with visibility" do
         @quiz.only_visible_to_overrides = true
         @quiz.save!
-        @course.enable_feature!(:differentiated_assignments)
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_success

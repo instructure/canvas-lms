@@ -31,6 +31,7 @@ describe 'drag and drop reordering' do
     click_save_settings_button
 
     refresh_page
+    wait_for_ajaximations
     group_should_contain_question(@group, @quest1)
   end
 

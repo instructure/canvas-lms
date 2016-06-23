@@ -5,7 +5,7 @@ define [
   module 'ExternalApps.ExternalAppsStore',
     setup: ->
       fakeENV.setup({
-        CONTEXT_BASE_URL: "/courses/1"
+        CONTEXT_BASE_URL: "/accounts/1"
       })
       @server = sinon.fakeServer.create()
       store.reset()
@@ -41,6 +41,17 @@ define [
           "context_id": 1
         }
       ]
+      @accountResponse = {
+        "id": 1,
+        "name": "root",
+        "workflow_state": "active",
+        "parent_account_id": null,
+        "root_account_id": null,
+        "default_storage_quota_mb": 500,
+        "default_user_storage_quota_mb": 50,
+        "default_group_storage_quota_mb": 50,
+        "default_time_zone": "America/Denver"
+      }
 
     teardown: ->
       @server.restore()
@@ -51,6 +62,15 @@ define [
     store.fetch()
     @server.respond()
     equal store.getState().externalTools.length, 3
+
+  test 'updateAccessToken', ->
+    @server.respondWith 'PUT', /\/accounts/, [200, { 'Content-Type': 'application/json' }, JSON.stringify(@accountResponse)]
+    success = (data, statusText, xhr) ->
+      equal statusText, 'success'
+    error = ->
+      ok false, 'Unable to update app center access token'
+    store.updateAccessToken('/accounts/1', '1234', success.bind(this), error.bind(this))
+    @server.respond()
 
   test 'fetchWithDetails with ContextExternalTool', ->
     expect 1

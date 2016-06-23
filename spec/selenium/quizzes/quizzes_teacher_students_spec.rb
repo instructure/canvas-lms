@@ -40,7 +40,7 @@ describe 'quizzes students' do
       wait_for_ajaximations
       answer_questions_and_submit(@quiz, 1)
 
-      expect(f('#take_quiz_link')).to be_nil
+      expect(f("#content")).not_to contain_css('#take_quiz_link')
     end
 
     context 'when using the course student view' do

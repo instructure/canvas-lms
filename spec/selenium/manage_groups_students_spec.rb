@@ -335,10 +335,10 @@ describe "manage groups students" do
       expect(fj("#category_#{new_category.id} .assign_students_link:visible")).not_to be_nil
 
       edit_category(:restrict_self_signup => true)
-      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).to be_nil
+      expect(f("#content")).not_to contain_jqcss("#category_#{new_category.id} .assign_students_link:visible")
 
       new_category = add_category(@course, "Restricted Self-Signup Category", :enable_self_signup => true, :restrict_self_signup => true)
-      expect(fj("#category_#{new_category.id} .assign_students_link:visible")).to be_nil
+      expect(f("#content")).not_to contain_jqcss("#category_#{new_category.id} .assign_students_link:visible")
 
       edit_category(:restrict_self_signup => false)
       expect(fj("#category_#{new_category.id} .assign_students_link:visible")).not_to be_nil

@@ -59,6 +59,10 @@ describe 'Models' do
     end
   end
 
+  it "inherits strong_params from parent" do
+    expect(AccountAuthorizationConfig::Canvas).to be_strong_params
+  end
+
   it "raises when you forget to use strong_params with a strong_params model" do
 
     expect { AccountAuthorizationConfig.new(WeakParameters.new(secret: 'ldap')) }.to(

@@ -20,7 +20,7 @@ require 'atom'
 require 'sanitize'
 
 class EportfolioEntry < ActiveRecord::Base
-  attr_accessible :eportfolio, :eportfolio_category, :name, :allow_comments, :show_comments, :url
+  attr_accessible :eportfolio, :eportfolio_category, :name, :allow_comments, :show_comments
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category
@@ -36,7 +36,7 @@ class EportfolioEntry < ActiveRecord::Base
   has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
 
-  serialize_utf8_safe :content
+  serialize :content
 
   set_policy do
     given {|user| user && self.allow_comments }

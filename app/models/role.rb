@@ -287,4 +287,12 @@ class Role < ActiveRecord::Base
       roles
     }
   end
+
+  def self.account_role_data(account, user)
+    active_states = %w{created claimed available completed}
+    courses = account.associated_courses.order(:id).where(:workflow_state => active_states)
+    courses.map do |course|
+      {course_id: course.id, roles: Role.role_data(course, user)}
+    end
+  end
 end

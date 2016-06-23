@@ -163,6 +163,7 @@ module ApplicationHelper
     if @context.respond_to?(:wiki)
       limit = Setting.get('wiki_sidebar_item_limit', 1000000).to_i
       @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
+      @wiki_sidebar_data[:wiki] = @context.wiki
     end
     @wiki_sidebar_data[:wiki_pages] ||= []
     if can_do(@context, @current_user, :manage_files, :read_as_admin)
@@ -229,7 +230,7 @@ module ApplicationHelper
   def use_optimized_js?
     if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
-      !(params[:debug_assets] || params[:debug_js])
+      use_webpack? || !(params[:debug_assets] || params[:debug_js])
     else
       # allows overriding by adding ?optimized_js=1 to the url
       params[:optimized_js] || false
@@ -281,9 +282,14 @@ module ApplicationHelper
       bundles = css_bundles.map do |(bundle,plugin)|
         css_url_for(bundle, plugin)
       end
+      bundles << css_url_for("disable_transitions") if disable_css_transitions?
       bundles << {:media => 'all'}
       stylesheet_link_tag(*bundles)
     end
+  end
+
+  def disable_css_transitions?
+    Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
   def css_variant
@@ -480,7 +486,7 @@ module ApplicationHelper
     tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
-        Collaboration.any_collaborations_configured?
+        Collaboration.any_collaborations_configured?(@context)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
         feature_enabled?(:web_conferences)
       else
@@ -545,7 +551,7 @@ module ApplicationHelper
 
   def license_help_link
     @include_license_dialog = true
-    link_to(image_tag('help.png'), '#', :class => 'license_help_link no-hover', :title => "Help with content licensing")
+    link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
   end
 
   def equella_enabled?
@@ -567,7 +573,7 @@ module ApplicationHelper
   #
   # Returns an HTML string.
   def sidebar_button(url, label, img = nil)
-    link_to(url, :class => 'btn button-sidebar-wide') do
+    link_to(url) do
       img ? ("<i class='icon-" + img + "'></i> ").html_safe + label : label
     end
   end
@@ -611,7 +617,6 @@ module ApplicationHelper
       :disableScribdPreviews    => !feature_enabled?(:scribd),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :enableScribdHtml5        => feature_enabled?(:scribd_html5),
-      :enableHtml5FirstVideos   => @domain_root_account.feature_enabled?(:html5_first_videos),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -836,6 +841,12 @@ module ApplicationHelper
     end
   end
 
+  def active_brand_config_json_url(opts={})
+    path = active_brand_config(opts).try(:public_json_path)
+    path ||= BrandableCSS.public_default_json_path
+    "/#{path}"
+  end
+
   def brand_config_for_account(opts={})
     account = Context.get_account(@context)
 
@@ -869,24 +880,36 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    chain = (@domain_root_account || Account.site_admin).account_chain(include_site_admin: true).reverse
-    @global_includes = chain.map(&:global_includes_hash)
-    if @domain_root_account.try(:sub_account_includes?)
+    @global_includes = if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
       if (acct = Context.get_account(@context))
+
+        # cache via the id because it could be that the root account js changes
+        # but the cache is for the sub-account, and we'd rather have everything
+        # reset after 15 minutes then have some places update immediately and
+        # some places wait.
         key = [acct.id, 'account_context_global_includes'].cache_key
-        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          acct.account_chain.reverse.map(&:global_includes_hash)
+        Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          acct.account_chain(include_site_admin: true).
+            reverse.map(&:global_includes_hash)
         end
-        @global_includes.concat(includes)
       elsif @current_user.present?
-        key = [@domain_root_account.id, 'common_account_global_includes', @current_user.id].cache_key
-        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          @current_user.common_account_chain(@domain_root_account).map(&:global_includes_hash)
+        key = [
+          @domain_root_account.id,
+          'common_account_global_includes',
+          @current_user.id
+        ].cache_key
+        Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          chain = @domain_root_account.account_chain(include_site_admin: true).reverse
+          chain.concat(@current_user.common_account_chain(@domain_root_account))
+          chain.uniq.map(&:global_includes_hash)
         end
-        @global_includes.concat(includes)
       end
     end
+
+    @global_includes ||= (@domain_root_account || Account.site_admin).
+      account_chain(include_site_admin: true).
+      reverse.map(&:global_includes_hash)
     @global_includes.uniq!
     @global_includes.compact!
     @global_includes

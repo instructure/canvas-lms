@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/offline_contents_common')
+require_relative 'common'
+require_relative 'offline_contents_common'
 
 describe "offline contents" do
   include_context "in-process server selenium tests"
@@ -18,8 +18,8 @@ describe "offline contents" do
       user_session(@teacher1)
     end
 
-    it_behaves_like 'show courses for ePub generation', 'teacher'
-    it_behaves_like 'generate and download ePub', 'teacher'
+    it_behaves_like 'show courses for ePub generation', :teacher
+    it_behaves_like 'generate and download ePub', :teacher
   end
 
   context "as a student" do
@@ -29,8 +29,8 @@ describe "offline contents" do
       user_session(@student1)
     end
 
-    it_behaves_like 'show courses for ePub generation', 'student'
-    it_behaves_like 'generate and download ePub', 'student'
+    it_behaves_like 'show courses for ePub generation', :student
+    it_behaves_like 'generate and download ePub', :student
   end
 end
 

@@ -103,8 +103,8 @@ describe "grading standards" do
       expect(rows.length).to eq @standard.data.length
       rows.each_with_index do |r, idx|
         expect(r.find_element(:css, '.name').text).to eq @standard.data[idx].first
-        expect(r.find_element(:css, '.value').text).to eq(idx == 0 ? "100" : "< #{@standard.data[idx - 1].last * 100}")
-        expect(r.find_element(:css, '.next_value').text).to eq "#{@standard.data[idx].last * 100}"
+        expect(r.find_element(:css, '.value').text).to eq(idx == 0 ? "100" : "< #{round_if_whole(@standard.data[idx - 1].last * 100)}")
+        expect(r.find_element(:css, '.next_value').text).to eq "#{round_if_whole(@standard.data[idx].last * 100)}"
       end
       dialog.find_element(:css, "#grading_standard_brief_#{@standard.id} .select_grading_standard_link").click
       expect(dialog.find_element(:css, "#grading_standard_brief_#{@standard.id}")).not_to be_displayed
@@ -148,6 +148,31 @@ describe "grading standards" do
       std.find_element(:css, "button.save_button")
       wait_for_ajax_requests
       expect(@standard.reload.data.length).to eq 3
+    end
+
+    context 'course settings' do
+      before :each do
+        course_with_teacher_logged_in
+        get "/courses/#{@course.id}/settings"
+        f('.grading_standard_checkbox').click
+        f('.edit_letter_grades_link').click
+      end
+
+      it "set default grading scheme", priority: "2", test_id: 164234 do
+        expect(f('#edit_letter_grades_form')).to be_displayed
+      end
+
+      it "manage default grading scheme", priority: "2", test_id: 164235 do
+        element = ff('.displaying a').select { |a| a.text == 'manage grading schemes' }
+        element[0].click
+        expect(f('.icon-add')).to be_displayed
+      end
+
+      it "edit current grading scheme", priority: "2", test_id: 164237 do
+        element = ff('.displaying a').select { |a| a.text == '' }
+        element[0].click
+        expect(f('.ui-dialog-titlebar').text).to eq("View/Edit Grading Scheme\nclose")
+      end
     end
   end
 

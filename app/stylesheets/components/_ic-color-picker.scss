@@ -2,6 +2,10 @@
 // we upgrade to React 0.13
 
 @keyframes color-picker-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(-20%,0,0);
+  }
   to {
     opacity: 1;
     transform: translate3d(0,0,0);
@@ -18,8 +22,6 @@
 }
 
 .ColorPicker__Container {
-  opacity: 0;
-  transform: translate3d(-20%,0,0);
   animation-name: color-picker-enter;
   animation-duration: 0.2s;
   animation-fill-mode: forwards;

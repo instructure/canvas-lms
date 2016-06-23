@@ -25,9 +25,7 @@ module Assignments
         end
       end
       concat_scope do
-        if context.feature_enabled?(:differentiated_assignments)
-          DifferentiableAssignment.scope_filter(@relation, user, context)
-        end
+        DifferentiableAssignment.scope_filter(@relation, user, context)
       end
     end
   end

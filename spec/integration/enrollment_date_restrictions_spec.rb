@@ -50,9 +50,9 @@ describe "enrollment_date_restrictions" do
 
     get "/courses"
     page = Nokogiri::HTML(response.body)
-    active_enrollments = page.css(".current_enrollments tr")
+    active_enrollments = page.css("#my_courses_table tbody tr")
     expect(active_enrollments.length).to eq 1
-    # Make sure that the active coures have the star column.
+    # Make sure that the active courses have the star column.
     expect(active_enrollments[0].css('td')[0]['class']).to match /star-column/
 
     expect(page.css(".past_enrollments tr")).to be_empty
@@ -132,7 +132,6 @@ describe "enrollment_date_restrictions" do
     Account.default.account_users.create!(user: @user)
     @user.reload
     get "/users/#{@user.id}"
-    expect(response.body).to match /Inactive/
     expect(response.body).to match /Completed/
     expect(response.body).to match /Active/
   end

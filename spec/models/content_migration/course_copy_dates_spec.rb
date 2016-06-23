@@ -39,13 +39,9 @@ describe ContentMigration do
                                            :start_at => @old_start + 4.days,
                                            :end_at => @old_start + 4.days + 1.hour)
         cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
-        cm.start_at = @old_start + 2.day
-        cm.end_at = @old_start + 3.days
         cm.save!
 
         cm2 = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
-        cm2.start_at = @old_start + 2.day
-        cm2.end_at = @old_start + 3.days
         cm2.save!
       end
 
@@ -94,13 +90,53 @@ describe ContentMigration do
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(new_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
-        expect(new_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
 
         newer_mod = @copy_to.context_modules.last
         expect(newer_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
-        expect(newer_mod.start_at.to_i).to eq (@new_start + 2.day).to_i
-        expect(newer_mod.end_at.to_i).to eq (@new_start + 3.day).to_i
+      end
+
+      it "infers a sensible end date if not provided" do
+        skip unless Qti.qti_enabled?
+        options = {
+                :everything => true,
+                :shift_dates => true,
+                :old_start_date => 'Jul 1, 2012',
+                :old_end_date => nil,
+                :new_start_date => 'Aug 5, 2012',
+                :new_end_date => nil
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        new_asmnt = @copy_to.assignments.first
+        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
+      end
+
+      it "ignores a bad end date" do
+        skip unless Qti.qti_enabled?
+        options = {
+                :everything => true,
+                :shift_dates => true,
+                :old_start_date => 'Jul 1, 2012',
+                :old_end_date => nil,
+                :new_start_date => 'Aug 5, 2012',
+                :new_end_date => 'Jul 4, 2012'
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        new_asmnt = @copy_to.assignments.first
+        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
+        expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
       end
 
       it "should remove dates" do
@@ -145,13 +181,9 @@ describe ContentMigration do
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at).to be_nil
-        expect(new_mod.start_at).to be_nil
-        expect(new_mod.end_at).to be_nil
 
         newer_mod = @copy_to.context_modules.last
         expect(newer_mod.unlock_at).to be_nil
-        expect(newer_mod.start_at).to be_nil
-        expect(newer_mod.end_at).to be_nil
       end
 
       it "should not create broken assignments from unpublished quizzes" do

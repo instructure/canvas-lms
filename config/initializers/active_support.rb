@@ -1,5 +1,9 @@
 ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
-ActiveSupport::SafeBuffer.delegate :to_yaml, :to => :to_str
+ActiveSupport::SafeBuffer.class_eval do
+  def encode_with(coder)
+    coder.scalar("!str", self.to_str)
+  end
+end
 
 module ActiveSupport::Cache
   module RailsCacheShim

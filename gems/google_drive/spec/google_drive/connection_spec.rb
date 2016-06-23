@@ -117,16 +117,33 @@ describe GoogleDrive::Connection do
     end
 
     describe "#list_with_extension_filter" do
-      it "should submit `trashed = false` parameter" do
+      before(:each) do
         stub_request(
           :get, "https://www.googleapis.com/drive/v2/files?maxResults=0&q=trashed=false"
         ).to_return(
           :status => 200, :body => load_fixture('list.json'), :headers => {'Content-Type' => 'application/json'}
         )
+      end
 
-        connection.list_with_extension_filter('.txt')
+      it "should submit `trashed = false` parameter" do
+        connection.list_with_extension_filter('txt')
         expect(WebMock).to have_requested(:get,
                                           "https://www.googleapis.com/drive/v2/files?maxResults=0&q=trashed=false")
+      end
+
+      it "should return allowed extension" do
+        returned_list = connection.list_with_extension_filter('png')
+        expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
+      end
+
+      it "should not return other extension" do
+        returned_list = connection.list_with_extension_filter('txt')
+        expect(returned_list.files).to be_empty
+      end
+
+      it "should return all extensions if no extension filter provided" do
+        returned_list = connection.list_with_extension_filter('')
+        expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
       end
     end
 

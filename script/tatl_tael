@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+require_relative "../gems/tatl_tael/lib/tatl_tael"
+
+unless ENV['GERRIT_PATCHSET_REVISION']
+  require 'colorize'
+end
+
+def pretty_comment(severity, message)
+  result = ""
+  result += "[#{severity}]".colorize(:yellow)
+  result += " => #{message.colorize(:green)}"
+  puts result
+end
+
+def post(message)
+  if ENV['GERRIT_PATCHSET_REVISION']
+    `gergich message "#{message}"`
+    `gergich label "Code-Review" -1`
+  else
+    pretty_comment("error", message)
+  end
+end
+
+plugin = ENV['GERRIT_PROJECT']
+plugin = nil if plugin == 'canvas-lms'
+git_dir = "gems/plugins/#{plugin}/" if plugin
+if git_dir && !Dir.exist?(git_dir)
+  puts "No plugin #{plugin} found"
+  exit 0
+end
+
+linter = TatlTael::Linter.new(git_dir: git_dir)
+
+# don't run for wips
+if linter.wip?
+  puts "WIP detected, TatlTael will not run."
+  exit 0
+end
+
+linter.ensure_specs do
+  post("Your commit does not include specs."\
+       " Please add some to verify your changes.")
+end
+
+linter.ban_new_erb do
+  post("Your commit includes new ERB files,"\
+       " which has been a no-no in Canvas since 2011."\
+       " All new UI should be built in React on top of documented APIs")
+end

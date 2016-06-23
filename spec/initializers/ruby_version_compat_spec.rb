@@ -57,44 +57,4 @@ describe 'ruby_version_compat' do
       expect(stderr).to eq ''
     end
   end
-
-  describe "unserialize_attribute_with_utf8_check" do
-    it "should strip out invalid utf-8 when deserializing a column" do
-      # non-binary invalid utf-8 can't even be inserted into the db in this environment,
-      # so we only test the !binary case here
-      yaml_blob = %{
----
- answers:
- - !map:HashWithIndifferentAccess
-   weight: 0
-   id: 2
-   html: ab&ecirc;cd.
-   valid_ascii: !binary |
-     oHRleHSg
-   migration_id: QUE_2
- question_text: What is the answer
- position: 2
-      }.force_encoding('binary').strip
-      # now actually insert it into an AR column
-      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
-      ActiveRecord::Base.connection.execute("UPDATE #{AssessmentQuestion.quoted_table_name} SET question_data = '#{yaml_blob}' WHERE id = #{aq.id}")
-      text = aq.reload.question_data['answers'][0]['valid_ascii']
-      expect(text).to eq "text"
-      expect(text.encoding).to eq Encoding::UTF_8
-    end
-
-    it "should not strip columns not on the list" do
-      Utf8Cleaner.expects(:recursively_strip_invalid_utf8!).never
-      a = Account.find(Account.default.id)
-      a.settings # deserialization is lazy, trigger it
-    end
-
-    it "should strip columns on the list" do
-      Utf8Cleaner.unstub(:recursively_strip_invalid_utf8!)
-      aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
-      Utf8Cleaner.expects(:recursively_strip_invalid_utf8!).with(instance_of(HashWithIndifferentAccess), true)
-      aq = AssessmentQuestion.find(aq)
-      aq.question_data
-    end
-  end
 end

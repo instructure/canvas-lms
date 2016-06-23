@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 define([
-  'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/RceCommandShim',
   'INST' /* INST */,
   'i18n!instructure',
   'jquery' /* jQuery, $ */,
@@ -31,9 +31,8 @@ define([
   'jquery.instructure_misc_helpers' /* /\$\.uniq/ */,
   'jquery.instructure_misc_plugins' /* /\.log\(/ */,
   'compiled/jquery.rails_flash_notifications',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(callOnRCE, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
+], function(RceCommandShim, INST, I18n, $, _, FakeXHR, authenticity_token, htmlEscape) {
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -87,7 +86,10 @@ define([
         var newData = null;
         try {
           newData = options.processData.call($form, formData);
-        } catch(e) { error = e; }
+        } catch(e) {
+          error = e;
+          if (INST && INST.environment !== 'production') throw error;
+        }
         if(newData === false) {
           return false;
         } else if(newData) {
@@ -102,7 +104,10 @@ define([
         submitParam = null;
         try {
           submitParam = options.beforeSubmit.call($form, formData);
-        } catch(e) { error = e; }
+        } catch(e) {
+          error = e;
+          if (INST && INST.environment !== 'production') throw error;
+        }
         if(submitParam === false) {
           return false;
         }
@@ -151,9 +156,6 @@ define([
       }
       if(error && !options.preventDegradeToFormSubmit) {
         if (loadingPromise) loadingPromise.reject();
-        if(INST && INST.environment == 'development') {
-          $.flashError('formSubmit error, trying to gracefully degrade. See console for details');
-        }
         return;
       }
       event.preventDefault();
@@ -685,7 +687,7 @@ define([
       }
       try {
         if($input.data('rich_text')) {
-          val = callOnRCE($input, "get_code", false);
+          val = RceCommandShim.send($input, "get_code", false);
         }
       } catch(e) {}
       var attr = $input.prop('name') || '';

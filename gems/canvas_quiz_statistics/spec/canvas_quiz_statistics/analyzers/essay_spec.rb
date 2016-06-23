@@ -68,6 +68,50 @@ describe CanvasQuizStatistics::Analyzers::Essay do
       end
     end
 
+    describe ':answers' do
+      let :question_data do
+        { points_possible: 10 }
+      end
+
+      it 'should group items into answer type buckets with appropriate data' do
+        output = subject.run([
+          { points: 0, correct: 'undefined', user_name: 'Joe0'},
+          { points: 0, correct: 'undefined', user_name: 'Joe0'},
+          { points: 0, correct: 'undefined', user_name: 'Joe0'},
+          { points: 1, correct: 'defined', user_name: 'Joe1'},
+          { points: 2, correct: 'defined', user_name: 'Joe2'},
+          { points: 3, correct: 'defined', user_name: 'Joe3'},
+          { points: 4, correct: 'defined', user_name: 'Joe4'},
+          { points: 6, correct: 'defined', user_name: 'Joe6'},
+          { points: 7, correct: 'defined', user_name: 'Joe7'},
+          { points: 8, correct: 'defined', user_name: 'Joe8'},
+          { points: 9, correct: 'defined', user_name: 'Joe9'},
+          { points: 10, correct: 'defined', user_name: 'Joe10'},
+        ])
+        answers = output[:answers]
+
+        bottom = answers[2]
+        expect(bottom[:responses]).to eq 2
+        expect(bottom[:user_names]).to include('Joe1')
+        expect(bottom[:full_credit]).to be_false
+
+        middle = answers[1]
+        expect(middle[:responses]).to eq 5
+        expect(middle[:user_names]).to include('Joe6')
+        expect(middle[:full_credit]).to be_false
+
+        top = answers[0]
+        expect(top[:responses]).to eq 2
+        expect(top[:user_names]).to include('Joe10')
+        expect(top[:full_credit]).to be_true
+
+        undefined = answers[3]
+        expect(undefined[:responses]).to eq 3
+        expect(undefined[:user_names].uniq).to eq ['Joe0']
+        expect(undefined[:full_credit]).to be_false
+      end
+    end
+
     describe ':point_distribution' do
       it 'should map each score to the number of receivers' do
         output = subject.run([

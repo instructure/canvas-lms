@@ -24,8 +24,7 @@ module Lti
     has_many :bindings, class_name: 'Lti::ToolProxyBinding', dependent: :destroy
     has_many :resources, class_name: 'Lti::ResourceHandler', dependent: :destroy
     has_many :tool_settings, class_name: 'Lti::ToolSetting', dependent: :destroy
-    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
-    belongs_to :context, :polymorphic => true
+    belongs_to :context, polymorphic: [:course, :account]
 
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 

@@ -19,7 +19,7 @@ define [
       @clock = sinon.useFakeTimers()
       props =
         handleUpdate: ->
-        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
+        dateValue: new Date(Date.UTC(2012, 1, 1, 7, 1, 0))
         dateType: "unlock_at"
         rowKey: "nullnullnull"
         labelledBy: "foo"
@@ -36,18 +36,18 @@ define [
     ok @dueDateCalendarPicker.isMounted()
 
   test 'formattedDate returns a nicely formatted Date', ->
-    equal "Feb 1, 2012 at 7:00am", @dueDateCalendarPicker.formattedDate()
+    equal "Feb 1, 2012 at 7:01am", @dueDateCalendarPicker.formattedDate()
 
   test 'formattedDate returns a localized Date', ->
     snapshot = tz.snapshot()
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.pushFrame()
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.medium': "%-d %b %Y"
       'time.formats.tiny': "%-k:%M"
       'time.event': "%{date} à %{time}"
-    equal "1 févr. 2012 à 7:00", @dueDateCalendarPicker.formattedDate()
+    equal "1 févr. 2012 à 7:01", @dueDateCalendarPicker.formattedDate()
     I18nStubber.popFrame()
     tz.restore(snapshot)
 

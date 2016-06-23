@@ -836,7 +836,6 @@ describe "Modules API", type: :request do
 
   context "differentiated assignments" do
     before(:once) do
-      @course.enable_feature!(:differentiated_assignments)
       @assignment.only_visible_to_overrides = true; @assignment.save!
       @other_section = @course.course_sections.create! name: "other section"
       create_section_override_for_assignment(@assignment, {course_section: @other_section})

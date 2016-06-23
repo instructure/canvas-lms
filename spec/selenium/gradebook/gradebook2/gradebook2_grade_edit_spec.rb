@@ -182,7 +182,7 @@ describe "editing grades" do
     set_value(grade_input, 3)
     ff('body')[0].click
     wait_for_ajax_requests
-    expect(ff('.gradebook_cell_editable').count).to eq 0
+    expect(f("body")).not_to contain_css('.gradebook_cell_editable')
   end
 
   it "should validate curving grades option", priority: "1", test_id: 220320 do
@@ -278,8 +278,6 @@ describe "editing grades" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-    keep_trying_until do
-      expect(flash_message_present?(:error, /refresh/)).to be_truthy
-    end
+    expect_flash_message :error, /refresh/
   end
 end

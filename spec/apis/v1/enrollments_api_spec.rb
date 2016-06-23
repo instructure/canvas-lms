@@ -180,7 +180,23 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.workflow_state).to eq 'invited'
       end
 
-      it "should default observer enrollments to 'active' state" do
+      it "should not default observer enrollments to 'active' state if the user is not registered" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'ObserverEnrollment',
+              :course_section_id => @section.id,
+              :limit_privileges_to_course_section => true
+            }
+          }
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'invited'
+      end
+
+      it "should default observer enrollments to 'active' state if the user is registered" do
+        @unenrolled_user.register!
         json = api_call :post, @path, @path_options,
           {
             :enrollment => {
@@ -1405,7 +1421,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
-            'total_activity_time' => 0
+            'total_activity_time' => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -1657,7 +1678,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
-            'total_activity_time'                => 0
+            'total_activity_time'                => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           })
         end
 
@@ -1709,7 +1735,12 @@ describe EnrollmentsApiController, type: :request do
             'start_at'                           => nil,
             'end_at'                             => nil,
             'last_activity_at'                   => nil,
-            'total_activity_time'                => 0
+            'total_activity_time'                => 0,
+            'course_integration_id' => nil,
+            'sis_course_id' => nil,
+            'sis_section_id' => nil,
+            'sis_source_id' => nil,
+            'section_integration_id' => nil
           })
         end
 

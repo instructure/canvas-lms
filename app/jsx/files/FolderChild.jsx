@@ -1,8 +1,8 @@
 define([
   'i18n!react_files',
   'react',
-  'react-router',
   'compiled/react_files/components/FolderChild',
+  'compiled/react_files/modules/filesEnv',
   'classnames',
   'jsx/files/ItemCog',
   'jsx/shared/PublishCloud',
@@ -12,8 +12,8 @@ define([
   'compiled/fn/preventDefault',
   'jsx/shared/FriendlyDatetime',
   'compiled/util/friendlyBytes'
-], function(I18n, React, ReactRouter, FolderChild, classnames, ItemCog, PublishCloud, FilesystemObjectThumbnail, UsageRightsIndicator, Folder, preventDefault, FriendlyDatetime, friendlyBytes) {
-  var Link = ReactRouter.Link
+], function(I18n, React, FolderChild, filesEnv, classnames, ItemCog, PublishCloud, FilesystemObjectThumbnail, UsageRightsIndicator, Folder, preventDefault, FriendlyDatetime, friendlyBytes) {
+
   FolderChild.renderItemCog = function () {
     if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
       return (
@@ -69,9 +69,9 @@ define([
       );
     }else if(this.props.model instanceof Folder) {
       return (
-        <Link
+        <a
           ref= 'nameLink'
-          to= 'folder'
+          href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
           className= 'media'
           onClick= {this.checkForAccess}
           params= {{splat: this.props.model.urlPath()}}
@@ -82,15 +82,15 @@ define([
           <span className= 'media-body'>
             {this.props.model.displayName()}
           </span>
-        </Link>
+        </a>
       );
     } else{
       return (
         <a
-          href= {this.props.model.get('url')}
-          onClick= {preventDefault(this.handleFileLinkClick)}
-          className= 'media'
-          ref= 'nameLink'
+          href={this.props.model.get('url')}
+          onClick={preventDefault(this.handleFileLinkClick)}
+          className='media'
+          ref='nameLink'
         >
           <span className= 'pull-left'>
             <FilesystemObjectThumbnail model= {this.props.model} />

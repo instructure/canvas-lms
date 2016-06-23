@@ -57,7 +57,7 @@ to do this opens your application to the possibility of logging the
 wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-common-oauth2.html">described here</a>.</td>
     </tr>
     <tr>
-      <td class="mono">scopes<span class="label optional"></span></td>
+      <td class="mono">scope<span class="label optional"></span></td>
       <td>This can be used to specify what information the access token
       will provide access to.  By default an access token will have access to
       all api calls that a user can make.  The only other accepted value
@@ -76,6 +76,11 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
       credentials, even if they're already logged into Canvas. By default,
       if a user already has an active Canvas web session, they will not be
       asked to re-enter their credentials.</td>
+    </tr>
+    <tr>
+      <td class="mono">unique_id<span class="label optional"></span></td>
+      <td>Set to the user's username to be populated in the login form in the event
+      that the user must authenticate.</td>
     </tr>
   </tbody>
 </table>

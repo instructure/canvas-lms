@@ -13,14 +13,24 @@ define [
     React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || {submission: {}, cellData: {id: '1'}, rowData: {enrollment: {}}}
+    cellData = props || {
+      rowData: {
+        student: {
+          enrollment_state: "active"
+        }
+      }
+    }
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 
   buildComponentWithSubmission = (additionalProps) ->
     cellData =
-      columnData: {id: '1'}
       cellData: {id: '1', grade: '100%', assignment_id: '1'}
+      rowData: {
+        student: {
+          enrollment_state: "active"
+        }
+      }
     $.extend(cellData, additionalProps)
     buildComponent(cellData)
 

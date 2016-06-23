@@ -42,9 +42,9 @@ class ObserverEnrollment < Enrollment
     RequestCache.cache(:observed_students, context, current_user) do
       context.shard.activate do
         associated_user_ids = context.observer_enrollments.where(user_id: current_user)
-          .where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
-        context.student_enrollments.active
-          .where(user_id: associated_user_ids).group_by(&:user)
+          .where("associated_user_id IS NOT NULL").select(:associated_user_id)
+        context.student_enrollments.
+          where(user_id: associated_user_ids).group_by(&:user)
       end
     end
   end

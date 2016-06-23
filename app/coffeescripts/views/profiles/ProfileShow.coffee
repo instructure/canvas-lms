@@ -22,9 +22,7 @@ define [
   'jquery'
   'jst/profiles/addLinkRow'
   'compiled/util/AvatarWidget'
-  'compiled/tinymce'
   'jquery.instructure_forms'
-  'tinymce.editor_box'
 ], (I18n, Backbone, $, addLinkRow, AvatarWidget) ->
 
   class ProfileShow extends Backbone.View
@@ -66,7 +64,6 @@ define [
 
     showEditForm: ->
       @$el.addClass('editing').removeClass('not-editing')
-      @$('.profile_links').removeClass('span6')
 
     initEdit: ->
       if @options.links?.length
@@ -75,13 +72,10 @@ define [
         @addLinkField()
         @addLinkField()
 
-      # setTimeout so tiny has some width to read
-      #setTimeout -> @$('#profile_bio').editorBox()
       @showEditForm()
 
     cancelEditProfile: ->
       @$el.addClass('not-editing').removeClass('editing')
-      @$('.profile_links').addClass('span6')
 
     ##
     # Event handler that can also be called manually.

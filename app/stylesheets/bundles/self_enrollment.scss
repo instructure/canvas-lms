@@ -1,17 +1,52 @@
 @import "base/environment";
 
-@if $use_new_styles {
-  body {
-    min-width: 0;
+body.embedded {
+
+  // New UI adds more layout elements, so needs
+  // this for the self-enrollments footer to
+  // stick at the bottom of the iframe-modal.
+  @if $use_new_styles {
+    #main { min-height: 100vh !important; }
   }
 
-  #main {
-    position: initial;
+  // Only give the layout element styles when
+  // the body is embedded in an iframe, so the
+  // footer is not absolutely positioned when the
+  // page is viewed outside an iframe-modal
+  .ic-Self-enrollment-footer-modal-layout {
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: $ic-sp;
+    margin: 0 -1em !important;
+    background-color: $ic-bg-light-neutral;
+    border-top: 1px solid $ic-border-light;
+    text-align: right;
+    .footer-info {
+      //position: absolute;
+      //left: 1em;
+      //top: 1.5em;
+    }
+    .ic-Self-enrollment-footer {
+      margin-top: 0;
+    }
   }
-} @else {
-  /*!
-    this file is intentionally blank
-    since we only need to do things here if
-    new_styles is turned on
-  */
+}
+
+.ic-Self-enrollment-form {
+  margin-bottom: 0;
+}
+
+.ic-Self-enrollment-footer {
+  margin-top: $ic-sp*2;
+  display: flex;
+  align-items: center;
+}
+
+// primary element contains button(s)
+// and is right-text-aligned
+.ic-Self-enrollment-footer__Primary {
+  flex: 1;
+  text-align: right;
 }

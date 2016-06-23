@@ -22,8 +22,7 @@ module DifferentiatedAssignments
         course_name = opts.fetch(:name, 'Selective Release Course')
         course(
           course_name: course_name,
-          active_course: true,
-          differentiated_assignments: true
+          active_course: true
         )
       end
   end

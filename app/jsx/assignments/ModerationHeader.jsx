@@ -9,9 +9,13 @@ define([
     propTypes: {
       onPublishClick: React.PropTypes.func.isRequired,
       onReviewClick: React.PropTypes.func.isRequired,
-      published: React.PropTypes.bool.isRequired
+      published: React.PropTypes.bool.isRequired,
+      selectedStudentCount: React.PropTypes.number.isRequired
     },
 
+    noStudentSelected () {
+      return this.props.selectedStudentCount === 0;
+    },
     handlePublishClick () {
       // TODO: Make a better looking confirm one day
       var confirmMessage = I18n.t('Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.')
@@ -57,7 +61,7 @@ define([
                 type='button'
                 className='ModeratedGrading__Header-AddReviewerBtn Button'
                 onClick={this.props.onReviewClick}
-                disabled={this.props.published}
+                disabled={this.props.published || this.noStudentSelected()}
               >
                 <span className='screenreader-only'>{I18n.t('Add a reviewer for the selected students')}</span>
                 <span aria-hidden='true'>

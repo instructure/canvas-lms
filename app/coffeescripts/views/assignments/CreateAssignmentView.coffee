@@ -136,7 +136,7 @@ define [
       validRange = ENV.VALID_DATE_RANGE
       data.lock_at = @model.lockAt()
       data.unlock_at = @model.unlockAt()
-      dateValidator = new DateValidator({date_range: validRange, data: data})
+      dateValidator = new DateValidator({date_range: _.extend({}, validRange), data: data})
       errs = dateValidator.validateDates()
 
       return errors if _.isEmpty(errs)
@@ -149,4 +149,3 @@ define [
 
       errors["due_at"] = [message: errs["due_at"]]
       errors
-

@@ -43,7 +43,7 @@ describe "assignments" do
       it "should not exist in a published assignment", priority: "1", test_id: 140648 do
         create_assignment
 
-        expect(f(".save_and_publish")).to be_nil
+        expect(f("#content")).not_to contain_css(".save_and_publish")
       end
 
       context "moderated grading assignments" do
@@ -131,7 +131,7 @@ describe "assignments" do
       # freeze for a certain time, so we don't get unexpected ui complications
       time = DateTime.new(Time.now.year,1,7,2,13)
       Timecop.freeze(time) do
-        due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+        due_at = format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
@@ -174,8 +174,8 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      driver.execute_script "$('.edit_assignment').first().hover().click()"
-      expect(fj('.form-dialog .ui-datepicker-trigger:visible')).to be_nil
+      hover_and_click(".edit_assignment")
+      expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       expect(f('.multiple_due_dates input').attribute('disabled')).to be_present
       assignment_title = f("#assign_#{@assignment.id}_assignment_name")
       assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
@@ -195,7 +195,7 @@ describe "assignments" do
         # freeze time to avoid ui complications
         time = DateTime.new(2015,1,7,2,13)
         Timecop.freeze(time) do
-          due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+          due_at = format_time_for_view(time)
           points = '25'
 
           get "/courses/#{@course.id}/assignments"
@@ -300,7 +300,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f(".description.teacher-version")).to be_present
-      expect(ff(".edit_assignment_link")).to be_empty
+      expect(f("#content")).not_to contain_css(".edit_assignment_link")
     end
 
     context "group assignments" do
@@ -365,14 +365,14 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments"
         fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
         wait_for_ajaximations
-        expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
+        expect(f("div#assignment_group_#{@frozen_assign.assignment_group_id}")).not_to contain_css("a.delete_group")
       end
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
         wait_for_ajaximations
-        expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
+        expect(f("div#assignment_#{@frozen_assign.id}")).not_to contain_jqcss("a.delete_assignment:visible")
       end
 
       it "should allow editing the due date even if completely frozen", priority: "2", test_id: 649310 do
@@ -402,7 +402,7 @@ describe "assignments" do
 
       accept_alert
       wait_for_ajaximations
-      expect(element_exists("#assignment_#{as.id}")).to be_falsey
+      expect(f("#content")).not_to contain_css("#assignment_#{as.id}")
 
       as.reload
       expect(as.workflow_state).to eq 'deleted'
@@ -549,7 +549,7 @@ describe "assignments" do
       it 'should not show when no passback configured', priority: "1", test_id: 244956 do
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
+        expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
       end
 
       it 'should show when powerschool is enabled', priority: "1", test_id: 244913 do
@@ -575,62 +575,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
-      end
-
-      it 'should display post to SIS icon on assignments page when enabled', priority: "2", test_id: 649314 do
-        Account.default.set_feature_flag!('post_grades', 'on')
-
-        @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
-        @a2 = @course.assignments.create!(:name => 'assignment 2', :post_to_sis => false)
-        @a3 = @course.assignments.create!(:name => 'assignment 3', :post_to_sis => true)
-
-        get "/courses/#{@course.id}/assignments/"
-        wait_for_ajaximations
-
-        expect(find_all('.post-to-sis-status.enabled').count).to be 2
-        expect(find_all('.post-to-sis-status.disabled').count).to be 1
-
-        Account.default.set_feature_flag!('post_grades', 'off')
-
-        get "/courses/#{@course.id}/assignments/"
-        wait_for_ajaximations
-
-        expect(find_all('.post-to-sis-status.enabled').count).to be 0
-        expect(find_all('.post-to-sis-status.disabled').count).to be 0
-      end
-
-      it 'should toggle the post to SIS feature when clicked', priority: "2", test_id: 649315 do
-        Account.default.set_feature_flag!('post_grades', 'on')
-
-        @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
-        @a2 = @course.assignments.create!(:name => 'assignment 2', :post_to_sis => false)
-        @a3 = @course.assignments.create!(:name => 'assignment 3', :post_to_sis => true)
-
-        get "/courses/#{@course.id}/assignments/"
-        wait_for_ajaximations
-
-        enabled = find_all('.post-to-sis-status.enabled')
-        disabled = find_all('.post-to-sis-status.disabled')
-
-        expect(enabled.count).to be 2
-        expect(disabled.count).to be 1
-
-        enabled.each(&:click)
-        disabled.each(&:click)
-
-        wait_for_ajaximations
-
-        @a1.reload
-        @a2.reload
-        @a3.reload
-
-        expect(@a1.post_to_sis).to be_falsey
-        expect(@a2.post_to_sis).to be_truthy
-        expect(@a3.post_to_sis).to be_falsey
-
-        expect(find_all('.post-to-sis-status.enabled').count).to be 1
-        expect(find_all('.post-to-sis-status.disabled').count).to be 2
+        expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
       end
     end
 

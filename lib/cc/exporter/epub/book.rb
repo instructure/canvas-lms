@@ -2,10 +2,12 @@ module CC::Exporter::Epub
   class Book
     include CC::Exporter::Epub::Converters
 
-    def initialize(content)
+    def initialize(exporter)
+      content = exporter.templates.dup
       @title = content.delete(:title)
       @files = content.delete(:files)
       @content = content
+      @filename_prefix = exporter.filename_prefix
     end
     attr_reader :content, :files, :title
 
@@ -54,9 +56,7 @@ module CC::Exporter::Epub
     end
 
     def filename
-      name = CanvasTextHelper.truncate_text(title, {:max_length => 200, :ellipsis => ''})
-      timestamp = Time.zone.now.strftime('%Y-%b-%d_%H-%M-%S')
-      "#{name}-#{timestamp}.epub"
+      "#{@filename_prefix}.epub"
     end
   end
 end

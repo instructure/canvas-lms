@@ -4,7 +4,7 @@ require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
+  desc 'run Karma as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
     app = nil if app == 'NA'
@@ -17,7 +17,7 @@ namespace :js do
         exit
       end
     end
-    Rake::Task['js:generate_runner'].invoke
+    build_runner
     exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
@@ -59,7 +59,7 @@ namespace :js do
 
     matcher = Canvas::RequireJs.matcher
     tests = Dir[
-      "public/javascripts/#{matcher}",
+      "public/javascripts/*[!bower]/#{matcher}",
       "spec/javascripts/compiled/#{matcher}",
       "spec/plugins/*/javascripts/compiled/#{matcher}"
     ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
@@ -292,21 +292,15 @@ namespace :js do
     threads.each(&:join)
   end
 
-  desc "build webpack js for production"
+  desc "build webpack js"
   task :webpack do
     if CANVAS_WEBPACK
-      if ENV['RAILS_ENV'] == 'production'
+      if ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`
       else
         puts "--> Building DEVELOPMENT webpack bundles"
         `npm run webpack-development`
-        if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-          # if this var is set, we'll need to have optimized version of the
-          # webpack bundles available too
-          puts "--> Building OPTIMIZED webpack bundles"
-          `npm run webpack-production`
-        end
       end
       raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
     end

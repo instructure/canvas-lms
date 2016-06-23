@@ -141,7 +141,7 @@ These commands should get you going?
 
 ```bash
 cp docker-compose/config/* config/
-docker-compose run --rm web script/docker_first_time_setup.sh
+docker-compose run --rm web script/docker_first_time_build.sh
 ```
 
 #### Not in a hurry. Or I want to see whats happening

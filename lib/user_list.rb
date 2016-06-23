@@ -42,17 +42,17 @@ class UserList
   #                         is used. otherwise a temporary user is created
   # * <tt>:infer</tt> - uses :open or :closed according to root_account.open_registration
   #
-  def initialize(list_in, options = {})
-    options.reverse_merge! :root_account => Account.default,
-                           :search_method => :infer,
-                           :initial_type => nil
-    @options = options
+  def initialize(list_in, root_account: Account.default,
+                 search_method: :infer, initial_type: nil,
+                 current_user: nil)
     @addresses = []
     @errors = []
     @duplicate_addresses = []
-    @root_account = @options[:root_account]
-    @search_method = @options[:search_method]
+    @root_account = root_account
+    @search_method = search_method
+    @initial_type = initial_type
     @search_method = (@root_account.open_registration? ? :open : :closed) if @search_method == :infer
+    @current_user = current_user
     parse_list(list_in)
     resolve
   end
@@ -79,7 +79,7 @@ class UserList
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
-      user.initial_enrollment_type = User.initial_enrollment_type_from_text(@options[:initial_type])
+      user.initial_enrollment_type = User.initial_enrollment_type_from_text(@initial_type)
       user.save!
       user
     end
@@ -161,7 +161,12 @@ class UserList
   end
 
   def resolve
-    all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
+    trusted_account_ids = @root_account.trusted_account_ids
+    if @current_user && (!@current_user.associated_shards.include?(Account.site_admin.shard) ||
+        !Account.site_admin.pseudonyms.active.merge(@current_user.pseudonyms).exists?)
+      trusted_account_ids.delete(Account.site_admin.id)
+    end
+    all_account_ids = [@root_account.id] + trusted_account_ids
     associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
     associated_shards << @root_account.shard
     # Search for matching pseudonyms

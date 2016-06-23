@@ -22,8 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_canceled_by_user.email' do
   it "should render" do
     user = user_model
-    appointment_participant_model(:participant => user)
-
+    course_with_student(course: @course, active_enrollment: true)
+    appointment_participant_model(:participant => user, :updating_user => @user)
     generate_message(:appointment_canceled_by_user, :email, @event,
                      :user => @user, :data => {:updating_user => user,
                                                :cancel_reason => "because"})
@@ -40,15 +40,15 @@ describe 'appointment_canceled_by_user.email' do
     user = user_model
     @course = course_model
     cat = group_category
+    user_model
     @group = cat.groups.create(:context => @course)
-    @group.users << user
-    appointment_participant_model(:participant => @group, :course => @course)
+    @group.users << user << @user
+    appointment_participant_model(:participant => @group, :course => @course, :updating_user => @user)
     @event.cancel_reason = 'just because'
 
     generate_message(:appointment_canceled_by_user, :email, @event,
-                     :data => {:updating_user => user,
-                                       :cancel_reason => "just because"})
-
+                     :user => @user, :data => {:updating_user => user,
+                                               :cancel_reason => "just because"})
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
     expect(@message.body).to include('just because')

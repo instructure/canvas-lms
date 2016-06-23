@@ -1,8 +1,11 @@
 @import "components/main";
 @import "base/layout";
 @if $use_new_styles { @import "base/ic_app_layout"; }
-@import "base/#header";
-@if $use_new_styles { @import "base/ic_app_header"; }
+@if $use_new_styles {
+  @import "base/ic_app_header";
+} @else {
+  @import "base/#header";
+}
 @import "base/#left-side";
 @import "base/#right-side";
 @import "base/print";

@@ -14,7 +14,7 @@
               <%= render partial: "shared/auth_type_icon",
                          locals: {
                            auth_type: aac.auth_type,
-                           sr_message: only_one ? nil : t("Login with %{provider}", provider: aac.auth_type),
+                           sr_message: only_one ? nil : t("Login with %{provider}", provider: aac.class.display_name),
                            with_login_text: only_one
                          } %>
           </a>

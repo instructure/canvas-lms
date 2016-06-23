@@ -24,15 +24,16 @@ class DeveloperKey < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :account
+
   has_many :page_views
   has_many :access_tokens
-  has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email, :event, :auto_expire_tokens
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :email, :event, :auto_expire_tokens
 
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
-  before_save :nullify_empty_tool_id
+  before_save :nullify_empty_icon_url
+  after_save :clear_cache
 
   validates_as_url :redirect_uri
 
@@ -54,8 +55,7 @@ class DeveloperKey < ActiveRecord::Base
     self.save
   end
 
-  def nullify_empty_tool_id
-    self.tool_id = nil if tool_id.blank?
+  def nullify_empty_icon_url
     self.icon_url = nil if icon_url.blank?
   end
 
@@ -73,12 +73,26 @@ class DeveloperKey < ActiveRecord::Base
 
   def authorized_for_account?(target_account)
     return true unless account_id
-    account_ids = target_account.account_chain.map{|acct| acct.global_id}
-    account_ids.include? account.global_id
+    target_account.id == account_id
   end
 
   def account_name
     account.try(:name)
+  end
+
+  class << self
+    def find_cached(id)
+      global_id = Shard.global_id_for(id)
+      MultiCache.fetch("developer_key/#{global_id}") do
+        Shackles.activate(:slave) do
+          DeveloperKey.find(global_id)
+        end
+      end
+    end
+  end
+
+  def clear_cache
+    MultiCache.delete("developer_key/#{global_id}")
   end
 
   def self.get_special_key(default_key_name)

@@ -57,11 +57,6 @@ define [
     # default if the <video height> is not specified
     defaultVideoHeight: VIDEO_HEIGHT
 
-  unless INST.enableHtml5FirstVideos
-    # prefer flash player, as it works more consistently
-    # for now, but allow fallback to html5 (like on mobile)
-    mejs.MepDefaults.mode = 'auto_plugin'
-
   mejs.MepDefaults.success = (mediaElement, domObject) ->
     kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
     mediaElement.play()
@@ -198,9 +193,9 @@ define [
           close: ->
             $mediaPlayer = $this.data('mediaelementplayer')
             $mediaPlayer.pause() if $mediaPlayer
-          open: (ev) -> $(ev.currentTarget).parent()
-                          .find('.ui-dialog-titlebar-close')
-                          .focus()
+          open: (ev) -> $(ev.currentTarget).parent().
+                          find('.ui-dialog-titlebar-close').
+                          focus()
 
         # Populate dialog box with a video
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->

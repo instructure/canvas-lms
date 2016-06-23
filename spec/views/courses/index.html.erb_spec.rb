@@ -31,7 +31,7 @@ describe "/courses/index" do
     expect(response).not_to be_nil
   end
 
-  it "should show context name under group name" do
+  it "should show context name in groups table" do
     course_with_student
     group_with_user(:user => @user, :group_context => @course)
     view_context
@@ -41,7 +41,7 @@ describe "/courses/index" do
     assigns[:visible_groups] = [@group]
     render "courses/index"
     doc = Nokogiri::HTML.parse(response.body)
-    expect(doc.at_css('#my_groups_table tr:first span.subtitle').text).to eq @course.name
+    expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
   end
 
   it "should not show groups for restricted future courses" do

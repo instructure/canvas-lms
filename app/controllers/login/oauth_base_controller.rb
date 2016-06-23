@@ -23,6 +23,10 @@ class Login::OauthBaseController < ApplicationController
   before_filter :run_login_hooks, :check_sa_delegated_cookie, :fix_ms_office_redirects, only: :new
 
   def new
+    # a subclass might explicitly set the AAC, so that we don't need to infer
+    # it from the URL
+    return if @aac
+
     auth_type = params[:controller].sub(%r{^login/}, '')
     # ActionController::TestCase can't deal with aliased controllers, so we have to
     # explicitly specify this
@@ -33,8 +37,6 @@ class Login::OauthBaseController < ApplicationController
     else
       @aac = scope.first!
     end
-
-    reset_session_for_login
   end
 
   protected
@@ -60,12 +62,21 @@ class Login::OauthBaseController < ApplicationController
   end
 
   def find_pseudonym(unique_ids)
+    if unique_ids.nil?
+      unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
+      logger.warn "Received OAuth2 login with no unique_id"
+      flash[:delegated_message] =
+          t("Authentication with %{provider} was successful, but no unique ID for logging in to Canvas was provided.",
+            provider: @aac.class.display_name)
+      return redirect_to unknown_user_url
+    end
+
     pseudonym = nil
     unique_ids = Array(unique_ids)
     unique_ids.any? do |unique_id|
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
-    pseudonym ||= @aac.provision_user(unique_ids.first) if @aac.jit_provisioning?
+    pseudonym ||= @aac.provision_user(unique_ids.first) if !unique_ids.empty? && @aac.jit_provisioning?
 
     if pseudonym
       # Successful login and we have a user

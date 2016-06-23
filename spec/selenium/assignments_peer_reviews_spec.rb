@@ -82,7 +82,7 @@ describe "assignments" do
     let!(:comment) {
       submission_comment_model({
         author: reviewer,
-        recipient: reviewed
+        submission: submission
       })
     }
     let!(:rubric) { rubric_model }

@@ -1,6 +1,26 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
+describe "assignment group that can't manage a course" do
+  include_context "in-process server selenium tests"
+  include AssignmentsCommon
+
+  it "does not display the manage cog menu" do
+    @domain_root_account = Account.default
+    course
+    account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+    user_session(@user)
+    @course.require_assignment_group
+    @assignment_group = @course.assignment_groups.first
+    @course.assignments.create(name: "test", assignment_group: @assignment_group)
+    get "/courses/#{@course.id}/assignments"
+
+    wait_for_ajaximations
+
+    expect(f("#content")).not_to contain_css("#assignmentSettingsCog")
+  end
+end
+
 describe "assignment groups" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
@@ -211,7 +231,7 @@ describe "assignment groups" do
     ag = @course.assignment_groups.first
     time = DateTime.new(Time.now.year,2,7,4,15)
     Timecop.freeze(time) do
-      current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+      current_time = format_time_for_view(time)
       assignment_name, assignment_points = ["Do this", "13"]
 
       # Navigates to assignments index page.
@@ -317,8 +337,8 @@ describe "assignment groups" do
 
     it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2", test_id: 210085 do
       get "/courses/#{@course.id}/assignments"
-      expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
-      expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
+      expect(f("#content")).not_to contain_css("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")
+      expect(f("#content")).not_to contain_css("#assignment_#{@frozen_assign.id} .delete_assignment_link")
     end
 
     it "should not be locked for admin", priority: "2", test_id: 210086 do

@@ -133,8 +133,8 @@ describe SIS::CSV::Import do
       ",U004,student,S004,active,",
       ",U005,student,S005,active,",
       ",U006,student,S006,deleted,",
-      ",U007,student,S007,active,",
-      ",U008,student,S008,active,",
+      ",U007,student,S007,deleted,",
+      ",U008,student,S008,deleted,",
       ",U009,student,S005,deleted,",
       ",U001,student,S001S,active,",
       ",U002,student,S002S,active,",
@@ -142,8 +142,8 @@ describe SIS::CSV::Import do
       ",U004,student,S004S,active,",
       ",U005,student,S005S,active,",
       ",U006,student,S006S,deleted,",
-      ",U007,student,S007S,active,",
-      ",U008,student,S008S,active,",
+      ",U007,student,S007S,deleted,",
+      ",U008,student,S008S,deleted,",
       ",U009,student,S005S,deleted,"
     )
     process_csv_data_cleanly(

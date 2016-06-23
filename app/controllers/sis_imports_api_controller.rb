@@ -221,9 +221,9 @@ class SisImportsApiController < ApplicationController
   #
   # @returns [SisImport]
   def index
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       scope = @account.sis_batches.order('created_at DESC')
-      if created_since = CanvasTime.try_parse(params[:created_since])
+      if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end
       @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
@@ -323,7 +323,7 @@ class SisImportsApiController < ApplicationController
   #
   # @returns SisImport
   def create
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, :import_sis)
       params[:import_type] ||= 'instructure_csv'
       raise "invalid import type parameter" unless SisBatch.valid_import_types.has_key?(params[:import_type])
 
@@ -416,7 +416,7 @@ class SisImportsApiController < ApplicationController
   #
   # @returns SisImport
   def show
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = SisBatch.find(params[:id])
       raise "Sis Import not found" unless @batch
       raise "Batch does not match account" unless @batch.account.id == @account.id

@@ -8,6 +8,7 @@ define([
       ACTIVE_CLASS = ' active',
       LATE_CLASS = ' late',
       RESUBMIITED_CLASS = ' resubmitted',
+      CONCLUDED_OR_INACTIVE_CLASS = ' grayed-out',
       ASSIGNMENT_TYPES = [
         'percent',
         'pass_fail',
@@ -40,6 +41,18 @@ define([
       return _.contains(ASSIGNMENT_TYPES, columnData.columnType);
     },
 
+    isConcluded() {
+      return this.props.rowData.isConcluded;
+    },
+
+    isInactive() {
+      return this.props.rowData.isInactive;
+    },
+
+    isConcludedOrInactive() {
+      return this.isConcluded() || this.isInactive();
+    },
+
     getClassName(isActiveCell, cellData, isAssignment) {
       var className = GRADEBOOK_CELL_CLASS;
 
@@ -53,6 +66,10 @@ define([
         } else if (cellData.grade_matches_current_submission !== null && !(cellData.grade_matches_current_submission)) {
           className += RESUBMIITED_CLASS;
         }
+      }
+
+      if (this.isConcludedOrInactive()) {
+        className += CONCLUDED_OR_INACTIVE_CLASS;;
       }
 
       return className;

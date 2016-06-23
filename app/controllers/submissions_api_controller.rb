@@ -189,7 +189,7 @@ class SubmissionsApiController < ApplicationController
                     end
       submissions = @assignment.submissions.where(user_id: student_ids)
 
-      if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
+      if includes.include?("visibility")
         json = bulk_process_submissions_for_visibility(submissions, includes)
       else
         submissions = submissions.order(:user_id)
@@ -315,12 +315,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignment_visibilities = {}
-    if @context.feature_enabled?(:differentiated_assignments)
-      assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
-    else
-      students_with_visibility = @context.all_students.pluck(:id).uniq.to_set
-      assignments.each { |a| assignment_visibilities[a.id] = students_with_visibility }
-    end
+    assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
 
     # unless teacher, filter assignments down to only assignments current user can see
     unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
@@ -334,7 +329,7 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-          eager_load(:user).
+          eager_load(:user => :pseudonyms).
           where("users.id" => student_ids)
 
       submissions = if requested_assignment_ids.present?
@@ -428,11 +423,10 @@ class SubmissionsApiController < ApplicationController
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
-      if !(da_on = @context.feature_enabled?(:differentiated_assignments)) ||
-           @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
-           @submission.assignment_visible_to_user?(@current_user, differentiated_assignments: da_on)
+      if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
+           @submission.assignment_visible_to_user?(@current_user)
         includes = Array(params[:include])
-        @submission.visible_to_user = includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments) ? @assignment.visible_to_user?(@submission.user) : true
+        @submission.visible_to_user = includes.include?("visibility") ? @assignment.visible_to_user?(@submission.user) : true
         render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
@@ -463,7 +457,7 @@ class SubmissionsApiController < ApplicationController
     permission = :nothing if @user != @current_user
     # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false)
+      api_attachment_preflight(@user, request, :check_quota => false, :submission_context => @context)
     end
   end
 
@@ -607,7 +601,12 @@ class SubmissionsApiController < ApplicationController
         submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
       end
       if submission[:grade] || submission[:excuse]
-        @submissions = @assignment.grade_student(@user, submission)
+        begin
+          @submissions = @assignment.grade_student(@user, submission)
+        rescue Assignment::GradeError => e
+          logger.info "GRADES: grade_student failed because '#{e.message}'"
+          return render json: { error: e.to_s }, status: 400
+        end
         @submission = @submissions.first
       else
         @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
@@ -660,9 +659,8 @@ class SubmissionsApiController < ApplicationController
       includes.concat(Array.wrap(params[:include]) & ['visibility'])
       includes << 'provisional_grades' if submission[:provisional]
 
-      da_enabled = @context.feature_enabled?(:differentiated_assignments)
       visiblity_included = includes.include?("visibility")
-      if visiblity_included && da_enabled
+      if visiblity_included
         user_ids = @submissions.map(&:user_id)
         users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
       end
@@ -672,7 +670,7 @@ class SubmissionsApiController < ApplicationController
       json[:all_submissions] = @submissions.map { |submission|
 
         if visiblity_included
-          submission.visible_to_user = da_enabled ? users_with_visibility.include?(submission.user_id) : true
+          submission.visible_to_user = users_with_visibility.include?(submission.user_id)
         end
 
         submission_json(submission, @assignment, @current_user, session, @context, includes)
@@ -692,7 +690,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       includes = Array(params[:include])
-      student_scope = context.students_visible_to(@current_user)
+      student_scope = context.students_visible_to(@current_user, include: :inactive)
       student_scope = @assignment.students_with_visibility(student_scope)
       student_scope = student_scope.order(:id)
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
@@ -838,7 +836,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def get_user_considering_section(user_id)
-    students = @context.students_visible_to(@current_user, true)
+    students = @context.students_visible_to(@current_user, include: :priors)
     if @section
       students = students.where(:enrollments => { :course_section_id => @section })
     end

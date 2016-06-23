@@ -19,16 +19,13 @@
 class ExternalIntegrationKey < ActiveRecord::Base
   attr_accessible
 
-  CONTEXT_TYPES = %w{ Account }
-
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:account]
 
   validates_presence_of :context_id
   validates_presence_of :context_type
   validates_presence_of :key_type
   validates_presence_of :key_value
   validates_inclusion_of :key_type, in: proc { self.key_types }
-  validates_inclusion_of :context_type, in: CONTEXT_TYPES
   validates_uniqueness_of :key_type, scope: [ :context_type, :context_id ]
 
   def key_type

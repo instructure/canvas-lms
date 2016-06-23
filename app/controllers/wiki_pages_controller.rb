@@ -18,6 +18,7 @@
 class WikiPagesController < ApplicationController
   include Api::V1::WikiPage
   include KalturaHelper
+  include SubmittableHelper
 
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:front_page]
@@ -25,6 +26,7 @@ class WikiPagesController < ApplicationController
   before_filter :set_pandapub_read_token
   before_filter :set_js_rights
   before_filter :set_js_wiki_data
+  before_filter :rich_content_service_config, only: [:edit, :index]
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -71,6 +73,7 @@ class WikiPagesController < ApplicationController
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       log_asset_access([ "pages", @context ], "pages", "other")
+      js_env ConditionalRelease::Service.env_for @context
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       @padless = true
     end
@@ -149,13 +152,24 @@ class WikiPagesController < ApplicationController
       wiki_page_jsenv(@context)
       @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
       @padless = true
+      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+        add_crumb(@page.title)
+        log_asset_access(@page, 'wiki', @wiki)
+        wiki_page_jsenv(@context)
+        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+        @padless = true
+      end
     end
   end
 
   def edit
     if @page.grants_any_right?(@current_user, session, :update, :update_content)
-      add_crumb(@page.title)
-      @padless = true
+      js_env ConditionalRelease::Service.env_for @context
+      if !ConditionalRelease::Service.enabled_in_context?(@context) ||
+        enforce_assignment_visible(@page)
+        add_crumb(@page.title)
+        @padless = true
+      end
     else
       if authorized_action(@page, @current_user, :read)
         flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', :title => @page.title)
@@ -166,10 +180,12 @@ class WikiPagesController < ApplicationController
 
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
-      add_crumb(@page.title, polymorphic_url([@context, @page]))
-      add_crumb(t("#crumbs.revisions", "Revisions"))
+      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+        add_crumb(@page.title, polymorphic_url([@context, @page]))
+        add_crumb(t("#crumbs.revisions", "Revisions"))
 
-      @padless = true
+        @padless = true
+      end
     else
       if authorized_action(@page, @current_user, :read)
         flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', :title => @page.title)
@@ -188,6 +204,10 @@ class WikiPagesController < ApplicationController
   end
 
   private
+  def rich_content_service_config
+    rce_js_env(:sidebar)
+  end
+
   def wiki_page_jsenv(context)
     js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
     js_env :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true})

@@ -1,5 +1,5 @@
 class MigrateToLimitPrivilegesToCourseSection < ActiveRecord::Migration
-  tag :predeploy, :postdeploy
+  tag :postdeploy
   disable_ddl_transaction!
 
   def self.up

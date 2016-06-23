@@ -340,7 +340,7 @@ describe "Files API", type: :request do
         {
           "id" => @user.id,
           "display_name" => @user.short_name,
-          "avatar_image_url" => User.avatar_fallback_url,
+          "avatar_image_url" => User.avatar_fallback_url(nil, request),
           "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
         }
       ]
@@ -383,7 +383,7 @@ describe "Files API", type: :request do
         {
           "id" => @user.id,
           "display_name" => @user.short_name,
-          "avatar_image_url" => User.avatar_fallback_url,
+          "avatar_image_url" => User.avatar_fallback_url(nil, request),
           "html_url" => "http://www.example.com/about/#{@user.id}"
         }
       ]
@@ -729,7 +729,7 @@ describe "Files API", type: :request do
       expect(json['user']).to eql({
         "id" => @user.id,
         "display_name" => @user.short_name,
-        "avatar_image_url" => User.avatar_fallback_url,
+        "avatar_image_url" => User.avatar_fallback_url(nil, request),
         "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
       })
     end
@@ -862,6 +862,30 @@ describe "Files API", type: :request do
         expect(@existing_file.reload).not_to be_deleted
         expect(@att.reload.folder).to eq @sub
         expect(@att.display_name).not_to eq @existing_file.display_name
+      end
+    end
+
+    describe "submissions folder" do
+      before(:once) do
+        @student = user_model
+        @root_folder = Folder.root_folders(@student).first
+        @file = Attachment.create! filename: 'file.txt', display_name: 'file.txt', uploaded_data: StringIO.new('blah'), folder: @root_folder, context: @student
+        @sub_folder = @student.submissions_folder
+        @sub_file = Attachment.create! filename: 'sub.txt', display_name: 'sub.txt', uploaded_data: StringIO.new('bleh'), folder: @sub_folder, context: @student
+      end
+
+      it "should not move a file into a submissions folder" do
+        api_call_as_user(@student, :put, "/api/v1/files/#{@file.id}",
+                         { :controller => "files", :action => "api_update", :format => "json", :id => @file.to_param },
+                         { :parent_folder_id => @sub_folder.to_param },
+                         {}, { :expected_status => 401 })
+      end
+
+      it "should not move a file out of a submissions folder" do
+        api_call_as_user(@student, :put, "/api/v1/files/#{@sub_file.id}",
+                         { :controller => "files", :action => "api_update", :format => "json", :id => @sub_file.to_param },
+                         { :parent_folder_id => @root_folder.to_param },
+                         {}, { :expected_status => 401 })
       end
     end
 

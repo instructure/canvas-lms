@@ -6,13 +6,13 @@ define [
   'Backbone'
   'jst/calendar/editCalendarEventFull'
   'compiled/views/calendar/MissingDateDialogView'
-  'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'compiled/object/unflatten'
   'compiled/util/deparam'
   'compiled/views/editor/KeyboardShortcuts'
-  'tinymce.editor_box'
-  'compiled/tinymce'
-], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten, deparam, KeyboardShortcuts) ->
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, RichContentEditor, unflatten, deparam, KeyboardShortcuts) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   ##
   # View for editing a calendar event on it's own page
@@ -36,6 +36,8 @@ define [
           'start_date', 'start_time', 'end_time',
           'title', 'description', 'location_name', 'location_address',
           'duplicate')
+        if picked_params.start_date
+          picked_params.start_date = $.dateString($.fudgeDateForProfileTimezone(picked_params.start_date), {format: 'medium'})
 
         attrs = @model.parse(picked_params)
         # if start and end are at the beginning of a day, assume it is an all day date
@@ -71,9 +73,9 @@ define [
 
       @$(".date_field").date_field()
       @$(".time_field").time_field()
-      $textarea = @$('textarea').editorBox()
-      wikiSidebar.init() unless wikiSidebar.inited
-      wikiSidebar.attachToEditor($textarea).show()
+      $textarea = @$('textarea')
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true })
 
       _.defer(@attachKeyboardShortcuts)
       _.defer(@toggleDuplicateOptions)
@@ -101,7 +103,7 @@ define [
       @updateRemoveChildEvents(e)
     toggleHtmlView: (event) ->
       event?.preventDefault()
-      $("textarea[name=description]").editorBox('toggle')
+      RichContentEditor.callOnRCE($("textarea[name=description]"), 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()
@@ -126,7 +128,6 @@ define [
             $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
             if $fields.length > 0 then $fields else true
           labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
-          da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success   : ($dialog) =>
             $dialog.dialog('close')
             @$el.disableWhileLoading @model.save eventData, success: =>

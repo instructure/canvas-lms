@@ -67,77 +67,6 @@ describe "quizzes" do
       expect(group_form.find_element(:css, '.group_display.name')).to include_text('new group')
     end
 
-    it 'should display post to SIS icon on quiz page when enabled' do
-      Account.default.set_feature_flag!('post_grades', 'on')
-
-      @q1 = quiz_create
-      @q2 = quiz_create
-      @q3 = quiz_create
-
-      @q1.post_to_sis = true
-      @q2.post_to_sis = false
-      @q3.post_to_sis = true
-
-      @q1.save!
-      @q2.save!
-      @q3.save!
-
-      get "/courses/#{@course.id}/quizzes/"
-      wait_for_ajaximations
-
-      expect(find_all('.post-to-sis-status.enabled').count).to be 2
-      expect(find_all('.post-to-sis-status.disabled').count).to be 1
-
-      Account.default.set_feature_flag!('post_grades', 'off')
-
-      get "/courses/#{@course.id}/quizzes/"
-      wait_for_ajaximations
-
-      expect(find_all('.post-to-sis-status.enabled').count).to be 0
-      expect(find_all('.post-to-sis-status.disabled').count).to be 0
-    end
-
-    it 'should display post to SIS icon on quiz page when enabled' do
-      Account.default.set_feature_flag!('post_grades', 'on')
-
-      @q1 = quiz_create
-      @q2 = quiz_create
-      @q3 = quiz_create
-
-      @q1.post_to_sis = true
-      @q2.post_to_sis = false
-      @q3.post_to_sis = true
-
-      @q1.save!
-      @q2.save!
-      @q3.save!
-
-      get "/courses/#{@course.id}/quizzes/"
-      wait_for_ajaximations
-
-      enabled = find_all('.post-to-sis-status.enabled')
-      disabled = find_all('.post-to-sis-status.disabled')
-
-      expect(enabled.count).to be 2
-      expect(disabled.count).to be 1
-
-      enabled.each(&:click)
-      disabled.each(&:click)
-
-      wait_for_ajaximations
-
-      @q1.reload
-      @q2.reload
-      @q3.reload
-
-      expect(@q1.post_to_sis?).to be_falsey
-      expect(@q2.post_to_sis?).to be_truthy
-      expect(@q3.post_to_sis?).to be_falsey
-
-      expect(find_all('.post-to-sis-status.enabled').count).to be 1
-      expect(find_all('.post-to-sis-status.disabled').count).to be 2
-    end
-
     it "should update a question group", priority: "1", test_id: 210061 do
       skip('fragile')
       get "/courses/#{@course.id}/quizzes/new"
@@ -167,7 +96,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit", priority: "3", test_id: 210062 do
+    it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab
@@ -569,6 +498,7 @@ describe "quizzes" do
 
 
     it "works with file upload questions", priority: "1", test_id: 210071 do
+      skip_if_chrome('issue with upload_attachment_answer')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -584,6 +514,9 @@ describe "quizzes" do
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"
+
+      Setting.set('context_default_quota', '1') # shouldn't check quota
+
       user_session(@student)
       get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       expect_new_page_load do
@@ -597,10 +530,10 @@ describe "quizzes" do
       upload_attachment_answer
       expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
       # delete the attachment id
-      fj('.delete-attachment').click
-      keep_trying_until { expect(fj('.answered')).to eq nil }
+      f('.delete-attachment').click
+      expect(f("#content")).not_to contain_css('.answered')
 
-      fj('.upload-label').click
+      f('.upload-label').click
       wait_for_ajaximations
       keep_trying_until { expect(file_upload_submission_data).to eq [""] }
       upload_attachment_answer
@@ -681,7 +614,7 @@ describe "quizzes" do
       @quiz.save!
 
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
-      expect(ff("#take_quiz_link").size).to eq 0
+      expect(f("#content")).not_to contain_css("#take_quiz_link")
     end
   end
 end

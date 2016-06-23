@@ -9,6 +9,24 @@ describe 'Global Navigation' do
       Account.default.enable_feature! :use_new_styles
     end
 
+    describe 'Profile Link' do
+      it 'should show the profile tray upon clicking' do
+        get "/"
+        f('#global_nav_profile_link').click
+        wait_for_ajaximations
+        expect(f('#global_nav_profile_header')).to be_displayed
+      end
+
+      # Profile links are hardcoded, so check that something is appearing for
+      # the display_name in the tray header
+      it 'should populate the profile tray with the current user display_name' do
+        get "/"
+        f('#global_nav_profile_link').click
+        wait_for_ajaximations
+        expect(ff('#global_nav_profile_display_name')).not_to be_empty
+      end
+    end
+
     describe 'Courses Link' do
       it 'should show the courses tray upon clicking' do
         get "/"

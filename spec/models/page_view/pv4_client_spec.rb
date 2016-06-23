@@ -70,6 +70,23 @@ describe PageView::Pv4Client do
       expect(pv.remote_ip).to eq '192.168.0.1'
       expect(pv.render_time).to eq 6.367549
     end
+
+    it "formats url params correctly" do
+      t = Time.zone.parse("2016-04-27")
+      Timecop.freeze(t) do
+        zone = ActiveSupport::TimeZone.new("America/Denver")
+        start_time = Time.now.in_time_zone(zone)
+        end_time = 5.minutes.from_now.in_time_zone(zone)
+
+        expect_params = '?start_time=2016-04-27T00:00:00.000Z&end_time=2016-04-27T00:05:00.000Z'
+        expect_url = "http://pv4/users/1/page_views#{expect_params}"
+        expect_header = {'Authorization' => 'Bearer token'}
+
+        res = stub(body: { 'page_views' => [pv4_object] }.to_json)
+        CanvasHttp.expects(:get).with(expect_url, expect_header).returns(res)
+        client.fetch(1, start_time: start_time, end_time: end_time)
+      end
+    end
   end
 
   describe "#for_user" do

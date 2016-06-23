@@ -35,6 +35,7 @@
               >{{#t "unknown_author"}}>Unknown Author{{/t}}
             {{/if}}
           {{/if}}
+          {{#if author.isInactive}}<span class="label" title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
         </a>
       </h2>
       <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime created_at pubdate=true contextSensitive=true}}</div>

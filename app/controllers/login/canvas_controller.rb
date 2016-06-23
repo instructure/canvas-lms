@@ -28,16 +28,13 @@ class Login::CanvasController < ApplicationController
   def new
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @aacs_with_buttons = @domain_root_account.authentication_providers.active.select(&:login_button?)
+    @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
     flash.now[:error] = params[:message] if params[:message]
 
     maybe_render_mobile_login
   end
 
   def create
-    # reset the session id cookie to prevent session fixation.
-    reset_session_for_login
-
     # Check referer and authenticity token.  If the token is invalid but the referer is trusted
     # and one is not provided then continue.  If the referer is trusted and they provide a token
     # we still want to check it.
@@ -48,6 +45,9 @@ class Login::CanvasController < ApplicationController
         return unsuccessful_login(t("Invalid Authenticity Token"))
       end
     end
+
+    # reset the session id cookie to prevent session fixation.
+    reset_session_for_login
 
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t("No password was given"))

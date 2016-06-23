@@ -37,6 +37,12 @@
       </div>
     </div>
     <div class="right">
+      <div class="left">
+        <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action-rev" type="button">
+          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
+          <i class="icon-info"></i>
+        </button>
+      </div>
       <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class=mute_label><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>
@@ -94,6 +100,9 @@
       </ul>
     </div>
   </div>
+</div>
+<div id="enrollment_inactive_notice" class="alert alert-info" style="display: none;">
+  <span><%= t "Notice: Inactive Student" %></span>
 </div>
 <div id="full_width_container" style="display:none">
   <div id="left_side" class="full_height">
@@ -219,7 +228,7 @@
                 <a href="javascript:void 0;" class="delete_comment_link icon-x">
                   <span class="screenreader-only"><%= t('icons.delete_comment', 'Delete comment') %></span>
                 </a>
-                <img src="#" class="avatar" alt="" style="display: none;"/>
+                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
                 <span class="comment"></span>
                 <a href="#" class="play_comment_link media-comment" style="display:none;"><%= t('links.click_to_view', "click here to view") %></a>
                 <div class="media_comment_content" style="display:none"></div>

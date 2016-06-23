@@ -90,7 +90,7 @@
           </div>
         <% end %>
         <% entries.each_with_index do |entry, idx| %>
-          <%= render :partial => "discussion_topics/sub_entry", :locals => {:entry => entry, :hide_entry => entries.length > 3 && idx < entries.length - 2 && !@context.try_rescue(:show_all_discussion_entries)} %>
+          <%= render :partial => "discussion_topics/sub_entry", :locals => {:entry => entry, :hide_entry => entries.length > 3 && idx < entries.length - 2} %>
         <% end %>
       <% end %>
       <% if entry && entry.editor_id && entry.editor_id != entry.user_id %>

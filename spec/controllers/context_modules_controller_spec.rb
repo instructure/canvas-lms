@@ -279,6 +279,19 @@ describe ContextModulesController do
       expect(response).to redirect_to course_discussion_topic_url(@course, topic, :module_item_id => topicTag.id)
     end
 
+    it "should redirect to a wiki page" do
+      user_session(@student)
+
+      @module = @course.context_modules.create!
+      page = wiki_page_model(course: @course)
+
+      page_tag = @module.add_item :type => 'wiki_page', :id => page.id
+
+      get 'item_redirect', :course_id => @course.id, :id => page_tag.id
+      expect(response).to be_redirect
+      expect(response).to redirect_to course_wiki_page_url(@course, page, :module_item_id => page_tag.id)
+    end
+
     it "should redirect to a quiz page" do
       user_session(@student)
 
@@ -646,6 +659,32 @@ describe ContextModulesController do
       get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
       json = JSON.parse response.body.gsub("while(1);",'')
       expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
+    end
+
+    it "should return past_due if survey quiz is past due" do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
+      @quiz.publish!
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json'
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["past_due"]).to be_present
+    end
+
+    it "should not return past_due if survey quiz is completed" do
+      course_with_student_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
+      @quiz.publish!
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      @quiz.generate_submission(@student).complete!
+      
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["past_due"]).to be_blank
     end
   end
 

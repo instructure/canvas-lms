@@ -75,8 +75,11 @@ describe "collaborations" do
 
         user_session(@student)
         get "/courses/#{@course.id}/collaborations"
+        if link = f('.ic-flash-success .close_link')
+          link.click
+        end
 
-        fj("#groups-filter-btn-new:visible").click
+        move_to_click('label[for=groups-filter-btn-new]')
         wait_for_ajaximations
 
         expect(ffj('.available-groups:visible a').count).to eq 1

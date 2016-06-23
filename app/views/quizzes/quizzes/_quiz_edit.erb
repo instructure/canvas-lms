@@ -1,0 +1,39 @@
+<div class="form">
+  <% if @has_student_submissions %>
+    <% has_student_submissions_title = t(<<-TEXT)
+      Students have either already taken or started taking this quiz, so be careful
+      about editing it.  If you change any quiz questions in a significant way, you
+      may want to consider regrading students who took the old version of the quiz.
+      TEXT
+    %>
+    <div class="alert alert-info" id="student_submissions_warning">
+      <i class="icon-warning"></i><span class="screenreader-only"><%= has_student_submissions_title %></span> <%= has_student_submissions_title %>
+    </div>
+  <% end %>
+
+  <div style="display: none;" id="quiz_urls">
+    <a href="<%= context_url(@context, :context_quiz_url, @quiz.id) %>" class="update_quiz_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_question_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :api_v1_context_quiz_reorder_url, @quiz.id) %>" class="reorder_questions_url">&nbsp;</a>
+    <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
+  </div>
+
+  <div id="quiz_tabs" class="ui-tabs-minimal">
+    <ul id="quiz_tabs_tab_list">
+      <li><a href="#options_tab"><%= t('Details') %></a></li>
+      <li><a href="#questions_tab"><%= t('Questions') %></a></li>
+      <% if ConditionalRelease::Service.enabled_in_context?(@context) then %>
+        <li><a href="#conditional_release_tab"><%= t('Conditional Content') %></a></li>
+      <% end %>
+      <span id="quiz_tabs_spacer"></span>
+      <%= render :partial => 'quiz_edit_header' %>
+    </ul>
+
+    <%= render :partial => 'quiz_edit_details' %>
+    <%= render :partial => 'quiz_edit_questions' %>
+    <% if ConditionalRelease::Service.enabled_in_context?(@context) then %>
+      <%= render :partial => 'quiz_edit_conditional_release' %>
+    <% end %>
+  </div>
+  <%= render :partial => 'quiz_edit_form_actions' %>
+</div>

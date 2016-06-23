@@ -23,8 +23,7 @@ class Collaboration < ActiveRecord::Base
   attr_accessible :user, :title, :description
   attr_readonly   :collaboration_type
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+  belongs_to :context, polymorphic: [:course, :group]
   belongs_to :user
   has_many :collaborators, :dependent => :destroy
   has_many :users, :through => :collaborators
@@ -167,10 +166,12 @@ class Collaboration < ActiveRecord::Base
   # Public: Determine if any collaborations plugin is enabled.
   #
   # Returns true/false.
-  def self.any_collaborations_configured?
-    collaboration_types.any? do |type|
+  def self.any_collaborations_configured?(context)
+    plugin_collabs = collaboration_types.any? do |type|
       collaboration_class(type['type'].titleize.gsub(/\s/, '')).present?
     end
+    external_tool_collabs = ContextExternalTool.all_tools_for(context, placements: :collaboration).exists?
+    plugin_collabs || external_tool_collabs
   end
 
   # Public: Declare excluded serialization fields.

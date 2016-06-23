@@ -165,6 +165,13 @@ describe WebConference do
       expect(conference).to be_finished
       expect(conference).not_to be_restartable
     end
+
+    it "should not be active if it was manually ended" do
+      conference.start_at = 1.hour.ago
+      conference.end_at = nil
+      conference.ended_at = 1.minute.ago
+      expect(conference).not_to be_active
+    end
   end
 
   context "notifications" do

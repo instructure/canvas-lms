@@ -753,7 +753,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
 
-    it "should copy stuff" do
+    def terrible_quiz(context)
       data1 = {:question_type => "file_upload_question",
                :points_possible => 10,
                :question_text => "why is this question terrible"
@@ -774,12 +774,17 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
               [{:migration_id => "QUE_1016_A1", :text => "<br />", :weight => 100, :id => 8080},
                {:migration_id => "QUE_1017_A2", :text => "<pre>", :weight => 0, :id => 2279}]}.with_indifferent_access
 
-      q = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      q = context.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
       q.quiz_questions.create!(:question_data => data1)
       q.quiz_questions.create!(:question_data => data2)
       q.quiz_questions.create!(:question_data => data3)
       q.generate_quiz_data
       q.save!
+      q
+    end
+
+    it "should copy stuff" do
+      q = terrible_quiz(@copy_from)
 
       run_course_copy
       q_copy = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
@@ -840,6 +845,24 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(quiz_to).to be_published
       expect(quiz_to.assignment).to eq a_to
       expect(a_to).to be_published
+    end
+
+    it "should not bring questions back when restoring a deleted quiz" do
+      quiz_from = terrible_quiz(@copy_from)
+
+      run_course_copy
+
+      quiz_from.quiz_questions.detect { |qq| qq['question_data']['question_text'].include? 'html' }.destroy
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz_from)).first
+      quiz_to.destroy
+
+      run_course_copy
+
+      quiz_to.reload
+      expect(quiz_to).to be_unpublished
+      expect(quiz_to.quiz_questions.active.map { |qq| qq['question_data']['question_text'] })
+        .to match_array(["why is this question terrible", "so terrible"])
     end
 
     it "should correctly copy links to quizzes inside assessment questions" do

@@ -55,11 +55,9 @@ class GradebookImporter
     @attachment = attachment
     @progress = progress
 
-    if @context.feature_enabled?(:differentiated_assignments)
-      @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-        course_id: @context.id, user_id: @context.all_students.pluck(:id)
-      )
-    end
+    @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
+      course_id: @context.id, user_id: @context.all_students.pluck(:id)
+    )
   end
 
   CSV::Converters[:nil] = lambda do |e|
@@ -154,7 +152,9 @@ class GradebookImporter
           # expectations for the compare so it doesn't look changed
           submission['grade'] = 'EX' if submission['grade'].to_s.upcase == 'EX'
 
-          submission['original_grade'].to_s == submission['grade'].to_s ||
+
+          submission['grade'] == submission['original_grade'] ||
+            (submission['original_grade'].present? && submission['grade'].present? && submission['original_grade'].to_f == submission['grade'].to_f) ||
             (submission['original_grade'].blank? && submission['grade'].blank?)
         end
       end

@@ -74,7 +74,7 @@ define [
     bindEvents: ()->
       $(document).on('keyup.tinymce_keyboard_shortcuts', @openDialogByKeybinding.bind(this))
 
-      #special event for keyups in the editor iframe, fired from "tinymce.editor_box.js"
+      #special event for keyups in the editor iframe, fired from "setupAndFocusTinyMCEConfig.js"
       $(document).on('editorKeyUp', ((e, originalEvent)->
         @openDialogByKeybinding(originalEvent)
       ).bind(this))

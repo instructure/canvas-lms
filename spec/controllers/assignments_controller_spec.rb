@@ -70,6 +70,7 @@ describe AssignmentsController do
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
         expect(assigns[:js_env][:PERMISSIONS][:manage]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:manage_course]).to be_truthy
       end
     end
   end
@@ -129,6 +130,26 @@ describe AssignmentsController do
       get 'show', :course_id => @course.id, :id => @assignment.id
       expect(response).to be_success
       expect(assigns[:current_user_submission]).not_to be_nil
+    end
+
+    it "should redirect to wiki page if assignment is linked to wiki page" do
+      @course.enable_feature!(:conditional_release)
+      user_session(@student)
+      @assignment.reload.submission_types = 'wiki_page'
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      expect(response).to be_redirect
+    end
+
+    it "should not redirect to wiki page" do
+      @course.disable_feature!(:conditional_release)
+      user_session(@student)
+      @assignment.submission_types = 'wiki_page'
+      @assignment.save!
+
+      get 'show', :course_id => @course.id, :id => @assignment.id
+      expect(response).not_to be_redirect
     end
 
     it "should redirect to discussion if assignment is linked to discussion" do
@@ -355,6 +376,25 @@ describe AssignmentsController do
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
     end
 
+    context "conditional release" do
+      before do
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'cr-assignment' })
+      end
+
+      it "should define env when enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @assignment.id
+        expect(assigns[:js_env][:dummy]).to eq 'cr-assignment'
+      end
+
+      it "should not define env when not enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @assignment.id
+        expect(assigns[:js_env][:dummy]).to be nil
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -366,9 +406,11 @@ describe AssignmentsController do
 
     it "should update attributes" do
       user_session(@teacher)
-      put 'update', :course_id => @course.id, :id => @assignment.id, :assignment => {:title => "test title"}
+      put 'update', :course_id => @course.id, :id => @assignment.id,
+        :assignment_type => "attendance", :assignment => { :title => "test title" }
       expect(assigns[:assignment]).to eql(@assignment)
       expect(assigns[:assignment].title).to eql("test title")
+      expect(assigns[:assignment].submission_types).to eql("attendance")
     end
   end
 

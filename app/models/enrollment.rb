@@ -52,6 +52,7 @@ class Enrollment < ActiveRecord::Base
   validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?
+  validate :valid_section?
 
   before_save :assign_uuid
   before_validation :assert_section
@@ -67,9 +68,10 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
+  after_save :dispatch_invitations_later
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :available_at, :soft_completed_at
+  attr_accessor :already_enrolled, :available_at, :soft_completed_at, :need_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -77,6 +79,14 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_future, -> { joins(:course).where(QueryBuilder.new(:current_and_future).conditions).readonly(false) }
   scope :concluded, -> { joins(:course).where(QueryBuilder.new(:completed).conditions).readonly(false) }
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
+
+  def self.not_yet_started(course)
+    collection = where(course_id: course)
+    Canvas::Builders::EnrollmentDateBuilder.preload(collection)
+    collection.select do |enrollment|
+      enrollment.effective_start_at > Time.zone.now
+    end
+  end
 
   def ensure_role_id
     self.role_id ||= self.role.id
@@ -86,8 +96,14 @@ class Enrollment < ActiveRecord::Base
     self.errors.add(:associated_user_id, "Cannot observe yourself") if self.user_id == self.associated_user_id
   end
 
+  def valid_section?
+    unless self.course_section.active? || self.deleted?
+      self.errors.add(:course_section_id, "is not a valid section")
+    end
+  end
+
   def valid_role?
-    return true if role.built_in?
+    return true if self.deleted? || role.built_in?
 
     unless self.role.base_role_type == self.type
       self.errors.add(:role_id, "is not valid for the enrollment type")
@@ -161,7 +177,7 @@ class Enrollment < ActiveRecord::Base
       record.course &&
       record.user.registered? &&
       !record.observer? &&
-      ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_registration
@@ -170,8 +186,7 @@ class Enrollment < ActiveRecord::Base
       !record.self_enrolled &&
       record.course &&
       !record.user.registered? &&
-      !record.observer? &&
-      ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
+      ((record.invited? && (record.just_created || record.workflow_state_changed?)) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_notification
@@ -185,12 +200,21 @@ class Enrollment < ActiveRecord::Base
     }
 
     p.dispatch :enrollment_accepted
-    p.to {self.course.admins - [self.user] }
+    p.to {self.course.participating_admins - [self.user] }
     p.whenever { |record|
       record.course &&
       !record.observer? &&
       !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
     }
+  end
+
+  def dispatch_invitations_later
+    # if in an invited state but not frd "invited?" because of future date restrictions, send it later
+    if (self.just_created || self.workflow_state_changed? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
+        !self.self_enrolled && !(self.observer? && self.user.registered?)
+      # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
+      self.send_later_enqueue_args(:re_send_confirmation_if_invited!, {:run_at => self.available_at, :singleton => "send_enrollment_invitations_#{global_id}"})
+    end
   end
 
   scope :active, -> { where("enrollments.workflow_state<>'deleted'") }
@@ -302,7 +326,7 @@ class Enrollment < ActiveRecord::Base
 
   def update_user_account_associations_if_necessary
     return if self.fake_student?
-    if id_was.nil?
+    if id_was.nil? || (workflow_state_changed? && workflow_state_was == 'deleted')
       return if %w{creation_pending deleted}.include?(self.user.workflow_state)
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
@@ -406,7 +430,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_cached_due_dates
-    if workflow_state_changed? && course
+    if workflow_state_changed? && (student? || fake_student?) && course
       DueDateCacher.recompute_course(course)
     end
   end
@@ -443,7 +467,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def cancel_future_appointments
-    if workflow_state_changed? && completed?
+    if workflow_state_changed? && %w{completed deleted}.include?(workflow_state)
       course.appointment_participants.active.current.for_context_codes(user.asset_string).update_all(:workflow_state => 'deleted')
     end
   end
@@ -636,7 +660,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self) do
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
       calculated_state_based_on_date
     end
   end
@@ -669,17 +693,37 @@ class Enrollment < ActiveRecord::Base
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
-    elsif view_restrictable? && !self.restrict_future_view?
-      self.available_at = global_start_at
-      if state == :active
-        # an accepted enrollment state means they still can't participate yet,
-        # but should be able to view just like an invited enrollment
-        :accepted
-      else
-        state
-      end
     else
-      :inactive
+      self.available_at = global_start_at
+      if view_restrictable? && !self.restrict_future_view?
+        if state == :active
+          # an accepted enrollment state means they still can't participate yet,
+          # but should be able to view just like an invited enrollment
+          :accepted
+        else
+          state
+        end
+      else
+        :inactive
+      end
+    end
+  end
+
+  def readable_state_based_on_date
+    # when view restrictions are in place, the effective state_based_on_date is :inactive, but
+    # to admins we should show that they are :completed or :pending
+
+    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
+      :completed
+    else
+      date_state = state_based_on_date
+      if self.available_at
+        :pending
+      elsif self.soft_completed_at
+        :completed
+      else
+        date_state
+      end
     end
   end
 
@@ -755,6 +799,10 @@ class Enrollment < ActiveRecord::Base
     self.save
     @re_send_confirmation = false
     true
+  end
+
+  def re_send_confirmation_if_invited!
+    self.re_send_confirmation! if self.invited?
   end
 
   def has_permission_to?(action)
@@ -847,10 +895,6 @@ class Enrollment < ActiveRecord::Base
       when 'inactive'
         t('#enrollment.workflow.inactive', "Inactive")
     end
-  end
-
-  def workflow_readable_type
-    Enrollment.workflow_readable_type(self.workflow_state)
   end
 
   def readable_role_name
@@ -996,7 +1040,7 @@ class Enrollment < ActiveRecord::Base
     given { |user| self.user == user }
     can :read and can :read_grades
 
-    given { |user, session| self.course.students_visible_to(user, true).where(:id => self.user_id).exists? &&
+    given { |user, session| self.course.students_visible_to(user, include: :priors).where(:id => self.user_id).exists? &&
       self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 
@@ -1139,21 +1183,6 @@ class Enrollment < ActiveRecord::Base
 
   def self.cross_shard_invitations?
     false
-  end
-
-  # DO NOT TRUST
-  # This is only a convenience method to assist in identifying which enrollment
-  # goes to which user when users have accidentally been merged together
-  # This is the *only* reason the sis_source_id column has not been dropped
-  def sis_user_id
-    return @sis_user_id if @sis_user_id
-    sis_source_id_parts = sis_source_id ? sis_source_id.split(':') : []
-    if sis_source_id_parts.length == 4
-      @sis_user_id = sis_source_id_parts[1]
-    else
-      @sis_user_id = sis_source_id_parts[0]
-    end
-    @sis_user_id
   end
 
   def total_activity_time

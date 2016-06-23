@@ -2,11 +2,12 @@ class GradingPeriodGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   attr_accessible # None of this model's attributes are mass-assignable
-  belongs_to :course
   belongs_to :account
+  belongs_to :course
   has_many :grading_periods, dependent: :destroy
+  has_many :enrollment_terms, inverse_of: :grading_period_group
 
-  validate :belongs_to_course_or_account_exclusive
+  validate :associated_with_course_or_account_or_enrollment_term?
 
   set_policy do
     given { |user| multiple_grading_periods_enabled? && (course || account).grants_right?(user, :read) }
@@ -24,15 +25,34 @@ class GradingPeriodGroup < ActiveRecord::Base
   end
 
   private
-  def belongs_to_course_or_account_exclusive
-    if course.blank? && account.blank?
-      errors.add(:course_id, t("cannot be nil when account_id is nil"))
-      errors.add(:account_id, t("cannot be nil when course_id is nil"))
-    end
 
-    if course.present? && account.present?
+  def associated_with_course_or_account_or_enrollment_term?
+    has_enrollment_terms = enrollment_terms.loaded? ? enrollment_terms.any?(&:active?) : enrollment_terms.active.exists?
+    if has_enrollment_terms
+      validate_with_enrollment_terms
+    else
+      validate_without_enrollment_terms if active?
+    end
+  end
+
+  def validate_without_enrollment_terms
+    if course_id.blank? && account_id.blank?
+      errors.add(:enrollment_terms, t("cannot be empty when course_id is nil and account_id is nil"))
+    elsif course_id.present? && account_id.present?
       errors.add(:course_id, t("cannot be present when account_id is present"))
       errors.add(:account_id, t("cannot be present when course_id is present"))
+    end
+  end
+
+  def validate_with_enrollment_terms
+    if enrollment_terms.loaded?
+      account_ids = enrollment_terms.map(&:root_account_id)
+    else
+      account_ids = enrollment_terms.uniq.pluck(:root_account_id)
+    end
+    account_ids << self.account_id if self.account_id.present?
+    if account_ids.uniq.count > 1
+      errors.add(:enrollment_terms, t("cannot be associated with different accounts"))
     end
   end
 

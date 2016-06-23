@@ -123,7 +123,7 @@ module GradebooksHelper
     when 'percent'
       grade
     when 'points'
-      score.to_f.round(2)
+      round_if_whole(score.to_f.round(2))
     when 'gpa_scale', 'letter_grade'
       nil
     end

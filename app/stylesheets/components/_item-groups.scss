@@ -334,8 +334,7 @@
   // firefox flex breaks the parent container
   min-width: 1px;
 
-  @include breakpoint(desktop) { flex: 0 0 34%; }
-  @include breakpoint(wide) { flex: 0 0 40%; }
+  @include breakpoint(desktop) { flex: 0 0 40%;}
   @if $use_new_styles { font-weight: 500; }
   @else { font-weight: bold; }
 }

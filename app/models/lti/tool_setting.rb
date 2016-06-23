@@ -20,11 +20,10 @@ module Lti
     attr_accessible :tool_proxy, :context, :resource_link_id, :custom
 
     belongs_to :tool_proxy
-    belongs_to :context, polymorphic: true
+    belongs_to :context, polymorphic: [:course, :account]
 
     validates_presence_of :tool_proxy
     validates_presence_of :context, if: :has_resource_link_id?
-    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
 
     serialize :custom
 

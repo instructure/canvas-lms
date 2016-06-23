@@ -41,7 +41,7 @@ describe "context modules" do
     it "should validate that course modules show up correctly" do
       go_to_modules
       # shouldn't show the teacher's "show student progression" button
-      expect(ff('.module_progressions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
@@ -60,7 +60,7 @@ describe "context modules" do
       go_to_modules
 
       # shouldn't show the teacher's "show student progression" button
-      expect(ff('.module_progressions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.module_progressions_link')
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
@@ -102,6 +102,26 @@ describe "context modules" do
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @completed_icon)
       validate_context_module_status_icon(@module_3.id, @completed_icon)
+    end
+
+    it "should not cache a changed module requirement" do
+      other_assmt = @course.assignments.create!(:title => "assignment")
+      other_tag = @module_1.add_item({:id => other_assmt.id, :type => 'assignment'})
+      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, other_tag.id => {:type => 'must_view'}}
+      @module_1.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
+
+      # fulfill the must_view
+      go_to_modules
+      validate_context_module_item_icon(@tag_1.id, @completed_icon)
+
+      # change the req
+      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_submit'}, other_tag.id => {:type => 'must_view'}}
+      @module_1.save!
+
+      go_to_modules
+      validate_context_module_item_icon(@tag_1.id, @open_item_icon)
     end
 
     it "should show progression in large_roster courses" do
@@ -147,7 +167,7 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       expect(f('#content')).to include_text("is not available yet")
-      expect(f('#module_prerequisites_list')).to be_nil
+      expect(f("#content")).not_to contain_css('#module_prerequisites_list')
     end
 
     it "should validate that a student can't see an unpublished context module item", priority: "1", test_id: 126745 do
@@ -183,7 +203,6 @@ describe "context modules" do
       @assignment_2.only_visible_to_overrides = true
       @assignment_2.save!
 
-      @course.enable_feature!(:differentiated_assignments)
       @student.enrollments.each(&:destroy)
       @overriden_section = @course.course_sections.create!(name: "test section")
       student_in_section(@overriden_section, user: @student)
@@ -212,6 +231,7 @@ describe "context modules" do
     end
 
     it "should allow a student view student to progress through module content" do
+      skip_if_chrome('breaks because of masquerade_bar')
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student
 
@@ -234,6 +254,8 @@ describe "context modules" do
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @completed_icon)
       validate_context_module_status_icon(@module_3.id, @no_icon)
+
+      scroll_page_to_bottom
 
       navigate_to_module_item(2, @quiz_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
@@ -351,10 +373,8 @@ describe "context modules" do
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(prev).to be_nil
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(nxt).to be_nil
+        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-left')
+        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-right')
       end
 
       it "should show the nav when going straight to the item if there's only one tag" do
@@ -532,6 +552,23 @@ describe "context modules" do
         validate_context_module_item_icon(@tag_4.id, @no_icon)
       end
 
+      it "should show incomplete for differentiated assignments" do
+        @course.course_sections.create!
+        assignment = @course.assignments.create!(:title => "assignmentt")
+        create_section_override_for_assignment(assignment)
+        assignment.only_visible_to_overrides = true
+        assignment.save!
+
+        tag = @module_1.add_item({:id => assignment.id, :type => 'assignment'})
+        @module_1.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+        @module_1.require_sequential_progress = false
+        @module_1.save!
+
+        go_to_modules
+
+        validate_context_module_item_icon(tag.id, @open_item_icon)
+      end
+
       it "should show a warning icon when module item is a min score requirement that didn't meet score requirment" do
         add_min_score_assignment
         grade_assignment(50)
@@ -542,7 +579,10 @@ describe "context modules" do
 
       it "should show an info icon when module item is a min score requirement that has not yet been graded" do
         add_min_score_assignment
-        @assignment_4.submit_homework(@user)
+        @assignment_4.submission_types = 'online_text_entry'
+        @assignment_4.save!
+
+        @assignment_4.submit_homework(@user, :body => "body")
         go_to_modules
 
         validate_context_module_item_icon(@tag_4.id, 'icon-info')
