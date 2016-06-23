@@ -1462,6 +1462,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
+      # this only includes users with a submission who are unexcused
       users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
       reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)

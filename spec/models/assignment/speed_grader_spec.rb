@@ -273,9 +273,13 @@ describe Assignment::SpeedGrader do
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
 
-    it "prefers people who aren't excused" do
+    it "prefers people who aren't excused when submission exists" do
       g1, _ = @groups
       g1rep, *others = g1.users.to_a.shuffle
+      @assignment.submit_homework(g1rep, {
+        submission_type: 'online_text_entry',
+        body: 'hi'
+      })
       others.each { |u|
         @assignment.grade_student(u, excuse: true)
       }
