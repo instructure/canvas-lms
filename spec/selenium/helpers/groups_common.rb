@@ -338,7 +338,7 @@ module GroupsCommon
     wait_for_ajaximations
     expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}\nClose"
     # Click folder
-    ff('.media-body').first.click
+    ff('.ef-name-col__text').first.click
     wait_for_ajaximations
     expect(fln(file_name)).to be_displayed
   end
@@ -348,7 +348,7 @@ module GroupsCommon
     @top_folder = 'Top Folder'
     @inner_folder = 'Inner Folder'
     add_folder(@top_folder)
-    ff('.media-body')[0].click
+    ff('.ef-name-col__text')[0].click
     wait_for_ajaximations
     add_folder(@inner_folder)
     wait_for_ajaximations
