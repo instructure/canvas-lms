@@ -167,9 +167,11 @@
           <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" <%= 'checked' if rubric_association && rubric_association.hide_score_total %>/>
           <label for="totalling_rubric"><%= t 'labels.totallying_rubric', "Hide score total for assessment results" %></label>
         </div>
-        <div class="button-container">
-          <button type="button" class="btn btn-small cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
-          <button type="submit" class="btn btn-small save_button btn-primary"><%= t 'buttons.create', "Create Rubric" %></button>
+        <div class="ic-Action-header ic-Action-header--half-margin">
+          <div class="ic-Action-header__Primary">
+            <button type="button" class="Button cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
+            <button type="submit" class="Button Button--primary save_button"><%= t 'buttons.create', "Create Rubric" %></button>
+          </div>
         </div>
       </form>
     </td>
