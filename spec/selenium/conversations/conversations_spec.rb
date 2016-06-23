@@ -36,7 +36,6 @@ describe "conversations new" do
     expect(f('#compose-message-subject')).to be_displayed
     # Send Individual messages checkbox displays and is unchecked
     expect(f('#bulk_message').selected?).to be_falsey
-    expect(f('.icon-question')).to have_attribute('title','This will send an individual message to each of the recipients')
     # Message field displays
     expect(f('.conversation_body')).to be_displayed
     # Attachment button displays
