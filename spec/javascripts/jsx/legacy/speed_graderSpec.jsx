@@ -38,7 +38,7 @@ define([
       fakeENV.teardown();
       window.jsonData = this.originalWindowJSONData;
       $.ajaxJSON.restore();
-      $("#fixtures").html("");
+      $("#fixtures").empty();
     }
   });
 
@@ -62,5 +62,77 @@ define([
     equal(formData['submission[grade]'], '56');
     equal(formData['submission[user_id]'], 4);
     SpeedgraderHelpers.determineGradeToSubmit.restore();
+  });
+
+  let $div = null;
+  module('loading a submission Preview', {
+    setup() {
+      fakeENV.setup();
+      sinon.spy($, 'ajaxJSON');
+      $div = $("<div id='iframe_holder'>not empty</div>")
+      $("#fixtures").html($div)
+    },
+
+    teardown() {
+      fakeENV.teardown();
+      $.ajaxJSON.restore();
+      $("#fixtures").empty();
+    }
+  });
+
+  test('entry point function, loadSubmissionPreview, is a function', () => {
+    ok(typeof speedGrader.EG.loadSubmissionPreview === 'function');
+  })
+
+  module('emptyIframeHolder', {
+    setup() {
+      fakeENV.setup();
+      sinon.spy($, 'ajaxJSON');
+      $div = $("<div id='iframe_holder'>not empty</div>")
+      $("#fixtures").html($div)
+    },
+
+    teardown() {
+      fakeENV.teardown();
+      $.ajaxJSON.restore();
+      $("#fixtures").empty();
+    }
+  });
+
+  test('is a function', () => {
+    ok(typeof speedGrader.EG.emptyIframeHolder === 'function');
+  });
+
+  test('clears the contents of the iframe_holder', () => {
+    speedGrader.EG.emptyIframeHolder($div);
+    ok($div.is(':empty'));
+  });
+
+  module('renderLtiLaunch', {
+    setup() {
+      fakeENV.setup();
+      sinon.spy($, 'ajaxJSON');
+      $div = $("<div id='iframe_holder'>not empty</div>")
+      $("#fixtures").html($div)
+    },
+
+    teardown() {
+      fakeENV.teardown();
+      $.ajaxJSON.restore();
+      $("#fixtures").empty();
+    }
+  });
+
+  test('is a function', () => {
+    ok(typeof speedGrader.EG.renderLtiLaunch === 'function')
+  })
+
+  test('contains iframe with the formatted student submission url', () => {
+    let retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
+    let url = 'www.example.com/lti/launch/user/4'
+    speedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
+    let srcUrl = $div.find('iframe').attr('src')
+    ok(srcUrl.indexOf(retrieveUrl) > -1)
+    ok(srcUrl.indexOf(url) > -1)
   });
 });

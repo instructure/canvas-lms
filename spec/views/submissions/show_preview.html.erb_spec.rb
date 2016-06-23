@@ -37,7 +37,7 @@ describe "/submissions/show_preview" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com'
     render "submissions/show_preview"
-    expect(response.body).to match /(?=.*external_tools\/retrieve?)(?=.*www\.example\.com).*/
+    expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
   it "should give a user-friendly explaination why there's no preview" do
@@ -47,7 +47,7 @@ describe "/submissions/show_preview" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework(@user)
     render "submissions/show_preview"
-    expect(response.body).to match /No Preview Available/
+    expect(response.body).to match(/No Preview Available/)
   end
 end
 
