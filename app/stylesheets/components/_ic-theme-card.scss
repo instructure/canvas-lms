@@ -28,17 +28,17 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   overflow: hidden;
   user-select: none;
   background: $ic-color-light;
-  .no-touch & {
-    cursor: pointer;
+  cursor: pointer;
+
+  .ic-ThemeCard-overlay {
+    opacity: 0;
+  }
+  &:hover {
     .ic-ThemeCard-overlay {
-      opacity: 0;
-    }
-    &:hover {
-      .ic-ThemeCard-overlay {
-        opacity: 1;
-      }
+      opacity: 1;
     }
   }
+
 }
 
 .ic-ThemeCard-thumbnail__primary-content {
@@ -234,7 +234,7 @@ $te-light-on-dark-bg-text: darken($ic-color-light, 15%);
   padding: $ic-sp/2 $ic-sp;
   color: $ic-color-light;
   &.ic-ThemeCard-status--is-active-theme {
-    padding: $ic-sp $ic-sp 8px $ic-sp; // taking off 4px for bottom border 
+    padding: $ic-sp $ic-sp 8px $ic-sp; // taking off 4px for bottom border
     background: $ic-color-success;
   }
 }
