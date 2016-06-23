@@ -20,7 +20,7 @@ module Api::V1::SisAssignment
   include Api::V1::Json
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id created_at due_at points_possible integration_id integration_data).freeze,
+    only: %i(id created_at due_at unlock_at lock_at points_possible integration_id integration_data).freeze,
     methods: %i(name submission_types_array).freeze
   }.freeze
 
@@ -37,7 +37,7 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS = {
-    only: %i(title due_at).freeze
+    only: %i(title due_at unlock_at lock_at).freeze
   }.freeze
 
   def sis_assignments_json(assignments)
