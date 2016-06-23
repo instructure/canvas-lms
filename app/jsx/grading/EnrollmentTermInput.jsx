@@ -88,7 +88,7 @@ define([
           this.optionsForType('active'),
           this.optionsForType('undated'),
           this.optionsForType('future'),
-          this.optionsForType('past'),
+          this.optionsForType('past')
         );
       }
     },
