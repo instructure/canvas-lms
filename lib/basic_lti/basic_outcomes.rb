@@ -247,7 +247,6 @@ to because the assignment has no points possible.
           end
 
           if @submission
-            @submission.submission_type = old_submission.submission_type if old_submission
             @submission.save
           else
             self.code_major = 'failure'

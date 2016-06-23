@@ -483,10 +483,7 @@ class Submission < ActiveRecord::Base
   end
 
   def external_tool_url
-    if self.submission_type == 'basic_lti_launch'
-      base_url = "#{HostUrl.protocol}://#{HostUrl.default_host}"
-      base_url + "/courses/#{assignment.context.id}/external_tools/retrieve?display=borderless&assignment_id=#{assignment.id}&url=#{URI.encode(url)}"
-    end
+    URI.encode(url) if self.submission_type == 'basic_lti_launch'
   end
 
   def touch_graders

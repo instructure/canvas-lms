@@ -1563,7 +1563,7 @@ define([
             .data('attachment', attachment)
             .click(function(event){
               event.preventDefault();
-              EG.loadAttachmentInline($(this).data('attachment'));
+              EG.loadSubmissionPreview($(this).data('attachment'));
             })
           .end()
           .find('a.submission-file-download')
@@ -1585,15 +1585,13 @@ define([
 
       $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
-      // load up a preview of one of the attachments if we can.
-      // do it in this order:
-      // show the first scridbable doc if there is one
-      // then show the first image if there is one,
-      // if not load the generic thing for the current submission (by not passing a value)
       var preview_attachment = null;
-      if (submission.submission_type != 'discussion_topic')
+      if (submission.submission_type != 'discussion_topic') {
         preview_attachment = inlineableAttachments[0] || browserableAttachments[0];
-      this.loadAttachmentInline(preview_attachment);
+      }
+
+      // load up a preview of one of the attachments if we can.
+      this.loadSubmissionPreview(preview_attachment);
 
       // if there is any submissions after this one, show a notice that they are not looking at the newest
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
@@ -1714,7 +1712,8 @@ define([
         return jsonData.context.students.length;
       };
     },
-    loadAttachmentInline: function(attachment){
+
+    loadSubmissionPreview: function(attachment) {
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
       $(".speedgrader_alert").hide();
@@ -1722,85 +1721,98 @@ define([
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
           $this_student_has_a_submission.show();
+      } else if (attachment) {
+        this.renderAttachment(attachment);
+      } else if (this.currentStudent.submission.external_tool_url) {
+        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, this.currentStudent.submission.external_tool_url)
       } else {
-        $iframe_holder.empty();
+        this.renderSubmissionPreview()
+      }
+    },
 
-        if (attachment) {
-          var previewOptions = {
-            height: '100%',
-            id: "speedgrader_iframe",
-            mimeType: attachment.content_type,
-            attachment_id: attachment.id,
-            submission_id: this.currentStudent.submission.id,
-            attachment_view_inline_ping_url: attachment.view_inline_ping_url,
-            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
-          };
-        }
+    emptyIframeHolder: function(elem) {
+      elem = elem || $iframe_holder
+      elem.empty();
+    },
 
-        if (attachment &&
-            attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
-          $("#crocodoc_pending").show();
-        }
+    //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
+    renderSubmissionPreview: function() {
+      this.emptyIframeHolder()
+      $iframe_holder.html($.raw(
+        '<iframe id="speedgrader_iframe" src="' +
+        htmlEscape('/courses/' + jsonData.context_id  +
+        '/assignments/' + this.currentStudent.submission.assignment_id +
+        '/submissions/' + this.currentStudent.submission.user_id +
+        '?preview=true' + (SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)) + (
+          utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
+        )) +
+        '" frameborder="0"></iframe>'
+      )).show();
+    },
 
-        if (attachment && attachment.crocodoc_url) {
-          var crocodocStart = new Date()
-          ,   sessionLimit = 60 * 60 * 1000
-          ,   aggressiveWarnings = [50 * 60 * 1000,
-                                    55 * 60 * 1000,
-                                    58 * 60 * 1000,
-                                    59 * 60 * 1000];
-          crocodocSessionTimer = window.setInterval(function() {
-            var elapsed = new Date() - crocodocStart;
-            if (elapsed > sessionLimit) {
-              window.location.reload();
-            } else if (elapsed > aggressiveWarnings[0]) {
-              alert(I18n.t("crocodoc_expiring",
-                           "Your Crocodoc session is expiring soon.  Please reload " +
-                           "the window to avoid losing any work."));
-              aggressiveWarnings.shift();
-            }
-          }, 1000);
+    renderLtiLaunch: function($div, urlBase, externalToolUrl) {
+      this.emptyIframeHolder()
+      var launchUrl = urlBase + '&url=' + externalToolUrl;
+      $div.html(
+        $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
+      ).show();
+    },
 
-          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-            crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
-          }));
-        } else if (attachment && attachment.canvadoc_url) {
-          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-            canvadoc_session_url: attachment.canvadoc_url
-          }));
-        } else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
-          if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+    renderAttachment: function(attachment) {
+      // show the crocodoc doc if there is one
+      // then show the google attachment if there is one
+      // then show the first browser viewable attachment if there is one
+      this.emptyIframeHolder()
+      var previewOptions = {
+        height: '100%',
+        id: "speedgrader_iframe",
+        mimeType: attachment.content_type,
+        attachment_id: attachment.id,
+        submission_id: this.currentStudent.submission.id,
+        attachment_view_inline_ping_url: attachment.view_inline_ping_url,
+        attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
+      };
 
-          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
-          previewOptions = $.extend(previewOptions, {
-              ajax_valid: _.bind(function() {
-                return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
-              },this)});
-          $iframe_holder.show().loadDocPreview(previewOptions);
-        } else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
-          var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-            .replace("{{submissionId}}", this.currentStudent.submission.user_id)
-            .replace("{{attachmentId}}", attachment.id);
-          $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
-        } else if (this.currentStudent.submission.external_tool_url) {
-          $iframe_holder.html(
-            $.raw('<iframe id="speedgrader_iframe" src="' +
-              htmlEscape(this.currentStudent.submission.external_tool_url) + '" class="tool_launch"></iframe>'
-            )
-          ).show();
-        } else {
-          //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-          $iframe_holder.html($.raw(
-            '<iframe id="speedgrader_iframe" src="' + htmlEscape('/courses/' + jsonData.context_id  +
-            '/assignments/' + this.currentStudent.submission.assignment_id +
-            '/submissions/' + this.currentStudent.submission.user_id +
-            '?preview=true' + (
-              SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)
-            ) + (
-              utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-            )) + '" frameborder="0"></iframe>'))
-            .show();
-        }
+      if (attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+        $("#crocodoc_pending").show();
+      }
+
+      if (attachment.crocodoc_url) {
+        var crocodocStart = new Date()
+        ,   sessionLimit = 60 * 60 * 1000
+        ,   aggressiveWarnings = [50 * 60 * 1000,
+                                  55 * 60 * 1000,
+                                  58 * 60 * 1000,
+                                  59 * 60 * 1000];
+        crocodocSessionTimer = window.setInterval(function() {
+          var elapsed = new Date() - crocodocStart;
+          if (elapsed > sessionLimit) {
+            window.location.reload();
+          } else if (elapsed > aggressiveWarnings[0]) {
+            alert(I18n.t("crocodoc_expiring",
+                         "Your Crocodoc session is expiring soon.  Please reload " +
+                         "the window to avoid losing any work."));
+            aggressiveWarnings.shift();
+          }
+        }, 1000);
+
+        $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+          crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
+        }));
+      } else if ($.isPreviewable(attachment.content_type, 'google')) {
+        if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+
+        var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
+        previewOptions = $.extend(previewOptions, {
+            ajax_valid: _.bind(function() {
+              return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
+            },this)});
+        $iframe_holder.show().loadDocPreview(previewOptions);
+      } else if (browserableCssClasses.test(attachment.mime_class)) {
+        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
+          .replace("{{submissionId}}", this.currentStudent.submission.user_id)
+          .replace("{{attachmentId}}", attachment.id);
+        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
       }
     },
 
