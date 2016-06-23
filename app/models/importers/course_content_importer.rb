@@ -151,6 +151,10 @@ module Importers
       migration.resolve_content_links!
       migration.update_import_progress(95)
 
+      if data['external_content']
+        Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
+      end
+
       begin
         #Adjust dates
         if shift_options = migration.date_shift_options

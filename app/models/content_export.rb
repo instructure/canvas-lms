@@ -103,6 +103,7 @@ class ContentExport < ActiveRecord::Base
     self.save
     begin
       self.job_progress.try :start!
+
       @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
       if @cc_exporter.export
         self.progress = 100
@@ -187,6 +188,10 @@ class ContentExport < ActiveRecord::Base
 
   def for_course_copy?
     self.export_type == COURSE_COPY
+  end
+
+  def common_cartridge?
+    self.export_type == COMMON_CARTRIDGE
   end
 
   def qti_export?

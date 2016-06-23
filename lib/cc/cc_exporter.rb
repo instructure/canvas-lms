@@ -50,6 +50,8 @@ module CC
 
     def export
       begin
+        pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course) unless @qti_only_export || epub_export?
+
         create_export_dir
         create_zip_file
         if @qti_only_export
@@ -59,6 +61,12 @@ module CC
         end
         @manifest.create_document
         @manifest.close
+
+        if pending_exports
+          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(pending_exports)
+          write_external_content(external_content)
+        end
+
         copy_all_to_zip
         @zip_file.close
 
@@ -83,6 +91,18 @@ module CC
         end
       end
       true
+    end
+
+    def write_external_content(external_content)
+      return unless external_content.present?
+
+      folder = File.join(@export_dir, CCHelper::EXTERNAL_CONTENT_FOLDER)
+      FileUtils::mkdir_p(folder)
+
+      external_content.each do |service_key, data|
+        path = File.join(folder, "#{service_key}.json")
+        File.write(path, data.to_json)
+      end
     end
 
     def referenced_files
