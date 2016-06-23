@@ -12371,7 +12371,7 @@ nb:
       other: "%{count} timer"
     duration_in_hours_and_minutes: "%{hours} og %{minutes}"
     duration_in_minutes: 
-      one: "%{count} minutter"
+      one: "1 minutt"
       other: "%{count} minutter"
     duration_in_minutes_and_seconds: "%{minutes} og %{seconds}"
     duration_in_seconds: 
