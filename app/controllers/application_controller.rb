@@ -1684,6 +1684,23 @@ class ApplicationController < ActionController::Base
   end
   helper_method :user_content
 
+  def public_user_content(str, context=@context, user=@current_user, is_public=false)
+    return nil unless str
+
+    rewriter = UserContent::HtmlRewriter.new(context, user)
+    rewriter.set_handler('files') do |match|
+      UserContent::FilesHandler.new(
+        match: match,
+        context: context,
+        user: user,
+        preloaded_attachments: {},
+        is_public: is_public
+      ).processed_url
+    end
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port)
+  end
+  helper_method :public_user_content
+
   def find_bank(id, check_context_chain=true)
     bank = @context.assessment_question_banks.active.where(id: id).first || @current_user.assessment_question_banks.active.where(id: id).first
     if bank
