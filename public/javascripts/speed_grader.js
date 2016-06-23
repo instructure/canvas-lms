@@ -1031,12 +1031,12 @@ define([
       if (!jsonData.rubric_association){ return false; }
 
       if ($rubric_full.filter(":visible").length || force === "close") {
-        $("#grading").height("auto").children().show();
+        $("#grading").show().height("auto");
         $rubric_full.fadeOut();
         $(".toggle_full_rubric").focus()
       } else {
         $rubric_full.fadeIn();
-        $("#grading").children().hide();
+        $("#grading").hide();
         this.refreshFullRubric();
         $rubric_full.find('.rubric_title .title').focus()
       }
@@ -1533,7 +1533,6 @@ define([
           hrefValues: ['submissionId', 'attachmentId']
         }).appendTo($submission_files_list)
           .find('a.display_name')
-            .addClass(attachment.mime_class)
             .data('attachment', attachment)
             .click(function(event){
               event.preventDefault();

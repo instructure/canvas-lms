@@ -3,10 +3,10 @@
     {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
   {{/each}}
 {{else}}
-  <label for="submission_to_view">
+  <label for="submission_to_view" class="ic-Label">
     {{#t "submission_to_view"}}Submission to view:{{/t}}
   </label>
-  <select id="submission_to_view">
+  <select id="submission_to_view" class="ic-Input">
   {{#each submissions}}
     <option value="{{value}}"
             {{#if late}}class=late{{/if}}

@@ -22,6 +22,7 @@ describe "speed grader" do
     def add_rubric_assessment(score, comment)
       f('.toggle_full_rubric').click
       expect(f('#rubric_full')).to be_displayed
+      expand_right_pane
       f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
 
       f('textarea.criterion_comments').send_keys(comment)
@@ -171,7 +172,7 @@ describe "speed grader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#students_selectmenu-button")).to have_class("not_graded")
-      
+
       new_mark_dd = f('#moderation_bar #new_mark_dropdown_link')
       expect(new_mark_dd).to include_text("Add Review")
       new_mark_dd.click

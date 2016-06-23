@@ -187,11 +187,11 @@
           <div id="submission_not_newest_notice" title='<%= t('titles.not_newest', "use the dropdown above to change which submission to look at") %>'><%= t(:not_newest_notice, "Note: This is not the most recent submission") %></div>
           <div id="submission_attachment_viewed_at_container"></div>
           <div id="submission_files_container">
-            <label><%= t(:submitted_files, "Submitted Files: (click to load)") %></label>
+            <label><%= t("Submitted Files") %>: <span class="labelText--not-bold"><%= t("(click to load)") %></span>&nbsp;</label>
             <div id="submission_files_list">
               <div id="submission_file_hidden"  class="submission-file" style='display:none;'>
+                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"></a>
                 <span class="turnitin_score_container"></span>
-                <a class="submission-file-download" title="<%= t('titles.download_file', "Download this file") %>" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}") %>"><%= t('links.download_file', "Download File") %></a>
                 <a class="display_name no-hover" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{submissionId}}", :download => "{{attachmentId}}", :inline => 1) %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
               </div>
             </div>
@@ -199,61 +199,59 @@
           </div>
         </div>
 
-        <% if @assignment.rubric_association %>
-        <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
-        <div id="rubric_full" style="display:none;">
-          <div id="rubric_full_resizer">
-            <div id="rubric_full_resizer_handle"></div>
-          </div>
-          <h2><%= t('headers.grading', "Grading") %></h2>
-          <div class="content_box">
-            <div id="rubric_holder">
-              <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
-              <div class="button-container">
-                <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
-                  <button type="button" class="save_rubric_button btn"><%= t('buttons.save', "Save") %></button>
-                <% end %>
-                <button type="button" class="hide_rubric_link btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+        <div class="content_box">
+          <% if @assignment.rubric_association %>
+          <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+          <div id="rubric_full" style="display: none;">
+            <div id="rubric_full_resizer">
+              <div id="rubric_full_resizer_handle"></div>
+            </div>
+              <h2><%= t("Grading") %></h2>
+              <div id="rubric_holder">
+                <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true, :rubric_association => @assignment.rubric_association } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+                <div class="button-container">
+                  <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
+                    <button type="button" class="save_rubric_button Button Button--primary"><%= t("Save") %></button>
+                  <% end %>
+                  <button type="button" class="hide_rubric_link Button"><%= t("Cancel") %></button>
+                </div>
+                <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
+                <%= render :partial => "shared/rubric_criterion_dialog" %>
               </div>
-              <a href="<%= context_url(@context, :context_rubric_association_rubric_assessments_url, @assignment.rubric_association) %>" class="update_rubric_assessment_url" style="display: none;">&nbsp;</a>
-              <%= render :partial => "shared/rubric_criterion_dialog" %>
-            </div>
           </div>
-        </div>
-        <% end %>
+          <% end %>
 
-        <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) %>
-        <div id="grading">
-          <h2><%= t('headers.assessment', "Assessment") %></h2>
-          <div>
+          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) %>
+          <div id="grading">
+            <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) %>
-            <div id="grade_container" class="content_box">
-              <%= render partial: "grading_box_extended",
-                         locals: { assignment: @assignment } %>
-              <span class="turnitin_score_container"></span>
-              <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
-              <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
-              <div class="turnitin_info_container"></div>
-            </div>
+              <div id="grade_container">
+                <%= render partial: "grading_box_extended",
+                           locals: { assignment: @assignment } %>
+                <span class="turnitin_score_container"></span>
+                <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
+                <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
+                <div class="turnitin_info_container"></div>
+              </div>
             <% end %>
             <% if @assignment.rubric_association %>
-            <div id="rubric_summary_holder">
-              <div id="rubric_assessments_list_and_edit_button_holder" class="content_box">
-                <span id="rubric_assessments_list">
-                  <%= before_label(:show_assessment_by, "Show Assessment By") %>
-                  <select id="rubric_assessments_select"></select>
-                </span>
+              <div id="rubric_summary_holder">
+                <div id="rubric_assessments_list_and_edit_button_holder">
+                  <span id="rubric_assessments_list">
+                    <%= before_label(:show_assessment_by, "Show Assessment By") %>
+                    <select id="rubric_assessments_select"></select>
+                  </span>
+                </div>
+                <div id="rubric_summary_container">
+                  <%= render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+                </div>
               </div>
-              <div id="rubric_summary_container">
-                <%= render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
-              </div>
-            </div>
             <% end %>
-          </div>
-        </div><!-- end #grading -->
-        <% end %>
+          </div><!-- end #grading -->
+          <% end %>
+        </div>
 
-      <div>
+        <div class="content_box">
           <h2><%= t("Assignment Comments") %></h2>
           <div id="discussion">
             <div id="comments">
@@ -275,27 +273,25 @@
                 <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, "{{ submitter_id }}", :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
               </div>
             </div>
-
           </div>
-        </div>
 
-        <% unless @context.completed? || @context_enrollment.try(:completed?) %>
-          <form id="add_a_comment">
-            <label for="speedgrader_comment_textarea"><%= t('labels.add_comment', "Add a Comment") %></label>
-            <textarea id="speedgrader_comment_textarea"></textarea>
-            <div>
+          <% unless @context.completed? || @context_enrollment.try(:completed?) %>
+            <form id="add_a_comment">
+              <label for="speedgrader_comment_textarea" class="screenreader-only"><%= t('labels.add_comment', "Add a Comment") %></label>
+              <textarea id="speedgrader_comment_textarea" class="ic-Input" placeholder="<%= t("Add a Comment") %>"></textarea>
               <div id="media_media_recording" style="display: none;">
                 <div class="media_recording"></div>
               </div>
               <% if @assignment.has_group_category? %>
-                <div id="group_comment_wrapper">
-                  <input type="checkbox" name="group_comment" id="submission_group_comment"/>
-                  <label for="submission_group_comment"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>
+                <div id="group_comment_wrapper" class="ic-Form-control ic-Form-control--checkbox">
+                  <input type="checkbox" name="group_comment" id="submission_group_comment" class="ic_Input"/>
+                  <label for="submission_group_comment" class="ic-Label"><%= t('labels.group_comment', "Send Comment to the Whole Group") %></label>
                 </div>
               <% end %>
+
               <div id="comment_attachments"></div>
               <div class="comment_attachment_input" id="comment_attachment_input_blank" style="display: none;">
-                <input type="file" name="attachments[-1][uploaded_data]" style="font-size: 0.8em;"/>
+                <input type="file" name="attachments[-1][uploaded_data]"/>
                 <a href="#">
                   <i class="icon-end text-error"></i>
                   <span class="screenreader-only">
@@ -303,32 +299,38 @@
                   </span>
                 </a>
               </div>
-
-
-              <button class="btn btn-small btn-primary" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
-
-              <div class="attach_things" role="group" aria-labelledby="speedgrader_attach_things_label">
-                <span class="prompt" id="speedgrader_attach_things_label"><%= t(:attach, "Attach") %></span>
-                <button data-tooltip title="<%= t('tooltips.file_attachment', "File Attachment") %>" class="btn btn-small" id="add_attachment" aria-label="<%= t('tooltips.file_attachment', "File Attachment") %>" type="button">
-                  <i class="icon-paperclip" aria-hidden="true"></i>
-                </button>
-                <% if feature_enabled?(:kaltura) %>
-                  <button data-tooltip title="<%= t('tooltips.media_comment', "Media Comment") %>" class="btn btn-small media_comment_link" aria-label="<%= t('tooltips.media_comment', "Media Comment") %> " type="button">
-                    <i class="icon-media" aria-hidden="true"></i>
+              <div class="ic-Action-header">
+                <div class="ic-Action-header__Primary attach_things" role="group" aria-labelledby="speedgrader_attach_things_label">
+                  <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
+                    <i class="icon-paperclip" aria-hidden="true"></i>
+                    <span class="screenreader-only">
+                      <%= t("File Attachment") %>
+                    </span>
                   </button>
-                <% end %>
+                  <% if feature_enabled?(:kaltura) %>
+                    <button class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
+                      <i class="icon-media" aria-hidden="true"></i>
+                      <span class="screenreader-only">
+                        <%= t("Media Comment") %>
+                      </span>
+                    </button>
+                  <% end %>
+                  <div class="speech-recognition">
+                    <a title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
+                      <i class="icon-audio"></i>
+                      <span class="screenreader-only">
+                        <%= t("Speech Recognition") %>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+                <div class="ic-Action-header__Secondary">
+                  <button class="Button Button--primary" type="submit"><%= t("Submit") %></button>
+                </div>
               </div>
-              <div class="speech-recognition" style="display:none">
-                <a data-tooltip title="<%= t('tooltips.speech_recognition', "Speech Recognition") %>" href="#" class="btn btn-small speech_recognition_link">
-                  <i class="icon-audio"></i>
-                  <span class="screenreader-only">
-                    <%= t('icons.speech_recognition', 'Speech Recognition') %>
-                  </span>
-                </a>
-              </div>
-            </div>
-          </form>
-        <% end %>
+            </form>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

@@ -374,19 +374,12 @@ $icon-size: 1.4rem;
   top: 0;
   bottom: 0;
   right: 0;
-  background-color: #f2f2f2;
-  color: #444;
-  @include fontSize(12px);
-  .bold {
-    font-weight: bold;
-  }
-  #rubric_summary_holder {
-    border-top: 1px dashed #bbb;
-  }
+  @include fontSize(14px);
+
   #rubric_summary_container {
-    border-top: 1px solid #aaa;
-    overflow: auto;
+    margin-top: $ic-sp;
   }
+
   #rubric_assessments_list_and_edit_button_holder {
     .button-container {
       display: inline-block;
@@ -394,17 +387,14 @@ $icon-size: 1.4rem;
   }
   div.comment {
     padding: 8px;
-    @include fontSize(12px);
-    border-top: 1px dashed $ic-border-light;
+    @include fontSize(14px);
+    border-top: 1px dotted $ic-border-light;
     background: $ic-color-light;
     &:first-of-type {
       border-top: none;
     }
     .comment_citation {
-      @if $use_high_contrast == false {
-        color: #888;
-      }
-      font-size: 0.8em;
+      @include fontSize(12px);
       text-align: right;
     }
     .delete_comment_link {
@@ -421,18 +411,13 @@ $icon-size: 1.4rem;
     }
   }
   h2, .h2 {
-    background: lighten($ic-color-neutral, 5%);
-    border-bottom: 1px solid $ic-border-light;
-    border-top: 1px solid $ic-border-light;
-    font-size: 1.2em;
+    @include fontSize(14px);
     font-weight: bold;
-    margin: 0;
-    padding: 8px;
-    line-height: 1.1;
   }
   .content_box {
-    padding: 8px;
+    padding: $ic-sp*2;
     background: $ic-color-light;
+    border-bottom: 1px solid $gray-lighter;
   }
   #rightside_inner {
     @extend %flex-1;
@@ -456,39 +441,15 @@ $icon-size: 1.4rem;
   right: 0;
 }
 
-#rubric_full h2, #rubric_full .h2, #grading h2, #grading .h2 {
-  margin-top: 0 !important;
-  border-top: 0px none !important;
-}
-
 #rubric_full {
-  background-color: $ic-color-light;
-  border-bottom: 7px solid #bbb;
-  border-bottom-left-radius: 5px;
-  border-left: 7px solid #bbb;
-  position: absolute;
-  right: 1px;
-  top: 0px;
-  width: 100%;
-  .content_box {
-    padding-right: 24px;
-  }
-  #rubric_full_resizer {
+  #rubric_full_resizer #rubric_full_resizer_handle {
     position: absolute;
-    top: 0;
-    left: -6px;
+    top: 50%;
+    left: 0px;
+    background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
     cursor: pointer;
-    height: 100%;
+    height: 20px;
     width: 7px;
-    #rubric_full_resizer_handle {
-      position: absolute;
-      top: 50%;
-      left: 0px;
-      background: transparent url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-      cursor: pointer;
-      height: 20px;
-      width: 7px;
-    }
   }
   a.big_link {
     display: none;
@@ -497,29 +458,23 @@ $icon-size: 1.4rem;
     margin-top: 0;
   }
 }
-
-#discussion {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+#submission_files_container {
+  padding: $ic-sp 0;
 }
-
 #comments {
   overflow-y: auto;
   .comment {
     .avatar {
-      height: 30px;
-      max-width: 30px;
+      height: 24px;
+      max-width: 24px;
       float: left;
-      margin-right: 6px;
+      margin-right: 12px;
     }
   }
 }
 
 #add_a_comment {
-  border-top: 1px solid $ic-border-light;
-  margin: 0;
-  box-sizing: border-box;
-  padding: 8px;
+
   #media_media_recording {
     margin: 0 -2px;
   }
@@ -530,17 +485,10 @@ $icon-size: 1.4rem;
     color: #888;
     @include fontSize(10px);
   }
-  label {
-    font-weight: bold;
-  }
-  button {
-    float: right;
-  }
+
   .attach_things {
-    float: left;
-    margin: 0;
-    padding: 0;
     list-style: none;
+
     //Chrome has a nice bug where clicking on block element
     //inside an inline element will force the inline element
     //to keep the :active pseudo class.
@@ -562,42 +510,16 @@ $icon-size: 1.4rem;
     }
     button {
       float: left;
+      margin-right: 5px;
     }
   }
-  #group_comment_wrapper {
-    margin-bottom: 2px;
-    label {
-      font-weight: normal;
-    }
-    input {
-      margin: 0;
-      vertical-align: middle;
-    }
-  }
-  .comment_attachment_input {
-    margin-bottom: 2px;
-    input {
-      float: left;
-      width: 85%;
-      // this is a hack  because windows based browsers do not allow me to set the width of a file input.
-      // so I just have to make it smaller font so that it fits.
-      @include fontSize(8.5px);
-    }
+  #comment_attachments {
+    padding: $ic-sp/2 0;
+    display: block;
     a {
-      display: block;
       float: right;
     }
   }
-  textarea {
-    border-radius: $baseBorderRadius;
-    max-height: 200px;
-    @include fontSize(13px);
-  }
-}
-
-html > body #add_a_comment textarea {
-  width: 100%;
-  box-sizing: border-box;
 }
 
 body .ui-selectmenu-dropdown {
@@ -753,7 +675,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #submission_details {
   border-bottom: 1px solid $ic-border-light;
   a {
-    @include fontSize(12px);
+    @include fontSize(14px);
   }
   .on_time {
     color: #004B00;
@@ -768,8 +690,9 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     font-weight: bold;
   }
   #submission_not_newest_notice {
-    color: #EB9A00;
+    color: $orange;
     font-weight: bold;
+    padding: $ic-sp/2 0;
   }
   .submission_attachment_viewed_at {
     display: inline;
@@ -784,18 +707,26 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   label {
     font-weight: bold;
   }
+  .labelText--not-bold {
+    font-weight: normal;
+  }
   #submission_files_list {
-    overflow: auto;
+    overflow: hidden;
+    padding: $ic-sp/2 0;
     .submission-file {
-      padding: 1px 16px 1px 19px;
       position: relative;
       .turnitin_score_container {
-        position: absolute;
-        top: 0;
-        right: 20px;
+        float: left;
+        margin-right: $ic-sp;
+        margin-left: 0;
+      }
+      .turnitin_score_container_caret {
+        display: none;
       }
       .turnitin_similarity_score {
         @include fontSize(12px);
+        text-align: center;
+        width: 34px;
         &.submission_error, &.submission_pending {
           padding: 1px;
         }
@@ -804,30 +735,19 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         }
       }
       .submission-file-download {
-        display: block;
-        opacity: 0.5;
-        background: url("/images/download.png") no-repeat top right;
         width: 16px;
         height: 16px;
         position: absolute;
-        top: 0;
+        top: 3px;
         right: 1px;
-        text-indent: -9999px;
+        overflow: hidden;
       }
-      a.display_name {
+      .display_name {
         display: block;
-        margin-right: 40px;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        word-break: break-all;
-        word-break: break-word;
-      }
-      &:hover {
-        background-color: #DCECFB;
-        .submission-file-download {
-          display: block;
-          opacity: 1;
-        }
+        margin-right: 28px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
     .submission-file-selected {

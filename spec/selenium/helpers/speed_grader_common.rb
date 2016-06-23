@@ -80,4 +80,11 @@ module SpeedGraderCommon
     f(selectedStudent).text.include?(@students[new_index].name) &&
         f(studentXofXlabel).text.include?(student_X_of_X_string)
   end
+
+  def expand_right_pane
+    # attempting to click things that were on the very edge of the page
+    # was causing certain specs to flicker. this fixes that issue by
+    # increasing the width of the right pane
+    driver.execute_script("$('#right_side').width('500px')")
+  end
 end

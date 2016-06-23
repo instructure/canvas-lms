@@ -219,6 +219,8 @@ describe "speed grader" do
   end
 
   it "displays inactive students" do
+    skip "Skipped because this spec fails if not run in foreground\n"\
+      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     student_submission(:username => 'inactivestudent@example.com')
     en = @student.student_enrollments.first
     en.deactivate
