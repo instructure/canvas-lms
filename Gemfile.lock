@@ -25,6 +25,16 @@ GIT
       redcarpet
 
 GIT
+  remote: https://github.com/instructure/testrailtagging
+  revision: 002c483ad2f0d2a288c96bde30ff70ed92f1fa50
+  ref: 002c483ad2f0d2a288c96bde30ff70ed92f1fa50
+  specs:
+    testrailtagging (0.3.1)
+      parser
+      rspec
+      testrail_client
+
+GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: beed72e249d02cebc850a4b92b468c8b64b12257
   ref: beed72e249d02cebc850a4b92b468c8b64b12257
@@ -48,11 +58,6 @@ GIT
   specs:
     active_model_serializers (0.9.0.alpha1)
       activemodel (>= 3.2)
-
-PATH
-  remote: gems
-  specs:
-    autoextend (1.0.0)
 
 PATH
   remote: gems/activesupport-suspend_callbacks
@@ -168,7 +173,7 @@ PATH
   remote: gems/canvas_sanitize
   specs:
     canvas_sanitize (0.0.1)
-      sanitize (= 2.0.6)
+      sanitize (= 2.1.0)
 
 PATH
   remote: gems/canvas_slug
@@ -252,7 +257,7 @@ PATH
       canvas_text_helper
       iconv (~> 1.0)
       nokogiri
-      sanitize (~> 2.0.3)
+      sanitize (~> 2.1.0)
 
 PATH
   remote: gems/i18n_extraction
@@ -343,7 +348,7 @@ PATH
   remote: gems/plugins/moodle_importer
   specs:
     moodle_importer (1.0.0)
-      moodle2cc (= 0.2.28)
+      moodle2cc (= 0.2.31)
       rails (>= 3.2, < 4.3)
 
 PATH
@@ -376,6 +381,8 @@ PATH
   remote: gems/selinimum
   specs:
     selinimum (0.0.1)
+      activerecord (>= 3.2, < 4.3)
+      activesupport (>= 3.2, < 4.3)
       aws-sdk (~> 1.63.0)
 
 PATH
@@ -397,6 +404,11 @@ PATH
   specs:
     workflow (0.0.1)
       rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems
+  specs:
+    autoextend (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -434,10 +446,12 @@ GEM
       rake (>= 0.9.2)
     after_transaction_commit (1.0.1)
       activerecord (>= 3.2)
+    airbrussh (1.0.2)
+      sshkit (>= 1.6.1, != 1.7.0)
     arel (4.0.2)
     aroi (0.0.3)
       rails (>= 3.2, < 5.0)
-    ast (2.2.0)
+    ast (2.3.0)
     astrolabe (1.3.1)
       parser (~> 2.2)
     authlogic (3.4.6)
@@ -456,20 +470,14 @@ GEM
       nokogiri (>= 1.4.4)
     barby (0.5.0)
     bcrypt-ruby (3.0.1)
-    bindata (2.3.0)
+    bindata (2.3.1)
     bluecloth (2.2.0)
     builder (3.1.4)
     bullet_instructure (4.14.8)
       activesupport (>= 3.0.0)
       redcarpet (>= 3.0.0)
       uniform_notifier (~> 1.9.0)
-    byebug (8.2.2)
-    canvas-jobs (0.10.4)
-      after_transaction_commit (= 1.0.1)
-      rails (>= 3.2)
-      redis (> 3.0)
-      redis-scripting (~> 1.0.1)
-      rufus-scheduler (~> 3.1.2)
+    byebug (8.2.5)
     canvas_connect (0.3.10)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
@@ -478,16 +486,19 @@ GEM
       statsd-ruby (= 1.0.0)
     canvas_webex (0.17)
       railties
-    capistrano (3.4.0)
+    capistrano (3.5.0)
+      airbrussh (>= 1.0.0)
+      capistrano-harrow
       i18n
       rake (>= 10.0.0)
-      sshkit (~> 1.3)
+      sshkit (>= 1.9.0)
     capistrano-bundler (1.1.4)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
+    capistrano-harrow (0.5.2)
     capistrano-passenger (0.2.0)
       capistrano (~> 3.0)
-    capistrano-rails (1.1.6)
+    capistrano-rails (1.1.7)
       capistrano (~> 3.1)
       capistrano-bundler (~> 1.1)
     childprocess (0.5.0)
@@ -500,14 +511,14 @@ GEM
     coffee-script-source (1.6.2)
     colored (1.2)
     colorize (0.7.7)
-    concurrent-ruby (1.0.1)
+    concurrent-ruby (1.0.2)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crocodoc-ruby (0.0.1)
       json
     daemons (1.2.3)
     diff-lcs (1.2.5)
-    diplomat (0.14.0)
+    diplomat (0.15.0)
       faraday (~> 0.9)
       json (~> 1.8)
     docile (1.1.3)
@@ -524,9 +535,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.10.0)
       faraday (>= 0.7.4, < 0.10)
-    fast_stack (0.1.0)
-      rake
-      rake-compiler
+    fast_stack (0.2.0)
     ffi (1.1.5)
     ffi-compiler (0.1.3)
       ffi (>= 1.0.0)
@@ -546,7 +555,7 @@ GEM
       nokogiri (~> 1.6.1)
       rubyzip (>= 1.1.1)
     github-markdown (0.6.8)
-    globby (0.1.1)
+    globby (0.1.2)
     google-api-client (0.8.2)
       activesupport (>= 3.2)
       addressable (~> 2.3)
@@ -584,6 +593,7 @@ GEM
     i18n (0.7.0)
     i18nema (0.0.8)
       i18n (>= 0.5)
+      syck (~> 1.0.0)
     i18nliner (0.0.12)
       activesupport (>= 3.0)
       erubis (~> 2.7.0)
@@ -595,14 +605,20 @@ GEM
       ya2yaml (= 0.31)
     icalendar (1.5.4)
     iconv (1.0.4)
-    ims-lti (2.0.0.beta.33)
+    ims-lti (2.0.0.beta.39)
       builder
       faraday (~> 0.8)
       faraday_middleware (~> 0.8)
       simple_oauth (= 0.2)
+    inst-jobs (0.11.1)
+      after_transaction_commit (= 1.0.1)
+      rails (>= 3.2)
+      redis (> 3.0)
+      redis-scripting (~> 1.0.1)
+      rufus-scheduler (~> 3.1.2)
     instructure-happymapper (0.5.10)
       nokogiri (~> 1.5)
-    iso8601 (0.9.0)
+    iso8601 (0.9.1)
     jira_ref_parser (1.0.0)
     json (1.8.2)
     json-jwt (1.5.1)
@@ -633,7 +649,7 @@ GEM
     mini_magick (4.2.7)
     mini_portile (0.6.2)
     minitest (4.7.5)
-    moodle2cc (0.2.28)
+    moodle2cc (0.2.31)
       builder
       instructure-happymapper (~> 0.5.10)
       nokogiri
@@ -644,12 +660,11 @@ GEM
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mustache (0.99.5)
-    mysql2 (0.3.15)
     net-http-persistent (2.9.4)
     net-ldap (0.10.1)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (3.1.1)
+    net-ssh (3.2.0)
     netaddr (1.5.0)
     oauth-instructure (0.4.10)
     oauth2 (1.0.0)
@@ -664,7 +679,7 @@ GEM
       rspec (>= 2.14)
     open4 (1.3.0)
     parallel (1.4.1)
-    parser (2.3.0.7)
+    parser (2.3.1.2)
       ast (~> 2.2)
     pg (0.18.4)
     polyglot (0.3.5)
@@ -703,8 +718,6 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rainbow (2.1.0)
     rake (10.5.0)
-    rake-compiler (0.9.7)
-      rake
     ratom-nokogiri (0.10.4)
       nokogiri (>= 1.5.6, < 1.7)
     rb-fchange (0.0.6)
@@ -735,7 +748,7 @@ GEM
       redis-store (~> 1.1.0)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    request_store (1.3.0)
+    request_store (1.3.1)
     retriable (1.4.1)
     ritex (1.0.1)
     rotp (1.6.1)
@@ -779,7 +792,7 @@ GEM
       i18n
       iso8601
     ruby-progressbar (1.7.5)
-    ruby-saml-mod (0.2.7)
+    ruby-saml-mod (0.3.0)
       ffi
       nokogiri (~> 1.6)
     ruby2ruby (2.0.8)
@@ -792,23 +805,22 @@ GEM
     rubyzip (1.1.1)
     rufus-scheduler (3.1.2)
     safe_yaml (1.0.4)
-    sanitize (2.0.6)
+    sanitize (2.1.0)
       nokogiri (>= 1.4.4)
-    scrypt (2.0.2)
+    scrypt (2.1.1)
       ffi-compiler (>= 0.0.2)
       rake
     securecompare (1.0.0)
-    selenium-webdriver (2.46.2)
+    selenium-webdriver (2.53.0)
       childprocess (~> 0.5)
-      multi_json (~> 1.0)
       rubyzip (~> 1.0)
       websocket (~> 1.0)
-    sentry-raven (0.15.3)
+    sentry-raven (0.15.6)
       faraday (>= 0.7.6)
     sequel (4.5.0)
     sexp_processor (4.4.5)
-    shackles (1.0.10)
-      activerecord (>= 3.2, < 4.3)
+    shackles (1.1.0)
+      activerecord (>= 4.0, < 5.1)
     shoulda-matchers (2.8.0)
       activesupport (>= 3.0.0)
     signet (0.6.0)
@@ -830,10 +842,10 @@ GEM
     soap4r-middleware (0.8.3)
       soap4r-ruby1.9 (= 2.0.0)
     soap4r-ruby1.9 (2.0.0)
-    spring (1.6.4)
+    spring (1.7.1)
     spring-commands-rspec (1.0.2)
       spring (>= 0.9.1)
-    sprockets (3.5.2)
+    sprockets (3.6.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (2.3.3)
@@ -841,17 +853,17 @@ GEM
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
     sqlite3 (1.3.9)
-    sshkit (1.9.0)
+    sshkit (1.11.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     stackprof (0.2.7)
     statsd-ruby (1.0.0)
     subexec (0.0.4)
-    switchman (1.4.4)
-      activerecord (>= 4.0, < 4.3)
+    switchman (1.5.3)
+      activerecord (>= 4.0, < 5.1)
       open4 (= 1.3.0)
-      railties (>= 4.0, < 4.3)
-      shackles (>= 1.0.10, < 2.0)
+      railties (>= 4.0, < 5.1)
+      shackles (~> 1.1.0)
     syck (1.0.4)
     test_after_commit (0.4.2)
       activerecord (>= 3.2)
@@ -859,6 +871,7 @@ GEM
       json
       net-http-persistent
       selenium-webdriver
+    testrail_client (0.0.1)
     thin (1.6.3)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0)
@@ -921,7 +934,6 @@ DEPENDENCIES
   bullet_instructure (= 4.14.8)
   bundler (>= 1.8.0, <= 1.11.2)
   byebug (~> 8.2)
-  canvas-jobs (= 0.10.4)
   canvas_breach_mitigation!
   canvas_cassandra!
   canvas_color!
@@ -957,7 +969,7 @@ DEPENDENCIES
   crocodoc-ruby (= 0.0.1)
   csv_diff!
   diigo!
-  diplomat (= 0.14.0)
+  diplomat (= 0.15.0)
   docile (= 1.1.3)
   dress_code (= 1.0.2)!
   dynamic_form (= 1.1.4)
@@ -995,8 +1007,9 @@ DEPENDENCIES
   i18nliner (= 0.0.12)
   icalendar (= 1.5.4)
   iconv (= 1.0.4)
-  ims-lti (= 2.0.0.beta.33)
+  ims-lti (= 2.0.0.beta.39)
   incoming_mail_processor!
+  inst-jobs (= 0.11.1)
   jira_ref_parser (= 1.0.0)
   json (= 1.8.2)
   json-jwt (= 1.5.1)
@@ -1017,7 +1030,6 @@ DEPENDENCIES
   multi_json (= 1.10.1)
   multipart!
   mustache (= 0.99.5)
-  mysql2 (= 0.3.15)
   net-ldap (= 0.10.1)
   netaddr (= 1.5.0)
   nokogiri (= 1.6.6.2.20150813143452)!
@@ -1063,20 +1075,20 @@ DEPENDENCIES
   rubocop-rspec
   ruby-duration (= 3.2.0)
   ruby-progressbar (= 1.7.5)
-  ruby-saml-mod (= 0.2.7)
+  ruby-saml-mod (= 0.3.0)
   ruby2ruby (= 2.0.8)
   ruby_parser (= 3.7.0)
   rubycas-client (= 2.3.9)
   rubyzip (= 1.1.1)
   rufus-scheduler (= 3.1.2)
   safe_yaml (= 1.0.4)
-  sanitize (= 2.0.6)
-  scrypt (= 2.0.2)
-  selenium-webdriver (= 2.46.2)
+  sanitize (= 2.1.0)
+  scrypt (= 2.1.1)
+  selenium-webdriver (= 2.53.0)
   selinimum (= 0.0.1)!
-  sentry-raven (= 0.15.3)
+  sentry-raven (= 0.15.6)
   sequel (= 4.5.0)
-  shackles (= 1.0.10)
+  shackles (= 1.1.0)
   shoulda-matchers (= 2.8.0)
   simple_uuid (= 0.4.0)
   simplecov (= 0.9.2)
@@ -1087,10 +1099,11 @@ DEPENDENCIES
   sqlite3 (= 1.3.9)
   stackprof (= 0.2.7)
   subexec (= 0.0.4)
-  switchman (= 1.4.4)
+  switchman (= 1.5.3)
   syck (= 1.0.4)
   test_after_commit (= 0.4.2)
   testingbot
+  testrailtagging (~> 0.3.1)!
   thin (= 1.6.3)
   thrift (= 0.8.0)
   thrift_client (= 0.8.4)
@@ -1109,3 +1122,6 @@ DEPENDENCIES
   yajl-ruby (= 1.1.0)
   yard (= 0.8.7.6)
   yard-appendix (>= 0.1.8)
+
+BUNDLED WITH
+   1.11.2
