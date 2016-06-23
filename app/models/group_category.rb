@@ -21,8 +21,7 @@ class GroupCategory < ActiveRecord::Base
   attr_reader :create_group_count
   attr_accessor :assign_unassigned_members
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
@@ -405,10 +404,14 @@ class GroupCategory < ActiveRecord::Base
     groups.preload(:group_memberships).find_each do |group|
       new_group = group.dup
       new_group.group_category = new_group_category
+      [:sis_batch_id, :sis_source_id, :uuid, :wiki_id].each do |attr|
+        new_group[attr] = nil
+      end
       new_group.save!
 
       group.group_memberships.find_each do |group_membership|
         new_group_membership = group_membership.dup
+        new_group_membership.uuid = nil
         new_group_membership.group = new_group
         new_group_membership.save!
       end

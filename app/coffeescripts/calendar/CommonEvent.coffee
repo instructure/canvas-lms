@@ -100,6 +100,7 @@ define [
       else
         # minimum duration should only be enforced if not due at midnight
         @forceMinimumDuration()
+      @preventWrappingAcrossDates()
 
     formatTime: (datetime, allDay=false) ->
       datetime = fcUtil.unwrap(datetime)
@@ -113,6 +114,10 @@ define [
       if @start && @end
         minimumEnd = fcUtil.clone(@start).add(30, "minutes")
         @end = minimumEnd if minimumEnd > @end
+
+    preventWrappingAcrossDates: () ->
+      if @start && @start.hours() == 23 && @start.minutes() > 0 && (!@end || @start.isSame(@end))
+        @end = fcUtil.clone(@start).add(60 - @start.minutes(), "minutes")
 
     assignmentType: () ->
       return if !@assignment

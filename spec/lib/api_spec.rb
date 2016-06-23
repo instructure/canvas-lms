@@ -73,7 +73,7 @@ describe Api do
     it 'should find record from other root account explicitly' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything).
+      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything).
           returns(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
@@ -333,7 +333,8 @@ describe Api do
       pluck_result = ["thing2", "thing3"]
       relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
@@ -343,7 +344,8 @@ describe Api do
       pluck_result = ["thing2", "thing3"]
       relation_result = mock(eager_load_values: nil, pluck: pluck_result)
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"other-lookup" => ["thing2", "thing3"]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(collection, {"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
@@ -351,7 +353,8 @@ describe Api do
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({"test-lookup" => ["thing1", "thing2"]})
       Api.expects(:relation_for_sis_mapping_and_columns).never
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
@@ -361,7 +364,8 @@ describe Api do
       object1 = mock()
       object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything, root_account: "test-root-account").
+          returns({})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq []
     end
@@ -716,7 +720,8 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "should not raise Folio::InvalidPage for pages past the end" do
-        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1, per_page: 1)).
+        controller = stub('controller', request: request, response: response, params: {per_page: 1})
+        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1)).
           to eq []
       end
 
@@ -736,6 +741,42 @@ describe Api do
       it "should raise Folio::InvalidPage for non-integer pages" do
         expect{ Api.paginate(collection, controller, 'example.com', page: 'abc') }.
           to raise_error(Folio::InvalidPage)
+      end
+    end
+
+    describe "page size limits" do
+      let(:collection) { (1..101).to_a }
+
+      context "with no max_per_page argument" do
+        it "should limit to the default max_per_page" do
+          controller = stub('controller', request: request, response: response, params: {per_page: Api.max_per_page + 5})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.max_per_page
+        end
+      end
+
+      context "with no per_page parameter" do
+        it "should limit to the default per_page" do
+          controller = stub('controller', request: request, response: response, params: {})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.per_page
+        end
+      end
+
+      context "with per_page parameter > max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 100}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 75}).size).
+            to eq 75
+        end
+      end
+
+      context "with per_page parameter < max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 75}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 100}).size).
+            to eq 75
+        end
       end
     end
   end

@@ -155,7 +155,7 @@ h3.beta {
 .method_details h3.endpoint {
   font-weight: normal;
   font-size: 14px;
-  font-family: Monaco, Consolas, Courier, monospace;
+  font-family: Monaco, Lucida Console, monospace;
   padding: 6px 10px;
   margin-top: 18px;
   color: #333;
@@ -317,7 +317,7 @@ table.request-params, table.request-params th, table.request-params td {
 table.request-params td {
   border-bottom: 1px solid #ccc;
   vertical-align: text-top;
-  font-family: Monaco;
+  font-family: Monaco, Lucida Console, monospace;
   font-size: 12px;
 }
 table.request-params td.param-desc {

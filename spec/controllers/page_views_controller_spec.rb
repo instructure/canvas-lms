@@ -85,9 +85,8 @@ describe PageViewsController do
         pv = page_view(@student, '/somewhere/in/app/1', :created_at => 1.day.ago)
 
         user_session(@student)
-        expect {
-          xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
-        }.not_to change { ErrorReport.count }
+        xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
+        expect(response.status).to eq 200
       end
     end
   end

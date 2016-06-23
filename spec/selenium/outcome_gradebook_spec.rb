@@ -11,7 +11,7 @@ describe "outcome gradebook" do
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
+      expect(f("#content")).not_to contain_css('.gradebook-navigation')
     end
 
     context "when enabled" do

@@ -59,7 +59,7 @@ define [
 
         unless @outcomes
           @outcomes = new OutcomeCollection
-          @outcomes.url = @outcomeGroup.get('outcomes_url')
+          @outcomes.url = @outcomeGroup.get('outcomes_url')+'?outcome_style=full'
         @outcomes.on 'add remove reset', @reset, this
 
       # for PaginatedView

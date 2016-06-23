@@ -230,6 +230,7 @@ $.widget("ui.dialog", {
 		}
 
 		this._isOpen = false;
+		this.uiDialog.attr('aria-hidden', true);
 
 		if ( this.overlay ) {
 			this.overlay.destroy();

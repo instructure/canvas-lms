@@ -22,9 +22,9 @@
       allowedbypermissions = ([StudentEnrollment, ObserverEnrollment].include?(enrollment.try(:class)) && can_do(@context, @current_user, :manage_students) || can_do(@context, @current_user, :manage_admin_users))
     %>
     <% if show_information_link %>
-      <a href="#" class="user_information_link no-hover"><%= image_tag "information.png" %></a>
+      <a href="#" class="user_information_link no-hover"><%= image_tag "information.png", :alt => t('Information') %></a>
       <% if !lockedbysis && allowedbypermissions  && show_section && enrollments %>
-        <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png" %></a>
+        <a href="#" class="edit_section_link no-hover"><%= image_tag "edit.png", :alt => t('Edit') %></a>
       <% end %>
     <% end %>
     <% if allowedbypermissions && !multiple_enrollments %>

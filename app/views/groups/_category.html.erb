@@ -28,7 +28,7 @@
       <span style="color: #888;"> &nbsp; &nbsp; <%= t 'instructions.group_assignment', "drag students to assign to groups" %></span>
       </div>
       <% if student_organized %>
-        <div style="color: #444;"><%= image_tag "warning.png" %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments." %></div>
+        <div style="color: #444;"><%= image_tag "warning.png", :alt => '' %> <%= t 'warnings.studend_groups', "These groups are self-organized by students.  Unlike other types of groups, students can belong to more than one of these groups at a time, so these groups cannot be used for graded assignments." %></div>
       <% end %>
       <div style="color: #444;<%= hidden unless category && category.self_signup? %>" class="self_signup_text">
         <%= t 'self_signup_blurb', "Self sign-up is enabled for these groups." %>
@@ -50,11 +50,11 @@
         </div>
         <div class="links">
           <span class="expand_collapse_links">
-          <a href="#" class="expand_group_link blank_link no-hover" style="display: none;" title="<%= t 'buttons.expand_group', "Expand Group" %>"><%= image_tag "expand.png" %></a>
-          <a href="#" class="collapse_group_link blank_link no-hover" title="<%= t 'buttons.collapse_group', "Collapse Group" %>"><%= image_tag "collapse.png" %></a>
+          <a href="#" class="expand_group_link blank_link no-hover" style="display: none;" title="<%= t 'buttons.expand_group', "Expand Group" %>"><%= image_tag "expand.png", :alt => t('Expand Group') %></a>
+          <a href="#" class="collapse_group_link blank_link no-hover" title="<%= t 'buttons.collapse_group', "Collapse Group" %>"><%= image_tag "collapse.png", :alt => t('Collapse Group') %></a>
           </span>
-          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="edit_group_link no-hover" title="<%= t 'buttons.edit_group', "Edit Group" %>"><%= image_tag "edit.png" %></a>
-          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover" title="<%= t 'buttons.delete_group', "Delete Group" %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="edit_group_link no-hover" title="<%= t 'buttons.edit_group', "Edit Group" %>"><%= image_tag "edit.png", :alt => t('Edit Group') %></a>
+          <a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="delete_group_link no-hover" title="<%= t 'buttons.delete_group', "Delete Group" %>"><%= image_tag "delete.png", :alt => t('Delete Group') %></a>
         </div>
         <h3 style="display: none;" class="group_name"><a href="<%= context_url(@context, :context_group_url, "{{ id }}") %>" class="name"><%= t :group_name, "Name" %></a></h3>
         <% if student_organized %>
@@ -97,11 +97,11 @@
         </div>
         <div class="links">
           <span class="expand_collapse_links">
-          <a href="#" class="expand_group_link no-hover" style="display: none;" title="<%= t 'buttons.expand_group', "Expand Group" %>"><%= image_tag "expand.png" %></a>
-          <a href="#" class="collapse_group_link no-hover" title="<%= t 'buttons.collapse_group', "Collapse Group" %>"><%= image_tag "collapse.png" %></a>
+          <a href="#" class="expand_group_link no-hover" style="display: none;" title="<%= t 'buttons.expand_group', "Expand Group" %>"><%= image_tag "expand.png", :alt => t('Expand Group') %></a>
+          <a href="#" class="collapse_group_link no-hover" title="<%= t 'buttons.collapse_group', "Collapse Group" %>"><%= image_tag "collapse.png", :alt => t('Collapse Group') %></a>
           </span>
-          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="edit_group_link no-hover" title="<%= t 'buttons.edit_group', "Edit Group" %>"><%= image_tag "edit.png" %></a>
-          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="delete_group_link no-hover" title="<%= t 'buttons.delete_group', "Delete Group" %>"><%= image_tag "delete.png" %></a>
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="edit_group_link no-hover" title="<%= t 'buttons.edit_group', "Edit Group" %>"><%= image_tag "edit.png", :alt => t('Edit Group') %></a>
+          <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>" class="delete_group_link no-hover" title="<%= t 'buttons.delete_group', "Delete Group" %>"><%= image_tag "delete.png", :alt => t('Delete Group') %></a>
         </div>
         <h3 class="name">
           <a href="<%= context_url(@context, :context_group_url, group ? group.id : "{{ id }}") %>"><%= group.name %></a>

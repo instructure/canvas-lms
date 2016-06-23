@@ -185,6 +185,12 @@ describe TermsController, type: :request do
         expect(new_term.sis_source_id).to eq 'SIS Term 2'
       end
 
+      it "rejects invalid sis ids" do
+        json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+          { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+          { enrollment_term: { name: 'Term 2', sis_term_id: {:fail => true} } }, {}, {:expected_status => 400})
+      end
+
       it "rejects sis_term_id without :manage_sis permission" do
         account_with_role_changes(account: @account, role_changes: { manage_sis: false })
         expect(@account.grants_right?(@user, :manage_sis)).to be_falsey

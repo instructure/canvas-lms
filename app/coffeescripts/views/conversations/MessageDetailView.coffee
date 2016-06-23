@@ -68,6 +68,7 @@ define [
 
     onStarToggle: (e) ->
       e.preventDefault()
+      @$el.find('.message-detail-kyle-menu').focus()
       @trigger('star-toggle')
 
     onReply: (e) ->

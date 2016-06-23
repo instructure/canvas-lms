@@ -79,6 +79,8 @@ define([
       return student;
     });
 
+    newState.selectedCount = newState.students.length;
+
     return newState;
   };
 
@@ -89,6 +91,8 @@ define([
       student.on_moderation_stage = false;
       return student;
     });
+
+    newState.selectedCount = 0;
 
     return newState;
   };
@@ -102,6 +106,7 @@ define([
     var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
       newState.students[studentIndex].on_moderation_stage = true;
+      newState.selectedCount += 1;
     }
     return newState;
   };
@@ -115,6 +120,7 @@ define([
     var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
       newState.students[studentIndex].on_moderation_stage = false;
+      newState.selectedCount += -1;
     }
     return newState;
   };
@@ -122,15 +128,19 @@ define([
   studentHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
     var newState = _.extend({}, state);
     var idsAdded = action.payload.students.map((student) => student.id);
+    var studentsUpdated = 0;
     newState.students = newState.students.map((student) => {
       if (_.contains(idsAdded, student.id)) {
         student.in_moderation_set = true;
         student.on_moderation_stage = false;
+        studentsUpdated += 1;
         return student;
       } else {
         return student;
       }
     });
+
+    newState.selectedCount -= studentsUpdated;
 
     return newState;
   };
@@ -235,6 +245,7 @@ define([
 
   function studentList (state, action) {
     state = state || {
+      selectedCount: 0,
       students: [],
       sort: {
         direction: '',

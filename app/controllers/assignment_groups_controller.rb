@@ -96,6 +96,10 @@ class AssignmentGroupsController < ApplicationController
   #  "assignment_visibility" & "submission" are only valid are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
+  # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
+  #  If "assignments" are included, those with the specified submission types
+  #  will be excluded from the assignment groups.
+  #
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
   #
@@ -241,10 +245,14 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_includes
     includes = [:context, :external_tool_tag, {:quiz => :context}]
-    includes += [:rubric, :rubric_association] unless params[:exclude_rubrics]
+    includes += [:rubric, :rubric_association] unless assignment_excludes.include?('rubric')
     includes << :discussion_topic if include_params.include?("discussion_topic")
     includes << :assignment_overrides if include_overrides?
     includes
+  end
+
+  def assignment_excludes
+    params[:exclude_response_fields] || []
   end
 
   def filter_by_grading_period?
@@ -264,19 +272,12 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_visibilities(course, assignments)
-    if include_visibility? && differentiated_assignments?
-      AssignmentStudentVisibility.users_with_visibility_by_assignment(
-        course_id: course.id,
-        assignment_id: assignments.map(&:id)
-      )
+    if include_visibility?
+      AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete('assignment_visibility')
       AssignmentStudentVisibility.none
     end
-  end
-
-  def differentiated_assignments?
-    @context.feature_enabled?(:differentiated_assignments)
   end
 
   def index_groups_json(context, current_user, groups, assignments, submissions = [])
@@ -294,23 +295,18 @@ class AssignmentGroupsController < ApplicationController
         group_overrides = group_assignments.map{|assignment| assignment.assignment_overrides.select(&:active?)}.flatten
       end
 
-      assignment_group_json(
-        group,
-        current_user,
-        session,
-        params[:include],
-        {
-          stringify_json_ids: stringify_json_ids?,
-          override_assignment_dates: override_dates?,
-          preloaded_user_content_attachments: preloaded_attachments,
-          assignments: group_assignments,
-          assignment_visibilities: assignment_visibilities(context, assignments),
-          differentiated_assignments_enabled: differentiated_assignments?,
-          exclude_descriptions: !!params[:exclude_descriptions],
-          overrides: group_overrides,
-          submissions: submissions
-        }
-      )
+      options = {
+        stringify_json_ids: stringify_json_ids?,
+        override_assignment_dates: override_dates?,
+        preloaded_user_content_attachments: preloaded_attachments,
+        assignments: group_assignments,
+        assignment_visibilities: assignment_visibilities(context, assignments),
+        exclude_response_fields: assignment_excludes,
+        overrides: group_overrides,
+        submissions: submissions
+      }
+
+      assignment_group_json(group, current_user, session, params[:include], options)
     end
   end
 
@@ -323,7 +319,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def user_content_attachments(assignments, context)
-    if params[:exclude_descriptions]
+    if assignment_excludes.include?('description')
       {}
     else
       api_bulk_load_user_content_attachments(assignments.map(&:description), context)
@@ -338,7 +334,16 @@ class AssignmentGroupsController < ApplicationController
       context,
       groups,
       assignment_includes
-    ).with_student_submission_count.all
+    )
+
+    if params[:exclude_assignment_submission_types].present?
+      exclude_types = params[:exclude_assignment_submission_types]
+      exclude_types = Array.wrap(exclude_types) &
+        %w(online_quiz discussion_topic wiki_page external_tool)
+      assignments = assignments.where.not(submission_types: exclude_types)
+    end
+
+    assignments = assignments.with_student_submission_count.all
 
     if params[:grading_period_id].present? && multiple_grading_periods?
       assignments = filter_assignments_by_grading_period(assignments, context)

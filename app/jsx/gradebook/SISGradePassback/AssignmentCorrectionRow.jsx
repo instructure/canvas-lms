@@ -57,6 +57,26 @@ define([
       this.props.updateAssignment({name: e.target.value, please_ignore: false})
     },
 
+    currentSectionforOverride(a) {
+      if(_.isEmpty(_.where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) || a.currentlySelected.type == 'course'){
+        return true
+      } else {
+        return false
+      }
+    },
+
+    validCheck(a) {
+      if(a.overrideForThisSection != undefined && a.currentlySelected.type == 'course'){
+        return a.due_at != null ? true : false
+      }
+      else if(a.overrideForThisSection != undefined && a.currentlySelected.type == 'section' && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id){
+        return a.overrideForThisSection.due_at != null ? true : false
+      }
+      else{
+        return true
+      }
+    },
+
     render() {
       var assignment = this.props.assignment;
       var assignmentList = this.props.assignmentList;
@@ -88,8 +108,14 @@ define([
         default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
         place_holder = assignment.due_at ? null : I18n.t("No Due Date")
       }
-      var anyError = nameError || dueAtError || nameTooLongError || nameEmptyError
 
+      //handles 'Everyone Else' scenario
+      if(assignmentUtils.noDueDateForEveryoneElseOverride(assignment) && this.currentSectionforOverride(assignment)){
+        default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
+        dueAtError = true
+      }
+
+      var anyError = nameError || dueAtError || nameTooLongError || nameEmptyError
       return (
         <div className={rowClass}>
           <div className="span3 input-container">

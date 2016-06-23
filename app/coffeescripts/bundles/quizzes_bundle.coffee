@@ -4,12 +4,13 @@ require [
   'quizzes'
   'supercalc'
   'quiz_rubric'
-], ($, CreateQuizArrows) ->
+], ($, QuizArrowApplicator) ->
 
   $('#show_question_details').on 'click', (e)->
     # Create the quiz arrows
     if $(this).is(':checked')
-      CreateQuizArrows()
+      arrowApplicator = new QuizArrowApplicator()
+      arrowApplicator.applyArrows()
     else
       # Delete all quiz arrows
       $('.answer_arrow').remove()
@@ -19,4 +20,5 @@ require [
     # Remove all arrows and recreate all if option is checked
     $('.answer_arrow').remove()
     if $('#show_question_details').is(':checked')
-        CreateQuizArrows()
+      arrowApplicator = new QuizArrowApplicator()
+      arrowApplicator.applyArrows()

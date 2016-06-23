@@ -44,15 +44,18 @@ describe "speed grader" do
     end
   end
 
-  it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
-    student_in_course(:active_user => true).user
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    comment_textarea = f("#speedgrader_comment_textarea")
-    replace_content(comment_textarea, "oh no i forgot to save this comment!")
-    driver.close
-    alert_shown = alert_present?
-    dismiss_alert
-    expect(alert_shown).to eq(true)
+  context "alerts" do
+    it "should alert the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+      student_in_course(active_user: true).user
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      comment_textarea = f("#speedgrader_comment_textarea")
+      replace_content(comment_textarea, "oh no i forgot to save this comment!")
+      # navigate away
+      driver.navigate.refresh
+      alert_shown = alert_present?
+      dismiss_alert
+      expect(alert_shown).to eq(true)
+    end
   end
 
   context "url submissions" do
@@ -95,7 +98,7 @@ describe "speed grader" do
     f('#add_attachment').click
     expect(f('#comment_attachments input')).to be_displayed
     f('#comment_attachments a').click
-    expect(element_exists('#comment_attachments input')).to be_falsey
+    expect(f("#comment_attachments")).not_to contain_css("input")
 
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
@@ -165,7 +168,7 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    expect(ff("#avatar_image").length).to eq 0
+    expect(f("#content")).not_to contain_css("#avatar_image")
     expect(ff("#comments > .comment .avatar").length).to eq 1
     expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
   end
@@ -214,10 +217,31 @@ describe "speed grader" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    keep_trying_until { ffj('#students_selectmenu option').size > 0 }
-    expect(ffj('#students_selectmenu option').size).to eq 1 # just the one student
-    expect(ffj('#section-menu ul li').size).to eq 1 # "Show all sections"
-    expect(fj('#students_selectmenu #section-menu')).to be_nil # doesn't get inserted into the menu
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(ff('#section-menu ul li').size).to eq 1 # "Show all sections"
+    expect(f("#students_selectmenu")).not_to contain_css('#section-menu') # doesn't get inserted into the menu
+  end
+
+  it "displays inactive students" do
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.deactivate
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+    expect(f('#enrollment_inactive_notice').text).to eq 'Notice: Inactive Student'
+
+    replace_content f('#grading-box-extended'), "5", tab_out: true
+    wait_for_ajaximations
+    @submission.reload
+    expect(@submission.score).to eq 5
+
+    f('#speedgrader_comment_textarea').send_keys('srsly')
+    f('#add_a_comment button[type="submit"]').click
+    wait_for_ajaximations
+    expect(@submission.submission_comments.first.comment).to eq 'srsly'
   end
 
   context "multiple enrollments" do
@@ -411,6 +435,8 @@ describe "speed grader" do
     end
 
     it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+      skip_if_chrome('This test applies to Firefox')
+      skip_if_ie('This test applies to Firefox')
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
       expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
     end

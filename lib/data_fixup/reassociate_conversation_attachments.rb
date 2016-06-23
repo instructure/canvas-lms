@@ -2,27 +2,19 @@ module DataFixup::ReassociateConversationAttachments
 
   def self.run
     conn = ConversationMessage.connection
-    if ['MySQL', 'Mysql2'].include?(conn.adapter_name)
-      temp_table_options = '(INDEX _cma_cmid_index (conversation_message_id), INDEX _cma_aid_index (attachment_id)) engine=innodb'
-    else
-      temp_table_options = 'AS'
-    end
-
     cmas = []
 
     ConversationMessage.transaction do
       conn.execute <<-SQL
-        CREATE TEMPORARY TABLE _conversation_message_attachments #{temp_table_options}
+        CREATE TEMPORARY TABLE _conversation_message_attachments AS
         SELECT context_id AS conversation_message_id,
           (SELECT author_id FROM #{ConversationMessage.quoted_table_name} WHERE id = a.context_id) AS author_id,
           id AS attachment_id
         FROM #{Attachment.quoted_table_name} a
         WHERE context_type = 'ConversationMessage'
       SQL
-      unless ['MySQL', 'Mysql2'].include?(conn.adapter_name)
-        conn.execute("CREATE INDEX _cma_cmid_index ON _conversation_message_attachments(conversation_message_id)")
-        conn.execute("CREATE INDEX _cma_aid_index ON _conversation_message_attachments(attachment_id)")
-      end
+      conn.execute("CREATE INDEX _cma_cmid_index ON _conversation_message_attachments(conversation_message_id)")
+      conn.execute("CREATE INDEX _cma_aid_index ON _conversation_message_attachments(attachment_id)")
       conn.execute "ANALYZE _conversation_message_attachments" if conn.adapter_name == 'PostgreSQL'
   
       # make sure users w/ conversation attachments have root folders
@@ -49,8 +41,7 @@ module DataFixup::ReassociateConversationAttachments
         WHERE author_id IS NOT NULL
       SQL
       cmas = conn.select_all("SELECT * FROM _conversation_message_attachments WHERE author_id IS NOT NULL")
-      temp = " TEMPORARY" if ['MySQL', 'Mysql2'].include?(conn.adapter_name)
-      conn.execute "DROP#{temp} TABLE _conversation_message_attachments"
+      conn.execute "DROP TABLE _conversation_message_attachments"
     end
 
     cmas.group_by{ |r| r['conversation_message_id'] }.each_slice(1000) do |groups|

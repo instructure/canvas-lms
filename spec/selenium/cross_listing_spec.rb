@@ -40,7 +40,7 @@ describe "cross-listing" do
 
     # verify teacher doesn't have de-crosslist privileges
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    expect(ff('.uncrosslist_link').length).to eq 0
+    expect(f("#content")).not_to contain_css('.uncrosslist_link')
 
     # enroll teacher and de-crosslist
     @course1.enroll_teacher(@user).accept
@@ -106,7 +106,7 @@ describe "cross-listing" do
     # they were enrolled in got moved). they don't have the rights to
     # uncrosslist.
     get "/courses/#{other_course.id}/sections/#{section.id}"
-    expect(ff(".uncrosslist_link").length).to eq 0
+    expect(f("#content")).not_to contain_css('.uncrosslist_link')
 
     # enroll, and make sure the teacher can uncrosslist.
     course.enroll_teacher(@user).accept

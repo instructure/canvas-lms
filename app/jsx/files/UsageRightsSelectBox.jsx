@@ -27,7 +27,7 @@ define([
 
   UsageRightsSelectBox.renderContentOptions = function () {
     return CONTENT_OPTIONS.map((contentOption) => {
-      return (<option value={contentOption.value}>{contentOption.display}</option>);
+      return (<option key={contentOption.value} value={contentOption.value}>{contentOption.display}</option>);
     });
   };
 

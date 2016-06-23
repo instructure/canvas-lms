@@ -29,6 +29,14 @@ define [
     createPendingModel: ->
       @model = new ExternalFeed
 
+    validateBeforeSave: (data) ->
+      errors = {}
+      if !data.url or $.trim(data.url.toString()).length == 0
+        errors["url"] = [
+          message: I18n.t 'Feed URL is required'
+        ]
+      errors
+
     toJSON: ->
       json = @collection.toJSON()
       json.cid = @cid

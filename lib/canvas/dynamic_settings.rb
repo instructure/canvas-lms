@@ -6,10 +6,10 @@ module Canvas
     class ConsulError < StandardError
     end
 
-    KV_NAMESPACE = "/config/canvas".freeze
+    KV_NAMESPACE = "config/canvas".freeze
 
     class << self
-      attr_accessor :config, :cache
+      attr_accessor :config, :cache, :fallback_data
 
       def config=(conf_hash)
         @config = conf_hash
@@ -27,10 +27,14 @@ module Canvas
       end
 
       def find(key)
-        raise(ConsulError, "Unable to contact consul without config") if config.nil?
-        config_records = store_get(key)
-        config_records.each_with_object({}) do |node, hash|
-          hash[node[:key].split("/").last] = node[:value]
+        if config.nil?
+          return fallback_data.fetch(key) if fallback_data.present?
+          raise(ConsulError, "Unable to contact consul without config")
+        else
+          config_records = store_get(key)
+          config_records.each_with_object({}) do |node, hash|
+            hash[node[:key].split("/").last] = node[:value]
+          end
         end
       end
 
@@ -48,8 +52,9 @@ module Canvas
         value
       end
 
-      def reset_cache!
+      def reset_cache!(hard: false)
         @cache = {}
+        @strategic_reserve = {} if hard
       end
 
       private
@@ -75,8 +80,28 @@ module Canvas
       end
 
       def store_get(key)
-        Canvas.timeout_protection('consul') do
-          Diplomat::Kv.get("#{KV_NAMESPACE}/#{key}", {recurse: true, consistency: 'stale'})
+        begin
+          # store all values that we get here to
+          # kind-of recover in case of big failure
+          @strategic_reserve ||= {}
+          consul_value = Canvas.timeout_protection('consul', {raise_on_timeout: true}) do
+            diplomat_get(key)
+          end
+
+          @strategic_reserve[key] = consul_value
+          consul_value
+        rescue Faraday::ConnectionFailed,
+               Faraday::ClientError,
+               Timeout::Error,
+               TimeoutCutoff => exception
+          if @strategic_reserve.key?(key)
+            # we have an old value for this key, log the error but recover
+            Canvas::Errors.capture_exception(:consul, exception)
+            return @strategic_reserve[key]
+          else
+            # didn't have an old value cached, raise the error
+            raise
+          end
         end
       end
 
@@ -84,6 +109,22 @@ module Canvas
         Canvas.timeout_protection('consul') do
           Diplomat::Kv.put("#{KV_NAMESPACE}/#{key}", value)
         end
+      end
+
+      def diplomat_get(key)
+        parent_key = "#{KV_NAMESPACE}/#{key}"
+        read_options = {recurse: true, consistency: 'stale'}
+        diplomat_val = Diplomat::Kv.get(parent_key, read_options)
+        if diplomat_val && !diplomat_val.is_a?(Array)
+          diplomat_val = []
+          Diplomat::Kv.get(parent_key, read_options.merge({keys: true})).each do |full_key|
+            diplomat_val << {
+              key: full_key,
+              value: Diplomat::Kv.get(full_key, read_options)
+            }
+          end
+        end
+        diplomat_val
       end
     end
 

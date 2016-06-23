@@ -34,8 +34,9 @@ describe "new account course search" do
 
     expect(get_rows.count).to eq 2
 
-    f('.course_search_bar input[type=checkbox]').click # hide anymore
-    f('.course_search_bar button').click
+    cb = f('.course_search_bar input[type=checkbox]')
+    move_to_click("label[for=#{cb['id']}]")
+    move_to_click('.course_search_bar button')
     wait_for_ajaximations
 
     rows = get_rows
@@ -57,7 +58,7 @@ describe "new account course search" do
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 11
-    expect(f(".load_more")).to be_nil
+    expect(f("#content")).not_to contain_css(".load_more")
   end
 
   it "should search by term" do

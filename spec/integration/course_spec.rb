@@ -86,9 +86,9 @@ describe "course" do
     get "/courses"
     doc = Nokogiri::HTML(response.body)
     course_rows = doc.css('#my_courses_table tr')
-    expect(course_rows.size).to eq 2
-    expect(course_rows[0].to_s).to include 'A nickname or something'
-    expect(course_rows[1].to_s).to include 'Course 1'
+    expect(course_rows.size).to eq 3
+    expect(course_rows[1].to_s).to include 'A nickname or something'
+    expect(course_rows[2].to_s).to include 'Course 1'
   end
 
   it "should not show students' nicknames to admins on the student's account profile page" do

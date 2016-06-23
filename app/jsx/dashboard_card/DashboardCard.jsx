@@ -49,10 +49,6 @@ define([
       this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
     },
 
-    hasLinks: function() {
-      return this.props.links.filter(link => !link.hidden).length > 0;
-    },
-
     getInitialState: function() {
       return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
         CourseActivitySummaryStore.getStateForCourse(this.props.id))
@@ -207,21 +203,13 @@ define([
               className="Button Button--icon-action-rev ic-DashboardCard__header-button"
               onClick={this.settingsClick}
               ref="settingsToggle">
-              <i className="icon-settings" aria-hidden="true" />
+              <i className="icon-compose" aria-hidden="true" />
                 <span className="screenreader-only">
                   { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
                 </span>
             </button>
           </div>
-          <div
-            className={
-              (this.hasLinks() ?
-                "ic-DashboardCard__action-container"
-                :
-                "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
-              )
-            }
-          >
+          <div className="ic-DashboardCard__action-container">
             { this.linksForCard() }
           </div>
           { this.colorPickerIfEditing() }

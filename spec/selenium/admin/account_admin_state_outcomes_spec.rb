@@ -75,14 +75,13 @@ describe "account admin outcomes" do
       f(".ellipsis[title='Something else']").click
       wait_for_ajaximations
 
-      keep_trying_until do
-        f('.delete_button').click
-        expect(driver.switch_to.alert).not_to be nil
-        driver.switch_to.alert.accept
-        refresh_page
-        wait_for_ajaximations
-        expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
-      end
+      f('.delete_button').click
+      expect(driver.switch_to.alert).not_to be nil
+      driver.switch_to.alert.accept
+      refresh_page
+      wait_for_ajaximations
+      # validations
+      expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
       expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     end
 

@@ -54,13 +54,7 @@ define([
 
     renderIframe() {
       if (this.state.modalIsOpen) {
-        return <iframe src={this.getLaunchUrl()} title={I18n.t('Tool Configuration')} style={{
-          width: '100%',
-          padding: 0,
-          margin: 0,
-          height: 500,
-          border: 0
-        }}/>;
+        return <iframe src={this.getLaunchUrl()} title={I18n.t('Tool Configuration')} className="tool_launch"/>;
       } else {
         return null;
       }

@@ -70,10 +70,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   }
   @include breakpoint(desktop) {
     flex: 0 0 $ic-sp*9;
-    @include breakpoint(short) {
-      flex: 0 0 $ic-sp*6;
-      background-size: 114px 27px;
-    }
   }
 
 }
@@ -294,11 +290,6 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(desktop) {
     @include fontSize(15px);
     line-height: 1.6;
-
-    @include breakpoint(short) {
-      @include fontSize(14px);
-      line-height: 1.3;
-    }
   }
 }
 

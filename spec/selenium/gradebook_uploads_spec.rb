@@ -23,8 +23,8 @@ describe "gradebook uploads" do
   end
 
   def assert_assignment_is_not_highlighted
-    expect(ff('.left-highlight').length).to be 0
-    expect(ff('.right-highlight').length).to be 0
+    expect(f("#content")).not_to contain_css('.left-highlight')
+    expect(f("#content")).not_to contain_css('.right-highlight')
   end
 
   it "should correctly update grades for assignments with GPA Scale grading type",priority: "1", test_id: 209969 do
@@ -40,7 +40,7 @@ describe "gradebook uploads" do
     wait_for_ajaximations
     keep_trying_until { !f("#spinner").displayed? }
     submit_form('#gradebook_grid_form')
-    driver.switch_to.alert.accept
+    accept_alert
     wait_for_ajaximations
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"

@@ -33,6 +33,7 @@ describe "discussions" do
       end
 
       it "should display 100 discussions", priority: "1", test_id: 272278 do
+        skip_if_chrome('chrome does not read order right')
         #Setup: Creates 100 discussion topics
         1.upto(100) do |n|
           DiscussionTopic.create!(context: course, user: teacher,
@@ -81,7 +82,7 @@ describe "discussions" do
         # Student cannot reply to a closed discussion
         user_session(student)
         get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}"
-        expect(f('.discussion-reply-action')).not_to be_present
+        expect(f("#content")).not_to contain_css('.discussion-reply-action')
       end
 
 
@@ -198,7 +199,22 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           expect(topic.reload.workflow_state).to eq 'deleted'
-          expect(f('.discussion-list li.discussion')).to be_nil
+          expect(f("#content")).not_to contain_css('.discussion-list li.discussion')
+        end
+
+        it "should restore a deleted topic with replies", priority: "2", test_id: 927756 do
+          topic.reply_from(user: student, text: 'student reply')
+          topic.workflow_state = "deleted"
+          topic.save!
+          get "/courses/#{@course.id}/undelete"
+          expect(f('#deleted_items_list').text).to include('teacher topic title')
+          f('.restore_link').click
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          get url
+          expect(f('#open-discussions .discussion-title').text).to include('teacher topic title')
+          fln('teacher topic title').click
+          expect(ff('.discussion-entries .entry').count).to eq(1)
         end
 
         it "should sort the discussions", priority: "1", test_id: 150509 do

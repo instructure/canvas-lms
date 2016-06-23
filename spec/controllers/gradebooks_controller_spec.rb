@@ -47,6 +47,7 @@ describe GradebooksController do
     it "redirects to the login page if the user is logged out" do
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       expect(response).to redirect_to(login_url)
+      expect(flash[:warning]).to be_present
     end
 
     it "redirects teacher to gradebook" do
@@ -59,6 +60,13 @@ describe GradebooksController do
       user_session(@student)
       get 'grade_summary', :course_id => @course.id, :id => nil
       expect(response).to render_template('grade_summary')
+    end
+
+    it "does not allow access for inactive enrollment" do
+      user_session(@student)
+      @student_enrollment.deactivate
+      get 'grade_summary', :course_id => @course.id, :id => nil
+      assert_unauthorized
     end
 
     it "renders with specified user_id" do
@@ -194,8 +202,18 @@ describe GradebooksController do
       expect(assigns[:js_env][:submissions].sort_by { |s|
         s['assignment_id']
       }).to eq [
-        {'score' => 5, 'assignment_id' => a2.id}
+        {score: 5, assignment_id: a2.id, excused: false, workflow_state: 'graded'}
       ]
+    end
+
+    it "includes necessary attributes on the submissions" do
+      user_session(@student)
+      assignment = @course.assignments.create!(points_possible: 10)
+      assignment.grade_student(@student, grade: 10)
+      get('grade_summary', course_id: @course.id, id: @student.id)
+      submission = assigns[:js_env][:submissions].first
+      expect(submission).to include :excused
+      expect(submission).to include :workflow_state
     end
 
     context "assignment sorting" do
@@ -474,6 +492,12 @@ describe GradebooksController do
         get "show", :course_id => @course.id
         expect(response).to render_template("screenreader")
       end
+
+      it "requests groups without wiki_page assignments" do
+        get "show", :course_id => @course.id
+        url = controller.js_env[:GRADEBOOK_OPTIONS][:assignment_groups_url]
+        expect(URI.unescape(url)).to include 'exclude_assignment_submission_types[]=wiki_page'
+      end
     end
 
     it "renders the unauthorized page without gradebook authorization" do
@@ -492,6 +516,15 @@ describe GradebooksController do
       # tell it to use gradebook 2
       get 'change_gradebook_version', :course_id => @course.id, :version => 2
       expect(response).to redirect_to(:action => 'show')
+    end
+  end
+
+  describe "POST 'submissions_zip_upload'" do
+    it "requires authentication" do
+      course
+      assignment_model
+      post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
+      assert_unauthorized
     end
   end
 

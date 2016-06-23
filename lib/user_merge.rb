@@ -13,6 +13,9 @@ class UserMerge
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+    user_merge_data = target_user.shard.activate do
+      UserMergeData.create!(user: target_user, from_user: from_user)
+    end
 
     if target_user.avatar_state == :none && from_user.avatar_state != :none
       [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
@@ -96,11 +99,13 @@ class UserMerge
 
     destroy_conflicting_module_progressions(@from_user, target_user)
 
-    move_enrollments(@from_user, target_user)
+    move_enrollments(target_user, user_merge_data)
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
-      max_position = Pseudonym.where(:user_id => target_user).order(:position).last.try(:position) || 0
-      Pseudonym.where(:user_id => from_user).update_all(["user_id=?, position=position+?", target_user, max_position])
+      max_position = Pseudonym.where(user_id: target_user).order(:position).last.try(:position) || 0
+      pseudonyms_to_move = Pseudonym.where(user_id: from_user)
+      user_merge_data.add_more_data(pseudonyms_to_move)
+      pseudonyms_to_move.update_all(["user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
         Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
@@ -127,11 +132,6 @@ class UserMerge
             # a) delete empty submissions where there is a non-empty submission in the from user
             # b) don't delete otherwise
             subscope = scope.having_submission.select(unique_id)
-            if %w{MySQL Mysql2}.include?(model.connection.adapter_name)
-              # handing the scope directly to from doesn't work until Rails 4, and I don't
-              # feel like backporting at the moment
-              subscope = Submission.from("(#{subscope.to_sql}) AS s").select(unique_id)
-            end
             already_scope.where(unique_id => subscope).without_submission.delete_all
           end
           # for the from user
@@ -139,10 +139,6 @@ class UserMerge
           # b) move the empty submission over to the new user if there is no collision, as we don't mind persisting the what_if history in this case
           # c) if there is an empty submission for each user for this assignment, prefer the target user
           subscope = already_scope.select(unique_id)
-          if %w{MySQL Mysql2}.include?(model.connection.adapter_name)
-            # ditto
-            subscope = Submission.from("(#{subscope.to_sql}) AS s").select(unique_id)
-          end
           scope = scope.where("#{unique_id} NOT IN (?)", subscope)
           model.transaction do
             update_versions(from_user, target_user, scope, table, :user_id)
@@ -165,9 +161,12 @@ class UserMerge
         Rails.logger.error "migrating discussions failed: #{e}"
       end
 
+      account_users = AccountUser.where(user_id: from_user)
+      user_merge_data.add_more_data(account_users)
+      account_users.update_all(user_id: target_user)
+
       updates = {}
-      ['account_users', 'access_tokens', 'asset_user_accesses',
-       'attachments',
+      ['access_tokens', 'asset_user_accesses', 'attachments',
        'calendar_events', 'collaborations',
        'context_module_progressions',
        'group_memberships', 'page_comments',
@@ -207,17 +206,7 @@ class UserMerge
       end
 
       unless Shard.current != target_user.shard
-        # delete duplicate or invalid observers/observees, move the rest
-        from_user.user_observees.where(:user_id => target_user.user_observees.map(&:user_id)).delete_all
-        from_user.user_observees.where(user_id: target_user).delete_all
-        target_user.user_observees.where(user_id: from_user).delete_all
-        from_user.user_observees.update_all(:observer_id => target_user)
-        xor_observer_ids = (Set.new(from_user.user_observers.map(&:observer_id)) ^ target_user.user_observers.map(&:observer_id)).to_a
-        from_user.user_observers.where(:observer_id => target_user.user_observers.map(&:observer_id)).delete_all
-        from_user.user_observers.update_all(:user_id => target_user)
-        # for any observers not already watching both users, make sure they have
-        # any missing observer enrollments added
-        target_user.user_observers.where(:observer_id => xor_observer_ids).each(&:create_linked_enrollments)
+        move_observees(target_user, user_merge_data)
       end
 
       Enrollment.send_later(:recompute_final_scores, target_user.id)
@@ -227,6 +216,25 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+  end
+
+  def move_observees(target_user, user_merge_data)
+    # record all the records before destroying them
+    # pass the from_user since user_id will be the observer
+    user_merge_data.add_more_data(from_user.user_observees, from_user)
+    user_merge_data.add_more_data(from_user.user_observers)
+    # delete duplicate or invalid observers/observees, move the rest
+    from_user.user_observees.where(user_id: target_user.user_observees.map(&:user_id)).destroy_all
+    from_user.user_observees.where(user_id: target_user).destroy_all
+    user_merge_data.add_more_data(target_user.user_observees.where(user_id: from_user), target_user)
+    target_user.user_observees.where(user_id: from_user).destroy_all
+    from_user.user_observees.active.update_all(observer_id: target_user)
+    xor_observer_ids = UserObserver.where(user_id: [from_user, target_user]).uniq.pluck(:observer_id)
+    from_user.user_observers.where(observer_id: target_user.user_observers.map(&:observer_id)).destroy_all
+    from_user.user_observers.active.update_all(user_id: target_user)
+    # for any observers not already watching both users, make sure they have
+    # any missing observer enrollments added
+    target_user.user_observers.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
   end
 
   def destroy_conflicting_module_progressions(from_user, target_user)
@@ -277,45 +285,74 @@ class UserMerge
 
   def enrollment_keeper(scope)
     # prefer active enrollments to have no impact to the end user.
-    # then prefer enrollments that were created by sis imports
     # then just keep the newest one.
     scope.order("CASE WHEN workflow_state='active' THEN 1
                       WHEN workflow_state='invited' THEN 2
                       WHEN workflow_state='creation_pending' THEN 3
-                      WHEN sis_batch_id IS NOT NULL THEN 4
-                      WHEN workflow_state='completed' THEN 5
-                      WHEN workflow_state='rejected' THEN 6
-                      WHEN workflow_state='inactive' THEN 7
-                      WHEN workflow_state='deleted' THEN 8
-                      ELSE 9
-                      END, sis_batch_id DESC, updated_at DESC").first
+                      WHEN workflow_state='completed' THEN 4
+                      WHEN workflow_state='rejected' THEN 5
+                      WHEN workflow_state='inactive' THEN 6
+                      WHEN workflow_state='deleted' THEN 7
+                      ELSE 8
+                      END, updated_at DESC").first
   end
 
-  def move_enrollments(from_user, target_user)
+  def update_enrollment_state(scope, keeper, user_merge_data)
+    # record both records state sicne both will change
+    user_merge_data.add_more_data(scope)
+    # update the record on the target user to the better state of the from users enrollment
+    Enrollment.where(id: scope).where.not(id: keeper).update_all(workflow_state: keeper.workflow_state)
+    # mark the would be keeper from the from_user as deleted so it will not be moved later
+    keeper.destroy
+  end
+
+  def handle_conflicts(column, target_user, user_merge_data)
+    users = [from_user, target_user]
+
+    # get each pair of conflicts and "handle them"
+    conflict_scope(column).where(column => users).find_each do |e|
+
+      # identify the other record that is conflicting with this one.
+      scope = enrollment_conflicts(e, column, users)
+      # get the highest state between the 2 users enrollments
+      keeper = enrollment_keeper(scope)
+
+      # identify if the target_users record needs promoted to better state
+      to_update = scope.where.not(id: keeper).where(column => target_user)
+      # if the target_users enrollment state will be updated pass the scope so
+      # both target and from users records will be recorded in case of a split.
+      update_enrollment_state(scope, keeper, user_merge_data) if to_update.exists?
+
+      # identify if the from users records are worse states than target user
+      to_delete = scope.active.where.not(id: keeper).where(column => from_user)
+      # record the current state in case of split
+      user_merge_data.add_more_data(to_delete)
+      # mark all conflicts on from_user as deleted so they will not be moved later
+      to_delete.destroy_all
+    end
+  end
+
+  def remove_self_observers(target_user, user_merge_data)
+    # prevent observing self by marking them as deleted
+    to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
+                                                   (associated_user_id = :target_user AND user_id = :from_user OR
+                                                   associated_user_id = :from_user AND user_id = :target_user)",
+                                                  {target_user: target_user, from_user: from_user})
+    user_merge_data.add_more_data(to_delete)
+    to_delete.destroy_all
+  end
+
+  def move_enrollments(target_user, user_merge_data)
     [:associated_user_id, :user_id].each do |column|
-      users = [from_user, target_user]
       Shard.with_each_shard(from_user.associated_shards) do
         Enrollment.transaction do
-          conflict_scope(column).where(column => users).find_each do |e|
+          handle_conflicts(column, target_user, user_merge_data)
+          remove_self_observers(target_user, user_merge_data)
 
-            scope = enrollment_conflicts(e, column, users)
-            keeper = enrollment_keeper(scope)
-
-            # delete all conflicts from target user
-            scope.where("id<>?", keeper).where(column => target_user).delete_all
-
-            # mark all conflicts on from_user as deleted so they will be left
-            scope.active.where("id<>?", keeper).where(column => from_user).destroy_all
-          end
-
-          # prevent observing self by marking them as deleted
-          Enrollment.active.where("type = 'ObserverEnrollment' AND
-                                  (associated_user_id = :target_user AND user_id = :from_user OR
-                                  associated_user_id = :from_user AND user_id = :target_user)",
-                                  {target_user: target_user, from_user: from_user}).destroy_all
-
-          # move all the enrollments that are not marked as deleted to the target user
-          Enrollment.active.where(column => from_user).update_all(column => target_user)
+          # move all the enrollments that have not been marked as deleted to the target user
+          to_move = Enrollment.active.where(column => from_user)
+          user_merge_data.add_more_data(to_move)
+          to_move.update_all(column => target_user)
         end
       end
     end

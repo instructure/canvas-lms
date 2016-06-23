@@ -79,6 +79,8 @@ define [
       students:@gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment)
     }) =>
       {students, assignment} = opts
+
+      students = _.filter students, (student) => !student.is_inactive
       students = _.map students, (student)=>
         sub = student["assignment_#{assignment.id}"]
         id: student.id

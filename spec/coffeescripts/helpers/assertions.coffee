@@ -34,3 +34,6 @@ define ['jquery', 'underscore'], ($, _) ->
       ok(violations.length is 0, err)
 
       done()
+
+  contains: (string, substring) ->
+    QUnit.assert.push string.indexOf(substring) > -1, string, substring, "expected string not found in actual"

@@ -132,7 +132,7 @@
       <div id="modules">
         <%= render :partial => "context_modules/context_module", :object => @module %>
         <div style="float: right; margin-top: 5px;">
-          <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png" %></a>
+          <a href="#" class="hide_sidebar_link no-hover" title="<%= t 'links.hide_sidebar', "Hide Sidebar" %>"><%= image_tag "delete_circle.png", :alt => t('Hide Sidebar') %></a>
         </div>
       </div>
     </td>

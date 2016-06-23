@@ -20,7 +20,7 @@ module Canvas::Oauth
     end
 
     def is_for_valid_code?
-      code_data.present? &&  client_id == key.id
+      code_data.present?
     end
 
     def client_id
@@ -87,6 +87,7 @@ module Canvas::Oauth
     def as_json(_options={})
       json = {
           'access_token' => access_token.full_token,
+          'token_type' => 'Bearer',
           'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
 

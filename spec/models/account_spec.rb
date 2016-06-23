@@ -96,8 +96,8 @@ describe Account do
         "S004,C004,Sec4,,,active",
         "S005,C005,Sec5,,,active",
         "S006,C006,Sec6,,,active",
-        "S007,C007,Sec7,,,deleted",
-        "S008,C001,Sec8,,,deleted",
+        "S007,C007,Sec7,,,active",
+        "S008,C001,Sec8,,,active",
         "S009,C008,Sec9,,,active",
         "S001S,C001S,Sec1,,,active",
         "S002S,C002S,Sec2,,,active",
@@ -105,8 +105,8 @@ describe Account do
         "S004S,C004S,Sec4,,,active",
         "S005S,C005S,Sec5,,,active",
         "S006S,C006S,Sec6,,,active",
-        "S007S,C007S,Sec7,,,deleted",
-        "S008S,C001S,Sec8,,,deleted",
+        "S007S,C007S,Sec7,,,active",
+        "S008S,C001S,Sec8,,,active",
         "S009S,C008S,Sec9,,,active"
       ])
 
@@ -519,6 +519,19 @@ describe Account do
     end
   end
 
+  context "sharding" do
+    specs_require_sharding
+
+    it "queries for enrollments correctly when another shard is active" do
+      teacher_in_course
+      @enrollment.accept!
+
+      @shard1.activate do
+        expect(@course.grants_right?(@user, :read_sis)).to eq true
+      end
+    end
+  end
+
   it "should allow no_enrollments_can_create_courses correctly" do
     a = Account.default
     a.settings = { :no_enrollments_can_create_courses => true }
@@ -889,15 +902,6 @@ describe Account do
 
   context "permissions" do
     before(:once) { Account.default }
-
-    it "should grant :read_sis to teachers" do
-      user_with_pseudonym(:active_all => 1)
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
-      @course = Account.default.courses.create!
-      @course.enroll_teacher(@user).accept!
-      AdheresToPolicy::Cache.clear
-      expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
-    end
 
     it "should grant :read_global_outcomes to any user iff site_admin" do
       @site_admin = Account.site_admin

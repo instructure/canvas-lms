@@ -39,7 +39,14 @@ class Attachment < ActiveRecord::Base
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
 
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, exhaustive: false, polymorphic:
+      [:account, :assessment_question, :assignment, :attachment,
+       :content_export, :content_migration, :course, :eportfolio, :epub_export,
+       :gradebook_upload, :group, :submission,
+       { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_user: 'User', quiz: 'Quizzes::Quiz',
+         quiz_statistics: 'Quizzes::QuizStatistics',
+         quiz_submission: 'Quizzes::QuizSubmission' }]
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user
@@ -245,7 +252,11 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.where(cloned_item_id: self.cloned_item_id).first : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    dup.assign_attributes(self.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+
+    excluded_atts = EXCLUDED_COPY_ATTRIBUTES
+    excluded_atts += ["locked", "hidden"] if dup == existing
+    dup.assign_attributes(self.attributes.except(*excluded_atts), :without_protection => true)
+
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -260,6 +271,14 @@ class Attachment < ActiveRecord::Base
     dup.clone_updated = true
     dup.set_publish_state_for_usage_rights unless self.locked?
     dup
+  end
+
+  def copy_to_folder!(folder, on_duplicate = :rename)
+    copy = self.clone_for(folder.context, nil, force_copy: true)
+    copy.folder = folder
+    copy.save!
+    copy.handle_duplicates(on_duplicate)
+    copy
   end
 
   def ensure_media_object
@@ -296,6 +315,7 @@ class Attachment < ActiveRecord::Base
   attr_accessor :recently_created
 
   validates_presence_of :context_id, :context_type, :workflow_state
+  validates_length_of :content_type, :maximum => maximum_string_length, :allow_blank => true
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment
@@ -530,7 +550,7 @@ class Attachment < ActiveRecord::Base
 
     res[:id] = id
     res[:upload_params].merge!({
-       'Filename' => '',
+       'Filename' => filename,
        'key' => sanitized_filename,
        'acl' => 'private',
        'Policy' => policy_encoded,
@@ -582,6 +602,7 @@ class Attachment < ActiveRecord::Base
 
           if context.is_a?(User)
             excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
 
@@ -970,14 +991,15 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user|
-      self.context.grants_right?(user, :manage_files) &&
-      !self.associated_with_submission?
+    given { |user, session|
+      self.context.grants_right?(user, session, :manage_files) &&
+        !self.associated_with_submission? &&
+        (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
     }
-    can :delete
+    can :delete and can :update
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
-    can :read and can :update and can :create and can :download and can :read_as_admin
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    can :read and can :create and can :download and can :read_as_admin
 
     given { self.public? }
     can :read and can :download
@@ -1028,8 +1050,10 @@ class Attachment < ActiveRecord::Base
 
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
-    send_later_enqueue_args(:touch, { :run_at => unlock_at,
-                                      :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    Shackles.activate(:master) do
+      send_later_enqueue_args(:touch, { :run_at => unlock_at,
+                                        :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    end
   end
 
   def locked_for?(user, opts={})
@@ -1045,7 +1069,7 @@ class Attachment < ActiveRecord::Base
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
-        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"]
+        locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
       locked
     end
@@ -1153,6 +1177,23 @@ class Attachment < ActiveRecord::Base
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
     self.context.clear_avatar_image_url_with_uuid(self.uuid) if self.context_type == 'User' && self.uuid.present?
+    true
+  end
+
+  def make_childless
+    child = children.take
+    return unless child
+    child.root_attachment_id = nil
+    child.filename ||= filename
+    if Attachment.s3_storage?
+      if s3object.exists? && !child.s3object.exists?
+        s3object.copy_to(child.s3object)
+      end
+    else
+      child.uploaded_data = open
+    end
+    child.save!
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
   end
 
   def restore
@@ -1481,7 +1522,6 @@ class Attachment < ActiveRecord::Base
   def set_publish_state_for_usage_rights
     if self.context &&
        self.context.respond_to?(:feature_enabled?) &&
-       self.context.feature_enabled?(:better_file_browsing) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?
     end

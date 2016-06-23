@@ -286,7 +286,6 @@ body.body--login-confirmation {
   width: 400px;
   margin: $ic-sp*3 auto 0;
   width: 696px;
-  @include breakpoint(short) { margin-top: $ic-sp; }
   form { margin-bottom: 0; } //override default margin on forms
 }
 

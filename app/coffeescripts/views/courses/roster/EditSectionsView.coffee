@@ -83,6 +83,8 @@ define [
             user_id: @model.get('id')
             type: enrollment.type
             limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section
+        unless @model.pending(@model.currentRole)
+          data.enrollment.enrollment_state = 'active'
         if enrollment.role != enrollment.type
           data.enrollment.role_id = enrollment.role_id
         deferreds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>

@@ -41,7 +41,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -49,7 +51,9 @@ describe Login::SamlController do
     )
 
     controller.request.env['canvas.domain_root_account'] = account1
+    session[:sentinel] = true
     post :create, :SAMLResponse => "foo"
+    expect(session[:sentinel]).to be_nil
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:saml_unique_id]).to eq unique_id
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
@@ -79,7 +83,9 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: unique_id,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "such a lie"
@@ -103,7 +109,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -150,7 +158,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"
@@ -181,13 +191,15 @@ describe Login::SamlController do
       @aac2.save!
 
       @stub_hash = {
-          :issuer => @aac2.idp_entity_id,
-          :is_valid? => true,
-          :success_status? => true,
-          :name_id => @unique_id,
-          :name_qualifier => nil,
-          :session_index => nil,
-          :process => nil,
+          issuer: @aac2.idp_entity_id,
+          is_valid?: true,
+          success_status?: true,
+          name_id: @unique_id,
+          name_identifier_format: nil,
+          name_qualifier: nil,
+          sp_name_qualifier: nil,
+          session_index: nil,
+          process: nil,
       }
     end
 
@@ -232,7 +244,9 @@ describe Login::SamlController do
         is_valid?: true,
         success_status?: true,
         name_id: @unique_id,
+        name_identifier_format: nil,
         name_qualifier: nil,
+        sp_name_qualifier: nil,
         session_index: nil,
         process: nil
       }
@@ -260,7 +274,9 @@ describe Login::SamlController do
       it "redirects to login screen with message if no AAC found" do
         @stub_hash[:issuer] = "hahahahahahaha"
 
+        session[:sentinel] = true
         post_create
+        expect(session[:sentinel]).to eq true
 
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "The institution you logged in from is not configured on this account."
@@ -371,6 +387,22 @@ describe Login::SamlController do
       get :destroy, :SAMLResponse => "foo", :RelayState => "/courses"
       expect(response.status).to eq 400
     end
+
+    it "renders an error if the IdP fails the request" do
+      Account.default.authentication_providers.create!(auth_type: 'saml',
+                                                       idp_entity_id: 'http://adfs.ryana.local/adfs/services/trust')
+      get :destroy,
+          SAMLResponse: <<SAML.delete("\n")
+fZLBboMwDIZfBeUOIRQojSjS1F4qdZe26mGXKSSmQ6IJi5Npe/sF0A6Vpp7iWP7j359To7gPIz+am/H
+uBDgajRAd9lvynrFCdmm1ioG1Ks6rTRpvKiXidbtismrbTIEk0RUs9kZvSZakJDogejhodEK7kEpZGa
+d5nJWXjPG05Pk6yTerNxLtAV2vhZuVH86NyCm1P0KLpA9q66XzFhJp7nQwt17TyeYUBpck2k0mpwbea
+m4E9si1uANyJ/n55fXIgxculyLuNY4g+64HFfzpvxkvZktk1ZVMMdaWKwVtCkURTiZLpYo8S/NCyIJl
+Xb6e5vy+Dxr5TOt539EaZ6QZSFPPNOwifS4SiGAnGqSZaAQYQnWYLEQGI8UwJ2io+uolIA2I0NV06dD
+UyxbPTjiPj7edURBdxeDhuQOcq/kJPn3YDVgS0aamj+/S/z5L8ws=
+SAML
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).not_to be_nil
+    end
   end
 
   context "login attributes" do
@@ -394,7 +426,9 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: nil,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "saml_entity",
@@ -419,7 +453,9 @@ describe Login::SamlController do
              is_valid?: true,
              success_status?: true,
              name_id: @unique_id,
+             name_identifier_format: nil,
              name_qualifier: nil,
+             sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
              issuer: "saml_entity"
@@ -450,7 +486,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: nil,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity",
@@ -479,7 +517,9 @@ describe Login::SamlController do
            is_valid?: true,
            success_status?: true,
            name_id: unique_id,
+           name_identifier_format: nil,
            name_qualifier: nil,
+           sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
            issuer: "saml_entity"

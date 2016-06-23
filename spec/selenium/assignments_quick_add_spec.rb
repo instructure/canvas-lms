@@ -64,7 +64,7 @@ describe 'assignments' do
         fill_out_quick_add_modal('Quiz')
         f('.more_options').click
 
-        expect(f('#quiz_edit_header')).to be
+        expect(f('#quiz_edit_wrapper')).to be
         expect(f('#quiz_title').attribute(:value)).to include_text(@assignment_name)
         expect(f('input.date_field.datePickerDateField.DueDateInput.datetime_field_enabled.hasDatepicker').attribute(:value)).to include_text('Jul 31')
       end

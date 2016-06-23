@@ -252,6 +252,9 @@ describe ContentExportsApiController, type: :request do
       let_once(:quiz_to_copy) do
         t_course.quizzes.create! title: 'thaumolinguistics'
       end
+      let_once(:announcement) do
+        t_course.announcements.create! title: 'hear ye!', message: 'wat'
+      end
 
       it "should create a selective course export with old migration id format" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
@@ -342,6 +345,15 @@ describe ContentExportsApiController, type: :request do
         expect(export.export_object?(quiz_to_copy)).to be_truthy
       end
 
+      it "should select announcements correctly" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:announcements => [announcement.id]} })
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.settings['selected_content']['announcements']).to eq({CC::CCHelper.create_key(announcement) => "1"})
+        expect(export.export_object?(announcement)).to be_truthy
+      end
+
       it "should select using shortened collection names" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
@@ -392,6 +404,37 @@ describe ContentExportsApiController, type: :request do
         expect(copied_page).not_to be_nil
         expect(@course.wiki.wiki_pages.where(migration_id: CC::CCHelper.create_key(page_to_not_copy))).not_to be_exists
       end
+
+      it "should export rubrics attached to discussions" do
+        @course = t_course
+        outcome_with_rubric
+        assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'graded discussion')
+        @rubric.associate_with(@assignment, @course, purpose: 'grading')
+
+        topic = @assignment.discussion_topic
+
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+          { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+          { :select => {:discussion_topics => [topic.id]} })
+        export = t_course.content_exports.where(id: json['id']).first
+        run_jobs
+
+        export.reload
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
+
+        run_jobs
+
+        to_assign = @course.assignments.first
+        to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
+        expect(to_outcomes).to eql [CC::CCHelper.create_key(@outcome)]
+      end
+
     end
   end
 

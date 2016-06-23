@@ -113,10 +113,7 @@
     }
     p, .more_link {
       @include fontSize(12px);
-      line-height: 13px;
-    }
-    em, .more_link {
-      font-style: italic;
+      margin-bottom: 0;
     }
     em, p {
       @if $use_high_contrast {
@@ -125,12 +122,9 @@
       @else {
         color: #777;
       }
-      padding-bottom: 2px;
-    }
-    p {
-      margin-bottom: 0;
     }
     .more_link {
+      font-style: italic;
       padding-top: 6px;
     }
   }
@@ -170,18 +164,16 @@
       height: 1px;
     }
   }
-  &.to-do-list, &.events {
+  &.events {
     i {
       width: 40px;
       min-width: 40px;
+      padding-right: $ic-sp;
+      text-align: right;
+      box-sizing: border-box;
     }
     .event > a {
       display: flex;
-    }
-    .todo-badge-wrapper {
-      display: inline-block;
-      vertical-align: top;
-      min-width: 40px;
     }
   }
   &.to-do-list {
@@ -189,9 +181,6 @@
       position: relative;
       a.item {
         display: flex;
-        b {
-          padding-right: 24px;
-        }
       }
       a.disable_item_link {
         @if $use_high_contrast {
@@ -204,10 +193,11 @@
         position: absolute;
         background-image: none;
         right: 0;
-        top: 2px;
+        top: 4px;
         z-index: 2;
         border-bottom: none;
         box-shadow: none;
+        text-align: right;
       }
       &:hover {
         a.disable_item_link {
@@ -222,61 +212,65 @@
     }
   }
 }
-
-// these are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
-// NOTE: they used to get applied to body but were moved to #right side to not force a repaint
-// of the entire page and be less jumpy going in and out display modes.
-.with-scrolling-right-side {
-
-  @if $use_new_styles {
-    #right-side {
-      @include breakpoint(desktop) {
-        position: fixed;
-        top: 0;
-        margin-top: 0;
-        width: 240px;
-      }
-    }
-  }
-  @else {
-    #right-side {
-      position: fixed;
-      top: 0;
-      margin-top: 0;
-    }
-  }
-
+#right-side .todo-list-header {
+  margin-top: 21px;
+}
+#right-side .right-side-list .todo-badge-wrapper {
+  display: inline-block;
+  vertical-align: top;
+  min-width: 40px;
+  text-align: right;
+  padding-right: $ic-sp;
+  box-sizing: border-box;
+}
+#right-side .right-side-list .IgnoreButton {
+  width: 25px;
+  min-width: 25px;
 }
 
-#right-side-wrapper.with-sidebar-pinned-to-bottom {
-  @if $use_new_styles {
-    @include breakpoint(desktop) {
-      #right-side {
-        position: fixed;
-        top: 0;
-        margin-top: 0;
-        width: 240px;
-      }
-    }
-  }
-  @else {
-    position: absolute;
-    bottom: 0;
-  }
-}
+@mixin sidebar-logo {display: block;}
 
 @if $use_new_styles {
   .ic-sidebar-logo {
     display: none;
     margin-bottom: $ic-sp*2;
     text-align: center;
-    @include breakpoint(desktop) {
-      display: block;
-    }
   }
   .ic-sidebar-logo__image {
     max-width: 180px;
     max-height: 70px;
     display: inline-block;
+  }
+  body:not(.course-menu-expanded) {
+    .ic-sidebar-logo {
+      @include breakpoint(desktop) {
+        @include sidebar-logo;
+      }
+    }
+  }
+  body.course-menu-expanded {
+    .ic-sidebar-logo {
+      @include breakpoint(desktop--nav-open) {
+        @include sidebar-logo;
+      }
+    }
+  }
+}
+
+// Legacy Styles
+@if not $use_new_styles {
+  // These are the classes that get applied to #right-side-wrapper to handle $.scrollSidebar
+  // NOTE: they used to get applied to body but were moved to #right side to not force a repaint
+  // of the entire page and be less jumpy going in and out display modes.
+  .with-scrolling-right-side {
+    #right-side {
+      position: fixed;
+      top: 0;
+      margin-top: 0;
+    }
+  }
+  #right-side-wrapper.with-sidebar-pinned-to-bottom {
+    position: absolute;
+    bottom: 0;
   }
 }

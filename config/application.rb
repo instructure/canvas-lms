@@ -125,7 +125,7 @@ module CanvasRails
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 
-    module PostgreSQLPreparedStatementsDefault
+    module PostgreSQLEarlyExtensions
       def initialize(connection, logger, connection_parameters, config)
         unless config.key?(:prepared_statements)
           config = config.dup
@@ -133,10 +133,38 @@ module CanvasRails
         end
         super(connection, logger, connection_parameters, config)
       end
+
+      def connect
+        hosts = Array(@connection_parameters[:host]).presence || [nil]
+        hosts.each_with_index do |host, index|
+          begin
+            connection_parameters = @connection_parameters.dup
+            connection_parameters[:host] = host
+            @connection = PGconn.connect(connection_parameters)
+
+            if CANVAS_RAILS4_0
+              ActiveRecord::ConnectionAdapters::PostgreSQLColumn.money_precision = (postgresql_version >= 80300) ? 19 : 10
+            else
+              ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID::Money.precision = (postgresql_version >= 80300) ? 19 : 10
+            end
+
+            configure_connection
+
+            break
+          rescue ::PG::Error => error
+            if !CANVAS_RAILS4_0 && error.message.include?("does not exist")
+              raise ActiveRecord::NoDatabaseError.new(error.message, error)
+            elsif index == hosts.length - 1
+              raise
+            end
+            # else try next host
+          end
+        end
+      end
     end
 
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
-                    PostgreSQLPreparedStatementsDefault,
+                    PostgreSQLEarlyExtensions,
                     method: :prepend)
 
     SafeYAML.singleton_class.send(:attr_accessor, :safe_parsing)
@@ -153,6 +181,14 @@ module CanvasRails
     # safe_yaml can't whitelist specific instances of scalar values, so just override the loading
     # here, and do a weird check
     YAML.add_ruby_type("object:Class") do |_type, val|
+      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
+        raise "Cannot load class #{val} from YAML"
+      end
+      val.constantize
+    end
+
+    # TODO: Use this instead of the above block when we switch to Psych
+    Psych.add_domain_type("ruby/object", "Class") do |_type, val|
       if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
         raise "Cannot load class #{val} from YAML"
       end

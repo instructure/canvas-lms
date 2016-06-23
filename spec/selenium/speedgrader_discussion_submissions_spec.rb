@@ -132,7 +132,7 @@ describe "speed grader - discussion submissions" do
       keep_trying_until { f('#speedgrader_iframe') }
       in_frame 'speedgrader_iframe' do
         f('#discussion_view_link').click
-        expect(ff('.avatar').length).to eq 0
+        expect(f("body")).not_to contain_css('.avatar')
       end
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -140,7 +140,7 @@ describe "speed grader - discussion submissions" do
       keep_trying_until { f('#speedgrader_iframe') }
       in_frame 'speedgrader_iframe' do
         f('.header_title a').click
-        expect(ff('.avatar').length).to eq 0
+        expect(f("body")).not_to contain_css('.avatar')
       end
     end
   end

@@ -56,10 +56,7 @@ define([
         var url = this.getUrl();
         var state = this.getState()[key] || {};
 
-        // just use what's in the cache
-        if (state.data) return;
-
-        this._load(key, url, params);
+        return this._load(key, url, params);
       },
 
       /**
@@ -68,7 +65,7 @@ define([
        */
       create(params) {
         var url = this.getUrl();
-        return $.ajaxJSON(url, "POST", params).then(() => {
+        return $.ajaxJSON(url, "POST", this.normalizeParams(params)).then(() => {
           this.clearState();
           if (this.lastParams)
             this.load(this.lastParams);
@@ -85,7 +82,7 @@ define([
 
         if (!state.next) return;
 
-        this._load(key, state.next, {}, {append: true});
+        return this._load(key, state.next, {}, {append: true});
       },
 
       /**

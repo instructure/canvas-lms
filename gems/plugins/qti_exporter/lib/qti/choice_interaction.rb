@@ -156,6 +156,9 @@ class ChoiceInteraction < AssessmentItemConverter
           answer = answers_hash["#{blank_id}_#{migration_id}"]
           answer[:weight] = get_response_weight(cond)
         end
+      elsif @doc.at_css('instructureField[name="bb_question_type"][value="Multiple Answer"]') &&
+            @doc.at_css('responseIf > and > match')
+        process_blackboard_9_multiple_answers(answers_hash)
       elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
         migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip()
         migration_id = migration_id.sub('.', '_') if is_either_or
@@ -261,6 +264,32 @@ class ChoiceInteraction < AssessmentItemConverter
     end
 
     weight
+  end
+
+  # BB9 does these questions a little differently, so we will special-case them
+  def process_blackboard_9_multiple_answers(answers_hash)
+    and_node = @doc.at_css('responseIf > and')
+    matches = and_node.css('> match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+    not_matches = and_node.css('> not match').map { |match| match.at_css('baseValue[baseType=identifier]').text.strip() }
+    get_real_blackboard_match_ids(answers_hash, matches, not_matches).each do |migration_id|
+      answer = answers_hash[migration_id]
+      answer[:weight] = get_response_weight(and_node.parent)
+      answer[:feedback_id] ||= get_feedback_id(and_node.parent)
+    end
+  end
+
+  # in a blackboard multiple-answer example given to us by a customer,
+  # the answers had ids `answer_1` through `answer_4`,
+  # but the response conditions referred to `answer_0` through `answer_3`...
+  # so if this happens, sort the IDs and match by position. :P
+  def get_real_blackboard_match_ids(answers_hash, matches, not_matches)
+    actual_answer_ids = answers_hash.keys.uniq.sort
+    putative_answer_ids = (matches + not_matches).uniq.sort
+    if (putative_answer_ids - actual_answer_ids).empty?
+      matches
+    else
+      matches.map { |bad_id| actual_answer_ids[putative_answer_ids.index(bad_id)] }
+    end
   end
 
 end

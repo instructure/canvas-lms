@@ -51,7 +51,7 @@ define [
           model: dueDateList
           views: {}
 
-    @stub(app, "_initializeWikiSidebar")
+    @stub(app, 'scrollSidebar')
     app.render()
 
   module 'EditView',

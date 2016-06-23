@@ -151,3 +151,14 @@ define [
       equal list.length, 2
       ok ['calendar_event_1', 'assignment_3'].indexOf(list[0].id) >= 0
       ok ['calendar_event_1', 'assignment_3'].indexOf(list[1].id) >= 0
+
+  test 'pagination: calls data callback with each page of data if set', ->
+    @server.addCalendarEvent('course_1', '1', fcUtil.unwrap(@date1).toISOString())
+    @server.addAssignment('course_2', '3', fcUtil.unwrap(@date3).toISOString())
+    pages = 0
+    @source.getEvents @date1, @date4, @contexts, (list) ->
+      equal list.length, 2
+      equal pages, 2
+    , (list) ->
+      pages += 1
+      equal list.length, 1

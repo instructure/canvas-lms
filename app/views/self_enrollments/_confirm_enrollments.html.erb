@@ -1,11 +1,18 @@
-<form action="<%= self_enrollment_url %>" method="post" id="enroll_form" class="form-horizontal bootstrap-form">
+<form action="<%= self_enrollment_url %>" method="post" class="ic-Self-enrollment-form" id="enroll_form">
   <input type="hidden" name="initial_action" value="enroll">
   <%= registration_summary || content_tag(:p, mt(:getting_started, "You are enrolling in **%{course}**", :course => @course.name)) %>
+  <div class="ic-Self-enrollment-footer-modal-layout">
 
-  <div class="control-group embedded-footer">
-    <a href="<%= privacy_policy_url %>" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
-    <div class="controls">
-      <button class="btn btn-primary" type="submit"><%= @confirm_enrollment_url ? t("buttons.next", "Next") : t("buttons.enroll_in_course", "Enroll in Course") %></button>
+    <div class="ic-Self-enrollment-footer">
+      <div class="ic-Self-enrollment-footer__Secondary">
+        <a href="<%= privacy_policy_url %>" target="_blank" class="footer-info"><%= t '#site.view_privacy_policy', 'View Privacy Policy' %></a>
+      </div>
+      <div class="ic-Self-enrollment-footer__Primary">
+        <button class="btn btn-primary" type="submit">
+          <%= @confirm_enrollment_url ? t("buttons.next", "Next") : t("buttons.enroll_in_course", "Enroll in Course") %>
+        </button>
+      </div>
     </div>
+
   </div>
 </form>

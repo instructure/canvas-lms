@@ -8,7 +8,7 @@
 <% #TODO: implement previous courses  %>
 <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
-        <a href="#" class="previous_courses_link"><%= image_tag "history.png" %> <%= t('show_previous_courses', 'Show Previous Courses') %></a>
+        <a href="#" class="previous_courses_link"><%= image_tag "history.png", :alt => '' %> <%= t('show_previous_courses', 'Show Previous Courses') %></a>
     </div>
 <% end %>
 <% end %>
@@ -30,7 +30,7 @@
         <%= t('no_grade', 'no grade') %>
       <% end %>
     </td>
-    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png" %></a></td>
+    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png", :alt => t('Send a Message to the Teacher') %></a></td>
     <td class="grading_period_dropdown">
       <% if @grading_periods[course.id] %>
           <%= render partial: "shared/grading_periods_selector", locals: {selected_period_id: @grading_periods[course.id][:selected_period_id], enrollment_id: enrollment.global_id, grading_periods: @grading_periods[course.id][:periods], all_grading_periods_option: course.feature_enabled?(:all_grading_periods_totals)} %>
@@ -55,7 +55,7 @@
         <%= t('no_grade', 'no grade') %>
       <% end %>
     </td>
-    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png" %></a></td>
+    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png", :alt => t('Send a Message to the Teacher') %></a></td>
     <td class="grading_period_dropdown">
       <% if @grading_periods[enrollment.course_id] %>
           <%= render partial: "shared/grading_periods_selector", locals: {selected_period_id: @grading_periods[enrollment.course_id][:selected_period_id], enrollment_id: enrollment.global_id, grading_periods: @grading_periods[enrollment.course_id][:periods], all_grading_periods_option: enrollment.course.feature_enabled?(:all_grading_periods_totals)} %>
@@ -79,7 +79,7 @@
         <span style="font-weight: normal; font-size: 0.9em;"><%= t('no_grades', 'no grades') %></span>
       <% end %>
     </td>
-    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png" %></a></td>
+    <td style="display: none;"><a href="#" title="<%= t('send_teacher_message', 'Send a Message to the Teacher') %>" class="no-hover"><%= image_tag "email.png", :alt => t('Send a Message to the Teacher') %></a></td>
     <td class="report">
       <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@current_user, enrollment.course_id)) unless @presenter.course_grade_summaries[enrollment.course_id][:students].try(:zero?) %>
     </td>

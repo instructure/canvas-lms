@@ -17,16 +17,9 @@
 #
 
 class AssessmentQuestionBankUser < ActiveRecord::Base
-  include Workflow
   attr_accessible :assessment_question_bank, :user
   belongs_to :assessment_question_bank
   belongs_to :user
 
-  validates_presence_of :assessment_question_bank_id, :user_id, :workflow_state
-  
-  workflow do
-    state :active
-    state :invited
-    state :deleted
-  end
+  validates_presence_of :assessment_question_bank_id, :user_id
 end

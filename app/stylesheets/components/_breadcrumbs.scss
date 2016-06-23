@@ -23,7 +23,7 @@
       // white space issues, hence the float.
       > a .ellipsis {
         float: right;
-        @if $use_new_styles { line-height: 1.2; }
+        @if $use_new_styles { line-height: inherit; }
         // firefox has a bug so it can't do it like the rest of the browsers:
         // https://bugzilla.mozilla.org/show_bug.cgi?id=488725
         // so we have to do it differently, but doing it this way doesn't work in safari.

@@ -2,13 +2,11 @@ define([
   'i18n!external_tools',
   'jquery',
   'react',
-  'react-router'
-], function (I18n, $, React, {Navigation}) {
+  'page'
+], function (I18n, $, React, page) {
 
   return React.createClass({
     displayName: 'AppTile',
-
-    mixins: [Navigation],
 
     getInitialState() {
       return {
@@ -39,7 +37,7 @@ define([
 
     handleClick(e) {
       e.preventDefault();
-      this.transitionTo('appDetails', {shortName: this.props.app.short_name});
+      page(`${this.props.pathname}/app/${this.props.app.short_name}`)
     },
 
     installedRibbon() {

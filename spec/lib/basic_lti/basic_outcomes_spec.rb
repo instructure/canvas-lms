@@ -114,6 +114,16 @@ describe BasicLTI::BasicOutcomes do
       expect(described_class.decode_source_id(tool, source_id)).to eq [@course, assignment, @user]
     end
 
+    it 'throws Invalid sourcedid if sourcedid is nil' do
+      expect{described_class.decode_source_id(tool, nil)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Invalid sourcedid')
+    end
+
+    it 'throws Invalid sourcedid if sourcedid is empty' do
+      expect{described_class.decode_source_id(tool, "")}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Invalid sourcedid')
+    end
+
     it 'throws Invalid sourcedid if no signature' do
       missing_signature = source_id.split('-')[0..3].join('-')
       expect{described_class.decode_source_id(tool, missing_signature)}.

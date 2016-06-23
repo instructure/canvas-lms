@@ -1,5 +1,5 @@
 class ClearRailsCache < ActiveRecord::Migration
-  tag :predeploy, :postdeploy
+  tag :predeploy
 
   # note that if you have any environments that are "split" somehow -
   # sharing a database, or created from a snapshot of a database,

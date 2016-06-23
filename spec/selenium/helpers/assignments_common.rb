@@ -167,7 +167,7 @@ module AssignmentsCommon
 
     f('#assignment_text_entry').click
     f('#has_group_category').click
-    f('#assignment_group_category_id').click
+    move_to_click('#assignment_group_category_id')
     f('#assignment_group_category_id').send_keys :arrow_up
     f('#assignment_group_category_id').send_keys :return
   end

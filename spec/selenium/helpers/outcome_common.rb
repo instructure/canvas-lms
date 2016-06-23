@@ -171,6 +171,7 @@ module OutcomeCommon
     refresh_page
 
     # select group
+    wait_for_ajaximations
     f('.outcome-group').click
     wait_for_ajaximations
     # select nested outcome
@@ -240,12 +241,12 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
     expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     # db
     expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ff('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
   def should_validate_mastery_points
@@ -269,7 +270,7 @@ module OutcomeCommon
     get outcome_url
     f('.add_outcome_link').click
     # create array of drop down options
-    drop_down = get_options('#calculation_method').map(&:text)
+    drop_down = get_options('#calculation_method').map(&:text).map(&:strip)
     expected_array = ['Decaying Average', 'n Number of Times', 'Most Recent Score', 'Highest Score']
     # expect
     expect(drop_down.length).to eq(4)
@@ -382,6 +383,7 @@ module OutcomeCommon
   end
 
   def should_create_an_outcome_group_nested
+    make_full_screen
     get outcome_url
 
     ## when
@@ -390,17 +392,21 @@ module OutcomeCommon
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
     wait_for_ajaximations
+
+    if link = f('.ic-flash-success .close_link')
+      link.click
+    end
 
     # create nested group
     f('.add_outcome_group').click
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
+    wait_for_ajaximations
 
-    driver.execute_script("$('.submit_button').click()") unless f('.submit_button').nil?
     refresh_page
     wait_for_ajaximations
 
@@ -465,11 +471,11 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
-    expect(fj('.outcomes-content .title').text).to eq "Setting up Outcomes"
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
+    expect(f('.outcomes-content .title').text).to eq "Setting up Outcomes"
     # db
     expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ffj('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 end

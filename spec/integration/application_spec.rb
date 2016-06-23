@@ -83,22 +83,19 @@ describe "site-wide" do
       get "/courses/#{@course.id}"
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
       expect(response[x_canvas_meta]).to match(%r{t=Course;})
-      expect(response[x_canvas_meta]).to match(%r{x=5;})
+      expect(response[x_canvas_meta]).to match(%r{x=5.0;})
     end
   end
 
   context "user headers" do
     before(:each) do
       course_with_teacher
-      @teacher = @user
 
       student_in_course
-      @student = @user
       user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
       @student_pseudonym = @pseudonym
 
       account_admin_user :account => Account.site_admin
-      @admin = @user
       user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
     end
 
@@ -179,5 +176,30 @@ describe "site-wide" do
     expect(assigns[:real_current_user]).to eq @user
     expect(Time.zone.name).to eq "Hawaii"
     expect(I18n.locale).to eq :es
+  end
+
+  context "csrf protection" do
+    it "returns a real status code for csrf errors" do
+      enable_forgery_protection do
+        course_with_teacher
+        student_in_course
+        user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+
+        account_admin_user(:account => Account.site_admin)
+        user_with_pseudonym(:user => @admin, :username => 'admin@example.com', :password => 'password')
+
+        user_session(@admin, @admin.pseudonyms.first)
+        post "/users/#{@student.id}/masquerade"
+
+        expect(response.status).to eq 422
+      end
+    end
+  end
+
+  context "error templates" do
+    it "returns an html error page even for non-html requests" do
+      Canvas::Errors.expects(:capture).once.returns({})
+      get "/courses/blah.png"
+    end
   end
 end

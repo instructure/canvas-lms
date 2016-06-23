@@ -194,28 +194,6 @@ describe DiscussionEntry do
 
   end
 
-  context "send_to_inbox" do
-    it "should send to inbox" do
-      course
-      @course.offer
-      topic = @course.discussion_topics.create!(:title => "abc " * 63 + "abc")
-      expect(topic.title.length).to eq 255
-      @u = user_model
-      entry = topic.discussion_entries.create!(:user => @u)
-      @u2 = user_model
-      sub_entry = topic.discussion_entries.build
-      sub_entry.parent_id = entry.id
-      sub_entry.user = @u2
-      sub_entry.save!
-      expect(sub_entry.inbox_item_recipient_ids).not_to be_nil
-      expect(sub_entry.inbox_item_recipient_ids).not_to be_empty
-      expect(sub_entry.inbox_item_recipient_ids).to be_include(entry.user_id)
-      item = InboxItem.last
-      expect(item.subject.length).to be <= 255
-      expect(item.subject).to match /abc /
-    end
-  end
-
   context "sub-topics" do
     it "should not allow students to edit sub-topic entries of other students" do
       course_with_student(:active_all => true)

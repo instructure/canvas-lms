@@ -34,7 +34,7 @@ describe "student groups" do
         wait_for_ajaximations
       end
 
-      expect(g1.reload.name).to eq "new group name"
+      expect(g1.reload.name).to include_text("new group name")
     end
 
     it "should show locked student organized, invite only groups", priority: "1", test_id: 180671 do
@@ -51,10 +51,7 @@ describe "student groups" do
       @course.save!
       user_session(@students.first)
       get "/courses/#{@course.id}/groups"
-      fln("Visit").click
-      keep_trying_until do
-        expect(f("#unauthorized_message")).to be_displayed
-      end
+      expect(f("#unauthorized_message")).to be_displayed
     end
 
     describe "new student group" do

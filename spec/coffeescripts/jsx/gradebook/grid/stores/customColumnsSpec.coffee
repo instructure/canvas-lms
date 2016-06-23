@@ -75,7 +75,6 @@ define [
     }
 
     actual = CustomColumnsStore.state.customColumns.columnData
-    debugger
     deepEqual(actual, expected)
 
   module 'CustomColumnsStore#getColumnDatum',

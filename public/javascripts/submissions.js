@@ -282,7 +282,6 @@ define([
       }
       rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
       var current_user = (!found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id);
-      $("#rubric_holder .rubric").toggleClass('assessing', current_user && ENV.RUBRIC_ASSESSMENT.assessor_id != ENV.RUBRIC_ASSESSMENT.assessment_user_id);
       $("#rubric_holder .save_rubric_button").showIf(current_user);
     }).change();
     $(".media_comment_link").click(function(event) {

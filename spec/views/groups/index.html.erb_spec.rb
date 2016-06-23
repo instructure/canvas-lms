@@ -43,6 +43,6 @@ describe "/groups/index" do
     assigns[:previous_groups] = []
     render "groups/index"
     doc = Nokogiri::HTML.parse(response.body)
-    expect(doc.at_css('ul.context_list li:first span.subtitle').text).to eq @course.name
+    expect(doc.at_css('#my_groups_table td:nth-child(2) span.group-course-name').text).to eq @course.name
   end
 end

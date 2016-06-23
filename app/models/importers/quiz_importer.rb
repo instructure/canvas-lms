@@ -170,10 +170,12 @@ module Importers
         if item.deleted?
           item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
+          item.quiz_questions.destroy_all
           item.save
         end
       end
       item ||= context.quizzes.new
+      new_record = item.new_record? || item.deleted?
 
       hash[:due_at] ||= hash[:due_date]
       hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
@@ -256,7 +258,7 @@ module Importers
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
 
-        if !hash[:available] && item.can_unpublish?
+        if new_record && !hash[:available] && item.can_unpublish?
           item.workflow_state = 'unpublished'
           item.assignment.workflow_state = 'unpublished'
         end
@@ -278,7 +280,7 @@ module Importers
         end
       end
 
-      if item.for_assignment? && !item.assignment && item.can_unpublish?
+      if new_record && item.for_assignment? && !item.assignment && item.can_unpublish?
         item.workflow_state = 'unpublished'
       end
 

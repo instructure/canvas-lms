@@ -1,0 +1,6 @@
+<small <%= context_sensitive_datetime_title(collaboration.created_at, @context) %>>
+  <%= t :started_by, "Started by *%{user}*, %{at}",
+        :user => context_user_name(@context, collaboration.user),
+        :wrapper => "<a href=\"#{context_url(@context, :context_user_url, collaboration.user_id)}\" class=\"collaborator_link\">\\1</a>",
+        :at => datetime_string(collaboration.created_at) %>
+</small>

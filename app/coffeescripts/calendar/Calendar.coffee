@@ -173,7 +173,7 @@ define [
       @gotoDate(fcUtil.now())
 
     # FullCalendar callbacks
-    getEvents: (start, end, timezone, cb) =>
+    getEvents: (start, end, timezone, donecb, datacb) =>
       @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
@@ -185,9 +185,14 @@ define [
               event.removeClass('current-appointment-group')
             for event in aEvents
               event.addClass('current-appointment-group')
-            cb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
+            donecb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
         else
-          cb(calendarEventFilter(@displayAppointmentEvents, events))
+          if (datacb?)
+            donecb([])
+          else
+            donecb(calendarEventFilter(@displayAppointmentEvents, events))
+      , datacb? && (events) =>
+        datacb(calendarEventFilter(@displayAppointmentEvents, events))
 
     # Close all event details popup on the page and have them cleaned up.
     closeEventPopups: ->
@@ -406,7 +411,7 @@ define [
       originalEnd = fcUtil.clone(event.end)
       @copyYMD(event.start, date)
       @copyYMD(event.end, date)
-      @_eventDrop(event, 0, false, =>
+      @_eventDrop(event, moment.duration(event.start.diff(originalStart)).asMinutes(), false, =>
         event.start = originalStart
         event.end = originalEnd
         @updateEvent(event)

@@ -23,8 +23,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_messages, -> { order("created_at DESC, id DESC") }, dependent: :delete_all
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
+  belongs_to :context, polymorphic: [:account, :course, :group]
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
@@ -535,7 +534,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.batch_regenerate_private_hashes!(ids)
-    select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ',')} FROM conversation_participants WHERE conversation_id = conversations.id) AS user_ids").
+    select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ',')} FROM #{ConversationParticipant.quoted_table_name} WHERE conversation_id = conversations.id) AS user_ids").
       where(:id =>ids).
       each do |c|
       c.regenerate_private_hash!(c.user_ids.split(',').map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting

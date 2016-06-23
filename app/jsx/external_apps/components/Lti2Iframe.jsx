@@ -37,7 +37,7 @@ define([
     render() {
       return (
         <div className="ReactModal__Body" style={{padding: '0px !important'}}>
-          <iframe src={this.getLaunchUrl()} style={{width: '100%', padding: 0, margin: 0, height: 500, border: 0}} title={I18n.t('Tool Content')}/>
+          <iframe src={this.getLaunchUrl()} className="tool_launch" title={I18n.t('Tool Content')}/>
         </div>
       )
     }

@@ -138,15 +138,15 @@ module QuizQuestionsCommon
   end
 
   def it_should_not_show_previous_button
-    expect(f("button.previous-question")).to be_nil
+    expect(f("#content")).not_to contain_css("button.previous-question")
   end
 
   def it_should_not_show_next_button
-    expect(f("button.next-question")).to be_nil
+    expect(f("#content")).not_to contain_css("button.next-question")
   end
 
   def submit_the_quiz
-    fj("#submit_quiz_button").click
+    f("#submit_quiz_button").click
   end
 
   def submit_unfinished_quiz(alert_message=nil)

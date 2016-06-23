@@ -203,9 +203,10 @@ class GroupsController < ApplicationController
       format.html do
         groups_scope = groups_scope.by_name
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
-        groups_scope = groups_scope.preload(:group_category)
+        groups_scope = groups_scope.preload(:group_category, :context)
 
         groups = groups_scope.shard(@current_user).to_a
+        groups.select!{|group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read)}
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
@@ -592,7 +593,10 @@ class GroupsController < ApplicationController
     find_group
     if authorized_action(@group, @current_user, :manage)
       root_account = @group.context.try(:root_account) || @domain_root_account
-      ul = UserList.new(params[:invitees], :root_account => root_account, :search_method => :preferred)
+      ul = UserList.new(params[:invitees],
+                        root_account: root_account,
+                        search_method: :preferred,
+                        current_user: @current_user)
       @memberships = []
       ul.users.each{ |u| @memberships << @group.invite_user(u) }
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }

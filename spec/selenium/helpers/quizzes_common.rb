@@ -163,6 +163,54 @@ module QuizzesCommon
     @quiz
   end
 
+  def quiz_with_essay_questions(goto_edit=true)
+    # TODO: DRY this up
+    @context = @course
+    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    @quiz = quiz_model
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
+    c = bank.assessment_questions.create!
+    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: a
+    )
+
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: b
+    )
+
+    @quest3 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'third question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: c
+    )
+
+    yield bank, @quiz if block_given?
+
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
+  end
+
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
     bank = @context.assessment_question_banks.create!(title: 'Test Bank')
@@ -201,10 +249,12 @@ module QuizzesCommon
   end
 
   def click_settings_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(0)').click
   end
 
   def click_questions_tab
+    wait_for_ajaximations
     fj('#quiz_tabs ul:first a:eq(1)').click
   end
 
@@ -289,12 +339,18 @@ module QuizzesCommon
     submit = opts.fetch(:submit, true)
     access_code = opts.fetch(:access_code, nil)
 
-    begin_quiz(access_code)
+    begin_quiz(access_code, opts)
     complete_and_submit_quiz(submit)
   end
 
-  def begin_quiz(access_code=nil)
+  def begin_quiz(access_code=nil, opts={})
     get take_quiz_url
+
+    # do this as close to submission creation as possible to avoid being locked by the time the page loads
+    if opts[:lock_after]
+      @quiz.lock_at = Time.now + opts[:lock_after]
+      @quiz.save!
+    end
 
     if access_code.nil?
       expect_new_page_load { f('#take_quiz_link').click }
@@ -417,12 +473,6 @@ module QuizzesCommon
 
   def visible_regrade_options
     ffj('label.checkbox:visible', '.regrade_enabled')
-  end
-
-  # clicks |Okay, got it|
-  def close_regrade_tooltip
-    fj('.btn.usher-close').click
-    wait_for_ajaximations
   end
 
   # clicks |Okay, fine|
@@ -578,6 +628,8 @@ module QuizzesCommon
     move_to_question question_id
     source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id}"
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -601,6 +653,8 @@ module QuizzesCommon
     move_to_question id
     source = "#question_#{id} .draggable-handle"
     target = '#questions > *'
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -611,6 +665,8 @@ module QuizzesCommon
     move_to_group id
     source = "#group_top_#{id} .draggable-handle"
     target = '#questions > *'
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -621,6 +677,8 @@ module QuizzesCommon
     move_to_question question_id
     source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id} + *"
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
   end
 

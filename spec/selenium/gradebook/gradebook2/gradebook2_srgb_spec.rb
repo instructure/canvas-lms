@@ -1,20 +1,15 @@
 require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/gradebook2_srgb_common'
 
-describe "screenreader gradebook" do
-  include_context "in-process server selenium tests"
+describe "Screenreader Gradebook" do
+  include_context 'in-process server selenium tests'
+  include_context 'gradebook_components'
+  include_context 'srgb_components'
+  include_context 'reusable_course'
   include Gradebook2Common
+  include Gradebook2SRGBCommon
 
   let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
-
-  def basic_setup(num=1)
-    init_course_with_students num
-    @course.assignments.create!(
-      title: 'Test 1',
-      submission_types: 'online_text_entry',
-      points_possible: 20,
-      grading_type: 'percent'
-    )
-  end
 
   it 'can select a student', priority: "1", test_id: 163994 do
     init_course_with_students 2
@@ -92,19 +87,6 @@ describe "screenreader gradebook" do
     expect(f('#assignment_information').text).to include 'Online text entry'
   end
 
-  it 'updates grade to percentage in percentage grade field', priority: "1", test_id: 163999 do
-    skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-    assignment = basic_setup
-    get srgb
-
-    click_option '#assignment_select', assignment.name
-    click_option '#student_select', @students[0].name
-    replace_content f('#student_and_assignment_grade'), "10\t"
-    wait_for_ajaximations
-    expect(f('#student_and_assignment_grade').attribute 'value').to eq '50%'
-  end
-
   it 'displays/removes warning message for resubmitted assignments', priority: "1", test_id: 164000 do
     skip "Skipped because this spec fails if not run in foreground\n"\
       "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
@@ -126,7 +108,7 @@ describe "screenreader gradebook" do
 
     replace_content f('#student_and_assignment_grade'), "15\t"
     wait_for_ajaximations
-    expect(f('p.resubmitted')).to be_nil
+    expect(f("#content")).not_to contain_css('p.resubmitted')
   end
 
   it 'grades match default gradebook grades', priority: "1", test_id: 163994 do
@@ -209,7 +191,7 @@ describe "screenreader gradebook" do
     expect(f('#message_students_dialog')).to_not be_displayed
   end
 
-  it 'has total graded submission', priority: "1", test_id: 164003 do
+  it 'has total graded submission', priority: "1", test_id: 615686 do
     assignment = basic_setup 2
 
     assignment.grade_student @students[0], grade: 15
@@ -234,52 +216,28 @@ describe "screenreader gradebook" do
   end
 
   context 'Group Weights' do
-    let(:test_course) { course() }
-    let(:teacher)     { user(active_all: true) }
-    let(:student)     { user(active_all: true) }
-    let!(:enroll_teacher_and_students) do
-      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
-    end
-    let!(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
-    let!(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
-    let!(:assignment_1) do
-      test_course.assignments.create!(
-        title: 'Test 1',
-        points_possible: 20,
-        assignment_group: assignment_group_1
-      )
-    end
-    let!(:assignment_2) do
-      test_course.assignments.create!(
-        title: 'Test 2',
-        points_possible: 20,
-        assignment_group: assignment_group_2
-      )
-    end
-
     before(:each) do
+      enroll_teacher_and_students
+      assignment_1
+      assignment_5
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=srgb"
     end
 
     it 'should display the group weighting dialog with group weights disabled', priority: "1", test_id: 163995 do
-      f('#ag_weights').click
-      expect(fj("#assignment_group_weights_dialog table[style='opacity: 0.5;']")).to be_truthy
+      group_weights_button.click
+      expect(f("#assignment_group_weights_dialog table[style='opacity: 0.5;']")).to be_truthy
     end
 
     it 'should correctly sync group weight settings between srgb and gb2', priority: "1", test_id: 588913 do
-      # turn on group weights in srgb
-      f('#ag_weights').click
-      f('#group_weighting_scheme').click
-      f('button .ui-button-text').click
+      turn_on_group_weights
 
       # go back to gb2 to verify settings stuck
       get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=2"
-      fj('#gradebook_settings').click
-      fj('.gradebook_dropdown .ui-menu-item:nth-child(3) a').click
+      gradebook_settings_cog.click
+      group_weights_menu.click
 
-      expect(fj("#assignment_group_weights_dialog table[style='opacity: 1;']")).to be_truthy
+      expect(f("#assignment_group_weights_dialog table[style='opacity: 1;']")).to be_truthy
     end
   end
 
@@ -288,17 +246,17 @@ describe "screenreader gradebook" do
       gradebook_data_setup
     end
 
-    it "should switch to srgb", priority: "1", test_id: 209987 do
+    it "switches to srgb", priority: "1", test_id: 615682 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder").click
-      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
+      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
       refresh_page
-      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
+      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
       f(".span12 a").click
       expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end
 
-    it "Should show sections in drop-down", priority: "1", test_id: 209989 do
+    it "shows sections in drop-down", priority: "1", test_id: 615680 do
       sections=[]
       2.times do |i|
         sections << @course.course_sections.create!(:name => "other section #{i}")
@@ -313,21 +271,18 @@ describe "screenreader gradebook" do
     end
 
     it "should focus on accessible elements when setting default grades", priority: "1", test_id: 209991 do
-      get "/courses/#{@course.id}/gradebook"
-      f("#change_gradebook_version_link_holder").click
-      refresh_page
-      Selenium::WebDriver::Support::Select.new(f("#assignment_select"))
-                                          .select_by(:text, 'second assignment')
+      get srgb
+      select_assignment(@second_assignment)
 
       # When the modal opens the close button should have focus
-      f("#set_default_grade").click
+      default_grade.click
       focused_classes = driver.execute_script('return document.activeElement.classList')
       expect(focused_classes).to include("ui-dialog-titlebar-close")
 
       # When the modal closes
       # by setting a grade the "set default grade" button should have focus
       f(".button_type_submit").click
-      driver.switch_to.alert.accept
+      accept_alert
       check_element_has_focus(f "#set_default_grade")
 
       # by the close button the "set default grade" button should have focus
@@ -365,7 +320,7 @@ describe "screenreader gradebook" do
       it "is not displayed for assignments which are not submitted online" do
         click_option '#assignment_select', @assignment.name
 
-        expect(f("#submissions_download_button")).to_not be_present
+        expect(f("#content")).not_to contain_css("#submissions_download_button")
       end
 
       it "is displayed for assignments which allow both online and non-online submittion" do
@@ -373,40 +328,6 @@ describe "screenreader gradebook" do
 
         expect(f("#submissions_download_button")).to be_present
       end
-    end
-  end
-
-  context 'warning messages for group weights with no points' do
-    before(:each) do
-      init_course_with_students 1
-      group0 = @course.assignment_groups.create!(name: "Guybrush Group")
-      @course.assignment_groups.create!(name: "Threepwood Group")
-      @assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0)
-
-      get srgb
-
-      # turn on group weights
-      f('#ag_weights').click
-      wait_for_ajaximations
-      f('#group_weighting_scheme').click
-      f('.ui-button-text').click
-      wait_for_ajaximations
-    end
-
-    it "should have a no point possible warning when a student is selected", priority: "2", test_id: 164226 do
-      # select from dropdown
-      click_option('#student_select', @students[0].name)
-
-      expect(f('span.text-error > i.icon-warning')).to be_displayed
-      expect(f('#student_information > div.row')).to include_text('Score does not include assignments from the group')
-    end
-
-    it "should have a no point possible warning when an assignment is selected", priority: "2", test_id: 602625 do
-      # select from dropdown
-      click_option('#assignment_select', @assignment.name)
-
-      expect(f('a > i.icon-warning')).to be_displayed
-      expect(f('#assignment_information > div.row')).to include_text('Assignments in this group have no points')
     end
   end
 end

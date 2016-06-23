@@ -18,8 +18,7 @@
 
 class AppointmentGroupSubContext < ActiveRecord::Base
   belongs_to :appointment_group
-  belongs_to :sub_context, :polymorphic => true
-  validates_inclusion_of :sub_context_type, :allow_nil => true, :in => ['GroupCategory', 'CourseSection']
+  belongs_to :sub_context, polymorphic: [:group_category, :course_section]
 
   attr_accessible :appointment_group, :sub_context, :sub_context_code
 

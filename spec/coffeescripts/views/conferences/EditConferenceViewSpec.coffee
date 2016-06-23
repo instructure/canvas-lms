@@ -14,7 +14,7 @@ define [
       tz.restore(@snapshot)
 
   test 'updateConferenceUserSettingDetailsForConference localizes values for datepicker settings', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.pushFrame()
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'date.formats.full_with_weekday': '%a %-d %b, %Y %-k:%M'

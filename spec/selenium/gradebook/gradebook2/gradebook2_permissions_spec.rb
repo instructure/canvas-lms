@@ -21,7 +21,7 @@ describe "gradebook2 - permissions" do
                           :role => role)
 
       get "/courses/#{course.id}/gradebook2"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
 
     it "should display for users with only :manage_grades permissions" do
@@ -36,7 +36,7 @@ describe "gradebook2 - permissions" do
                           :role => role)
 
       get "/courses/#{course.id}/gradebook2"
-      expect(flash_message_present?(:error)).to be_falsey
+      expect_no_flash_message :error
     end
   end
 

@@ -46,7 +46,7 @@ describe UsersController, type: :request do
   end
 
   before :each do
-    @a1_json = 
+    @a1_json =
       {
         'type' => 'submitting',
         'assignment' => {},
@@ -166,6 +166,16 @@ describe UsersController, type: :request do
     @a2_json['assignment']['needs_grading_count'] = 2
     update_assignment_json
     compare_json(json.first, @a2_json)
+  end
+
+  it "should ignore excused assignments for students" do
+    @a1.grade_student(@me, excuse: true)
+
+    json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
+      :controller => "courses", :action => "todo_items",
+      :format => "json", :course_id => @student_course.to_param)
+
+    expect(json).to eq []
   end
 
   it "works correctly when turnitin is enabled" do

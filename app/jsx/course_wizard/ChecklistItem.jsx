@@ -50,7 +50,7 @@ define([
 
         return (
           <li>
-            <a href='#' id={this.props.id} className={this.state.classNameString} onClick={this.handleClick}>
+            <a href='#' id={this.props.id} className={this.state.classNameString} onClick={this.handleClick} aria-label={"Select task: " + this.props.title}>
               <span>
                 {this.props.title}
                 <span className='screenreader-only'>{completionMessage}</span>

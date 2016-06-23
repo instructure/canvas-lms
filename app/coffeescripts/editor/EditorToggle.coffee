@@ -5,8 +5,13 @@ define [
   'Backbone'
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
-  'tinymce.editor_box'
-], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts) ->
+  'react'
+  'jsx/editor/SwitchEditorControl'
+  'jsx/shared/rce/RichContentEditor'
+], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts,
+    React, SwitchEditorControl, RichContentEditor) ->
+
+  RichContentEditor.preloadRemoteModule()
 
   ###
   xsslint safeString.property content
@@ -54,7 +59,6 @@ define [
       @el.detach()
       if @options.switchViews
         @switchViews.insertBefore @textArea
-        @switchViews.find('a').toggle() if !@switchViews.find('a').first().is(":visible")
       @infoIcon ||= (new KeyboardShortcuts()).render().$el
       @infoIcon.css("float", "right")
       @infoIcon.insertAfter @switchViews
@@ -63,7 +67,8 @@ define [
       opts = {focus: true, tinyOptions: {}}
       if @options.editorBoxLabel
         opts.tinyOptions.aria_label = @options.editorBoxLabel
-      @textArea.editorBox opts
+      RichContentEditor.initSidebar()
+      RichContentEditor.loadNewEditor(@textArea, opts)
       @editing = true
       @trigger 'edit'
 
@@ -72,11 +77,11 @@ define [
     # @api public
     display: (opts) ->
       if not opts?.cancel
-        @content = @textArea._justGetCode()
+        @content = RichContentEditor.callOnRCE(@textArea, 'get_code')
         @textArea.val @content
         @el.html @content
       @el.insertBefore @textArea
-      @textArea._removeEditor()
+      RichContentEditor.destroyRCE(@textArea)
       @textArea.detach()
       @switchViews.detach() if @options.switchViews
       @infoIcon.detach()
@@ -124,22 +129,15 @@ define [
           @display()
           @editButton.focus()
       )
+
     ##
     # create the switch views links to go between rich text and a textarea
     # @api private
     createSwitchViews: ->
-      $switchToHtmlLink = $('<a/>', href: "#")
-      $switchToVisualLink = $switchToHtmlLink.clone()
-      $switchToHtmlLink.text(I18n.t('switch_editor_html', 'HTML Editor'))
-      $switchToVisualLink.hide().text(I18n.t('switch_editor_rich_text', 'Rich Content Editor'))
-      $switchViewsContainer = $('<div/>', style: "float: right")
-      $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
-      $switchViewsContainer.find('a').click preventDefault (e) =>
-        @textArea.editorBox('toggle')
-        # hide the clicked link, and show the other toggle link.
-        # todo: replace .andSelf with .addBack when JQuery is upgraded.
-        $(e.currentTarget).siblings('a').andSelf().toggle()
-      return $switchViewsContainer
+      component = React.createElement(SwitchEditorControl, { textarea: @textArea })
+      $container = $("<div class='switch-views'></div>")
+      React.render(component, $container[0])
+      return $container
 
 
   _.extend(EditorToggle.prototype, Backbone.Events)

@@ -159,6 +159,9 @@ $gradebook_header_height: 52px;
   &.with_moderation_tabs {
     top: $gradebook_header_height * 2 + 3;
   }
+  &.with_enrollment_inactive_notice {
+    top: $gradebook_header_height + 46;
+  }
 }
 
 .full_width {
@@ -193,6 +196,12 @@ $gradebook_header_height: 52px;
   #right_side {
     width: 329px;
   }
+}
+
+#enrollment_inactive_notice {
+  width: 100%;
+  border-bottom: 1px solid $ic-border-light;
+  text-align: center;
 }
 
 #moderation_bar {
@@ -381,6 +390,7 @@ $gradebook_header_height: 52px;
   #rightside_inner {
     @extend %flex-1;
     overflow-y: auto;
+    position: relative;
   }
   #not_gradeable_message {
     padding: 20px;

@@ -287,11 +287,12 @@ require 'securerandom'
 class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
+  include CustomSidebarLinksHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_user_or_observer, :only=>[:user_index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
-  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
+  skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -370,7 +371,7 @@ class CoursesController < ApplicationController
   #   - "favorites": Optional information to include with each Course.
   #     Indicates if the user has marked the course as a favorite course.
   #   - "teachers": Teacher information to include with each Course.
-  #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
+  #     Returns an array of hashes containing the {api:Users:UserDisplay UserDisplay} information
   #     for each teacher in the course.
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
@@ -491,9 +492,6 @@ class CoursesController < ApplicationController
   # @API Create a new course
   # Create a new course
   #
-  # @argument account_id [Required, Integer]
-  #   The unique ID of the account to create to course under.
-  #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
   #   Course."
@@ -520,10 +518,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
   #
   # @argument course[is_public_to_auth_users] [Boolean]
-  #   Set to true if course if public to authenticated users.
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -750,8 +748,9 @@ class CoursesController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
-  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type[] [String, "teacher"|"student"|"student_view"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
+  #   "student_view" implies include[]=test_student.
   #   This argument is ignored if enrollment_role is given.
   #
   # @argument enrollment_role [String] Deprecated
@@ -767,7 +766,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -780,7 +779,8 @@ class CoursesController < ApplicationController
   #   - "bio": Optionally include each user's bio.
   #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
-  #
+  #   - "custom_links": Optionally include plugin-supplied custom links for each student,
+  #   such as analytics information
   # @argument user_id [String]
   #   If included, the user will be queried and if the user is part of the
   #   users set, the page parameter will be modified so that the page
@@ -797,12 +797,13 @@ class CoursesController < ApplicationController
   # @returns [User]
   def users
     get_context
-    if authorized_action(@context, @current_user, :read_roster)
+    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       #backcompat limit param
       params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
-      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
+      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && (!params.has_key?(:include_inactive) || value_to_boolean(params[:include_inactive]))
+
       search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
 
@@ -830,7 +831,7 @@ class CoursesController < ApplicationController
       users = Api.paginate(users, self, api_v1_course_users_url)
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
-      if not includes.include?('test_student')
+      unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
         users.reject! do |u|
           u.preferences[:fake_student]
         end
@@ -839,7 +840,12 @@ class CoursesController < ApplicationController
         enrollment_scope = @context.enrollments.
           where(user_id: users).
           preload(:course)
-        enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+
+        if search_params[:enrollment_state]
+          enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
+        else
+          enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+        end
         enrollments_by_user = enrollment_scope.group_by(&:user_id)
       end
       render :json => users.map { |u|
@@ -1090,7 +1096,8 @@ class CoursesController < ApplicationController
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
-        PUBLISHING_ENABLED: @publishing_enabled
+        PUBLISHING_ENABLED: @publishing_enabled,
+        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
@@ -1222,6 +1229,7 @@ class CoursesController < ApplicationController
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
         enrollment.accept!
+        @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
 
@@ -1306,7 +1314,7 @@ class CoursesController < ApplicationController
 
       @pending_enrollment = enrollment
 
-      if @context.root_account.allow_invitation_previews?
+      if @context.root_account.allow_invitation_previews? || enrollment.admin?
         flash[:notice] = t('notices.preview_course', "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate.")
       elsif params[:action] != "enrollment_invitation"
         # directly call the next action; it's just going to redirect anyway, so no need to have
@@ -1745,9 +1753,10 @@ class CoursesController < ApplicationController
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
       list = UserList.new(params[:user_list],
-                          :root_account => @context.root_account,
-                          :search_method => @context.user_list_search_mode_for(@current_user),
-                          :initial_type => params[:enrollment_type])
+                          root_account: @context.root_account,
+                          search_method: @context.user_list_search_mode_for(@current_user),
+                          initial_type: params[:enrollment_type],
+                          current_user: @current_user)
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
@@ -1857,7 +1866,7 @@ class CoursesController < ApplicationController
       @course.start_at = DateTime.parse(params[:course][:start_at]).utc rescue nil
       @course.conclude_at = DateTime.parse(params[:course][:conclude_at]).utc rescue nil
       @course.workflow_state = 'claimed'
-      @course.save
+      @course.save!
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
       @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
@@ -1894,7 +1903,7 @@ class CoursesController < ApplicationController
   # editable through this endpoint will be "syllabus_body"
   #
   # @argument course[account_id] [Integer]
-  #   The unique ID of the account to create to course under.
+  #   The unique ID of the account to move the course to.
   #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
@@ -1922,7 +1931,10 @@ class CoursesController < ApplicationController
   #   - 'public_domain' (Public Domain).
   #
   # @argument course[is_public] [Boolean]
-  #   Set to true if course if public.
+  #   Set to true if course is public to both authenticated and unauthenticated users.
+  #
+  # @argument course[is_public_to_auth_users] [Boolean]
+  #   Set to true if course is public only to authenticated users.
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
@@ -1965,9 +1977,26 @@ class CoursesController < ApplicationController
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
   #
+  # @argument course[storage_quota_mb] [Integer]
+  #   Set the storage quota for the course, in megabytes. The caller must have
+  #   the "Manage storage quotas" account permission.
+  #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students
   #   immediately.
+  #
+  # @argument event [String, "claim"|"offer"|"conclude"|"delete"|"undelete"]
+  #   The action to take on each course.
+  #   * 'claim' makes a course no longer visible to students. This action is also called "unpublish" on the web site.
+  #     A course cannot be unpublished if students have received graded submissions.
+  #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
+  #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
+  #     in prior-enrollment lists.
+  #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
+  #     All enrollments are deleted. Course content may be physically deleted at a future date.
+  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
+  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
+  #     will be unpublished. Deleted enrollments will not be recovered.
   #
   # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
@@ -2113,7 +2142,10 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :edit }
+          format.html do
+            flash[:error] = t('There was an error saving the changes to the course')
+            redirect_to course_url(@course)
+          end
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end
@@ -2290,6 +2322,7 @@ class CoursesController < ApplicationController
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
+      ModeratedGrading::ProvisionalGrade.where(:submission_id => @fake_student.submissions).delete_all
       @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all

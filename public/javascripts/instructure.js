@@ -25,7 +25,7 @@ define([
   'timezone',
   'compiled/userSettings',
   'str/htmlEscape',
-  'wikiSidebar',
+  'jsx/shared/rce/RichContentEditor',
   'instructure_helper',
   'jqueryui/draggable',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -43,7 +43,6 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'compiled/jquery/fixDialogButtons',
   'compiled/jquery/mediaCommentThumbnail',
-  'tinymce.editor_box' /* editorBox */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.ba-tinypubsub' /* /\.publish\(/ */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
@@ -53,7 +52,9 @@ define([
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, RichContentEditor) {
+
+  RichContentEditor.preloadRemoteModule()
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -310,6 +311,7 @@ define([
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
+            .attr('rel', 'noreferrer')
             .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
             .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
         }).end()
@@ -478,22 +480,16 @@ define([
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox();
-      $editor.editorBox('focus', true);
-      if(wikiSidebar) {
-        wikiSidebar.attachToEditor($editor);
-        $("#sidebar_content").hide();
-        wikiSidebar.show();
-      }
+      RichContentEditor.initSidebar({
+        show: function() { $('#sidebar_content').hide() },
+        hide: function() { $('#sidebar_content').show() }
+      })
+      RichContentEditor.loadNewEditor($editor, { focus: true })
     }).bind('richTextEnd', function(event, $editor) {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox('destroy');
-      if(wikiSidebar) {
-        $("#sidebar_content").show();
-        wikiSidebar.hide();
-      }
+      RichContentEditor.destroyRCE($editor);
     });
 
     $(".cant_record_link").click(function(event) {
@@ -854,7 +850,7 @@ define([
       var $item = $(this).parents("li, div.topic_message").last();
       var $prevItem = $(this).closest('.to-do-list > li').prev()
       var toFocus = ($prevItem.find('.disable-todo-item-link').length && $prevItem.find('.disable-todo-item-link')) ||
-                    $('.event-list-view-calendar')
+                    $('.todo-list-header')
       var url = $(this).data('api-href');
       var flashMessage = $(this).data('flash-message');
       function remove(delete_url) {
@@ -889,6 +885,7 @@ define([
           .children("span.ui-icon-extlink").remove().end()
           .html('<span>' + $(this).html() + '</span>')
           .attr('target', '_blank')
+          .attr('rel', 'noreferrer')
           .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
       });
     }, 2000);

@@ -92,12 +92,15 @@ module SIS
         course.sis_source_id = course_id
         if !course.stuck_sis_fields.include?(:workflow_state)
           if status =~ /active/i
-            if course.workflow_state == 'completed'
+            case course.workflow_state
+            when 'completed'
               course.workflow_state = 'available'
               state_changes << :unconcluded
-            elsif course.workflow_state != 'available'
+            when 'deleted'
               course.workflow_state = 'claimed'
-              state_changes << :published
+              state_changes << :restored
+            when 'created', nil
+              course.workflow_state = 'claimed'
             end
           elsif status =~ /deleted/i
             course.workflow_state = 'deleted'

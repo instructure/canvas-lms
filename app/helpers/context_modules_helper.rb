@@ -17,11 +17,10 @@
 #
 
 module ContextModulesHelper
-  def cache_if_module(context_module, editable, differentiated_assignments, user, context, &block)
+  def cache_if_module(context_module, editable, user, context, &block)
     if context_module
-      visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_14_', context_module.cache_key, editable, true, Time.zone]
-      cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments
+      visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
+      cache_key_items = ['context_module_render_16_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
       if user
         # Our per-section things also needs to be checked in the cache -
         # both user sections and course tags, both of which may change

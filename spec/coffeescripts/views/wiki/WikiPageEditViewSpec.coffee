@@ -1,33 +1,35 @@
 define [
   'jquery'
+  'compiled/models/Assignment'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageEditView'
-  'wikiSidebar'
-], ($, WikiPage, WikiPageEditView, wikiSidebar) ->
+  'jsx/shared/rce/RichContentEditor',
+  'helpers/fixtures'
+  'helpers/editorUtils'
+  'helpers/fakeENV'
+], ($, Assignment, WikiPage, WikiPageEditView, RichContentEditor, fixtures, editorUtils, fakeENV) ->
+
 
   module 'WikiPageEditView:Init',
     setup: ->
-      @initStub = @stub(wikiSidebar, 'init')
-      @scrollSidebarStub = @stub($, 'scrollSidebar')
-      @attachWikiEditorStub = @stub(wikiSidebar, 'attachToEditor')
-      @attachWikiEditorStub.returns(show: ->)
+      @initSpy = sinon.spy(RichContentEditor, 'initSidebar')
+      @scrollSidebarStub = sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
+
     teardown: ->
+      RichContentEditor.initSidebar.restore()
+      WikiPageEditView.prototype.scrollSidebar.restore()
+      editorUtils.resetRCE()
       $(window).off('beforeunload')
 
   test 'init wiki sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
     wikiPageEditView.render()
-    ok @initStub.calledOnce, 'Called wikiSidebar init once'
+    ok @initSpy.calledOnce, 'Called richContentEditor.initSidebar once'
 
   test 'scroll sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
     wikiPageEditView.render()
     ok @scrollSidebarStub.calledOnce, 'Called scrollSidebar once'
-
-  test 'wiki body gets attached to the wikisidebar', ->
-    wikiPageEditView = new WikiPageEditView
-    wikiPageEditView.render()
-    ok @attachWikiEditorStub.calledOnce, 'Attached wikisidebar to body'
 
   test 'renders escaped angle brackets properly', ->
     body = "<p>&lt;E&gt;</p>"
@@ -36,14 +38,88 @@ define [
     view.render()
     equal view.$wikiPageBody.val(), body
 
+  test 'conditional content is hidden when disabled', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
 
-  module 'WikiPageEditView:UnsavedChanges'
+    conditionalToggle = view.$el.find('#conditional_content')
+    equal conditionalToggle.length, 0, 'Toggle is hidden'
+
+  module 'WikiPageEditView:ConditionalContent',
+    setup: ->
+      fakeENV.setup(CONDITIONAL_RELEASE_SERVICE_ENABLED: true)
+      sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
+
+    teardown: ->
+      fakeENV.teardown()
+      WikiPageEditView.prototype.scrollSidebar.restore()
+
+  test 'conditional content option hidden for insufficient rights', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        read: true
+      PAGE_RIGHTS:
+        read: true
+        update_content: true
+    view.render()
+
+    conditionalToggle = view.$el.find('#conditional_content')
+    equal conditionalToggle.length, 0, 'Toggle is hidden'
+
+  test 'conditional content option appears', ->
+    view = new WikiPageEditView
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    conditionalToggle = view.$el.find('#conditional_content')
+    equal conditionalToggle.length, 1, 'Toggle is visible'
+    equal conditionalToggle.prop('checked'), false, 'Toggle is unchecked'
+
+  test 'conditional content option appears populated', ->
+    wikiPage = new WikiPage
+      set_assignment: true
+      assignment: new Assignment
+        set_assignment: true
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    conditionalToggle = view.$el.find('#conditional_content')
+    equal conditionalToggle.prop('checked'), true, 'Toggle is checked'
+
+  test 'conditional content option does stuff', ->
+    wikiPage = new WikiPage
+    view = new WikiPageEditView
+      model: wikiPage
+      WIKI_RIGHTS:
+        manage: true
+    view.render()
+
+    conditionalToggle = view.$el.find('#conditional_content')
+    equal conditionalToggle.prop('checked'), false, 'Toggle is unchecked'
+    conditionalToggle.prop('checked', true)
+    assignment = view.getFormData().assignment
+    equal assignment.get('set_assignment'), '1', 'Sets assignment'
+    equal assignment.get('only_visible_to_overrides'), '1', 'Sets override visibility'
+
+  module 'WikiPageEditView:UnsavedChanges',
+    setup: ->
+      fixtures.setup()
+      sinon.stub(WikiPageEditView.prototype, 'scrollSidebar')
+
+    teardown: ->
+      fixtures.teardown()
+      WikiPageEditView.prototype.scrollSidebar.restore()
+      editorUtils.resetRCE()
+      $(window).off('beforeunload')
+
   setupUnsavedChangesTest = (test, attributes) ->
     setup = ->
-      @stub($, 'scrollSidebar')
-      @stub(wikiSidebar, 'init')
-      @stub(wikiSidebar, 'attachToEditor').returns(show: ->)
-
       @wikiPage = new WikiPage attributes
       @view = new WikiPageEditView model: @wikiPage
       @view.$el.appendTo('#fixtures')
@@ -52,7 +128,12 @@ define [
       @titleInput = @view.$el.find('[name=title]')
       @bodyInput = @view.$el.find('[name=body]')
 
-      # stub the 'is_dirty' command of the editorBox
+      # stub the 'is_dirty' RCE command. NOTE: this stubs only the editorBox
+      # version with the feature flag off. force these specs to start failing
+      # when run with the feature flag on, at which point this will need to be
+      # updated to stub remoteEditor instead
+      ok !@bodyInput.data('remoteEditor')
+      ok @bodyInput.data('rich_text')
       model = @wikiPage
       bodyInput = @bodyInput
       editorBox = bodyInput.editorBox
@@ -61,14 +142,6 @@ define [
           return bodyInput.val() != model.get('body')
         else
           editorBox.apply(this, arguments)
-
-      # extend the teardown function
-      teardown = @teardown
-      @teardown = ->
-        teardown.apply(this, arguments)
-
-        @view.remove()
-        $(window).off('beforeunload')
 
     setup.call(test, attributes)
 

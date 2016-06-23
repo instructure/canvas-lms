@@ -93,6 +93,25 @@ describe CollaborationsController do
       get 'index', :group_id => group.id
       expect(response).to be_success
     end
+
+    it "only returns collaborations that the user has access to read" do
+      user_session(@student)
+      collab1 = @course.collaborations.create!(
+        title: "inaccessible",
+        user: @teacher
+      ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+
+      collab2 = @course.collaborations.create!(
+        title: "accessible",
+        user: @student
+      ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+
+
+      get 'index', course_id: @course.id
+
+      expect(assigns[:collaborations]).to eq [collab2]
+    end
+
   end
 
   describe "GET 'show'" do
@@ -167,5 +186,58 @@ describe CollaborationsController do
       expect(assigns[:collaboration].collaboration_type).to eql('EtherPad')
       expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
     end
+
+    context "content_items" do
+
+      let(:content_items) do
+        [
+          {
+            title: 'my collab',
+            text: 'collab description',
+            url: 'http://example.invalid/test',
+            confirmUrl: 'http://example.com/confirm/343'
+          }
+        ]
+      end
+
+      it "should create a collaboration using content-item" do
+        user_session(@teacher)
+
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(assigns[:collaboration]).not_to be_nil
+        expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
+        expect(collaboration).to be_is_a(ExternalToolCollaboration)
+        expect(collaboration.title).to eq content_items.first[:title]
+        expect(collaboration.description).to eq content_items.first[:text]
+        expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+      end
+
+      it "callback url should not be nil if provided" do
+        user_session(@teacher)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = ExternalToolCollaboration.last
+        expect(collaboration.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
+      end
+
+      it "should callback on success" do
+        user_session(@teacher)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:success_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "should callback on failure" do
+        user_session(@teacher)
+        Collaboration.any_instance.expects(:save).returns(false)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:failure_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+    end
+
   end
 end

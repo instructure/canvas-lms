@@ -38,6 +38,7 @@ module Api::V1::PageView
       :real_user => json_hash.delete(:real_user_id),
       :account => json_hash.delete(:account_id),
     }
+    json_hash[:app_name] = page_view.app_name
     json_hash
   end
 end

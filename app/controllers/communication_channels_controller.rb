@@ -255,7 +255,7 @@ class CommunicationChannelsController < ApplicationController
       # load merge opportunities
       merge_users = cc.merge_candidates
       merge_users << @current_user if @current_user && !@user.registered? && !merge_users.include?(@current_user)
-      user_observers = UserObserver.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
+      user_observers = UserObserver.active.where("user_id = ? OR observer_id = ?", @user.id, @user.id)
       merge_users = merge_users.reject { |u| user_observers.any?{|uo| uo.user == u || uo.observer == u} }
       # remove users that don't have a pseudonym for this account, or one can't be created
       merge_users = merge_users.select { |u| u.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account) }
@@ -472,25 +472,48 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def bouncing_channel_report
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
-      res = BulkBounceCountResetter.new(bouncing_channel_args).bouncing_channel_report
-      send_data(res, type: 'text/csv')
+    generate_bulk_report do
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
     end
   end
 
   def bulk_reset_bounce_counts
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
-      resetter = BulkBounceCountResetter.new(bouncing_channel_args)
-      resetter.send_later(:bulk_reset_bounce_counts)
-      render json: {scheduled_reset_approximate_count: resetter.count}
+    perform_bulk_action do
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
+    end
+  end
+
+  def unconfirmed_channel_report
+    generate_bulk_report do
+      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
+    end
+  end
+
+  def bulk_confirm
+    perform_bulk_action do
+      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
     end
   end
 
   protected
-  def bouncing_channel_args
+  def bulk_action_args
     account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.slice(:after, :before, :pattern).symbolize_keys
+    args = params.slice(:after, :before, :pattern, :with_invalid_paths, :path_type).symbolize_keys
     args.merge!({account: account})
+  end
+
+  def generate_bulk_report
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      action = yield
+      send_data(action.report, type: 'text/csv')
+    end
+  end
+
+  def perform_bulk_action
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      action = yield
+      render json: action.perform!
+    end
   end
 
   def has_api_permissions?

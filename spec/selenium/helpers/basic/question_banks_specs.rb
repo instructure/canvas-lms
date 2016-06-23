@@ -58,11 +58,7 @@ shared_examples_for "question bank basic tests" do
     question_bank = add_question_bank
     f("#questions .delete_bank_link").click
     driver.switch_to.alert.accept
-    wait_for_ajaximations
-    question_bank.reload
-    keep_trying_until do
-      expect(question_bank.workflow_state).to eq "deleted"
-      expect(f("#questions .title")).to be_nil
-    end
+    keep_trying_until { question_bank.reload.workflow_state == "deleted" }
+    expect(f("#content")).not_to contain_css("#questions .title")
   end
 end

@@ -79,8 +79,8 @@ To manually generate a token for testing:
 <small><a href="#top">Back to Top</a></small>
 
 Your application can rely on canvas for a user's identity.  During step 1 of
-the web application flow below, specify the optional scopes parameter as
-scopes=/auth/userinfo.  When the user is asked to grant your application
+the web application flow below, specify the optional scope parameter as
+scope=/auth/userinfo.  When the user is asked to grant your application
 access in step 2 of the web application flow, they will also be given an
 option to remember their authorization.  If they grant access and remember
 the authorization, Canvas will skip step 2 of the request flow for future requests.

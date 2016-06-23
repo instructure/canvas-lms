@@ -26,7 +26,6 @@ class Login::SamlController < ApplicationController
   before_filter :fix_ms_office_redirects, only: :new
 
   def new
-    reset_session_for_login
     auth_redirect(aac)
   end
 
@@ -110,14 +109,12 @@ class Login::SamlController < ApplicationController
           return
         end
 
+        reset_session_for_login
+
         pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
 
         if pseudonym
-          # We have to reset the session again here -- it's possible to do a
-          # SAML login without hitting the #new action, depending on the
-          # school's setup.
-          reset_session_for_login
           # Successful login and we have a user
           @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
           user = pseudonym.login_assertions_for_user
@@ -130,7 +127,9 @@ class Login::SamlController < ApplicationController
 
           session[:saml_unique_id] = unique_id
           session[:name_id] = response.name_id
+          session[:name_identifier_format] = response.name_identifier_format
           session[:name_qualifier] = response.name_qualifier
+          session[:sp_name_qualifier] = response.sp_name_qualifier
           session[:session_index] = response.session_index
           session[:return_to] = params[:RelayState] if params[:RelayState] && params[:RelayState] =~ /\A\/(\z|[^\/])/
           session[:login_aac] = aac.id
@@ -201,6 +200,12 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
         aac.debug_set(:idp_logout_response_destination, saml_response.destination)
         aac.debug_set(:debugging, t('debug.logout_response_redirect_from_idp', "Received LogoutResponse from IdP"))
+      end
+
+      unless saml_response.success_status?
+        logger.error "Failed SAML LogoutResponse: #{saml_response.status_code}: #{saml_response.status_message}"
+        flash[:delegated_message] = t("There was a failure logging out at your IdP")
+        return redirect_to login_url
       end
 
       # for parent using self-registration to observe a student
@@ -312,9 +317,7 @@ class Login::SamlController < ApplicationController
     observee_unique_id = registration_data[:observee][:unique_id]
     observee = @domain_root_account.pseudonyms.by_unique_id(observee_unique_id).first.user
     unless @current_user.user_observees.where(user_id: observee).exists?
-      @current_user.user_observees.create! do |uo|
-        uo.user_id = observee.id
-      end
+      @current_user.user_observees.create_or_restore(user_id: observee)
       @current_user.touch
     end
   end
@@ -351,7 +354,7 @@ class Login::SamlController < ApplicationController
 
     # set the new user (observer) to observe the target user (observee)
     observee = @domain_root_account.pseudonyms.active.by_unique_id(observee_unique_id).first.user
-    user.user_observees << user.user_observees.create!{ |uo| uo.user_id = observee.id }
+    user.user_observees << user.user_observees.create_or_restore(user_id: observee)
 
     notify_policy = Users::CreationNotifyPolicy.new(false, unique_id: observer_unique_id)
     notify_policy.dispatch!(user, pseudonym, cc)

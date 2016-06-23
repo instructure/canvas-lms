@@ -153,19 +153,12 @@ module CanvasPartman
     end
 
     def find_and_load_migrations
-      ActiveRecord::Migrator.migrations(CanvasPartman.migrations_path).reduce([]) do |migrations, proxy|
-        if proxy.scope == CanvasPartman.migrations_scope
-          require(File.expand_path(proxy.filename))
+      ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths).map do |proxy|
+        next unless proxy.scope == CanvasPartman.migrations_scope
 
-          migration_klass = proxy.name.constantize
-
-          if migration_klass.base_class == base_class
-            migrations << migration_klass.new
-          end
-        end
-
-        migrations
-      end
+        migration = proxy.send(:migration)
+        migration.new if migration.base_class == base_class
+      end.compact
     end
 
     def execute(*args)

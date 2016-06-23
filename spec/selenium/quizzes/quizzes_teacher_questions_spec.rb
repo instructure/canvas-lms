@@ -46,7 +46,7 @@ describe "quizzes questions" do
 
       submit_form(question)
       question = f("#question_#{quest1.id}")
-      expect(question.find_element(:css, ".question_name").text).to eq 'edited question'
+      expect(question.find_element(:css, ".question_name").text).to include_text('edited question')
       f('#show_question_details').click
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
@@ -84,7 +84,7 @@ describe "quizzes questions" do
         f(".add_question .add_question_link").click
         ff("#questions .question_holder").length > 0
       end
-      expect(ff("#questions .question_holder option.missing_word").length).to eq 0
+      expect(f("#questions")).not_to contain_css(".question_holder option.missing_word")
     end
 
     it "should not show the display details for text questions", priority: "1", test_id: 209951 do

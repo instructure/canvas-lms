@@ -51,4 +51,8 @@ module Api::V1::Section
 
     res
   end
+
+  def sections_json(sections, user, session, includes = [])
+    sections.map { |s| section_json(s, user, session, includes) }
+  end
 end

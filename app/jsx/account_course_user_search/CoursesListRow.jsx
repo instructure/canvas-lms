@@ -1,11 +1,17 @@
 define([
   'jquery',
   "react",
+  "Backbone",
   "i18n!account_course_user_search",
   "underscore",
   "./UserLink",
   "compiled/views/courses/roster/CreateUsersView",
-], function($, React, I18n, _, UserLink, CreateUsersView) {
+  "compiled/collections/RosterUserCollection",
+  "compiled/collections/SectionCollection",
+  "compiled/collections/RolesCollection",
+  "compiled/models/Role",
+  "compiled/models/CreateUserList",
+], function($, React, {Model}, I18n, _, UserLink, CreateUsersView, RosterUserCollection, SectionCollection, RolesCollection, Role, CreateUserList) {
 
   var { number, string, func, shape, arrayOf } = React.PropTypes;
 
@@ -26,13 +32,58 @@ define([
     showMoreLink () {
       if (this.props.teachers.length > 2 && this.state.teachersToShow.length === 2) {
         return <a className="showMoreLink" href="#" onClick={this.showMoreTeachers}> {I18n.t('Show More')}</a>
-      } 
+      }
     },
     showMoreTeachers () {
       this.setState({teachersToShow: _.uniq(this.props.teachers, (t) => t.id)});
     },
     addUserToCourse () {
-      let createUsersBackboneView = new CreateUsersView({title: I18n.t('Add People'), height: 520});
+      const course = new Model({id: this.props.id});
+
+      const userCollection = new RosterUserCollection(null, {
+        course_id: this.props.id,
+        sections: new SectionCollection(this.props.sections),
+        params: {
+          include: ['avatar_url', 'enrollments', 'email', 'observed_users', 'can_be_removed'],
+          per_page: 50
+        }
+      });
+
+      userCollection.fetch();
+      userCollection.once('reset', () => {
+        userCollection.on('reset', () => {
+          const numUsers = userCollection.length;
+          let msg = "";
+          if (numUsers === 0) {
+            msg = I18n.t("No matching users found.");
+          }
+          else if (numUsers === 1) {
+            msg = I18n.t("1 user found.");
+          }
+          else {
+            msg = I18n.t("%{userCount} users found.", {userCount: numUsers});
+          }
+          $('#aria_alerts').empty().text(msg);
+        });
+      });
+
+      const createUsersViewParams = {
+        collection: userCollection,
+        rolesCollection: new RolesCollection(this.props.roles.map((role) => new Role(role))),
+        model: new CreateUserList({
+          sections: this.props.sections,
+          roles: this.props.roles,
+          readURL: this.props.urls.USER_LISTS_URL,
+          updateURL: this.props.urls.ENROLL_USERS_URL
+        }),
+        courseModel: course,
+        title: I18n.t('Add People'),
+        height: 520,
+        className: 'form-dialog'
+
+      };
+
+      let createUsersBackboneView = new CreateUsersView(createUsersViewParams);
       createUsersBackboneView.open();
       createUsersBackboneView.on('close', () => {
         createUsersBackboneView.remove()
@@ -70,9 +121,15 @@ define([
           </div>
           <div className="col-md-2" role='gridcell'>
             <div className="grid-row" style={{justifyContent: "flex-end"}}>
-              <a className="al-trigger-gray icon-plus" href="#" onClick={this.addUserToCourse}></a>
-              <a className="al-trigger-gray icon-stats" href={`/courses/${this.props.id}/statistics`}></a>
-              <a className="al-trigger-gray icon-settings" href={`/courses/${this.props.id}/settings`}></a>
+              <a className="al-trigger-gray icon-plus" href="#" onClick={this.addUserToCourse} role="button">
+                <span className="screenreader-only">{I18n.t("Add Users to %{name}", {name: this.props.name})}</span>
+              </a>
+              <a className="al-trigger-gray icon-stats" href={`/courses/${this.props.id}/statistics`}>
+                <span className="screenreader-only">{I18n.t("Go to statistics for %{name}", {name: this.props.name})}</span>
+              </a>
+              <a className="al-trigger-gray icon-settings" href={`/courses/${this.props.id}/settings`}>
+                <span className="screenreader-only">{I18n.t("Go to settings for %{name}", {name: this.props.name})}</span>
+              </a>
             </div>
           </div>
         </div>

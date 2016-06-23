@@ -14,9 +14,9 @@
   <% elsif @assignment.expects_submission? %>
     <div class="header">
       <% if @current_user_submission.has_submission? %>
-        <%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %>
+        <%= image_tag "graded.png", :alt => '' %> <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
-        <%= image_tag "not_graded.png" %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
+        <%= image_tag "not_graded.png", :alt => '' %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>
       <% end %>
     </div>
   <% end %>
@@ -59,7 +59,7 @@
         <% else %>
           <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
             :grade => @current_user_submission.grade,
-            :points_possible => @assignment.points_possible,
+            :points_possible => round_if_whole(@assignment.points_possible),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
           } %></div>
           <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {

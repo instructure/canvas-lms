@@ -19,8 +19,7 @@
 class ContentParticipationCount < ActiveRecord::Base
   attr_accessible :context, :user, :content_type, :unread_count
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  belongs_to :context, polymorphic: [:course]
   belongs_to :user
 
   def self.create_or_update(opts={})

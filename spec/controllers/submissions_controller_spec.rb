@@ -51,6 +51,21 @@ describe SubmissionsController do
       expect(assigns[:submission][:submission_type]).to eql("online_upload")
     end
 
+    it "should copy attachments to the submissions folder if that feature is enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @course.root_account.enable_feature! :submissions_folder
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+      att = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload", :attachment_ids => att.id}, :attachments => { "0" => { :uploaded_data => "" }, "-1" => { :uploaded_data => "" } }
+      expect(response).to be_redirect
+      expect(assigns[:submission]).not_to be_nil
+      att_copy = Attachment.find(assigns[:submission].attachment_ids.to_i)
+      expect(att_copy).not_to eq att
+      expect(att_copy.root_attachment).to eq att
+      expect(att).not_to be_associated_with_submission
+      expect(att_copy).to be_associated_with_submission
+    end
+
     it "should reject illegal file extensions from submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
@@ -90,9 +105,11 @@ describe SubmissionsController do
     it "should allow attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true)
-      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
+      att1 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/doc.doc", "application/msword", true))
+      att2 = attachment_model(:context => @user, :uploaded_data => fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true))
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id,
+           :submission => {:submission_type => "online_upload", :attachment_ids => [att1.id, att2.id].join(',')},
+           :attachments => {"0" => {:uploaded_data => "doc.doc"}, "1" => {:uploaded_data => "txt.txt"}}
       expect(response).to be_redirect
       expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].user_id).to eql(@user.id)
@@ -120,6 +137,36 @@ describe SubmissionsController do
       expect(response).to be_redirect
       expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].url).to eql("http://www.google.com")
+    end
+
+    it "should redirect to the assignment when locked in submit-at-deadline situation" do
+      enable_cache do
+        now = Time.now.utc
+        Timecop.freeze(now) do
+          course_with_student_logged_in(:active_all => true)
+          @assignment = @course.assignments.create!(
+            :title => "some assignment",
+            :submission_types => "online_url",
+            :lock_at => now + 5.seconds
+          )
+
+          # cache permission as true (for 5 minutes)
+          expect(@assignment.grants_right?(@student, :submit)).to be_truthy
+        end
+
+        # travel past due date (which resets the Assignment#locked_for? cache)
+        Timecop.freeze(now + 10.seconds) do
+          # now it's locked, but permission is cached, locked_for? is not
+          post 'create',
+            :course_id => @course.id,
+            :assignment_id => @assignment.id,
+            :submission => {
+              :submission_type => "online_url",
+              :url => " http://www.google.com "
+            }
+          expect(response).to be_redirect
+        end
+      end
     end
 
     describe 'when submitting a text response for the answer' do
@@ -432,14 +479,6 @@ describe SubmissionsController do
     end
   end
 
-  def course_with_student_and_submitted_homework
-      course_with_teacher_logged_in(:active_all => true)
-      @teacher = @user
-      student_in_course
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      @submission = @assignment.submit_homework(@user)
-  end
-
   describe "GET zip" do
     it "should zip and download" do
       course_with_student_and_submitted_homework
@@ -461,10 +500,82 @@ describe SubmissionsController do
     end
   end
 
-  describe "GET show" do
-    it "should not expose muted assignment's scores" do
+  describe 'GET /submissions/:id param routing', type: :request do
+    before do
       course_with_student_and_submitted_homework
+      @context = @course
+    end
 
+    describe "preview query param", type: :request do
+      it 'renders with submissions/previews#show if params is present and format is html' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1"
+        expect(request.params[:controller]).to eq 'submissions/previews'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with submissions#show if params is present and format is json' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1", format: :json
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with action #show if params is not present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+    end
+
+    describe "download query param", type: :request do
+      it 'renders with action #download if params is present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?download=12345"
+        expect(request.params[:controller]).to eq 'submissions/downloads'
+        expect(request.params[:action]).to eq 'show'
+      end
+
+      it 'renders with action #show if params is not present' do
+        get "/courses/#{@context.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        expect(request.params[:controller]).to eq 'submissions'
+        expect(request.params[:action]).to eq 'show'
+      end
+    end
+  end
+
+  describe "GET show" do
+    before do
+      course_with_student_and_submitted_homework
+      @context = @course
+      user_session(@teacher)
+    end
+
+    it "renders show template" do
+      get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+      expect(response).to render_template(:show)
+    end
+
+    it "renders json" do
+      request.accept = Mime::JSON.to_s
+      get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id, format: :json
+      expect(JSON.parse(response.body)['submission']['id']).to eq @submission.id
+    end
+
+    context "with user id not present in course" do
+      before(:once) do
+        course_with_student(active_all: true)
+      end
+
+      it "sets flash error" do
+        get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+        expect(flash[:error]).not_to be_nil
+      end
+
+      it "should redirect to context assignment url" do
+        get :show, course_id: @context.id, assignment_id: @assignment.id, id: @student.id
+        expect(response).to redirect_to(course_assignment_url(@context, @assignment))
+      end
+    end
+
+    it "should not expose muted assignment's scores" do
       get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
       expect(response).to be_success
 
@@ -474,38 +585,19 @@ describe SubmissionsController do
     end
 
     it "should show rubric assessments to peer reviewers" do
-      course_with_student_and_submitted_homework
-
-      @assessor = student_in_course.user
+      course_with_student(active_all: true)
+      @assessor = @student
       outcome_with_rubric
-      @association = @rubric.associate_with @assignment, @course, :purpose => 'grading'
+      @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
       @assignment.assign_peer_review(@assessor, @submission.user)
       @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading'})
       user_session(@assessor)
 
-      get "show", :id => @submission.to_param, :assignment_id => @assignment.to_param, :course_id => @course.to_param
+      get "show", :id => @submission.user.id, :assignment_id => @assignment.id, :course_id => @context.id
+
       expect(response).to be_success
 
       expect(assigns[:visible_rubric_assessments]).to eq [@assessment]
-    end
-
-    it "should redirect download requests with the download_frd parameter" do
-      # This is because the files controller looks for download_frd to indicate a forced download
-      course_with_teacher_logged_in
-      assignment = assignment_model(course: @course)
-      student_in_course
-      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
-      submission = submission_model(
-        course: @course,
-        assignment: assignment,
-        submission_type: "online_upload",
-        attachment_ids: att.id,
-        attachments: [att],
-        user: @student)
-      get 'show', assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id
-
-      expect(response).to be_redirect
-      expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
     end
   end
 
@@ -527,5 +619,42 @@ describe SubmissionsController do
       expect(response.response_code).to eq 400
     end
 
+  end
+
+  describe "copy_attachments_to_submissions_folder" do
+    before(:once) do
+      course_with_student
+      attachment_model(context: @student)
+    end
+
+    it "copies a user attachment into the user's submissions folder" do
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @student.submissions_folder(@course)
+    end
+
+    it "leaves files already in submissions folders alone" do
+      @attachment.folder = @student.submissions_folder(@course)
+      @attachment.save!
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts).to eq [@attachment]
+    end
+
+    it "copies a group attachment into the group submission folder" do
+      group_model(context: @course)
+      attachment_model(context: @group)
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @group.submissions_folder
+    end
+
+    it "leaves files in non user/group context alone" do
+      assignment_model(context: @course)
+      weird_file = @assignment.attachments.create! name: 'blah', uploaded_data: default_uploaded_data
+      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [weird_file])
+      expect(atts).to eq [weird_file]
+    end
   end
 end

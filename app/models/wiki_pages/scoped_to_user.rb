@@ -20,6 +20,13 @@ class WikiPages::ScopedToUser < ScopeFilter
   def scope
     # published API parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
     concat_scope { @relation.published unless can?(:view_unpublished_items) }
+    concat_scope do
+      wiki_context = context.is_a?(Wiki) ? context.context : context
+      if wiki_context.is_a?(Course) && wiki_context.feature_enabled?(:conditional_release)
+        return DifferentiableAssignment.scope_filter(@relation, user, wiki_context)
+      end
+      @relation
+    end
   end
 end
 

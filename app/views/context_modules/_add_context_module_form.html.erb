@@ -33,7 +33,7 @@
           <div id="criterion_blank_prereq" class="criterion clearfix" style="display: none;">
             <div class="prereq-req-item">
               <span class="prereq_desc"></span>
-              <span class="option"></span>
+              <div class="option"></div>
             </div>
             <div class="prereq-req-item-delete">
               <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>">
@@ -74,10 +74,10 @@
       <div id="criterion_blank_req" class="criterion clearfix" style="display: none;">
         <div class="prereq-req-item">
           <span class="prereq_desc"><%= t('must_complete_prerequisites', %{Must complete}) %></span>
-          <span class="option"></span>
+          <div class="option"></div>
         </div>
         <div class="prereq-req-item-delete">
-          <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('Delete requirement') %>" title="<%= t('Delete requirement') %>">
+          <button class="delete_criterion_link dim-till-hover Button" aria-label="<%= t('Delete requirement') %>" title="<%= t('Delete requirement') %>">
             <i class="icon-end standalone-icon"  alt="<%= t('remove icon') %>"></i>
           </button>
         </div>

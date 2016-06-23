@@ -22,7 +22,7 @@ define([
     handleKeydown(e) {
       // 188 is comma and 191 is forward slash
       var keyComboPressed = e.which === 188 || (e.which === 191 && e.shiftKey);
-      if (keyComboPressed && e.target.nodeName !== "INPUT") {
+      if (keyComboPressed && e.target.nodeName !== "INPUT" && e.target.nodeName !== "TEXTAREA") {
         e.preventDefault();
         this.setState({isOpen: !this.state.isOpen});
       }
@@ -31,7 +31,7 @@ define([
       if (this.props.shortcuts) {
         return this.props.shortcuts.map(function(shortcut) {
           return (
-            <li>
+            <li key={shortcut.keycode}>
               <span className="keycode">{shortcut.keycode}</span>
               <span className="colon">:</span>
               <span className="description">{shortcut.description}</span>

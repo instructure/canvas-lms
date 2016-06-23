@@ -159,6 +159,51 @@ describe "Groups API", type: :request do
     expect(json.first['id']).to eq @group.id
   end
 
+  it "should not show inactive users to students" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => 'New group')
+
+    inactive_user = user
+    enrollment = @course.enroll_student(inactive_user)
+    enrollment.deactivate
+    @group.add_user(inactive_user, 'accepted')
+
+    @course.enroll_student(user).accept!
+    @group.add_user(@user, 'accepted')
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to eq [@user.id]
+
+    enrollment.reactivate
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to match_array [@user.id, inactive_user.id]
+  end
+
+  it "should show inactive users to admins" do
+    course_with_teacher(:active_all => true)
+    @group = @course.groups.create!(:name => 'New group')
+
+    inactive_user = user
+    enrollment = @course.enroll_student(inactive_user)
+    enrollment.deactivate
+    @group.add_user(inactive_user, 'accepted')
+
+    @user = @teacher
+
+    json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
+      @category_path_options.merge(:action => 'context_index',
+        :course_id => @course.to_param, :include => ['users']))
+
+    expect(json.first['users'].map{|u| u['id']}).to eq [inactive_user.id]
+  end
+
   it "should allow listing all of an account's groups for account admins" do
     @account = Account.default
     sis_batch = @account.sis_batches.create

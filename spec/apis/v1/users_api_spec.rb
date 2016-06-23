@@ -52,6 +52,7 @@ describe Api::V1::User do
   before :each do
     @test_api = TestUserApi.new
     @test_api.services_enabled = []
+    @test_api.request.protocol = 'http'
   end
 
   context 'user_json' do
@@ -90,6 +91,57 @@ describe Api::V1::User do
           'login_id' => 'xyz',
           'sis_login_id' => 'xyz'
         })
+    end
+
+    it 'should show SIS data to sub account admins' do
+      student = User.create!(:name => 'User')
+      student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+
+      sub_account = Account.create!(:parent_account => Account.default)
+      sub_admin = account_admin_user(:account => sub_account)
+
+      course = sub_account.courses.create!
+
+      expect(@test_api.user_json(student, sub_admin, {}, [], course)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User',
+        'sis_user_id' => 'xyz',
+        'integration_id' => nil,
+        'login_id' => 'xyz',
+        'sis_login_id' => 'xyz'
+      })
+    end
+
+    it 'should show SIS data to teachers only in courses they are teachers in' do
+      student = User.create!(:name => 'User')
+      student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+
+      teacher = user
+      course1 = course(:active_all => true)
+      course1.enroll_user(teacher, "TeacherEnrollment").accept!
+      course2 = course(:active_all => true)
+      course2.enroll_user(teacher, "StudentEnrollment").accept!
+
+      expect(@test_api.user_json(student, teacher, {}, [], course1)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User',
+        'sis_user_id' => 'xyz',
+        'integration_id' => nil,
+        'login_id' => 'xyz',
+        'sis_login_id' => 'xyz'
+      })
+
+      expect(@test_api.user_json(student, teacher, {}, [], course2)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User'
+      })
+
     end
 
     it 'should use the SIS pseudonym instead of another pseudonym' do
@@ -182,7 +234,7 @@ describe Api::V1::User do
     def test_context(mock_context, context_to_pass)
       mock_context.expects(:account).returns(mock_context)
       mock_context.expects(:global_id).returns(42)
-      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       expect(if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
       else
@@ -216,7 +268,7 @@ describe Api::V1::User do
       @test_api.context = mock()
       @test_api.context.expects(:global_id).returns(42)
       @test_api.context.expects(:account).returns(@test_api.context)
-      @test_api.context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      @test_api.context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?).to eq true
     end
@@ -225,7 +277,7 @@ describe Api::V1::User do
       mock_context = mock()
       mock_context.expects(:global_id).returns(42)
       mock_context.expects(:account).returns(mock_context)
-      mock_context.expects(:grants_right?).with(@admin, :manage_students).returns(true)
+      mock_context.expects(:grants_any_right?).with(@admin, :manage_students, :read_sis).returns(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
     end
@@ -283,7 +335,7 @@ describe "Users API", type: :request do
         @timestamp = Time.zone.at(1.day.ago.to_i)
         page_view_model(:user => @student, :created_at => @timestamp - 1.day)
         page_view_model(:user => @student, :created_at => @timestamp + 1.day)
-        page_view_model(:user => @student, :created_at => @timestamp)
+        page_view_model(:user => @student, :created_at => @timestamp, developer_key: DeveloperKey.default)
       end
 
       it "should return page view history" do
@@ -293,6 +345,8 @@ describe "Users API", type: :request do
         expect(json.size).to eq 2
         json.each { |j| expect(j['url']).to eq "http://www.example.com/courses/1" }
         expect(json[0]['created_at']).to be > json[1]['created_at']
+        expect(json[0]['app_name']).to be_nil
+        expect(json[1]['app_name']).to eq 'User-Generated'
         expect(response.headers['Link']).to match /next/
         expect(response.headers['Link']).not_to match /last/
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
@@ -484,6 +538,19 @@ describe "Users API", type: :request do
         expect((user.keys & expected_keys).sort).to eq expected_keys.sort
         expect(users.map(&:id)).to include(user['id'])
       end
+    end
+
+    it "includes last login info" do
+      @account = Account.default
+      u = User.create!(name: 'test user')
+      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+      p.current_login_at = Time.now.utc
+      p.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
+
+      expect(json.count).to eq 1
+      expect(json.first['last_login']).to eq p.current_login_at.iso8601
     end
   end
 
@@ -985,7 +1052,8 @@ describe "Users API", type: :request do
           'login_id' => 'student@example.com',
           'email' => 'student@example.com',
           'sis_login_id' => 'student@example.com',
-          'locale' => 'en'
+          'locale' => 'en',
+          'time_zone' => "Tijuana"
         })
         expect(user.birthdate.to_date).to eq birthday.to_date
         expect(user.time_zone.name).to eql 'Tijuana'
@@ -1338,7 +1406,7 @@ describe "Users API", type: :request do
     end
   end
 
-  describe "user merge" do
+  describe "user merge and split" do
     before :once do
       @account = Account.default
       @user1 = user_with_managed_pseudonym(
@@ -1352,17 +1420,23 @@ describe "Users API", type: :request do
       @user = account_admin_user(account: @account)
     end
 
-    it "should merge users" do
-      json = api_call(
+    it "should merge and split users" do
+      api_call(
         :put, "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: @user2.to_param, destination_user_id: @user1.to_param }
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: @user2.to_param, destination_user_id: @user1.to_param}
       )
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user1.id
       expect(@user2.pseudonyms).to be_empty
+      api_call(
+        :post, "/api/v1/users/#{@user1.id}/split/",
+        {controller: 'users', action: 'split', format: 'json', id: @user1.to_param}
+      )
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_01').first.user_id).to eq @user1.id
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
-    it "should merge users cross accounts" do
+    it "should merge and split users cross accounts" do
       account = Account.create(name: 'new account')
       @user1.pseudonym.account_id = account.id
       @user1.pseudonym.save!
@@ -1371,14 +1445,20 @@ describe "Users API", type: :request do
       api_call(
         :put,
         "/api/v1/users/sis_user_id:user_sis_id_02/merge_into/accounts/#{account.id}/users/sis_user_id:user_sis_id_01",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: 'sis_user_id:user_sis_id_02',
-          destination_user_id: 'sis_user_id:user_sis_id_01',
-          destination_account_id: account.to_param
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: 'sis_user_id:user_sis_id_02',
+         destination_user_id: 'sis_user_id:user_sis_id_01',
+         destination_account_id: account.to_param
         }
       )
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user1.id
       expect(@user2.pseudonyms).to be_empty
+      api_call(
+        :post, "/api/v1/users/#{@user1.id}/split/",
+        {controller: 'users', action: 'split', format: 'json', id: @user1.to_param}
+      )
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_01').first.user_id).to eq @user1.id
+      expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
     it "should fail to merge users cross accounts without permissions" do
@@ -1389,10 +1469,16 @@ describe "Users API", type: :request do
       raw_api_call(
         :put,
         "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
-        { controller: 'users', action: 'merge_into', format: 'json',
-          id: @user2.to_param, destination_user_id: @user1.to_param}
+        {controller: 'users', action: 'merge_into', format: 'json',
+         id: @user2.to_param, destination_user_id: @user1.to_param}
       )
       assert_status(401)
+    end
+
+    it "should fail to split users that have not been merged" do
+      raw_api_call(:post, "/api/v1/users/#{@user2.id}/split/",
+                   {controller: 'users', action: 'split', format: 'json', id: @user2.to_param})
+      assert_status(400)
     end
   end
 

@@ -5,18 +5,11 @@ define(function(require) {
   // var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');
   var QuestionHeader = require('jsx!./header');
   var I18n = require('i18n!quiz_statistics');
+  var AnswerTable = require('jsx!./answer_table');
 
   var Essay = React.createClass({
     render: function() {
       var props = this.props;
-      // var correctResponseRatio;
-      //
-      // if (props.participantCount <= 0) {
-      //   correctResponseRatio = 0;
-      // }
-      // else {
-      //   correctResponseRatio = props.fullCredit / props.participantCount;
-      // }
 
       return(
         <Question>
@@ -38,12 +31,10 @@ define(function(require) {
           </div>
           <div className="grid-row">
             <div className="col-sm-8 question-bottom-left">
-              { /* TODO: render an essay specific answer table here */ }
+              <AnswerTable answers={this.props.answers} useAnswerBuckets={true} />
               {this.renderLinkButton()}
             </div>
-            <div className="col-sm-4 question-bottom-right">
-              {/* <CorrectAnswerDonut correctResponseRatio={correctResponseRatio} /> */ }
-            </div>
+            <div className="col-sm-4 question-bottom-right"></div>
           </div>
         </Question>
       );

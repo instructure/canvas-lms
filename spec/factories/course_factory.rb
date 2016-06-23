@@ -29,10 +29,6 @@ def course(opts={})
       e.save!
       @teacher = u
     end
-    if opts[:differentiated_assignments]
-      account.allow_feature!(:differentiated_assignments)
-      @course.enable_feature!(:differentiated_assignments)
-    end
     create_grading_periods_for(@course, opts) if opts[:grading_periods]
   end
   @course
@@ -157,3 +153,18 @@ def create_courses(records, options = {})
   end
   course_data
 end
+
+def course_with_student_and_submitted_homework
+  course_with_teacher_logged_in(active_all: true)
+  @teacher = @user
+  student_in_course(active_all: true)
+  @assignment = @course.assignments.create!({
+    title: "some assignment",
+    submission_types: "online_url,online_upload"
+  })
+  @submission = @assignment.submit_homework(@user, {
+    submission_type: "online_url",
+    url: "http://www.google.com"
+  })
+end
+

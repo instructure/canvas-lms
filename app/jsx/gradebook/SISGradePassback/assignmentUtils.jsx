@@ -45,6 +45,15 @@ define([
       return assignments.some(_.partial(assignmentUtils.namesMatch, a))
     },
 
+    noDueDateForEveryoneElseOverride(a) {
+      var has_overrides = a.overrides != undefined ? a.overrides.length > 0 : false
+      if(has_overrides && a.overrides.length != a.sectionCount && !a.due_at){
+        return true
+      } else {
+        return false
+      }
+    },
+
     withOriginalErrors (assignments) {
       // This logic handles an assignment with multiple overrides
       // because #setGradeBookAssignments runs on load
@@ -56,13 +65,25 @@ define([
       // for the invalid override on the assignment.
       _.each(assignments, (a) => {
           if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == true && a.overrideForThisSection.due_at != null){a.original_error = false}
-          else if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == false && a.overrideForThisSection.due_at == null){a.original_error = true}
+          else if(a.overrideForThisSection != undefined && a.recentlyUpdated != undefined && a.recentlyUpdated == false && a.overrideForThisSection.due_at == null){a.original_error = true} 
+          //for handling original error detection of a valid override for one section and an invalid override for another section 
+          else if(a.overrideForThisSection != undefined && a.overrideForThisSection.due_at != null && !assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.recentlyUpdated == false && a.hadOriginalErrors == false){a.original_error = false}
+          //for handling original error detection of a valid override for one section and the EveryoneElse "override" scenario  
+          else if(a.overrideForThisSection != undefined && a.overrideForThisSection.due_at != null && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id && a.recentlyUpdated == false && a.hadOriginalErrors == false){a.original_error = false}
+          //for handling original error detection of an override for one section and the EveryoneElse "override" scenario but the second section is currentlySelected and IS NOT valid
+          else if(a.overrideForThisSection == undefined && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.due_at == null && a.currentlySelected.id.toString() == a.selectedSectionForEveryone){a.original_error = true}
+          //for handling original error detection of an override for one section and the EveryoneElse "override" scenario but the second section is currentlySelected and IS valid
+          else if(a.overrideForThisSection == undefined && a.due_at != null && a.currentlySelected.id.toString() == a.selectedSectionForEveryone && a.hadOriginalErrors == false){a.original_error = false}
+          //for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS NOT valid
+          else if(a.overrideForThisSection == undefined && assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.due_at == null && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone){a.original_error = true}
+          //for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS valid    
+          else if(a.overrideForThisSection == undefined && a.due_at != null && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone && a.hadOriginalErrors == false){a.original_error = false} 
       });
-      return _.filter(assignments, (a) => a.original_error)
+      return _.filter(assignments, (a) => a.original_error && !a.please_ignore)
     },
 
     withOriginalErrorsNotIgnored (assignments) {
-      return _.filter(assignments, (a) => a.original_error && !a.please_ignore)
+      return _.filter(assignments, function(a){ return (a.original_error || a.hadOriginalErrors) && !a.please_ignore})
     },
 
     withErrors (assignments) {
@@ -96,7 +117,22 @@ define([
 
       ////Override missing due_at
       var has_this_override = a.overrideForThisSection != undefined
-      if(has_this_override && a.overrideForThisSection.due_at == null) return true
+      if(has_this_override && a.overrideForThisSection.due_at == null && a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id) return true  
+
+      ////Override missing due_at while currentlySelecteed is at the course level
+      if(has_this_override && a.overrideForThisSection.due_at == null && a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id) return true
+
+      ////Has one override and another override for 'Everyone Else'
+      ////
+      ////The override for 'Everyone Else' isn't really an override and references
+      ////the assignments actual due_at. So we must check for this behavior 
+      if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.currentlySelected != undefined && a.overrideForThisSection != undefined && a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id) return true
+
+      ////Has only one override but the section that is currently selected does not have an override thus causing the assignment to have due_at that is null making it invalid
+      if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.overrideForThisSection == undefined && a.currentlySelected != undefined && a.currentlySelected.id.toString() == a.selectedSectionForEveryone) return true
+      
+      ////'Everyone Else' scenario and the course is currentlySelected but due_at is null making it invalid
+      if(assignmentUtils.noDueDateForEveryoneElseOverride(a) && a.overrideForThisSection == undefined && a.currentlySelected != undefined && a.currentlySelected.type == 'course' && a.currentlySelected.id.toString() != a.selectedSectionForEveryone) return true
 
       ////Passes all tests, looks good.
       return false
@@ -109,6 +145,8 @@ define([
     saveAssignmentToCanvas (course_id, assignment) {
       // if the date on an override is being updated confirm by checking if the due_at is an object
       if(assignment.overrideForThisSection != undefined && typeof(assignment.overrideForThisSection.due_at) == "object") {
+        //allows the validation process to determine when it has been updated and can display the correct page
+        assignment.hadOriginalErrors = false
         var url = '/api/v1/courses/' + course_id + '/assignments/' + assignment.id + '/overrides/' + assignment.overrideForThisSection.id
         //sets up form data to allow a single override to be updated
         var fd = new FormData();
@@ -145,6 +183,8 @@ define([
         })
       }
       else {
+        //allows the validation process to determine when it has been updated and can display the correct page
+        assignment.hadOriginalErrors = false
         var url = '/api/v1/courses/' + course_id + '/assignments/' + assignment.id
         var data = { assignment: {
           name: assignment.name,

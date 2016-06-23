@@ -102,6 +102,7 @@ class AccountsController < ApplicationController
   before_filter :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
+  include CustomSidebarLinksHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
 
@@ -185,21 +186,38 @@ class AccountsController < ApplicationController
   end
 
   def course_user_search
-    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    return unless authorized_action(@account, @current_user, :read)
+    can_read_course_list = !@account.site_admin? && @account.grants_right?(@current_user, session, :read_course_list)
     can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+    can_manage_account = @account.grants_right?(@current_user, session, :manage_account_settings)
 
     unless can_read_course_list || can_read_roster
       return render_unauthorized_action
     end
 
     @permissions = {
-      theme_editor: use_new_styles? && can_do(@account, @current_user, :manage_account_settings) && @account.branding_allowed?,
+      theme_editor: use_new_styles? && can_manage_account && @account.branding_allowed?,
       can_read_course_list: can_read_course_list,
       can_read_roster: can_read_roster,
       can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
       can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins),
-      analytics: @account.service_enabled?(:analytics)
+      analytics: @account.service_enabled?(:analytics),
+      can_masquerade: @account.grants_right?(@current_user, session, :become_user),
+      can_message_users: @account.grants_right?(@current_user, session, :send_messages),
+      can_edit_users: @account.grants_any_right?(@current_user, session, :manage_students, :manage_user_logins)
     }
+
+    js_env({
+      TIMEZONES: {
+        priority_zones: localized_timezones(I18nTimeZone.us_zones),
+        timezones: localized_timezones(I18nTimeZone.all)
+      },
+      ALL_ROLES: Role.account_role_data(@account, @current_user),
+      URLS: {
+        USER_LISTS_URL: course_user_lists_url("{{ id }}"),
+        ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
+      }
+    })
     render template: "accounts/course_user_search"
   end
 
@@ -388,9 +406,12 @@ class AccountsController < ApplicationController
       unauthorized = false
 
       # account settings (:manage_account_settings)
-      account_settings = account_params.select {|k, v| [:name, :default_time_zone].include?(k.to_sym)}.with_indifferent_access
+      account_settings = account_params.select {|k, v| [:name, :default_time_zone, :settings].include?(k.to_sym)}.with_indifferent_access
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
+          if account_settings[:settings]
+            account_settings[:settings].slice!(:restrict_student_past_view, :restrict_student_future_view, :restrict_student_future_listing)
+          end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
@@ -459,11 +480,23 @@ class AccountsController < ApplicationController
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
-  # @argument account[settings][restrict_student_past_view] [Boolean]
+  # @argument account[settings][restrict_student_past_view][value] [Boolean]
   #   Restrict students from viewing courses after end date
   #
-  # @argument account[settings][restrict_student_future_view] [Boolean]
+  # @argument account[settings][restrict_student_past_view][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][restrict_student_future_view][value] [Boolean]
   #   Restrict students from viewing courses before start date
+  #
+  # @argument account[settings][restrict_student_future_view][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][restrict_student_future_listing][value] [Boolean]
+  #   Restrict students from viewing future enrollments in course list
+  #
+  # @argument account[settings][restrict_student_future_listing][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \
@@ -609,13 +642,14 @@ class AccountsController < ApplicationController
       @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
       @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map{|role| {:id => role.id, :label => role.label}}
 
-      @announcements = @account.announcements
+      @announcements = @account.announcements.order(:created_at).paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       js_env({
         APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
         LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
-        CONTEXT_BASE_URL: "/accounts/#{@context.id}"
+        CONTEXT_BASE_URL: "/accounts/#{@context.id}",
+        MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5)
       })
     end
   end
@@ -798,7 +832,7 @@ class AccountsController < ApplicationController
   end
 
   def sis_import
-    if authorized_action(@account, @current_user, :manage_sis)
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
       @current_batch = @account.current_sis_batch
       @last_batch = @account.sis_batches.order('created_at DESC').first
@@ -875,8 +909,9 @@ class AccountsController < ApplicationController
     end
 
     list = UserList.new(params[:user_list],
-                        :root_account => @context.root_account,
-                        :search_method => @context.user_list_search_mode_for(@current_user))
+                        root_account: @context.root_account,
+                        search_method: @context.user_list_search_mode_for(@current_user),
+                        current_user: @current_user)
     users = list.users
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
@@ -951,6 +986,16 @@ class AccountsController < ApplicationController
 
   protected
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account))
+    rce_js_env(:basic)
   end
+
+  def localized_timezones(timezones)
+    timezones.map do |timezone|
+      {
+        name: timezone.name,
+        localized_name: timezone.to_s
+      }
+    end
+  end
+  private :localized_timezones
 end

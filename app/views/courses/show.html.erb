@@ -77,6 +77,10 @@
           <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
           </a>
         <% end %>
+
+        <% course_custom_links.each do |link| %>
+          <a class="btn button-sidebar-wide" href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+        <% end %>
       </div>
     <% end %>
 
@@ -116,7 +120,7 @@
     <% end %>
   <% end %>
   <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true, :period => :two_weeks} %>
+    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
   <% end %>
 <% end %>
 
@@ -141,6 +145,7 @@
 
 <% js_bundle 'legacy/courses_show' %>
 <% if @context.created? || @context.claimed? %>
+  <% css_bundle("reminder_course_setup") %>
   <div class="reminder Reminder__course-setup">
     <h2 class="Reminder__course-setup-title">
       <%= t('headings.unpublished', %{This Course is Unpublished}) %>
@@ -150,7 +155,7 @@
       </span>
     </h2>
     <div class="body Reminder__course-setup-body">
-      <p>Need help setting up your course?</p>
+      <p><%= t('Need help setting up your course?') %></p>
       <br/>
       <a href="#" class="btn btn-primary wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
         <%= t("Setup Checklist") %>

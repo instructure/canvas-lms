@@ -140,17 +140,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'html5_first_videos' =>
-    {
-      display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },
-      description: -> { I18n.t('html5_first_videos_description', <<-END) },
-By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
-then fall back to Flash.
-END
-      applies_to: 'RootAccount',
-      state: 'on',
-      beta: false
-    },
     'high_contrast' =>
     {
       display_name: -> { I18n.t('features.high_contrast', 'High Contrast UI') },
@@ -222,28 +211,6 @@ END
       state: 'hidden',
       root_opt_in: true,
       beta: true
-    },
-    'student_groups_next' =>
-    {
-      display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
-      description:  -> { I18n.t('student_groups_desc', <<-END) },
-This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
-experience.
-END
-      applies_to: 'RootAccount',
-      state: 'on'
-    },
-    'better_file_browsing' =>
-    {
-      display_name: -> { I18n.t('features.better_file_browsing', 'Better File Browsing') },
-      description:  -> { I18n.t('better_file_browsing_description', <<-END) },
-A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
-then all of the users in that course will see the new interface.  To get it to show up when someone
-goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
-END
-
-      applies_to: 'Course',
-      state: 'on'
     },
     'allow_opt_out_of_inbox' =>
     {
@@ -356,7 +323,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false
     },
     'use_new_tree' =>
@@ -367,6 +334,16 @@ END
       state: 'hidden',
       development: true,
       root_opt_in: true
+    },
+    'course_card_images' =>
+    {
+      display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
+      description: -> {I18n.t('Allow course images to be assigned to a course and used on the dashboard cards.')},
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true,
+      beta: true
     },
     'gradebook_performance' => {
       display_name: -> { I18n.t('Gradebook Performance') },
@@ -387,13 +364,6 @@ END
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      root_opt_in: true
-    },
-    'international_sms_from_recipient_country' => {
-      display_name: -> { I18n.t("International SMS - Send from Recipient's Country") },
-      description: -> { I18n.t("Sends international text messages from a phone number in the recipient's country, if possible.") },
-      applies_to: 'RootAccount',
-      state: 'on',
       root_opt_in: true
     },
     'all_grading_periods_totals' =>
@@ -417,6 +387,26 @@ END
       display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
       description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
       applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      development: false,
+      root_opt_in: false
+    },
+    'rich_content_service_with_sidebar' =>
+    {
+      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar') },
+      description: -> { I18n.t('In cases where it is available, load the RCE and the wiki sidebar from a canvas rich content service') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: false,
+      root_opt_in: false
+    },
+    'rich_content_service_high_risk' =>
+    {
+      display_name: -> { I18n.t('Use remote version of Rich Content Editor AND sidebar in high-risk areas like quizzes') },
+      description: -> { I18n.t('Always load the RCE and Sidebar from a canvas rich content service everywhere') },
+      applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
       development: false,
@@ -432,6 +422,14 @@ END
       development: true,
       root_opt_in: false,
     },
+    'wrap_calendar_event_titles' =>
+    {
+      display_name: -> { I18n.t('Wrap event titles in Calendar month view') },
+      description: -> { I18n.t("Show calendar events in the month view on multiple lines if the title doesn't fit on a single line") },
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true
+    }
   )
 
   def self.definitions

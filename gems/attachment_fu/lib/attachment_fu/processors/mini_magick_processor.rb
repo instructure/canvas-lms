@@ -45,6 +45,9 @@ module AttachmentFu # :nodoc:
         img.combine_options do |commands|
           commands.strip unless attachment_options[:keep_profile]
 
+          commands.limit("area", "100MB")
+          commands.limit("disk", "1000MB") # because arbitrary numbers are arbitrary
+
           # gif are not handled correct, this is a hack, but it seems to work.
           if img[:format] =~ /GIF/
             img.format("png")

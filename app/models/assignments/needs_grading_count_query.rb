@@ -10,10 +10,6 @@ module Assignments
         @user = _user
       end
 
-      def da_enabled?
-        @da_enabled ||= course.feature_enabled?(:differentiated_assignments)
-      end
-
       def section_visibilities
         @section_visibilities ||= course.section_visibilities_for(user)
       end
@@ -29,7 +25,7 @@ module Assignments
 
     attr_reader :assignment, :user, :course_proxy
 
-    delegate :course, :da_enabled?, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
+    delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
 
     def initialize(_assignment, _user, _course_proxy=nil)
       @assignment = _assignment
@@ -46,7 +42,7 @@ module Assignments
           else
             case visibility_level
             when :full, :limited
-              da_enabled? ? manual_count : assignment.needs_grading_count
+              manual_count
             when :sections
               section_filtered_submissions.count(:id, distinct: true)
             else
@@ -130,11 +126,9 @@ module Assignments
               AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)))
         SQL
 
-      if da_enabled?
-        string += <<-SQL
-          AND EXISTS (SELECT * FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
-        SQL
-      end
+      string += <<-SQL
+        AND EXISTS (SELECT * FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
+      SQL
       joined_submissions.where(string, assignment, course)
     end
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2016-2-8: Created with FontForge (http://fontforge.org)
+2016-4-14: Created with FontForge (http://fontforge.org)
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20150504 at Mon Feb  8 10:39:07 2016
+Created by FontForge 20150504 at Thu Apr 14 16:00:05 2016
  By Pam Hiett
 Copyright (c) 2016, Pam Hiett
 </metadata>
@@ -19,10 +19,10 @@ Copyright (c) 2016, Pam Hiett
     panose-1="2 0 5 3 0 0 0 0 0 0"
     ascent="448"
     descent="-64"
-    bbox="-1.71191 -64.416 513.008 449.392"
+    bbox="-1.71191 -64.416 513.729 449.392"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+0020-F1BA"
+    unicode-range="U+0020-F1BB"
   />
     <missing-glyph />
     <glyph glyph-name="space" unicode=" " horiz-adv-x="200" 
@@ -725,6 +725,10 @@ d="M203 -15c-3.59961 -3.7002 -8 -5.5 -13 -6c-4.7002 -0.599609 -10.4004 1 -15 5l-
     <glyph glyph-name="uniF118" unicode="&#xf118;" 
 d="M27.9043 127.952h-0.0166016v57.0078h456.177v-57.0078h-456.16zM156.192 -43.0879v-0.015625l99.8076 115.039l99.7441 -115.023h-199.552zM27.9043 413.056h-0.0166016h456.177v-57.0234h-456.16v57.0234zM27.9043 241.984l-0.0166016 0.015625v57.0078h456.177
 v-57.0234h-456.16z" />
+    <glyph glyph-name="uniF1BB" unicode="&#xf1bb;" 
+d="M513.729 261.189l-117.621 -128l20.7568 -172.974l-159.136 74.3789l-159.135 -74.3789l20.7568 172.974l-119.352 128l172.973 34.5947l83.0273 152.216l86.4863 -153.946zM262.919 58.8105l122.811 -57.0811l-17.2969 134.919l-1.72949 6.91895l5.18848 5.18945
+l93.4053 98.5947l-133.188 25.9453l-6.91895 1.73047l-3.45996 6.91895l-65.7295 119.351l-65.7295 -119.351l-5.18945 -5.18945l-6.91895 -1.72949l-133.189 -25.9463l93.4053 -100.324l5.18945 -5.18945l-1.72949 -6.91895l-15.5674 -134.919l124.54 57.0811
+l6.91895 3.45996z" />
     <glyph glyph-name="uniF12E" unicode="&#xf12e;" 
 d="M256 416c123.712 0 224 -100.288 224 -224s-100.288 -224 -224 -224s-224 100.288 -224 224s100.288 224 224 224zM396 108l-84 84l84 84l-56 56l-84 -84l-84 84l-56 -56l84 -84l-84 -84l56 -56l84 84l84 -84z" />
     <glyph glyph-name="uniF15A" unicode="&#xf15a;" 

@@ -219,5 +219,67 @@ describe 'Account Notification API', type: :request do
     end
   end
 
+  describe 'update' do
+    before :each do
+      @notification = account_notification(message: 'default')
+      @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications/#{@notification.id}"
+      @api_params = { :controller => 'account_notifications',
+                      :action => 'update',
+                      :format => 'json',
+                      :account_id => @admin.account.id.to_s,
+                      :id => @notification.id.to_s }
+      @start_at = Time.zone.now
+      @end_at = Time.zone.now + 1.day
+    end
+
+    it 'should return not authorized for non admin user' do
+      user = user_with_managed_pseudonym
+      api_call_as_user(user, :put, @path, @api_params,
+                        { :account_notification_roles => ['StudentEnrollment'],
+                          :account_notification => {
+                            :subject => 'update a global notification',
+                            :start_at => @start_at.iso8601,
+                            :end_at => @end_at.iso8601,
+                            :message => 'This is a notification'}},
+                        {},
+                        expected_status: 401)
+    end
+
+    it 'should update an existing account notification' do
+      raw_api_call(:put, @path, @api_params,
+                   { :account_notification => {
+                       :subject => 'updated global notification',
+                       :start_at => @start_at.iso8601,
+                       :end_at => @end_at.iso8601,
+                       :message => 'This is an updated notification',
+                       :icon => 'warning'}})
+      @notification.reload
+      expect(@notification.subject).to eq('updated global notification')
+      expect(@notification.start_at).to eq(@start_at.iso8601)
+      expect(@notification.end_at).to eq(@end_at.iso8601)
+      expect(@notification.message).to eq('This is an updated notification')
+      expect(@notification.icon).to eq('warning')
+    end
+
+    it 'should update an account notification for specific roles using role names' do
+      student_role = @account.get_role_by_name('StudentEnrollment')
+      existing_roles = [student_role]
+      @notification.account_notification_roles.build(existing_roles.map{|r| {:role => r}})
+      @notification.save
+      raw_api_call(:put, @path, @api_params,
+                       { :account_notification_roles => ['TeacherEnrollment'],
+                         :account_notification => {
+                           :subject => 'added role to global notification',
+                           :start_at => @start_at.iso8601,
+                           :end_at => @end_at.iso8601,
+                           :message => 'This is a notification'}})
+      @notification.reload
+      notification_roles = @notification.account_notification_roles
+      expect(@notification.subject).to eq('added role to global notification')
+      role_names = notification_roles.map {|r| r.role.name}
+      expect(role_names).not_to include("StudentEnrollment")
+      expect(role_names).to include("TeacherEnrollment")
+    end
+  end
 end
 

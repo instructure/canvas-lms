@@ -50,14 +50,14 @@ define([
     if (Renderer) {
       var key = columnData.columnType + cellDataKey;
       return (<GridCell
-                cellIndex={cellIndex++}
                 activeCell={columnData.activeCell}
-                setActiveCell={columnData.setActiveCell}
+                cellIndex={cellIndex++}
                 columnData={columnData}
-                renderer={Renderer}
                 cellData={cellData}
+                key={key}
+                renderer={Renderer}
                 rowData={rowData}
-                key={key}/>);
+                setActiveCell={columnData.setActiveCell}/>);
     } else {
       var message = 'Cell Renderer Not Registered. ' +
         'Register "' + columnData.columnType +

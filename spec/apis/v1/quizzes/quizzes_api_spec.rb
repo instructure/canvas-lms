@@ -740,62 +740,41 @@ describe Quizzes::QuizzesApiController, type: :request do
       @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
     end
 
-    context "feature flag on" do
-      before {@course.enable_feature!(:differentiated_assignments)}
-      it "lets the teacher see all quizzes" do
-        @user = @teacher
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
-
-      it "lets students with visibility see quizzes" do
-        @user = @student_with_override
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
-
-      it 'gives observers the same visibility as their student' do
-        @user = @observer
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
-
-      it 'observers without students see all' do
-        @observer_enrollment.update_attribute(:associated_user_id, nil)
-        @user = @observer
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q)}
-      end
-
-      it "restricts access to students without visibility" do
-        @user = @student_without_override
-        calls_do_not_show_quiz(@quiz_with_restricted_access)
-        calls_display_quiz(@quiz_visible_to_all)
-      end
-
-      it "doesnt show extra assignments with overrides in the index" do
-        @quiz_assigned_to_empty_section = create_quiz_for_da(title: "assigned to none", only_visible_to_overrides: true)
-        @unassigned_section = @course.course_sections.create!(name: "unassigned section")
-        create_section_override_for_quiz(@quiz_assigned_to_empty_section, {course_section: @unassigned_section})
-
-        @user = @student_with_override
-        get_index(@course)
-        expect(JSON.parse(response.body).to_s).not_to include("#{@quiz_assigned_to_empty_section.title}")
-      end
+    it "lets the teacher see all quizzes" do
+      @user = @teacher
+      [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
     end
 
-    context "feature flag off" do
-      before {@course.disable_feature!(:differentiated_assignments)}
-      it "lets the teacher see all quizzes" do
-        @user = @teacher
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
+    it "lets students with visibility see quizzes" do
+      @user = @student_with_override
+      [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+    end
 
-      it "lets students with visibility see quizzes" do
-        @user = @student_with_override
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
+    it 'gives observers the same visibility as their student' do
+      @user = @observer
+      [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
+    end
 
-      it "does not restrict access to students without visibility" do
-        @user = @student_without_override
-        [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q) }
-      end
+    it 'observers without students see all' do
+      @observer_enrollment.update_attribute(:associated_user_id, nil)
+      @user = @observer
+      [@quiz_with_restricted_access,@quiz_visible_to_all].each{|q| calls_display_quiz(q)}
+    end
+
+    it "restricts access to students without visibility" do
+      @user = @student_without_override
+      calls_do_not_show_quiz(@quiz_with_restricted_access)
+      calls_display_quiz(@quiz_visible_to_all)
+    end
+
+    it "doesnt show extra assignments with overrides in the index" do
+      @quiz_assigned_to_empty_section = create_quiz_for_da(title: "assigned to none", only_visible_to_overrides: true)
+      @unassigned_section = @course.course_sections.create!(name: "unassigned section")
+      create_section_override_for_quiz(@quiz_assigned_to_empty_section, {course_section: @unassigned_section})
+
+      @user = @student_with_override
+      get_index(@course)
+      expect(JSON.parse(response.body).to_s).not_to include("#{@quiz_assigned_to_empty_section.title}")
     end
   end
 end

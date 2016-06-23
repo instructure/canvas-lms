@@ -698,5 +698,27 @@ describe ConversationsController do
         expect(ids.length).to eq 2
       end
     end
+
+    describe "show" do
+      it "should find conversations across shards" do
+        users = []
+        users << user(:name => 'a')
+        @shard1.activate { users << user(:name => 'b') }
+
+        @shard1.activate do
+          @conversation = Conversation.initiate(users, false)
+          users.each do |user|
+            @conversation.add_message(user, "user '#{user.name}' says HI")
+          end
+        end
+        expect(@conversation.shard).to eq @shard1
+
+        users.each do |user|
+          user_session(user) # should work for both users
+          get 'show', :id => @conversation.global_id, :format => 'json'
+          expect(response).to be_success
+        end
+      end
+    end
   end
 end

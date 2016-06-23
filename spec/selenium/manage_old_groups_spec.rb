@@ -102,10 +102,8 @@ describe "manage groups" do
       f("#category_#{group_category.id} .delete_category_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-      keep_trying_until do
-        expect(fj("#category_#{group_category.id}")).to be_nil
-        expect(fj("#sidebar_category_#{group_category.id}")).to be_nil
-      end
+      expect(f("#content")).not_to contain_jqcss("#category_#{group_category.id}")
+      expect(f("#content")).not_to contain_jqcss("#sidebar_category_#{group_category.id}")
     end
 
     it "should populate sidebar with new category and groups when adding a category" do
@@ -173,14 +171,14 @@ describe "manage groups" do
 
     it "should not show the Make a New Set of Groups button if there are no students in the course" do
       get "/courses/#{@course.id}/groups"
-      expect(f('.add_category_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_category_link')
       expect(f('#no_students_message')).to be_displayed
     end
     it "should show the Make a New Set of Groups button if there are students in the course" do
       student_in_course
       get "/courses/#{@course.id}/groups"
       expect(f('.add_category_link')).to be_displayed
-      expect(f('#no_students_message')).to be_nil
+      expect(f("#content")).not_to contain_css('#no_students_message')
     end
 
     it "should let you message students not in a group" do

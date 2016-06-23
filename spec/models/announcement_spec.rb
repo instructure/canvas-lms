@@ -92,6 +92,13 @@ describe Announcement do
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
+
+    it 'does not allow announcements to be viewed without :read_announcements (even with moderate_forum)' do
+      course_with_teacher(active_all: true)
+      @course.account.role_overrides.create!(permission: 'read_announcements', role: teacher_role, enabled: false)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      expect(a.grants_right?(@user, :read)).to be(false)
+    end
   end
 
   context "broadcast policy" do
@@ -146,6 +153,19 @@ describe Announcement do
       expect(to_users).to include(@student)
       expect(to_users).to include(@observer)
       expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
+    end
+
+    it "should not broadcast if read_announcements is diabled" do
+      Account.default.role_overrides.create!(:role => student_role, :permission => 'read_announcements', :enabled => false)
+      course_with_student(:active_all => true)
+      notification_name = "New Announcement"
+      n = Notification.create(:name => notification_name, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+
+      @context = @course
+      announcement_model(:user => @teacher)
+
+      expect(@a.messages_sent[notification_name]).to be_blank
     end
   end
 end

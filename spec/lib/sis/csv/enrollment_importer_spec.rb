@@ -68,10 +68,10 @@ describe SIS::CSV::EnrollmentImporter do
       "NONEXISTENT,U001,student,1B,active",
       "C001,U001,student,NONEXISTENT,active",
       "C002,U001,student,1B,active")
-    warnings = importer.warnings.map { |r| r.last }
+    warnings = importer.warnings.map(&:last)
     expect(warnings).to eq ["An enrollment referenced a non-existent course NONEXISTENT",
-                        "An enrollment referenced a non-existent section NONEXISTENT",
-                        "An enrollment listed a section and a course that are unrelated"]
+                            "An enrollment referenced a non-existent section NONEXISTENT",
+                            "An enrollment listed a section (1B) and a course (C002) that are unrelated for user (U001)"]
     expect(importer.errors).to eq []
   end
 
@@ -103,15 +103,21 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    process_csv_data_cleanly(
+    batch = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active",
       "user_3,user4,User,Tres,user3@example.com,active",
       "user_5,user5,User,Quatro,user5@example.com,active",
       "user_6,user6,User,Cinco,user6@example.com,active",
-      "user_7,user7,User,Siete,user7@example.com,active"
+      "user_7,user7,User,Siete,user7@example.com,active",
+      ",,,,,"
     )
+    expect(batch.errors).to eq []
+    expect(batch.warnings).to eq []
+    # should skip empty lines without error or warning
+    expect(batch.counts[:users]).to eq 6
+
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
       "S001,test_1,Sec1,active,,"
@@ -809,4 +815,24 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.first).to be_deleted
   end
 
+  it "should not enroll users into deleted sections" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+    )
+    process_csv_data_cleanly(
+      "section_id,course_id,name,status,start_date,end_date",
+      "S001,test_1,Sec1,deleted,,"
+    )
+    importer = process_csv_data(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,teacher,S001,active,,,",
+    )
+    warnings = importer.warnings.map { |r| r.last }
+    expect(warnings.first).to include("not a valid section")
+  end
 end

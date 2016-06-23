@@ -1,18 +1,39 @@
 require File.expand_path('../spec_helper', File.dirname( __FILE__ ))
 
 describe I18n do
-  describe '.qualified_locale' do
-    it 'should return the qualified locale for the given locale' do
+  describe '.bigeasy_locale' do
+    it 'does explicit overrides' do
       I18n.locale = :fr
-      expect(I18n.qualified_locale).to eq 'fr-FR'
+      expect(I18n.bigeasy_locale).to eq 'fr_FR'
     end
 
-    it 'should return en-US for a locale without a qualified locale' do
-      I18n.backend.stub lolz: {key: "text"} do
-        I18n.config.available_locales_set << :lolz
-        I18n.locale = :lolz
-        expect(I18n.qualified_locale).to eq 'en-US'
-      end
+    it 'does underscore conversion' do
+      I18n.locale = :'en-GB'
+      expect(I18n.bigeasy_locale).to eq 'en_GB'
+    end
+  end
+
+  describe '.moment_locale' do
+    it 'does explicit overrides' do
+      I18n.locale = :hy
+      expect(I18n.moment_locale).to eq 'hy-am'
+    end
+
+    it 'does lowercase conversion' do
+      I18n.locale = :'en-GB'
+      expect(I18n.moment_locale).to eq 'en-gb'
+    end
+  end
+
+  describe '.fullcalendar_locale' do
+    it 'does explicit overrides' do
+      I18n.locale = :hy
+      expect(I18n.fullcalendar_locale).to eq 'en'
+    end
+
+    it 'does lowercase conversion' do
+      I18n.locale = :'en-GB'
+      expect(I18n.fullcalendar_locale).to eq 'en-gb'
     end
   end
 

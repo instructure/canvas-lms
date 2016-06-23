@@ -45,7 +45,6 @@ module BroadcastPolicies
     end
 
     def user_has_visibility?
-      return true unless quiz_submission.context.feature_enabled?(:differentiated_assignments)
       return false if quiz_submission.user_id.nil?
       Quizzes::QuizStudentVisibility.where(quiz_id: quiz.id, user_id: quiz_submission.user_id).any?
     end

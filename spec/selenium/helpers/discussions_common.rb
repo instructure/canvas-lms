@@ -93,8 +93,7 @@ module DiscussionsCommon
     expect(fj("#{li_selector} .al-trigger")).to be_displayed
     fj("#{li_selector} .al-trigger").click
     wait_for_ajaximations
-    menu_item = fj(menu_item_selector)
-    expect(menu_item).to be_nil
+    expect(f("body")).not_to contain_jqcss(menu_item_selector)
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
@@ -116,13 +115,26 @@ module DiscussionsCommon
   end
 
   def set_checkbox(selector, check)
-    fj(selector + (check ? ':not(:checked)' : ':checked')).try(:click)
+    cb = fj('#' + selector + (check ? ':not(:checked)' : ':checked'))
+    if cb
+      f("label[for=#{selector}]").click # have to click on the label because the input isn't visible
+    end
   end
 
   def filter(opts)
     replace_content(f('#searchTerm'), opts[:term] || '')
-    set_checkbox('#onlyGraded', opts[:only_graded])
-    set_checkbox('#onlyUnread', opts[:only_unread])
+    wait_for_ajaximations
+    f('#searchTerm').send_keys(:return)
+    # logic for dealing with options
+      case opts
+      when {:only_graded=>true}
+        set_checkbox('onlyGraded', opts[:only_graded])
+      when {:only_unread=>true}
+        set_checkbox('onlyUnread', opts[:only_unread])
+      when {:only_unread=>true, :only_graded=>true}
+        set_checkbox('onlyGraded', opts[:only_graded])
+        set_checkbox('onlyUnread', opts[:only_unread])
+      end
     wait_for_animations
   end
 
@@ -145,7 +157,7 @@ module DiscussionsCommon
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    expect(f('#discussion_topic .discussion-title').text).to eq title
+    expect(f('#discussion_topic .discussion-title').text).to include_text(title)
   end
 
   def topic_index_element(topic)
@@ -155,8 +167,12 @@ module DiscussionsCommon
   def check_permissions(number_of_checkboxes = 1)
     get url
     wait_for_ajaximations
-    checkboxes = ff('.discussion .al-trigger')
-    expect(checkboxes.length).to eq number_of_checkboxes
+    if number_of_checkboxes > 0
+      checkboxes = ff('.discussion .al-trigger')
+      expect(checkboxes.length).to eq number_of_checkboxes
+    else
+      expect(f("#content")).not_to contain_css(".discussion .al-trigger")
+    end
     expect(ff('.discussion-list li.discussion').length).to eq DiscussionTopic.count
   end
 

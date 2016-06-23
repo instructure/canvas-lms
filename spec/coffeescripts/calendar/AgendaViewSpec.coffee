@@ -27,6 +27,7 @@ define [
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]
       @contextCodes = ["user_1", "course_2", "group_3"]
       @startDate = fcUtil.now()
+      @startDate.minute(1)
       @startDate.year(2001)
       @dataSource = new EventDataSource(@contexts)
       @server = sinon.fakeServer.create()
@@ -114,7 +115,7 @@ define [
     equal @container.find('.ig-row').length, 70, 'finds 70 ig-rows'
 
   test 'renders non-assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 
@@ -126,7 +127,7 @@ define [
     ok @container.find('.ig-details').slice(2, 3).text().match(/13:00/), 'formats according to locale'
 
   test 'renders assignment events with locale-appropriate format string', ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
 

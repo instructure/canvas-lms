@@ -31,21 +31,34 @@ class Oauth2ProviderController < ApplicationController
       return render()
     end
 
-    scopes = params.fetch(:scopes, '').split(',')
+    scopes = (params[:scope] || params[:scopes] || '').split(' ')
 
     provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
 
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
-    raise Canvas::Oauth::RequestError, :client_not_authorized_for_account unless provider.key.authorized_for_account?(@domain_root_account)
 
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 
+    unless provider.key.authorized_for_account?(@domain_root_account)
+      return redirect_to Canvas::Oauth::Provider.final_redirect(self,
+        error: "unauthorized_client",
+        error_description: "Client does not have access to the specified Canvas account.")
+    end
+
+    unless params[:response_type] == 'code'
+      return redirect_to Canvas::Oauth::Provider.final_redirect(self,
+        error: "unsupported_response_type",
+        error_description: "Only response_type=code is permitted")
+    end
+
     if @current_pseudonym && !params[:force_login]
       redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user)
     else
-      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login, :authentication_provider))
+      params["pseudonym_session"] = {"unique_id" => params[:unique_id]} if params.key?(:unique_id)
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login,
+                                         :authentication_provider, :pseudonym_session))
     end
   end
 
@@ -80,12 +93,12 @@ class Oauth2ProviderController < ApplicationController
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_client_secret unless provider.is_authorized_by?(secret)
 
-
     if grant_type == "authorization_code"
       raise OAuth2RequestError :authorization_code_not_supplied unless params[:code]
 
       token = provider.token_for(params[:code])
       raise Canvas::Oauth::RequestError, :invalid_authorization_code  unless token.is_for_valid_code?
+      raise Canvas::Oauth::RequestError, :incorrect_client unless token.key.id == token.client_id
 
       token.create_access_token_if_needed(value_to_boolean(params[:replace_tokens]))
       Canvas::Oauth::Token.expire_code(params[:code])
@@ -95,6 +108,7 @@ class Oauth2ProviderController < ApplicationController
       token = provider.token_for_refresh_token(params[:refresh_token])
       # token = AccessToken.authenticate_refresh_token(params[:refresh_token])
       raise Canvas::Oauth::RequestError, :invalid_refresh_token unless token
+      raise Canvas::Oauth::RequestError, :incorrect_client unless token.access_token.developer_key_id == token.key.id
       token.access_token.regenerate_access_token
     else
       raise Canvas::Oauth::RequestError, :unsupported_grant_type
@@ -112,6 +126,7 @@ class Oauth2ProviderController < ApplicationController
 
   private
   def oauth_error(exception)
+    response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
     return render(exception.to_render_data)
   end
 

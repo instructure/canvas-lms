@@ -21,8 +21,7 @@ class ExternalFeedEntry < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :external_feed
-  belongs_to :asset, :polymorphic => true
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['DiscussionTopic']
+  belongs_to :asset, polymorphic: [:discussion_topic]
 
   before_save :infer_defaults
   validates_presence_of :external_feed_id, :workflow_state

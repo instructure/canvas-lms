@@ -1,11 +1,11 @@
 define([
   'i18n!external_tools',
   'react',
-  'react-router',
   'jsx/external_apps/components/Header',
   'jsx/external_apps/components/ExternalToolsTable',
-  'jsx/external_apps/components/AddExternalToolButton'
-], function(I18n, React, {Link}, Header, ExternalToolsTable, AddExternalToolButton) {
+  'jsx/external_apps/components/AddExternalToolButton',
+  'page'
+], function(I18n, React, Header, ExternalToolsTable, AddExternalToolButton, page) {
   return React.createClass({
     displayName: 'Configurations',
 
@@ -14,7 +14,8 @@ define([
         if (!ENV.APP_CENTER['enabled']) {
           return '';
         }
-        return <Link ref="appCenterLink" to="appList" className="btn view_tools_link lm">{I18n.t('View App Center')}</Link>;
+        const baseUrl = page.base();
+        return <a ref="appCenterLink" href={baseUrl} className="btn view_tools_link lm">{I18n.t('View App Center')}</a>;
       }.bind(this);
 
       return (

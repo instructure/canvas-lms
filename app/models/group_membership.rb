@@ -25,13 +25,13 @@ class GroupMembership < ActiveRecord::Base
 
   attr_accessible :group, :user, :workflow_state, :moderator
 
-  before_save :assign_uuid
-  before_save :auto_join
-  before_save :capture_old_group_id
-
-  validates_presence_of :group_id, :user_id, :workflow_state
+  validates :group_id, :user_id, :workflow_state, :uuid, presence: true
+  before_validation :assign_uuid
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
+
+  before_save :auto_join
+  before_save :capture_old_group_id
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
@@ -81,7 +81,7 @@ class GroupMembership < ActiveRecord::Base
     p.whenever {|record| record.changed_state(:rejected, :requested) }
 
     p.dispatch :new_student_organized_group
-    p.to { self.group.context.admins }
+    p.to { self.group.context.participating_admins }
     p.whenever {|record|
       record.group.context &&
       record.group.context.is_a?(Course) &&
@@ -197,7 +197,7 @@ class GroupMembership < ActiveRecord::Base
   set_policy do
     # for non-communities, people can be put into groups by users who can manage groups at the context level,
     # but not moderators (hence :manage_groups)
-    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.grants_right?(self.user, session, :participate) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
+    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.can_join?(self.user) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
     can :create
 
     # for communities, users must initiate in order to be added to a group

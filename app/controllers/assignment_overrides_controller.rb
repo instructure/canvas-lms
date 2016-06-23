@@ -102,7 +102,7 @@ class AssignmentOverridesController < ApplicationController
   # @returns [AssignmentOverride]
   def index
     @overrides = assignment_override_collection(@assignment, true)
-    render :json => assignment_overrides_json(@overrides)
+    render :json => assignment_overrides_json(@overrides, @current_user)
   end
 
   # @API Get a single assignment override

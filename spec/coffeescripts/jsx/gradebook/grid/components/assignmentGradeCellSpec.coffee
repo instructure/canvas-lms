@@ -5,9 +5,8 @@ define [
   'jsx/gradebook/grid/constants'
 ], (React, AssignmentGradeCell, _, GradebookConstants) ->
 
-  TestUtils = React.addons.TestUtils
-  Simulate  = TestUtils.Simulate
-  wrapper   = document.getElementById('fixtures')
+  Simulate = React.addons.TestUtils.Simulate
+  wrapper  = document.getElementById('fixtures')
 
   renderComponent = (props) ->
     element = React.createElement(AssignmentGradeCell, props)

@@ -36,6 +36,23 @@ define [
     element = React.createElement(TotalColumn, cellData)
     React.render(element, wrapper)
 
+  firstTestAssignment = (opts) ->
+    defaultAssignment = { name: 'assignment 1', id: '3', points_possible: 25, submission_types: ['graded'] }
+    _.defaults(opts || {}, defaultAssignment)
+
+  secondTestAssignment = (opts) ->
+    defaultAssignment = { name: 'assignment 2', id: '7', points_possible: 15, submission_types: ['graded'] }
+    _.defaults(opts || {}, defaultAssignment)
+
+  generateCellData = (assignment1Properties, assignment2Properties, groupProperties) ->
+    assignmentGroup = _.defaults(groupProperties || {}, { name: 'Group A' })
+    assignmentGroup.assignments = [
+      firstTestAssignment(assignment1Properties),
+      secondTestAssignment(assignment2Properties)
+    ]
+    rowData:
+      assignmentGroups: [assignmentGroup]
+
   module 'ReactGradebook.totalColumn',
     setup: ->
       fakeENV.setup(gradingPeriodsData())
@@ -61,19 +78,8 @@ define [
     component = buildComponent(props)
     deepEqual(totalGradeOutput(component), '100%')
 
-  test 'displays warning icon if assignment group has 0 points possible', ->
-    cellData =
-      rowData:
-        assignmentGroups: [{shouldShowNoPointsWarning: true, assignments: [{id: '3', points_possible: 0}]}]
-
-    component = buildComponent(cellData)
-    equal component.refs.icon.props.className, 'icon-warning final-warning'
-
   test 'displays warning icon if all assignments combined have 0 points possible', ->
-    cellData =
-      rowData:
-        assignmentGroups: [{shouldShowNoPointsWarning: false, assignments: [{id: '3', points_possible: 0}]}]
-
+    cellData = generateCellData({ points_possible: 0 }, { points_possible: 0 }, { shouldShowNoPointsWarning: false })
     component = buildComponent(cellData)
     equal component.refs.icon.props.className, 'icon-warning final-warning'
 
@@ -89,8 +95,100 @@ define [
     deepEqual(totalGradeOutput(component), '-')
 
   test 'displays mute icon if an assignment is muted', ->
-    cellData =
-      rowData:
-        assignmentGroups: [{assignments: [{ id: '3', muted: true }] }]
+    cellData = generateCellData({ muted: true }, { muted: true })
     component = buildComponent(cellData)
     equal component.refs.icon.props.className, 'icon-muted final-warning'
+
+  test 'assignments(): picks all assignments out of assignmentGroups()', ->
+    cellData = generateCellData()
+    totalColumn = buildComponent(cellData)
+    deepEqual(totalColumn.assignments(), [firstTestAssignment(), secondTestAssignment()])
+
+  test 'visibleAssignments(): assignments without the not_graded submissions type', ->
+    cellData = generateCellData(submission_types: ['not_graded'])
+    totalColumn = buildComponent(cellData)
+    propEqual(totalColumn.visibleAssignments(), [secondTestAssignment()])
+
+  test 'getWarning() for anyMutedAssignments', ->
+    cellData = generateCellData(muted: true)
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.getWarning(), "This grade differs from the student's view of the grade because some assignments are muted")
+
+  test 'getWarning() for group with no points', ->
+    cellData = generateCellData({ submission_types: ['not_graded'] }, null, { shouldShowNoPointsWarning: true })
+    groupWeightingSchemeData = ->
+      GRADEBOOK_OPTIONS:
+        group_weighting_scheme: 'percent'
+    fakeENV.setup(groupWeightingSchemeData())
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.getWarning(), 'Score does not include Group A because it has no points possible')
+
+  test 'getWarning() for multiple groups with no points', ->
+    cellData = generateCellData(
+      { submission_types: ['not_graded'], points_possible: null },
+      { points_possible: null },
+      { shouldShowNoPointsWarning: true }
+    )
+    groupB =
+      shouldShowNoPointsWarning: true
+      name: 'Group B'
+      assignments: [
+        { id: '1', submission_types: ['not_graded']}
+        { id: '2', submission_types: ['graded']}
+      ]
+    cellData.rowData.assignmentGroups.push(groupB)
+
+    groupWeightingSchemeData = ->
+      GRADEBOOK_OPTIONS:
+        group_weighting_scheme: 'percent'
+    fakeENV.setup(groupWeightingSchemeData())
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.getWarning(), 'Score does not include Group A and Group B because they have no points possible')
+
+
+  test 'getWarning() for noPointsPossible', ->
+    cellData = generateCellData({ points_possible: 0 }, { points_possible: 0 })
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.getWarning(), "Can't compute score until an assignment has points possible")
+
+  test 'anyMutedAssignments() for one muted assignment', ->
+    cellData = generateCellData(muted: true)
+    totalColumn = buildComponent(cellData)
+    ok(totalColumn.anyMutedAssignments())
+
+  test 'anyMutedAssignments() for no muted assignments', ->
+    cellData = generateCellData()
+    totalColumn = buildComponent(cellData)
+    notOk(totalColumn.anyMutedAssignments())
+
+  test 'noPointsPossible() for null and 0 points is true', ->
+    cellData = generateCellData({ points_possible: null }, { points_possible: 0 })
+    totalColumn = buildComponent(cellData)
+    ok(totalColumn.noPointsPossible())
+
+  test 'noPointsPossible() for greater than 0 points is false', ->
+    cellData = generateCellData(points_possible: null)
+    totalColumn = buildComponent(cellData)
+    notOk(totalColumn.noPointsPossible())
+
+  test 'iconClassNames() produces no class names for no muted and has points', ->
+    cellData = generateCellData()
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.iconClassNames(), '')
+
+  test 'iconClassNames() produces class names for muted', ->
+    cellData = generateCellData(muted: true)
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.iconClassNames(), 'icon-muted final-warning')
+
+  test 'iconClassNames() produces class names no points', ->
+    cellData = generateCellData({ points_possible: 0 }, { points_possible: 0 })
+    totalColumn = buildComponent(cellData)
+    equal(totalColumn.iconClassNames(), 'icon-warning final-warning')
+
+  test "assignmentGroups() returns rowData's assignmentGroups", ->
+    cellData = generateCellData()
+    totalColumn = buildComponent(cellData)
+    propEqual(totalColumn.assignmentGroups(), [{
+      name: 'Group A', assignments: [firstTestAssignment(), secondTestAssignment()]
+    }] )

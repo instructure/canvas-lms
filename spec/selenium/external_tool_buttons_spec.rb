@@ -7,6 +7,18 @@ describe "external tool buttons" do
     course_with_teacher_logged_in
   end
 
+  def editor_traversal
+    "$('textarea[name=message]').parent().find('iframe').contents().find('body')"
+  end
+
+  def editor_html
+    driver.execute_script("return #{editor_traversal}.html()")
+  end
+
+  def editor_text
+    driver.execute_script("return #{editor_traversal}.text()")
+  end
+
   def load_selection_test_tool(element, context=@course)
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.editor_button = {
@@ -20,38 +32,36 @@ describe "external tool buttons" do
     wait_for_ajaximations
     external_tool_button = f(".mce-instructure_external_tool_button")
     expect(external_tool_button).to be_displayed
-    
+
     external_tool_button.click
     wait_for_ajax_requests
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to eq ""
+    editor_html
+    expect(editor_text).to eq ""
 
-    expect(fj("#external_tool_button_dialog")).to be_displayed
+    expect(f("#external_tool_button_dialog")).to be_displayed
 
     in_frame('external_tool_button_frame') do
       f(element).click
       wait_for_ajax_requests
     end
-    keep_trying_until { !expect(f("#external_tool_button_dialog")).not_to be_displayed }
+    expect(f("body")).not_to contain_jqcss("#external_tool_button_dialog:visible")
   end
 
   it "should work with groups" do
     group(:context => @course)
     load_selection_test_tool("#oembed_link", @group)
 
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/ZB8T0193/)
+    expect(editor_html).to match(/ZB8T0193/)
   end
 
   it "should allow inserting oembed content from external tool buttons" do
     load_selection_test_tool("#oembed_link")
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/ZB8T0193/)
+    expect(editor_html).to match(/ZB8T0193/)
   end
 
   it "should allow inserting basic lti links from external tool buttons" do
     load_selection_test_tool("#basic_lti_link")
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
+    html = editor_html
     expect(html).to match(/example/)
     expect(html).to match(/lti link/)
     expect(html).to match(/lti embedded link/)
@@ -59,20 +69,17 @@ describe "external tool buttons" do
 
   it "should allow inserting iframes from external tool buttons" do
     load_selection_test_tool("#iframe_link")
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/iframe/)
+    expect(editor_html).to match(/iframe/)
   end
 
   it "should allow inserting images from external tool buttons" do
     load_selection_test_tool("#image_link")
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/delete\.png/)
+    expect(editor_html).to match(/delete\.png/)
   end
 
   it "should allow inserting links from external tool buttons" do
     load_selection_test_tool("#link_link")
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/delete link/)
+    expect(editor_html).to match(/delete link/)
   end
 
   it "should show limited number of external tool buttons" do
@@ -94,8 +101,8 @@ describe "external tool buttons" do
     # find things whose id *ends* with instructure_external_button_...
     expect(fj("[id$='instructure_external_button_#{tools[0].id}']")).to be_displayed
     expect(fj("[id$='instructure_external_button_#{tools[1].id}']")).to be_displayed
-    expect(fj("[id$='instructure_external_button_#{tools[2].id}']")).to be_nil
-    expect(fj("[id$='instructure_external_button_#{tools[3].id}']")).to be_nil
+    expect(f("#content")).not_to contain_jqcss("[id$='instructure_external_button_#{tools[2].id}']")
+    expect(f("#content")).not_to contain_jqcss("[id$='instructure_external_button_#{tools[3].id}']")
     expect(f(".mce_instructure_external_button_clump")).to be_displayed
     f(".mce_instructure_external_button_clump").click
 
@@ -136,7 +143,6 @@ describe "external tool buttons" do
 
     wait_for_ajax_requests
     expect(f("#external_tool_button_dialog")).not_to be_displayed
-    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
-    expect(html).to match(/ZB8T0193/)
+    expect(editor_html).to match(/ZB8T0193/)
   end
 end

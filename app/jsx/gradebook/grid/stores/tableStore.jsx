@@ -148,6 +148,8 @@ define([
             submissions: userSubmissions,
             assignmentGroups: assignmentGroups,
             student: student,
+            isConcluded: student.enrollment_state === "completed",
+            isInactive: student.enrollment_state === "inactive",
             teacherNote: teacherNote ? teacherNote.content : ''
           }
 

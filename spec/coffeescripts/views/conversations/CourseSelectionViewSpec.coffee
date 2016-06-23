@@ -46,6 +46,15 @@ define [
     view = courseSelectionView()
     ok view.is_complete(course, @now)
 
+  test 'does not label as completed a course with a term overriding end_at in the future', ->
+    course = new Course
+      end_at: Date.today().next().monday().toISOString()
+      restrict_enrollments_to_course_dates: true
+      term:
+        end_at: Date.today().last().monday().toISOString()
+    view = courseSelectionView()
+    ok !view.is_complete(course, @now)
+
   test 'does not label as completed a course with a term with an end_at date in the future', ->
     course = new Course
       term:

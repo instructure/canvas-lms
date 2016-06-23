@@ -48,12 +48,12 @@ define([
         <button
           type= 'button'
           className= 'btn btn-primary btn-upload'
-          ariaLabel= {I18n.t('upload', 'Upload')}
+          ariaLabel= {I18n.t('Upload')}
           onClick= {this.handleAddFilesClick}
         >
-          <i className='icon-upload'/>
+          <i className='icon-upload'/>&nbsp;
           <span className= {this.hiddenPhoneClassname()} >
-            { I18n.t('upload', 'Upload') }
+            { I18n.t('Upload') }
           </span>
         </button>
         { this.buildPotentialModal() }

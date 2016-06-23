@@ -4,6 +4,15 @@
   css_bundle :statistics
   js_bundle :account_statistics
 %>
+<% @customLinks = account_custom_links; if @customLinks %>
+  <% content_for :right_side do %>
+    <div class="rs-margin-all">
+      <% @customLinks.each do |link| %>
+        <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
 <h1 class="screenreader-only"><%= t(:page_header_title, "Account Statistics") %></h1>
 <% if @counts_report %>
   <h2><%= t(:general_numbers_title, "General Numbers") %></h2>

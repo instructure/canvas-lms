@@ -562,9 +562,6 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
-      if Setting.get("notification_service_traffic", '').present?
-        send(delivery_method)
-      end
       enqueue_to_sqs
     else
       send(delivery_method)
@@ -576,10 +573,15 @@ class Message < ActiveRecord::Base
   # Returns nothing
   def enqueue_to_sqs
     notification_targets.each do |target|
-      NotificationService.process(global_id, notification_message, path_type, target, remote_configuration)
+      Services::NotificationService.process(
+        global_id,
+        notification_message,
+        path_type,
+        target
+      )
       complete_dispatch
     end
-  rescue AWS::SQS::Errors::ServiceError => e
+  rescue AWS::SQS::Errors::Base => e
     Canvas::Errors.capture(
       e,
       message: 'Message delivery failed',
@@ -697,7 +699,6 @@ class Message < ActiveRecord::Base
   def infer_defaults
     if notification
       self.notification_name     ||= notification.name
-      self.notification_category ||= notification_category
     end
 
     self.path_type ||= communication_channel.try(:path_type)
@@ -865,7 +866,7 @@ class Message < ActiveRecord::Base
           Canvas::Twilio.deliver(
             to,
             body,
-            from_recipient_country: user.account.feature_enabled?(:international_sms_from_recipient_country)
+            from_recipient_country: true
           )
         end
       rescue StandardError => e

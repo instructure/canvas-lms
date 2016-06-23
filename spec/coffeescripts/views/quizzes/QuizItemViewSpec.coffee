@@ -10,12 +10,20 @@ define [
 
   fixtures = $('#fixtures')
 
-  createView = (quiz) ->
+  createView = (quiz, options={}) ->
     quiz ?= new Quiz(id: 1, title: 'Foo')
 
     icon = new PublishIconView(model: quiz)
-    view = new QuizItemView(model: quiz, publishIconView: icon)
 
+    ENV.PERMISSIONS = {
+      manage: options.canManage
+    }
+
+    ENV.FLAGS = {
+      post_to_sis_enabled: options.post_to_sis
+    }
+
+    view = new QuizItemView(model: quiz, publishIconView: icon)
     view.$el.appendTo $('#fixtures')
     view.render()
 
@@ -33,6 +41,20 @@ define [
     view = createView(quiz)
     equal view.$('.ig-admin').length, 0
 
+  test "initializes sis toggle if post to sis enabled", ->
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz, canManage: true, post_to_sis: true)
+    ok view.sisButtonView
+
+  test "does not initialize sis toggle if post to sis disabled", ->
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: true)
+    view = createView(quiz, canManage: true, post_to_sis: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled but can't manage", ->
+    quiz = new Quiz(id: 1, title: 'Foo', can_update: false)
+    view = createView(quiz, canManage: false, post_to_sis: false)
+    ok !view.sisButtonView
 
   test 'udpates publish status when model changes', ->
     quiz = new Quiz(id: 1, title: 'Foo', published: false)
@@ -42,7 +64,6 @@ define [
 
     quiz.set("published", true)
     ok view.$el.find(".ig-row").hasClass("ig-published")
-
 
   test 'prompts confirm for delete', ->
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true)

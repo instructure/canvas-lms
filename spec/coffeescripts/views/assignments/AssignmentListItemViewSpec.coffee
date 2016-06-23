@@ -116,6 +116,8 @@ define [
       read_grades: options.canReadGrades
     }
 
+    ENV.POST_TO_SIS = options.post_to_sis
+
     view = new AssignmentListItemView(model: model)
     view.$el.appendTo $('#fixtures')
     view.render()
@@ -170,6 +172,18 @@ define [
     ok !view.publishIconView
     ok !view.vddTooltipView
     ok !view.editAssignmentView
+
+  test "initializes sis toggle if post to sis enabled", ->
+    view = createView(@model, canManage: true, post_to_sis: true)
+    ok view.sisButtonView
+
+  test "does not initialize sis toggle if post to sis disabled", ->
+    view = createView(@model, canManage: true, post_to_sis: false)
+    ok !view.sisButtonView
+
+  test "does not initialize sis toggle if sis enabled but can't manage", ->
+    view = createView(@model, canManage: false, post_to_sis: true)
+    ok !view.sisButtonView
 
   test "upatePublishState toggles ig-published", ->
     view = createView(@model, canManage: true)
@@ -339,7 +353,7 @@ define [
     equal spy.callCount, 0
 
   test "renders lockAt/unlockAt with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'
@@ -373,7 +387,7 @@ define [
     equal $("span", $dds.last()).last().text().trim(), 'Aug 27'
 
   test "renders due date column with locale-appropriate format string", ->
-    tz.changeLocale(french, 'fr_FR')
+    tz.changeLocale(french, 'fr_FR', 'fr')
     I18nStubber.setLocale 'fr_FR'
     I18nStubber.stub 'fr_FR',
       'date.formats.short': '%-d %b'

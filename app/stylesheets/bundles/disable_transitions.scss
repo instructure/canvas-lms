@@ -1,0 +1,26 @@
+/**
+ * we use this stylesheet during selenium tests to disable css animations,
+ * since they slow things down and sometimes make it hard for selenium
+ * to interact with things (e.g. it tries to click on a link that is
+ * moving, so it mis-clicks and nothing happens)
+ **/
+
+* {
+ transition-property: none !important;
+ -o-transition-property: none !important;
+ -moz-transition-property: none !important;
+ -ms-transition-property: none !important;
+ -webkit-transition-property: none !important;
+
+ transform: none !important;
+ -o-transform: none !important;
+ -moz-transform: none !important;
+ -ms-transform: none !important;
+ -webkit-transform: none !important;
+
+ animation: none !important;
+ -o-animation: none !important;
+ -moz-animation: none !important;
+ -ms-animation: none !important;
+ -webkit-animation: none !important;
+}

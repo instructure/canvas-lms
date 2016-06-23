@@ -423,6 +423,12 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to be_empty
         end
 
+        it "should not include section overrides for sections with concluded enrollments" do
+          @student2.student_enrollments.first.conclude
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
+          expect(overrides).to be_empty
+        end
+
         it "should include all relevant section overrides" do
           @course.enroll_student(@student, :section => @override2.set, :allow_multiple_enrollments => true)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)

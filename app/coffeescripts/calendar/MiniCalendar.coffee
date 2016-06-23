@@ -34,15 +34,15 @@ define [
           "CommonEvent/eventSaved" : @eventSaved
       )
 
-    getEvents: (start, end, timezone, cb) =>
+    getEvents: (start, end, timezone, donecb, datacb) =>
       # Since we have caching (lazyFetching) turned off, we can rely on this
       # getting called every time we switch views, *before* the events are rendered.
       # That makes this a great place to clear out the previous classes.
 
-      @calendar.find(".fc-content td")
+      @calendar.find(".fc-widget-content td")
         .removeClass("event slot-available")
         .removeAttr('title')
-      @mainCalendar.getEvents start, end, timezone, cb
+      @mainCalendar.getEvents start, end, timezone, donecb, datacb
 
     dayClick: (date) =>
       @mainCalendar.gotoDate(date)

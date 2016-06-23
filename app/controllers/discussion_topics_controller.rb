@@ -237,11 +237,13 @@ require 'atom'
 #
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context_and_read_access, :except => :public_feed
+  before_filter :rich_content_service_config
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
   include KalturaHelper
+  include SubmittableHelper
 
   # @API List discussion topics
   #
@@ -420,8 +422,8 @@ class DiscussionTopicsController < ApplicationController
                      reject { |category| category.student_organized? }.
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
-                 CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+                 CONTEXT_ACTION_SOURCE: :discussion_topic
+      }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis
@@ -442,6 +444,9 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
       append_sis_data(js_hash)
       js_env(js_hash)
+
+      conditional_release_js_env(@topic.assignment)
+
       render :edit
     end
   end
@@ -465,19 +470,22 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if authorized_action(@topic, @current_user, :read)
-      if @current_user && @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
-        respond_to do |format|
-          flash[:error] = t "You do not have access to the requested discussion."
-          format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
-        end
-        return
-      end
+      return unless enforce_assignment_visible(@topic)
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) if @topic.visible_for?(@current_user)
       if @topic.for_group_discussion?
-        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }.sort! {|a, b| a.id <=> b.id}
+
+        group_scope = @topic.group_category.groups.active
+        if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
+          @groups = group_scope.where(:id => @topic.assignment.assignment_overrides.active.where(:set_type => "Group").pluck(:set_id)).to_a
+        else
+          @groups = group_scope.to_a
+        end
+        @groups.select!{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
+        @groups.sort_by!(&:id)
+
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -817,6 +825,10 @@ class DiscussionTopicsController < ApplicationController
 
   protected
 
+  def rich_content_service_config
+    rce_js_env(:highrisk)
+  end
+
   def cancel_redirect_url
     topic_type = @topic.is_announcement ? :announcements : :discussion_topics
     @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
@@ -859,7 +871,11 @@ class DiscussionTopicsController < ApplicationController
 
     process_podcast_parameters(discussion_topic_hash)
 
-    @topic.send(is_new ? :user= : :editor=, @current_user)
+    if is_new
+      @topic.user = @current_user
+    elsif discussion_topic_hash.except(*%w{pinned}).present? # don't update editor if the only thing that changed was the pinned status
+      @topic.editor = @current_user
+    end
     @topic.current_user = @current_user
     @topic.content_being_saved_by(@current_user)
 
@@ -893,7 +909,9 @@ class DiscussionTopicsController < ApplicationController
 
         apply_positioning_parameters
         apply_attachment_parameters
-        apply_assignment_parameters
+        unless @topic.root_topic_id?
+          apply_assignment_parameters(params[:assignment], @topic)
+        end
         if publish_later
           @topic.publish!
           @topic.root_topic.try(:publish!)
@@ -1044,38 +1062,6 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def apply_assignment_parameters
-    # handle creating/deleting assignment
-    if params[:assignment] && !@topic.root_topic_id?
-      if params[:assignment].has_key?(:set_assignment) && !value_to_boolean(params[:assignment][:set_assignment])
-        if @topic.assignment && @topic.assignment.grants_right?(@current_user, session, :update)
-          assignment = @topic.assignment
-          @topic.assignment = nil
-          @topic.save!
-          assignment.discussion_topic = nil
-          assignment.destroy
-        end
-
-      elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
-             @assignment.grants_right?(@current_user, session, :update)
-        params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
-        params[:assignment][:published] = @topic.published?
-        params[:assignment][:name] = @topic.title
-
-        @assignment.submission_types = 'discussion_topic'
-        @assignment.saved_by = :discussion_topic
-        @assignment.workflow_state = @topic.published? ? "published" : "unpublished"
-        @topic.assignment = @assignment
-        @topic.save_without_broadcasting!
-
-        assignment_params = params[:assignment].except('anonymous_peer_reviews')
-        update_api_assignment(@assignment.reload, assignment_params, @current_user)
-
-        @topic.save!
-      end
-    end
-  end
-
   def child_topic
     if params[:headless]
       extra_params = {
@@ -1086,12 +1072,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
-    @topic = @context.discussion_topics.where(root_topic_id: params[:root_discussion_topic_id]).first_or_initialize
-    @topic.message = @root_topic.message
-    @topic.title = @root_topic.title
-    @topic.assignment_id = @root_topic.assignment_id
-    @topic.user_id = @root_topic.user_id
-    @topic.save
+    @topic = @root_topic.ensure_child_topic_for(@context)
     redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id, extra_params)
   end
 

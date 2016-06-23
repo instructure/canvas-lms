@@ -179,12 +179,17 @@ define [
   test 'should format in profile timezone', ->
     I18nStubber.stub 'en', 'time.formats.tiny': "%l:%M%P"
     tz.changeZone(detroit, 'America/Detroit')
-    equal $.timeString(new Date(0)), '7:00pm'
+    equal $.timeString(new Date(60000)), '7:01pm'
 
   test 'should format according to profile locale', ->
     I18nStubber.setLocale 'en-GB'
     I18nStubber.stub 'en-GB', 'time.formats.tiny': "%k:%M"
-    equal $.timeString(new Date(46800000)), '13:00'
+    equal $.timeString(new Date(46860000)), '13:01'
+
+  test 'should use the tiny_on_the_hour format on the hour', ->
+    I18nStubber.stub 'en', 'time.formats.tiny_on_the_hour': "%l%P"
+    tz.changeZone(detroit, 'America/Detroit')
+    equal $.timeString(new Date(0)), '7pm'
 
   module 'datetimeString',
     setup: ->
@@ -201,16 +206,16 @@ define [
       'date.formats.medium': "%b %-d, %Y"
       'time.formats.tiny': "%l:%M%P"
       'time.event': "%{date} at %{time}"
-    equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at 7:00pm'
+    equal $.datetimeString(new Date(60000)), 'Dec 31, 1969 at 7:01pm'
 
   test 'should translate into the profile locale', ->
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.setLocale 'pt'
     I18nStubber.stub 'pt',
       'date.formats.medium': "%-d %b %Y"
       'time.formats.tiny': "%k:%M"
       'time.event': "%{date} em %{time}"
-    equal $.datetimeString('1970-01-01 15:00:00Z'), "1 Jan 1970 em 15:00"
+    equal $.datetimeString('1970-01-01 15:01:00Z'), "1 Jan 1970 em 15:01"
 
   module '$.datepicker.parseDate',
     setup: ->
@@ -223,7 +228,7 @@ define [
 
   test 'should accept localized strings and return them fudged', ->
     tz.changeZone(detroit, 'America/Detroit')
-    tz.changeLocale(portuguese, 'pt_PT')
+    tz.changeLocale(portuguese, 'pt_PT', 'pt')
     I18nStubber.setLocale 'pt'
     I18nStubber.stub 'pt',
       # this isn't the real format, but we want the %Y in here to make it

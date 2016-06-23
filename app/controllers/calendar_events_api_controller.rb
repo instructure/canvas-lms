@@ -337,6 +337,26 @@ class CalendarEventsApiController < ApplicationController
         submissions = Submission.where(assignment_id: events, user_id: user)
           .group_by(&:assignment_id)
       end
+      # preload data used by assignment_json
+      ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
+      Shard.partition_by_shard(events) do |shard_events|
+        having_submission = Submission.having_submission.
+            where(assignment_id: shard_events).
+            uniq.
+            pluck(:assignment_id).to_set
+        shard_events.each do |event|
+          event.has_submitted_submissions = having_submission.include?(event.id)
+        end
+
+        having_student_submission = Submission.having_submission.
+            where(assignment_id: shard_events).
+            where.not(user_id: nil).
+            uniq.
+            pluck(:assignment_id).to_set
+        shard_events.each do |event|
+          event.has_student_submissions = having_student_submission.include?(event.id)
+        end
+      end
     end
 
     scope = @type == :assignment ? assignment_scope : calendar_event_scope
@@ -698,6 +718,30 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  def visible_contexts
+    get_context
+    get_all_pertinent_contexts(include_groups: true, favorites_first: true)
+    selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
+
+    contexts = @contexts.map do |context|
+      {
+        id: context.id,
+        name: context.nickname_for(@current_user),
+        asset_string: context.asset_string,
+        color: @current_user.custom_colors[context.asset_string],
+        selected: selected_contexts.include?(context.asset_string)
+      }
+    end
+
+    render json: {contexts: Api.recursively_stringify_json_ids(contexts)}
+  end
+
+  def save_selected_contexts
+    @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
+    @current_user.save!
+    render json: {status: 'ok'}
+  end
+
   protected
 
   def get_calendar_context
@@ -853,7 +897,6 @@ class CalendarEventsApiController < ApplicationController
       # context can sometimes be a user, so must filter those out
       select{|context| context.is_a? Course }.
       reject{|course|
-       !course.feature_enabled?(:differentiated_assignments) ||
        courses_to_not_filter.include?(course.id)
       }
 
@@ -894,14 +937,16 @@ class CalendarEventsApiController < ApplicationController
       Assignment.preload_context_module_tags(student_events) if student_events.any?
     end
 
+    courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
     events = events.inject([]) do |assignments, assignment|
 
-      if assignment.context.user_has_been_student?(user)
+      if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day
         assignments << assignment
       else
-        dates_list = assignment.all_dates_visible_to(user)
+        dates_list = assignment.all_dates_visible_to(user,
+          courses_user_has_been_enrolled_in: courses_user_has_been_enrolled_in)
 
         if dates_list.empty?
           assignments << assignment
@@ -916,7 +961,8 @@ class CalendarEventsApiController < ApplicationController
         if original_dates.present?
           section_override_count = dates_list.count{|d| d[:set_type] == 'CourseSection'}
           all_sections_overridden = section_override_count > 0 && section_override_count == assignment.context.active_section_count
-          if (assignment.context.user_has_been_observer?(user) && assignments.empty?) || !all_sections_overridden
+          if !all_sections_overridden ||
+              (assignments.empty? && courses_user_has_been_enrolled_in[:observer].include?(assignment.context_id))
             assignments << assignment
           end
         end

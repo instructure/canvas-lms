@@ -209,7 +209,7 @@ class ConferencesController < ApplicationController
           return redirect_to(urls.first[:url])
         end
       end
-      log_asset_access(@conference, "conferences", "conferences")
+      return redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
     end
   end
 

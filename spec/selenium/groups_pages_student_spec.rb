@@ -32,7 +32,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "home page" do
-      it_behaves_like 'home_page', 'student'
+      it_behaves_like 'home_page', :student
 
       it "should only allow group members to access the group home page", priority: "1", test_id: 319908 do
         get url
@@ -43,13 +43,13 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
-      it_behaves_like 'announcements_page', 'student'
+      it_behaves_like 'announcements_page', :student
 
       it "should allow group members to delete their own announcements", priority: "1", test_id: 326521 do
         create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
         expect(ff('.discussion-topic').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-topic').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
@@ -70,12 +70,12 @@ describe "groups" do
         f('.discussion-title').click
         f('.edit-btn').click
         expect(driver.title).to eq 'Edit Announcement'
-        type_in_tiny('textarea[name=message]','Rey is Yodas daughter ')
+        type_in_tiny('textarea[name=message]','Rey is Yodas daughter')
         f('.btn-primary').click
         wait_for_ajaximations
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        expect(fj('.discussion-summary').text).to include_text('Rey is Yodas daughter ')
+        expect(f('.discussion-summary').text).to include_text('Rey is Yodas daughter')
       end
 
       it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do
@@ -84,7 +84,7 @@ describe "groups" do
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         f('.discussion-title').click
-        expect(f('.edit-btn')).to be_nil
+        expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
@@ -105,7 +105,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "people page" do
-      it_behaves_like 'people_page', 'student'
+      it_behaves_like 'people_page', :student
 
       it "should display and show a list of group members", priority: "1", test_id: 273614 do
         get people_page
@@ -123,7 +123,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      it_behaves_like 'discussions_page', 'student'
+      it_behaves_like 'discussions_page', :student
 
       it "should allow discussions to be created within a group", priority: "1", test_id: 273615 do
         get discussions_page
@@ -147,7 +147,7 @@ describe "groups" do
         expect(f('#threaded')).to be_displayed
         expect(f('#allow_rating')).to be_displayed
         # Shouldn't be Enable Podcast Feed option
-        expect(f('#podcast_enabled')).to be_nil
+        expect(f("#content")).not_to contain_css('#podcast_enabled')
       end
 
       it "should only allow group members to access discussions", priority: "1", test_id: 315332 do
@@ -161,7 +161,7 @@ describe "groups" do
         get discussions_page
         expect(ff('.discussion-title-block').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-title-block').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-title-block')
       end
 
       it "should not be able to delete a discussion by a different creator", priority: "1", test_id: 420009 do
@@ -171,7 +171,7 @@ describe "groups" do
                                 message: 'There are no hover boards!')
         get discussions_page
         expect(ff('.discussion-title-block').size).to eq 1
-        expect(f('#manage_link')).to be_nil
+        expect(f("#content")).not_to contain_css('#manage_link')
       end
 
       it "should allow group members to edit their discussions", priority: "1", test_id: 312866 do
@@ -186,7 +186,7 @@ describe "groups" do
         type_in_tiny('textarea[name=message]','The slopes are ready,')
         f('.btn-primary').click
         wait_for_ajaximations
-        expect(fj('.user_content').text).to include_text('The slopes are ready,')
+        expect(f('.user_content').text).to include_text('The slopes are ready,')
       end
 
       it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
@@ -196,14 +196,14 @@ describe "groups" do
                                 message: 'Where are my skis?')
         get discussions_page
         f('.discussion-title').click
-        expect(f('.edit-btn')).to be_nil
+        expect(f("#content")).not_to contain_css('.edit-btn')
       end
 
     end
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      it_behaves_like 'pages_page', 'student'
+      it_behaves_like 'pages_page', :student
 
       it "should allow group members to create a page", priority: "1", test_id: 273611 do
         get pages_page
@@ -228,7 +228,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "Files page" do
-      it_behaves_like 'files_page', 'student'
+      it_behaves_like 'files_page', :student
 
       it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
         get files_page
@@ -295,7 +295,7 @@ describe "groups" do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
       end
 
-      it_behaves_like 'conferences_page', 'student'
+      it_behaves_like 'conferences_page', :student
 
       it "should allow access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
         get conferences_page
@@ -318,11 +318,13 @@ describe "groups" do
         replace_content(find('#collaboration_description'), "c1 description")
         fj('.available-users li:contains("1, Test Student") .icon-user').click
         fj('.btn:contains("Start Collaborating")').click
-        wait_for_ajaximations
-        # Reload page and new collaboration will be displayed on main window
-        refresh_page
-        expect(element_exists(fj('.collaboration .title:contains("c1")'))).to be true
-        expect(element_exists(fj('.collaboration .description:contains("c1 description")'))).to be true
+        keep_trying_until do
+          # verifies collaboration will be displayed on main window
+          tab1 = driver.window_handles.first
+          driver.switch_to.window(tab1)
+          expect(fj('.collaboration .title:contains("c1")')).to be_present
+          expect(fj('.collaboration .description:contains("c1 description")')).to be_present
+        end
       end
 
       it 'can invite people within your group', priority: "1", test_id: 273642 do
@@ -330,7 +332,7 @@ describe "groups" do
         seed_students(2, 'non-group student')
         get collaborations_page
         students_in_group.each do |student|
-          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be true
+          expect(fj(".available-users li:contains(#{student.sortable_name}) .icon-user")).to be_present
         end
       end
 
@@ -338,8 +340,9 @@ describe "groups" do
         # overriding '@students' array with new students not included in the group
         seed_students(2, 'non-group Student')
         get collaborations_page
+        users = f(".available-users")
         @students.each do |student|
-          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be false
+          expect(users).not_to contain_jqcss("li:contains(#{student.sortable_name}) .icon-user")
         end
       end
 

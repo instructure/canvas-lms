@@ -167,6 +167,26 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:REGRADE_OPTIONS]).to eq({q.id => 'no_regrade' })
       expect(response).to render_template("new")
     end
+
+    context "conditional release" do
+      before do
+        ConditionalRelease::Service.stubs(:env_for).returns({ dummy: 'charliemccarthy' })
+      end
+
+      it "should define env when enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(true)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @quiz.id
+        expect(assigns[:js_env][:dummy]).to eq 'charliemccarthy'
+      end
+
+      it "should not define env when not enabled" do
+        ConditionalRelease::Service.stubs(:enabled_in_context?).returns(false)
+        user_session(@teacher)
+        get 'edit', :course_id => @course.id, :id => @quiz.id
+        expect(assigns[:js_env][:dummy]).to be nil
+      end
+    end
   end
 
   describe "GET 'show'" do
@@ -424,7 +444,6 @@ describe Quizzes::QuizzesController do
 
         @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
         @course.enroll_student(@user1)
-        @course.enable_feature!(:differentiated_assignments)
 
         questions = [{:question_data => { :name => "test 1" }}]
 
@@ -910,6 +929,8 @@ describe Quizzes::QuizzesController do
       section = @course.course_sections.create!
       course_due_date = 3.days.from_now.iso8601
       section_due_date = 5.days.from_now.iso8601
+      Quizzes::Quiz.any_instance.expects(:relock_modules!).once
+
       post 'create', :course_id => @course.id,
         :quiz => {
           :title => "overridden quiz",
@@ -919,6 +940,7 @@ describe Quizzes::QuizzesController do
             :due_at => section_due_date,
           }]
         }
+
       expect(response).to be_success
       quiz = assigns[:quiz].overridden_for(@teacher)
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @teacher)
@@ -1398,7 +1420,6 @@ describe Quizzes::QuizzesController do
     before do
       course_with_teacher(active_all: true)
       @student1, @student2 = n_students_in_course(2,:active_all => true, :course => @course)
-      @course.enable_feature!(:differentiated_assignments)
       @course_section = @course.course_sections.create!
       course_quiz(active = true)
       @quiz.only_visible_to_overrides = true

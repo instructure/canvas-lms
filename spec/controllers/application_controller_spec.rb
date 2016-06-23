@@ -129,7 +129,10 @@ describe ApplicationController do
     it "should auto-set timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
-      expect(@controller.js_env[:LOCALE]).to eq 'fr-FR'
+      expect(@controller.js_env[:LOCALE]).to eq 'fr'
+      expect(@controller.js_env[:BIGEASY_LOCALE]).to eq 'fr_FR'
+      expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq 'fr'
+      expect(@controller.js_env[:MOMENT_LOCALE]).to eq 'fr'
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
@@ -464,7 +467,7 @@ describe ApplicationController do
       controller.stubs(:polymorphic_url).returns("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :is_new => false, :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
     end
   end
 
@@ -506,13 +509,13 @@ describe ApplicationController do
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 
@@ -600,6 +603,31 @@ describe ApplicationController do
     it "detects Word 2011 for mac" do
       controller.request.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X) Word/14.57.0'
       expect(controller.send(:ms_office?)).to eq true
+    end
+  end
+
+  describe "#get_all_pertinent_contexts" do
+    it "doesn't touch the database if there are no valid courses" do
+      user
+      controller.instance_variable_set(:@context, @user)
+
+      course_scope = stub('current_enrollments')
+      course_scope.stubs(:current).returns(course_scope)
+      course_scope.stubs(:shard).returns(course_scope)
+      course_scope.stubs(:preload).returns(course_scope)
+      course_scope.expects(:none).returns(Enrollment.none)
+      @user.stubs(:enrollments).returns(course_scope)
+      controller.send(:get_all_pertinent_contexts, only_contexts: 'Group_1')
+    end
+
+    it "doesn't touch the database if there are no valid groups" do
+      user
+      controller.instance_variable_set(:@context, @user)
+
+      group_scope = stub('current_groups')
+      group_scope.expects(:none).returns(Group.none)
+      @user.stubs(:current_groups).returns(group_scope)
+      controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
     end
   end
 end

@@ -21,9 +21,9 @@ require 'csv'
 class MediaObject < ActiveRecord::Base
   include Workflow
   belongs_to :user
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'ConversationMessage',
-    'Account', 'Assignment', 'AssessmentQuestion', 'ContextMessage', 'ZipFileImport']
+  belongs_to :context, polymorphic:
+    [:course, :group, :conversation_message, :account, :assignment,
+     :assessment_question, { context_user: 'User' }], exhaustive: false
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 
@@ -107,7 +107,7 @@ class MediaObject < ActiveRecord::Base
           JSON.parse(entry[:originalId]).with_indifferent_access
         rescue JSON::ParserError
           Rails.logger.error("Failed to parse kaltura partner info: #{entry[:originalId]}")
-          {}
+          Rack::Utils.parse_nested_query(entry[:originalId]).with_indifferent_access
         end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end

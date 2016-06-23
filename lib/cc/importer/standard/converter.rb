@@ -44,6 +44,8 @@ module CC::Importer::Standard
 
     # exports the package into the intermediary json
     def convert(to_export = nil)
+      @course[:assignments] ||= []
+
       @archive.prepare_cartridge_file(MANIFEST_FILE)
       @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
       @manifest.remove_namespaces!
@@ -55,7 +57,7 @@ module CC::Importer::Standard
       @course[:discussion_topics] = convert_discussions
       lti_converter = CC::Importer::BLTIConverter.new
       @course[:external_tools] = convert_blti_links_with_flat(lti_converter)
-      @course[:assignments] = lti_converter.create_assignments_from_lti_links(@course[:external_tools])
+      @course[:assignments] += lti_converter.create_assignments_from_lti_links(@course[:external_tools])
       convert_cc_assignments(@course[:assignments])
       @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)

@@ -17,6 +17,7 @@
 #
 
 require 'oauth2'
+require 'canvas/core_ext/oauth2'
 
 class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
 

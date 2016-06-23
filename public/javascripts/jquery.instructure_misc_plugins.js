@@ -174,14 +174,13 @@ define([
   $.fn.fragmentChange = function(fn) {
     if(fn && fn !== true) {
       var query = (window.location.search || "").replace(/^\?/, "").split("&");
-      var idx;
       // The URL can hard-code a hash regardless of what's
       // actually shown in the hash by specifying a query
       // parameter, hash=some_hash
       var query_hash = null;
-      for(idx in query) {
-        var item = query[idx];
-        if(item && item.indexOf("hash=") === 0) {
+      for (var i = 0; i < query.length; i++) {
+        var item = query[i]
+        if (item && item.indexOf("hash=") === 0) {
           query_hash = "#" + item.substring(5);
         }
       }
@@ -190,8 +189,8 @@ define([
       var found = false;
       // Can only be used on the root document,
       // will not work on an iframe, for example.
-      for(idx in $._checkFragments.fragmentList) {
-        var obj = $._checkFragments.fragmentList[idx];
+      for (var i = 0; i < $._checkFragments.fragmentList.length; i++) {
+        var obj = $._checkFragments.fragmentList[i];
         if(obj.doc[0] == $doc[0]) {
           found = true;
         }
@@ -217,7 +216,7 @@ define([
   };
   $._checkFragments = function() {
     var list = $._checkFragments.fragmentList;
-    for(var idx in list) {
+    for (var idx = 0; idx < list.length; idx++) {
       var obj = list[idx];
       var $doc = obj.doc;
       if($doc[0].location.hash != obj.fragment) {

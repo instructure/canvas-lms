@@ -39,7 +39,7 @@ describe 'Course Grading Periods' do
 
     it 'creates a blank grading period form when Add Grading Period is clicked', priority: "1", test_id: 239999 do
       get "/courses/#{@course.id}/grading_standards"
-      expect(ff('.grading-period').length).to eq(0)
+      expect(f("#content")).not_to contain_css(".grading-period")
       f('#add-period-button').click
       expect(ff('.grading-period').length).to eq(1)
     end
@@ -130,7 +130,7 @@ describe 'Course Grading Periods' do
   context 'with Multiple Grading Periods feature off', priority: "1", test_id: 240005 do
     it 'does not contain a tab for grading periods' do
       get "/courses/#{@course.id}/grading_standards"
-      expect(f(".grading_periods_tab")).to be_nil
+      expect(f("#content")).not_to contain_css(".grading_periods_tab")
     end
   end # mgp feature off
 end # course grading periods
@@ -143,9 +143,8 @@ describe 'Course Grading Periods Inheritance' do
   include_examples 'in-process server selenium tests'
 
   let(:title) {'hi'}
-  let(:start_date) { 3.months.from_now.strftime('%b %-d') }
-  let(:end_date) { (4.months.from_now - 1.day).strftime('%b %-d') }
-  let(:date_time_format)  {'%b %-d, %Y at %-l:%M%P'}   # e.g. May 28, 2015 at 8:58pm
+  let(:start_date) { format_date_for_view(3.months.from_now) }
+  let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
 
   before(:each) do
     course_with_admin_logged_in
@@ -210,8 +209,8 @@ describe 'Course Grading Periods Inheritance' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
       end # as admin
 
@@ -243,8 +242,8 @@ describe 'Course Grading Periods Inheritance' do
 
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
-          expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
+          expect(f("#period_start_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.start_date, :medium))
+          expect(f("#period_end_date_#{new_id}")).to have_value(format_time_for_view(new_grading_period.end_date, :medium))
         end
       end # as sub-admin
 

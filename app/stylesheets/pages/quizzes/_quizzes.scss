@@ -35,8 +35,7 @@ li.quiz {
   }
   .ig-title {
     flex: 1;
-    @include breakpoint(desktop) { flex: 0 0 25%; }
-    @include breakpoint(wide) { flex: 0 0 30%; }
+    @include breakpoint(desktop) { flex: 0 0 30%;}
   }
   .ig-details { flex: 1; }
   .default-dates .status-description { font-weight: bold; }
@@ -1265,6 +1264,7 @@ ul#quiz_versions {
   #unpublished_changes_message {
     padding: 12px;
     border-width: 1px;
+    margin-bottom: 0.7em;
   }
   #quiz_display_points_possible {
     line-height: 40px;
@@ -1282,7 +1282,24 @@ ul#quiz_versions {
     overflow-x: scroll;
   }
   #quiz_tabs {
-    margin-top: 0.7em;
+    #quiz_tabs_tab_list {
+      display: flex;
+      align-items: flex-end;
+
+      #quiz_tabs_spacer {
+        flex: 1;
+      }
+
+      .header-bar-right {
+        display: flex;
+        align-items: center;
+
+        .admin-links {
+          padding-bottom: 6px;
+        }
+      }
+    }
+
     #questions_tab {
       background: $backgroundColor;
       #show_question_details_wrap {
@@ -1777,17 +1794,6 @@ ul#quiz_versions {
   }
 }
 
-// use a solid color instead of a gradient in IE, because IE's gradient
-// filter causes the box to hide overflow (including the box's comment
-// arrow.
-.ie .quiz_comment {
-  background: #f4f5f6;
-  filter: none;
-  &:after {
-    border-bottom-color: #f4f5f6;
-  }
-}
-
 .answer_comment_holder {
   border-radius: 5px;
   border: 1px solid #faa;
@@ -2263,5 +2269,15 @@ li.quiz.quiz-loading-overrides {
     background-repeat: no-repeat;
     opacity: 0.35;
     width: 100%;
+  }
+}
+
+.rce_links {
+  float: right;
+  font-size: 0.8em;
+  cursor: pointer;
+
+  .icon-info {
+    margin-left: 2px;
   }
 }

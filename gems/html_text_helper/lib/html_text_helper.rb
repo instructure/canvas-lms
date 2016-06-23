@@ -218,7 +218,7 @@ module HtmlTextHelper
                               link = s
                               link = "http://#{link}" if link[0, 3] == 'www'
                               link = add_notification_to_link(link, opts[:notification_id]) if opts[:notification_id]
-                              link = URI.escape(link).gsub("'", "%27")
+                              link = link.gsub("'", "%27")
                               links << link
                               "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(s)}</a>"
                             end

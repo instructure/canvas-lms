@@ -8,24 +8,33 @@
 
 $body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
-$embedded-footer-bg:                $ic-color-neutral;
-$embedded-footer-border-color:      $ic-border-color;
-$embedded-footer-box-shadow:        $ic-color-light;
 $layout-modal-bg:                   $ic-color-light;
 $layout-modal-font-color:           $ic-color-dark;
 $footer-links-color:                lighten($ic-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
+@if $use_new_styles == false {
+  body, html { height: 100%; }
+}
+
 @if $use_new_styles {
-  body {
-    min-height: 100vh;
-    min-width: 768px;
+  body:not(.full-width) .ic-app-container {
+    // We want to add a max size to most pages in canvas
+    // unless it's a full-width app
+    max-width: 1366px;
   }
 }
-@else { body, html { height: 100%; } }
+
 
 body {
-  @if $use_new_styles == false { min-width: $min_main_width; }
+  @if $use_new_styles {
+    min-height: 100vh;
+    &:not(.is-inside-submission-frame):not(.embedded) {
+      min-width: 768px;
+    }
+  }
+  @else { min-width: $min_main_width; }
+
   @if $use_high_contrast { background: white; }
   @else {
     @if $use_new_styles {
@@ -34,6 +43,7 @@ body {
     }
     @else { background-color: $ic-body-background-color; }
   }
+
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
     @if $use_new_styles {
@@ -77,26 +87,6 @@ body {
         display: none;
       }
     }
-    .embedded-footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      padding: 14px 0 15px;
-      margin: 0 -1em !important;
-      background-color: $embedded-footer-bg;
-      border-top: 1px solid $embedded-footer-border-color;
-      box-shadow: inset 0 1px 0 $embedded-footer-box-shadow;
-      text-align: right;
-      .footer-info {
-        position: absolute;
-        left: 1em;
-        top: 1.5em;
-      }
-      .controls {
-        margin-left: 15px;
-        margin-right: 15px;
-      }
-    }
     #modal-box {
       background: $layout-modal-bg !important;
       color: $layout-modal-font-color !important;
@@ -115,8 +105,7 @@ body {
 
 @if $use_new_styles {
   #wrapper-container {
-    margin-left: $ic-header-primary-width - $ic-sp;
-    @include breakpoint(wide) { margin-left: $ic-header-primary-width; }
+    margin-left: $ic-header-primary-width;
     body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
     body.no-headers & { margin-left: 0; }
   }
@@ -141,7 +130,13 @@ body {
 }
 
 #content {
-  @if $use_new_styles { padding: $ic-sp*2; }
+  @if $use_new_styles {
+    padding: $ic-sp*2;
+    body.is-inside-submission-frame & {
+      padding-left: $ic-sp;
+      padding-right: $ic-sp;
+    }
+  }
   @else {
     padding: 1em;
     overflow: hidden;
@@ -252,5 +247,45 @@ div.content_notice {
   }
   i {
     padding-right: 8px;
+  }
+}
+
+iframe.tool_launch {
+  min-height: 500px;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+// implemented to make new profile page use flex for layout //
+.ic-Layout {
+  display: flex;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  width: 100%;
+}
+.ic-Layout__Primary {
+  flex: 2;
+    @include breakpoint(desktop) {
+    flex: 3;
+  }
+}
+.ic-Layout__Secondary {
+  flex: 1;
+  text-align: right;
+}
+#skip_navigation_link {
+  @include accessibility-prompt;
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  &:focus {
+    left: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+    z-index: 1;
   }
 }

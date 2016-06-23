@@ -341,7 +341,8 @@ define([
             $.each(uploadedGradebook.assignments, function(index){
               if(uploadedGradebook.assignments[index].previous_id && _.all(uploadedGradebook.students, function(student){
                 var submission = student.submissions[index];
-                return submission.original_grade == submission.grade || (!submission.original_grade && !submission.grade);
+
+                return parseFloat(submission.original_grade) == parseFloat(submission.grade) || (!submission.original_grade && !submission.grade);
               })) {
                 indexes_to_delete.push(index);
               }

@@ -21,8 +21,7 @@ class Rubric < ActiveRecord::Base
   attr_accessible :user, :rubric, :context, :points_possible, :title, :description, :reusable, :public, :free_form_criterion_comments, :hide_score_total
   belongs_to :user
   belongs_to :rubric # based on another rubric
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
@@ -35,7 +34,7 @@ class Rubric < ActiveRecord::Base
   after_save :update_alignments
   after_save :touch_associations
 
-  serialize_utf8_safe :data
+  serialize :data
   simply_versioned
 
   scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }
@@ -208,7 +207,7 @@ class Rubric < ActiveRecord::Base
     return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
-    return true if data.criteria != self.criteria
+    return true if Rubric.normalize(data.criteria) != Rubric.normalize(self.criteria)
     false
   end
 
@@ -257,5 +256,22 @@ class Rubric < ActiveRecord::Base
 
   def update_assessments_for_new_criteria(new_criteria)
     criteria = self.data
+    end
+
+  # undo innocuous changes introduced by migrations which break `will_change_with_update?`
+  def self.normalize(criteria)
+    case criteria
+    when Array
+      criteria.map { |criterion| Rubric.normalize(criterion) }
+    when Hash
+      h = criteria.reject { |k, v| v.blank? }.stringify_keys
+      h.delete('title') if h['title'] == h['description']
+      h.each do |k, v|
+        h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)
+      end
+      h
+    else
+      criteria
+    end
   end
 end

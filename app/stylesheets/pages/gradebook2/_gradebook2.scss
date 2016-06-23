@@ -2,7 +2,7 @@ $gradebook_letter-grade-font: lighten($ic-color-dark, 8%);
 
 a#accessibility_warning {
   @include accessibility-prompt;
-  @include fontSize($ic-font-size--small);
+  @include fontSize(14px);
 }
 
 #footer {
@@ -76,13 +76,13 @@ $cell_height: 33px;
 }
 
 .student-section {
-  margin-top: -7px;
-  @include fontSize(10px);
+  margin-top: -5px;
+  @include fontSize(12px);
 }
 
 .secondary_identifier_cell, .custom_column {
   color: #333333;
-  @include fontSize(10px);
+  @include fontSize(12px);
   text-align: center;
   line-height: 35px;
 }
@@ -109,7 +109,7 @@ $cell_height: 33px;
   background-color: #f3f4f8;
   background-image: none;
   padding: 10px;
-  @include fontSize($ic-font-size--xsmall);
+  @include fontSize(12px);
   text-align: center;
   font-weight: normal;
   // override jqueryUI style
@@ -147,7 +147,7 @@ $cell_height: 33px;
   }
   .assignment-points-possible {
     font-weight: normal;
-    @include fontSize(10px);
+    @include fontSize(12px);
     margin: {
       left: 10px;
       right: 14px;
@@ -274,8 +274,35 @@ $cell_height: 33px;
   }
 }
 
+// We need both visibility and opacity because visibility is binary but opacity will allow fading in/out
+@keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-o-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-moz-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@-webkit-keyframes fade-in-and-out {
+  0%   { opacity: 0; visibility: hidden; }
+  1%   { opacity: 0; visibility: visible; }
+  75%  { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
 .gradebook-tooltip {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   background-color: #444444;
   color: white;
   border-radius: 3px;
@@ -295,8 +322,17 @@ $cell_height: 33px;
     left: 15px;
     content: "";
   }
-  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected &, .slick-cell.active & {
-    display: block;
+  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected & {
+    visibility: visible;
+    opacity: 1;
+  }
+  .slick-cell.active &, .slick-cell.editable & {
+    visibility: visible;
+    opacity: 1;
+    -webkit-animation: fade-in-and-out 2s 1 forwards;
+    -moz-animation: fade-in-and-out 2s 1 forwards;
+    -o-animation: fade-in-and-out 2s 1 forwards;
+    animation: fade-in-and-out 2s 1 forwards;
   }
   &.first-row {
     @include first-row-tooltip();
@@ -474,7 +510,7 @@ $cell_height: 33px;
     border: none;
     text-align: center;
     outline: none;
-    @include fontSize($ic-font-size--xsmall);
+    @include fontSize(12px);
     width: 100%;
     padding: 0;
     margin: 0;
@@ -524,7 +560,7 @@ $cell_height: 33px;
       border: none;
       text-align: right;
       outline: none;
-      @include fontSize($ic-font-size--xsmall);
+      @include fontSize(12px);
     }
     .grade::-webkit-outer-spin-button {
       display: none;
@@ -606,7 +642,6 @@ $gradebook_checkbox_width: 16px;
   display: inline-block;
   input {
     width: 248px;
-    @include breakpoint(wide) { width: 300px; }
   }
   @if $use_new_styles {
     @include breakpoint(desktop) {
@@ -687,7 +722,7 @@ $gradebook_checkbox_width: 16px;
 .letter-grade-points,
 .gpa-scale-points {
   position: absolute;
-  @include fontSize(11px);
+  @include fontSize(12px);
   padding-left: 8px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;

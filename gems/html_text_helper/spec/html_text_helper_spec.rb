@@ -54,7 +54,12 @@ describe HtmlTextHelper do
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages/informação").first
       html = Nokogiri::HTML::DocumentFragment.parse(str)
       link = html.css('a').first
-      link['href'].should == "http://www.instructure.com/courses/1/pages/informa%C3%A7%C3%A3o"
+      link['href'].should == "http://www.instructure.com/courses/1/pages/informação"
+
+      str = th.format_message("click here: http://www.instructure.com/courses/1/pages#anchor").first
+      html = Nokogiri::HTML::DocumentFragment.parse(str)
+      link = html.css('a').first
+      link['href'].should == "http://www.instructure.com/courses/1/pages#anchor"
 
       str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
       html = Nokogiri::HTML::DocumentFragment.parse(str)

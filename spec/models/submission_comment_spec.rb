@@ -38,7 +38,7 @@ describe SubmissionComment do
 
   describe 'notifications' do
     before(:once) do
-      Notification.create(:name => 'Submission Comment')
+      Notification.create(:name => 'Submission Comment', category: 'TestImmediately')
       Notification.create(:name => 'Submission Comment For Teacher')
     end
 
@@ -50,10 +50,23 @@ describe SubmissionComment do
       expect(comment.messages_sent.keys.sort).to eq ["Submission Comment For Teacher"]
     end
 
+    it "dispatches notifications to observers" do
+      course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student.id)
+      @submission.add_comment(:author => @teacher, :comment => "some comment")
+      expect(@observer.email_channel.messages.length).to eq 1
+    end
+
     it "should not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
       expect(@course).to_not be_available
+      expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
+    end
+
+    it "should not dispatch notification on create if student is inactive" do
+      @student.enrollments.first.deactivate
+
+      @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 

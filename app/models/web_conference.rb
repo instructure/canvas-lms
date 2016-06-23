@@ -21,8 +21,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings, :context
   attr_readonly :context_id, :context_type
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group', 'Account']
+  belongs_to :context, polymorphic: [:course, :group, :account]
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: 'invitee' }) }, through: :web_conference_participants, source: :user
@@ -306,9 +305,9 @@ class WebConference < ActiveRecord::Base
 
   def active?(force_check=false)
     if !force_check
+      return false if self.ended_at && Time.now > self.ended_at
       return true if self.start_at && (self.end_at.nil? || self.end_at && Time.now > self.start_at && Time.now < self.end_at)
       return true if self.ended_at && Time.now < self.ended_at
-      return false if self.ended_at && Time.now > self.ended_at
       return @conference_active if @conference_active
     end
     @conference_active = (conference_status == :active)

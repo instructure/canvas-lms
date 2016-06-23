@@ -174,6 +174,20 @@ describe DeveloperKeysController do
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
+      it "Shouldn't be allowed to update dev keys for a foreign account" do
+        dk = @other_root_account.developer_keys.create!
+        post 'update', id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq "You don't have permission to access that page"
+      end
+
+      it "Shouldn't be allowed to update global dev keys" do
+        dk = DeveloperKey.create!
+        post 'update', id: dk.id, account_id: @test_domain_root_account_admin.id, developer_key: { event: :deactivate }
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq "You don't have permission to access that page"
+      end
+
       it "Shouldn't be allowed to view foreign accounts dev_key" do
         dk = @other_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
 
