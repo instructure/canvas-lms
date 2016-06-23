@@ -361,8 +361,9 @@ $revision-button-hover-color: $ic-brand-primary;
   .show-content {
     overflow-x: auto;
     @if $use_new_styles {
+      box-sizing: border-box;
       padding: 0 $ic-sp;
-      @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; }
+      @include breakpoint(desktop) { padding: 0 $ic-sp*2 0 $ic-sp; }
     }
     @else {
       padding: 15px 25px;
@@ -441,7 +442,6 @@ $revision-button-hover-color: $ic-brand-primary;
   .show-content {
     @if $use_new_styles {
       @include breakpoint(desktop) {
-        float: left;
         margin-right: $revision-sidebar-width;
       }
     }
