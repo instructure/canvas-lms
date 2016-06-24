@@ -27,7 +27,8 @@ module Lti
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
-                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment
+                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment,
+                  :collaboration
 
     def self.register_expansion(name, permission_groups, proc, guard = -> { true })
       @expansions ||= {}
@@ -47,6 +48,7 @@ module Lti
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
+    COLLABORATION_GUARD = -> { @collaboration }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
@@ -97,6 +99,14 @@ module Lti
     register_expansion 'Canvas.api.domain', [],
                        -> { HostUrl.context_host(@root_account, @request.host) }
 
+    # returns the api url for the members of the collaboration
+    # @example
+    #  ```
+    #  https://canvas.instructure.com/api/v1/collaborations/1/members
+    #  ```
+    register_expansion 'Canvas.api.collaborationMembers.url', [],
+                       -> { @controller.api_v1_collaboration_members_url(@collaboration) },
+                       COLLABORATION_GUARD
     # returns the base URL for the current context.
     # @example
     #   ```

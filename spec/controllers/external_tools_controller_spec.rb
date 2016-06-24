@@ -619,6 +619,21 @@ describe ExternalToolsController do
       expect(flash[:error]).to eq "Couldn't find valid settings for this link"
     end
 
+    it "should return a variable expansion for a collaboration" do
+      user_session(@teacher)
+      collab = ExternalToolCollaboration.create!(
+        title: "my collab",
+        user: @teacher,
+        url: 'http://www.example.com'
+      )
+      tool = new_valid_tool(@course)
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.settings[:custom_fields] = { 'collaboration_url' => '$Canvas.api.collaborationMembers.url' }
+      tool.save!
+      get 'retrieve', course_id: @course.id, url: tool.url, content_item_id: collab.id, placement: 'collaboration'
+      expect(assigns[:lti_launch].params['custom_collaboration_url']).to eq api_v1_collaboration_members_url(collab)
+    end
+
     it "should remove query params when post_only is set" do
       u = user(:active_all => true)
       account.account_users.create!(user: u)
@@ -640,83 +655,92 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
 
-    it "lets you specify the selection_type" do
-      u = user(active_all: true)
-      account.account_users.create!( user: u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, account_id: account.id, placement: 'collaboration'}
-      expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
-    end
+    context 'collaborations' do
+      let(:collab) do
+        collab = ExternalToolCollaboration.create!(
+          title: "my collab",
+          user: @teacher,
+          url: 'http://www.example.com'
+        )
+      end
 
-    it "creates a content-item return url with an id" do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      return_url = assigns[:lti_launch].params['content_item_return_url']
-      expect(return_url).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog/3"
-    end
+      it "lets you specify the selection_type" do
+        u = user(active_all: true)
+        account.account_users.create!( user: u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, account_id: account.id, placement: 'collaboration'}
+        expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
+      end
 
-    it "sets the auto_create param to true" do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      expect(assigns[:lti_launch].params['auto_create']).to eq "true"
-    end
+      it "creates a content-item return url with an id" do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        return_url = assigns[:lti_launch].params['content_item_return_url']
+        expect(return_url).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog/#{collab.id}"
+      end
 
-    it "sets the accept_unsigned param to false" do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      expect(assigns[:lti_launch].params['accept_unsigned']).to eq "false"
-    end
+      it "sets the auto_create param to true" do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        expect(assigns[:lti_launch].params['auto_create']).to eq "true"
+      end
 
-    it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      data = assigns[:lti_launch].params['data']
-      json_data = Canvas::Security.decode_jwt(data)
-      expect(json_data[:content_item_id]).to eq "3"
-    end
+      it "sets the accept_unsigned param to false" do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        expect(assigns[:lti_launch].params['accept_unsigned']).to eq "false"
+      end
 
-    it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      data = assigns[:lti_launch].params['data']
-      json_data = Canvas::Security.decode_jwt(data)
-      expect(json_data[:oauth_consumer_key]).to eq tool.consumer_key
-    end
+      it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        data = assigns[:lti_launch].params['data']
+        json_data = Canvas::Security.decode_jwt(data)
+        expect(json_data[:content_item_id]).to eq collab.id.to_s
+      end
 
-    it 'adds to the data element the default launch url' do
-      u = user(active_all: true)
-      account.account_users.create!(user:u)
-      user_session u
-      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
-      tool.save!
-      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
-      data = assigns[:lti_launch].params['data']
-      json_data = Canvas::Security.decode_jwt(data)
-      expect(json_data[:default_launch_url]).to eq tool.url
-    end
+      it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        data = assigns[:lti_launch].params['data']
+        json_data = Canvas::Security.decode_jwt(data)
+        expect(json_data[:oauth_consumer_key]).to eq tool.consumer_key
+      end
 
+      it 'adds to the data element the default launch url' do
+        u = user(active_all: true)
+        account.account_users.create!(user:u)
+        user_session u
+        tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+        tool.save!
+        get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id: collab.id }
+        data = assigns[:lti_launch].params['data']
+        json_data = Canvas::Security.decode_jwt(data)
+        expect(json_data[:default_launch_url]).to eq tool.url
+      end
+    end
   end
 
   describe "GET 'resource_selection'" do

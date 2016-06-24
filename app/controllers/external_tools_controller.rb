@@ -522,6 +522,7 @@ class ExternalToolsController < ApplicationController
       accept_presentation_document_targets << 'window'
       accept_unsigned = false
       auto_create = true
+      collaboration = ExternalToolCollaboration.find(opts[:content_item_id]) if opts[:content_item_id]
     when 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])
       accept_media_types = '*/*'
@@ -549,7 +550,7 @@ class ExternalToolsController < ApplicationController
         accept_unsigned: accept_unsigned,
         auto_create: auto_create,
         context_title: @context.name,
-    }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
+    }).merge(extra_params).merge(variable_expander(tool:tool, collaboration: collaboration).expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = launch_url

@@ -26,6 +26,13 @@ module Lti
     let(:group) { course.groups.new(name: 'Group', group_category: group_category) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
+    let(:collaboration) do
+      ExternalToolCollaboration.new(
+        title: "my collab",
+        user: user,
+        url: 'http://www.example.com'
+      )
+    end
     let(:substitution_helper) { stub_everything }
     let(:right_now) { DateTime.now }
     let(:tool) do
@@ -381,6 +388,18 @@ module Lti
           expect(ids.size).to eq 2
           expect(ids.include?(g1.lti_context_id)).to be true
           expect(ids.include?(g2.lti_context_id)).to be true
+        end
+      end
+
+      context 'context is a course with an assignment' do
+        subject { described_class.new(root_account, course, controller, collaboration: collaboration) }
+
+        it 'has substitution for $Canvas.api.collaborationMembers.url' do
+          collaboration.stubs(:id).returns(1)
+          controller.stubs(:api_v1_collaboration_members_url).returns('https://www.example.com/api/v1/collaborations/1/members')
+          exp_hash = {test: '$Canvas.api.collaborationMembers.url'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'https://www.example.com/api/v1/collaborations/1/members'
         end
       end
 
