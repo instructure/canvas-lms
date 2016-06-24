@@ -2885,11 +2885,11 @@ nn:
       descriptions: 
         etherpad: |-
             EtherPad er eit ope kjeldeprosjekt som gjer at du raskt kan bruke delte dokument.  Det er raskt nok til at du kan sjå kva andre skriv når dei faktisk skriv det. På den andre sida er "pads" ikkje passordbeskytta, slik at kven som helst med ei lenke kan redigere det som vert skrive. EtherPad passar betre enn Google Docs dersom du støttar anonymitet og/eller vil la personar utan Google-kontoar ta del.  
-              
+            
             **Åtvaring**: kontroller om du er kjend med [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt vert lagra og sikra.
         google_docs: |-
             Google Docs er ei fantastisk plattform for samarbeid i gruppeprosjekt.  Det liknar på Microsoft Word, men du kan arbeide saman med andre på same fila til same tid utan å måtte sende ho rundt med e-post.  
-              
+            
             **Åtvaring**: du (og alle samarbeidspartnarane) treng ein Google-konto for å kunne ta del i alt samarbeid gjennom Google Docs.
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
