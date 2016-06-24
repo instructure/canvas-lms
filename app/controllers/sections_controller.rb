@@ -95,9 +95,9 @@ class SectionsController < ApplicationController
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
   #   - "enrollments": If 'students' is also included, return the section
-  #      enrollment for each student
+  #     enrollment for each student
   #   - "total_students": Returns the total amount of active and invited students
-  #      for the course section
+  #     for the course section
   #   - "passback_status": Include the grade passback status.
   #
   # @returns [Section]
@@ -109,8 +109,9 @@ class SectionsController < ApplicationController
 
       includes = Array(params[:include])
 
-      render :json => sections_json(@context.active_course_sections,
-                                    @current_user, session, includes)
+      sections = Api.paginate(@context.active_course_sections, self, api_v1_course_sections_url)
+
+      render :json => sections_json(sections, @current_user, session, includes)
     end
   end
 
