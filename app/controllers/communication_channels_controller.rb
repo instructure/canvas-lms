@@ -338,7 +338,14 @@ class CommunicationChannelsController < ApplicationController
         if @pseudonym && params[:register]
           @user.require_acceptance_of_terms = require_terms?
           @user.attributes = params[:user] if params[:user]
-          @pseudonym.attributes = params[:pseudonym] if params[:pseudonym]
+
+          if params[:pseudonym]
+            if @pseudonym.unique_id.present?
+              params[:pseudonym].delete(:unique_id)
+            end
+            @pseudonym.attributes = params[:pseudonym]
+          end
+
           @pseudonym.communication_channel = cc
 
           # ensure the password gets validated, but don't require confirmation
