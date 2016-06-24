@@ -2115,17 +2115,22 @@ define([
 
       // create toggler instance on the first click
       if (!toggler) {
+        var tinyOptions = {}
+
         var inputColumn = $comment.parents().find('.answer_type:visible')[0]
 
-        var rightMargin = parseInt($comment.css('marginRight')) || 0
-        var leftMargin = parseInt($comment.css('marginLeft')) || 0
-        var commentMargin = rightMargin + leftMargin
+        if (inputColumn) {
+          var rightMargin = parseInt($comment.css('marginRight')) || 0
+          var leftMargin = parseInt($comment.css('marginLeft')) || 0
+          var commentMargin = rightMargin + leftMargin
 
-        var rceWidth = inputColumn.offsetWidth - commentMargin
+          var rceWidth = inputColumn.offsetWidth - commentMargin
+          tinyOptions.width = rceWidth
+        }
 
         toggler = new EditorToggle($comment_html, {
           editorBoxLabel: $link.title,
-          tinyOptions: {width: rceWidth}
+          tinyOptions: tinyOptions
         });
 
         toggler.editButton = $link;
