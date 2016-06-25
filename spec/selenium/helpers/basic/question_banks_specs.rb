@@ -6,13 +6,10 @@ shared_examples_for "question bank basic tests" do
   end
 
   def add_question_bank(title = 'bank 1')
-    question_bank_title = keep_trying_until do
-      f(".add_bank_link").click
-      wait_for_ajaximations
-      question_bank_title = f("#assessment_question_bank_title")
-      expect(question_bank_title).to be_displayed
-      question_bank_title
-    end
+    f(".add_bank_link").click
+    wait_for_ajaximations
+    question_bank_title = f("#assessment_question_bank_title")
+    expect(question_bank_title).to be_displayed
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
     question_bank = AssessmentQuestionBank.where(title: title).first

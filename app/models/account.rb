@@ -21,7 +21,7 @@ require 'atom'
 class Account < ActiveRecord::Base
   include Context
   attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
-    :turnitin_host, :turnitin_comments, :turnitin_pledge,
+    :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
@@ -100,6 +100,7 @@ class Account < ActiveRecord::Base
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
+  has_many :shared_brand_configs
   belongs_to :brand_config, foreign_key: "brand_config_md5"
 
   before_validation :verify_unique_sis_source_id
@@ -186,6 +187,7 @@ class Account < ActiveRecord::Base
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
+  add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
   add_setting :external_notification_warning, :boolean => true, :default => false
   # Terms of Use and Privacy Policy settings for the root account
@@ -1245,6 +1247,14 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def closest_turnitin_originality
+    if self.turnitin_originality && !self.turnitin_originality.empty?
+      self.turnitin_originality
+    else
+      self.parent_account.try(:turnitin_originality)
+    end
+  end
+
   def self_enrollment_allowed?(course)
     if !settings[:self_enrollment].blank?
       !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
@@ -1274,6 +1284,7 @@ class Account < ActiveRecord::Base
   TAB_QUESTION_BANKS = 13
   TAB_ADMIN_TOOLS = 17
   TAB_SEARCH = 18
+  TAB_BRAND_CONFIGS = 19
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1336,6 +1347,7 @@ class Account < ActiveRecord::Base
         tabs << { id: TAB_SIS_IMPORT, label: t('#account.tab_sis_import', "SIS Import"),
                   css_class: 'sis_import', href: :account_sis_import_path }
       end
+      tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && (root_account.feature_enabled?(:use_new_styles) || root_account.feature_enabled?(:k12)) && branding_allowed?
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && root_account.grants_right?(user, :manage_developer_keys)
     end
     tabs += external_tool_tabs(opts)

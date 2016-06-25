@@ -2,15 +2,8 @@
   content_for :page_title, t(:page_title, "App Login")
 %>
 <div class="face">
-  <h2><%= @provider.app_name %></h2>
   <p>
-  <%= mt 'details.allow_application', "%{app_name} is requesting access to your account.", :app_name => @provider.app_name %>
-    <br/><br/>
-    <%= mt 'details.login_name', "You are authorizing this app as %{user_name}.", :user_name => link_to(@current_user.short_name, user_profile_url(@current_user), :popup => true) %>
-    <% if @current_user.email.present? && @current_user.email != @current_user.short_name %>
-      <br/>
-      <%= t 'details.email', "Your email address is %{email}.", :email => @current_user.email %>
-    <% end %>
+    <%= mt 'details.allow_application', " Allow %{app_name} to access your account.", :app_name => @provider.app_name %>
   </p>
   <%= form_tag oauth2_auth_accept_path do %>
     <div class="button_box">
@@ -21,7 +14,7 @@
       <div class="control-group">
         <label class="checkbox" for="remember_access">
           <%= check_box_tag(:remember_access, "1", false, :class => "checkbox") %>
-          <%= t 'remember_auth', 'Remember my authorization for this service' %>
+          <%= t 'remember_auth', 'Remember Authorization' %>
         </label>
       </div>
     <% end %>

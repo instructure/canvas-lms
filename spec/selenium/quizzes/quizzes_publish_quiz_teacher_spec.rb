@@ -20,19 +20,18 @@ describe 'publishing a quiz' do
 
       context 'after the ajax calls finish' do
         before(:each) do
-          f('#quiz-publish-link').click
-          wait_for_ajaximations
           wait_for_quiz_publish_button_to_populate
+          f('#quiz-publish-link').click
         end
 
         it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do
-          driver.mouse.move_to f('#footer')
-          expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Published'
+          driver.mouse.move_to f('#header')
+          expect(f('#quiz-publish-link')).to include_text 'Published'
         end
 
         it 'changes the button text on hover to |Unpublish|', priority: "1", test_id: 398936 do
           driver.mouse.move_to f('#quiz-publish-link')
-          expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Unpublish'
+          expect(f('#quiz-publish-link')).to include_text 'Unpublish'
         end
 
         it 'removes the \'This quiz is unpublished\' message', priority: "1", test_id: 398937 do
@@ -40,14 +39,10 @@ describe 'publishing a quiz' do
         end
 
         it 'adds links to the right sidebar', priority: "1", test_id: 398938 do
-          links_text = []
-          ff('ul.page-action-list li').each do |link|
-            # also remove the trademark (TM) unicode character
-            links_text << link.text.split("\n")[0].delete("^\u{0000}-\u{007F}")
-          end
+          links = ff('ul.page-action-list li')
 
-          expect(links_text).to include 'Moderate This Quiz'
-          expect(links_text).to include 'SpeedGrader'
+          expect(links[0]).to include_text 'Moderate This Quiz'
+          expect(links[1]).to include_text 'SpeedGrader'
         end
 
         it 'displays both |Preview| buttons', priority: "1", test_id: 398939 do
@@ -56,12 +51,13 @@ describe 'publishing a quiz' do
 
         context 'when clicking the cog menu tool' do
           before(:each) do
-            fj('a.al-trigger', '.header-group-right').click
+            wait_for_ajaximations
+            f('.header-group-right a.al-trigger').click
             wait_for_ajaximations
           end
 
           it 'shows updated options', priority: "1", test_id: 398940 do
-            items = ffj('li.ui-menu-item', 'ul#toolbar-1')
+            items = ff('ul#toolbar-1 li.ui-menu-item')
             items_text = []
             items.each { |i| items_text << i.text.split("\n")[0] }
 

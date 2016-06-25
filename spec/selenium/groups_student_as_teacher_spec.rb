@@ -58,9 +58,9 @@ describe "student groups" do
 
         # verify each student is in the group
         expected_students = ["Test Student 1","Test Student 2","Test Student 3","Test Student 4"]
-        users = fj("[data-view=groupUsers]")
+        users = f("[data-view=groupUsers]")
         expected_students.each do |student|
-          keep_trying_until(2) { expect(users).to include_text(student.to_s) }
+          expect(users).to include_text(student.to_s)
         end
       end
 

@@ -961,6 +961,12 @@ define([
     $('#aria_alerts').empty();
     $.each(errors, function(name, msg) {
       var $obj = $form.find(":input[name='" + name + "'],:input[name*='[" + name + "]']").filter(":visible").first();
+      if(!$obj || $obj.length === 0) {
+        var $hiddenInput = $form.find("[name='" + name + "'],[name*='[" + name + "]']").filter(":not(:visible)").first();
+        if ($hiddenInput && $hiddenInput.length > 0) {
+          $obj = $hiddenInput.prev();
+        }
+      }
       if(!$obj || $obj.length === 0 || name == "general") {
         $obj = $form;
       }

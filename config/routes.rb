@@ -338,6 +338,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :collaborations
+    get 'lti_collaborations' => 'collaborations#lti_index'
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do
@@ -415,11 +416,13 @@ CanvasRails::Application.routes.draw do
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
 
   get 'external_content/success/:service' => 'external_content#success', as: :external_content_success
+  get 'external_content/success/:service/:id' => 'external_content#success', as: :external_content_update
   get 'external_content/retrieve/oembed' => 'external_content#oembed_retrieve', as: :external_content_oembed_retrieve
   get 'external_content/cancel/:service' => 'external_content#cancel', as: :external_content_cancel
 
   %w(account course group user).each do |context|
     match "#{context.pluralize}/:#{context}_id/external_content/success/:service" => 'external_content#success', as: "#{context}_external_content_success", via: [:get, :post]
+    match "#{context.pluralize}/:#{context}_id/external_content/success/:service/:id" => 'external_content#success', as: "#{context}_external_content_update", via: [:get, :post]
   end
 
   # We offer a bunch of atom and ical feeds for the user to get
@@ -495,6 +498,7 @@ CanvasRails::Application.routes.draw do
     concerns :media
 
     resources :collaborations
+    get 'lti_collaborations' => 'collaborations#lti_index'
     get 'calendar' => 'calendars#show2', as: :old_calendar
 
     resources :external_tools do
@@ -527,6 +531,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :brand_configs) do
       get 'theme_editor', action: :new, as: :theme_editor
+      get 'brand_configs', action: :index
       post 'brand_configs', action: :create
       delete 'brand_configs', action: :destroy
       post 'brand_configs/save_to_account', action: :save_to_account
@@ -903,6 +908,7 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
       put 'accounts/:account_id/account_notifications/:id', action: :update, as: 'account_notification_update'
       get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
+      get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end
 
@@ -1795,6 +1801,12 @@ CanvasRails::Application.routes.draw do
       put 'users/self/course_nicknames/:course_id', action: :update
       delete 'users/self/course_nicknames/:course_id', action: :delete
       delete 'users/self/course_nicknames', action: :clear
+    end
+
+    scope(controller: :shared_brand_configs) do
+      post 'accounts/:account_id/shared_brand_configs', action: :create
+      put 'accounts/:account_id/shared_brand_configs/:id', action: :update
+      delete 'shared_brand_configs/:id', action: :destroy
     end
 
     scope(controller: :errors) do

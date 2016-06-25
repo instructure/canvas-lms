@@ -133,7 +133,7 @@ describe 'Student Gradebook' do
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.final_grade .grade').text).to eq '100%'
 
-    f('#only_consider_graded_assignments').click
+    f('#only_consider_graded_assignments_wrapper').click
     expect(f('.final_grade .grade').text).to eq '66.67%'
   end
 

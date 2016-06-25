@@ -1,13 +1,10 @@
 require_relative 'git_proxy'
-require 'forwardable'
 
 module TatlTael
   class Linter
-    extend ::Forwardable
 
     attr_reader :git
     private :git
-    def_delegator :git, :wip?
 
     attr_reader :git_dir
     private :git_dir
@@ -21,11 +18,34 @@ module TatlTael
       yield if new_erb?
     end
 
-    def ensure_specs
-      yield if needs_specs? && !spec_changes?
+    def ensure_coffee_specs
+      yield if needs_coffee_specs? && !coffee_specs?
     end
 
-    private
+    def ensure_jsx_specs
+      yield if needs_jsx_specs? && !jsx_specs?
+    end
+
+    def ensure_public_js_specs
+      yield if needs_public_js_specs? && !public_js_specs
+    end
+
+    def ensure_ruby_specs
+      yield if needs_ruby_specs? && !ruby_specs?
+    end
+
+    def ensure_no_unnecessary_selenium_specs
+      yield if selenium_specs? && (
+        needs_public_js_specs? && !public_js_specs ||
+        needs_coffee_specs? && !coffee_specs? ||
+        needs_jsx_specs? && !jsx_specs? ||
+        needs_ruby_specs? && !ruby_specs?
+      )
+    end
+
+    def wip?
+      git.wip?
+    end
 
     ERB_REGEX = /\.erb$/
     def new_erb?
@@ -35,21 +55,80 @@ module TatlTael
       end
     end
 
-    NEED_SPECS_REGEX = /(app|lib|public)\/.*\.(coffee|js|jsx|html|erb|rb)$/
-    EXCLUDED_SUB_DIR_REGEX = /(bower|mediaelement|shims|vendor)\//
-    def needs_specs?
+    NEED_SPEC_PUBLIC_JS_REGEX = /public\/javascripts\/.*.js$/
+    EXCLUDED_PUBLIC_SUB_DIRS_REGEX = /(bower|mediaelement|shims|vendor)\//
+    def needs_public_js_specs?
       changes.any? do |change|
-        change.path =~ NEED_SPECS_REGEX &&
-          change.path !~ EXCLUDED_SUB_DIR_REGEX &&
-          !change.deleted?
+        !change.deleted? &&
+          change.path =~ NEED_SPEC_PUBLIC_JS_REGEX &&
+          change.path !~ EXCLUDED_PUBLIC_SUB_DIRS_REGEX
       end
     end
 
-    SPEC_REGEX = /\/(spec|spec_canvas|test)\//
-    def spec_changes?
+    PUBLIC_JS_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\//
+    def public_js_specs
       changes.any? do |change|
-        change.path =~ SPEC_REGEX &&
-          !change.deleted?
+        !change.deleted? &&
+          change.path =~ PUBLIC_JS_SPEC_REGEX
+      end
+    end
+
+    NEED_COFFEE_SPECS_REGEX = /app\/coffeescripts\/.*\.coffee$/
+    EXCLUDED_COFFEE_SUB_DIRS_REGEX = /bundles\//
+    def needs_coffee_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ NEED_COFFEE_SPECS_REGEX &&
+          change.path !~ EXCLUDED_COFFEE_SUB_DIRS_REGEX
+      end
+    end
+
+    COFFEE_SPEC_REGEX = /spec\/coffeescripts\//
+    def coffee_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ COFFEE_SPEC_REGEX
+      end
+    end
+
+    NEED_JSX_SPECS_REGEX = /app\/jsx\/.*\.jsx/
+    def needs_jsx_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ NEED_JSX_SPECS_REGEX
+      end
+    end
+
+    JSX_SPEC_REGEX = /spec\/(coffeescripts|javascripts)\/jsx\//
+    def jsx_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ JSX_SPEC_REGEX
+      end
+    end
+
+    NEED_RUBY_SPECS_REGEX = /(app|lib)\/.*\.rb$/
+    def needs_ruby_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ NEED_RUBY_SPECS_REGEX
+      end
+    end
+
+    RUBY_SPEC_REGEX = /(spec|spec_canvas|test)\/.*\.rb$/
+    SELENIUM_SPEC_REGEX = /(spec|spec_canvas|test)\/selenium\//
+    def ruby_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ RUBY_SPEC_REGEX &&
+          change.path !~ SELENIUM_SPEC_REGEX
+      end
+    end
+
+    def selenium_specs?
+      changes.any? do |change|
+        !change.deleted? &&
+          change.path =~ SELENIUM_SPEC_REGEX
       end
     end
 

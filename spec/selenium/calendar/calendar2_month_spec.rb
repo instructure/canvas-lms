@@ -46,14 +46,6 @@ describe "calendar2" do
         end
       end
 
-      it "should drag and drop an event" do
-        skip('drag and drop not working correctly')
-        create_middle_day_event
-        driver.action.drag_and_drop(find('.calendar .fc-event'), find('.calendar .fc-week:nth-child(2) .fc-last')).perform
-        wait_for_ajaximations
-        expect(CalendarEvent.last.start_at.strftime('%d')).to eq find('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
-      end
-
       it "should create an assignment by clicking on a calendar day" do
         create_middle_day_assignment
       end
@@ -217,7 +209,7 @@ describe "calendar2" do
           quick_jump_to_date(@initial_time_str)
 
           drag_and_drop_element(f('.calendar .fc-event'), fj("#minical .fc-day-number[data-date=#{@one_day_later_str}]"))
-          keep_trying_until { fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]") }
+          expect(fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]")).to be
           wait_for_ajaximations
 
           event.reload
@@ -227,55 +219,46 @@ describe "calendar2" do
 
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
-        find('.fc-event').click
+        f('.fc-event').click
         expect(fj('.popover-links-holder:visible')).not_to be_nil
-        driver.execute_script("$('.edit_event_link').hover().click()")
-        expect_new_page_load { driver.execute_script("$('#edit_calendar_event_form .more_options_link').hover().click()") }
+        hover_and_click '.edit_event_link'
+        expect_new_page_load { hover_and_click '#edit_calendar_event_form .more_options_link' }
         expect(find('#editCalendarEventFull .btn-primary').text).to eq "Update Event"
-        expect(find('#breadcrumbs').text).to include 'Calendar Events'
+        expect(find('#breadcrumbs')).to include_text 'Calendar Events'
       end
 
       it "should go to assignment page when clicking assignment title" do
         name = 'special assignment'
         create_middle_day_assignment(name)
-        keep_trying_until do
-          f('.fc-event.assignment').click
-          wait_for_ajaximations
-          if f('.view_event_link').displayed?
-            expect_new_page_load { driver.execute_script("$('.view_event_link').hover().click()") }
-          end
-          f('h1.title').displayed?
-        end
+        f('.fc-event.assignment').click
+        expect_new_page_load { hover_and_click '.view_event_link' }
+        expect(f('h1.title')).to be_displayed
 
-        expect(find('h1.title').text).to include(name)
+        expect(find('h1.title')).to include_text(name)
       end
 
       it "more options link on assignments should go to assignment edit page" do
         name = 'super big assignment'
         create_middle_day_assignment(name)
-        fj('.fc-event.assignment').click
-        driver.execute_script("$('.edit_event_link').hover().click()")
-        expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
+        f('.fc-event.assignment').click
+        hover_and_click '.edit_event_link'
+        expect_new_page_load { hover_and_click '.more_options_link' }
         expect(find('#assignment_name').attribute(:value)).to include(name)
       end
 
       it "should publish a new assignment when toggle is clicked" do
         create_published_middle_day_assignment
-        wait_for_ajax_requests
-        fj('.fc-event.assignment').click
-        driver.execute_script("$('.edit_event_link').hover().click()")
-        driver.execute_script("$('.more_options_link').hover().click()")
+        f('.fc-event.assignment').click
+        hover_and_click '.edit_event_link'
+        expect_new_page_load { hover_and_click '.more_options_link' }
         expect(find('#assignment-draft-state')).not_to include_text("Not Published")
       end
 
       it "should delete an event" do
         create_middle_day_event('doomed event')
-        fj('.fc-event:visible').click
-        wait_for_ajaximations
-        driver.execute_script("$('.delete_event_link').hover().click()")
-        wait_for_ajaximations
-        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
-        wait_for_ajaximations
+        f('.fc-event').click
+        hover_and_click '.delete_event_link'
+        hover_and_click '.ui-dialog:visible .btn-primary'
         expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
@@ -284,13 +267,11 @@ describe "calendar2" do
 
       it "should delete an assignment" do
         create_middle_day_assignment
-        keep_trying_until do
-          f('.fc-event').click()
-          driver.execute_script("$('.delete_event_link').hover().click()")
-          f('.ui-dialog .ui-dialog-buttonset').displayed?
-        end
+        f('.fc-event').click()
+        hover_and_click '.delete_event_link'
+        expect(f('.ui-dialog .ui-dialog-buttonset')).to be_displayed
         wait_for_ajaximations
-        driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
+        hover_and_click '.ui-dialog:visible .btn-primary'
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.fc-event')
         # make sure it was actually deleted and not just removed from the interface
@@ -310,8 +291,7 @@ describe "calendar2" do
 
         get("/calendar2")
         fj('.fc-event:visible').click
-        wait_for_ajaximations
-        expect(not_found('.delete_event_link')).to be
+        expect(f('body')).not_to contain_css('.delete_event_link')
       end
 
       it "should correctly display next month on arrow press", priority: "1", test_id: 197555 do
@@ -320,13 +300,13 @@ describe "calendar2" do
         change_calendar(:next)
 
         # Verify known dates in calendar header and grid
-        expect(header_text).to include_text('February 2012')
+        expect(header_text).to include('February 2012')
         first_wednesday = '.fc-day-number.fc-wed:first'
         expect(fj(first_wednesday).text).to eq('1')
-        expect(fj(first_wednesday).attribute('data-date')).to eq('2012-02-01')
+        expect(fj(first_wednesday)).to have_attribute('data-date', '2012-02-01')
         last_thursday = '.fc-day-number.fc-thu:last'
         expect(fj(last_thursday).text).to eq('1')
-        expect(fj(last_thursday).attribute('data-date')).to eq('2012-03-01')
+        expect(fj(last_thursday)).to have_attribute('data-date', '2012-03-01')
       end
 
       it "should correctly display previous month on arrow press", priority: "1", test_id: 419290 do
@@ -335,13 +315,13 @@ describe "calendar2" do
         change_calendar(:prev)
 
         # Verify known dates in calendar header and grid
-        expect(header_text).to include_text('December 2011')
+        expect(header_text).to include('December 2011')
         first_thursday = '.fc-day-number.fc-thu:first'
         expect(fj(first_thursday).text).to eq('1')
-        expect(fj(first_thursday).attribute('data-date')).to eq('2011-12-01')
+        expect(fj(first_thursday)).to have_attribute('data-date', '2011-12-01')
         last_saturday = '.fc-day-number.fc-sat:last'
         expect(fj(last_saturday).text).to eq('31')
-        expect(fj(last_saturday).attribute('data-date')).to eq('2011-12-31')
+        expect(fj(last_saturday)).to have_attribute('data-date', '2011-12-31')
       end
 
       it "should fix up the event's date for events after 11:30pm" do
@@ -368,7 +348,7 @@ describe "calendar2" do
         make_event(start: eventStart)
 
         get "/calendar2"
-        expect(not_found('.fc-event')).to be
+        expect(f('#content')).not_to contain_css('.fc-event')
         eventStartText = eventStart.strftime("%Y %m %d")
         quick_jump_to_date(eventStartText)
         expect(find('.fc-event')).to be
@@ -427,8 +407,8 @@ describe "calendar2" do
         find(".fc-event").click
 
         #expect to find the location name and address
-        expect(find('.event-details-content').text).to include_text(location_name)
-        expect(find('.event-details-content').text).to include_text(location_address)
+        expect(find('.event-details-content')).to include_text(location_name)
+        expect(find('.event-details-content')).to include_text(location_address)
       end
 
       it "should bring up a calendar date picker when clicking on the month" do
@@ -439,8 +419,8 @@ describe "calendar2" do
 
         # Expect that a the event picker is present
         # Check various elements to verify that the calendar looks good
-        expect(find('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-        expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
+        expect(find('.ui-datepicker-header')).to include_text(Time.now.utc.strftime("%B"))
+        expect(find('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
       it "should strikethrough past due assignment", priority: "1", test_id: 518370 do
@@ -526,6 +506,19 @@ describe "calendar2" do
 
         # verify discussion has line-through
         expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should load events from adjacent months correctly" do
+        time = DateTime.parse("2016-04-01")
+        @course.calendar_events.create! title: 'aprilfools', start_at: time, end_at: time + 5.minutes
+
+        get '/calendar2'
+
+        quick_jump_to_date("2016-03-31") # jump to previous month
+        expect(find('.fc-title')).to include_text("aprilfools") # should show event at end of week
+
+        quick_jump_to_date("2016-04-01") # jump to next month
+        expect(find('.fc-title')).to include_text("aprilfools") # should still load cached event
       end
     end
   end

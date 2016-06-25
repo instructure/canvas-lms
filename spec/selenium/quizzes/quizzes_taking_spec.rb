@@ -76,21 +76,10 @@ describe "quiz taking" do
     fj("input[type=radio][name= 'question_#{question}']").click
     wait_for_js
     expect_new_page_load { f('#submit_quiz_button').click }
-    keep_trying_until do
-      expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
-    end
+    expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
   end
 
-  it "should not restrict whitelisted ip addresses", priority: "1", test_id: 338082 do
-    skip('might fail Jenkins due to ip address conflicts')
-    @quiz.ip_filter = "10.0.9.249"
-    @quiz.save!
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load{f('#take_quiz_link').click}
-    expect(driver.current_url).to include_text("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
-    expect(f("#content .quiz-header").text).to include('Test Quiz')
-    expect(f('#submit_quiz_form')).to be_present
-  end
+  it "should not restrict whitelisted ip addresses", priority: "1", test_id: 338082
 
   it "should account for question group settings", priority: "1", test_id: 140591 do
     skip_if_chrome('research')
@@ -112,15 +101,11 @@ describe "quiz taking" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     2.times do |o|
-      keep_trying_until(3) do
-        expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder").text).to eq('15 pts')
-        click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", 'a1')
-        click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", 'a3')
-      end
+      expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder")).to include_text('15 pts')
+      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", 'a1')
+      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", 'a3')
     end
     submit_quiz
-    keep_trying_until do
-      expect(f('.quiz-submission .quiz_score .score_value').text).to eq('30')
-    end
+    expect(f('.quiz-submission .quiz_score .score_value')).to include_text('30')
   end
 end

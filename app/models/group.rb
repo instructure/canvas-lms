@@ -624,7 +624,8 @@ class Group < ActiveRecord::Base
   end
 
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
-    TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
+    TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS,
+    TAB_COLLABORATIONS_NEW = *1..20
   def tabs_available(user=nil, opts={})
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
@@ -638,8 +639,13 @@ class Group < ActiveRecord::Base
     if root_account.try :canvas_network_enabled?
       available_tabs << {:id => TAB_PROFILE, :label => t('#tabs.profile', 'Profile'), :css_class => 'profile', :href => :group_profile_path}
     end
-    available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, :read)
-    available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, :read)
+
+    if user && self.grants_right?(user, :read)
+      available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path }
+      available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path }
+      available_tabs << { :id => TAB_COLLABORATIONS_NEW, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_lti_collaborations_path }
+    end
+
     if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, :manage)
       available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path }
     end

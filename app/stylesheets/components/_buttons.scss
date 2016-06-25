@@ -228,12 +228,6 @@ input[type="button"] {
 // Primary appears as blue
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
-  $button--primary-text: $ic-brand-button--primary-text;
-  $button--primary-bgd: $ic-brand-button--primary-bgd;
-  @if $use_high_contrast {
-    $button--primary-bgd: $ic-brand-primary;
-    $button--primary-text: $ic-color-light;
-  }
   @include canvas-button($button--primary-bgd, $button--primary-text);
 }
 // Warning appears as orange

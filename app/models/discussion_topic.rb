@@ -786,7 +786,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| self.user && self.user == user }
+    given { |user| self.visible_for?(user) }
     can :read
 
     given { |user| self.grants_right?(user, :read) }
@@ -801,15 +801,9 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && self.available_for?(user) && !self.root_topic_id && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
     can :delete
 
-    given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }
-    can :read
-
     given { |user, session| !self.locked_for?(user, :check_policies => true) &&
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
-
-    given { |user, session| self.context.grants_any_right?(user, session, :read_forum, :post_to_forum) && self.visible_for?(user)}
-    can :read
 
     given { |user, session|
       !is_announcement &&
@@ -1028,33 +1022,28 @@ class DiscussionTopic < ActiveRecord::Base
   def visible_for?(user = nil)
     RequestCache.cache('discussion_visible_for', self, user) do
       # user is the topic's author
-      return true if user == self.user
+      next true if user && user == self.user
 
-      return false if user && !(is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
+      next false if user && !(is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
-      return true if context.grants_any_right?(user, :manage, :read_course_content)
+      next true if context.grants_any_right?(user, :manage, :read_course_content)
 
       # assignment exists and isnt assigned to user (differentiated assignments)
       if for_assignment? && !self.assignment.visible_to_user?(user)
-        return false
-      end
-
-      # locked by context module
-      if self.could_be_locked && locked_by_module_item?(user, true)
-        return false
+        next false
       end
 
       # topic is not published
       if !published?
-        false
+        next false
       elsif is_announcement && unlock_at = available_from_for(user)
       # unlock date exists and has passed
-        unlock_at < Time.now.utc
+        next unlock_at < Time.now.utc
       # everything else
       else
-        true
+        next true
       end
     end
   end
@@ -1064,7 +1053,6 @@ class DiscussionTopic < ActiveRecord::Base
   #         the visibility of the topic to the user, only that they are unable to reply.
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && self.grants_right?(user, :update)
-    return {:asset_string => self.asset_string} if self.locked?
 
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
@@ -1076,6 +1064,8 @@ class DiscussionTopic < ActiveRecord::Base
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
+      elsif self.locked? # nothing more specific, it's just locked
+        locked = {:asset_string => self.asset_string, :can_view => true}
       elsif (self.root_topic && l = self.root_topic.locked_for?(user, opts))
         locked = l
       end

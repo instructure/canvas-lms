@@ -191,7 +191,7 @@ define [
             donecb([])
           else
             donecb(calendarEventFilter(@displayAppointmentEvents, events))
-      , datacb? && (events) =>
+      , datacb && (events) =>
         datacb(calendarEventFilter(@displayAppointmentEvents, events))
 
     # Close all event details popup on the page and have them cleaned up.

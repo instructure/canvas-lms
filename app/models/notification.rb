@@ -181,7 +181,7 @@ class Notification < ActiveRecord::Base
       {
         name: :send_scores_in_emails,
         value: user.preferences[:send_scores_in_emails],
-        label: t('Include scores when alerting about grade changes.'),
+        label: t('Include scores when alerting about grades.'),
         id: "cat_#{self.id}_option",
       }
     end

@@ -68,16 +68,7 @@ describe 'taking a quiz' do
         end
 
         context 'when the access code changes during an active quiz session' do
-
-          it 'doesn\'t prompt for the access code again', priority: "1", test_id: 522902 do
-            skip('Known issue: CNVS-23169')
-            verify_no_access_code_reprompts_during_oqaat_quiz do
-              # change the access code
-              oqaat_quiz.access_code = access_code.reverse!
-              oqaat_quiz.save!
-              oqaat_quiz.reload
-            end
-          end
+          it 'doesn\'t prompt for the access code again', priority: "1", test_id: 522902
         end
 
         it 'does not prompt for access code for sidebar question navigation' do

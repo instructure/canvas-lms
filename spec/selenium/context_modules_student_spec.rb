@@ -5,15 +5,20 @@ describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
 
+  before :once do
+    @course = course_model.tap(&:offer!)
+    @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
+    @student = student_in_course(course: @course, name: 'student', active_all: true).user
+  end
+
   context "as a student, with multiple modules", priority: "1" do
-    before(:each) do
+    before :once do
       @locked_icon = 'icon-lock'
       @completed_icon = 'icon-check'
       @in_progress_icon = 'icon-minimize'
       @open_item_icon = 'icon-mark-as-read'
       @no_icon = 'no-icon'
 
-      course_with_student_logged_in
       #initial module setup
       @module_1 = create_context_module('Module One')
       @assignment_1 = @course.assignments.create!(:title => "assignment 1")
@@ -36,6 +41,10 @@ describe "context modules" do
       @module_1.save!
       @module_2.save!
       @module_3.save!
+    end
+
+    before :each do
+      user_session(@student)
     end
 
     it "should validate that course modules show up correctly" do
@@ -84,7 +93,7 @@ describe "context modules" do
       expect(context_modules[1].find_element(:css, '.due_date_display').text).not_to be_blank
     end
 
-    it "should move a student through context modules in sequential order" do
+    it "moves a student through context modules in sequential order", priority: "2", test_id: 126742 do
       go_to_modules
 
       #sequential normal validation
@@ -191,8 +200,8 @@ describe "context modules" do
 
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
-      nxt = f('.module-sequence-footer a.pull-right')
-      expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}"
+      nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+      expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}")
 
       # Should redirect to the published item
       get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
@@ -227,12 +236,21 @@ describe "context modules" do
     it "should lock module until a given date", priority: "1", test_id: 126741 do
       mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
       go_to_modules
-      expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).to include_text 'Will unlock'
+      expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).to include_text 'Will unlock'
+    end
+
+    it "does not show the description of a discussion locked by module", priority: "1", test_id: 1426125 do
+      module1 = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
+      discussion = @course.discussion_topics.create!(title: 'discussion', message: 'discussion description')
+      module1.add_item type: 'discussion_topic', id: discussion.id
+      get "/courses/#{@course.id}/discussion_topics/#{discussion.id}?module_item_id=#{ContentTag.last.id}"
+      expect(f('.entry-content')).not_to contain_css('.discussion-section .message')
     end
 
     it "should allow a student view student to progress through module content" do
       skip_if_chrome('breaks because of masquerade_bar')
-      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      # course_with_teacher_logged_in(:course => @course, :active_all => true)
+      user_session(@teacher)
       @fake_student = @course.student_view_student
 
       enter_student_view
@@ -267,12 +285,12 @@ describe "context modules" do
 
       def verify_next_and_previous_buttons_display
         wait_for_ajaximations
-        expect(f('.module-sequence-footer a.pull-left')).to be_displayed
-        expect(f('.module-sequence-footer a.pull-right')).to be_displayed
+        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')).to be_displayed
+        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')).to be_displayed
       end
 
       def module_setup
-        course_with_teacher_logged_in(:active_all => true)
+
         @module = @course.context_modules.create!(:name => "module")
 
         #create module items
@@ -314,7 +332,11 @@ describe "context modules" do
         @module.add_item :type => 'assignment', :id => @assignment3.id
       end
 
-      before(:each) do
+      before :each do
+        user_session(@teacher)
+      end
+
+      before :once do
         module_setup
       end
 
@@ -359,22 +381,22 @@ describe "context modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
+        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after2.id}"
+        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
+        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
 
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-left')
-        expect(f("#content")).not_to contain_css('.module-sequence-footer a.pull-right')
+        expect(f("#content")).not_to contain_css(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        expect(f("#content")).not_to contain_css(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
       end
 
       it "should show the nav when going straight to the item if there's only one tag" do
@@ -383,31 +405,14 @@ describe "context modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
+        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
 
-      it "should show module navigation for group assignment discussions" do
-        skip('intermittently fails')
-        group_assignment_discussion(:course => @course)
-        @group.users << @student
-        assignment_model(:course => @course)
-        @module = ContextModule.create!(:context => @course)
-        @page = wiki_page_model(:course => @course)
-        i1 = @module.content_tags.create!(:context => @course, :content => @assignment, :tag_type => 'context_module')
-        i2 = @module.content_tags.create!(:context => @course, :content => @root_topic, :tag_type => 'context_module')
-        i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
-        @module2 = ContextModule.create!(:context => @course, :name => 'second module')
-        get "/courses/#{@course.id}/modules/items/#{i2.id}"
-
-        prev = f('.module-sequence-footer a.pull-left')
-        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i1.id}"
-
-        nxt = f('.module-sequence-footer a.pull-right')
-        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i3.id}"
-      end
+      # TODO reimplement per CNVS-29600, but make sure we're testing at the right level
+      it "should show module navigation for group assignment discussions"
     end
 
     context 'mark as done' do
@@ -458,12 +463,12 @@ describe "context modules" do
         @module_1.save!
       end
 
-      it "should show a pill message that says 'Complete All Items'" do
+      it "should show a pill message that says 'Complete All Items'", priority: "1", test_id: 250296 do
         go_to_modules
         vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
       end
 
-      it "should show a pill message that says 'Complete One Item'" do
+      it "should show a pill message that says 'Complete One Item'", priority: "1", test_id: 250295 do
         make_module_1_complete_one
         go_to_modules
 
@@ -480,7 +485,7 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 
-      it "should show a completed icon when module is complete for 'Complete One Item' requirement" do
+      it "should show a completed icon when module is complete for 'Complete One Item' requirement", priority: "1", test_id: 250542 do
         create_additional_assignment_for_module_1
         make_module_1_complete_one
         go_to_modules
@@ -490,12 +495,12 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @completed_icon)
       end
 
-      it "should show a locked icon when module is locked" do
+      it "should show a locked icon when module is locked", priority:"1", test_id: 250541 do
         go_to_modules
         validate_context_module_status_icon(@module_2.id, @locked_icon)
       end
 
-      it "should show a warning in-progress icon when module has been started" do
+      it "should show a warning in-progress icon when module has been started", priority: "1", test_id: 250543 do
         create_additional_assignment_for_module_1
         go_to_modules
 
@@ -503,7 +508,7 @@ describe "context modules" do
         validate_context_module_status_icon(@module_1.id, @in_progress_icon)
       end
 
-      it "should not show an icon when module has not been started" do
+      it "should not show an icon when module has not been started", priority: "1", test_id: 250540 do
         go_to_modules
         validate_context_module_status_icon(@module_1.id, @no_icon)
       end
@@ -535,18 +540,18 @@ describe "context modules" do
         @assignment_4.grade_student(@user, :grade => score)
       end
 
-      it "should show a completed icon when module item is completed" do
+      it "should show a completed icon when module item is completed", priority: "1", test_id: 250546 do
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
         validate_context_module_item_icon(@tag_1.id, @completed_icon)
       end
 
-      it "should show an incomplete circle icon when module item is requirement but not complete" do
+      it "should show an incomplete circle icon when module item is requirement but not complete", priority: "1", test_id: 250544 do
         go_to_modules
         validate_context_module_item_icon(@tag_1.id, @open_item_icon)
       end
 
-      it "should not show an icon when module item is not a requirement" do
+      it "should not show an icon when module item is not a requirement", priority: "1", test_id: 250545 do
         add_non_requirement
         go_to_modules
         validate_context_module_item_icon(@tag_4.id, @no_icon)
@@ -569,7 +574,7 @@ describe "context modules" do
         validate_context_module_item_icon(tag.id, @open_item_icon)
       end
 
-      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment" do
+      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment", priority: "1", test_id: 250547 do
         add_min_score_assignment
         grade_assignment(50)
         go_to_modules
@@ -616,8 +621,6 @@ describe "context modules" do
   end
 
   it "should fetch locked module prerequisites" do
-    course_with_teacher(:active_all => true)
-    student_in_course(:course => @course, :active_all => true)
     @module = @course.context_modules.create!(:name => "module", :require_sequential_progress => true)
     @assignment = @course.assignments.create!(:title => "assignment")
     @assignment2 = @course.assignments.create!(:title => "assignment2")
@@ -638,8 +641,6 @@ describe "context modules" do
   end
 
   it "should validate that a student can see published and not see unpublished context module", priority: "1", test_id: 126744 do
-    course_with_teacher(active_all: true)
-    student_in_course(course: @course, active_all: true)
     @module = @course.context_modules.create!(name: "module")
     @module_1 = @course.context_modules.create!(name: "module_1")
     @module_1.workflow_state = 'unpublished'
@@ -648,23 +649,20 @@ describe "context modules" do
     go_to_modules
     # for a11y there is a hidden header now that gets read as part of the text hence the regex matching
     expect(f("#context_modules").text).to match(/module\s*module/)
-    expect(f("#context_modules").text).not_to include_text "module_1"
+    expect(f("#context_modules")).not_to include_text "module_1"
   end
 
   it "should unlock module after a given date", priority: "1", test_id: 126746 do
-    course_with_teacher(active_all: true)
-    student_in_course(course: @course, active_all: true)
     mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.ago
     user_session(@student)
     go_to_modules
-    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).not_to include_text 'Will unlock'
+    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details")).not_to include_text 'Will unlock'
   end
 
   it "should mark locked but visible assignments/quizzes/discussions as read" do
     # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
     # they just can't be submitted to anymore
 
-    course_with_student_logged_in(:active_all => true)
     mod = @course.context_modules.create!(:name => "module")
 
     asmt = @course.assignments.create!(:title => "assmt", :lock_at => 1.day.ago)
@@ -697,7 +695,7 @@ describe "context modules" do
   end
 
   it "should not lock a page module item on first load" do
-    course_with_student_logged_in(:active_all => true)
+    user_session(@student)
     page = @course.wiki.wiki_pages.create!(:title => "some page", :body => "some body")
     page.set_as_front_page!
 

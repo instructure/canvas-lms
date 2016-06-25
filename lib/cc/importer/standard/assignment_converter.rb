@@ -24,7 +24,7 @@ module CC::Importer::Standard
         if doc = get_node_or_open_file(res, 'assignment')
           path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
-          
+
           asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
           if res[:intended_user_role] == 'Instructor'
             asmnt[:workflow_state] = 'unpublished'
@@ -103,7 +103,7 @@ module CC::Importer::Standard
           assignment[:saved_rubric_comments][comment_node['criterion_id']] << comment_node.text.strip
         end
       end
-      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url"].each do |string_type|
+      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "turnitin_settings"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end

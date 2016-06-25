@@ -17,9 +17,8 @@ describe "content exports" do
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
       @export.export_without_send_later
-      new_download_link = keep_trying_until { f("#export_files a") }
-      url = new_download_link.attribute 'href'
-      expect(url).to match(%r{/files/\d+/download\?verifier=})
+      new_download_link = f("#export_files a")
+      expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
     end
 
     it "should allow course export downloads", priority: "1", test_id: 126678 do

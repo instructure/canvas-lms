@@ -12,9 +12,7 @@ describe "assignments turn it in" do
   end
 
   def change_turnitin_settings
-    keep_trying_until {
-      expect(f('#assignment_submission_type')).to be_displayed
-    }
+    expect(f('#assignment_submission_type')).to be_displayed
     click_option('#assignment_submission_type', 'Online')
     f('#assignment_text_entry').click
     expect(f('#advanced_turnitin_settings_link')).not_to be_displayed

@@ -20,6 +20,10 @@ $menu-item-keyboard-shortcut-color: $ic-color-dark;
 
 }
 
+.mce-primary {
+  @include canvas-button($button--primary-bgd, $button--primary-text);
+}
+
 .mce-menu-item {
   .mce-disabled {
     .mce-text {

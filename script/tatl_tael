@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require_relative "../gems/tatl_tael/lib/tatl_tael"
+require 'yaml'
 
 unless ENV['GERRIT_PATCHSET_REVISION']
   require 'colorize'
@@ -14,8 +15,9 @@ end
 
 def post(message)
   if ENV['GERRIT_PATCHSET_REVISION']
+    label = ENV['GERGICH_REVIEW_LABEL'] || "Lint-Review"
     `gergich message "#{message}"`
-    `gergich label "Code-Review" -1`
+    `gergich label "#{label}" -1`
   else
     pretty_comment("error", message)
   end
@@ -37,13 +39,61 @@ if linter.wip?
   exit 0
 end
 
-linter.ensure_specs do
-  post("Your commit does not include specs."\
-       " Please add some to verify your changes.")
+user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
+if File.exists?(user_config_file)
+  config = YAML.load_file(user_config_file) || {}
+  user_list = config['only_report_errors'] || []
+  exit 0 if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
 end
 
+errors = []
+
 linter.ban_new_erb do
-  post("Your commit includes new ERB files,"\
-       " which has been a no-no in Canvas since 2011."\
-       " All new UI should be built in React on top of documented APIs")
+  errors << "Your commit includes new ERB files,"\
+            " which has been a no-no in Canvas since 2011."\
+            " All new UI should be built in React on top of documented APIs"
+end
+
+linter.ensure_public_js_specs do
+  errors << "Your commit includes changes to public/javascripts,"\
+            " but does not include specs (coffee or jsx)."\
+            " Please add some to verify your changes."\
+            " Even $.fn.crazyMethods can and should be tested"\
+            " (and not via selenium)."
+end
+
+linter.ensure_coffee_specs do
+  errors << "Your commit includes coffee changes,"\
+            " but does not include coffee specs."\
+            " Please add some to verify your changes."
+end
+
+linter.ensure_jsx_specs do
+  errors << "Your commit includes jsx changes,"\
+            " but does not include jsx specs."\
+            " Please add some to verify your changes."\
+            " See /doc/testing_javascript.md for help."
+end
+
+linter.ensure_ruby_specs do
+  if linter.selenium_specs?
+    errors << "Your commit includes ruby changes,"\
+              " but does not include ruby specs."\
+              " Please add some to verify your changes."
+  else
+    errors << "Your commit includes ruby changes,"\
+              " but does not include non-selenium specs (model, controller, etc)."\
+              " Please add some to verify your changes."
+  end
+end
+
+linter.ensure_no_unnecessary_selenium_specs do
+  errors << "Your commit modifies selenium specs,"\
+            " when your changes might be more appropriately"\
+            " tested at a lower level (see above)."\
+            " Please limit your selenium specs to happy-path scenarios."
+end
+
+unless errors.empty?
+  post(errors.join("\n\n"))
 end

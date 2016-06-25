@@ -86,10 +86,8 @@ describe "speed grader" do
     wait_for_ajaximations
 
     #check media comment
-    keep_trying_until do
-      driver.execute_script("$('#add_a_comment .media_comment_link').click();")
-      expect(f("#audio_record_option")).to be_displayed
-    end
+    f('#add_a_comment .media_comment_link').click
+    expect(f("#audio_record_option")).to be_displayed
     expect(f("#video_record_option")).to be_displayed
     close_visible_dialog
     expect(f("#audio_record_option")).not_to be_displayed
@@ -103,7 +101,7 @@ describe "speed grader" do
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
     submit_form('#add_a_comment')
-    keep_trying_until { expect(f('#comments > .comment')).to be_displayed }
+    expect(f('#comments > .comment')).to be_displayed
     expect(f('#comments > .comment')).to include_text('grader comment')
 
     #make sure gradebook link works
@@ -121,7 +119,7 @@ describe "speed grader" do
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
     submit_form('#add_a_comment')
-    keep_trying_until { expect(f('#comments > .comment')).to be_displayed }
+    expect(f('#comments > .comment')).to be_displayed
     @submission.reload
     @comment = @submission.submission_comments.first
 
@@ -155,7 +153,7 @@ describe "speed grader" do
     #add comment
     f('#add_a_comment > textarea').send_keys('grader comment')
     submit_form('#add_a_comment')
-    keep_trying_until { expect(f('#comments > .comment')).to be_displayed }
+    expect(f('#comments > .comment')).to be_displayed
     expect(f('#comments > .comment')).to include_text('grader comment')
 
     # make sure avatar shows up for user comment
@@ -184,17 +182,15 @@ describe "speed grader" do
     sub.add_comment(:comment => "ohai teacher")
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    keep_trying_until { expect(f("#avatar_image")).to be_displayed }
+    expect(f("#avatar_image")).to be_displayed
 
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     wait_for_ajaximations
 
-    keep_trying_until do
-      expect(f("#avatar_image")).not_to be_displayed
-      expect(fj('#students_selectmenu-button .ui-selectmenu-item-header').text).to eq "Student 1"
-    end
+    expect(f("#avatar_image")).not_to be_displayed
+    expect(f('#students_selectmenu-button .ui-selectmenu-item-header')).to include_text "Student 1"
 
     expect(f('#comments > .comment')).to include_text('ohai')
     expect(f("#comments > .comment .avatar")).not_to be_displayed
@@ -203,7 +199,7 @@ describe "speed grader" do
     # add teacher comment
     f('#add_a_comment > textarea').send_keys('grader comment')
     submit_form('#add_a_comment')
-    keep_trying_until { ff('#comments > .comment').size == 2 }
+    expect(ff('#comments > .comment')).to have_size(2)
 
     # make sure name and avatar show up for teacher comment
     expect(ffj("#comments > .comment .avatar:visible").size).to eq 1
@@ -266,7 +262,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       sections = @course.course_sections
-      expect(ff("#section-menu ul li a").map{|e| e.attribute('text')}).to be_include(@course_section.name)
+      expect(ff("#section-menu ul li a")[1]).to have_attribute("text", @course_section.name)
       goto_section(sections[0].id)
       expect(ff("#students_selectmenu option").length).to eq 1
       goto_section(sections[1].id)
@@ -302,25 +298,25 @@ describe "speed grader" do
     f("#settings_link").click
     f('select#eg_sort_by option[value="submitted_at"]').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "student@example.com" }
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "student@example.com"
 
     # hide student names
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "Student 1"
 
     # make sure it works a second time too
     f("#settings_link").click
     f('select#eg_sort_by option[value="alphabetically"]').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    keep_trying_until { f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text == "Student 1" }
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "Student 1"
 
     # unselect the hide option
     f("#settings_link").click
     f('#hide_student_names').click
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-    keep_trying_until { expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text).to eq "student@example.com" }
+    expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header')).to include_text "student@example.com"
   end
 
   context "student dropdown" do
@@ -368,14 +364,11 @@ describe "speed grader" do
 
     expect(f("#students_selectmenu-button")).to have_class("not_graded")
 
-    #if this block loses focuses of the window the checkbox won't get checked
-    keep_trying_until do
-      f('#grade_container input[type=text]').click
-      set_value(f('#grade_container input[type=text]'), 1)
-      f(".ui-selectmenu-icon").click
-      wait_for_ajaximations
-      expect(f("#students_selectmenu-button")).to have_class("graded")
-    end
+    f('#grade_container input[type=text]').click
+    set_value(f('#grade_container input[type=text]'), 1)
+    f(".ui-selectmenu-icon").click
+    wait_for_ajaximations
+    expect(f("#students_selectmenu-button")).to have_class("graded")
   end
 
   context "Pass / Fail assignments" do

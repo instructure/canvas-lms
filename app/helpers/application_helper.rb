@@ -667,18 +667,31 @@ module ApplicationHelper
     end
   end
 
+  def active_brand_config_cache
+    @active_brand_config_cache ||= {}
+  end
 
   def active_brand_config(opts={})
-    @active_brand_config_cache ||= {}
-    return @active_brand_config_cache[opts] if @active_brand_config_cache.key?(opts)
-    @active_brand_config_cache[opts] = begin
-      if !use_new_styles? || (!opts[:ignore_high_contrast_preference] && @current_user && @current_user.prefers_high_contrast?)
-        nil
-      elsif session.key?(:brand_config_md5)
+    return active_brand_config_cache[opts] if active_brand_config_cache.key?(opts)
+
+    ignore_branding = !use_new_styles? || (@current_user.try(:prefers_high_contrast?) && !opts[:ignore_high_contrast_preference])
+    active_brand_config_cache[opts] = if ignore_branding
+      nil
+    else
+      # If the user is actively working on unapplied changes in theme editor, session[:brand_config_md5]
+      # will either be the md5 of the thing they are working on or `false`, meaning they want
+      # to start from a blank slate.
+      brand_config = if session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
       else
         brand_config_for_account(opts)
       end
+      # If the account does not have a brandConfig, or they explicitly chose to start from a blank
+      # slate in the theme editor, do one last check to see if we should actually use the k12 theme
+      if !brand_config && k12?
+        brand_config = BrandConfig.k12_config
+      end
+      brand_config
     end
   end
 
@@ -711,11 +724,7 @@ module ApplicationHelper
       account ||= @domain_root_account
     end
 
-    if account && (brand_config = account.effective_brand_config)
-      brand_config
-    elsif k12?
-      BrandConfig.k12_config
-    end
+    account.try(:effective_brand_config)
   end
   private :brand_config_for_account
 

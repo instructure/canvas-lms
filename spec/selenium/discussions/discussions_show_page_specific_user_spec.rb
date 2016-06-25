@@ -234,7 +234,7 @@ describe "discussions" do
           new_points = get_value(".criterion_points")
           dialog = fj(".ui-dialog:visible")
 
-          keep_trying_until { expect(fj(".grading_rubric_checkbox:visible")).to be_displayed }
+          expect(fj(".grading_rubric_checkbox:visible")).to be_displayed
           set_value fj(".grading_rubric_checkbox:visible", dialog), true
 
           fj(".save_button:visible", dialog).click
@@ -258,7 +258,6 @@ describe "discussions" do
       end
 
       it "should reply as a student and validate teacher can see reply", priority: "1", test_id: 150479 do
-        skip "figure out delayed jobs"
         entry = topic.discussion_entries.create!(:user => student, :message => 'new entry from student')
         get url
         expect(f("#entry-#{entry.id}")).to include_text('new entry from student')
@@ -309,7 +308,7 @@ describe "discussions" do
         get url
         f("#discussion-managebar .al-trigger").click
         expect_new_page_load { f(".discussion_locked_toggler").click }
-        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments'
+        expect(f('.discussion-fyi').text).to eq 'This topic is closed for comments.'
         expect(DiscussionTopic.last.locked?).to be_truthy
 
         expect(ff('.discussion-reply-action')).to_not be_empty # should let teachers reply

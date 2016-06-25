@@ -43,6 +43,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
+
+  li {
+    // when the flash message is first child of the message_holder,
+    // add margin at the top of the screen per design team
+    &.ic-flash-info:first-child,
+    &.ic-flash-success:first-child,
+    &.ic-flash-warning:first-child,
+    &.ic-flash-error:first-child {
+      margin-top: $ic-sp;
+    }
+  }
+
   li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error), .ui-effects-wrapper {
     margin: 0 auto !important;
   }
@@ -64,7 +76,7 @@
       text-decoration: underline;
       color: inherit;
     }
-    a.close_link {
+    .close_link {
       position: absolute;
       right: 10px;
       top: 50%;
@@ -90,7 +102,7 @@
       }
     }
     &.no_close {
-      a.close_link {
+      .close_link {
         display: none;
       }
     }
@@ -125,7 +137,9 @@
   }
 }
 
-.user_content iframe {
+.user_content iframe,
+.user_content video
+ {
   border: 0;
   padding: 0;
   margin: 0;
@@ -1665,43 +1679,6 @@ body.padless-content #content, #content.padless {
       }
       ul {
         display: none;
-      }
-    }
-  }
-}
-
-#aligned_outcomes {
-  .outcomes {
-    list-style-type: none;
-    padding-left: 10px;
-    .outcome {
-      margin-bottom: 5px;
-      .short_description {
-        font-weight: bold;
-      }
-      .description {
-        font-size: 0.8em;
-        margin-left: 20px;
-      }
-      .mastery {
-        margin-top: 5px;
-        font-size: 0.7em;
-        font-style: italic;
-        margin-left: 20px;
-      }
-    }
-  }
-}
-
-#align_outcomes_dialog {
-  .all_outcomes {
-    list-style-type: none;
-    padding-left: 10px;
-    .outcome {
-      padding: 2px 5px;
-      margin-bottom: 2px;
-      &.selected_outcome {
-        background-color: #eee;
       }
     }
   }

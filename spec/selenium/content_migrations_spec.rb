@@ -86,28 +86,8 @@ describe "content migrations", :non_parallel do
       @filename = 'cc_full_test.zip'
     end
 
-    it "should import all content immediately by default" do
-      skip('fragile')
-      skip unless Qti.qti_enabled?
-      visit_page
-      fill_migration_form
-      ff('[name=selective_import]')[0].click
-      submit
-      run_migration
-
-      keep_trying_until do
-        visit_page
-        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
-      end
-
-      # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
-      expect(@course.attachments.count).to eq 10
-      expect(@course.discussion_topics.count).to eq 2
-      expect(@course.context_modules.count).to eq 3
-      expect(@course.context_external_tools.count).to eq 2
-      expect(@course.quizzes.count).to eq 1
-      expect(@course.quizzes.first.quiz_questions.count).to eq 11
-    end
+    # TODO reimplement per CNVS-29593, but make sure we're testing at the right level
+    it "should import all content immediately by default"
 
     it "should show each form" do
       visit_page
@@ -116,10 +96,10 @@ describe "content migrations", :non_parallel do
       migration_types.each do |type|
         select_migration_type(type)
 
-        keep_trying_until { expect(ffj("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq true }
+        expect(f("#content")).to contain_jqcss("input[type=\"submit\"]:visible")
 
         select_migration_type('none')
-        expect(ff("input[type=\"submit\"]").any? { |el| el.displayed? }).to eq false
+        expect(f("#content")).not_to contain_jqcss("input[type=\"submit\"]:visible")
       end
 
       select_migration_type
@@ -164,46 +144,11 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "should import selective content" do
-      skip('fragile')
-      skip unless Qti.qti_enabled?
-      visit_page
-      fill_migration_form
-      ff('[name=selective_import]')[1].click
-      submit
-      run_migration
+    # TODO reimplement per CNVS-29594, but make sure we're testing at the right level
+    it "should import selective content"
 
-      test_selective_content
-    end
-
-    it "should overwrite quizzes when option is checked and duplicate otherwise" do
-      skip('fragile')
-      skip unless Qti.qti_enabled?
-
-      # Pre-create the quiz
-      q = @course.quizzes.create!(:title => "Name to be overwritten")
-      q.migration_id = "QDB_1"
-      q.save!
-
-      # Don't overwrite
-      visit_page
-      fill_migration_form(:type => "qti_converter")
-      submit
-      run_migration
-      expect(@course.quizzes.reload.count).to eq 2
-      expect(@course.quizzes.map(&:title).sort).to eq ["Name to be overwritten", "Pretest"]
-
-      # Overwrite original
-      visit_page
-      fill_migration_form(:type => "qti_converter", :filename => 'cc_full_test.zip')
-      f('#overwriteAssessmentContent').click
-      submit
-      cm = @course.content_migrations.last
-      expect(cm.migration_settings["overwrite_quizzes"]).to eq true
-      run_migration(cm)
-      expect(@course.quizzes.reload.count).to eq 2
-      expect(@course.quizzes.map(&:title)).to eq ["Pretest", "Pretest"]
-    end
+    # TODO reimplement per CNVS-29595, but make sure we're testing at the right level
+    it "should overwrite quizzes when option is checked and duplicate otherwise"
 
     it "should shift dates" do
       visit_page
@@ -229,85 +174,18 @@ describe "content migrations", :non_parallel do
       expect(Date.parse(opts["new_end_date"])).to eq Date.new(2014, 8, 15)
     end
 
-    it "should remove dates" do
-      skip('fragile')
-      visit_page
-      fill_migration_form
-      f('#dateAdjustCheckbox').click
-      f('#dateRemoveOption').click
-      ff('[name=selective_import]')[0].click
-      submit
-      opts = @course.content_migrations.last.migration_settings["date_shift_options"]
-      expect(opts["remove_dates"]).to eq '1'
-    end
+    # TODO reimplement per CNVS-29596, but make sure we're testing at the right level
+    it "should remove dates"
 
     context "default question bank" do
-      it "should import into selected question bank" do
-        skip('fragile')
-        skip unless Qti.qti_enabled?
+      # TODO reimplement per CNVS-29597, but make sure we're testing at the right level
+      it "should import into selected question bank"
 
-        bank = @course.assessment_question_banks.create!(:title => "bankity bank")
-        visit_page
+      # TODO reimplement per CNVS-29598, but make sure we're testing at the right level
+      it "should import into new question bank"
 
-        data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_default_qb_test.zip')
-        fill_migration_form(:filename => 'cc_default_qb_test.zip', :data => data)
-
-        click_option('.questionBank', bank.id.to_s, :value)
-        ff('[name=selective_import]')[0].click
-
-        submit
-        run_migration
-
-        keep_trying_until do
-          expect(@course.assessment_question_banks.count).to eq 1
-          expect(bank.assessment_questions.count).to eq 1
-        end
-      end
-
-      it "should import into new question bank" do
-        skip('fragile')
-        skip unless Qti.qti_enabled?
-
-        old_bank = @course.assessment_question_banks.create!(:title => "bankity bank")
-        visit_page
-
-        data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_default_qb_test.zip')
-        fill_migration_form(:filename => 'cc_default_qb_test.zip', :data => data)
-
-        click_option('.questionBank', 'new_question_bank', :value)
-
-        f('#createQuestionInput').send_keys('new bank naem')
-
-        ff('[name=selective_import]')[0].click
-        submit
-        run_migration
-
-        expect(@course.assessment_question_banks.count).to eq 2
-        new_bank = @course.assessment_question_banks.where(title: 'new bank naem').first
-        expect(new_bank.assessment_questions.count).to eq 1
-      end
-
-      it "should import into default question bank if not selected" do
-        skip('fragile')
-        skip unless Qti.qti_enabled?
-
-        old_bank = @course.assessment_question_banks.create!(:title => "bankity bank")
-        visit_page
-
-        data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_default_qb_test.zip')
-        fill_migration_form(:filename => 'cc_default_qb_test.zip', :data => data)
-
-        click_option('.questionBank', 'new_question_bank', :value)
-        click_option('.questionBank', f('.questionBank option').text, :text)
-
-        ff('[name=selective_import]')[0].click
-        submit
-        run_migration
-
-        expect(@course.assessment_question_banks.count).to eq 2
-        new_bank = @course.assessment_question_banks.where(title: AssessmentQuestionBank.default_imported_title).first
-        expect(new_bank.assessment_questions.count).to eq 1
-      end
+      # TODO reimplement per CNVS-29599, but make sure we're testing at the right level
+      it "should import into default question bank if not selected"
     end
   end
 
@@ -373,10 +251,8 @@ describe "content migrations", :non_parallel do
 
       # search bar
       f('#courseSearchField').send_keys("cop")
-      keep_trying_until do
-        ui_auto_complete = f('.ui-autocomplete')
-        expect(ui_auto_complete).to be_displayed
-      end
+      ui_auto_complete = f('.ui-autocomplete')
+      expect(ui_auto_complete).to be_displayed
 
       el = f('.ui-autocomplete li a')
       divs = ff('div', el)
@@ -589,9 +465,7 @@ describe "content migrations", :non_parallel do
       ff('[name=selective_import]')[0].click
       submit
       run_jobs
-      keep_trying_until do
-        expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
-      end
+      expect(f('.migrationProgressItem .progressStatus')).to include_text("Completed")
       @course.reload
       expect(@course.announcements.last.locked).to be_truthy
       expect(@course.lock_all_announcements).to be_truthy
@@ -665,14 +539,14 @@ describe "content migrations", :non_parallel do
       visit_page
       select_migration_type(import_tool.asset_string)
       f("button#externalToolLaunch").click
-      tool_iframe = keep_trying_until { f(".tool_launch") }
+      tool_iframe = f(".tool_launch")
       expect(f('.ui-dialog-title').text).to eq import_tool.label_for(:migration_selection)
 
       driver.switch_to.frame(tool_iframe)
-      keep_trying_until { f("#basic_lti_link") }.click
+      f("#basic_lti_link").click
 
       driver.switch_to.default_content
-      file_name_elt = keep_trying_until { expect(f("#converter .file_name").text).to eq "lti embedded link" }
+      expect(f("#converter .file_name")).to include_text "lti embedded link"
     end
 
     it "should have content selection option" do

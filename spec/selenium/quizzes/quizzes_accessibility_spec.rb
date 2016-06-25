@@ -36,7 +36,7 @@ describe 'quizzes accessibility' do
     click_questions_tab
 
     4.times do |i|
-      keep_trying_until(10) { expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy }
+      expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy
     end
 
     questions = ff('.display_question')

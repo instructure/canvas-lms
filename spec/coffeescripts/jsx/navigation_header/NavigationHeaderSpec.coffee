@@ -21,10 +21,10 @@ define [
       $(wrapper).append(@$inbox_data)
       @server = sinon.fakeServer.create()
       window.ENV.current_user_id = 10
+      ENV.current_user_disabled_inbox = false
       response =
         unread_count: 10
       @server.respondWith("GET", /unread/, [200, { "Content-Type": "application/json" }, JSON.stringify(response)])
-      @component = renderComponent()
 
     teardown: ->
       @server.restore()
@@ -33,9 +33,19 @@ define [
       @$inbox_data.remove()
 
   test 'it renders', ->
+    @component = renderComponent()
     ok @component.isMounted()
 
   test 'shows the inbox badge when necessary', ->
+    @component = renderComponent()
     @server.respond()
     $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
     ok $badge.is(':visible')
+
+  test 'does not show the inbox badge when the user has opted out of notifications', ->
+    ENV.current_user_disabled_inbox = true
+    @component = renderComponent()
+    @server.respond()
+    $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
+    notOk $badge.is(':visible')
+    

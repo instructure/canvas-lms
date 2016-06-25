@@ -17,7 +17,7 @@ shared_examples 'profile_settings_page' do |context|
     # but are limited to assuming that with almost all popular browsers...
     # "The information is most often shown as a tooltip text when the mouse moves over the element."
     # ...as shown in HTML title attribute at http://www.w3schools.com/tags/att_global_title.asp
-    expect(f('.avatar.profile_pic_link.none').attribute('title')).to eq 'Click to change profile pic'
+    expect(f('.avatar.profile_pic_link.none')).to have_attribute('title', 'Click to change profile pic')
   end
 end
 
@@ -32,7 +32,7 @@ shared_examples 'profile_user_about_page' do |context|
 
     # We are checking the title in this tooltip like we do in the one above,
     # given the same limitation.
-    expect(f('.avatar.profile-link').attribute('title')).to eq 'Click to change profile pic'
+    expect(f('.avatar.profile-link')).to have_attribute('title', 'Click to change profile pic')
   end
 end
 
@@ -44,26 +44,24 @@ shared_examples 'user settings page change pic window' do |context|
     f('.avatar.profile_pic_link.none').click
     wait_for_ajaximations
 
-    keep_trying_until(3) do
-      # There is a window with title "Select Profile Picture"
-      expect(f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')).to be_truthy
-      expect(f('.ui-dialog-title')).to be_truthy
-      expect(f('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')).to include_text('Select Profile Picture')
+    # There is a window with title "Select Profile Picture"
+    expect(f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')).to be_truthy
+    expect(f('.ui-dialog-title')).to be_truthy
+    expect(f('.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix')).to include_text('Select Profile Picture')
 
-      # There is a default gray image placeholder for picture
-      expect(f('.avatar-content .active .select-photo-link')).to include_text('choose a picture')
+    # There is a default gray image placeholder for picture
+    expect(f('.avatar-content .active .select-photo-link')).to include_text('choose a picture')
 
-      # There are 'Upload Picture' and 'From Gravatar' buttons
-      expect(f('.nav.nav-pills .active')).to include_text('Upload a Picture')
-      expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text('From Gravatar')
-      # Firefox and Chrome: There is a 'Take a Picture' button
-      expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text('Take a Picture')
+    # There are 'Upload Picture' and 'From Gravatar' buttons
+    expect(f('.nav.nav-pills .active')).to include_text('Upload a Picture')
+    expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text('From Gravatar')
+    # Firefox and Chrome: There is a 'Take a Picture' button
+    expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text('Take a Picture')
 
-      # There are 'X', Save, and Cancel buttons
-      expect(f('.ui-icon.ui-icon-closethick')).to be_truthy
-      expect(fj('.ui-button :contains("Cancel")')).to be_truthy
-      expect(fj('.ui-button :contains("Save")')).to be_truthy
-    end
+    # There are 'X', Save, and Cancel buttons
+    expect(f('.ui-icon.ui-icon-closethick')).to be_truthy
+    expect(fj('.ui-button :contains("Cancel")')).to be_truthy
+    expect(fj('.ui-button :contains("Save")')).to be_truthy
   end
 end
 
@@ -82,43 +80,6 @@ shared_examples 'user settings change pic cancel' do |context|
     expect(f("body")).not_to contain_css('.ui-widget-overlay')
   end
 end
-
-
-
-shared_examples 'user settings profile pic gravatar link' do |context|
-  it 'opens the Gravatar homepage', priority: "1", test_id: pick_test_id(context, student: 69159, teacher: 403055, admin: 403056) do
-    skip "depends on external service"
-    enable_avatars
-    get '/profile/settings'
-    f('.avatar.profile_pic_link.none').click
-    wait_for_ajaximations
-
-    fln('From Gravatar', f('.nav.nav-pills')).click
-    wait_for_ajaximations
-
-    # get a handle on current window
-    original_window = driver.window_handle
-
-    # Make sure driver is looking at the current window
-    expect(driver.title).to eq 'User Settings: nobody@example.com'
-
-    # Click the link to the Gravatar site
-    fln('Gravatar').click
-    wait_for_ajaximations
-
-    # gather all windows
-    all_windows = driver.window_handles
-    # assign a var to the new window -- the one that is not the old window
-    new_window = all_windows.select { |this_window| this_window != original_window }
-
-    # switch driver to act on new window
-    driver.switch_to.window(new_window)
-
-    # Ensure new window opened as expected
-    expect(driver.title).to eq 'Gravatar - Globally Recognized Avatars'
-  end
-end
-
 
 # ======================================================================================================================
 # Helper Methods

@@ -141,6 +141,7 @@ class SubmissionsController < ApplicationController
     "online_url" => ["url"].freeze,
     "online_upload" => ["file_ids"].freeze,
     "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
+    "basic_lti_launch" => ["url"].freeze
   }.freeze
 
   # @API Submit an assignment
@@ -158,7 +159,7 @@ class SubmissionsController < ApplicationController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
-  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"]
+  # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
@@ -177,7 +178,7 @@ class SubmissionsController < ApplicationController
   #   Submit the assignment as a URL. The URL scheme must be "http" or "https",
   #   no "ftp" or other URL schemes are allowed. If no scheme is given (e.g.
   #   "www.example.com") then "http" will be assumed. Requires a submission_type
-  #   of "online_url".
+  #   of "online_url" or "basic_lti_launch".
   #
   # @argument submission[file_ids][] [Integer]
   #   Submit the assignment as a set of one or more previously uploaded files

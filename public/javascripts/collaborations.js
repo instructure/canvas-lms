@@ -70,7 +70,7 @@ define([
       $('#delete_collaboration_dialog .delete_button').on('click', this.onDelete);
       $(document).fragmentChange(this.onFragmentChange);
       $('#collaboration_collaboration_type').on('change', this.onTypeChange).change();
-      $(window).on('externalContentReady', this.onExternalContentReady);
+      $(window).on('externalContentReady', this.onExternalContentReady.bind(this));
     },
 
     onClose: function(e) {
@@ -135,15 +135,34 @@ define([
     },
 
     onExternalContentReady: function(e, data) {
-      var contentItem = { contentItems: JSON.stringify(data.contentItems)};
-      var url = $("#new_collaboration").attr('action');
-      $.ajaxJSON( url, 'POST', contentItem, function( msg ){
-        CollaborationsPage.Util.openCollaboration(msg.collaboration.id);
-        window.location.reload();
-      }, function( msg ) {
-          $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'));
+      var contentItem = {contentItems: JSON.stringify(data.contentItems)};
+      if (data.service_id) {
+        this.updateCollaboration(contentItem);
+      }
+      else {
+        this.createCollaboration(contentItem);
+      }
+    },
+
+    updateCollaboration: function(contentItem) {
+      var url = $('.collaboration_'+ data.service_id + ' a.title')[0].href;
+      $.ajaxJSON( url, 'PUT', contentItem, this.collaborationSuccess, function( msg ) {
+        $.screenReaderFlashMessage(I18n.t('Collaboration update failed'));
       });
+    },
+
+    createCollaboration: function(contentItem){
+      var url = $("#new_collaboration").attr('action')
+      $.ajaxJSON( url, 'POST', contentItem, this.collaborationSuccess, function( msg ) {
+        $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'));
+      });
+    },
+
+    collaborationSuccess: function(msg) {
+      CollaborationsPage.Util.openCollaboration(msg.collaboration.id);
+      window.location.reload();
     }
+
   };
 
   $(document).ready(CollaborationsPage.Events.init.bind(CollaborationsPage.Events));

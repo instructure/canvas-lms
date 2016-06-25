@@ -8,53 +8,53 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-    course_with_admin_logged_in
     Account.default.enable_feature!(:use_new_styles)
+    course_with_admin_logged_in
   end
 
-  it 'should open theme editor from the admin page', priority: "1", test_id: 244225 do
+  it 'should open theme index from the admin page', priority: "1", test_id: 244225 do
     get "/accounts/#{Account.default.id}"
 
-    fj('#right-side > div:nth-of-type(4) > a.btn.button-sidebar-wide').click
-    wait_for_ajaximations
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    f('#left-side #section-tabs .brand_configs').click
+    expect(driver.title).to include 'Themes:'
   end
 
   it 'should open theme editor', priority: "1", test_id: 239980 do
     open_theme_editor(Account.default.id)
 
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
   end
 
-  it 'should close theme editor on cancel and redirect to account settings page', priority: "1", test_id: 239981 do
+  it 'should close theme editor on cancel and redirect to /accounts/x', priority: "1", test_id: 239981 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
-    fj('button:contains("Cancel")').click
+    fj('.Theme__header button:contains("Exit")').click
+    driver.switch_to.alert.accept
     # validations
     assert_flash_notice_message /Theme editor changes have been cancelled/
-    expect(f('#breadcrumbs')).to include_text('Courses')
-    expect(fj('.btn.button-sidebar-wide').text).to include_text 'Open Theme Editor'
+    expect(driver.current_url).to end_with("/accounts/#{Account.default.id}/brand_configs")
+    expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
-    fj('.Theme__editor-color-block_input-text').send_keys('#dc6969')
+    f('.Theme__editor-color-block_input-text').send_keys('#dc6969')
     # validations
-    expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
+    expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
   it 'should accept valid Hex IDs', priority: "1", test_id: 239986 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
     all_colors(all_global_branding)
 
@@ -66,49 +66,39 @@ describe 'Theme Editor' do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
-    fj('.Theme__editor-color-block_input-text').send_keys('#fff')
+    f('.Theme__editor-color-block_input-text').send_keys('#fff')
     # validations
-    expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
+    expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
   it 'should accept valid color names', priority: "2", test_id: 240233 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
-    fj('.Theme__editor-color-block_input-text').send_keys('orange')
+    f('.Theme__editor-color-block_input-text').send_keys('orange')
     # validations
-    expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
+    expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
   it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
-    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+    expect(driver.title).to include 'Theme Editor'
 
     # enters invalid ID and presses tab
-    fj('.Theme__editor-color-block_input-text').send_keys('#xxxxx!')
-    fj('.Theme__editor-color-block_input-text').send_keys(:tab)
+    f('.Theme__editor-color-block_input-text').send_keys('#xxxxx!')
+    f('.Theme__editor-color-block_input-text').send_keys(:tab)
 
     # validations
-    expect(fj('.ic-Form-message--error').text).to include_text "'#xxxxx!' is not a valid color."
+    expect(f('.ic-Form-message--error')).to include_text "'#xxxxx!' is not a valid color."
   end
 
-  it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001 do
-    skip("Skipped because the K12 template option does not appear in selenium tests")
-    Account.default.enable_feature!(:k12)
-    open_theme_editor(Account.default.id)
-    expect(f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input').attribute(:placeholder)).to include_text('#E66135')
-  end
-
-  it 'Theme editor has a dropdown menu for Templates', priority: "1", test_id: 244889 do
-    open_theme_editor(Account.default.id)
-    expect(f('#sharedThemes')).to include_text('Start from a template...')
-  end
+  it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001
 
   it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
     open_theme_editor(Account.default.id)
@@ -127,7 +117,7 @@ describe 'Theme Editor' do
     create_theme('#xxxxxx')
 
     # tab to trigger last validation
-    fj('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(3) > section.Theme__editor-accordion_element.Theme__editor-color.ic-Form-control > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input.Theme__editor-color-block_input--has-error').send_keys(:tab)
+    fj('.Theme__editor-color-block_input--has-error:last').send_keys(:tab)
 
     # expect all 15 text fields to have working validation
     expect(all_warning_messages.length).to eq 15

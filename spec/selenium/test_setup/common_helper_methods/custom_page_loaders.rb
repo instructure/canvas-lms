@@ -2,7 +2,7 @@ module CustomPageLoaders
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
   def get(link)
-    @click_ready = true
+    driver.ready_for_interaction = true
     link = polymorphic_path(link) if link.is_a? Array
 
     # If the new link is identical to the old link except for the hash, we don't

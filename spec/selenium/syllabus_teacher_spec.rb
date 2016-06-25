@@ -46,7 +46,7 @@ describe "course syllabus" do
       wait_for_ajaximations
       expect(f('#editor_tabs .wiki-sidebar-header')).to include_text("Insert Content into the Page")
       edit_form = f('#edit_course_syllabus_form')
-      wait_for_tiny(keep_trying_until { f('#edit_course_syllabus_form') })
+      wait_for_tiny(f('#edit_course_syllabus_form'))
       type_in_tiny('#course_syllabus_body', new_description)
       submit_form(edit_form)
       wait_for_ajaximations

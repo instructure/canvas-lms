@@ -1,12 +1,16 @@
 class EquationImagesController < ApplicationController
 
-  # Facade to codecogs API so we retain control
+  # Facade to codecogs API for gif generation or microservice MathMan for svg
   def show
-    # TODO: escape id here, and stop double escaping it in
-    # public/javascripts/tinymce/jscripts/tiny_mce/plugins/instructure_equation/editor_plugin.js
-    # this will require a corresponding data migration to fix
-    base_url = Setting.get('codecogs.equation_image_link', 'http://latex.codecogs.com/gif.latex')
-    redirect_to base_url + '?' + params[:id]
+    base_url = Setting.get('equation_image_url', 'http://latex.codecogs.com/gif.latex?')
+
+    # At the moment, the latex string is stored in the db double escaped. By
+    # the time the value gets here as `params[:id]` it has been unescaped once.
+    # This is nearly how we want it to pass it on to the next service, except
+    # `+` signs are in tact. Since normally the `+` signifies a space and we
+    # want the `+` signs for real, we need to encode them.
+    latex = params[:id].gsub('+', '%2B')
+    redirect_to base_url + latex
   end
 
 end

@@ -36,5 +36,5 @@ define ['collaborations'], (collaborations) ->
     equal $.screenReaderFlashMessage.callCount, 1
 
   test "returns a collaboration url", ->
-    url = collaborations.Util.collaborationUrl(1);
+    url = collaborations.Util.collaborationUrl(1)
     equal url, window.location.toString() + "/1"

@@ -499,7 +499,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def defined_by_sis?
-    !!self.sis_source_id
+    !!self.sis_batch_id
   end
 
   def assigned_observer?

@@ -297,6 +297,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>
   <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>
   <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>
+  <span class="span3"><i class="icon-folder-locked"></i> icon-folder-locked</span>
 </div>
 <div class="row-fluid">
   <span class="span3"><i class="icon-import"></i> icon-import</span>
@@ -466,6 +467,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-filmstrip:before { content: "\f13a"; }
 .icon-flag:before { content: "\f13b"; }
 .icon-folder:before { content: "\f13c"; }
+.icon-folder-locked:before { content: "\f1bc"; }
 .icon-forward:before { content: "\f13d"; }
 .icon-github:before { content: "\f13e"; }
 .icon-gradebook:before { content: "\f13f"; }

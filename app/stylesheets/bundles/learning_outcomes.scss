@@ -90,7 +90,7 @@
     }
     .outcome-calculation-method-form {
       .grid-row {
-        padding: 10px;
+        padding: $ic-sp/2;
       }
       label {
         display: inline;
@@ -104,10 +104,10 @@
     }
     dl.dl-horizontal {
       dt {
-        width: 127px;
+        width: 140px;
       }
       dd {
-        margin-left: 145px;
+        margin-left: 158px;
       }
     }
   }

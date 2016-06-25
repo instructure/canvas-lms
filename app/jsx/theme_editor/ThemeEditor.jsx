@@ -7,14 +7,15 @@ define([
   'compiled/fn/preventDefault',
   'compiled/models/Progress',
   './PropTypes',
+  './submitHtmlForm',
+  './SaveThemeButton',
   './ThemeEditorAccordion',
-  './SharedBrandConfigPicker',
   './ThemeEditorFileUpload',
   './ThemeEditorModal'
-], (I18n, React, $, _, htmlEscape, preventDefault, Progress, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker, ThemeEditorFileUpload, ThemeEditorModal) => {
+], (I18n, React, $, _, htmlEscape, preventDefault, Progress, customTypes, submitHtmlForm, SaveThemeButton, ThemeEditorAccordion, ThemeEditorFileUpload, ThemeEditorModal) => {
 
 /*eslint no-alert:0*/
-  var TABS = [
+  const TABS = [
     {
       id: 'te-editor',
       label: I18n.t('Edit'),
@@ -27,12 +28,12 @@ define([
       value: 'upload',
       selected: false
     }
-  ];
+  ]
 
   function findVarDef (variableSchema, variableName) {
-    for (var i = 0; i < variableSchema.length; i++) {
-      for (var j = 0; j < variableSchema[i].variables.length; j++) {
-        var varDef = variableSchema[i].variables[j]
+    for (let i = 0; i < variableSchema.length; i++) {
+      for (let j = 0; j < variableSchema[i].variables.length; j++) {
+        let varDef = variableSchema[i].variables[j]
         if (varDef.variable_name === variableName){
           return varDef
         }
@@ -40,21 +41,16 @@ define([
     }
   }
 
-  function filterCompleteProgresses (progresses) {
-    return _.select(progresses, (p) => {
-      return p.completion !== 100
-    })
+  function readSharedBrandConfigBeingEditedFromStorage() {
+    try {
+      const stored = sessionStorage.getItem('sharedBrandConfigBeingEdited')
+      if (stored) return JSON.parse(stored)
+    } catch (e) {
+      console.error('Error reading sharedBrandConfigBeingEdited from sessionStore:', e)
+    }
   }
 
-  function submitHtmlForm(action, method, md5) {
-    $(`
-      <form hidden action="${htmlEscape(action)}" method="POST">
-        <input name="_method" type="hidden" value="${htmlEscape(method)}" />
-        <input name="authenticity_token" type="hidden" value="${htmlEscape($.cookie('_csrf_token'))}" />
-        <input name="brand_config_md5" value="${htmlEscape(md5 ? md5 : '')}" />
-      </form>
-    `).appendTo('body').submit()
-  }
+  const notComplete = (progress) => progress.completion !== 100
 
   return React.createClass({
 
@@ -64,19 +60,9 @@ define([
       brandConfig: customTypes.brandConfig,
       hasUnsavedChanges: React.PropTypes.bool.isRequired,
       variableSchema: customTypes.variableSchema,
-      sharedBrandConfigs: customTypes.sharedBrandConfigs,
       allowGlobalIncludes: React.PropTypes.bool,
       accountID: React.PropTypes.string,
-      highContrast: React.PropTypes.bool
-    },
-
-    getDefaultProps: function() {
-      if (window.ENV.use_high_contrast) {
-        return { highContrast: true }
-      }
-      else {
-        return { highContrast: false }
-      }
+      useHighContrast: React.PropTypes.bool,
     },
 
     getInitialState() {
@@ -84,17 +70,18 @@ define([
         changedValues: {},
         showProgressModal: false,
         progress: 0,
+        sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
         showSubAccountProgress: false,
         activeSubAccountProgresses: []
       }
     },
 
     changeSomething(variableName, newValue, isInvalid) {
-      var change = { val: newValue, invalid: isInvalid }
-      this.state.changedValues[variableName] = change
-      this.setState({
-        changedValues: this.state.changedValues
-      })
+      const changedValues = {
+        ...this.state.changedValues,
+        [variableName]: { val: newValue, invalid: isInvalid },
+      }
+      this.setState({changedValues})
     },
 
     invalidForm() {
@@ -111,8 +98,14 @@ define([
       })
     },
 
+    displayedMatchesSaved() {
+      return this.state.sharedBrandConfigBeingEdited &&
+             this.state.sharedBrandConfigBeingEdited.brand_config_md5 === this.props.brandConfig.md5
+    },
+
+
     getDisplayValue(variableName, opts) {
-      var val
+      let val
 
       // try getting the modified value first, unless we're skipping it
       if (!opts || !opts.ignoreChanges) val = this.getChangedValue(variableName)
@@ -142,22 +135,26 @@ define([
     },
 
     getSchemaDefault(variableName, opts) {
-      var varDef = findVarDef(this.props.variableSchema, variableName)
-      var val = varDef ? varDef.default : null
+      const varDef = findVarDef(this.props.variableSchema, variableName)
+      const val = varDef ? varDef.default : null
 
       if (val && val[0] === '$') return this.getDisplayValue(val.slice(1), opts)
       return val
     },
 
+    updateSharedBrandConfigBeingEdited (updatedSharedConfig) {
+      sessionStorage.setItem('sharedBrandConfigBeingEdited', JSON.stringify(updatedSharedConfig))
+      this.setState({sharedBrandConfigBeingEdited: updatedSharedConfig})
+    },
+
     handleCancelClicked() {
-      if (this.props.hasUnsavedChanges || this.somethingHasChanged()) {
-        var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
-                         'Would you still like to proceed?')
-        if (!window.confirm(msg)) {
-          return;
-        }
+      if (this.somethingHasChanged() || !this.displayedMatchesSaved()) {
+        const msg = I18n.t('You are about to lose any unsaved changes.\n\n' +
+                           'Would you still like to proceed?')
+        if (!window.confirm(msg)) return
       }
-      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs', 'DELETE');
+      sessionStorage.removeItem('sharedBrandConfigBeingEdited')
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs', 'DELETE')
     },
 
     saveToSession(md5) {
@@ -165,7 +162,7 @@ define([
     },
 
     handleFormSubmit() {
-      var newMd5
+      let newMd5
 
       this.setState({showProgressModal: true})
 
@@ -195,14 +192,14 @@ define([
     },
 
     handleApplyClicked() {
-      var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?');
+      const msg = I18n.t('This will apply this theme to your entire account. Would you like to proceed?')
       if (window.confirm(msg)) {
-        this.kickOffSubAcountCompilation();
+        this.kickOffSubAcountCompilation()
       }
     },
 
     redirectToAccount() {
-      window.location.replace("/accounts/"+this.props.accountID+"?theme_applied=1");
+      window.location.replace("/accounts/"+this.props.accountID+"/brand_configs?theme_applied=1")
     },
 
     kickOffSubAcountCompilation() {
@@ -218,7 +215,7 @@ define([
         if (!resp.subAccountProgresses || _.isEmpty(resp.subAccountProgresses)) {
           this.redirectToAccount()
         } else {
-          this.openSubAccountProgressModal();
+          this.openSubAccountProgressModal()
           this.filterAndSetActive(resp.subAccountProgresses)
           return resp.subAccountProgresses.map( (prog) => {
             return new Progress(prog).poll().progress(this.onSubAccountProgress)
@@ -231,31 +228,28 @@ define([
     },
 
     onSubAccountProgress(data) {
-      var newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, (progress) => {
-        return progress.tag == data.tag ?
-          data :
-          progress
+      const newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, (progress) => {
+        return progress.tag == data.tag ? data : progress
       })
 
       this.filterAndSetActive(newSubAccountProgs)
 
       if ( _.isEmpty(this.state.activeSubAccountProgresses)) {
-        this.closeSubAccountProgressModal();
-        this.redirectToAccount();
+        this.closeSubAccountProgressModal()
+        this.redirectToAccount()
       }
     },
 
     filterAndSetActive(progresses) {
-      var activeProgs = filterCompleteProgresses(progresses)
-      this.setState({activeSubAccountProgresses: activeProgs})
+      this.setState({activeSubAccountProgresses: progresses.filter(notComplete)})
     },
 
     openSubAccountProgressModal() {
-      this.setState({ showSubAccountProgress: true });
+      this.setState({ showSubAccountProgress: true })
     },
 
     closeSubAccountProgressModal() {
-      this.setState({ showSubAccountProgress: false });
+      this.setState({ showSubAccountProgress: false })
     },
 
     renderTabInputs() {
@@ -268,8 +262,8 @@ define([
             defaultValue={tab.value}
             className="Theme__editor-tabs_input"
             defaultChecked={tab.selected} />
-        );
-      }) : null;
+        )
+      }) : null
     },
 
     renderTabLabels() {
@@ -282,31 +276,38 @@ define([
             id={`${tab.id}-tab`}>
               {tab.label}
           </label>
-        );
-      }) : null;
+        )
+      }) : null
     },
 
     render() {
+      let tooltipForWhyApplyIsDisabled = null
+      if (this.somethingHasChanged()) {
+        tooltipForWhyApplyIsDisabled = I18n.t('You need to "Preview Changes" before you can apply this to your account')
+      } else if (this.props.brandConfig.md5 && !this.displayedMatchesSaved()) {
+        tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
+      }
+
       return (
         <div id="main">
-          {
-            this.props.highContrast ? (
-              <div role="alert" className="ic-flash-static ic-flash-error">
-                <h4 className="ic-flash__headline">
-                  <i aria-hidden="true" className="icon-warning" />&nbsp;
-                  {I18n.t('You will not be able to preview your changes')}
-                </h4>
-                <p
-                  className="ic-flash__text"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      I18n.t('To preview Theme Editor branding, you will need to *turn off High Contrast UI*.', {
-                        wrappers: ['<a href="/profile/settings">$1</a>']
-                      })
-                    }}
-                />
-              </div>
-            ) : null
+          { this.props.useHighContrast &&
+            <div role="alert" className="ic-flash-static ic-flash-error">
+              <h4 className="ic-flash__headline">
+                <div className="ic-flash__icon" aria-hidden="true">
+                  <i className="icon-warning"></i>
+                </div>
+                {I18n.t('You will not be able to preview your changes')}
+              </h4>
+              <p
+                className="ic-flash__text"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    I18n.t('To preview Theme Editor branding, you will need to *turn off High Contrast UI*.', {
+                      wrappers: ['<a href="/profile/settings">$1</a>']
+                    })
+                  }}
+              />
+            </div>
           }
           <form
             ref="ThemeEditorForm"
@@ -319,48 +320,63 @@ define([
             <input name="utf8" type="hidden" value="✓" />
             <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
 
-            <div className="Theme__layout">
+            <header className={`Theme__header ${!this.props.hasUnsavedChanges && 'Theme__header--is-active-theme'}`}>
 
-              <div className="Theme__editor">
+              <h1 className="screenreader-only">{I18n.t('Theme Editor')}</h1>
+              <div className="Theme__header-layout">
+                <div className="Theme__header-primary">
 
-                <div className="Theme__editor-header">
-                  <div className="Theme__editor-header_title">
-                    <i className="Theme__editor-header_title-icon icon-instructure" aria-hidden="true" />
-                    <h1 className="Theme__editor-header_title-text">
-                      {I18n.t('Theme Editor')}
-                    </h1>
-                  </div>
-
-                  <div className="Theme__editor-header_actions">
+                  {/* HIDE THIS BUTTON IF THEME IS ACTIVE THEME */}
+                  {/* IF CHANGES ARE MADE, THIS BUTTON IS DISABLED UNTIL THEY ARE SAVED */}
+                  { this.props.hasUnsavedChanges ? (
                     <span
-                      data-tooltip="bottom"
-                      title={this.somethingHasChanged() ?
-                        I18n.t('You need to "Preview Your Changes" before applying to everyone.') :
-                        null
-                      }
+                      data-tooltip="right"
+                      title={tooltipForWhyApplyIsDisabled}
                     >
                       <button
                         type="button"
-                        className="Theme__editor-header_button Button Button--small Button--success"
-                        disabled={!this.props.hasUnsavedChanges || this.somethingHasChanged()}
+                        className="Button Button--success"
+                        disabled={!!tooltipForWhyApplyIsDisabled}
                         onClick={this.handleApplyClicked}
                       >
-                        {I18n.t('Apply')}
+                        {I18n.t('Apply theme')}
                       </button>
-
                     </span>
-                    <button
-                      type="button"
-                      className="Theme__editor-header_button Button Button--small"
-                      onClick={this.handleCancelClicked}
-                    >
-                      {I18n.t('Cancel')}
-                    </button>
-                  </div>
+                  ) : null}
+
+
+                  <h2 className="Theme__header-theme-name">
+                    {this.props.hasUnsavedChanges || this.somethingHasChanged() ?
+                      null
+                    :
+                      <i className="icon-check"/>
+                    }
+                    &nbsp;&nbsp;
+                    {this.state.sharedBrandConfigBeingEdited ? this.state.sharedBrandConfigBeingEdited.name : null }
+                  </h2>
                 </div>
+                <div className="Theme__header-secondary">
+                  <SaveThemeButton
+                    userNeedsToPreviewFirst={this.somethingHasChanged()}
+                    sharedBrandConfigBeingEdited={this.state.sharedBrandConfigBeingEdited}
+                    accountID={this.props.accountID}
+                    brandConfigMd5={this.props.brandConfig.md5}
+                    onSave={this.updateSharedBrandConfigBeingEdited}
+                  />
+
+                  &nbsp;
+
+                  <button type="button" className="Button" onClick={this.handleCancelClicked}>
+                    {I18n.t('Exit')}
+                  </button>
+                </div>
+              </div>
+            </header>
+
+            <div className={`Theme__layout ${!this.props.hasUnsavedChanges && 'Theme__layout--is-active-theme'}`} >
+              <div className="Theme__editor">
 
                 <div className="Theme__editor-tabs">
-
                   { this.renderTabInputs() }
 
                   <div className="Theme__editor-tab-label-layout">
@@ -368,13 +384,6 @@ define([
                   </div>
 
                   <div id="te-editor-panel" className="Theme__editor-tabs_panel">
-                    <SharedBrandConfigPicker
-                      sharedBrandConfigs={this.props.sharedBrandConfigs}
-                      activeBrandConfigMd5={this.props.brandConfig.md5}
-                      saveToSession={this.saveToSession}
-                      hasUnsavedChanges={this.props.hasUnsavedChanges}
-                      somethingChanged={this.somethingHasChanged()}
-                    />
                     <ThemeEditorAccordion
                       variableSchema={this.props.variableSchema}
                       brandConfigVariables={this.props.brandConfig.variables}
@@ -435,13 +444,13 @@ define([
                       <div className="Theme__editor-upload-overrides">
 
                         <div className="Theme__editor-upload-overrides_header">
-                          { I18n.t('File(s) will be included when user content is displayed within Canvas iOS or Android apps.') }
+                          { I18n.t('File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.') }
                         </div>
 
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Mobile CSS file')}
+                            label={I18n.t('Mobile app CSS file')}
                             accept=".css"
                             name="mobile_css_overrides"
                             currentValue={this.props.brandConfig.mobile_css_overrides}
@@ -450,7 +459,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Mobile JavaScript file')}
+                            label={I18n.t('Mobile app JavaScript file')}
                             accept=".js"
                             name="mobile_js_overrides"
                             currentValue={this.props.brandConfig.mobile_js_overrides}
@@ -472,7 +481,7 @@ define([
                   <div className="Theme__preview-overlay">
                     <button
                       type="submit"
-                      className="Button Button--primary"
+                      className="Button Button--primary Button--large"
                       disabled={this.invalidForm()}>
                       <i className="icon-refresh" />
                       <span className="Theme__preview-button-text">
@@ -495,7 +504,8 @@ define([
             showProgressModal={this.state.showProgressModal}
             showSubAccountProgress={this.state.showSubAccountProgress}
             activeSubAccountProgresses={this.state.activeSubAccountProgresses}
-            progress={this.state.progress} />
+            progress={this.state.progress}
+          />
 
         </div>
       )

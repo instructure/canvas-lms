@@ -42,10 +42,8 @@ describe 'Web conferences' do
     context 'as a teacher' do
       it 'concludes the conference', priority: "1", test_id: 323320 do
         end_first_conference_in_list
-        keep_trying_until do
-          verify_conference_list_is_empty
-          verify_concluded_conference_list_includes(conference_title)
-        end
+        verify_conference_list_is_empty
+        verify_concluded_conference_list_includes(conference_title)
       end
 
       it 'should not treat the concluded conference as active', priority: "2", test_id: 1041396 do
@@ -63,17 +61,15 @@ describe 'Web conferences' do
 
       it 'concludes the conference', priority: "1", test_id: 323319 do
         end_first_conference_in_list
-        keep_trying_until do
-          verify_conference_list_is_empty
-          verify_concluded_conference_list_includes(conference_title)
-        end
+        verify_conference_list_is_empty
+        verify_concluded_conference_list_includes(conference_title)
       end
     end
   end
 
   context 'when no conferences exist' do
     it 'should display initial elements of the conference page', priority: "1", test_id: 118488 do
-      keep_trying_until { expect(new_conference_button).to be_truthy }
+      expect(new_conference_button).to be
 
       headers = ff('.element_toggler')
       expect(headers[0]).to include_text('New Conferences')

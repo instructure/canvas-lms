@@ -126,7 +126,7 @@ END
 This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
 END
       applies_to: 'RootAccount',
-      state: 'allowed',
+      state: ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 'on' : 'allowed',
       root_opt_in: true
     },
     'epub_export' =>
@@ -419,7 +419,7 @@ END
       applies_to: 'Course',
       state: 'hidden',
       beta: true,
-      development: true,
+      development: false,
       root_opt_in: false,
     },
     'wrap_calendar_event_titles' =>
@@ -428,6 +428,14 @@ END
       description: -> { I18n.t("Show calendar events in the month view on multiple lines if the title doesn't fit on a single line") },
       applies_to: 'RootAccount',
       state: 'allowed',
+      root_opt_in: true
+    },
+    'new_collaborations' =>
+    {
+      display_name: -> { I18n.t("External Collaborations Tool") },
+      description: -> { I18n.t("Use the new Collaborations external tool enabling more options for tools to use to collaborate") },
+      applies_to: 'RootAccount',
+      state: 'hidden',
       root_opt_in: true
     }
   )

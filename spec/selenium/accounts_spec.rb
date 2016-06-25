@@ -86,7 +86,7 @@ describe "account" do
       f('.editing_term .general_dates .start_date .edit_term input').send_keys("2011-07-01")
       f('.editing_term .general_dates .end_date .edit_term input').send_keys("2011-07-31")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["Jul 1", "Jul 31"],
           :student_enrollment => ["term start", "term end"],
@@ -102,7 +102,7 @@ describe "account" do
       f('.editing_term .student_enrollment_dates .start_date .edit_term input').send_keys("2011-07-02")
       f('.editing_term .student_enrollment_dates .end_date .edit_term input').send_keys("2011-07-30")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["Jul 2", "Jul 30"],
@@ -118,7 +118,7 @@ describe "account" do
       f('.editing_term .teacher_enrollment_dates .start_date .edit_term input').send_keys("2011-07-03")
       f('.editing_term .teacher_enrollment_dates .end_date .edit_term input').send_keys("2011-07-29")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],
@@ -134,7 +134,7 @@ describe "account" do
       f('.editing_term .ta_enrollment_dates .start_date .edit_term input').send_keys("2011-07-04")
       f('.editing_term .ta_enrollment_dates .end_date .edit_term input').send_keys("2011-07-28")
       f("button[type='submit']").click
-      keep_trying_until { term.attribute(:class) !~ /editing_term/ }
+      expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
           :general => ["whenever", "whenever"],
           :student_enrollment => ["term start", "term end"],
@@ -169,17 +169,15 @@ describe "account" do
     it "should search for an existing course" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', @course_name)
-      expect(f('#section-tabs-header')).to include_text(@course_name)
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(@course_name)
     end
 
     it "should correctly autocomplete for courses" do
       get "/accounts/#{Account.default.id}"
       f('#course_name').send_keys(@course_name.chop)
 
-      keep_trying_until do
-        ui_auto_complete = f('.ui-autocomplete')
-        expect(ui_auto_complete).to be_displayed
-      end
+      ui_auto_complete = f('.ui-autocomplete')
+      expect(ui_auto_complete).to be_displayed
 
       elements = ff('.ui-autocomplete li:first-child a div')
       expect(elements[0].text).to eq @course_name

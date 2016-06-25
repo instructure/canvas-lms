@@ -10,10 +10,7 @@ I18n.locale = document.documentElement.getAttribute('lang');
 
 I18n.lookup = function(scope, options) {
   var translations = this.prepareOptions(I18n.translations);
-  var locales = [I18n.currentLocale()];
-  if (I18n.currentLocale() != I18n.defaultLocale) {
-      locales.push(I18n.defaultLocale);
-  }
+  var locales = I18n.getLocaleAndFallbacks(I18n.currentLocale());
   options = this.prepareOptions(options);
   if (typeof(scope) == "object") {
     scope = scope.join(this.defaultSeparator);
@@ -38,6 +35,32 @@ I18n.lookup = function(scope, options) {
   }
 
   return messages;
+};
+
+I18n.getLocaleAndFallbacks = function(locale) {
+  if (!I18n.fallbacksMap) {
+    I18n.fallbacksMap = I18n.computeFallbacks();
+  }
+  return (I18n.fallbacksMap[locale] || [I18n.defaultLocale]).slice();
+};
+
+I18n.computeFallbacks = function() {
+  var map = {};
+  Object.keys(I18n.translations).forEach(function(locale) {
+    var locales = [];
+    var parts = locale.split(/-/);
+    for (var i = parts.length; i > 0; i--) {
+      var candidateLocale = parts.slice(0, i).join("-");
+      if (candidateLocale in I18n.translations) {
+        locales.push(candidateLocale);
+      }
+    }
+    if (locales.indexOf(I18n.defaultLocale) === -1) {
+      locales.push(I18n.defaultLocale);
+    }
+    map[locale] = locales;
+  });
+  return map;
 };
 
 var _localize = I18n.localize;

@@ -57,9 +57,7 @@ describe 'Screenreader Gradebook grading' do
       grade_srgb_assignment(main_grade_input, 8)
       tab_out_of_input(main_grade_input)
 
-      keep_trying_until do
-        expect(main_grade_input).to have_value('80%')
-      end
+      expect(main_grade_input).to have_value('80%')
     end
 
     it 'displays correct points for graded by Complete/Incomplete', priority: "1", test_id: 615694 do
@@ -84,10 +82,8 @@ describe 'Screenreader Gradebook grading' do
       tab_out_of_input(main_grade_input)
       submission_details_button.click
 
-      keep_trying_until do
-        expect(f('.submission_details_dialog .assignment-name')).to include_text(assignment_1.name)
-        expect(f('.submission_details_grade_form input')).to have_value('8')
-      end
+      expect(f('.submission_details_dialog .assignment-name')).to include_text(assignment_1.name)
+      expect(fj('.submission_details_grade_form input:visible')).to have_value('8')
     end
 
     it 'updates grade in submission details modal', priority: "2", test_id: 949577 do
@@ -101,11 +97,8 @@ describe 'Screenreader Gradebook grading' do
       details_modal_grade_input.clear
       replace_content(details_modal_grade_input, 10)
       f("form.submission_details_grade_form button").click
-      wait_for_ajaximations
 
-      keep_trying_until do
-        expect(main_grade_input).to have_value('100%')
-      end
+      expect(main_grade_input).to have_value('100%')
     end
   end
 

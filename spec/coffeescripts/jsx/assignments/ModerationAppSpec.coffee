@@ -18,6 +18,10 @@ define [
             students: []
             sort: 'asc'
           },
+          inflightAction: {
+            review: false,
+            publish: false
+          },
           flashMessage: {
             message: "",
             time: 0

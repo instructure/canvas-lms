@@ -129,7 +129,7 @@ describe "Screenreader Gradebook" do
     get srgb
     click_option '#student_select', @students[0].name
     click_option '#assignment_select', a1.name
-    expect(f('#student_and_assignment_grade').attribute 'value').to eq grades[0]
+    expect(f('#student_and_assignment_grade')).to have_value grades[0]
     expect(f('#student_information .total-grade').text).to eq "75% (#{grades[0]} / 20 points)"
 
     click_option '#assignment_select', a2.name
@@ -151,7 +151,7 @@ describe "Screenreader Gradebook" do
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.student_assignment.editable').attribute 'data-muted').to eq 'true'
+    expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
 
     get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
@@ -170,7 +170,7 @@ describe "Screenreader Gradebook" do
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f('.student_assignment.editable').attribute 'data-muted').to eq 'false'
+    expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
 
     get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2"
     expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to_not have_class 'muted'
@@ -249,9 +249,9 @@ describe "Screenreader Gradebook" do
     it "switches to srgb", priority: "1", test_id: 615682 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder").click
-      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
+      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       refresh_page
-      keep_trying_until { expect(f("#not_right_side")).to include_text("Gradebook: Individual View") }
+      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       f(".span12 a").click
       expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end

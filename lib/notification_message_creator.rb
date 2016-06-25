@@ -270,16 +270,22 @@ class NotificationMessageCreator
 
   # Finds channels for a user that should get this notification immediately
   #
-  # If the user doesn't have a policy for this notification and the default
-  # frequency is immediate, the user should get the notification by email.
+  # If the user doesn't have a policy for this notification on a non-push
+  # channel and the default frequency is immediate, the user should get the
+  # notification by email.
   # Unregistered users don't get notifications. (registration notifications
   # are a special case handled elsewhere)
   def immediate_channels_for(user)
     return [] unless user.registered?
 
-    user_has_a_policy = user.communication_channels.active.for(@notification).exists?
-    return [user.email_channel].compact if !user_has_a_policy && @notification.default_frequency == 'immediately'
-    user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
+    active_channel_scope = user.communication_channels.active.for(@notification)
+    immediate_channel_scope = user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
+
+    user_has_a_policy = active_channel_scope.where.not(path_type: 'push').exists?
+    if !user_has_a_policy && @notification.default_frequency == 'immediately'
+      return [user.email_channel, *immediate_channel_scope.where(path_type: 'push')].compact
+    end
+    immediate_channel_scope
   end
 
   def cancel_pending_duplicate_messages

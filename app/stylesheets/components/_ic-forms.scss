@@ -1,7 +1,15 @@
 /*
 @styleguide Forms
 
-## Basic example
+## Basic inputs and labels
+
+Our forms styles are **opt-in**, which means you need to add the right CSS
+classes to inputs, labels, etc. to see the styles. (This prevents us from breaking
+any existing Canvas forms CSS.) Inputs, selects, textareas, etc. should be
+given the `.ic-Input` class, while labels should have the `.ic-Label` class.
+
+The `.ic-Form-control` element provides positioning context and margin for
+each label-input pair.
 
 ```html
 <div class="ic-Form-control">
@@ -58,113 +66,206 @@ Also works with ``.ic-Input-group`` (see more about ``.ic-Input-group`` below)
 </div>
 ```
 
+## Radio buttons
 
-## Custom radio buttons
+### Radio button group
 
-### Basic example: stacked radio button group
+Radio button groups should be contained within their own `<fieldset>` with
+the class `ic-Fieldset--radio-checkbox` and labeled with a `<legend>`.
 
 ```html
-<div class="ic-Form-control ic-Form-control--radio">
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-1" type="radio" value="value 1" name="ic-radio-group-1" checked>
-    <label for="demo-ic-radio-1" class="ic-Label">myValue 1</label>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    Favorite flower
+  </legend>
+  <div class="ic-Form-control ic-Form-control--radio">
+    <div class="ic-Radio">
+      <input id="tulip" type="radio" value="tulip" name="flower" checked>
+      <label for="tulip" class="ic-Label">Tulip</label>
+    </div>
+    <div class="ic-Radio">
+      <input id="daisy" type="radio" value="daisy" name="flower">
+      <label for="daisy" class="ic-Label">Daisy</label>
+    </div>
+    <div class="ic-Radio">
+      <input id="daffodil" type="radio" value="daffodil" name="flower">
+      <label for="daffodil" class="ic-Label">Daffodil</label>
+    </div>
   </div>
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-2" type="radio" value="value 2" name="ic-radio-group-1">
-    <label for="demo-ic-radio-2" class="ic-Label">myValue 2</label>
+</fieldset>
+```
+
+### Inline radio button group
+
+Add the `ic-Form-control--radio-inline` class to the `ic-Form-control--radio`
+element to make the radio buttons display inline.
+
+```html
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    Favorite Premier League team
+  </legend>
+  <div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
+    <div class="ic-Radio">
+      <input id="liverpool" type="radio" value="liverpool" name="epl" checked>
+      <label for="liverpool" class="ic-Label">Liverpool</label>
+    </div>
+    <div class="ic-Radio">
+      <input id="manutd" type="radio" value="manutd" name="epl">
+      <label for="manutd" class="ic-Label">Manchester United</label>
+    </div>
+    <div class="ic-Radio">
+      <input id="astonvilla" type="radio" value="astonvilla" name="epl" disabled>
+      <label for="astonvilla" class="ic-Label">Aston Villa (relegated)</label>
+    </div>
+    <div class="ic-Radio">
+      <input id="otherteam" type="radio" value="otherteam" name="epl">
+      <label for="otherteam" class="ic-Label">Another team</label>
+    </div>
   </div>
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-3" type="radio" value="value 3" name="ic-radio-group-1">
-    <label for="demo-ic-radio-3" class="ic-Label">myValue 3</label>
-  </div>
+</fieldset>
+```
+
+## Checkboxes
+
+### Basic checkbox
+For these to work properly, make sure the ``for`` attribute of the ``label`` matches the ``id``
+of the ``checkbox`` element. If you want to use default checkboxes, the existing Bootstrap 2.x
+styles have been left unchanged.
+
+```html
+<div class="ic-Form-control ic-Form-control--checkbox">
+  <input type="checkbox" id="freecandy">
+  <label class="ic-Label" for="freecandy">Yes, I want free candy</label>
 </div>
 ```
 
-### Disabled radio buttons
+### Checkbox group
+Checkbox groups should be contained within their own `<fieldset>` with
+the class `ic-Fieldset--radio-checkbox` and labeled with a `<legend>`.
 
 ```html
-<div class="ic-Form-control ic-Form-control--radio">
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-4" type="radio" value="value 1" name="ic-radio-group-2" disabled>
-    <label for="demo-ic-radio-4" class="ic-Label">myValue 1</label>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    Major label artists you admire
+  </legend>
+  <div class="ic-Checkbox-group">
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="beyonce">
+      <label class="ic-Label" for="beyonce">Beyonce</label>
+    </div>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="coldplay">
+      <label class="ic-Label" for="coldplay">Coldplay</label>
+    </div>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="mariah">
+      <label class="ic-Label" for="mariah">Mariah Carey</label>
+    </div>
   </div>
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-5" type="radio" value="value 2" name="ic-radio-group-2" checked disabled>
-    <label for="demo-ic-radio-5" class="ic-Label">myValue 2</label>
-  </div>
-</div>
+</fieldset>
 ```
 
-### Inline radio buttons
+### Inline checkbox group
+Add the `ic-Checkbox-group--inline` class to the `ic-Checkbox-group`
+element to make the checkboxes display inline.
 
 ```html
-<div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-6" type="radio" value="value 1" name="ic-radio-group-3" checked>
-    <label for="demo-ic-radio-6" class="ic-Label">myValue 1</label>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    Major label artists you admire
+  </legend>
+  <div class="ic-Checkbox-group ic-Checkbox-group--inline">
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="beyonce2">
+      <label class="ic-Label" for="beyonce2">Beyonce</label>
+    </div>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="coldplay2">
+      <label class="ic-Label" for="coldplay2">Coldplay</label>
+    </div>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <input type="checkbox" id="mariah2">
+      <label class="ic-Label" for="mariah2">Mariah Carey</label>
+    </div>
   </div>
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-7" type="radio" value="value 2" name="ic-radio-group-3">
-    <label for="demo-ic-radio-7" class="ic-Label">myValue 2</label>
-  </div>
-  <div class="ic-Radio">
-    <input id="demo-ic-radio-8" type="radio" value="value 3" name="ic-radio-group-3">
-    <label for="demo-ic-radio-8" class="ic-Label">myValue 3</label>
-  </div>
-</div>
+</fieldset>
 ```
 
+## Fieldsets
 
-## Custom checkboxes
-
-For these to work properly, make sure the ``for`` attribute of the ``label`` matches the ``id`` of the ``checkbox`` element.
-
-(If you want to use default checkboxes, the existing Bootstrap 2.x styles have been left unchanged.)
-
-### Basic example: stacked checkboxes
+Use `<fieldset class="ic-Fieldset">` to group related form
+sections. Label each fieldset with `<legend class="ic-Legend">`.
 
 ```html
-
-<div class="ic-Checkbox-group">
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-1">
-    <label class="ic-Label" for="demo-ic-check-1">Custom checkbox</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-2" checked>
-    <label class="ic-Label" for="demo-ic-check-2">Checked custom checkbox</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-3" checked disabled>
-    <label class="ic-Label" for="demo-ic-check-3">Checked and disabled</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-4" disabled>
-    <label class="ic-Label" for="demo-ic-check-4">Unchecked and disabled</label>
-  </div>
-</div>
-
-```
-
-### Inline checkboxes
-
-```html
-<div class="ic-Checkbox-group ic-Checkbox-group--inline">
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-5">
-    <label class="ic-Label" for="demo-ic-check-5">Custom checkbox</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-6" checked>
-    <label class="ic-Label" for="demo-ic-check-6">Checked custom checkbox</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-7" checked disabled>
-    <label class="ic-Label" for="demo-ic-check-7">Checked and disabled</label>
-  </div>
-  <div class="ic-Form-control ic-Form-control--checkbox">
-    <input type="checkbox" id="demo-ic-check-8" disabled>
-    <label class="ic-Label" for="demo-ic-check-8">Unchecked and disabled</label>
+<div class="ic-Form-group ic-Form-group--horizontal">
+  <fieldset class="ic-Fieldset">
+    <legend class="ic-Legend">Personal information</legend>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="firstname">First name</label>
+      <input type="text" class="ic-Input" id="firstname" />
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="lastname">Last name</label>
+      <input type="text" class="ic-Input" id="lastname" />
+    </div>
+    <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+      <legend class="ic-Legend">
+        Prefix
+      </legend>
+      <div class="ic-Form-control ic-Form-control--radio ic-Form-control--radio-inline">
+        <div class="ic-Radio">
+          <input id="mr" type="radio" value="mr" name="prefix" checked>
+          <label for="mr" class="ic-Label">Mr.</label>
+        </div>
+        <div class="ic-Radio">
+          <input id="ms" type="radio" value="ms" name="prefix">
+          <label for="ms" class="ic-Label">Ms.</label>
+        </div>
+        <div class="ic-Radio">
+          <input id="mrs" type="radio" value="mrs" name="prefix">
+          <label for="mrs" class="ic-Label">Mrs.</label>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+      <legend class="ic-Legend">
+        Instructure office locations worked at
+      </legend>
+      <div class="ic-Checkbox-group ic-Checkbox-group--inline">
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="saltlake">
+          <label class="ic-Label" for="saltlake">Salt Lake City, UT</label>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="chicago">
+          <label class="ic-Label" for="chicago">Chicago, IL</label>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="seattle">
+          <label class="ic-Label" for="seattle">Seattle, WA</label>
+        </div>
+        <div class="ic-Form-control ic-Form-control--checkbox">
+          <input type="checkbox" id="remote">
+          <label class="ic-Label" for="remote">Weird remote pajama person</label>
+        </div>
+      </div>
+    </fieldset>
+  </fieldset>
+  <fieldset class="ic-Fieldset">
+    <legend class="ic-Legend">Security questions</legend>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="firstpet">Name of your first pet</label>
+      <input type="text" class="ic-Input" id="firstpet" placeholder="e.g., Mr. Wuffles" />
+    </div>
+    <div class="ic-Form-control">
+      <label class="ic-Label" for="firstcar">Name of your first car</label>
+      <input type="text" class="ic-Input" id="firstcar" placeholder="e.g., Ford Escort" />
+    </div>
+  </fieldset>
+  <div class="ic-Form-actions">
+    <button class="Button" type="button">Cancel</button>
+    <button class="Button Button--primary" type="submit">Submit</button>
   </div>
 </div>
 ```
@@ -276,29 +377,42 @@ This is a toggle that switches between 2 states, indicated by icons on the left 
           </label>
           <!-- end super toggle -->
         </div>
-        <div class="ic-Checkbox-group">
-          <div class="ic-Form-control ic-Form-control--checkbox">
-            <input type="checkbox" id="demo-input-10" checked>
-            <label class="ic-Label" for="demo-input-10">Receive a free panda after work today</label>
+        <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+          <legend class="ic-Legend">
+            Contact preferences
+          </legend>
+          <div class="ic-Checkbox-group">
+            <div class="ic-Form-control ic-Form-control--checkbox">
+              <input type="checkbox" id="demo-input-10a" checked>
+              <label class="ic-Label" for="demo-input-10a">Email me about new products</label>
+            </div>
+            <div class="ic-Form-control ic-Form-control--checkbox">
+              <input type="checkbox" id="demo-input-10b">
+              <label class="ic-Label" for="demo-input-10b">Email me ONLY about special offers</label>
+            </div>
           </div>
-        </div>
-        <div class="ic-Form-control ic-Form-control--radio">
-          <div class="ic-Radio">
-            <input id="demo-radio-horiz-3" type="radio" value="hoodie" name="demo-radio-horiz-group-2" checked>
-            <label for="demo-radio-horiz-3" class="ic-Label">I would like a hoodie</label>
+        </fieldset>
+        <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+          <legend class="ic-Legend">
+            What free gift would you like?
+          </legend>
+          <div class="ic-Form-control ic-Form-control--radio">
+            <div class="ic-Radio">
+              <input id="demo-radio-horiz-3" type="radio" value="hoodie" name="demo-radio-horiz-group-2" checked>
+              <label for="demo-radio-horiz-3" class="ic-Label">I would like a hoodie</label>
+            </div>
+            <div class="ic-Radio">
+              <input id="demo-radio-horiz-4" type="radio" value="frisbee" name="demo-radio-horiz-group-2">
+              <label for="demo-radio-horiz-4" class="ic-Label">I would like a frisbee</label>
+            </div>
           </div>
-          <div class="ic-Radio">
-            <input id="demo-radio-horiz-4" type="radio" value="frisbee" name="demo-radio-horiz-group-2">
-            <label for="demo-radio-horiz-4" class="ic-Label">I would like a frisbee</label>
-          </div>
-        </div>
+        </fieldset>
         <div class="ic-Form-actions">
           <button class="Button" type="button">Cancel</button>
           <button class="Button Button--primary" type="submit">Submit</button>
         </div>
       </form>
       <!-- End form markup -->
-
     </div>
 </div>
 
@@ -352,22 +466,36 @@ Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element.
           </label>
           <!-- end super toggle -->
           </div>
-          <div class="ic-Checkbox-group">
-            <div class="ic-Form-control ic-Form-control--checkbox">
-              <input type="checkbox" id="demo-input-9" checked>
-              <label class="ic-Label" for="demo-input-9">Receive a free panda after work today</label>
+          <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+            <legend class="ic-Legend">
+              Contact preferences
+            </legend>
+            <div class="ic-Checkbox-group">
+              <div class="ic-Form-control ic-Form-control--checkbox">
+                <input type="checkbox" id="demo-input-99a" checked>
+                <label class="ic-Label" for="demo-input-99a">Email me about new products</label>
+              </div>
+              <div class="ic-Form-control ic-Form-control--checkbox">
+                <input type="checkbox" id="demo-input-99b">
+                <label class="ic-Label" for="demo-input-99b">Email me ONLY about special offers</label>
+              </div>
             </div>
-          </div>
-          <div class="ic-Form-control ic-Form-control--radio">
-            <div class="ic-Radio">
-              <input id="demo-radio-horiz-1" type="radio" value="hoodie" name="demo-radio-horiz-group" checked>
-              <label for="demo-radio-horiz-1" class="ic-Label">I would like a hoodie</label>
+          </fieldset>
+          <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+            <legend class="ic-Legend">
+              What free gift would you like?
+            </legend>
+            <div class="ic-Form-control ic-Form-control--radio">
+              <div class="ic-Radio">
+                <input id="demo-radio-horiz-1" type="radio" value="hoodie" name="demo-radio-horiz-group" checked>
+                <label for="demo-radio-horiz-1" class="ic-Label">I would like a hoodie</label>
+              </div>
+              <div class="ic-Radio">
+                <input id="demo-radio-horiz-2" type="radio" value="frisbee" name="demo-radio-horiz-group">
+                <label for="demo-radio-horiz-2" class="ic-Label">I would like a frisbee</label>
+              </div>
             </div>
-            <div class="ic-Radio">
-              <input id="demo-radio-horiz-2" type="radio" value="frisbee" name="demo-radio-horiz-group">
-              <label for="demo-radio-horiz-2" class="ic-Label">I would like a frisbee</label>
-            </div>
-          </div>
+          </fieldset>
           <div class="ic-Form-actions">
             <button class="Button" type="button">Cancel</button>
             <button class="Button Button--primary" type="submit">Submit</button>
@@ -415,103 +543,6 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
     </div>
   </form>
 </div>
-```
-
-## Forms inside React Modal
-
-```html
-<!-- Do not use this modal markup in production. See the docs below for React Modal! -->
-<div class="ReactModal__Content ReactModal__Content--canvas ReactModal__Content--demo-styleguide">
-  <div class="ReactModal__Layout">
-    <div class="ReactModal__Header">
-      <div class="ReactModal__Header-Title">
-        <h4>Add external tool</h4>
-      </div>
-      <div class="ReactModal__Header-Actions">
-        <button class="Button Button--icon-action" type="button">
-          <i class="icon-x" role="presentation"></i>
-          <span class="screenreader-only">Close</span>
-        </button>
-      </div>
-    </div>
-    <div class="ReactModal__Body">
-<!-- end do not use markup -->
-
-<!-- You CAN use this markup to put a form into a React Modal body (or any modal) -->
-        <div class="ic-Form-group">
-          <div class="ic-Form-control">
-            <label class="ic-Label" for="demo-react-modal-1">Custom fields</label>
-            <textarea class="ic-Input" id="demo-react-modal-1" placeholder="Separated by commas"></textarea>
-          </div>
-        </div>
-
-        <div class="grid-row">
-          <div class="col-xs-12 col-md-6">
-            <div class="ic-Form-group">
-              <div class="ic-Form-control">
-                <label for="demo-react-modal-2" class="ic-Label">Consumer key</label>
-                <input type="text" id="demo-react-modal-2" class="ic-Input" placeholder="At least 5 letters and 3 numbers"></input>
-              </div>
-            </div>
-          </div>
-          <div class="col-xs-12 col-md-6">
-            <div class="ic-Form-group">
-              <div class="ic-Form-control">
-                <label for="demo-react-modal-3" class="ic-Label">Shared secret</label>
-                <input type="text" id="demo-react-modal-3" class="ic-Input" placeholder="See your registation email"></input>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="grid-row middle-md">
-          <div class="col-xs-12 col-md-6">
-            <div class="ic-Form-group">
-              <div class="ic-Form-control">
-                <label for="demo-react-modal-4" class="ic-Label">Canvas instance</label>
-                <select class="ic-Input" id="demo-react-modal-4">
-                  <option>Instance 1</option>
-                  <option>Instance 2</option>
-                  <option>Instance 3</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="col-xs-12 col-md-6">
-            <div class="ic-Form-group">
-              <div class="ic-Form-control">
-                <!-- start super toggle -->
-                <label class="ic-Super-toggle--on-off" for="super-toggle-demo5">
-                  <div class="ic-Label">Visible to public</div>
-                  <input type="checkbox" id="super-toggle-demo5" class="ic-Super-toggle__input">
-                  <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Visible" data-unchecked="Not Visible">
-                    <div class="ic-Super-toggle__switch">
-                      <div class="ic-Super-toggle__option--LEFT">
-                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
-                      </div>
-                      <div class="ic-Super-toggle__option--RIGHT">
-                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
-                      </div>
-                    </div>
-                  </div>
-                </label>
-                <!-- end super toggle -->
-              </div>
-            </div>
-          </div>
-        </div>
-<!-- End markup you can use -->
-
-<!-- Do not use this modal markup in production. See the docs below for React Modal! -->
-    </div>
-    <div class="ReactModal__Footer">
-      <div class="ReactModal__Footer-Actions">
-        <button type="button" class="Button">Cancel</button>
-        <button type="button" class="Button Button--primary">Submit</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- end do not use markup -->
 ```
 
 ## The amazing **.ic-Input-group**
@@ -759,7 +790,7 @@ New and improved version of a common Canvas UI: a header with action buttons on 
   </div>
 </div>
 ```
-### **.ic-action-box**
+### **.ic-Form-action-box**
 
 This responsive pattern is useful for when you need to build instances of things using form elements. It features an area on the right for interactions with the form, such as Delete.
 
@@ -1087,7 +1118,7 @@ Reduce the width of your screen to see how the example components below both sca
 ```html
 <div class="grid-row">
   <div class="col-md-6">
-    
+
     <div class="ic-Form-group">
       <div class="ic-Form-control ic-Form-control--has-warning">
         <!-- start super toggle -->
@@ -1117,7 +1148,7 @@ Reduce the width of your screen to see how the example components below both sca
 
   </div>
   <div class="col-md-6">
-    
+
     <div class="ic-Form-group ic-Form-group--horizontal">
       <div class="ic-Form-control ic-Form-control--has-error">
         <!-- start super toggle -->
@@ -1262,9 +1293,8 @@ textarea.ic-Input {
   height: auto;
 }
 
-
 // We removed -webkit-appearance from anything with the
-// .ic-Input class, to give us more styling control. 
+// .ic-Input class, to give us more styling control.
 // This makes the select's caret disappear in IE Edge and Webkit.
 // So we add it back in with these hacks.
 
@@ -1274,7 +1304,7 @@ textarea.ic-Input {
   background-repeat: no-repeat;
   background-size: 10px 5.667px;
   background-position: $bg-position-x 50%;
-  padding: 0 $ic-sp;
+  padding: 0 $ic-sp*2 0 $ic-sp;
 }
 
 // webkit hack
@@ -1319,10 +1349,6 @@ select.ic-Input:not(*:root) {
   &.ic-Form-group--horizontal {
     @include breakpoint(tablet) {
 
-      .ic-Checkbox-group, .ic-Form-control--radio {
-        margin-left: $ic-horizontal-form-offset;
-      }
-
       .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
         display: flex;
         align-items: center;
@@ -1348,11 +1374,51 @@ select.ic-Input:not(*:root) {
           }
         }
 
+        .ic-Form-help-text {
+          padding-left: $ic-horizontal-form-offset;
+        }
+      }
+
+      .ic-Fieldset--radio-checkbox {
+        position: relative;
+        padding-left: $ic-horizontal-form-offset;
+        min-height: 30px;
+
+        .ic-Legend {
+          position: absolute;
+          top: 5px; left: 0;
+          width: $ic-horizontal-form-offset - ($ic-sp * 2);
+          margin-bottom: 0;
+        }
       }
     }
 
   }
 
+}
+
+// HACK - whole thing can be removed once IE11/Win7 support is dropped
+@include breakpoint(tablet) {
+  _:-ms-input-placeholder, :root  {
+    .ic-Form-group.ic-Form-group--horizontal {
+
+      .ic-Form-control:not(.ic-Form-control--checkbox):not(.ic-Form-control--radio) {
+        .ic-Form-help-text {
+          padding-left: $ic-horizontal-form-offset + $ic-sp*2;
+        }
+      }
+
+      .ic-Fieldset--radio-checkbox {
+        padding-left: $ic-horizontal-form-offset + $ic-sp*2;
+
+        .ic-Legend {
+          width: $ic-horizontal-form-offset;
+        }
+      }
+
+    }
+
+  }
 }
 
 @mixin form-message-variant($color) {
@@ -1450,6 +1516,10 @@ form.ic-Form-group { margin: 0; }
   margin-bottom: $ic-sp*1.5;
   position: relative;
 
+  .ic-Form-control--radio {
+    margin-bottom: 0;
+  }
+
   &.ic-Form-control--checkbox-inline,
   &.ic-Form-control--radio-inline {
     display: flex;
@@ -1518,6 +1588,43 @@ form.ic-Form-group { margin: 0; }
   white-space: nowrap;
 }
 
+.ic-Fieldset {
+  box-sizing: border-box;
+  margin: 0 0 $ic-sp*1.5;
+  padding: 0;
+  border: none;
+
+  // when the fieldset contains a radio or checkbox group, use this class
+  // to give the legend the appearance of a label
+  &.ic-Fieldset--radio-checkbox {
+    margin-bottom: $ic-sp*1.75;
+
+    .ic-Legend {
+      margin-bottom: $ic-sp/2;
+      font-weight: 500;
+      @include fontSize($ic-font-size--small);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .ic-Form-control--radio {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.ic-Legend {
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  padding: 0 0 $ic-sp/2;
+  margin: 0 0 $ic-sp*2;
+  @include fontSize(18px);
+  line-height: $ic-label-line-height;
+  color: $ic-font-color-dark;
+  border-bottom: 1px solid $ic-border-light;
+}
+
 .ic-Radio {
   overflow: hidden;
   position: relative;
@@ -1527,7 +1634,7 @@ form.ic-Form-group { margin: 0; }
     margin: 0;
     position: relative;
     z-index: 1;
-    padding: $ic-sp/3 0 $ic-sp/2 $ic-radio-checkbox-left-offset;
+    padding: $ic-sp/3 0 $ic-sp/3 $ic-radio-checkbox-left-offset;
     font-weight: 400;
     display: inline-block;
 
@@ -1539,8 +1646,7 @@ form.ic-Form-group { margin: 0; }
       width: 16px; height: 16px;
       border: 1px solid $ic-Input-border;
       position: absolute;
-      top: 50%; left: 0;
-      margin-top: -8px;
+      top: 5px; left: 0;
       background: $ic-color-light;
     }
 
@@ -1590,7 +1696,6 @@ form.ic-Form-group { margin: 0; }
 }
 
 .ic-Checkbox-group {
-  margin-bottom: $ic-sp;
 
   &.ic-Checkbox-group--inline {
     @include breakpoint(tablet) {
@@ -1628,8 +1733,7 @@ form.ic-Form-group { margin: 0; }
       transition: border-color 0.2s ease-out, outline-offset 0.2s ease-out, outline-color 0.2s ease-out;
       box-sizing: border-box;
       position: absolute;
-      top: 50%; left: 0;
-      margin-top: -8px;
+      top: 5px; left: 0;
       width: 16px; height: 16px;
       border-radius: $baseBorderRadius;
       background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $ic-color-light;
@@ -1803,11 +1907,11 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
   margin-bottom: $ic-sp*2;
   @include breakpoint(desktop) { margin-bottom: $ic-sp; }
-  
+
   .ic-Form-control {
     margin-bottom: $ic-sp/2;
     @include breakpoint(desktop) {
@@ -1831,5 +1935,12 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-action-box__Actions {
   box-sizing: border-box;
-  padding-left: $ic-sp*2;
+  padding-left: $ic-sp*4;
+}
+
+.ic-Form-help-text {
+  @include fontSize(12px);
+  margin-top: $ic-sp/2;
+  color: $ic-font-color--subdued;
+  width: 100%;
 }

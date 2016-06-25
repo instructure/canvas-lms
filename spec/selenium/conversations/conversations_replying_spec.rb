@@ -28,10 +28,10 @@ describe "conversations new" do
     it "should maintain context and subject", priority: "1", test_id: 138696 do
       go_to_inbox_and_select_message
       f('#reply-btn').click
-      expect(f('#compose-message-course')).to have_attribute(:disabled, 'true')
+      expect(f('#compose-message-course')).to be_disabled
       expect(f('.message_course_ro').text).to eq @group.name
       expect(f('input[name=context_code]')).to have_value @group.asset_string
-      expect(f('#compose-message-subject')).to have_attribute(:disabled, 'true')
+      expect(f('#compose-message-subject')).to be_disabled
       expect(f('#compose-message-subject')).not_to be_displayed
       expect(f('#compose-message-subject')).to have_value(@convo.subject)
       expect(f('.message_subject_ro')).to be_displayed

@@ -24,6 +24,25 @@ define([], function() {
         return student.submission["score"].toString();
       }
       return grade.val();
+    },
+
+    iframePreviewVersion: function(submission){
+      //check if the submission object is valid
+      if (submission == null) {
+        return '';
+      }
+      //check if the index is valid (multiple submissions)
+      var currentSelectedIndex = submission.currentSelectedIndex;
+      if (currentSelectedIndex == null || isNaN(currentSelectedIndex)) {
+        return '';
+      }
+      var select = '&version=';
+      //check if the version is valid, or matches the index
+      var version = submission.submission_history[currentSelectedIndex].submission.version;
+      if (version == null || isNaN(version)) {
+        return select + currentSelectedIndex;
+      }
+      return select + version;
     }
   }
 

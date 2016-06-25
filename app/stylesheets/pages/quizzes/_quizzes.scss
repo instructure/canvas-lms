@@ -229,15 +229,10 @@ li.quiz {
     min-width: 120px;
   }
   .button-container {
-    padding-right: 10%;
-    padding-left: 10%;
+    padding: 0 30px 0 30px;
     .previous-question,
     .next-question {
       position: relative;
-      i {
-        position: absolute;
-        top: 5px;
-      }
     }
     .previous-question {
       i {
@@ -250,10 +245,10 @@ li.quiz {
         right: 5px;
       }
     }
-    .btn-secondary.next-question:after, .btn-secondary.previous-question:before {
+    .next-question:after, .previous-question:before {
       color: #666;
     }
-    .btn-primary.next-question:after, .btn-primary.previous-question:before {
+    .next-question:after, .previous-question:before {
       color: #fff;
     }
   }
@@ -1282,6 +1277,8 @@ ul#quiz_versions {
     overflow-x: scroll;
   }
   #quiz_tabs {
+    margin-top: $ic-sp;
+
     #quiz_tabs_tab_list {
       display: flex;
       align-items: flex-end;

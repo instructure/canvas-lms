@@ -207,13 +207,10 @@ describe "gradebook2" do
   it "should hide and show student names", priority: "2", test_id: 164220 do
 
     def toggle_hiding_students
-      keep_trying_until do
-        f('#gradebook_settings').click
-        student_toggle = f('.student_names_toggle')
-        expect(student_toggle).to be_displayed
-        student_toggle.click
-        true
-      end
+      f('#gradebook_settings').click
+      student_toggle = f('.student_names_toggle')
+      expect(student_toggle).to be_displayed
+      student_toggle.click
     end
 
     get "/courses/#{@course.id}/gradebook2"
@@ -290,7 +287,7 @@ describe "gradebook2" do
     @student_3_submission.save!
     get "/courses/#{@course.id}/gradebook2"
 
-    keep_trying_until { expect(ff('.late').count).to eq 1 }
+    expect(ff('.late')).to have_size(1)
   end
 
   it "should not display a speedgrader link for large courses", priority: "2", test_id: 210099 do

@@ -32,20 +32,28 @@ describe "context modules" do
       modules[0].add_item({id: @assignment.id, type: 'assignment'})
       modules[0].add_item({id: @assignment2.id, type: 'assignment'})
       get "/courses/#{@course.id}/modules"
-      ff(".icon-mini-arrow-down")[1].click
+      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
       wait_for_ajaximations
     end
 
     it "should show all module items", priority: "1", test_id: 126743 do
       module_with_two_items
-      f(".icon-mini-arrow-right").click
-      wait_for_ajaximations
+      f(".expand_module_link").click
+      wait_for_animations
       expect(f('.context_module .content')).to be_displayed
+    end
+
+    it "expands/collapses module with 0 items", priority: "2", test_id: 126731 do
+      modules = create_modules(1, true)
+      get "/courses/#{@course.id}/modules"
+      f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
+      wait_for_ajaximations
+      expect(f('.icon-mini-arrow-down')).to be_displayed
     end
 
     it "should hide module items", priority: "1", test_id: 280415 do
       module_with_two_items
-      wait_for_ajaximations
+      wait_for_animations
       expect(f('.context_module .content')).not_to be_displayed
     end
 
@@ -76,10 +84,8 @@ describe "context modules" do
       js_drag_and_drop(selector2, selector1)
       wait_for_ajaximations
       list_post_drag = ff("a.title").map(&:text)
-      keep_trying_until do
-        expect(list_prior_drag[0]).to eq list_post_drag[1]
-        expect(list_prior_drag[1]).to eq list_post_drag[0]
-      end
+      expect(list_prior_drag[0]).to eq list_post_drag[1]
+      expect(list_prior_drag[1]).to eq list_post_drag[0]
     end
 
     it "should rearrange child object to new module", priority: "1", test_id: 126734 do
@@ -127,16 +133,12 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules"
 
-      keep_trying_until do
-        f('.ig-header-admin  .al-trigger').click
-        hover_and_click('#context_modules .edit_module_link')
-        wait_for_ajax_requests
-        expect(f('#add_context_module_form')).to be_displayed
-      end
-      assignment_picker = keep_trying_until do
-        f('.add_completion_criterion_link').click
-        fj('.assignment_picker:visible')
-      end
+      f('.ig-header-admin  .al-trigger').click
+      hover_and_click('#context_modules .edit_module_link')
+      wait_for_ajax_requests
+      expect(f('#add_context_module_form')).to be_displayed
+      f('.add_completion_criterion_link').click
+      assignment_picker = fj('.assignment_picker:visible')
 
       assignment_picker.find_element(:css, "option[value='#{content_tag_1.id}']").click
       requirement_picker = fj('.assignment_requirement_picker:visible')
@@ -165,7 +167,8 @@ describe "context modules" do
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
       check_element_has_focus f("#add_context_module_form .assignment_picker")
-      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
+      # be_disabled
+      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]')).to be_disabled
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
 
@@ -226,11 +229,7 @@ describe "context modules" do
       f('.delete_item_link').click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      keep_trying_until do
-        expect(f('.context_module_items')).not_to include_text(@assignment.title)
-        true
-      end
+      expect(f('.context_module_items')).not_to include_text(@assignment.title)
     end
 
     it "should edit a module item and validate the changes stick", priority: "1", test_id: 126737 do
@@ -337,7 +336,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       locked_title = ff("#context_module_item_#{tag1.id} .locked_title[title]")
 
-      expect(locked_title[0].attribute(:title)).to eq text_header
+      expect(locked_title[0]).to have_attribute("title", text_header)
     end
 
     it "should not rename every text header when you rename one" do
@@ -388,11 +387,8 @@ describe "context modules" do
       f('.ig-header-admin .al-trigger').click
       f('.add_module_item_link').click
       select_module_item('#add_module_item_select', 'Text Header')
-      keep_trying_until do
-        replace_content(f('#sub_header_title'), header_text)
-        true
-      end
-      fj('.add_item_button.ui-button').click
+      replace_content(f('#sub_header_title'), header_text)
+      f('.add_item_button.ui-button').click
       wait_for_ajaximations
       tag = ContentTag.last
       module_item = f("#context_module_item_#{tag.id}")
@@ -427,11 +423,9 @@ describe "context modules" do
       wait_for_ajaximations
       f('.add_module_item_link').click
       wait_for_ajaximations
-      keep_trying_until do
-        select_module_item('#add_module_item_select', 'External Tool')
-        fj('.add_item_button.ui-button').click
-        expect(ff('.alert.alert-error').length).to eq 1
-      end
+      select_module_item('#add_module_item_select', 'External Tool')
+      f('.add_item_button.ui-button').click
+      expect(ff('.alert.alert-error').length).to eq 1
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
     end
 
@@ -591,23 +585,32 @@ describe "context modules" do
     end
 
     it "should prompt relock when adding an unlock_at date" do
-      mod = @course.context_modules.create!(:name => "name")
-
+      lock_until=format_date_for_view(Time.zone.today + 2.days)
+      @course.context_modules.create!(name: "name")
       get "/courses/#{@course.id}/modules"
-
       f(".ig-header-admin .al-trigger").click
       f(".edit_module_link").click
       expect(f('#add_context_module_form')).to be_displayed
-
       edit_form = f('#add_context_module_form')
       lock_check_click(edit_form)
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
-      unlock_date.send_keys((Date.today + 2.days).to_s)
+      unlock_date.send_keys(lock_until)
       wait_for_ajaximations
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
       test_relock
+    end
+
+    it "validates module lock date picker format", priority: "2", test_id: 132519 do
+      unlock_date = format_time_for_view(Time.zone.today + 2.days)
+      @course.context_modules.create!(name: "name", unlock_at: unlock_date)
+      get "/courses/#{@course.id}/modules"
+      f(".ig-header-admin .al-trigger").click
+      f(".edit_module_link").click
+      edit_form = f('#add_context_module_form')
+      unlock_date_in_dialog = edit_form.find_element(:id, 'context_module_unlock_at')
+      expect(format_time_for_view(unlock_date_in_dialog.attribute("value"))).to eq unlock_date
     end
 
     it "should properly change indent of an item with arrows" do
@@ -651,7 +654,9 @@ describe "context modules" do
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        keep_trying_until { ff('.cancel_button.ui-button')[1] }.click
+        cancel_buttons = ff('.cancel_button.ui-button')
+        expect(cancel_buttons).to have_size(2)
+        cancel_buttons[1].click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
@@ -804,25 +809,21 @@ describe "context modules" do
 
         wait_for_ajaximations(1000)
         context_module_items[0].send_keys("i")
-        keep_trying_until do
-          expect(ff('.context_module_item')[0]).to have_class('indent_1')
-        end
+        item = f('.context_module_item')
+        expect(item).to have_class('indent_1')
 
         wait_for_ajaximations(1000)
         ff('.context_module_item a.title')[0].send_keys("o")
-        keep_trying_until do
-          expect(ff('.context_module_item')[0]).to have_class('indent_0')
-        end
+        item = f('.context_module_item')
+        expect(item).to have_class('indent_0')
 
         # Test Delete key
         wait_for_ajaximations(1000)
         new_first_module_item = ff('.context_module_item')[1]
         ff('.context_module_item')[0].send_keys("d")
         driver.switch_to.alert.accept
-        keep_trying_until do
-          expect(ff('.context_module_item')[0]).to eq(new_first_module_item)
-        end
-
+        expect(ff('.context_module_item')).to have_size(3) # wait for draggy clone to disappear
+        expect(f('.context_module_item')).to eq(new_first_module_item)
       end
     end
 
@@ -924,8 +925,8 @@ describe "context modules" do
 
       # make sure the completion criterion was preserved
       module_item = f("#context_module_item_#{tag.id}")
-      expect(module_item.attribute('class').split).to include 'must_submit_requirement'
-      expect(f('.criterion', module_item).attribute('class').split).to include 'defined'
+      expect(module_item).to have_class 'must_submit_requirement'
+      expect(f('.criterion', module_item)).to have_class 'defined'
       expect(driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()")).to eq "must_submit"
     end
 
@@ -1146,12 +1147,9 @@ describe "context modules" do
       title_input = fj('input[name="title"]:visible')
       replace_content(title_input, 'some title')
 
-      fj('.add_item_button.ui-button').click
-      wait_for_ajaximations
+      f('.add_item_button.ui-button').click
 
-      keep_trying_until do
-        expect(ff('.errorBox').any?(&:displayed?)).to be_truthy
-      end
+      expect(f('.errorBox:not(#error_box_template)')).to be_displayed
 
       expect(f("#select_context_content_dialog")).to be_displayed
     end
@@ -1229,6 +1227,21 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
+    it 'edits available/until dates on a quiz in a module', priority: "2", test_id: 126722 do
+      available_from = 2.days.from_now
+      available_until = 4.days.from_now
+      @pub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Published Quiz')
+      @mod.add_item(type: 'quiz', id: @pub_quiz.id)
+      go_to_modules
+      fln('Published Quiz').click
+      f('.quiz-edit-button').click
+      f(".date_field[data-date-type='unlock_at']").send_keys(format_date_for_view(available_from))
+      f(".date_field[data-date-type='lock_at']").send_keys(format_date_for_view(available_until))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.due_date_display').text).to eq date_string(available_until, :no_words)
+    end
+
     it 'should add an unpublished assignment to a module', priority: "1", test_id: 126724 do
       @unpub_assignment = Assignment.create!(context: @course, title: 'Unpublished Assignment')
       @unpub_assignment.workflow_state = 'unpublished'
@@ -1274,7 +1287,7 @@ describe "context modules" do
       go_to_modules
       verify_persistence('Graded Unpublished Discussion')
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
     it 'should add a graded published discussion to a module', priority: "1", test_id: 126715 do
@@ -1285,10 +1298,10 @@ describe "context modules" do
       go_to_modules
       verify_persistence('Graded Published Discussion')
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'should add a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
+    it 'adds a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
       @due_at = 3.days.from_now
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10, due_at: @due_at)
       @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion with Due Date')
@@ -1299,9 +1312,42 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
       expect(f('.due_date_display').text).not_to be_blank
       expect(f('.due_date_display').text).to eq date_string(@due_at, :no_words)
-      expect(f('.points_possible_display').text).to include_text "10 pts"
+      expect(f('.points_possible_display')).to include_text "10 pts"
+    end
+
+    it 'edits due date on a ungraded discussion in a module', priority: "2", test_id: 126717 do
+      due_at = 3.days.from_now
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
+      go_to_modules
+      fln('Non-graded Published Discussion').click
+      f('.edit-btn').click
+      make_full_screen
+      wait_for_ajaximations
+      f('input[type=checkbox][name="assignment[set_assignment]"]').click
+      expect(f('.DueDateInput')).to be_displayed
+      f(".date_field[data-date-type='due_at']").send_keys(format_date_for_view(due_at))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.due_date_display').text).to eq date_string(due_at, :no_words)
+    end
+
+    it 'edits available/until dates on a ungraded discussion in a module', priority: "2", test_id: 126718 do
+      available_from = 2.days.from_now
+      available_until = 4.days.from_now
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
+      go_to_modules
+      fln('Non-graded Published Discussion').click
+      f('.edit-btn').click
+      f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(available_from))
+      f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(available_until))
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+      go_to_modules
+      expect(f('.context_module_item')).not_to include_text(available_from.to_s)
     end
   end
+
   context 'edit inline items on module page' do
     before(:once) do
       course(:active_course => true)

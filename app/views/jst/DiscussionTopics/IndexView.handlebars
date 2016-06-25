@@ -8,23 +8,29 @@
       <span id="searchTermDescription" class="screenreader-only">
         {{#t}}As you type in this field, the list of results will be automatically updated.{{/t}}
       </span>
+      <label class="screenreader-only" for="searchTerm">
+        {{t "Search title, body, or author"}}"
+      </label>
       <input id="searchTerm"
              placeholder="{{t "Search title, body, or author"}}"
-             aria-label="{{t "Search title, body, or author"}}"
              aria-describedby="searchTermDescription"
              value="{{searchTerm}}"
              type="search">
       <span id="discussionsFilter">
-        <span class="screenreader-only" id="onlyUnreadAccessibleLabel">{{t "filter discussions by unread"}}</span>
         <input type="checkbox"
                id="onlyUnread"
-               aria-labelledby="onlyUnreadAccessibleLabel"
-               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
-        <span class="screenreader-only" id="onlyGradedAccessibleLabel">{{t "filter discussions by assignments"}}</span>
+               {{#if onlyUnread}}checked{{/if}} />
+        <label for="onlyUnread" class="no-button-role">
+          <span aria-hidden="true">{{#t "unread"}}Unread{{/t}}</span>
+          <span class="screenreader-only">{{t "filter discussions by unread"}}</span>
+        </label>
         <input type="checkbox"
                id="onlyGraded"
-               aria-labelledby="onlyGradedAccessibleLabel"
-               {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
+               {{#if onlyGraded}}checked{{/if}}/>
+        <label for="onlyGraded" class="no-button-role">
+          <span aria-hidden="true">{{#t "assignments"}}Assignments{{/t}}</span>
+          <span class="screenreader-only">{{t "filter discussions by assignments"}}</span>
+        </label>
       </span>
       <div id="searchResultCount" aria-live="polite" class="screenreader-only"></div>
     </div>

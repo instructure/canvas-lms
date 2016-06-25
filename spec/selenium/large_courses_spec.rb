@@ -18,7 +18,7 @@ describe "large courses", priority: "2" do
       get "/courses/#{@course.id}/copy"
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = Course.last
       expect(@new_course.assignments.count).to eq 20
@@ -30,9 +30,8 @@ describe "large courses", priority: "2" do
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
       @export.export_without_send_later
-      new_download_link = keep_trying_until { f("#export_files a") }
-      url = new_download_link.attribute 'href'
-      expect(url).to match(%r{/files/\d+/download\?verifier=})
+      new_download_link = f("#export_files a")
+      expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
     end
   end
 

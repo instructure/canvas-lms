@@ -11,7 +11,7 @@ class DropZipFileImports < ActiveRecord::Migration
         readonly(false).find_each do |root|
 
         # move children attachments to a non-zipfileimport attachment
-        child = Attachment.where(root_attachment_id: root).where.not(:context_type => "ZipFileImport").first
+        child = Attachment.where(root_attachment_id: root).where.not(:context_type => "ZipFileImport").take
         child.root_attachment_id = nil
         child.filename ||= root.filename
         if Attachment.s3_storage?

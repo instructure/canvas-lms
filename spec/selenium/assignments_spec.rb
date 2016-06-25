@@ -80,6 +80,25 @@ describe "assignments" do
       insert_file_from_rce
     end
 
+    it "should switch text editor context from RCE to HTML", priority: "1", test_id: 699624 do
+      get "/courses/#{@course.id}/assignments/new"
+      wait_for_ajaximations
+      text_editor=f('.mce-tinymce')
+      expect(text_editor).to be_displayed
+      html_editor_link=fln('HTML Editor')
+      expect(html_editor_link).to be_displayed
+      type_in_tiny 'textarea[name=description]', 'Testing HTML- RCE Toggle'
+      html_editor_link.click
+      wait_for_ajaximations
+      rce_link=fln('Rich Content Editor')
+      rce_editor=f('#assignment_description')
+      expect(html_editor_link).not_to be_displayed
+      expect(rce_link).to be_displayed
+      expect(text_editor).not_to be_displayed
+      expect(rce_editor).to be_displayed
+      expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
+    end
+
     it "should edit an assignment", priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
@@ -123,7 +142,7 @@ describe "assignments" do
 
       #save changes
       submit_assignment_form
-      expect(driver.execute_script("return document.title")).to include_text(assignment_name + ' edit')
+      expect(driver.title).to include(assignment_name + ' edit')
     end
 
     it "should create an assignment using main add button", priority: "1", test_id: 132582 do
@@ -176,7 +195,8 @@ describe "assignments" do
       wait_for_ajaximations
       hover_and_click(".edit_assignment")
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
-      expect(f('.multiple_due_dates input').attribute('disabled')).to be_present
+      # be_disabled
+      expect(f('.multiple_due_dates input')).to be_disabled
       assignment_title = f("#assign_#{@assignment.id}_assignment_name")
       assignment_points_possible = f("#assign_#{@assignment.id}_assignment_points")
       replace_content(assignment_title, "VDD Test Assignment Updated")
@@ -208,10 +228,10 @@ describe "assignments" do
           replace_content(f("#ag_#{group.id}_assignment_due_at"), due_at)
           replace_content(f("#ag_#{group.id}_assignment_points"), points)
           expect_new_page_load { f('.more_options').click }
-          expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
-          expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
+          expect(f('#assignment_name').attribute(:value)).to include(expected_text)
+          expect(f('#assignment_points_possible').attribute(:value)).to include(points)
           due_at_field = fj(".date_field:first[data-date-type='due_at']")
-          expect(due_at_field.attribute(:value)).to eq due_at
+          expect(due_at_field).to have_value due_at
           click_option('#assignment_submission_type', 'No Submission')
           submit_assignment_form
           expect(@course.assignments.count).to eq 1
@@ -320,7 +340,8 @@ describe "assignments" do
       it "should not allow group set to be changed if there are submissions", priority: "1", test_id: 626907 do
         get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
         wait_for_ajaximations
-        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+        # be_disabled
+        expect(f("#assignment_group_category_id")).to be_disabled
       end
 
       it "should still show deleted group set only on an attached assignment with " +
@@ -342,7 +363,7 @@ describe "assignments" do
 
         expect(get_value("#assignment_group_category_id")).to eq @assignment1.group_category.id.to_s
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
-        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+        expect(f("#assignment_group_category_id")).to be_disabled
       end
 
       it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "2", test_id: 627150 do
@@ -456,7 +477,8 @@ describe "assignments" do
         f("#assignment_#{@assignment.id} .publish-icon").click
         wait_for_ajaximations
         expect(@assignment.reload).to be_published
-        keep_trying_until { expect(f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label')).to include_text("Published") }
+        icon = f("#assignment_#{@assignment.id} .publish-icon")
+        expect(icon).to have_attribute('aria-label', 'Published')
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do
@@ -472,22 +494,14 @@ describe "assignments" do
 
       it "should allow publishing from the show page", priority: "1", test_id: 647851 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
 
-        def speedgrader_hidden?
-          driver.execute_script(
-              "return $('#assignment-speedgrader-link').hasClass('hidden')"
-          )
-        end
-
-        expect(speedgrader_hidden?).to eq true
+        expect(f("#assignment-speedgrader-link")).to have_class("hidden")
 
         f("#assignment_publish_button").click
-        wait_for_ajaximations
 
         expect(@assignment.reload).to be_published
-        expect(f("#assignment_publish_button").text).to match "Published"
-        expect(speedgrader_hidden?).to eq false
+        expect(f("#assignment_publish_button")).to include_text("Published")
+        expect(f("#assignment-speedgrader-link")).not_to have_class("hidden")
       end
 
       it "should show publishing status on the edit page", priority: "2", test_id: 647852 do
@@ -511,15 +525,10 @@ describe "assignments" do
           get "/courses/#{@course.id}/assignments"
 
           f("#assignment_#{@assignment.id} .publish-icon").click
-          wait_for_ajaximations
           keep_trying_until { @assignment.reload.published? }
 
           # need to make sure buttons
-          keep_trying_until do
-            driver.execute_script(
-                "return !$('#assignment_#{@assignment.id} .publish-icon').hasClass('disabled')"
-            )
-          end
+          expect(f("#assignment_#{@assignment.id} .publish-icon")).not_to have_class("disabled")
 
           f("#assignment_#{@assignment.id} .publish-icon").click
           wait_for_ajaximations

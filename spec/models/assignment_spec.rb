@@ -355,6 +355,38 @@ describe Assignment do
     expect(comment).to be_hidden
   end
 
+  describe "#infer_grading_type" do
+    before do
+      setup_assignment_without_submission
+    end
+
+    it "infers points if none is set" do
+      @assignment.grading_type = nil
+      @assignment.infer_grading_type
+      expect(@assignment.grading_type).to eq 'points'
+    end
+
+    it "maintains existing type for vanilla assignments" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.infer_grading_type
+      expect(@assignment.grading_type).to eq 'letter_grade'
+    end
+
+    it "infers pass_fail for attendance assignments" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.submission_types = 'attendance'
+      @assignment.infer_grading_type
+      expect(@assignment.grading_type).to eq 'pass_fail'
+    end
+
+    it "infers not_graded for page assignments" do
+      wiki_page_assignment_model course: @course
+      @assignment.grading_type = 'letter_grade'
+      @assignment.infer_grading_type
+      expect(@assignment.grading_type).to eq 'not_graded'
+    end
+  end
+
   context "needs_grading_count" do
     before :once do
       setup_assignment_with_homework
@@ -611,7 +643,7 @@ describe Assignment do
       end
 
       it "uses the canvas default" do
-        expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Standard"
+        expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Scheme"
       end
     end
 
@@ -2473,6 +2505,14 @@ describe Assignment do
       assignment.save
       assignment.reload
       expect(assignment.turnitin_settings[:current]).to be_nil
+    end
+
+    it "should use default originality setting from account" do
+      assignment = @assignment
+      account = assignment.course.account
+      account.turnitin_originality = "after_grading"
+      account.save!
+      expect(assignment.turnitin_settings[:originality_report_visibility]).to eq('after_grading')
     end
   end
 

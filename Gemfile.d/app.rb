@@ -89,6 +89,8 @@ gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
 gem 'ruby-saml-mod', '0.3.0'
+gem 'saml2', '1.0.7', require: false
+  gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '3236a249986413c6c399ef3477132a0af0410bb7'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false

@@ -7,6 +7,23 @@ class BrandConfigsController < ApplicationController
   before_filter :require_user
   before_filter :require_account_management
   before_filter :require_account_branding, except: [:destroy]
+  before_filter { |c| c.active_tab = "brand_configs" }
+
+  def index
+    add_crumb t('Themes')
+    @page_title = join_title(t('Themes'), @account.name)
+    css_bundle :brand_config_index
+    js_bundle :brand_configs_index
+
+
+    js_env brandConfigStuff: {
+      brandableVariableDefaults: BrandableCSS.variables_map,
+      accountID: @account.id.to_s,
+      sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: 'brand_config'),
+      activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
+    }
+    render text: '', layout: true
+  end
 
   def new
     @page_title = join_title(t('Theme Editor'), @account.name)
@@ -17,7 +34,6 @@ class BrandConfigsController < ApplicationController
     js_env brandConfig: brand_config.as_json(include_root: false),
            hasUnsavedChanges: session.key?(:brand_config_md5),
            variableSchema: default_schema,
-           sharedBrandConfigs: BrandConfig.shared(@domain_root_account).select('md5, name').as_json(include_root: false),
            allowGlobalIncludes: @account.allow_global_includes?,
            account_id: @account.id
     render text: '', layout: 'layouts/bare'
@@ -88,10 +104,6 @@ class BrandConfigsController < ApplicationController
     end
   end
 
-  def existing_config(config)
-    config.default? || !config.new_record?
-  end
-  private :existing_config
 
   # Activiate a given brandConfig for the current users's session.
   # this is what is called after the user pushes "Preview"
@@ -103,34 +115,29 @@ class BrandConfigsController < ApplicationController
   #   If the empty string ('') is passed, will use nothing for this session
   #   (so the user will see the canvas default theme).
   def save_to_user_session
-    old_md5 = session[:brand_config_md5]
-    session[:brand_config_md5] = begin
-      if params[:brand_config_md5] == ''
-        false
-      elsif params[:brand_config_md5]
-        BrandConfig.find(params[:brand_config_md5]).md5
-      end
+    old_md5 = session.delete(:brand_config_md5)
+    session[:brand_config_md5] = if params[:brand_config_md5] == ''
+      false
+    elsif params[:brand_config_md5]
+      BrandConfig.find(params[:brand_config_md5]).md5
     end
+
     BrandConfig.destroy_if_unused(old_md5) if old_md5 != session[:brand_config_md5]
     redirect_to account_theme_editor_path(@account)
   end
 
   # After someone is satisfied with the preview of how their session brand config looks,
-  # they POST to this action to save it to their accout so everyone else sees it.
+  # they POST to this action to save it to their account so everyone else sees it.
   def save_to_account
     old_md5 = @account.brand_config_md5
     new_md5 = session.delete(:brand_config_md5).presence
     new_brand_config = new_md5 && BrandConfig.find(new_md5)
-
-    @account.brand_config = new_brand_config
-    @account.save!
-
-    sub_account_progresses = @account.recompile_descendant_brand_configs(@current_user)
+    regenerator = BrandConfigRegenerator.new(@account, @current_user, new_brand_config)
 
     BrandConfig.destroy_if_unused(old_md5)
 
     render json: {
-      subAccountProgresses: sub_account_progresses.map{|p| progress_json(p, @current_user, session)}
+      subAccountProgresses: regenerator.progresses.map{|p| progress_json(p, @current_user, session)}
     }
   end
 
@@ -141,10 +148,20 @@ class BrandConfigsController < ApplicationController
       session.delete(:brand_config_md5)
       BrandConfig.destroy_if_unused(session.delete(:brand_config_md5))
     end
-    redirect_to account_path(@account), notice: t('Theme editor changes have been cancelled.')
+    redirect_to account_brand_configs_path(@account), notice: t('Theme editor changes have been cancelled.')
   end
 
+  def existing_config(config)
+    config.default? || !config.new_record?
+  end
+  private :existing_config
+
   protected
+
+  def visible_shared_brand_configs
+    # things shared in this account, or globally (account_id is nil)
+    SharedBrandConfig.where(account_id: [@account.id, nil])
+  end
 
   def require_account_branding
     unless @account.branding_allowed?

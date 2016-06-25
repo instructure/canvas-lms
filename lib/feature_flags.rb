@@ -128,7 +128,7 @@ module FeatureFlags
         (retval.default? || retval.context_type == 'Account' && retval.context_id == Account.site_admin.id)
       if is_root_account
         # create a virtual feature flag in "off" state
-        retval = self.feature_flags.build feature: feature, state: 'off' unless retval.hidden?
+        retval = self.feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?
       else
         # the feature doesn't exist beneath the root account until the root account opts in
         return @feature_flag_cache[feature] = nil

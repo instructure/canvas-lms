@@ -52,7 +52,7 @@ describe "dashboard" do
         get "/"
 
         ignore_link = f('.to-do-list .disable_item_link')
-        expect(ignore_link['title']).to include_text("Ignore until new submission")
+        expect(ignore_link['title']).to include("Ignore until new submission")
         ignore_link.click
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.to-do-list > li')
@@ -82,6 +82,7 @@ describe "dashboard" do
       it 'shows an assignment stream item under Recent Activity in dashboard', priority: "1", test_id: 108723 do
         assignment_model({:submission_types => ['online_text_entry'], :course => @course})
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         find('.toggle-details').click
         expect(fj('.fake-link:contains("Unnamed")')).to be_present
       end
@@ -149,7 +150,7 @@ describe "dashboard" do
           get "/"
 
           ff('.to-do-list .disable_item_link').each do |link|
-            expect(link['title']).to include_text("Ignore until new mark")
+            expect(link['title']).to include("Ignore until new mark")
             link.click
             wait_for_ajaximations
           end
@@ -242,15 +243,19 @@ describe "dashboard" do
     context "course menu customization" do
 
       it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
-        20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
+        course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true})
 
         get "/"
 
-        driver.execute_script %{$('#courses_menu_item').addClass('hover');}
-        wait_for_ajaximations
-
-        expect(fj('#courses_menu_item')).to include_text('My Courses')
-        expect(fj('#courses_menu_item')).to include_text('View All or Customize')
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          f('#global_nav_courses_link').click
+          expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
+        else
+          course_menu_item = f("#courses_menu_item")
+          hover(course_menu_item)
+          expect(course_menu_item).to include_text('My Courses')
+          expect(course_menu_item).to include_text('View All or Customize')
+        end
       end
     end
   end

@@ -153,8 +153,7 @@ module ThemeEditorCommon
 
   def all_colors(array, color = 'random')
     array.each do |x|
-      x.send_keys(color) if color != 'random'
-      x.send_keys(random_hex_color) if color == 'random'
+      x.send_keys(color == 'random' ? random_hex_color : color)
     end
   end
 

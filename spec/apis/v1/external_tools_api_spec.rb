@@ -39,6 +39,10 @@ describe ExternalToolsController, type: :request do
       index_call(@course)
     end
 
+    it "should return filtered external tools" do
+      index_call_with_placment(@course, "collaboration")
+    end
+
     it "should search for external tools by name" do
       search_call(@course)
     end
@@ -297,6 +301,18 @@ describe ExternalToolsController, type: :request do
     expect(HashDiff.diff(json.first, example_json(et))).to eq []
   end
 
+  def index_call_with_placment(context, placement, type="course")
+    tool_with_everything(context)
+    et_with_placement = tool_with_everything(context, {:placement => placement})
+
+    json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
+                    {:controller => 'external_tools', :action => 'index', :format => 'json', :placement => placement,
+                     :"#{type}_id" => context.id.to_s})
+
+    expect(json.size).to eq 1
+    expect(HashDiff.diff(json.first, example_json(et_with_placement))).to eq []
+  end
+
   def search_call(context, type="course")
     2.times { |i| context.context_external_tools.create!(:name => "first_#{i}", :consumer_key => "fakefake", :shared_secret => "sofakefake", :url => "http://www.example.com/ims/lti") }
     ids = context.context_external_tools.map(&:id)
@@ -424,6 +440,7 @@ describe ExternalToolsController, type: :request do
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
+    et.context_external_tool_placements.new(:placement_type => opts[:placement]) if opts[:placement]
     et.save!
     et
   end

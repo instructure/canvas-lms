@@ -483,7 +483,7 @@ describe Api do
   context 'relation_for_sis_mapping' do
     it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
-      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything).returns({"users.id" => [4,5,6]})
+      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything, root_account: root_account).returns({"users.id" => [4,5,6]})
       Api.expects(:relation_for_sis_mapping_and_columns).with(User, {"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).returns("params")
       expect(Api.relation_for_sis_mapping(User, {:lookups => "lookups"}, [1,2,3], root_account)).to eq "params"
     end
@@ -659,22 +659,39 @@ describe Api do
       expect(res).to eq html
     end
 
-    it 'prepends mobile css' do
-      student_in_course
-      account = @course.root_account
-      account.enable_feature!(:use_new_styles)
-      bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
-      account.brand_config_md5 = bc.md5
-      account.save!
+    context "mobile css/js" do
+      before(:each) do
+        student_in_course
+        account = @course.root_account
+        account.enable_feature!(:use_new_styles)
+        bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
+        account.brand_config_md5 = bc.md5
+        account.save!
 
-      html = "<p>a</p><p>b</p>"
+        @html = "<p>a</p><p>b</p>"
 
-      k = klass.new
-      k.stubs(:mobile_device?).returns(true)
-      res = k.api_user_content(html, @course, @student)
-      expect(res).to eq <<-HTML.strip
-<link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
-      HTML
+        @k = klass.new
+      end
+
+      it 'prepends mobile css when not coming from a web browser' do
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq <<-HTML.strip
+  <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+        HTML
+      end
+
+      it 'does not prepend mobile css when coming from a web browser' do
+        @k.stubs(:in_app?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
+
+      it 'does not prepend mobile css when coming from a web browser, even if it is a mobile browser' do
+        @k.stubs(:in_app?).returns(true)
+        @k.stubs(:mobile_device?).returns(true)
+        res = @k.api_user_content(@html, @course, @student)
+        expect(res).to eq "<p>a</p><p>b</p>"
+      end
     end
   end
 

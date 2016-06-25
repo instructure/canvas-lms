@@ -11,6 +11,7 @@ module RuboCop
           describe
           shared_context
           shared_examples
+          shared_examples_for
         ].freeze
 
         def on_def(node)

@@ -25,29 +25,14 @@ describe "calendar2" do
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
       end
 
-      it "should render assignments due just before midnight" do
-        skip("fails on event count validation")
-        assignment_model(:course => @course,
-                         :title => "super important",
-                         :due_at => Time.zone.now.beginning_of_day + 1.day - 1.minute)
-        calendar_events = @teacher.calendar_events_for_calendar.last
-
-        expect(calendar_events.title).to eq "super important"
-        expect(@assignment.due_date).to eq (Time.zone.now.beginning_of_day + 1.day - 1.minute).to_date
-
-        load_week_view
-        keep_trying_until do
-          events = ff('.fc-event').select { |e| e.text =~ /due.*super important/ }
-          # shows on monday night and tuesday morning
-          expect(events.size).to eq 2
-        end
-      end
+      # TODO reimplement per CNVS-29592, but make sure we're testing at the right level
+      it "should render assignments due just before midnight"
 
       it 'should show manual assignment event due saturday after 6pm', priority: "1", test_id: 486894 do
         load_week_view
-        fj('#create_new_event_link').click
+        f('#create_new_event_link').click
         wait_for_ajaximations
-        event_dialog = fj('#edit_event_tabs')
+        event_dialog = f('#edit_event_tabs')
         event_dialog.find('.edit_assignment_option').click
         wait_for_ajaximations
         event_dialog.find('#assignment_title').send_keys('saturday assignment')
@@ -81,11 +66,11 @@ describe "calendar2" do
 
         load_week_view
 
-        expect(f('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
+        expect(f('.fc-event .fc-time')).to have_attribute('data-start', '11:45')
       end
 
       it "should stagger pseudo-overlapping short events", priority: "2", test_id: 768980 do
-        noon = Time.now.at_beginning_of_day + 12.hours
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
         second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
@@ -124,8 +109,8 @@ describe "calendar2" do
 
         load_week_view
         quick_jump_to_date('Jan 1, 2015')
-        keep_trying_until { expect(ffj('.fc-event').length).to eq 2 }
-        events = ffj('.fc-event')
+        expect(ff('.fc-event')).to have_size(2)
+        events = ff('.fc-event')
 
         # Scroll the elements into view
         events[0].location_once_scrolled_into_view
@@ -145,7 +130,7 @@ describe "calendar2" do
         load_week_view
 
         elt = fj('.fc-event:visible')
-        expect(elt.attribute('title')).to match(/12:00.*12:05/)
+        expect(elt).to have_attribute('title', /12:00.*12:05/)
       end
     end
 
@@ -155,7 +140,7 @@ describe "calendar2" do
       change_calendar(:next)
 
       # Verify Week and Day labels are correct
-      expect(header_text).to include_text("Jan 8 — 14, 2012")
+      expect(header_text).to include("Jan 8 — 14, 2012")
       expect(f('.fc-sun')).to include_text('SUN 1/8')
     end
 
@@ -166,7 +151,7 @@ describe "calendar2" do
       # Click non all-day event
       fj('.fc-agendaWeek-view .fc-time-grid .fc-slats .fc-widget-content:not(.fc-axis):first').click
       event_from_modal(title,false,false)
-      expect(f('.fc-title').text).to include title
+      expect(f('.fc-title')).to include_text title
     end
 
     it "should create all day event on week calendar", priority: "1", test_id: 138865 do
@@ -174,9 +159,9 @@ describe "calendar2" do
       load_week_view
 
       # click all day event
-      fj('.fc-agendaWeek-view .fc-week .fc-wed').click
+      f('.fc-agendaWeek-view .fc-week .fc-wed').click
       event_from_modal(title,false,false)
-      expect(f('.fc-title').text).to include title
+      expect(f('.fc-title')).to include_text title
     end
 
     it "should have a working today button", priority: "1", test_id: 142042 do
@@ -209,8 +194,8 @@ describe "calendar2" do
       f(".fc-event").click
 
       # expect to find the location name and address
-      expect(f('.event-details-content').text).to include_text(location_name)
-      expect(f('.event-details-content').text).to include_text(location_address)
+      expect(f('.event-details-content')).to include_text(location_name)
+      expect(f('.event-details-content')).to include_text(location_address)
     end
 
     it "should bring up a calendar date picker when clicking on the week range", priority: "2", test_id: 768985 do
@@ -220,8 +205,8 @@ describe "calendar2" do
 
       # Expect that a the event picker is present
       # Check various elements to verify that the calendar looks good
-      expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-      expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+      expect(f('.ui-datepicker-header')).to include_text(Time.now.utc.strftime("%B"))
+      expect(f('.ui-datepicker-calendar')).to include_text("Mo")
     end
 
     it "should extend event time by dragging", priority: "1", test_id: 138864 do
@@ -235,8 +220,8 @@ describe "calendar2" do
 
       # Drag and drop event resizer from first event onto assignment icon
       load_week_view
-      keep_trying_until { expect(ffj('.fc-view-container .icon-calendar-month').length).to eq 1 }
-      drag_and_drop_element(fj('.fc-end-resizer'), fj('.icon-assignment'))
+      expect(ff('.fc-view-container .icon-calendar-month')).to have_size(1)
+      drag_and_drop_element(f('.fc-end-resizer'), f('.icon-assignment'))
 
       # Verify Event now ends at assignment start time + 30 minutes
       expect(event1.reload.end_at).to eql(midnight + 12.hours + 30.minutes)
@@ -253,8 +238,8 @@ describe "calendar2" do
 
       # Drag object event onto target event using calendar icons
       load_week_view
-      keep_trying_until { expect(ffj('.fc-view-container .icon-calendar-month').length).to eq 2 }
-      icon_array = ffj('.fc-view-container .icon-calendar-month')
+      expect(ff('.fc-view-container .icon-calendar-month')).to have_size(2)
+      icon_array = ff('.fc-view-container .icon-calendar-month')
       drag_and_drop_element(icon_array[1], icon_array[0])
       wait_for_ajaximations
 

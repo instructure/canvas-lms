@@ -13,22 +13,14 @@ module CustomSeleniumActions
   end
 
   def find(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find(css)
   end
 
   def find_all(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find_all(css)
   end
 
-  def not_found(css)
-    raise 'need to do a get to use find' unless @click_ready
-    driver.not_found(css)
-  end
-
   def find_radio_button_by_value(value, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     fj("input[type=radio][value=#{value}]", scope)
   end
 
@@ -43,14 +35,16 @@ module CustomSeleniumActions
   #
   #   expect(f('#content')).not_to contain_css('.this-should-be-gone')
   def f(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    (scope || driver).find_element :css, selector
+    stale_element_protection do
+      (scope || driver).find_element :css, selector
+    end
   end
 
   # short for find with link
   def fln(link_text, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    (scope || driver).find_element :link, link_text
+    stale_element_protection do
+      (scope || driver).find_element :link, link_text
+    end
   end
 
   # find an element via fake-jquery-css selector
@@ -67,10 +61,11 @@ module CustomSeleniumActions
   #
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    keep_trying_until { find_with_jquery selector, scope }
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise Selenium::WebDriver::Error::NoSuchElementError
+    stale_element_protection do
+      wait_for(method: :fj) do
+        find_with_jquery selector, scope
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
+    end
   end
 
   # same as `f`, but returns all matching elements
@@ -78,8 +73,9 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    result = (scope || driver).find_elements :css, selector
+    result = reloadable_collection do
+      (scope || driver).find_elements :css, selector
+    end
     raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
     result
   end
@@ -89,24 +85,21 @@ module CustomSeleniumActions
   # like other selenium methods, this will wait until it finds elements on
   # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    result = nil
-    keep_trying_until do
-      result = find_all_with_jquery(selector, scope)
-      result.present?
+    reloadable_collection do
+      result = nil
+      wait_for(method: :ffj) do
+        result = find_all_with_jquery(selector, scope)
+        result.present?
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      result
     end
-    result
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise Selenium::WebDriver::Error::NoSuchElementError
   end
 
   def find_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
   def find_all_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
@@ -127,11 +120,14 @@ module CustomSeleniumActions
   end
 
   def in_frame(id)
+    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
     saved_window_handle = driver.window_handle
     driver.switch_to.frame(id)
-    yield
-  ensure
-    driver.switch_to.window saved_window_handle
+    begin
+      yield
+    ensure
+      driver.switch_to.window saved_window_handle
+    end
   end
 
   def is_checked(css_selector)
@@ -268,7 +264,9 @@ module CustomSeleniumActions
   end
 
   def hover(element)
-    driver.action.move_to(element).perform
+    element.with_stale_element_protection do
+      driver.action.move_to(element).perform
+    end
   end
 
   def set_value(input, value)
@@ -431,105 +429,43 @@ module CustomSeleniumActions
     driver.action.move_to(el).click.perform
   end
 
-  def disable_implicit_wait
-    driver.manage.timeouts.implicit_wait = 0
-    yield
-  ensure
-    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
-  end
-end
-
-# assert the presence (or absence) of something inside the element via css
-# selector. will return as soon as the expectation is met, e.g.
-#
-#   expect(f('#courses')).to contain_css("#course_123")
-#   f('#delete_course').click
-#   expect(f('#courses')).not_to contain_css("#course_123")
-#
-RSpec::Matchers.define :contain_css do |selector|
-  match do |element|
-    begin
-      # rely on implicit_wait
-      f(selector, element)
-      true
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      false
-    end
+  def scroll_to(element)
+    element_location = "#{element.location['y']}"
+    driver.execute_script('window.scrollTo(0, ' + element_location + ');')
   end
 
-  match_when_negated do |element|
-    disable_implicit_wait do # so find_element calls return ASAP
-      begin
-        keep_trying_until do
-          begin
-            f(selector, element)
-            false
-          rescue Selenium::WebDriver::Error::NoSuchElementError
-            true
-          end
-        end
-      rescue Selenium::WebDriver::Error::TimeOutError
-        false
-      end
-    end
-  end
-end
-
-# assert the presence (or absence) of something inside the element via
-# fake-jquery-css selector. will return as soon as the expectation is met,
-# e.g.
-#
-#   expect(f('#weird-ui')).to contain_css(".something:visible")
-#   f('#hide-things').click
-#   expect(f('#weird-ui')).not_to contain_css(".something:visible")
-#
-RSpec::Matchers.define :contain_jqcss do |selector|
-  match do |element|
-    begin
-      keep_trying_until { find_with_jquery(selector, element) }
-      true
-    rescue Selenium::WebDriver::Error::TimeOutError
-      false
-    end
+  def dismiss_flash_messages
+    ff("#flash_message_holder li").each(&:click)
   end
 
-  match_when_negated do |element|
-    begin
-      keep_trying_until { !find_with_jquery(selector, element) }
-    rescue Selenium::WebDriver::Error::TimeOutError
-      false
-    end
-  end
-end
-
-# assert the presence (or absence) of a link with certain text inside the
-# element. will return as soon as the expectation is met, e.g.
-#
-#   expect(f('#weird-ui')).to contain_link("Click Here")
-#   f('#hide-things').click
-#   expect(f('#weird-ui')).not_to contain_link("Click Here")
-#
-RSpec::Matchers.define :contain_link do |text|
-  match do |element|
-    begin
-      # rely on implicit_wait
-      fln(text, element)
-      true
-    rescue Selenium::WebDriver::Error::NoSuchElementError
-      false
-    end
+  def scroll_into_view(selector)
+    driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
   end
 
-  match_when_negated do |element|
-    disable_implicit_wait do # so find_element calls return ASAP
-      keep_trying_until do
-        begin
-          fln(text, element)
-          false
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          true
-        end
-      end
+  # see public/javascripts/vendor/jquery.scrollTo.js
+  # target can be:
+  #  - A number position (will be applied to all axes).
+  #  - A string position ('44', '100px', '+=90', etc ) will be applied to all axes
+  #  - A string selector, that will be relative to the element to scroll ( 'li:eq(2)', etc )
+  #  - A hash { top:x, left:y }, x and y can be any kind of number/string like above.
+  #  - A percentage of the container's dimension/s, for example: 50% to go to the middle.
+  #  - The string 'max' for go-to-end.
+  def scroll_element(selector, target)
+    driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
+  end
+
+  def stale_element_protection
+    element = yield
+    element.finder_proc = proc do
+      disable_implicit_wait { yield }
     end
+    element
+  end
+
+  def reloadable_collection
+    collection = yield
+    SeleniumExtensions::ReloadableCollection.new(collection, proc do
+      disable_implicit_wait { yield }
+    end)
   end
 end

@@ -130,4 +130,21 @@ Rails.configuration.after_initialize do
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process)
   end
+
+  Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
+    with_each_shard_by_database(Version::Partitioner, :process)
+  end
+
+  if AccountAuthorizationConfig::SAML.enabled?
+    Delayed::Periodic.cron 'AccountAuthorizationConfig::SAML::MetadataRefresher.refresh_providers', '15 0 * * *' do
+      with_each_shard_by_database(AccountAuthorizationConfig::SAML::MetadataRefresher,
+                                  :refresh_providers)
+    end
+
+    Delayed::Periodic.cron 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers', '45 0 * * *' do
+      DatabaseServer.send_in_each_region(AccountAuthorizationConfig::SAML::InCommon,
+                                  :refresh_providers,
+                                  singleton: 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers')
+    end
+  end
 end

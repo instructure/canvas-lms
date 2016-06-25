@@ -49,6 +49,7 @@ web: &WEB
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
+    REMOTE_DEBUGGING_ENABLED: 'true'
 
 jobs:
   <<: *WEB

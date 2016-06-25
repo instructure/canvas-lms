@@ -492,6 +492,17 @@ describe Course do
       end
     end
 
+    context "as a 'student view' student" do
+      it "should grant read rights for unpublished courses" do
+        course
+        test_student = @course.student_view_student
+
+        expect(@course.grants_right?(test_student, :read)).to be_truthy
+        expect(@course.grants_right?(test_student, :read_grades)).to be_truthy
+        expect(@course.grants_right?(test_student, :read_forum)).to be_truthy
+      end
+    end
+
     context "as a student" do
       let_once :c do
         course_with_student(:active_user => 1)
@@ -699,6 +710,14 @@ describe Course do
       category1.destroy
       course.reload
       expect(course.all_group_categories.count).to eq 2
+    end
+  end
+
+  context "turnitin" do
+    it "should return turnitin_originality" do
+      @course.account.turnitin_originality = "after_grading"
+      @course.account.save!
+      expect(@course.turnitin_originality).to eq("after_grading")
     end
   end
 end
@@ -3309,7 +3328,7 @@ describe Course, "section_visibility" do
       @admin = account_admin_user
 
       @course.enroll_user(@admin, "ObserverEnrollment")
-      
+
       visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
@@ -4016,21 +4035,18 @@ describe Course do
         # Both of these need to be defined, as they're both involved in SIS imports
         # and expected manual enrollment behavior
         @enrollment.sis_batch_id = batch.id
-        @enrollment.sis_source_id = 'abc:1234'
         @enrollment.save
       end
 
       it 'should retain SIS attributes if re-enrolled, but the SIS enrollment is still active' do
         e2 = @course.enroll_student @user
         expect(e2.sis_batch_id).not_to eql nil
-        expect(e2.sis_source_id).not_to eql nil
       end
 
       it 'should remove SIS attributes from enrollments when re-created manually' do
         @enrollment.destroy
         @enrollment = @course.enroll_student @user
         expect(@enrollment.sis_batch_id).to eql nil
-        expect(@enrollment.sis_source_id).to eql nil
       end
     end
 

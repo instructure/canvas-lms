@@ -156,7 +156,6 @@ describe "discussions" do
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
           expect(topic).not_to be_pinned
           get(url)
-          keep_trying_until { fj(".al-trigger") }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
           wait_for_ajaximations

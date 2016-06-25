@@ -67,52 +67,53 @@ describe "conversations new" do
     end
 
     it "should have a courses dropdown", priority: "1", test_id: 117960 do
-      fj("[data-id = 'course-filter']").click
+      f("[data-id = 'course-filter']").click
       wait_for_ajaximations
 
       # Verify course filter is open
-      expect(fj('.course-filter.open')).to be_truthy
+      expect(f('.course-filter.open')).to be_truthy
 
       # Verify course filter names
-      dropdown_array = ffj('#course-filter-bs .text')
-      expect(dropdown_array[0].text).to include_text('All Courses')
-      expect(dropdown_array[1].text).to include_text(@course.name)
+      dropdown_array = ff('#course-filter-bs .text')
+      expect(dropdown_array[0]).to include_text('All Courses')
+      expect(dropdown_array[1]).to include_text(@course.name)
     end
 
     it "should have a type dropdown", priority: "1", test_id: 446594 do
-      fj("[data-id = 'type-filter']").click
+      f("[data-id = 'type-filter']").click
       wait_for_ajaximations
 
       # Verify type filter is open
-      expect(fj('.type-filter.open')).to be
+      expect(f('.type-filter.open')).to be
 
       # Verify type filter names and order
-      dropdown_array = ffj('#type-filter-bs .text')
-      expect(dropdown_array[0].text).to include_text('Inbox')
-      expect(dropdown_array[1].text).to include_text('Unread')
-      expect(dropdown_array[2].text).to include_text('Starred')
-      expect(dropdown_array[3].text).to include_text('Sent')
-      expect(dropdown_array[4].text).to include_text('Archived')
-      expect(dropdown_array[5].text).to include_text('Submission Comments')
+      dropdown_array = ff('#type-filter-bs .text')
+      expect(dropdown_array[0]).to include_text('Inbox')
+      expect(dropdown_array[1]).to include_text('Unread')
+      expect(dropdown_array[2]).to include_text('Starred')
+      expect(dropdown_array[3]).to include_text('Sent')
+      expect(dropdown_array[4]).to include_text('Archived')
+      expect(dropdown_array[5]).to include_text('Submission Comments')
     end
 
     it "should have action buttons", priority: "1", test_id: 446595 do
-      expect(fj('#conversation-actions #compose-btn')).to be
-      expect(fj('#conversation-actions #reply-btn')).to be
-      expect(fj('#conversation-actions #reply-all-btn')).to be
-      expect(fj('#conversation-actions #archive-btn')).to be
-      expect(fj('#conversation-actions #delete-btn')).to be
-      expect(fj('.inline-block')).to be
+      expect(f('#conversation-actions #compose-btn')).to be
+      expect(f('#conversation-actions #reply-btn')).to be
+      expect(f('#conversation-actions #reply-all-btn')).to be
+      expect(f('#conversation-actions #archive-btn')).to be
+      expect(f('#conversation-actions #delete-btn')).to be
+      expect(f('.inline-block')).to be
     end
 
     it "should have a search box with address book", priority: "1", test_id: 446596 do
       # Click on the address book
-      fj('.recipient-finder .icon-address-book').click
+      f('.recipient-finder .icon-address-book').click
       wait_for_ajaximations
-      keep_trying_until { expect(fj('.paginatedLoadingIndicator')['style']).to include_text('none') }
+      indicator = f('.paginatedLoadingIndicator')
+      keep_trying_until { expect(indicator['style']).to include('none') }
 
       # Verify the names of the course and all students and teachers appear
-      expect(fj('.ac-result-contents .context .result-name')).to include_text(@course.name)
+      expect(f('.ac-result-contents .context .result-name')).to include_text(@course.name)
       users = @course.users.collect(&:name)
       users.each do |u|
         expect(fj(".ac-result-contents .result-name:contains('#{u}')")).to be
@@ -121,8 +122,8 @@ describe "conversations new" do
 
     it "should display a no messages image", priority: "1", test_id: 456175 do
       # Verify Text and Icon Class
-      expect(fj('.no-messages').text).to include_text('No Conversations Selected')
-      expect(fj('.no-messages .icon-email')).to be
+      expect(f('.no-messages')).to include_text('No Conversations Selected')
+      expect(f('.no-messages .icon-email')).to be
     end
   end
 
@@ -250,7 +251,7 @@ describe "conversations new" do
 
       select_view('sent')
       click_message(0)
-      expect(f('#archive-btn').attribute('disabled')).to be_present
+      expect(f('#archive-btn')).to be_disabled
     end
 
     it "should not be able to archive a sent message via the cog dropdown" do

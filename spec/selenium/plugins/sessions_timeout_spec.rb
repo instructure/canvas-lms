@@ -14,7 +14,7 @@ describe "Sessions Timeout" do
         get "/plugins/sessions"
         if !f("#plugin_setting_disabled").displayed?
           f("#accounts_select option:nth-child(2)").click
-          keep_trying_until { f("#plugin_setting_disabled").displayed? }
+          expect(f("#plugin_setting_disabled")).to be_displayed
         end
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').send_keys('19')
@@ -24,14 +24,14 @@ describe "Sessions Timeout" do
     end
   end
 
-  it "when sessions timeout is set to .04 minutes it logs the user out after 3 seconds" do
-    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => ".04"})
+  it "when sessions timeout is set to .08 minutes it logs the user out after 5 seconds" do
+    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => ".08"})
     plugin_setting.save!
     user_with_pseudonym({:active_user => true})
     login_as
-    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
+    expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_profile_display_name' : '.user_name').text).to eq @user.primary_pseudonym.unique_id
 
-    sleep 3
+    sleep 5
 
     get "/courses"
 

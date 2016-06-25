@@ -8,7 +8,7 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
-  var Modal = React.createClass({
+  const Modal = React.createClass({
 
     getInitialState() {
       return {
@@ -21,25 +21,31 @@ define([
       }
     },
     componentWillReceiveProps(props){
-      this.setState({modalIsOpen: props.isOpen});
+      let callback
+      if (this.props.isOpen && !props.isOpen) callback = this.cleanupAfterClose
+      this.setState({modalIsOpen: props.isOpen}, callback);
     },
 
     openModal() {
       this.setState({modalIsOpen: true});
     },
-    closeModal() {
-      this.setState({modalIsOpen: false}, function(){
-        this.props.onRequestClose();
-        $(this.getAppElement()).removeAttr('aria-hidden');
-      });
+
+    cleanupAfterClose () {
+      if (this.props.onRequestClose) this.props.onRequestClose();
+      $(this.getAppElement()).removeAttr('aria-hidden');
     },
+
+    closeModal() {
+      this.setState({modalIsOpen: false}, this.cleanupAfterClose);
+    },
+
     closeWithX() {
       if(_.isFunction(this.props.closeWithX))
         this.props.closeWithX()
       this.closeModal();
     },
     onSubmit(){
-      var promise = this.props.onSubmit();
+      const promise = this.props.onSubmit();
       $(this.refs.modal.getDOMNode()).disableWhileLoading(promise);
     },
     getAppElement () {
@@ -47,8 +53,8 @@ define([
       return this.props.appElement || document.getElementById('application');
     },
     processMultipleChildren(props){
-      var content = null;
-      var buttons = null;
+      let content = null;
+      let buttons = null;
 
       React.Children.forEach(props.children, function(child){
         if(child.type == ModalContent){

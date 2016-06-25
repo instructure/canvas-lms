@@ -4,7 +4,7 @@ describe "course copy" do
   include_context "in-process server selenium tests"
 
   def validate_course_main_page
-    header = f('#section-tabs-header')
+    header = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')
     expect(header).to be_displayed
     expect(header.text).to eq @course.course_code
   end
@@ -21,7 +21,7 @@ describe "course copy" do
       get "/courses/#{@course.id}/copy"
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = Course.last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -30,29 +30,8 @@ describe "course copy" do
       expect(@new_course.wiki.wiki_pages.count).to eq 1
     end
 
-    it "should copy the course with different settings" do
-      skip("killing thread with intermittent failures")
-      enable_cache do
-        course_with_admin_logged_in
-        5.times { |i| @course.wiki.wiki_pages.create!(:title => "hi #{i}", :body => "Whatever #{i}") }
-
-        get "/courses/#{@course.id}/copy"
-        expect_new_page_load { f('button[type="submit"]').click }
-        submit_form('#copy_context_form')
-        wait_for_ajaximations
-        f('#copy_everything').click
-        wait_for_ajaximations
-
-        keep_trying_until { Canvas::Migration::Worker::CourseCopyWorker.new.perform(ContentMigration.last)}
-
-        keep_trying_until { expect(f('#copy_results > h2')).to include_text('Copy Succeeded') }
-
-        @new_course = Course.last
-        get "/courses/#{@new_course.id}"
-        expect(f(".no-recent-messages")).to include_text("No Recent Messages")
-        expect(@new_course.wiki.wiki_pages.count).to eq 5
-      end
-    end
+    # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
+    it "should copy the course with different settings"
 
     it "should set the course name and code correctly" do
       course_with_admin_logged_in
@@ -131,7 +110,7 @@ describe "course copy" do
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = subaccount.courses.where("id <>?", @course.id).last
       expect(@new_course.syllabus_body).to eq @course.syllabus_body
@@ -158,7 +137,7 @@ describe "course copy" do
 
       expect_new_page_load { f('button[type="submit"]').click }
       run_jobs
-      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+      expect(f('div.progressStatus span')).to include_text 'Completed'
 
       @new_course = @account.courses.where("id <>?", @course.id).last
       expect(@new_course.enrollment_term).to eq @account.default_enrollment_term
@@ -173,15 +152,12 @@ describe "course copy" do
       replace_content(f('#course_start_at'), 'Aug 15, 2012')
       replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
 
-      keep_trying_until do
-        expect(f('button.btn-primary').attribute('disabled')).to be_present
-      end
+      button = f('button.btn-primary')
+      expect(button).to be_disabled
 
       replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
 
-      keep_trying_until do
-        expect(f('button.btn-primary').attribute('disabled')).to be_blank
-      end
+      expect(button).not_to be_disabled
     end
   end
 end

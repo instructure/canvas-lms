@@ -76,7 +76,7 @@ describe 'Account Grading Periods' do
 
       get "/accounts/#{@account.id}/grading_standards"
       expect(ff('.grading-period').length).to eq(1)
-      expect(f("#period_title_#{account_grading_period.id}").attribute('value')).to eq(account_grading_period.title)
+      expect(f("#period_title_#{account_grading_period.id}")).to have_value(account_grading_period.title)
     end
 
     it 'flashes a notice message when saved', priority: "1", test_id: 202312 do

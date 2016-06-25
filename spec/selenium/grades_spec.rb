@@ -151,10 +151,8 @@ describe "grades" do
       end
 
       assert_grade = lambda do |grade|
-        keep_trying_until do
-          wait_for_ajaximations
-          expect(fj('#submission_final-grade .grade').text).to eq grade.to_s
-        end
+        wait_for_ajaximations
+        expect(f('#submission_final-grade .grade')).to include_text grade.to_s
       end
 
       # test changing existing scores

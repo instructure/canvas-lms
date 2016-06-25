@@ -7,7 +7,7 @@ module SeleniumDriverSetup
   RECENT_SPEC_FAILURE_LIMIT = 10
   # Number of failures to record
   MAX_FAILURES_TO_RECORD = 20
-  IMPLICIT_WAIT_TIMEOUT = 10
+  IMPLICIT_WAIT_TIMEOUT = 15
 
   def setup_selenium
 

@@ -48,11 +48,8 @@ module RubricsCommon
     create_rubric_with_criterion_points "5"
     f('.delete_rubric_link').click
     driver.switch_to.alert.accept
-    wait_for_ajaximations
-    keep_trying_until do
-      expect(Rubric.last.workflow_state).to eq 'deleted'
-      ff('#rubrics .rubric').each { |rubric| expect(rubric).not_to be_displayed }
-    end
+    ff('#rubrics .rubric').each { |rubric| expect(rubric).not_to be_displayed }
+    expect(Rubric.last.workflow_state).to eq 'deleted'
   end
 
   def should_edit_a_rubric
@@ -62,12 +59,9 @@ module RubricsCommon
     f('.edit_rubric_link').click
     replace_content(ff("#rubric_#{rubric.id} .rubric_title input")[1], edit_title)
     submit_form(ff("#rubric_#{rubric.id} #edit_rubric_form")[1])
-    wait_for_ajaximations
-    keep_trying_until do
-      rubric.reload
-      expect(rubric.title).to eq edit_title
-      expect(f('.rubric_title .title').text).to eq edit_title
-    end
+    expect(f('.rubric_title .title')).to include_text edit_title
+    rubric.reload
+    expect(rubric.title).to eq edit_title
   end
 
   def should_allow_fractional_points
@@ -78,9 +72,7 @@ module RubricsCommon
 
   def should_round_to_2_decimal_places
     create_rubric_with_criterion_points "5.249"
-    keep_trying_until do
-        expect(fj(".rubric .criterion:visible .display_criterion_points").text).to eq '5.25'
-    end
+    expect(fj(".rubric .criterion:visible .display_criterion_points")).to include_text '5.25'
   end
 
   def should_round_to_an_integer_when_splitting

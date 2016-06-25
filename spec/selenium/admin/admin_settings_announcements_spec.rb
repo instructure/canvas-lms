@@ -24,12 +24,20 @@ describe "settings tabs" do
       submit_form("#add_notification_form")
       wait_for_ajax_requests
       notification = AccountNotification.first
-      expect(notification.message).to include_text("this is a message")
-      expect(notification.subject).to include_text(subject)
+      expect(notification.message).to include("this is a message")
+      expect(notification.subject).to include(subject)
       expect(notification.start_at.day).to eq 1
       expect(notification.end_at.day).to eq 15
-      login_text = f("#header .user_name").text
-      expect(f("#tab-announcements .announcement-details").text).to include_text(login_text)
+      expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
+
+      if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+        # close the "user account" reactTray that opened so we could read the displayed username
+        if tray_close = f('.ReactTray__closeBtn')
+         tray_close.click
+        end
+        expect(f('body')).not_to contain_css('.ReactTray__Overlay')
+      end
+
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
     end

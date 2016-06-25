@@ -7,10 +7,6 @@ describe "plugins ui" do
     site_admin_logged_in
   end
 
-  after(:each) do
-    truncate_table PluginSetting
-  end
-
   it 'should have plugins default to disabled when no plugin_setting exits', priority: "1", test_id: 268053 do
     get '/plugins/etherpad'
     expect(is_checked('#plugin_setting_disabled')).to be_truthy
@@ -63,7 +59,7 @@ describe "plugins ui" do
   def multiple_accounts_select
     if !f("#plugin_setting_disabled").displayed?
       f("#accounts_select option:nth-child(2)").click
-      keep_trying_until { f("#plugin_setting_disabled").displayed? }
+      expect(f("#plugin_setting_disabled")).to be_displayed
     end
   end
 

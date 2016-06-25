@@ -20,9 +20,28 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 module Lti
   describe MembershipServiceController do
+    context 'user not enrolled in course' do
+      before(:each) do
+        course_model
+        user_model
+        pseudonym(@user)
+        @user.save!
+        token = @user.access_tokens.create!(purpose: 'test').full_token
+        @request.headers['Authorization'] = "Bearer #{token}"
+      end
+
+      describe '#course_index' do
+        it 'returns 401 if user is not part of course' do
+          get 'course_index', course_id: @course.id
+          assert_unauthorized
+        end
+      end
+    end
+
     context 'course with single enrollment' do
       before(:each) do
         course_with_teacher
+        @course.offer!
       end
 
       describe "#course_index" do
@@ -157,6 +176,46 @@ module Lti
           hash = json_parse.with_indifferent_access
 
           expect(hash.fetch(:nextPage)).to be_nil
+        end
+      end
+    end
+
+    context 'user not in course group' do
+      before(:each) do
+        course_with_teacher
+        @course.offer!
+        user_model
+        @course.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+        @group_category = @course.group_categories.create!(name: 'Membership')
+        @group = @course.groups.create!(name: 'Group 1', group_category: @group_category)
+        pseudonym(@user)
+        @user.save!
+        token = @user.access_tokens.create!(purpose: 'test').full_token
+        @request.headers['Authorization'] = "Bearer #{token}"
+      end
+
+      describe '#group_index' do
+        it 'returns 401 if user is not part of group' do
+          get 'group_index', group_id: @group.id
+          assert_unauthorized
+        end
+      end
+    end
+
+    context 'user not in account group' do
+      before(:each) do
+        user_model
+        group_model
+        pseudonym(@user)
+        @user.save!
+        token = @user.access_tokens.create!(purpose: 'test').full_token
+        @request.headers['Authorization'] = "Bearer #{token}"
+      end
+
+      describe '#group_index' do
+        it 'returns 401 if user is not part of group' do
+          get 'group_index', group_id: @group.id
+          assert_unauthorized
         end
       end
     end

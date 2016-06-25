@@ -580,20 +580,9 @@ $gradebook_checkbox_width: 16px;
   height: $gradebook_checkbox_width;
   margin-top: -$gradebook_checkbox_width / 2;
   margin-left: -$gradebook_checkbox_width / 2;
-  background: url("/images/checkbox_sprite3.png") no-repeat 0 0;
-  &.gradebook-checkbox-pass {
-    background-position: -48px 0;
-  }
-  &.gradebook-checkbox-fail {
-    background-position: -64px 0;
-  }
-  &.editable {
-    &.gradebook-checkbox-pass {
-      background-position: -16px 0;
-    }
-    &.gradebook-checkbox-fail {
-      background-position: -32px 0;
-    }
+  & i {
+    text-indent: 0;
+    color: inherit;
   }
 }
 

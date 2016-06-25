@@ -21,12 +21,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       # add quiz to rce
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.quizzes', 'Quizzes')).click
-      keep_trying_until { expect(accordion.find_element(:link, quiz.title)).to be_displayed }
-      keep_trying_until do
-        accordion.find_element(:link, quiz.title).click
-        in_frame wiki_page_body_ifr_id do
-          expect(f('#tinymce')).to include_text(quiz.title)
-        end
+      expect(accordion.find_element(:link, quiz.title)).to be_displayed
+      accordion.find_element(:link, quiz.title).click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce')).to include_text(quiz.title)
       end
 
       f('form.edit-form button.submit').click
@@ -44,7 +42,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       #check assignment accordion
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
-      keep_trying_until { expect(accordion.find_element(:link, assignment_name)).to be_displayed }
+      expect(accordion.find_element(:link, assignment_name)).to be_displayed
       wait_for_ajaximations
       accordion.find_element(:link, assignment_name).click
       wait_for_ajaximations
@@ -67,7 +65,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         p = create_wiki_page(title, unpublished, edit_roles)
         get "/courses/#{@course.id}/pages/#{p.title}/edit"
 
-        keep_trying_until { expect(f("form.edit-form .edit-content")).to be_displayed }
+        expect(f("form.edit-form .edit-content")).to be_displayed
 
         click_option("select[name=\"editing_roles\"]", permission)
         #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save

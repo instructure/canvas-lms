@@ -24,6 +24,8 @@ describe CollaborationsController do
     plugin_setting.save!
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
+
+    group_model(:context => @course)
   end
 
   describe "GET 'index'" do
@@ -113,6 +115,18 @@ describe CollaborationsController do
     end
 
   end
+  describe "GET 'lti_index" do
+    it "should require authorization for the course" do
+      get 'lti_index', :course_id => @course.id
+      assert_unauthorized
+    end
+
+    it "should require authorization for the group" do
+      get 'lti_index', :group_id => @group.id
+      assert_unauthorized
+    end
+  end
+
 
   describe "GET 'show'" do
     let(:collaboration) do
@@ -120,6 +134,21 @@ describe CollaborationsController do
         title: "my collab",
         user: @teacher
       ).tap{ |c| c.update_attribute :url, 'http://www.example.com' }
+    end
+
+    it 'redirects to the lti launch url for ExternalToolCollaborations' do
+      course_with_teacher(:active_all => true)
+      user_session(@teacher)
+      collab = ExternalToolCollaboration.create!(
+        title: "my collab",
+        user: @teacher,
+        url: 'http://www.example.com'
+      )
+      collab.context = @course
+      collab.save!
+      get 'show', :course_id=>@course.id, :id => collab.id
+      url = CGI::escape(collab[:url])
+      expect(response).to redirect_to "/courses/#{@course.id}/external_tools/retrieve?display=borderless&url=#{url}"
     end
 
     context "logged in user" do
@@ -151,6 +180,7 @@ describe CollaborationsController do
         expect(page_view.url).to match %r{^http://test\.host/courses/\d+/collaborations}
         expect(page_view.participated).to be_truthy
       end
+
     end
 
     context "logged out user" do
@@ -210,7 +240,7 @@ describe CollaborationsController do
         expect(collaboration).to be_is_a(ExternalToolCollaboration)
         expect(collaboration.title).to eq content_items.first[:title]
         expect(collaboration.description).to eq content_items.first[:text]
-        expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+        expect(collaboration.url).to eq content_items[0][:url]
       end
 
       it "callback url should not be nil if provided" do
@@ -237,7 +267,111 @@ describe CollaborationsController do
         post 'create', :course_id => @course.id, :contentItems => content_items.to_json
       end
 
+      it "adds users if sent" do
+        user_session(@teacher)
+        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
+        lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
+        content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
+      end
+
+      it "adds groups if sent" do
+        user_session(@teacher)
+        group = group_model
+        group.add_user(@teacher, 'active')
+        content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+      end
+
     end
 
   end
+
+  describe "PUT #update" do
+    context "content_items" do
+
+      let(:collaboration) do
+        collab = @course.collaborations.create!(
+          title: "a collab",
+          user: @teacher
+        )
+        collab.update_attribute :url, 'http://www.example.com'
+        collab.update_attribute :type, "ExternalToolCollaboration"
+        collab
+      end
+
+      let(:content_items) do
+        [
+          {
+            title: 'my collab',
+            text: 'collab description',
+            url: 'http://example.invalid/test',
+            confirmUrl: 'http://example.com/confirm/343'
+          }
+        ]
+      end
+
+      it "should update a collaboration using content-item" do
+        user_session(@teacher)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(assigns[:collaboration]).not_to be_nil
+        expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
+        expect(collaboration).to be_is_a(ExternalToolCollaboration)
+        expect(collaboration.title).to eq content_items.first[:title]
+        expect(collaboration.description).to eq content_items.first[:text]
+        expect(collaboration.url).to eq content_items[0][:url]
+      end
+
+      it "callback url should not be nil if provided" do
+        user_session(@teacher)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        c = ExternalToolCollaboration.find(collaboration.id)
+        expect(c.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
+      end
+
+      it "should callback on success" do
+        user_session(@teacher)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:success_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "should callback on failure" do
+        user_session(@teacher)
+        Collaboration.any_instance.stubs(:save).returns(false)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:failure_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "adds users if sent" do
+        user_session(@teacher)
+        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user}
+        lti_user_ids = users.map {|student| Lti::Asset.opaque_identifier_for(student)}
+        content_items.first['ext_canvas_visibility'] = {users: lti_user_ids}
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:user_id)).to match_array([*users, @teacher].map(&:id))
+      end
+
+      it "adds groups if sent" do
+        user_session(@teacher)
+        group = group_model
+        group.add_user(@teacher, 'active')
+        content_items.first['ext_canvas_visibility'] = {groups: [Lti::Asset.opaque_identifier_for(group)]}
+        put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+      end
+
+    end
+  end
+
 end

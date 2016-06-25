@@ -101,6 +101,61 @@ describe ExternalToolsController do
   end
 
   describe "GET 'show'" do
+    context 'basic-lti-launch-request' do
+      it "launches account tools for non-admins" do
+        user_session(@teacher)
+        tool = @course.account.context_external_tools.new(:name => "bob",
+                                                          :consumer_key => "bob",
+                                                          :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.account_navigation = { enabled: true }
+        tool.save!
+
+        get :show, :account_id => @course.account.id, id: tool.id
+
+        expect(response).to be_success
+      end
+
+      it "generates the resource_link_id correctly for a course navigation launch" do
+        user_session(@teacher)
+        tool = @course.context_external_tools.new(:name => "bob",
+                                                          :consumer_key => "bob",
+                                                          :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.course_navigation = { enabled: true }
+        tool.save!
+
+        get :show, :course_id => @course.id, id: tool.id
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
+      end
+
+      it 'generates the correct resource_link_id for a homework submission' do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.save!
+        tool = @course.context_external_tools.new(:name => "bob",
+                                                  :consumer_key => "bob",
+                                                  :shared_secret => "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.course_navigation = { enabled: true }
+        tool.homework_submission = { enabled: true }
+        tool.save!
+
+        get :show, course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
+      end
+
+      it "returns flash error if the tool is not found" do
+        user_session(@teacher)
+        get :show, :account_id => @course.account.id, id: 0
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/find valid settings/)
+      end
+    end
+
     context 'ContentItemSelectionResponse' do
       before :once do
         @tool = new_valid_tool(@course)
@@ -285,71 +340,29 @@ describe ExternalToolsController do
 
       it "sends content item json for selected content" do
         user_session(@teacher)
-        get :show, :course_id => @course.id, id: @tool.id, :pages => [1,6], :assignments => [6]
+        page = @course.wiki.wiki_pages.create!(title: 'a page')
+        assignment = @course.assignments.create!(name: 'an assignment')
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [page.id], :assignments => [assignment.id]
         placement = JSON.parse(assigns[:lti_launch].params['content_items'])['@graph'].first
         migration_url = placement['placementOf']['@id']
         params = migration_url.split('?').last.split('&')
 
         expect(migration_url).to start_with api_v1_course_content_exports_url(@course)
         expect(params).to include 'export_type=common_cartridge'
-        expect(params).to include "select%5Bpages%5D%5B%5D=1"
-        expect(params).to include "select%5Bpages%5D%5B%5D=6"
-        expect(params).to include "select%5Bassignments%5D%5B%5D=6"
+        expect(params).to include "select%5Bpages%5D%5B%5D=#{page.id}"
+        expect(params).to include "select%5Bassignments%5D%5B%5D=#{assignment.id}"
         expect(placement['placementOf']['mediaType']).to eq 'application/vnd.instructure.api.content-exports.course'
         expect(placement['placementOf']['title']).to eq 'a course'
       end
-    end
 
-    context 'basic-lti-launch-request' do
-      it "launches account tools for non-admins" do
+      it "returns flash error if invalid id params are passed in" do
         user_session(@teacher)
-        tool = @course.account.context_external_tools.new(:name => "bob",
-                                                          :consumer_key => "bob",
-                                                          :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.account_navigation = { enabled: true }
-        tool.save!
-
-        get :show, :account_id => @course.account.id, id: tool.id
-
-        expect(response).to be_success
-      end
-
-      it "generates the resource_link_id correctly for a course navigation launch" do
-        user_session(@teacher)
-        tool = @course.context_external_tools.new(:name => "bob",
-                                                          :consumer_key => "bob",
-                                                          :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.course_navigation = { enabled: true }
-        tool.save!
-
-        get :show, :course_id => @course.id, id: tool.id
-        expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
-      end
-
-      it 'generates the correct resource_link_id for a homework submission' do
-        user_session(@teacher)
-        assignment = @course.assignments.create!(name: 'an assignment')
-        assignment.save!
-        tool = @course.context_external_tools.new(:name => "bob",
-                                                  :consumer_key => "bob",
-                                                  :shared_secret => "bob")
-        tool.url = "http://www.example.com/basic_lti"
-        tool.course_navigation = { enabled: true }
-        tool.homework_submission = { enabled: true }
-        tool.save!
-
-        get :show, course_id: @course.id, id: tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
-        expect(response).to be_success
-
-        lti_launch = assigns[:lti_launch]
-        expect(lti_launch.params['resource_link_id']).to eq opaque_id(@course)
+        get :show, :course_id => @course.id, id: @tool.id, :pages => [0]
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/error generating the tool launch/)
       end
     end
-  end
 
-  describe "GET 'show'" do
     context 'ContentItemSelectionRequest' do
       before :once do
         @tool = new_valid_tool(@course)
@@ -636,6 +649,62 @@ describe ExternalToolsController do
       get :retrieve, {url: tool.url, account_id: account.id, placement: 'collaboration'}
       expect(assigns[:lti_launch].params['lti_message_type']).to eq "ContentItemSelectionRequest"
     end
+
+    it "creates a content-item return url with an id" do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      return_url = assigns[:lti_launch].params['content_item_return_url']
+      expect(return_url).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog/3"
+    end
+
+    it "sets the auto_create param to true" do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      expect(assigns[:lti_launch].params['auto_create']).to eq "true"
+    end
+
+    it "sets the accept_unsigned param to false" do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      expect(assigns[:lti_launch].params['accept_unsigned']).to eq "false"
+    end
+
+    it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      data = assigns[:lti_launch].params['data']
+      json_data = Canvas::Security.decode_jwt(data)
+      expect(json_data[:content_item_id]).to eq "3"
+    end
+
+    it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
+      u = user(active_all: true)
+      account.account_users.create!(user:u)
+      user_session u
+      tool.collaboration = { message_type: 'ContentItemSelectionRequest' }
+      tool.save!
+      get :retrieve, {url: tool.url, course_id: @course.id, placement: 'collaboration', content_item_id:3 }
+      data = assigns[:lti_launch].params['data']
+      json_data = Canvas::Security.decode_jwt(data)
+      expect(json_data[:oauth_consumer_key]).to eq tool.consumer_key
+    end
+
   end
 
   describe "GET 'resource_selection'" do
