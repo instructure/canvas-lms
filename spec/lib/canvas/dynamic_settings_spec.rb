@@ -249,18 +249,13 @@ module Canvas
         end
 
         it "returns old value during connection timeout" do
-          Canvas.stubs(:timeout_protection).with('consul', raise_on_timeout: true).
+
+          Timeout.stubs(:timeout).with(DynamicSettings::TIMEOUT_INTERVAL).
             raises(Timeout::Error, 'consul took too long')
           value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
           expect(value["app-host"]).to eq("rce.insops.com")
         end
 
-        it "uses cached values during TimeoutCutoff events" do
-          Canvas.stubs(:timeout_protection).with('consul', raise_on_timeout: true).
-            raises(TimeoutCutoff, 'consul took too long too many times')
-          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
-          expect(value["app-host"]).to eq("rce.insops.com")
-        end
       end
     end
 
