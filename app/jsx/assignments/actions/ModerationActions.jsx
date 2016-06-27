@@ -200,11 +200,14 @@ define([
                  dispatch(this.publishedGrades(I18n.t('Success! Grades were published to the grade book.')));
                })
                .catch((response) => {
-                 if (response.status === 400) {
-                   dispatch(this.publishGradesFailed(I18n.t('Assignment grades have already been published.')));
-                 } else {
-                   dispatch(this.publishGradesFailed(I18n.t('An error occurred publishing grades.')));
-                 }
+                 const errorMessages = {
+                   400: I18n.t('Assignment grades have already been published.'),
+                   422: I18n.t('All submissions must have a selected grade.')
+                 };
+                 let message =
+                   errorMessages[response.status] ||
+                   I18n.t('An error occurred publishing grades.');
+                 dispatch(this.publishGradesFailed(message));
                });
       };
     },
