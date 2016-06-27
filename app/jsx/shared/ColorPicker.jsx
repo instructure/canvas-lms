@@ -125,7 +125,7 @@ define([
     },
 
     setInputColor (event) {
-      var value = event.target.value;
+      var value = event.target.value || event.target.placeholder;
       event.preventDefault();
       this.setCurrentColor(value);
     },
