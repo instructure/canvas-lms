@@ -1,4 +1,5 @@
-<%= t :subject, "You created this Announcement: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
+<%= t "You created an announcement in %{course}", :course => asset.context.name %>
+<%= asset.title %>
 
 <%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>
 

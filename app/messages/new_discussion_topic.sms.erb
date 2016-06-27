@@ -1,4 +1,4 @@
-<%= t :body, "New Topic for %{course}:", :course => asset.context.name %>
+<%= t "New Topic for %{course}", :course => asset.context.name %>
 <%= asset.title %>
 
 <%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>
