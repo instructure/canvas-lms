@@ -149,7 +149,12 @@ class Conversation < ActiveRecord::Base
         end
 
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
-          User.where(:id => shard_user_ids).update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc]) unless shard_user_ids.empty?
+          unless shard_user_ids.empty?
+            shard_user_ids.sort!
+            shard_user_ids.each_slice(1000) do |sliced_user_ids|
+              User.where(:id => sliced_user_ids).update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc])
+            end
+          end
 
           next if Shard.current == self.shard
           bulk_insert_participants(shard_user_ids, bulk_insert_options)
