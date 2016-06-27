@@ -29,6 +29,7 @@ define([
       if(this.props.multipleGradingPeriodsEnabled) {
         return (
           <div>
+            <h1>{I18n.t("Grading")}</h1>
             <div className="ui-tabs-minimal">
               <ul>
                 <li><a href="#grading-periods-tab" className="grading_periods_tab"> {I18n.t('Grading Periods')}</a></li>
@@ -49,7 +50,7 @@ define([
       } else {
         return (
           <div ref="gradingStandards">
-            <h1 tabIndex="0">{I18n.t("Grading Schemes")}</h1>
+            <h1>{I18n.t("Grading Schemes")}</h1>
             <GradingStandardCollection />
           </div>
         );
