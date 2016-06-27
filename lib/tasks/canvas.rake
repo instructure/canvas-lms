@@ -105,22 +105,25 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation, :check_syntax, :compile_css, :build_js do |t, args|
-    args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_css => true, :build_js => true)
+  task :compile_assets, :generate_documentation, :check_syntax, :compile_styleguide, :build_js do |t, args|
+    args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_styleguide => true, :build_js => true)
     truthy_values = [true, 'true', '1']
     generate_documentation = truthy_values.include?(args[:generate_documentation])
     check_syntax = truthy_values.include?(args[:check_syntax])
-    compile_css = truthy_values.include?(args[:compile_css])
+    compile_styleguide = truthy_values.include?(args[:compile_styleguide])
     build_js = truthy_values.include?(args[:build_js])
 
-    log_time('Making sure node_modules are up to date') {
-      raise 'error running npm install' unless `npm install`
-    }
+    if ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
+      log_time('Making sure node_modules are up to date') {
+        raise 'error running npm install' unless `npm install`
+      }
+    end
 
-    # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
-    # to exist before we run handlebars stuff, so we have to do this first
-    require 'lib/brandable_css'
-    log_time('compile css (including custom brands)') { BrandableCSS.compile_all! }
+    if ENV["COMPILE_ASSETS_CSS"] != "0"
+      # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
+      # to exist before we run handlebars stuff, so we have to do this first
+      Rake::Task['css:compile'].invoke
+    end
 
     require 'parallel'
     processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
@@ -128,7 +131,7 @@ namespace :canvas do
 
     tasks = Hash.new
 
-    if compile_css
+    if compile_styleguide
       tasks["css:styleguide"] = -> {
         Rake::Task['css:styleguide'].invoke
       }
