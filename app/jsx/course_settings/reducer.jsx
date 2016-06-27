@@ -20,6 +20,13 @@ define([
       state.showModal = false;
       state.hiddenInputName = "course[image_id]"
       return state;
+    },
+    SET_COURSE_IMAGE_URL (state, action) {
+      state.imageUrl = action.payload.imageUrl;
+      state.courseImage = action.payload.imageUrl;
+      state.showModal = false;
+      state.hiddenInputName = "course[image_url]";
+      return state;
     }
   };
 

@@ -2,8 +2,9 @@ define([
   'react',
   'i18n!course_images',
   'underscore',
-  './UploadArea'
-], (React, I18n, _, UploadArea) => {
+  './UploadArea',
+  '../../shared/FlickrSearch'
+], (React, I18n, _, UploadArea, FlickrSearch) => {
 
   class CourseImagePicker extends React.Component {
     constructor (props) {
@@ -84,6 +85,7 @@ define([
             <UploadArea 
               courseId={this.props.courseId}
               handleFileUpload={this.props.handleFileUpload}/>
+            <FlickrSearch selectImage={this.props.handleFlickrUrlUpload} />
           </div>
         </div>
       );

@@ -79,6 +79,7 @@ define([
               courseId={this.props.courseId}
               handleClose={this.handleModalClose}
               handleFileUpload={(e, courseId) => this.props.store.dispatch(Actions.uploadFile(e, courseId))}
+              handleFlickrUrlUpload={(flickrUrl) => this.props.store.dispatch(Actions.setCourseImageUrl(flickrUrl))}
             />
           </Modal>
         </div>

@@ -60,6 +60,15 @@ define ([
       };
     },
 
+    setCourseImageUrl (imageUrl) {
+      return {
+        type: 'SET_COURSE_IMAGE_URL',
+        payload: {
+          imageUrl
+        }
+      };
+    },
+
     prepareSetImage (imageUrl, imageId, ajaxLib = axios) {
       if (imageUrl) {
         return this.setCourseImageId(imageUrl, imageId);
@@ -76,6 +85,12 @@ define ([
                    this.errorUploadingImage();
                  });
         }
+      }
+    },
+
+    uploadFlickrUrl (flickrUrl, ajaxLib = axios) {
+      return (dispatch, getState) => {
+        dispatch(this.setCourseImageUrl(flickrUrl));
       }
     },
 
