@@ -186,11 +186,15 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def group_for(user)
-    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
+    shard.activate do
+      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).take
+    end
   end
 
   def is_member?(user)
-    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
+    shard.activate do
+      groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).exists?
+    end
   end
 
   alias_method :destroy_permanently!, :destroy
