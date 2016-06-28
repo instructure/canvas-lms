@@ -78,7 +78,9 @@ class ExternalToolsController < ApplicationController
       end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
-      @tools = @tools.placements(params[:placement]) if params[:placement]
+      @context.shard.activate do
+        @tools = @tools.placements(params[:placement]) if params[:placement]
+      end
       if Canvas::Plugin.value_to_boolean(params[:selectable])
         @tools = @tools.select{|t| t.selectable }
       end
