@@ -465,5 +465,33 @@ describe "courses" do
       expect(content).to include_text('My Groups')
       expect(content).to include_text('group1')
     end
+
+    it "should reset cached permissions when enrollment is activated by date" do
+      enable_cache do
+        enroll_student(@student, true)
+
+        @course.start_at = 1.day.from_now
+        @course.restrict_enrollments_to_course_dates = true
+        @course.restrict_student_future_view = true
+        @course.save!
+
+        user_session(@student)
+
+        User.where(:id => @student).update_all(:updated_at => 5.minutes.ago) # make sure that touching the user resets the cache
+
+        get "/courses/#{@course.id}"
+
+        # cache unauthorized permission
+        expect(f('#unauthorized_message')).to be_displayed
+
+        # manually trigger a stale enrollment - should recalculate on visit if it didn't already in the background
+        Course.where(:id => @course).update_all(:start_at => 1.day.ago)
+        Enrollment.where(:id => @student.student_enrollments).update_all(:updated_at => 1.second.from_now) # because of enrollment date caching
+        EnrollmentState.where(:enrollment_id => @student.student_enrollments).update_all(:state_is_current => false)
+
+        refresh_page
+        expect(f('#course_home_content')).to be_displayed
+      end
+    end
   end
 end

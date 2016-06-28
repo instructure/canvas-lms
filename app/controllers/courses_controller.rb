@@ -1351,6 +1351,7 @@ class CoursesController < ApplicationController
   def fetch_enrollment
     # Use the enrollment we already fetched, if possible
     enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+    @current_user.reload if @context_enrollment && @context_enrollment.enrollment_state.user_needs_touch # needed to prevent permission caching
 
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&

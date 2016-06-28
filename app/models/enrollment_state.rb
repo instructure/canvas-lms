@@ -1,5 +1,9 @@
 class EnrollmentState < ActiveRecord::Base
+  strong_params
+
   belongs_to :enrollment
+
+  attr_accessor :skip_touch_user, :user_needs_touch
 
   self.primary_key = 'enrollment_id'
 
@@ -65,6 +69,16 @@ class EnrollmentState < ActiveRecord::Base
 
     if self.state_changed? && self.enrollment.view_restrictable?
       self.access_is_current = false
+    end
+
+    if self.state_changed? && self.state == "active"
+      # we could make this happen on every state change, to expire cached authorization right away but
+      # the permissions cache expires within an hour anyway
+      # this will at least prevent cached unauthorization
+      self.user_needs_touch = true
+      unless self.skip_touch_user
+        self.enrollment.user.touch
+      end
     end
 
     # TODO: remove when diagnostic columns are removed
@@ -157,7 +171,15 @@ class EnrollmentState < ActiveRecord::Base
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments, false)
 
     enrollments.each do |enrollment|
+      enrollment.enrollment_state.skip_touch_user = true
       update_enrollment(enrollment)
+    end
+
+    user_ids_to_touch = enrollments.select{|e| e.enrollment_state.user_needs_touch}.map(&:user_id)
+    if user_ids_to_touch.any?
+      Shard.partition_by_shard(user_ids_to_touch) do |sliced_user_ids|
+        User.where(:id => sliced_user_ids).touch_all
+      end
     end
   end
 
