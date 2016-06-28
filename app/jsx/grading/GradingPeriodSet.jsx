@@ -386,7 +386,6 @@ define([
                         aria-label="Toggle grading period visibility">
                   <i className={"icon-mini-arrow-" + arrow}/>
                 </button>
-                <span className="screenreader-only">{I18n.t("Grading period title")}</span>
                 <h2 ref="title" tabIndex="0" className="GradingPeriodSet__title">
                   {this.props.set.title}
                 </h2>
