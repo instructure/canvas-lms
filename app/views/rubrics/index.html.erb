@@ -2,7 +2,10 @@
 <% add_crumb t('#crumbs.rubrics', "Rubrics") %>
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="Button add_rubric_link"><i class="icon-plus"></i> <%= t('buttons.add_rubric', 'Rubric') %></a>
+    <a href="<%= context_url(@context, :context_rubrics_url) %>" class="Button icon-plus add_rubric_link">
+      <span aria-hidden="true"><%= t('buttons.add_rubric', 'Rubric') %></span>
+      <span class="screenreader-only"><%= t('Add Rubric') %></span>
+    </a>
   </div>
 <% end %>
 
