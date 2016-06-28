@@ -17,15 +17,19 @@ define [
 
       if aDate < bDate
         1
-      else if aDate is bDate
-        0
-      else
+      else if aDate > bDate
         -1
+      else
+        @idCompare(a, b)
 
     @positionComparator: (a, b) ->
       aPosition = a.get('position')
       bPosition = b.get('position')
-      numberCompare(aPosition, bPosition)
+      c = numberCompare(aPosition, bPosition)
+      if c isnt 0 then c else @idCompare(a, b)
+
+    idCompare: (a, b) ->
+      numberCompare(parseInt(a.get('id')), parseInt(b.get('id')), descending: true)
 
     reorderURL: -> @url()+'/reorder'
 

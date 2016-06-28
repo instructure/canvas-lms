@@ -33,7 +33,6 @@ describe "discussions" do
       end
 
       it "should display 100 discussions", priority: "1", test_id: 272278 do
-        skip_if_chrome('chrome does not read order right')
         #Setup: Creates 100 discussion topics
         1.upto(100) do |n|
           DiscussionTopic.create!(context: course, user: teacher,
