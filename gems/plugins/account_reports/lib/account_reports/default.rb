@@ -34,6 +34,10 @@ module AccountReports
       GradeReports.new(account_report).grade_export
     end
 
+    def self.mgp_grade_export_csv(account_report)
+      GradeReports.new(account_report).mgp_grade_export
+    end
+
     def self.sis_export_csv(account_report)
       SisExporter.new(account_report, {:sis_format => true}).csv
     end
