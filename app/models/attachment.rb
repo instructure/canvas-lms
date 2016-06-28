@@ -1181,13 +1181,17 @@ class Attachment < ActiveRecord::Base
   end
 
   def make_childless(preferred_child = nil)
-    child = preferred_child || children.take
-    return unless child
+    preferred_child = nil if preferred_child && preferred_child.filename.nil?
+    child = preferred_child || children.where.not(filename: nil).take
+    if !child && children.exists?
+      Attachment.where(root_attachment_id: self).update_all(root_attachment_id: child)
+      return
+    end
     raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
-    child.filename ||= filename
+    child.filename ||= filename if filename
     if Attachment.s3_storage?
-      if s3object.exists? && !child.s3object.exists?
+      if filename && s3object.exists? && !child.s3object.exists?
         s3object.copy_to(child.s3object)
       end
     else
