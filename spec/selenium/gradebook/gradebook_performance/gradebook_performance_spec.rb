@@ -223,9 +223,10 @@ describe "gradebook performance" do
 
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
-
       expect(f('#gradebook_grid .assignment-group-grade')).to include_text('100%') # otherwise 108%
-      expect(f('#gradebook_grid .total-grade')).to include_text('100%') # otherwise 108%
+      cell = f('#gradebook_grid .total-grade')
+      hover cell
+      expect(cell).to include_text('100%') # otherwise 108%
     end
   end
 end
