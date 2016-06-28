@@ -327,7 +327,9 @@ module ApplicationHelper
     tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
     tabs.select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
-        Collaboration.any_collaborations_configured?(@context)
+        Collaboration.any_collaborations_configured?(@context) && !@context.feature_enabled?(:new_collaborations)
+      elsif (tab[:id] == @context.class::TAB_COLLABORATIONS_NEW rescue false)
+        @context.feature_enabled?(:new_collaborations)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
         feature_enabled?(:web_conferences)
       else
