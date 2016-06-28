@@ -46,6 +46,10 @@ module CC::Importer::Canvas
       wiki[:front_page] = meta['front_page'] == 'true'
       wiki[:text] = body
       wiki[:url_name] = wiki_name
+      wiki[:assignment] = nil
+      if asg_id = meta['assignment_identifier']
+        wiki[:assignment] = { migration_id: asg_id }
+      end
       wiki
     end
 
