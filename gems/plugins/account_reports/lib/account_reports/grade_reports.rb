@@ -55,6 +55,148 @@ module AccountReports
     # - enrollment status
 
     def grade_export()
+      students = student_grade_scope
+      students = add_term_scope(students, 'c')
+
+      headers = []
+      headers << I18n.t('student name')
+      headers << I18n.t('student id')
+      headers << I18n.t('student sis')
+      headers << I18n.t('course')
+      headers << I18n.t('course id')
+      headers << I18n.t('course sis')
+      headers << I18n.t('section')
+      headers << I18n.t('section id')
+      headers << I18n.t('section sis')
+      headers << I18n.t('term')
+      headers << I18n.t('term id')
+      headers << I18n.t('term sis')
+      headers << I18n.t('current score')
+      headers << I18n.t('final score')
+      headers << I18n.t('enrollment state')
+
+      write_report headers do |csv|
+
+        students.find_each do |student|
+          arr = []
+          arr << student["user_name"]
+          arr << student["user_id"]
+          arr << student["sis_user_id"]
+          arr << student["course_name"]
+          arr << student["course_id"]
+          arr << student["course_sis_id"]
+          arr << student["section_name"]
+          arr << student["course_section_id"]
+          arr << student["section_sis_id"]
+          arr << student["term_name"]
+          arr << student["term_id"]
+          arr << student["term_sis_id"]
+          arr << student["computed_current_score"]
+          arr << student["computed_final_score"]
+          arr << student["enroll_state"]
+          csv << arr
+        end
+      end
+    end
+
+    def mgp_grade_export
+      terms = @account_report.parameters[:enrollment_term_id].blank? ?
+        root_account.enrollment_terms.active :
+        root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
+
+      term_reports = terms.reduce({}) do |reports, term|
+        reports[term.name] = mgp_term_csv(term)
+        reports
+      end
+
+      send_report(term_reports)
+    end
+
+    def mgp_term_csv(term)
+      students = student_grade_scope
+      students = students.where(c: {enrollment_term_id: term})
+
+      gp_set = term.grading_period_group
+      unless gp_set
+        not_found = Tempfile.open(%w[not-found csv])
+        not_found.puts I18n.t("no grading periods configured for this term")
+        not_found.close
+        return not_found
+      end
+      grading_periods = gp_set.grading_periods.active.order(:start_date)
+
+      headers = []
+      headers << I18n.t('student name')
+      headers << I18n.t('student id')
+      headers << I18n.t('student sis')
+      headers << I18n.t('course')
+      headers << I18n.t('course id')
+      headers << I18n.t('course sis')
+      headers << I18n.t('section')
+      headers << I18n.t('section id')
+      headers << I18n.t('section sis')
+      headers << I18n.t('term')
+      headers << I18n.t('term id')
+      headers << I18n.t('term sis')
+      headers << I18n.t('grading period set')
+      headers << I18n.t('grading period set id')
+      grading_periods.each { |gp|
+        headers << I18n.t('%{name} grading period id', name: gp.title)
+        headers << I18n.t('%{name} current score', name: gp.title)
+        headers << I18n.t('%{name} final score', name: gp.title)
+      }
+      headers << I18n.t('current score')
+      headers << I18n.t('final score')
+      headers << I18n.t('enrollment state')
+
+      generate_and_run_report headers do |csv|
+        students.find_in_batches do |student_chunk|
+          # loading students/courses in chunks to avoid unnecessarily
+          # re-loading assignments/etc. in the grade calculator
+          students_by_course = student_chunk.group_by { |x| x.course_id }
+          courses_by_id = Course.find(students_by_course.keys).index_by(&:id)
+          students_by_course.each do |course_id, course_students|
+            grading_period_grades = grading_periods.reduce({}) { |h,gp|
+              h[gp] = GradeCalculator.new(course_students.map(&:user_id), courses_by_id[course_id],
+                                          grading_period: gp).compute_scores
+              h
+            }
+
+            course_students.each do |student|
+              arr = []
+              arr << student["user_name"]
+              arr << student["user_id"]
+              arr << student["sis_user_id"]
+              arr << student["course_name"]
+              arr << student["course_id"]
+              arr << student["course_sis_id"]
+              arr << student["section_name"]
+              arr << student["course_section_id"]
+              arr << student["section_sis_id"]
+              arr << student["term_name"]
+              arr << student["term_id"]
+              arr << student["term_sis_id"]
+              arr << gp_set.title
+              arr << gp_set.id
+              grading_period_grades.each do |gp, grades|
+                arr << gp.id
+                student_grades = grades.shift
+                arr << student_grades[:current][:grade]
+                arr << student_grades[:final][:grade]
+              end
+              arr << student["computed_current_score"]
+              arr << student["computed_final_score"]
+              arr << student["enroll_state"]
+              csv << arr
+            end
+          end
+        end
+      end
+    end
+
+    private
+
+    def student_grade_scope
       students = root_account.pseudonyms.except(:preload).
         select("pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
                 pseudonyms.sis_user_id, c.name AS course_name,
@@ -92,47 +234,6 @@ module AccountReports
       end
 
       students = add_course_sub_account_scope(students, 'c')
-      students = add_term_scope(students, 'c')
-
-      headers = []
-      headers << I18n.t('#account_reports.report_header_student_name', 'student name')
-      headers << I18n.t('#account_reports.report_header_student_id', 'student id')
-      headers << I18n.t('#account_reports.report_header_student_sis', 'student sis')
-      headers << I18n.t('#account_reports.report_header_course', 'course')
-      headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      headers << I18n.t('#account_reports.report_header_course_sis', 'course sis')
-      headers << I18n.t('#account_reports.report_header_section', 'section')
-      headers << I18n.t('#account_reports.report_header_section_id', 'section id')
-      headers << I18n.t('#account_reports.report_header_section_sis', 'section sis')
-      headers << I18n.t('#account_reports.report_header_term', 'term')
-      headers << I18n.t('#account_reports.report_header_term_id', 'term id')
-      headers << I18n.t('#account_reports.report_header_term_sis', 'term sis')
-      headers << I18n.t('#account_reports.report_header_current_score', 'current score')
-      headers << I18n.t('#account_reports.report_header_final_score', 'final score')
-      headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
-
-      write_report headers do |csv|
-
-        students.find_each do |student|
-          arr = []
-          arr << student["user_name"]
-          arr << student["user_id"]
-          arr << student["sis_user_id"]
-          arr << student["course_name"]
-          arr << student["course_id"]
-          arr << student["course_sis_id"]
-          arr << student["section_name"]
-          arr << student["course_section_id"]
-          arr << student["section_sis_id"]
-          arr << student["term_name"]
-          arr << student["term_id"]
-          arr << student["term_sis_id"]
-          arr << student["computed_current_score"]
-          arr << student["computed_final_score"]
-          arr << student["enroll_state"]
-          csv << arr
-        end
-      end
     end
   end
 end
