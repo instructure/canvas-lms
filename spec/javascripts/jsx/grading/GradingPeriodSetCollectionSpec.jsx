@@ -490,6 +490,28 @@ define([
     });
   });
 
+  asyncTest("removeGradingPeriodSet focuses on the set above the one deleted, if one exists", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.sets, this.terms]).then(function() {
+      collection.removeGradingPeriodSet("2");
+      equal(document.activeElement.textContent, "Fall 2015");
+      start();
+    });
+  });
+
+  asyncTest("removeGradingPeriodSet focuses on the '+ Set of Grading Periods' button" +
+  " after deletion if there are no sets above the one that was deleted", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.sets, this.terms]).then(function() {
+      collection.removeGradingPeriodSet("1");
+      const activeElementText = document.activeElement.textContent;
+      ok(activeElementText.includes("Set of Grading Periods"));
+      start();
+    });
+  });
+
   module("GradingPeriodSetCollection - Update Set Periods", {
     setup() {
       const setsSuccess = new Promise(resolve => resolve(exampleSets));
