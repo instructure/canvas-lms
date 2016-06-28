@@ -72,7 +72,7 @@ nb:
   bigeasy_locale: nb_NO
 nn:
   locales:
-    nn: Norsk (Nynorsk)
+    nn: Norsk (Nynorsk) (crowd-sourced)
   bigeasy_locale: nn_NO
   fullcalendar_locale: nb
   crowdsourced: true
