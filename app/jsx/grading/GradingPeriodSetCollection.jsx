@@ -131,7 +131,7 @@ define([
     },
 
     onSetsLoaded(sets) {
-      const sortedSets = _.sortBy(sets, "createdAt").reverse()
+      const sortedSets = _.sortBy(sets, "createdAt").reverse();
       this.setState({ sets: sortedSets });
     },
 
@@ -218,9 +218,21 @@ define([
       this.setState({ editSet: {id: set.id, saving: false} });
     },
 
+    nodeToFocusOnAfterSetDeletion(setID) {
+      const index = this.state.sets.findIndex(set => set.id === setID);
+      if (index < 1) {
+        return this.refs.addSetFormButton;
+      } else {
+        const setRef = getShowGradingPeriodSetRef(this.state.sets[index - 1]);
+        const setToFocus = this.refs[setRef];
+        return setToFocus.refs.title;
+      }
+    },
+
     removeGradingPeriodSet(setID) {
       let newSets = _.reject(this.state.sets, set => set.id === setID);
-      this.setState({ sets: newSets });
+      const nodeToFocus = this.nodeToFocusOnAfterSetDeletion(setID);
+      this.setState({ sets: newSets }, () => nodeToFocus.focus());
     },
 
     updateSetPeriods(setID, gradingPeriods) {
