@@ -151,7 +151,12 @@ body {
 }
 
 .with-left-side {
-  #left-side { display: block; }
+  #left-side {
+    display: block;
+    overflow: visible;
+    /* #main has a z-index: 10 on it. This is needed so that group set names will appear above the main content */
+    z-index: 11;
+  }
   @if $use_new_styles == false {
     min-width: $left_side_width + $min_main_width;
     #footer { margin-left: $left_side_width; }
