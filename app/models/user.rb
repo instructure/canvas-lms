@@ -1685,7 +1685,7 @@ class User < ActiveRecord::Base
             courses_hash = courses.index_by(&:id)
             # prepopulate the reverse association
             enrollments.each { |e| e.course = courses_hash[e.course_id] }
-            Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+            Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
             date_restricted_ids = enrollments.select{ |e| e.completed? || e.inactive? }.map(&:id)
             courses.reject! { |course| date_restricted_ids.include?(Shard.relative_id_for(course.primary_enrollment_id, course.shard, Shard.current)) }
           end
@@ -1754,7 +1754,7 @@ class User < ActiveRecord::Base
       end + temporary_invitations
 
       if opts[:preload_dates]
-        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
       elsif opts[:preload_courses]
         ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
       end
@@ -1995,7 +1995,7 @@ class User < ActiveRecord::Base
   def select_available_assignments(assignments)
     return [] if assignments.empty?
     enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id)).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments.select!{|e| e.participating?}
     assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}
   end

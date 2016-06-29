@@ -2692,7 +2692,7 @@ class Course < ActiveRecord::Base
   def participating_users(user_ids)
     enrollments = self.enrollments.eager_load(:user).
       where(:enrollments => {:workflow_state => 'active'}, :users => {:id => user_ids}).to_a
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments.select { |e| e.active? }.map(&:user).uniq
   end
 

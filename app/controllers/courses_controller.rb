@@ -403,7 +403,7 @@ class CoursesController < ApplicationController
         @past_enrollments = []
         @current_enrollments = []
         @future_enrollments  = []
-        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
         all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
           e = enrollments.sort_by{|e| e.state_with_date_sortable}.first
           if enrollments.count > 1
@@ -2537,7 +2537,7 @@ class CoursesController < ApplicationController
 
     hash = []
 
-    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
