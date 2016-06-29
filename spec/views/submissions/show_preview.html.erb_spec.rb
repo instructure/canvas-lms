@@ -37,6 +37,7 @@ describe "/submissions/show_preview" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com'
     render "submissions/show_preview"
+    expect(response.body).to match(/courses\/#{@course.id}\/external_tools\/retrieve/)
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
