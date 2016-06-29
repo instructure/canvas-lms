@@ -139,6 +139,17 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://www.google.com")
     end
 
+    it 'must accept a basic_lti_launch url when any online submission type is allowed' do
+      course_with_student_logged_in(:active_all => true)
+      @assignment = @course.assignments.create!(:title => 'some assignment', :submission_types => 'online_url')
+      request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+      post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => 'basic_lti_launch', :url => 'http://www.google.com'}
+      expect(response).to be_redirect
+      expect(assigns[:submission]).not_to be_nil
+      expect(assigns[:submission].submission_type).to eq 'basic_lti_launch'
+      expect(assigns[:submission].url).to eq 'http://www.google.com'
+    end
+
     it "should redirect to the assignment when locked in submit-at-deadline situation" do
       enable_cache do
         now = Time.now.utc
