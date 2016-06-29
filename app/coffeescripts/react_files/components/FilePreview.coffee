@@ -32,6 +32,7 @@ define [
       collection: React.PropTypes.object
       params: React.PropTypes.object
       isOpen: React.PropTypes.bool
+      closePreview: React.PropTypes.func
 
     getInitialState: ->
       showInfoPanel: false
@@ -100,6 +101,8 @@ define [
         preview: (opts.id if opts.id)
         search_term: (@props.query.search_term if @props.query.search_term)
         only_preview: (@state.otherItemsString if @state.otherItemsString)
+        sort: (@props.query.sort if @props.query.sort)
+        order: (@props.query.order if @props.query.order)
 
       _.each obj, (v, k) ->
         delete obj[k] if not v or (opts.except?.length and (opts.except is k or k in opts.except))

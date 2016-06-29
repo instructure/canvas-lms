@@ -1,11 +1,12 @@
 define([
   'i18n!react_files',
   'react',
+  'react-dom',
   'compiled/react_files/modules/customPropTypes',
   'compiled/models/Folder',
   'compiled/react_files/modules/filesEnv',
   'jsx/files/UsageRightsDialog'
-], function (I18n, React, customPropTypes, Folder, filesEnv, UsageRightsDialog) {
+], function (I18n, React, ReactDOM, customPropTypes, Folder, filesEnv, UsageRightsDialog) {
 
   var UsageRightsIndicator = React.createClass({
     displayName: 'UsageRightsIndicator',
@@ -28,7 +29,7 @@ define([
         />
       );
       this.props.modalOptions.openModal(contents, () => {
-        this.getDOMNode().focus();
+        React.findDOMNode(this).focus();
       });
     },
 

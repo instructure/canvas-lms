@@ -8,10 +8,9 @@ define([
   'compiled/react_files/components/FilePreview',
   'jsx/files/FilePreviewInfoPanel',
   'compiled/react_files/utils/collectionHandler',
-  'compiled/react_files/modules/FocusStore',
   'compiled/fn/preventDefault',
   'compiled/models/Folder'
-], function (React, page, $, I18n, classnames, ReactModal, FilePreview, FilePreviewInfoPanel, CollectionHandler, FocusStore, preventDefault, Folder) {
+], function (React, page, $, I18n, classnames, ReactModal, FilePreview, FilePreviewInfoPanel, CollectionHandler, preventDefault, Folder) {
 
   const modalOverrides = {
     overlay : {
@@ -46,13 +45,7 @@ define([
   };
 
   FilePreview.closeModal = function () {
-    // TODO Remove this jQuery line once react modal is upgraded. It should clean
-    // itself up after unmounting but it doesn't so using this quick fix for now
-    // until everything is upgraded.
-    $('#application').removeAttr('aria-hidden')
-    // ############## kill me #####################
-    page(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`);
-    FocusStore.setFocusToItem();
+    this.props.closePreview(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`);
   };
 
   FilePreview.getRouteIdentifier = function () {

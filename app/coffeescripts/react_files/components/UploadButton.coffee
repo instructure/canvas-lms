@@ -1,10 +1,11 @@
 define [
   'i18n!upload_button'
   'react'
+  'react-dom'
   'underscore'
   '../modules/customPropTypes'
   '../modules/FileOptionsCollection'
-], (I18n, React, _, customPropTypes, FileOptionsCollection) ->
+], (I18n, React, ReactDOM, _, customPropTypes, FileOptionsCollection) ->
 
   resolvedUserAction = false
 
@@ -20,15 +21,15 @@ define [
       return FileOptionsCollection.getState()
 
     queueUploads: ->
-      @refs.form.getDOMNode().reset()
+      ReactDOM.findDOMNode(@refs.form).reset()
       FileOptionsCollection.queueUploads(@props.contextId, @props.contextType)
 
     handleAddFilesClick: ->
-      this.refs.addFileInput.getDOMNode().click()
+      ReactDOM.findDOMNode(this.refs.addFileInput).click()
 
     handleFilesInputChange: (e) ->
       resolvedUserAction = false
-      files = this.refs.addFileInput.getDOMNode().files
+      files = ReactDOM.findDOMNode(this.refs.addFileInput).files
       FileOptionsCollection.setFolder(@props.currentFolder)
       FileOptionsCollection.setOptionsFromFiles(files)
       @setState(FileOptionsCollection.getState())
@@ -44,7 +45,7 @@ define [
       @setState(FileOptionsCollection.getState())
 
     onClose: ->
-      @refs.form.getDOMNode().reset()
+      ReactDOM.findDOMNode(@refs.form).reset()
       if !resolvedUserAction
         # user dismissed zip or name conflict modal without resolving things
         # reset state to dump previously selected files

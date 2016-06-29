@@ -1,18 +1,19 @@
 define([
   'react',
+  'react-dom',
   'page',
   'qs',
   'compiled/react_files/modules/filesEnv',
   'jsx/files/FilesApp',
   'jsx/files/ShowFolder',
   'jsx/files/SearchResults'
-], function (React, page, qs, filesEnv, FilesApp, ShowFolder, SearchResults) {
+], function (React, ReactDOM, page, qs, filesEnv, FilesApp, ShowFolder, SearchResults) {
 
   /**
    * Route Handlers
    */
   function renderShowFolder (ctx) {
-    React.render(
+    ReactDOM.render(
       <FilesApp
         query={ctx.query}
         params={ctx.params}
@@ -26,7 +27,7 @@ define([
   }
 
   function renderSearchResults (ctx) {
-    React.render(
+    ReactDOM.render(
       <FilesApp
         query={ctx.query}
         params={ctx.params}

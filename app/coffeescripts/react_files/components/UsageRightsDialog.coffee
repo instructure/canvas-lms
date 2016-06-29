@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
+  'react-dom'
   'i18n!usage_rights_modal'
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
@@ -11,7 +12,7 @@ define [
   '../utils/updateModelsUsageRights'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
+], ($, _, React, ReactDOM, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
 
   ManageUsageRightsModal =
     displayName: 'ManageUsageRightsModal'
@@ -36,7 +37,7 @@ define [
 
       # They didn't choose a copyright
       if (values.use_justification == 'choose')
-        $(@refs.usageSelection.refs.usageRightSelection.getDOMNode()).errorBox(I18n.t('You must specify a usage right.'))
+        $(ReactDOM.findDOMNode(@refs.usageSelection.refs.usageRightSelection)).errorBox(I18n.t('You must specify a usage right.'))
         return false
 
       usageRightValue =

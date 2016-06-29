@@ -2,6 +2,7 @@ define([
   'jquery',
   'i18n!react_files',
   'react',
+  'react-dom',
   'page',
   'compiled/react_files/components/Toolbar',
   'compiled/react_files/modules/FocusStore',
@@ -11,17 +12,17 @@ define([
   'classnames',
   'compiled/fn/preventDefault',
   'compiled/models/Folder'
-], function ($, I18n, React, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
+], function ($, I18n, React, ReactDOM, page, Toolbar, FocusStore, openMoveDialog, deleteStuff, UploadButton, classnames, preventDefault, Folder) {
 
   Toolbar.openPreview = function () {
-    FocusStore.setItemToFocus(this.refs.previewLink.getDOMNode());
+    FocusStore.setItemToFocus(ReactDOM.findDOMNode(this.refs.previewLink));
     const queryString  = $.param(this.props.getPreviewQuery());
     page(`${this.props.getPreviewRoute()}?${queryString}`);
   };
 
   Toolbar.onSubmitSearch = function (event) {
     event.preventDefault();
-    const searchTerm = this.refs.searchTerm.getDOMNode().value;
+    const searchTerm = ReactDOM.findDOMNode(this.refs.searchTerm).value;
     page(`/search?search_term=${searchTerm}`);
   };
 
@@ -274,4 +275,3 @@ define([
 
   return React.createClass(Toolbar);
 });
-
