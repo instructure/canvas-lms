@@ -1,10 +1,12 @@
 define [
   'jquery'
   'underscore'
+  'i18n!grading_periods'
+  'jsx/shared/helpers/dateHelper'
   'axios'
   'jsx/gradebook2/CheatDepaginator'
   'jquery.instructure_misc_helpers'
-], ($, _, axios, Depaginate) ->
+], ($, _, I18n, DateHelper, axios, Depaginate) ->
   listUrl = () =>
     ENV.GRADING_PERIOD_SETS_URL
 
@@ -30,11 +32,18 @@ define [
   baseDeserializeSet = (set) ->
     {
       id: set.id.toString()
-      title: set.title
+      title: gradingPeriodSetTitle(set)
       gradingPeriods: deserializePeriods(set.grading_periods)
       permissions: set.permissions
       createdAt: new Date(set.created_at)
     }
+
+  gradingPeriodSetTitle = (set) ->
+    if set.title?.trim()
+      set.title.trim()
+    else
+      createdAt = DateHelper.formatDateForDisplay(new Date(set.created_at))
+      I18n.t("Set created %{createdAt}", { createdAt: createdAt });
 
   deserializeSet = (set) ->
     newSet = baseDeserializeSet(set)
