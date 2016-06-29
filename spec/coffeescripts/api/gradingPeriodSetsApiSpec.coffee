@@ -86,6 +86,23 @@ define [
           start()
     @server.respond()
 
+  asyncTest "uses the creation date as the title if the grading period set does not have a title", ->
+    untitledSets =
+      grading_period_sets: [
+        id: "1"
+        title: null
+        grading_periods: []
+        permissions: { read: true, create: true, update: true, delete: true }
+        created_at: "2015-11-29T12:00:00Z"
+      ]
+
+    @server.respondWith "GET", /grading_period_sets/, [200, { "Content-Type":"application/json", "Link": @fakeHeaders }, JSON.stringify untitledSets]
+    api.list()
+       .then (sets) =>
+          equal sets[0].title, "Set created Nov 29, 2015"
+          start()
+    @server.respond()
+
   # no fail for CheatDepaginator
   # asyncTest "SKIPPED: rejects the promise upon errors", ->
   #   @server.respondWith "GET", /grading_period_sets/, [500, {"Content-Type":"application/json"}, "FAIL"]
