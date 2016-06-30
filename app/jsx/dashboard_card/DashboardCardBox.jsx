@@ -60,6 +60,8 @@ define([
             assetString={card.assetString}
             backgroundColor={this.colorForCard(card.assetString)}
             handleColorChange={this.handleColorChange.bind(this, card.assetString)}
+            image={card.image}
+            imagesEnabled={card.imagesEnabled}
           />
         );
       });
