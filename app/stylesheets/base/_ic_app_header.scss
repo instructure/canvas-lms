@@ -328,22 +328,29 @@
     flex-direction: column;
   }
 
-  .ReactTray__primary-content {
+
+  // Nav menu styles
+
+  .ic-NavMenu__primary-content {
     flex: 1 0 auto;
   }
 
-  .ReactTray__link-list {
+  .ic-NavMenu__secondary-content {
+    margin-top: $ic-sp;
+  }
+
+  .ic-NavMenu__link-list {
     @include reset-list;
     @include fontSize($ic-font-size--small);
-    .ReactTray-list-item {
+    .ic-NavMenu-list-item {
       line-height: 1.3;
       margin-bottom: $ic-sp;
       &:last-of-type { margin-bottom: 0; }
-      &.ReactTray-list-item--feature-item {
+      &.ic-NavMenu-list-item--feature-item {
         border-top: 1px solid $ic-border-light;
         padding-top: $ic-sp;
       }
-      &.ReactTray-list-item--loading-message {
+      &.ic-NavMenu-list-item--loading-message {
         background: url("/images/panda-cycle-loader.gif") no-repeat left center;
         background-size: 100px;
         text-align: center;
@@ -356,7 +363,7 @@
       }
     }
 
-    .ReactTray-list-item__link {
+    .ic-NavMenu-list-item__link {
       display: inline-block;
       i[class*=icon-],
       i[class^=icon-] { margin-right: $ic-sp/3; }
@@ -364,23 +371,23 @@
 
   }
 
-  .ReactTray__header {
+  .ic-NavMenu__header {
     border-bottom: 1px solid $ic-border-light;
     margin-bottom: $ic-sp;
 
-    &:not(.ReactTray__header--is-profile) {
+    &:not(.ic-NavMenu__header--is-profile) {
       padding-bottom: $ic-sp;
       display: flex;
       align-items: flex-start;
 
-      .ReactTray__headline {
+      .ic-NavMenu__headline {
         flex: 1;
         min-width: 1px;
       }
 
     }
 
-    &.ReactTray__header--is-profile {
+    &.ic-NavMenu__header--is-profile {
       text-align: center;
       padding-bottom: $ic-sp*2;
 
@@ -393,28 +400,56 @@
 
   }
 
-  .ReactTray-profile-header-avatar-image {
+  .ic-NavMenu-profile-header-avatar-image {
     min-width: 72px; min-height: 72px;
   }
 
-  .ReactTray-profile-header-close { text-align: right; }
+  .ic-NavMenu-profile-header-close { text-align: right; }
 
-  .ReactTray-profile-header-logout-form {
+  .ic-NavMenu-profile-header-logout-form {
     margin-top: $ic-sp;
     margin-bottom: 0;
   }
 
-  .ReactTray__headline {
+  .ic-NavMenu__headline {
     @include fontSize(21px);
     box-sizing: border-box;
     margin: 0;
   }
 
-  .ReactTray-list-item__helper-text {
+  .ic-NavMenu-list-item__helper-text {
     color: $ic-hint-text;
     @include fontSize(12px);
     text-transform: uppercase;
     margin-top: $ic-sp/6;
+
+    &.is-help-link {
+      text-transform: none;
+    }
   }
 
+
+  // help dialog/tray styles
+  .ic-HelpDialog__form-legend {
+    display: table;
+    font-size: 1em;
+    line-height: inherit;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .ic-HelpDialog__form-fieldset {
+    border: 0;
+    padding: 0.01em 0 0 0;
+    min-width: 0;
+    margin: 0 0 $spacing-width/2 0;
+  }
+
+  .ic-HelpDialog__form-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

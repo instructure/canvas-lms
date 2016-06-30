@@ -1522,6 +1522,7 @@ select.ic-Input:not(*:root) {
 form.ic-Form-group { margin: 0; }
 
 .ic-Form-control {
+  display: block;
   box-sizing: border-box;
   margin-bottom: $ic-sp*1.5;
   position: relative;
@@ -2001,7 +2002,9 @@ form.ic-Form-group { margin: 0; }
 
 .ic-Form-help-text {
   @include fontSize(12px);
+  display: block;
   margin-top: $ic-sp/2;
   color: $ic-font-color--subdued;
   width: 100%;
+  line-height: 1.5;
 }
