@@ -130,9 +130,9 @@ describe Quizzes::QuizQuestionBuilder do
           expect(questions.count).to eq(1)
           expect(aqs.map(&:id)).to include(questions[0][:assessment_question_id])
 
-          expect(@quiz.quiz_questions.generated.count).to eq(1)
-          expect(aqs.map(&:id)).not_to include(questions[0][:id]),
-            "it links to QuizQuestion objects and not the AssessmentQuestion objects from the bank"
+          quiz_questions = @quiz.quiz_questions.generated.to_a
+          expect(quiz_questions.count).to eq(1)
+          expect(quiz_questions.first.id).to eq questions[0][:id]
         end
 
         context 'when the pick count is higher than the available questions' do
