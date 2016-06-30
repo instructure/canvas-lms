@@ -40,7 +40,7 @@ module SectionTabHelper
       return [] unless context.respond_to?(:tabs_available)
 
       Rails.cache.fetch(cache_key, expires_in: 1.hour) do
-        new_collaborations_enabled = @domain_root_account.feature_enabled?(:new_collaborations)
+        new_collaborations_enabled = context.feature_enabled?(:new_collaborations) if context.respond_to?(:feature_enabled?)
 
         context.tabs_available(current_user, {
           session: session,
