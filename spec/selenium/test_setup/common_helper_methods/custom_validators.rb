@@ -54,7 +54,7 @@ module CustomValidators
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
         message ? !!text.match(message) : messages.present?
-      end
+      end or raise(RSpec::Expectations::ExpectationNotMetError, "expected flash #{type} message#{message ? " " + message.inspect : ""}, none found")
     end
   end
 
@@ -65,7 +65,7 @@ module CustomValidators
         messages = driver.find_elements :css, "#flash_message_holder .ic-flash-#{type}"
         text = messages.map(&:text).join('\n')
         message ? !text.match(message) : messages.empty?
-      end
+      end or raise(RSpec::Expectations::ExpectationNotMetError, "expected no flash #{type} message#{message ? " " + message.inspect : ""}, one was found")
     end
   end
 
