@@ -1195,7 +1195,10 @@ class Attachment < ActiveRecord::Base
         s3object.copy_to(child.s3object)
       end
     else
+      old_content_type = self.content_type
+      Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       child.uploaded_data = open
+      Attachment.where(:id => self).update_all(:content_type => old_content_type)
     end
     child.save!
     Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
