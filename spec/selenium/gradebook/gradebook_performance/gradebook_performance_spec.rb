@@ -187,7 +187,7 @@ describe "gradebook performance" do
     end
 
     it "does not include non-graded group assignment in group total" do
-      skip('Broken and throwing false positives, fix with react gradebook')
+      skip('CNVS-30264 - Broken and throwing false positives, fix with react gradebook')
       driver.manage.window.maximize
       gc = group_category
       graded_assignment = @course.assignments.create!({
