@@ -212,6 +212,7 @@ describe 'Speedgrader' do
       end
 
       it 'in submissions page', priority: "1", test_id: 217612 do
+        driver.manage.window.maximize
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
 
