@@ -83,7 +83,7 @@ describe "assignments" do
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
       expect(f('.ui-state-error')).to be_displayed
-      expect(f('#assignment_show')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_show')
     end
 
     it "should verify lock until date is enforced" do
@@ -92,7 +92,7 @@ describe "assignments" do
       locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
-      expect(f('#content')).to include_text(unlock_time.strftime("%b %-d"))
+      expect(f('#content')).to include_text(format_date_for_view(unlock_time))
       locked_assignment.update_attributes(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
@@ -100,7 +100,6 @@ describe "assignments" do
 
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments"
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
@@ -112,10 +111,9 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'locked assignment',
                                                :due_at => 5.days.ago,
                                                :lock_at => 3.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
       expect(f(".student-assignment-overview")).to be_displayed
     end
 
@@ -124,10 +122,9 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
                                                :unlock_at => 3.days.from_now)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
-      expect(f(".student-assignment-overview")).to be_nil
+      expect(f("#content")).not_to contain_css(".student-assignment-overview")
     end
 
     context "overridden lock_at" do
@@ -194,14 +191,12 @@ describe "assignments" do
         submission_input = f('.submission_attachment input')
         ext_error = f('.bad_ext_msg')
 
-        keep_trying_until do
-          submission_input.send_keys(fullpath_txt)
-          expect(ext_error).not_to be_displayed
-          expect(submit_file_button['disabled']).to be_nil
-          submission_input.send_keys(fullpath_zip)
-          expect(ext_error).to be_displayed
-          expect(submit_file_button).to have_attribute(:disabled, "true")
-        end
+        submission_input.send_keys(fullpath_txt)
+        expect(ext_error).not_to be_displayed
+        expect(submit_file_button['disabled']).to be_nil
+        submission_input.send_keys(fullpath_zip)
+        expect(ext_error).to be_displayed
+        expect(submit_file_button).to be_disabled
       end
     end
 
@@ -295,11 +290,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('.new_assignment')).to be_nil
-      expect(f('#addGroup')).to be_nil
-      expect(f('.add_assignment')).to be_nil
+      expect(f("#content")).not_to contain_css('.new_assignment')
+      expect(f("#content")).not_to contain_css('#addGroup')
+      expect(f("#content")).not_to contain_css('.add_assignment')
       move_to_click("label[for=show_by_type]")
-      expect(f("ag_#{ag.id}_manage_link")).to be_nil
+      expect(f("#content")).not_to contain_css("ag_#{ag.id}_manage_link")
     end
 
     it "should default to grouping by date" do
@@ -337,11 +332,11 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
 
-      expect(f('#assignment_group_overdue')).to be_nil
-      expect(f('#assignment_group_past')).to be_nil
+      expect(f("#content")).not_to contain_css('#assignment_group_overdue')
+      expect(f("#content")).not_to contain_css('#assignment_group_past')
 
       move_to_click("label[for=show_by_type]")
-      expect(f("#assignment_group_#{empty_ag.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#assignment_group_#{empty_ag.id}")
     end
 
     it "should show empty assignment groups if they have a weight" do

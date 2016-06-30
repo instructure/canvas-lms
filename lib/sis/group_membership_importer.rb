@@ -47,18 +47,18 @@ module SIS
         raise ImportError, "No user_id given for a group user" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for a group user" unless status =~ /\A(accepted|deleted)/i
 
-        pseudo = @root_account.pseudonyms.where(sis_user_id: user_id).first
+        pseudo = @root_account.pseudonyms.where(sis_user_id: user_id).take
         user = pseudo.try(:user)
 
         group = @groups_cache[group_id]
-        group ||= @root_account.all_groups.where(sis_source_id: group_id).first
+        group ||= @root_account.all_groups.where(sis_source_id: group_id).take
         @groups_cache[group.sis_source_id] = group if group
 
         raise ImportError, "User #{user_id} didn't exist for group user" unless user
         raise ImportError, "Group #{group_id} didn't exist for group user" unless group
 
         # can't query group.group_memberships, since that excludes deleted memberships
-        group_membership = GroupMembership.where(group_id: group, user_id: user).first
+        group_membership = GroupMembership.where(group_id: group, user_id: user).take
         group_membership ||= group.group_memberships.build(:user => user)
 
         group_membership.sis_batch_id = @batch.id if @batch

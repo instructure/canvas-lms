@@ -38,7 +38,7 @@ define([
         // no equivalent of "onEvent" in tinymce4
         ed.on('keyup keydown click mousedown', function() {
           if(enableBookmarking && ed.selection) {
-            $textarea.data('last_bookmark', ed.selection.getBookmark(1));
+            $editor.data('last_bookmark', ed.selection.getBookmark(1));
           }
         });
 

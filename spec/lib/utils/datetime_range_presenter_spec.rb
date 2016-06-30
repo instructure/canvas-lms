@@ -32,8 +32,9 @@ module Utils
       end
 
       describe "with shortened midnight" do
-        before { Timecop.travel(Time.utc(2014, 10, 1, 9, 30)) }
-        after { Timecop.return }
+        around do |example|
+          Timecop.freeze(Time.zone.local(2014, 10, 1, 9, 30), &example)
+        end
 
         it "omits the time for events when midnight is specified as shortened" do
           datetime = Time.zone.now.midnight

@@ -71,10 +71,8 @@ module DiscussionsCommon
 
     submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))
     wait_for_ajaximations
-    keep_trying_until do
-      id = DiscussionEntry.last.id
-      @last_entry = f "#entry-#{id}"
-    end
+    id = DiscussionEntry.last.id
+    @last_entry = f "#entry-#{id}"
   end
 
   def get_all_replies
@@ -82,9 +80,7 @@ module DiscussionsCommon
   end
 
   def validate_entry_text(discussion_entry, text)
-    keep_trying_until do
-      f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
-    end
+    expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)
@@ -93,8 +89,7 @@ module DiscussionsCommon
     expect(fj("#{li_selector} .al-trigger")).to be_displayed
     fj("#{li_selector} .al-trigger").click
     wait_for_ajaximations
-    menu_item = fj(menu_item_selector)
-    expect(menu_item).to be_nil
+    expect(f("body")).not_to contain_jqcss(menu_item_selector)
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
@@ -158,7 +153,7 @@ module DiscussionsCommon
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    expect(f('#discussion_topic .discussion-title').text).to include_text(title)
+    expect(f('#discussion_topic .discussion-title')).to include_text(title)
   end
 
   def topic_index_element(topic)
@@ -168,8 +163,12 @@ module DiscussionsCommon
   def check_permissions(number_of_checkboxes = 1)
     get url
     wait_for_ajaximations
-    checkboxes = ff('.discussion .al-trigger')
-    expect(checkboxes.length).to eq number_of_checkboxes
+    if number_of_checkboxes > 0
+      checkboxes = ff('.discussion .al-trigger')
+      expect(checkboxes.length).to eq number_of_checkboxes
+    else
+      expect(f("#content")).not_to contain_css(".discussion .al-trigger")
+    end
     expect(ff('.discussion-list li.discussion').length).to eq DiscussionTopic.count
   end
 
@@ -218,14 +217,8 @@ module DiscussionsCommon
   end
 
   def wait_for_subscription_icon_to_load(expected_class)
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until do
-      f(".subscription-toggler").present?
-    end
+    expect(f(".subscription-toggler")).to be
     driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-    wait.until do
-      f(".subscription-toggler").attribute("class").include?(expected_class) &&
-      f(".#{expected_class}").present?
-    end
+    expect(f(".subscription-toggler")).to have_class(expected_class)
   end
 end

@@ -190,11 +190,12 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#generate_post_payload" do
     it "calls generate on the tool launch" do
-      tool_launch = mock('tool launch', generate: {})
+      tool_launch = mock('tool launch')
+      tool_launch.expects(generate: {})
+      tool_launch.stubs(url: "http://example.com/launch")
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
-
-      expect(adapter.generate_post_payload).to eq({})
+      adapter.generate_post_payload
     end
 
     it "raises a not prepared error if the tool launch has not been prepared" do
@@ -206,7 +207,7 @@ describe Lti::LtiOutboundAdapter do
     let(:outcome_service_url) { '/outcome/service' }
     let(:legacy_outcome_service_url) { '/legacy/service' }
     let(:lti_turnitin_outcomes_placement_url) { 'turnitin/outcomes/placement' }
-    let(:tool_launch) { stub('tool launch', generate: {}) }
+    let(:tool_launch) { stub('tool launch', generate: {}, url: "http://example.com/launch") }
 
     before(:each) do
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
@@ -244,7 +245,7 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#generate_post_payload_for_homework_submission" do
     it "creates an lti_assignment" do
-      tool_launch = mock('tool launch', generate: {})
+      tool_launch = mock('tool launch', generate: {}, url: "http://example.com/launch")
       LtiOutbound::ToolLaunch.stubs(:new).returns(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
 

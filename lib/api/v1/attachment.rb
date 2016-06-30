@@ -149,6 +149,11 @@ module Api::V1::Attachment
     elsif context.respond_to?(:folders) && params[:parent_folder_path].is_a?(String)
       @attachment.folder = Folder.assert_path(params[:parent_folder_path], context)
     end
+    if @attachment.folder
+      return unless authorized_action(@attachment.folder, @current_user, :manage_contents)
+    elsif opts[:submission_context] && opts[:submission_context].root_account.feature_enabled?(:submissions_folder)
+      @attachment.folder = context.submissions_folder(opts[:submission_context]) if context.respond_to?(:submissions_folder)
+    end
     duplicate_handling = check_duplicate_handling_option(params)
     if opts[:check_quota]
       get_quota

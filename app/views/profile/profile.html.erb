@@ -90,7 +90,7 @@
       <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
       <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale', "aria-describedby" => "hints_language"} %>
       <%= render :partial => 'shared/locale_warning' %>
-      <span id="hints_language" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
+      <span id="hints_language" class="data_description"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
       </span>
     </td>
   </tr>
@@ -495,7 +495,7 @@ TEXT
   </div>
   <% unless @real_current_user %>
     <div style="margin-top: 10px;">
-      <a href="#" class="btn btn-primary add_access_token_link"><i class="icon-add"></i> <%= t('buttons.new_access_token', "New Access Token") %></a>
+      <a href="#" class="btn btn-primary add_access_token_link"><i class="icon-plus"></i> <%= t('buttons.new_access_token', "New Access Token") %></a>
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">

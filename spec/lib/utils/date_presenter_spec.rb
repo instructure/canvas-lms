@@ -35,12 +35,8 @@ module Utils
 
       describe 'on relative dates' do
         let(:today) { Date.parse("2014-10-1") }
-        before do
-          Timecop.travel(today)
-        end
-
-        after do
-          Timecop.return
+        around do |example|
+          Timecop.freeze(today, &example)
         end
 
         it 'returns Today for today' do

@@ -82,6 +82,16 @@
 #           "example": "grade_change",
 #           "type": "string"
 #         },
+#         "excused_after": {
+#           "description": "Boolean indicating whether the submission was excused after the change.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "excused_before": {
+#           "description": "Boolean indicating whether the submission was excused before the change.",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "grade_after": {
 #           "description": "The grade after the change.",
 #           "example": "8",

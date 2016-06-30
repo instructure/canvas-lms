@@ -24,6 +24,7 @@ describe 'drag and drop reordering' do
   end
 
   it 'should add questions to a group', priority: "1", test_id: 140588 do
+    skip_if_chrome('fragile in chrome')
     resize_screen_to_default
     create_question_group
     drag_question_into_group(@quest1.id, @group.id)

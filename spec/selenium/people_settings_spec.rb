@@ -18,7 +18,7 @@ describe "course people" do
   def add_user(email, type, section_name=nil)
     get "/courses/#{@course.id}/users"
     add_button = f('#addUsers')
-    keep_trying_until { expect(add_button).to be_displayed }
+    expect(add_button).to be_displayed
     add_button.click
     wait_for_ajaximations
 
@@ -55,17 +55,21 @@ describe "course people" do
       get "/courses/#{@course.id}/users"
     end
 
-    def kyle_menu(user, role = nil)
+    def kyle_menu_css(user, role = nil)
       if role
         role_name = if role.respond_to?(:name)
           role.name
         else
           role
         end
-        f("#user_#{user.id}.#{role_name} .admin-links")
+        "#user_#{user.id}.#{role_name} .admin-links"
       else
-        f("#user_#{user.id} .admin-links")
+        "#user_#{user.id} .admin-links"
       end
+    end
+
+    def kyle_menu(user, role = nil)
+      f(kyle_menu_css(user, role))
     end
 
     def open_kyle_menu(user, role = nil)
@@ -193,7 +197,7 @@ describe "course people" do
       expect(link).to include_text("Re-activate User")
       link.click
       wait_for_ajaximations
-      expect(f("#user_#{@student.id} span.label")).to be_nil
+      expect(f("#content")).not_to contain_css("#user_#{@student.id} span.label")
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq 'active'
     end
@@ -232,8 +236,8 @@ describe "course people" do
       go_to_people_page
 
       observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
-      expect(observer_row).to include_text students[0].name
-      expect(observer_row).to include_text students[1].name
+      expect(observer_row).to include students[0].name
+      expect(observer_row).to include students[1].name
       # remove an observer
       use_link_dialog(obs) do
         fj("#link_students input:visible").send_keys(:backspace)
@@ -285,17 +289,17 @@ describe "course people" do
         go_to_people_page
 
         # should NOT see remove link for teacher
-        expect(kyle_menu(@teacher)).to be_nil
+        expect(f("#content")).not_to contain_css(kyle_menu_css(@teacher))
         # should see remove link for student
         cog = open_kyle_menu @student
-        expect(fj('a[data-event="removeFromCourse"]', cog)).not_to be_nil
+        expect(f('a[data-event="removeFromCourse"]', cog)).not_to be_nil
       end
     end
 
     it "should not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_people_page
-      expect(ff(".student_enrollments #user_#{@fake_student.id}")).to be_empty
+      expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
     end
 
     context "multiple enrollments" do

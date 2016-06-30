@@ -19,6 +19,9 @@
           {{/each}}
         </select>
       {{/if}}
+      <label class="screenreader-only">
+        {{#t "search_for_assignment"}}Search for Assignment{{/t}}
+      </label>
       <input
         class="ic-Input"
         id="search_term"
@@ -27,7 +30,6 @@
         value=""
         disabled
         placeholder="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
-        aria-label="{{#t "search_for_assignment"}}Search for Assignment{{/t}}"
       >
     </div>
   </div>

@@ -1,10 +1,28 @@
+#
+# Copyright (C) 2015-2016 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require_relative '../../helpers/gradebook2_common'
 
 describe "gradebook performance" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let(:uneditable_cells) { f('.cannot_edit') }
+  let(:uneditable_cells) { '.cannot_edit' }
   let(:gradebook_headers) { ff('#gradebook_grid .gradebook-header-column') }
   let(:header_titles) { gradebook_headers.map { |header| header.attribute('title') } }
 
@@ -24,7 +42,7 @@ describe "gradebook performance" do
 
     describe 'with a current and past grading period' do
       let!(:create_period_group_and_default_periods) do
-        group = @course.root_account.grading_period_groups.create
+        group = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
         group.grading_periods.create(
           start_date: 4.months.ago,
           end_date:   2.months.ago,
@@ -47,7 +65,6 @@ describe "gradebook performance" do
         user_session(@teacher)
       end
 
-
       context "assignments in past grading periods" do
         let!(:assignment_in_the_past) do
           @course.assignments.create!(
@@ -61,7 +78,7 @@ describe "gradebook performance" do
 
           select_period_in_the_past
           expect(header_titles).to include 'past-due assignment'
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
 
         it "teachers cannot edit" do
@@ -72,7 +89,7 @@ describe "gradebook performance" do
 
           select_period_in_the_past
           expect(header_titles).to include 'past-due assignment'
-          expect(uneditable_cells).to be_present
+          expect(f("#content")).to contain_css(uneditable_cells)
         end
       end
 
@@ -85,7 +102,7 @@ describe "gradebook performance" do
           get "/courses/#{@course.id}/gradebook"
 
           expect(header_titles).to include "No Due Date"
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
 
         it "teachers can edit" do
@@ -94,7 +111,7 @@ describe "gradebook performance" do
           get "/courses/#{@course.id}/gradebook"
 
           expect(header_titles).to include "No Due Date"
-          expect(uneditable_cells).to_not be_present
+          expect(f("#content")).not_to contain_css(uneditable_cells)
         end
       end
     end

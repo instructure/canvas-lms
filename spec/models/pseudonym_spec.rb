@@ -94,6 +94,10 @@ describe Pseudonym do
     expect(Pseudonym.active.by_unique_id('cody@instructure.com').sort).to eq [p1, p3]
   end
 
+  it "should not blow up if by_unique_id is passed a non-string" do
+    expect(Pseudonym.active.by_unique_id(123)).to eq []
+  end
+
   it "should associate to another user" do
     user_model
     pseudonym_model

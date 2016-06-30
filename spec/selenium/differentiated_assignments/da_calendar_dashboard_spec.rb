@@ -27,14 +27,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
-      end
-      it "should show assignments with an override in Recent activity" do
-        skip "recent activity items are not being generated"
-        create_section_override_for_assignment(@da_assignment)
-        get "/"
-        f("#not-right-side .title").click
-        expect(f("#assignment-details")).to include_text("Assignment Created - DA assignment")
       end
     end
 
@@ -43,7 +37,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}"
         #make sure this element isn't visible as there should be nothing to do.
-        expect(f(".to-do-list")).to be nil
+        expect(f("#content")).not_to contain_css(".to-do-list")
       end
       it "should show assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment)
@@ -95,14 +89,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
-      end
-      it "should show assignments with an override in Recent activity" do
-        skip "recent activity is not working currently in these tests"
-        create_section_override_for_assignment(@da_assignment)
-        get "/"
-        f("#not-right-side .title").click
-        expect(f("#assignment-details")).to include_text("Assignment Created - DA assignment")
       end
     end
 
@@ -111,7 +99,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}"
         #make sure this element isn't visible as there should be nothing to do.
-        expect(f(".to-do-list")).to be nil
+        expect(f("#content")).not_to contain_css(".to-do-list")
       end
       it "should show assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment)

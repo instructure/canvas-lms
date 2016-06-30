@@ -22,6 +22,8 @@ define [
         repeated:     I18n.t("errors.repeated", "Can't have the same character more than %{max} times in a row", {max: policy.max_repeats})
         confirmation: I18n.t("errors.mismatch", "Doesn't match")
         too_long:     I18n.t("errors.too_long", "Can't exceed %{max} characters", {max: 255})
+      password_confirmation:
+        confirmation: I18n.t("errors.mismatch", "Doesn't match")
 
     normalizeErrors: (errors, policy) ->
       if errors

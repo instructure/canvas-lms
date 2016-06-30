@@ -102,10 +102,8 @@ describe "manage groups" do
       f("#category_#{group_category.id} .delete_category_link").click
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
-      keep_trying_until do
-        expect(fj("#category_#{group_category.id}")).to be_nil
-        expect(fj("#sidebar_category_#{group_category.id}")).to be_nil
-      end
+      expect(f("#content")).not_to contain_jqcss("#category_#{group_category.id}")
+      expect(f("#content")).not_to contain_jqcss("#sidebar_category_#{group_category.id}")
     end
 
     it "should populate sidebar with new category and groups when adding a category" do
@@ -173,14 +171,14 @@ describe "manage groups" do
 
     it "should not show the Make a New Set of Groups button if there are no students in the course" do
       get "/courses/#{@course.id}/groups"
-      expect(f('.add_category_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_category_link')
       expect(f('#no_students_message')).to be_displayed
     end
     it "should show the Make a New Set of Groups button if there are students in the course" do
       student_in_course
       get "/courses/#{@course.id}/groups"
       expect(f('.add_category_link')).to be_displayed
-      expect(f('#no_students_message')).to be_nil
+      expect(f("#content")).not_to contain_css('#no_students_message')
     end
 
     it "should let you message students not in a group" do
@@ -193,36 +191,33 @@ describe "manage groups" do
       wait_for_ajaximations
 
       expect(ff(".group_category").size).to eq 3
-      keep_trying_until { !f("#category_#{group_category1.id} .right_side .loading_members").displayed? }
+      expect(f("#category_#{group_category1.id} .right_side .loading_members")).not_to be_displayed
       expect(f('.group_category .student_links')).to be_displayed
       expect(f('.group_category .message_students_link')).not_to be_displayed # only self signup can do it
       ff('.ui-tabs-anchor')[1].click
 
-      keep_trying_until { !f("#category_#{group_category2.id} .right_side .loading_members").displayed? }
+      expect(f("#category_#{group_category2.id} .right_side .loading_members")).not_to be_displayed
       message_students_link =  ff('.group_category .message_students_link')[1]
       expect(message_students_link).to be_displayed
       message_students_link.click
 
-      keep_trying_until{ expect(f('.message-students-dialog')).to be_displayed }
+      expect(f('.message-students-dialog')).to be_displayed
     end
 
     context "data validation" do
-      before (:each) do
+      before(:each) do
         student_in_course
         get "/courses/#{@course.id}/groups"
-        @form = keep_trying_until do
-          f('.add_category_link').click
-          @form = f('#add_category_form')
-          expect(@form).to be_displayed
-          @form
-        end
+        f('.add_category_link').click
+        @form = f('#add_category_form')
+        expect(@form).to be_displayed
       end
 
       max_length_name = "jkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskjkljfdklfjsaklfjasfjlsaklfjsafsaffdafdjasklsajfjskfffff"
 
       it "should create a new group category with a 255 character name when creating groups manually" do
         replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
-        submit_form(@form)
+        submit_dialog_form(@form)
         wait_for_ajaximations
         expect(GroupCategory.where(name: max_length_name)).to be_exists
       end
@@ -230,7 +225,7 @@ describe "manage groups" do
       it "should not create a new group category if the generated group names will exceed 255 characters" do
         replace_content(f('#add_category_form input[name="category[name]"]'), max_length_name)
         f('#category_split_groups').click
-        submit_form(@form)
+        submit_dialog_form(@form)
         wait_for_ajaximations
         expect(ff('.error_box').last.text).to eq 'Enter a shorter category name'
         expect(GroupCategory.where(name: max_length_name)).not_to be_exists

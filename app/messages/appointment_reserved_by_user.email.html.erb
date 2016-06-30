@@ -6,11 +6,13 @@
   <%= t('subject', 'User signed up for "%{appointment_name}" (%{course})', :appointment_name => asset.title, :course => asset.appointment_group.contexts_for_user(user).map(&:name).join(", ")) %>
 <% end %>
 
+<% if asset.grants_right?(user, :read) -%>
 <% define_content :footer_link do %>
   <a href="<%= content(:link) %>">
     <%= t :link_text, 'View the appointment' %>
   </a>
 <% end %>
+<% end -%>
 
 <p><%= t :message, '%{user} has signed up for "%{appointment_name}".', :user => data.updating_user.name, :appointment_name => asset.title %></p>
 
@@ -44,7 +46,7 @@
                 asset.appointment_group.contexts.first.name  :
                 asset.appointment_group.contexts_for_user(user).map(&:name).join(", ") %></td>
     </tr>
-    <% if asset.appointment_group.available_slots -%>
+    <% if asset.appointment_group.available_slots && asset.grants_right?(user, :read) -%>
       <tr>
           <td style="padding-right: 10px;" valign="top"><%= t :slots_remaining, 'Available time slots' %>:</td>
           <td valign="top"><%= asset.appointment_group.available_slots %></td>

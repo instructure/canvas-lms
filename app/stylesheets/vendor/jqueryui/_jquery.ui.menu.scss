@@ -85,12 +85,12 @@ $kyle-menu-carat-size: 8px;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
   margin-top: $kyle-menu-carat-size;
-  font-weight: bold;
   @if $use_new_styles {
     text-align: left;
     border: 1px solid $ic-border-light;
     box-shadow: 0px 0px 6px rgba(black, 0.1);
     background-color: $ic-color-light;
+    font-weight: $ic-font-weight;
   }
   @else {
     background-color: $kyle-menu-bg-color;
@@ -99,10 +99,11 @@ $kyle-menu-carat-size: 8px;
     color: #525252;
     border-radius:  $kyle-menu-border-radius + 1;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
+    font-weight: bold;
   }
 
   a {
-    @if $use_new_styles { 
+    @if $use_new_styles {
       color: #333;
       padding: $ic-sp/2 $ic-sp;
       min-width: $ic-sp*12;
@@ -131,7 +132,7 @@ $kyle-menu-carat-size: 8px;
       color: white;
       text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
     }
-    
+
     .ui-icon-radio-on {
       background: url(/images/icon-checkmark-rev.svg) 0 50% no-repeat !important;
       background-size: 14px;

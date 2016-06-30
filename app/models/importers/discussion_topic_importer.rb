@@ -95,7 +95,7 @@ module Importers
       item.last_reply_at   = nil if item.new_record?
 
       if options[:workflow_state].present?
-        item.workflow_state = options[:workflow_state] if (options[:workflow_state] != 'unpublished') || item.new_record?
+        item.workflow_state = options[:workflow_state] if (options[:workflow_state] != 'unpublished') || item.new_record? || item.deleted?
       elsif item.should_not_post_yet
         item.workflow_state = 'post_delayed'
       else
@@ -115,6 +115,7 @@ module Importers
       end
 
       if options[:has_group_category]
+        item.group_category ||= context.group_categories.active.where(:name => options[:group_category]).first
         item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
       end
 

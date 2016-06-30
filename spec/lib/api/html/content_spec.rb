@@ -85,9 +85,15 @@ module Api
 
       describe "#add_css_and_js_overrides" do
 
-        it "does nothing if there is no brand_config" do
+        it "does nothing if :include_mobile is false" do
           string = "<div>stuff</div>"
           html = Content.new(string).add_css_and_js_overrides.to_s
+          expect(html).to eq("<div>stuff</div>")
+        end
+
+        it "does nothing if there is no account" do
+          string = "<div>stuff</div>"
+          html = Content.new(string, nil, include_mobile: true).add_css_and_js_overrides.to_s
           expect(html).to eq("<div>stuff</div>")
         end
 

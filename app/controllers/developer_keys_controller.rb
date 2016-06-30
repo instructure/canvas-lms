@@ -77,11 +77,11 @@ class DeveloperKeysController < ApplicationController
   end
 
   def account_context
-    if params[:account_id]
+    if @key
+      return @key.account || Account.site_admin
+    elsif params[:account_id]
       require_account_context
       return @context if @context == @domain_root_account
-    elsif @key && @key.account
-      return @key.account
     end
 
     # failover to what require_site_admin_with_permission uses

@@ -17,7 +17,5 @@ describe 'profile_pics' do
 
     it_behaves_like 'user settings change pic cancel', :admin
 
-    it_behaves_like 'user settings profile pic gravatar link', :admin
-
   end
 end

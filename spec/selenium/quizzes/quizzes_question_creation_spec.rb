@@ -51,7 +51,7 @@ describe 'quizzes question creation' do
       quiz = @last_quiz
       create_true_false_question
       quiz.reload
-      keep_trying_until { expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed }
+      expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
 
       quiz.reload
       question_data = quiz.quiz_questions[0].question_data
@@ -130,7 +130,6 @@ describe 'quizzes question creation' do
       submit_form(question)
       wait_for_ajax_requests
 
-      close_regrade_tooltip if f('.btn.usher-close')
       move_to_click('label[for=show_question_details]')
       finished_question = f("#question_#{quiz.quiz_questions[0].id}")
       expect(finished_question).to be_displayed
@@ -267,6 +266,7 @@ describe 'quizzes question creation' do
 
     # Formula Question
     it 'creates a basic formula question', priority: "1", test_id: 201945 do
+      skip_if_chrome('CNVS-29843')
       quiz = @last_quiz
 
       question = fj('.question_form:visible')
@@ -278,10 +278,14 @@ describe 'quizzes question creation' do
       # get focus out of tinymce to allow change event to propogate
       f(".question_header").click
       f('button.recompute_variables').click
-      val = f('.variables.value').to_i
+      val = f('.variable .value').text.to_i
       expect(val <= 10 && val >= 0)
-      f('button.recompute_variables').click
-      keep_trying_until { expect(f('.variables.value').to_i != val) }
+      recompute_button = f('button.recompute_variables')
+      var_el = f('.variable .value')
+      keep_trying_until do
+        recompute_button.click
+        var_el.text.to_i != val
+      end
       fj('.supercalc:visible').send_keys('x + y')
       f('button.save_formula_button').click
       # normally it's capped at 200 (to keep the yaml from getting crazy big)...
@@ -291,7 +295,7 @@ describe 'quizzes question creation' do
       button = fj('button.compute_combinations:visible')
       button.click
       expect(fj('.combination_count:visible')).to have_attribute(:value, '10')
-      keep_trying_until { button.text == 'Generate' }
+      expect(button).to include_text 'Generate'
       expect(ffj('table.combinations:visible tr').size).to eq 11 # plus header row
       submit_form(question)
       wait_for_ajax_requests

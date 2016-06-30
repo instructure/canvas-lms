@@ -5,9 +5,8 @@
     class="collapsable collapse-discussion pad-box-mini"
     role="button"
     tabindex="0"
-    title="{{t "Collapse Subdiscussion"}}"
     data-event="toggleCollapsed">
-    <span class="screenreader-only">{{t "Collapse Subdiscussion"}}</span>
+    <span aria-live="assertive" class="screenreader-only">{{t "Collapse Subdiscussion"}}</span>
 </a>
 {{/if}}
   {{#unless hiddenName}}
@@ -56,7 +55,7 @@
           <li><a data-event="remove" href="#"><i class="icon-trash"></i> {{#t "delete"}}Delete{{/t}}</a></li>
         {{/ifAll}}
         {{#if speedgraderUrl}}
-          <li><a href="{{speedgraderUrl}}"><i class="icon-check"></i> {{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>
+          <li><a href="{{speedgraderUrl}}"><i class="icon-speed-grader"></i> {{#t "open_in_speedgrader"}}Open in SpeedGrader{{/t}}</a></li>
         {{/if}}
       </ul>
     </div>
@@ -69,7 +68,7 @@
   <span class="message-notification" data-bind="messageNotification"></span>
   <div data-bind="message" class="message user_content">{{convertApiUserContent message}}</div>
   {{#if editor}}
-    <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a {{editor_href}}>{{editor.display_name}}</a> on {{edited_at}}{{/t}}</div>
+    <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a href="{{editor_href}}">{{editor.display_name}}</a> on {{edited_at}}{{/t}}</div>
   {{/if}}
   {{#if attachments}}
     <div class="comment_attachments">

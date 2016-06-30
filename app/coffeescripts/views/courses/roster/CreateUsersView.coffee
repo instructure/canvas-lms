@@ -38,6 +38,7 @@ define [
 
     attach: ->
       @model.on 'change:step', @render, this
+      @model.on 'change:step', @focusX, this
 
     changeEnrollment: (event) ->
       @model.set 'role_id', event.target.value
@@ -45,14 +46,13 @@ define [
     openAgain: ->
       @startOverFrd()
       super
+      @focusX()
 
     hasUsers: ->
       @model.get('users')?.length
 
     onSaveSuccess: ->
       @model.incrementStep()
-      # maintain focus in scope
-      @$('.createUsersStartOver').focus()
       if @model.get('step') is 3
         role = @rolesCollection.where({id: @model.get('role_id')})[0]
         role?.increment 'count', @model.get('users').length
@@ -84,8 +84,7 @@ define [
 
     afterRender: ->
       @$('[placeholder]').placeholder()
-      $('#user_email_errors').focus()
-      if @model.get('step') == 3
-        @$('button.dialog_closer').focus()
 
+    focusX: ->
+      $('.ui-dialog-titlebar-close', @el.parentElement).focus()
 

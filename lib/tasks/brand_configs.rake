@@ -5,10 +5,10 @@ namespace :brand_configs do
        "Set BRAND_CONFIG_MD5=<whatever> to save just that one, otherwise writes a file for each BrandConfig in db."
   task :write => :environment do
     if md5 = ENV['BRAND_CONFIG_MD5']
-      BrandConfig.find(md5).save_scss_file!
+      BrandConfig.find(md5).save_all_files!
     else
       BrandConfig.clean_unused_from_db!
-      BrandConfig.find_each(&:save_scss_file!)
+      BrandConfig.find_each(&:save_all_files!)
     end
   end
   Switchman::Rake.shardify_task('brand_configs:write')
@@ -23,8 +23,9 @@ namespace :brand_configs do
   # bucket has all static assets including the css for custom themes people
   # have created in the Theme Editor.
   desc "generate all brands and upload everything to s3"
-  task :generate_and_upload_all do
+  task :generate_and_upload_all => :environment do
     Rake::Task['brand_configs:clean'].invoke
+    BrandableCSS.save_default_json!
     Rake::Task['brand_configs:write'].invoke
 
     # This'll pick up on all those written brand_configs and compile their css.

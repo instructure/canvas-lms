@@ -31,7 +31,7 @@ describe "better_file_browsing" do
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
         wait_for_ajaximations
-        expect(fln("example.pdf")).not_to be_present
+        expect(f("#content")).not_to contain_link("example.pdf")
         expect(fln(file_rename_to)).to be_present
       end
       it "should delete file", priority: "1", test_id: 133128 do
@@ -44,20 +44,16 @@ describe "better_file_browsing" do
       it "should unpublish and publish a file", priority: "1", test_id: 133096 do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        expect(driver.find_element(:class => 'unpublished')).to be_displayed
         set_item_permissions(:publish, :cloud_icon)
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(driver.find_element(:class => 'published')).to be_displayed
       end
       it "should make file available to student with link", priority: "1", test_id: 223504 do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
-        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
       it "should make file available to student within given timeframe", priority: "1", test_id: 223505 do
         set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
-        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
     end
 
@@ -69,20 +65,16 @@ describe "better_file_browsing" do
       it "should unpublish and publish a file", priority: "1", test_id: 223503 do
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
-        expect(driver.find_element(:class => 'unpublished')).to be_displayed
         set_item_permissions(:publish, :toolbar_menu)
         expect(f('.btn-link.published-status.published')).to be_displayed
-        expect(driver.find_element(:class => 'published')).to be_displayed
       end
       it "should make file available to student with link from toolbar", priority: "1", test_id: 193158 do
         set_item_permissions(:restricted_access, :available_with_link, :toolbar_menu)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
-        expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
       it "should make file available to student within given timeframe from toolbar", priority: "1", test_id: 193159 do
         set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
-        expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
 
       it "should disable the file preview button when a folder is selected" do
@@ -249,21 +241,6 @@ describe "better_file_browsing" do
     end
   end
 
-  context "File Downloads" do
-    it "should download a file from top toolbar successfully" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_toolbar
-    end
-    it "should download a file from cog" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_cog_icon
-    end
-    it "should download a file from file preview successfully" do
-      skip("Skipped until issue with firefox on OSX is resolved")
-      download_from_preview
-    end
-  end
-
   context "Publish Cloud Dialog" do
     before(:each) do
       course_with_teacher_logged_in
@@ -320,7 +297,7 @@ describe "better_file_browsing" do
     end
 
     def react_modal_hidden
-      expect(f('.ReactModal__Content')).to eq(nil)
+      expect(f("body")).not_to contain_css('.ReactModal__Content')
     end
 
     before :each do
@@ -383,16 +360,14 @@ describe "better_file_browsing" do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
         set_value f('.UsageRightsSelectBox__select'), 'fair_use'
-        expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
+        expect(f('.UsageRightsSelectBox__container')).not_to contain_css('.UsageRightsSelectBox__creativeCommons')
       end
       it "should publish warning when usage rights is not selected", priority: "2", test_id: 133135 do
         expect(f('.icon-warning')).to be_present
         f('.icon-publish').click
         wait_for_ajaximations
         f('.form-controls .btn-primary').click
-        keep_trying_until do
-           expect(f('.errorBox')).to be_present
-        end
+        expect(f('.errorBox')).to be_present
       end
     end
 

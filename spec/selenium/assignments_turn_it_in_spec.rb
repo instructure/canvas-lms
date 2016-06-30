@@ -12,9 +12,7 @@ describe "assignments turn it in" do
   end
 
   def change_turnitin_settings
-    keep_trying_until {
-      expect(f('#assignment_submission_type')).to be_displayed
-    }
+    expect(f('#assignment_submission_type')).to be_displayed
     click_option('#assignment_submission_type', 'Online')
     f('#assignment_text_entry').click
     expect(f('#advanced_turnitin_settings_link')).not_to be_displayed
@@ -33,11 +31,11 @@ describe "assignments turn it in" do
     f('#exclude_small_matches_words_value').click # 0 -> 1
     f('#submit_papers_to').click # 1 -> 0
     f('#exclude_small_matches_words_value').send_keys([:backspace, "5"]) # '0' -> 5
-    submit_form('#assignment_turnitin_settings')
+    submit_dialog_form('#assignment_turnitin_settings')
     wait_for_ajaximations
 
     # dialog is closed and removed from the page
-    expect(f('#assignment_turnitin_settings')).to be_nil
+    expect(f("#content")).not_to contain_css('#assignment_turnitin_settings')
   end
 
   def expected_settings

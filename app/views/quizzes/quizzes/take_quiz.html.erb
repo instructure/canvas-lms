@@ -18,14 +18,16 @@
   <header class="quiz-header">
     <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>
     <% if @submission.preview? %>
-      <% preview_title = @quiz.published? ? t('headers.published_preview',
-            "This is a preview of the published version of the quiz") :
-            t('headers.draft_preview',
-            "This is a preview of the draft version of the quiz") %>
-      <h3>
-        <i class="icon-warning"></i>
-        <%= preview_title %>
-      </h3>
+      <p>
+        <div class="alert">
+          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <% if @quiz.published? %>
+            <%= t 'This is a preview of the published version of the quiz' %>
+          <% else %>
+            <%= t 'This is a preview of the draft version of the quiz' %>
+          <% end %>
+        </div>
+      </p>
     <% end %>
     <%= before_label(:started, "Started") %>
     <%= datetime_string(@submission.started_at) %>
@@ -76,7 +78,7 @@
       <% if @quiz_presenter.one_question_at_a_time? %>
         <% if @quiz_presenter.previous_question_viewable? %>
           <% previous_question_button_title = t('buttons.previous', "Previous") %>
-          <button type="submit" class="btn submit_button btn-secondary previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" disabled>
+          <button type="submit" class="Button submit_button previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" disabled>
             <i class="icon-mini-arrow-left"></i>
             <%= previous_question_button_title %>
           </button>
@@ -86,7 +88,7 @@
           <% next_question_button_title = t('buttons.next', "Next") %>
           <%= hidden_field_tag :last_question_id, @quiz_presenter.current_question[:id] %>
 
-          <button type="submit" class="btn submit_button btn-secondary next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" disabled>
+          <button type="submit" class="Button submit_button  next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" disabled>
             <%= next_question_button_title %>
             <i class="icon-mini-arrow-right"></i>
           </button>

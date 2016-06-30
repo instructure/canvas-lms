@@ -104,13 +104,11 @@ define([
         <CurrentUploads />
         <ColumnHeaders
           ref='columnHeaders'
-          to={folderOrRootFolder}
           query={this.props.query}
-          params={this.props.params}
+          pathname={this.props.pathname}
           toggleAllSelected={this.props.toggleAllSelected}
           areAllItemsSelected={this.props.areAllItemsSelected}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-          splat={this.props.params.splat}
         />
         { this.renderFolderChildOrEmptyContainer() }
         <LoadingIndicator isLoading={foldersNextPageOrFilesNextPage} />

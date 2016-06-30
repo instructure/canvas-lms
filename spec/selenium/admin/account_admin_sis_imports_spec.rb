@@ -117,9 +117,9 @@ describe "sis imports ui" do
     f("#add_sis_stickiness").click
     f("#batch_mode").click
     submit_form('#sis_importer')
-    keep_trying_until { expect(f('.progress_bar_holder .progress_message')).to be_displayed }
+    expect(f('.progress_bar_holder .progress_message')).to be_displayed
     SisBatch.last.process_without_send_later
-    keep_trying_until { f(".sis_messages .sis_error_message").text =~ /No SIS records were imported. The import failed with these messages:/ }
+    expect(f(".sis_messages .sis_error_message")).to include_text "No SIS records were imported. The import failed with these messages:"
     expect(SisBatch.last.batch_mode).to eq true
     expect(SisBatch.last.options).to eq({:override_sis_stickiness => true,
                                      :add_sis_stickiness => true})
@@ -127,9 +127,9 @@ describe "sis imports ui" do
     expect_new_page_load { get "/accounts/#{@account.id}/sis_import" }
     f("#override_sis_stickiness").click
     submit_form('#sis_importer')
-    keep_trying_until { expect(f('.progress_bar_holder .progress_message')).to be_displayed }
+    expect(f('.progress_bar_holder .progress_message')).to be_displayed
     SisBatch.last.process_without_send_later
-    keep_trying_until { f(".sis_messages .sis_error_message").text =~ /No SIS records were imported. The import failed with these messages:/ }
+    expect(f(".sis_messages .sis_error_message")).to include_text "No SIS records were imported. The import failed with these messages:"
     expect(!!SisBatch.last.batch_mode).to be_falsey
     expect(SisBatch.last.options).to eq({:override_sis_stickiness => true})
   end

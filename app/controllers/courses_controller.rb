@@ -371,7 +371,7 @@ class CoursesController < ApplicationController
   #   - "favorites": Optional information to include with each Course.
   #     Indicates if the user has marked the course as a favorite course.
   #   - "teachers": Teacher information to include with each Course.
-  #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
+  #     Returns an array of hashes containing the {api:Users:UserDisplay UserDisplay} information
   #     for each teacher in the course.
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
@@ -645,7 +645,7 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           @course.require_assignment_group rescue nil
           # offer updates the workflow state, saving the record without doing validation callbacks
-          if api_request? and params[:offer].present?
+          if api_request? and value_to_boolean(params[:offer])
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
@@ -1229,6 +1229,7 @@ class CoursesController < ApplicationController
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
         enrollment.accept!
+        @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
 
@@ -1519,6 +1520,7 @@ class CoursesController < ApplicationController
     if @context && @current_user
       @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
       if @context_enrollment
+        @context_membership = @context_enrollment # for AUA
         @context_enrollment.course = @context
         @context_enrollment.user = @current_user
       end
@@ -1586,7 +1588,7 @@ class CoursesController < ApplicationController
         else
           @contexts += @user_groups if @user_groups
         end
-        @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
+        @current_conferences = @context.web_conferences.select{|c| c.active?(false, false) && c.users.include?(@current_user) }
         @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
@@ -1599,7 +1601,7 @@ class CoursesController < ApplicationController
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
-    elsif @context.indexed
+    elsif @context.indexed && @context.available?
       render :description
     else
       # clear notices that would have been displayed as a result of processing
@@ -1974,6 +1976,10 @@ class CoursesController < ApplicationController
   #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument course[storage_quota_mb] [Integer]
+  #   Set the storage quota for the course, in megabytes. The caller must have
+  #   the "Manage storage quotas" account permission.
   #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students

@@ -528,16 +528,29 @@ describe 'Student reports' do
       expect(parsed.length).to eq 2
     end
 
+    it 'does not include a user who has no enrollment activity' do
+      @e1.last_activity_at = nil
+      @e3.last_activity_at = nil
+      @e1.save!
+      @e3.save!
+
+      report = run_report(@type)
+      parsed = parse_report(report, { order: 1 })
+
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
+      expect(parsed.length).to eq 1
+    end
+
     it 'should scope by course if param given' do
       # course1 is e1 and e4
       parameters = {}
       parameters['course'] = @course1.id
       report = run_report(@type, {params: parameters})
-      parsed = parse_report(report)
+      parsed = parse_report(report, {order: 1})
 
       # Bolton will show earlier time if restricted to course 1
-      expect(parsed[0]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
+      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
       expect(parsed.length).to eq 2
     end
 
@@ -550,11 +563,11 @@ describe 'Student reports' do
       parameters = {}
       parameters['enrollment_term'] = @term1.id
       report = run_report(@type, {params: parameters})
-      parsed = parse_report(report)
+      parsed = parse_report(report, {order: 1})
 
       # Bolton will show earlier time if restricted to course 1 (via term restriction)
-      expect(parsed[0]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
-      expect(parsed[1]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
+      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
       expect(parsed.length).to eq 2
     end
 

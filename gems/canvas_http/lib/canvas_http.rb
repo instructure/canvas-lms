@@ -57,16 +57,17 @@ module CanvasHttp
       request = request_class.new(uri.request_uri, other_headers)
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request) do |response|
-        case response
-          when Net::HTTPRedirection
-            last_host = uri.host
-            last_scheme = uri.scheme
-            url_str = response['Location']
-            redirect_limit -= 1
-          else
+        if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
+          last_host = uri.host
+          last_scheme = uri.scheme
+          url_str = response['Location']
+          redirect_limit -= 1
+        else
           if block_given?
             yield response
           else
+            # have to read the body before we exit this block, and
+            # close the connection
             response.body
           end
           return response

@@ -49,6 +49,13 @@ module Selinimum
 
     spec_files
   end
+
+  def self.whitelist
+    @whitelist ||= begin
+      path = `git rev-parse --show-toplevel`.strip + "/.selinimumignore"
+      File.read(path).split(/\r?\n|\r/)
+    end
+  end
 end
 
 require_relative "selinimum/capture"

@@ -6,12 +6,19 @@
   content_for :page_title, join_title(translated_title, @context.name)
 %>
 
-<h1 class='screenreader-only'><%= t('#titles.people', 'People') %></h1>
 
-<% content_for :right_side, render(:partial => 'context/roster_right_side') %>
 
 <% css_bundle :roster %>
 
+
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Primary">
+    <h1 class="screenreader-only"><%= t('#titles.people', 'People') %></h1>
+  </div>
+  <div class="ic-Action-header__Secondary">
+    <%= render :partial => 'context/roster_right_side' %>
+  </div>
+</div>
 <% if @context.is_a?(Course) %>
   <% js_bundle :roster %>
   <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>

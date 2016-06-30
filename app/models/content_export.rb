@@ -232,7 +232,10 @@ class ContentExport < ActiveRecord::Base
     return true if is_set?(selected_content[:everything])
 
     # because Announcement.table_name == 'discussion_topics'
-    return true if obj.is_a?(Announcement) && asset_type.nil? && export_object?(obj, 'announcements')
+    if obj.is_a?(Announcement)
+      return true if selected_content['discussion_topics'] && is_set?(selected_content['discussion_topics'][select_content_key(obj)])
+      asset_type ||= 'announcements'
+    end
 
     asset_type ||= obj.class.table_name
     return true if is_set?(selected_content["all_#{asset_type}"])

@@ -28,7 +28,9 @@ class Auditors::GradeChange
                :context_id,
                :context_type,
                :grader_id,
-               :graded_anonymously
+               :graded_anonymously,
+               :excused_after,
+               :excused_before
 
     def self.generate(submission, event_type=nil)
       new(
@@ -68,6 +70,8 @@ class Auditors::GradeChange
       attributes['context_id'] = Shard.global_id_for(context)
       attributes['context_type'] = assignment.context_type
       attributes['account_id'] = Shard.global_id_for(context.account)
+      attributes['excused_after'] = @submission.excused?
+      attributes['excused_before'] = previous_version.present? && previous_version.model.excused?
     end
 
     def root_account

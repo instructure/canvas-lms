@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'saml2'
+
 class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.sti_name
     'saml'.freeze
@@ -41,14 +43,20 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
       :login_attribute,
       :idp_entity_id,
       :parent_registration,
-      :jit_provisioning ].freeze
+      :jit_provisioning,
+      :metadata,
+      :metadata_uri
+    ].freeze
   end
 
   def self.deprecated_params
     [:change_password_url, :login_handle_name, :unknown_user_url].freeze
   end
 
+  SENSITIVE_PARAMS = [:metadata].freeze
+
   before_validation :set_saml_defaults
+  before_validation :download_metadata
   validates_presence_of :entity_id
 
   def auth_provider_filter
@@ -62,6 +70,40 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?
+  end
+
+  def download_metadata
+    return unless metadata_uri.present?
+    return unless metadata_uri_changed? || idp_entity_id_changed?
+    # someone's trying to cheat; switch to our more efficient implementation
+    self.metadata_uri = InCommon::URN if metadata_uri == InCommon.endpoint
+
+    if metadata_uri == InCommon::URN
+      unless idp_entity_id.present?
+        errors.add(:idp_entity_id, :present)
+        return
+      end
+
+      begin
+        entity = InCommon.metadata[idp_entity_id]
+        unless entity
+          errors.add(:idp_entity_id, t("Entity %{entity_id} not found in InCommon Metadata", entity_id: idp_entity_id))
+          return
+        end
+        populate_from_metadata(entity)
+      rescue => e
+        ::Canvas::Errors.capture_exception(:incommon, e)
+        errors.add(:metadata_uri, e.message)
+      end
+      return
+    end
+
+    begin
+      populate_from_metadata_url(metadata_uri)
+    rescue => e
+      ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
+      errors.add(:metadata_uri, e.message)
+    end
   end
 
   def self.login_attributes
@@ -85,6 +127,38 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     super
   end
 
+  def populate_from_metadata(entity)
+    idps = entity.identity_providers
+    raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
+    idp = idps.first
+    self.idp_entity_id = entity.entity_id
+    self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
+    self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Endpoint::Bindings::HTTP_REDIRECT }.try(:location)
+    self.certificate_fingerprint = (idp.signing_keys.first || idp.keys.first).try(:fingerprint)
+    self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
+  end
+
+  def populate_from_metadata_xml(xml)
+    entity = SAML2::Entity.parse(xml)
+    raise "Invalid schema" unless entity.valid_schema?
+    if entity.is_a?(SAML2::Entity::Group) && idp_entity_id.present?
+      entity = entity.find { |e| e.entity_id == idp_entity_id }
+    end
+    raise "Must be a single Entity" unless entity.is_a?(SAML2::Entity)
+    populate_from_metadata(entity)
+  end
+  alias_method :metadata=, :populate_from_metadata_xml
+
+  def populate_from_metadata_url(url)
+    ::Canvas.timeout_protection("saml_metadata_fetch") do
+      CanvasHttp.get(url) do |response|
+        # raise error unless it's a 2xx
+        response.value
+        populate_from_metadata_xml(response.body)
+      end
+    end
+  end
+
   def saml_settings(current_host=nil)
     return nil unless self.auth_type == 'saml'
 
@@ -93,7 +167,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
       @saml_settings.idp_sso_target_url = self.log_in_url
       @saml_settings.idp_slo_target_url = self.log_out_url
-      @saml_settings.idp_cert_fingerprint = self.certificate_fingerprint
+      @saml_settings.idp_cert_fingerprint = (certificate_fingerprint || '').split.presence
       @saml_settings.name_identifier_format = self.identifier_format
       @saml_settings.requested_authn_context = self.requested_authn_context
       @saml_settings.logger = logger
@@ -110,7 +184,6 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
     settings.assertion_consumer_service_url = domains.flat_map do |domain|
       [
-        "#{HostUrl.protocol}://#{domain}/saml_consume",
         "#{HostUrl.protocol}://#{domain}/login/saml"
       ]
     end
@@ -188,7 +261,9 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     saml_request = Onelogin::Saml::LogoutRequest.generate(
       session[:name_qualifier],
+      session[:sp_name_qualifer],
       session[:name_id],
+      session[:name_identifier_format],
       session[:session_index],
       settings
     )

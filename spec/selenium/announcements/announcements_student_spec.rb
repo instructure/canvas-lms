@@ -49,7 +49,7 @@ describe "announcements" do
 
     it "should not show an announcements section if there are no announcements", priority: "1", test_id: 150534 do
       get "/courses/#{@course.id}"
-      expect(f(".announcements active")).to be_nil
+      expect(f("#content")).not_to contain_css(".announcements active")
     end
 
     it "should not show JSON when loading more announcements via pageless", priority: "2", test_id: 220375 do
@@ -57,8 +57,8 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       start = ff(".discussionTopicIndexList .discussion-topic").length
-      driver.execute_script('window.scrollTo(0, 100000)')
-      keep_trying_until { ffj(".discussionTopicIndexList .discussion-topic").length > start }
+      scroll_page_to_bottom
+      expect(ff(".discussionTopicIndexList .discussion-topic")).not_to have_size(start)
 
       expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
     end
@@ -81,8 +81,8 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
       wait_for_ajaximations
 
-      expect(f('.discussion_actions a.al-trigger')).to be_nil
-      expect(f('.discussion_actions ul.al-options')).to be_nil
+      expect(f("#content")).not_to contain_css('.discussion_actions a.al-trigger')
+      expect(f("#content")).not_to contain_css('.discussion_actions ul.al-options')
     end
 
     it "should allow a group member to create an announcement", priority: "1", test_id: 220378 do
@@ -103,7 +103,7 @@ describe "announcements" do
       expect(f(".discussion-title")).to include_text('delete me')
       @announcement.destroy
       get "/courses/#{@course.id}/announcements/"
-      expect(f(".discussion-title")).to be_nil
+      expect(f("#content")).not_to contain_css(".discussion-title")
     end
 
     it "should remove notifications from unenrolled courses", priority: "1", test_id: 220380 do
@@ -111,10 +111,11 @@ describe "announcements" do
         @student.enrollments.first.update_attribute(:workflow_state, 'active')
         @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         expect(ff('.title .count')[0].text).to eq '1'
         @student.enrollments.first.update_attribute(:workflow_state, 'deleted')
         get "/"
-        expect(ff('.title .count')).to eq([])
+        expect(f("#content")).not_to contain_css('.title .count')
       end
     end
 
@@ -146,7 +147,7 @@ describe "announcements" do
       submit_form('.discussion-reply-form')
       wait_for_ajaximations
 
-      expect(f('.discussion-rate-action')).to be_nil
+      expect(f("#content")).not_to contain_css('.discussion-rate-action')
     end
   end
 end

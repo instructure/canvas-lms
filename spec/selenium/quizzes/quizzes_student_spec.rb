@@ -71,12 +71,12 @@ describe 'quizzes' do
           it 'can\'t see the resume quiz button if quiz is locked', priority: "1", test_id: 209410 do
             update_quiz_lock(5.minutes.ago, nil)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#not_right_side .take_quiz_button')).not_to be_present
+            expect(f('#not_right_side')).not_to contain_css('.take_quiz_button')
           end
 
           it 'can\'t see the publish button', priority: "1", test_id: 209411 do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#quiz-publish-link')).not_to be_present
+            expect(f('#content')).not_to contain_css('#quiz-publish-link')
           end
 
           it 'can\'t see unpublished warning', priority: "1", test_id: 209412 do
@@ -87,7 +87,7 @@ describe 'quizzes' do
 
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-            expect(f('.unpublished_warning')).not_to be_present
+            expect(f('#content')).not_to contain_css('.unpublished_warning')
           end
         end
       end
@@ -107,25 +107,18 @@ describe 'quizzes' do
           expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
           # now kill our session (like logging out)
           destroy_session
+          sleep 1 # updateSubmission throttles itself at 1 sec (quite
+                  # unintelligently, cuz it ignores calls in that second,
+                  # so you'd have to wait 15-30 sec for the periodic
+                  # update to hit)
 
-          index = 1
-          keep_trying_until do
-            # and try answering another question
-            ff('.answers .answer_input input')[index].click
-            wait_for_ajaximations
+          # and try answering another question
+          ff('.answers .answer_input input')[1].click
 
-            # we should get notified that we are logged out
-            expect(fj('#deauthorized_dialog:visible')).to be_present
-            index = (index + 1) % 2
-          end
+          # we should get notified that we are logged out
+          expect(fj('#deauthorized_dialog:visible')).to be_present
 
           expect_new_page_load { submit_dialog('#deauthorized_dialog') }
-
-          # log back in
-          login_as(@pseudonym.unique_id, @pseudonym.password)
-
-          # we should be back at the quiz show page
-          expect(fln('Resume Quiz')).to be_present
         end
       end
     end
@@ -159,35 +152,7 @@ describe 'quizzes' do
   end
 
   context 'when a student closes the session without submitting' do
-
-    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415 do
-      skip('disabled because of regression')
-
-      job_tag = 'Quizzes::QuizSubmission#grade_if_untaken'
-
-      prepare_quiz
-
-      expect(Delayed::Job.find_by_tag(job_tag)).to eq nil
-
-      take_and_answer_quiz(submit: false)
-
-      driver.execute_script('window.close()')
-
-      quiz_sub = @quiz.quiz_submissions.where(user_id: @user).first
-      expect(quiz_sub).to be_present
-      expect(quiz_sub.workflow_state).to eq 'untaken'
-
-      job = Delayed::Job.find_by_tag(job_tag)
-      expect(job).to be_present
-
-      # okay, we will manually "run" the job because we can't afford to wait
-      # for it to be picked up by DJ in a spec:
-      auto_grader = YAML.parse(job.handler).transform
-      auto_grader.perform
-
-      quiz_sub.reload
-      expect(quiz_sub.workflow_state).to eq 'complete'
-    end
+    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415
   end
 
   context 'when the \'show correct answers\' setting is on' do
@@ -226,14 +191,14 @@ describe 'quizzes' do
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
 
       take_and_answer_quiz
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
 
       # shouldn't show to an observer either
       user_session(@observer)
       sub = @quiz.quiz_submissions.where(:user_id => @student).first
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{sub.id}"
 
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
 
       # attempt two
       user_session(@student)
@@ -253,7 +218,7 @@ describe 'quizzes' do
     it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
       take_and_answer_quiz
 
-      expect(ff('.correct_answer').length).to eq 0
+      expect(f("#content")).not_to contain_css('.correct_answer')
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209480 do

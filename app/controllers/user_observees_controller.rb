@@ -162,7 +162,7 @@ class UserObserveesController < ApplicationController
   def destroy
     raise ActiveRecord::RecordNotFound unless has_observee?(observee)
 
-    remove_observee(observee)
+    user.user_observees.active.where(user_id: observee).destroy_all
     render json: user_json(observee, @current_user, session)
   end
 
@@ -178,23 +178,11 @@ class UserObserveesController < ApplicationController
 
   def add_observee(observee)
     @current_user.shard.activate do
-      UserObserver.unique_constraint_retry do
-        unless has_observee?(observee)
-          user.user_observees.create_or_restore(user_id: observee)
-          user.touch
-        end
+      unless has_observee?(observee)
+        user.user_observees.create_or_restore(user_id: observee)
+        user.touch
       end
     end
-  end
-
-  def remove_observee(observee)
-    user.observer_enrollments.shard(user).where(:associated_user_id => observee).each do |enrollment|
-      enrollment.workflow_state = 'deleted'
-      enrollment.save
-    end
-    user.user_observees.active.where(user_id: observee).destroy_all
-    user.update_account_associations
-    user.touch
   end
 
   def has_observee?(observee)
@@ -220,12 +208,12 @@ class UserObserveesController < ApplicationController
     shards = users.map(&:associated_shards).reduce(:&)
     Shard.with_each_shard(shards) do
       user_ids = users.map(&:id)
-      Account.where(id: UserAccountAssociation
-        .joins(:account).where(accounts: {parent_account_id: nil})
-        .where(user_id: user_ids)
-        .group(:account_id)
-        .having("count(*) = #{user_ids.length}") # user => account is unique for user_account_associations
-        .select(:account_id)
+      Account.where(id: UserAccountAssociation.
+        joins(:account).where(accounts: {parent_account_id: nil}).
+        where(user_id: user_ids).
+        group(:account_id).
+        having("count(*) = #{user_ids.length}"). # user => account is unique for user_account_associations
+        select(:account_id)
       )
     end
   end

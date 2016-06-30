@@ -4,6 +4,16 @@ is available at that URL.
 TEXT
 %></p>
 <% css_bundle :saml_fields %>
+<p><%= t(<<-TEXT)
+Provide a URI to your IdP's metadata to automatically populate the other
+fields. If your school is part of InCommon, specify urn:mace:incommon for
+the metadata URI, and also provide your school's entity ID.
+TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :metadata_uri, t('IdP Metadata URI'), class: 'ic-Label' %>
+  <%= f.text_field :metadata_uri, class: 'ic-Input' %>
+</div>
 <div class="ic-Form-control">
   <%= f.label :idp_entity_id, t('IdP Entity ID'), class: 'ic-Label' %>
   <%= f.text_field :idp_entity_id, class: 'ic-Input' %>

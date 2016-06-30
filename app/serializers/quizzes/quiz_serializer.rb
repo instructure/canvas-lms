@@ -187,13 +187,13 @@ module Quizzes
         when :unpublishable, :can_unpublish
           include_unpublishable?
         when :section_count,
-             :access_code,
              :speed_grader_url,
              :message_students_url,
              :submitted_students,
              :only_visible_to_overrides
           user_may_grade?
-        when :unsubmitted_students
+        when :unsubmitted_students,
+             :access_code
           user_may_grade? || user_may_manage?
         when :quiz_extensions_url, :moderate_url, :deleted
           accepts_jsonapi? && user_may_manage?

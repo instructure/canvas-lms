@@ -489,6 +489,7 @@ class ContentMigrationsController < ApplicationController
           @content_migration.workflow_state = 'pre_process_error'
         end
         @content_migration.save!
+        @content_migration.reset_job_progress
       elsif !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
         @content_migration.queue_migration(@plugin)
       end

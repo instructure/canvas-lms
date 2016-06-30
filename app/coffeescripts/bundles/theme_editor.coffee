@@ -1,10 +1,9 @@
 require [
   'react'
-  'jsx/theme_editor/ThemeEditor',
-  'underscore'
-], (React, ThemeEditor, _) ->
+  'jsx/theme_editor/ThemeEditor'
+], (React, ThemeEditor) ->
 
-  # framebust out so we don't ever get themeditor inside theme editor
+  # framebust out so we don't ever get theme editor inside theme editor
   if window.top.location isnt self.location
     window.top.location = self.location.href
 
@@ -14,5 +13,6 @@ require [
     variableSchema: window.ENV.variableSchema
     sharedBrandConfigs: window.ENV.sharedBrandConfigs
     allowGlobalIncludes: window.ENV.allowGlobalIncludes
-    accountID: window.ENV.account_id
+    accountID: window.ENV.account_id,
+    useHighContrast: window.ENV.use_high_contrast
   }), document.body)

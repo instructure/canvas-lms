@@ -23,7 +23,7 @@ describe 'quizzes question creation edge cases' do
     refresh_page # make sure the quizzes load up from the database
     click_questions_tab
     3.times do |i|
-      keep_trying_until(10) {expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy}
+      expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy
     end
     questions = ff('.display_question')
     expect(questions[0]).to have_class('multiple_choice_question')
@@ -59,7 +59,6 @@ describe 'quizzes question creation edge cases' do
     submit_form(question)
     wait_for_ajax_requests
 
-    close_regrade_tooltip if f('.btn.usher-close')
     # check to see if the questions displays correctly
     move_to_click('label[for=show_question_details]')
     quiz.reload
@@ -122,10 +121,7 @@ describe 'quizzes question creation edge cases' do
       web_element.send_keys(:tab)
     end
 
-    keep_trying_until do
-      short_answer_field.call
-      alert_present?
-    end
+    short_answer_field.call
     alert = driver.switch_to.alert
     yield (driver.switch_to.alert)
     accept_alert

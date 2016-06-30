@@ -79,7 +79,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__body {
   background: $ic-brand-Login-Content-inner-body-bgd;
   border: 2px solid $ic-brand-Login-Content-inner-body-border;
-  padding: $ic-sp*2 $ic-sp*2 $ic-sp $ic-sp*2;
+  padding: $ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5;
   margin-top: $ic-sp;
 }
 // these have !important because Canvas specificity on labels and
@@ -101,20 +101,35 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 //////////
 // Login Header
 //////////
-.ic-Login__header {
-  padding: 0 $ic-sp*2;
+.ic-Login-header {
+  padding: 0 $ic-sp*1.5;
   display: flex;
-  align-items: center;
   justify-content: center;
-  .ic-Login__header__logo {
-    flex: 1;
-    img { max-width: 190px; }
-  }
-  .ic-Login__headerBrowse {
-    text-align: right;
-    padding-top: $ic-sp/2;
+  align-items: center;
+}
+
+.ic-Login-header__logo {
+  flex: 0 0 160px;
+}
+
+.ic-Login-header__links {
+  flex: 1;
+  text-align: right;
+  @include fontSize(13px);
+  line-height: 1.3;
+  box-sizing: border-box;
+  padding-left: $ic-sp;
+
+  .ic-Login__link {
+    display: block;
+    margin-top: $ic-sp/2;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
   }
 }
+
 .ic-Login__actions {
   display: flex;
   align-items: center;
@@ -191,9 +206,6 @@ body.ic-Login-Body #footer.ic-Login-footer {
       @include fontSize(11px);
       padding: 0 $ic-sp/2;
       white-space: nowrap;
-      @if not $use_high_contrast {
-        text-decoration: none;
-      }
       &:hover {
         background-color: none;
         color: $ic-brand-Login-footer-link-color-hover;
@@ -206,9 +218,6 @@ body.ic-Login-Body #footer.ic-Login-footer {
 // Register Banner
 //////////
 .ic-Login__register-banner {
-  display: block;
-  text-align: right;
-  margin-left: $ic-sp;
 
   .ic-Login__banner-title {
     font-weight: 300;

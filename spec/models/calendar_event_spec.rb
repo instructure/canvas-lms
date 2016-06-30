@@ -452,29 +452,37 @@ describe CalendarEvent do
         @ag2.publish!
         @appointment2 = @ag2.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
 
-        [@teacher, @student1, @student2].each do |user|
+        course_with_observer(active_all: true, course: @course, associated_user_id: @student1.id)
+
+        [@teacher, @student1, @student2, @observer].each do |user|
           channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
           channel.confirm
         end
+
+        @expected_users = [@teacher.id, @student1.id, @student2.id, @observer.id].sort
+      end
+
+      def message_recipients_for(notification_name)
+        Message.where(notification_id: BroadcastPolicy.notification_finder.by_name(notification_name), user_id: @expected_users).pluck(:user_id).sort
       end
 
       it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
         reservation = @appointment2.reserve_for(@group, @student1)
-        expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Reserved For User"), user_id: [@student1, @student2]).pluck(:user_id)).to eq [@student2.id]
+        expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
       it "should notify all participants except the person canceling the reservation" do
         reservation = @appointment2.reserve_for(@group, @student1)
         reservation.updating_user = @student1
         reservation.destroy
-        expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id)).to eq [@student2.id]
+        expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
       it "should notify participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
-        expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort).to eq [@student1.id, @student2.id]
+        expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
       it "should notify all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
@@ -483,27 +491,27 @@ describe CalendarEvent do
         user_evt = CalendarEvent.where(context_type: 'Group').first
         user_evt.updating_user = @teacher
         user_evt.destroy
-        expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort).to eq [@student1.id, @student2.id]
+        expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "should notify admins when a user reserves", priority: "1", test_id: 193144 do
-        reservation = @appointment.reserve_for(@user, @user)
+      it "should notify admins and observers when a user reserves", priority: "1", test_id: 193144 do
+        reservation = @appointment.reserve_for(@student1, @student1)
         expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
-        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
+        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "should notify admins when a user reserves a group appointment" do
+      it "should notify admins and observers when a user reserves a group appointment" do
         reservation = @appointment2.reserve_for(@group, @student1)
         expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
-        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
+        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "should notify admins when a user cancels", priority: "1", test_id: 193147 do
+      it "should notify admins and observers when a user cancels", priority: "1", test_id: 193147 do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy
         expect(reservation.messages_sent).to be_include("Appointment Canceled By User")
-        expect(reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
+        expect(reservation.messages_sent["Appointment Canceled By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
     end
 

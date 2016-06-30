@@ -90,7 +90,7 @@ describe DeveloperKeysController, type: :request do
 
   def create_call
     admin_session
-    post_hash = {:developer_key => {'name' => 'cool tool', :tool_id => 'cool_tool', :icon_url => ''}}
+    post_hash = {:developer_key => {'name' => 'cool tool', :icon_url => ''}}
     # make sure this key is created
     DeveloperKey.default
     json = api_call(:post, "/api/v1/developer_keys.json",
@@ -104,7 +104,7 @@ describe DeveloperKeysController, type: :request do
   def update_call
     admin_session
     key = DeveloperKey.create!
-    post_hash = {:developer_key => {'name' => 'cool tool', :tool_id => 'cool_tool'}}
+    post_hash = {:developer_key => {'name' => 'cool tool'}}
     json = api_call(:put, "/api/v1/developer_keys/#{key.id}.json",
                     {:controller => 'developer_keys', :action => 'update', :format => 'json',
                      :id => key.id.to_s}, post_hash)
@@ -130,7 +130,7 @@ describe DeveloperKeysController, type: :request do
 
   def confirm_valid_key_in_json(json, key)
     json.map! do |hash|
-      hash.keep_if {|k, v| ['id', 'tool_id', 'icon_url', 'name'].include?(k)}
+      hash.keep_if {|k, _| ['id', 'icon_url', 'name'].include?(k)}
     end
 
     expect(json.include?(key_to_hash(key))).to be true
@@ -140,7 +140,6 @@ describe DeveloperKeysController, type: :request do
   def key_to_hash(key)
     {
       'id' => key.global_id,
-      'tool_id' => key.tool_id,
       'icon_url' => key.icon_url,
       'name' => key.name
     }

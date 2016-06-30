@@ -1,0 +1,50 @@
+#license_help_dialog {
+  #licence-help-options {
+    th {
+      vertical-align: top;
+      white-space: nowrap;
+    }
+    .option {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      margin: 0 2px;
+      padding: 4px 2px;
+      border: 2px solid #444;
+      border-radius: 5px;
+      &:hover {
+        background-color: #eee;
+      }
+      &.selected {
+        background-color: #c3decf;
+      }
+    }
+    img {
+      vertical-align: middle;
+    }
+  }
+  .licenses {
+    margin-top: 10px;
+  }
+  .license {
+    float: left;
+    display: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    img {
+      vertical-align: middle;
+    }
+    &.active {
+      display: block;
+    }
+  }
+  .select {
+    float: left;
+    margin-right: 10px;
+  }
+  #option-explanations td {
+    font-size: 0.8em;
+    padding: 5px 5px 0;
+    vertical-align: top;
+  }
+}

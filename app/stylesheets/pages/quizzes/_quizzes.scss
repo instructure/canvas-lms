@@ -229,15 +229,10 @@ li.quiz {
     min-width: 120px;
   }
   .button-container {
-    padding-right: 10%;
-    padding-left: 10%;
+    padding: 0 30px 0 30px;
     .previous-question,
     .next-question {
       position: relative;
-      i {
-        position: absolute;
-        top: 5px;
-      }
     }
     .previous-question {
       i {
@@ -250,10 +245,10 @@ li.quiz {
         right: 5px;
       }
     }
-    .btn-secondary.next-question:after, .btn-secondary.previous-question:before {
+    .next-question:after, .previous-question:before {
       color: #666;
     }
-    .btn-primary.next-question:after, .btn-primary.previous-question:before {
+    .next-question:after, .previous-question:before {
       color: #fff;
     }
   }
@@ -1048,6 +1043,7 @@ form.question_form {
       left: 0;
     }
     .answer_comments {
+      overflow-x: auto;
       margin-left: 30px;
       padding: 10px 5px;
       margin-top: 5px;
@@ -1282,6 +1278,8 @@ ul#quiz_versions {
     overflow-x: scroll;
   }
   #quiz_tabs {
+    margin-top: $ic-sp;
+
     #quiz_tabs_tab_list {
       display: flex;
       align-items: flex-end;
@@ -1440,9 +1438,20 @@ ul#quiz_versions {
     display: none;
   }
   .variables {
+    #equation_var_name {
+      width: 10%;
+    }
     margin-bottom: 10px;
+    table-layout: fixed;
     th {
       font-size: 0.8em;
+    }
+    td {
+      input {
+        width: 120px;
+        min-width: 40px;
+        max-width: 100%;
+      }
     }
   }
   .equation_content > table {
@@ -1456,6 +1465,17 @@ ul#quiz_versions {
     width: 100%;
   }
   .formulas {
+    table-layout: fixed;
+    thead {
+      tr {
+        td:last-child {
+          width: 5%;
+        }
+        #headings\.result{
+          width: 30%;
+        }
+      }
+    }
     .formula_row.last_row {
       font-weight: bold;
     }
@@ -1791,17 +1811,6 @@ ul#quiz_versions {
     border-bottom-color: #fff;
     left: 30px;
     top: -19px;
-  }
-}
-
-// use a solid color instead of a gradient in IE, because IE's gradient
-// filter causes the box to hide overflow (including the box's comment
-// arrow.
-.ie .quiz_comment {
-  background: #f4f5f6;
-  filter: none;
-  &:after {
-    border-bottom-color: #f4f5f6;
   }
 }
 

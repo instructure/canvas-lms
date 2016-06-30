@@ -1,6 +1,3 @@
-@import "base/variables";
-@import "base/environment";
-
 $turnitin_blue: #397af4;
 @if $use_high_contrast { $turnitin_blue: #0d5bed; }
 

@@ -74,7 +74,7 @@ define([
 
     componentDidMount () {
       if (this.state.unread_count_attempts == 0) {
-        if (window.ENV.current_user_id && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
+        if (window.ENV.current_user_id && !ENV.current_user_disabled_inbox && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
           this.pollUnreadCount();
         }
       }
@@ -174,13 +174,37 @@ define([
     renderTrayContent () {
       switch (this.state.type) {
         case 'courses':
-          return <CoursesTray courses={this.state.courses} hasLoaded={this.state.coursesAreLoaded} closeTray={this.closeTray} />;
+          return (
+            <CoursesTray
+              courses={this.state.courses}
+              hasLoaded={this.state.coursesAreLoaded}
+              closeTray={this.closeTray}
+            />
+          );
         case 'groups':
-          return <GroupsTray groups={this.state.groups} hasLoaded={this.state.groupsAreLoaded} closeTray={this.closeTray} />;
+          return (
+            <GroupsTray
+              groups={this.state.groups}
+              hasLoaded={this.state.groupsAreLoaded}
+              closeTray={this.closeTray}
+            />
+          );
         case 'accounts':
-          return <AccountsTray accounts={this.state.accounts} hasLoaded={this.state.accountsAreLoaded} closeTray={this.closeTray} />;
+          return (
+            <AccountsTray
+              accounts={this.state.accounts}
+              hasLoaded={this.state.accountsAreLoaded}
+              closeTray={this.closeTray}
+            />
+          );
         case 'profile':
-          return <ProfileTray userDisplayName={window.ENV.current_user.display_name} userAvatarURL={window.ENV.current_user.avatar_image_url} closeTray={this.closeTray} />;
+          return (
+            <ProfileTray
+              userDisplayName={window.ENV.current_user.display_name}
+              userAvatarURL={window.ENV.current_user.avatar_image_url}
+              closeTray={this.closeTray}
+            />
+          );
         default:
           return null;
       }

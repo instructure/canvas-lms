@@ -519,6 +519,15 @@ describe GradebooksController do
     end
   end
 
+  describe "POST 'submissions_zip_upload'" do
+    it "requires authentication" do
+      course
+      assignment_model
+      post 'submissions_zip_upload', :course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'
+      assert_unauthorized
+    end
+  end
+
   describe "POST 'update_submission'" do
     it "allows adding comments for submission" do
       user_session(@teacher)
@@ -732,6 +741,16 @@ describe GradebooksController do
         @assign.publish
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         expect(response).not_to be_redirect
+      end
+    end
+
+    context 'assignment.external_tool?' do
+      it 'includes the lti_retrieve_url in the js_env' do
+        user_session(@teacher)
+        @assignment = @course.assignments.create!(title: "A Title", submission_types: 'external_tool')
+
+        get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+        expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
       end
     end
   end

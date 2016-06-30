@@ -20,7 +20,7 @@ describe "assignments" do
       wait_for_ajaximations
 
       f('.submit_assignment_link').click
-      expect(ff('#submit_google_doc_form')).to be_empty
+      expect(f("#content")).not_to contain_css('#submit_google_doc_form')
 
       # navigate off the page and dismiss the alert box to avoid problems
       # with other selenium tests
@@ -33,7 +33,7 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations
 
-      expect(f('.submit_assignment_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.submit_assignment_link')
 
       @course.enroll_student(@admin, :enrollment_state => 'active')
 

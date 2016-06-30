@@ -179,17 +179,21 @@ shared_examples_for "an object whose dates are overridable" do
         expect(overridable.overrides_for(@teacher)).to_not be_empty
       end
 
-      it "returns two for override of student in same section and different section" do
+      it "returns single override for students in different sections" do
         override.set_type = "ADHOC"
         @override_student = override.assignment_override_students.build
         @override_student.user = @student_visible
         @override_student.save!
 
         @override_student = override.assignment_override_students.build
+        @override_student.user = student_in_section(@section_visible)
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
         @override_student.user = @student_invisible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher).size).to eq 2
+        expect(overridable.overrides_for(@teacher).size).to eq 1
       end
     end
   end
@@ -239,6 +243,17 @@ shared_examples_for "an object whose dates are overridable" do
         override.delete
         overridable.reload
         expect(overridable.all_dates_visible_to(@teacher).size).to eq 2
+      end
+
+      it "doesn't duplicate adhoc overrides in list" do
+        override.set_type = "ADHOC"
+        2.times { override.assignment_override_students.create(user: student_in_section(course.active_course_sections.first)) }
+        override.title = nil
+        override.save!
+
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        expect(dates_hash.size).to eq 3
+        expect(dates_hash.map{ |d| d[:title] }).to eq [nil, "Summer session", "2 students"]
       end
     end
 

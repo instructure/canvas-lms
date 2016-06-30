@@ -85,17 +85,17 @@ describe "discussions" do
           lock_at = Time.zone.now + 4.days
 
           # set due_at, lock_at, unlock_at
-          ffj(".date_field[data-date-type='due_at']")[0].send_keys(due_at.strftime('%b %-d, %y'))
-          ffj(".date_field[data-date-type='unlock_at']")[0].send_keys(unlock_at.strftime('%b %-d, %y'))
-          ffj(".date_field[data-date-type='lock_at']")[0].send_keys(lock_at.strftime('%b %-d, %y'))
+          f(".date_field[data-date-type='due_at']").send_keys(format_date_for_view(due_at))
+          f(".date_field[data-date-type='unlock_at']").send_keys(format_date_for_view(unlock_at))
+          f(".date_field[data-date-type='lock_at']").send_keys(format_date_for_view(lock_at))
           wait_for_ajaximations
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
 
           a = DiscussionTopic.last.assignment
-          expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date.strftime('%b %-d, %y')
-          expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date.strftime('%b %-d, %y')
-          expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date.strftime('%b %-d, %y')
+          expect(a.due_at.to_date).to eq due_at.to_date
+          expect(a.unlock_at.to_date).to eq unlock_at.to_date
+          expect(a.lock_at.to_date).to eq lock_at.to_date
         end
 
         it "should add an attachment to a graded topic", priority: "1", test_id: 270918 do
@@ -128,7 +128,6 @@ describe "discussions" do
           expect(alert_present?).to be_truthy
 
           driver.switch_to.alert.dismiss
-          expect(fj('#discussion-title input[value=new title]'))
         end
       end
 
@@ -147,9 +146,8 @@ describe "discussions" do
           topic.child_topics[0].reply_from({:user => @student, :text => "I feel pretty"})
           @gc.destroy
           get url
-          wait_for_ajaximations
 
-          expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+          expect(f("#assignment_group_category_id")).to be_disabled
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
         end
 
@@ -171,9 +169,8 @@ describe "discussions" do
             topic.reply_from({:user => @student, :text => "I feel pretty"})
             @gc.destroy
             get url
-            wait_for_ajaximations
 
-            expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+            expect(f("#assignment_group_category_id")).to be_disabled
             expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
           end
         end
@@ -219,7 +216,7 @@ describe "discussions" do
 
           get url
 
-          keep_trying_until { expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed }
+          expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear
@@ -243,17 +240,16 @@ describe "discussions" do
 
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
-          date_format = '%b %-d, %Y'
 
-          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
-          f('input[type=text][name="lock_at"]').send_keys(lock_at.strftime(date_format))
+          f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
+          f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(lock_at))
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
           wait_for_ajaximations
 
           topic.reload
-          expect(topic.delayed_post_at.strftime(date_format)).to eq delayed_post_at.strftime(date_format)
-          expect(topic.lock_at.strftime(date_format)).to eq lock_at.strftime(date_format)
+          expect(topic.delayed_post_at.to_date).to eq delayed_post_at.to_date
+          expect(topic.lock_at.to_date).to eq lock_at.to_date
           expect(topic.locked?).to be_truthy
         end
 
@@ -267,16 +263,15 @@ describe "discussions" do
           get url
 
           delayed_post_at = Time.zone.now - 5.days
-          date_format = '%b %-d, %Y'
 
           f('input[type=text][name="delayed_post_at"]').clear
-          f('input[type=text][name="delayed_post_at"]').send_keys(delayed_post_at.strftime(date_format))
+          f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
           wait_for_ajaximations
 
           topic.reload
-          expect(topic.delayed_post_at.strftime(date_format)).to eq delayed_post_at.strftime(date_format)
+          expect(topic.delayed_post_at.to_date).to eq delayed_post_at.to_date
           expect(topic.active?).to be_truthy
           expect(topic.locked?).to be_falsey
         end

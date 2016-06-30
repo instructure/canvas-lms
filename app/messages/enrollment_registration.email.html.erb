@@ -6,16 +6,20 @@
   <%= t :subject, "Course Invitation" %>
 <% end %>
 
-<a href="<%= content(:link) %>">
-  <%= t :link, "Click here to get started" %>
-</a>
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t(:link, "Click here to view the course page") %>
+  </a>
+<% end %>
 
+<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 <% website = HostUrl.context_host(asset.course) %>
+
 <p>
   <%= t :body, "You've been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}",
       :website => website, :course => asset.course.name, :role_type => asset.readable_role_name %>
 </p>
-<% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
+
 <table border="0" style="font-size: 14px; color: #444444;
     font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';
     border-collapse: collapse;">

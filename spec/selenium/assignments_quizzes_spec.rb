@@ -24,7 +24,7 @@ describe "quizzes assignments" do
       ag = @course.assignment_groups.create!(:name => "Quiz group")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { build_assignment_with_type("Quiz", :assignment_group_id => ag.id, :name => "Testy!", :more_options => true) }
-      expect(fj('input[name="quiz[title]"]').attribute(:value)).to eq "Testy!"
+      expect(f('input[name="quiz[title]"]')).to have_value "Testy!"
     end
   end
 
@@ -42,7 +42,7 @@ describe "quizzes assignments" do
       assign = @course.assignments.create!(:name => "Testy!", :submission_types => "online_quiz")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { edit_assignment(assign.id, :name => "Retest!", :more_options => true)}
-      expect(fj('input[name="quiz[title]"]').attribute(:value)).to eq "Retest!"
+      expect(f('input[name="quiz[title]"]')).to have_value "Retest!"
     end
   end
 end

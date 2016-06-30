@@ -116,13 +116,18 @@ define([
 
   $(document).ready(function() {
     updateStudentGrades();
+    var showAllWhatIfButton = $(this).find('#student-grades-whatif button');
+    var revertButton = $(this).find("#revert-all-to-actual-score");
     $(".revert_all_scores_link").click(function(event) {
       event.preventDefault();
+      // we pass in refocus: false here so the focus won't go to the revert arrows within the grid
       $("#grades_summary .revert_score_link").each(function() {
-        $(this).trigger('click', true);
+        $(this).trigger('click', {skipEval: true, refocus: false});
       });
       $("#.show_guess_grades.exists").show();
       updateStudentGrades();
+      showAllWhatIfButton.focus();
+      $.screenReaderFlashMessageExclusive(I18n.t('Grades are now reverted to original scores'));
     });
 
     // manages toggling and screenreader focus for comments, scoring, and rubric details
@@ -182,7 +187,7 @@ define([
       }
     });
 
-    $('#grades_summary .student_assignment').bind('score_change', function(event, update) {
+    $('#grades_summary .student_assignment').bind('score_change', function(event, options) {
       var $assignment   = $(this),
           originalScore = $assignment.find('.original_score').text(),
           originalVal   = parseFloat(originalScore),
@@ -199,11 +204,11 @@ define([
       }
       $assignment.find('.what_if_score').text(val);
       if ($assignment.hasClass('dont_update')) {
-        update = false;
+        options.update = false;
         $assignment.removeClass('dont_update');
       }
       var assignment_id = $assignment.getTemplateData({ textValues: ['assignment_id'] }).assignment_id;
-      if (update) {
+      if (options.update) {
         var url = $.replaceTags($('.update_submission_url').attr('href'), 'assignment_id', assignment_id);
         if (!isChanged) { val = null; }
         $.ajaxJSON(url, 'PUT', { 'submission[student_entered_score]': val },
@@ -221,7 +226,11 @@ define([
           .find(".score_teaser").text(I18n.t('titles.hypothetical_score', "This is a What-If score")).end()
           .find(".score_holder").append($("#revert_score_template").clone(true).attr('id', '').show())
           .find(".grade").addClass('changed');
-        setTimeout(function() { $assignment.find(".revert_score_link").focus();}, 0)
+        // this is to distinguish between the revert_all_scores_link in the right nav and
+        // the revert arrows within the grade_summary page grid
+        if(options.refocus) {
+          setTimeout(function() { $assignment.find(".revert_score_link").focus();}, 0);
+        }
       } else {
         var tooltip = $assignment.data('muted') ?
           I18n.t('student_mute_notification', 'Instructor is working on grades') :
@@ -245,10 +254,11 @@ define([
 
     $("#grade_entry").blur(function() {
       var $assignment = $(this).parents(".student_assignment");
-      $assignment.triggerHandler('score_change', true);
+      $assignment.triggerHandler('score_change', { update: true, refocus: true });
     });
 
-    $("#grades_summary").delegate('.revert_score_link', 'click', function(event, skipEval) {
+    $("#grades_summary").delegate('.revert_score_link', 'click', function(event, options) {
+      var opts = _.defaults(options || {}, { refocus: true, skipEval: false });
       event.preventDefault();
       event.stopPropagation();
       var $assignment       = $(this).parents(".student_assignment"),
@@ -279,12 +289,16 @@ define([
 
       var assignmentId = $assignment.getTemplateValue('assignment_id');
       updateScoreForAssignment(assignmentId, val);
-      if(!skipEval) {
+      if(!opts.skipEval) {
         updateStudentGrades();
       }
       var $screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
       $assignment.find('.grade').prepend($screenreader_link_clone);
-      setTimeout(function() { $assignment.find(".grade").focus();}, 0);
+     // this is to distinguish between the revert_all_scores_link in the right nav and
+      // the revert arrows within the grade_summary grid
+      if(opts.refocus) {
+        setTimeout(function() { $assignment.find(".grade").focus();}, 0);
+      }
     });
 
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
@@ -302,10 +316,12 @@ define([
           var $assignment = $(this).parents(".student_assignment");
           $assignment.find(".what_if_score").text(val);
           $assignment.find(".score_value").hide();
-          $assignment.triggerHandler('score_change', false);
+          $assignment.triggerHandler('score_change', { update: false, focus: false });
         }
       });
       $(".show_guess_grades").hide();
+      revertButton.focus();
+      $.screenReaderFlashMessageExclusive(I18n.t('Grades are now showing what-if scores'));
     });
 
     $("#grades_summary .student_entered_score").each(function() {

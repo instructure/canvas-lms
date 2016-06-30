@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -69,7 +69,7 @@ module AssignmentGroupsApiSpecHelper
     @group1_assignment_today = @course.assignments.create!(:assignment_group => @group1, :due_at => Time.zone.now)
     @group1_assignment_future = @course.assignments.create!(:assignment_group => @group1, :due_at => 3.months.from_now)
     @group2_assignment_today = @course.assignments.create!(:assignment_group => @group2, :due_at => Time.zone.now)
-    gpg = @course.grading_period_groups.create!
+    gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
     @gp_current = gpg.grading_periods.create!(
       title: 'current',
       weight: 50,

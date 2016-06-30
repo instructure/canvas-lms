@@ -13,13 +13,10 @@ describe 'quizzes question banks' do
 
     it 'should be able to create question bank', priority: "1", test_id: 140667 do
       get "/courses/#{@course.id}/question_banks"
-      question_bank_title = keep_trying_until do
-        f('.add_bank_link').click
-        wait_for_ajaximations
-        question_bank_title = f('#assessment_question_bank_title')
-        expect(question_bank_title).to be_displayed
-        question_bank_title
-      end
+      f('.add_bank_link').click
+      wait_for_ajaximations
+      question_bank_title = f('#assessment_question_bank_title')
+      expect(question_bank_title).to be_displayed
       question_bank_title.send_keys('goober', :return)
       wait_for_ajaximations
       question_bank = AssessmentQuestionBank.where(title: 'goober').first
@@ -50,15 +47,13 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       find_questions_link = f('.find_question_link')
       click_questions_tab
-      keep_trying_until do
-        find_questions_link.click
-        wait_for_ajaximations
-        f('.select_all_link')
-      end.click
+      find_questions_link.click
+      wait_for_ajaximations
+      f('.select_all_link').click
       submit_dialog('#find_question_dialog', '.submit_button')
       wait_for_ajaximations
       click_settings_tab
-      keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '17' }
+      expect(f('#quiz_display_points_possible .points_possible')).to include_text '17'
     end
 
     it 'should allow you to use inherited question banks', priority: "1", test_id: 201931 do
@@ -71,29 +66,27 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
 
-      keep_trying_until do
-        f('.find_question_link').click
-        wait_for_ajaximations
-        expect(f('#find_question_dialog')).to be_displayed
-        expect(f('.select_all_link')).to be_displayed
-      end
+      f('.find_question_link').click
+      wait_for_ajaximations
+      expect(f('#find_question_dialog')).to be_displayed
+      expect(f('.select_all_link')).to be_displayed
       f('.select_all_link').click
       wait_for_ajaximations
       submit_dialog('#find_question_dialog', '.submit_button')
       wait_for_ajaximations
       click_settings_tab
-      keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '1' }
+      expect(f('#quiz_display_points_possible .points_possible')).to include_text '1'
 
       click_questions_tab
       f('.add_question_group_link').click
       wait_for_ajaximations
       f('.find_bank_link').click
-      keep_trying_until { fj('#find_bank_dialog .bank:visible') }.click
+      fj('#find_bank_dialog .bank:visible').click
       submit_dialog('#find_bank_dialog', '.submit_button')
       submit_form('.quiz_group_form')
       wait_for_ajaximations
       click_settings_tab
-      keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '2' }
+      expect(f('#quiz_display_points_possible .points_possible')).to include_text '2'
     end
 
     it 'should allow you to use bookmarked question banks', priority: "1", test_id: 201932 do
@@ -107,31 +100,29 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
 
-      keep_trying_until do
-        f('.find_question_link').click
-        wait_for_ajaximations
-        expect(f('#find_question_dialog')).to be_displayed
-        wait_for_ajaximations
-        expect(f('.select_all_link')).to be_displayed
-      end
+      f('.find_question_link').click
+      wait_for_ajaximations
+      expect(f('#find_question_dialog')).to be_displayed
+      wait_for_ajaximations
+      expect(f('.select_all_link')).to be_displayed
       f('.select_all_link').click
       wait_for_ajaximations
       submit_dialog('#find_question_dialog', '.submit_button')
       wait_for_ajaximations
       click_settings_tab
-      keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '1' }
+      expect(f('#quiz_display_points_possible .points_possible')).to include_text '1'
 
       click_questions_tab
       f('.add_question_group_link').click
       wait_for_ajaximations
       f('.find_bank_link').click
       wait_for_ajaximations
-      keep_trying_until { fj('#find_bank_dialog .bank:visible') }.click
+      fj('#find_bank_dialog .bank:visible').click
       submit_dialog('#find_bank_dialog', '.submit_button')
       submit_form('.quiz_group_form')
       wait_for_ajaximations
       click_settings_tab
-      keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '2' }
+      expect(f('#quiz_display_points_possible .points_possible')).to include_text '2'
     end
 
     it 'should check permissions when retrieving question banks', priority: "1", test_id: 201933 do
@@ -153,13 +144,10 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
 
-      expect(f('.find_question_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.find_question_link')
 
-      keep_trying_until do
-        f('.add_question_group_link').click
-        wait_for_ajaximations
-        expect(f('.find_bank_link')).to be_nil
-      end
+      f('.add_question_group_link').click
+      expect(f("#content")).not_to contain_css('.find_bank_link')
     end
 
     it 'should create a question group from a question bank', priority: "1", test_id: 319907 do
@@ -239,17 +227,14 @@ describe 'quizzes question banks' do
       end
       get "/courses/#{@course.id}/question_banks/#{@bank.id}"
       f('.more_questions_link').click
-      wait_for_ajaximations
-      keep_trying_until do
-        expect(ffj('.display_question:visible').length).to eq 60
-        driver.execute_script("$('.display_question .links a').css('left', '0')")
-        wait_for_ajaximations
-        driver.execute_script('window.confirm = function(msg) { return true; };')
-        wait_for_ajaximations
-        fj('.display_question:visible:last .delete_question_link').click
-        wait_for_ajaximations
-        expect(ffj('.display_question:visible').length).to eq 59
-      end
+
+      expect(ffj('.display_question:visible')).to have_size 60
+      links = fj('.display_question:visible:last .links')
+      hover links
+      f('.delete_question_link', links).click
+      accept_alert
+      expect(ffj('.display_question:visible')).to have_size 59
+
       @bank.reload
       wait_for_ajaximations
       expect(@bank.assessment_questions.select { |aq| !aq.deleted? }.length).to eq 59
@@ -303,9 +288,9 @@ describe 'quizzes question banks' do
 
       expect_new_page_load { view_banks_link.click }
 
-      expect(f('.add_bank_link')).to be_nil
-      expect(f('.edit_bank_link')).to be_nil
-      expect(f('.delete_bank_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_bank_link')
+      expect(f("#content")).not_to contain_css('.edit_bank_link')
+      expect(f("#content")).not_to contain_css('.delete_bank_link')
 
       view_bank_link = f("#question_bank_#{@bank.id} a.title")
       expect(view_bank_link).to be_displayed
@@ -330,9 +315,9 @@ describe 'quizzes question banks' do
 
       expect_new_page_load { view_banks_link.click }
 
-      expect(f('.add_bank_link')).to be_nil
-      expect(f('.edit_bank_link')).to be_nil
-      expect(f('.delete_bank_link')).to be_nil
+      expect(f("#content")).not_to contain_css('.add_bank_link')
+      expect(f("#content")).not_to contain_css('.edit_bank_link')
+      expect(f("#content")).not_to contain_css('.delete_bank_link')
 
       view_bank_link = f("#question_bank_#{@bank.id} a.title")
       expect(view_bank_link).to be_displayed
@@ -351,7 +336,7 @@ describe 'quizzes question banks' do
       Account.default.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
 
       get "/courses/#{@course.id}/quizzes"
-      expect(f('.view_question_banks')).to be_nil
+      expect(f("#content")).not_to contain_css('.view_question_banks')
 
       get "/courses/#{@course.id}/question_banks"
       expect(f('#unauthorized_message')).to be_displayed
@@ -385,7 +370,7 @@ describe 'quizzes question banks' do
       submit_dialog('#move_question_dialog', '.submit_button')
       wait_for_ajaximations
       refresh_page
-      expect(f('.more_questions_link')).not_to be_present
+      expect(f("#content")).not_to contain_css('.more_questions_link')
       expect(source_bank.assessment_question_count).to eq(50)
       expect(target_bank.assessment_question_count).to eq(1)
     end

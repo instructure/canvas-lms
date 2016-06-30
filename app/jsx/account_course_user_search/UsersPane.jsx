@@ -70,7 +70,7 @@ define([
               isLoading={isLoading}
               errors={errors}
               {...searchFilter}
-              accountId={accountId}
+              accountId={accountId.toString()}
               handlers={{
                 handleAddNewUser: this.handleAddNewUser,
                 handleAddNewUserFormErrors: this.handleAddNewUserFormErrors
@@ -81,7 +81,7 @@ define([
           {!_.isEmpty(users) &&
             <UsersList
               timezones={timezones}
-              accountId={accountId}
+              accountId={accountId.toString()}
               users={users}
               handlers={{
                 handleSubmitEditUserForm: this.handleSubmitEditUserForm,

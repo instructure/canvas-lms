@@ -10,6 +10,8 @@ describe Selinimum::Minimizer do
       def dependents_for(file)
         raise Selinimum::TooManyDependentsError, file
       end
+
+      def commit_files=(*); end
     end
 
     class FooDetector
@@ -20,6 +22,8 @@ describe Selinimum::Minimizer do
       def dependents_for(file)
         ["file:#{file}"]
       end
+
+      def commit_files=(*); end
     end
 
     let(:spec_dependency_map) { { "spec/selenium/foo_spec.rb" => ["file:app/views/foos/show.html.erb"] } }

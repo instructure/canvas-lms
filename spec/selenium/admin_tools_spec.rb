@@ -127,7 +127,7 @@ describe "admin_tools" do
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
           expect(f('#commMessagesSearchResults .alert').text).to include('No messages found')
-          expect(f('#commMessagesSearchResults .message-body')).to be_nil
+          expect(f("#content")).not_to contain_css('#commMessagesSearchResults .message-body')
         end
 
         it "should display valid search params used" do
@@ -145,14 +145,14 @@ describe "admin_tools" do
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12:00am to Mar 9, 2001 at 12:00am.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
           set_value f('#commMessagesSearchForm .dateStartSearchField'), 'Mar 3, 2001 1:05p'
           set_value f('#commMessagesSearchForm .dateEndSearchField'), 'Mar 9, 2001 3p'
           f('#commMessagesSearchForm .userDateRangeSearchBtn').click
           wait_for_ajaximations
-          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3:00pm.")
+          expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
         it "should display search params used when given invalid input data" do
@@ -173,8 +173,7 @@ describe "admin_tools" do
 
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
 
@@ -183,8 +182,7 @@ describe "admin_tools" do
           setup_account_admin({:view_notifications => false})
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .notifications > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.notifications')
         end
       end
     end
@@ -241,8 +239,7 @@ describe "admin_tools" do
           )
           load_admin_tools_page
           wait_for_ajaximations
-          tab = fj('#adminToolsTabs .logging > a')
-          expect(tab).to be_nil
+          expect(f('#adminToolsTabs')).not_to contain_css('.logging')
         end
 
         it "should not include login activity option for revoked permission" do

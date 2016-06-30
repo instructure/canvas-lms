@@ -57,11 +57,11 @@ module SIS
         raise ImportError, "No section_id given for a cross-listing" if section_id.blank?
         raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless status =~ /\A(active|deleted)\z/i
 
-        section = @root_account.course_sections.where(sis_source_id: section_id).first
+        section = @root_account.course_sections.where(sis_source_id: section_id).take
         raise ImportError, "A cross-listing referenced a non-existent section #{section_id}" unless section
 
         unless @course && @course.sis_source_id == xlist_course_id
-          @course = @root_account.all_courses.where(sis_source_id: xlist_course_id).first
+          @course = @root_account.all_courses.where(sis_source_id: xlist_course_id).take
           if !@course && status =~ /\Aactive\z/i
             # no course with this crosslist id found, make a new course,
             # using the section's current course as a template

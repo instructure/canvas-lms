@@ -319,9 +319,13 @@ module AssignmentOverrideApplicator
 
   def self.overridden_unlock_at(assignment_or_quiz, overrides)
     applicable_overrides = overrides.select(&:unlock_at_overridden)
+
+    # CNVS-24849 if the override has been locked it's unlock_at no longer applies
+    applicable_overrides.reject!(&:availability_expired?)
+
     if applicable_overrides.empty?
       assignment_or_quiz.unlock_at
-    elsif override = applicable_overrides.detect{ |o| o.unlock_at.nil? }
+    elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
       nil
     else
       applicable_overrides.sort_by(&:unlock_at).first.unlock_at
@@ -332,7 +336,7 @@ module AssignmentOverrideApplicator
     applicable_overrides = overrides.select(&:lock_at_overridden)
     if applicable_overrides.empty?
       assignment_or_quiz.lock_at
-    elsif override = applicable_overrides.detect{ |o| o.lock_at.nil? }
+    elsif applicable_overrides.detect{ |o| o.lock_at.nil? }
       nil
     else
       applicable_overrides.sort_by(&:lock_at).last.lock_at

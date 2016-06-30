@@ -29,7 +29,7 @@ describe 'editing a quiz' do
       end
 
       it 'hides the |Save and Publish| button', priority: "1", test_id: 255478 do
-        expect(f('.save_and_publish')).to be_nil
+        expect(f("#content")).not_to contain_css('.save_and_publish')
       end
 
       it 'shows the speedgrader link', priority: "1", test_id: 351926 do
@@ -42,8 +42,7 @@ describe 'editing a quiz' do
       it 'remains published after saving changes', priority: "1", test_id: 210059 do
         type_in_tiny('#quiz_description', 'changed description')
         click_save_settings_button
-        wait_for_ajax_requests
-        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Published'
+        expect(f('#quiz-publish-link')).to include_text 'Published'
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351921 do
@@ -78,7 +77,7 @@ describe 'editing a quiz' do
         # verify the student sees the changes
         user_session(@student)
         take_quiz do
-          expect(fj('.display_question.question.multiple_choice_question').text).to \
+          expect(f('.display_question.question.multiple_choice_question')).to \
             include_text question_description
         end
       end
@@ -99,7 +98,7 @@ describe 'editing a quiz' do
         expect_new_page_load do
           click_save_settings_button
         end
-        expect(f('.icon-speed-grader')).to be_nil
+        expect(f("#content")).not_to contain_css('.icon-speed-grader')
       end
 
       it 'shows the |Save and Publish| button', priority: "1", test_id: 255479 do
@@ -115,9 +114,8 @@ describe 'editing a quiz' do
         expect_new_page_load do
           click_save_settings_button
         end
-        f('#quiz-publish-link').click
-        wait_for_ajax_requests
-        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Unpublish'
+        f('#quiz-publish-link.btn-publish').click
+        expect(f('#quiz-publish-link')).to include_text 'Unpublish'
       end
     end
 
@@ -126,12 +124,12 @@ describe 'editing a quiz' do
       click_questions_tab
       click_new_question_button
       f('.question_holder .question_form .cancel_link').click
-      expect(ff('.question_holder .question_form').length).to eq 0
+      expect(f('.question_holder')).not_to contain_css('.question_form')
     end
 
     it 'changes the quiz\'s description', priority: "1", test_id: 210057 do
       wait_for_ajaximations
-      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
+      expect(f('#quiz_description_ifr')).to be_displayed
 
       test_text = 'changed description'
       type_in_tiny '#quiz_description', test_text
@@ -162,13 +160,13 @@ describe 'editing a quiz' do
       select_first_override_section(default_section.name)
       first_due_at_element.clear
       first_due_at_element.
-          send_keys(default_section_due.strftime('%b %-d, %y'))
+          send_keys(format_date_for_view(default_section_due))
 
       add_override
 
       select_last_override_section(other_section.name)
       last_due_at_element.
-          send_keys(other_section_due.strftime('%b %-d, %y'))
+          send_keys(format_date_for_view(other_section_due))
       expect_new_page_load do
         click_save_settings_button
         wait_for_ajax_requests
@@ -176,11 +174,11 @@ describe 'editing a quiz' do
       overrides = @quiz.reload.assignment_overrides
       expect(overrides.size).to eq 2
       default_override = overrides.detect { |o| o.set_id == default_section.id }
-      expect(default_override.due_at.strftime('%b %-d, %y')).
-          to eq default_section_due.to_date.strftime('%b %-d, %y')
+      expect(default_override.due_at.to_date).
+          to eq default_section_due.to_date
       other_override = overrides.detect { |o| o.set_id == other_section.id }
-      expect(other_override.due_at.strftime('%b %-d, %y')).
-          to eq other_section_due.to_date.strftime('%b %-d, %y')
+      expect(other_override.due_at.to_date).
+          to eq other_section_due.to_date
     end
 
     context 'when the quiz has a submission' do
@@ -191,11 +189,27 @@ describe 'editing a quiz' do
 
       it 'flashes a warning message', priority: "1", test_id: 140609 do
         message = 'Keep in mind, some students have already taken or started taking this quiz'
-        keep_trying_until(3) { expect(f('#flash_message_holder')).to include_text message }
+        expect(f('#flash_message_holder')).to include_text message
       end
 
       it 'deletes the quiz', priority: "1", test_id: 210073 do
         delete_quiz
+      end
+    end
+
+    context 'when the quiz has a question with a custom name' do
+      before(:each) do
+        @custom_name = 'the hardest question ever'
+        qd = { question_type: "text_only_question", id: 1, question_name: @custom_name}.with_indifferent_access
+        @quiz.quiz_questions.create! question_data: qd
+        @quiz.save!
+        @quiz.reload
+      end
+
+      it 'displays the custom name correctly' do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        click_questions_tab
+        expect(f('.question_name')).to include_text @custom_name
       end
     end
   end

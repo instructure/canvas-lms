@@ -18,16 +18,30 @@ module Lti
   class MembershipServiceController < ApplicationController
     before_filter :require_context
     before_filter :require_user
+    before_filter :check_authorized_action
 
-    def index
+    def course_index
+      render_page_presenter
+    end
+
+    def group_index
+      render_page_presenter
+    end
+
+    private
+
+    def check_authorized_action
+      authorized_action(@context, @current_user, :read)
+    end
+
+    def render_page_presenter
       @page = MembershipService::PagePresenter.new(@context,
                                                    @current_user,
                                                    request.base_url,
                                                    membership_service_params)
+
       render json: @page
     end
-
-    private
 
     def membership_service_params
       keys = %w(role page per_page)

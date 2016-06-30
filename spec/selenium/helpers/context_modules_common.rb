@@ -44,22 +44,20 @@ module ContextModulesCommon
   end
 
   def validate_context_module_status_icon(module_id, icon_expected)
-    visible_icon = fj("#context_module_#{module_id} .completion_status i:visible")
     if icon_expected == 'no-icon'
-      expect(visible_icon).to eq nil
+      expect(fj("#context_module_#{module_id}")).not_to contain_jqcss(".completion_status i:visible")
     else
-      expect(visible_icon).not_to eq nil
+      expect(fj("#context_module_#{module_id} .completion_status i:visible")).to be_present
       context_modules_status = f("#context_module_#{module_id} .completion_status")
       expect(context_modules_status.find_element(:css, '.' + icon_expected)).to be_displayed
     end
   end
 
   def validate_context_module_item_icon(module_item_id, icon_expected)
-    item_icon = fj("#context_module_item_#{module_item_id} .module-item-status-icon i:visible")
     if icon_expected == 'no-icon'
-      expect(item_icon).to eq nil
+      expect(f("#context_module_item_#{module_item_id}")).not_to contain_jqcss(".module-item-status-icon i:visible")
     else
-      expect(item_icon).not_to eq nil
+      expect(fj("#context_module_item_#{module_item_id} .module-item-status-icon i:visible")).to be_present
       item_status = f("#context_module_item_#{module_item_id} .module-item-status-icon")
       expect(item_status.find_element(:css, '.' + icon_expected)).to be_displayed
     end
@@ -103,16 +101,14 @@ module ContextModulesCommon
 
   def new_module_form
     add_form = f('#add_context_module_form')
-    keep_trying_until do
-      driver.execute_script("$('.add_module_link').trigger('click')")
-      wait_for_ajaximations
-      expect(add_form).to be_displayed
-    end
+    f(".add_module_link").click
+    expect(add_form).to be_displayed
 
     add_form
   end
 
   def add_module(module_name = 'Test Module')
+    wait_for_modules_ui
     add_form = new_module_form
     replace_content(add_form.find_element(:id, 'context_module_name'), module_name)
     submit_form(add_form)
@@ -127,14 +123,11 @@ module ContextModulesCommon
     f('.add_module_item_link').click
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', new_item_text)
-    item_title = keep_trying_until do
-      item_title = fj('.item_title:visible')
-      expect(item_title).to be_displayed
-      item_title
-    end
+    item_title = fj('.item_title:visible')
+    expect(item_title).to be_displayed
     replace_content(item_title, item_title_text)
     yield if block_given?
-    fj('.add_item_button.ui-button').click
+    f('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -173,19 +166,29 @@ module ContextModulesCommon
     module_item.find_element(:css, '.edit_item_link').click
     edit_form = f('#edit_item_form')
     yield edit_form
-    submit_form(edit_form)
+    submit_dialog_form(edit_form)
     wait_for_ajaximations
   end
 
   def verify_persistence(title)
     refresh_page
+    verify_module_title(title)
+  end
+
+  def verify_module_title(title)
     expect(f('#context_modules')).to include_text(title)
   end
 
+  def need_to_wait_for_modules_ui?
+    !@already_waited_for_modules_ui
+  end
+
   def wait_for_modules_ui
+    return unless need_to_wait_for_modules_ui?
     # context_modules.js has some setTimeout(..., 1000) calls
     # before it adds click handlers and drag/drop
     sleep 2
+    @already_waited_for_modules_ui = true
   end
 
    def verify_edit_item_form
@@ -204,6 +207,7 @@ module ContextModulesCommon
 
   # so terrible
   def get(url)
+    @already_waited_for_modules_ui = false
     super
     wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
   end

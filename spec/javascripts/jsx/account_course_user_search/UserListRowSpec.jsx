@@ -57,7 +57,7 @@ define([
     user.avatar_url = originalAvatar;
   });
 
-  test('renders all links when all permissions are present', () => {
+  test('renders all actions when all permissions are present', () => {
     const component = TestUtils.renderIntoDocument(
       <UsersListRow
         user={user}
@@ -67,11 +67,11 @@ define([
       />
     );
 
-    const links = TestUtils.scryRenderedDOMComponentsWithTag(component.refs.linksContainer, 'a');
-    equal(links.length, 3);
+    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component.refs.linksContainer, 'user_actions_js_test');
+    equal(actions.length, 3);
   });
 
-  test('renders no links if no permissions are present', () => {
+  test('renders no actions if no permissions are present', () => {
     const originalPermissions = Object.assign({}, permissions);
 
     permissions = {
@@ -89,8 +89,8 @@ define([
       />
     );
 
-    const links = TestUtils.scryRenderedDOMComponentsWithTag(component.refs.linksContainer, 'a');
-    equal(links.length, 0);
+    const actions = TestUtils.scryRenderedDOMComponentsWithClass(component.refs.linksContainer, 'user_actions_js_test');
+    equal(actions.length, 0);
 
     permissions = originalPermissions;
   });

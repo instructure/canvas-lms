@@ -21,13 +21,19 @@ require "selenium-webdriver"
 require "socket"
 require "timeout"
 require 'coffee-script'
-require File.expand_path(File.dirname(__FILE__) + '/test_setup/custom_selenium_rspec_matchers')
-require File.expand_path(File.dirname(__FILE__) + '/test_setup/selenium_driver_setup')
+require_relative 'test_setup/custom_selenium_rspec_matchers'
+require_relative 'test_setup/selenium_driver_setup'
+require_relative 'test_setup/selenium_extensions'
 
 if ENV["TESTRAIL_RUN_ID"]
   require 'testrailtagging'
   RSpec.configure do |config|
     TestRailRSpecIntegration.register_rspec_integration(config,:canvas, add_formatter: false)
+  end
+elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
+  require "testrailtagging"
+  RSpec.configure do |config|
+    TestRailRSpecIntegration.add_rspec_callback(config, :canvas)
   end
 end
 
@@ -55,21 +61,12 @@ at_exit do
   end
 end
 
-shared_context "in-process server selenium tests" do
-  include SeleniumDriverSetup
-  include CustomSeleniumRspecMatchers
-  include OtherHelperMethods
-  include CustomSeleniumActions
-  include CustomAlertActions
-  include CustomPageLoaders
-  include CustomScreenActions
-  include CustomValidators
-  include CustomWaitMethods
-  include CustomDateHelpers
-  include LoginAndSessionMethods
-
-  # set up so you can use rails urls helpers in your selenium tests
-  include Rails.application.routes.url_helpers
+module SeleniumErrorRecovery
+  # this gets called wherever an exception happens (example, before/after/around, each/all)
+  def set_exception(exception, *args)
+    maybe_recover_from_exception(exception)
+    super
+  end
 
   def maybe_recover_from_exception(exception)
     case exception
@@ -88,19 +85,28 @@ shared_context "in-process server selenium tests" do
     end
     false
   end
+end
+RSpec::Core::Example.prepend(SeleniumErrorRecovery)
 
-  around do |example|
-    begin
-      example.run
-    rescue # before/after/around ... always re-raise so the example fails
-      maybe_recover_from_exception $ERROR_INFO
-      raise
-    end
-    maybe_recover_from_exception example.example.exception
-  end
+shared_context "in-process server selenium tests" do
+  include SeleniumDriverSetup
+  include OtherHelperMethods
+  include CustomSeleniumActions
+  include CustomAlertActions
+  include CustomPageLoaders
+  include CustomScreenActions
+  include CustomValidators
+  include CustomWaitMethods
+  include CustomDateHelpers
+  include LoginAndSessionMethods
+  include SeleniumErrorRecovery
+
+  # set up so you can use rails urls helpers in your selenium tests
+  include Rails.application.routes.url_helpers
 
   prepend_before :each do
     SeleniumDriverSetup.allow_requests!
+    driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
 
   prepend_before :all do

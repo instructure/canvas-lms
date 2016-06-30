@@ -16,7 +16,9 @@ define([
         ></span>
       );
     } else {
-      var thumbnailClassName = (this.props.model instanceof Folder) ? 'folder' : mimeClass(this.props.model.get('content-type'));
+      var thumbnailClassName = (this.props.model instanceof Folder) ?
+        (this.props.model.get('for_submissions') ? 'folder-locked' : 'folder') :
+        mimeClass(this.props.model.get('content-type'));
       return (
         <i
           className={`media-object ef-big-icon FilesystemObjectThumbnail mimeClass-${thumbnailClassName} ${additionalClassName}`}

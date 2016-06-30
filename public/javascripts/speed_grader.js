@@ -55,14 +55,6 @@ define([
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function(studentViewedAtTemplate, submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
-  // fire off the request to get the jsonData
-  window.jsonData = {};
-  $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
-    jsonData = json;
-    $(EG.jsonReady);
-  });
-  // ...and while we wait for that, get this stuff ready
-
   // PRIVATE VARIABLES AND FUNCTIONS
   // all of the $ variables here are to speed up access to dom nodes,
   // so that the jquery selector does not have to be run every time.
@@ -125,6 +117,7 @@ define([
       $multiple_submissions = $("#multiple_submissions"),
       $submission_late_notice = $("#submission_late_notice"),
       $submission_not_newest_notice = $("#submission_not_newest_notice"),
+      $enrollment_inactive_notice = $("#enrollment_inactive_notice"),
       $submission_files_container = $("#submission_files_container"),
       $submission_files_list = $("#submission_files_list"),
       $submission_attachment_viewed_at = $("#submission_attachment_viewed_at_container"),
@@ -170,21 +163,25 @@ define([
     }
   };
 
-  function mergeStudentsAndSubmission(){
+  function mergeStudentsAndSubmission() {
     jsonData.studentsWithSubmissions = jsonData.context.students;
     jsonData.studentMap = {};
-    $.each(jsonData.studentsWithSubmissions, function(i, student){
-      this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, i){
-          return enrollment.user_id === student.id;
+    $.each(jsonData.studentsWithSubmissions, function(_, student){
+      jsonData.studentMap[student.id] = student;
+      jsonData.studentMap[student.id].enrollments = [];
+      this.section_ids = $.map($.grep(jsonData.context.enrollments, function(enrollment, _){
+          if(enrollment.user_id === student.id) {
+            jsonData.studentMap[student.id].enrollments.push(enrollment);
+            return true;
+          }
         }), function(enrollment){
         return enrollment.course_section_id;
       });
-      this.submission = $.grep(jsonData.submissions, function(submission, i){
+      this.submission = $.grep(jsonData.submissions, function(submission, _){
         return submission.user_id === student.id;
       })[0];
 
       this.submission_state = submissionState(this);
-      jsonData.studentMap[student.id] = student;
     });
 
     // handle showing students only in a certain section.
@@ -321,7 +318,7 @@ define([
     }).join("");
 
     $selectmenu = new SpeedgraderSelectMenu(optionsHtml, MENU_PARTS_DELIMITER);
-    $selectmenu.appendTo("#combo_box_container", function(e){
+    $selectmenu.appendTo("#combo_box_container", function(){
       EG.handleStudentChanged();
     });
 
@@ -359,7 +356,7 @@ define([
             .addClass('selected');
       }
 
-	$selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
+      $selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
         $selectmenu_list.find('li:first').css('margin-top', $selectmenu_list.find('li').height() + 'px');
         $menu.show().css({
           'left'   : $selectmenu_list.css('left'),
@@ -778,9 +775,9 @@ define([
 
         $(".rubric_summary").loadingImage('remove');
         EG.showGrade();
-    	  EG.showDiscussion();
-    	  EG.showRubric();
-    	  EG.updateStatsInHeader();
+        EG.showDiscussion();
+        EG.showRubric();
+        EG.updateStatsInHeader();
       });
     });
   }
@@ -1029,7 +1026,7 @@ define([
     },
 
     skipRelativeToCurrentIndex: function(offset){
-      var newIndex = (this.currentIndex() + offset+ jsonData.studentsWithSubmissions.length) % jsonData.studentsWithSubmissions.length;
+      var newIndex = (this.currentIndex() + offset + jsonData.studentsWithSubmissions.length) % jsonData.studentsWithSubmissions.length;
       this.goToStudent(jsonData.studentsWithSubmissions[newIndex].id);
     },
 
@@ -1117,7 +1114,7 @@ define([
 
       if (student) {
         $selectmenu.jquerySelectMenu().selectmenu("value", student.id);
-        //this is lame but I have to manually tell $selectmenu to fire its 'change' event if has changed.
+        // manually tell $selectmenu to fire the change event
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
           $selectmenu.jquerySelectMenu().change();
         }
@@ -1154,6 +1151,8 @@ define([
         $(".speedgrader_alert").hide();
         $submission_not_newest_notice.hide();
         $submission_late_notice.hide();
+        $full_width_container.removeClass("with_enrollment_inactive_notice");
+        $enrollment_inactive_notice.hide();
 
         $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
         if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
@@ -1186,6 +1185,7 @@ define([
         this.showStudent();
       }
     },
+
     showStudent: function(){
       $rightside_inner.scrollTo(0);
       if (this.currentStudent.submission_state == 'not_gradeable' && ENV.grading_role == "provisional_grader") {
@@ -1202,6 +1202,7 @@ define([
         this.showSubmission();
       }
     },
+
     showSubmission: function(){
       this.showGrade();
       this.showDiscussion();
@@ -1210,6 +1211,7 @@ define([
       this.showSubmissionDetails();
       this.refreshFullRubric();
     },
+
     handleModerationTabs: function(index_to_load) {
       var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
       var final_grade = this.currentStudent.submission && this.currentStudent.submission.final_provisional_grade;
@@ -1295,6 +1297,7 @@ define([
         this.setReadOnly(false);
       }
     },
+
     updateModerationTabs: function() {
       if (!this.currentStudent.submission) return;
       var prov_grades = this.currentStudent.submission.provisional_grades;
@@ -1303,6 +1306,7 @@ define([
       this.updateModerationTab($moderation_tabs.eq(1), prov_grades && prov_grades[1]);
       this.updateModerationTab($moderation_tab_final, this.currentStudent.submission.final_provisional_grade);
     },
+
     updateModerationTab: function($tab, prov_grade) {
       var CHOSEN_GRADE_MESSAGE = I18n.t('This is the currently chosen grade for this student.');
       var $srMessage = $('<span class="selected_sr_message screenreader-only"></span>').text(CHOSEN_GRADE_MESSAGE);
@@ -1329,6 +1333,7 @@ define([
         $mark_grade.empty();
       }
     },
+
     showProvisionalGrade: function(idx) {
       if (this.current_prov_grade_index != idx) {
 
@@ -1351,6 +1356,7 @@ define([
         this.setReadOnly(prov_grade.readonly);
       }
     },
+
     newProvisionalGrade: function(type, index) {
       if (type == 'new')  {
         var new_mark = {
@@ -1388,6 +1394,7 @@ define([
         }
       }
     },
+
     selectProvisionalGrade: function(index) {
       var prov_grade, $tab;
       if (index == 'final') {
@@ -1409,6 +1416,7 @@ define([
         })
       );
     },
+
     setReadOnly: function(readonly) {
       if (readonly) {
         $grade.attr('disabled', true);
@@ -1420,6 +1428,7 @@ define([
         $add_a_comment.show();
       }
     },
+
     populateTurnitin: function(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent) {
       var $turnitinSimilarityScore = null;
 
@@ -1485,12 +1494,6 @@ define([
           result = context.currentStudent.submission.currentSelectedIndex;
         } else {
           result = 0;
-        }
-
-        // For some reason, assignments and other submissions fill the
-        // select dropdown with 0 based values. Quizzes started with 1.
-        if (jsonData.context.quiz && result > 0) {
-          result = result - 1;
         }
 
         return result;
@@ -1560,7 +1563,7 @@ define([
             .data('attachment', attachment)
             .click(function(event){
               event.preventDefault();
-              EG.loadAttachmentInline($(this).data('attachment'));
+              EG.loadSubmissionPreview($(this).data('attachment'));
             })
           .end()
           .find('a.submission-file-download')
@@ -1582,21 +1585,27 @@ define([
 
       $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
-      // load up a preview of one of the attachments if we can.
-      // do it in this order:
-      // show the first scridbable doc if there is one
-      // then show the first image if there is one,
-      // if not load the generic thing for the current submission (by not passing a value)
       var preview_attachment = null;
-      if (submission.submission_type != 'discussion_topic')
+      if (submission.submission_type != 'discussion_topic') {
         preview_attachment = inlineableAttachments[0] || browserableAttachments[0];
-      this.loadAttachmentInline(preview_attachment);
+      }
+
+      // load up a preview of one of the attachments if we can.
+      this.loadSubmissionPreview(preview_attachment);
 
       // if there is any submissions after this one, show a notice that they are not looking at the newest
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
-      // if the submission was after the due date, mark it as late
       $submission_late_notice.showIf(submission['late']);
+      $full_width_container.removeClass("with_enrollment_inactive_notice");
+      $enrollment_inactive_notice.showIf(
+        _.any(jsonData.studentMap[this.currentStudent.id].enrollments, function(enrollment) {
+          if(enrollment.workflow_state === 'inactive') {
+            $full_width_container.addClass("with_enrollment_inactive_notice");
+            return true;
+          }
+        })
+      );
     },
 
     refreshSubmissionsToView: function(){
@@ -1616,7 +1625,7 @@ define([
             var grade = s.grade;
           }
           return {
-            value: s.version || i,
+            value: i,
             late: s.late,
             selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
@@ -1704,7 +1713,7 @@ define([
       };
     },
 
-    loadAttachmentInline: function(attachment){
+    loadSubmissionPreview: function(attachment) {
       clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
       $(".speedgrader_alert").hide();
@@ -1712,89 +1721,99 @@ define([
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
           $this_student_has_a_submission.show();
+      } else if (attachment) {
+        this.renderAttachment(attachment);
+      } else if (this.currentStudent.submission.external_tool_url) {
+        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, this.currentStudent.submission.external_tool_url)
       } else {
-        $iframe_holder.empty();
+        this.renderSubmissionPreview()
+      }
+    },
 
-        if (attachment) {
-          var previewOptions = {
-            height: '100%',
-            id: "speedgrader_iframe",
-            mimeType: attachment.content_type,
-            attachment_id: attachment.id,
-            submission_id: this.currentStudent.submission.id,
-            attachment_view_inline_ping_url: attachment.view_inline_ping_url,
-            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
-          };
-        }
+    emptyIframeHolder: function(elem) {
+      elem = elem || $iframe_holder
+      elem.empty();
+    },
 
-        if (attachment &&
-            attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
-          $("#crocodoc_pending").show();
-        }
+    //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
+    renderSubmissionPreview: function() {
+      this.emptyIframeHolder()
+      $iframe_holder.html($.raw(
+        '<iframe id="speedgrader_iframe" src="' +
+        htmlEscape('/courses/' + jsonData.context_id  +
+        '/assignments/' + this.currentStudent.submission.assignment_id +
+        '/submissions/' + this.currentStudent.submission.user_id +
+        '?preview=true' + (SpeedgraderHelpers.iframePreviewVersion(this.currentStudent.submission)) + (
+          utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
+        )) +
+        '" frameborder="0"></iframe>'
+      )).show();
+    },
 
-        if (attachment && attachment.crocodoc_url) {
-          var crocodocStart = new Date()
-          ,   sessionLimit = 60 * 60 * 1000
-          ,   aggressiveWarnings = [50 * 60 * 1000,
-                                    55 * 60 * 1000,
-                                    58 * 60 * 1000,
-                                    59 * 60 * 1000];
-          crocodocSessionTimer = window.setInterval(function() {
-            var elapsed = new Date() - crocodocStart;
-            if (elapsed > sessionLimit) {
-              window.location.reload();
-            } else if (elapsed > aggressiveWarnings[0]) {
-              alert(I18n.t("crocodoc_expiring",
-                           "Your Crocodoc session is expiring soon.  Please reload " +
-                           "the window to avoid losing any work."));
-              aggressiveWarnings.shift();
-            }
-          }, 1000);
+    renderLtiLaunch: function($div, urlBase, externalToolUrl) {
+      this.emptyIframeHolder()
+      var launchUrl = urlBase + '&url=' + externalToolUrl;
+      $div.html(
+        $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
+      ).show();
+    },
 
-          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-            crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
-          }));
-        }
-        else if (attachment && attachment.canvadoc_url) {
-          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
-            canvadoc_session_url: attachment.canvadoc_url
-          }));
-        }
-        else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
-          if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+    renderAttachment: function(attachment) {
+      // show the crocodoc doc if there is one
+      // then show the google attachment if there is one
+      // then show the first browser viewable attachment if there is one
+      this.emptyIframeHolder()
+      var previewOptions = {
+        height: '100%',
+        id: "speedgrader_iframe",
+        mimeType: attachment.content_type,
+        attachment_id: attachment.id,
+        submission_id: this.currentStudent.submission.id,
+        attachment_view_inline_ping_url: attachment.view_inline_ping_url,
+        attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
+      };
 
-          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
-          previewOptions = $.extend(previewOptions, {
-              ajax_valid: _.bind(function() {
-                return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
-              },this)});
-          $iframe_holder.show().loadDocPreview(previewOptions);
-	      }
-	      else if (attachment && browserableCssClasses.test(attachment.mime_class)) {
-	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
-	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
-	                  .replace("{{attachmentId}}", attachment.id);
-	        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
-	      }
-	      else {
-	        //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-	        $iframe_holder.html($.raw(
-            '<iframe id="speedgrader_iframe" src="' + htmlEscape('/courses/' + jsonData.context_id  +
-            '/assignments/' + this.currentStudent.submission.assignment_id +
-            '/submissions/' + this.currentStudent.submission.user_id +
-            '?preview=true' + (
+      if (attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+        $("#crocodoc_pending").show();
+      }
 
-              this.currentStudent.submission &&
-              !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
-              this.currentStudent.submission.currentSelectedIndex != null ?
-              '&version=' + this.currentStudent.submission.currentSelectedIndex :
-              ''
-            ) + (
-              utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-            )) + '" frameborder="0"></iframe>'))
-            .show();
-	      }
-  	  }
+      if (attachment.crocodoc_url) {
+        var crocodocStart = new Date()
+        ,   sessionLimit = 60 * 60 * 1000
+        ,   aggressiveWarnings = [50 * 60 * 1000,
+                                  55 * 60 * 1000,
+                                  58 * 60 * 1000,
+                                  59 * 60 * 1000];
+        crocodocSessionTimer = window.setInterval(function() {
+          var elapsed = new Date() - crocodocStart;
+          if (elapsed > sessionLimit) {
+            window.location.reload();
+          } else if (elapsed > aggressiveWarnings[0]) {
+            alert(I18n.t("crocodoc_expiring",
+                         "Your Crocodoc session is expiring soon.  Please reload " +
+                         "the window to avoid losing any work."));
+            aggressiveWarnings.shift();
+          }
+        }, 1000);
+
+        $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+          crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
+        }));
+      } else if ($.isPreviewable(attachment.content_type, 'google')) {
+        if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
+
+        var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
+        previewOptions = $.extend(previewOptions, {
+            ajax_valid: _.bind(function() {
+              return(currentStudentIDAsOfAjaxCall == this.currentStudent.id);
+            },this)});
+        $iframe_holder.show().loadDocPreview(previewOptions);
+      } else if (browserableCssClasses.test(attachment.mime_class)) {
+        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
+          .replace("{{submissionId}}", this.currentStudent.submission.user_id)
+          .replace("{{attachmentId}}", attachment.id);
+        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+      }
     },
 
     showRubric: function(){
@@ -2018,7 +2037,12 @@ define([
 
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
+      } else if (use_existing_score) {
+        // If we're resubmitting a score, pass it as a raw score not grade.
+        // This allows percentage grading types to be handled correctly.
+        formData["submission[score]"] = grade;
       } else {
+        // Any manually entered grade is a grade.
         formData["submission[grade]"] = grade;
       }
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
@@ -2148,9 +2172,21 @@ define([
     }
   };
 
-  //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
-  $(document).ready(function() {
-    EG.domReady();
-  });
+  return {
+    setup: function() {
+      // fire off the request to get the jsonData
+      window.jsonData = {};
+      $.ajaxJSON(window.location.pathname+ '.json' + window.location.search, 'GET', {}, function(json) {
+        jsonData = json;
+        $(EG.jsonReady);
+      });
+
+      //run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData
+      $(document).ready(function() {
+        EG.domReady();
+      });
+    },
+    EG: EG
+  };
 
 });

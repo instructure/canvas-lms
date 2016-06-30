@@ -3,7 +3,7 @@ class DropZipFileImports < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    drop_table :zip_file_imports
+    drop_table :zip_file_imports if connection.table_exists?(:zip_file_imports)
 
     if Attachment.where(:context_type => "ZipFileImport").exists?
       Attachment.where(:context_type => "ZipFileImport").
@@ -11,7 +11,7 @@ class DropZipFileImports < ActiveRecord::Migration
         readonly(false).find_each do |root|
 
         # move children attachments to a non-zipfileimport attachment
-        child = Attachment.where(root_attachment_id: root).where.not(:context_type => "ZipFileImport").first
+        child = Attachment.where(root_attachment_id: root).where.not(:context_type => "ZipFileImport").take
         child.root_attachment_id = nil
         child.filename ||= root.filename
         if Attachment.s3_storage?

@@ -9,15 +9,6 @@ describe 'new ui' do
     Account.default.enable_feature!(:use_new_styles)
   end
 
-  context 'as admin' do
-
-    it 'should not show k-12 template in the theme editor pulldown if disabled', priority: "2", test_id: 295290 do
-      admin_logged_in
-      get "/accounts/#{Account.default.id}/theme_editor"
-      expect(f('#sharedThemes')).not_to include_text('K12 Theme')
-    end
-  end
-
   context 'as teacher' do
 
     before(:each) do

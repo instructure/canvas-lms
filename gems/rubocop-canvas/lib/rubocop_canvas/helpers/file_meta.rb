@@ -1,7 +1,6 @@
 module RuboCop
   module Cop
     module FileMeta
-      SPEC_DIR_REGEX = /\/spec\//
       SPEC_FILE_NAME_REGEX = /_spec\.rb$/
       CONTROLLER_FILE_NAME_REGEX = /controller\.rb$/
 
@@ -11,10 +10,6 @@ module RuboCop
 
       def file_path
         processed_source.buffer.name
-      end
-
-      def in_spec_dir?
-        file_path =~ SPEC_DIR_REGEX
       end
 
       def named_as_spec?

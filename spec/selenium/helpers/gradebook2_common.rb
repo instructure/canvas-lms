@@ -4,14 +4,19 @@ module Gradebook2Common
   shared_context 'gradebook_components' do
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
+    let(:show_notes) { fj('li a:contains("Show Notes Column")') }
+    let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
-    let(:test_course) { course() }
+    let(:test_course) { course(active_course: true) }
     let(:teacher)     { user(active_all: true) }
     let(:student)     { user(active_all: true) }
+    let(:concluded_student) { user(name: 'Stewie Griffin', active_all: true) }
+    let(:observer)    { user(active_all: true) }
     let(:enroll_teacher_and_students) do
       test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
       test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
     end
     let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
     let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
@@ -85,12 +90,7 @@ module Gradebook2Common
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)
     submit_dialog(dialog, '.ui-button')
-    keep_trying_until do
-      expect(driver.switch_to.alert).not_to be_nil
-      driver.switch_to.alert.dismiss
-      true
-    end
-    driver.switch_to.default_content
+    accept_alert
   end
 
   def toggle_muting(assignment)
@@ -116,22 +116,17 @@ module Gradebook2Common
   end
 
   def edit_grade(cell, grade)
-    grade_input = keep_trying_until do
-      driver.execute_script("$('#{cell}').hover().click()")
-      sleep 1
-      input = fj("#{cell} .grade")
-      expect(input).not_to be_nil
-      input
-    end
+    hover_and_click cell
+    grade_input = fj("#{cell} .grade")
     set_value(grade_input, grade)
     grade_input.send_keys(:return)
     wait_for_ajaximations
   end
 
   def open_comment_dialog(x=0, y=0)
-    # move_to occasionally breaks in the hudson build
-    cell = driver.execute_script "return $('#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})').addClass('hover')[0]"
-    cell.find_element(:css, '.gradebook-cell-comment').click
+    cell = f("#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})")
+    hover cell
+    fj('.gradebook-cell-comment:visible', cell).click
     # the dialog fetches the comments async after it displays and then innerHTMLs the whole
     # thing again once it has fetched them from the server, completely replacing it
     wait_for_ajax_requests
@@ -148,7 +143,7 @@ module Gradebook2Common
     section = section.id if section.is_a?(CourseSection)
     section ||= ""
     fj('.section-select-button:visible').click
-    keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
+    expect(fj('.section-select-menu:visible')).to be_displayed
     fj("label[for='section_option_#{section}']").click
     wait_for_ajaximations
   end
@@ -316,11 +311,7 @@ module Gradebook2Common
   end
 
   def get_group_points
-    group_points_holder = keep_trying_until do
-      group_points_holder = ff('div.assignment-points-possible')
-      group_points_holder
-    end
-    group_points_holder
+    ff('div.assignment-points-possible')
   end
 
   def check_group_points(expected_weight_text)
@@ -329,7 +320,27 @@ module Gradebook2Common
     end
   end
 
-  def set_group_weight(assignment_group, weight_number)
+  def set_group_weight(assignment_group, weight_number, enable_scheme: false)
+    f('#gradebook_settings').click
+    f('[aria-controls="assignment_group_weights_dialog"]').click
+
+    dialog = f('#assignment_group_weights_dialog')
+    expect(dialog).to be_displayed
+
+    if enable_scheme
+      group_check = dialog.find_element(:id, 'group_weighting_scheme')
+      group_check.click
+    end
+    expect(is_checked('#group_weighting_scheme')).to be_truthy
+    group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
+    set_value(group_weight_input, "")
+    set_value(group_weight_input, weight_number)
+    fj('.ui-button:contains("Save")').click
+    wait_for_ajaximations
+    expect(@course.reload.group_weighting_scheme).to eq 'percent'
+  end
+
+  def disable_group_weight
     f('#gradebook_settings').click
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
@@ -337,16 +348,10 @@ module Gradebook2Common
     expect(dialog).to be_displayed
 
     group_check = dialog.find_element(:id, 'group_weighting_scheme')
-    keep_trying_until do
-      group_check.click
-      expect(is_checked('#group_weighting_scheme')).to be_truthy
-    end
-    group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
-    set_value(group_weight_input, "")
-    set_value(group_weight_input, weight_number)
+    group_check.click
+    expect(is_checked('#group_weighting_scheme')).to be_falsey
     fj('.ui-button:contains("Save")').click
-    wait_for_ajaximations
-    expect(@course.reload.group_weighting_scheme).to eq 'percent'
+    refresh_page
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)

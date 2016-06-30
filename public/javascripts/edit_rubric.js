@@ -852,13 +852,17 @@ define([
       if ($prevCriterion.length == 0) {
         $target = $criterion.parents('.rubric_container').find('.rubric_title input');
       }
+
+      // focusing before the fadeOut so safari
+      // screenreader can handle focus properly
+      $target.focus();
+
       $criterion.fadeOut(function() {
         var $rubric = $criterion.parents(".rubric");
         $criterion.remove();
         rubricEditing.updateCriteria($rubric);
         rubricEditing.updateRubricPoints($rubric);
       });
-      $target.focus();
       return false;
     }).delegate('.rating_description_value,.edit_rating_link', 'click', function(event) {
       rubricEditing.editRating($(this).parents(".rating"));

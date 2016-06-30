@@ -37,7 +37,8 @@ module Lti
 
       def next_page
         if @membership_collator.next_page?
-          course_membership_service_url(@membership_collator.context, next_page_query_params.merge(host: @base_url))
+          method = "#{@membership_collator.context.class.to_s.downcase}_membership_service_url".to_sym
+          send method, @membership_collator.context, next_page_query_params.merge(host: @base_url)
         end
       end
 

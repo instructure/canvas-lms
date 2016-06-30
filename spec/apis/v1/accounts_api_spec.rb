@@ -295,6 +295,16 @@ describe "Accounts API", type: :request do
       expect(@a1.name).to eq new_name
     end
 
+    it "should update account settings" do
+      new_name = 'root2'
+      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
+        { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+        { :account => {:settings => {:restrict_student_past_view => {:value => true, :locked => false}}} })
+
+      @a1.reload
+      expect(@a1.restrict_student_past_view).to eq({:value => true, :locked => false})
+    end
+
     it "should not update with a blank name" do
       @a1.name = "blah"
       @a1.save!

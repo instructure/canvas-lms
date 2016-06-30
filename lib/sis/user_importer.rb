@@ -89,10 +89,10 @@ module SIS
             @logger.debug("Processing User #{user_row.inspect}")
             user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name, authentication_provider_id = user_row
 
-            pseudo = @root_account.pseudonyms.where(sis_user_id: user_id.to_s).first
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
+            pseudo = @root_account.pseudonyms.where(sis_user_id: user_id.to_s).take
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).take
             pseudo ||= pseudo_by_login
-            pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
+            pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).take if email.present?
 
             status_is_active = !(status =~ /\Adeleted/i)
             if pseudo

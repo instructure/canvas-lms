@@ -230,6 +230,14 @@ $ic-dim-helper-text:            darken($ic-color-neutral, 45);
 $ic-dim-helper-text:            darken($ic-color-neutral, 55);
 }
 
+// special handling for button--primary coloring
+$button--primary-text: $ic-brand-button--primary-text;
+$button--primary-bgd: $ic-brand-button--primary-bgd;
+@if $use_high_contrast {
+  $button--primary-bgd: $ic-brand-primary;
+  $button--primary-text: $ic-color-light;
+}
+
 // We don't use any of the Bootstrap glyph icons, But bootstrap's scss expects this variable to be defined.
 $iconSpritePath:  "canvas_does_not_use_boostraps_default_sprit_based_icons_so_this_is_meaningless" !default;
 $iconWhiteSpritePath: $iconSpritePath !default;
@@ -274,7 +282,7 @@ $ic-transition: cubic-bezier(0,1,0.5,1);
 //=======================
 // Form-related variables
 //=======================
-$ic-horizontal-form-offset:       $ic-sp*19;
+$ic-horizontal-form-offset:       $ic-sp*16;
 $ic-label-line-height:            1.3;
 $ic-radio-checkbox-left-offset:   22px;
 

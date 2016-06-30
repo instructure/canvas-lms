@@ -35,7 +35,7 @@ describe "better_file_browsing, folders" do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
-      expect(fln("new test folder")).not_to be_present
+      expect(f("#content")).not_to contain_link("new test folder")
       expect(fln("test folder")).to be_present
     end
 
@@ -56,28 +56,24 @@ describe "better_file_browsing, folders" do
 
     it "should delete a folder from cog icon", priority: "1", test_id: 223502 do
       delete(0, :cog_icon)
-      expect(fln("new test folder")).not_to be_present
+      expect(f("#content")).not_to contain_link("new test folder")
     end
 
     it "should unpublish and publish a folder from cloud icon", priority: "1", test_id: 220354 do
       set_item_permissions(:unpublish, :cloud_icon)
       expect(f('.btn-link.published-status.unpublished')).to be_displayed
-      expect(driver.find_element(:class => 'unpublished')).to be_displayed
       set_item_permissions(:publish, :cloud_icon)
       expect(f('.btn-link.published-status.published')).to be_displayed
-      expect(driver.find_element(:class => 'published')).to be_displayed
     end
 
     it "should make folder available to student with link", priority: "1", test_id: 133110 do
       set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
       expect(f('.btn-link.published-status.hiddenState')).to be_displayed
-      expect(driver.find_element(:class => 'hiddenState')).to be_displayed
     end
 
     it "should make folder available to student within given timeframe", priority: "1", test_id: 193160 do
       set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
       expect(f('.btn-link.published-status.restricted')).to be_displayed
-      expect(driver.find_element(:class => 'restricted')).to be_displayed
     end
 
     it "should delete folder from toolbar", priority: "1", test_id: 133105 do
@@ -149,7 +145,7 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
        f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
        wait_for_ajaximations
-       keep_trying_until { expect(driver.find_elements(:css, 'ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li').count).to eq 15 }
+       expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
      end
   end
 end

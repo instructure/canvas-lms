@@ -48,10 +48,46 @@ define [
     Simulate.change(refs.restrictedSelection.refs.permissionsInput.getDOMNode())
     @restrictedDialogForm.refs.restrictedSelection.setState selectedOption: 'date_range'
 
-    $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', '123')
-    $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', '123')
+    startDate = new Date(2016, 5, 1)
+    endDate = new Date(2016, 5, 4)
+    $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
+    $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
 
     stubbedSave = @spy(@restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
 
-    ok stubbedSave.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123', locked: false}}), 'Called save with lock_at, unlock_at and locked attributes'
+    ok stubbedSave.calledWithMatch({}, {attrs: {hidden: false, lock_at: endDate, unlock_at: startDate, locked: false}}), 'Called save with lock_at, unlock_at and locked attributes'
+
+  test 'accepts blank unlock_at date', ->
+    refs = @restrictedDialogForm.refs
+    Simulate.change(refs.restrictedSelection.refs.permissionsInput.getDOMNode())
+    @restrictedDialogForm.refs.restrictedSelection.setState selectedOption: 'date_range'
+    endDate = new Date(2016, 5, 4)
+    $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', null)
+    $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
+    stubbedSave = @spy(@restrictedDialogForm.props.models[0], 'save')
+    Simulate.submit(refs.dialogForm.getDOMNode())
+    ok stubbedSave.calledWithMatch({}, {attrs: {hidden: false, lock_at: endDate, unlock_at: '', locked: false}}), 'Accepts blank unlock_at date'
+
+  test 'accepts blank lock_at date', ->
+    refs = @restrictedDialogForm.refs
+    Simulate.change(refs.restrictedSelection.refs.permissionsInput.getDOMNode())
+    @restrictedDialogForm.refs.restrictedSelection.setState selectedOption: 'date_range'
+    startDate = new Date(2016, 5, 4)
+    $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
+    $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', null)
+    stubbedSave = @spy(@restrictedDialogForm.props.models[0], 'save')
+    Simulate.submit(refs.dialogForm.getDOMNode())
+    ok stubbedSave.calledWithMatch({}, {attrs: {hidden: false, lock_at: '', unlock_at: startDate, locked: false}}), 'Accepts blank lock_at date'
+
+  test 'rejects unlock_at date after lock_at date', ->
+    refs = @restrictedDialogForm.refs
+    Simulate.change(refs.restrictedSelection.refs.permissionsInput.getDOMNode())
+    @restrictedDialogForm.refs.restrictedSelection.setState selectedOption: 'date_range'
+    startDate = new Date(2016, 5, 4)
+    endDate = new Date(2016, 5, 1)
+    $(refs.restrictedSelection.refs.unlock_at.getDOMNode()).data('unfudged-date', startDate)
+    $(refs.restrictedSelection.refs.lock_at.getDOMNode()).data('unfudged-date', endDate)
+    stubbedSave = @spy(@restrictedDialogForm.props.models[0], 'save')
+    Simulate.submit(refs.dialogForm.getDOMNode())
+    equal stubbedSave.callCount, 0

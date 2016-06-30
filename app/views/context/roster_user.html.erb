@@ -89,79 +89,81 @@
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
 <%= render :partial => 'users/name' %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
-<div class="more_user_information" style="display: none;">
-  <% if @context.is_a?(Course) %>
-    <fieldset>
-      <legend><%= t('legends.memberships', %{Membership(s)}) %></legend>
-      <table>
-        <% @enrollments.sort_by(&:id).each do |enrollment| %>
-          <tr class="enrollment">
-            <td style="vertical-align: top; padding: 5px 50px 5px 5px;">
-              <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
-              <div style="font-size: 0.8em; padding-left: 20px;"><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
-              <div style="font-size: 0.8em; padding-left: 20px;">created <%= datetime_string(enrollment.created_at) %></div>
-              <% if enrollment.is_a?(ObserverEnrollment) %>
-                <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
-                  <%= t 'enrollment_linked_to', "linked to *%{linked_user}*",
-                      :linked_user => context_user_name(@context, enrollment.associated_user),
-                      :wrapper => '<span class="associated_user_name">\1</span>' %>
-                </div>
-              <% end %>
-              <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
-                <% if enrollment.inactive? %>
-                  <%= t 'inactive' %>
-                <% elsif enrollment.completed_at %>
-                  <%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %>
-                <% else %>
-                  <%= t 'completed' %>
-                <% end %>
-              </div>
-            </td>
-            <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
-              <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
-                <% unless @context.completed? %>
-                  <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
-                    <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
-                  </div>
-                  <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
-                    <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
+  <div class="more_user_information" style="display: none;">
+    <% if @context.is_a?(Course) %>
+      <fieldset>
+        <legend><h3><%= t('legends.memberships', %{Membership(s)}) %></h3></legend>
+        <table class="ic-Table">
+          <% @enrollments.sort_by(&:id).each do |enrollment| %>
+            <tr class="enrollment">
+              <td>
+                <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
+                <div><%= t 'enrolled_as', "Enrolled as a %{enrollment_type}", :enrollment_type => enrollment.readable_type %></div>
+                <div>created <%= datetime_string(enrollment.created_at) %></div>
+                <% if enrollment.is_a?(ObserverEnrollment) %>
+                  <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
+                    <%= t 'enrollment_linked_to', "linked to *%{linked_user}*",
+                        :linked_user => context_user_name(@context, enrollment.associated_user),
+                        :wrapper => '<span class="associated_user_name">\1</span>' %>
                   </div>
                 <% end %>
-                <div><% if enrollment.defined_by_sis? %>
-                  <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
-                <% else %>
-                  <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete this Enrollment}) %></a>
-                <% end %>
+                <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? || enrollment.inactive? %>" class="completed_at_holder">
+                  <% if enrollment.inactive? %>
+                    <%= t 'inactive' %>
+                  <% elsif enrollment.completed_at %>
+                    <%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %>
+                  <% else %>
+                    <%= t 'completed' %>
+                  <% end %>
                 </div>
               </td>
-            <% end %>
-          </tr>
-        <% end %>
-        <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
-          <tr>
-            <td style="border-top: 1px solid #eee; padding-top: 5px; vertical-align: top; font-weight: bold;"><%= before_label('user_privileges', %{Privileges}) %></td>
-            <td style="border-top: 1px solid #eee; padding-top: 5px;">
-              <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
-                <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
-                <div style="margin-left: 10px; font-size: 0.8em;">
-                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
+              <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
+                <td>
+                  <% unless @context.completed? %>
+                    <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
+                      <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
+                    </div>
+                    <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? || enrollment.inactive? %>">
+                      <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
+                    </div>
+                  <% end %>
+                  <div><% if enrollment.defined_by_sis? %>
+                    <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
+                  <% else %>
+                    <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete this Enrollment}) %></a>
+                  <% end %>
+                  </div>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+          <% if @context.is_a?(Course) && can_do(@context, @current_user, :manage_admin_users) %>
+            <tr>
+              <td>
+                <%= before_label('user_privileges', %{Privileges}) %>
+              </td>
+              <td>
+                <div class="elevate_enrollment_link_holder" style="<%= hidden if @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
+                  <%= t('user_only_view_section', %{this user can only view students in their assigned course section(s)}) %>
+                  <div style="margin-left: 10px; font-size: 0.8em;">
+                    <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="elevate_enrollment_link"><%= t('links.user_view_all_sections', %{let this user see all course users}) %></a>
+                  </div>
                 </div>
-              </div>
-              <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
-                <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
-                <div style="margin-left: 10px; font-size: 0.8em;">
-                  <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>
+                <div class="restrict_enrollment_link_holder" style="<%= hidden unless @enrollments.any?{|e| !e.limit_privileges_to_course_section } %>">
+                  <%= t('user_view_all_sections', %{this user can view students in any course section}) %>
+                  <div style="margin-left: 10px; font-size: 0.8em;">
+                    <a href="<%= context_url(@context, :context_limit_user_grading_url, @user.id) %>" class="restrict_enrollment_link"><%= t('links.user_only_view_section', %{limit this user to only see fellow section users}) %></a>
+                  </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    </fieldset>
-    <%= render :partial => 'courses/link_enrollment' %>
-  <% end %>
-  <%= render :partial => 'users/logins' %>
-</div>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      </fieldset>
+      <%= render :partial => 'courses/link_enrollment' %>
+    <% end %>
+    <%= render :partial => 'users/logins' %>
+  </div>
 <div style="margin-bottom: 10px;">&nbsp;</div>
 <% elsif service_enabled?(:avatars) %>
   <div style="margin-bottom: 20px;">

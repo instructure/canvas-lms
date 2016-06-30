@@ -29,13 +29,13 @@ describe "assignment rubrics" do
       sleep 1 if url =~ %r{\A/courses/\d+/assignments/\d+\z}
     end
 
-    def mark_rubric_for_grading(rubric, expect_confirmation)
+    def mark_rubric_for_grading(rubric, expect_confirmation, expect_dialog = true)
       f("#rubric_#{rubric.id} .edit_rubric_link").click
       driver.switch_to.alert.accept if expect_confirmation
       fj(".grading_rubric_checkbox:visible").click
       fj(".save_button:visible").click
       # If change points possible dialog box is present
-      if f('.ui-dialog')
+      if expect_dialog
         f(' .ui-button:nth-of-type(1)').click
       end
       wait_for_ajaximations
@@ -131,19 +131,13 @@ describe "assignment rubrics" do
       assignment_with_rubric(2.5)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajax_requests
-      full_rubric_button =
-          keep_trying_until do
-            full_rubric_button = fj('.toggle_full_rubric')
-            expect(full_rubric_button).to be_displayed
-            full_rubric_button
-          end
+      full_rubric_button = f('.toggle_full_rubric')
+      expect(full_rubric_button).to be_displayed
       full_rubric_button.click
       fj('#rubric_holder .criterion:visible .rating').click
       f('#rubric_holder .save_rubric_button').click
-      wait_for_ajaximations
 
-      expect(f('#rubric_summary_container .rubric_total').text).to eq '2.5'
+      expect(f('#rubric_summary_container .rubric_total')).to include_text '2.5'
     end
 
     it "should import rubric to assignment", priority: "1", test_id: 220317 do
@@ -239,9 +233,9 @@ describe "assignment rubrics" do
       f(".toggle_full_rubric").click
       wait_for_ajaximations
       f('#criterion_1 .long_description_link').click
-      keep_trying_until { expect(f('#rubric_long_description_dialog')).to be_displayed }
-      expect(f("#rubric_long_description_dialog div.displaying .long_description").
-          text).to eq "<b>This text should not be bold</b>"
+      expect(f('#rubric_long_description_dialog')).to be_displayed
+      expect(f("#rubric_long_description_dialog div.displaying .long_description")).
+          to include_text "<b>This text should not be bold</b>"
     end
 
     it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do
@@ -298,10 +292,10 @@ describe "assignment rubrics" do
       @association2 = @rubric.associate_with(@assignment2, @course, purpose: 'grading')
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
-      mark_rubric_for_grading(@rubric, true)
+      mark_rubric_for_grading(@rubric, true, false)
 
       get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
-      mark_rubric_for_grading(@rubric, true)
+      mark_rubric_for_grading(@rubric, true, false)
 
       expect(@association1.reload.use_for_grading).to be_truthy
       expect(@association1.rubric.id).to eq @rubric.id
@@ -322,7 +316,7 @@ describe "assignment rubrics" do
       )
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
-      mark_rubric_for_grading(@rubric, false)
+      mark_rubric_for_grading(@rubric, false, false)
 
       f("#rubric_#{@rubric.id} .edit_rubric_link").click
       expect(is_checked(".grading_rubric_checkbox:visible")).to be_truthy
@@ -382,7 +376,7 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".criterion_description .long_description_link").click
-      expect(fj('.ui-dialog .save_button:visible')).to be_nil
+      expect(f("#content")).not_to contain_jqcss('.ui-dialog .save_button:visible')
     end
   end
 

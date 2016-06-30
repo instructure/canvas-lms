@@ -168,4 +168,23 @@ describe "accounts/settings.html.erb" do
       expect(response).not_to have_tag '#enroll_users_form'
     end
   end
+
+  context "theme editor" do
+    before do
+      @account = Account.default
+      assigns[:account] = @account
+      assigns[:account_users] = []
+      assigns[:root_account] = @account
+      assigns[:associated_courses_count] = 0
+      assigns[:announcements] = AccountNotification.none.paginate
+    end
+
+    it "should show sub account theme editor option for non siteadmin admins" do
+      admin = account_admin_user
+      view_context(@account, admin)
+      assigns[:current_user] = admin
+      render
+      expect(response).to include("Let sub-accounts use the Theme Editor")
+    end
+  end
 end

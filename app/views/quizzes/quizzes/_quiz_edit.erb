@@ -17,7 +17,9 @@
     <a href="<%= context_url(@context, :api_v1_context_quiz_reorder_url, @quiz.id) %>" class="reorder_questions_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_quiz_quiz_groups_url, @quiz.id) %>" class="add_group_url">&nbsp;</a>
   </div>
-
+  <div class="header-bar">
+    <%= render :partial => 'quiz_edit_header' %>
+  </div>
   <div id="quiz_tabs" class="ui-tabs-minimal">
     <ul id="quiz_tabs_tab_list">
       <li><a href="#options_tab"><%= t('Details') %></a></li>
@@ -25,10 +27,7 @@
       <% if ConditionalRelease::Service.enabled_in_context?(@context) then %>
         <li><a href="#conditional_release_tab"><%= t('Conditional Content') %></a></li>
       <% end %>
-      <span id="quiz_tabs_spacer"></span>
-      <%= render :partial => 'quiz_edit_header' %>
     </ul>
-
     <%= render :partial => 'quiz_edit_details' %>
     <%= render :partial => 'quiz_edit_questions' %>
     <% if ConditionalRelease::Service.enabled_in_context?(@context) then %>

@@ -121,6 +121,18 @@ describe Submission do
     @submission.save!
   end
 
+  it "should log excused submissions" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.excused = true
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
+  end
+
   context "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model
@@ -259,6 +271,21 @@ describe Submission do
         expect(@submission.assignment.state).to eql(:published)
         @submission.grade_it!
         expect(@submission.messages_sent).to be_include('Submission Graded')
+      end
+
+      it "should not create a message for a soft-concluded student" do
+        submission_spec_model
+        @course.start_at = 2.weeks.ago
+        @course.conclude_at = 1.weeks.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+
+        @cc = @user.communication_channels.create(:path => "somewhere")
+        @submission.reload
+        expect(@submission.assignment).to eql(@assignment)
+        expect(@submission.assignment.state).to eql(:published)
+        @submission.grade_it!
+        expect(@submission.messages_sent).to_not be_include('Submission Graded')
       end
 
       it "notifies observers" do
@@ -734,6 +761,22 @@ describe Submission do
     end
   end
 
+  context '#external_tool_url' do
+    let(:submission) { Submission.new }
+    let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
+    context 'submission_type of "basic_lti_launch"' do
+      it 'returns a url containing the submitted url' do
+        expect(lti_submission.external_tool_url).to eq(lti_submission.url)
+      end
+    end
+
+    context 'submission_type of anything other than "basic_lti_launch"' do
+      it 'returns nothing' do
+        expect(submission.external_tool_url).to be_nil
+      end
+    end
+  end
+
   it "should return the correct quiz_submission_version" do
     # see redmine #6048
 
@@ -832,7 +875,7 @@ describe Submission do
     it "should be unread after submission is commented on by teacher" do
       @student = @user
       course_with_teacher(:course => @context, :active_all => true)
-      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 
@@ -1119,29 +1162,31 @@ describe Submission do
     end
   end
 
-  describe "#bulk_load_versioned_attachments" do
-    def ensure_attachments_arent_queried
-      Attachment.expects(:where).never
+  describe "includes_attachment?" do
+    it "includes current attachments" do
+      spoiler = attachment_model(context: @student)
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(spoiler)).to eq false
+      expect(sub.includes_attachment?(@attachment)).to eq true
     end
 
-    it "loads attachments for many submissions at once" do
-      attachments = []
+    it "includes attachments to previous versions" do
+      old_attachment_1 = attachment_model(context: @student)
+      old_attachment_2 = attachment_model(context: @student)
+      sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(old_attachment_1)).to eq true
+      expect(sub.includes_attachment?(old_attachment_2)).to eq true
+    end
+  end
 
-      submissions = 3.times.map { |i|
-        student_in_course(active_all: true)
-        attachments << [
-          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
-          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
-        ]
-
-        @assignment.submit_homework @student, attachments: attachments[i]
-      }
-
-      Submission.bulk_load_versioned_attachments(submissions)
-      ensure_attachments_arent_queried
-      submissions.each_with_index { |s, i|
-        expect(s.versioned_attachments).to eq attachments[i]
-      }
+  context "bulk loading" do
+    def ensure_attachments_arent_queried
+      Attachment.expects(:where).never
     end
 
     def submission_for_some_user
@@ -1151,21 +1196,95 @@ describe Submission do
                                   url: "http://example.com")
     end
 
-    it "includes url submission attachments" do
-      s = submission_for_some_user
-      s.attachment = attachment_model(filename: "screenshot.jpg",
-                                      context: @student)
+    describe "#bulk_load_versioned_attachments" do
+      it "loads attachments for many submissions at once" do
+        attachments = []
 
-      Submission.bulk_load_versioned_attachments([s])
-      ensure_attachments_arent_queried
-      expect(s.versioned_attachments).to eq [s.attachment]
+        submissions = 3.times.map do |i|
+          student_in_course(active_all: true)
+          attachments << [
+                          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
+                          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+                         ]
+
+          @assignment.submit_homework @student, attachments: attachments[i]
+        end
+
+        Submission.bulk_load_versioned_attachments(submissions)
+        ensure_attachments_arent_queried
+        submissions.each_with_index do |s, i|
+          expect(s.versioned_attachments).to eq attachments[i]
+        end
+      end
+
+      it "includes url submission attachments" do
+        s = submission_for_some_user
+        s.attachment = attachment_model(filename: "screenshot.jpg",
+                                        context: @student)
+
+        Submission.bulk_load_versioned_attachments([s])
+        ensure_attachments_arent_queried
+        expect(s.versioned_attachments).to eq [s.attachment]
+      end
+
+      it "handles bad data" do
+        s = submission_for_some_user
+        s.update_attribute(:attachment_ids, '99999999')
+        Submission.bulk_load_versioned_attachments([s])
+        expect(s.versioned_attachments).to eq []
+      end
+
+      it "handles submission histories with different attachments" do
+        student_in_course(active_all: true)
+        attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
+        Timecop.freeze(10.second.ago) do
+          @assignment.submit_homework(@student, submission_type: 'online_upload',
+                                      attachments: [attachments[0]])
+        end
+
+        attachments << attachment_model(filename: "submission-b.doc", :context => @student)
+        Timecop.freeze(5.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[1]]
+        end
+
+        attachments << attachment_model(filename: "submission-c.doc", :context => @student)
+        Timecop.freeze(1.second.ago) do
+          @assignment.submit_homework @student, attachments: [attachments[2]]
+        end
+
+        submission = @assignment.submission_for_student(@student)
+        Submission.bulk_load_versioned_attachments(submission.submission_history)
+
+        submission.submission_history.each_with_index do |s, index|
+          expect(s.attachment_ids.to_i).to eq attachments[index].id
+        end
+      end
     end
 
-    it "handles bad data" do
-      s = submission_for_some_user
-      s.update_attribute(:attachment_ids, '99999999')
-      Submission.bulk_load_versioned_attachments([s])
-      expect(s.versioned_attachments).to eq []
+    describe "#bulk_load_attachments_for_submissions" do
+      it "loads attachments for many submissions at once and returns a hash" do
+        expected_attachments_for_submissions = {}
+
+        submissions = 3.times.map do |i|
+          student_in_course(active_all: true)
+          attachment = [attachment_model(filename: "submission#{i}.doc", :context => @student)]
+          sub = @assignment.submit_homework @student, attachments: attachment
+          expected_attachments_for_submissions[sub] = attachment
+          sub
+        end
+
+        result = Submission.bulk_load_attachments_for_submissions(submissions)
+        ensure_attachments_arent_queried
+        expect(result).to eq(expected_attachments_for_submissions)
+      end
+
+      it "handles bad data" do
+        s = submission_for_some_user
+        s.update_attribute(:attachment_ids, '99999999')
+        expected_attachments_for_submissions = { s => [] }
+        result = Submission.bulk_load_attachments_for_submissions(s)
+        expect(result).to eq(expected_attachments_for_submissions)
+      end
     end
   end
 

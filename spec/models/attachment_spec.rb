@@ -1294,6 +1294,14 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 1.megabyte
     end
 
+    it "should not count attachments in submissions folders toward the quota" do
+      user_model
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => 'whatever.png', :folder => @user.submissions_folder)
+      @attachment.update_attribute(:size, 1.megabyte)
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 0
+    end
+
   end
 
   context "#open" do
@@ -1538,6 +1546,26 @@ describe Attachment do
       pseudonym @user
       json = @attachment.ajax_upload_params(@user.pseudonym, '', '')
       expect(json[:upload_params]['Filename']).to eq 'test.txt'
+    end
+  end
+
+  describe 'copy_to_folder!' do
+    before(:once) do
+      attachment_model filename: 'test.txt'
+      @folder = @context.folders.create! name: 'over there'
+    end
+
+    it 'copies a file into a folder' do
+      dup = @attachment.copy_to_folder!(@folder)
+      expect(dup.root_attachment).to eq @attachment
+      expect(dup.display_name).to eq 'test.txt'
+    end
+
+    it "handles duplicates" do
+      attachment_model filename: 'test.txt', folder: @folder
+      dup = @attachment.copy_to_folder!(@folder)
+      expect(dup.root_attachment).to eq @attachment
+      expect(dup.display_name).not_to eq 'test.txt'
     end
   end
 end

@@ -157,11 +157,24 @@ define [
       )
 
     removeFromCourse: (e) ->
-      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')
+      return unless confirm I18n.t('Are you sure you want to remove this user?')
       @$el.hide()
       success = =>
         # TODO: change the count on the search roles drop down
-        $.flashMessage I18n.t('flash.removed', 'User successfully removed.')
+        $.flashMessage I18n.t('User successfully removed.')
+        $previousRow = @$el.prev(':visible')
+        $focusElement = if ($previousRow.length)
+          $previousRow.find('.al-trigger')
+        else
+          # For some reason, VO + Safari sends the virtual cursor to the window
+          # instead of to this element, this has the side effect of making the
+          # flash message not read either in this case :(
+          # Looking at the Tech Preview version of Safari, this isn't an issue
+          # so it should start working once new Safari is released.
+          $('#addUsers')
+        $focusElement.focus()
+
+
       failure = =>
         @$el.show()
         $.flashError I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')

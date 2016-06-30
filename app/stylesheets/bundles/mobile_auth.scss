@@ -1,6 +1,7 @@
 @import "base/environment";
-@import "vendor/bootstrap/forms";
+@import "components/ic-forms";
 @import "components/buttons";
+@import "components/show_hide_opacity";
 
 * {
   margin: 0px;
@@ -13,25 +14,17 @@ html, body {
 html {
   margin: 0;
   padding: 0;
+  color: $ic-color-light;
   background-color: black;
-  background: url('/images/Money_Noise_tm.png'),
-              -webkit-gradient(radial, 50% 0px, 0, 50% 0px, 0, color-stop(0%, rgba(255, 255, 255, 0.4)), color-stop(100%, transparent)),
-              -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2B2B2B), color-stop(100%, black));
-  background: url('/images/Money_Noise_tm.png'),
-              -webkit-radial-gradient(50% 0px, circle cover, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
-              -webkit-linear-gradient(top, #2B2B2B, black);
-  background: url('/images/Money_Noise_tm.png'),
-              radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
-              linear-gradient(to bottom, #2B2B2B, black);
+  background-image:
+    linear-gradient(to bottom,  rgba(0,225,225,0.7) 0%,rgba(0,30,194,0.7) 100%),
+    url('/images/mobile_login/mobile_background.png');
+  background-size: cover;
   min-height: 420px;  /* this is a workaround to be high enough on an iphone */
   font-size: 114%;
   font-family: Helvetica;
 }
-.face {
-  background: #1a1b1a;
-  border-radius: 1em;
-  color: white;
-}
+
 #f1_container {
   position: relative;
   margin: 0 auto;
@@ -39,10 +32,10 @@ html {
   width: 300px;
   height: 198px;
   z-index: 1;
-  background-image: url("/images/canvas_logo_for_mobile_login.png");
+  background-image: url("/images/mobile_login/canvas_logo_login.svg");
   background-position: center 30px;
   background-repeat: no-repeat;
-  background-size: 270px 48px;
+  background-size: auto 60px;
 }
 
 #f1_card {
@@ -67,10 +60,6 @@ html {
   display: none;
 }
 
-a {
-  color: lightgray;
-}
-
 p {
   margin: 15px 0;
 }
@@ -78,41 +67,38 @@ p {
 .btn {
   text-align: center;
   display: block;
+  box-sizing: border-box;
   text-decoration: none;
   margin-bottom: 15px;
   width: 270px;
 }
 a.btn {
-  width: 230px;
+  display: block;
+  width: 270px;
 }
 .flip-to-back, .flip-to-front {
   margin: 0;
 }
-input.input-block-level {
-  display: block;
-  padding: 10px 15px;
-  width: 240px;
-  margin-bottom: 15px;
-  @include fontSize(20px);
-}
-label {
-  padding: 10px 15px;
-  @include fontSize(15px);
-}
-input::-webkit-input-placeholder {
-  color: #898989;
-}
-.error {
-  background: #faa;
-  color: #a00;
-  @include fontSize(20px);
-  text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
-  margin: 15px 0;
-  padding: 10px 5px;
-  border-radius: 6px;
+.forgotBlock {
+  color: $ic-color-light;
+  margin: $ic-sp*2 auto 0;
   text-align: center;
 }
-
+input {
+  border-radius: $ic-border-radius;
+}
+input::-webkit-input-placeholder {
+  color: $gray-light;
+}
+.error {
+  background: $ic-color-danger;
+  color: $ic-color-light;
+  @include fontSize(14px);
+  margin: $ic-sp 0;
+  padding: $ic-sp/2;
+  border-radius: $borderRadius;
+  text-align: center;
+}
 .icon_url {
   display: none;
 }

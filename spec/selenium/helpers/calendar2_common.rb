@@ -55,8 +55,8 @@ module Calendar2Common
 
   def open_edit_event_dialog
     f('.fc-event').click
-    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
-    driver.execute_script("$('.edit_event_link').trigger('click')")
+    expect(f('.edit_event_link')).to be_displayed
+    f('.edit_event_link').click
     wait_for_ajaximations
   end
 
@@ -127,7 +127,7 @@ module Calendar2Common
 
   def quick_jump_to_date(text)
     f('.navigation_title').click
-    date_input = keep_trying_until { f('.date_field') }
+    date_input = f('.date_field')
     date_input.send_keys(text + "\n")
     wait_for_ajaximations
   end
@@ -151,7 +151,7 @@ module Calendar2Common
     publish_toggle = edit_assignment_form.find('#assignment_published')
     move_to_click('label[for=assignment_published]') if publish
     submit_form(edit_assignment_form)
-    keep_trying_until { expect(f('.fc-month-view .fc-title')).to include_text(assignment_title) }
+    expect(f('.fc-month-view .fc-event:not(.event_pending) .fc-title')).to include_text(assignment_title)
   end
 
   # Creates event from clicking on the mini calendar
@@ -180,14 +180,12 @@ module Calendar2Common
 
     submit_form(edit_event_form)
     wait_for_ajax_requests
-    keep_trying_until do
-      if should_duplicate
-        4.times do |i|
-          expect(ff('.fc-month-view .fc-title')[i]).to include_text("#{event_title} #{i + 1}")
-        end
-      else
-        expect(f('.fc-month-view .fc-title')).to include_text(event_title)
+    if should_duplicate
+      4.times do |i|
+        expect(ff('.fc-month-view .fc-title')[i]).to include_text("#{event_title} #{i + 1}")
       end
+    else
+      expect(f('.fc-month-view .fc-title')).to include_text(event_title)
     end
   end
 
@@ -249,7 +247,7 @@ module Calendar2Common
   def assert_edit_modal_date(due_at)
     move_to_click('.fc-event')
     wait_for_ajaximations
-    expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %-d')}")
+    expect(f('.event-details-timestring')).to include_text(format_date_for_view(due_at))
   end
 
   def assert_title(title,agenda_view)
@@ -264,7 +262,7 @@ module Calendar2Common
   def assert_agenda_view(title,due)
     load_agenda_view
     assert_title(title,true)
-    expect(f('.navigation_title')).to include_text(due.utc.strftime("%b %-d, %Y"))
+    expect(f('.navigation_title')).to include_text(format_date_for_view(due))
   end
 
   def assert_week_view(title,due)

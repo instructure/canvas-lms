@@ -1,18 +1,29 @@
 require_relative "generic_detector"
+require "globby"
 
 module Selinimum
   module Detectors
     # stuff we ignore that should never affect a build
-    # TODO: config file, maybe .gitignore style?
     class WhitelistDetector < GenericDetector
+      def commit_files=(files)
+        # rather than glob **/* (which can be slow), just give globby the
+        # files and dirs that actually changed
+        dirs = Set.new
+        files.each do |file|
+          path = file.dup
+          dirs << path + "/" while path.sub!(%r{/[^/]+\z}, '') && !dirs.include?(path)
+        end
+
+        @whitelisted_files = Set.new(
+          Globby.select(
+            Selinimum.whitelist,
+            Globby::GlObject.new(files, dirs)
+          )
+        )
+      end
+
       def can_process?(file, _)
-        return false if file =~ %r{\Aspec/fixtures/}
-        return true if file =~ %r{\.(txt|md|png|jpg|gif|ico|svg|html|yml)\z}
-        return true if file =~ %r{\A(spec/coffeescripts|doc|guard|bin|script|gems/rubocop-canvas\z)/}
-        return true if file =~ %r{\Agems/selinimum/}
-        return true if file == "spec/spec.opts"
-        return true if file == "public/javascripts/translations/_core_en.js"
-        false
+        @whitelisted_files.include?(file)
       end
     end
   end

@@ -11,7 +11,7 @@ describe "conversations new" do
   describe 'conversations inbox opt-out option' do
     it "should be hidden a feature flag", priority: "1", test_id: 206028 do
       get "/profile/settings"
-      expect(ff('#disable_inbox').count).to eq 0
+      expect(f("#content")).not_to contain_css('#disable_inbox')
     end
 
     it "should reveal when the feature flag is set", priority: "1", test_id: 138894 do
@@ -28,22 +28,31 @@ describe "conversations new" do
                              category: "Conversation Message", delay_for: 0)
         policy = NotificationPolicy.create!(notification_id: notification.id, communication_channel_id: @teacher.email_channel.id, broadcast: true, frequency: "weekly")
         @teacher.update_attribute(:unread_conversations_count, 3)
-        sleep 0.5
 
         get '/profile/communication'
         expect(ff('td[data-category="conversation_message"]').count).to eq 1
-        expect(ff('.unread-messages-count').count).to eq 1
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          # make sure the link exists in the global nav
+          expect(f('#header')).to contain_css("#global_nav_conversations_link")
+          # make sure the little blue circle indicating how many unread messages you have says 3
+          expect(f('#global_nav_conversations_link .menu-item__badge')).to include_text('3')
+        else
+          expect(ff('.unread-messages-count').count).to eq 1
+        end
 
         get "/profile/settings"
         f('#disable_inbox').click
-        sleep 0.5
 
-        expect(@teacher.reload.disabled_inbox?).to be_truthy
+        keep_trying_until { expect(@teacher.reload.disabled_inbox?).to be_truthy }
 
         get '/profile/communication'
-        expect(ff('td[data-category="conversation_message"]').count).to eq 0
+        expect(f("#content")).not_to contain_css('td[data-category="conversation_message"]')
         expect(policy.reload.frequency).to eq "immediately"
-        expect(ff('.unread-messages-count').count).to eq 0
+        if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+          expect(f("#global_nav_conversations_link .menu-item__badge")).to have_attribute('style', "display: none\;")
+        else
+          expect(f("body")).not_to contain_css('.unread-messages-count')
+        end
       end
     end
   end

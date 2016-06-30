@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,7 +21,7 @@ require 'atom'
 class Account < ActiveRecord::Base
   include Context
   attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
-    :turnitin_host, :turnitin_comments, :turnitin_pledge,
+    :turnitin_host, :turnitin_comments, :turnitin_pledge, :turnitin_originality,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
@@ -52,7 +52,7 @@ class Account < ActiveRecord::Base
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
-  has_many :pseudonyms, -> { preload(:user) }
+  has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
@@ -74,8 +74,6 @@ class Account < ActiveRecord::Base
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
   has_many :content_migrations, :as => :context
-  has_many :grading_period_groups, dependent: :destroy
-  has_many :grading_periods, through: :grading_period_groups
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
@@ -100,6 +98,7 @@ class Account < ActiveRecord::Base
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
+  has_many :shared_brand_configs
   belongs_to :brand_config, foreign_key: "brand_config_md5"
 
   before_validation :verify_unique_sis_source_id
@@ -156,7 +155,13 @@ class Account < ActiveRecord::Base
   add_setting :global_stylesheet, :condition => :allow_global_includes
   add_setting :sub_account_includes, :condition => :use_new_styles_or_allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
+
+  # Help link settings
   add_setting :custom_help_links, :root_only => true
+  add_setting :help_link_icon, :root_only => true
+  add_setting :help_link_name, :root_only => true
+  add_setting :support_url, :root_only => true
+
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
@@ -172,7 +177,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
-  add_setting :support_url, :root_only => true
+
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
@@ -186,6 +191,7 @@ class Account < ActiveRecord::Base
   add_setting :mfa_settings, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
+  add_setting :canvadocs_prefer_office_online, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
   add_setting :external_notification_warning, :boolean => true, :default => false
   # Terms of Use and Privacy Policy settings for the root account
@@ -929,36 +935,7 @@ class Account < ActiveRecord::Base
       given { |user| self.account_users_for(user).any? { |au| au.has_permission_to?(self, permission) && (!details[:if] || send(details[:if])) } }
       can permission
       can :create_courses if permission == :manage_courses
-
-      next unless details[:account_only]
-      ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
-        given { |user|
-          next if permission == :read_sis && self.settings[:strict_sis_check]
-
-          if user && (!details[:if] || send(details[:if]))
-            shard.activate do
-              role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
-                where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).distinct.pluck(:role_id)
-              role_ids.any?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, permission, role)[:enabled] }
-            end
-          end
-        }
-        can permission
-      end
     end
-
-    given { |user|
-      details = RoleOverride.permissions[:read_sis]
-      if self.settings[:strict_sis_check] && user && (!details[:if] || send(details[:if]))
-        # because apparently some people panic if a student *who is also a teacher* can see sis ids
-        shard.activate do
-          role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
-            where("enrollments.workflow_state IN ('active', 'completed') AND user_id=?", user).distinct.pluck(:role_id)
-          role_ids.any? && role_ids.all?{|role_id| (role = self.get_role_by_id(role_id)) && RoleOverride.permission_for(self, :read_sis, role)[:enabled] }
-        end
-      end
-    }
-    can :read_sis
 
     given { |user| !self.account_users_for(user).empty? }
     can :read and can :manage and can :update and can :delete and can :read_outcomes
@@ -1128,8 +1105,8 @@ class Account < ActiveRecord::Base
       special_account_list.map { |key| send(key) }
     end
   end
-  define_special_account(:default, 'Default Account')
-  define_special_account(:site_admin)
+  define_special_account(:default, 'Default Account') # Account.default
+  define_special_account(:site_admin) # Account.site_admin
 
   # an opportunity for plugins to load some other stuff up before caching the account
   def precache
@@ -1274,6 +1251,14 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def closest_turnitin_originality
+    if self.turnitin_originality && !self.turnitin_originality.empty?
+      self.turnitin_originality
+    else
+      self.parent_account.try(:turnitin_originality)
+    end
+  end
+
   def self_enrollment_allowed?(course)
     if !settings[:self_enrollment].blank?
       !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
@@ -1303,6 +1288,7 @@ class Account < ActiveRecord::Base
   TAB_QUESTION_BANKS = 13
   TAB_ADMIN_TOOLS = 17
   TAB_SEARCH = 18
+  TAB_BRAND_CONFIGS = 19
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1328,7 +1314,13 @@ class Account < ActiveRecord::Base
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if root_account.site_admin?
       tabs = []
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      if user && self.grants_right?(user, :read_roster)
+        if feature_enabled?(:course_user_search)
+          tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_course_user_search_path }
+        else
+          tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path }
+        end
+      end
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
@@ -1359,6 +1351,7 @@ class Account < ActiveRecord::Base
         tabs << { id: TAB_SIS_IMPORT, label: t('#account.tab_sis_import', "SIS Import"),
                   css_class: 'sis_import', href: :account_sis_import_path }
       end
+      tabs << { :id => TAB_BRAND_CONFIGS, :label => t('#account.tab_brand_configs', "Themes"), :css_class => 'brand_configs', :href => :account_brand_configs_path } if manage_settings && (root_account.feature_enabled?(:use_new_styles) || root_account.feature_enabled?(:k12)) && branding_allowed?
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && root_account.grants_right?(user, :manage_developer_keys)
     end
     tabs += external_tool_tabs(opts)
@@ -1580,5 +1573,10 @@ class Account < ActiveRecord::Base
 
   def parent_registration_aac
     authentication_providers.where(parent_registration: true).first
+  end
+
+  def to_param
+    return 'site_admin' if site_admin?
+    super
   end
 end

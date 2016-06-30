@@ -273,6 +273,14 @@ class Attachment < ActiveRecord::Base
     dup
   end
 
+  def copy_to_folder!(folder, on_duplicate = :rename)
+    copy = self.clone_for(folder.context, nil, force_copy: true)
+    copy.folder = folder
+    copy.save!
+    copy.handle_duplicates(on_duplicate)
+    copy
+  end
+
   def ensure_media_object
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
@@ -594,6 +602,7 @@ class Attachment < ActiveRecord::Base
 
           if context.is_a?(User)
             excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
 
@@ -982,14 +991,15 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user|
-      self.context.grants_right?(user, :manage_files) &&
-      !self.associated_with_submission?
+    given { |user, session|
+      self.context.grants_right?(user, session, :manage_files) &&
+        !self.associated_with_submission? &&
+        (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
     }
-    can :delete
+    can :delete and can :update
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
-    can :read and can :update and can :create and can :download and can :read_as_admin
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    can :read and can :create and can :download and can :read_as_admin
 
     given { self.public? }
     can :read and can :download
@@ -1170,6 +1180,23 @@ class Attachment < ActiveRecord::Base
     true
   end
 
+  def make_childless(preferred_child = nil)
+    child = preferred_child || children.take
+    return unless child
+    raise "must be a child" unless child.root_attachment_id == id
+    child.root_attachment_id = nil
+    child.filename ||= filename
+    if Attachment.s3_storage?
+      if s3object.exists? && !child.s3object.exists?
+        s3object.copy_to(child.s3object)
+      end
+    else
+      child.uploaded_data = open
+    end
+    child.save!
+    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
+  end
+
   def restore
     self.file_state = 'available'
     self.save
@@ -1234,7 +1261,7 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload annotatable: opts[:wants_annotation]
+      doc.upload annotatable: opts[:wants_annotation], preferred_renders: opts[:preferred_renders]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e

@@ -34,7 +34,9 @@ module SIS
       #  * Course must be imported before Section
       #  * Course and Section must be imported before Xlist
       #  * Course, Section, and User must be imported before Enrollment
-      IMPORTERS = [:account, :term, :abstract_course, :course, :section, :xlist, :user, :enrollment, :group, :group_membership, :grade_publishing_results]
+      IMPORTERS = [:account, :term, :abstract_course, :course, :section, :xlist,
+                   :user, :user_observer, :enrollment, :group,
+                   :group_membership, :grade_publishing_results].freeze
 
       def initialize(root_account, opts = {})
         opts = opts.with_indifferent_access
@@ -410,10 +412,10 @@ module SIS
           begin
             ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
               row.each(&:downcase!)
-              importer = IMPORTERS.index do |importer|
-                if SIS::CSV.const_get(importer.to_s.camelcase + 'Importer').send('is_' + importer.to_s + '_csv?', row)
-                  @csvs[importer] << csv
-                  @headers[importer].merge(row)
+              importer = IMPORTERS.index do |type|
+                if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
+                  @csvs[type] << csv
+                  @headers[type].merge(row)
                   true
                 else
                   false

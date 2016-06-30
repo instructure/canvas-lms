@@ -2,6 +2,7 @@ define [
   'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
+  'compiled/gradebook2/GradebookHelpers'
   'compiled/gradebook2/Turnitin'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial
@@ -12,7 +13,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, submissionDetailsDialog, {extractDataFor}) ->
+], (I18n, $, submissionDetailsDialog, GradebookHelpers, {extractDataFor}) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -22,15 +23,7 @@ define [
         null
 
       isInPastGradingPeriodAndNotAdmin = ((assignment) ->
-        return false unless ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
-        return false unless ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past
-
-        return false unless ENV.current_user_roles
-        return false unless typeof ENV.current_user_roles.find == 'function'
-        return false if ENV.current_user_roles.find (elem) -> elem == 'admin'
-
-        latest_end_date = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
-        assignment.due_at <= latest_end_date
+        GradebookHelpers.gradeIsLocked(assignment, ENV)
       )(@assignment)
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)

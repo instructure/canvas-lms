@@ -1,10 +1,11 @@
 define([
+  'jquery',
   'underscore',
   'i18n!react_files',
   'react',
   'classnames',
   'compiled/react_files/components/ColumnHeaders',
-  ], function(_, I18n, React, classnames, ColumnHeaders) {
+  ], function($, _, I18n, React, classnames, ColumnHeaders) {
 
     ColumnHeaders.renderColumns = function (sort, order) {
       return this.columns.map((column) => {
@@ -21,9 +22,12 @@ define([
           'visible-desktop': column.displayNameShort,
           'ef-usage-rights-col-offset': (column.property === 'usage_rights')
         });
+
+        const href = `${this.props.pathname}?${$.param(this.queryParamsFor(this.props.query, column.property))}`;
         var linkProps = _.defaults({
               query: this.queryParamsFor(this.props.query, column.property),
-              className: 'ef-plain-link'
+              className: 'ef-plain-link',
+              href
             }, this.props);
         var linkText;
         if (column.property === 'select') {

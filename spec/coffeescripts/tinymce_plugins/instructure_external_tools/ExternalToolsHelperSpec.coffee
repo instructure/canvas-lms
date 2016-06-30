@@ -25,16 +25,16 @@ define [
     equal config.image, null
 
   test "defaults to image if no icon class", ->
-    btn = _.extend({}, @buttonOpts, {icon_url: "icon.com"})
+    btn = _.extend({}, @buttonOpts, {icon_url: "example.com"})
     config = ExternalToolsHelper.buttonConfig(btn)
     equal config.icon, null
-    equal config.image, "icon.com"
+    equal config.image, "example.com"
 
   module "ExternalToolsHelper:clumpedButtonMapping",
     setup: ->
       @clumpedButtons = [
-        {id: "ID_1", name: "NAME_1", icon_url: "moot.com", canvas_icon_class: "foo"},
-        {id: "ID_2", name: "NAME_2", icon_url: "not_moot.com", canvas_icon_class: null},
+        {id: "ID_1", name: "NAME_1", icon_url: "", canvas_icon_class: "foo"},
+        {id: "ID_2", name: "NAME_2", icon_url: "", canvas_icon_class: null},
       ]
       @onClickHander = sinon.spy()
 

@@ -12,7 +12,9 @@ define([
       },
       rowData: {
         student: {
-          html_url: "/foo"
+          grades: {
+            html_url: "/foo"
+          }
         },
         studentName: "An Student"
       }
@@ -55,4 +57,13 @@ define([
     equal(span.title, 'This user is currently not able to access the course');
     equal(span.textContent, 'concluded');
   });
+
+  test("renders the url for the students grades", () => {
+    let component = buildComponent();
+    let link = React.findDOMNode(component.refs.gradesUrl);
+
+    equal(link.getAttribute('href'), '/foo');
+  });
+
+
 });

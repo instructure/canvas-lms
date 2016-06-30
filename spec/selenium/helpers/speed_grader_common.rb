@@ -63,9 +63,9 @@ module SpeedGraderCommon
     @assignment.grade_student @students[1], {grade: ''}
 
     refresh_page
-    expect(f('#grading-box-extended').attribute 'value').to eq ''
+    expect(f('#grading-box-extended')).to have_value ''
     f('a.next').click
-    expect(f('#grading-box-extended').attribute 'value').to eq ''
+    expect(f('#grading-box-extended')).to have_value ''
   end
 
   def cycle_students_correctly(direction_string)

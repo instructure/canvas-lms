@@ -46,17 +46,43 @@ define [
         <span>#{escapeContent(content)}</span>
       """)
     $screenreader_node.appendTo($screenreader_holder)
-    # we're hiding these instead of removing them, since calling .remove() on a
-    # DOM node contained in an 'assertive' live region causes another alert that
-    # interrupts whatever alert message(s) are in progress in NVDA
-    window.setTimeout((-> $screenreader_node.attr('aria-hidden', true)), 1000)
+    # We are removing all the attributes and readding them due to Jaws inability
+    # to communicate with IE.  If we were to just remove the element out right
+    # NVDA would interrupt itself, however if we were to hide element Jaws will
+    # read the element multiple times.
+    window.setTimeout((->
+      $screenreader_node.parent().each(->
+        attributes = $.extend(true, {}, this.attributes);
+        i = attributes.length;
+        while( i-- )
+          this.removeAttributeNode(attributes[i])
+
+        $screenreader_node.remove()
+        parentNode = this
+        Array.prototype.forEach.call(attributes,(attribute) ->
+          $(parentNode).attr(attribute.name, attribute.value))
+        )
+      ), 7000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
+    if type is "success"
+      icon = "check"
+    else if type is "warning" || type is "error"
+      icon = "warning"
+    else
+      icon = "info"
     $node = $("""
       <li class="ic-flash-#{htmlEscape(type)}">
-        <i></i>
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-#{htmlEscape(icon)}"></i>
+        </div>
         #{escapeContent(content)}
-        <a href="#" class="close_link icon-end">#{htmlEscape I18n.t("close", "Close")}</a>
+        <button type="button" class="Button Button--icon-action close_link">
+          <span class="screenreader-only">
+            #{htmlEscape I18n.t("close", "Close")}
+          </span>
+          <i class="icon-x" aria-hidden="true"></i>
+        </button>
       </li>
     """)
 

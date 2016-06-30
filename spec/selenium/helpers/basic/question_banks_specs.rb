@@ -6,13 +6,10 @@ shared_examples_for "question bank basic tests" do
   end
 
   def add_question_bank(title = 'bank 1')
-    question_bank_title = keep_trying_until do
-      f(".add_bank_link").click
-      wait_for_ajaximations
-      question_bank_title = f("#assessment_question_bank_title")
-      expect(question_bank_title).to be_displayed
-      question_bank_title
-    end
+    f(".add_bank_link").click
+    wait_for_ajaximations
+    question_bank_title = f("#assessment_question_bank_title")
+    expect(question_bank_title).to be_displayed
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
     question_bank = AssessmentQuestionBank.where(title: title).first
@@ -58,11 +55,7 @@ shared_examples_for "question bank basic tests" do
     question_bank = add_question_bank
     f("#questions .delete_bank_link").click
     driver.switch_to.alert.accept
-    wait_for_ajaximations
-    question_bank.reload
-    keep_trying_until do
-      expect(question_bank.workflow_state).to eq "deleted"
-      expect(f("#questions .title")).to be_nil
-    end
+    keep_trying_until { question_bank.reload.workflow_state == "deleted" }
+    expect(f("#content")).not_to contain_css("#questions .title")
   end
 end

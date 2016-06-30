@@ -173,15 +173,22 @@ define [
   # Binds to edit syllabus dom events
   bindToEditSyllabus = ->
 
+    $course_syllabus = $('#course_syllabus')
+    $course_syllabus.data('syllabus_body', ENV.SYLLABUS_BODY)
+    $edit_syllabus_link = $('.edit_syllabus_link')
+
+    # if there's no edit link, don't need to (and shouldn't) do the rest of
+    # this. the edit link is included on the page if and only if the user has
+    # :manage_content permission on the course (see assignments'
+    # syllabus_right_side view)
+    return unless $edit_syllabus_link.length > 0
+
     # Add the backbone view for keyboardshortup help here
     $('.toggle_views_link').first().before((new KeyboardShortcuts()).render().$el)
 
     $edit_course_syllabus_form = $('#edit_course_syllabus_form')
     $course_syllabus_body = $('#course_syllabus_body')
-    $course_syllabus = $('#course_syllabus')
     $course_syllabus_details = $('#course_syllabus_details')
-
-    $course_syllabus.data('syllabus_body', ENV.SYLLABUS_BODY)
 
     RichContentEditor.initSidebar({
       show: -> $('#sidebar_content').hide(),
@@ -190,6 +197,7 @@ define [
 
     $edit_course_syllabus_form.on 'edit', ->
       $edit_course_syllabus_form.show()
+      $edit_syllabus_link.hide()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
       $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
@@ -199,12 +207,13 @@ define [
 
     $edit_course_syllabus_form.on 'hide_edit', ->
       $edit_course_syllabus_form.hide()
+      $edit_syllabus_link.show()
       $course_syllabus.show()
       text = $.trim $course_syllabus.html()
       $course_syllabus_details.showIf not text
       RichContentEditor.destroyRCE($course_syllabus_body)
 
-    $('.edit_syllabus_link').on 'click', (ev) ->
+    $edit_syllabus_link.on 'click', (ev) ->
       ev.preventDefault()
       $edit_course_syllabus_form.triggerHandler 'edit'
 

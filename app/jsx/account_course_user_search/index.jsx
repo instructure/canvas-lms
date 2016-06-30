@@ -45,17 +45,17 @@ define([
       var tabs = [];
       var panels = [];
       if (permissions.can_read_course_list) {
-        tabs.push(<Tab>{I18n.t("Courses")}</Tab>);
+        tabs.push(<Tab key='courses'>{I18n.t("Courses")}</Tab>);
         panels.push(
-          <TabPanel>
+          <TabPanel key='coursePanel'>
             <CoursesPane roles={this.props.roles} addUserUrls={this.props.addUserUrls} />
           </TabPanel>
         );
       }
       if (permissions.can_read_roster) {
-        tabs.push(<Tab>{I18n.t("People")}</Tab>);
+        tabs.push(<Tab key='people'>{I18n.t("People")}</Tab>);
         panels.push(
-          <TabPanel>
+          <TabPanel key='peoplePanel'>
             <UsersPane store={this.props.store} />
           </TabPanel>
         );
@@ -63,21 +63,15 @@ define([
 
       return (
         <div>
-          <div className="pad-box-mini no-sides grid-row middle-xs margin-none">
-            <div className="col-xs-8 padding-none">
-              <h1>{I18n.t("Search")}</h1>
+          <div className="ic-Action-header">
+            <div className="ic-Action-header__Primary">
+              <h1 className="ic-Action-header__Heading">{I18n.t("Search")}</h1>
             </div>
-            <div className="col-xs-4 padding-none align-right">
-              <div>
-                {
-                  permissions.analytics &&
-                  <a href={`/accounts/${accountId}/analytics`} className="btn button-group">{I18n.t("Analytics")}</a>
-                }
-                {
-                  permissions.theme_editor &&
-                  <a href={`/accounts/${accountId}/theme_editor`} className="btn button-group">{I18n.t("Theme Editor")}</a>
-                }
-              </div>
+            <div className="ic-Action-header__Secondary">
+              {
+                permissions.analytics &&
+                <a href={`/accounts/${accountId}/analytics`} className="Button">{I18n.t("Analytics")}</a>
+              }
             </div>
           </div>
 

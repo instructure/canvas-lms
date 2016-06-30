@@ -73,12 +73,9 @@ describe "enhanceable_content" do
 
     dialog = f(".enhanceable_content.dialog")
 
-    # need to wait for the content to get enhanced (it happens in instructure.js in a setTimeout of 1000 ms)
-    keep_trying_until {
-      f("#link1").click
-      expect(dialog).to be_displayed
-      expect(dialog).to have_class('ui-dialog')
-    }
+    f("#link1").click
+    expect(dialog).to be_displayed
+    expect(dialog).to have_class('ui-dialog')
     f(".ui-dialog .ui-dialog-titlebar-close").click
     expect(dialog).not_to be_displayed
 
@@ -151,7 +148,7 @@ describe "enhanceable_content" do
         student_in_course(:course => @course, :active_user => true)
         user_session(@student)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
-        expect(f('#media_comment_0_deadbeef span.media_comment_thumbnail')).to be_nil
+        expect(f("#content")).not_to contain_css('#media_comment_0_deadbeef span.media_comment_thumbnail')
       end
 
       it "should show for teachers" do

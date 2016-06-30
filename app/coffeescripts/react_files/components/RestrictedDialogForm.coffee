@@ -63,6 +63,9 @@ define [
 
     setRestrictedAccess: ->
       attributes = @refs.restrictedSelection.extractFormValues()
+      if attributes.unlock_at and attributes.lock_at and attributes.unlock_at > attributes.lock_at
+        $(@refs.restrictedSelection.refs.unlock_at.getDOMNode()).errorBox(I18n.t('"Available From" date must precede "Available Until"'))
+        return false
       promises = @props.models.map (item) ->
         # Calling .save like this (passing data as the 'attrs' property on
         # the 'options' argument instead of as the first argument) is so that we just send

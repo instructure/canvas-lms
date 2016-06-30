@@ -36,7 +36,6 @@ describe "conversations new" do
     expect(f('#compose-message-subject')).to be_displayed
     # Send Individual messages checkbox displays and is unchecked
     expect(f('#bulk_message').selected?).to be_falsey
-    expect(f('.icon-question')).to have_attribute('title','This will send an individual message to each of the recipients')
     # Message field displays
     expect(f('.conversation_body')).to be_displayed
     # Attachment button displays
@@ -67,52 +66,53 @@ describe "conversations new" do
     end
 
     it "should have a courses dropdown", priority: "1", test_id: 117960 do
-      fj("[data-id = 'course-filter']").click
+      f("[data-id = 'course-filter']").click
       wait_for_ajaximations
 
       # Verify course filter is open
-      expect(fj('.course-filter.open')).to be_truthy
+      expect(f('.course-filter.open')).to be_truthy
 
       # Verify course filter names
-      dropdown_array = ffj('#course-filter-bs .text')
-      expect(dropdown_array[0].text).to include_text('All Courses')
-      expect(dropdown_array[1].text).to include_text(@course.name)
+      dropdown_array = ff('#course-filter-bs .text')
+      expect(dropdown_array[0]).to include_text('All Courses')
+      expect(dropdown_array[1]).to include_text(@course.name)
     end
 
     it "should have a type dropdown", priority: "1", test_id: 446594 do
-      fj("[data-id = 'type-filter']").click
+      f("[data-id = 'type-filter']").click
       wait_for_ajaximations
 
       # Verify type filter is open
-      expect(fj('.type-filter.open')).to be
+      expect(f('.type-filter.open')).to be
 
       # Verify type filter names and order
-      dropdown_array = ffj('#type-filter-bs .text')
-      expect(dropdown_array[0].text).to include_text('Inbox')
-      expect(dropdown_array[1].text).to include_text('Unread')
-      expect(dropdown_array[2].text).to include_text('Starred')
-      expect(dropdown_array[3].text).to include_text('Sent')
-      expect(dropdown_array[4].text).to include_text('Archived')
-      expect(dropdown_array[5].text).to include_text('Submission Comments')
+      dropdown_array = ff('#type-filter-bs .text')
+      expect(dropdown_array[0]).to include_text('Inbox')
+      expect(dropdown_array[1]).to include_text('Unread')
+      expect(dropdown_array[2]).to include_text('Starred')
+      expect(dropdown_array[3]).to include_text('Sent')
+      expect(dropdown_array[4]).to include_text('Archived')
+      expect(dropdown_array[5]).to include_text('Submission Comments')
     end
 
     it "should have action buttons", priority: "1", test_id: 446595 do
-      expect(fj('#conversation-actions #compose-btn')).to be
-      expect(fj('#conversation-actions #reply-btn')).to be
-      expect(fj('#conversation-actions #reply-all-btn')).to be
-      expect(fj('#conversation-actions #archive-btn')).to be
-      expect(fj('#conversation-actions #delete-btn')).to be
-      expect(fj('.inline-block')).to be
+      expect(f('#conversation-actions #compose-btn')).to be
+      expect(f('#conversation-actions #reply-btn')).to be
+      expect(f('#conversation-actions #reply-all-btn')).to be
+      expect(f('#conversation-actions #archive-btn')).to be
+      expect(f('#conversation-actions #delete-btn')).to be
+      expect(f('.inline-block')).to be
     end
 
     it "should have a search box with address book", priority: "1", test_id: 446596 do
       # Click on the address book
-      fj('.recipient-finder .icon-address-book').click
+      f('.recipient-finder .icon-address-book').click
       wait_for_ajaximations
-      keep_trying_until { expect(fj('.paginatedLoadingIndicator')['style']).to include_text('none') }
+      indicator = f('.paginatedLoadingIndicator')
+      keep_trying_until { expect(indicator['style']).to include('none') }
 
       # Verify the names of the course and all students and teachers appear
-      expect(fj('.ac-result-contents .context .result-name')).to include_text(@course.name)
+      expect(f('.ac-result-contents .context .result-name')).to include_text(@course.name)
       users = @course.users.collect(&:name)
       users.each do |u|
         expect(fj(".ac-result-contents .result-name:contains('#{u}')")).to be
@@ -121,8 +121,8 @@ describe "conversations new" do
 
     it "should display a no messages image", priority: "1", test_id: 456175 do
       # Verify Text and Icon Class
-      expect(fj('.no-messages').text).to include_text('No Conversations Selected')
-      expect(fj('.no-messages .icon-email')).to be
+      expect(f('.no-messages')).to include_text('No Conversations Selected')
+      expect(f('.no-messages .icon-email')).to be
     end
   end
 
@@ -183,7 +183,7 @@ describe "conversations new" do
       select_message(0)
       reply_to_message
       expect(f('.message-count')).to include_text('2')
-
+      dismiss_flash_messages
       reply_to_message
       expect(f('.message-count')).to include_text('3')
     end
@@ -207,7 +207,7 @@ describe "conversations new" do
       f('#delete-btn').click
 
       driver.switch_to.alert.accept
-      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+      expect_flash_message :success, /Message Deleted!/
     end
 
     it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
@@ -218,7 +218,7 @@ describe "conversations new" do
       click_more_options(convo:true)
       f('.delete-btn.ui-corner-all').click
       driver.switch_to.alert.accept
-      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+      expect_flash_message :success, /Message Deleted!/
     end
 
     it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
@@ -250,7 +250,7 @@ describe "conversations new" do
 
       select_view('sent')
       click_message(0)
-      expect(f('#archive-btn').attribute('disabled')).to be_present
+      expect(f('#archive-btn')).to be_disabled
     end
 
     it "should not be able to archive a sent message via the cog dropdown" do
@@ -260,7 +260,7 @@ describe "conversations new" do
       click_message(0)
       # Clicks the title-level more options gear menu
       click_more_options(convo:true)
-      expect(f('.archive-btn.ui-corner-all')).to be_nil
+      expect(f("#content")).not_to contain_css('.archive-btn.ui-corner-all')
     end
 
     context "in archive view" do
@@ -379,12 +379,11 @@ describe "conversations new" do
       expect(conversation_elements.size).to eq 1
       conversation_elements[0].click
       wait_for_ajaximations
-      fj('#delete-btn').click
+      f('#delete-btn').click
       driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(conversation_elements.size).to eq 0
-      expect(ffj('.message-list .paginatedLoadingIndicator:visible').length).to eq 0
-      expect(ffj('.actions .btn-group button:disabled').size).to eq 4
+      expect(f('.messages')).not_to contain_css('li')
+      expect(f('.message-list')).not_to contain_jqcss('.paginatedLoadingIndicator:visible')
+      expect(ff('.actions .btn-group button:disabled').size).to eq 4
     end
   end
 
@@ -404,7 +403,7 @@ describe "conversations new" do
 
       star_btn = f('.star-btn', unstarred_elt)
       expect(star_btn).to be_present
-      expect(f('.active', unstarred_elt)).to be_nil
+      expect(unstarred_elt).not_to contain_css('.active')
 
       click_star_icon(unstarred_elt,star_btn)
       expect(f('.active', unstarred_elt)).to be_present
@@ -420,7 +419,7 @@ describe "conversations new" do
 
       star_btn.click
       wait_for_ajaximations
-      expect(f('.active', starred_elt)).to be_nil
+      expect(starred_elt).not_to contain_css('.active')
       expect(@conv_starred.reload.starred).to be_falsey
     end
 
@@ -442,7 +441,7 @@ describe "conversations new" do
       starred_elt.click
       wait_for_ajaximations
       click_star_toggle_menu_item
-      expect(f('.active', starred_elt)).to be_nil
+      expect(starred_elt).not_to contain_css('.active')
       run_progress_job
       expect(@conv_starred.reload.starred).to be_falsey
     end

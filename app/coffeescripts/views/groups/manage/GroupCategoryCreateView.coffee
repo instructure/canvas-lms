@@ -18,14 +18,12 @@ define [
       height: if ENV.allow_self_signup then 520 else 310
       title: I18n.t('create_group_set', 'Create Group Set')
 
-    els: _.extend {},
-      GroupCategoryEditView::els
+    els: _.extend {}, GroupCategoryEditView::els,
       '.admin-signup-controls': '$adminSignupControls'
       '#split_groups': '$splitGroups'
       '.admin-signup-controls input[name=split_groups][value=1]': '$autoGroupSplitControl'
 
-    events: _.extend {},
-      GroupCategoryEditView::events
+    events: _.extend {}, GroupCategoryEditView::events,
       'click .admin-signup-controls [name=create_group_count]': 'clickSplitGroups'
       'click .auto-group-leader-toggle': 'toggleAutoGroupLeader'
       'click .admin-signup-controls input[name=split_groups]' : 'setVisibilityOfGroupLeaderControls'

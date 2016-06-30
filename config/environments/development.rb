@@ -29,6 +29,13 @@ environment_configuration(defined?(config) && config) do |config|
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.0.0'
       require 'byebug'
+      if ENV['REMOTE_DEBUGGING_ENABLED']
+        require 'byebug/core'
+        Byebug.start_server('0.0.0.0', 0)
+        puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
+        byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
+        File.write(byebug_port_file, Byebug.actual_port)
+      end
     else
       require "debugger"
     end

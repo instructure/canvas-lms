@@ -14,7 +14,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     def wysiwyg_state_setup(text = "1\n2\n3", val: false, html: false)
       get "/courses/#{@course.id}/pages/front-page/edit"
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
 
       if val == true
         add_text_to_tiny(text)
@@ -46,7 +46,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       save_wiki
 
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce a')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('a')
       end
     end
 
@@ -73,7 +73,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce li')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('li')
       end
     end
 
@@ -92,7 +92,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce li')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('li')
       end
     end
 
@@ -113,7 +113,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f("#mceu_3 .mce-caret").click
       f(".mce-colorbutton-grid div[title='No color']").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce span')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('span')
       end
     end
 
@@ -134,7 +134,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f("#mceu_4 .mce-caret").click
       f(".mce-colorbutton-grid div[title='No color']").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce span')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('span')
       end
     end
 
@@ -181,7 +181,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       wait_for_ajaximations
-      keep_trying_until { @image_list.find_elements(:css, '.img') }
 
       @image_list.find_element(:css, '.img_link').click
 
@@ -249,7 +248,6 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
         f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
         wait_for_ajaximations
-        keep_trying_until { @image_list.find_elements(:css, '.img') }
 
         @image_list.find_element(:css, '.img_link').click
 
@@ -285,10 +283,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       skip_if_chrome('fragile in chrome')
       text = "<p><sup>This is my text</sup></p>"
       wysiwyg_state_setup(text, html: true)
-
       shift_click_button('.mce-i-superscript')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce sup')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('sup')
       end
     end
 
@@ -308,7 +305,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       shift_click_button('.mce-i-subscript')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce sub')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('sub')
       end
     end
 
@@ -320,21 +317,21 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       create_wiki_page(title, unpublished, edit_roles)
 
       get "/courses/#{@course.id}/pages/front-page/edit"
-      wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+      wait_for_tiny(f("form.edit-form .edit-content"))
 
       f('#new_page_link').click
-      keep_trying_until { expect(f('#new_page_name')).to be_displayed }
+      expect(f('#new_page_name')).to be_displayed
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce p a').attribute('href')).to include_text title
+        expect(f('#tinymce p a').attribute('href')).to include title
       end
 
       select_all_wiki
       f('.mce-i-unlink').click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce p a')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('p a')
       end
     end
 
@@ -397,7 +394,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.mce-i-table').click
       driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce table')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('table')
       end
     end
 
@@ -415,7 +412,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-bold')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce strong')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('strong')
       end
     end
 
@@ -433,7 +430,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-italic')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce em')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('em')
       end
     end
 
@@ -448,7 +445,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, html: true)
       shift_click_button('.mce-i-underline')
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce u')).to be_nil
+        expect(f("#tinymce")).not_to contain_css('u')
       end
     end
 
@@ -535,7 +532,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajax_requests
       in_frame wiki_page_body_ifr_id do
-        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+        img = f('.equation_image')
+        keep_trying_until { expect(img.attribute('title')).to eq equation_text }
 
         # currently there's an issue where the equation is double-escaped in the
         # src, though it's correct after the redirect to codecogs. here we just
@@ -574,7 +572,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajax_requests
       in_frame wiki_page_body_ifr_id do
-        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+        img = f('.equation_image')
+        keep_trying_until { expect(img.attribute('title')).to eq equation_text }
 
         # currently there's an issue where the equation is double-escaped in the
         # src, though it's correct after the redirect to codecogs. here we just
@@ -629,7 +628,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       get "/courses/#{@course.id}/pages/front-page/edit"
 
       f("div[aria-label='Record/Upload Media'] button").click
-      keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
+      expect(f('#record_media_tab')).to be_displayed
       f('#media_comment_dialog a[href="#upload_media_tab"]').click
       expect(f('#media_comment_dialog #audio_upload')).to be_displayed
       close_visible_dialog

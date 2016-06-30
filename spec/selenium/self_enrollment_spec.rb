@@ -11,7 +11,7 @@ describe "self enrollment" do
       @course.self_enrollment_limit = 0
       @course.save!
       get "/enroll/#{@course.self_enrollment_code}"
-      expect(f("form#enroll_form")).to be_nil
+      expect(f("#content")).not_to contain_css("form#enroll_form")
     end
   end
 
@@ -62,7 +62,7 @@ describe "self enrollment" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
-      expect(f("input[name='pseudonym[unique_id]']")).to be_nil
+      expect(f("#content")).not_to contain_css("input[name='pseudonym[unique_id]']")
       expect_new_page_load {
         submit_form("#enroll_form")
       }
@@ -100,8 +100,8 @@ describe "self enrollment" do
 
     it "should not register a new user" do
       get "/enroll/#{@course.self_enrollment_code}"
-      expect(f("input[type=radio][name=user_type]")).to be_nil
-      expect(f("input[name='user[name]']")).to be_nil
+      expect(f("#content")).not_to contain_css("input[type=radio][name=user_type]")
+      expect(f("#content")).not_to contain_css("input[name='user[name]']")
     end
 
     it "should authenticate and register an existing user" do
@@ -126,7 +126,7 @@ describe "self enrollment" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
-      expect(f("input[name='pseudonym[unique_id]']")).to be_nil
+      expect(f("#content")).not_to contain_css("input[name='pseudonym[unique_id]']")
       expect_new_page_load {
         submit_form("#enroll_form")
       }
@@ -157,7 +157,7 @@ describe "self enrollment" do
     let(:set_up_course){ }
     let(:primary_action){ "Go to the Course" }
     let(:assert_valid_dashboard) {
-      expect(f('#courses_menu_item')).to include_text("Courses")
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to include_text("Courses")
     }
 
     context "with open registration" do
@@ -177,7 +177,7 @@ describe "self enrollment" do
     }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      expect(f('#courses_menu_item')).to include_text("Courses") # show for future course
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to include_text("Courses") # show for future course
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do
@@ -193,7 +193,7 @@ describe "self enrollment" do
     let(:set_up_course){ }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      expect(f('#courses_menu_item')).to include_text("Courses")
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to include_text("Courses")
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do

@@ -17,5 +17,12 @@
 #
 
 class ExternalToolCollaboration < Collaboration
+  attr_accessible :url
+
   validates_presence_of :url
+
+  def update_url
+    data['updateUrl']
+  end
+
 end

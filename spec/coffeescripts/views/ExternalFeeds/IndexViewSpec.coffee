@@ -40,6 +40,12 @@ define [
     equal $('li.external_feed').length, 1
     ok $('li.external_feed').text().match('Example Feed')
 
+  test 'validates the url properly', ->
+    errors = @view.validateBeforeSave(url: '')
+    equal errors.url.length, 1
+
+    errors = @view.validateBeforeSave(url: 'http://example.com')
+    ok !errors.url
 
   # TODO: These specs are failing intermittantly and I can't figure out why,
   # but it's not worth the build being super fragile

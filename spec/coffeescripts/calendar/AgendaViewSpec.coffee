@@ -27,6 +27,7 @@ define [
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]
       @contextCodes = ["user_1", "course_2", "group_3"]
       @startDate = fcUtil.now()
+      @startDate.minute(1)
       @startDate.year(2001)
       @dataSource = new EventDataSource(@contexts)
       @server = sinon.fakeServer.create()

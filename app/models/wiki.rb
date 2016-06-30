@@ -133,9 +133,6 @@ class Wiki < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| self.context.is_public}
-    can :read
-
     given {|user, session| self.context.grants_right?(user, session, :read)}
     can :read
 

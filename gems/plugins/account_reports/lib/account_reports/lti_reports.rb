@@ -29,13 +29,10 @@ module AccountReports
     end
 
     def lti_report
-      file = AccountReports.generate_file(@account_report)
-      CSV.open(file, "w") do |csv|
+      headers = ['context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
+                 'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
 
-        headers = ['context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
-                   'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
-
-        csv << headers
+      write_report headers do |csv|
 
         tools = ContextExternalTool.active.
           where("context_type = 'Account' OR context_type = 'Course'").
@@ -53,24 +50,21 @@ module AccountReports
                        CourseAccountAssociation.where("course_id=courses.id").where(account_id: account))
         end
 
-        Shackles.activate(:slave) do
-          tools.find_each do |t|
-            row = []
-            row << t.context_type
-            row << t.context_id
-            row << t.account_name
-            row << t.course_name
-            row << t.name
-            row << t.tool_id
-            row << t.created_at
-            row << t.privacy_level
-            row << t.url
-            row << t.custom_fields
-            csv << row
-          end
+        tools.find_each do |t|
+          row = []
+          row << t.context_type
+          row << t.context_id
+          row << t.account_name
+          row << t.course_name
+          row << t.name
+          row << t.tool_id
+          row << t.created_at
+          row << t.privacy_level
+          row << t.url
+          row << t.custom_fields
+          csv << row
         end
       end
-      send_report(file)
     end
   end
 end

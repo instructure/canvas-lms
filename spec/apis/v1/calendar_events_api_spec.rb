@@ -1871,4 +1871,50 @@ describe CalendarEventsApiController, type: :request do
     end
   end
 
+  context 'save_selected_contexts' do
+    it 'persists contexts' do
+      json = api_call(:post, "/api/v1/calendar_events/save_selected_contexts", {
+          controller: 'calendar_events_api',
+          action: 'save_selected_contexts',
+          format: 'json',
+          selected_contexts: ['course_1', 'course_2', 'course_3']
+      })
+      expect(@user.reload.preferences[:selected_calendar_contexts]).to eq(['course_1', 'course_2', 'course_3'])
+    end
+  end
+
+  context 'visible_contexts' do
+    it 'includes custom colors' do
+      @user.custom_colors[@course.asset_string] = '#0099ff'
+      @user.save!
+      puts @user.inspect
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['asset_string'] == @course.asset_string
+      end
+      expect(context['color']).to eq('#0099ff')
+    end
+
+    it 'includes whether the context has been selected' do
+      @user.preferences[:selected_calendar_contexts] = [@course.asset_string];
+      @user.save!
+
+      json = api_call(:get, '/api/v1/calendar_events/visible_contexts', {
+        controller: 'calendar_events_api',
+        action: 'visible_contexts',
+        format: 'json'
+      })
+
+      context = json['contexts'].find do |c|
+        c['asset_string'] == @course.asset_string
+      end
+      expect(context['selected']).to be(true)
+    end
+  end
 end

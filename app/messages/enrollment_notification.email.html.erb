@@ -11,6 +11,10 @@
     <a href="<%= registration_confirmation_url(asset.user.communication_channel.confirmation_code, :host => HostUrl.context_host(asset.course)) %>">
       <%= t :complete_registration_link, "Click here to complete registration" %>
     </a>
+  <% else %>
+    <a href="<%= content(:link) %>">
+      <%= t(:link, "Click here to view the course page") %>
+    </a>
   <% end %>
 <% end %>
 
@@ -37,4 +41,16 @@
           <td style="font-weight: bold;"><%= asset.user.pseudonym.unique_id rescue t(:none, "none") %></td>
       </tr>
     <% end %>
+</table>
+
+<br><br>
+
+<table width="100%" border="0" style="text-align:center;">
+  <tr>
+    <td>
+      <a href="<%= content(:link) %>">
+        <img src="<%= "#{HostUrl.protocol}://#{HostUrl.context_host(asset_context)}" %>/images/get-started-btn.png" alt="Get Started"/>
+      </a>
+    </td>
+  </tr>
 </table>
