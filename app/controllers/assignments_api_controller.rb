@@ -403,6 +403,7 @@
 #               "discussion_topic",
 #               "online_quiz",
 #               "on_paper",
+#               "not_graded",
 #               "none",
 #               "external_tool",
 #               "online_text_entry",
