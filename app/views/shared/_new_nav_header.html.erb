@@ -109,9 +109,10 @@
         <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
           <ul class="ic-app-header__menu-list">
             <li class="ic-app-header__menu-list-item">
-              <%= link_to help_link_url,
-                    :class => help_link_classes(["ic-app-header__menu-list-link"]),
-                    :data => help_link_data do %>
+             <%= link_to help_link_url,
+                  :id => support_url ? '' : 'global_nav_help_link',
+                  :class => "ic-app-header__menu-list-link",
+                  :data => help_link_data do %>
                 <div class="menu-item-icon-container" role="presentation">
                   <%= svg_icon help_link_icon %>
                 </div>

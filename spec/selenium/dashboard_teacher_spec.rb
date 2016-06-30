@@ -249,7 +249,7 @@ describe "dashboard" do
 
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_courses_link').click
-          expect(fj('.ReactTray-list-item a:contains("All Courses")')).to be_present
+          expect(fj('.ic-NavMenu-list-item a:contains("All Courses")')).to be_present
         else
           course_menu_item = f("#courses_menu_item")
           hover(course_menu_item)
