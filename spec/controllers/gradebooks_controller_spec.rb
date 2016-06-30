@@ -744,14 +744,12 @@ describe GradebooksController do
       end
     end
 
-    context 'assignment.external_tool?' do
-      it 'includes the lti_retrieve_url in the js_env' do
-        user_session(@teacher)
-        @assignment = @course.assignments.create!(title: "A Title", submission_types: 'external_tool')
+    it 'includes the lti_retrieve_url in the js_env' do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(title: "A Title", submission_types: 'online_url,online_file')
 
-        get 'speed_grader', course_id: @course, assignment_id: @assignment.id
-        expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
-      end
+      get 'speed_grader', course_id: @course, assignment_id: @assignment.id
+      expect(assigns[:js_env][:lti_retrieve_url]).not_to be_nil
     end
   end
 

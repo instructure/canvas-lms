@@ -127,12 +127,12 @@ define([
     ok(typeof speedGrader.EG.renderLtiLaunch === 'function')
   })
 
-  test('contains iframe with the formatted student submission url', () => {
+  test('contains iframe with the escaped student submission url', () => {
     let retrieveUrl = 'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
     let url = 'www.example.com/lti/launch/user/4'
     speedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
     let srcUrl = $div.find('iframe').attr('src')
     ok(srcUrl.indexOf(retrieveUrl) > -1)
-    ok(srcUrl.indexOf(url) > -1)
+    ok(srcUrl.indexOf(encodeURIComponent(url)) > -1)
   });
 });

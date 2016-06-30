@@ -1752,7 +1752,7 @@ define([
 
     renderLtiLaunch: function($div, urlBase, externalToolUrl) {
       this.emptyIframeHolder()
-      var launchUrl = urlBase + '&url=' + externalToolUrl;
+      var launchUrl = urlBase + '&url=' + encodeURIComponent(externalToolUrl);
       $div.html(
         $.raw('<iframe id="speedgrader_iframe" src="' + htmlEscape(launchUrl) + '" class="tool_launch"></iframe>' )
       ).show();
