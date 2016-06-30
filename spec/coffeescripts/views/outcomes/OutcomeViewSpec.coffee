@@ -1,10 +1,11 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'helpers/fakeENV'
   'compiled/models/Outcome'
   'compiled/views/outcomes/OutcomeView'
-], ($, Backbone, fakeENV, Outcome, OutcomeView) ->
+], ($, _, Backbone, fakeENV, Outcome, OutcomeView) ->
 
   newOutcome = (outcomeOptions, outcomeLinkOptions) ->
     new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), { parse: true })
@@ -84,6 +85,13 @@ define [
     ok @outcome1.outcomeLink.outcome.title
     ok @outcome1.outcomeLink.outcome.id
 
+  test 'dropdown includes available calculation methods', ->
+    view = createView(model: @outcome1, state: 'edit')
+    methods = $.map $('#calculation_method option'), (option) ->
+      option.value
+    ok _.isEqual(["decaying_average", "n_mastery", "latest", "highest"], methods)
+    view.remove()
+
   test 'calculation method of decaying_average is rendered properly on show', ->
     view = createView(model: @outcome1, state: 'show')
     ok view.$('#calculation_method').length
@@ -156,6 +164,11 @@ define [
     equal view.$('#calculation_method').val(), 'decaying_average'
     equal view.$('#calculation_int').val(), '65'
     ok view.$('#calculation_int_left_side').is(':visible')
+    view.remove()
+
+  test 'placeholder text is rendered properly for new outcomes', ->
+    view = createView(model: newOutcome(), state: 'add')
+    equal view.$('input[name="title"]').attr("placeholder"), 'New Outcome'
     view.remove()
 
   test 'calculation int updates when the calculation method is changed', ->
@@ -295,13 +308,38 @@ define [
     ok not view.$el.find('.delete_button').attr('disabled')
     view.remove()
 
+  test 'validates title is present', ->
+    view = createView(model: @outcome1, state: 'edit')
+    view.$('#title').val("")
+    view.$('#dtitle').trigger('change')
+    ok !view.isValid()
+    ok view.errors.title
+    view.remove()
+
+  test 'validates title length', ->
+    long_name = "long outcome name "
+    long_name += long_name for _ in [1..5]
+    ok long_name.length > 256
+    view = createView(model: @outcome1, state: 'edit')
+    view.$('#title').val(long_name)
+    ok !view.isValid()
+    ok view.errors.title
+    view.remove()
+
   test 'validates display_name length', ->
     long_name = "long outcome name "
     long_name += long_name for _ in [1..5]
     ok long_name.length > 256
     view = createView(model: @outcome1, state: 'edit')
     view.$('#display_name').val(long_name)
-    view.$('#display_name').trigger('change')
     ok !view.isValid()
     ok view.errors.display_name
     view.remove()
+
+  test 'validates mastery points', ->
+    view = createView(model: @outcome1, state: 'edit')
+    view.$('input[name="mastery_points"]').val('-1')
+    ok !view.isValid()
+    ok view.errors.mastery_points
+    view.remove()
+

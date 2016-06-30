@@ -46,7 +46,7 @@ define [
 
     addGroup: (e) =>
       e.preventDefault()
-      model = new OutcomeGroup title: I18n.t('new_outcome_group', 'New Outcome Group')
+      model = new OutcomeGroup title: ''
       @trigger 'add', model
 
     findDialog: (e) =>

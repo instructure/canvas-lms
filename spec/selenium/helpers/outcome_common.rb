@@ -250,83 +250,19 @@ module OutcomeCommon
     expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
-  def should_validate_mastery_points
-    get outcome_url
-    f('.add_outcome_link').click
-    # Must have title for correct validation message to appear.
-    replace_content(f('.outcomes-content input[name=title]'), 'Outcome Mastery')
-    ## when
-    # not in ratings
-    replace_content f('input[name="mastery_points"]'), '-1'
-    # submit
-    f('.submit_button').click
-    wait_for_ajaximations
-
-    ## expect
-    expect(f('.error_box')).to be_present
-    expect(fj('.error_text div').text).to include("Must be greater than or equal to 0")
-  end
-
-  def should_validate_calculation_method_dropdown
-    get outcome_url
-    f('.add_outcome_link').click
-    # create array of drop down options
-    drop_down = get_options('#calculation_method').map(&:text).map(&:strip)
-    expected_array = ['Decaying Average', 'n Number of Times', 'Most Recent Score', 'Highest Score']
-    # expect
-    expect(drop_down.length).to eq(4)
-    expect(drop_down).to match_array(expected_array)
-  end
-
-  def should_validate_decaying_average_below_range
+  def should_validate_decaying_average_range
     get outcome_url
     f('.add_outcome_link').click
     below_range = 0
-    replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
-    click_option('#calculation_method', "Decaying Average")
-    # enter invalid number below range
-    replace_content(f('input[name=calculation_int]'), below_range)
-    f('.submit_button').click
-    wait_for_ajaximations
-    expect(f('.error_box')).to be_present
-    expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
-  end
-
-  def should_validate_decaying_average_above_range
-    get outcome_url
-    f('.add_outcome_link').click
     above_range = 100
     replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
     click_option('#calculation_method', "Decaying Average")
-    # enter second invalid number above range
-    replace_content(f('input[name=calculation_int]'), above_range)
-    wait_for_ajaximations
-    f('.submit_button').click
-    wait_for_ajaximations
-    expect(f('.error_box')).to be_present
-    expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
-  end
-
-  def should_validate_n_mastery_below_range
-    get outcome_url
-    f('.add_outcome_link').click
-    below_range = 0
-    replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
-    click_option('#calculation_method', "n Number of Times")
     # enter invalid number below range
     replace_content(f('input[name=calculation_int]'), below_range)
     f('.submit_button').click
     wait_for_ajaximations
     expect(f('.error_box')).to be_present
     expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
-  end
-
-  def should_validate_n_mastery_above_range
-    get outcome_url
-    f('.add_outcome_link').click
-    above_range = 6
-    replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
-    click_option('#calculation_method', "n Number of Times")
     # enter invalid number above range
     replace_content(f('input[name=calculation_int]'), above_range)
     f('.submit_button').click
@@ -335,29 +271,25 @@ module OutcomeCommon
     expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
   end
 
-  def should_validate_short_description_presence
+  def should_validate_n_mastery_range
     get outcome_url
-    wait_for_ajaximations
     f('.add_outcome_link').click
-    # Submit outcome with an empty title
-    f('.outcome_title').clear
+    below_range = 0
+    above_range = 6
+    replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
+    click_option('#calculation_method', "n Number of Times")
+    # enter invalid number below range
+    replace_content(f('input[name=calculation_int]'), below_range)
     f('.submit_button').click
     wait_for_ajaximations
-    scroll_page_to_top
-    scroll_element '.outcomes-content', 0
-
-    expect(f('.error_text div')).to include_text("Cannot be blank")
-  end
-
-  def should_validate_short_description_length
-    get outcome_url
-    wait_for_ajaximations
-    f('.add_outcome_link').click
-    content = ('Wee taco banana hello 255 characters exceeded' * 10)
-    replace_content f('.outcome_title'), (content)
+    expect(f('.error_box')).to be_present
+    expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
+    # enter invalid number above range
+    replace_content(f('input[name=calculation_int]'), above_range)
     f('.submit_button').click
     wait_for_ajaximations
-    expect(fj('.error_text')).to be_present
+    expect(f('.error_box')).to be_present
+    expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
   end
 
   def should_create_an_outcome_group_root_level
