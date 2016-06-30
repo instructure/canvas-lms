@@ -18,7 +18,7 @@ module Turnitin
       update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
       self.send_later(:update_originality_data, submission, asset_string)
     end
-    handle_asynchronously :process, max_attempts: 1, run_at: 1.minutes.from_now, priority: Delayed::LOW_PRIORITY
+    handle_asynchronously :process, max_attempts: 1, run_at: 5.minutes.from_now, priority: Delayed::LOW_PRIORITY
 
     def resubmit(submission, asset_string)
       self.send_later(:update_originality_data, submission, asset_string)

@@ -19,6 +19,7 @@ class DropZipFileImports < ActiveRecord::Migration
             root.s3object.copy_to(child.s3object)
           end
         else
+          Attachment.where(:id => root).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
           child.uploaded_data = root.open
         end
         child.save!
