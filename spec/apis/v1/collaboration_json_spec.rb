@@ -23,11 +23,12 @@ include Api::V1::Collaboration
 describe Api::V1::Collaboration do
   before(:once) do
     @current_user  = user_with_pseudonym(:active_all => true)
-    @collaboration = Collaboration.new(:title => 'Test collaboration',
+    @collaboration = ExternalToolCollaboration.new(:title => 'Test collaboration',
                                        :description => 'Let us collaborate',
                                        :type => 'ExternalToolCollaboration',
                                        :url => 'https://google.com',
                                        :user => @current_user)
+    @collaboration.data = {updateUrl: 'https://google.com'}
     @collaboration.save!
   end
 
@@ -51,9 +52,15 @@ describe Api::V1::Collaboration do
     expect(json['deleted_at']).to eq nil
   end
 
-  it 'should includes the owning users name' do
+  it 'should include the owning users name' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['user_name']).to eq @current_user.name
+  end
+
+  it 'should include the update_url' do
+    json = collaboration_json(@collaboration, @current_user, nil)
+
+    expect(json['update_url']).to eq @collaboration.update_url
   end
 end
