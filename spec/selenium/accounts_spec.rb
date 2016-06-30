@@ -169,7 +169,7 @@ describe "account" do
     it "should search for an existing course" do
       find_course_form = f('#new_course')
       submit_input(find_course_form, '#course_name', @course_name)
-      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(@course_name)
+      expect(f('#breadcrumbs .home + li a')).to include_text(@course_name)
     end
 
     it "should correctly autocomplete for courses" do

@@ -33,7 +33,7 @@ describe "dashboard" do
 
       get "/"
 
-      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
+      f('#dashboardToggleButton').click
       #verify assignment changed notice is in messages
       f('.stream-assignment .stream_header').click
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')

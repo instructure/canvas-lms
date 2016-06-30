@@ -280,7 +280,7 @@ describe "courses" do
       expect(options.length).to eq 2
       wait_for_ajaximations
       expect_new_page_load{ click_option('#course_url', course2.name) }
-      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(course2.name)
+      expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)
     end
 
     it "should load the users page using ajax" do

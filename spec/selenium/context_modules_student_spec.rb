@@ -199,7 +199,7 @@ describe "context modules" do
 
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
-      nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+      nxt = f('.module-sequence-footer-button--next')
       expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}")
 
       # Should redirect to the published item
@@ -284,8 +284,8 @@ describe "context modules" do
 
       def verify_next_and_previous_buttons_display
         wait_for_ajaximations
-        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')).to be_displayed
-        expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')).to be_displayed
+        expect(f('.module-sequence-footer-button--previous')).to be_displayed
+        expect(f('.module-sequence-footer-button--next')).to be_displayed
       end
 
       def module_setup
@@ -380,22 +380,22 @@ describe "context modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        nxt = f('.module-sequence-footer-button--next')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
-        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        nxt = f('.module-sequence-footer-button--next')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after2.id}")
 
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        expect(f("#content")).not_to contain_css(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
-        expect(f("#content")).not_to contain_css(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        expect(f("#content")).not_to contain_css('.module-sequence-footer-button--previous')
+        expect(f("#content")).not_to contain_css('.module-sequence-footer-button--next')
       end
 
       it "should show the nav when going straight to the item if there's only one tag" do
@@ -404,9 +404,9 @@ describe "context modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        prev = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--previous' : '.module-sequence-footer a.pull-left')
+        prev = f('.module-sequence-footer-button--previous')
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
-        nxt = f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.module-sequence-footer-button--next' : '.module-sequence-footer a.pull-right')
+        nxt = f('.module-sequence-footer-button--next')
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
 
