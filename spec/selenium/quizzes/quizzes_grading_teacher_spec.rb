@@ -59,6 +59,7 @@ describe 'Grading quizzes' do
       it 'doesn\'t offer regrade options', priority: "1", test_id: 140626 do
         driver.manage.window.maximize
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        dismiss_flash_messages # can interfere w/ our hovering
         click_questions_tab
         edit_first_question
 

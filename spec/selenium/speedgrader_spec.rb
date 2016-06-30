@@ -219,6 +219,7 @@ describe 'Speedgrader' do
         expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
 
         replace_content f('#criterion_crit1 input.criterion_points'), '5'
+        scroll_into_view('button.save_rubric_button')
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
