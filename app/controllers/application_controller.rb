@@ -1774,6 +1774,13 @@ class ApplicationController < ActionController::Base
     super
   end
 
+  # flash is normally only preserved for one redirect; make sure we carry
+  # it along in case there are more
+  def redirect_to(*)
+    flash.keep
+    super
+  end
+
   def css_bundles
     @css_bundles ||= []
   end
