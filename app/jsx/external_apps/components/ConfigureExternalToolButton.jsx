@@ -75,7 +75,7 @@ define([
             <div className="ReactModal__Layout">
               <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Configurate %{tool} App?', {tool: this.props.tool.name})}</h4>
+                  <h4>{I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
                   <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
