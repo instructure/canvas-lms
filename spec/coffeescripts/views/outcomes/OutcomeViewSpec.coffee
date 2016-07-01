@@ -199,6 +199,16 @@ define [
     ok not view.$('.delete_button').attr('disabled')
     view.remove()
 
+  test 'edit is disabled when viewing an assessed account outcome in its native context', ->
+    view = createView
+      model: newOutcome(
+        { 'assessed' : true, 'native' : true, 'can_edit' : true, 'can_remove' : true  },
+        { 'assessed' : false, 'can_unlink': true}),
+      state: 'show'
+    ok view.$('.edit_button').length > 0
+    ok view.$('.edit_button').attr('disabled')
+    view.remove()
+
   test 'delete button is not shown for outcomes that cannot be unlinked', ->
     view = createView
       model: newOutcome(

@@ -284,6 +284,20 @@ describe "Outcomes API", type: :request do
                      :format => 'json')
         expect(json).to eq(outcome_json(@outcome, { :calculation_method => "highest", :can_edit => true }))
       end
+
+      it "should report as assessed if assessments exist in any aligned course" do
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true)
+        assignment_model({:course => @course})
+        assess_outcome(@outcome)
+        raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                     :controller => 'outcomes_api',
+                     :action => 'show',
+                     :id => @outcome.id.to_s,
+                     :format => 'json')
+        json = controller.outcome_json(@outcome, @account_user, session, {assessed_outcomes: [@outcome]})
+        expect(json["assessed"]).to be true
+      end
     end
 
     describe "update" do
