@@ -27,7 +27,7 @@ define([
 
     var $label = $("<label/>", {
       id: labelId,
-      class: "screenreader-only",
+      "class": "screenreader-only",
       text: text
     })
 
