@@ -2616,6 +2616,13 @@ describe CoursesController, type: :request do
       expect(json['grading_standard_id']).to eq(standard.id)
     end
 
+    it 'includes tabs if requested' do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=tabs",
+        { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['tabs'] })
+      expect(json).to have_key 'tabs'
+      expect(json['tabs'].map{ |tab| tab['id']} ).to eq(["home", "announcements", "assignments", "discussions", "grades", "people", "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings"])
+    end
+
     context "when scoped to account" do
       before :once do
         @admin = account_admin_user(:account => @course.account, :active_all => true)

@@ -303,6 +303,11 @@ describe "Groups API", type: :request do
     expect(json['permissions']['create_announcement']).to be_truthy
   end
 
+  it 'includes tabs if requested' do
+    json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "tabs" ]))
+    expect(json).to have_key 'tabs'
+    expect(json['tabs'].map{ |tab| tab['id']} ).to eq(["home", "announcements", "pages", "people", "discussions", "files"])
+  end
 
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')

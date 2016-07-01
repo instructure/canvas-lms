@@ -107,8 +107,7 @@ class TabsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      json = tabs_available_json(context_tabs, @current_user, session)
-      render :json => json.select { |tab| tab[:type] == 'external' ? Array(params[:include]).include?('external') : true }
+      render :json => tabs_available_json(@context, @current_user, session, Array(params[:include]))
     end
   end
 
@@ -134,7 +133,7 @@ class TabsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_content) && @context.is_a?(Course)
     css_class = params['tab_id']
     new_pos = params['position'].to_i if params['position']
-    tabs = context_tabs
+    tabs = context_tabs(@context, @current_user)
     tab = (tabs.find { |t| t.with_indifferent_access[:css_class] == css_class }).with_indifferent_access
     tab_config = @context.tab_configuration
     tab_config = tabs.map do |t|
@@ -169,38 +168,7 @@ class TabsController < ApplicationController
 
       @context.tab_configuration = tab_config
       @context.save!
-      render json: tab_json(tab, @current_user, session)
+      render json: tab_json(tab, @context, @current_user, session)
     end
   end
-
-  def context_tabs
-    new_collaborations_enabled = @context.feature_enabled?(:new_collaborations)
-
-    tabs = @context.tabs_available(@current_user, :include_external => true, :api => true).select do |tab|
-      if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
-        tab[:href] && tab[:label] && !new_collaborations_enabled && Collaboration.any_collaborations_configured?(@context)
-      elsif (tab[:id] == @context.class::TAB_COLLABORATIONS_NEW rescue false)
-        tab[:href] && tab[:label] && new_collaborations_enabled
-      elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
-        tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
-      else
-        tab[:href] && tab[:label]
-      end
-    end
-    tab_positions(tabs)
-  end
-
-  def tab_positions(tabs)
-    tab_config = self.respond_to?(:tab_configuration) && self.tab_configuration.present? && self.tab_configuration
-    tabs.each_with_index.map do |tab, i|
-      if tab_config
-        position = @context.class::TAB_SETTINGS == tab['id'] ? tabs.size : tab_configuration.index { |t| t['id'] == tab['id'] } + 1
-      else
-        position = i + 1
-      end
-      tab[:position] = position
-    end
-    tabs
-  end
-
 end

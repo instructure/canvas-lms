@@ -376,6 +376,9 @@ class CoursesController < ApplicationController
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
   #     observer enrollment.
+  #   - "tabs": Optional information to include with each Course.
+  #     Will include the list of tabs configured for each course.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -482,6 +485,9 @@ class CoursesController < ApplicationController
   #   - "observed_users": Optional information to include with each Course.
   #     Will include data for observed users if the current user has an
   #     observer enrollment.
+  #   - "tabs": Optional information to include with each Course.
+  #     Will include the list of tabs configured for each course.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
