@@ -9,6 +9,8 @@ define([
   'jqueryui/accordion'
 ], (React, I18n, ThemeEditorColorRow, ThemeEditorImageRow, RangeInput, customTypes, $) => {
 
+  const activeIndexKey = 'Theme__editor-accordion-index'
+
   return React.createClass({
 
     displayName: 'ThemeEditorAccordion',
@@ -22,7 +24,33 @@ define([
     },
 
     componentDidMount() {
+      this.initAccordion()
+    },
+
+    getStoredAccordionIndex(){
+    // Note that "Number(null)" returns 0
+      return Number(window.sessionStorage.getItem(activeIndexKey))
+    },
+
+    setStoredAccordionIndex(index){
+      window.sessionStorage.setItem(activeIndexKey, index)
+    },
+
+    // Returns the index of the current accordion pane open
+    getCurrentIndex(){
+      return $(this.getDOMNode()).accordion('option','active')
+    },
+
+    // Remembers which accordion pane is open
+    rememberActiveIndex(){
+      var index = this.getCurrentIndex()
+      this.setStoredAccordionIndex(index)
+    },
+
+    initAccordion(){
+      const index = this.getStoredAccordionIndex()
       $(this.getDOMNode()).accordion({
+        active: index,
         header: "h3",
         heightStyle: "content",
         beforeActivate: function ( event, ui) {
@@ -33,7 +61,8 @@ define([
           } else {
             previewIframe.scrollTo(0);
           }
-        }
+        },
+        activate: this.rememberActiveIndex
       });
     },
 
