@@ -149,7 +149,6 @@ distinct and easier to identify. Note: Institution branding will be disabled.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true,
       autoexpand: true
     },
     'outcome_gradebook' =>
