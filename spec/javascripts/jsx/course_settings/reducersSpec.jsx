@@ -74,5 +74,24 @@ define(['jsx/course_settings/reducer'], (reducer) => {
     equal(newState.hiddenInputName, 'course[image_id]', 'input name is set properly');
   });
 
+  test('REMOVE_IMAGE', () => {
+    const action = {
+      type: 'REMOVE_IMAGE'
+    };
+
+    const initialState = {
+      imageUrl: 'http://imageUrl',
+      courseImage: '42',
+      removeImage: false,
+      hiddenInputName: ''
+    };
+
+    const newState = reducer(initialState, action);
+    equal(newState.imageUrl, '', 'image url gets set');
+    equal(newState.courseImage, 'abc', 'image id gets set');
+    equal(newState.removeImage, true, 'remove image is set');
+    equal(newState.hiddenInputName, 'course[remove_image]', 'input name is set properly');
+  });
+
 
 });

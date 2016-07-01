@@ -4,6 +4,8 @@ define([], () => {
     courseImage: 'abc',
     imageUrl: '',
     showModal: false,
+    gettingImage: false,
+    removeImage: false,
     hiddenInputName: ''
   };
 

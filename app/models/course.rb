@@ -413,7 +413,7 @@ class Course < ActiveRecord::Base
 
   def image
     if self.image_id.present?
-      self.attachments.active.where(id: self.image_id).first.download_url
+      self.attachments.active.where(id: self.image_id).first.download_url rescue nil
     elsif self.image_url
       self.image_url
     end

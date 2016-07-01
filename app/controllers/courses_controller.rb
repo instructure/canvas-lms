@@ -2056,6 +2056,9 @@ class CoursesController < ApplicationController
   #   This will clear the course's image_id setting if set.  If you attempt
   #   to provide image_url and image_id in a request it will fail.
   #
+  # @argument course[remove_image] [Boolean]
+  #   If this option is set to true, the course image url and course image
+  #   ID are both set to nil
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -2197,6 +2200,11 @@ class CoursesController < ApplicationController
             return
           end
         end
+      end
+
+      if params[:course][:remove_image]
+        @course.image_url = nil
+        @course.image_id = nil
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)

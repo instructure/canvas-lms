@@ -1495,6 +1495,22 @@ describe CoursesController do
         expect(@course.settings[:image_id]).to eq ''
         expect(@course.settings[:image_url]).to eq 'http://farm3.static.flickr.com/image.jpg'
       end
+
+      it "should clear image id after setting remove_image" do
+        put 'update', :id => @course.id, :course => { :image_id => '12345678' }
+        put 'update', :id => @course.id, :course => { :remove_image => true }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq ''
+        expect(@course.settings[:image_url]).to eq ''
+      end
+
+      it "should clear image url after setting remove_image" do
+        put 'update', :id => @course.id, :course => { :image_url => 'http://farm3.static.flickr.com/image.jpg' }
+        put 'update', :id => @course.id, :course => { :remove_image => true }
+        @course.reload
+        expect(@course.settings[:image_id]).to eq ''
+        expect(@course.settings[:image_url]).to eq ''
+      end
     end
   end
 

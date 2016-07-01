@@ -1,9 +1,10 @@
 define ([
   'axios',
+  'jquery',
   'i18n!actions',
   './helpers',
   'compiled/jquery.rails_flash_notifications'
-], (axios, I18n, Helpers) => {
+], (axios, $, I18n, Helpers) => {
 
   const Actions = {
 
@@ -36,6 +37,12 @@ define ([
 
     errorUploadingImage() {
       $.flashError(I18n.t("There was an error uploading the image"));
+    },
+
+    removeImage() {
+      return {
+        type: 'REMOVE_IMAGE'
+      };
     },
 
     getCourseImage (courseId, ajaxLib = axios) {
