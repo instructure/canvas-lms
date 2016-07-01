@@ -60,7 +60,7 @@ module Api::V1::Group
     hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.account.grants_any_right?(user, session, :read_sis, :manage_sis)
     hash['sis_import_id'] = group.sis_batch_id if group.context_type == 'Account' && group.account.grants_right?(user, session, :manage_sis)
     hash['has_submission'] = group.submission?
-    hash['concluded'] = group.context.concluded?
+    hash['concluded'] = group.context.concluded? || group.context.deleted?
 
     hash
   end
