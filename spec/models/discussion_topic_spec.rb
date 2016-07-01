@@ -182,6 +182,11 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(@student)).to be_truthy
     end
 
+    it "should not be visible to unauthenticated users in a public course" do
+      @course.update_attribute(:is_public, true)
+      expect(@topic.visible_for?(nil)).to be_falsey
+    end
+
     it "should be visible when no delayed_post but assignment unlock date in future" do
       @topic.delayed_post_at = nil
       group_category = @course.group_categories.create(:name => "category")

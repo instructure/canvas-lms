@@ -556,8 +556,15 @@ describe DiscussionTopicsController do
       expect(feed.links.first.href).to match(/http:\/\//)
     end
 
-    it "should include an author for each entry" do
+    it "should not include entries in an anonymous feed" do
       get 'public_feed', :format => 'atom', :feed_code => @course.feed_code
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed).not_to be_nil
+      expect(feed.entries).to be_empty
+    end
+
+    it "should include an author for each entry with an enrollment feed" do
+      get 'public_feed', :format => 'atom', :feed_code => @course.teacher_enrollments.first.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
