@@ -1024,7 +1024,7 @@ class DiscussionTopic < ActiveRecord::Base
       # user is the topic's author
       next true if user && user == self.user
 
-      next false if user && !(is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
+      next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
 
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
