@@ -102,7 +102,7 @@ describe BrandConfig do
     end
 
     it "includes default variables not found in brand config" do
-      expect(@brand_variables["ic-link-color"]).to eq '#0081bd'
+      expect(@brand_variables["ic-link-color"]).to eq '#008EE2'
     end
   end
 

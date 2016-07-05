@@ -1,130 +1,81 @@
 /*
 @styleguide Colors
-
-
-## 3:1 Default Colors
+<br/>
 
 <div class="grid-row Colorguide-container--primary-theme">
-  <div class="Colorguide-color Colorguide-color--primary">
-    <span class="Colorguide-var">
-      Brand Primary
-      <br/>
-      $ic-brand-primary
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--success">
-    <span class="Colorguide-var ">
-      Success Green
-      <br/>
-      $ic-color-success
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--neutral">
-    <span class="Colorguide-var">
-      Neutral Grey
-      <br/>
-      $ic-color-neutral
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--action">
-    <span class="Colorguide-var">
-      Action Magenta
-      <br/>
-      $ic-color-action
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--danger">
-    <span class="Colorguide-var">
-      Danger Red
-      <br/>
-      $ic-color-danger
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--alert">
-    <span class="Colorguide-var">
-      Alert Gold
-      <br/>
-      $ic-color-alert
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--light">
-    <span class="Colorguide-var">
-      Light White
-      <br/>
-      $ic-color-light
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--dark">
-    <span class="Colorguide-var">
-      Dark Grey
-      <br/>
-      $ic-color-dark
-    </span>
-  </div>
+    <div class="Colorguide-color Colorguide-color--primary">
+      <span class="Colorguide-var">
+        Brand Primary
+        <br/>
+        $ic-brand-primary
+      </span>
+    </div>
+    <div class="Colorguide-color Colorguide-color--success">
+      <span class="Colorguide-var ">
+        Success Green
+        <br/>
+        $ic-color-success
+      </span>
+    </div>
+    <div class="Colorguide-color Colorguide-color--action">
+      <span class="Colorguide-var">
+        Action
+        <br/>
+        $ic-color-action
+      </span>
+    </div>
+    <div class="Colorguide-color Colorguide-color--danger">
+      <span class="Colorguide-var">
+        Danger
+        <br/>
+        $ic-color-danger
+      </span>
+    </div>
+    <div class="Colorguide-color Colorguide-color--alert">
+      <span class="Colorguide-var">
+        Alert
+        <br/>
+        $ic-color-alert
+      </span>
+    </div>
 </div>
-
-
-## 4.5:1 High Contrast Colors
-
-**Note**: We are forcing high-contrast mode here to show color changes
-<br/>
-<div class="grid-row Colorguide-container--hc-theme">
-  <div class="Colorguide-color Colorguide-color--primary">
-    <span class="Colorguide-var">
-      Brand Primary
-      <br/>
-      $ic-brand-primary
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--success">
-    <span class="Colorguide-var ">
-      Success Green
-      <br/>
-      $ic-color-success
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--neutral">
-    <span class="Colorguide-var">
-      Neutral Grey
-      <br/>
-      $ic-color-neutral
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--action">
-    <span class="Colorguide-var">
-      Action Magenta
-      <br/>
-      $ic-color-action
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--danger">
-    <span class="Colorguide-var">
-      Danger Red
-      <br/>
-      $ic-color-danger
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--alert">
-    <span class="Colorguide-var">
-      Alert Gold
-      <br/>
-      $ic-color-alert
-    </span>
-  </div>
-  <div class="Colorguide-color Colorguide-color--light">
-    <span class="Colorguide-var">
-      Light White
-      <br/>
-      $ic-color-light
-    </span>
-  </div>
+<div class="grid-row Colorguide-container--primary-theme">
   <div class="Colorguide-color Colorguide-color--dark">
     <span class="Colorguide-var">
-      Dark Grey
+      Dark
       <br/>
       $ic-color-dark
     </span>
   </div>
+  <div class="Colorguide-color Colorguide-color--medium-darker">
+    <span class="Colorguide-var">
+      Medium-Darker
+      <br/>
+      $ic-color-medium-darker
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--medium">
+    <span class="Colorguide-var">
+      Medium
+      <br/>
+      $ic-color-medium
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--medium-light">
+    <span class="Colorguide-var">
+      Medium Light
+      <br/>
+      $ic-color-medium-light
+    </span>
+  </div>
+  <div class="Colorguide-color Colorguide-color--light">
+    <span class="Colorguide-var">
+      Light
+      <br/>
+      $ic-color-light
+    </span>
+  </div>
+
 </div>
 
 ## Using color variables
@@ -151,25 +102,20 @@ Then we would write our scss it like:
 When adding background colors, use the variable we have provided. This will ensure we continue to meet our a11y contrast ratios.
 <br/>
 <br/>
-<div class="sg-bg-color-example">This is using: background: $ic-bg-light-primary</div>
+<div class="sg-bg-color-example">This is using: background: $ic-bg-light-primary and color: $ic-bg-light-primary-text</div>
 <br/>
-<div class="sg-bg-color-example sg-bg-color-example--neutral">This is using: background: $ic-bg-light-neutral</div>
+<div class="sg-bg-color-example sg-bg-color-example--neutral">This is using: background: $ic-bg-light-neutral and color: $ic-bg-light-neutral-text</div>
 <br/>
-<div class="sg-bg-color-example sg-bg-color-example--success">This is using: background: $ic-bg-light-success</div>
+<div class="sg-bg-color-example sg-bg-color-example--success">This is using: background: $ic-bg-light-success and color: $ic-bg-light-success-text</div>
 <br/>
-<div class="sg-bg-color-example sg-bg-color-example--alert">This is using: background: $ic-bg-light-alert</div>
+<div class="sg-bg-color-example sg-bg-color-example--alert">This is using: background: $ic-bg-light-alert and color: $ic-bg-color-light-alert-text</div>
 <br/>
-<div class="sg-bg-color-example sg-bg-color-example--danger">This is using: background: $ic-bg-light-danger</div>
+<div class="sg-bg-color-example sg-bg-color-example--danger">This is using: background: $ic-bg-light-danger and color: $ic-bg-light-danger-text</div>
 
 
-
-
-## tl;dr
 
   - Use color variables when adding colors to your elements.
   - Use function variable names when pulling in color variables.
-  - Do not use hex codes in .scss files.
-  - If that color needs to be tweaked, use the scss functions for `lighten($my-color, 10%)` and `darken($my-color, 10%)`
   - High Contrast colors are automatically pulled in based on the canvas color variables.
 
 */

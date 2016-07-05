@@ -278,8 +278,11 @@ $announcements_disscussion-summary-color: $ic-color-dark;
       }
     }
     &.discussion-published {
-      .discussion-type, .discussion-title a {
-        @if $use_new_styles { color: $ic-color-success; }
+      .discussion-type {
+        color: $ic-color-success;
+      }
+      .discussion-title a {
+        @if $use_new_styles { color: $ic-font-color-dark; }
         @else { color: #33802a; }
       }
     }
@@ -294,7 +297,7 @@ $announcements_disscussion-summary-color: $ic-color-dark;
   .discussion-type {
     text-align: center;
     width: 36px;
-    @if $use_new_styles { padding-right: $ic-sp; }
+    @if $use_new_styles { padding-right: $ic-sp;}
   }
 
   @if $use_new_styles {
