@@ -13,12 +13,12 @@ module Lti
     end
 
     def resource_path
-      url = URI.parse(resource_url)
+      url = URI.parse(URI.encode(resource_url.strip))
       url.path.empty? ? '/' : url.path
     end
 
     def analytics_id
-      @analytics_id || URI.parse(resource_url).host || 'unknown'
+      @analytics_id || URI.parse(URI.encode(resource_url.strip)).host || 'unknown'
     end
 
     def analytics_message_type

@@ -164,7 +164,7 @@ module LtiOutbound
     end
 
     def self.generate_params(params, url, key, secret, feature_flags = {})
-      uri = URI.parse(url)
+      uri = URI.parse(URI.encode(url.strip))
 
       if uri.port == uri.default_port
         host = uri.host
