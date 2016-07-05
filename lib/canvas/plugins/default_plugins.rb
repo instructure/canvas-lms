@@ -367,3 +367,14 @@ Canvas::Plugin.register('live_events', nil, {
   :settings_partial => 'plugins/live_events_settings',
   :validator => 'LiveEventsValidator'
 })
+Canvas::Plugin.register('ally', :ally, {
+  :name => lambda{ t :name, "Ally" },
+  :description => lambda{ t :description, "Accessible Learning Content" },
+  :website => 'http://ally.ac',
+  :author => 'Ally',
+  :author_website => 'http://ally.ac',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/ally_settings',
+  :validator => 'AllyValidator',
+  :encrypted_settings => [:client_id, :secret, :base_url]
+})
