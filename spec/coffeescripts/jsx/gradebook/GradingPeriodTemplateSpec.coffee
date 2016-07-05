@@ -8,13 +8,14 @@ define [
   TestUtils = React.addons.TestUtils
   wrapper = document.getElementById('fixtures')
 
-  module 'readonly GradingPeriod',
+  module 'GradingPeriod with read-only permissions',
     renderComponent: (opts) ->
       defaultProps =
         title: "Spring"
         startDate: new Date("2015-03-01T00:00:00Z")
         endDate: new Date("2015-05-31T00:00:00Z")
         id: "1"
+        readOnly: false
         permissions: {
           update: false
           delete: false
@@ -36,10 +37,68 @@ define [
     gradingPeriod = @renderComponent(id: "new1")
     ok gradingPeriod.isNewGradingPeriod()
 
-  test 'addIdToText returns the given text with the component ID appended to it', ->
+  test 'does not render a delete button', ->
     gradingPeriod = @renderComponent()
-    expectedText = "some-text-" + gradingPeriod.props.id
-    equal gradingPeriod.addIdToText("some-text-"), expectedText
+    notOk gradingPeriod.refs.deleteButton
+
+  test 'renderTitle returns a non-input element (since the grading period is readonly)', ->
+    gradingPeriod = @renderComponent()
+    notEqual gradingPeriod.renderTitle().type, "input"
+
+  test 'renderStartDate returns a non-input element (since the grading period is readonly)', ->
+    gradingPeriod = @renderComponent()
+    notEqual gradingPeriod.renderStartDate().type, "input"
+
+  test 'renderEndDate returns a non-input element (since the grading period is readonly)', ->
+    gradingPeriod = @renderComponent()
+    notEqual gradingPeriod.renderEndDate().type, "input"
+
+  test 'displays the correct title', ->
+    gradingPeriod = @renderComponent()
+    titleNode = gradingPeriod.refs.title
+    equal titleNode.textContent, "Spring"
+
+  test 'displays the correct start date', ->
+    gradingPeriod = @renderComponent()
+    startDateNode = gradingPeriod.refs.startDate
+    equal startDateNode.textContent, "Mar 1, 2015 at 12am"
+
+  test 'displays the correct end date', ->
+    gradingPeriod = @renderComponent()
+    endDateNode = gradingPeriod.refs.endDate
+    equal endDateNode.textContent, "May 31, 2015 at 12am"
+
+  module "GradingPeriod with 'readOnly' set to true",
+    renderComponent: (opts) ->
+      defaultProps =
+        title: "Spring"
+        startDate: new Date("2015-03-01T00:00:00Z")
+        endDate: new Date("2015-05-31T00:00:00Z")
+        id: "1"
+        readOnly: true
+        permissions: {
+          update: true
+          delete: true
+        }
+        disabled: false
+        onDeleteGradingPeriod: ->
+        onDateChange: ->
+        onTitleChange: ->
+
+      @props = _.defaults(opts || {}, defaultProps)
+      GradingPeriodElement = React.createElement(GradingPeriod, @props)
+      ReactDOM.render(GradingPeriodElement, wrapper)
+
+    teardown: ->
+      ReactDOM.unmountComponentAtNode(wrapper)
+
+  test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
+    gradingPeriod = @renderComponent()
+    equal gradingPeriod.isNewGradingPeriod(), false
+
+  test 'isNewGradingPeriod returns true if the id contains "new"', ->
+    gradingPeriod = @renderComponent(id: "new1")
+    ok gradingPeriod.isNewGradingPeriod()
 
   test 'does not render a delete button', ->
     gradingPeriod = @renderComponent()
@@ -84,6 +143,7 @@ define [
           delete: true
         }
         disabled: false
+        readOnly: false
         onDeleteGradingPeriod: ->
         onDateChange: ->
         onTitleChange: ->
@@ -131,6 +191,7 @@ define [
           delete: true
         }
         disabled: false
+        readOnly: false
         onDeleteGradingPeriod: ->
         onDateChange: ->
         onTitleChange: ->

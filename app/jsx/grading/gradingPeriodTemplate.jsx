@@ -8,8 +8,12 @@ define([
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_date_and_time'
 ], function(tz, React, ReactDOM, $, I18n, _, DateHelper) {
-
   const types = React.PropTypes;
+
+  const postfixId = (text, { props }) => {
+    return text + props.id;
+  };
+
   let GradingPeriodTemplate = React.createClass({
     propTypes: {
       title: types.string.isRequired,
@@ -20,6 +24,7 @@ define([
         update: types.bool.isRequired,
         delete: types.bool.isRequired,
       }).isRequired,
+      readOnly: types.bool.isRequired,
       requiredPropsIfEditable: function(props) {
         if (!props.permissions.update && !props.permissions.delete) return;
 
@@ -67,7 +72,7 @@ define([
     },
 
     renderDeleteButton: function() {
-      if (!this.props.permissions.delete) return null;
+      if (!this.props.permissions.delete || this.props.readOnly) return null;
       let cssClasses = "Button Button--icon-action icon-delete-grading-period";
       if (this.props.disabled) cssClasses += " disabled";
       return (
@@ -87,9 +92,9 @@ define([
     },
 
     renderTitle: function() {
-      if (this.props.permissions.update) {
+      if (this.props.permissions.update && !this.props.readOnly) {
         return (
-          <input id={this.addIdToText("period_title_")}
+          <input id={postfixId("period_title_", this)}
                  type="text"
                  onChange={this.props.onTitleChange}
                  value={this.props.title}
@@ -98,7 +103,7 @@ define([
         );
       } else {
         return (
-          <div id={this.addIdToText("period_title_")} ref="title">
+          <div id={postfixId("period_title_", this)} ref="title">
             {this.props.title}
           </div>
         );
@@ -106,9 +111,9 @@ define([
     },
 
     renderStartDate: function() {
-      if (this.props.permissions.update) {
+      if (this.props.permissions.update && !this.props.readOnly) {
         return (
-          <input id={this.addIdToText("period_start_date_")}
+          <input id={postfixId("period_start_date_", this)}
                  type="text"
                  ref="startDate"
                  name="startDate"
@@ -118,7 +123,7 @@ define([
         );
       } else {
         return (
-          <div id={this.addIdToText("period_start_date_")} ref="startDate">
+          <div id={postfixId("period_start_date_", this)} ref="startDate">
             {DateHelper.formatDatetimeForDisplay(this.props.startDate)}
           </div>
         );
@@ -126,9 +131,9 @@ define([
     },
 
     renderEndDate: function() {
-      if (this.props.permissions.update) {
-        return(
-          <input id={this.addIdToText("period_end_date_")} type="text"
+      if (this.props.permissions.update && !this.props.readOnly) {
+        return (
+          <input id={postfixId("period_end_date_", this)} type="text"
                  className="input-grading-period-date date_field"
                  ref="endDate"
                  name="endDate"
@@ -137,35 +142,31 @@ define([
         );
       } else {
         return (
-          <div id={this.addIdToText("period_end_date_")} ref="endDate">
+          <div id={postfixId("period_end_date_", this)} ref="endDate">
             {DateHelper.formatDatetimeForDisplay(this.props.endDate)}
           </div>
         );
       }
     },
 
-    addIdToText: function(text) {
-      return text + this.props.id;
-    },
-
     render: function () {
       return (
-        <div id={this.addIdToText("grading-period-")} className="grading-period pad-box-mini border border-trbl border-round">
+        <div id={postfixId("grading-period-", this)} className="grading-period pad-box-mini border border-trbl border-round">
           <div className="grid-row pad-box-micro">
             <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={this.addIdToText("period_title_")}>
+              <label htmlFor={postfixId("period_title_", this)}>
                 {I18n.t("Grading Period Name")}
               </label>
               {this.renderTitle()}
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={this.addIdToText("period_start_date_")}>
+              <label htmlFor={postfixId("period_start_date_", this)}>
                 {I18n.t("Start Date")}
               </label>
               {this.renderStartDate()}
             </div>
             <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={this.addIdToText("period_end_date_")}>
+              <label htmlFor={postfixId("period_end_date_", this)}>
                {I18n.t("End Date")}
               </label>
               {this.renderEndDate()}

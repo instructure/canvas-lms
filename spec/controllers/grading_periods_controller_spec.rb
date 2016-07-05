@@ -39,28 +39,56 @@ describe GradingPeriodsController do
     let(:get_index!) { get :index, { course_id: course.id } }
     let(:json) { json_parse }
 
-    before do
-      period_helper.create_with_group_for_course(course)
+    context 'with course grading periods' do
+      before do
+        period_helper.create_with_group_for_course(course)
+      end
+
+      it 'contains grading periods owned by the course' do
+        get_index!
+        expect(json['grading_periods'].count).to eql(1)
+      end
+
+      it 'paginates' do
+        get_index!
+        expect(json).to have_key('meta')
+        expect(json['meta']).to have_key('pagination')
+        expect(json['meta']['primaryCollection']).to eql('grading_periods')
+      end
+
+      it 'is ordered by start_date' do
+        get_index!
+        expect(json['grading_periods']).to be_sorted_by('start_date')
+      end
+
+      it "sets 'grading_periods_read_only' to false" do
+        get_index!
+        expect(json['grading_periods_read_only']).to eql(false)
+      end
     end
 
-    it 'contains grading periods owned by the course' do
-      get_index!
-      expect(json['grading_periods'].count).to eql(1)
+    context 'with no grading periods' do
+      it "sets 'grading_periods_read_only' to false" do
+        get_index!
+        expect(json['grading_periods_read_only']).to eql(false)
+      end
     end
 
-    it 'paginates' do
-      get_index!
-      expect(json).to have_key('meta')
-      expect(json['meta']).to have_key('pagination')
-      expect(json['meta']['primaryCollection']).to eql('grading_periods')
-    end
-
-    it 'is ordered by start_date' do
-      get_index!
-      expect(json['grading_periods']).to be_sorted_by('start_date')
+    context 'with account grading periods' do
+      it "sets 'grading_periods_read_only' to true" do
+        group = group_helper.create_for_account(root_account)
+        course.enrollment_term.update_attribute(:grading_period_group_id, group)
+        period_helper.create_for_group(group)
+        get_index!
+        expect(json['grading_periods_read_only']).to eql(true)
+      end
     end
 
     context 'with root account admins' do
+      before do
+        period_helper.create_with_group_for_course(course)
+      end
+
       it 'disallows creating grading periods' do
         root_account.enable_feature!(:multiple_grading_periods)
         get_index!
@@ -88,6 +116,10 @@ describe GradingPeriodsController do
 
     context 'with sub account admins' do
       let(:sub_account_admin) { account_admin_user(account: sub_account) }
+
+      before do
+        period_helper.create_with_group_for_course(course)
+      end
 
       it 'disallows creating grading periods' do
         root_account.enable_feature!(:multiple_grading_periods)
@@ -386,6 +418,84 @@ describe GradingPeriodsController do
       period = period_helper.create_with_group_for_course(course)
       patch :batch_update, { course_id: course.id, grading_periods: [{id: period.id, title: ''}] }
       expect(response).not_to be_ok
+      json = JSON.parse(response.body)
+      expect(json['errors']).to be_present
+      expect(json).not_to have_key('grading_periods')
+    end
+  end
+
+  describe "PATCH batch_update with a course for account-level grading periods" do
+    let(:period_1_params) do
+      {
+        title: 'Original Title',
+        start_date: 2.days.ago(now).to_s,
+        end_date: 2.days.from_now(now).to_s
+      }
+    end
+    let(:group) { group_helper.create_for_account(root_account) }
+    let(:period_1) { group.grading_periods.create!(period_1_params) }
+
+    before(:each) do
+      user = User.create!
+      root_account.account_users.create!(:user => user)
+      user_session(user)
+      course.enrollment_term.update_attribute(:grading_period_group_id, group)
+    end
+
+    it "cannot update any grading periods" do
+      patch :batch_update, { course_id: course.id, grading_periods: [
+        period_1_params.merge(id: period_1.id, title: 'Updated Title')
+      ] }
+      expect(period_1.reload.title).to eql('Original Title')
+      expect(GradingPeriod.for(course).find(period_1.id).title).to eql('Original Title')
+    end
+
+    it "responds with json upon failure" do
+      patch :batch_update, { course_id: course.id, grading_periods: [
+        period_1_params.merge(id: period_1.id, title: 'Updated Title')
+      ] }
+      expect(response.status).to eql(Rack::Utils.status_code(:unauthorized))
+      json = JSON.parse(response.body)
+      expect(json['errors']).to be_present
+      expect(json).not_to have_key('grading_periods')
+    end
+  end
+
+  describe "DELETE destroy with a course for course-level grading periods" do
+    it "can destroy any grading periods" do
+      user = User.create!
+      root_account.account_users.create!(:user => user)
+      user_session(user)
+
+      group = group_helper.legacy_create_for_course(course)
+      period = period_helper.create_for_group(group)
+      course.enrollment_term.update_attribute(:grading_period_group_id, group)
+
+      delete :destroy, { course_id: course.id, id: period.to_param }
+      expect(period.reload).to be_deleted
+    end
+  end
+
+  describe "DELETE destroy with a course for account-level grading periods" do
+    let(:group) { group_helper.create_for_account(root_account) }
+    let(:period) { period_helper.create_for_group(group) }
+
+    before(:each) do
+      user = User.create!
+      root_account.account_users.create!(:user => user)
+      user_session(user)
+      course.enrollment_term.update_attribute(:grading_period_group_id, group)
+    end
+
+    it "cannot destroy any grading periods" do
+      delete :destroy, { course_id: course.id, id: period.to_param }
+      expect(period.reload).not_to be_deleted
+      expect(GradingPeriod.for(course).find(period.id).title).to eql('Example Grading Period')
+    end
+
+    it "responds with json upon failure" do
+      delete :destroy, { course_id: course.id, id: period.to_param }
+      expect(response.status).to eql(Rack::Utils.status_code(:unauthorized))
       json = JSON.parse(response.body)
       expect(json['errors']).to be_present
       expect(json).not_to have_key('grading_periods')

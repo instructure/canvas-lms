@@ -41,45 +41,62 @@ define [
         endDate: new Date("2015-05-31T00:00:00Z")
         weight: null
         disabled: false
+        readOnly: false
         permissions: { read: true, update: true, create: true, delete: true }
         onDeleteGradingPeriod: ->
         updateGradingPeriodCollection: sinon.spy()
 
+      @server.respond()
+    renderComponent: ->
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
       @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
-      @server.respond()
     teardown: ->
       ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@gradingPeriod).parentNode)
       ENV.GRADING_PERIODS_URL = null
       @server.restore()
 
   test 'sets initial state properly', ->
+    @renderComponent()
     equal @gradingPeriod.state.title, @props.title
     equal @gradingPeriod.state.startDate, @props.startDate
     equal @gradingPeriod.state.endDate, @props.endDate
     equal @gradingPeriod.state.weight, @props.weight
 
   test 'onDateChange calls replaceInputWithDate', ->
+    @renderComponent()
     replaceInputWithDate = @stub(@gradingPeriod, 'replaceInputWithDate')
     @gradingPeriod.onDateChange("startDate", "period_start_date_1")
     ok replaceInputWithDate.calledOnce
 
   test 'onDateChange calls updateGradingPeriodCollection', ->
+    @renderComponent()
     @gradingPeriod.onDateChange("startDate", "period_start_date_1")
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'onTitleChange changes the title state', ->
+    @renderComponent()
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
     @gradingPeriod.onTitleChange(fakeEvent)
     deepEqual @gradingPeriod.state.title, "MXP: Most Xtreme Primate"
 
   test 'onTitleChange calls updateGradingPeriodCollection', ->
+    @renderComponent()
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
     @gradingPeriod.onTitleChange(fakeEvent)
     ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'replaceInputWithDate calls formatDatetimeForDisplay', ->
+    @renderComponent()
     formatDatetime = @stub(DateHelper, 'formatDatetimeForDisplay')
     fakeDateElement = { val: -> }
     @gradingPeriod.replaceInputWithDate("startDate", fakeDateElement)
     ok formatDatetime.calledOnce
+
+  test "assigns the 'readOnly' property on the template when false", ->
+    @renderComponent()
+    equal @gradingPeriod.refs.template.props.readOnly, false
+
+  test "assigns the 'readOnly' property on the template when true", ->
+    @props.readOnly = true
+    @renderComponent()
+    equal @gradingPeriod.refs.template.props.readOnly, true
