@@ -24,21 +24,36 @@ class ContextModulesController < ApplicationController
   before_filter { |c| c.active_tab = "modules" }
 
   module ModuleIndexHelper
+    include ContextModulesHelper
+
     def load_module_file_details
       attachment_tags = @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').preload(:content => :folder)
       attachment_tags.inject({}) do |items, file_tag|
         items[file_tag.id] = {
-            id: file_tag.id,
-            content_id: file_tag.content_id,
-            content_details: content_details(file_tag, @current_user, :for_admin => true)
+          id: file_tag.id,
+          content_id: file_tag.content_id,
+          content_details: content_details(file_tag, @current_user, :for_admin => true)
         }
         items
+      end
+    end
+
+    def modules_cache_key
+      @modules_cache_key ||= begin
+        visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
+        cache_key_items = [@context.cache_key, @can_edit, 'all_context_modules_draft_8', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+        cache_key = cache_key_items.join('/')
+        cache_key = add_menu_tools_to_cache_key(cache_key)
       end
     end
 
     def load_modules
       @modules = @context.modules_visible_to(@current_user)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).select([:context_module_id, :collapsed]).select{|p| p.collapsed? }.map(&:context_module_id)
+
+      @can_edit = can_do(@context, @current_user, :manage_content)
+
+      modules_cache_key
 
       @menu_tools = {}
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
@@ -65,7 +80,6 @@ class ContextModulesController < ApplicationController
 
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        ActiveRecord::Associations::Preloader.new.preload(@modules, :content_tags)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end

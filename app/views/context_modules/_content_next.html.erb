@@ -1,17 +1,16 @@
-<% @body_classes << 'padless-content' %>
-<% course_home ||= false %>
 <%
+  @body_classes << 'padless-content'
+  course_home ||= false
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
-    :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content),
+    :CAN_MANAGE_MODULES => @can_edit,
     :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
   })
+  js_bundle :context_modules
+  css_bundle :content_next
 %>
-<% js_bundle :context_modules %>
-<% css_bundle :content_next %>
-
 <% if course_home %>
   <div class="screenreader-only"><%= @context.name %></div>
   <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
@@ -20,7 +19,7 @@
 <% end %>
 
 <div class="header-bar">
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if @can_edit %>
     <div class="header-bar-right">
       <a class="btn module_progressions_link" href="<%= progressions_course_context_modules_path(@context) %>"><%= t('links.student_progress', 'View Progress') %></a>
       <button class="btn btn-primary add_module_link">
@@ -32,7 +31,7 @@
   <% end %>
 </div>
 
-<% if can_do(@context, @current_user, :manage_content) %>
+<% if @can_edit %>
   <div class="hidden-readable screenreader-only" aria-label="keyboard instructions">
     <%= t('modules_keyboard_hint_updated',
           'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
@@ -59,27 +58,21 @@ TEXT
   <div
     id="context_modules"
     aria-label="<%= t('headings.course_modules', %{Course Modules}) %>"
-    class="ig-list <%= 'editable' if can_do(@context, @current_user, :manage_content) %>"
+    class="ig-list <%= 'editable' if @can_edit %>"
   >
-    <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context) %>
-    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_9', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)] %>
-    <% cache_key = cache_key_items.join('/') %>
-    <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
-    <% cache(cache_key) do %>
-      <% ActiveRecord::Associations::Preloader.new.preload(@modules, :content_tags => :content) %>
-      <% preload_can_unpublish(@context, @modules) %>
+    <% cache(@modules_cache_key) do %>
+      <% preload_modules_content(@modules, @can_edit) %>
       <% @modules.each do |m| %>
-        <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable} %>
+        <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module, :locals => { :editable => @can_edit } %>
       <% end %>
     <% end %>
   </div>
 </div>
 
-<%= render :partial => 'context_modules/context_module_next', :object => nil %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable } %>
+<%= render :partial => 'context_modules/context_module_next', :object => nil, :as => :context_module %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :as => :module_item, :locals => { :editable => @can_edit } %>
 
-<% if can_do(@context, @current_user, :manage_content) %>
+<% if @can_edit %>
   <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
     <div class="form-dialog-content">
       <h2><%= t('move_module.place', "Place ") %> <span id="move_module_name"> </span></h2>
