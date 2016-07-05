@@ -135,7 +135,7 @@ class DiscussionTopicsApiController < ApplicationController
       participant_info = participants.map do |participant|
         json = user_display_json(participant, @context.is_a_context? && @context)
         if include_enrollment_state
-          enrolls = all_enrollments[participant.id]
+          enrolls = all_enrollments[participant.id] || []
           json[:isInactive] = enrolls.any? && enrolls.all?(&:inactive?)
         end
 
