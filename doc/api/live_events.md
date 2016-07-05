@@ -70,6 +70,7 @@ Note: All Canvas ids are "global" identifiers, returned as strings.
 Note that the actual bodies of events may include more fields than
 what's described in this document. Those fields are subject to change.
 
+
 #### `syllabus_updated`
 
 | Field | Description |
@@ -105,7 +106,7 @@ what's described in this document. Those fields are subject to change.
 | Field | Description |
 | ----- | ----------- |
 | `group_category_id` | The Canvas id of the newly created group category. |
-| `group_category_name` | The name of the newly created group |
+| `group_category_name` | The name of the newly created group. |
 
 
 #### `group_created`
@@ -266,10 +267,11 @@ by `asset_type` and `asset_id`.
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |
 | `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
-| `submission_type` | The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording') |
-| `body` | The content of the submission, if it was submitted directly in a text field.  (possibly truncated)|
+| `submission_type` | The types of submission ex: ('online_text_entry'\|'online_url'\|'online_upload'\|'media_recording') |
+| `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
-| `attempt` | This is the submission attempt number.|
+| `attempt` | This is the submission attempt number. |
+
 
 #### `submission_updated`
 
@@ -282,7 +284,33 @@ by `asset_type` and `asset_id`.
 | `updated_at` | The time at which this assignment was last modified in any way |
 | `score` | The raw score |
 | `grade` | The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example)|
-| `submission_type` | The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording') |
+| `submission_type` | The types of submission ex: ('online_text_entry'\|'online_url'\|'online_upload'\|'media_recording') |
 | `body` | The content of the submission, if it was submitted directly in a text field. (possibly truncated) |
 | `url` | The URL of the submission (for 'online_url' submissions) |
-| `attempt` | This is the submission attempt number.|
+| `attempt` | This is the submission attempt number. |
+
+
+#### `enrollment_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `enrollment_id` | The Canvas id of the new enrollment. |
+| `course_id` | The Canvas id of the course for this enrollment. |
+| `user_id` | The Canvas id of the user for this enrollment. |
+| `user_name` | The user's name. |
+| `type` | The type of enrollment; e.g. 'StudentEnrollment', 'TeacherEnrollment', etc. |
+| `created_at` | The time at which this enrollment was created. |
+| `updated_at` | The time at which this enrollment was last modified in any way. |
+| `limit_privileges_to_course_section ` | Whether students can only talk to students withing their course section. |
+| `course_section_id ` | The id of the section of the course for the new enrollment. |
+
+
+#### `user_account_association_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `user_id` | The Canvas id of the user for this association. |
+| `account_id` | The Canvas id of the account for this association. |
+| `created_at` | The time at which this association was created. |
+| `updated_at` | The time at which this association was last modified. |
+| `roles ` | The roles the user has in the account. |
