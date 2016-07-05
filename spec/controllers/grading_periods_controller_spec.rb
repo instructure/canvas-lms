@@ -168,6 +168,17 @@ describe GradingPeriodsController do
       period = json['grading_periods'].first
       expect(period['id']).to eql(grading_period.id.to_s)
     end
+
+    it 'returns the expected attributes' do
+      grading_period = period_helper.create_with_group_for_course(course)
+      get :show, { course_id: course.id, id: grading_period.id }
+      expected_attributes = [
+        "id", "grading_period_group_id", "start_date", "end_date",
+        "close_date", "weight", "title", "permissions"
+      ]
+      period_attributes = json_parse['grading_periods'].first.keys
+      expect(period_attributes).to match_array(expected_attributes)
+    end
   end
 
   describe "PATCH batch_update for a grading period set" do
@@ -194,7 +205,7 @@ describe GradingPeriodsController do
         patch :batch_update, {
           set_id: group.id,
           grading_periods: [
-            period_1_params.merge(id: period_1.id, end_date: 3.days.from_now(now)),
+            period_1_params.merge(id: period_1.id, end_date: 3.days.from_now(now), close_date: 3.days.from_now(now)),
             period_2_params.merge(id: period_2.id, start_date: 3.days.from_now(now))
           ]
         }
@@ -295,7 +306,7 @@ describe GradingPeriodsController do
         patch :batch_update, {
           course_id: course.id,
           grading_periods: [
-            period_1_params.merge(id: period_1.id, end_date: 3.days.from_now(now)),
+            period_1_params.merge(id: period_1.id, end_date: 3.days.from_now(now), close_date: 3.days.from_now(now)),
             period_2_params.merge(id: period_2.id, start_date: 3.days.from_now(now))
           ]
         }

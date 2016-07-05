@@ -800,6 +800,7 @@ describe UsersController do
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
+        grading_period.close_date = 4.months.from_now
         grading_period.save!
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
@@ -847,6 +848,7 @@ describe UsersController do
         expect(json_parse(response.body)).to eq expected_response
 
         grading_period.end_date = 4.months.from_now
+        grading_period.close_date = 4.months.from_now
         grading_period.save!
         get('grades_for_student', grading_period_id: grading_period.id,
           enrollment_id: student_enrollment.id)
