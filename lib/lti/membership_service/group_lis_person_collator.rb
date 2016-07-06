@@ -30,11 +30,7 @@ module Lti
       private
 
       def users
-        options = {
-          enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student'],
-          include_inactive_enrollments: false
-        }
-        @users ||= UserSearch.scope_for(@context, @user, options)
+        @users ||= UserSearch.scope_for(@context, @user)
                              .preload(:communication_channels)
                              .offset(@page * @per_page)
                              .limit(@per_page + 1)
