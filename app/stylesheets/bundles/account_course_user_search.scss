@@ -8,14 +8,15 @@
 }
 
 .grid-row {
+  padding-right: 10px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+
   .icon-stats, .icon-message{
     margin-left: 10px;
     margin-right: 10px;
   }
-}
-
-.grid-row {
-  padding-right: 10px;
 }
 
 [role=columnheader] a{
@@ -126,11 +127,6 @@
 
 .flex-grow-2 {
   flex-grow: 2;
-}
-
-.userUrl {
-  display: flex;
-  align-items: center;
 }
 
 .UserListRow__Avatar {
