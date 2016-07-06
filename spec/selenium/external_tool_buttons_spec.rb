@@ -47,7 +47,7 @@ describe "external tool buttons" do
     expect(f("body")).not_to contain_jqcss("#external_tool_button_dialog:visible")
   end
 
-  it "should allow inserting basic lti links from external tool buttons" do
+  it "should allow inserting basic lti links from external tool buttons", priority: "1", test_id: 2624914 do
     load_selection_test_tool("#basic_lti_link")
     html = editor_html
     expect(html).to match(/example/)
@@ -55,17 +55,17 @@ describe "external tool buttons" do
     expect(html).to match(/lti embedded link/)
   end
 
-  it "should allow inserting iframes from external tool buttons" do
+  it "should allow inserting iframes from external tool buttons", priority: "1", test_id: 2624915 do
     load_selection_test_tool("#iframe_link")
     expect(editor_html).to match(/iframe/)
   end
 
-  it "should allow inserting images from external tool buttons" do
+  it "should allow inserting images from external tool buttons", priority: "1", test_id: 2624916 do
     load_selection_test_tool("#image_link")
     expect(editor_html).to match(/delete\.png/)
   end
 
-  it "should allow inserting links from external tool buttons" do
+  it "should allow inserting links from external tool buttons", priority: "1", test_id: 2624917 do
     load_selection_test_tool("#link_link")
     expect(editor_html).to match(/delete link/)
   end

@@ -149,7 +149,7 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
     end
 
-    it "should validate that a student can't get to locked external items" do
+    it "should validate that a student can't get to locked external items", priority: "1", test_id: 2624906 do
       external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
           :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
 
@@ -360,7 +360,7 @@ describe "context modules" do
         verify_next_and_previous_buttons_display
       end
 
-      it "should show previous and next buttons for external tools" do
+      it "should show previous and next buttons for external tools", priority: "2", test_id: 2624907 do
         get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
         verify_next_and_previous_buttons_display
       end

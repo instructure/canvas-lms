@@ -352,15 +352,7 @@ describe "courses" do
         @course.context_external_tools.create!(defaults.merge(options))
       end
 
-      it "should display course_home_sub_navigation lti apps (draft state off)" do
-        course_with_teacher_logged_in(active_all: true)
-        num_tools = 3
-        num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
-        get "/courses/#{@course.id}"
-        expect(ff(".course-home-sub-navigation-lti").size).to eq num_tools
-      end
-
-      it "should display course_home_sub_navigation lti apps (draft state on)" do
+      it "should display course_home_sub_navigation lti apps", priority: "1", test_id: 2624910 do
         course_with_teacher_logged_in(active_all: true)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
@@ -368,21 +360,14 @@ describe "courses" do
         expect(ff(".course-home-sub-navigation-lti").size).to eq num_tools
       end
 
-      it "should include launch type parameter (draft state off)" do
+      it "should include launch type parameter", priority: "1", test_id: 2624911 do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
         expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
-      it "should include launch type parameter (draft state on)" do
-        course_with_teacher_logged_in(active_all: true)
-        create_course_home_sub_navigation_tool
-        get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
-      end
-
-      it "should only display active tools" do
+      it "should only display active tools", priority: "1", test_id: 2624912 do
         course_with_teacher_logged_in(active_all: true)
         tool = create_course_home_sub_navigation_tool
         tool.workflow_state = 'deleted'
@@ -391,7 +376,7 @@ describe "courses" do
         expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
 
-      it "should not display admin tools to students" do
+      it "should not display admin tools to students", priority: "1", test_id: 2624913 do
         course_with_teacher_logged_in(active_all: true)
         tool = create_course_home_sub_navigation_tool
         tool.course_home_sub_navigation['visibility'] = 'admins'

@@ -415,7 +415,7 @@ describe "context modules" do
       expect(@assignment.reload.context_module_tags.size).to eq 2
     end
 
-    it "should not save an invalid external tool" do
+    it "should not save an invalid external tool", priority: "1", test_id: 2624908 do
       get "/courses/#{@course.id}/modules"
 
       add_module 'Test module'
@@ -1181,7 +1181,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it "should add an external tool item to a module" do
+    it "should add an external tool item to a module", priority: "1", test_id: 2624909 do
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
       expect(fln('Instructure')).to be_displayed
