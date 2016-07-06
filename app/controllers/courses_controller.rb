@@ -485,7 +485,7 @@ class CoursesController < ApplicationController
   # @returns [Course]
   def user_index
     @user.shard.activate do
-      render json: courses_for_user(@user)
+      render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
     end
   end
 
@@ -2424,7 +2424,7 @@ class CoursesController < ApplicationController
     ObserverEnrollment.observed_enrollments_for_courses(courses, user)
   end
 
-  def courses_for_user(user)
+  def courses_for_user(user, paginate_url: api_v1_courses_url)
     include_observed = params.fetch(:include, []).include?("observed_users")
 
     if params[:state]
@@ -2466,7 +2466,7 @@ class CoursesController < ApplicationController
 
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
-    enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+    enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
     preloads = [:account]
     preloads << :teachers if includes.include?('teachers')

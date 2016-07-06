@@ -905,7 +905,7 @@ CanvasRails::Application.routes.draw do
       post 'courses/:course_id/link_validation', action: :start_link_validation
 
       post 'courses/:course_id/reset_content', :action => :reset_content
-      get  'users/:user_id/courses', action: :user_index
+      get  'users/:user_id/courses', action: :user_index, as: 'user_courses'
     end
 
     scope(controller: :account_notifications) do
