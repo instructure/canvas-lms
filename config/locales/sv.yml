@@ -1274,6 +1274,7 @@ sv:
   actions_efcde10d: Handling
   actions_taken_6fb20fd0: "Vidtagna Åtgärder"
   activate_this_key_6cd98f4b: "Aktivera den här nyckeln"
+  active_d7e32718: Aktiv
   activerecord: 
     errors: 
       messages: 
@@ -1288,6 +1289,7 @@ sv:
   add_2nd_review_ea988088: "Lägg till 2:a omdömet"
   add_8523c19b: "Lägg till"
   add_a_course_b72b18d7: "Lägg till en kurs"
+  add_a_custom_help_link_4328252f: "Lägg till en egen hjälplänk"
   add_a_new_announcement_878b717f: "Lägg till nytt meddelande"
   add_a_new_course_4a041207: "Lägg till en ny kurs"
   add_a_new_user_c440d053: "Lägg till en ny användare"
@@ -1297,10 +1299,12 @@ sv:
   add_assignment_to_name_caf173b0: "Lägg till uppgiften till %{name}"
   add_attachment_93868828: Bifoga
   add_collaboration_da9665ac: "Lägg till samarbete"
+  add_contact_method_d2dfea03: "Lägg till kontaktmetod"
   add_content_to_module_name_589a8d54: "Lägg till material till %{module_name}"
   add_course_406cb773: "Lägg til kurs"
   add_course_assignments_628ed6d0: "Lägg till kursuppgifter"
   add_course_calendar_events_146154a5: "Lägg till händelser i kurskalendern"
+  add_email_address_aef3b61: "Lägg till e-postadress"
   add_files_to_the_course_da6ffd32: "Lägg till filer i kursen"
   add_folder_ba50d107: "Lägg till mapp"
   add_grading_period_6f774dc3: "Lägg till betygsperiod"
