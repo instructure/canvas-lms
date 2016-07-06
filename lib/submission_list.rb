@@ -50,18 +50,15 @@ require 'hashery/dictionary'
 # The version data is actually pulled from some yaml storage through
 # simply_versioned.
 class SubmissionList
-
+  include Api::V1::GradeChangeEvent
     VALID_KEYS = [
-      :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
-      :body, :course_id, :created_at, :current_grade, :current_graded_at,
-      :current_grader, :grade_matches_current_submission, :graded_at,
-      :graded_on, :grader, :grader_id, :group_id, :id, :new_grade,
+      :assignment_id, :assignment_name, :current_grade, :current_graded_at,
+      :current_grader, :graded_at, :graded_on, :grader, :new_grade, :grader_id,
       :new_graded_at, :new_grader, :previous_grade, :previous_graded_at,
-      :previous_grader, :process_attempts, :processed, :published_grade,
-      :published_score, :safe_grader_id, :score, :student_entered_score,
-      :student_user_id, :submission_id, :student_name, :submission_type,
-      :updated_at, :url, :user_id, :workflow_state, :score_before_regrade
+      :previous_grader, :student_user_id, :submission_id, :student_name, :user_id
     ].freeze
+    MAX_AUDIT_LOG_RESULTS = 100000
+    USE_AUDIT_LOG = Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
 
   class << self
     # Shortcut for SubmissionList.each(course) { ... }
@@ -125,6 +122,8 @@ class SubmissionList
       # current = Time.now
       OpenObject.new(:date => day, :graders => graders_for_day(day))
     end
+
+
     # puts "----------------------------------------------"
     # puts Time.now - start
     # puts "---------------------------------------------------------------------------------"
@@ -134,10 +133,51 @@ class SubmissionList
   # A filtered list of hashes of all submission versions that change the
   # grade with all the meta data finally included. This list can be sorted
   # and displayed.
+
+
+  def submission_entries_audit
+    @submission_entries ||= filtered_submissions_audit.map do |s|
+
+      entry = current_grade_map[s["submission_id"] ]
+      s[:previous_grader] = get_grader_name(s[:previous_grader])
+      s[:current_grade] = entry.grade
+      s[:current_grader] = entry.grader
+      s[:current_graded_at] = entry.graded_at
+      s[:assignment_id] = self.assignment_map[s["assignment_id"]].id
+      s[:submission_id] = s["submission_id"]
+      s[:student_user_id] = self.student_map[s["student_id"]].id
+      s[:user_id] = self.student_map[s["student_id"]].id
+      s[:graded_on] = s["created_at"].in_time_zone.to_date
+      s[:graded_at] = s["created_at"]
+      s[:new_grade] = s["grade_after"]
+      s[:assignment_name] = self.assignment_map[s["assignment_id"]].title
+      s[:student_name] = self.student_map[s["student_id"]].name
+      s[:grader] = get_grader_name(s["grader_id"])
+      s[:new_grader] = s[:grader]
+      s[:new_graded_at] = s["created_at"]
+      s[:grader_id] = s["grader_id"] ? self.grader_map[s["grader_id"]].id : nil
+      s
+    end
+    trim_keys(@submission_entries)
+  end
+
+  def get_grader_name (grader_id)
+    grader = self.grader_map[grader_id].name unless grader_id.nil?
+    grader ||= I18n.t('Graded on submission')
+    grader
+
+  end
+
+  # A filtered list of hashes of all submission versions that change the
+  # grade with all the meta data finally included. This list can be sorted
+  # and displayed.
   def submission_entries
     return @submission_entries if @submission_entries
+    # We will use the audit log if it is enabled.
+    return submission_entries_audit if USE_AUDIT_LOG
     @submission_entries = filtered_submissions.map do |s|
       entry = current_grade_map[s[:id]]
+
       s[:current_grade] = entry.grade
       s[:current_graded_at] = entry.graded_at
       s[:current_grader] = entry.grader
@@ -168,7 +208,6 @@ class SubmissionList
 
     # Returns an array of assignments with an array of submission open structs.
     def assignments_for_grader_and_day(grader, day)
-      start = Time.now
       hsh = submission_entries.find_all {|e| e[:grader] == grader and e[:graded_on] == day}.inject({}) do |h, submission|
         assignment = submission[:assignment_name]
         h[assignment] ||= OpenObject.new(
@@ -221,6 +260,100 @@ class SubmissionList
       list.each do |hsh|
         hsh.delete_if { |key, v| ! VALID_KEYS.include?(key) }
       end
+    end
+    def fix_audit_attribute_ids (h)
+      h["grade_before"] = h["excused_before"] ? "EX" : h["grade_before"]
+      h["grade_after"]= h["excused_after"] ? "EX" : h["grade_after"]
+    end
+
+    def filtered_submissions_audit
+      return @filtered_submissions if @filtered_submissions
+      query_options = {}
+      events = Auditors::GradeChange.for_course(@course, query_options)
+
+      options = {}
+      options[:per_page] = MAX_AUDIT_LOG_RESULTS
+      @filtered_submissions = []
+
+      @all_assignment_ids_hash = {}
+      @all_student_ids_hash = {}
+      @all_grader_ids_hash = {}
+      @current_grade_map = {}
+      data = events.paginate(options)
+      data = data.sort_by! { |a| [a.submission_id, a.version_number, a.created_at] }
+      prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
+      @filtered_submissions = data.inject([]) do |l, h|
+        h = h.attributes
+        fix_audit_attribute_ids(h)
+
+        # If the submission is different (not null for the first one, or just
+        # different than the last one), set the previous_grade to nil (this is
+        # the first version that changes a grade), set the new_grade to this
+        # version's grade, and add this to the list.
+        if prior_submission_id != h["submission_id"]
+          h[:previous_grade] = nil
+          h[:previous_graded_at] = nil
+          h[:previous_grader] = nil
+          h[:new_graded_at] = h[:created_at]
+          h[:new_grader] = h[:grader_id]
+          l << h
+        # The audit log has the auto-graded entries.  We want to make sure
+        # that these are overridden by any manual submissions so that we match
+        # the history generated by the submission-versions table.
+        elsif prior_grader.nil? && !h["grader_id"].nil?
+          x = l.pop
+
+          h[:previous_grade] = x[:previous_grade]
+          h[:previous_graded_at] = x[:previous_graded_at]
+          h[:previous_grader] = x[:previous_grader]
+          h[:new_graded_at] = h[:created_at]
+          h[:new_grader] = h[:grader_id]
+          l << h
+
+        # If the prior_grade is different than the grade for this version, the
+        # grade for this submission has been changed.  Thats because we know
+        # that this submission must be the same as the prior submission.
+        # Set the prevous grade and the new grade and add this to the list.
+        # Remove the old submission so that it doesn't show up twice in the
+        # grade history.
+        elsif prior_grade != h["grade_after"]
+          l.pop if prior_graded_at.try(:to_date) == h["created_at"].try(:to_date) && prior_grader == h["grader_id"]
+
+          h[:previous_grade] = prior_grade
+          h[:previous_graded_at] = prior_graded_at
+          h[:previous_grader] = prior_grader
+          h[:new_graded_at] = h[:created_at]
+          h[:new_grader] = h[:grader_id]
+
+          l << h
+        end
+
+        @all_assignment_ids_hash[h["assignment_id"]] = 1
+        @all_student_ids_hash[h["student_id"]] = 1
+        @all_grader_ids_hash[h["grader_id"]] = 1 unless h["grader_id"].nil?
+
+        # At this point, we are only working with versions that have changed a
+        # grade.  Go ahead and save that grade and save this version as the
+        # prior version and iterate.
+        prior_grade = h["grade_after"]
+        prior_graded_at = h["created_at"]
+        prior_grader = h["grader_id"]
+        prior_submission_id = h["submission_id"]
+
+        # Update the current_grade_map
+        @current_grade_map[h["submission_id"]] = OpenObject.new(
+          :grade     => h["grade_after"],
+          :graded_at => h["created_at"],
+          :grader_id => h["grader_id"],
+          :grader => nil)
+        l
+      end
+      # Now that we have all the grader_ids, populate grader names.
+      # This way we will get all the names at once.
+      @current_grade_map.each do |key,entry|
+        entry.grader = get_grader_name(entry.grader_id)
+      end
+      @filtered_submissions
     end
 
     # Creates a list of any submissions that change the grade. Adds:
@@ -282,6 +415,7 @@ class SubmissionList
         prior_submission_id = h[:submission_id]
         l
       end
+
     end
 
     def translate_grade(submission)
@@ -345,7 +479,7 @@ class SubmissionList
 
     # A unique list of all grader ids
     def all_grader_ids
-      @all_grader_ids ||= raw_hash_list.map { |e| e[:grader_id] }.uniq.compact
+      @all_grader_ids ||= @all_grader_ids_hash ? @all_grader_ids_hash.keys : raw_hash_list.map { |e| e[:grader_id] }.uniq.compact
     end
 
     # A complete list of all graders that have graded submissions for this
@@ -357,14 +491,14 @@ class SubmissionList
     # A hash of graders by their ids, for easy lookup in full_hash_list
     def grader_map
       @grader_map ||= graders.inject({}) do |h, g|
-        h[g.id] = g
+        h[USE_AUDIT_LOG ? g.global_id : g.id] = g
         h
       end
     end
 
     # A unique list of all student ids
     def all_student_ids
-      @all_student_ids ||= raw_hash_list.map { |e| e[:user_id] }.uniq.compact
+      @all_student_ids ||= @all_student_ids_hash ? @all_student_ids_hash.keys : raw_hash_list.map { |e| e[:user_id] }.uniq.compact
     end
 
     # A complete list of all students that have submissions for this course
@@ -376,14 +510,14 @@ class SubmissionList
     # A hash of students by their ids, for easy lookup in full_hash_list
     def student_map
       @student_map ||= students.inject({}) do |h, s|
-        h[s.id] = s
+        h[USE_AUDIT_LOG ? s.global_id : s.id] = s
         h
       end
     end
 
     # A unique list of all assignment ids
     def all_assignment_ids
-      @all_assignment_ids ||= raw_hash_list.map { |e| e[:assignment_id] }.uniq.compact
+      @all_assignment_ids ||= @all_assignment_ids_hash ? @all_assignment_ids_hash.keys : raw_hash_list.map { |e| e[:assignment_id] }.uniq.compact
     end
 
     # A complete list of assignments that have submissions for this course
@@ -394,7 +528,7 @@ class SubmissionList
     # A hash of assignments by their ids, for easy lookup in full_hash_list
     def assignment_map
       @assignment_map ||= assignments.inject({}) do |h, a|
-        h[a.id] = a
+        h[USE_AUDIT_LOG ? a.global_id : a.id] = a
         h
       end
     end
