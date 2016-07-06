@@ -566,7 +566,7 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          a.create_canvadoc! unless a.canvadoc
+          a.create_canvadoc!(canvadoc_params) unless a.canvadoc
           unless canvadocs.exists?(attachment: a)
             canvadocs << a.canvadoc
           end
@@ -883,6 +883,20 @@ class Submission < ActiveRecord::Base
     true
   end
   private :validate_single_submission
+
+  def canvadoc_params
+    { preferred_plugin_course_id: preferred_plugin_course_id }
+  end
+  private :canvadoc_params
+
+  def preferred_plugin_course_id
+    if self.context && self.context.is_a?(Course)
+      self.context.id
+    else
+      nil
+    end
+  end
+  private :preferred_plugin_course_id
 
   def grade_change_audit
     return true unless (self.changed & %w(grade score excused)).present? || self.assignment_changed_not_sub

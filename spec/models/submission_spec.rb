@@ -1400,6 +1400,21 @@ describe Submission do
           expect(submission.canvadocs).to eq [@attachment.canvadoc]
         end
       end
+
+      context 'preferred plugin course id' do
+        let(:submit_homework) do
+          ->() do
+            @assignment.submit_homework(@student1,
+                                        submission_type: "online_upload",
+                                        attachments: [@attachment])
+          end
+        end
+
+        it 'sets preferred plugin course id to the course ID' do
+          s = submit_homework.call
+          expect(s.canvadocs.first.preferred_plugin_course_id).to eq(@course.id.to_s)
+        end
+      end
     end
 
     it "doesn't create jobs for non-previewable documents" do
