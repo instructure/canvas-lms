@@ -31,6 +31,10 @@ describe EpubExports::CourseEpubExportsPresenter do
       active_all: true,
       user: @student
     ).course
+    @course_as_ta = course_with_user('TaEnrollment',
+      active_all: true,
+      user: @student
+    ).course
   end
 
   describe "#courses" do
@@ -40,7 +44,7 @@ describe EpubExports::CourseEpubExportsPresenter do
 
     context 'when feature is enabled' do
       before do
-        [@course_with_epub, @course_without_epub, @course_as_obsever].map {|course| course.enable_feature!(:epub_export) }
+        [@course_with_epub, @course_without_epub, @course_as_obsever, @course_as_ta].map {|course| course.enable_feature!(:epub_export) }
       end
 
       it "sets latest_epub_export for course with epub_export" do
@@ -57,6 +61,10 @@ describe EpubExports::CourseEpubExportsPresenter do
 
       it 'does not include course for which user is an observer' do
         expect(courses).not_to include(@course_as_observer)
+      end
+
+      it 'includes courses for which the user is a ta' do
+        expect(courses).to include(@course_as_ta)
       end
     end
 
