@@ -54,7 +54,7 @@ gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.41', require: 'ims'
+gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.2'
 gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false
