@@ -82,7 +82,7 @@
       </div>
 
       <div>
-        <h3 for="profile_bio" class="profileHeader"><%= t :bio, "Biography" %></h3>
+        <h3 id="profile_bio_label" class="profileHeader"><%= t :bio, "Biography" %></h3>
         <% if @user_data[:bio] %>
           <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
         <% else %>
@@ -90,7 +90,7 @@
         <% end %>
         <% if @user_data[:can_edit] %>
           <div class="show-if-editing">
-            <textarea class="ic_Input" id="profile_bio" name="user_profile[bio]"><%= @user_data[:bio] %></textarea>
+            <textarea class="ic_Input" id="profile_bio" name="user_profile[bio]" aria-labelledby="profile_bio_label"><%= @user_data[:bio] %></textarea>
           </div>
         <% end %>
       </div>

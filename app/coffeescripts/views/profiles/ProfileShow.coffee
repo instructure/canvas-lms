@@ -64,7 +64,8 @@ define [
 
     showEditForm: ->
       @$el.addClass('editing').removeClass('not-editing')
-      $("#name_input").focus()
+      elementToFocus = document.querySelector("#name_input") || document.querySelector("#profile_bio")
+      elementToFocus.focus()
 
     initEdit: ->
       if @options.links?.length
