@@ -196,7 +196,12 @@
                 </span>
               <% end %>
             </span>
-            <span class="grade" tabindex="0">
+            <span
+              class="grade"
+              <% unless assignment_presenter.unchangeable? %>
+                tabindex="0"
+              <% end %>
+            >
               <% if assignment.muted? %>
                 <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
               <% else %>
