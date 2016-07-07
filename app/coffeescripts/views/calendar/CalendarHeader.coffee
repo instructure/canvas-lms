@@ -28,6 +28,8 @@ define [
       'click #create_new_event_link': '_triggerCreateNewEvent'
       'click #refresh_calendar_link': '_triggerRefreshCalendar'
       'keydown .calendar_view_buttons': '_handleKeyDownEvent'
+      'focus .recommend_agenda': '_showVisualAgendaRecommendation'
+      'blur .recommend_agenda': '_hideVisualAgendaRecommendation'
 
     initialize: ->
       super
@@ -88,6 +90,12 @@ define [
       @$createNewEventLink.hide()
       @$appointmentGroupTitle.hide()
       @$schedulerDoneButton.show()
+
+    _showVisualAgendaRecommendation: ->
+      @$recommendAgenda.removeClass('screenreader-only')
+
+    _hideVisualAgendaRecommendation: ->
+      @$recommendAgenda.addClass('screenreader-only')
 
     showAgendaRecommendation: ->
       @$recommendAgenda.show()

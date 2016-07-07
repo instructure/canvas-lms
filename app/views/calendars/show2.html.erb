@@ -25,7 +25,11 @@
   <a href="#" class="skip-to-calendar screenreader-only"><%= t(:skip_to_calendar, "Skip to calendar") %></a>
 
   <div class="rs-section">
-    <div id="minical" aria-hidden="true"></div>
+    <div tabindex="0" role="note" class="screenreader-only accessibility-warning">
+      <span><%= t 'Mini calendar' %></span>
+      <span><%= t "Warning: For improved accessibility of calendar events, please use the agenda view." %></span>
+    </div>
+    <div id="minical"></div>
   </div>
   <div class="rs-section">
     <span role="button" id="calendar-toggle-button" class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
