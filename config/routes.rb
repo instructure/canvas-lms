@@ -916,6 +916,10 @@ CanvasRails::Application.routes.draw do
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end
 
+    scope(controller: :brand_configs_api) do
+      get "brand_variables", action: :show
+    end
+
     scope(controller: :tabs) do
       get "courses/:course_id/tabs", action: :index, as: 'course_tabs'
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
