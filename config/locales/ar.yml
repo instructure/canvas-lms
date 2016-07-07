@@ -1309,8 +1309,11 @@ ar:
   add_2nd_review_ea988088: "إضافة مراجعة ثانية"
   add_8523c19b: إضافة
   add_a_course_b72b18d7: "إضافة مساق"
+  add_a_custom_help_link_4328252f: "إضافة ارتباط تعليمات مخصص"
   add_a_new_announcement_878b717f: "إضافة إعلان جديد"
   add_a_new_course_4a041207: "إضافة مساق جديد"
+  add_a_new_outcome_cbdbe96c: "إضافة نتيجة جديدة"
+  add_a_new_outcome_group_e3fab2fc: "إضافة مجموعة نتائج جديدة"
   add_a_new_user_c440d053: "إضافة مستخدم جديد"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "إضافة مراجع للطلاب المحددين"
   add_an_identity_provider_to_this_account_c2644478: "إضافة موفر الهوية لهذا الحساب:"
@@ -1322,6 +1325,8 @@ ar:
   add_course_406cb773: "إضافة مساق"
   add_course_assignments_628ed6d0: "إضافة مهام المساق"
   add_course_calendar_events_146154a5: "إضافة أحداث تقويم المساق"
+  add_criterion_eb9587ef: "إضافة معيار"
+  add_email_address_aef3b61: "إضافة عنوان بريد إلكتروني"
   add_files_to_the_course_da6ffd32: "إضافة ملفات إلى المساق"
   add_folder_ba50d107: "إضافة مجلد"
   add_grading_period_6f774dc3: "إضافة فترة تقييم الدرجات"
@@ -3056,6 +3061,8 @@ ar:
   choose_a_csv_file_to_upload_9644480c: "اختيار ملف CSV لتحميله:"
   choose_a_timezone_d9c52998: "اختيار منطقة زمنية"
   choose_an_authentication_service_47dc8875: "اختيار خدمة مصادقة"
+  choose_assignment_b0132c5e: "-- اختيار مهمة --"
+  choose_student_1513fcd1: "-- اختيار طالب --"
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ليس لون صالح."
   clear_2084585f: مسح
@@ -4130,7 +4137,7 @@ ar:
       no_course: "لا يوجد مساق"
       no_subject: "لا يوجد موضوع"
       search_names_groups_courses: "بحث عن أسماء ومجموعات ومساقات"
-      send_individual_messages: "إرسال رسائل فردية"
+      send_individual_messages: "إرسال رسالة فردية إلى كل مستلم"
       titles: 
         media_comment: "تعليق وسائط تم تسجيله"
         record_media_comment: "تسجيل تعليق صوتي أو تعليق فيديو"
@@ -4828,7 +4835,7 @@ ar:
     settings: 
       alerts_title: تنبيهات
       buttons: 
-        add_section: "إضافة قسم"
+        add_section: القسم
         edit_section_name: "تحرير اسم القسم"
         move_course: "نقل المساق"
         update_course: "تحديث تفاصيل المساق"
@@ -5117,10 +5124,12 @@ ar:
   created_at_73839757: "تم الإنشاء في"
   created_by_b39b9c8b: "تم الإنشاء من قِبَل"
   created_by_sis_93fbb66b: created_by_sis
+  created_by_sis_e1449c31: "تم الإنشاء من قبل SIS"
   created_group_group_name_2097306b: "تم إنشاء المجموعة %{group_name}"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "سيسمح لك إنشاء \"تصدير إرسال\" بتنزيل ملف Zip يضم كافة إرسالات مهمتك في جميع مساقاتك الحالية والسابقة. قد يكون ملفاً كبيراً، وبالتالي قد يستغرق بعض الوقت. يمكنك الانتقال إلى صفحات أخرى والعودة فيما بعد."
   creative_commons_714a065f: "المشاع الإبداعي"
   creative_commons_license_725584ae: "ترخيص المشاع الإبداعي:"
+  criterion_5f0b62f8: المعيار
   crumbs: 
     access_report: "تقرير الوصول"
     announcements: الإعلانات
@@ -5240,6 +5249,7 @@ ar:
     this_is_permanent: "لا يمكن التراجع عن إنشاء منحنى للدرجات. ستتوفر محفزظات الدرجة التي تم إنشاء منحنى لها مسبقًا، إلا أنه لا يمكن التراجع عن إجراء إنشاء منحنى."
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "قد تؤدي CSS و JavaScript المخصصة إلى حدوث مشاكل أو تعارضات مع تحديثات Canvas في المستقبل!"
   custom_fields_fc3e55af: "حقول مخصصة"
+  custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "تخصيص الارتباطات لتضمينها في نافذة مربع حوار التعليمات"
   cutoff_score_74254c89: "أدنى درجة للاجتياز"
   cyan_c1d5f68a: سماوي
   d2l_display: Desire2Learn

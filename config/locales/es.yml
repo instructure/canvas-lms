@@ -11198,7 +11198,7 @@ es:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Las revisiones por pares no pueden ser habilitadas para tareas moderadas"
   people_b4ebb13c: Personas
   people_options_cfb419a6: "Opciones de Personas"
-  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en las foros, mensajes y comentarios."
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: "Otros verán este nombre en los foros, mensajes y comentarios."
   percent_complete_3a7edc20: "%{percent} completado"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Porcentaje de respondedores que seleccionaron esta respuesta"
   percent_of_students_scored_score_53d2c4d5: "%{percent} de alumnos con una puntuación de %{score}"
@@ -11801,7 +11801,7 @@ es:
         expires_at: "dejar en blanco para que no expire"
         language: "Esto anulará las configuraciones de cualquier navegador o cuenta."
         name: "Este nombre será usado por los profesores para las calificaciones."
-        short_name: "Otros verán este nombre en las foros, mensajes y comentarios."
+        short_name: "Otros verán este nombre en los foros, mensajes y comentarios."
         sortable_name: "Este nombre aparece en listas clasificables."
       labels: 
         change_password: "Cambiar Contraseña"

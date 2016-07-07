@@ -817,11 +817,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def jwt_token
-    tool = ContextExternalTool.find(params['tool_id']) if params['tool_id']
-
-    if params['tool_launch_url'] && tool.nil?
-      tool = ContextExternalTool.find_external_tool(params['tool_launch_url'], @context)
-    end
+    tool = ContextExternalTool.find_external_tool(params[:tool_launch_url], @context, params[:tool_id])
 
     raise ActiveRecord::RecordNotFound if tool.nil?
 
