@@ -60,26 +60,50 @@ describe GradingPeriod do
   end
 
   describe "close_date" do
-    it "sets the close_date to the end_date if no close_date is provided" do
-      grading_period = grading_period_group.grading_periods.create!(params.except(:close_date))
-      expect(grading_period.close_date).to eq(grading_period.end_date)
+    context "grading period group belonging to an account" do
+      it "allows setting a close_date that is different from the end_date" do
+        grading_period = grading_period_group.grading_periods.create!(params)
+        expect(grading_period.close_date).not_to eq(grading_period.end_date)
+      end
+
+      it "sets the close_date to the end_date if no close_date is provided" do
+        grading_period = grading_period_group.grading_periods.create!(params.except(:close_date))
+        expect(grading_period.close_date).to eq(grading_period.end_date)
+      end
+
+      it "considers the grading period invalid if the close date is before the end date" do
+        period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
+        grading_period = grading_period_group.grading_periods.build(period_params)
+        expect(grading_period).to be_invalid
+      end
+
+      it "considers the grading period valid if the close date is equal to the end date" do
+        period_params = params.merge(close_date: params[:end_date])
+        grading_period = grading_period_group.grading_periods.build(period_params)
+        expect(grading_period).to be_valid
+      end
     end
 
-    it "allows setting a close_date that is different from the end_date" do
-      grading_period = grading_period_group.grading_periods.create!(params)
-      expect(grading_period.close_date).not_to eq(grading_period.end_date)
-    end
+    context "grading period group belonging to a course" do
+      let(:course_grading_period_group) { group_helper.legacy_create_for_course(course) }
 
-    it "considers the grading period invalid if the close date is before the end date" do
-      period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
-      grading_period = grading_period_group.grading_periods.build(period_params)
-      expect(grading_period).to be_invalid
-    end
+      it "does not allow setting a close_date that is different from the end_date" do
+        grading_period = course_grading_period_group.grading_periods.create!(params)
+        expect(grading_period.close_date).to eq(params[:end_date])
+      end
 
-    it "considers the grading period valid if the close date is equal to the end date" do
-      period_params = params.merge(close_date: params[:end_date])
-      grading_period = grading_period_group.grading_periods.build(period_params)
-      expect(grading_period).to be_valid
+      it "sets the close_date to the end_date if no close_date is provided" do
+        grading_period = course_grading_period_group.grading_periods.create!(params.except(:close_date))
+        expect(grading_period.close_date).to eq(grading_period.end_date)
+      end
+
+      it "sets the close_date to the end_date when the grading period is updated" do
+        grading_period = course_grading_period_group.grading_periods.create!(params.except(:close_date))
+        new_end_date = 5.weeks.from_now(now)
+        grading_period.end_date = new_end_date
+        grading_period.save!
+        expect(grading_period.close_date).to eq(new_end_date)
+      end
     end
   end
 
