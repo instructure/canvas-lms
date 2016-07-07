@@ -135,6 +135,13 @@ module ConversationsCommon
     fj(".ac-result:contains('All in #{to}')").click
   end
 
+  def reply_to_submission_comment(message = "test")
+    f('#submission-reply-btn').click
+    f('.reply_body').send_keys(message)
+    f('.submission-comment-reply-dialog .send-message').click
+    wait_for_ajaximations
+  end
+
   def write_message_subject(subject)
     message_subject_input.send_keys(subject)
   end
