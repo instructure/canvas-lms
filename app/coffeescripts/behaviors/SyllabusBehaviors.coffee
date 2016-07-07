@@ -200,6 +200,7 @@ define [
       $edit_syllabus_link.hide()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
+      $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
       $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
       RichContentEditor.loadNewEditor($course_syllabus_body, { focus: true, manageParent: true })
 
