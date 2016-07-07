@@ -117,6 +117,20 @@ describe GradeCalculator do
       expect(enrollment.reload.computed_final_score).to eq 50
     end
 
+    it "recomputes during #run_if_overrides_changed!" do
+      a = @course.assignments.create! name: "Foo", points_possible: 10,
+            context: @assignment
+      a.grade_student(@student, grade: 10)
+
+      e = @student.enrollments.first
+      expect(e.computed_final_score).to eq 100
+
+      Submission.update_all(score: 5, grade: 5)
+      a.only_visible_to_overrides = true
+      a.run_if_overrides_changed!
+      expect(e.reload.computed_final_score).to eq 50
+    end
+
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => g1_weight)
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => a1_possible)

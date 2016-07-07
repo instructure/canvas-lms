@@ -775,6 +775,26 @@ describe AssignmentOverridesController, type: :request do
         expect(prog).to be_unlocked # now they can
       end
 
+      it "recomputes grades when changing overrides" do
+        @assignment.update_attributes! only_visible_to_overrides: true, points_possible: 10
+        other_assignment = @course.assignments.create! points_possible: 10, context: @course
+
+        student1 = @student
+        student2 = student_in_course(:course => @course).user
+        other_assignment.grade_student(student1, grade: 10)
+        other_assignment.grade_student(student2, grade: 10)
+
+        e1 = student1.enrollments.first
+        e2 = student2.enrollments.first
+        expect(e1.computed_final_score).to eq 50
+        expect(e2.computed_final_score).to eq 100
+
+        api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [student2.id] })
+        expect(e1.reload.computed_final_score).to eq 100
+        expect(e2.reload.computed_final_score).to eq 50
+
+      end
+
       it "should allow changing the title" do
         @new_title = "new #{@title}"
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
