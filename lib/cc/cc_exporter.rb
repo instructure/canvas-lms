@@ -50,7 +50,10 @@ module CC
 
     def export
       begin
-        pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course) unless @qti_only_export || epub_export?
+        if for_external_migration? && !@content_export.selective_export?
+          # we already know we're exporting all the data so we can begin the external exports now
+          @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course)
+        end
 
         create_export_dir
         create_zip_file
@@ -62,8 +65,14 @@ module CC
         @manifest.create_document
         @manifest.close
 
-        if pending_exports
-          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(pending_exports)
+        if for_external_migration?
+          if @content_export.selective_export?
+            # if it's selective, we have to wait until we've completed the rest of the export
+            # before we really know what we exported. because magic
+            @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
+              :selective => true, :exported_assets => @content_export.exported_assets.to_a)
+          end
+          external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@pending_exports)
           write_external_content(external_content)
         end
 
@@ -125,12 +134,20 @@ module CC
       @content_export ? @content_export.export_object?(obj, asset_type) : true
     end
 
+    def add_exported_asset(obj)
+      @content_export && @content_export.add_exported_asset(obj)
+    end
+
     def export_symbol?(obj)
       @content_export ? @content_export.export_symbol?(obj) : true
     end
 
     def epub_export?
       @content_export ? @content_export.epub_export.present? : nil
+    end
+
+    def for_external_migration?
+      @content_export && !(@qti_only_export || epub_export?)
     end
 
     private

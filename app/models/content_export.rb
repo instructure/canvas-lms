@@ -233,8 +233,7 @@ class ContentExport < ActiveRecord::Base
   #   Returns: bool
   def export_object?(obj, asset_type=nil)
     return false unless obj
-    return true if selected_content.empty?
-    return true if is_set?(selected_content[:everything])
+    return true unless selective_export?
 
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
@@ -264,12 +263,32 @@ class ContentExport < ActiveRecord::Base
 
   def add_item_to_export(obj, type=nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
-    return if selected_content.empty?
-    return if is_set?(selected_content[:everything])
+    return unless selective_export?
 
     asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
     selected_content[asset_type][select_content_key(obj)] = true
+  end
+
+  def selective_export?
+    if @selective_export.nil?
+      @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+    end
+    @selective_export
+  end
+
+  def exported_assets
+    @exported_assets ||= Set.new
+  end
+
+  def add_exported_asset(obj)
+    return unless selective_export?
+    return if qti_export? || epub_export.present?
+
+    # for integrating selective exports with external content
+    if type = Canvas::Migration::ExternalContent::Translator::CLASSES_TO_TYPES[obj.class]
+      exported_assets << "#{type}_#{obj.id}"
+    end
   end
 
   def add_error(user_message, exception_or_info=nil)

@@ -20,7 +20,7 @@ module CC
     class QTIGenerator
       include CC::CCHelper
       include QTIItems
-      delegate :add_error, :export_object?, :to => :@manifest
+      delegate :add_error, :export_object?, :add_exported_asset, :to => :@manifest
 
       def initialize(manifest, resources_node, html_exporter)
         @manifest = manifest
@@ -82,6 +82,8 @@ module CC
       end
 
       def generate_quiz(quiz, for_cc=true)
+        add_exported_asset(quiz)
+
         cc_qti_migration_id = create_key(quiz)
         resource_dir = File.join(@export_dir, cc_qti_migration_id)
         FileUtils::mkdir_p resource_dir
@@ -151,6 +153,8 @@ module CC
       end
 
       def generate_question_bank(bank)
+        add_exported_asset(bank)
+
         bank_mig_id = create_key(bank)
 
         rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, bank_mig_id + QTI_EXTENSION)

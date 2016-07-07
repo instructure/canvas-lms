@@ -38,6 +38,8 @@ module CC
     end
 
     def add_topic(topic)
+      add_exported_asset(topic)
+
       migration_id = CCHelper.create_key(topic)
 
       # the CC Discussion Topic

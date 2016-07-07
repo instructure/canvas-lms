@@ -7,9 +7,12 @@ module Canvas::Migration::ExternalContent
         # applies_to_course?(course)
         #   is the service on for this course?
         #
-        # begin_export(course)
+        # begin_export(course, opts)
         #   tell the service to begin an export
         #   data sent back here will be sent to retrieve_export
+        #
+        #   if the export is selective, opts[:selective] will be true
+        #   and opts[:exported_assets] will be a set of exported asset strings
         #
         # retrieve_export(export_data)
         #   return the data that we need to save in the package
@@ -18,7 +21,7 @@ module Canvas::Migration::ExternalContent
         #   give back the translated data for importing
         methods = {
           :applies_to_course? => 1,
-          :begin_export => 1,
+          :begin_export => 2,
           :retrieve_export => 1,
           :send_imported_content => 2
         }

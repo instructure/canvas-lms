@@ -15,12 +15,12 @@ module Canvas::Migration::ExternalContent
 
       # tells the services to begin exporting
       # should return the info we need to go retrieve the exported data later (e.g. a status url)
-      def begin_exports(course)
+      def begin_exports(course, opts={})
         pending_exports = {}
         self.registered_services.each do |key, service|
           if service.applies_to_course?(course)
             begin
-              pending_exports[key] = service.begin_export(course)
+              pending_exports[key] = service.begin_export(course, opts)
             rescue => e
               Canvas::Errors.capture_exception(:external_content_migration, e)
             end

@@ -22,6 +22,8 @@ module CC
 
       @course.context_external_tools.active.each do |tool|
         next unless export_object?(tool)
+        add_exported_asset(tool)
+
         migration_id = CCHelper::create_key(tool)
 
         lti_file_name = "#{migration_id}.xml"
@@ -30,7 +32,7 @@ module CC
         lti_doc = Builder::XmlMarkup.new(:target=>lti_file, :indent=>2)
 
         create_blti_link(tool, lti_doc)
-        
+
         lti_file.close
 
         @resources.resource(
@@ -67,7 +69,7 @@ module CC
           v_node.lticp :code, 'unknown'
           v_node.lticp :name, 'unknown'
         end
-        
+
         if tool.settings[:custom_fields]
           blti_node.tag!("blti:custom") do |custom_node|
             tool.settings[:custom_fields].each_pair do |key, val|
@@ -114,7 +116,7 @@ module CC
             end
           end
         end
-        
+
         if tool.settings[:vendor_extensions]
           tool.settings[:vendor_extensions].each do |extension|
             blti_node.blti(:extensions, :platform => extension[:platform]) do |ext_node|
@@ -126,6 +128,6 @@ module CC
         end
       end
     end
-    
+
   end
 end

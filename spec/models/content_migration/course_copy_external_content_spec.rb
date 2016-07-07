@@ -29,7 +29,7 @@ describe ContentMigration do
       TestExternalContentService.expects(:applies_to_course?).with(@copy_from).returns(true)
 
       test_data = {:sometestdata => "something"}
-      TestExternalContentService.expects(:begin_export).with(@copy_from).returns(test_data)
+      TestExternalContentService.expects(:begin_export).with(@copy_from, {}).returns(test_data)
       TestExternalContentService.expects(:retrieve_export).with(test_data).returns(nil)
       TestExternalContentService.expects(:send_imported_content).never
       run_course_copy
@@ -106,6 +106,24 @@ describe ContentMigration do
         '$canvas_discussion_topic_id' => copied_topic.id
       }
       expect(TestExternalContentService.imported_content).to eq expected_data
+    end
+
+    it "should send a list of exported assets to the external service when selectively exporting" do
+      assmt = @copy_from.assignments.create!
+      other_assmt = @copy_from.assignments.create!
+      cm = @copy_from.context_modules.create!(:name => "some module")
+      item = cm.add_item(:id => assmt.id, :type => 'assignment')
+
+      TestExternalContentService.stubs(:applies_to_course?).returns(true)
+      TestExternalContentService.stubs(:retrieve_export).returns({})
+
+      @cm.copy_options = {:context_modules => {mig_id(cm) => "1"}}
+      @cm.save!
+
+      TestExternalContentService.expects(:begin_export).with(@copy_from,
+        {:selective => true, :exported_assets => ["context_module_#{cm.id}", "assignment_#{assmt.id}"]})
+
+      run_course_copy
     end
   end
 end

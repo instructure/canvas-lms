@@ -55,6 +55,8 @@ module Canvas::Migration::ExternalContent
       "wiki_page" => WikiPage
     }.freeze
 
+    CLASSES_TO_TYPES = TYPES_TO_CLASSES.invert.freeze
+
     ALIASED_TYPES = {
       'context_module_item' => 'context_module_tag',
       'file' => 'attachment',

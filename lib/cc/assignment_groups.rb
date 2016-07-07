@@ -19,7 +19,7 @@ module CC
   module AssignmentGroups
     def create_assignment_groups(document=nil)
       return nil unless @course.assignment_groups.active.count > 0
-      
+
       if document
         group_file = nil
         rel_path = nil
@@ -28,7 +28,7 @@ module CC
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
         document = Builder::XmlMarkup.new(:target=>group_file, :indent=>2)
       end
-      
+
       document.instruct!
       document.assignmentGroups(
               "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -37,15 +37,17 @@ module CC
       ) do |groups_node|
         @course.assignment_groups.active.each do |group|
           next unless export_object?(group)
+          add_exported_asset(group)
+
           migration_id = CCHelper.create_key(group)
           groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|
             group_node.title group.name
             group_node.position group.position
             group_node.group_weight group.group_weight if group.group_weight
             unless group.rules.blank?
-              # This turns the rules column from something like: 
+              # This turns the rules column from something like:
               # "drop_lowest:1\ndrop_highest:2\nnever_drop:259\n"
-              # to something like: 
+              # to something like:
               # [["drop_lowest", "1"], ["drop_highest", "2"], ["never_drop", "259"]]
               rules = group.rules.split("\n").map{|r|r.split(':')}
               group_node.rules do |rules_node|
@@ -69,7 +71,7 @@ module CC
           end
         end
       end
-      
+
       group_file.close if group_file
       rel_path
     end
