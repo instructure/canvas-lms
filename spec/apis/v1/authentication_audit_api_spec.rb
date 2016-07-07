@@ -160,6 +160,7 @@ describe "AuthenticationAudit API", type: :request do
             "user_id" => @user.id,
             "unique_id" => @pseudonym.unique_id,
             "sis_user_id" => nil,
+            "integration_id" => nil,
             "authentication_provider_id" => nil
           }]
         end

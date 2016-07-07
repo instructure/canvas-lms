@@ -81,17 +81,21 @@ $(document).ready(function() {
   .delegate('.edit_pseudonym_link', 'click', function(event) {
     event.preventDefault();
     var $form = $("#edit_pseudonym_form"),
-        $sis_row = $form.find('.sis_user_id');
+        $sis_row = $form.find('.sis_user_id'),
+        $integration_id_row = $form.find('.integration_id');
     $sis_row.hide();
+    $integration_id_row.hide();
     $form.attr('action', $(this).attr('rel')).attr('method', 'PUT');
-    var data = $(this).parents(".login").getTemplateData({textValues: ['unique_id', 'sis_user_id', 'can_edit_sis_user_id']});
+    var data = $(this).parents(".login").getTemplateData({textValues: ['unique_id', 'sis_user_id', 'integration_id', 'can_edit_sis_user_id']});
     data.password = "";
     data.password_confirmation = "";
     $form.fillFormData(data, {object_name: 'pseudonym'});
     if( data.can_edit_sis_user_id == 'true' ){
       $sis_row.show();
+      $integration_id_row.show();
     } else {
       $sis_row.remove();
+      $integration_id_row.remove();
     }
     var passwordable = $(this).parents(".links").hasClass('passwordable');
     var delegated = passwordable && $(this).parents(".links").hasClass('delegated-auth');
