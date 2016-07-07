@@ -70,6 +70,20 @@ describe ExternalToolsController do
       expect(decoded_token['iat']). to eq @iat.to_i
     end
 
+    it "does not return a JWT token for another context" do
+      teacher_course = @course
+      other_course = course()
+
+      @tool.context_id = other_course.id
+      @tool.save!
+
+      user_session(@teacher)
+      response = get :jwt_token, {course_id: teacher_course.id, tool_id: @tool.id}
+
+      expect(response.status).to eq 404
+    end
+
+
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       response = get :jwt_token, {course_id: @course.id, tool_launch_url: @tool.url}
