@@ -80,6 +80,7 @@ module CanvasHttp
   def self.validate_url(value, host=nil, scheme=nil)
     value = value.strip
     raise ArgumentError if value.empty?
+    value = URI.encode(value, /[^%#{URI::Parser::PATTERN::RESERVED}#{URI::Parser::PATTERN::UNRESERVED}]/)
     uri = URI.parse(value)
     uri.host ||= host
     unless uri.scheme

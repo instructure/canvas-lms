@@ -127,4 +127,22 @@ describe "CanvasHttp" do
       http.use_ssl?.should == true
     end
   end
+
+  describe ".validate_url" do
+    it "should validate url with accented characters" do 
+      expect { CanvasHttp.validate_url("http://example.com/déjà-vu") }.not_to raise_error
+    end
+
+    it "should properly encode url with accented characters" do 
+      value, uri = CanvasHttp.validate_url("http://example.com/déjà-vu")
+      value.should == "http://example.com/d%C3%A9j%C3%A0-vu"
+      URI.parse(value).should == uri
+    end
+
+    it "should not encode already encoded characters" do 
+      value, uri = CanvasHttp.validate_url("http://example.com/d%C3%A9j%C3%A0-vu")
+      value.should == "http://example.com/d%C3%A9j%C3%A0-vu"
+      uri.path.should == "/d%C3%A9j%C3%A0-vu"
+    end
+  end
 end
