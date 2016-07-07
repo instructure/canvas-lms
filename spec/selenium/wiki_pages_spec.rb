@@ -380,6 +380,13 @@ describe "Wiki Pages" do
         wait_for_ajaximations
         expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
       end
+
+      it "keeps focus on clicked revision button" do
+        driver.execute_script("$('button.revision-details')[1].focus();")
+        ff('button.revision-details')[1].click
+        wait_for_ajaximations
+        check_element_has_focus(ff('button.revision-details')[1])
+      end
     end
 
     context "Edit Page" do

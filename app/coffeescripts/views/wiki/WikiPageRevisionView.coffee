@@ -14,9 +14,18 @@ define [
       'click .restore-link': 'restore'
       'keydown .restore-link': 'restore'
 
+    els:
+      '.revision-details': '$revisionButton'
+
     initialize: ->
       super
       @model.on 'change', => @render()
+
+    render: ->
+      hadFocus = @$revisionButton?.is(':focus')
+      super
+      if (hadFocus)
+        @$revisionButton.focus()
 
     afterRender: ->
       super
