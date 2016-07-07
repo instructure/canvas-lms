@@ -6,33 +6,70 @@ define([
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat'
 ], function(React, ReactDOM, _, I18n, DueDateCalendarPicker, accessibleDateFormat) {
-  const types = React.PropTypes;
+  const update = React.addons.update;
+  const Types = React.PropTypes;
 
   const buildPeriod = function(attr) {
     return {
       id:        attr.id,
       title:     attr.title,
-      startDate: attr.startDate || new Date(''),
-      endDate:   attr.endDate || new Date('')
+      startDate: attr.startDate,
+      endDate:   attr.endDate,
+      closeDate: attr.closeDate
     };
+  };
+
+  const hasDistinctCloseDate = ({ endDate, closeDate }) => {
+    return closeDate && !_.isEqual(endDate, closeDate);
+  };
+
+  const mergePeriod = (form, attr) => {
+    return update(form.state.period, {$merge: attr});
+  }
+
+  const changeTitle = function(e) {
+    let period = mergePeriod(this, {title: e.target.value});
+    this.setState({period: period});
+  };
+
+  const changeStartDate = function(date) {
+    let period = mergePeriod(this, {startDate: date});
+    this.setState({period: period});
+  };
+
+  const changeEndDate = function(date) {
+    let attr = {endDate: date};
+    if (!this.state.preserveCloseDate && !hasDistinctCloseDate(this.state.period)) {
+      attr.closeDate = date;
+    }
+    let period = mergePeriod(this, attr);
+    this.setState({period: period});
+  };
+
+  const changeCloseDate = function(date) {
+    let period = mergePeriod(this, {closeDate: date});
+    this.setState({period: period, preserveCloseDate: !!date});
   };
 
   let GradingPeriodForm = React.createClass({
     propTypes: {
-      period:   types.shape({
-        id:        types.string.isRequired,
-        title:     types.string.isRequired,
-        startDate: types.instanceOf(Date).isRequired,
-        endDate:   types.instanceOf(Date).isRequired
+      period:   Types.shape({
+        id:        Types.string.isRequired,
+        title:     Types.string.isRequired,
+        startDate: Types.instanceOf(Date).isRequired,
+        endDate:   Types.instanceOf(Date).isRequired,
+        closeDate: Types.instanceOf(Date).isRequired
       }),
-      disabled: types.bool.isRequired,
-      onSave:   types.func.isRequired,
-      onCancel: types.func.isRequired
+      disabled: Types.bool.isRequired,
+      onSave:   Types.func.isRequired,
+      onCancel: Types.func.isRequired
     },
 
     getInitialState: function() {
+      let period = buildPeriod(this.props.period || {});
       return {
-        period: buildPeriod(this.props.period || {})
+        period: period,
+        preserveCloseDate: hasDistinctCloseDate(period)
       };
     },
 
@@ -56,7 +93,7 @@ define([
                          className='ic-Input'
                          title={I18n.t('Grading Period Title')}
                          defaultValue={this.state.period.title}
-                         onChange={this.changeTitle}
+                         onChange={changeTitle.bind(this)}
                          type='text'/>
                 </div>
 
@@ -73,7 +110,7 @@ define([
                       <DueDateCalendarPicker dateValue    = {this.state.period.startDate}
                                              ref          = "startDate"
                                              dateType     = "due_at"
-                                             handleUpdate = {this.changeStartDate}
+                                             handleUpdate = {changeStartDate.bind(this)}
                                              rowKey       = "start-date"
                                              labelledBy   = "start-date" />
                     </div>
@@ -87,11 +124,23 @@ define([
                       <DueDateCalendarPicker dateValue    = {this.state.period.endDate}
                                              ref          = "endDate"
                                              dateType     = "due_at"
-                                             handleUpdate = {this.changeEndDate}
+                                             handleUpdate = {changeEndDate.bind(this)}
                                              rowKey       = "end-date"
                                              labelledBy   = "end-date" />
                     </div>
                   </div>
+                </div>
+
+                <div className="ic-Form-control">
+                  <label className="ic-Label" htmlFor="close-date">
+                    {I18n.t("Close Date")}
+                  </label>
+                  <DueDateCalendarPicker dateValue    = {this.state.period.closeDate}
+                                         ref          = "closeDate"
+                                         dateType     = "due_at"
+                                         handleUpdate = {changeCloseDate.bind(this)}
+                                         rowKey       = "close-date"
+                                         labelledBy   = "close-date" />
                 </div>
               </div>
             </div>
@@ -122,24 +171,6 @@ define([
           </button>
         </div>
       );
-    },
-
-    changeTitle: function(e) {
-      let period = _.clone(this.state.period);
-      period.title = e.target.value;
-      this.setState({period: period});
-    },
-
-    changeStartDate: function(date) {
-      let period = _.clone(this.state.period);
-      period.startDate = date;
-      this.setState({period: period});
-    },
-
-    changeEndDate: function(date) {
-      let period = _.clone(this.state.period);
-      period.endDate = date;
-      this.setState({period: period});
     },
 
     triggerSave: function() {

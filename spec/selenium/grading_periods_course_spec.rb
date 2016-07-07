@@ -50,11 +50,6 @@ describe 'Course Grading Periods' do
       expect(ff(grading_period_selector).length).to be 1
     end
 
-    it 'does not allow adding grading periods', priority: "1", test_id: 239999 do
-      get "/courses/#{@course.id}/grading_standards"
-      expect(f('#grading_periods')).to_not contain_css(('#add-period-button'))
-    end
-
     it 'allows updating grading periods', priority: "1", test_id: 202317 do
       period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
