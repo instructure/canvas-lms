@@ -8,6 +8,14 @@ module Factories
       end
     end
 
+    def create_for_account(account)
+      legacy_create_for_account(account)
+    end
+
+    def legacy_create_for_course(course)
+      create_for_course(course)
+    end
+
     def create_for_course(course)
       # This relationship will eventually go away.
       # Please use this helper so that old associations can be easily
