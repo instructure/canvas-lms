@@ -225,11 +225,11 @@ define([
     nodeToFocusOnAfterSetDeletion(setID) {
       const index = this.state.sets.findIndex(set => set.id === setID);
       if (index < 1) {
-        return this.refs.addSetFormButton;
+        return React.findDOMNode(this.refs.addSetFormButton);
       } else {
         const setRef = getShowGradingPeriodSetRef(this.state.sets[index - 1]);
         const setToFocus = this.refs[setRef];
-        return setToFocus.refs.title;
+        return React.findDOMNode(setToFocus.refs.title);
       }
     },
 

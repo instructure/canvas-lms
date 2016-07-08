@@ -28,7 +28,7 @@ define([
     },
 
     componentDidMount() {
-      this.refs.titleInput.focus();
+      React.findDOMNode(this.refs.titleInput).focus();
     },
 
     setSelectedEnrollmentTermIDs(termIDs) {
