@@ -506,7 +506,7 @@ EOS
 Student appointment sign-up
 EOS
     when 'Appointment Availability'
-      t(:appointment_availability_description, 'New appointment timeslots are available for signup')
+      t('New appointment timeslots are available for signup')
     when 'Appointment Signups'
       t(:appointment_signups_description, 'New appointment on your calendar')
     when 'Appointment Cancelations'
