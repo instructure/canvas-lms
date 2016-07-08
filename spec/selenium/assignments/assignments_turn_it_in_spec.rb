@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative '../common'
 
 describe "assignments turn it in" do
   include_context "in-process server selenium tests"

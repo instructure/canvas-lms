@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
+require_relative '../helpers/assignments_common'
 
 describe "quizzes assignments" do
   include_context "in-process server selenium tests"

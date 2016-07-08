@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require_relative '../common'
+require_relative '../helpers/assignment_overrides.rb'
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper

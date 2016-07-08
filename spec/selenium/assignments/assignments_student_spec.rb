@@ -1,6 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common')
+require_relative '../common'
+require_relative '../helpers/assignments_common'
+require_relative '../helpers/google_drive_common'
 
 describe "assignments" do
   include_context "in-process server selenium tests"

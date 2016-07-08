@@ -1,6 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
+require_relative '../common'
+require_relative '../helpers/files_common'
+require_relative '../helpers/submissions_common'
 
 describe "submissions" do
   include_context "in-process server selenium tests"
