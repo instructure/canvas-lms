@@ -1,12 +1,10 @@
 <%# presenter is a ToDoListPresenter::AssignmentPresenter or a ToDoListPresenter::AssessmentRequestPresenter %>
-<div class="IgnoreButton">
-  <a class="disable_item_link disable-todo-item-link"
-     title="<%= presenter.ignore_title %>"
-     href="#"
-     data-api-href="<%= presenter.ignore_url %>"
-     data-flash-message="<%= presenter.ignore_flash_message %>"
-  >
-    <i class="icon-x"></i>
-    <span class="screenreader-only"><%= t('Ignore') %></span>
-  </a>
-</div>
+<button type="button" class="Button Button--icon-action disable_item_link disable-todo-item-link"
+   title="<%= presenter.ignore_title %>"
+   href="#"
+   data-api-href="<%= presenter.ignore_url %>"
+   data-flash-message="<%= presenter.ignore_flash_message %>"
+>
+  <i class="icon-x"></i>
+  <span class="screenreader-only"><%= t('Ignore') %></span>
+</button>
