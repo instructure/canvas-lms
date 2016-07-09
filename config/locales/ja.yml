@@ -10723,8 +10723,8 @@ ja:
     announcement_description: コースの新しいアナウンス
     announcement_display: アナウンス
     appointment_availability_description: |-
-        *インストラクタおよび管理者のみ:*⏎
-        ⏎
+        *インストラクタおよび管理者のみ:*
+        
         予定時間スロットに対する変更
     appointment_availability_display: 予定の設定状況
     appointment_cancelations_description: 予定の取り消し
