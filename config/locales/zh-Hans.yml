@@ -10720,8 +10720,8 @@ zh-Hans:
     announcement_description: 您课程中的新通告
     announcement_display: 通告
     appointment_availability_description: |-
-        *仅适用于导师和管理员：*⏎
-        ⏎
+        *仅适用于导师和管理员:*
+        
         更改约会时段
     appointment_availability_display: 约会可用性
     appointment_cancelations_description: 预约取消
