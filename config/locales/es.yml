@@ -11967,7 +11967,7 @@ es:
     yo_select: 
       yo: Yo
     you_have_no_services: "No hay servicios registrados, puede agregar algunos en la página de *configuraciones*"
-  profile_6bd2baed: Profile
+  profile_6bd2baed: Perfil
   profiles: 
     avatar_dialog: 
       from_gravatar: "Desde Gravatar"
@@ -15373,7 +15373,7 @@ es:
     outcomes: Resultados
     pages: Páginas
     people: Personas
-    profile: Profile
+    profile: Perfil
     quizzes: Evaluaciones
     settings: Configuraciones
     syllabus: "Programa de Estudio"

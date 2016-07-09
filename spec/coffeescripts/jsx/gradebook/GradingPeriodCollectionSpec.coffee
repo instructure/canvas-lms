@@ -31,6 +31,7 @@ define [
             "weight":null, "title":"Summer", "permissions": { "update":true, "delete":true }
           }
         ]
+        "grading_periods_read_only": false,
         "can_create_grading_periods": true,
         "can_toggle_grading_periods": true
 
@@ -45,6 +46,7 @@ define [
             "weight":null, "title":"Summer", "permissions": { "update":true, "delete":true }
           }
         ]
+        "grading_periods_read_only": false,
         "can_create_grading_periods": true,
         "can_toggle_grading_periods": true
 
@@ -73,6 +75,10 @@ define [
     @spy($, "ajax")
     @gradingPeriodCollection.getPeriods()
     ok $.ajax.calledOnce
+
+  test "renders grading periods with 'readOnly' set to the returned value (false)", ->
+    equal @gradingPeriodCollection.refs.grading_period_1.props.readOnly, false
+    equal @gradingPeriodCollection.refs.grading_period_2.props.readOnly, false
 
   test 'createNewGradingPeriod adds a new period', ->
     deepEqual @gradingPeriodCollection.state.periods.length, 2
@@ -271,6 +277,7 @@ define [
             "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           }
         ]
+        "grading_periods_read_only": false,
         "can_create_grading_periods": true,
         "can_toggle_grading_periods": true
 
@@ -281,6 +288,7 @@ define [
             "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
           }
         ]
+        "grading_periods_read_only": false,
         "can_create_grading_periods": true,
         "can_toggle_grading_periods": true
 
@@ -300,3 +308,44 @@ define [
   test 'does not show a link to the settings page if the user cannot toggle the multiple grading periods feature', ->
     @gradingPeriodCollection.setState(canChangeGradingPeriodsSetting: false)
     notOk @gradingPeriodCollection.refs.linkToSettings
+
+  module 'GradingPeriodCollection with read-only grading periods',
+    setup: ->
+      @server = sinon.fakeServer.create()
+      fakeENV.setup()
+      ENV.current_user_roles = ["admin"]
+      ENV.GRADING_PERIODS_URL = "/api/v1/accounts/1/grading_periods"
+      @indexData =
+        "grading_periods":[
+          {
+            "id":"1", "start_date":"2015-03-01T06:00:00Z", "end_date":"2015-05-31T05:00:00Z",
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
+          }
+        ]
+        "grading_periods_read_only": true,
+        "can_create_grading_periods": true,
+        "can_toggle_grading_periods": true
+
+      @formattedIndexData =
+        "grading_periods":[
+          {
+            "id":"1", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
+            "weight":null, "title":"Spring", "permissions": { "update":true, "delete":true }
+          }
+        ]
+        "grading_periods_read_only": true,
+        "can_create_grading_periods": true,
+        "can_toggle_grading_periods": true
+
+      @server.respondWith "GET", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
+      GradingPeriodCollectionElement = React.createElement(GradingPeriodCollection)
+      @gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollectionElement)
+      @server.respond()
+
+    teardown: ->
+      React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
+      fakeENV.teardown()
+      @server.restore()
+
+  test "renders grading periods with 'readOnly' set to true", ->
+    equal @gradingPeriodCollection.refs.grading_period_1.props.readOnly, true

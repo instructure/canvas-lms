@@ -7,10 +7,9 @@ define([
   'jsx/grading/gradingPeriodTemplate',
   'jsx/shared/helpers/dateHelper'
 ], function(tz, React, $, I18n, _, GradingPeriodTemplate, DateHelper) {
-
   var types = React.PropTypes;
-  var GradingPeriod = React.createClass({
 
+  var GradingPeriod = React.createClass({
     propTypes: {
       title: types.string.isRequired,
       startDate: types.instanceOf(Date).isRequired,
@@ -19,6 +18,7 @@ define([
       updateGradingPeriodCollection: types.func.isRequired,
       onDeleteGradingPeriod: types.func.isRequired,
       disabled: types.bool.isRequired,
+      readOnly: types.bool.isRequired,
       permissions: types.shape({
         update: types.bool.isRequired,
         delete: types.bool.isRequired,
@@ -77,12 +77,14 @@ define([
     render: function () {
       return (
         <GradingPeriodTemplate key={this.props.id}
+                               ref="template"
                                id={this.props.id}
                                title={this.props.title}
                                startDate={this.props.startDate}
                                endDate={this.props.endDate}
                                permissions={this.props.permissions}
                                disabled={this.props.disabled}
+                               readOnly={this.props.readOnly}
                                onDeleteGradingPeriod={this.props.onDeleteGradingPeriod}
                                onDateChange={this.onDateChange}
                                onTitleChange={this.onTitleChange}/>

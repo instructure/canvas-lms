@@ -83,11 +83,13 @@ class GradingPeriodsController < ApplicationController
       else
         grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
       end
+      read_only = grading_periods.present? && grading_periods.first.grading_period_group.account_id.present?
       paginated_grading_periods, meta = paginate_for(grading_periods)
       respond_to do |format|
         format.json do
           render json: serialize_json_api(paginated_grading_periods, meta)
             .merge(index_permissions)
+            .merge(grading_periods_read_only: read_only)
         end
       end
     end
@@ -156,6 +158,9 @@ class GradingPeriodsController < ApplicationController
   # successful.
   def destroy
     grading_period = GradingPeriod.active.find(params[:id])
+    unless can_destroy_in_context?(grading_period)
+      return render_unauthorized_action
+    end
 
     if authorized_action(grading_period, @current_user, :delete)
       grading_period.destroy
@@ -206,6 +211,9 @@ class GradingPeriodsController < ApplicationController
   def course_batch_update
     periods = find_or_build_periods_for_course(params[:grading_periods])
     unless batch_update_rights?(periods)
+      return render_unauthorized_action
+    end
+    unless can_batch_update_in_context?(periods)
       return render_unauthorized_action
     end
 
@@ -285,6 +293,14 @@ class GradingPeriodsController < ApplicationController
 
   def current_user_can_update?(periods)
     periods.all? { |p| p.grants_right?(@current_user, :update) }
+  end
+
+  def can_batch_update_in_context?(periods)
+    periods.empty? || periods.first.grading_period_group.account_id.blank?
+  end
+
+  def can_destroy_in_context?(period)
+    @context.is_a?(Account) || period.grading_period_group.account_id.blank?
   end
 
   def context_grading_period_group

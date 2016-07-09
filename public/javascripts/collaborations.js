@@ -137,15 +137,15 @@ define([
     onExternalContentReady: function(e, data) {
       var contentItem = {contentItems: JSON.stringify(data.contentItems)};
       if (data.service_id) {
-        this.updateCollaboration(contentItem);
+        this.updateCollaboration(contentItem, data.service_id);
       }
       else {
         this.createCollaboration(contentItem);
       }
     },
 
-    updateCollaboration: function(contentItem) {
-      var url = $('.collaboration_'+ data.service_id + ' a.title')[0].href;
+    updateCollaboration: function(contentItem, collab_id) {
+      var url = $('.collaboration_'+ collab_id + ' a.title')[0].href;
       $.ajaxJSON( url, 'PUT', contentItem, this.collaborationSuccess, function( msg ) {
         $.screenReaderFlashMessage(I18n.t('Collaboration update failed'));
       });
