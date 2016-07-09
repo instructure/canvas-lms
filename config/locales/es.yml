@@ -10620,8 +10620,8 @@ es:
     announcement_description: "Nuevo anuncio en su curso"
     announcement_display: Anuncio
     appointment_availability_description: |-
-        *Solo instructores y administradores:*⏎
-        ⏎
+        *Solo instructores y administradores:*
+        
         Cambio en las horas de las citas
     appointment_availability_display: "Disponibilidad de citas"
     appointment_cancelations_description: "Cancelación de la cita"
