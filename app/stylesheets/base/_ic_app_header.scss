@@ -27,8 +27,12 @@
     position: fixed;
     top: 0; left: 0;
     height: 100%;
-    width: $ic-header-primary-width;
+    width: $ic-header-primary-width - 30;
     z-index: 100;
+
+    @include breakpoint(tablet) {
+      width: $ic-header-primary-width;
+    }
   }
 
   .ic-app-header__layout {
@@ -154,7 +158,11 @@
     flex-direction: column;
     overflow-y: auto;
     -ms-overflow-style: none; // IE11 and below was throwing on scrollbars no matter if needed or not
-    width: $ic-header-primary-width;
+    width: $ic-header-primary-width - 30;
+
+    @include breakpoint(tablet) {
+      width: $ic-header-primary-width;
+    }
   }
 
   .ic-avatar {
@@ -179,16 +187,36 @@
 
     .ic-avatar {
       transform: translate3d(0,0,0);
-      width: $ic-sp*3; height: $ic-sp*3;
+      width: $ic-sp*2.5; height: $ic-sp*2.5;
+
+      @include breakpoint(tablet) {
+        width: $ic-sp*3; height: $ic-sp*3;
+      }
     }
   }
 
   .menu-item__text {
-    margin-top: $ic-sp/2;
-    box-sizing: border-box;
-    color: $ic-brand-global-nav-menu-item__text-color;
-    line-height: 1.1;
-    @include fontSize($ic-font-size--xsmall);
+    position: absolute; // for tablet... completely hide text, but make available to screenreader so it can read it
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    width: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+
+    @include breakpoint(tablet) {
+      position: static;
+      overflow: visible;
+      clip: auto;
+      height: auto;
+      width: auto;
+      margin: $ic-sp/2 auto auto;
+      box-sizing: border-box;
+      color: $ic-brand-global-nav-menu-item__text-color;
+      line-height: 1.1;
+      @include fontSize($ic-font-size--xsmall);
+    }
   }
 
   .menu-item__badge {
@@ -209,11 +237,15 @@
     width: 100%;
     background-color: $ic-brand-global-nav-logo-bgd;
     box-sizing: border-box;
+
     @if $ic-brand-header-image != $ic-logomark-url {
       padding: 0;
     }
     @else {
-      padding: 0 $ic-sp+6;
+      padding: 0 $ic-sp/2;
+      @include breakpoint(tablet) {
+        padding: 0 $ic-sp+6;
+      }
     }
   }
 
@@ -228,11 +260,19 @@
     background-size: contain;
     transition: transform 0.5s;
     @if $ic-brand-header-image != $ic-logomark-url {
-      height: 85px;
+      height: 75px;
     }
     @else {
-      height: 75px;
+      height: 65px;
       transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
+    }
+    @include breakpoint(tablet) {
+      @if $ic-brand-header-image != $ic-logomark-url {
+        height: 85px;
+      }
+      @else {
+        height: 75px;
+      }
     }
   }
   // set to block to avoid any exta inline spacing at bottom
@@ -261,9 +301,12 @@
     overflow-x: hidden;
     width: $ic-sp*28;
     top: 0; bottom: 0;
-    left: $ic-header-primary-width;
+    left: $ic-header-primary-width - 30;
     @if $use_high_contrast == false {
       &:focus { outline: none; }
+    }
+    @include breakpoint(tablet) {
+      left: $ic-header-primary-width;
     }
   }
 
