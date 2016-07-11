@@ -1,14 +1,14 @@
 define([
   'react',
+  'react-dom',
   'jsx/collaborations/NewCollaborationsDropDown'
-], (react, NewCollaborationsDropDown) => {
+], (React, ReactDOM, NewCollaborationsDropDown) => {
   const TestUtils = React.addons.TestUtils;
 
   module('NewCollaborationsDropDown');
 
   let defaultProps = {
-    ltiCollaborators: [{name: "A name", id: '1'}],
-    onItemClicked: () => {}
+    ltiCollaborators: [{name: "A name", id: '1'}]
   }
 
   test('renders the create-collaborations-dropdown div', () => {
@@ -18,22 +18,32 @@ define([
     ok(TestUtils.findRenderedDOMComponentWithClass(component, 'create-collaborations-dropdown'));
   });
 
-  test('calls onItemClicked with the correct url when an item is clicked', () => {
+  test('has a link to open the lti tool to create a collaboration', () => {
     ENV.context_asset_string = 'courses_1';
 
-    let onItemClicked = false
+    let component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...defaultProps} />);
+    let button = TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[0];
+    ok(ReactDOM.findDOMNode(button).href.includes('/courses/1/lti_collaborations/external_tools/1?launch_type=collaboration&display=borderless'));
+  })
+
+  test('has a dropdown if there is more than one tool', () => {
+    ENV.context_asset_string = 'courses_1';
+
     let props = {
-      ...defaultProps,
-      onItemClicked: (url) => {
-        onItemClicked = true
-        equal(url, '/courses/1/external_tools/1?launch_type=collaboration&display=borderless')
-      }
+      ltiCollaborators: [{
+        name: "A name",
+        id: '1'
+      }, {
+        name: "Another name",
+        id: '2'
+      }]
     }
+
     let component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...props} />);
-    let button = TestUtils.findRenderedDOMComponentWithClass(component, 'Button').getDOMNode();
-    TestUtils.Simulate.click(button);
-    let tool = TestUtils.findRenderedDOMComponentWithTag(component, 'Button').getDOMNode();
-    TestUtils.Simulate.click(tool);
-    ok(onItemClicked)
+    let dropdownButton = TestUtils.findRenderedDOMComponentWithTag(component, 'button');
+    TestUtils.Simulate.click(dropdownButton);
+
+    let links = TestUtils.scryRenderedDOMComponentsWithTag(component, 'a');
+    equal(links.length, 2)
   })
 });

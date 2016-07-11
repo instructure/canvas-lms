@@ -6,12 +6,6 @@ define([
   class NewCollaborationsDropDown extends React.Component {
     constructor (props) {
       super(props);
-      this.openModal = this.openModal.bind(this)
-    }
-
-    openModal (e, itemUrl) {
-      e.preventDefault()
-      this.props.onItemClicked(itemUrl)
     }
 
     render () {
@@ -21,27 +15,26 @@ define([
         <div className="al-dropdown__container create-collaborations-dropdown">
           {hasOne
             ?
-            <button
-            className="Button Button--primary"
-            aria-label={I18n.t('Add Collaboration')}
-            onClick={(e) => this.openModal(e, `/${context}/${contextId}/external_tools/${this.props.ltiCollaborators[0].id}?launch_type=collaboration&display=borderless`)}
+            <a
+              className="Button Button--primary"
+              aria-label={I18n.t('Add Collaboration')}
+              href={`/${context}/${contextId}/lti_collaborations/external_tools/${this.props.ltiCollaborators[0].id}?launch_type=collaboration&display=borderless`}
             >
-            {I18n.t('+ Collaboration')}
-            </button>
+              {I18n.t('+ Collaboration')}
+            </a>
             :
           <div>
             <button className="al-trigger Button Button--primary" aria-label={I18n.t('Add Collaboration')} role="button" href="#">{I18n.t('+ Collaboration')}</button>
             <ul className="al-options" role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="new-collaborations-dropdown">
               {
                 this.props.ltiCollaborators.map(ltiCollaborator => {
-                  let itemUrl = `/${context}/${contextId}/external_tools/${ltiCollaborator.id}?launch_type=collaboration`
+                  let itemUrl = `lti_collaborations/external_tools/${ltiCollaborator.id}?launch_type=collaboration&display=borderless`
                   return(
                     <li key={ltiCollaborator.id}>
                       <a
                         href={itemUrl}
                         rel="external"
                         role="menuitem"
-                        onClick={(e) => this.openModal(e, `${itemUrl}&display=borderless`)}
                       >
                         {ltiCollaborator.name}
                       </a>

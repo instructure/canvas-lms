@@ -339,6 +339,7 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
+    get 'lti_collaborations/*all' => 'collaborations#lti_index'
     resources :gradebook_uploads
     resources :rubrics
     resources :rubric_associations do
@@ -499,6 +500,7 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'lti_collaborations' => 'collaborations#lti_index'
+    get 'lti_collaborations/*all' => 'collaborations#lti_index'
     get 'calendar' => 'calendars#show2', as: :old_calendar
 
     resources :external_tools do
