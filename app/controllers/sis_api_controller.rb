@@ -58,7 +58,9 @@ class SisApiController < ApplicationController
   #       },
   #       "assignment_group": {
   #         "id": 12,
-  #         "name": "Assignments Group"
+  #         "name": "Assignments Group",
+  #         "group_weight": 0.0,
+  #         "sis_source_id": "abc123"
   #       }
   #       "sections": [
   #         {
