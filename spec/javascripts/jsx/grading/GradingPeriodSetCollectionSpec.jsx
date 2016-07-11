@@ -1,10 +1,11 @@
 define([
   'react',
   'underscore',
+  'jquery',
   'jsx/grading/GradingPeriodSetCollection',
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi'
-], (React, _, SetCollection, setsApi, termsApi) => {
+], (React, _, $, SetCollection, setsApi, termsApi) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -354,6 +355,30 @@ define([
       collection.changeSearchText("does not match");
       filteredIDs = _.pluck(collection.getVisibleSets(), "id");
       propEqual(collection.getVisibleSets(), []);
+      start();
+    });
+  });
+
+  asyncTest("announces number of search results for screen readers", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.terms, this.sets]).then(function() {
+      sinon.spy($, "screenReaderFlashMessageExclusive");
+      collection.changeSearchText("201");
+      collection.getVisibleSets();
+      ok($.screenReaderFlashMessageExclusive.calledWith(I18n.t({
+          one: "1 set of grading periods found.",
+          other: "%{count} sets of grading periods found.",
+          zero: "No matching sets of grading periods found."
+        }, {count: 2}
+      )));
+
+      collection.changeSearchText("");
+      collection.getVisibleSets();
+      ok($.screenReaderFlashMessageExclusive.calledWith(I18n.t("Showing all sets of grading periods.")));
+
+      $.screenReaderFlashMessageExclusive.restore();
+
       start();
     });
   });
