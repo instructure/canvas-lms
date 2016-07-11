@@ -142,6 +142,8 @@ module SIS
               # delete the pseudonym.
               d = @root_account.enrollments.active.where(user_id: user).update_all(workflow_state: 'deleted')
               d += @root_account.all_group_memberships.active.where(user_id: user).update_all(workflow_state: 'deleted')
+              d += user.account_users.shard(@root_account).where(account_id: @root_account.all_accounts).delete_all
+              d += user.account_users.shard(@root_account).where(account_id: @root_account).delete_all
               if 0 < d
                 should_update_account_associations = true
               end
