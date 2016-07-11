@@ -294,7 +294,7 @@
     background-color: $ic-list-item-background--hover;
   }
 
-  &.ig-published {
+  &.ig-published:not(.student-view) {
 
     &:before {
       content: "";
@@ -339,7 +339,7 @@
   background-color: $ic-font-color--subdued;
   color: $ic-color-light;
 
-  .ig-published & {
+  .ig-published:not(.student-view) & {
     background-color: $ic-color-success;
   }
 }

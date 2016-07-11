@@ -197,6 +197,6 @@ module Api::V1::ContextModule
   def conditional_release_assignment_set(rules, id)
     result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
     return unless result.present?
-    result.slice(:locked, :assignment_sets)
+    result.slice(:locked, :assignment_sets, :selected_set_id)
   end
 end

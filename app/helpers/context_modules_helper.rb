@@ -17,12 +17,15 @@
 #
 
 module ContextModulesHelper
+  include Api::V1::ContextModule
+
   def cache_if_module(context_module, editable, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_17_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+      cache_key_items = ['context_module_render_18_', context_module.cache_key, editable, true, Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
+      cache_key = add_mastery_paths_to_cache_key(cache_key, context, context_module, user)
       cache(cache_key, nil, &block)
     else
       yield
@@ -33,6 +36,17 @@ module ContextModulesHelper
     tool_key = @menu_tools && @menu_tools.values.flatten.map(&:cache_key).join("/")
     cache_key += Digest::MD5.hexdigest(tool_key) if tool_key.present?
     # should leave it alone if there are no tools
+    cache_key
+  end
+
+  def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
+    if ConditionalRelease::Service.enabled_in_context?(context) && context.user_is_student?(user)
+      items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
+        Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
+      end
+      rules = ConditionalRelease::Service.rules_for(context, user, items, @session)
+      cache_key += '/mastery:' + Digest::MD5.hexdigest(rules.to_s)
+    end
     cache_key
   end
 
@@ -75,33 +89,35 @@ module ContextModulesHelper
 
   def preload_modules_content(modules, can_edit)
     ActiveRecord::Associations::Preloader.new.preload(modules, :content_tags => :content)
-    preload_can_unpublish(@context, @modules) if can_edit
+    preload_can_unpublish(@context, modules) if can_edit
   end
 
-  def process_module_data(mod, is_cyoe_on = false, is_student = false, cyoe_data = nil)
+  def process_module_data(mod, is_student = false, is_cyoe_on = false, current_user = nil, session = nil)
     # pre-calculated module view data can be added here
     module_data = {
       published_status: mod.published? ? 'published' : 'unpublished',
-      items: mod.content_tags_visible_to(@current_user).map
+      items: mod.content_tags_visible_to(@current_user)
     }
+
+    cyoe_rules = []
+
+    if is_student && is_cyoe_on
+      cyoe_rules = ConditionalRelease::Service.rules_for(@context, current_user, module_data[:items], session)
+    end
 
     items_data = {}
     module_data[:items].each do |item|
       # pre-calculated module item view data can be added here
       item_data = {
-        published_status: item.published? ? 'published' : 'unpublished'
+        published_status: item.published? ? 'published' : 'unpublished',
       }
 
-      if is_cyoe_on && is_student
-        item_data[:is_trigger_assignment] = cyoe_data ? cyoe_data.has_key?(item.id) : false
-        item_data[:is_in_conditional] = false # TODO: check against cyoe_data
-
-        # FIXME: use CYOE data to figure out if
-        if item.graded?
-          item_data[:has_submission] = item.content.submissions.length > 0 if defined? item.content.submissions
-          item_data[:has_submission] = item.content.quiz_submissions.length > 0 if defined? item.content.quiz_submissions
-        end
+      if is_student && is_cyoe_on
+        item_data[:mastery_paths] = conditional_release(item, { conditional_release_rules: cyoe_rules })
+        item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
       end
+
+      item_data[:show_cyoe_placeholder] = is_student && item_data[:mastery_paths] && item_data[:mastery_paths][:selected_set_id] == nil
 
       items_data[item.id] = item_data
     end

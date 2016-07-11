@@ -1,7 +1,7 @@
 <%
   context_module_next ||= nil
   context_module ||= context_module_next
-  module_data = context_module ? process_module_data(context_module) : { published_status: 'unpublished' }
+  module_data = context_module ? process_module_data(context_module, @is_student, @is_cyoe_on, @current_user, @session) : { published_status: 'unpublished' }
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
@@ -164,7 +164,18 @@
     <ul class="ig-list items context_module_items <%= 'manageable' if editable %>">
       <% if context_module && module_data[:items] %>
         <% module_data[:items].each do |item| %>
-          <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => {:completion_criteria => context_module.completion_requirements, :item_data => module_data[:items_data][item.id], :editable => editable} %>
+          <%
+            item_data = module_data[:items_data][item.id]
+            locals = {
+              :completion_criteria => context_module.completion_requirements,
+              :item_data => item_data,
+              :editable => editable,
+            }
+          %>
+          <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
+          <% if item_data[:show_cyoe_placeholder] %>
+            <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+          <% end %>
         <% end %>
       <% end %>
     </ul>
