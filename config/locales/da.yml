@@ -51,6 +51,7 @@ da:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Et logo i fuld størrelse, der vises i den højre margentekst på Canvas-oversigten. Ideel størrelse er 360 x 140 pixels. Accepterede formater: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "En praktisk kode/værdi dump for en lang række interessante oplysninger om miljøet til den rapporterende bruger."
   a_message_is_required_129e1814: "Der kræves en besked"
+  a_name_for_this_set_is_required_222bad23: "Der kræves et navn for dette sæt"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Der er blevet oprettet en ny opgave til dit kursus, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Der opstod et problem under tilføjelse af bedømmere."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabel indeholdende navene på bedømmelsessystemet og ikoner for redigering eller sletning af system."
@@ -3013,6 +3014,7 @@ da:
   close_d634289d: luk
   close_picker_256aca8a: "Luk vælger"
   code_is_case_sensitive_d8175cad: "Kode er afhængig af store og små bogstaver"
+  cog_icon_69bdffd5: Tandhjuls-ikon
   collaboration: 
     default_title: "Samarbejde uden navn"
   collaboration_71c024f4: Samarbejde
@@ -7307,6 +7309,7 @@ da:
       overlap_message: "Bedømmelsesperiode kan ikke overlappe med eksisterende bedømmelsesperioder i gruppe"
   grading_period_8b0a4a10: Bedømmelseperiode
   grading_period_name_31ceb3e3: "Navn på bedømmelsesperiode"
+  grading_period_set_for_account_name_b9823b2a: "Sæt af bedømmelsesperioder for %{account_name}"
   grading_period_set_title_880a6ec4: "Tiltel for sæt af bedømmelsesperioder"
   grading_period_title_23b7f8ac: Bedømmelsesperiodetitel
   grading_period_title_fa470c50: Bedømmelsesperiodetitel
@@ -7344,6 +7347,10 @@ da:
   grading_type_type_7d8b42d7: "Bedømmelsestype: %{type}"
   graph_bar_b5daa23d: Graflinje
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagrom over karakterer for hver opgave"
+  graph_of_student_page_views_and_participation_over_4a1d4803: "Diagram over studerendes sidevisninger og deltagelse over tid"
+  graph_of_student_page_views_by_category_7cb49887: "Diagram over studerendes sidevisninger efter kategori"
+  graph_of_the_distribution_of_grades_in_the_departm_30445777: "Diagram over karakterfordeling i afdelingen"
+  graph_showing_the_fraction_of_on_time_submissions__735e47db: "Diagram over andel af indsendelser til tiden for hver opgave"
   graphs_89fcfeb: Grafer
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Fantastisk, så du har et kursus. Hvad nu? Tja, inden du offentliggør det til omverdenen, anbefaler vi, at du tjekker det og sørger for, at du har styr på de grundlæggende ting. Gå igennem listen til venstre for at sikre, at dit kursus er klar til brug."
   green_15af4778: Grøn
@@ -7888,6 +7895,7 @@ da:
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Hvis du konfigurere indstillinger, så du ikke kan logge ind, kan du få direkte adgang via normal Canvas login via %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke vælger brugsrettigheder nu, annulleres filens offentliggørelse efter upload."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Hvis du aktiverer denne funktion, skal du sikre, at din salesforce-konto tilføjer disse brugertilpassede felter på korrekt måde med navnene i tabellens venstre kolonne."
+  if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "Hvis du fortsat har problemer, klik \"%{link}\" linket nedenfor for at søge i guiderne eller for at lade os vide, hvad problemet er."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Hvis du lukker, så annulleres den zip-fil, som forberedes i øjeblikket."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       Hvis du foretager ændringer til de studerendes afleveringsfiler, som du downloadede 
@@ -7897,6 +7905,7 @@ da:
         *Sørg for, at du ikke ændrer afleveringsfilernes navne, så vi kan genkende dem.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Hvis du har brugt et andet system til kursusadministration, har du sikkert ting og sager deri, som du gerne vil flytte over i Canvas. Vi kan sammen gennemgå processen til nemt at overføre dit indhold ind i Canvas."
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Hvis du gerne vil beholde de kommentarer, du ikke har sendt, skal du gemme dem, inden du navigerer bort fra siden."
+  if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "Hvis du ønsker at forbinde til din egen campus support webside i hjælp dialogen kan du gøre det her."
   ignore_91750df8: Ignorer
   ignore_assignment_738b3c99: "Ignorer opgave"
   ignore_name_55edc6fe: "Ignorer %{name}"
@@ -8302,6 +8311,7 @@ da:
       word_separator: " "
   license_help: 
     content_license_help: "Hjælp til indholdslicensering"
+  life_preserver_icon_8660b6ce: Redningsbætle-ikon
   light_blue_5374f600: Lyseblå
   light_green_c1cd020d: Lysegrøn
   light_pink_e1214d62: Lyserød
@@ -10668,6 +10678,7 @@ da:
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studerende har taget quizzen endnu"
   no_students_have_taken_the_survey_yet_d378cd35: "Alle studerende har gennemført spørgeundersøgelsen endnu"
   no_tls_618add1a: "Ingen TLS"
+  no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
   no_unresponsive_links_found_8ea497f9: "Ingen brudte link fundet"
   no_usage_rights_object_supplied_304b8d40: "Ikke oplyst objekt til 'usage_rights'"
   no_users_found_64a043ff: "Ikke fundet nogen brugere"
@@ -15429,6 +15440,7 @@ da:
   submitting_types_7c5a7096: "Indsender: %{types}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Succes! Alle brugere på dette domæne vil nu se denne branding."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Succes! Karaktererne blev offentliggjort til karakterbogen."
+  successfully_created_a_set_38374719: "Sæt oprettet succesfuldt"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Flyttet %{model} til %{newGroup}"
   sum_of_all_files_in_mb_2b705055: "summen af alle filer i MB"
   summary_statistics_f74852a5: "Oversigt over statistik"
@@ -15515,6 +15527,7 @@ da:
   tenant_d2a41f78: Lejer
   term_created_27d27c2b: "Betingelse oprettet"
   term_e1c1d390: Semester
+  term_starting_5bd5e070: "Semester starter"
   terms: 
     index: 
       date: 
@@ -15572,6 +15585,7 @@ da:
         term_start: "semesterets start"
         unspecified: "når som helst"
       timespan: "%{start_at} *til* %{end_at}"
+  terms_35d91184: "Semstre:"
   text_document_eacbcdb7: Tekstdokument
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstaflevering kan ikke være tom"
   text_input_d3480b8c: Tekstindtastning
@@ -15596,7 +15610,10 @@ da:
   the_grade_for_this_assignment_will_sync_to_the_stu_29c3b522: "Karakteren for denne opgave synkroniseres med de studerendes informationssystem. Klik her for at skifte denne indstilling."
   the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Karakteren for denne opgave synkroniseres i de studerendes informationssystem."
   the_grade_for_this_assignment_will_sync_to_the_stu_5fb4c455: "Karakteren for denne opgave vil synkronisere til studerendes information system., Klik her for at ændre denne indstilling."
+  the_grading_period_set_was_deleted_cce5d8f6: "Sæt af bedømmelsesperioder blev slettet"
+  the_grading_period_set_was_updated_successfully_d8dd5d0f: "Sæt af bedømmelsesperioder blev opdateret succesfuldt."
   the_grading_period_was_deleted_7814a349: "Bedømmelsesperioden blev slettet"
+  the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerede tekst for dette spørgsmål var for lang."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institutionen fra hvilken du loggede på, er ikke konfigureret på denne konto."
   the_list_of_results_has_been_updated_46e3c733: "Listen af resultater er blevet opdateret."
   the_material_is_in_the_public_domain_279c39a3: "Materialer er på det offentlige domæne"
@@ -15621,6 +15638,7 @@ da:
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De seneste scores for bruger %{current_user_name} og læringsmål %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Profilbilledet er blevet indberettet"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den medfølgende Academic Benchmark-fil indeholder fejl"
+  the_question_text_for_the_question_question_name_w_3a68a2c7: "Spørgsmålteksten for spørgsmål \"%{question_name}\" var for lang."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "den rapporterende brugers roller (studerende, underviser, administrator osv.)"
   the_salesforce_account_id_if_it_exists_e7949706: "Salesforce konto-id (hvis den eksisterer)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planlægningsværktøjet lader dig konfigurere tidsrubrikker, som studerende (eller studiegrupper) kan melde sig til. Klik på nedenstående knap for at komme i gang."
@@ -15653,6 +15671,7 @@ da:
   there_was_a_problem_logging_in_at_institution_5a298155: "Der opstod et problem under login på %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Der opstod et problem under lagring af bedømmelsesperiode"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Der opstod et problem under lagring af bedømmelsessystemet"
+  there_was_a_problem_submitting_your_set_27ca2ed0: "Der var et problem med indsendelsen af dit sæt"
   there_was_an_error_generating_the_tool_launch_fb3f47ac: "Der var en fejl ved start af værktøj"
   there_was_an_error_in_processing_your_request_6513a49a: "Der opstod en fejl under behandling af din anmodning"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Der opstod en fejl under lagring af kursets ændringer"
@@ -15671,6 +15690,7 @@ da:
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Kurset er endnu ikke startet. Du kan ikke deltage i dette kursus før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette kursus er taget og klart, men du skal afslutte registreringsprocessen, inden du kan offentliggøre kurset. Du burde have modtaget en e-mail fra Canvas med et link til at afslutte processen. Husk at tjekke din mappe med uønsket post."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dette kursus er kun synligt for undervisere, indtil det offentliggøres."
+  this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette element er et mere tilgængeligt alternativ til træk & slip omorganisering. Tryk Retu eller Mellemrum for at flytte dette spørgsmål. "
   this_email_address_is_unconfirmed_f0fc8c6e: "Denne e-mailadresse er ubekræftet"
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette giver mulighed for en opdateret navigation, ny oversigt og et mere enkelt, mere moderne udseende og fornemmelse."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette giver brugere mulighed for at danne og downloade ePub."
@@ -15708,6 +15728,7 @@ da:
   this_quiz_has_been_excused_d89d2b74: "Denne quiz er blevet undtaget"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne quiz er ikke offentliggjort* Kun undervisere kan se quizzen, indtil den offentliggøres."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Denne optager bruger Flash. Som følge er det muligvis nemmere for at at optage på din egen computer, og så bruge fanen til medieoverførsel til at uploade den."
+  this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Denne rapport viser all kurser for et givent semester. Den resulterende csv fil vil have en række per kursus og vil vise kursus id, kursus sis id, kursus kort navn, kursusnavn, konto id, konto sis id, kontonavn, lagring benyttet i MB og summen af alle filer i MB. Benyttet lagring reflekterer all filer, der benyttes, i forhold til kursuskvote. Summen af alle filer i kurset er summen af alle filer, der er i kurset uanset af påvirkningen af kursuskvoten."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Denne rapport viser alle kurser for et givet semester. Den resulterede csv-fil har én række pr. kursus, og viser kursus-id, kursets sis-id, kursets korte navn, kursusnavn, konto-id, konto sis-id, kontonavn, brugt lagerplads i MB."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Dette eksempelbillede inkluderer almindelige elementer til brugergrænsefladen i Canvas, som hjælper dig med at oprette brugertilpasset branding. Når du begynder at foretage ændringer til farveværdierne og billederne i venstre sidepanel, vil du se knappen *Vis dine ændringer*. Klik på den for at opdatere siden og se, hvordan dine ændringer ser ud."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Denne studerendes svar er skjult fordi denne opgave er anonym."
@@ -15897,6 +15918,8 @@ da:
     yakutsk: Yakutsk
     yerevan: Yerevan
     zagreb: Zagreb
+  timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Tidslinje for beskeder mellem studerende og instruktører"
+  timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Tidslinje, der viser, hvornår opgaver skal indsendes"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Beskriv billedet for at forbedre tilgængeligheden"
@@ -16541,6 +16564,7 @@ da:
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoindhold understøttes ikke af din enhed eller app."
   video_player_b371005: Videoafspiller
   view_analytics_91a3b7a: "Vis kursusstatistik"
+  view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Se analysedata i tabeller istedet for grafer"
   view_announcements_b6d6d819: "Vis meddelelser"
   view_app_center_6c89a3fe: "Vis App Center"
   view_app_configurations_52b52441: "Vis app-konfigurationer"
@@ -16844,7 +16868,9 @@ da:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du skal vælge et kursus til at kopiere indhold fra"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du skal indstille det til et antal, der er større end eller lig med %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Du skal specificere en brugsrettighed."
+  you_need_to_enable_the_new_ui_feature_before_editi_50cbd68: "Du skal aktivere det \"Ny UI\" funktion før redigering af temaer."
   you_need_to_preview_changes_before_saving_85e60232: "Du skal \"forhåndsvise ændringer\" før du gemmer"
+  you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "Du skal \"forhåndsvise ændringer\" før du kan anvende dem til din konto"
   you_need_to_preview_changes_before_you_can_apply_t_c5eba588: "Du skal \"forhåndsvise ændringer\" før du kan anvende dette i din konto"
   you_need_to_preview_your_changes_before_applying_t_468d56e4: "Du skal \"Vise dine ændringer\", inden du kan anvende dem til alle."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "du skal 'Forhåndsvise dine ændringer' før du bruger dem for alle"
