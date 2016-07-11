@@ -129,7 +129,7 @@ namespace :js do
         end
         puts "--> executing browser tests with Karma"
         build_runner
-        reporters = ['progress', reporter].reject(&:blank?).join(',')
+        reporters = ['progress', 'coverage', reporter].reject(&:blank?).join(',')
         command = %Q{./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters #{reporters}}
         puts "running karma with command: #{command} on node #{`node -v`}"
         system command

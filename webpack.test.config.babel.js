@@ -60,6 +60,12 @@ testWebpackConfig.module.loaders.push({
   loaders: ["qunitDependencyLoader"]
 });
 
+testWebpackConfig.module.postLoaders = [{
+  test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
+  exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
+  loader: 'istanbul-instrumenter'
+}]
+
 
 testWebpackConfig.module.noParse = [
   /\/sinon-1.17.2.js/,

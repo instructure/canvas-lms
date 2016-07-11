@@ -59,7 +59,13 @@ var karmaConfig = {
   exclude: [],
 
   // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
-  reporters: ['progress'],
+  reporters: ['progress', 'coverage'],
+
+  coverageReporter: {
+    type: 'html',
+    dir: 'coverage-js/',
+    subdir: '.'
+  },
 
   port: 9876,
 
