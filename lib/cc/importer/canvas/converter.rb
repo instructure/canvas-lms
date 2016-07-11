@@ -52,7 +52,7 @@ module CC::Importer::Canvas
       set_progress(20)
       @course[:assignments] = convert_canvas_assignments
       set_progress(30)
-      @course[:discussion_topics] = convert_topics
+      @course[:discussion_topics], @course[:announcements]  = convert_topics_and_announcements
       set_progress(40)
       lti = CC::Importer::BLTIConverter.new
       res = lti.get_blti_resources(@manifest)

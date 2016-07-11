@@ -301,19 +301,6 @@ describe "Standard Common Cartridge importing" do
 
       expect(@course.attachments.count).to eq 0
     end
-
-    it "should import discussion_topics with 'announcement' type if announcements are selected" do
-      @course = course
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = {
-          :copy => {"announcements" => {"I_00006_R" => true}, "everything" => "0"}}.with_indifferent_access
-
-      @course_data['discussion_topics'].find{|topic| topic['migration_id'] == 'I_00006_R'}['type'] = 'announcement'
-
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
-
-      expect(@course.announcements.count).to eq 1
-    end
   end
 
   context "position conflicts" do
