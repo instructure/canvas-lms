@@ -112,6 +112,14 @@ describe Collaboration do
       expect(@collaboration.collaborators.map(&:group_id).uniq.count).to eq 1
       expect(@collaboration.collaborators.reload.map(&:user_id)).not_to include @users.last.id
     end
+
+    it "does not add a group multiple times" do
+      @collaboration.update_members([@users[0]], @groups)
+      @collaboration.update_members([@users[0]], @groups)
+      @collaboration.reload
+
+      expect(@collaboration.collaborators.map(&:group_id).compact).to eq @groups.map(&:id)
+    end
   end
 
   describe EtherpadCollaboration do

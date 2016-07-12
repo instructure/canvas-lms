@@ -255,10 +255,11 @@ class Collaboration < ActiveRecord::Base
   # Any current collaborators not passed to this method will be destroyed.
   #
   # users     - An array of users to include as collaborators.
-  # group_ids - An array of group ids to include as collaborators.
+  # groups    - An array of groups or group ids to include as collaborators.
   #
   # Returns nothing.
-  def update_members(users = [], group_ids = [])
+  def update_members(users = [], groups = [])
+    group_ids = groups.map {|g| g.try(:id) || g }
     save! if new_record?
     generate_document
     users << user if user.present? && !users.include?(user)
