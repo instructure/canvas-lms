@@ -124,6 +124,8 @@ class AssignmentsController < ApplicationController
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
 
+      conditional_release_js_env(@assignment)
+
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
       @can_grade = @assignment.grants_right?(@current_user, session, :grade)
       if @can_view_grades || @can_grade

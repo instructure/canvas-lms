@@ -25,6 +25,7 @@ module ConditionalRelease
       host: nil,      # required
       protocol: nil,  # defaults to Canvas
       edit_rule_path: "ui/editor",
+      stats_path: "stats/students_per_range",
       create_account_path: 'api/account',
       content_exports_path: 'api/content_exports',
       content_imports_path: 'api/content_imports',
@@ -41,6 +42,7 @@ module ConditionalRelease
             jwt: jwt_for(context, user, domain, session: session, real_user: real_user),
             assignment: assignment_attributes(assignment),
             edit_rule_url: edit_rule_url,
+            stats_url: stats_url,
             locale: I18n.locale.to_s
           }
         })
@@ -83,6 +85,10 @@ module ConditionalRelease
       build_url edit_rule_path
     end
 
+    def self.stats_url
+      build_url stats_path
+    end
+
     def self.create_account_url
       build_url create_account_path
     end
@@ -101,6 +107,10 @@ module ConditionalRelease
 
     def self.edit_rule_path
       config[:edit_rule_path]
+    end
+
+    def self.stats_path
+      config[:stats_path]
     end
 
     def self.create_account_path
