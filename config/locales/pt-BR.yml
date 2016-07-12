@@ -15756,6 +15756,7 @@ pt-BR:
   this_quiz_has_been_excused_d89d2b74: "Este quiz tem sido dispensado"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este teste não foi publicado.* Apenas os professores podem ver o teste até que ele seja publicado."
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Este gravador utiliza Flash. Como resultado, você pode achar mais facil fazer uma gravação na sua máquina local, e aí utilizar a aba de uploader de mídia para fazer o upload dela."
+  this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "Este relatório mostra todos os cursos para um determinado período. O arquivo csv resultante terá uma linha para cada curso e irá mostrar o id do curso, id SIS do curso, nome curto do curso, nome do curso, id da conta, id SIS da conta, nome da conta, armazenamento usado em MB e a soma de todos os arquivos em MB. O armazenamento usado reflete todos os arquivos que consomem a cota de cursos. A soma de todos os arquivos do curso é a soma de todos os arquivos que estão no curso independentemente do impacto na cota de cursos."
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "Este relatório mostra todos os cursos para um determinado período. O arquivo CSV resultante terá uma linha por curso e mostrará a id do curso, a id sis do curso, nome abreviado do curso, nome do curso, id da conta, id sis da conta, nome da conta, e o armazenamento utilizado em MB."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Esta página de exemplo inclui elementos comuns de interface do usuário no Canvas para ajudar a construir a sua marca personalizada. Uma vez que você começar a fazer mudanças para os valores de cor e imagens na barra lateral esquerda, você verá um botão de *visualizar as Suas Alterações* de botão. Clique nele para atualizar esta página e ver como as alterações ficaram."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "As respostas deste aluno estão ocultas porque esta tarefa é anônima."
@@ -15945,6 +15946,8 @@ pt-BR:
     yakutsk: Yakutsk
     yerevan: Yerevan
     zagreb: Zagreb
+  timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "Cronograma de mensagens entre o aluno e instrutores"
+  timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Linha do tempo mostrando quando atribuições foram entregues"
   tinymce: 
     insert_update_image_view: 
       alt_help_text: "Descreva a imagem para melhorar a acessibilidade"
@@ -16587,6 +16590,7 @@ pt-BR:
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Conteúdo de vídeo não é suportado pelo seu aparelho ou aplicativo."
   video_player_b371005: "Reprodutor de Vídeo"
   view_analytics_91a3b7a: "Visualizar análise"
+  view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Exibir dados de análise em tabelas em vez de gráficos"
   view_announcements_b6d6d819: "Visualizar anúncios"
   view_app_center_6c89a3fe: "Exibir App Center"
   view_app_configurations_52b52441: "Exibir Configurações do aplicativo"
@@ -16892,6 +16896,7 @@ pt-BR:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Você deve selecionar um curso para copiar o conteúdo de"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Você deve defini-la para um número maior que ou igual a %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Você deve especificar um direito de uso"
+  you_need_to_enable_the_new_ui_feature_before_editi_50cbd68: "Você precisa habilitar o recurso de 'Nova UI' antes de editar temas."
   you_need_to_preview_changes_before_saving_85e60232: "Você precisa \"Visualizar Alterações\" antes de salvar"
   you_need_to_preview_changes_before_you_can_apply_t_212d1cca: "Você precisa \"Visualizar Alterações\" antes de poder aplicar isto para sua conta"
   you_need_to_preview_changes_before_you_can_apply_t_c5eba588: "Você precisa \"Visualizar Alterações\" antes de poder aplicar isto para sua conta"
