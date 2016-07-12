@@ -92,6 +92,7 @@ nn:
     sis_id_in_use: "SIS-ID \"%{sis_id}\" er allereie i bruk"
     tab_admin_tools: Administrasjonsverktøy
     tab_authentication: Godkjenning
+    tab_brand_configs: Tema
     tab_courses: Kurs
     tab_developer_keys: Utviklarnøklar
     tab_faculty_journal: Faglærarprotokoll
@@ -2885,11 +2886,11 @@ nn:
       descriptions: 
         etherpad: |-
             EtherPad er eit ope kjeldeprosjekt som gjer at du raskt kan bruke delte dokument.  Det er raskt nok til at du kan sjå kva andre skriv når dei faktisk skriv det. På den andre sida er "pads" ikkje passordbeskytta, slik at kven som helst med ei lenke kan redigere det som vert skrive. EtherPad passar betre enn Google Docs dersom du støttar anonymitet og/eller vil la personar utan Google-kontoar ta del.  
-            
+              
             **Åtvaring**: kontroller om du er kjend med [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt vert lagra og sikra.
         google_docs: |-
             Google Docs er ei fantastisk plattform for samarbeid i gruppeprosjekt.  Det liknar på Microsoft Word, men du kan arbeide saman med andre på same fila til same tid utan å måtte sende ho rundt med e-post.  
-            
+              
             **Åtvaring**: du (og alle samarbeidspartnarane) treng ein Google-konto for å kunne ta del i alt samarbeid gjennom Google Docs.
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
@@ -12595,6 +12596,8 @@ nn:
     index: 
       account_rubrics: "Vurderingsskjema for konto"
       are_you_sure_prompt: "Er du sikker på at du vil slette vurderingsskjemaet? Alle kurs som er tilknytte vurderingsskjemaet har framleis tilgang, men ingen nye kurs kan bruke det."
+      buttons: 
+        add_rubric: Vurderingskriterium
       course_rubrics: "Vurderingsskjema for kurs"
       delete_rubric: "Slett vurderingsskjema"
       edit_rubric: "Rediger vurderingsskjema"
@@ -14215,6 +14218,7 @@ nn:
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressa til sida brukaren var på då feilen vart rapportert"
   theme_editor_b7b00f6b: Temaredigeringsprogram
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Endringar i temaredigeringsprogram er avbrotne."
+  themes_89bfe9c4: Tema
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Det er 1 resultat i lista"
     other: "Det er %{count} resultat i lista"
