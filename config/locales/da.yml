@@ -3085,11 +3085,11 @@ da:
       descriptions: 
         etherpad: |-
             EtherPad er et projekt med åben kildekode, med hvilket du hurtigt kan konfigurere delte dokumenter. Det er så hurtigt, at du kan se, hvad andre indtaster, mens de indtaster det. På den anden side er "pads" ikke beskyttet med adgangskode, så enhver person med et tilhørende link kan redigere dem. EtherPads egner sig bedre end Google Docs, hvis du ønsker forbedret anonymitet og/eller at give personer uden Google-konti muligheden for at deltage.  
-            
+             
             **Advarsel**: Du skal sørge for at være bekendt med [EtherPad's sletningspolitik](%{etherpad_deletion_policy_url}) for at sikre, at dit arbejde bevares.
         google_docs: |-
             Google Docs er et fantastisk sted til at samarbejde om et gruppeprojekt. Det ligner Microsoft Word, men lader dig samarbejde med andre på samme fil på samme tid uden at være nødsaget til at sende den rundt med e-mail.  
-            
+             
             **Advarsel**: Du (og alle dine samarbejdspartnere) har brug for en Google-konto for at deltage i Google Docs-samarbejder.
       labels: 
         collaboration_type: "Samarbejde med:"
@@ -9330,15 +9330,15 @@ da:
       email: 
         body: |-
             Hej %{user}, 
-            
+                        
                         Gode nyheder! %{course}, kurset du tilmeldte dig på Canvas Network starter snart. 
-            
+                        
                         Du skal undersøge, om der eventuelt findes særlige instruktioner eller kursusmaterialer fra underviseren for at sikre, at du får det meste ud af dit kursus. Du kan undersøge dette på siden med nærmere oplysninger om kurset på Canvas Netværk, eller blot klikke på linket nedenfor. 
-            
+                        
                         %{url}
-            
+                        
                         Hold hjernen skarp, 
-            
+                        
                         Canvas Network
         course_required_materials: "Materialer og instruktioner til %{kursus}"
     course_started: 
@@ -10779,11 +10779,11 @@ da:
     files_display: Filer
     grading_description: |-
         Inkluderer: 
-        
+                
         * Karakter for opgave/aflevering indtastet/ændret 
         * Karakter til genoptaget opgave 
         * Karaktervægt ændret 
-        
+                
         Sæt flueben i 'Inkluder scores, når du informerer om karakterændringer', hvis du vil se 
         dine karakterer i notifikationerne. 
         Hvis din e-mail ikke er en institutions-e-mail, medfører dette, at følsomt indhold sendes uden for institutionen.
@@ -10793,7 +10793,7 @@ da:
     grading_policies_display: Bedømmelsespolitikker
     invitation_description: |-
         Invitation til: 
-        
+                
         * Webkonference 
         * Gruppe 
         * Samarbejde 
@@ -11412,7 +11412,7 @@ da:
     diigo_settings: 
       description: |-
           Du skal registrere en [ny app på Diigo](%{diigo_url}). 
-          
+                    
           * Efter du gemmer din app, skal du notere dig API-koden.
       labels: 
         api_key: API-kode
@@ -11506,9 +11506,9 @@ da:
           For eksempel vil Instructure formaterede CSV, POST en csv fil med mime type 'tekst/csv' til specificerede endepunkt, indeholdende følgende kolonner: 
           
           "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade" 
-          
+                    
           (Bemærk: \"grade\" kolonnen returneres kun, hvis kurset specificerer en bedømmelsesstandard) 
-          
+                    
           For hver studerende i kurset, der offentliggøres, vil der være 1 eller flere rækker i den offentliggjorte csv. Specifikt vil der være 1 række for hvert login, som den studerende har i kursets rodkonto. For det meste vil det resultere i 1 række pr. studerende, men hvis den studerende har flere logins, vil der være en række for hver af dem.
       labels: 
         format_type: Udlæsningsformattype
@@ -11550,13 +11550,13 @@ da:
       description: |-
           Du har brug for en konto hos [Kaltura.com](%{kaltura_url}) 
           eller med en selvhostet forekomst af Kaltura. 
-          
+                    
           **Bemærk:** Når du har Kaltura konfigureret i Canvas, skal du åbne Kaltura Management Console og aktivere servernotifikationer med en notifikation URL for: 
           
           %{notification_url} 
-          
+                    
           under "Indstillinger -> Integrationsindstillinger" 
-          
+                    
           Derefter sætte flueben i felterne "Tilføj indtastning" og "Slet indtastning" i kolonnen "Sendt af server".
       headers: 
         account_settings: Kontoindstillinger
@@ -11990,7 +11990,7 @@ da:
       twitter_description: |-
           Twitter er en tjeneste til at offentliggøre og bidrage til korte meddelelser.
           Hvis du har en Twitter-konto, kan du registrere den her. Hvis du så efterfølgende tillader, at andre kursus-/gruppemedlemmer kan se dine registrerede tjenester, kan de nemt forbinde med din Twitter-konto. 
-          
+                    
           Du kan også melde dig til at få notifikationer sendt til din Twitter-konto. 
           Disse notifikationer sendes som direkte beskeder til dig selv fra dig selv, og vises ikke i din offentlige stream.
       unknown_service: Ukendt
