@@ -422,4 +422,11 @@ describe GradingPeriod do
       it { is_expected.not_to be_course_group }
     end
   end
+
+  describe '#weight' do
+    it "can persist double precision values" do
+      subject.update!(weight: 1.5)
+      expect(subject.reload.weight).to eql 1.5
+    end
+  end
 end

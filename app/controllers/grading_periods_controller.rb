@@ -46,10 +46,16 @@
 #           "type": "string",
 #           "format": "date-time"
 #         },
+#         "close_date": {
+#           "description": "Grades can only be changed before the close date of the grading period.",
+#           "example": "2014-06-07T17:07:00Z",
+#           "type": "string",
+#           "format": "date-time"
+#         },
 #         "weight": {
-#           "description": "The weighted percentage on how much this particular period should count toward the total grade.",
+#           "description": "A weight value that contributes to the overall weight of a grading period set which is used to calculate how much assignments in this period contribute to the total grade",
 #           "type": "integer",
-#           "example": "25"
+#           "example": "33.33"
 #         }
 #       }
 #    }
@@ -57,9 +63,9 @@
 class GradingPeriodsController < ApplicationController
   include ::Filters::GradingPeriods
 
-  before_filter :require_user
-  before_filter :get_context
-  before_filter :check_feature_flag
+  before_action :require_user
+  before_action :get_context
+  before_action :check_feature_flag
 
   # @API List grading periods
   # @beta
@@ -106,9 +112,6 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    grading_period = GradingPeriod.context_find(@context, params[:id])
-    fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
-
     if authorized_action(grading_period, @current_user, :read)
       respond_to do |format|
         format.json { render json: serialize_json_api(grading_period) }
@@ -126,8 +129,8 @@ class GradingPeriodsController < ApplicationController
   #
   # @argument grading_periods[][end_date] [Required, Date]
   #
-  # @argument grading_periods[][weight] [Number]
-  #   The percentage weight of how much the period should count toward the course grade.
+  # @argument grading_periods[][weight] [Float]
+  #   A weight value that contributes to the overall weight of a grading period set which is used to calculate how much assignments in this period contribute to the total grade
   #
   # @example_response
   #   {
@@ -135,7 +138,6 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def update
-    grading_period = GradingPeriod.active.find(params[:id])
     grading_period_params = params[:grading_periods].first
 
     if authorized_action(grading_period, @current_user, :update)
@@ -157,7 +159,6 @@ class GradingPeriodsController < ApplicationController
   # <b>204 No Content</b> response code is returned if the deletion was
   # successful.
   def destroy
-    grading_period = GradingPeriod.active.find(params[:id])
     unless can_destroy_in_context?(grading_period)
       return render_unauthorized_action
     end
@@ -172,16 +173,19 @@ class GradingPeriodsController < ApplicationController
 
   def batch_update
     if authorized_action(@context, @current_user, :manage_grades)
-      case @context
-      when Account
-        account_batch_update
-      when Course
-        course_batch_update
-      end
+      method("#{@context.class.to_s.downcase}_batch_update").call
     end
   end
 
   private
+
+  def grading_period
+    @grading_period ||= begin
+      grading_period = GradingPeriod.context_find(@context, params[:id])
+      fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
+      grading_period
+    end
+  end
 
   def account_batch_update
     periods = find_or_build_periods_for_account(params[:grading_periods])
