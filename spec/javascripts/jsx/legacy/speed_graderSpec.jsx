@@ -10,19 +10,43 @@ define([
     setup() {
       fakeENV.setup();
       sinon.spy($, 'ajaxJSON');
+      sinon.spy($.fn, 'append');
       this.originalWindowJSONData = window.jsonData;
       window.jsonData = {
-        id: 27
+        id: 27,
+        GROUP_GRADING_MODE: false
       };
       speedGrader.EG.currentStudent = {
         id: 4,
         submission: {
           score: 7,
-          grade: 70
+          grade: 70,
+          submission_comments: [{
+            group_comment_id: null,
+            anonymous: false,
+            assessment_request_id: null,
+            attachment_ids: "",
+            author_id: 1000,
+            author_name: "neil@instructure.com",
+            comment: "test",
+            context_id: 1,
+            context_type: "Course",
+            created_at: "2016-07-12T23:47:34Z",
+            hidden: false,
+            id: 11,
+            posted_at:"Jul 12 at 5:47pm",
+            submission_id: 1,
+            teacher_only_comment: false,
+            updated_at: "2016-07-12T23:47:34Z"
+          }]
         }
       };
       ENV.SUBMISSION = {
         grading_role: 'teacher'
+      };
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
       };
       $("#fixtures").html(
         "<div id='grade_container'>"                          +
@@ -30,6 +54,7 @@ define([
         "   href='my_url.com' title='POST'></a>"              +
         "  <input class='grading_value' value='56' />"        +
         "  <div id='combo_box_container'></div>"              +
+        "  <div id='comments'></div>"                         +
         "</div>"
       );
     },
@@ -38,8 +63,30 @@ define([
       fakeENV.teardown();
       window.jsonData = this.originalWindowJSONData;
       $.ajaxJSON.restore();
+      $.fn.append.restore();
       $("#fixtures").empty();
     }
+  });
+
+  test('showDiscussion should not show private comments for a group assignment', () => {
+    jsonData.GROUP_GRADING_MODE = true;
+    speedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
+    speedGrader.EG.showDiscussion();
+    sinon.assert.notCalled($.fn.append);
+  });
+
+  test('showDiscussion should show group comments for group assignments', () => {
+    jsonData.GROUP_GRADING_MODE = true;
+    speedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = "hippo";
+    speedGrader.EG.showDiscussion();
+    sinon.assert.calledOnce($.fn.append);
+  });
+
+  test('showDiscussion should show private comments for non group assignments', () => {
+    jsonData.GROUP_GRADING_MODE = false;
+    speedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null;
+    speedGrader.EG.showDiscussion();
+    sinon.assert.calledOnce($.fn.append);
   });
 
   test('handleGradeSubmit should submit score if using existing score', ()=>{
