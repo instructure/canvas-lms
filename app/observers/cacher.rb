@@ -27,14 +27,23 @@ class Cacher < ActiveRecord::Observer
     case obj
     when AccountUser
       if obj.account_id == Account.site_admin.id
-        Switchman::DatabaseServer.send_in_each_region(self.class,
-                                                      :clear_all_site_admin_account_users,
-                                                      singleton: "clear_all_site_admin_account_users")
+        Account.site_admin.shard.activate do
+          AccountUser.connection.after_transaction_commit do
+            # current shard may have reverted in this block
+            Account.site_admin.shard.activate do
+              Switchman::DatabaseServer.send_in_each_region(self.class,
+                                                            :clear_all_site_admin_account_users,
+                                                            { singleton: "clear_all_site_admin_account_users" },
+                                                            AccountUser.current_xlog_location)
+            end
+          end
+        end
       end
     end
   end
 
-  def self.clear_all_site_admin_account_users
+  def self.clear_all_site_admin_account_users(current_xlog_location = nil)
+    AccountUser.wait_for_replication(start: current_xlog_location)
     MultiCache.delete("all_site_admin_account_users3")
   end
 
