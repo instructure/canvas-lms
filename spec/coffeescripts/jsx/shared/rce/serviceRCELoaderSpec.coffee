@@ -95,6 +95,10 @@ define [
   test 'returns the textareas parent as the renderingTarget when no custom function given', ->
     equal RCELoader.getRenderingTarget(@$textarea.get(0)), @$div.get(0)
 
+  test 'returned parent has class `ic-RichContentEditor`', ->
+    target = RCELoader.getRenderingTarget(@$textarea.get(0))
+    ok $(target).hasClass('ic-RichContentEditor')
+
   test 'uses a custom get target function if given', ->
     customFn = -> "someCustomTarget"
     RCELoader.loadOnTarget(@$textarea, {getRenderingTarget: customFn}, ()->)
