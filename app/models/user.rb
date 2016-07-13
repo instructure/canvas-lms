@@ -1386,8 +1386,8 @@ class User < ActiveRecord::Base
     preferences[:watched_conversations_intro] = value
   end
 
-  def send_scores_in_emails?
-    preferences[:send_scores_in_emails] == true
+  def send_scores_in_emails?(root_account)
+    preferences[:send_scores_in_emails] == true && root_account.settings[:allow_sending_scores_in_emails] != false
   end
 
   def close_announcement(announcement)
