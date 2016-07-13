@@ -80,7 +80,7 @@ module CanvasSanitize #:nodoc:
           'del', 'ins', 'iframe', 'font',
           'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
           'q', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
-          'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'audio',
+          'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'track', 'audio',
           # MathML
           'annotation', 'annotation-xml', 'maction', 'maligngroup', 'malignmark', 'math',
           'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv',
@@ -156,6 +156,7 @@ module CanvasSanitize #:nodoc:
           'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode',
                       'allowscriptaccess', 'width', 'height'].freeze,
           'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls'].freeze,
+          'track' => ['default', 'kind', 'label', 'src', 'srclang'].freeze,
           'audio' => ['name', 'src', 'muted'].freeze,
           'font' => ['face', 'color', 'size'].freeze,
           # MathML
