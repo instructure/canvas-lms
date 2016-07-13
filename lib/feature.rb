@@ -151,6 +151,19 @@ END
       state: 'allowed',
       autoexpand: true
     },
+    'underline_all_links' =>
+    {
+      display_name: -> { I18n.t('Underline Links') },
+      description: -> { I18n.t('Display all text links in Canvas as *underlined text*.',
+        wrapper: {
+          '*' => '<span class="feature-detail-underline">\1</span>'
+        }
+      )
+    },
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true
+    },
     'outcome_gradebook' =>
     {
       display_name: -> { I18n.t('features.learning_mastery_gradebook', 'Learning Mastery Gradebook') },
