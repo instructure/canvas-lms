@@ -114,10 +114,10 @@ define([
     }
   }
 
-  actions.updateCollaboration = (context, contextId, contentItems) => {
+  actions.updateCollaboration = (context, contextId, contentItems, collaborationId) => {
     return (dispatch) => {
       dispatch(actions.updateCollaborationStart());
-      let url = `/${context}/${contextId}/collaborations/${contentItems.id}`
+      let url = `/${context}/${contextId}/collaborations/${collaborationId}`
       axios.put(url, { contentItems: JSON.stringify(contentItems) }, { headers: {
         'Accept': 'application/json'
       }})
@@ -135,7 +135,7 @@ define([
     return (dispatch) => {
       let [context, contextId] = splitAssetString(ENV.context_asset_string);
       if (data.service_id) {
-        dispatch(actions.updateCollaboration(context, contextId, data.contentItems));
+        dispatch(actions.updateCollaboration(context, contextId, data.contentItems, data.service_id));
       }
       else {
         dispatch(actions.createCollaboration(context, contextId, data.contentItems));
