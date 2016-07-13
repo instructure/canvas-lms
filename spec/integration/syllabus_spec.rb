@@ -78,7 +78,55 @@ describe "syllabus" do
       expect(link.attributes['href'].value).to_not include("verifier=#{@attachment.uuid}")
     end
   end
-  
+
+  shared_examples_for "public syllabus for authenticated file verifiers" do
+    it "should allow viewing available files in a public to authenticated syllabus" do
+      course(:active_all => true)
+      attachment_model
+      @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+      @course.public_syllabus_to_auth = true
+      @course.public_syllabus = false
+      @course.save!
+
+      get "/courses/#{@course.id}/assignments/syllabus"
+
+      expect(response).to be_success
+      page = Nokogiri::HTML(response.body)
+      expect(page.css('#identity a[href="/login"]')).not_to be_nil
+      link = page.at_css('#course_syllabus a')
+      expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
+    end
+
+    it "should not allow viewing locked files in a public to authenticated syllabus" do
+      course(:active_all => true)
+      attachment_model
+      @attachment.locked = true
+      @attachment.save!
+
+      @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
+      @course.public_syllabus = false
+      @course.public_syllabus_to_auth = true
+      @course.save!
+
+      get "/courses/#{@course.id}/assignments/syllabus"
+
+      expect(response).to be_success
+      page = Nokogiri::HTML(response.body)
+      expect(page.css('#identity a[href="/login"]')).not_to be_nil
+      link = page.at_css('#course_syllabus a')
+      expect(link.attributes['href'].value).to_not include("verifier=#{@attachment.uuid}")
+    end
+  end
+
+  context "as an authenticated non-course user" do
+    before :each do
+      user(:active_all => true)
+      user_session(@user)
+    end
+
+    include_examples "public syllabus for authenticated file verifiers"
+  end
+
   context "as an anonymous user" do
     include_examples "public syllabus file verifiers"
   end
@@ -90,6 +138,15 @@ describe "syllabus" do
     end
 
     include_examples "public syllabus file verifiers"
+  end
+
+  it "as an authenticated non-course user with public_syllabus_to_auth true" do
+    course.public_syllabus_to_auth = true
+    course.public_syllabus = false
+    course.save
+    user(:active_user => true)
+    user_session(@user)
+
   end
 
   it "should display syllabus description on syllabus course home pages" do

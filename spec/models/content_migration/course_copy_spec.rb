@@ -374,6 +374,7 @@ describe ContentMigration do
       @copy_from.grading_standard_enabled = true
       @copy_from.is_public = true
       @copy_from.public_syllabus = true
+      @copy_from.public_syllabus_to_auth = true
       @copy_from.lock_all_announcements = true
       @copy_from.allow_student_discussion_editing = false
       @copy_from.save!

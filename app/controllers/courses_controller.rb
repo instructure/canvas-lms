@@ -215,6 +215,10 @@ require 'securerandom'
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "public_syllabus_to_auth": {
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "public_description": {
 #           "description": "optional: the public description of the course",
 #           "example": "Come one, come all to InstructureCon 2012!",
@@ -552,6 +556,9 @@ class CoursesController < ApplicationController
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
   #
+  # @argument course[public_syllabus_to_auth] [Boolean]
+  #   Set to true to make the course syllabus public for authenticated users.
+  #
   # @argument course[public_description] [String]
   #   A publicly visible description of the course.
   #
@@ -686,7 +693,7 @@ class CoursesController < ApplicationController
             @current_user,
             session,
             [:start_at, course_end, :license,
-             :is_public, :is_public_to_auth_users, :public_syllabus, :allow_student_assignment_edits, :allow_wiki_comments,
+             :is_public, :is_public_to_auth_users, :public_syllabus, :public_syllabus_to_auth, :allow_student_assignment_edits, :allow_wiki_comments,
              :allow_student_forum_attachments, :open_enrollment, :self_enrollment,
              :root_account_id, :account_id, :public_description,
              :restrict_enrollments_to_course_dates, :hide_final_grades], nil)
@@ -1971,6 +1978,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
+  #
+  # @argument course[public_syllabus_to_auth] [Boolean]
+  #   Set to true to make the course syllabus to public for authenticated users.
   #
   # @argument course[public_description] [String]
   #   A publicly visible description of the course.

@@ -85,6 +85,10 @@ module Api
           expect(course_json.methods_to_send).to include('public_syllabus')
         end
 
+        it 'includes the public_syllabus_to_auth field' do
+          expect(course_json.methods_to_send).to include('public_syllabus_to_auth')
+        end
+
         it 'includes the storage_quota_mb field' do
           expect(course_json.methods_to_send).to include('storage_quota_mb')
         end
