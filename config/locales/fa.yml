@@ -1415,6 +1415,8 @@ fa:
         suspended: "دانشگاه به حالت تعلیق در آمد"
     wiki_front_page_default_content_course: "به ویکی درس جدید خود خوش آمدید!"
     wiki_front_page_default_content_group: "به ویکی گروه جدید خود خوش آمدید!"
+  application_id_2aa1640f: "شناسه برنامه"
+  application_secret_e6803c7e: "رمز برنامه"
   apply_781a2546: اعمال
   appointment_group: 
     errors: 
@@ -2010,6 +2012,7 @@ fa:
       links: 
         add_another_file: "افزودن یک فایل دیگر"
         authorize_google_docs: "اجازه دادن برای دسترسی به Google Docs"
+        authorize_google_drive: "دادن اجازه دسترسی به Google Drive"
         find_file: "برای یافتن فایلی که قبلا بارگذاری کرده اید، اینجا کلیک کنید"
         submit: 
           external_tool: بیشتر
@@ -2051,6 +2054,7 @@ fa:
       labels: 
         syllabus_body: "شرح سرفصل"
       links: 
+        edit_syllabus_description: ویرایش
         jump_to_today: "پرش به امروز"
       titles: 
         course_syllabus: "سرفصل درس"
@@ -2238,6 +2242,7 @@ fa:
     add_item: "افزودن مورد"
     apply: اعمال
     authorize_google_docs: "اجازه دادن برای دسترسی به Google Docs"
+    authorize_google_drive: "دادن اجازه دسترسی به Google Drive"
     back_to_outcomes: "بازگشت به نتایج"
     cancel: لغو
     choose_a_file: "انتخاب یک فایل"
@@ -2274,6 +2279,7 @@ fa:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: بستن
+  calculation_method_fe281f9: "روش محاسبه"
   calculator: 
     buttons: 
       save: "ذخیره سازی"
@@ -3165,7 +3171,7 @@ fa:
         access_report: "گزارش دسترسی برای %{user}"
         cant_delete: "نمی توان حذف کرد"
         conclude_enrollment: "خاتمه دادن به این ثبت نام"
-        delete_enrollment: "حذف این ثبت نام"
+        delete_enrollment: حذف
         faculty_journal: "ژورنال هیأت علمی برای %{user}"
         link_enrollment: "پیوند دادن این ثبت نام"
         restore_enrollment: "بازیابی این ثبت نام"
@@ -4997,6 +5003,9 @@ fa:
       due_date: "مهلت %{date}"
       peer_review_alert: "یک بازبینی گروهی برای %{person} به شما تخصیص داده شده است"
     points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
+    published_button: 
+      buttons: 
+        published: "منتشر شده"
     reply_count_tooltip: 
       one: "1 پاسخ."
       other: "%{count} پاسخ."
@@ -5913,6 +5922,7 @@ fa:
       که تلاش می کنند در یک دامنه تأیید نشده تکلیف ها را ارسال کنند یا به همکاری ها بپیوندند، یک پیام خطا دریافت خواهند
       کرد که آنها را از اینکه باید یکپارچه سازی Google Docs خود را بهنگام سازی کنند، مطلع خواهد ساخت.
   google_docs_preview_9f41b23c: "پیش نمایش Google Docs"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "دوباره برای این درس نمایش داده نشود."
@@ -6266,6 +6276,7 @@ fa:
     react_gradebook: 
       download_scores: صدور
       grades: "نمره ها"
+      publish_to_sis: "انتشار نمره ها در سامانه اطلاعات دانشجو"
       set_group_weights: "تعیین وزن گروه ها"
       show_concluded_enrollments: "نمایش ثبت نام های خاتمه یافته"
       show_inactive_enrollments: "نمایش ثبت نام های غیر فعال"
@@ -6683,6 +6694,8 @@ fa:
         randomly_assigning_students: "تخصیص دادن تصادفی دانشجویان"
         search_groups: "جستجوی گروه ها"
         search_users: "جستجوی کاربران"
+      group_category_clone: 
+        cancel: لغو
       group_category_create: 
         allow_self_signup: "اجازه دادن برای ثبت نام شخصی"
         cancel: لغو
@@ -9616,6 +9629,8 @@ fa:
       labels: 
         remember_access: "مجوز من برای این سرویس به خاطر سپرده شود"
       page_title: "ورود به برنامه"
+    confirm_form: 
+      cancel: لغو
     confirm_mobile: 
       authorize: "اجازه دادن"
       cancel: لغو
@@ -9625,24 +9640,51 @@ fa:
         login_name: "شما در حال ورود به این برنامه با عنوان %{user_name} هستید."
       login: ورود
       page_title: "ورود به برنامه"
-      remember_auth: "مجوز من برای این سرویس به خاطر سپرده شود"
+      remember_auth: "به خاطر سپردن مجوز"
   observees: 
     being_observed: "دانشجویانی که در حال مشاهده شدن هستند"
     new_observee_password: "رمز عبور"
     new_observee_username: "نام کاربری"
     observee_added: "اکنون در حال مشاهده %{user}"
     observing: "در حال مشاهده"
+  observer_accounts_only_30c70a70: "فقط حساب های بیننده "
+  observing_f3c5e759: "در حال مشاهده"
   of_students_5d1af0d2: "# دانشجو"
   ok_c47544a2: تأیید
+  on_paper_46d0ba36: "روی کاغذ"
+  on_time_17ca5ad9: "سر وقت"
   on_time_percent_eebffe38: "بموقع: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
   one_per_line_format_name_value_79647700: "یکی در هر خط.. قالب: نام=مقدار"
+  online_submission_type_file_uploads_24910d74: "نوع مورد ارسالی آنلاین - بارگذاری های فایل"
+  online_submission_type_file_uploads_restrict_uploa_5ec7b263: "نوع مورد ارسالی آنلاین - بارگذاری های فایل - محدود کردن بارگذاری انواع فایل"
+  online_submission_type_media_recordings_9424bf34: "نوع مورد ارسالی آنلاین - ضبط های رسانه"
+  online_submission_type_text_entry_ac56d100: "نوع مورد ارسالی آنلاین - ورودی متن"
+  online_submission_type_website_url_2c9df33d: "نوع مورد ارسالی آنلاین - نشانی ایترنتی تارنما"
+  online_text_entry_1d893ce: "ورودی متن آنلاین"
+  online_upload_59969592: "بارگذاری آنلاین"
+  online_url_37830a72: "نشانی اینترنتی آنلاین"
+  only_a_maximum_of_100_events_can_be_created_ad703982: "فقط حداکثر 100 رویداد می تواند ایجاد شود"
+  only_after_their_last_attempt_3593d101: "فقط بعد از آخرین تلاش آنها"
+  only_available_to_students_with_link_not_visible_i_b21ec391: "فقط از طریق پیوند برای دانشجویان قابل دسترسی است. در فایل های دانشجویان قابل مشاهده نیست."
+  only_once_after_each_attempt_cc842738: "فقط یک بار بعد از هر تلاش"
+  only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "بعد از اینکه این درس منتشر شود، فقط اساتید می توانند آن را ببینند"
+  open_in_theme_editor_156028e2: "باز کردن در ویرایشگر زمینه"
+  open_name_color_picker_a2646a33: "باز کردن انتخاب کننده رنگ %{name}"
   open_title_in_a_new_window_b29fed77: "باز کردن %{title} در یک پنجره جدید"
+  option_1_dea39f90: "گزینه 1"
+  option_2_47aace2a: "گزینه 2"
+  option_3_30adfebc: "گزینه 3"
+  option_4_aec96b1f: "گزینه 4"
+  option_name_ba758e08: "%{option_name}"
   options: 
     ? "no"
     : خیر
     ? "yes"
     : بله
+  options_3ab0ea65: "گزینه ها"
+  or_a01eec62: یا
+  orange_81386a62: نارنجی
   orbis_report_header_assignment_id: "شناسه تکلیف"
   orbis_report_header_assignment_title: "عنوان تکلیف"
   orbis_report_header_canvas_course_id: "شناسه درس"
@@ -9654,6 +9696,7 @@ fa:
   orbis_report_header_student_name: "نام دانشجو"
   orbis_report_header_student_sis_id: "سامانه اطلاعات کاربر"
   orbis_report_header_submission_score: "نمره مورد ارسالی"
+  other_timezones_42530564: "منطقه های زمانی دیگر"
   outcome_groups: 
     invalid_file: "فایل گروه نتیجه معتبر نیست"
   outcome_groups_api: 
@@ -9671,8 +9714,8 @@ fa:
       links: 
         back: بازگشت
         find: یافتن
-        new_group: "گروه جدید"
-        new_outcome: "نتیجه جدید"
+        new_group: گروه
+        new_outcome: نتیجه
     common_core: "استانداردهای هسته مشترک"
     common_core_description: "در سمت چپ، ساختار پوشه نتایج آشنا برای هر گروه از استانداردهای استانی هسته مشترک موجود است. این امر به شما امکان می دهد بدون زحمت هر گونه استاندارد هسته مشترک را برای نمره گذاری در درس خود شامل کنید."
     confirm: 
@@ -9722,9 +9765,10 @@ fa:
     new_outcome_group: "گروه جدید نتیجه"
     outcome: 
       links: 
-        delete_outcome: "حذف نتیجه"
-        edit_outcome: "ویرایش نتیجه"
+        delete_outcome: حذف
+        edit_outcome: ویرایش
       mastery_at_label: "تعیین تسلط برای هر نمره از این نمره یا بالاتر:"
+      point_mastery: "تسلط: %{mastery_points} امتیاز"
       points: 
         rating: "%{points} نتیجه"
         total: "%{points_possible} امتیاز"
@@ -9732,6 +9776,7 @@ fa:
       use_for_scoring: "استفاده از این معیار برای نمره گذاری"
     outcome_criterion: "معیار نتیجه یادگیری"
     outcome_form: 
+      calculation_method: "روش محاسبه"
       criterion: "رتبه بندی های معیار"
       criterion_dialog: "نتایج یاد گیری را می توان به عنوان روشی آسان برای ارزیابی تسلط در نتایج تطبیق داده شده با برخی تکلیف ها در دستورالعمل های ارزیابی تکلیف گنجاند. وقتی یک نتیجه یادگیری را تعیین می کنید، باید یک معیار نیز تعیین کنید که بتوان از آن در هنگام ایجاد دستورالعمل ارزیابی تکلیف استفاده کرد. ستون های دستورالعمل ارزیابی را تا حد لازم ایجاد کنید و یک نقطه آستانه را تعیین کنید که برای تعیین تسلط در این نتیجه استفاده شود."
       criterion_info_link: "برای آشنایی با رتبه بندی های معیار کلیک کنید"
@@ -9743,8 +9788,8 @@ fa:
       total_points: "امتیازهای کل"
     outcome_group: 
       links: 
-        delete_outcome_group: "حذف گروه نتیجه"
-        edit_outcome_group: "ویرایش گروه نتیجه"
+        delete_outcome_group: حذف
+        edit_outcome_group: ویرایش
     outcome_group_form: 
       group_description: "این گروه را شرح دهید"
       title: "این گروه را نام گذاری کنید"
@@ -9809,6 +9854,7 @@ fa:
         url: "نشانی اینترنتی"
         user_agent: "نماینده کاربر"
   page_views_eb64cf53: "نماهای صفحه"
+  page_views_only_312b7577: "فقط نماهای صفحه"
   pages: 
     cancel_button: لغو
     cannot_unpublish_front_page: "نمی توان انتشار صفحه آغازین را لغو کرد"
@@ -9843,19 +9889,56 @@ fa:
     view_more_link: "مشاهده بیشتر"
   paginated_view: 
     loading_more_results: "در حال بارگذاری نتایج بیشتر"
+  panama_fa454c86: پاناما
+  paraguay_181a5029: پاراگوئه
+  parent_of_a_canvas_user_afba1624: "والدین یک کاربر کانواس"
+  parent_signup_b7c6bf0a: "ثبت نام والدین"
+  parents_sign_up_here_f0aa8f4f: "والدین اینجا ثبت نام کنند"
+  participation_af2598: مشارکت
+  participations_1823832d: "مشارکت ها"
+  pass_fail_3d9461b0: قبول/رد
   password_8a271b1c: "رمز عبور"
+  past_14da759a: گذشته
   paste_xml_cda3a64e: "چسباندن XML"
+  path_4f9abf12: مسیر
   paypal: 
     exception: "متأسفانه خطایی رخ داده است، لطفا بعدا دوباره امتحان کنید."
   pdf_d8236d9a: PDF
+  peer_review_for_assignment_ce72fc52: "بازبینی گروهی برای  %{assignment}"
+  peer_reviews_api: 
+    errors: 
+      delete_reminder_failed: "حذف انجام نشد"
+  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "بازبینی های گروهی را نمی توان برای تکلیف های تعدیل سازی شده فعال کرد"
+  people_b4ebb13c: افراد
+  people_options_cfb419a6: "گزینه های افراد"
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: "افراد این نام را در بحث ها، پیام ها و نظرها خواهند دید."
+  percent_complete_3a7edc20: "%{percent} تکمیل شده"
+  percent_of_respondents_selecting_this_answer_4c2ce4ee: "درصد پاسخ دهنده هایی که این پاسخ را انتخاب می کنند"
   percent_of_students_scored_score_53d2c4d5: "%{percent} از دانشجویان نمره %{score} را کسب کرده اند"
+  percentage_34ab7c2c: درصد
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% از %{bytesAvailable} استفاده شده است"
+  performance_ac5f9e70: عملکرد
+  performance_enhancements_for_the_gradebook_e6c5d5a5: "ارتقای عملکرد برای دفتر نمره"
+  permission_must_be_enabled_for_someone_397e1ce3: "مجوز باید برای یک شخص فعال شده باشد"
+  permission_not_found_620b80d1: "مجوز موجود نیست"
   permissions: 
     manage_webhooks: "مدیریت وب هوک ها"
+    provision_catalog: "فراهم کردن یک کاتالوگ"
+  peru_7dcfdc91: پرو
+  philippines_37a6289e: فیلیپین
+  pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "یک مقصد انتخاب کنید، خطاها را برای شما ارسال خواهیم کرد"
+  pick_a_name_to_save_this_theme_as_9773cb1a: "یک نام انتخاب کنید برای ذخیره سازی این زمینه به عنوان"
+  pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "یک نقطه پایانی انتخاب کنید، گزارش های خطای شما را به آنجا ارسال خواهیم کرد"
+  pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "تاریخ و زمان را برای تنظیمات کنفرانس زیر انتخاب کنید:"
+  pink_68ad45cb: صورتی
   plain_text_e3ab33aa: "متن ساده"
   please_add_at_least_one_non_blank_answer_213c2c8e: "لطفا حداقل یک پاسخ غیر خالی بیفزایید."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "لطفا حداقل یک پاسخ غیر خالی برای هر متغیر بیفزایید."
+  please_enter_your_label_name_7745272d: "لطفا %{label_name} خود را وارد کنید:"
+  please_enter_your_label_name_and_password_5c56be80: "لطفا %{label_name} و رمز عبور خود را وارد کنید:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "لطفا به آنها اطلاع دهید کدام صفحه را مشاهده می کردید و روی کدام پیوند کلیک کردید."
+  please_let_them_know_which_page_you_were_viewing_a_c9816406: "لطفا به آنها اطلاع دهید کدام صفحه را مشاهده می کردید و روی کدام پیوند کلیک کردید."
+  please_wait_e6355980: "لطفا صبر کنید..."
   plugins: 
     academic_benchmark_importer: 
       description: "این امر وارد کردن استانداردهای معیارهای علمی به کانواس را ممکن می سازد."
@@ -9908,6 +9991,15 @@ fa:
     canvas_webhooks: 
       description: "پلاگین وب هوک ها برای کانواس"
       name: "وب هوک های کانواس"
+    catalog_provisioner: 
+      description: "فراهم کننده حساب کاتالوگ کانواس"
+      name: "فراهم کننده کاتالوگ"
+    clever: 
+      description: "ورود به Clever"
+    clever_settings: 
+      labels: 
+        client_id: "شناسه سرویس گیرنده"
+        client_secret: "رمز سرویس گیرنده"
     crocodoc: 
       description: "فعال سازی Crocodoc به عنوان یک گزینه پیش نمایش سند"
       name: Crocodoc
@@ -9966,6 +10058,19 @@ fa:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
+    facebook: 
+      description: "ورود به فیس بوک"
+    facebook_settings: 
+      labels: 
+        app_id: "شناسه برنامه"
+        app_secret: "رمز برنامه"
+    github: 
+      description: "ورود به Github"
+    github_settings: 
+      labels: 
+        client_id: "شناسه سرویس گیرنده"
+        client_secret: "رمز سرویس گیرنده"
+        domain: دامنه
     google_docs: 
       description: "به اشتراک گذاری سند Google Docs"
       name: "Google Docs"
@@ -9976,6 +10081,16 @@ fa:
       labels: 
         api_key: "کلید مصرف کننده OAuth "
         secret_key: "رمز مصرف کننده OAuth "
+    google_drive: 
+      description: "به اشتراک گذاری فایل Google Drive"
+      name: "Google Drive"
+    google_drive_settings: 
+      labels: 
+        client_id: "شناسه سرویس گیرنده"
+        client_secret: "رمز سرویس گیرنده"
+        client_secret_json: "json رمزهای سرویس گیرنده"
+        redirect_uri: "هدایت نشانی اینترنتی"
+        token_uri: "نشانه اینترنتی نشانه"
     grade_export: 
       description: "صدور نمره برای سامانه اطلاعات دانشجو"
       name: "صدور نمره"
@@ -10058,6 +10173,18 @@ fa:
       description: "یکپارچه‌سازی لینکدین"
     linked_in_settings: 
       domain_name: دامنه
+      labels: 
+        client_id: "شناسه سرویس گیرنده"
+        client_secret: "رمز سرویس گیرنده"
+    live_events: 
+      description: "سرویس برای رویدادهای بلادرنگ."
+      name: "رویدادهای زنده"
+    live_events_settings: 
+      labels: 
+        aws_access_key_id: "شناسه کلید دسترسی AWS"
+        aws_endpoint: "نقطه پایانی AWS (نشانی اینترنتی)"
+        aws_region: "ناحیه AWS"
+        aws_secret_access_key: "کلید دسترسی رمز AWS"
     lockdown_browser: 
       labels: 
         download_url: "نشانی اینترنتی بارگیری مرورگر LockDown"
@@ -10067,6 +10194,12 @@ fa:
       labels: 
         password: "رمز عبور برای اعتبارسنجی"
         username: "نام کاربری برای اعتبارسنجی"
+    microsoft: 
+      description: "ورود به مایکروسافت"
+    microsoft_settings: 
+      labels: 
+        application_id: "شناسه برنامه"
+        application_secret: "رمز برنامه"
     notices: 
       settings_updated: "تنظیمات افزونه با موفقیت بهنگام سازی شد."
     panda_pub_settings: 
@@ -10079,6 +10212,11 @@ fa:
     pandapub: 
       description: "سرویس انتشار/اشتراک"
       name: PandaPub
+    pv4: 
+      description: "نماهای صفحه 4"
+    pv4_settings: 
+      labels: 
+        page_view_method: "روش مشاهده صفحه"
     qti_converter_settings: 
       labels: 
         enabled: "فعال شد"
@@ -10114,6 +10252,10 @@ fa:
         queue_for_parallel_jobs: "صف کار جهت استفاده برای کارهای موازی (جای خالی به عنوان پیش فرض)"
     twitter: 
       description: "اطلاعیه های توییتر"
+    twitter_settings: 
+      labels: 
+        consumer_key: "کلید مصرف کننده"
+        consumer_secret: "رمز مصرف کننده"
     webct_scraper_settings: 
       description: |-
           اگر دانشگاه از «ماژول های یادگیری» WebCT استفاده نمی کند (شامل دانشکده هایی که در هنگام در دسترس قرار گرفتن
@@ -10144,10 +10286,28 @@ fa:
         api_token: "نشانه Api"
     zendesk_settings: 
       labels: 
+        account_domain_value: "مقدار دامنه حساب"
+        account_id: "شناسه حساب"
+        api_url: "نشانی اینترنتی API"
+        become_user_id_uri: "تبدیل شدن به نشانی اینترنتی کاربر"
+        message_type: "نوع پیام"
         password: "رمز عبور"
+        request_context_id: " درخواست شناسه زمینه"
+        shared_secret: "رمز مشترک"
+        site: تارنما
+        url: "نشانی اینترنتی"
         user_id: "شناسه کاربر"
+        user_roles: "نقش های کاربر"
+        user_severity: "جدیت کاربر"
+        username: "نام کاربری"
   points_bb475533: امتیازها
+  points_n_e0b20623: "امتیازها %{n}"
+  points_points_b6b422e2: "امتیازها: %{points}"
+  points_possible_1c0b3445: "امتیاز ممکن"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "امتیازهای ممکن باید برای نوع نمره گذاری انتخابی 0 یا بیشتر باشد"
+  pointspossible_points_possible_964c8592: "%{pointsPossible} امتیاز ممکن"
+  pointspossible_pts_624a6733: "%{pointsPossible} امتیاز"
+  poland_b43b9d20: لهستان
   polling: 
     poll_sessions: 
       errors: 
@@ -10159,7 +10319,13 @@ fa:
         poll_choice_belongs_to_poll: "این حق رأی به رأی گیری فعلی تعلق ندارد."
         poll_is_published: "این جلسه رأی گیری برای موردهای ارسالی باز نیست."
         user_and_poll_session_uniqueness: "فقط می توان یک رأی برای هر جلسه رأی گیری ارسال کرد."
+  poor_1150a0f8: ضعیف
+  poor_score_715306e2: "نمره ضعیف"
+  port_75f69d1: درگاه
+  position_f9c9b93c: موقعیت
+  possible_combination_count_db651ca4: "تعداد احتمالی ترکیب"
   possible_score_5e0a328e: "ممکن: %{score}"
+  post_1e445890: ارسال
   post_grades_39c52870: "ارسال نمره ها"
   post_grades_description: |-
       Post Grades به اساتید امکان می دهد نمره ها را به سامانه های فعال شده اطلاعات دانشجو: Powerschool، 
@@ -10168,12 +10334,28 @@ fa:
       GradingAssignment، GradingAssignmentScore را می پذیرد، ارسال نمایند.
   post_grades_to_sis_97ece878: "ارسال نمره ها به سامانه اطلاعات دانشجو"
   practice_quiz_19a8505d: "آزمون تمرینی"
+  prerequisites_49659f16: "پیش نیازها:"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "پیش نیازهای تکمیل"
     labels: 
       requirements_must_be_completed: "قبل از اینکه این صفحه قفل گشایی شود، الزامات زیر باید برآورده شود"
   presentation_2d9387ca: ارائه
+  press_the_comma_key_or_shift_question_mark_to_see__930af9df: "کلید ویرگول یا shift + علامت سؤال را فشار دهید تا فهرستی از میانبرهای صفحه کلید را ببینید"
+  press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "کلید ویرگول یا shift + ? را فشار دهید تا فهرستی از میانبرهای صفحه کلید را ببینید"
+  press_the_esc_key_to_close_this_modal_14d10601: "برای بستن این ماژول، کلید esc را فشار دهید"
+  preview_53003fd2: پیش‌نمایش
+  preview_your_changes_373557d8: "پیش نمایش تغییرات شما"
+  previous_bd2ac015: قبلی
+  previous_message_8804f87e: "پیام قبلی"
+  previous_module_item_2bb5e499: "ماژول/مورد قبلی"
+  previous_time_cc96b361: "(%{time}) قبلی"
+  previous_timestamp_19343a58: "(%{timestamp}) قبلی"
+  primary_button_3a98f4bc: "دکمه اولیه"
+  primary_button_text_1f55d27b: "متن رنگ اولیه"
+  primary_color_630fc6f3: "رنگ اولیه"
+  primary_color_button_b75db628: "دکمه رنگ اولیه"
+  primary_color_button_disabled_9081ddff: "دکمه رنگ اولیه غیر فعال شد"
   privacy_290109ea: "حریم خصوصی"
   product_name: کانواس
   profile: 
@@ -10212,7 +10394,7 @@ fa:
     crumb: "تنظیمات %{user}"
     crumbs: 
       observees: "در حال مشاهده"
-      settings_frd: "تنظیمات %{user}"
+      settings_frd: "رخ نمای %{user}"
     done_resending: "انجام شد! ارسال پیام ممکن است چند دقیقه طول بکشد."
     email_select: 
       default_email_option: "[انتخاب پست الکترونیکی]"
@@ -10243,6 +10425,7 @@ fa:
       buttons: 
         add_picture_file: "افزودن فایل"
         authorize_google_docs: "اجازه دادن برای دسترسی به Google Docs"
+        authorize_google_drive: "دادن اجازه دسترسی به Google Drive"
         authorize_twitter: "اجازه دادن برای دسترسی به توییتر"
         generate_token: "ایجاد نشانه"
         new_access_token: "نشانه دسترسی جدید"
@@ -10264,6 +10447,7 @@ fa:
           دسترسی پیدا کنند. این نشانه ها معمولا به طور خودکار در صورت لزوم برای برنامه ها ایجاد می شوند، اما در صورت [اجرای یک پروژه جدید یا محدود](%{documentation_url})، می توانید نشانه
           را از اینجا ایجاد کنید .
       google_docs_description: "وقتی به ما اجازه می دهید که Google Docs تان را مشاهده کنیم، قادر خواهید بود تکلیف های خود را به طور مستقیم از Google Docs ارسال کنید و اسناد را ایجاد کنید و با همکلاسی های خود به اشتراک بگذارید."
+      google_drive_description: "وقتی به ما اجازه می دهید که Google Drive تان را مشاهده کنیم، قادر خواهید بود تکلیف های خود را به طور مستقیم از Google Docs ارسال کنید و اسناد را ایجاد کنید و با همکلاسی های خود به اشتراک بگذارید."
       headers: 
         application_abbrev: برنامه
         dates: "تاریخ ها"
@@ -10271,6 +10455,7 @@ fa:
         diigo_login: "ورود Diigo"
         generate_access_token: "ایجاد نشانه دسترسی"
         google_docs_access: "دسترسی به Google Docs "
+        google_drive_access: "دسترسی Google Drive"
         inbox_opt_out: "انتخاب از صندوق ورودی گفتگوها"
         linkedin_access: "دسترسی به لینکدین"
         loading_images: "در حال بارگذاری تصاویر..."
@@ -10330,6 +10515,7 @@ fa:
         disable_mfa: "غیر فعال سازی اعتبارسنجی چند عاملی"
         edit_settings: "ویرایش تنظیمات"
         google_docs: "Google Docs"
+        google_drive: "Google Drive"
         linkedin: لینکدین
         more_options: "گزینه های بیشتر"
         reconfigure_mfa: "پیکربندی دوباره اعتبارسنجی چند عاملی"
@@ -10350,6 +10536,7 @@ fa:
       titles: 
         access_token_details: "اطلاعات نشانه دسترسی"
         authorize_google_docs: "دادن اجازه دسترسی به Google Docs"
+        authorize_google_drive: "دادن اجازه دسترسی به Google Drive"
         authorize_linkedin: "دادن اجازه دسترسی به لینکدین"
         authorize_twitter: "دادن اجازه دسترسی به توییتر"
         authorize_yo: "ورود به Yo"
@@ -10382,6 +10569,7 @@ fa:
       edit_profile: "ویرایش رخ نما"
       links: 
         user_account_details: "اطلاعات حساب"
+      masquerade: "تغییر دادن عنوان"
     sms_select: 
       default_sms_option: "[انتخاب تلفن همراه]"
       new_sms_option: "شماره تلفن همراه جدید"
@@ -10418,12 +10606,13 @@ fa:
       labels: 
         carrier: حامل
         cell_number: "شماره تلفن همراه"
+        country: کشور
         email_address: "نشانی پست الکترونیکی"
         enable_login_for_email: "می خواهم با استفاده از این نشانی پست الکترونیکی وارد کانواس شوم"
         sms_email: "پست الکترونیکی و پیامک"
       links: 
-        add_contact_method: "افزودن روش تماس"
-        add_email_address: "افزودن نشانی پست الکترونیکی"
+        add_contact_method: "روش تماس"
+        add_email_address: "نشانی پست الکترونیکی"
         email: "پست الکترونیکی"
         resend_confirmation: "ارسال دوباره تأییدیه"
         text_sms: "متن (پیامک)"
@@ -10472,6 +10661,12 @@ fa:
     upload_file_view: 
       choose_a_picture: "انتخاب عکس"
       crop_instructions: "برای بریدن تصویر، قسمت انتخاب شده را بکشید و سپس روی دکمه \"ذخیره\" در قسمت زیر کلیک کنید."
+  progress_for_account_name_ef203250: "پیشرفت برای %{account_name}"
+  progress_loading_bar_a26b8861: "نوار پیشرفت/بارگذاری"
+  project_groups_1fa0320b: "گروه های پروژه"
+  provider_icon_5064fa6e: "نماد ارائه دهنده"
+  provision_a_catalog_account_8cea67f6: "فراهم کردن حساب کاتالوگ"
+  provisioned_catalog_account_26339afd: "حساب کاتالوگ فراهم شده"
   provisioning_title: "در حال ارائه"
   pseudonym: 
     errors: 
@@ -10515,8 +10710,12 @@ fa:
       link_invalid: "پیوند مورد استفاده شما دیگر معتبر نیست. اگر نمی توانید وارد شوید، بر روی «رمز عبور خود را نمی دانید؟» کلیک کنید تا رمز عبور خود را باز نشانی کنید."
       password_changed: "رمز عبور تغییر یافت"
   public_a749f507: عمومی
+  public_course_index_59270e80: "فهرست عمومی درس"
   public_courses_title: "درس های عمومی"
   public_domain_112ed397: "دامنه عمومی"
+  publish_5211dca3: انتشار
+  publish_aa888e3c: "انتشار:"
+  publish_announcement_fec6d7e2: "انتشار اطلاعیه"
   publish_btn_module: 
     buttons: 
       publish: انتشار
@@ -10526,6 +10725,7 @@ fa:
       publishing: "در حال انتشار..."
       unpublish: "لغو انتشار"
       unpublishing: "در حال لغو انتشار..."
+  publish_grades_to_sis_51402d46: "انتشار نمره ها در سامانه اطلاعات دانشجو"
   publish_icon_component: 
     publish: انتشار
     publish_click: "منتشر شده، برای لغو انتشار کلیک کنید"
@@ -10542,14 +10742,26 @@ fa:
     disabled_assignment: "اگر موردهای ارسالی دانشجو وجود داشته باشد، انتشار نمی تواند لغو شود"
     disabled_discussion_topic: "اگر موردهای ارسالی دانشجو وجود داشته باشد، انتشار نمی تواند لغو شود"
     disabled_quiz: "اگر موردهای ارسالی دانشجو وجود داشته باشد، انتشار نمی تواند لغو شود"
+  published_4bb5209e: "منتشر شده"
+  published_c944a23d: "منتشر شده"
+  published_click_to_modify_233c0d4: "منتشر شده - برای تغییر دادن کلیک کنید."
+  published_click_to_unpublish_ec4495b5: "منتشر شده. برای لغو انتشار کلیک کنید."
+  published_click_to_unpublish_item_name_aaa804b0: "منتشر شده. برای لغو انتشار %{item_name} کلیک کنید"
+  published_click_to_unpublish_module_name_eddd07bb: "منتشر شده. برای لغو انتشار  %{module_name} کلیک کنید."
+  published_click_to_unpublish_name_9bdd66cf: "منتشر شده. برای لغو انتشار %{name} کلیک کنید"
+  publishing_is_disabled_for_this_item_efa7803f: "انتشار برای این مورد غیر فعال شده است"
+  publishing_item_name_is_disabled_8207a9e7: "انتشار %{item_name} غیر فعال شده است"
   purchases: 
     new: 
       payment_info: "اطلاعات پرداخت"
+  purple_7678a9fc: ارغوانی
+  qatar_d52a8d27: قطر
   qti_display: QTI
   qti_file_description: "فایل .zip QTI"
   qti_img_matching_question: "پرسش نظیر وارد شده دارای تصاویری در هر دو طرف است که پشتیبانی نشده اند"
   qti_img_matching_question_distractors: "پرسش نظیر وارد شده دارای تصاویری در داخل گزینه هاست و نمی تواند ثابت شود، زیرا دارای گزینه های نادرست نیز هست"
   qti_name: "مبدل QTI"
+  question_9121487: پرسش
   question_answered: "پاسخ داده شده"
   question_bank: 
     align_outcomes: "تطبیق دادن نتایج"
@@ -10644,15 +10856,20 @@ fa:
       move_copy: انتقال/کپی
       select_bank: "مخزن پرسش مقصد برای این پرسش را انتخاب کنید:"
       show_details: "نمایش اطلاعات پرسش"
+  question_f06476d1: پرسش
+  question_group_837b8014: "گروه پرسش"
+  question_mark_icon_d2bbd204: "نماد علامت سؤال"
   question_unanswered: "هنوز پاسخ داده نشده است"
+  questions_a955145c: "پرسش ها"
   quiz: 
     regrade: 
-      give_everyone_full_credit: "به همه نمره ی کامل را برای این پرسش بدهید."
+      give_everyone_full_credit: "دادن امتیاز کامل به همه برای این پرسش"
       no_scores_reduced: "دادن امتیاز هم به پاسخ های تصحیح شده و هم پاسخ های درست قبلی (*هیچ نمره ای کسر نخواهد شد*) "
       regrade_disabled: "نمره گذاری دوباره برای این پرسش مجاز نیست، زیرا بعد از اینکه دانشجو مورد ارسالی را ارسال کرده است، پاسخ حذف شده است یا نوع پرسش تغییر یافته است."
       regrade_options: "گزینه های نمره گذاری دوباره *(برای دانشجویانی که قبلا به این پرسش پاسخ داده اند):*"
       some_scores_reduced: "دادن امتیاز فقط به پاسخ درست (*برخی نمره های دانشجویان ممکن است کسر شود*) "
       update_question_without_regrading: "بهنگام سازی پرسش بدون نمره گذاری دوباره"
+  quiz_40ee61b1: آزمون
   quiz_e0dcce8f: آزمون
   quiz_log_auditing: 
     buttons: 
@@ -10719,6 +10936,8 @@ fa:
   quiz_log_auditing_desc: |-
       ردگیری رویدادهای مربوط به یک آزمون ارسالی و قابلیت مشاهده گزارش ثبت وقایع
       این رویدادها در هنگام ارسال آزمون را فعال سازید.
+  quiz_lti_plugin_a6256549: "افزونه LTI آزمون"
+  quiz_menu_4fcd5e61: "منوی آزمون"
   quiz_reports: 
     cancel_generation: لغو
     download_item_analysis: "گزارش تحلیل مورد را بارگیری کنید."
@@ -10741,9 +10960,11 @@ fa:
       generating_report_name: "در حال ایجاد %{report_name}..."
       item_analysis_not_available: "تحلیل پرسش برای نظرسنجی ها موجود نیست"
     student_analysis: "تحلیل دانشجو"
+  quiz_restrictions_5db831c5: "محدودیت های آزمون"
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "نتایج آزمون برای این آزمون محافظت شده هستند و برای دانشجویان قابل مشاهده نیستند."
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "نتایج آزمون برای این آزمون محافظت شده هستند و تا زمانی که دانشجویان آخرین تلاش خود را ارسال نکنند، برای آنها قابل مشاهده نیستند."
   quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "نتایج آزمون برای این آزمون محافظت شده هستند و می توان آن را در یک دفعه بلافاصله بعد از ارسال مشاهده کرد."
+  quiz_score_to_keep_d1f7c4b1: "نمره ی آزمون برای نگه داشتن"
   quiz_statistics: 
     answer_bars_chart: 
       audible_answer_position: "پاسخ %{position}:"
@@ -10802,6 +11023,7 @@ fa:
       one: "1 دانشجو"
       other: "%{count} دانشجو"
       zero: "هیچ کس"
+    sad-panda-alttext: "چیزهای غم انگیز در سرزمین پاندا."
     speedgrader: "مشاهده در برنامه نمره گذاری سریع"
     summary: 
       audible_chart_description: "دانشجویان %{above_average} نمره بالا یا متوسط و دانشجویان %{below_average} نمره پایین کسب کرده اند."
@@ -10825,6 +11047,9 @@ fa:
       table_description: "آمار خلاصه برای همه موردهای ارسالی تحویل داده شده"
     title: "آمار آزمون"
     unknown_answer: "چیز دیگر"
+    user_names: "نام های کاربری"
+  quiz_title_4b50ade9: "عنوان آزمون"
+  quiz_type_be1633db: "نوع آزمون"
   quizzes: 
     alerts: 
       no_valid_combinations: "سیستم نمی تواند هیچ ترکیب معتبری برای پارامترهای داده شده ایجاد کند"
@@ -10905,6 +11130,9 @@ fa:
       confirms: 
         delete_quiz: "مطمئنید که می خواهید این آزمون حذف شود؟"
       default_title: "آزمون بی نام"
+      flash: 
+        fail: "حذف آزمون انجام نشد."
+        removed: "آزمون با موفقیت حذف شد."
       multiple_due_dates: "چند تاریخ"
     index_view: 
       add_quiz: آزمون
@@ -10981,6 +11209,8 @@ fa:
       no_quizzes: "هیچ آزمونی در دسترس نیست"
     notices: 
       message_sent: "پیام ارسال شد!"
+    question: 
+      positive_points: "باید صفر یا بزرگتر باشد"
     question_colon: "پرسش:"
     question_count: 
       one: "%{count} پرسش"
@@ -11063,6 +11293,7 @@ fa:
       display_answer: 
         labels: 
           answer_with_margin: "با حاشیه"
+          answer_with_precision: "با دقت"
           your_answer: "پاسخ شما"
         margin_of_error: "حاشیه خطا"
         plus_or_minus: "-/+"
@@ -11141,6 +11372,7 @@ fa:
           manage_question_banks: "مدیریت مخزن های پرسش درس"
           more_questions: "پرسش های بیشتر"
           select_all_banks: "انتخاب همه"
+          view_question_banks: "مشاهده مخزن های پرسش درس"
         options: 
           new_group: "[ گروه جدید ]"
           no_group: "[ گروه موجود نیست ]"
@@ -11151,10 +11383,12 @@ fa:
         answer_in_range_accessible: "بین *شروع بازه* و #range end#"
         answer_text: "متن پاسخ"
         answer_weight: "وزن پاسخ"
+        answer_with_precision_accessible: "*پاسخ دقیق* با دقت #precision#"
         exact_answer_with_error_margin_accessible: "*پاسخ دقیق* با حاشیه خطای #error margin#"
         labels: 
           answer_comments: "نظرها، اگر دانشجو این پاسخ را انتخاب کند"
           answer_in_range: "پاسخ در بازه "
+          answer_with_precision: "پاسخ دادن با دقت"
           exact_answer: "پاسخ دقیق"
         matching_left: "در حال انطباق سمت چپ"
         matching_right: "در حال انطباق سمت راست"
@@ -11316,6 +11550,7 @@ fa:
         extended_quiz_time_explanation: "می توانید به این دانشجو برای آزمون فعلی زمان اضافی بدهید. چقدر می خواهید به آنها زمان بدهید؟"
         extra_time_on_every_attempt: "وقت اضافی برای هر تلاش:"
         finished_in: "تکمیل شده در %{duration}"
+        global_extra_attempt_time: "همه هم اکنون %{count} دقیقه دریافت می کنند"
         global_extra_attempts: "همه اکنون %{n} دریافت می کنند"
         headers: 
           attempt: تلاش
@@ -11499,6 +11734,7 @@ fa:
         unlimited: نامحدود
       quiz_edit_details: 
         labels: 
+          quiz_instructions: "دستورالعمل های آزمون"
           quiz_score: نمره
       quiz_right_side: 
         attempts_left: 
@@ -11620,6 +11856,7 @@ fa:
           lock_survey: "این نظرسنجی اکنون قفل شود"
           unlock_quiz: "به دانشجویان اجازه داده شود اکنون این آزمون را بدهند"
           unlock_survey: "به دانشجویان اجازه داده شود اکنون این نظرسنجی را انجام بدهند"
+        course_concluded_notice: "این آزمون دیگر در دسترس نیست، زیرا درس خاتمه یافته است."
         labels: 
           available_until: تا
           no_time_limit: "بدون محدودیت زمانی"
@@ -11842,8 +12079,16 @@ fa:
     ? "true"
     : درست
   quizzes_7e598f57: آزمون‌ها
+  radio_button_option_1_a8ec51f9: "گزینه دکمه رادیویی 1"
+  radio_button_option_2_31e50043: "گزینه دکمه رادیویی 2"
+  range_56b2f310: بازه
   range_8760934b: "محدوده:"
   range_name_90614433: "نام محدوده"
+  ratio_answered_correctly_b0c1e7d: "%{ratio}% درست پاسخ داد"
+  ratio_responded_correctly_6d890107: "%{ratio}% درست پاسخ داد"
+  re_activate_user_f7d77c9a: "فعال سازی دوباره کاربر"
+  re_submit_assignment_b3e2bd28: "ارسال دوباره تکلیف"
+  re_upload_submissions_125e415d: "بارگذاری دوباره موردهای ارسالی"
   re_upload_submissions_form: 
     buttons: 
       upload: "بارگذاری فایل ها"
@@ -11917,6 +12162,16 @@ fa:
     sections_count: 
       one: "%{count} بخش"
       other: "%{count} بخش"
+  record_media_6637ff19: "ضبط رسانه"
+  record_with_microphone_only_e4ee07aa: "ضبط فقط با میکروفون"
+  record_with_webcam_af21e07c: "ضبط با وب کم"
+  recurring_calendar_events_c940b6b8: "رویدادهای تکرارشونده تقویم"
+  red_8258edf3: قرمز
+  reference_code_3e8355dd: "رمز مرجع"
+  reference_code_is_required_c32c757f: "رمز مرجع لازم است"
+  regenerate_epub_395c8e56: "ایجاد دوباره ePub"
+  region_47e29025: "ناحیه:"
+  region_939f2a6c: ناحیه
   registration: 
     get_started: "شروع به کار"
     incomplete_registration_warning: 
@@ -11951,14 +12206,46 @@ fa:
         email: "پست الکترونیکی"
         name: نام
     welcome_to_canvas: "به کانواس خوش آمدید!"
+  registration_url_60e0eaaa: "نشانی اینترنتی ثبت نام"
+  remove_account_from_this_profile_c3095eb2: "حذف حساب از این رخ نما"
   remove_attachment_ceae0973: "حذف پیوست"
+  remove_c_name_section_d8eabd3a: "حذف بخش %{c.name}"
+  remove_contact_method_ca890ba3: "حذف روش تماس"
+  remove_email_address_b1820820: "حذف نشانی پست الکترونیکی"
+  remove_empty_attachment_b2aea632: "حذف پیوست خالی"
   remove_f47dc62a: حذف
+  remove_filename_87f3781e: "حذف %{filename}"
+  remove_icon_a4646413: "حذف نماد"
+  remove_recipient_name_a6b83cef: "حذف گیرنده %{name}"
   remove_row_c198da5a: "حذف ردیف"
   remove_row_f9d59cba: "حذف ردیف"
+  remove_student_from_recipients_4b206e35: "حذف %{student} از گیرنده ها"
   remove_these_dates_48453a81: "حذف این تاریخ ها"
+  remove_this_rubric_from_my_list_c7d80704: "حذف این دستورالعمل ارزیابی از فهرست من"
+  remove_this_section_9a88ca43: "حذف این بخش"
   rename_45608f54: "تغییر نام"
+  rename_c_name_section_e0e92c97: "تغییر دادن نام بخش %{c.name}"
+  rename_this_section_73065edd: "تغییر دادن نام این بخش"
+  replace_e61834a7: "جایگزین کردن"
   reply_from_name: "%{name} از طریق اطلاعیه های کانواس "
+  reply_to_comment_72d96728: "پاسخ به نظر"
+  reply_to_current_message_55391f5b: "پاسخ به پیام فعلی"
+  reply_to_main_discussion_29823888: "پاسخ به بحث اصلی"
+  reply_to_topic_12412b0f: "پاسخ به موضوع"
+  require_an_access_code_600e06e8: "نیازمند یک رمز دسترسی"
+  require_respondus_lockdown_browser_31425b3a: "نیازمند مرورگر Respondus LockDown"
   require_usage_rights_for_uploaded_files_4507865b: "لازم دانستن حقوق استفاده برای فایل های بارگذاری شده"
+  required_access_code_592902d7: "رمز دسترسی لازم است"
+  required_to_view_quiz_results_dba7368b: "مشاهده نتایج آزمون لازم است"
+  requirement_f5b75da1: الزام
+  requirement_subject_7cfac6c8: "موضوع الزام"
+  reregister_9ab95a57: "ثبت نام دوباره"
+  reregister_toolname_3dde0bfc: "ثبت نام دوباره %{toolName}"
+  reserved_f247b60b: "رزرو شده"
+  reset_95a81614: بازنشانی
+  reset_multi_factor_authentication_2b63a558: "بازنشانی اعتبارسنجی چند عاملی"
+  reset_this_contact_method_s_bounce_count_3845ecf4: "بازنشانی تعداد بازگشت این روش تماس"
+  reset_this_email_address_s_bounce_count_d81d8fd9: "بازنشانی تعداد بازگشت این نشانی پست الکترونیکی"
   respondus_lockdown_browser_support_413352eb: "پشتیبانی مرورگر Respondus LockDown"
   respondus_soap_endpoint: 
     plugin_settings: 
