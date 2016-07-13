@@ -134,6 +134,17 @@ a {
   }
 
 }
+////////=============
+/// Underline All Links Feature Flag
+////////=============
+.Underline-All-Links__enabled {
+  a {
+    text-decoration: underline;
+    &:focus, &:hover { text-decoration: none; }
+    @include ic-focus-base;
+    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
+  }
+}
 
 // make links in .alert be same color as alert text but bold
 .alert a {
