@@ -41,11 +41,7 @@ module CanvasHttp
   # rather than reading it all into memory.
   #
   # Eventually it may be expanded to optionally do cert verification as well.
-  #
-  # TODO: this doesn't yet handle relative redirects (relative Location HTTP
-  # header), which actually isn't even technically allowed by the HTTP spec.
-  # But everybody allows and handles it.
-  def self.request(request_class, url_str, other_headers = {}, redirect_limit = 3)
+  def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false)
     last_scheme = nil
     last_host = nil
 
@@ -54,9 +50,20 @@ module CanvasHttp
 
       _, uri = CanvasHttp.validate_url(url_str, last_host, last_scheme) # uses the last host and scheme for relative redirects
       http = CanvasHttp.connection_for_uri(uri)
+
+      multipart_query = nil
+      if form_data && multipart
+        multipart_query, multipart_headers = Multipart::Post.new.prepare_query(form_data)
+        other_headers = other_headers.merge(multipart_headers)
+      end
+
       request = request_class.new(uri.request_uri, other_headers)
+      add_form_data(request, form_data) if form_data && !multipart
+
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.request(request) do |response|
+      args = [request]
+      args << multipart_query if multipart
+      http.request(*args) do |response|
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           last_host = uri.host
           last_scheme = uri.scheme
@@ -73,6 +80,15 @@ module CanvasHttp
           return response
         end
       end
+    end
+  end
+
+  def self.add_form_data(request, form_data)
+    if form_data.is_a?(String)
+      request.body = form_data
+      request.content_type = 'application/x-www-form-urlencoded'
+    else
+      request.set_form_data(form_data)
     end
   end
 

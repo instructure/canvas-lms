@@ -26,6 +26,8 @@ module ConditionalRelease
       protocol: nil,  # defaults to Canvas
       edit_rule_path: "ui/editor",
       create_account_path: 'api/account',
+      content_exports_path: 'api/content_exports',
+      content_imports_path: 'api/content_imports',
     }.freeze
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, domain: nil, real_user: nil)
@@ -103,6 +105,14 @@ module ConditionalRelease
 
     def self.create_account_path
       config[:create_account_path]
+    end
+
+    def self.content_exports_url
+      build_url(config[:content_exports_path])
+    end
+
+    def self.content_imports_url
+      build_url(config[:content_imports_path])
     end
 
     class << self

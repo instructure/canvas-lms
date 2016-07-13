@@ -84,7 +84,7 @@ describe "CanvasHttp" do
         to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
       stub_request(:get, "http://www.example2.com/a").
         to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
-      expect { CanvasHttp.get("http://www.example.com/a", {}, 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
+      expect { CanvasHttp.get("http://www.example.com/a", redirect_limit: 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
 
     it "should yield requests to blocks" do
