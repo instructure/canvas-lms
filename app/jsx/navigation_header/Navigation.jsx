@@ -230,7 +230,13 @@ define([
 
     render () {
       return (
-        <Tray isOpen={this.state.isTrayOpen} onBlur={this.closeTray} closeTimeoutMS={400}>
+        <Tray
+          isOpen={this.state.isTrayOpen}
+          onBlur={this.closeTray}
+          closeTimeoutMS={400}
+          getAriaHideElement={() => $('#application')[0]}
+          getElementToFocus={() => $('.ic-NavMenu__closeButton')[0]}
+        >
           {this.renderTrayContent()}
         </Tray>
       );

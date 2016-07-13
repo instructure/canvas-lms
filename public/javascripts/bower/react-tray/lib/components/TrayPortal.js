@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import cx from 'classnames';
 import focusManager from '../helpers/focusManager';
 import isLeavingNode from '../helpers/isLeavingNode';
+import findTabbable from '../helpers/tabbable';
 
 const styles = {
   overlay: {
@@ -53,9 +54,13 @@ export default React.createClass({
     overlayClassName: PropTypes.string,
     isOpen: PropTypes.bool,
     onBlur: PropTypes.func,
+    onOpen: PropTypes.func,
     closeOnBlur: PropTypes.bool,
     closeTimeoutMS: PropTypes.number,
-    children: PropTypes.any
+    children: PropTypes.any,
+    maintainFocus: PropTypes.bool,
+    getElementToFocus: PropTypes.func,
+    getAriaHideElement: PropTypes.func
   },
 
   getInitialState() {
@@ -83,7 +88,11 @@ export default React.createClass({
 
   componentDidUpdate() {
     if (this.focusAfterRender) {
-      this.focusContent();
+      if (this.props.getElementToFocus) {
+        this.props.getElementToFocus().focus();
+      } else {
+        this.focusContent();
+      }
       this.setFocusAfterRender(false);
     }
   },
@@ -94,6 +103,14 @@ export default React.createClass({
 
   focusContent() {
     this.refs.content.focus();
+  },
+
+  applyAriaHidden(element) {
+    element.setAttribute('aria-hidden', true);
+  },
+
+  removeAriaHidden(element) {
+    element.removeAttribute('aria-hidden');
   },
 
   handleOverlayClick(e) {
@@ -108,6 +125,15 @@ export default React.createClass({
       this.props.onBlur();
     }
 
+    // Keep focus inside the tray if maintainFocus is true
+    if (e.keyCode === 9 && this.props.maintainFocus && isLeavingNode(this.refs.content, e)) {
+      e.preventDefault();
+      const tabbable = findTabbable(this.refs.content);
+      const target = tabbable[e.shiftKey ? tabbable.length - 1 : 0];
+      target.focus();
+      return;
+    }
+
     // Treat tabbing away from content as blur/close if closeOnBlur
     if (e.keyCode === 9 && this.props.closeOnBlur && isLeavingNode(this.refs.content, e)) {
       e.preventDefault();
@@ -118,6 +144,12 @@ export default React.createClass({
   open() {
     focusManager.markForFocusLater();
     this.setState({isOpen: true}, () => {
+      if (this.props.onOpen) {
+        this.props.onOpen();
+      }
+      if (this.props.getAriaHideElement) {
+        this.applyAriaHidden(this.props.getAriaHideElement());
+      }
       this.setState({afterOpen: true});
     });
   },
@@ -127,6 +159,9 @@ export default React.createClass({
       this.closeWithTimeout();
     } else {
       this.closeWithoutTimeout();
+    }
+    if (this.props.getAriaHideElement) {
+      this.removeAriaHidden(this.props.getAriaHideElement());
     }
   },
 
