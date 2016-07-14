@@ -123,6 +123,19 @@ Canvas::Plugin.register('kaltura', nil, {
   :settings_partial => 'plugins/kaltura_settings',
   :validator => 'KalturaValidator'
 })
+Canvas::Plugin.register('mathman', nil, {
+  :name => lambda{ t :name, 'MathMan' },
+  :description => lambda{ t :description, 'A simple microservice that converts LaTeX formulae to MathML and SVG'},
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/mathman_settings',
+  :validator => 'MathmanValidator',
+  :settings => {
+    use_for_svg: false,
+    use_for_mml: false
+  }
+})
 Canvas::Plugin.register('wimba', :web_conferencing, {
   :name => lambda{ t :name, "Wimba" },
   :description => lambda{ t :description, "Wimba web conferencing support" },
@@ -223,9 +236,9 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
     :requires_file_upload => true,
-    :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
-                 :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
-                 :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
+    :provides =>{:common_cartridge=>CC::Importer::Standard::Converter,
+                 :common_cartridge_1_0=>CC::Importer::Standard::Converter,
+                 :common_cartridge_1_1=>CC::Importer::Standard::Converter,
                  :common_cartridge_1_2=>CC::Importer::Standard::Converter,
                  :common_cartridge_1_3=>CC::Importer::Standard::Converter},
     :valid_contexts => %w{Account Course}
