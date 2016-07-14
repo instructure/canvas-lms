@@ -106,7 +106,6 @@ define [
         error: @onPostReplyError
         multipart: entry.get('attachment')
         proxyAttachment: true
-      @hide()
       @removeAttachments()
 
     ##
@@ -146,6 +145,7 @@ define [
       else
         @view.model.set 'notification', ''
         @trigger 'save', entry
+        @textArea.val ''
 
     ##
     # Callback when the model fails to save
