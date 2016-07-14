@@ -2257,6 +2257,54 @@ describe DiscussionTopicsController, type: :request do
       expect(v1_r0['updated_at']).to eq @reply3.updated_at.as_json
     end
 
+    context "with mobile overrides" do
+      before :once do
+        course_with_teacher(:active_all => true)
+        student_in_course(:course => @course, :active_all => true)
+        @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+        @root1 = @topic.reply_from(:user => @student, :html => "root1")
+        @reply1 = @root1.reply_from(:user => @teacher, :html => "reply1")
+
+        # materialized view jobs are now delayed
+        Timecop.travel(Time.now + 20.seconds) do
+          run_jobs
+
+          # make everything slightly in the past to test updating
+          DiscussionEntry.update_all(:updated_at => 5.minutes.ago)
+          @reply2 = @root1.reply_from(:user => @teacher, :html => "reply2")
+        end
+
+        account = @course.root_account
+        account.enable_feature!(:use_new_styles)
+        bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
+        account.brand_config_md5 = bc.md5
+        account.save!
+
+        @tag = "<link rel=\"stylesheet\" href=\"somewhere.css\">"
+      end
+
+      it "should include mobile overrides in the html if not in-app" do
+        DiscussionTopicsApiController.any_instance.stubs(:in_app?).returns(false)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+          {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+
+        expect(json['view'].first['message']).to start_with(@tag)
+        expect(json['view'].first['replies'].first['message']).to start_with(@tag)
+        expect(json['new_entries'].first['message']).to start_with(@tag)
+      end
+
+      it "should not include mobile overrides in the html if in-app" do
+        DiscussionTopicsApiController.any_instance.stubs(:in_app?).returns(true)
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/view",
+          {:controller => "discussion_topics_api", :action => "view", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}, {:include_new_entries => '1'})
+
+        expect(json['view'].first['message']).to_not start_with(@tag)
+        expect(json['view'].first['replies'].first['message']).to_not start_with(@tag)
+        expect(json['new_entries'].first['message']).to_not start_with(@tag)
+      end
+    end
+
     it "should include new entries if the flag is given" do
       course_with_teacher(:active_all => true)
       student_in_course(:course => @course, :active_all => true)
