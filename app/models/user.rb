@@ -2909,7 +2909,7 @@ class User < ActiveRecord::Base
   end
 
   def preferred_gradebook_version
-    preferences.fetch(:gradebook_version, '2')
+    preferences.fetch(:gradebook_version, 'default')
   end
 
   def stamp_logout_time!
