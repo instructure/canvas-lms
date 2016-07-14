@@ -1781,6 +1781,10 @@ define([
         $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
           crocodoc_session_url: (attachment.provisional_crocodoc_url || attachment.crocodoc_url)
         }));
+      } else if (attachment.canvadoc_url) {
+        $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+          canvadoc_session_url: attachment.canvadoc_url
+        }));
       } else if ($.isPreviewable(attachment.content_type, 'google')) {
         if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 
