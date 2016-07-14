@@ -29,7 +29,14 @@ describe Outcomes::ResultAnalytics do
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
   MockOutcome = Struct.new(:id, :calculation_method, :calculation_int, :rubric_criterion)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :artifact_type, :percent)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :artifact_type, :percent, :possible, :association_id, :association_type)
+    def initialize *args
+      return super unless (args.first.is_a?(Hash) && args.length == 1)
+      args.first.each_pair do |k, v|
+        self[k] = v
+      end
+    end
+
     def learning_outcome_id
       learning_outcome.id
     end
@@ -53,6 +60,22 @@ describe Outcomes::ResultAnalytics do
     method = args[:method] || "highest"
     criterion = args[:criterion] || {mastery_points: 3.0}
     MockOutcome[id, method, args[:calc_int], criterion]
+  end
+
+  def create_quiz_outcome_results(outcome, title, *results)
+    defaults = {
+      user: user,
+      learning_outcome: outcome,
+      title: title,
+      assessed_at: time,
+      artifact_type: "Quizzes::QuizSubmission",
+      association_type: "Quizzes::Quiz",
+      score: 1.0
+    }
+    results.map do |result|
+      result_params = defaults.merge(result)
+      MockOutcomeResult.new(result_params)
+    end
   end
 
   describe '#rollup_user_results' do
@@ -214,25 +237,167 @@ describe Outcomes::ResultAnalytics do
       o1 = MockOutcome[80, 'decaying_average', 65, {points_possible: 5}]
       o2 = MockOutcome[81, 'n_mastery', 3, {:mastery_points => 3.0, points_possible: 5}]
       o3 = MockOutcome[82, 'n_mastery', 3, {:mastery_points => 3.0, points_possible: 5}]
-      user = MockUser[10, 'a']
-      results = [
-        #first outcome
-        MockOutcomeResult[user, o1, 7.0, "name, o1", nil, time, "Quizzes::QuizSubmission", 0.4],
-        MockOutcomeResult[user, o1, 12.0, "name, o1", nil, time - 1.day, "Quizzes::QuizSubmission", 0.9],
-        #second outcome
-        MockOutcomeResult[user, o2, 30.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
-        MockOutcomeResult[user, o2, 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.5],
-        MockOutcomeResult[user, o2, 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
-        #third outcome
-        MockOutcomeResult[user, o3, 90.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
-        MockOutcomeResult[user, o3, 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.7],
-        MockOutcomeResult[user, o3, 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
-        MockOutcomeResult[user, o3, 100.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.9]
-      ]
+      res1 = create_quiz_outcome_results(o1, "name, o1",
+        {score: 7.0, percent: 0.4, possible: 1.0, association_id: 1},
+        {score: 12.0, assessed_at: time - 1.day, percent: 0.9, possible: 1.0, association_id: 2}
+      )
+      res2 = create_quiz_outcome_results(o2, "name, o2",
+        {score: 30.0, percent: 0.2, possible: 1.0, association_id: 1},
+        {score: 75.0, percent: 0.5, possible: 1.0, association_id: 2},
+        {score: 120.0, percent: 0.8, possible: 1.0, association_id: 3}
+      )
+      res3 = create_quiz_outcome_results(o3, "name, o3",
+        {score: 90.0, percent: 0.2, possible: 1.0, association_id: 1},
+        {score: 75.0, percent: 0.7, possible: 1.0, association_id: 2},
+        {score: 120.0, percent: 0.8, possible: 1.0, association_id: 3},
+        {score: 100.0, percent: 0.9, possible: 1.0, association_id: 4}
+      )
+      results = [res1, res2, res3].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 3
       expect(rollups.map(&:score)).to eq [2.88, nil, 4.0]
     end
   end
 
+  describe "handling scores for matching outcomes in results" do
+
+    it "does not create false matches" do
+      o1 = MockOutcome[80, 'decaying_average', 65, {points_possible: 5}]
+      o2 = MockOutcome[81, 'decaying_average', 65, {points_possible: 5}]
+      o3 = MockOutcome[82, 'decaying_average', 65, {points_possible: 5}]
+      o4 = MockOutcome[83, 'decaying_average', 65, {points_possible: 5}]
+      assignment_params = {
+        artifact_type: "RubricAssessment",
+        association_type: "Assignment"
+      }
+      res1 = create_quiz_outcome_results(o1, "name, o1",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.7, possible: 1.0, association_id: 2},
+        {assessed_at: time - 2.days, percent: 0.4, possible: 1.0, association_id: 3},
+      )
+      res2 = create_quiz_outcome_results(o2, "name, o2",
+        {percent: 0.6, possible: 2.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 2},
+      )
+      res3 = create_quiz_outcome_results(o3, "name, o3",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 1}.merge(assignment_params),
+      )
+      res4 = create_quiz_outcome_results(o4, "name, o4",
+        {percent: 0.6, possible: 2.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 1}.merge(assignment_params),
+      )
+      results = [res1, res2, res3, res4].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [2.91, 3.18, 3.0, 3.18]
+    end
+
+    it "properly aligns and weights decaying average results for matches" do
+      o1 = MockOutcome[80, 'decaying_average', 65, {points_possible: 5}]
+      o2 = MockOutcome[81, 'decaying_average', 65, {points_possible: 5}]
+      o3 = MockOutcome[82, 'decaying_average', 65, {points_possible: 5}]
+
+      #res1 reflects two quizzes. each quiz contain matching outcome alignments
+      #each question is equally weighted at 1/3 of total possible (3.0)
+      #quiz 1 results should be 2.83 (0.6 * 0.333 * 5) + (0.7 * 0.333 * 5) + (0.4 * 0.333 * 5)
+      #quiz 2 result should be 3.17 (0.5 * 0.333 * 5) + (0.8 * 0.333 * 5) + (0.6 * 0.333 * 5)
+      #should evaluate as (3.17 + 3.17 + 3.17 + 2.83 + 2.83) / 5 * 0.35 + (2.83 * 0.65)
+      res1 = create_quiz_outcome_results(o1, "name, o1",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {percent: 0.7, possible: 1.0, association_id: 1},
+        {percent: 0.4, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2}
+      )
+
+      #res2 reflects same setup as res1, but with variable question weights
+      #quiz 1 results should be 1.55 (0.6 * 0.3 * 5) + (0.1 * 0.5 * 5) + (0.4 * 0.2 * 5)
+      #quiz 2 results should be 2.95 (0.5 * 0.5 * 5) + (0.8 * 0.2 * 5) + (0.6 * 0.3 * 5)
+      #should evaluate as (2.95 + 2.95 + 2.95 + 1.55 + 1.55) / 5 * 0.35 + (1.55 * 0.65)
+      res2 = create_quiz_outcome_results(o2, "name, o2",
+        {percent: 0.6, possible: 3.0, association_id: 1},
+        {percent: 0.1, possible: 5.0, association_id: 1},
+        {percent: 0.4, possible: 2.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 5.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 2.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 3.0, association_id: 2}
+      )
+
+      #res 3 reflects a situation where only one quiz has been evaluated
+      #quiz 1 results should be 3.3 (0.6 * 0.4 * 5) + (0.7 * 0.6 * 5)
+      #should evaluate as 3.3 / 1 * 0.35 + (3.3 * 0.65)
+      res3 = create_quiz_outcome_results(o3, "name, o3",
+        {percent: 0.6, possible: 2.0, association_id: 1},
+        {percent: 0.7, possible: 3.0, association_id: 1}
+      )
+      results = [res1, res2, res3].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [2.9, 1.84, 3.3]
+    end
+
+    it "properly aligns and weights latest score results for matches" do
+      o1 = MockOutcome[80, 'latest', nil, {points_possible: 5}]
+      o2 = MockOutcome[81, 'latest', nil, {points_possible: 5}]
+
+      #quiz 1 results should be 2.83 (0.6 * 0.333 * 5) + (0.7 * 0.333 * 5) + (0.4 * 0.333 * 5)
+      #quiz 2 result should be 3.17 (0.5 * 0.333 * 5) + (0.8 * 0.333 * 5) + (0.6 * 0.333 * 5)
+      res1 = create_quiz_outcome_results(o1, "name, o1",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {percent: 0.7, possible: 1.0, association_id: 1},
+        {percent: 0.4, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2},
+      )
+
+      #quiz 1 results should be 1.55 (0.6 * 0.3 * 5) + (0.1 * 0.5 * 5) + (0.4 * 0.2 * 5)
+      #quiz 2 results should be 2.95 (0.5 * 0.5 * 5) + (0.8 * 0.2 * 5) + (0.6 * 0.3 * 5)
+      res2 = create_quiz_outcome_results(o2, "name, o2",
+        {percent: 0.6, possible: 3.0, association_id: 1},
+        {percent: 0.1, possible: 5.0, association_id: 1},
+        {percent: 0.4, possible: 2.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 5.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 2.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 3.0, association_id: 2},
+      )
+      results = [res1, res2].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [2.83, 1.55]
+    end
+
+    it "does not use aggregate score when calculation method is 'highest'" do
+      o = MockOutcome[80, 'highest', nil, {points_possible: 5}]
+
+      res = create_quiz_outcome_results(o, "name, o1",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {percent: 0.7, possible: 1.0, association_id: 1},
+        {percent: 0.4, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2},
+      )
+
+      results = [res].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [4.0]
+    end
+
+    it "does not use aggregate score when calculation method is 'n_mastery'" do
+      o = MockOutcome[80, 'n_mastery', 3, {points_possible: 5, mastery_points: 3}]
+
+      res = create_quiz_outcome_results(o, "name, o1",
+        {percent: 0.6, possible: 1.0, association_id: 1},
+        {percent: 0.7, possible: 1.0, association_id: 1},
+        {percent: 0.4, possible: 1.0, association_id: 1},
+        {assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2},
+        {assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2},
+      )
+
+      results = [res].flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [3.38]
+    end
+  end
 end
