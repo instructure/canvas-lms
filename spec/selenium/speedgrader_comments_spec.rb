@@ -36,7 +36,6 @@ describe "speed grader" do
 
       student_submission
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       # check media comment
       f('#add_a_comment .media_comment_link').click
@@ -61,13 +60,12 @@ describe "speed grader" do
       expect_new_page_load do
         f('#speed_grader_gradebook_link').click
       end
-      expect(fj('body.grades')).to be_displayed
+      expect(f('body.grades')).to be_displayed
     end
 
     it "shows comment post time", priority: "1", test_id: 283755 do
       @submission = student_submission
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       # add comment
       f('#add_a_comment > textarea').send_keys('grader comment')
@@ -83,7 +81,6 @@ describe "speed grader" do
 
       # after refresh
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
       expect(f('#comments > .comment .posted_at')).to include_text(expected_posted_at)
     end
 
@@ -97,10 +94,9 @@ describe "speed grader" do
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       # make sure avatar shows up for current student
-      expect(ff("#avatar_image").length).to eq 1
+      expect(ff("#avatar_image")).to have_size(1)
       expect(f("#avatar_image")).not_to have_attribute('src', 'blank.png')
 
       # add comment
@@ -117,10 +113,9 @@ describe "speed grader" do
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_falsey
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css("#avatar_image")
-      expect(ff("#comments > .comment .avatar").length).to eq 1
+      expect(ff("#comments > .comment .avatar")).to have_size(1)
       expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
     end
 
@@ -140,7 +135,6 @@ describe "speed grader" do
       f("#settings_link").click
       f('#hide_student_names').click
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-      wait_for_ajaximations
 
       expect(f("#avatar_image")).not_to be_displayed
       expect(f('#students_selectmenu-button .ui-selectmenu-item-header')).to include_text "Student 1"
@@ -155,7 +149,7 @@ describe "speed grader" do
       expect(ff('#comments > .comment')).to have_size(2)
 
       # make sure name and avatar show up for teacher comment
-      expect(ffj("#comments > .comment .avatar:visible").size).to eq 1
+      expect(ffj("#comments > .comment .avatar:visible")).to have_size(1)
       expect(ff('#comments > .comment .author_name')[1]).to include_text('nobody@example.com')
     end
 
@@ -165,9 +159,8 @@ describe "speed grader" do
       en.deactivate
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
-      expect(ff('#students_selectmenu option').size).to eq 1 # just the one student
+      expect(ff('#students_selectmenu option')).to have_size(1) # just the one student
 
       replace_content f('#grading-box-extended'), "5", tab_out: true
       wait_for_ajaximations
@@ -175,6 +168,7 @@ describe "speed grader" do
       expect(@submission.score).to eq 5
 
       f('#speedgrader_comment_textarea').send_keys('srsly')
+      scroll_into_view('#add_a_comment button[type="submit"]')
       f('#add_a_comment button[type="submit"]').click
       wait_for_ajaximations
       expect(@submission.submission_comments.first.comment).to eq 'srsly'
@@ -192,7 +186,6 @@ describe "speed grader" do
         end
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        wait_for_ajaximations
       end
 
       it 'decreases the number of published comments' do
@@ -209,16 +202,13 @@ describe "speed grader" do
       it 'removes the deleted comment from the list of comments' do
         delete_links = ff('#comments .comment > a.delete_comment_link').select(&:displayed?)
 
-        expect {
-          delete_links[0].click
-          accept_alert
-          wait_for_ajaximations
+        delete_links[0].click
+        accept_alert
+        wait_for_ajaximations
 
-          f('a.next').click
-          f('a.prev').click
-        }.to change {
-          ff('#comments .comment > a.delete_comment_link').select(&:displayed?).size
-        }.by(-1)
+        f('#next-student-button').click
+        f('#prev-student-button').click
+        expect(ffj('#comments .comment > a.delete_comment_link:visible')).to have_size(1)
       end
     end
   end
@@ -235,7 +225,6 @@ describe "speed grader" do
       end
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      wait_for_ajaximations
 
       @comment_textarea = f('#speedgrader_comment_textarea')
       @comment_textarea.send_keys 'Testing Draft Comments'
@@ -244,7 +233,7 @@ describe "speed grader" do
     describe 'saving a draft comment' do
       it 'when going to the next student', test_id: 1407005, priority: "1" do
         expect {
-          f('a.next').click
+          f('#next-student-button').click
           wait_for_ajaximations
         }.to change {
           SubmissionComment.draft.count
@@ -253,7 +242,7 @@ describe "speed grader" do
 
       it 'when going to the previous student', test_id: 1407006, priority: "1" do
         expect {
-          f('a.prev').click
+          f('#prev-student-button').click
           wait_for_ajaximations
         }.to change {
           SubmissionComment.draft.count
@@ -283,15 +272,13 @@ describe "speed grader" do
 
     describe 'notice on auto-saving a draft comment' do
       it 'is displayed', test_id: 1407009, priority: "1" do
-        f('a.next').click()
-        wait_for_ajaximations
+        f('#next-student-button').click()
 
         expect(f('div#comment_saved')).to be_displayed
       end
 
       it 'can be dismissed', test_id: 1407010, priority: "1" do
-        f('a.next').click()
-        wait_for_ajaximations
+        f('#next-student-button').click()
 
         f('div#comment_saved .dismiss_alert').click()
         expect(f('div#comment_saved')).not_to be_displayed
@@ -358,16 +345,13 @@ describe "speed grader" do
       it 'removes the deleted comment from the list of comments' do
         delete_links = ff('#comments .comment.draft > a.delete_comment_link').select(&:displayed?)
 
-        expect {
-          delete_links[0].click
-          accept_alert
-          wait_for_ajaximations
+        delete_links[0].click
+        accept_alert
+        wait_for_ajaximations
 
-          f('a.next').click
-          f('a.prev').click
-        }.to change {
-          ff('#comments .comment.draft > a.delete_comment_link').select(&:displayed?).size
-        }.by(-1)
+        f('#next-student-button').click
+        f('#prev-student-button').click
+        expect(ffj('#comments .comment > a.delete_comment_link:visible')).to have_size(1)
       end
     end
   end
