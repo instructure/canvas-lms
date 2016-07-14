@@ -178,7 +178,6 @@ shared_context "in-process server selenium tests" do
 
   before do |example|
     start_capturing_video
-    move_mouse_to_known_position
   end
 
   after(:each) do |example|
@@ -187,6 +186,7 @@ shared_context "in-process server selenium tests" do
       # while disallow_requests! would generally get these, there's a small window
       # between the ajax request starting up and the middleware actually processing it
       wait_for_ajax_requests
+      move_mouse_to_known_position
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     ensure
