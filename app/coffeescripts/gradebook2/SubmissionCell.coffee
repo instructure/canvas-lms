@@ -225,7 +225,7 @@ define [
           data-value="#{htmlEscape cssClass}"
           class="Button Button--icon-action gradebook-checkbox gradebook-checkbox-#{htmlEscape cssClass} #{htmlEscape(editable)}"
           type="button"
-          aria-label="#{htmlEscape cssClass}">#{checkboxButtonTemplate(iconClass)}</button>
+          aria-label="#{htmlEscape cssClass}"><span class="screenreader-only">#{htmlEscape cssClass}</span>#{checkboxButtonTemplate(iconClass)}</button>
         """, options)
 
     @formatter: (row, col, submission, assignment, student) ->
