@@ -1,0 +1,103 @@
+@keyframes rotate {
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes morph {
+
+  0% {
+    stroke-dashoffset: 190%;
+  }
+
+  50% {
+    stroke-dashoffset: 50%;
+    transform: rotate(90deg);
+  }
+
+  100% {
+    stroke-dashoffset: 190%;
+    transform: rotate(360deg);
+  }
+}
+
+.LoadingSpinner {
+  position: relative;
+  top: 200px;
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.LoadingSpinner-medium {
+  width: 5em;
+  height: 5em;
+
+  .circle {
+    stroke-width: 0.5em;
+    width: 5em;
+    height: 5em;
+  }
+
+  .circleShadow {
+    stroke-width: calc(0.5em * 1.75);
+  }
+
+  .circleTrack,
+  .circleSpin {
+    stroke-width: 0.5em;
+  }
+
+  .circleSpin {
+    stroke-dasharray: 10.5em;
+    transform-origin: calc(5em / 2);
+  }
+
+}
+
+.circle {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation-name: rotate;
+  animation-duration: 2.25s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.circleTrack,
+.circleShadow,
+.circleSpin {
+  fill: none;
+}
+
+.circleSpin {
+  stroke-linecap: round;
+  animation-name: morph;
+  animation-duration: 1.75s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+}
+
+.LoadingSpinner-lightBg {
+  .circleShadow {
+    stroke: none;
+  }
+  .circleTrack {
+    stroke: rgb(230, 230, 230);
+  }
+  .circleSpin {
+    stroke: rgb(0, 115, 172);
+  }
+}
+
+.LoadingSpinner-darkBg {
+
+  .circleShadow {
+    stroke: rgba(0, 0, 0, 0.3);
+  }
+}
