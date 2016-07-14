@@ -87,6 +87,8 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       entry_ids = self.entry_ids_array
 
       if opts[:include_new_entries]
+        @for_mobile = true if opts[:include_mobile_overrides]
+
         new_entries = all_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).to_a
         participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
@@ -94,6 +96,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       else
         new_entries_json_structure = []
       end
+
       return self.json_structure, participant_ids, entry_ids, new_entries_json_structure
     else
       return nil
@@ -134,6 +137,23 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     end
     StringifyIds.recursively_stringify_ids(view)
     return view.to_json, user_ids.to_a, entry_lookup.keys
+  end
+
+  def in_app?
+    !@for_mobile # default to non-mobileapp mode
+  end
+
+  def self.include_mobile_overrides(entries, overrides)
+    entries.each do |entry|
+      if entry["message"]
+        parsed_html = Nokogiri::HTML::DocumentFragment.parse(entry["message"])
+        Api::Html::Content.add_overrides_to_html(parsed_html, overrides)
+        entry["message"] = parsed_html.to_s
+      end
+      if entry["replies"]
+        include_mobile_overrides(entry["replies"], overrides)
+      end
+    end
   end
 end
 
