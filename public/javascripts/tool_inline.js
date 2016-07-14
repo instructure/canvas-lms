@@ -127,7 +127,7 @@ $(function() {
   if ( $tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool') ) {
     $window.resize(function () {
       if (!$tool_content_wrapper.data('height_overridden')) {
-        resize_tool_content_wrapper($window.height() - canvas_chrome_height);
+        resize_tool_content_wrapper($window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
       }
     }).triggerHandler('resize');
   }
