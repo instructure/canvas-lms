@@ -412,7 +412,7 @@ END
     },
     'conditional_release' =>
     {
-      display_name: -> { I18n.t('Conditional Release') },
+      display_name: -> { I18n.t('Mastery Paths') },
       description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
       applies_to: 'Course',
       state: 'hidden',
