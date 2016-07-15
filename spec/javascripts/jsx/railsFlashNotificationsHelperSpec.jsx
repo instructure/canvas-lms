@@ -354,13 +354,13 @@ define([
     equal(result, content.html);
   });
 
-  test('returns escaped string if content has string property', () => {
+  test('returns html if content has string property', () => {
     let content = {};
     content.string = '<script>Some String</script>';
 
     let result = helper.escapeContent(content);
 
-    equal(result, htmlEscape(content.string));
+    equal(result, content);
   });
 
   test('returns escaped content if content has no string or html property', () => {

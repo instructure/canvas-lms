@@ -168,8 +168,6 @@ xsslint safeString.method escapeContent
     escapeContent(content) {
       if(content.hasOwnProperty('html')) {
         return content.html;
-      } else if(content.hasOwnProperty('string')) {
-        return htmlEscape(content.string);
       } else {
         return htmlEscape(content);
       }
