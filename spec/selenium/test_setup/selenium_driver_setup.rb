@@ -65,7 +65,7 @@ module SeleniumDriverSetup
 
   # prevents subsequent specs from failing because tooltips are showing etc.
   def move_mouse_to_known_position
-    driver.mouse.move_to(f("body")) if driver.ready_for_interaction
+    driver.mouse.move_to(f("body"), 0, 0) if driver.ready_for_interaction
   end
 
   def self.set_up_display_buffer
