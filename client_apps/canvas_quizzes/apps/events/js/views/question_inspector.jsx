@@ -1,10 +1,10 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var I18n = require('i18n!quiz_log_auditing');
   var classSet = require('canvas_quizzes/util/class_set');
   var K = require('../constants');
-  var ReactRouter = require('canvas_packages/react-router');
+  var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
   var Answer = require('jsx!./question_inspector/answer');
   var NoAnswer = require('jsx!./question_inspector/answers/no_answer');
 

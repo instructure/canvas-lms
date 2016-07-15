@@ -1,13 +1,13 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var classSet = require('canvas_quizzes/util/class_set');
   var K = require('../../constants');
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
   var I18n = require('i18n!quiz_log_auditing.event_stream');
   var Icon = require('jsx!canvas_quizzes/components/icon');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
-  var Router = require('canvas_packages/react-router');
+  var Router = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
   var Link = Router.Link;
 
 

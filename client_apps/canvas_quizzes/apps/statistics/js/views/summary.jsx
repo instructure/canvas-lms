@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var I18n = require('i18n!quiz_statistics.summary');
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
   var round = require('canvas_quizzes/util/round');

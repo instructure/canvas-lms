@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var React = require('react');
+  var React = require('old_version_of_react_used_by_canvas_quizzes_client_apps');
   var d3 = require('d3');
   var ChartMixin = require('../../mixins/chart');
   var round = require('canvas_quizzes/util/round');

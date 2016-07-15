@@ -10,7 +10,7 @@ requirejs.config({
     },
 
     '*': {
-      'old_unsupported_dont_use_react': 'canvas/old_unsupported_dont_use_react',
+      'react': '../../../vendor/js/alias_to_old_version_of_react',
       'str': 'canvas/str',
       'jsx/railsFlashNotificationsHelper': 'canvas/jsx/railsFlashNotificationsHelper'
     }

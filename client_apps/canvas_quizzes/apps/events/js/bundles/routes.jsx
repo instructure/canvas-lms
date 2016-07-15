@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 define(function(require) {
-  var ReactRouter = require('canvas_packages/react-router');
+  var ReactRouter = require('old_version_of_react-router_used_by_canvas_quizzes_client_apps');
   var AppRoute = require('jsx!../routes/app');
   var EventStreamRoute = require('jsx!../routes/event_stream');
   var QuestionRoute = require('jsx!../routes/question');
