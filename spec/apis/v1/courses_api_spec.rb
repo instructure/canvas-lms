@@ -1491,7 +1491,8 @@ describe CoursesController, type: :request do
         expect(enrollment_json).to_not include(*grading_period_keys)
       end
 
-      it "returns true for 'multiple_grading_periods_enabled' if the course has Multiple Grading Periods enabled" do
+      it "returns true for 'multiple_grading_periods_enabled' on the enrollment " \
+      "JSON if the course has Multiple Grading Periods enabled" do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
         expect(enrollment_json['multiple_grading_periods_enabled']).to eq(true)
@@ -1502,6 +1503,18 @@ describe CoursesController, type: :request do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
         expect(enrollment_json['multiple_grading_periods_enabled']).to eq(false)
+      end
+
+      it "returns a 'multiple_grading_periods_enabled' key at the course-level " \
+      "on the JSON response if 'current_grading_period_scores' are requested" do
+        course_json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores']).first
+        expect(course_json_response).to have_key 'multiple_grading_periods_enabled'
+      end
+
+      it "does not return a 'multiple_grading_periods_enabled' key at the course-level " \
+      "on the JSON response if 'current_grading_period_scores' are not requested" do
+        course_json_response = courses_api_index_call.first
+        expect(course_json_response).to_not have_key 'multiple_grading_periods_enabled'
       end
 
       context "computed scores" do

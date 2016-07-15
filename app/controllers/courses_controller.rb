@@ -351,9 +351,10 @@ class CoursesController < ApplicationController
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
-  #     more information on these fields). This argument is ignored if the course
-  #     is configured to hide final grades or if the total_scores argument is not
-  #     included.
+  #     more information on these fields). In addition, when this argument is
+  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     on it. This argument is ignored if the course is configured to hide final
+  #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
@@ -463,9 +464,10 @@ class CoursesController < ApplicationController
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
-  #     more information on these fields). This argument is ignored if the course
-  #     is configured to hide final grades or if the total_scores argument is not
-  #     included.
+  #     more information on these fields). In addition, when this argument is
+  #     passed, the course will have a 'multiple_grading_periods_enabled' attribute
+  #     on it. This argument is ignored if the course is configured to hide final
+  #     grades or if the total_scores argument is not included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
