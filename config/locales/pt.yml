@@ -3092,11 +3092,11 @@ pt:
       descriptions: 
         etherpad: |-
             O EtherPad é um projeto "open source" que permite configurar rapidamente documentos partilhados. É tão rápido que até consegue ver o que as outras pessoas estão a escrever à medida que escrevem. Por outro lado, os "blocos" não são protegidos por palavra-passe, o que significa que qualquer pessoa com uma ligação pode editá-los. O EtherPad é mais adequado do que o Google Docs se pretender a função de anonimato e/ou permitir a participação de pessoas sem contas Google.  
-            
+              
             **Aviso**: certifique-se de que está familiarizado com a [política de eliminação do EtherPad](%{etherpad_deletion_policy_url}) para assegurar a preservação do seu trabalho.
         google_docs: |-
             O Google Docs é um bom local para colaborar num projeto de grupo.  É semelhante ao Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo ficheiro, ao mesmo tempo, sem ser necessário enviar o ficheiro por e-mail.  
-            
+              
             **Aviso**: você (e todos os seus colaboradores) precisarão de uma conta no Google para poder participar em qualquer colaboração no Google Docs.
       labels: 
         collaboration_type: "Colaborar utilizando:"
