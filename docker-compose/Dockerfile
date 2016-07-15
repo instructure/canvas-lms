@@ -29,3 +29,4 @@ RUN mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 WORKDIR /usr/src/app
 
 ENV RAILS_ENV development
+ENV NGINX_MAX_UPLOAD_SIZE 10g
