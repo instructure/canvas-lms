@@ -170,6 +170,7 @@ module Importers
         if item.deleted?
           item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
+          item.quiz_groups.destroy_all
           item.quiz_questions.destroy_all
           item.save
         end

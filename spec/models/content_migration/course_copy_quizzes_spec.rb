@@ -850,9 +850,16 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     it "should not bring questions back when restoring a deleted quiz" do
       quiz_from = terrible_quiz(@copy_from)
 
+      group1 = quiz_from.quiz_groups.create!(:name => "group1", :pick_count => 1, :question_points => 1.0)
+      group1.quiz_questions.create!(:quiz => quiz_from, :question_data => {'question_text' => 'group question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      group2 = quiz_from.quiz_groups.create!(:name => "group2", :pick_count => 1, :question_points => 1.0)
+      group2.quiz_questions.create!(:quiz => quiz_from, :question_data => {'question_text' => 'group question 2', 'answers' => [{'id' => 1}, {'id' => 2}]})
+
       run_course_copy
 
       quiz_from.quiz_questions.detect { |qq| qq['question_data']['question_text'].include? 'html' }.destroy
+
+      group2.destroy
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz_from)).first
       quiz_to.destroy
@@ -862,7 +869,9 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       quiz_to.reload
       expect(quiz_to).to be_unpublished
       expect(quiz_to.quiz_questions.active.map { |qq| qq['question_data']['question_text'] })
-        .to match_array(["why is this question terrible", "so terrible"])
+        .to match_array(["why is this question terrible", "so terrible", "group question 1"])
+      expect(quiz_to.quiz_groups.count).to eq 1
+      expect(quiz_to.quiz_groups.first.name).to eq 'group1'
     end
 
     it "should correctly copy links to quizzes inside assessment questions" do
