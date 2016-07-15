@@ -231,6 +231,26 @@ describe AppointmentGroupsController, type: :request do
     expect(json['requiring_action']).to be_falsey
   end
 
+  it "should return the correct context for appointment slots with existing signups in a different course" do
+    course1 = course_with_teacher(:active_all => true).course
+    student1 = student_in_course(:course => course1, :active_all => true).user
+    course2 = course_with_teacher(:active_all => true, :user => @teacher).course
+    student2 = student_in_course(:course => course2, :active_all => true).user
+    ag = AppointmentGroup.create!(:title => 'bleh',
+                             :participants_per_appointment => 2,
+                             :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                   ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]],
+                             :contexts => [course1, course2])
+    ag.publish!
+    ag.appointments.first.reserve_for(student1, @teacher)
+    json = api_call_as_user(student2, :get, "/api/v1/appointment_groups/#{ag.id}?include[]=child_events", {
+      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.to_param, :include => ['child_events'] })
+    appointments = json['appointments']
+    expect(appointments.length).to eq 2
+    expect(appointments[0]['context_code']).to eq course2.asset_string
+    expect(appointments[1]['context_code']).to eq course2.asset_string
+  end
+
   it 'should require action until the min has been met' do
     student_in_course :course => course(:active_all => true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1, :contexts => [@course])
