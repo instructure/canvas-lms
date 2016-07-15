@@ -87,4 +87,11 @@ module SpeedGraderCommon
     # increasing the width of the right pane
     driver.execute_script("$('#right_side').width('500px')")
   end
+
+  def submit_comment(text)
+    f('#speedgrader_comment_textarea').send_keys(text)
+    scroll_into_view('#add_a_comment button[type="submit"]')
+    f('#add_a_comment button[type="submit"]').click
+    wait_for_ajaximations
+  end
 end

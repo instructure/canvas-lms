@@ -20,6 +20,7 @@ describe "speed grader" do
 
   shared_examples_for "moderated grading" do
     def add_rubric_assessment(score, comment)
+      scroll_into_view('.toggle_full_rubric')
       f('.toggle_full_rubric').click
       expect(f('#rubric_full')).to be_displayed
       expand_right_pane
@@ -28,6 +29,7 @@ describe "speed grader" do
       f('textarea.criterion_comments').send_keys(comment)
       f('#rubric_criterion_comments_dialog .save_button').click
       f('#rubric_full input.criterion_points').send_keys(score.to_s)
+      scroll_into_view('.save_rubric_button')
       f('#rubric_full .save_rubric_button').click
       wait_for_ajaximations
     end
@@ -50,9 +52,7 @@ describe "speed grader" do
 
       time2 = 10.minutes.from_now
       Timecop.freeze(time2) do
-        f('#speedgrader_comment_textarea').send_keys('srsly')
-        f('#add_a_comment button[type="submit"]').click
-        wait_for_ajaximations
+        submit_comment "srsly"
       end
       @submission.reload
       expect(@submission.updated_at.to_i).to eq time2.to_i
@@ -191,10 +191,7 @@ describe "speed grader" do
 
       replace_content f('#grading-box-extended'), "8", tab_out: true
 
-      wait_for_ajax_requests(500)
-      f('#speedgrader_comment_textarea').send_keys('srsly')
-      f('#add_a_comment button[type="submit"]').click
-      wait_for_ajaximations
+      submit_comment "srsly"
 
       @submission.reload
       expect(@submission.score).to be_nil
@@ -279,10 +276,7 @@ describe "speed grader" do
       expect(grade['value']).to eq "3"
       replace_content grade, "8", tab_out: true
 
-      wait_for_ajax_requests(500)
-      f('#speedgrader_comment_textarea').send_keys('srsly')
-      f('#add_a_comment button[type="submit"]').click
-      wait_for_ajaximations
+      submit_comment "srsly"
 
       @submission.reload
       expect(@submission.score).to be_nil

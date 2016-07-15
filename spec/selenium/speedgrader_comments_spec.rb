@@ -167,10 +167,7 @@ describe "speed grader" do
       @submission.reload
       expect(@submission.score).to eq 5
 
-      f('#speedgrader_comment_textarea').send_keys('srsly')
-      scroll_into_view('#add_a_comment button[type="submit"]')
-      f('#add_a_comment button[type="submit"]').click
-      wait_for_ajaximations
+      submit_comment 'srsly'
       expect(@submission.submission_comments.first.comment).to eq 'srsly'
     end
 
