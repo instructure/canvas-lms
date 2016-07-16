@@ -3118,7 +3118,7 @@ pl:
             **Ostrzeżenie**: pamiętaj, aby zapoznać się z [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) w celu zachowania dotychczasowych postępów w pracy.
         google_docs: |-
             Google Docs to doskonałe miejsce do współpracy nad projektem grupowym.  Działa na takiej zasadzie jak program Microsoft Word, ale umożliwia wspólną pracę nad tym samym plikiem w tym samym czasie bez konieczności przesyłania pliku pocztą elektroniczną.  
-            
+              
             **Ostrzeżenie**: Aby wspólnie pracować nad zadaniem za pośrednictwem programu Google Docs, każdy z uczestników musi posiadać konto Google.
       labels: 
         collaboration_type: "Współpracuj z użyciem:"
