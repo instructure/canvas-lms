@@ -3091,7 +3091,7 @@ zh-Hans:
       descriptions: 
         etherpad: |-
             EtherPad 是一个开放源码项目，可让您快速设置共享文档。其速度很快，足以让您看到他人键入的过程。另一方面，“填充位”无密码保护，因此与其链接的任何人都可以编辑它们。如果您希望支持匿名和/或允许没有 Google 帐户的人参与，EtherPad 比 Google Docs 更适合。 
-            
+              
             **警告**：请务必熟悉 [EtherPad 的删除政策](%{etherpad_deletion_policy_url})，以确保保留您的工作成果。
         google_docs: |-
             Google Docs 是协作处理组项目的极佳方式。它像 Microsoft Word，但可让您同时与他人合作处理同一文件，而无需发送电子邮件。  
