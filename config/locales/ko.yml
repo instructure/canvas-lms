@@ -2335,7 +2335,7 @@ ko:
             **주의**: 여러분의 작업을 확실하게 보존하려면 [EtherPad 삭제 정책](%{etherpad_deletion_policy_url})을 숙지해야 합니다.
         google_docs: |-
             Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.  
-              
+            
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
       labels: 
         collaboration_type: "협업에 사용:"
