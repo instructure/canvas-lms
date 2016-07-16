@@ -2113,7 +2113,19 @@ define([
 
       // create toggler instance on the first click
       if (!toggler) {
-        toggler = new EditorToggle($comment_html, {editorBoxLabel: $link.title });
+        var inputColumn = $comment.parents().find('.answer_type:visible')[0]
+
+        var rightMargin = parseInt($comment.css('marginRight')) || 0
+        var leftMargin = parseInt($comment.css('marginLeft')) || 0
+        var commentMargin = rightMargin + leftMargin
+
+        var rceWidth = inputColumn.offsetWidth - commentMargin
+
+        toggler = new EditorToggle($comment_html, {
+          editorBoxLabel: $link.title,
+          tinyOptions: {width: rceWidth}
+        });
+
         toggler.editButton = $link;
         toggler.on('display', function() {
 
@@ -3456,9 +3468,9 @@ define([
         return params;
       }
     }
-    $(document).on('click keypress', ".draggable-handle", function(event) {
+    $(document).on('click keydown', ".draggable-handle", function(event) {
+      if (event.type == "keydown" && event.keyCode != 13 && event.keyCode != 32) { return; }
       event.preventDefault();
-      if (event.type == "keypress" && event.keyCode != 13) { return; }
 
       accessibleSortables.init(
         $(event.target), $("#questions"), $("#move_quiz_item_form")
@@ -4061,9 +4073,9 @@ define([
 
                 $variable = $("<tr class='variable'>"
                               + "<th id='" + label_id + "' class='name'></th>"
-                              + "<td><input aria-labelledby='" + label_id + " equation_var_minimum' type='text' name='min' class='min variable_setting' style='width: 30px;' value='1'/></td>"
-                              + "<td><input aria-labelledby='" + label_id + " equation_var_maximum' type='text' name='max' class='max variable_setting' style='width: 30px;' value='10'/></td>"
-                              + "<td><select aria-labelledby='" + label_id + " equation_var_precision' name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></td>"
+                              + "<td><div><input aria-labelledby='" + label_id + " equation_var_minimum' type='text' name='min' class='min variable_setting' style='width: 70%;' value='1'/></div></td>"
+                              + "<td><div><input aria-labelledby='" + label_id + " equation_var_maximum' type='text' name='max' class='max variable_setting' style='width: 70%;' value='10'/></div></td>"
+                              + "<td><div style='width: 70%;'><select aria-labelledby='" + label_id + " equation_var_precision' name='round' class='round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></div></td>"
                               + "<td aria-labelledby='equation_var_example' class='value'></td></tr>");
 
                 $question.find(".variables tbody").append($variable);
@@ -4096,10 +4108,15 @@ define([
     event.preventDefault();
     var $this = $(this);
     var toggler = $this.data('editorToggle');
+    var inputColumn = $this.parents().find('.answer_type:visible')[0]
+    var rceWidth = inputColumn.offsetWidth
 
     // create toggler instance on the first click
     if (!toggler) {
-      toggler = new MultipleChoiceToggle($this, {editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area')});
+      toggler = new MultipleChoiceToggle($this, {
+        editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area'),
+        tinyOptions: {width: rceWidth}
+      });
       $this.data('editorToggle', toggler);
     }
 

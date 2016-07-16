@@ -196,5 +196,21 @@ describe 'editing a quiz' do
         delete_quiz
       end
     end
+
+    context 'when the quiz has a question with a custom name' do
+      before(:each) do
+        @custom_name = 'the hardest question ever'
+        qd = { question_type: "text_only_question", id: 1, question_name: @custom_name}.with_indifferent_access
+        @quiz.quiz_questions.create! question_data: qd
+        @quiz.save!
+        @quiz.reload
+      end
+
+      it 'displays the custom name correctly' do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        click_questions_tab
+        expect(f('.question_name')).to include_text @custom_name
+      end
+    end
   end
 end

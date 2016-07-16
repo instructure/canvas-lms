@@ -3,7 +3,8 @@ $menu-item-text-hover-focus-color: $ic-color-dark;
 $menu-item-text-disabled-color: $ic-color-dark;
 $menu-item-keyboard-shortcut-color: $ic-color-dark;
 
-.mce-tinymce{
+.mce-tinymce,
+.mce-tinyrce{
   .mce-container-body {
     overflow: auto;
   }
@@ -24,7 +25,8 @@ $menu-item-keyboard-shortcut-color: $ic-color-dark;
   @include canvas-button($button--primary-bgd, $button--primary-text);
 }
 
-.mce-menu-item {
+.mce-tinymce .mce-menu-item,
+.mce-tinyrce .mce-menu-item {
   .mce-disabled {
     .mce-text {
       color: $menu-item-text-disabled-color;
@@ -47,3 +49,16 @@ $menu-item-keyboard-shortcut-color: $ic-color-dark;
 .mce-statusbar .mce-container-body {
   overflow: hidden;
 }
+
+@if $use_high_contrast {
+  .mce-toolbar .mce-btn.mce-active {
+    box-shadow: inset 0 0 0 2px $ic-font-color-dark !important;
+  }
+}
+
+.mce-tinymce :focus,
+.mce-tinyrce :focus{
+  outline: 2px solid $ic-link-color;
+  outline-offset: -2px;
+}
+

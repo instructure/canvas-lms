@@ -404,3 +404,10 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 
 <%= glyphs %>
 
+// conversations_new uses bootstrap-select to show a dropdown picker of which
+// course to show messages for, bootstrap-select adds the markup <i class="icon-ok...>
+// to designate which item in the menu is selected. we want that to use our .icon-check
+// icon, but since we don't control the markup it adds, we can't tell it to use .icon-check
+// instead, we just have .icon-ok copy .icon-check's styles here
+.icon-ok {@extend .icon-check}
+

@@ -65,20 +65,23 @@
 
 {{#if can_move}}
   <div class="pull-right">
-    {{#if can_remove}}
-      <button class="delete_button ui-button ui-widget ui-state-default ui-corner-all"
-        {{#if assessedInContext}} disabled {{/if}}>
-        {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
-      </button>
-    {{/if}}
+    <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
+      <span aria-hidden="true">{{#t}}Move{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Move Outcome{{/t}}</span>
+    </button>
     {{#if can_edit}}
       <button class="edit_button ui-button ui-widget ui-state-default ui-corner-all"
         {{#if assessedInContext}} disabled {{/if}}>
-        {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
+        <span aria-hidden="true">{{#t "links.edit_outcome"}}Edit{{/t}}</span>
+        <span class="screenreader-only">{{#t}}Edit Outcome{{/t}}</span>
       </button>
     {{/if}}
-    <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
-      {{#t}}Move Outcome{{/t}}
-    </button>
+    {{#if can_remove}}
+      <button class="delete_button ui-button ui-widget ui-state-default ui-corner-all"
+        {{#if assessedInContext}} disabled {{/if}}>
+        <span aria-hidden="true">{{#t "links.delete_outcome"}}Delete{{/t}}</span>
+        <span class="screenreader-only">{{#t}}Delete Outcome{{/t}}</span>
+      </button>
+    {{/if}}
   </div>
 {{/if}}

@@ -15,6 +15,8 @@ define([
     }
   }
 
+  const isSystemTheme = (sharedBrandConfig) => !sharedBrandConfig.account_id
+
   return React.createClass({
     displayName: 'CollectionView',
 
@@ -45,6 +47,7 @@ define([
       if (parent) {
         return this.brandVariableValue(parent.brand_config, variableName)
       }
+      return _default
     },
 
     startFromBlankSlate() {
@@ -77,7 +80,7 @@ define([
 
     isDeletable (sharedBrandConfig) {
       // Globally-shared themes and the active theme are not deletable
-      return sharedBrandConfig.account_id === this.props.accountID &&
+      return !isSystemTheme(sharedBrandConfig) &&
              !this.isActiveBrandConfig(sharedBrandConfig.brand_config)
     },
 
@@ -98,22 +101,33 @@ define([
       const sorted = _.sortBy(thingsToShow, thing => !isActive(thing))
 
       // split the globally shared themes and the ones that people in this account have shared apart
-      return _.groupBy(sorted, sbc => sbc.account_id ? 'accountSpecificThemes' : 'globalThemes')
+      return _.groupBy(sorted, (sbc) => isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes')
     },
 
     renderCard (sharedConfig) {
       const onClick = () => {
-        const isReadOnly = !sharedConfig.account_id
+        const isReadOnly = isSystemTheme(sharedConfig)
         this.startEditing({
           md5ToActivate: sharedConfig.brand_config.md5,
           sharedBrandConfigToStartEditing: !isReadOnly && sharedConfig
         })
       }
+
+      const isActiveEditableTheme = (sbc) =>
+        !isSystemTheme(sbc) && this.props.activeBrandConfig.md5 === sbc.brand_config.md5
+
+      // even if this theme's md5 is active, don't mark it as active if it is a system theme
+      // and there is an account-shared theme that also matches the active md5
+      const isActiveBrandConfig = this.isActiveBrandConfig(sharedConfig.brand_config) && (
+        !isSystemTheme(sharedConfig) ||
+        !this.props.sharedBrandConfigs.some(isActiveEditableTheme)
+      )
+
       return (
         <ThemeCard
           key={sharedConfig.id + sharedConfig.brand_config.md5}
           name={sharedConfig.name}
-          isActiveBrandConfig={this.isActiveBrandConfig(sharedConfig.brand_config)}
+          isActiveBrandConfig={isActiveBrandConfig}
           getVariable   ={this.brandVariableValue.bind(this, sharedConfig.brand_config)}
           open          ={onClick}
           isDeletable   ={this.isDeletable(sharedConfig)}

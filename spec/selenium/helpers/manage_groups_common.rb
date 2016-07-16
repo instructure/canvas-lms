@@ -28,7 +28,7 @@ module ManageGroupsCommon
     else
       form.find_element(:css, "#category_no_groups").click
     end
-    submit_form(form)
+    submit_dialog_form(form)
     expect(f("#add_category_form")).not_to be_displayed
     category = course.group_categories.where(name: name).first
     expect(category).not_to be_nil

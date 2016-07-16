@@ -43,7 +43,7 @@
       <button type="button" class="done_editing_button btn btn-primary"><%= t('buttons.done_editing', "Done Editing") %></button>
     </div>
     <a href="<%= eportfolio_entries_path(@portfolio) %>" class="add_page_url" style="display: none;">&nbsp;</a>
-    <a href="<%= eportfolio_reorder_entries_url(@portfolio.id, @category.id) %>" class="reorder_pages_url">&nbsp;</a>
+    <a href="<%= eportfolio_reorder_entries_url(@portfolio.id, @category.id) %>" class="reorder_pages_url" style="display:none;">&nbsp;</a>
   </div>
 </div>
 <span id="page_name_holder" style="display: none;">

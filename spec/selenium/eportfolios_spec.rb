@@ -81,23 +81,10 @@ describe "eportfolios" do
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name1"
       f('#edit_eportfolio_form #eportfolio_public').click
-      submit_form('#edit_eportfolio_form')
+      submit_dialog_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
       expect(@eportfolio.name).to include("new ePortfolio name1")
-    end
-
-    it "should validate time stamp on ePortfolio", priority: "2" do
-      # Freezes time to 2 days from today.
-      new_time = 2.days.from_now.utc.beginning_of_hour
-      Timecop.freeze(new_time) do
-        current_time = format_time_for_view(new_time)
-        # Saves an entry to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-      end
     end
 
     it "should have a working flickr search dialog" do
@@ -130,6 +117,7 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
+      wait_for_ajaximations
       expect(f("#delete_eportfolio_form")).to be_displayed
       submit_form("#delete_eportfolio_form")
       f("#wrapper-container .eportfolios").click
@@ -189,7 +177,7 @@ describe "eportfolios file upload" do
     wait_for_ajaximations
     f(".upload_file_button").click
     submit_form(".form_content")
-    download = f("a.eportfolio_download")
+    download = fj("a.eportfolio_download:visible")
     expect(download).to be_displayed
     expect(download).to have_attribute("href", /files/)
     #cannot test downloading the file, will check in the future

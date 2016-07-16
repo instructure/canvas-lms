@@ -195,7 +195,17 @@ Ctrl-C your `docker-compose up` window and restart.
 
 A byebug server is running in development mode on the web and job containers
 to allow you to remotely control any sessions where `byebug` has yielded
-execution. You can attach to the byebug server once the container is started:
+execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
+`docker-compose.override.yml` file in your app's root directory. If you don't have
+this file, you will need to create it and add the following:
+
+```
+web: &WEB
+  environment:
+    REMOTE_DEBUGGING_ENABLED: 'true'
+```
+
+You can attach to the byebug server once the container is started:
 
 Debugging web:
 
@@ -229,6 +239,13 @@ Cassandra configuration is commented out in the docker-compose file; uncomment
 it and also uncomment the Cassandra configuration in cassandra.yml. Also follow
 the directions in cassandra.yml.example.
 
+## Email
+
+Email is often sent through background jobs if you spin up the `jobs` container.
+If you would like to test or preview any notifications, simply trigger the email
+through it's normal actions, and it should immediately show up in the emulated
+webmail inbox available here: http://mail.canvas.docker/
+
 ## Running tests
 
 ```
@@ -237,13 +254,24 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ### Selenium
 
-The container used to run the selenium browser is commented out of the
-docker-compose file by default. To run selenium, just uncomment those lines,
-rerun `docker-compose build`, and when you run your tests you can watch
-the browser:
+The container used to run the selenium browser is only started when spinning up
+all docker-compose containers, or when specified explicitly. The selenium
+container needs to be started before running any specs that require selenium.
 
+```sh
+docker-compose up selenium
 ```
-$ open vnc://secret:secret@selenium.docker/
+
+With the container running, you should be able to open a VNC session:
+
+```sh
+open vnc://secret:secret@selenium.docker/
+```
+
+Now just run your choice of selenium specs:
+
+```sh
+docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
 ## Troubleshooting
@@ -280,4 +308,14 @@ Or it can be disabled permanently by editing `/etc/selinux/config` thusly:
 
 ```
 SELINUX=disabled
+```
+
+If you are having performance or other issues with your web container
+starting up, you may try adding `DISABLE_SPRING: 1` to your
+`docker-compose.override.yml` file, like so:
+
+```
+web: &WEB
+  environment:
+    DISABLE_SPRING: 1
 ```

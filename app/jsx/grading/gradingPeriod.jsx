@@ -4,18 +4,25 @@ define([
   'jquery',
   'i18n!external_tools',
   'underscore',
-  'jquery.instructure_date_and_time'
-], function(tz, React, $, I18n, _) {
-
+  'jsx/grading/gradingPeriodTemplate',
+  'jsx/shared/helpers/dateHelper'
+], function(tz, React, $, I18n, _, GradingPeriodTemplate, DateHelper) {
   var types = React.PropTypes;
-  var GradingPeriod = React.createClass({
 
+  var GradingPeriod = React.createClass({
     propTypes: {
       title: types.string.isRequired,
       startDate: types.instanceOf(Date).isRequired,
       endDate: types.instanceOf(Date).isRequired,
-      permissions: types.object.isRequired,
-      id: types.string.isRequired
+      id: types.string.isRequired,
+      updateGradingPeriodCollection: types.func.isRequired,
+      onDeleteGradingPeriod: types.func.isRequired,
+      disabled: types.bool.isRequired,
+      readOnly: types.bool.isRequired,
+      permissions: types.shape({
+        update: types.bool.isRequired,
+        delete: types.bool.isRequired,
+      }).isRequired
     },
 
     getInitialState: function(){
@@ -23,10 +30,7 @@ define([
         title: this.props.title,
         startDate: this.props.startDate,
         endDate: this.props.endDate,
-        weight: this.props.weight,
-        permissions: this.props.permissions,
-        id: this.props.id,
-        shouldUpdateBeDisabled: true
+        weight: this.props.weight
       };
     },
 
@@ -36,132 +40,54 @@ define([
         startDate: nextProps.startDate,
         endDate: nextProps.endDate,
         weight: nextProps.weight,
-        permissions: nextProps.permissions
       });
     },
 
-    componentDidMount: function() {
-      if (this.isNewGradingPeriod()) {
-        this.refs.title.getDOMNode().focus();
-      }
-      var dateField = $(this.getDOMNode()).find('.date_field');
-      dateField.datetime_field();
-      dateField.on('change', this.handleDateChange)
-    },
-
-    handleTitleChange: function(event) {
+    onTitleChange: function(event) {
       this.setState({title: event.target.value}, function () {
-        this.props.updateGradingPeriodCollection(this)
-      });
-    },
-
-    handleDateChange: function(event) {
-      var dateNode = this.refs[event.target.name].getDOMNode();
-      var isValidDate = ! ( $(dateNode).data('invalid') ||
-                            $(dateNode).data('blank') );
-      var updatedDate = isValidDate ?
-        $(dateNode).data('unfudged-date') :
-        new Date('invalid date');
-
-      if (tz.isMidnight(updatedDate, { timezone: ENV.CONTEXT_TIMEZONE }) &&
-        dateNode.id.match(/period_end_date/)) {
-        updatedDate = tz.changeToTheSecondBeforeMidnight(updatedDate);
-      }
-
-      var updatedState = {};
-      updatedState[event.target.name] = updatedDate;
-      this.setState(updatedState, function() {
-        this.replaceInputWithDate(this.refs[event.target.name]);
         this.props.updateGradingPeriodCollection(this);
       });
     },
 
-    formatDateForDisplay: function(date) {
-      return $.datetimeString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
-    },
+    onDateChange: function(dateType, id) {
+      var $date = $("#" + id);
+      var isValidDate = ! ( $date.data('invalid') ||
+                            $date.data('blank') );
+      var updatedDate = isValidDate ?
+        $date.data('unfudged-date') :
+        new Date('invalid date');
 
-    replaceInputWithDate: function(dateRef) {
-      var date = this.state[dateRef.getDOMNode().name];
-      dateRef.getDOMNode().value = this.formatDateForDisplay(date);
-    },
-
-    isNewGradingPeriod: function() {
-      return this.state.id.indexOf('new') > -1;
-    },
-
-    triggerDeleteGradingPeriod: function() {
-      this.props.onDeleteGradingPeriod(this.state.id);
-    },
-
-    renderDeleteButton: function() {
-      if (this.props.cannotDelete()) {
-        return null;
-      } else {
-        var cssClasses = "Button Button--icon-action icon-x icon-delete-grading-period";
-        if (this.props.disabled) cssClasses += " disabled";
-        return (
-          <a role="button"
-             href="#"
-             className={cssClasses}
-             onClick={this.triggerDeleteGradingPeriod}>
-            <span className="screenreader-only">{I18n.t("Delete grading period")}</span>
-          </a>
-        );
+      if (dateType === "endDate" && DateHelper.isMidnight(updatedDate)) {
+        updatedDate = tz.changeToTheSecondBeforeMidnight(updatedDate);
       }
+
+      var updatedState = {};
+      updatedState[dateType] = updatedDate;
+      this.setState(updatedState, function() {
+        this.replaceInputWithDate(dateType, $date);
+        this.props.updateGradingPeriodCollection(this);
+      });
+    },
+
+    replaceInputWithDate: function(dateType, dateElement) {
+      var date = this.state[dateType];
+      dateElement.val(DateHelper.formatDatetimeForDisplay(date));
     },
 
     render: function () {
       return (
-        <div id={"grading-period-" + this.state.id} className="grading-period pad-box-mini border border-trbl border-round">
-          <div className="grid-row pad-box-micro">
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={"period_title_" + this.state.id}>
-                {I18n.t("Grading Period Name")}
-              </label>
-              <input id={"period_title_" + this.state.id}
-                     type="text"
-                     ref="title"
-                     onChange={this.handleTitleChange}
-                     value={this.state.title}
-                     disabled={this.props.disabled}/>
-
-            </div>
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={"period_start_date_" + this.state.id}>
-                {I18n.t("Start Date")}
-              </label>
-              <input id={"period_start_date_" + this.state.id}
-                     type="text"
-                     ref="startDate"
-                     name="startDate"
-                     className="input-grading-period-date date_field"
-                     defaultValue={this.formatDateForDisplay(this.state.startDate)}
-                     disabled={this.props.disabled}/>
-
-            </div>
-            <div className="col-xs-12 col-sm-6 col-lg-3">
-              <label htmlFor={"period_end_date_" + this.state.id}>
-               {I18n.t("End Date")}
-              </label>
-              <input id={"period_end_date_" + this.state.id} type="text"
-                     className="input-grading-period-date date_field"
-                     ref="endDate"
-                     name="endDate"
-                     defaultValue={this.formatDateForDisplay(this.state.endDate)}
-                     disabled={this.props.disabled}/>
-
-            </div>
-            <div className="col-xs-12 col-sm-6 col-lg-3 manage-buttons-container">
-              <div className="content-box">
-                <div className="buttons-grid-row grid-row">
-                  <div className="col-xs">
-                    {this.renderDeleteButton()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <GradingPeriodTemplate key={this.props.id}
+                               ref="template"
+                               id={this.props.id}
+                               title={this.props.title}
+                               startDate={this.props.startDate}
+                               endDate={this.props.endDate}
+                               permissions={this.props.permissions}
+                               disabled={this.props.disabled}
+                               readOnly={this.props.readOnly}
+                               onDeleteGradingPeriod={this.props.onDeleteGradingPeriod}
+                               onDateChange={this.onDateChange}
+                               onTitleChange={this.onTitleChange}/>
       );
     }
   });

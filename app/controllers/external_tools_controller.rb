@@ -469,8 +469,13 @@ class ExternalToolsController < ApplicationController
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
-    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret,
-                                                                disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only))
+    lti_launch.params = Lti::Security.signed_post_params(
+      params,
+      lti_launch.resource_url,
+      tool.consumer_key,
+      tool.shared_secret,
+      @context.root_account.feature_enabled?(:disable_lti_post_only)
+    )
     lti_launch.link_text = tool.label_for(placement.to_sym)
     lti_launch.analytics_id = tool.tool_id
 
@@ -485,18 +490,21 @@ class ExternalToolsController < ApplicationController
     accept_unsigned= true
     auto_create= false
     return_url_opts = {service: 'external_tool_dialog'}
+    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+    data_hash = {default_launch_url: launch_url}
     if opts[:content_item_id]
-      extra_params[:data] = Canvas::Security.create_jwt(
-        {
-          content_item_id: opts[:content_item_id],
-          oauth_consumer_key: tool.consumer_key
-        }
-      )
+        data_hash.merge!(
+          {
+            content_item_id: opts[:content_item_id],
+            oauth_consumer_key: tool.consumer_key
+          }
+        )
       return_url_opts[:id] = opts[:content_item_id]
       return_url = polymorphic_url([@context, :external_content_update], return_url_opts)
     else
       return_url = polymorphic_url([@context, :external_content_success], return_url_opts)
     end
+    extra_params[:data] = Canvas::Security.create_jwt(data_hash)
     # choose accepted return types based on placement
     # todo, make return types configurable at installation?
     case placement
@@ -516,6 +524,7 @@ class ExternalToolsController < ApplicationController
       accept_presentation_document_targets << 'window'
       accept_unsigned = false
       auto_create = true
+      collaboration = ExternalToolCollaboration.find(opts[:content_item_id]) if opts[:content_item_id]
     when 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])
       accept_media_types = '*/*'
@@ -543,12 +552,17 @@ class ExternalToolsController < ApplicationController
         accept_unsigned: accept_unsigned,
         auto_create: auto_create,
         context_title: @context.name,
-    }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
+    }).merge(extra_params).merge(variable_expander(tool:tool, collaboration: collaboration).expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
-    lti_launch.resource_url = opts[:launch_url]|| tool.extension_setting(placement, :url)
-    lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret,
-                                                                disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only))
+    lti_launch.resource_url = launch_url
+    lti_launch.params = Lti::Security.signed_post_params(
+      params,
+      lti_launch.resource_url,
+      tool.consumer_key,
+      tool.shared_secret,
+      @context.root_account.feature_enabled?(:disable_lti_post_only)
+    )
     lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
     lti_launch.analytics_id = tool.tool_id
 
@@ -720,8 +734,13 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :update)
+      external_tool_params = params[:external_tool] || params
       @tool = @context.context_external_tools.new
-      set_tool_attributes(@tool, params[:external_tool] || params)
+      if request.content_type == 'application/x-www-form-urlencoded'
+        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+      end
+      set_tool_attributes(@tool, external_tool_params)
       respond_to do |format|
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
@@ -750,8 +769,13 @@ class ExternalToolsController < ApplicationController
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
     if authorized_action(@tool, @current_user, :update)
+      external_tool_params = params[:external_tool] || params
+      if request.content_type == 'application/x-www-form-urlencoded'
+        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+      end
       respond_to do |format|
-        set_tool_attributes(@tool, params[:external_tool] || params)
+        set_tool_attributes(@tool, external_tool_params)
         if @tool.save
           invalidate_nav_tabs_cache(@tool)
           if api_request?

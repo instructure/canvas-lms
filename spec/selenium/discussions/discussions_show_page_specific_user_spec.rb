@@ -200,7 +200,10 @@ describe "discussions" do
         expect_new_page_load{f('#new-discussion-btn').click}
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
+        expect(f('#availability_options')).to be_displayed
         f('#use_for_grading').click
+        wait_for_ajaximations
+        expect(f('#availability_options')).to_not be_displayed
         f('#discussion_topic_assignment_points_possible').send_keys('10')
         wait_for_ajaximations
         click_option('#assignment_group_id', assignment_group.name)

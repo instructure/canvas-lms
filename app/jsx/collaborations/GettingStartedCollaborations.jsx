@@ -6,8 +6,10 @@ define([
   class GettingStartedCollaborations extends React.Component {
     renderContent() {
       let header, content, link;
-      const splitString = splitAssetString(ENV.context_asset_string)
-      const url = `/${splitString[0]}/${splitString[1]}/settings/configurations`;
+      let [context, contextId] = splitAssetString((ENV.PARENT_CONTEXT && ENV.PARENT_CONTEXT.context_asset_string) || ENV.context_asset_string)
+      const url = `/${context}/${contextId}/settings/configurations`;
+
+
       if (this.props.ltiCollaborators.ltiCollaboratorsData.length === 0) {
         if (ENV.current_user_roles.indexOf("teacher") !== -1) {
           header = I18n.t('No LTIs Configured')

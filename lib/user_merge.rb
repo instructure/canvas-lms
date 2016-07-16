@@ -132,7 +132,10 @@ class UserMerge
             # a) delete empty submissions where there is a non-empty submission in the from user
             # b) don't delete otherwise
             subscope = scope.having_submission.select(unique_id)
-            already_scope.where(unique_id => subscope).without_submission.delete_all
+            scope_to_delete = already_scope.where(unique_id => subscope).without_submission
+            ModeratedGrading::ProvisionalGrade.where(:submission_id => scope_to_delete).delete_all
+            SubmissionComment.where(:submission_id => scope_to_delete).delete_all
+            scope_to_delete.delete_all
           end
           # for the from user
           # a) we ignore the empty submissions in our update unless the target user has no submission

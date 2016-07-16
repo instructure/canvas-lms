@@ -1071,17 +1071,19 @@ class Assignment < ActiveRecord::Base
   end
 
   def group_students(student)
-    group = nil
-    students = [student]
-    if has_group_category? && group = group_category.group_for(student)
-      students = group.users
+    group = group_category.group_for(student) if has_group_category?
+    students = if group
+      group.users
         .joins(:enrollments)
         .where(:enrollments => { :course_id => self.context})
         .merge(Course.instance_exec(&Course.reflections[CANVAS_RAILS4_0 ? :student_enrollments : 'student_enrollments'].scope).only(:where))
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
         .to_a
+    else
+      [student]
     end
+
     [group, students]
   end
 
@@ -1115,83 +1117,67 @@ class Assignment < ActiveRecord::Base
     end
     raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
 
-    if opts.key? :excuse
-      opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse))
-    end
+    opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse)) if opts.key? :excuse
     raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && (opts[:grade] || opts[:score])
     raise GradeError.new("Provisional grades require a grader") if opts[:provisional] && opts[:grader].nil?
 
     opts.delete(:id)
-    dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
-    group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
     group, students = group_students(original_student)
-    grader = opts.delete :grader
-    grade, score = compute_grade_and_score(opts.delete(:grade), opts.delete(:score))
-    comment = {
-      :comment => (opts.delete :comment),
-      :attachments => (opts.delete :comment_attachments),
-      :author => grader,
-      :media_comment_id => (opts.delete :media_comment_id),
-      :media_comment_type => (opts.delete :media_comment_type),
-      :hidden => muted?,
-    }
-    comment[:provisional] = true if opts[:provisional]
-    comment[:final] = true if opts[:final]
-    comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
-
-
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    find_or_create_submissions(students) do |submission|
-      submission_updated = false
-      submission.skip_grade_calc = opts[:skip_grade_calc]
-      student = submission.user
-      if student == original_student || grade_group_students
-        previously_graded = submission.grade.present? || submission.excused?
-        next if previously_graded && dont_overwrite_grade
-        next if student != original_student && submission.excused?
-
-        did_grade = false
-        submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
-        submission.assignment = self
-        submission.user = student
-
-        unless opts[:provisional]
-          submission.grader = grader
-          submission.grade = grade
-          submission.score = score
-          submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
-          submission.excused = false if score.present?
-          did_grade = true if score.present? || submission.excused?
-        end
-
-        submission.grade_matches_current_submission = true if did_grade
-
-        if submission.changes.except(*%w{user_id assignment_id}).values.flatten.any?(&:present?)
-          # changing turnitin_data from nil to {} doesn't count
-          submission_updated = true
-        end
-
-        if (submission.score_changed? ||
-            submission.grade_matches_current_submission) &&
-            ((submission.score && submission.grade) || submission.excused?)
-          submission.workflow_state = "graded"
-        end
-        submission.group = group
-        submission.graded_at = Time.zone.now if did_grade
-        previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
-
-        if opts[:provisional]
-          submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true, final: opts[:final])
-        end
+    if grade_group_students
+      find_or_create_submissions(students) do |submission|
+        submissions << save_grade_to_submission(submission, original_student, group, opts)
       end
-      submission.add_comment(comment) if comment && (group_comment || student == original_student)
-      submissions << submission if group_comment || student == original_student || submission_updated
+    else
+      submission = find_or_create_submission(original_student)
+      submissions << save_grade_to_submission(submission, original_student, group, opts)
     end
 
-    submissions
+    submissions.compact
   end
+
+  def save_grade_to_submission(submission, original_student, group, opts)
+    submission.skip_grade_calc = opts[:skip_grade_calc]
+
+    previously_graded = submission.grade.present? || submission.excused?
+    return if previously_graded && opts[:dont_overwrite_grade]
+    return if submission.user != original_student && submission.excused?
+
+    grader = opts[:grader]
+    grade, score = compute_grade_and_score(opts[:grade], opts[:score])
+
+    did_grade = false
+    submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
+
+    unless opts[:provisional]
+      submission.grader = grader
+      submission.grade = grade
+      submission.score = score
+      submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
+      submission.excused = false if score.present?
+      did_grade = true if score.present? || submission.excused?
+    end
+
+    submission.grade_matches_current_submission = true if did_grade
+
+    if (submission.score_changed? ||
+        submission.grade_matches_current_submission) &&
+        ((submission.score && submission.grade) || submission.excused?)
+      submission.workflow_state = "graded"
+    end
+    submission.group = group
+    submission.graded_at = Time.zone.now if did_grade
+    previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+
+    if opts[:provisional]
+      submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true, final: opts[:final])
+    end
+
+    submission
+  end
+  private :save_grade_to_submission
 
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
@@ -1275,11 +1261,13 @@ class Assignment < ActiveRecord::Base
   # Update at this point is solely used for commenting on the submission
   def update_submission(original_student, opts={})
     raise "Student Required" unless original_student
-    submission = submissions.where(user_id: original_student).first
-    res = []
-    raise "No submission found for that student" unless submission
+
     group, students = group_students(original_student)
-    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.where(id: opts[:user_id]).first
+    opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by(id: opts[:user_id])
+    res = []
+
+    # Only teachers (those who can manage grades) can have hidden comments
+    opts[:hidden] = muted? && self.context.grants_right?(opts[:author], :manage_grades) unless opts.key?(:hidden)
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
@@ -1288,26 +1276,24 @@ class Assignment < ActiveRecord::Base
 
     if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
       uuid = CanvasSlug.generate_securish_uuid
-      res = find_or_create_submissions(students) do |s|
-        s.group = group
-        s.save! if s.changed?
-        opts[:group_comment_id] = uuid if group
-        s.add_comment(opts)
-        # SubmissionComment updates the submission directly in the db
-        # in an after_save, and Rails doesn't preload the reverse association
-        # on new objects so it can't set it on this object
-        s.reload
+      res = find_or_create_submissions(students) do |submission|
+        save_comment_to_submission(submission, group, opts, uuid)
       end
     else
-      s = find_or_create_submission(original_student)
-      s.group = group
-      s.save! if s.changed?
-      s.add_comment(opts)
-      s.reload
-      res = [s]
+      submission = find_or_create_submission(original_student)
+      res << save_comment_to_submission(submission, group, opts)
     end
     res
   end
+
+  def save_comment_to_submission(submission, group, opts, uuid = nil)
+    submission.group = group
+    submission.save! if submission.changed?
+    opts[:group_comment_id] = uuid if group && uuid
+    submission.add_comment(opts)
+    submission.reload
+  end
+  private :save_comment_to_submission
 
   SUBMIT_HOMEWORK_ATTRS = %w[body url submission_type
                              media_comment_id media_comment_type]
@@ -1476,6 +1462,7 @@ class Assignment < ActiveRecord::Base
                                  else
                                    []
                                  end
+      # this only includes users with a submission who are unexcused
       users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
       reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)

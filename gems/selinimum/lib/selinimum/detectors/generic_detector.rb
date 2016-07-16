@@ -4,6 +4,9 @@ module Selinimum
       def dependents_for(*)
         []
       end
+
+      def commit_files=(*)
+      end
     end
   end
 end

@@ -119,6 +119,12 @@ module Importers
     def self.prep_for_import(hash, migration, item_type)
       return hash if hash[:prepped_for_import]
 
+      if hash[:question_text] && hash[:question_text].length > 16.kilobytes
+        hash[:question_text] = t("The imported question text for this question was too long.")
+        migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
+          :question_name => hash[:question_name]))
+      end
+
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         if hash[field].present?
           hash[field] = migration.convert_html(

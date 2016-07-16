@@ -1,0 +1,48 @@
+# these are things that selinimum can safely ignore when deciding whether
+# the current commit needs to run all specs or just a subset
+
+*.txt
+*.md
+*.png
+*.jpg
+*.gif
+*.ico
+*.svg
+*.html
+*.yml
+*.example
+*.ttf
+*.woff
+*.eot
+*.sh
+
+/.fontcustom-manifest.json
+/.selinimumignore
+/app/stylesheets/brandable_variables.json
+/app/stylesheets/components/_canvas-icons.scss
+/bin
+/config/environments/*
+!/config/environments/test.rb
+/doc
+/docker-compose*
+/gems/*/spec
+/gems/rubocop-canvas
+/gems/selinimum
+/gems/tatl_tael
+/guard
+/Guardfile
+/lib/data_fixup
+/public/fonts
+/public/javascripts/translations/_core_en.js
+/script
+
+# ignore all specs and spec-related things, except selenium specs and things
+# that can affect them
+/spec/*
+!/spec/factories
+!/spec/helpers
+!/spec/selenium
+!/spec/support
+!/spec/*.rb
+# ** so we unignore previously ignored .txt, etc.
+!/spec/fixtures/**

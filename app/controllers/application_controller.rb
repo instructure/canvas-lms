@@ -117,6 +117,7 @@ class ApplicationController < ActionController::Base
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         use_new_styles: use_new_styles?,
         k12: k12?,
+        help_link_name: help_link_name,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
@@ -214,20 +215,30 @@ class ApplicationController < ActionController::Base
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
-  helper_method 'k12?'
+  helper_method :k12?
 
   def use_new_styles?
     @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
   end
-  helper_method 'use_new_styles?'
+  helper_method :use_new_styles?
 
   def multiple_grading_periods?
-    is_account_and_mgp_is_allowed = !!(@context &&
-                                       @context.is_a?(Account) &&
-                                       @context.feature_allowed?(:multiple_grading_periods))
-    (@context && @context.feature_enabled?(:multiple_grading_periods)) || is_account_and_mgp_is_allowed
+    account_and_grading_periods_allowed? ||
+      context_grading_periods_enabled?
   end
-  helper_method 'multiple_grading_periods?'
+  helper_method :multiple_grading_periods?
+
+  def account_and_grading_periods_allowed?
+    @context.is_a?(Account) &&
+      @context.feature_allowed?(:multiple_grading_periods)
+  end
+  private :account_and_grading_periods_allowed?
+
+  def context_grading_periods_enabled?
+    @context.present? &&
+      @context.feature_enabled?(:multiple_grading_periods)
+  end
+  private :context_grading_periods_enabled?
 
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
@@ -920,8 +931,6 @@ class ApplicationController < ActionController::Base
   def discard_flash_if_xhr
     if request.xhr? || request.format.to_s == 'text/plain'
       flash.discard
-    else
-      flash.keep
     end
   end
 
@@ -1337,6 +1346,8 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
+    elsif tag.content_type == 'AssessmentQuestionBank'
+      redirect_to named_context_url(context, :context_question_bank_url, tag.content_id, url_params)
     elsif tag.content_type == 'Lti::MessageHandler'
       url_params[:module_item_id] = params[:module_item_id] if params[:module_item_id]
       url_params[:resource_link_fragment] = "ContentTag:#{tag.id}"
@@ -1730,7 +1741,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+    stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -1757,6 +1768,13 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
+    super
+  end
+
+  # flash is normally only preserved for one redirect; make sure we carry
+  # it along in case there are more
+  def redirect_to(*)
+    flash.keep
     super
   end
 
@@ -1958,7 +1976,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
@@ -2088,6 +2106,7 @@ class ApplicationController < ActionController::Base
       ctx[:session_id] = tctx[:session_id]
     end
 
+    StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
   end
 

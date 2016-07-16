@@ -182,7 +182,10 @@
           class="add_rubric_link Button icon-plus"
           style="<%= hidden if @assignment.rubric_association %>"
           role="button"
-        ><%= t 'links.add_rubric', "Rubric" %></a>
+        >
+          <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
+          <span class="screenreader-only"><%= t('Add Rubric') %></span>
+        </a>
       </div>
     <% end %>
 

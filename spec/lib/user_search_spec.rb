@@ -261,5 +261,14 @@ describe UserSearch do
       bad_scope = lambda { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
       expect(bad_scope).to raise_error(ArgumentError, 'Invalid Enrollment Type')
     end
+
+    it "doesn't explode with group context" do
+      course_with_student
+      group = @course.groups.create!
+      group.add_user(@student)
+      account_admin_user
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student']).to_a).to eq [@student]
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['teacher']).to_a).to be_empty
+    end
   end
 end

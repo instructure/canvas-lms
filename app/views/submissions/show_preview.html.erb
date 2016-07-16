@@ -83,7 +83,7 @@
   </div>
 <% elsif @submission.submission_type == "online_upload" %>
 
-  <% if @submission.attachments.empty? %>
+  <% if @submission.versioned_attachments.empty? %>
     <div class="file-upload-submission">
       <span>
         <%= t('no_files', 'No files were uploaded for this submission') %>
@@ -91,7 +91,7 @@
     </div>
   <% else %>
 
-    <% @submission.attachments.each do |attachment| %>
+    <% @submission.versioned_attachments.each do |attachment| %>
       <div class="file-upload-submission">
 
         <div class="file-upload-submission-info">
@@ -148,6 +148,8 @@
   <div class="media_comment_id" style="display: none;"><%= @submission.media_comment_id %></div>
 
   <% js_bundle 'legacy/submissions_show_preview_media' %>
+<% elsif @submission.submission_type == 'basic_lti_launch' %>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless', url: @submission.external_tool_url) %>"/>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

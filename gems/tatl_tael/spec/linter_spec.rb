@@ -79,6 +79,13 @@ describe TatlTael::Linter do
                          [{ path: APP_COFFEE_BUNDLE_PATH, deleted?: false }],
                          :ensure_coffee_specs
       end
+
+      context "with jsx spec changes" do
+        include_examples "change combos",
+                         APP_COFFEE_PATH,
+                         JSX_SPEC_PATH,
+                         :ensure_coffee_specs
+      end
     end
   end
 

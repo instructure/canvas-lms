@@ -58,6 +58,7 @@ class CollaborationsController < ApplicationController
   before_filter { |c| c.active_tab = "collaborations" }
 
   include Api::V1::Collaborator
+  include Api::V1::Collaboration
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -78,6 +79,39 @@ class CollaborationsController < ApplicationController
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types
+  end
+
+  # @API List collaborations
+  # List collaborations the current user has access to in the context of the course
+  # provided in the url
+  #
+  #   curl https://<canvas>/api/v1/courses/1/collaborations/
+  #
+  # @returns [Collaboration]
+  def api_index
+    return unless authorized_action(@context, @current_user, :read) &&
+      (tab_enabled?(@context.class::TAB_COLLABORATIONS) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW))
+
+    url = @context.instance_of?(Course) ? api_v1_course_collaborations_index_url : api_v1_group_collaborations_index_url
+
+    collaborations_query = @context.collaborations.active.
+                             eager_load(:user).
+                             where(type: 'ExternalToolCollaboration')
+
+    unless @context.grants_right?(@current_user, session, :manage_content)
+      collaborations_query = collaborations_query.
+                                eager_load(:collaborators).
+                                where(Collaboration.arel_table[:user_id].eq(@current_user.id).
+                                or(Collaborator.arel_table[:user_id].eq(@current_user.id)))
+    end
+
+    collaborations = Api.paginate(
+      collaborations_query,
+      self,
+      url
+    )
+
+    render :json => collaborations.map { |c| collaboration_json(c, @current_user, session) }
   end
 
   def show
@@ -116,6 +150,15 @@ class CollaborationsController < ApplicationController
     @body_classes << 'full-width padless-content'
     js_bundle :react_collaborations
     css_bundle :react_collaborations
+
+    add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))
+
+    if @context.instance_of? Group
+      parent_context = @context.context
+      js_env :PARENT_CONTEXT => {
+        :context_asset_string => parent_context.try(:asset_string)
+      }
+    end
 
     render :text => "".html_safe, :layout => true
   end
@@ -210,6 +253,12 @@ class CollaborationsController < ApplicationController
   #
   # List the collaborators of a given collaboration
   #
+  # @argument include[] [String, "collaborator_lti_id"|"avatar_image_url"]
+  #   - "collaborator_lti_id": Optional information to include with each member.
+  #     Represents an identifier to be used for the member in an LTI context.
+  #   - "avatar_image_url": Optional information to include with each member.
+  #     The url for the avatar of a collaborator with type 'user'.
+  #
   # @example_request
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
@@ -217,12 +266,13 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
+    options = {:include => params[:include]}
     collaborators = @collaboration.collaborators.preload(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)
 
-    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session) }
+    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
   end
 
   private

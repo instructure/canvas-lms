@@ -101,7 +101,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[type] = {}.with_indifferent_access
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url, :canvas_icon_class,
-                      :selection_height, :selection_width, :text, :url, :message_type]
+                      :selection_height, :selection_width, :text, :url, :message_type, :icon_svg_path_64]
     if custom_keys = CUSTOM_EXTENSION_KEYS[type]
       extension_keys += custom_keys
     end
@@ -295,6 +295,7 @@ class ContextExternalTool < ActiveRecord::Base
   def icon_url
     settings[:icon_url]
   end
+
   def canvas_icon_class=(i_url)
     settings[:canvas_icon_class] = i_url
   end

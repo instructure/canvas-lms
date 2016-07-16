@@ -242,18 +242,8 @@ describe BasicLTI::BasicOutcomes do
       expect(request.code_major).to eq 'failure'
     end
 
-    it "doesn't change the submission type if there is already a submission" do
-      assignment.submissions.create!(submission_type: 'online_upload', user: @user)
-      xml.css('resultData').remove
-      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-
-      expect(request.code_major).to eq 'success'
-      expect(request.handle_request(tool)).to be_truthy
-      submission = assignment.submissions.where(user_id: @user.id).first
-      expect(submission.submission_type).to eq 'online_upload'
-    end
-
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
+      xml.css('resultScore').remove
       xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 

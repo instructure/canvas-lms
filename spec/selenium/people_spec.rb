@@ -29,7 +29,7 @@ describe "people" do
     open_student_group_dialog
     inputs = ffj('input:visible')
     replace_content(inputs[0], group_text)
-    submit_form('#add_category_form')
+    submit_dialog_form('#add_category_form')
     wait_for_ajaximations
     expect(f('#category_list')).to include_text(group_text)
   end
@@ -187,15 +187,17 @@ describe "people" do
       check_element_has_focus(fj('.group-categories-actions .btn-primary'))
     end
 
-    it "should make sure focus is set to the 'Done' button when adding users" do
+    it "should make sure focus is set to the X button each time the page changes" do
       f('#addUsers').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#user_list_textarea').send_keys('student2@test.com')
       f('#next-step').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#createUsersAddButton').click
       wait_for_ajaximations
-      check_element_has_focus(f('.dialog_closer'))
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
     end
 
     it "should validate the main page" do
@@ -242,7 +244,7 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
       expect(f('.group_count')).to include_text("#{group_count} Groups")
@@ -260,7 +262,7 @@ describe "people" do
       dialog.find_element(:css, '#category_split_groups').click
       replace_content(f('#category_split_group_count'), group_count)
       expect(@course.groups.count).to eq 0
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
       expect(ffj('.left_side .group_name:visible').count).to eq group_count.to_i
@@ -301,7 +303,7 @@ describe "people" do
         fln('View User Groups').click
       end
       open_student_group_dialog
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       group_count.times do
         f('.add_group_link').click

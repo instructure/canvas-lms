@@ -1,56 +1,41 @@
-<% grading_standard ||= nil %>
-<% grading_standard_title = grading_standard.try(:title) %>
-<% grading_standard_list ||= false %>
-<% read_only ||= false %>
-<% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
+<% grading_standard ||= GradingStandard.default_instance %>
+
 <div class="grading_standard" id="grading_standard_<%= grading_standard && grading_standard.id ? grading_standard.id : 'blank' %>">
   <div class="display_grading_standard">
     <div class="standard_title text-center">
       <% if !read_only %>
       <div style="float: right;" class="displaying links">
-        <% if !grading_standard_list %>
-          <a href="#"
-             class="find_grading_standard_link no-hover"
-             aria-label="<%= t('Find an Existing Grading Scheme') %>"
-             title="<%= t('Find an Existing Grading Scheme') %>">
-            <%= image_tag "find.png", :alt => t('find', "Find") %> <%= t('select_another_scheme','Select Another Scheme') %>
-          </a>
-        <% end %>
-          <a href="#"
-             title="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
-             aria-label="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
-             class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && grading_standard.assessed_assignment? %>">
-            <i class="icon-edit standalone-icon"></i>
-          </a>
-        <% if grading_standard_list %>
-          <a href="#"
-             title="<%= t('delete_scheme', 'Delete Grading Scheme') %>"
-             aria-label="<%= t('delete_scheme', 'Delete Grading Scheme') %>"
-             class="delete_grading_standard_link no-hover">
-            <i class="icon-trash standalone-icon"></i>
-          </a>
-        <% else %>
-          <a href="#"
-             title="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
-             aria-label="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
-             class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>">
-           <i class="icon-end standalone-icon"></i>
-          </a>
-        <% end %>
+        <a href="#"
+           class="find_grading_standard_link no-hover"
+           aria-label="<%= t('Find an Existing Grading Scheme') %>"
+           title="<%= t('Find an Existing Grading Scheme') %>">
+          <%= image_tag "find.png", :alt => t('find', "Find") %> <%= t('select_another_scheme','Select Another Scheme') %>
+        </a>
+        <a href="#"
+           title="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
+           aria-label="<%= t('edit_scheme', 'Edit Grading Scheme') %>"
+           class="edit_grading_standard_link no-hover <%= 'read_only' if grading_standard && grading_standard.assessed_assignment? %>">
+          <i class="icon-edit standalone-icon"></i>
+        </a>
+        <a href="#"
+           title="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
+           aria-label="<%= t('remove_scheme', 'Remove Grading Scheme') %>"
+           class="remove_grading_standard_link no-hover <%= 'read_only' unless grading_standard %>">
+         <i class="icon-end standalone-icon"></i>
+        </a>
       </div>
       <% end %>
-      <strong class="displaying title"><%= grading_standard_title %></strong>
+      <strong class="displaying title"><%= grading_standard.title %></strong>
       <div class="editing_box">
         <label for="grading_standard_title"><%= before_label('scheme_name', 'Scheme Name') %></label>
         <input type="text"
                id="grading_standard_title"
                name="grading_standard[title]"
                class="scheme_name"
-               value="<%= grading_standard_title %>"
+               value="<%= grading_standard.title %>"
                style="width: 200px;"/>
       </div>
     </div>
-
     <table style="width: 100%; margin-bottom: 20px;" class="grading_standard_data">
       <caption class="screenreader-only">
         <%= t("Current grading scheme for this assignment") %>
@@ -69,7 +54,7 @@
           <a href="#" class="insert_grading_standard_link"><%= t('insert_here', 'insert here') %></a>
         </td>
       </tr>
-      <% data.to_a.each_index do |idx|; row = data[idx] %>
+      <% grading_standard.data.each_with_index do |row, idx| %>
         <tr class="grading_standard_row">
           <td style="width: 25%;">
             <div class="editing_box">
@@ -81,10 +66,10 @@
           </td>
           <td style="padding: 2px 5px; width: 25%;" class="max_score_cell" aria-label="<%= t('range_upper', 'Upper limit of range') %>">
             <div class="editing_box" aria-hidden="true">
-              <span class="edit_max_score"><%= idx == 0 ? 100 : "< #{(data[idx - 1][1] * 100).round(2)}" %></span>%
+              <span class="edit_max_score"><%= idx == 0 ? 100 : "< #{(grading_standard.data[idx - 1][1] * 100).round(2)}" %></span>%
             </div>
             <div class="displaying">
-              <span class="max_score"><%= idx == 0 ? 100 : "< #{(data[idx - 1][1] * 100).round(2)}" %></span>%
+              <span class="max_score"><%= idx == 0 ? 100 : "< #{(grading_standard.data[idx - 1][1] * 100).round(2)}" %></span>%
             </div>
           </td>
           <td style="padding: 2px 5px; width: 25%;">
@@ -145,14 +130,12 @@
         </td>
       </tr>
     </table>
-    <% unless grading_standard_list %>
-      <div class="displaying" style="text-align: right;">
-        <% if !read_only %>
-          <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
-        <% end %>
-        <button type="button" class="done_button btn"><%= t('buttons.done', 'Done') %></button>
-      </div>
-    <% end %>
+    <div class="displaying" style="text-align: right;">
+      <% if !read_only %>
+        <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
+      <% end %>
+      <button type="button" class="done_button btn"><%= t('buttons.done', 'Done') %></button>
+    </div>
     <div class="editing_box form-actions">
       <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', 'Cancel') %></button>
       <button type="button" class="btn btn-primary save_button"><%= t('buttons.save', 'Save') %></button>
@@ -210,7 +193,5 @@
     <div style="margin-top: 5px; text-align: right"><a href="#" class="cancel_find_grading_standard_link"><%= t('#buttons.cancel', 'Cancel') %></a></div>
   </div>
   <a href="<%= context_url(((grading_standard.context || @context) rescue @context), :context_grading_standard_url, grading_standard ? grading_standard.id : "{{ id }}") rescue "#" %>" style="display: none;" class="update_grading_standard_url">&nbsp;</a>
-  <% unless grading_standard_list %>
-    <textarea id="default_grading_standard_data" style="display: none;"><%= GradingStandard.default_grading_standard.to_json %></textarea>
-  <% end %>
+  <textarea id="default_grading_standard_data" style="display: none;"><%= GradingStandard.default_grading_standard.to_json %></textarea>
 </div>

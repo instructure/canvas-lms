@@ -1,7 +1,10 @@
 <p><%= t(%{This report shows all the courses for a given term. The resulting csv
   file will have one row per course and will show the course id, course sis id,
   course short name, course name, account id, account sis id, account name,
-  storage used in MB.}) %></p>
+  storage used in MB, and sum of all files in MB. The storage used reflects all
+  files that go against the courses quota. The sum of all files in the course is
+  the sum of all files that are in the course regardless of impact to the
+  courses quota.}) %></p>
 
 <h3><%= t(%{Example}) %></h3>
 
@@ -16,6 +19,7 @@
     <th><%= t(%{account sis id}) %></th>
     <th><%= t(%{account name}) %></th>
     <th><%= t(%{storage used in MB}) %></th>
+    <th><%= t(%{sum of all files in MB}) %></th>
   </tr>
   </thead>
   <tbody>
@@ -28,6 +32,7 @@
     <td>MATH</td>
     <td>Math Department</td>
     <td>18.82</td>
+    <td>53.15</td>
   </tr>
   </tbody>
 </table>

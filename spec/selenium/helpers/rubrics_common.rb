@@ -89,7 +89,7 @@ module RubricsCommon
     edit_rubric_after_updating
 
     split_ratings(1)
-
+    wait_for_ajaximations
     expect(ffj(".rubric .criterion:visible .rating .points").count).to eq 3
     expect(ffj(".rubric .criterion:visible .rating .points")[1].text).to eq '0'
   end

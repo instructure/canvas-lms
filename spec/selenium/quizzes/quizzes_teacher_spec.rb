@@ -196,13 +196,13 @@ describe "quizzes" do
 
         # validates data
         f('#extension_extra_attempts').send_keys('asdf')
-        submit_form('#moderate_student_form')
+        submit_dialog_form('#moderate_student_form')
         expect(f('.attempts_left').text).to eq '1'
 
         # valid values
         f('#extension_extra_attempts').clear()
         f('#extension_extra_attempts').send_keys('2')
-        submit_form('#moderate_student_form')
+        submit_dialog_form('#moderate_student_form')
         wait_for_ajax_requests
         expect(f('.attempts_left').text).to eq '3'
       end
@@ -213,7 +213,7 @@ describe "quizzes" do
 
         # initial data entry
         f('#extension_extra_time').send_keys('13')
-        submit_form('#moderate_student_form')
+        submit_dialog_form('#moderate_student_form')
         wait_for_ajax_requests
 
         # preserve values between moderation invocations

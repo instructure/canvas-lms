@@ -766,9 +766,10 @@ describe Submission do
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
     context 'submission_type of "basic_lti_launch"' do
       it 'returns a url containing the submitted url' do
-        expect(lti_submission.external_tool_url).to include(lti_submission.url)
+        expect(lti_submission.external_tool_url).to eq(lti_submission.url)
       end
     end
+
     context 'submission_type of anything other than "basic_lti_launch"' do
       it 'returns nothing' do
         expect(submission.external_tool_url).to be_nil
@@ -874,7 +875,7 @@ describe Submission do
     it "should be unread after submission is commented on by teacher" do
       @student = @user
       course_with_teacher(:course => @context, :active_all => true)
-      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 
@@ -1158,6 +1159,28 @@ describe Submission do
       sub = @assignment.submit_homework(@student, attachments: [att])
       sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
       expect(sub.reload.versioned_attachments).to be_empty
+    end
+  end
+
+  describe "includes_attachment?" do
+    it "includes current attachments" do
+      spoiler = attachment_model(context: @student)
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(spoiler)).to eq false
+      expect(sub.includes_attachment?(@attachment)).to eq true
+    end
+
+    it "includes attachments to previous versions" do
+      old_attachment_1 = attachment_model(context: @student)
+      old_attachment_2 = attachment_model(context: @student)
+      sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
+      attachment_model context: @student
+      sub = @assignment.submit_homework @student, attachments: [@attachment]
+      expect(sub.attachments).to eq([@attachment])
+      expect(sub.includes_attachment?(old_attachment_1)).to eq true
+      expect(sub.includes_attachment?(old_attachment_2)).to eq true
     end
   end
 

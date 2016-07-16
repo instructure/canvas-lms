@@ -21,7 +21,7 @@ describe 'unpublishing a quiz on the quiz show page' do
       unpublish_quiz_via_ui
 
       # changes the button's text to |Unpublished|
-      driver.mouse.move_to f('#footer')
+      driver.mouse.move_to f('#preview_quiz_button')
       expect(f('#quiz-publish-link')).to include_text 'Unpublished'
 
       # changes the button text on hover to |Publish|

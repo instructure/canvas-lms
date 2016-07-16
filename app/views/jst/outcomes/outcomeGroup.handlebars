@@ -8,12 +8,15 @@
 
 {{#unless readOnly}}
 <a href="#" style="float:left" class="move_button move_group_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t}}Move Outcome Group{{/t}}
+  <span aria-hidden="true">{{#t}}Move{{/t}}</span>
+  <span class="screenreader-only">{{#t}}Move Outcome Group{{/t}}</span>
 </a>
 <a href="#" style="float:left" class="edit_button edit_group_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t "links.edit_outcome_group"}}Edit Outcome Group{{/t}}
+  <span aria-hidden="true">{{#t "links.edit_outcome_group"}}Edit{{/t}}</span>
+  <span class="screenreader-only">{{#t}}Edit Outcome Group{{/t}}</span>
 </a>
 <a href="#" style="float:left" class="delete_button delete_group_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-  {{#t "links.delete_outcome_group"}}Delete Outcome Group{{/t}}
+  <span aria-hidden="true">{{#t "links.delete_outcome_group"}}Delete{{/t}}</span>
+  <span class="screenreader-only">{{#t}}Delete Outcome Group{{/t}}</span>
 </a>
 {{/unless}}

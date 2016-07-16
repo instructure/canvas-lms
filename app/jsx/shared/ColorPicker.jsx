@@ -3,8 +3,11 @@ define([
   'react',
   'react-modal',
   'i18n!calendar_color_picker',
-  'jsx/shared/CourseNicknameEdit'
+  'jsx/shared/CourseNicknameEdit',
+  'compiled/jquery.rails_flash_notifications'
 ], function($, React, ReactModal, I18n, CourseNicknameEdit) {
+
+  const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
@@ -122,9 +125,6 @@ define([
 
     setInputColor (event) {
       var value = event.target.value;
-      if (value.indexOf('#') < 0) {
-        value = '#' + value;
-      }
       event.preventDefault();
       this.setCurrentColor(value);
     },
@@ -150,6 +150,11 @@ define([
       }
     },
 
+    isValidHex (color) {
+      var re = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      return (re.test(color));
+    },
+
     setCourseNickname() {
       if (this.refs.courseNicknameEdit) {
         return this.refs.courseNicknameEdit.setCourseNickname();
@@ -157,18 +162,45 @@ define([
     },
 
     onApply (color, event) {
-      this.setState({ saveInProgress: true });
-      // both API calls update the same User model and thus need to be performed serially
-      $.when(this.setColorForCalendar(color)).then(() => {
-        $.when(this.setCourseNickname()).then(() => {
+      if (this.isValidHex(color)) {
+        this.setState({ saveInProgress: true });
+        
+        const doneSaving = () => {
           if (this.isMounted()) {
             this.setState({
               saveInProgress: false
             });
           }
+        };
+        
+        const handleSuccess = () => {
+          doneSaving();
           this.closeModal();
-        });
-      });
+        };
+        
+        const handleFailure = () => {
+          doneSaving();
+          $.flashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: this.state.currentColor}));
+        };
+        
+        // both API calls update the same User model and thus need to be performed serially
+        $.when(this.setColorForCalendar(color)).then( () => {
+          $.when(this.setCourseNickname()).then(
+            handleSuccess,
+            handleFailure
+          );
+        },
+          handleFailure
+        );
+      } else {
+        $.flashWarning(I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.state.currentColor}));
+      }
+    },
+
+    onCancel() {
+      //reset to the cards current actual displaying color 
+      this.setCurrentColor(this.props.currentColor);
+      this.closeModal();
     },
 
     // ===============
@@ -229,12 +261,44 @@ define([
       }
     },
 
-    pickerBody () {
+    colorPreview () {
+      var previewColor = this.isValidHex(this.state.currentColor) ? this.state.currentColor : "#FFFFFF";
+      
+      if (previewColor.indexOf('#') < 0) {
+        previewColor = '#' + previewColor;
+      }
+      
       var inputColorStyle = {
-        color: this.state.currentColor,
+        color: previewColor,
         borderColor: '#d6d6d6',
-        backgroundColor: this.state.currentColor
+        backgroundColor: previewColor
       };
+
+      return (
+        <div className = "ic-Input-group__add-on ColorPicker__ColorPreview"
+             title = {this.state.currentColor}
+             style = {inputColorStyle}
+             role = "presentation"
+             aria-hidden = "true"
+             tabIndex = "-1" 
+        >
+        { !this.isValidHex(this.state.currentColor) ?
+          <i className="icon-warning" role="presentation"></i> 
+          : 
+          null
+        }
+        </div>
+      );
+    },
+
+    pickerBody () {
+
+      var cx = React.addons.classSet;
+      var inputClasses = cx({
+        'ic-Input': true,
+        'ColorPicker__CustomInput': true,
+        'ic-Input--has-warning': !this.isValidHex(this.state.currentColor)
+      });
 
       var inputId = "ColorPickerCustomInput-" + this.props.assetString;
 
@@ -249,28 +313,25 @@ define([
           </div>
 
           <div className="ColorPicker__CustomInputContainer ic-Input-group">
-            <div className = "ic-Input-group__add-on ColorPicker__ColorPreview"
-                 title = {this.state.currentColor}
-                 style = {inputColorStyle}
-                 role = "presentation"
-                 aria-hidden = "true"
-                 tabIndex = "-1" />
+            
+            {this.colorPreview()}
 
             <label className="screenreader-only" htmlFor={inputId}>
               {I18n.t('Enter a hexcode here to use a custom color.')}
             </label>
 
-            <input className = "ic-Input ColorPicker__CustomInput"
+            <input className = {inputClasses}
                    id = {inputId}
-                   placeholder = {this.state.currentColor}
+                   value = {this.state.currentColor}
                    type = 'text'
                    maxLength = "7"
                    minLength = "4"
                    ref      = "hexInput"
                    onChange = {this.setInputColor} />
           </div>
+
           <div className="ColorPicker__Actions">
-            <button className="Button" onClick={this.closeModal}>
+            <button className="Button" onClick={this.onCancel}>
               {I18n.t('Cancel')}
             </button>
             <span>&nbsp;</span>

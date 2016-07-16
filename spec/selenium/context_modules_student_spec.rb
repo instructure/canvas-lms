@@ -447,6 +447,34 @@ describe "context modules" do
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
       end
+
+      it "should still show the mark done button when navigating directly" do
+        mod = create_context_module('Mark Done Module')
+        page = @course.wiki.wiki_pages.create!(:title => "page", :body => 'hi')
+        assmt = @course.assignments.create!(:title => "assmt")
+
+        tag1 = mod.add_item({:id => page.id, :type => 'wiki_page'})
+        tag2 = mod.add_item({:id => assmt.id, :type => 'assignment'})
+        mod.completion_requirements = {tag1.id => {:type => 'must_mark_done'}, tag2.id => {:type => 'must_mark_done'}}
+        mod.save!
+
+        get "/courses/#{@course.id}/pages/#{page.url}"
+        el = f '#mark-as-done-checkbox'
+        expect(el).to_not be_nil
+        expect(el).to_not be_selected
+        el.click
+        wait_for_ajaximations
+
+        get "/courses/#{@course.id}/assignments/#{assmt.id}"
+        el = f '#mark-as-done-checkbox'
+        expect(el).to_not be_nil
+        expect(el).to_not be_selected
+        el.click
+        wait_for_ajaximations
+
+        prog = mod.evaluate_for(@user)
+        expect(prog).to be_completed
+      end
     end
 
     describe "module header icons" do

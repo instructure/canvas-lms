@@ -7,7 +7,7 @@ describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
-  
+
   context "Navigation" do
     def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
@@ -499,6 +499,7 @@ describe "Wiki Pages" do
       Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
 
       @course.is_public = true
+      @course.workflow_state = 'available'
       @course.save!
 
       title = "foo"

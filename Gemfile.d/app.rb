@@ -25,7 +25,7 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.5.3'
+gem 'switchman', '1.5.13'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -40,7 +40,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.11.1'
+gem 'inst-jobs', '0.11.2'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -54,7 +54,7 @@ gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.39', require: 'ims'
+gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.2'
 gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false
@@ -88,7 +88,7 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
-gem 'ruby-saml-mod', '0.3.0'
+gem 'ruby-saml-mod', '0.3.1'
 gem 'saml2', '1.0.7', require: false
   gem 'nokogiri-xmlsec-me-harder', '0.9.3pre', require: false, github: 'instructure/nokogiri-xmlsec-me-harder', ref: '3236a249986413c6c399ef3477132a0af0410bb7'
 gem 'rubycas-client', '2.3.9', require: false
@@ -104,6 +104,7 @@ gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.6', require: false
 gem 'canvas_statsd', '1.0.3'
 gem 'diplomat', '0.15.0', require: false
+gem 'gepub'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
@@ -141,7 +142,7 @@ gem 'diigo', path: 'gems/diigo'
 gem 'lti_outbound', path: 'gems/lti_outbound'
 gem 'multipart', path: 'gems/multipart'
 gem 'paginated_collection', path: 'gems/paginated_collection'
+gem 'stringify_ids', path: 'gems/stringify_ids'
 gem 'twitter', path: 'gems/twitter'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
-gem 'gepub'

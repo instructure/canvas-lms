@@ -21,11 +21,7 @@ module CC
     def add_topics
       scope = @course.discussion_topics.active
       DiscussionTopic::ScopedToUser.new(@course, @user, scope).scope.each do |topic|
-        if topic.is_announcement
-          next unless export_object?(topic, 'announcements')
-        else
-          next unless export_object?(topic) || export_object?(topic.assignment)
-        end
+        next unless export_object?(topic) || export_object?(topic.assignment)
 
         title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 

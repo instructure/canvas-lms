@@ -332,8 +332,6 @@ input[type="button"] {
   &:focus { @include button-focus-dark; }
 }
 
-// Handle jQueryUI-generated button classes
-.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { @extend .ui-helper-hidden-accessible; }
 
 .ui-button {
   position: relative;

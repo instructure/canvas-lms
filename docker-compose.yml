@@ -20,13 +20,12 @@ consul:
   environment:
     GOMAXPROCS: "2"
 
-# Uncomment the below lines to run selenium tests locally. Don't forget the
-# line in the `web` section below too.
-#
-#selenium:
-#  build: ./docker-compose/seleniumff
-#  ports:
-#    - "5900:5900"
+selenium:
+  build: ./docker-compose/seleniumff
+  ports:
+    - 5900:5900
+  environment:
+    VIRTUAL_HOST: selenium.docker
 
 kinesis:
   image: instructure/kinesalite
@@ -44,12 +43,11 @@ web: &WEB
     - postgres
     - redis
 #    - cassandra
-#    - selenium
     - kinesis
+    - mailcatcher
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
-    REMOTE_DEBUGGING_ENABLED: 'true'
 
 jobs:
   <<: *WEB
@@ -58,6 +56,12 @@ jobs:
 guard:
   <<: *WEB
   command: bundle exec guard -i
+
+mailcatcher:
+  image: instructure/mailcatcher
+  environment:
+    VIRTUAL_HOST: mail.canvas.docker
+    VIRTUAL_PORT: 8080
 
 # Uncomment this entry to run qunit tests built from webpack
 # js-tests:

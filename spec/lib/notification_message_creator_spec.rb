@@ -464,7 +464,36 @@ describe NotificationMessageCreator do
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
       expect(@cc.notification_policies.reload).not_to be_empty
       expect(@cc.delayed_messages.reload).not_to be_empty
+    end
 
+    it "should properly find the root account for cross-shard summary messages" do
+      Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
+      notification_model(:name => 'Assignment Created')
+
+      @user = User.create!
+      @cc = @user.communication_channels.create!(path: "user@example.com")
+      @cc.confirm!
+
+      notification_policy_model(:notification => @notification, :communication_channel => @cc)
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+
+      @shard1.activate do
+        @cs_account = Account.new
+        @cs_account.settings[:outgoing_email_default_name] = "OutgoingName"
+        @cs_account.save!
+        course(:active_all => true, :account => @cs_account)
+        @course.enroll_student(@user).accept!
+        assignment_model(:course => @course)
+      end
+
+      dm = @cc.delayed_messages.reload.first
+      expect(dm).to_not be_nil
+
+      DelayedMessage.summarize([dm])
+      message = @user.messages.reload.last
+      expect(message.root_account).to eq @cs_account
+      expect(message.from_name).to eq "OutgoingName"
     end
 
     it "should find an already existing notification policy" do

@@ -27,10 +27,10 @@ module FeatureFlags
     false
   end
 
-  def feature_allowed?(feature)
+  def feature_allowed?(feature, exclude_enabled: false)
     flag = lookup_feature_flag(feature)
-    return flag.enabled? || flag.allowed? if flag
-    false
+    return false unless flag
+    exclude_enabled ? flag.allowed? : flag.enabled? || flag.allowed?
   end
 
   def set_feature_flag!(feature, state)
@@ -77,14 +77,16 @@ module FeatureFlags
   # each account that needs to be searched for a feature flag, in priority order,
   # starting with site admin
   def feature_flag_account_ids
-    Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
-      if is_a?(User)
-        chain = [Account.site_admin]
-      else
-        chain = account_chain(include_site_admin: true)
-        chain.shift if is_a?(Account)
+    RequestCache.cache('feature_flag_account_ids', self) do
+      Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+        if is_a?(User)
+          chain = [Account.site_admin]
+        else
+          chain = account_chain(include_site_admin: true)
+          chain.shift if is_a?(Account)
+        end
+        chain.reverse.map(&:global_id)
       end
-      chain.reverse.map(&:global_id)
     end
   end
 

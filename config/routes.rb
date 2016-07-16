@@ -559,7 +559,6 @@ CanvasRails::Application.routes.draw do
     resources :users, only: [:index, :new, :edit, :show, :update]
     resources :account_notifications, only: [:create, :update, :destroy]
     concerns :announcements
-    resources :assignments
     resources :submissions
     delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
     put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
@@ -594,6 +593,7 @@ CanvasRails::Application.routes.draw do
     resources :outcomes do
       get 'results' => 'outcomes#outcome_results'
       get 'results/:id' => 'outcomes#outcome_result', as: :result
+      get 'alignments/:id' => 'outcomes#alignment_redirect', as: :alignment_redirect
       get :details
       collection do
         get :list
@@ -877,6 +877,9 @@ CanvasRails::Application.routes.draw do
       put 'courses/:course_id/settings', action: :update_settings
       get 'courses/:course_id/recent_students', action: :recent_students, as: 'course_recent_students'
       get 'courses/:course_id/users', action: :users, as: 'course_users'
+      get 'courses/:course_id/collaborations', controller: :collaborations, action: :api_index, as: 'course_collaborations_index'
+      delete 'courses/:course_id/collaborations/:id', controller: :collaborations, action: :destroy
+
       # this api endpoint has been removed, it was redundant with just courses#users
       # we keep it around for backward compatibility though
       get 'courses/:course_id/search_users', action: :users
@@ -910,6 +913,10 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
       get 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :show, as: 'user_account_notification_show'
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
+    end
+
+    scope(controller: :brand_configs_api) do
+      get "brand_variables", action: :show
     end
 
     scope(controller: :tabs) do
@@ -1111,6 +1118,8 @@ CanvasRails::Application.routes.draw do
         put "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :update, as: "#{context}_external_tools_update"
         delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :destroy, as: "#{context}_external_tools_delete"
       end
+
+      get "groups/:group_id/external_tools", action: :index, as: "group_external_tools"
     end
 
     scope(controller: 'lti/lti_apps') do
@@ -1369,6 +1378,8 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/activity_stream/summary', action: :activity_stream_summary, as: 'group_activity_stream_summary'
       put "groups/:group_id/followers/self", action: :follow
       delete "groups/:group_id/followers/self", action: :unfollow
+      get 'groups/:group_id/collaborations', controller: :collaborations, action: :api_index, as: 'group_collaborations_index'
+      delete 'groups/:group_id/collaborations/:id', controller: :collaborations, action: :destroy
 
       scope(controller: :group_memberships) do
         resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships
@@ -1764,18 +1775,27 @@ CanvasRails::Application.routes.draw do
     get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', as: :crocodoc_session
     get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
 
+    scope(controller: :grading_period_sets) do
+      get 'accounts/:account_id/grading_period_sets', action: :index, as: :account_grading_period_sets
+      post 'accounts/:account_id/grading_period_sets', action: :create
+      patch 'accounts/:account_id/grading_period_sets/:id', action: :update, as: :account_grading_period_set
+      delete 'accounts/:account_id/grading_period_sets/:id', action: :destroy
+    end
+
     scope(controller: :grading_periods) do
-      %w(course account).each do |context|
-        content_prefix = "#{context.pluralize}/:#{context}_id"
-        prefix = "#{content_prefix}/grading_periods"
-        get prefix, action: :index, as: "#{context}_grading_periods"
-        get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
-        post prefix, action: :create, as: "#{context}_grading_period_create"
-        # FIXME: should be PATCH in upcoming Rails 4
-        put "#{prefix}/batch_update", action: :batch_update, as: "#{context}_grading_period_batch_update"
-        put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
-        delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
-      end
+      # FIXME: This route will be removed/replaced with CNVS-27101
+      get 'accounts/:account_id/grading_periods', action: :index, as: :account_grading_periods
+
+      get 'courses/:course_id/grading_periods', action: :index, as: :course_grading_periods
+      get 'courses/:course_id/grading_periods/:id', action: :show, as: :course_grading_period
+      patch 'courses/:course_id/grading_periods/batch_update',
+            action: :batch_update, as: :course_grading_period_batch_update
+      put 'courses/:course_id/grading_periods/:id', action: :update, as: :course_grading_period_update
+      delete 'courses/:course_id/grading_periods/:id', action: :destroy, as: :course_grading_period_destroy
+      delete 'accounts/:account_id/grading_periods/:id', action: :destroy, as: :account_grading_period_destroy
+
+      patch 'grading_period_sets/:set_id/grading_periods/batch_update',
+            action: :batch_update, as: :grading_period_set_periods_update
     end
 
     scope(controller: :usage_rights) do

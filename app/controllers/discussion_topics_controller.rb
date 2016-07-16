@@ -487,10 +487,13 @@ class DiscussionTopicsController < ApplicationController
         group_scope = @topic.group_category.groups.active
         if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
           @groups = group_scope.where(:id => @topic.assignment.assignment_overrides.active.where(:set_type => "Group").pluck(:set_id)).to_a
+          if @groups.empty?
+            @groups = group_scope.to_a # revert to default if we're not using Group overrides
+          end
         else
           @groups = group_scope.to_a
         end
-        @groups.select!{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
+        @groups.select!{ |g| g.grants_any_right?(@current_user, session, :post_to_forum, :read_as_admin) }
         @groups.sort_by!(&:id)
 
         topics = @topic.child_topics.to_a
@@ -1022,8 +1025,10 @@ class DiscussionTopicsController < ApplicationController
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
   def process_pin_parameters(discussion_topic_hash)
-    return unless params.has_key?(:pinned) && params[:pinned] != @topic.pinned?
-    @topic.pinned = params[:pinned]
+    return unless params.key?(:pinned)
+    pinned = value_to_boolean(params[:pinned])
+    return unless pinned != @topic.pinned?
+    @topic.pinned = pinned
     @topic.position = nil
     @topic.add_to_list_bottom
   end

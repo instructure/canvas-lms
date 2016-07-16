@@ -127,19 +127,21 @@ class NotificationMessageCreator
   end
 
   def build_summary_for(user, policy)
-    message = user.messages.build(message_options_for(user))
-    message.parse!('summary')
-    delayed_message = policy.delayed_messages.build(:notification => @notification,
-                                  :frequency => policy.frequency,
-                                  :communication_channel_id => policy.communication_channel_id,
-                                  :root_account_id => message.context_root_account.try(:id),
-                                  :linked_name => 'work on this link!!!',
-                                  :name_of_topic => message.subject,
-                                  :link => message.url,
-                                  :summary => message.body)
-    delayed_message.context = @asset
-    delayed_message.save! if Rails.env.test?
-    delayed_message
+    user.shard.activate do
+      message = user.messages.build(message_options_for(user))
+      message.parse!('summary')
+      delayed_message = policy.delayed_messages.build(:notification => @notification,
+                                    :frequency => policy.frequency,
+                                    :communication_channel_id => policy.communication_channel_id,
+                                    :root_account_id => message.context_root_account.try(:id),
+                                    :linked_name => 'work on this link!!!',
+                                    :name_of_topic => message.subject,
+                                    :link => message.url,
+                                    :summary => message.body)
+      delayed_message.context = @asset
+      delayed_message.save! if Rails.env.test?
+      delayed_message
+    end
   end
 
   def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))

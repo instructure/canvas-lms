@@ -645,7 +645,7 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           @course.require_assignment_group rescue nil
           # offer updates the workflow state, saving the record without doing validation callbacks
-          if api_request? and params[:offer].present?
+          if api_request? and value_to_boolean(params[:offer])
             @course.offer
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
@@ -1520,6 +1520,7 @@ class CoursesController < ApplicationController
     if @context && @current_user
       @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
       if @context_enrollment
+        @context_membership = @context_enrollment # for AUA
         @context_enrollment.course = @context
         @context_enrollment.user = @current_user
       end
@@ -1587,7 +1588,7 @@ class CoursesController < ApplicationController
         else
           @contexts += @user_groups if @user_groups
         end
-        @current_conferences = @context.web_conferences.select{|c| c.active? && c.users.include?(@current_user) }
+        @current_conferences = @context.web_conferences.select{|c| c.active?(false, false) && c.users.include?(@current_user) }
         @scheduled_conferences = @context.web_conferences.select{|c| c.scheduled? && c.users.include?(@current_user)}
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @contexts }) || []
       end
@@ -1600,7 +1601,7 @@ class CoursesController < ApplicationController
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
-    elsif @context.indexed
+    elsif @context.indexed && @context.available?
       render :description
     else
       # clear notices that would have been displayed as a result of processing

@@ -7,6 +7,7 @@ class BrandConfigsController < ApplicationController
   before_filter :require_user
   before_filter :require_account_management
   before_filter :require_account_branding, except: [:destroy]
+  before_filter :require_new_ui
   before_filter { |c| c.active_tab = "brand_configs" }
 
   def index
@@ -166,6 +167,13 @@ class BrandConfigsController < ApplicationController
   def require_account_branding
     unless @account.branding_allowed?
       flash[:error] = t "You cannot edit themes on this subaccount."
+      redirect_to account_path(@account)
+    end
+  end
+
+  def require_new_ui
+    unless use_new_styles?
+      flash[:error] = t "You need to enable the 'New UI' feature before editing themes."
       redirect_to account_path(@account)
     end
   end

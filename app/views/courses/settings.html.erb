@@ -469,7 +469,7 @@
           <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
-            <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
+            <button class="btn btn-primary" type="submit" title="<%= t('Add Section') %>" aria-label="<%= t('Add Section') %>"><i class="icon-plus" role="presentation"></i> <%= t('buttons.add_section', %{Section}) %></button>
           <% end %>
         </li>
       <% end %>
@@ -650,7 +650,7 @@
   </div>
 <% end %>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
-  <%= render :partial => "shared/grading_standard", :object => @context.grading_standard, :locals => {:read_only => !can_manage} %>
+  <%= render partial: "shared/grading_standard", object: @context.grading_standard, locals: {read_only: !can_manage} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>

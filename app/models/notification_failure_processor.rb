@@ -48,37 +48,44 @@ class NotificationFailureProcessor
   end
 
   def process
-    notification_failure_queue.poll(config.slice(*POLL_PARAMS)) do |message|
-      failure_notification = parse_failure_notification(message)
-      process_failure_notification(failure_notification) if failure_notification
+    notification_failure_queue.poll(config.slice(*POLL_PARAMS)) do |failure_summary_json|
+      summary = parse_failure_summary(failure_summary_json)
+      process_failure_summary(summary) if summary
     end
   end
 
   private
 
-  def parse_failure_notification(message)
-    JSON.parse(message.body)
+  def parse_failure_summary(summary)
+    JSON.parse(summary.body)
   rescue JSON::ParserError
     nil
   end
 
-  def process_failure_notification(notification)
-    global_id = notification['global_id']
-    error_message = notification['error']
-    message = global_message(global_id)
+  def process_failure_summary(summary)
+    global_id = summary['global_id']
+    error_message = summary['error']
+    is_disabled_endpoint = error_message.include? "EndpointDisabled"
+    error_context = summary['error_context']
 
-    message.set_transmission_error if message
-    message.transmission_errors = error_message if message && error_message
-    message.save!
+    if Message.exists?(global_id)
+      message = Message.find(global_id)
+
+      message.set_transmission_error
+      message.transmission_errors = error_message if error_message
+      message.save!
+
+      # clean up disabled push endpoints
+      if is_disabled_endpoint
+        bad_endpoint_arn = error_context
+        message.user.notification_endpoints.where(arn: bad_endpoint_arn).destroy_all
+      end
+    end
   end
 
   def notification_failure_queue
     return @notification_failure_queue if defined?(@notification_failure_queue)
     sqs = AWS::SQS.new(config)
     @notification_failure_queue = sqs.queues.named(config[:notification_failure_queue_name])
-  end
-
-  def global_message(global_id)
-    Message.find(global_id)
   end
 end

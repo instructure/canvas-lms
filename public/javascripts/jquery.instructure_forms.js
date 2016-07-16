@@ -1138,7 +1138,7 @@ define([
     if (options.object_name) {
       required = $._addObjectName(required, options.object_name);
     }
-    $form = $(this);
+    var $form = $(this);
     $.each(required, function(i, name) {
       var field = $form.find('[name="'+name+'"]');
       if (!field.length) {return;}

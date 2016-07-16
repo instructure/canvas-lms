@@ -36,6 +36,7 @@ describe AssetUserAccess do
   it "should update existing records that have changed display names" do
     @assignment.title = 'My changed Assignment'
     @assignment.save!
+    @asset = AssetUserAccess.find(@asset.id)
     @asset.log @course, { :level => 'view' }
     expect(@asset.display_name).to eq 'My changed Assignment'
   end

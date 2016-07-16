@@ -59,7 +59,9 @@ describe "jquery ui" do
   end
 
   it "should capture shift-tabbing" do
+    skip_if_chrome('fragile')
     create_simple_modal
+    active.click # sometimes the viewport doesn't have focus
     expect(active.tag_name).to eq 'select'
     shift_tab
     expect(active.tag_name).to eq 'a'

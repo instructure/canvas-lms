@@ -29,6 +29,7 @@ describe "settings tabs" do
       expect(notification.start_at.day).to eq 1
       expect(notification.end_at.day).to eq 15
       expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
+      dismiss_flash_messages
 
       if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         # close the "user account" reactTray that opened so we could read the displayed username
@@ -61,6 +62,7 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
+      driver.manage.window.maximize
     end
 
     it "should add and delete an announcement" do

@@ -36,7 +36,6 @@ describe "conversations new" do
     expect(f('#compose-message-subject')).to be_displayed
     # Send Individual messages checkbox displays and is unchecked
     expect(f('#bulk_message').selected?).to be_falsey
-    expect(f('.icon-question')).to have_attribute('title','This will send an individual message to each of the recipients')
     # Message field displays
     expect(f('.conversation_body')).to be_displayed
     # Attachment button displays
@@ -184,7 +183,7 @@ describe "conversations new" do
       select_message(0)
       reply_to_message
       expect(f('.message-count')).to include_text('2')
-
+      dismiss_flash_messages
       reply_to_message
       expect(f('.message-count')).to include_text('3')
     end

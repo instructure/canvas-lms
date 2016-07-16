@@ -23,7 +23,7 @@ end
 
 require 'securerandom'
 require 'tmpdir'
-require 'lti_spec_helper.rb'
+require_relative './lti_spec_helper'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!

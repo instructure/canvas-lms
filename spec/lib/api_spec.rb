@@ -798,6 +798,32 @@ describe Api do
     end
   end
 
+  context ".jsonapi_paginate" do
+    let(:request) { stub('request', query_parameters: {}) }
+    let(:response) { stub('response', headers: {}) }
+    let(:controller) { stub('controller', request: request, response: response, params: {}) }
+    let(:collection) { [1, 2, 3] }
+
+    it "should return the links in the headers" do
+      Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
+      link = controller.response.headers['Link']
+      expect(link).not_to be_empty
+      expect(link).to include('<example.com?page=1&per_page=1>; rel="current"')
+      expect(link).to include(',<example.com?page=2&per_page=1>; rel="next"')
+      expect(link).to include(',<example.com?page=1&per_page=1>; rel="first"')
+      expect(link).to include(',<example.com?page=3&per_page=1>; rel="last"')
+    end
+
+    it "should return the links in the meta" do
+      (data, meta) = Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
+      expect(meta).not_to be_empty
+      expect(meta[:pagination][:current]).to eq('example.com?page=1&per_page=1')
+      expect(meta[:pagination][:next]).to eq('example.com?page=2&per_page=1')
+      expect(meta[:pagination][:last]).to eq('example.com?page=3&per_page=1')
+      expect(data).to eq [1]
+    end
+  end
+
   context ".build_links" do
     it "should not build links if not pagination is provided" do
       expect(Api.build_links("www.example.com")).to be_empty

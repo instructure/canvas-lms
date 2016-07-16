@@ -1,6 +1,6 @@
 <script>
   INST = <%= raw(inst_env.to_json) %>;
-  ENV = <%= raw Api.recursively_stringify_json_ids(js_env.clone).to_json %>;
+  ENV = <%= raw StringifyIds.recursively_stringify_ids(js_env.clone).to_json %>;
 
   <% unless use_webpack? %>
     // TODO: move this out when we have a single require call

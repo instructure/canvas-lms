@@ -58,7 +58,7 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :wiki_pages, foreign_key: 'wiki_page', primary_key: 'wiki_page'
   has_many :web_conferences, :as => :context, :dependent => :destroy
-  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
+  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
@@ -156,6 +156,11 @@ class Group < ActiveRecord::Base
   def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
   end
+
+  def context_external_tools
+    ContextExternalTool.none
+  end
+
   private :group_category_limit_met?
 
   def student_organized?
@@ -257,23 +262,12 @@ class Group < ActiveRecord::Base
   end
 
   workflow do
-    state :available do
-      event :complete, :transitions_to => :completed
-      event :close, :transitions_to => :closed
-    end
-
-    # Closed to new entrants
-    state :closed do
-      event :complete, :transitions_to => :completed
-      event :open, :transitions_to => :available
-    end
-
-    state :completed
+    state :available
     state :deleted
   end
 
   def active?
-    self.available? || self.closed?
+    self.available?
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -553,6 +547,9 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
       can :read_as_admin
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_sis)}
+      can :read_sis
     end
   end
 

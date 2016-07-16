@@ -307,6 +307,20 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         qs_json = json['quiz_submissions'][0]
         expect(qs_json['html_url']).to eq course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
       end
+
+      it 'should include results_url only when completed or needs_grading' do
+        json = qs_api_show
+        expect(json['quiz_submissions'][0].key?('result_url')).to be_truthy
+        expected_url = course_quiz_history_url(
+          @course, @quiz,
+          quiz_submission_id: @quiz_submission.id, version: @quiz_submission.version_number
+        )
+        expect(json['quiz_submissions'][0]['result_url']).to eq expected_url
+
+        @quiz_submission.update_attribute :workflow_state, 'in_progress'
+        json = qs_api_show
+        expect(json['quiz_submissions'][0].key?('result_url')).to be_falsey
+      end
     end
 
     context 'Links' do
@@ -373,100 +387,132 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   end
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions [create]' do
-    before :once do
-      enroll_student
+    context 'as a teacher' do
+      it 'should create a preview quiz submission' do
+        json = qs_api_create false, { preview: true }
+        expect(Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id']).preview?).to be_truthy
+      end
     end
 
-    it 'should create a quiz submission' do
-      json = qs_api_create
-      expect(json.key?('quiz_submissions')).to be_truthy
-      expect(json['quiz_submissions'].length).to eq 1
-      expect(json['quiz_submissions'][0]['workflow_state']).to eq 'untaken'
-    end
-
-    it 'should create a preview quiz submission' do
-      json = qs_api_create false, { preview: true }
-      expect(Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id']).preview?).to be_truthy
-    end
-
-    it 'should allow the creation of multiple, subsequent QSes' do
-      @quiz.allowed_attempts = -1
-      @quiz.save
-
-      json = qs_api_create
-      qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
-      qs.mark_completed
-      qs.save
-
-      qs_api_create
-    end
-
-    context 'access validations' do
-      include_examples 'Quiz Submissions API Restricted Endpoints'
-
-      before :each do
-        @request_proxy = method(:qs_api_create)
+    context 'as a student' do
+      before :once do
+        enroll_student
+        @user = @student
       end
 
-      it 'should reject creating a QS when one already exists' do
-        qs_api_create
-        qs_api_create(true)
-        expect(response.status.to_i).to eq 409
+      it 'should create a quiz submission' do
+        json = qs_api_create
+        expect(json.key?('quiz_submissions')).to be_truthy
+        expect(json['quiz_submissions'].length).to eq 1
+        expect(json['quiz_submissions'][0]['workflow_state']).to eq 'untaken'
       end
 
-      it 'should respect the number of allowed attempts' do
+      it 'should allow the creation of multiple, subsequent QSes' do
+        @quiz.allowed_attempts = -1
+        @quiz.save
+
         json = qs_api_create
         qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
         qs.mark_completed
-        qs.save!
+        qs.save
 
-        qs_api_create(true)
-        expect(response.status.to_i).to eq 409
-      end
-    end
-
-    context "unpublished module quiz" do
-      before do
-        student_in_course(active_all: true)
-        @quiz = @course.quizzes.create! title: "Test Quiz w/ Module"
-        @quiz.quiz_questions.create!(
-          {question_data:
-            {name: 'question', points_possible: 1, question_type: 'multiple_choice_question',
-              'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
-            }
-        })
-        @quiz.published_at = Time.now
-        @quiz.workflow_state = 'available'
-        @quiz.save!
-        @pre_module = @course.context_modules.create!(:name => 'pre_module')
-        # No meaning in this URL
-        @tag = @pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
-        @tag.publish! if @tag.unpublished?
-        @pre_module.completion_requirements = { @tag.id => { :type => 'must_view' } }
-        @pre_module.save!
-
-        locked_module = @course.context_modules.create!(:name => 'locked_module', :require_sequential_progress => true)
-        item_tag = locked_module.add_item(:id => @quiz.id, :type => 'quiz')
-        locked_module.prerequisites = "module_#{@pre_module.id}"
-        locked_module.save!
+        qs_api_create
       end
 
-      it "shouldn't allow access to quiz until module is completed" do
-        expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
-          {controller: "quizzes/quiz_submissions_api", action: "create", format: "json", course_id: "#{@course.id}", quiz_id: "#{@quiz.id}"}, {},
-          {'Accept' => 'application/vnd.api+json'}, {expected_status: 400})
-        expect(json['status']).to eq "bad_request"
+      context 'access validations' do
+        include_examples 'Quiz Submissions API Restricted Endpoints'
+
+        before :each do
+          @request_proxy = method(:qs_api_create)
+        end
+
+        it 'should reject creating a QS when one already exists' do
+          qs_api_create
+          qs_api_create(true)
+          expect(response.status.to_i).to eq 409
+        end
+
+        it 'should respect the number of allowed attempts' do
+          json = qs_api_create
+          qs = Quizzes::QuizSubmission.find(json['quiz_submissions'][0]['id'])
+          qs.mark_completed
+          qs.save!
+
+          qs_api_create(true)
+          expect(response.status.to_i).to eq 409
+        end
       end
 
-      it "should allow access to quiz once module is completed" do
-        @course.context_modules.first.update_for(@student, :read, @tag)
-        @course.context_modules.first.update_downstreams
-        expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
-          {controller: "quizzes/quiz_submissions_api", action: "create", format: "json", course_id: "#{@course.id}", quiz_id: "#{@quiz.id}"}, {},
-          {'Accept' => 'application/vnd.api+json'})
-        expect(json['quiz_submissions'][0]['user_id']).to eq @student.id
+      context "unpublished module quiz" do
+        before do
+          student_in_course(active_all: true)
+          @quiz = @course.quizzes.create! title: "Test Quiz w/ Module"
+          @quiz.quiz_questions.create!(
+            {
+              question_data:
+              {
+                name: 'question',
+                points_possible: 1,
+                question_type: 'multiple_choice_question',
+                'answers' =>
+                  [
+                    {'answer_text' => '1', 'weight' => '100'},
+                    {'answer_text' => '2'},
+                    {'answer_text' => '3'},
+                    {'answer_text' => '4'}
+                  ]
+              }
+          })
+          @quiz.published_at = Time.zone.now
+          @quiz.workflow_state = 'available'
+          @quiz.save!
+          @pre_module = @course.context_modules.create!(:name => 'pre_module')
+          # No meaning in this URL
+          @tag = @pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+          @tag.publish! if @tag.unpublished?
+          @pre_module.completion_requirements = { @tag.id => { :type => 'must_view' } }
+          @pre_module.save!
+
+          locked_module = @course.context_modules.create!(name: 'locked_module', require_sequential_progress: true)
+          locked_module.add_item(:id => @quiz.id, :type => 'quiz')
+          locked_module.prerequisites = "module_#{@pre_module.id}"
+          locked_module.save!
+        end
+
+        it "shouldn't allow access to quiz until module is completed" do
+          expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
+          json = api_call(:post,
+                          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
+                          {
+                            controller: "quizzes/quiz_submissions_api",
+                            action: "create",
+                            format: "json",
+                            course_id: "#{@course.id}",
+                            quiz_id: "#{@quiz.id}"
+                          },
+                          {},
+                          {'Accept' => 'application/vnd.api+json'},
+                          {expected_status: 400})
+          expect(json['status']).to eq "bad_request"
+        end
+
+        it "should allow access to quiz once module is completed" do
+          @course.context_modules.first.update_for(@student, :read, @tag)
+          @course.context_modules.first.update_downstreams
+          expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
+          json = api_call(:post,
+                          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
+                          {
+                            controller: "quizzes/quiz_submissions_api",
+                            action: "create",
+                            format: "json",
+                            course_id: "#{@course.id}",
+                            quiz_id: "#{@quiz.id}"
+                          },
+                          {},
+                          {'Accept' => 'application/vnd.api+json'})
+          expect(json['quiz_submissions'][0]['user_id']).to eq @student.id
+        end
       end
     end
   end

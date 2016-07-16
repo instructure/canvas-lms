@@ -18,7 +18,7 @@ module UsersCommon
     end
     f("#add_user_form #user_name").send_keys name
     f("#pseudonym_unique_id").send_keys email
-    submit_form("#add_user_form")
+    submit_dialog_form("#add_user_form")
     wait_for_ajax_requests
     user = User.where(:name => name).first
     expect(user).to be_present

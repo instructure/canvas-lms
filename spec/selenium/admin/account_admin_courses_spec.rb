@@ -39,7 +39,7 @@ describe "account admin courses tab" do
         wait_for_ajaximations
         f("#add_course_form #course_name").send_keys(course_name)
         f("#course_course_code").send_keys(course_code)
-        submit_form("#add_course_form")
+        submit_dialog_form("#add_course_form")
         refresh_page # we need to refresh the page so the course shows up
         course = Course.where(name: course_name).first
         expect(course).to be_present

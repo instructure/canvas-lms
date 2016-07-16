@@ -66,8 +66,7 @@ class TabsController < ApplicationController
   # Returns a list of navigation tabs available in the current context.
   #
   # @argument include[] [String, "external"]
-  #   Optionally include external tool tabs in the returned list of tabs
-  #   (Only has effect for courses, not groups)
+  #   "external":: Optionally include external tool tabs in the returned list of tabs (Only has effect for courses, not groups)
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \

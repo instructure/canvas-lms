@@ -51,7 +51,7 @@ class ActiveRecord::Base
     return @all_models if @all_models.present?
     @all_models = (ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
-      (model.respond_to?(:tableless?) && model.tableless?) ||
+      (model < Tableless) ||
       model.abstract_class?
     }
   end

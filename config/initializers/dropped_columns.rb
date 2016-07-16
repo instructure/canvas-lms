@@ -161,7 +161,7 @@ class ActiveRecord::Base
   def self.instantiate_with_remove_dropped_columns(attributes, *args)
     (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
       attributes.delete(attr)
-    end unless self.respond_to?(:tableless?)
+    end unless self < Tableless
     instantiate_without_remove_dropped_columns(attributes, *args)
   end
 

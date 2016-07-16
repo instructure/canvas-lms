@@ -43,7 +43,7 @@ define([
         sections: this.formattedSectionHash(this.props.sections),
         groups: {},
         selectedGroupSetId: this.props.selectedGroupSetId
-      }, this.fetchAdhocStudents.bind(this))
+      }, this.fetchAdhocStudents)
 
       OverrideStudentStore.addChangeListener(this.handleStudentStoreChange)
       OverrideStudentStore.fetchStudentsForCourse()

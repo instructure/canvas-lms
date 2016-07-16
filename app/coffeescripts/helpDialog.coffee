@@ -25,6 +25,7 @@ define [
     animateDuration: 100
 
     initDialog: ->
+      @defaultTitle = ENV.help_link_name || @defaultTitle
       @$dialog = $('<div style="padding:0; overflow: visible;" />').dialog
         resizable: false
         width: 400
@@ -49,7 +50,6 @@ define [
           contextAssetString: ENV.context_asset_string
           userRoles: ENV.current_user_roles
 
-
         @$dialog.html(helpDialogTemplate locals)
         @initTicketForm()
         $(this).trigger('ready')
@@ -57,12 +57,12 @@ define [
       @dialogInited = true
 
     initTicketForm: ->
+      requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
+      requiredFields.push 'error[email]' if @showEmail()
+
       $form = @$dialog.find('#create_ticket').formSubmit
         disableWhileLoading: true
-        required: =>
-          requiredFields = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
-          requiredFields.push 'error[email]' if @showEmail()
-          requiredFields
+        required: requiredFields
         success: =>
           @$dialog.dialog('close')
           $form.find(':input').val('')

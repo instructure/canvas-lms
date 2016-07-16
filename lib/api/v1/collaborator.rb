@@ -19,14 +19,23 @@
 module Api::V1::Collaborator
   include Api::V1::Json
 
-  def collaborator_json(collaborator, current_user, session)
+  def collaborator_json(collaborator, current_user, session, options = {})
+    includes = options[:include] || []
     api_json(collaborator, current_user, session, :only => %w{id}).tap do |hash|
       hash['type'] = collaborator.group_id.present? ? 'group' : 'user'
       hash['name'] = collaborator.user.try(:sortable_name) ||
         collaborator.group.try(:name)
       hash['collaborator_id'] = collaborator.user.try(:id) ||
         collaborator.group.id
+
+      if includes.include?('collaborator_lti_id')
+        hash['collaborator_lti_id'] = collaborator.user ? Lti::Asset.opaque_identifier_for(collaborator.user) :
+          Lti::Asset.opaque_identifier_for(collaborator.group)
+      end
+
+      if includes.include?('avatar_image_url')
+        hash['avatar_image_url'] = collaborator.user.try(:avatar_image_url)
+      end
     end
   end
 end
-

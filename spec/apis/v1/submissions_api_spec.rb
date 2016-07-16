@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../file_uploads_spec_helper'
 
 describe 'Submissions API', type: :request do
   include Api::V1::User
@@ -632,7 +632,8 @@ describe 'Submissions API', type: :request do
     a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
     sub1 = submit_homework(a1, student1)
     media_object(:media_id => "3232", :media_type => "audio")
-    sub1 = a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher}).first
+    a1.update_submission(student1, {:comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher})
+    sub1 = a1.grade_student(student1, {:grade => '90%', :grader => @teacher}).first
     comment = sub1.submission_comments.first
 
     @user = student1
@@ -791,7 +792,8 @@ describe 'Submissions API', type: :request do
     }
 
     media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
-    a1.grade_student(student1, {:grade => '90%', :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :grader => @teacher})
+    a1.grade_student(student1, {:grade => '90%', :grader => @teacher})
+    a1.update_submission(student1, {:comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher})
     sub1.reload
     expect(sub1.submission_comments.size).to eq 1
     comment = sub1.submission_comments.first
@@ -1643,7 +1645,7 @@ describe 'Submissions API', type: :request do
       @course.enroll_student(@student2).accept!
 
       @course.account.enable_feature!(:multiple_grading_periods)
-      gpg = @course.grading_period_groups.create!
+      gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
       @gp1 = gpg.grading_periods.create!(
         title: 'first',
         weight: 50,

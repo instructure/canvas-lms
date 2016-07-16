@@ -26,9 +26,10 @@
     your password, click the "Forgot Password" link and you should get a new link
     that you can use to log in and re-set your password.},
     :wrapper => %{<a href="#{login_url}"><b>\\1</b></a>} %></p>
-    <% if Setting.get("show_feedback_link", "false") == "true" %>
-      <p><%= t :feedback, %{If you keep having problems, click the "Help" link below to search the guides
-      or to let us know what's going on.} %>
+    <% if show_feedback_link? %>
+      <p>
+      <%= t "If you keep having problems, click the \"%{link}\" link below to search the guides
+      or to let us know what's going on.", :link => help_link_name %>
     <% end %>
     </p>
   <% if use_new_styles? %></div><% end %>

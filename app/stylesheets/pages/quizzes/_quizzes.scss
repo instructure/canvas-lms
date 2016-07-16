@@ -1043,6 +1043,7 @@ form.question_form {
       left: 0;
     }
     .answer_comments {
+      overflow-x: auto;
       margin-left: 30px;
       padding: 10px 5px;
       margin-top: 5px;
@@ -1437,9 +1438,20 @@ ul#quiz_versions {
     display: none;
   }
   .variables {
+    #equation_var_name {
+      width: 10%;
+    }
     margin-bottom: 10px;
+    table-layout: fixed;
     th {
       font-size: 0.8em;
+    }
+    td {
+      input {
+        width: 120px;
+        min-width: 40px;
+        max-width: 100%;
+      }
     }
   }
   .equation_content > table {
@@ -1453,6 +1465,17 @@ ul#quiz_versions {
     width: 100%;
   }
   .formulas {
+    table-layout: fixed;
+    thead {
+      tr {
+        td:last-child {
+          width: 5%;
+        }
+        #headings\.result{
+          width: 30%;
+        }
+      }
+    }
     .formula_row.last_row {
       font-weight: bold;
     }
