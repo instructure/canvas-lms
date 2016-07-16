@@ -9,6 +9,7 @@ RUN  apt-get update -qq \
        libxmlsec1-dev \
        unzip \
        fontforge \
+       python-lxml \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
