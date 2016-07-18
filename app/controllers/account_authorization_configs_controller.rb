@@ -495,22 +495,38 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # - token_url [Required]
   #
-  #   The URL for exchanging the OAuth 2.0 authorization code for an access
-  #   token and id token
+  #   The URL for exchanging the OAuth 2.0 authorization code for an Access
+  #   Token and ID Token
   #
   # - scope [Optional]
   #
-  #   Space separated additional scopes to request for the token.
+  #   Space separated additional scopes to request for the token. Note that
+  #   you need not specify the 'openid' scope, or any scopes that can be
+  #   automatically inferred by the rules defined at
+  #   http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
   #
   # - end_session_endpoint [Optional]
   #
   #   URL to send the end user to after logging out of Canvas. See
   #   https://openid.net/specs/openid-connect-session-1_0.html#RPLogout
   #
+  # - userinfo_endpoint [Optional]
+  #
+  #   URL to request additional claims from. If the initial ID Token received
+  #   from the provider cannot be used to satisfy the login_attribute and
+  #   all federated_attributes, this endpoint will be queried for additional
+  #   information.
+  #
   # - login_attribute [Optional]
   #
-  #   The attribute of the ID token to look up the user's login in Canvas.
+  #   The attribute of the ID Token to look up the user's login in Canvas.
   #   Defaults to 'sub'.
+  #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Any value is allowed for the provider
+  #   attribute names, but standard claims are listed at
+  #   http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
   #
   # For SAML, the additional recognized parameters are:
   #
