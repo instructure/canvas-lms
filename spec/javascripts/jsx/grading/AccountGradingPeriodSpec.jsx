@@ -56,12 +56,12 @@ define([
 
   test("disables the 'edit grading period' button when 'actionsDisabled' is true", function() {
     let period = this.renderComponent({actionsDisabled: true});
-    ok(period.refs.editButton.disabled);
+    ok(period.refs.editButton.props.disabled);
   });
 
   test("disables the 'delete grading period' button when 'actionsDisabled' is true", function() {
     let period = this.renderComponent({actionsDisabled: true});
-    ok(period.refs.deleteButton.disabled);
+    ok(period.refs.deleteButton.props.disabled);
   });
 
   test("displays the start date in a friendly format", function() {
@@ -108,7 +108,7 @@ define([
   test("does not delete the period if the user cancels the delete confirmation", function() {
     this.stub(window, "confirm", () => false);
     let period = this.renderComponent();
-    Simulate.click(period.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(period.refs.deleteButton));
     ok(period.props.onDelete.notCalled);
   });
 
@@ -117,7 +117,7 @@ define([
     this.stub(axios, "delete").returns(deletePromise);
     this.stub(window, "confirm", () => true);
     let period = this.renderComponent();
-    Simulate.click(period.refs.deleteButton);
+    Simulate.click(ReactDOM.findDOMNode(period.refs.deleteButton));
     deletePromise.then(function() {
       ok(period.props.onDelete.calledOnce);
       start();

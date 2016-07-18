@@ -17,9 +17,9 @@ module MultipleGradingPeriods
       let(:create_set_button) { fj('button:contains("Create")') }
       let(:grading_period_set_title_css) { ".GradingPeriodSet__title" }
       let(:set_title) { f(grading_period_set_title_css) }
-      let(:add_grading_period_link) { f('.GradingPeriodList__new-period__add-button') }
-      let(:delete_grading_period_set_button) { f('.delete_grading_period_set_button') }
-      let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
+      let(:add_grading_period_link) { f('button[aria-label="Add Grading Period"]') }
+      let(:delete_grading_period_set_button) { f('#grading-period-sets button[title^="Delete "]') }
+      let(:edit_grading_period_set_button) { f('#grading-period-sets button[title^="Edit "]')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
       let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
       let(:all_sets_css) { '.GradingPeriodSet__title'}

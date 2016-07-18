@@ -1,11 +1,12 @@
 define([
   'react',
   'jquery',
+  'instructure-ui/Button',
   'axios',
   'i18n!grading_periods',
   'jsx/shared/helpers/dateHelper',
   'jquery.instructure_misc_helpers'
-], function(React, $, axios, I18n, DateHelper) {
+], function(React, $, { default: Button }, axios, I18n, DateHelper) {
   const Types = React.PropTypes;
 
   let AccountGradingPeriod = React.createClass({
@@ -54,16 +55,16 @@ define([
     renderEditButton() {
       if (this.props.permissions.update && !this.props.readOnly) {
         return (
-          <button className="Button Button--icon-action"
-                  ref="editButton"
-                  type="button"
+          <Button ref="editButton"
+                  variant="icon"
                   disabled={this.props.actionsDisabled}
-                  onClick={this.onEdit}>
+                  onClick={this.onEdit}
+                  title={I18n.t("Edit %{title}", { title: this.props.period.title })}>
             <span className="screenreader-only">
               {I18n.t("Edit %{title}", { title: this.props.period.title })}
             </span>
             <i className="icon-edit" role="presentation"/>
-          </button>
+          </Button>
         );
       }
     },
@@ -71,16 +72,16 @@ define([
     renderDeleteButton() {
       if (this.props.permissions.delete && !this.props.readOnly) {
         return (
-          <button ref="deleteButton"
-                  type="button"
-                  className="Button Button--icon-action"
+          <Button ref="deleteButton"
+                  variant="icon"
                   disabled={this.props.actionsDisabled}
-                  onClick={this.promptDeleteGradingPeriod}>
+                  onClick={this.promptDeleteGradingPeriod}
+                  title={I18n.t("Delete %{title}", { title: this.props.period.title })}>
             <span className="screenreader-only">
               {I18n.t("Delete %{title}", { title: this.props.period.title })}
             </span>
             <i className="icon-trash" role="presentation"/>
-          </button>
+          </Button>
         );
       }
 

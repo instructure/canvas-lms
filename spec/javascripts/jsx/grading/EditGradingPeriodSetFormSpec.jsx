@@ -8,6 +8,16 @@ define([
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
+  const assertDisabled = function(component) {
+    let $el = ReactDOM.findDOMNode(component);
+    equal($el.getAttribute('aria-disabled'), 'true');
+  };
+
+  const assertEnabled = function(component) {
+    let $el = ReactDOM.findDOMNode(component);
+    notEqual($el.getAttribute('aria-disabled'), 'true');
+  };
+
   const exampleSet = { id: "1", title: "Fall 2015" };
 
   module('EditGradingPeriodSetForm', {
@@ -34,31 +44,23 @@ define([
 
   test('renders with the save button enabled', function() {
     let form = this.renderComponent();
-    let saveButton = React.findDOMNode(form.refs.saveButton);
-    equal(saveButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(saveButton.classList, 'disabled'));
+    assertEnabled(form.refs.saveButton);
   });
 
   test('renders with the cancel button enabled', function() {
     let form = this.renderComponent();
-    let cancelButton = React.findDOMNode(form.refs.cancelButton);
-    equal(cancelButton.getAttribute('aria-disabled'), 'false');
-    notOk(_.contains(cancelButton.classList, 'disabled'));
+    assertEnabled(form.refs.cancelButton);
   });
 
   test('optionally renders with the save and cancel buttons disabled', function() {
     let form = this.renderComponent({ disabled: true });
-    let saveButton = React.findDOMNode(form.refs.saveButton);
-    let cancelButton = React.findDOMNode(form.refs.cancelButton);
-    equal(saveButton.getAttribute('aria-disabled'), 'true');
-    ok(_.contains(saveButton.classList, 'disabled'));
-    equal(cancelButton.getAttribute('aria-disabled'), 'true');
-    ok(_.contains(cancelButton.classList, 'disabled'));
+    assertDisabled(form.refs.saveButton);
+    assertDisabled(form.refs.cancelButton);
   });
 
   test('uses attributes from the given set', function() {
     let form = this.renderComponent();
-    equal(React.findDOMNode(form.refs.title).value, "Fall 2015");
+    equal(ReactDOM.findDOMNode(form.refs.title).value, "Fall 2015");
     equal(form.state.set.id, "1");
   });
 
@@ -70,7 +72,7 @@ define([
   test("calls the 'onSave' callback when the save button is clicked", function() {
     let spy = sinon.spy();
     let form = this.renderComponent({ onSave: spy });
-    let saveButton = React.findDOMNode(form.refs.saveButton);
+    let saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
     Simulate.click(saveButton);
     ok(spy.calledOnce);
     ok(spy.calledWith(form.state.set));
@@ -79,7 +81,7 @@ define([
   test("calls the 'onCancel' callback when the cancel button is clicked", function() {
     let spy = sinon.spy();
     let form = this.renderComponent({ onCancel: spy });
-    let cancelButton = React.findDOMNode(form.refs.cancelButton);
+    let cancelButton = ReactDOM.findDOMNode(form.refs.cancelButton);
     Simulate.click(cancelButton);
     ok(spy.calledOnce);
   });
@@ -88,7 +90,7 @@ define([
     let spy = sinon.spy();
     let updatedSet = _.extend({}, exampleSet, { title: "", enrollmentTermIDs: ["1"] });
     let form = this.renderComponent({ onSave: spy, set: updatedSet });
-    let saveButton = React.findDOMNode(form.refs.saveButton);
+    let saveButton = ReactDOM.findDOMNode(form.refs.saveButton);
     Simulate.click(saveButton);
     notOk(spy.called);
   });
