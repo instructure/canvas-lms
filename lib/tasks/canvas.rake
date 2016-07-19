@@ -9,20 +9,32 @@ def log_time(name, &block)
   time
 end
 
+def parallel_processes
+  processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
+  puts "working in #{processes} processes"
+  processes
+end
+
 namespace :canvas do
   desc "Compresses static assets"
   task :compress_assets do
     assets = FileList.new('public/**/*.js', 'public/**/*.css')
+    mutex = Mutex.new
     before_bytes = 0
     after_bytes = 0
     processed = 0
-    assets.each do |asset|
+
+    require 'parallel'
+
+    Parallel.each(assets, in_threads: parallel_processes, progress: 'compressing assets') do |asset|
       asset_compressed = "#{asset}.gz"
       unless File.exists?(asset_compressed)
         `gzip --best --stdout "#{asset}" > "#{asset_compressed}"`
-        before_bytes += File::Stat.new(asset).size
-        after_bytes += File::Stat.new(asset_compressed).size
-        processed += 1
+        mutex.synchronize do
+          before_bytes += File::Stat.new(asset).size
+          after_bytes += File::Stat.new(asset_compressed).size
+          processed += 1
+        end
       end
     end
     puts "Compressed #{processed} assets, #{before_bytes} -> #{after_bytes} bytes (#{"%.0f" % ((before_bytes.to_f - after_bytes.to_f) / before_bytes * 100)}% reduction)"
@@ -55,8 +67,6 @@ namespace :canvas do
     end
 
     require 'parallel'
-    processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
-    puts "working in #{processes} processes"
 
     tasks = Hash.new
 
@@ -77,7 +87,7 @@ namespace :canvas do
           ptasks = ['js:webpack']
           ptasks << 'js:build' if webpack_and_rjs
           # webpack and js:build can run concurrently
-          Parallel.each(ptasks, in_threads: processes.to_i) do |name|
+          Parallel.each(ptasks, in_threads: parallel_processes) do |name|
             log_time(name) { Rake::Task[name].invoke }
           end
         end
@@ -101,7 +111,7 @@ namespace :canvas do
 
     times = nil
     real_time = Benchmark.realtime do
-      times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
+      times = Parallel.map(tasks, :in_processes => parallel_processes) do |name, lamduh|
         log_time(name) { lamduh.call }
       end
     end
