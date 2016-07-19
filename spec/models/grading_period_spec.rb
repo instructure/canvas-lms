@@ -309,7 +309,8 @@ describe GradingPeriod do
       expect(grading_period).to_not be_current
     end
 
-    it "returns true if the current time falls between the start date and end date (inclusive)" do
+    it "returns true if the current time falls between the start date and end date (inclusive)",
+    test_id: 2528634, priority: "2" do
       grading_period.assign_attributes(start_date: 1.month.ago,
                                        end_date:   1.month.from_now)
       expect(grading_period).to be_current
