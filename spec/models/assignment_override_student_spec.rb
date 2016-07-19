@@ -127,6 +127,7 @@ describe AssignmentOverrideStudent do
     it "if callbacks arent run clean_up_for_assignment should delete invalid overrides" do
       adhoc_override_with_student
       #no callbacks
+      Score.where(enrollment_id: @user.enrollments).delete_all
       @user.enrollments.each(&:destroy_permanently!)
 
       expect(@ao.workflow_state).to eq("active")

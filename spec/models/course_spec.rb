@@ -2739,9 +2739,9 @@ describe Course, 'grade_publishing' do
         @course.recompute_student_scores_without_send_later
         @ase.map(&:reload)
 
-        @ase[1].computed_final_score = nil
-        @ase[3].computed_final_score = nil
-        @ase[4].computed_final_score = nil
+        @ase[1].scores.update_all(final_score: nil)
+        @ase[3].scores.update_all(final_score: nil)
+        @ase[4].scores.update_all(final_score: nil)
 
         expect(@course.generate_grade_publishing_csv_output(@ase, @user, @pseudonym)).to eq [
           [@ase.map(&:id) - [@ase[1].id, @ase[3].id, @ase[4].id],

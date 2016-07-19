@@ -137,7 +137,7 @@ describe Quizzes::QuizSubmission do
     describe "#update_scores" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -751,7 +751,7 @@ describe Quizzes::QuizSubmission do
     describe "#score_to_keep" do
       before(:once) do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -1245,7 +1245,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading?" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]
@@ -1311,7 +1311,7 @@ describe Quizzes::QuizSubmission do
     describe "#needs_grading" do
       before :once do
         student_in_course
-        assignment_quiz([])
+        assignment_quiz([], course: @course)
         qd = multiple_choice_question_data
         @quiz.quiz_data = [qd]
         @quiz.points_possible = qd[:points_possible]

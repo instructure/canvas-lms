@@ -809,7 +809,8 @@ describe Quizzes::Quiz do
     expect(q.quiz_submissions.size).to eq 0
 
     # create a graded submission
-    Quizzes::SubmissionGrader.new(q.generate_submission(User.create!(:name => "some_user"))).grade_submission
+    student_in_course(course: @course, active_all: true)
+    Quizzes::SubmissionGrader.new(q.generate_submission(@student)).grade_submission
     q.reload
 
     expect(q.quiz_submissions.size).to eq 1
@@ -1642,7 +1643,7 @@ describe Quizzes::Quiz do
     end
 
     context "show_correct_answers_last_attempt is true" do
-      let(:user) { User.create! }
+      let(:student) { student_in_course(course: @course, active_all: true) }
 
       it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({
@@ -1654,15 +1655,15 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        submission = quiz.generate_submission(user)
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        submission = quiz.generate_submission(student)
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
         submission.complete!
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_truthy
+        expect(quiz.show_correct_answers?(student, submission)).to be_truthy
       end
 
       it "hides the correct answers on last attempt" do
@@ -1675,9 +1676,9 @@ describe Quizzes::Quiz do
 
         quiz.publish!
 
-        submission = quiz.generate_submission(user)
+        submission = quiz.generate_submission(student)
 
-        expect(quiz.show_correct_answers?(user, submission)).to be_falsey
+        expect(quiz.show_correct_answers?(student, submission)).to be_falsey
       end
     end
   end

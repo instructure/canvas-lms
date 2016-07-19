@@ -721,7 +721,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns due dates as they apply to the user" do
       course_with_student(active_all: true)
       @user = @student
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(title: "Test Assignment", description: "public stuff")
       @section = @course.course_sections.create!(name: "afternoon delight")
       @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
@@ -735,7 +735,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
     it "returns original assignment due dates" do
       course_with_student(:active_all => true)
       @user = @teacher
-      @student.enrollments.map(&:destroy_permanently!)
+      @student.enrollments.each(&:destroy_permanently!)
       @assignment = @course.assignments.create!(
         :title => "Test Assignment",
         :description => "public stuff",
@@ -2974,7 +2974,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns the dates for assignment as they apply to the user" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff"
@@ -2991,7 +2992,8 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       end
 
       it "returns original assignment due dates" do
-        @student.enrollments.map(&:destroy_permanently!)
+        Score.where(enrollment_id: @student.enrollments).delete_all
+        @student.enrollments.each(&:destroy_permanently!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff",
