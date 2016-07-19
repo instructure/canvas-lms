@@ -374,11 +374,13 @@ END
       root_opt_in: true
     },
     'course_user_search' => {
-      display_name: -> { I18n.t('Course and User Search') },
+      display_name: -> { I18n.t('Account Course and User Search') },
       description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
+      applies_to: 'RootAccount',
       state: 'allowed',
-      applies_to: 'Account',
-      root_opt_in: true
+      beta: true,
+      development: false,
+      root_opt_in: false
     },
     'rich_content_service' =>
     {
