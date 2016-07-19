@@ -169,7 +169,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
-        return course_user_search if @account.feature_enabled?(:course_user_search)
+        return course_user_search if @domain_root_account.feature_enabled?(:course_user_search)
         if value_to_boolean(params[:theme_applied])
           flash[:notice] = t("Your custom theme has been successfully applied.")
         end
