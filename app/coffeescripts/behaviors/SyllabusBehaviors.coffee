@@ -191,8 +191,8 @@ define [
     $course_syllabus_details = $('#course_syllabus_details')
 
     RichContentEditor.initSidebar({
-      show: -> $('#sidebar_content').hide(),
-      hide: -> $('#sidebar_content').show()
+      show: -> $('#sidebar_content, #course_show_secondary').hide(),
+      hide: -> $('#sidebar_content, #course_show_secondary').show()
     })
 
     $edit_course_syllabus_form.on 'edit', ->
