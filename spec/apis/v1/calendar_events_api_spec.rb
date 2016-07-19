@@ -752,6 +752,68 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    describe 'moving events between calendars' do
+      it 'moves an event from a user to a course' do
+        event = @user.calendar_events.create!(:title => 'event', :start_at => '2012-01-08 12:00:00')
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
+                        {:controller => 'calendar_events_api', :action => 'update', :id => event.to_param, :format => 'json'},
+                        {:calendar_event => {:context_code => @course.asset_string}})
+        expect(json['context_code']).to eq @course.asset_string
+        expect(event.reload.context).to eq @course
+      end
+
+      it 'moves an event from a course to a user' do
+        event = @course.calendar_events.create!(:title => 'event', :start_at => '2012-01-08 12:00:00')
+        json = api_call(:put, "/api/v1/calendar_events/#{event.id}",
+                        {:controller => 'calendar_events_api', :action => 'update', :id => event.to_param, :format => 'json'},
+                        {:calendar_event => {:context_code => @user.asset_string}})
+        expect(json['context_code']).to eq @user.asset_string
+        expect(event.reload.context).to eq @user
+      end
+
+      context 'section-specific times' do
+        before :once do
+          @event = @course.calendar_events.build(:title => "test", :child_event_data => [{:start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string}])
+          @event.updating_user = @user
+          @event.save!
+        end
+
+        it 'refuses to move a parent event' do
+          json = api_call(:put, "/api/v1/calendar_events/#{@event.id}",
+                          {:controller => 'calendar_events_api', :action => 'update', :id => @event.to_param, :format => 'json'},
+                          {:calendar_event => {:context_code => @user.asset_string}}, {}, { :expected_status => 400 })
+          expect(json['message']).to include 'Cannot move events with section-specific times'
+        end
+
+        it 'refuses to move a child event' do
+          child_event = @event.child_events.first
+          expect(child_event).to be_present
+          json = api_call(:put, "/api/v1/calendar_events/#{child_event.id}",
+                          {:controller => 'calendar_events_api', :action => 'update', :id => child_event.to_param, :format => 'json'},
+                          {:calendar_event => {:context_code => @user.asset_string}}, {}, { :expected_status => 400 })
+          expect(json['message']).to include 'Cannot move events with section-specific times'
+        end
+      end
+
+      it 'refuses to move a Scheduler appointment' do
+        ag = AppointmentGroup.create!(:title => "something", :participants_per_appointment => 4, :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
+        ag.publish!
+        appointment = ag.appointments.first
+        json = api_call(:put, "/api/v1/calendar_events/#{appointment.id}",
+                        {:controller => 'calendar_events_api', :action => 'update', :id => appointment.to_param, :format => 'json'},
+                        {:calendar_event => {:context_code => @user.asset_string}}, {}, { :expected_status => 400 })
+        expect(json['message']).to include 'Cannot move Scheduler appointments'
+      end
+
+      it 'verifies the caller has permission to create the event in the destination context' do
+        other_course = Course.create!
+        event = @course.calendar_events.create!(:title => 'event', :start_at => '2012-01-08 12:00:00')
+        api_call(:put, "/api/v1/calendar_events/#{event.id}",
+                        {:controller => 'calendar_events_api', :action => 'update', :id => event.to_param, :format => 'json'},
+                        {:calendar_event => {:context_code => other_course.asset_string}}, {}, { :expected_status => 401 })
+      end
+    end
+
     it 'should delete an event' do
       event = @course.calendar_events.create(:title => 'event', :start_at => '2012-01-08 12:00:00')
       json = api_call(:delete, "/api/v1/calendar_events/#{event.id}",

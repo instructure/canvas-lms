@@ -542,9 +542,9 @@ class CalendarEventsApiController < ApplicationController
   #
   # Update and return a calendar event
   #
-  # @argument calendar_event[context_code] [Required, String]
-  #   Context code of the course/group/user whose calendar this event should be
-  #   added to.
+  # @argument calendar_event[context_code] [Optional, String]
+  #   Context code of the course/group/user to move this event to.
+  #   Scheduler appointments and events with section-specific times cannot be moved between calendars.
   # @argument calendar_event[title] [String]
   #   Short title for the calendar event.
   # @argument calendar_event[description] [String]
@@ -585,7 +585,19 @@ class CalendarEventsApiController < ApplicationController
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
       end
-      params[:calendar_event].delete(:context_code)
+      context_code = params[:calendar_event].delete(:context_code)
+      if context_code
+        if @event.context.is_a?(AppointmentGroup)
+          return render :json => { :message => 'Cannot move Scheduler appointments between calendars' }, :status => :bad_request
+        end
+        if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
+          return render :json => { :message => 'Cannot move events with section-specific times between calendars' }, :status => :bad_request
+        end
+        context = Context.find_by_asset_string(context_code)
+        raise ActiveRecord::RecordNotFound, "Invalid context_code" unless context
+        @event.context = context
+        return unless authorized_action(@event, @current_user, :create)
+      end
       if params[:calendar_event][:description].present?
         params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
       end
