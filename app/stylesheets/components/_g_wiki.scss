@@ -159,7 +159,7 @@ $revision-button-hover-color: $ic-brand-primary;
       }
       th {
         vertical-align: middle;
-        font-weight: 500;
+        font-weight: bold;
       }
     }
     .table tbody {
@@ -216,7 +216,7 @@ $revision-button-hover-color: $ic-brand-primary;
         .wiki-page-link {
           @include fontSize(13px);
           color: $darkened-text-color;
-          font-weight: 500;
+          font-weight: bold;
         }
         .wiki-page-link.published {
           color: $published-text-color;
@@ -403,8 +403,9 @@ $revision-button-hover-color: $ic-brand-primary;
     }
 
     .revision-history {
+      @include fontSize($ic-font-size--small);
       position: relative;
-      font-weight: 500;
+      font-weight: bold;
       margin-bottom: $ic-sp;
       @include fontSize($ic-font-size--small);
     }
@@ -484,7 +485,7 @@ $revision-button-hover-color: $ic-brand-primary;
     a {
       user-select: none;
       text-transform: uppercase;
-      font-weight: 500;
+      font-weight: bold;
     }
     a:hover {
       text-decoration: none;

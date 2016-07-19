@@ -1783,10 +1783,6 @@ class ApplicationController < ActionController::Base
   end
   helper_method :css_bundle
 
-  alias_method :jammit_css, :css_bundle
-  deprecate :jammit_css
-  helper_method :jammit_css
-
   def js_bundles; @js_bundles ||= []; end
   helper_method :js_bundles
 

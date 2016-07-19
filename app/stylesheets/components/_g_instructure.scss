@@ -222,7 +222,7 @@
     td, tbody th {
       background-color: $lightBackground;
     }
-    tbody th { font-weight: 500; }
+    tbody th { font-weight: bold; }
   }
   table.notifications {
     border-top: 2px solid #999;
@@ -318,7 +318,7 @@ table.summary {
     padding: $ic-sp/2;
   }
   thead th, caption {
-    font-weight: 500;
+    font-weight: bold;
     border-bottom: 1px solid $ic-border-dark;
   }
   td, tbody th {

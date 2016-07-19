@@ -108,7 +108,7 @@ h1 {
   padding: 1em 0 0.5em 0;
   border-bottom: 1px solid #333;
   color: #333;
-  font-weight: 300;
+  font-weight: normal;
 }
 h2 {
   padding: 0 0 3px;
@@ -134,7 +134,7 @@ h3.beta {
 #sidebar h2 {
   padding: 14px 10px 14px 6px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: bold;
   border-left: 3px solid #0073ac;
 
   margin:  0;
@@ -178,7 +178,7 @@ table {
 table th {
   background-color: #0073ac;
   color: #fff;
-  font-weight: 300;
+  font-weight: normal;
 }
 
 table th, table td {
@@ -289,7 +289,7 @@ div.warning-message {
 
 code.enum {
   color: white;
-  font-weight: 500;
+  font-weight: bold;
   padding: 0 4px;
   background-color: #2A404D;
   border: 1px solid #2A404D;
@@ -297,8 +297,8 @@ code.enum {
 }
 .param-values .allowed {
   display: block;
-  font-weight: 500;
-  margin-bottom:13px;
+  font-weight: bold;
+  margin-bottom: 13px;
 }
 .param-values {
   background: #efefef;

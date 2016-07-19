@@ -11,11 +11,55 @@
 /// Global Settings
 ///////==============
 
+
+@font-face {
+  font-family: 'LatoWeb';
+  src: url('/fonts/lato/latin/LatoLatin-Regular.woff2') format('woff2'),
+       url('/fonts/lato/latin/LatoLatin-Regular.woff') format('woff'),
+       url('/fonts/lato/latin/LatoLatin-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'LatoWeb';
+  src: url('/fonts/lato/latin/LatoLatin-Italic.woff2') format('woff2'),
+       url('/fonts/lato/latin/LatoLatin-Italic.woff') format('woff'),
+       url('/fonts/lato/latin/LatoLatin-Italic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'LatoWeb';
+  src: url('/fonts/lato/latin/LatoLatin-Bold.woff2') format('woff2'),
+       url('/fonts/lato/latin/LatoLatin-Bold.woff') format('woff'),
+       url('/fonts/lato/latin/LatoLatin-Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'LatoWeb';
+  src: url('/fonts/lato/latin/LatoLatin-Light.woff2') format('woff2'),
+       url('/fonts/lato/latin/LatoLatin-Light.woff') format('woff'),
+       url('/fonts/lato/latin/LatoLatin-Light.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 300;
+}
+
+html {
+  font-family: $ic-font-family-fallback;
+  &.lato-font-loaded {
+    font-family: $ic-font-family;
+  }
+}
+
 body {
+  @include fontSize($ic-font-size);
+  font-weight: normal;
   margin: 0;
   line-height: $ic-line-height;
-  @include fontSize($ic-font-size);
-  font-family: $ic-font-family;
   color: $ic-font-color-dark;
 }
 
@@ -97,7 +141,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 h1, h2, .h1, .h2 {
   font-size: 1.8em;
-  font-weight: 300;
   line-height: $ic-line-height;
 }
 h3, .h3 {
