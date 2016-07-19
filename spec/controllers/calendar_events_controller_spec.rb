@@ -34,7 +34,7 @@ describe CalendarEventsController do
       get 'show', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       get 'show', :course_id => @course.id, :id => @event.id, :format => :json
@@ -59,13 +59,13 @@ describe CalendarEventsController do
       expect(response).to be_redirect
     end
   end
-  
+
   describe "GET 'new'" do
     it "should require authorization" do
       get 'new', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to create" do
       user_session(@student)
       get 'new', :course_id => @course.id
@@ -78,20 +78,27 @@ describe CalendarEventsController do
       get 'new', :course_id => @course.id
       expect(@course.reload.calendar_events.count).to eq initial_count
     end
+
+    it "allows creating recurring calendar events on a user's calendar if the user's account allows them to" do
+      user_session(@teacher)
+      @teacher.account.enable_feature!(:recurring_calendar_events)
+      get 'new', user_id: @teacher.id
+      expect(@controller.js_env[:RECURRING_CALENDAR_EVENTS_ENABLED]).to be(true)
+    end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to create" do
       user_session(@student)
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should create a new event" do
       user_session(@teacher)
       post 'create', :course_id => @course.id, :calendar_event => {:title => "some event"}
@@ -100,32 +107,32 @@ describe CalendarEventsController do
       expect(assigns[:event].title).to eql("some event")
     end
   end
-  
+
   describe "GET 'edit'" do
     it "should require authorization" do
       get 'edit', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-   
+
     it "should not allow students to update" do
       user_session(@student)
       get 'edit', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       put 'update', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to update" do
       user_session(@student)
       put 'update', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-    
+
     it "should update the event" do
       user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @event.id, :calendar_event => {:title => "new title"}
@@ -135,19 +142,19 @@ describe CalendarEventsController do
       expect(assigns[:event].title).to eql("new title")
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it "should require authorization" do
       delete 'destroy', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to delete" do
       user_session(@student)
       delete 'destroy', :course_id => @course.id, :id => @event.id
       assert_unauthorized
     end
-    
+
     it "should delete the event" do
       user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @event.id
