@@ -1606,6 +1606,7 @@ class CoursesController < ApplicationController
         add_crumb(t('#crumbs.modules', "Modules"))
         load_modules
       when 'syllabus'
+        rce_js_env(:sidebar)
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @syllabus_body = api_user_content(@context.syllabus_body, @context)
         @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
