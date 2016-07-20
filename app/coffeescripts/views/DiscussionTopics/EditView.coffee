@@ -109,13 +109,17 @@ ConditionalRelease) ->
     # separated out so we can easily stub it
     scrollSidebar: $.scrollSidebar
 
+    # also separated for easy stubbing
+    loadNewEditor: ($textarea)->
+      RichContentEditor.loadNewEditor($textarea, { focus: true, manageParent: true})
+
     render: =>
       super
       $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message'))
 
       RichContentEditor.initSidebar(show: @scrollSidebar)
-      _.defer ->
-        RichContentEditor.loadNewEditor($textarea, { focus: true })
+      _.defer =>
+        @loadNewEditor($textarea)
         $('.rte_switch_views_link').click (event) ->
           event.preventDefault()
           event.stopPropagation()

@@ -3732,6 +3732,7 @@ define([
 
     RichContentEditor.loadNewEditor($("#quiz_description"), {
       focus: true,
+      manageParent: true,
       tinyOptions: {
         aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
       }
