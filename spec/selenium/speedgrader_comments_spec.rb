@@ -276,6 +276,7 @@ describe "speed grader" do
 
       it 'can be dismissed', test_id: 1407010, priority: "1" do
         f('#next-student-button').click()
+        wait_for_ajaximations
 
         f('div#comment_saved .dismiss_alert').click()
         expect(f('div#comment_saved')).not_to be_displayed
@@ -316,6 +317,7 @@ describe "speed grader" do
         expect {
           publish_links[0].click
           accept_alert
+          wait_for_ajaximations
         }.to change {
           SubmissionComment.published.count
         }.by(1)
