@@ -1983,7 +1983,7 @@ define([
           $comment_submitted.show();
           $comment_submitted_message.attr("tabindex",-1).focus();
         }
-        $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
+        $add_a_comment_submit_button.text(I18n.t('submit', "Submit"));
     },
 
     addSubmissionComment: function(draftComment){
