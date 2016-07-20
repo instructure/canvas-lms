@@ -12,10 +12,11 @@ define [
   'compiled/collections/AssignmentGroupCollection'
   'compiled/views/assignments/GroupCategorySelector'
   'helpers/fakeENV'
+  'jsx/shared/rce/RichContentEditor'
   'helpers/jquery.simulate'
 ], ($, _, SectionCollection, Assignment, DueDateList, Section, DiscussionTopic,
 Announcement, DueDateOverrideView, EditView, AssignmentGroupCollection,
-GroupCategorySelector, fakeENV) ->
+GroupCategorySelector, fakeENV, RichContentEditor) ->
 
   editView = (opts = {}) ->
     modelClass = if opts.isAnnouncement then Announcement else DiscussionTopic
@@ -54,6 +55,11 @@ GroupCategorySelector, fakeENV) ->
   test 'renders', ->
     view = @editView()
     ok view
+
+  test 'tells RCE to manage the parent', ->
+    lne = @stub(RichContentEditor, 'loadNewEditor')
+    EditView.prototype.loadNewEditor.call()
+    ok lne.firstCall.args[1].manageParent, 'manageParent flag should be set'
 
   test 'does error message show on assignment point change with submissions', ->
     view = @editView
