@@ -32,9 +32,15 @@ define [
       @$form.find("#duplicate_event").change @duplicateCheckboxChanged
       @$form.find("select.context_id").triggerHandler('change', false)
 
-      # Context can't be changed, and duplication only works on create
+      # show context select if the event allows moving between calendars
+      if @event.can_change_context
+        @setContext(@event.object.context_code) unless @event.isNewEvent()
+      else
+        @$form.find(".context_select").hide()
+
+      # duplication only works on create
       unless @event.isNewEvent()
-        @$form.find(".context_select, .duplicate_event_row, .duplicate_event_toggle_row").hide()
+        @$form.find(".duplicate_event_row, .duplicate_event_toggle_row").hide()
 
     contextInfoForCode: (code) ->
       for context in @event.possibleContexts()
@@ -184,6 +190,12 @@ define [
         @event.start = fcUtil.wrap(data.start_at)
         @event.end = fcUtil.wrap(data.end_at)
         @event.location_name = location_name
+        if @event.can_change_context && data.context_code != @event.object.context_code
+          @event.old_context_code = @event.object.context_code
+          @event.removeClass "group_#{@event.old_context_code}"
+          @event.object.context_code = data.context_code
+          @event.contextInfo = @contextInfoForCode(data.context_code)
+          params['calendar_event[context_code]'] = data.context_code
         @event.save(params)
 
       @closeCB()

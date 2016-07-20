@@ -11,6 +11,7 @@ define [
     if data == null
       obj = new CommonEvent()
       obj.allPossibleContexts = contexts
+      obj.can_change_context = true
       return obj
 
     actualContextCode = data.context_code
@@ -59,6 +60,8 @@ define [
     # the following assumptions:
     obj.can_edit = false
     obj.can_delete = false
+    obj.can_change_context = false
+
     # If the user can create an event in a context, they can also edit/delete
     # any events in that context.
     if contextInfo.can_create_calendar_events
@@ -77,6 +80,12 @@ define [
     # frozen assignments can't be deleted
     if obj.assignment?.frozen
       obj.can_delete = false
+
+    # events can be moved to a different calendar in limited circumstances
+    if type == 'calendar_event'
+      unless obj.object.appointment_group_id || obj.object.parent_event_id ||
+             obj.object.child_events_count || obj.object.effective_context_code
+        obj.can_change_context = true
 
     # disable fullcalendar.js dragging unless the user has permissions
     obj.editable = false unless obj.can_edit

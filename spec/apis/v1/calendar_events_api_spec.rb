@@ -793,6 +793,13 @@ describe CalendarEventsApiController, type: :request do
                           {:calendar_event => {:context_code => @user.asset_string}}, {}, { :expected_status => 400 })
           expect(json['message']).to include 'Cannot move events with section-specific times'
         end
+
+        it "doesn't complain if you 'move' the event into the calendar it's already in" do
+          api_call(:put, "/api/v1/calendar_events/#{@event.id}",
+                          {:controller => 'calendar_events_api', :action => 'update', :id => @event.to_param, :format => 'json'},
+                          {:calendar_event => {:context_code => @course.asset_string}})
+
+        end
       end
 
       it 'refuses to move a Scheduler appointment' do

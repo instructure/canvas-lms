@@ -587,15 +587,17 @@ class CalendarEventsApiController < ApplicationController
       end
       context_code = params[:calendar_event].delete(:context_code)
       if context_code
-        if @event.context.is_a?(AppointmentGroup)
-          return render :json => { :message => 'Cannot move Scheduler appointments between calendars' }, :status => :bad_request
-        end
-        if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
-          return render :json => { :message => 'Cannot move events with section-specific times between calendars' }, :status => :bad_request
-        end
         context = Context.find_by_asset_string(context_code)
         raise ActiveRecord::RecordNotFound, "Invalid context_code" unless context
-        @event.context = context
+        if @event.context != context
+          if @event.context.is_a?(AppointmentGroup)
+            return render :json => { :message => 'Cannot move Scheduler appointments between calendars' }, :status => :bad_request
+          end
+          if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
+            return render :json => { :message => 'Cannot move events with section-specific times between calendars' }, :status => :bad_request
+          end
+          @event.context = context
+        end
         return unless authorized_action(@event, @current_user, :create)
       end
       if params[:calendar_event][:description].present?
