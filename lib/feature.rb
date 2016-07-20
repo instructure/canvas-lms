@@ -18,7 +18,7 @@
 
 class Feature
   ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development,
-    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand]
+    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand, :touch_context]
   attr_reader *ATTRS
 
   def initialize(opts = {})

@@ -76,9 +76,6 @@ define([
                 ENROLL_USERS_URL: $.replaceTags(this.props.addUserUrls.ENROLL_USERS_URL, 'id', course.id)
               };
 
-              let rolesForCourse = this.props.roles.filter((roleObj) => roleObj.course_id === course.id);
-              rolesForCourse = (rolesForCourse.length) ? rolesForCourse[0].roles : [];
-
               const sectionsForCourse = this.state.sections.filter((section) => {
                 return section.course_id === parseInt(course.id, 10);
               });
@@ -87,7 +84,7 @@ define([
                 <CoursesListRow
                   key={course.id}
                   courseModel={courses}
-                  roles={rolesForCourse}
+                  roles={this.props.roles}
                   urls={urlsForCourse}
                   sections={sectionsForCourse}
                   {...course}

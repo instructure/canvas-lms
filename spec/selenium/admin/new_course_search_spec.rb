@@ -107,4 +107,20 @@ describe "new account course search" do
     expect(user_link).to include_text(@user.name)
     expect(user_link['href']).to eq user_url(@user)
   end
+
+  it "should show manageable roles in new enrollment dialog" do
+    custom_name = 'Custom Student role'
+    role = custom_student_role(custom_name, :account => @account)
+
+    @account.role_overrides.create!(:permission => "manage_admin_users", :enabled => false, :role => admin_role)
+    course(:account => @account)
+
+    get "/accounts/#{@account.id}"
+
+    f('.courses-list [role=row] .addUserButton').click
+    dialog = fj('.ui-dialog:visible')
+    expect(dialog).to be_displayed
+    role_options = dialog.find_elements(:css, '#role_id option')
+    expect(role_options.map{|r| r.text}).to match_array(["Student", "Observer", custom_name])
+  end
 end

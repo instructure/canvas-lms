@@ -213,7 +213,7 @@ class AccountsController < ApplicationController
         timezones: localized_timezones(I18nTimeZone.all)
       },
       BASE_PATH: request.env['PATH_INFO'].sub(/\/search.*/, '') + '/search',
-      ALL_ROLES: Role.account_role_data(@account, @current_user),
+      COURSE_ROLES: Role.course_role_data_for_account(@account, @current_user),
       URLS: {
         USER_LISTS_URL: course_user_lists_url("{{ id }}"),
         ENROLL_USERS_URL: course_enroll_users_url("{{ id }}", :format => :json)
