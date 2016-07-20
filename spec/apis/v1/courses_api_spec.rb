@@ -495,6 +495,7 @@ describe CoursesController, type: :request do
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
             'course_format'                        => 'online',
+            'time_zone'                            => 'America/Juneau'
           }
         }
         course_response = post_params['course'].merge({
@@ -524,6 +525,7 @@ describe CoursesController, type: :request do
         expect(new_course.account_id).to eql @account.id
         expect(new_course.enrollment_term_id).to eql term.id
         expect(new_course.workflow_state).to eql 'available'
+        expect(new_course.time_zone.tzinfo.name).to eql 'America/Juneau'
         course_response.merge!(
           'id' => new_course.id,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" }
@@ -556,6 +558,7 @@ describe CoursesController, type: :request do
             'license'                              => 'Creative Commons',
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
+            'time_zone'                            => 'America/Chicago'
           }
         }
         course_response = post_params['course'].merge({
@@ -753,7 +756,8 @@ describe CoursesController, type: :request do
         'apply_assignment_group_weights' => true,
         'restrict_enrollments_to_course_dates' => true,
         'default_view' => 'new default view',
-        'course_format' => 'on_campus'
+        'course_format' => 'on_campus',
+        'time_zone' => 'Pacific/Honolulu'
       }, 'offer' => true }
     end
 
@@ -775,6 +779,7 @@ describe CoursesController, type: :request do
         expect(json['end_at']).to eql @new_values['course']['end_at']
         expect(json['sis_course_id']).to eql @new_values['course']['sis_course_id']
         expect(json['default_view']).to eql @new_values['course']['default_view']
+        expect(json['time_zone']).to eql @new_values['course']['time_zone']
 
         expect(@course.name).to eql @new_values['course']['name']
         expect(@course.course_code).to eql @new_values['course']['course_code']
@@ -795,6 +800,7 @@ describe CoursesController, type: :request do
         expect(@course.apply_group_weights?).to eq true
         expect(@course.default_view).to eq 'new default view'
         expect(@course.course_format).to eq 'on_campus'
+        expect(@course.time_zone.tzinfo.name).to eq 'Pacific/Honolulu'
       end
 
       it "should not change dates that aren't given" do
@@ -2519,6 +2525,7 @@ describe CoursesController, type: :request do
 
   describe "#show" do
     it "should get individual course data" do
+      @course1.root_account.update_attributes(:default_time_zone => 'America/Los_Angeles')
       json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
               { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
 
@@ -2544,7 +2551,8 @@ describe CoursesController, type: :request do
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,
         'enrollment_term_id' => @course.enrollment_term_id,
-        'restrict_enrollments_to_course_dates' => false
+        'restrict_enrollments_to_course_dates' => false,
+        'time_zone' => 'America/Los_Angeles'
       })
     end
 

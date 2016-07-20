@@ -268,6 +268,11 @@ require 'securerandom'
 #           "description": "optional: this will be true if this user is currently prevented from viewing the course because of date restriction settings",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "time_zone": {
+#           "description": "The course's IANA time zone name.",
+#           "example": "America/Denver",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -582,6 +587,11 @@ class CoursesController < ApplicationController
   #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
+  #
+  # @argument course[time_zone] [String]
+  #   The time zone for the course. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
   # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students
@@ -1994,6 +2004,11 @@ class CoursesController < ApplicationController
   #   If this option is set to true, the totals in student grades summary will
   #   be hidden.
   #
+  # @argument course[time_zone] [String]
+  #   The time zone for the course. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
   # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
   #
@@ -2487,7 +2502,7 @@ class CoursesController < ApplicationController
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
-    preloads = [:account]
+    preloads = [:account, :root_account]
     preloads << :teachers if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
     ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
