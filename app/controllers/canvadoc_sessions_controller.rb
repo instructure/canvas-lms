@@ -31,10 +31,10 @@ class CanvadocSessionsController < ApplicationController
 
     if attachment.canvadocable?
       opts = {
-        preferred_renders: []
+        preferred_plugins: [Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC]
       }
       if @domain_root_account.settings[:canvadocs_prefer_office_online]
-        opts[:preferred_renders].unshift Canvadocs::RENDER_O365
+        opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
       end
       attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
       url = attachment.canvadoc.session_url(user: @current_user)
