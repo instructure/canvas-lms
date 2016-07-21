@@ -12,6 +12,15 @@
 <div class="moderate_header">
   <h1><%= t(:page_title, "Moderate Quiz") %></h1>
 </div>
+<%= form_tag(context_url(@context, :context_quiz_moderate_url, @quiz.id), method: :get) do %>
+  <div class="ic-Form-control">
+    <div class="ic-Input-group">
+      <%= text_field_tag :search_term, params[:search_term], class: "ic-Input", placeholder: t('Search People'),
+      aria_label: t('Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.') %>
+      <%= submit_tag t('Filter'), class: "Button" %>
+    </div>
+  </div>
+<% end %>
 <table id="students" class="table table-striped <%= 'can_add_attempts' if @quiz.allowed_attempts < 0 %>">
   <thead>
     <tr>
