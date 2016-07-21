@@ -50,7 +50,7 @@ describe "/gradebooks/speed_grader" do
   it 'includes the link to publish' do
     render 'gradebooks/speed_grader'
 
-    expect(rendered).to match(/button.+?class=.+?publish_comment_button/)
+    expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 end
 

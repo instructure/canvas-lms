@@ -1894,7 +1894,7 @@ define([
           $comment.addClass('draft');
         } else {
           $comment.find('.draft-marker').remove();
-          $comment.find('.publish_comment_button').remove();
+          $comment.find('.submit_comment_button').remove();
         }
 
         $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
@@ -1954,8 +1954,8 @@ define([
           });
         }).showIf(commentIsDeleteableByMe);
 
-        $comment.find(".publish_comment_button").click(function(event) {
-          if (confirm(I18n.t('Are you sure you want to publish this comment?'))) {
+        $comment.find(".submit_comment_button").click(function(event) {
+          if (confirm(I18n.t('Are you sure you want to submit this comment?'))) {
             function commentUpdateSucceeded(data) {
               var $replacementComment = renderComment(data.submission_comment, $comment_blank);
               $replacementComment.show();
@@ -1963,7 +1963,7 @@ define([
             }
 
             function commentUpdateFailed(jqXHR, textStatus) {
-              $.flashError(I18n.t("Failed to publish draft comment"));
+              $.flashError(I18n.t("Failed to submit draft comment"));
             }
 
             var url = '/submission_comments/' + comment.id;

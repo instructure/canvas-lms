@@ -307,7 +307,7 @@ describe "speed grader" do
           next unless match_data
 
           comment_elements_by_author[match_data[:teacher].to_sym] = {
-            publish_link: ce.find('button.publish_comment_button'),
+            publish_link: ce.find('button.submit_comment_button'),
           }
         end
 
@@ -318,7 +318,7 @@ describe "speed grader" do
 
     describe 'publishing a draft comment' do
       it 'should increase the number of published comments', test_id: 1407013, priority: "1" do
-        publish_links = ff('#comments .comment.draft > button.publish_comment_button').select(&:displayed?)
+        publish_links = ff('#comments .comment.draft > button.submit_comment_button').select(&:displayed?)
 
         expect {
           publish_links[0].click
