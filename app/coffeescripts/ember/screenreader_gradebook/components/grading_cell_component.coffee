@@ -1,6 +1,6 @@
 define [
   'i18n!grading_cell'
-  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
+  'compiled/gradebook2/GradebookTranslations'
   'compiled/gradebook2/GradebookHelpers'
   'underscore'
   'ember'

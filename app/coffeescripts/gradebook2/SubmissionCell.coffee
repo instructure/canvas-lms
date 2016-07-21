@@ -1,5 +1,5 @@
 define [
-  'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
+  'compiled/gradebook2/GradebookTranslations'
   'str/htmlEscape'
   'jquery'
   'underscore'
@@ -16,7 +16,7 @@ define [
 
     init: () ->
       submission = @opts.item[@opts.column.field]
-      @$wrapper = $(@cellWrapper("<input #{htmlEscape @ariaLabel(submission.submission_type)} class='grade'/>")).appendTo(@opts.container)
+      @$wrapper = $(@cellWrapper("<input #{@ariaLabelTemplate(submission.submission_type)} class='grade'/>")).appendTo(@opts.container)
       @$input = @$wrapper.find('input').focus().select()
 
     destroy: () ->
@@ -126,7 +126,7 @@ define [
       </div>
       """
 
-    ariaLabel: (submission_type) ->
+    ariaLabelTemplate: (submission_type) ->
       label = GRADEBOOK_TRANSLATIONS["submission_tooltip_#{submission_type}"]
       if label?
         "aria-label='#{label}'"
@@ -167,7 +167,7 @@ define [
       @$wrapper = $(@cellWrapper("""
         <div class="overflow-wrapper">
           <div class="grade-and-outof-wrapper">
-            <input type="text" #{htmlEscape @ariaLabel(submission.submission_type)} class="grade"/><span class="outof"><span class="divider">/</span>#{htmlEscape @opts.column.object.points_possible}</span>
+            <input type="text" #{@ariaLabelTemplate(submission.submission_type)} class="grade"/><span class="outof"><span class="divider">/</span>#{htmlEscape @opts.column.object.points_possible}</span>
           </div>
         </div>
       """, { classes: 'gradebook-cell-out-of-formatter' })).appendTo(@opts.container)
