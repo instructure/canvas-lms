@@ -3300,6 +3300,24 @@ describe Assignment do
         g.map { |c| c.submission.user }.sort_by(&:id)
       }).to eq [[s1, s2]]
     end
+
+    it "excludes student names from filenames when anonymous grading is enabled" do
+      @course.enable_feature! :anonymous_grading
+
+      s1 = @students.first
+      sub = submit_homework(s1)
+
+      zip = zip_submissions
+      filename = Zip::File.new(zip.open).entries.map(&:name).first
+      expect(filename).to eq "#{s1.id}_#{sub.id}_homework.pdf"
+
+      comments, ignored = @assignment.generate_comments_from_files(
+        zip.open.path,
+        @teacher)
+
+      expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
+      expect(ignored).to be_empty
+    end
   end
 
   describe "#restore" do

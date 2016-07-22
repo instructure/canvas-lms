@@ -404,7 +404,7 @@ class ContentZipper
     @submission = submission
     @logger.debug(" checking submission for #{(submission.user.id)}")
 
-    users_name = get_user_name(students, submission)
+    users_name = get_user_name(students, submission) unless @context.feature_enabled?(:anonymous_grading)
     filename = get_filename(users_name, submission)
 
     case submission.submission_type
@@ -442,7 +442,7 @@ class ContentZipper
   end
 
   def get_filename(users_name, submission)
-    filename = "#{users_name}#{submission.late? ? '_LATE' : ''}_#{submission.user_id}"
+    filename = [users_name, submission.late? ? 'LATE' : nil, submission.user_id].compact.join('_')
     sanitize_file_name(filename)
   end
 
