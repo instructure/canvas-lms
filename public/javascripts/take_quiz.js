@@ -686,7 +686,7 @@ define([
     setTimeout(function() {
       $(".question_holder textarea.question_input").each(function() {
         $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++);
-        RichContentEditor.loadNewEditor($(this));
+        RichContentEditor.loadNewEditor($(this), {manageParent: true});
       });
     }, 2000);
 
