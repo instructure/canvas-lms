@@ -14,7 +14,8 @@ define [
             'whatever': {}
         column:
             field: 'whatever'
-            object: {}
+            object:
+              points_possible: 100
         container: $('#fixtures')[0]
       @cell = new SubmissionCell @opts
     teardown: -> $('#fixtures').empty()
@@ -25,6 +26,12 @@ define [
     @stub @cell, 'postValue'
     @cell.applyValue(item,state)
     equal item.whatever.grade, escapedDangerousHTML
+
+  test "#applyValue calls flashWarning", ->
+    @stub @cell, 'postValue'
+    flashWarningStub = @stub $, 'flashWarning'
+    @cell.applyValue(@opts.item, '150')
+    ok flashWarningStub.calledOnce
 
   test "#loadValue escapes html", ->
     @opts.item.whatever.grade = dangerousHTML

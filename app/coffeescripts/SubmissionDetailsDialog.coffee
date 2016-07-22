@@ -1,9 +1,10 @@
 define [
-  'i18n!submission_details_dialog'
   'jquery'
   'jst/SubmissionDetailsDialog'
+  'i18n!submission_details_dialog'
   'compiled/gradebook2/GradebookHelpers'
   'compiled/gradebook2/Turnitin'
+  'jsx/grading/helpers/OutlierScoreHelper'
   'jst/_submission_detail' # a partial needed by the SubmissionDetailsDialog template
   'jst/_turnitinScore' # a partial needed by the submission_detail partial
   'jquery.ajaxJSON'
@@ -13,7 +14,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.scrollTo'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, submissionDetailsDialog, GradebookHelpers, {extractDataFor}) ->
+], ($, submissionDetailsDialog, I18n, GradebookHelpers, {extractDataFor}, OutlierScoreHelper) ->
 
   class SubmissionDetailsDialog
     constructor: (@assignment, @student, @options) ->
@@ -56,6 +57,9 @@ define [
           formData = {"submission[excuse]": true}
         $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
+          unless data.excused
+            outlierScoreHelper = new OutlierScoreHelper(@submission.score, @submission.assignment.points_possible)
+            $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
           $.publish 'submissions_updated', [@submission.all_submissions]
           setTimeout =>
             @dialog.dialog('close')

@@ -109,15 +109,14 @@ define [
     ok @component.get('isGpaScale')
 
   asyncTest "focusOut", ->
-    expect(1)
-    stub = sinon.stub @component, 'boundUpdateSuccess'
+    stub = @stub @component, 'boundUpdateSuccess'
     submissions = []
 
     requestStub = null
     run =>
       requestStub = Ember.RSVP.resolve all_submissions: submissions
 
-    sinon.stub(@component, 'ajax').returns requestStub
+    @stub(@component, 'ajax').returns requestStub
 
     run =>
       @component.set('value', 'ohai')
@@ -125,3 +124,9 @@ define [
       start()
 
     ok stub.called
+
+  test "onUpdateSuccess", ->
+    run => @assignment.set('points_possible', 100)
+    flashWarningStub = @stub $, 'flashWarning'
+    @component.onUpdateSuccess({all_submissions: [], score: 150})
+    ok flashWarningStub.called

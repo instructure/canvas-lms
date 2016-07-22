@@ -2,11 +2,12 @@ define [
   'i18n!grading_cell'
   'compiled/gradebook2/GradebookTranslations'
   'compiled/gradebook2/GradebookHelpers'
+  'jsx/grading/helpers/OutlierScoreHelper'
   'underscore'
   'ember'
   'jquery'
   'jquery.ajaxJSON'
-], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, _, Ember, $) ->
+], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, OutlierScoreHelper, _, Ember, $) ->
 
   GradingCellComponent = Ember.Component.extend
 
@@ -106,6 +107,10 @@ define [
 
     onUpdateSuccess: (submission) ->
       @sendAction 'on-submit-grade', submission.all_submissions
+      unless submission.excused
+        outlierScoreHelper = new OutlierScoreHelper(submission.score, @assignment.points_possible)
+        $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+
 
     onUpdateError: ->
       $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)

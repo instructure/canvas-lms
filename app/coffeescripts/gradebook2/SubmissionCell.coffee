@@ -1,13 +1,14 @@
 define [
-  'compiled/gradebook2/GradebookTranslations'
-  'str/htmlEscape'
   'jquery'
   'underscore'
+  'compiled/gradebook2/GradebookTranslations'
+  'jsx/grading/helpers/OutlierScoreHelper'
+  'str/htmlEscape'
   'compiled/gradebook2/Turnitin'
   'compiled/util/round'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # raw
-], (GRADEBOOK_TRANSLATIONS, htmlEscape,$, _, {extractData},round) ->
+], ($, _, GRADEBOOK_TRANSLATIONS, OutlierScoreHelper, htmlEscape, {extractData}, round) ->
 
   class SubmissionCell
 
@@ -43,9 +44,11 @@ define [
         submission.excused = true
       else
         submission.grade = htmlEscape state
+        pointsPossible = @opts.column.object.points_possible
+        outlierScoreHelper = new OutlierScoreHelper(state, pointsPossible)
+        $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
       @wrapper?.remove()
       @postValue(item, state)
-      # TODO: move selection down to the next row, same column
 
     postValue: (item, state) ->
       submission = item[@opts.column.field]
