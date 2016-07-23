@@ -24,6 +24,13 @@ clientAppPlugin.prototype.apply = function(compiler){
         if(request == "react-router" || request == "canvas_packages/react-router"){
           request = "old_unsupported_dont_use_react-router-webpack"
         }
+
+        // Likewise, they depend on requiring lodash directly, which was set to
+        // map to lodash.underscore prior to 37914f705ee4055224107f01f0afb772d443f90d
+        // which added up-to-date normal lodash via 'lodash'
+        if (request === "lodash") {
+          request = "underscore";
+        }
       }
 
       // client apps are using a jsx plugin for require js; we have a JSX
