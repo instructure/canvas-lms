@@ -379,7 +379,7 @@ END
       applies_to: 'Account',
       state: 'allowed',
       beta: true,
-      development: false,
+      development: true,
       root_opt_in: true
     },
     'rich_content_service' =>
