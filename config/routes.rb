@@ -1355,6 +1355,10 @@ CanvasRails::Application.routes.draw do
       post 'calendar_events/:id/reservations', action: :reserve
       post 'calendar_events/:id/reservations/:participant_id', action: :reserve, as: 'calendar_event_reserve'
       post 'calendar_events/save_selected_contexts', action: :save_selected_contexts
+
+      get 'courses/:course_id/calendar_events/timetable', action: :get_course_timetable
+      post 'courses/:course_id/calendar_events/timetable', action: :set_course_timetable
+      post 'courses/:course_id/calendar_events/timetable_events', action: :set_course_timetable_events
     end
 
     scope(controller: :appointment_groups) do

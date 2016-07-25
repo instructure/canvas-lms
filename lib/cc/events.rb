@@ -18,7 +18,8 @@
 module CC
   module Events
     def create_events(document=nil)
-      return nil unless @course.calendar_events.active.count > 0
+      calendar_event_scope = @course.calendar_events.active.user_created
+      return nil unless calendar_event_scope.count > 0
 
       if document
         events_file = nil
@@ -35,7 +36,7 @@ module CC
               "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |events_node|
-        @course.calendar_events.active.each do |event|
+        calendar_event_scope.each do |event|
           next unless export_object?(event)
           add_exported_asset(event)
           migration_id = CCHelper.create_key(event)

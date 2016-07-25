@@ -2547,6 +2547,7 @@ class Course < ActiveRecord::Base
     setting = setting.to_sym
     settings_options[setting] = opts
     cast_expression = "val.to_s"
+    cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
@@ -2605,6 +2606,8 @@ class Course < ActiveRecord::Base
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
   add_setting :restrict_student_past_view, :boolean => true, :inherited => true
+
+  add_setting :timetable_data, :arbitrary => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
