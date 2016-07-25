@@ -5,8 +5,10 @@ define([
   './stores/FlickrStore',
   './FlickrImage',
   './SVGWrapper',
-  '../files/LoadingIndicator'
-], (React, I18n, FlickrActions, FlickrStore, FlickrImage, SVGWrapper, LoadingIndicator) => {
+  'instructure-ui'
+], (React, I18n, FlickrActions, FlickrStore, FlickrImage, SVGWrapper, InstUI) => {
+
+  const Spinner = InstUI.Spinner;
 
   class FlickrSearch extends React.Component {
 
@@ -80,25 +82,31 @@ define([
                    onChange={this.handleInput} />
           </div>
 
-          <div className="FlickrSearch__images">
-            {photos ? photos.photo.map( (photo) => {
-              return <FlickrImage key={photo.id} 
-                                  url={photo.url_m}
-                                  searchTerm={this.state.searchTerm} 
-                                  selectImage={this.props.selectImage} />
-            }) : null}
-          </div>
+          {!this.state.searching ?
+            <div className="FlickrSearch__images">
+              {photos ? photos.photo.map( (photo) => {
+                return <FlickrImage key={photo.id} 
+                                    url={photo.url_m}
+                                    searchTerm={this.state.searchTerm} 
+                                    selectImage={this.props.selectImage} />
+              }) : null }
+            </div>
+            : 
+            <div className="FlickrSearch__loading">
+              <Spinner title="Loading"/>
+            </div>
+          }
 
           {photos ? 
             <span className="FlickrSearch__pageNavigation">
-              {this.state.page > 1 ?
+              {(this.state.page > 1 && !this.state.searching) ?
                 <a className="FlickrSearch__control" ref="flickrSearchControlPrev" href="#" onClick={this.decrementPageCount}>
                   <i className="icon-arrow-open-left"/> {I18n.t('Previous')}
                 </a>
                 :
                 null
               }
-              {this.state.page < photos.pages ?
+              {(this.state.page < photos.pages && !this.state.searching) ?
                 <a className="FlickrSearch__control" ref="flickrSearchControlNext" href="#" onClick={this.incrementPageCount}>
                   {I18n.t('Next')} <i className="icon-arrow-open-right"/>
                 </a>

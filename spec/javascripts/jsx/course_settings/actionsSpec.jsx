@@ -135,6 +135,30 @@ define([
 
   });
 
+  asyncTest('uploadFile dispatches UPLOADING_IMAGE when file type is valid', () => {
+    const fakeDragonDropEvent = {
+      dataTransfer: {
+        files: [{
+          name: 'test file',
+          size: 12345,
+          type: 'image/jpeg'
+        }]
+      },
+      preventDefault: () => {}
+    };
+
+    const expectedAction = {
+      type: 'UPLOADING_IMAGE'
+    };
+
+    Actions.uploadFile(fakeDragonDropEvent, 1)((dispatched) => {
+        if (dispatched.type === 'UPLOADING_IMAGE') {
+          start();
+          deepEqual(dispatched, expectedAction, 'the UPLOADING_IMAGE action was fired');
+        }
+    });
+  });
+
   asyncTest('uploadFile dispatches prepareSetImage when successful', () => {
     const firstCallPromise = new Promise((resolve) => {
       setTimeout(() => resolve({
@@ -176,9 +200,11 @@ define([
     sinon.spy(Actions, 'prepareSetImage');
 
     Actions.uploadFile(fakeDragonDropEvent, 1, fakeAjaxLib)((dispatched) => {
-      start();
-      ok(Actions.prepareSetImage.called, 'prepareSetImage was called');
-      Actions.prepareSetImage.restore();
+      if (dispatched.type !== 'UPLOADING_IMAGE') {
+        start();
+        ok(Actions.prepareSetImage.called, 'prepareSetImage was called');
+        Actions.prepareSetImage.restore();
+      }
     });
   })
 

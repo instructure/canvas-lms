@@ -8,6 +8,12 @@ define ([
 
   const Actions = {
 
+    uploadingImage () {
+      return {
+        type: 'UPLOADING_IMAGE'
+      }
+    },
+
     gotCourseImage (imageUrl) {
       return {
         type: 'GOT_COURSE_IMAGE',
@@ -37,11 +43,27 @@ define ([
 
     errorUploadingImage() {
       $.flashError(I18n.t("There was an error uploading the image"));
+      return {
+        type: 'ERROR_UPLOADING_IMAGE'
+      }
     },
 
-    removeImage() {
+    removingImage() {
       return {
-        type: 'REMOVE_IMAGE'
+        type: 'REMOVING_IMAGE'
+      };
+    },
+
+    removedImage() {
+      return {
+        type: 'REMOVED_IMAGE'
+      };
+    },
+
+    errorRemovingImage() {
+      $.flashError(I18n.t("There was an error removing the image"));
+      return {
+        type: 'ERROR_REMOVING_IMAGE'
       };
     },
 
@@ -87,19 +109,20 @@ define ([
                                  this.setCourseImageUrl(imageUrl)); 
           })
           .catch((response) => {
-            this.errorUploadingImage();
+            dispatch(this.errorUploadingImage());
           })
       }
     },
 
     putRemoveImage(courseId, ajaxLib = axios) {
       return (dispatch, getState) => {
-        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, {"course[remove_image]": true}, ajaxLib) 
+        dispatch(this.removingImage());
+        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, { "course[remove_image]": true}) 
           .then((response)=> {
-            dispatch(this.removeImage());   
+            dispatch(this.removedImage());   
           })
           .catch((response) => {
-            $.flashError(I18n.t("Error removing image"));
+            dispatch(this.errorRemovingImage());
           })
       }
     },
@@ -117,24 +140,28 @@ define ([
                    dispatch(this.putImageData(courseId, response.data.url, imageId, ajaxLib));
                  })
                  .catch((response) => {
-                   this.errorUploadingImage();
+                   dispatch(this.errorUploadingImage());
                  });
         }
       }
     },
 
-    uploadFlickrUrl (flickrUrl, ajaxLib = axios) {
+    uploadFlickrUrl (flickrUrl, courseId, ajaxLib = axios) {
       return (dispatch, getState) => {
-        dispatch(this.setCourseImageUrl(flickrUrl));
+        dispatch(this.uploadingImage());
+        dispatch(this.putImageData(courseId, flickrUrl, null, ajaxLib));
       }
     },
 
     uploadFile (event, courseId, ajaxLib = axios) {
       event.preventDefault();
       return (dispatch, getState) => {
+
         const { type, file } = Helpers.extractInfoFromEvent(event);
 
         if (Helpers.isValidImageType(type)) {
+          dispatch(this.uploadingImage());
+          
           const data = {
             name: file.name,
             size: file.size,
@@ -150,11 +177,11 @@ define ([
                              dispatch(this.prepareSetImage(response.data.url, response.data.id, courseId, ajaxLib));
                            })
                            .catch((response) => {
-                              this.errorUploadingImage();
+                              dispatch(this.errorUploadingImage());
                            });
                   })
                  .catch((response) => {
-                    this.errorUploadingImage();
+                    dispatch(this.errorUploadingImage());
                  });
         } else {
           dispatch(this.rejectedUpload(type));

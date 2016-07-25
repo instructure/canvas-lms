@@ -6,21 +6,25 @@
   const flickrHandlers = {
     START_FLICKR_SEARCH (state, action) {
       state.page = action.page;
+      state.searching = true;
       state.searchTerm = action.term;
       return state;
     },
     RECEIVE_FLICKR_RESULTS (state, action) {
       state.searchResults = action.results;
+      state.searching = false;
       return state;
     },
     CLEAR_FLICKR_SEARCH (state) {
       state.searchResults = [];
+      state.searching = false;
       state.page = 1;
       state.searchTerm = '';
       return state;
     },
     FAIL_FLICKR_SEARCH (state, action) {
       state.searchResults = [];
+      state.searching = false;
       return state;
     }
   };

@@ -11,6 +11,15 @@
   justify-content: center;
 }
 
+.CourseImageSelector__Overlay {
+  height: 100%;
+  width: 100%;
+  background: rgba($ic-color-light, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .CourseImageSelector__EditDropdown {
   position: absolute;
   top: $ic-sp/2;
@@ -58,17 +67,25 @@
   margin: $ic-sp*2 $ic-sp*8;
 }
 
-.DraggingOverlay {
+.CourseImagePicker__Overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: rgba($ic-color-light, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.DraggingOverlay {
   top: $ic-sp;
   left: $ic-sp;
   right: $ic-sp;
   bottom: $ic-sp;
-  pointer-events: none;
-  z-index: 10;
-  background: rgba($ic-color-light, 0.75);
-  display: flex;
-  align-items: center;
   border: 4px dashed $ic-brand-primary; 
 }
 

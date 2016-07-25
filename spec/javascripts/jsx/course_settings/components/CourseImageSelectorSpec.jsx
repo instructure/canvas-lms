@@ -1,12 +1,22 @@
 define([
   'react',
+  'react-dom',
   'jsx/course_settings/components/CourseImageSelector',
   'jsx/course_settings/store/initialState'
-], (React, CourseImageSelector, initialState) => {
-
+], (React, ReactDOM, CourseImageSelector, initialState) => {
+  const wrapper = document.getElementById('fixtures');
   const TestUtils = React.addons.TestUtils;
 
-  module('CourseImageSelector View');
+  module('CourseImageSelector View', {
+    renderComponent(props = {}) {
+      const element = React.createElement(CourseImageSelector, props);
+      return ReactDOM.render(element, wrapper);
+    },
+
+    teardown() {
+      ReactDOM.unmountComponentAtNode(wrapper);
+    }
+  });
 
   const fakeStore = {
     subscribe () {},
@@ -16,20 +26,17 @@ define([
     }
   };
 
-  test('it renders', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} />
-    );
+  test('it renders', function() {
+    let component = this.renderComponent({ store: fakeStore });
     ok(component);
   });
 
-  test('it sets the background image style properly', () => {
+  test('it sets the background image style properly', function() {
     const dispatchStub = sinon.stub(fakeStore, 'getState').returns(Object.assign(initialState, {
       imageUrl: 'http://coolUrl'
     }));
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} name="course[image]" />
-    );
+
+    let component = this.renderComponent({ store: fakeStore, name: "course[image]" });
 
     const selectorDiv = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImageSelector');
     equal(selectorDiv.props.style.backgroundImage, "url(http://coolUrl)", 'image set properly');
@@ -37,26 +44,27 @@ define([
     dispatchStub.restore();
   });
 
-  test('it renders course image edit options when an image is present', () => {
+  asyncTest('it renders course image edit options when an image is present', function() {
     const dispatchStub = sinon.stub(fakeStore, 'getState').returns(Object.assign(initialState, {
       imageUrl: 'http://coolUrl'
     }));
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} />
-    );
-    ok(component.refs.editDropdown, 'edit drowpdown appears when image is present');
 
-    dispatchStub.restore();
+    let component = this.renderComponent({ store: fakeStore });
+
+    component.setState({gettingImage: false}, () => {
+      start();
+      ok(component.refs.editDropdown, 'edit drowpdown appears when image is present');
+      dispatchStub.restore();
+    });
+    
   });
 
-  test('it calls the correct methods when each edit option is selected', () => {
+  asyncTest('it calls the correct methods when each edit option is selected', function() {
     const dispatchStub = sinon.stub(fakeStore, 'getState').returns(Object.assign(initialState, {
       imageUrl: 'http://coolUrl'
     }));
 
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} name="course[image]" />
-    );
+    let component = this.renderComponent({ store: fakeStore, name: "course[image]" });
 
     let calledChangeImage = false;
     let calledRemoveImage = false;
@@ -64,12 +72,16 @@ define([
     component.changeImage = () => calledChangeImage = true;
     component.removeImage = () => calledRemoveImage = true;
 
-    TestUtils.Simulate.click(component.refs.changeImage);
-    TestUtils.Simulate.click(component.refs.removeImage);
+    component.setState({gettingImage: false}, () => {
+      start();
 
-    ok(calledChangeImage && calledRemoveImage, 'called both change and remove image when options were selected');
-
-    dispatchStub.restore();
+      TestUtils.Simulate.click(component.refs.changeImage);
+      TestUtils.Simulate.click(component.refs.removeImage);
+      
+      ok(calledChangeImage && calledRemoveImage, 'called both change and remove image when options were selected');
+      dispatchStub.restore();
+    })
+    
   });
 
 });

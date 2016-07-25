@@ -3,8 +3,11 @@ define([
   'i18n!course_images',
   'underscore',
   './UploadArea',
-  '../../shared/FlickrSearch'
-], (React, I18n, _, UploadArea, FlickrSearch) => {
+  '../../shared/FlickrSearch',
+  'instructure-ui'
+], (React, I18n, _, UploadArea, FlickrSearch, InstUI) => {
+
+  const Spinner = InstUI.Spinner;
 
   class CourseImagePicker extends React.Component {
     constructor (props) {
@@ -52,8 +55,15 @@ define([
           onDragLeave={this.onDragLeave}
           onDragOver={this.onDragEnter}
           onDragEnter={this.onDragEnter}>
+          { this.props.uploadingImage ?
+            <div className="CourseImagePicker__Overlay">
+              <Spinner title="Loading"/>
+            </div>
+            :
+            null
+          }
           { this.state.draggingFile ?
-            <div className="DraggingOverlay">
+            <div className="DraggingOverlay CourseImagePicker__Overlay">
               <div className="DraggingOverlay__Content">
                 <div className="DraggingOverlay__Icon">
                   <i className="icon-upload" />
@@ -85,7 +95,7 @@ define([
             <UploadArea 
               courseId={this.props.courseId}
               handleFileUpload={this.props.handleFileUpload}/>
-            <FlickrSearch selectImage={this.props.handleFlickrUrlUpload} />
+            <FlickrSearch selectImage={(flickrUrl) => this.props.handleFlickrUrlUpload(flickrUrl)} />
           </div>
         </div>
       );
