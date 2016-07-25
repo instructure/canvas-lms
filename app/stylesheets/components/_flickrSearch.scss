@@ -14,6 +14,13 @@
   flex-flow: row wrap;
 }
 
+.FlickrSearch__loading {
+  margin-top: $ic-sp*5;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .FlickrSearch__pageNavigation {
   display: flex;
   align-items: center;

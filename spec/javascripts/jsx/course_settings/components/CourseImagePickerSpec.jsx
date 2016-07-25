@@ -1,19 +1,27 @@
 define([
   'react',
+  'react-dom',
   'jsx/course_settings/components/CourseImagePicker',
   'jsx/course_settings/store/initialState'
-], (React, CourseImagePicker, initialState) => {
-
+], (React, ReactDOM, CourseImagePicker, initialState) => {
+  const wrapper = document.getElementById('fixtures');
   const TestUtils = React.addons.TestUtils;
 
-  module('CourseImagePicker Component');
+  module('CourseImagePicker Component', {
+    renderComponent(props = {}) {
+      const element = React.createElement(CourseImagePicker, props);
+      return ReactDOM.render(element, wrapper);
+    },
 
-  test('calls handleClose prop when the close button is clicked', () => {
+    teardown() {
+      ReactDOM.unmountComponentAtNode(wrapper);
+    }
+  });
+
+  test('calls handleClose prop when the close button is clicked', function() {
     let called = false;
     const handleCloseFunc = () => called = true;
-    const component = TestUtils.renderIntoDocument(
-      <CourseImagePicker handleClose={handleCloseFunc} />
-    );
+    let component = this.renderComponent({ handleClose: handleCloseFunc });
 
     const btn = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker__CloseBtn');
 
@@ -22,10 +30,8 @@ define([
     ok(called, 'handleClose was called');
   });
   
-  test('dragging overlay modal appears when accepting a drag', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImagePicker />
-    );
+  test('dragging overlay modal appears when accepting a drag', function() {
+    let component = this.renderComponent();
 
     const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
@@ -38,10 +44,8 @@ define([
     ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1, 'the dragging overlay appeared');
   });
 
-  test('dragging overlay modal does not appear when denying a non-file drag', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImagePicker />
-    );
+  test('dragging overlay modal does not appear when denying a non-file drag', function() {
+    let component = this.renderComponent();
 
     const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
@@ -54,10 +58,8 @@ define([
     ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0, 'the dragging overlay did not appear');
   });
 
-  test('dragging overlay modal disappears when you leave the drag area', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImagePicker />
-    );
+  test('dragging overlay modal disappears when you leave the drag area', function() {
+    let component = this.renderComponent();
 
     const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 
@@ -72,15 +74,10 @@ define([
     ok(!component.state.draggingFile, 'draggingFile state is correctly false');
   });
 
-  test('calls the handleFileUpload prop when drop occurs', () => {
+  test('calls the handleFileUpload prop when drop occurs', function() {
     let called = false;
     const handleFileUploadFunc = () => called = true;
-    const component = TestUtils.renderIntoDocument(
-      <CourseImagePicker
-        courseId="101"
-        handleFileUpload={handleFileUploadFunc}
-      />
-    );
+    let component = this.renderComponent({ courseId: "101", handleFileUpload: handleFileUploadFunc });
 
     const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
 

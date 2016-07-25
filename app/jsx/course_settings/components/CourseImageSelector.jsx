@@ -3,8 +3,11 @@ define([
   'react-modal',
   'i18n!course_images',
   '../actions',
-  './CourseImagePicker'
-], (React, Modal, I18n, Actions, CourseImagePicker) => {
+  './CourseImagePicker',
+  'instructure-ui'
+], (React, Modal, I18n, Actions, CourseImagePicker, InstUI) => {
+
+  const Spinner = InstUI.Spinner;
 
   const modalOverrides = {
     content : {
@@ -104,7 +107,7 @@ define([
           </div>
         );
       }
-      else if (!this.state.gettingImage) {
+      else {
         return (
           <button
             className="Button"
@@ -114,13 +117,6 @@ define([
             {I18n.t('Choose Image')}
           </button>
         );
-      }
-      else {
-        //TODO: Replace with InstUI spinner
-        return (
-          <div>
-            {I18n.t('Loading...')}
-          </div>);
       }
     }
 
@@ -136,7 +132,13 @@ define([
             className="CourseImageSelector"
             style={(this.state.imageUrl) ? styles : {}}
           >
-            {this.imageControls()}
+            { this.state.gettingImage || this.state.removingImage ?
+              <div className="CourseImageSelector__Overlay">
+                <Spinner title="Loading" size="small" />
+              </div>
+              :
+              this.imageControls()
+            }
           </div>
           <Modal
             isOpen={this.state.showModal}
@@ -147,7 +149,8 @@ define([
               courseId={this.props.courseId}
               handleClose={this.handleModalClose}
               handleFileUpload={(e, courseId) => this.props.store.dispatch(Actions.uploadFile(e, courseId))}
-              handleFlickrUrlUpload={(flickrUrl) => this.props.store.dispatch(Actions.putImageData(this.props.courseId, flickrUrl))}
+              handleFlickrUrlUpload={(flickrUrl) => this.props.store.dispatch(Actions.uploadFlickrUrl(flickrUrl, this.props.courseId))}
+              uploadingImage={this.state.uploadingImage}
             />
           </Modal>
         </div>
