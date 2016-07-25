@@ -1584,6 +1584,63 @@ describe Course, "tabs_available" do
       expect(tabs).not_to be_include(t2.asset_string)
     end
 
+    it 'sets the target value on the tab if the external tool has a windowTarget' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "_blank"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab[:target]).to eq '_blank'
+    end
+
+    it 'includes in the args "display: borderless" if a target is set' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "_blank"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab[:args]).to include({display: 'borderless'})
+    end
+
+    it 'does not let value other than "_blank" be set for target' do
+      tool = @course.context_external_tools.create!(
+        :url => "http://example.com/ims/lti",
+        :consumer_key => "asdf",
+        :shared_secret => "hjkl",
+        :name => "external tools",
+        :course_navigation => {
+          :text => "blah",
+          :url =>  "http://example.com/ims/lti",
+          :default => false,
+        }
+      )
+      tool.settings[:windowTarget] = "parent"
+      tool.save!
+      tabs = @course.tabs_available
+      tab = tabs.find {|tab| tab[:id] == tool.asset_string}
+      expect(tab.keys).not_to include :target
+    end
+
     it "should not include tabs for external tools if opt[:include_external] is false" do
       t1 = @course.context_external_tools.create!(
              :url => "http://example.com/ims/lti",

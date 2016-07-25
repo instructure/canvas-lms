@@ -1320,17 +1320,7 @@ class Account < ActiveRecord::Base
 
   def external_tool_tabs(opts)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
-    tools.sort_by(&:id).map do |tool|
-     {
-        :id => tool.asset_string,
-        :label => tool.label_for(:account_navigation, opts[:language] || I18n.locale),
-        :css_class => tool.asset_string,
-        :visibility => tool.account_navigation(:visibility),
-        :href => :account_external_tool_path,
-        :external => true,
-        :args => [self.id, tool.id]
-     }
-    end
+    Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
   def tabs_available(user=nil, opts={})

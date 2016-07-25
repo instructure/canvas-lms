@@ -319,6 +319,20 @@ describe ContextExternalTool do
     end
   end
 
+  describe "#extension_setting" do
+
+    it "returns the top level extension setting if no placement is given" do
+      tool = @course.context_external_tools.new(:name => "bob",
+                                                :consumer_key => "bob",
+                                                :shared_secret => "bob")
+      tool.url = "http://www.example.com/basic_lti"
+      tool.settings[:windowTarget] = "_blank"
+      tool.save!
+      expect(tool.extension_setting(nil, :windowTarget)).to eq '_blank'
+    end
+
+  end
+
   describe "custom fields" do
     it "should parse custom_fields_string from a text field" do
       tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')

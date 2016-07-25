@@ -2393,18 +2393,7 @@ class Course < ActiveRecord::Base
   def external_tool_tabs(opts)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain).to_a
-    tools.sort_by(&:id).map do |tool|
-     {
-        :id => tool.asset_string,
-        :label => tool.label_for(:course_navigation, opts[:language] || I18n.locale),
-        :css_class => tool.asset_string,
-        :href => :course_external_tool_path,
-        :visibility => tool.course_navigation(:visibility),
-        :external => true,
-        :hidden => tool.course_navigation(:default) == 'disabled',
-        :args => [self.id, tool.id]
-     }
-    end
+    Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 
   def tabs_available(user=nil, opts={})
