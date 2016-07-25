@@ -24,6 +24,7 @@ describe "interaction with multiple grading periods" do
   include Gradebook2Common
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+  let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }
 
   context "gradebook" do
     before :each do
@@ -47,32 +48,33 @@ describe "interaction with multiple grading periods" do
       expect(f('.grading-period-select-button')).to include_text(current_period.title)
     end
 
-    it 'multiple grading period dropdown should filter assignments by selected grading period', priority: "1", test_id: 202330 do
-      get "/courses/#{@course.id}/gradebook"
+    context "using multiple grading period dropdown" do
+      it 'should display current grading period on load', test_id: 2528634, priority: "2" do
+        get_gradebook
+        element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+        expect(element.first).to be_displayed
+      end
 
-      # select future grading period
-      f('.grading-period-select-button').click
-      fj('.ui-menu-item label:contains("Course Period 1: future period")').click
-      wait_for_ajaximations
-      element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
-      expect(element.first).to be_displayed
+      it 'filters assignments when different grading periods selected', test_id: 2528635, priority: "2" do
+        get_gradebook
+        f('.grading-period-select-button').click
+        fj('.ui-menu-item label:contains("Course Period 1: future period")').click
+        wait_for_ajaximations
+        element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+        expect(element.first).to be_displayed
+      end
 
-      # select current grading period
-      f('.grading-period-select-button').click
-      fj('.ui-menu-item label:contains("Course Period 2: current period")').click
-      wait_for_ajaximations
-      element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
-      expect(element.first).to be_displayed
+      it 'displays all assignments when all grading periods selected', test_id: 2528636, priority: "2" do
+        get_gradebook
+        f('.grading-period-select-button').click
+        fj('.ui-menu-item label:contains("All Grading Periods")').click
+        wait_for_ajaximations
 
-      # select all grading periods
-      f('.grading-period-select-button').click
-      fj('.ui-menu-item label:contains("All Grading Periods")').click
-      wait_for_ajaximations
-
-      element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
-      expect(element.first).to be_displayed
-      element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
-      expect(element.first).to be_displayed
+        element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
+        expect(element.first).to be_displayed
+        element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
+        expect(element.first).to be_displayed
+      end
     end
   end
 
