@@ -28,6 +28,7 @@ define [
   'str/htmlEscape'
   'jsx/gradebook/SISGradePassback/PostGradesStore'
   'jsx/gradebook/SISGradePassback/PostGradesApp'
+  'jsx/gradebook/SubmissionStateMap'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
@@ -56,7 +57,7 @@ InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, GradeCalculator, UserSettings,
 Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog,
 GradeDisplayWarningDialog, PostGradesFrameDialog, SubmissionCell,
 GradebookHeaderMenu, NumberCompare, htmlEscape, PostGradesStore, PostGradesApp,
-ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate,
+SubmissionStateMap, ColumnHeaderTemplate, GroupTotalCellTemplate, RowStudentNameTemplate,
 SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
 
   class Gradebook
@@ -94,10 +95,15 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
         @options.settings['show_inactive_enrollments'] == "true"
       @totalColumnInFront = UserSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
-      @mgpEnabled = @options.multiple_grading_periods_enabled
-      @gradingPeriods = @options.active_grading_periods
-      @indexedGradingPeriods = _.indexBy @gradingPeriods, 'id'
+      @gradingPeriodsEnabled = @options.multiple_grading_periods_enabled
+      @gradingPeriods = _.map @options.active_grading_periods, (gradingPeriod) =>
+        _.extend({}, gradingPeriod, closed: @gradingPeriodIsClosed(gradingPeriod))
       @gradingPeriodToShow = @getGradingPeriodToShow()
+      @submissionStateMap = new SubmissionStateMap
+        gradingPeriodsEnabled: @gradingPeriodsEnabled
+        selectedGradingPeriodID: @gradingPeriodToShow
+        gradingPeriods: @gradingPeriods
+        isAdmin: _.contains(ENV.current_user_roles, "admin")
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @gradebookColumnOrderSettings = @options.gradebook_column_order_settings
       @teacherNotesNotYetLoaded = !@options.teacher_notes? || @options.teacher_notes.hidden
@@ -109,7 +115,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
-      if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+      if @gradingPeriodsEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
@@ -122,7 +128,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       submissionParams =
         response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
         exclude_response_fields: ['preview_url']
-      submissionParams['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+      submissionParams['grading_period_id'] = @gradingPeriodToShow if @gradingPeriodsEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
       dataLoader = DataLoader.loadGradebookData(
         assignmentGroupsURL: @options.assignment_groups_url
         assignmentGroupsParams: assignmentGroupsParams
@@ -188,23 +194,8 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
       assignment.assignment_visibility = filteredVisibility
 
-    # dependencies - assignmentGroupsLoaded
-    disableAssignmentsInClosedGradingPeriods: () ->
-      closedAdminGradingPeriods = @getClosedAdminGradingPeriods()
-
-      if closedAdminGradingPeriods.length > 0
-        assignments = @getAssignmentsInClosedGradingPeriods()
-        @disabledAssignments = assignments.map (a) -> a.id
-
-    getClosedAdminGradingPeriods: () ->
-      _.select @gradingPeriods, (gradingPeriod) =>
-        @gradingPeriodIsAdmin(gradingPeriod) && @gradingPeriodIsClosed(gradingPeriod)
-
-    gradingPeriodIsAdmin: (gradingPeriod) ->
-      !gradingPeriod.permissions.update
-
     gradingPeriodIsClosed: (gradingPeriod) ->
-      new Date(gradingPeriod.end_date) < new Date()
+      new Date(gradingPeriod.close_date) < new Date()
 
     gradingPeriodIsActive: (gradingPeriodId) ->
       activePeriodIds = _.pluck(@gradingPeriods, 'id')
@@ -216,18 +207,6 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
         currentPeriodId
       else
         @options.current_grading_period_id
-
-    getAssignmentsInClosedGradingPeriods: () ->
-      latestEndDate = new Date(@options.latest_end_date_of_admin_created_grading_periods_in_the_past)
-      #return assignments whose end date is within the latest closed's end date
-      _.select @assignments, (a) =>
-        @assignmentIsDueBeforeEndDate(a, latestEndDate)
-
-    assignmentIsDueBeforeEndDate: (assignment, gradingPeriodEndDate) ->
-      if assignment.due_at
-        new Date(assignment.due_at) <= gradingPeriodEndDate
-      else
-        false
 
     onShow: ->
       $(".post-grades-button-placeholder").show()
@@ -275,21 +254,6 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
           @assignments[assignment.id] = assignment
       @postGradesStore.setGradeBookAssignments @assignments
 
-      @disableAssignmentsInClosedGradingPeriods() if @mgpEnabled
-
-    initializeSubmissionsForStudent: (student) =>
-      for assignment_id, assignment of @assignments
-        student["assignment_#{assignment_id}"] ?= { assignment_id: assignment_id, user_id: student.id }
-        submission = student["assignment_#{assignment_id}"]
-
-        if @submissionOutsideOfGradingPeriod(submission, student)
-          submission.hidden = true
-          submission.outsideOfGradingPeriod = true
-
-      student.initialized = true
-      @calculateStudentGrade(student)
-      @grid?.invalidateRow(student.row)
-
     gotSections: (sections) =>
       @sections = {}
       for section in sections
@@ -322,10 +286,15 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       e.type == "StudentEnrollment" || e.type == "StudentViewEnrollment"
 
     setupGrading: (students) =>
-      # fill in dummy submissions, so there's something there even if the
-      # student didn't submit anything for that assignment
+      @submissionStateMap.setup(students, @assignments)
       for student in students
-        @initializeSubmissionsForStudent(student)
+        for assignment_id of @assignments
+          student["assignment_#{assignment_id}"] ?=
+            @submissionStateMap.getSubmission student.id, assignment_id
+
+        student.initialized = true
+        @calculateStudentGrade(student)
+        @grid?.invalidateRow(student.row)
 
       @setAssignmentVisibility(_.pluck(students, 'id'))
 
@@ -634,17 +603,9 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
           activeCell.row is student.row and
           activeCell.cell is cell
         #check for DA visible
-        if submission.assignment_visible?
-          submission.hidden = !submission.assignment_visible
-
-        if @submissionOutsideOfGradingPeriod(submission, student)
-          submission.hidden = true
-          submission.outsideOfGradingPeriod = true
-
-        if submission.hidden
-          @updateAssignmentVisibilities(submission)
-
+        @updateAssignmentVisibilities(submission) unless submission.assignment_visible
         @updateSubmission(submission)
+        @submissionStateMap.setSubmissionCellState(student, @assignments[submission.assignment_id], submission)
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
         @updateRowTotals student.row
@@ -658,113 +619,39 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       if !@rows[row].loaded or !@rows[row].initialized
         @staticCellFormatter(row, col, '')
       else
-        if submission.outsideOfGradingPeriod
-          @uneditableCellOutsideOfGradingPeriodFormatter(row, col)
-        else if submission.hidden
-          @uneditableCellFormatter(row, col)
-        else if !submission?
-          @staticCellFormatter(row, col, '-')
+        cellAttributes = @submissionStateMap.getSubmissionState(submission)
+        if cellAttributes.hideGrade
+          @lockedAndHiddenGradeCellFormatter(row, col, cellAttributes.tooltip)
         else
           assignment = @assignments[submission.assignment_id]
           student = @students[submission.user_id]
+          formatterOpts =
+            isLocked: cellAttributes.locked
+            tooltip: cellAttributes.tooltip
 
           if !assignment?
             @staticCellFormatter(row, col, '')
           else if submission.workflow_state == 'pending_review'
-           (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student)
+           (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)
           else if assignment.grading_type == 'points' && assignment.points_possible
-            SubmissionCell.out_of.formatter(row, col, submission, assignment, student)
+            SubmissionCell.out_of.formatter(row, col, submission, assignment, student, formatterOpts)
           else
-            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student)
-
-    indexedOverrides: =>
-      @_indexedOverrides ||= (=>
-        indexed = {
-          studentOverrides: {},
-          groupOverrides: {},
-          sectionOverrides: {}
-        }
-
-        _.each @assignments, (assignment) ->
-          if assignment.has_overrides && assignment.overrides
-            _.each assignment.overrides, (override) ->
-              if override.student_ids
-                indexed.studentOverrides[assignment.id] ?= {}
-                _.each override.student_ids, (studentId) ->
-                  indexed.studentOverrides[assignment.id][studentId] = override
-              else if sectionId = override.course_section_id
-                indexed.sectionOverrides[assignment.id] ?= {}
-                indexed.sectionOverrides[assignment.id][sectionId] = override
-              else if groupId = override.group_id
-                indexed.groupOverrides[assignment.id] ?= {}
-                indexed.groupOverrides[assignment.id][groupId] = override
-
-        indexed
-      )()
-
-    # depedencies: assignmentGroupsLoaded
-    submissionOutsideOfGradingPeriod: (submission, student) ->
-      return false unless @mgpEnabled
-      selectedPeriodId = @gradingPeriodToShow
-      return false if @isAllGradingPeriods(selectedPeriodId)
-
-      assignment = @assignments[submission.assignment_id]
-      gradingPeriod = @indexedGradingPeriods[selectedPeriodId]
-      effectiveDueAt = assignment.due_at
-
-      if assignment.has_overrides && assignment.overrides
-        IDsByOverrideType = {
-          "sectionOverrides": student.sections
-          "groupOverrides": student.group_ids
-          "studentOverrides": [student.id]
-        }
-
-        getOverridesForType = ((typeIds, overrideType) =>
-          _.map typeIds, (typeId) =>
-            @indexedOverrides()[overrideType]?[assignment.id]?[typeId]).bind(this)
-
-        allOverridesForSubmission = _.chain(IDsByOverrideType)
-          .map(getOverridesForType)
-          .flatten()
-          .compact()
-          .value()
-
-        overrideDates = _.chain(allOverridesForSubmission)
-          .pluck('due_at')
-          .map((dateString) -> tz.parse(dateString))
-          .value()
-
-        if overrideDates.length > 0
-          nullDueAtsExist = _.any(overrideDates, (date) -> _.isNull(date))
-          effectiveDueAt = if nullDueAtsExist then null else _.max(overrideDates)
-        else
-          return true if assignment.only_visible_to_overrides
-
-      showSubmission = @lastGradingPeriodAndDueAtNull(gradingPeriod, effectiveDueAt) || @dateIsInGradingPeriod(gradingPeriod, effectiveDueAt)
-      !showSubmission
-
-    lastGradingPeriodAndDueAtNull: (gradingPeriod, dueAt) ->
-      gradingPeriod.is_last && _.isNull(dueAt)
-
-    dateIsInGradingPeriod: (gradingPeriod, date) ->
-      return false if _.isNull(date)
-      startDate = tz.parse(gradingPeriod.start_date)
-      endDate = tz.parse(gradingPeriod.end_date)
-      startDate < date && date <= endDate
+            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, student, formatterOpts)
 
     staticCellFormatter: (row, col, val) ->
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
 
-    uneditableCellOutsideOfGradingPeriodFormatter: (row, col) ->
-      """
-        <div class='gradebook-tooltip'>
-          #{htmlEscape(I18n.t("Submission in another grading period"))}
-        </div>
-        <div class='cell-content gradebook-cell grayed-out cannot_edit'></div>
-      """
-
-    uneditableCellFormatter: (row, col) ->
-      "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
+    lockedAndHiddenGradeCellFormatter: (row, col, tooltipKey) ->
+      if tooltipKey
+        tooltip = GRADEBOOK_TRANSLATIONS["submission_tooltip_#{tooltipKey}"]
+        """
+          <div class='gradebook-tooltip'>
+            #{htmlEscape(tooltip)}
+          </div>
+          <div class='cell-content gradebook-cell grayed-out cannot_edit'></div>
+        """
+      else
+        "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
@@ -1084,7 +971,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
-      @drawGradingPeriodSelectButton() if @mgpEnabled
+      @drawGradingPeriodSelectButton() if @gradingPeriodsEnabled
 
       $settingsMenu = $('.gradebook_dropdown')
       showConcludedEnrollmentsEl = $settingsMenu.find("#show_concluded_enrollments")
@@ -1708,7 +1595,7 @@ SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
       currentPeriodId == "0"
 
     hideAggregateColumns: ->
-      return false unless @mgpEnabled
+      return false unless @gradingPeriodsEnabled
       return false if @options.all_grading_periods_totals
       selectedPeriodId = @getGradingPeriodToShow()
       @isAllGradingPeriods(selectedPeriodId)

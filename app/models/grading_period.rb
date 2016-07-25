@@ -124,7 +124,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def as_json_with_user_permissions(user)
     as_json(
-      only: [:id, :title, :start_date, :end_date],
+      only: [:id, :title, :start_date, :end_date, :close_date],
       permissions: { user: user },
       methods: :is_last
     ).fetch(:grading_period)
