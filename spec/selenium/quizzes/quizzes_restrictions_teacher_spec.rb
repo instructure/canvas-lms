@@ -166,4 +166,28 @@ describe 'quiz restrictions as a teacher' do
       expect(show_page).to include_text('64.233.160.0')
     end
   end
+
+  it "should let a teacher preview a quiz even without management rights" do
+    @context = @course
+    quiz = quiz_model
+    description = "some description"
+    quiz.description = description
+    quiz.quiz_questions.create! question_data: true_false_question_data
+    quiz.generate_quiz_data
+    quiz.save!
+
+    @course.account.role_overrides.create!(:permission => :manage_assignments, :role => teacher_role, :enabled => false)
+
+    expect(@quiz.grants_right?(@user, :manage)).to be_falsey
+    expect(@course.grants_right?(@user, :read_as_admin)).to be_truthy
+
+    open_quiz_show_page
+
+    expect(f(".description")).to include_text(description)
+
+    expect_new_page_load { f('#preview_quiz_button').click }
+    wait_for_quiz_to_begin
+
+    complete_and_submit_quiz
+  end
 end

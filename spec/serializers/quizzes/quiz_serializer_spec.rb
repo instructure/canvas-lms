@@ -479,7 +479,8 @@ describe Quizzes::QuizSerializer do
         view_answer_audits: true,
         manage: true,
         delete: true,
-        grade: true
+        grade: true,
+        preview: true
       })
     end
   end
