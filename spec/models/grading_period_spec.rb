@@ -59,6 +59,13 @@ describe GradingPeriod do
     expect(grading_period).to_not be_valid
   end
 
+  describe "#as_json_with_user_permissions" do
+    it "includes the close_date in the returned object" do
+      json = grading_period.as_json_with_user_permissions(User.new)
+      expect(json).to have_key("close_date")
+    end
+  end
+
   describe "close_date" do
     context "grading period group belonging to an account" do
       it "allows setting a close_date that is different from the end_date" do
@@ -200,7 +207,7 @@ describe GradingPeriod do
       it "does not include grading periods from the course enrollment term group if inherit is false" do
         group = group_helper.create_for_account(@root_account)
         term.update_attribute(:grading_period_group_id, group)
-        period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
+        period_helper.create_with_weeks_for_group(group, 5, 3)
         period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
         period_2.workflow_state = :deleted
         period_2.save
@@ -234,8 +241,8 @@ describe GradingPeriod do
 
       it "does not return grading periods on the course directly" do
         group = group_helper.legacy_create_for_course(@course)
-        period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
-        period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
+        period_helper.create_with_weeks_for_group(group, 5, 3)
+        period_helper.create_with_weeks_for_group(group, 3, 1)
         expect(GradingPeriod.for(@root_account)).to match_array([])
       end
 
