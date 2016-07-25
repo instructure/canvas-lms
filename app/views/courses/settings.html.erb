@@ -284,20 +284,23 @@
       </tr><tr>
         <td class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></td>
         <td colspan="3" id="course_visibility">
-          <span>
-            <%= f.check_box :public_syllabus, :disabled => !can_manage %>
-            <%= f.label :public_syllabus, :en => "Make the syllabus for this course publicly visible" %>
-          </span>
-          <div>
-            <%= f.check_box :is_public, :class => "is_public_checkbox", :disabled => !can_manage %>
-            <%= f.label :is_public, t("Make this course publicly visible (student data will remain private)") %>
-          </div>
-          <div>
+          <% if can_manage %>
             <span>
-              <%= f.check_box :is_public_to_auth_users, :disabled => !can_manage %>
-              <%= f.label :is_public_to_auth_users, :en => "Make this course visible to authenticated users" %>
+              <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] } %>
+              <%= visibility_help_link %>
             </span>
-          </div>
+            <div class="panel-border">
+              <%= f.check_box :custom_course_visibility %>
+              <%= f.label :custom_course_visibility, :en => "Customize" %>
+              <% @context.customize_course_visibility_list.map do |setting, options| %>
+                <div id="customize_course_visibility">
+                  <%= f.label :syllabus_visibility_option, options[:setting] %>
+                  <%= f.select :syllabus_visibility_option, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] }, {}, :id => options[:setting] %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          <br/>
           <div class="public_options">
             <%= f.check_box :indexed, :disabled => !can_manage %>
             <%= f.label :indexed, :en => "Include this course in the public course index" %>
@@ -655,4 +658,3 @@
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
 </div>
-
