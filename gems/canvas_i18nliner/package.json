@@ -9,7 +9,7 @@
     "handlebars": "1.3.0",
     "i18nliner": "0.0.16",
     "i18nliner-handlebars": "0.1.0",
-    "jsdom": "~0.8.10",
+    "jsdom": "0.8.10",
     "minimist": "^1.1.0",
     "mkdirp": "^0.5.1"
   },
