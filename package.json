@@ -6,7 +6,11 @@
     "node": ">=0.12.5"
   },
   "dependencies": {
-    "brandable_css": "0.0.67"
+    "brandable_css": "0.0.67",
+
+    "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
+    "request": "2.73.0",
+    "tough-cookie": "2.2.2"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -63,11 +67,7 @@
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.12.0",
     "worker-loader": "^0.6.0",
-    "xsslint": "0.1.2",
-
-    "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
-    "request": "2.73.0",
-    "tough-cookie": "2.2.2"
+    "xsslint": "0.1.2"
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
