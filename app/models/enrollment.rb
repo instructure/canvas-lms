@@ -665,8 +665,10 @@ class Enrollment < ActiveRecord::Base
   def enrollment_state
     self.association(:enrollment_state).target ||=
       self.shard.activate do
-        EnrollmentState.unique_constraint_retry do
-          EnrollmentState.where(:enrollment_id => self).first_or_create
+        Shackles.activate(:master) do
+          EnrollmentState.unique_constraint_retry do
+            EnrollmentState.where(:enrollment_id => self).first_or_create
+          end
         end
       end
     super
