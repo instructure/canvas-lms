@@ -178,6 +178,7 @@ describe ConditionalRelease::Service do
       expect(claims[:context_id]).to eq @course.id.to_s
       expect(claims[:context_type]).to eq 'Course'
       expect(claims[:account_id]).to eq Account.default.lti_guid.to_s
+      expect(claims[:domain]).to eq 'foo.bar'
     end
 
     it 'returns a teacher jwt for a teacher viewing a course' do

@@ -50,6 +50,7 @@ module ConditionalRelease
       Canvas::Security::ServicesJwt.generate(
         claims.merge({
           sub: user.id.to_s,
+          domain: domain,
           account_id: Context.get_account(context).root_account.lti_guid.to_s,
           context_type: context.class.name,
           context_id: context.id.to_s,
