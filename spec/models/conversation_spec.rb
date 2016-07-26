@@ -993,6 +993,12 @@ describe Conversation do
       conversation.add_message(u2, 'ohai yourself', :root_account_id => 2)
       expect(conversation.root_account_ids).to eql [1, 2]
     end
+
+    it "includes the context's root account when initiating" do
+      new_course = course
+      conversation = Conversation.initiate([], false, context_type: 'Course', context_id: new_course.id)
+      expect(conversation.root_account_ids).to eql [new_course.root_account_id]
+    end
   end
 
   def merge_and_check(sender, source, target, source_user, target_user)
