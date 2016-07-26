@@ -20,7 +20,7 @@ describe "multiple grading periods account page" do
     end
 
     it "deletes grading period set", test_id: 2528621, priority: "1" do
-      group = Factories::GradingPeriodGroupHelper.new.create_for_account(Account.default)
+      group = group_helper.create_for_account(Account.default)
       visit_account_grading_standards(Account.default.id)
       delete_first_grading_period_set(false)
       expect(set_present?(group.title)).to be true
@@ -29,11 +29,17 @@ describe "multiple grading periods account page" do
     end
 
     it "edits grading period set", test_id: 2528628, priority: "1" do
-      Factories::GradingPeriodGroupHelper.new.create_for_account(Account.default)
+      group_helper.create_for_account(Account.default)
       visit_account_grading_standards(Account.default.id)
       edit_first_grading_period_set("Edited Title")
       expect(set_present?("Edited Title")).to be true
+    end
 
+    it "adds grading period", test_id: 2528648, priority: "1" do
+      group_helper.create_for_account(Account.default)
+      visit_account_grading_standards(Account.default.id)
+      add_grading_period("New Period")
+      expect(period_present?("New Period")).to be true
     end
   end
 end

@@ -1,8 +1,15 @@
 module MultipleGradingPeriods
   module AccountPage
     shared_context "account_page_components" do
+      # Helpers
+      let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+      let(:period_helper) { Factories::GradingPeriodHelper.new }
+
+      # Main page components
       let(:grading_periods_tab) { f("#grading-periods-tab") }
       let(:add_set_of_grading_periods_button) { f('button[aria-label="Add Set of Grading Periods"]') }
+
+      # Set components
       let(:set_name_input) { f('#set-name')}
       let(:term_input) { f('input[aria-label^="Start typing to search."]') }
       let(:create_set_button) { fj('button:contains("Create")') }
@@ -12,6 +19,16 @@ module MultipleGradingPeriods
       let(:delete_grading_period_set_button) { f('.delete_grading_period_set_button') }
       let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
+      let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
+
+      # Period components
+      let(:period_title_input) { f('#title') }
+      let(:start_date_input) { f('input[data-row-key="start-date"]') }
+      let(:end_date_input) { f('input[data-row-key="end-date"]') }
+      let(:close_date_input) { f('input[data-row-key="close-date"]') }
+      let(:save_period_button) { f('button[aria-label="Save Grading Period"]')}
+      let(:first_period) { f('.GradingPeriodList__period span') }
+      let(:period_delete_button) { f('.GradingPeriodList .icon-trash')}
     end
 
     def visit_account_grading_standards(account_id)
@@ -48,6 +65,23 @@ module MultipleGradingPeriods
       edit_grading_period_set_button.click
       replace_content(set_name_input, new_name)
       edit_set_save_button.click
+    end
+
+    def add_grading_period(title="Grading Period 1")
+      expand_first_set
+      add_grading_period_link.click
+      replace_content(period_title_input, title)
+      replace_content(start_date_input, format_date_for_view(Time.zone.now, :medium))
+      replace_content(end_date_input, format_date_for_view(Time.zone.now + 1.month, :medium))
+      save_period_button.click
+    end
+
+    def expand_first_set
+      first_collapsed_set.click
+    end
+
+    def period_present?(title)
+      first_period.text == title
     end
   end
 end
