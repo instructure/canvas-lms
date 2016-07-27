@@ -1124,7 +1124,7 @@ nb:
       pending_batches_title: "Ventende batcher"
       process_data_button: "Prosesser data"
       select_file_instructions: |-
-          Velg zip filen som du vil importere. 
+          Velg zip filen som du vil importere.
           Beskrivelse om hvordan å generere disse zip filer, [vennligst se dette dokumentasjon](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Startet: %{started_at}"
@@ -2124,7 +2124,7 @@ nb:
     positive_number: "Du må bruke et positivt tall"
     redirect_page: 
       redirect_message: |-
-          Denne innleveringen var en url, vi tar deg til lenken nå. 
+          Denne innleveringen var en url, vi tar deg til lenken nå.
           [Klikk her for å gå til innleveringen](%{url})
     remove_never_drop_rule: "Fjern regelen om aldri å utelate"
     remove_unsaved_never_drop_rule: "Fjern den ulagrede regelen om aldri å utelate"
@@ -3133,9 +3133,9 @@ nb:
             **Advarsel:** Sjekk [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt ikke blir slettet.
         google_docs: |-
             Google Docs er en godt egnet ressurs for å samarbeide på et gruppeprosjekt. Det er som Microsoft Word, men lar deg arbeide sammen med andre på den samme filen samtidig uten
-            å måtte sende den rundt med epost.  
-              
-            **Advarsel**. Du (og de du samarbeider med) må ha en Google-konto for å kunne delta i 
+            å måtte sende den rundt med epost.
+            
+            **Advarsel**. Du (og de du samarbeider med) må ha en Google-konto for å kunne delta i
             et Google Docs samarbeid.
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
@@ -3228,7 +3228,7 @@ nb:
         account_exists: |-
             Det finnes allerede en brukerkonto assosiert med %{email}.
             
-              **Er du %{name}?**
+            **Er du %{name}?**
         account_needed: "Du er invitert til å delta i **%{course}**. For å akseptere denne forespørselen må du ha en konto i Canvas. Klikk lenken nedenfor for å lage en konto i Canvas."
         add_email: "Vil du legge til denne epost-adressen til din brukerkonto?"
         choose_login: "Velg hvor du vil logge inn."
@@ -6900,9 +6900,9 @@ nb:
     confirms: 
       delete_comment: "Er du sikker på at du vil slette denne kommentaren?"
       unsaved_changes: |-
-          Følgende studenter har endringer til sine testinnleveringer som ikke er lagret: 
+          Følgende studenter har endringer til sine testinnleveringer som ikke er lagret:
           
-           %{users}
+          %{users}
           Fortsett likevel?
     crocodoc_expiring: "Din Crocodoc økten utløper snart. Last inn vinduet for å unngå å miste noe arbeid."
     dialog_button: 
@@ -8305,7 +8305,7 @@ nb:
   learn_more_about_collaborations_2978f66d: "Lær mer om samarbeid"
   learning_mastery_5fc34276: Læremestring
   learning_mastery_gradebook_description: |-
-      Vurderinger av måloppnåelse gir lærerne en rask måte å vise studentenes og kursets 
+      Vurderinger av måloppnåelse gir lærerne en rask måte å vise studentenes og kursets
       fremdrift i forhold til kursets læringsmål. Læringsmålene presenteres i et karakterboklignende format
       og studentenes fremdrift vises både som en numerisk score og om de overgår/innfrir/innfrir ikke forventningene i forhold til læringsmålet.
   learning_outcome: 
@@ -9260,7 +9260,7 @@ nb:
             og du ble invitert ved å benytte din epostadresse, %{email}.
             
             Om det er feil epostadresse for denne type samarbeid, må du endre
-             innstillingene i din profil eller registrere deg hos %{service}.
+            innstillingene i din profil eller registrere deg hos %{service}.
             
             Du kan se flere detaljer her:
             %{link}
@@ -11489,7 +11489,7 @@ nb:
       name: "Oppgaveverdier kan \"fryses\""
     assignment_freezer_settings: 
       description: |-
-          Dette programtillegget gjør det mulig for administratorer å kontrollere en verdi på oppgaver som gjør de konfigurerte 
+          Dette programtillegget gjør det mulig for administratorer å kontrollere en verdi på oppgaver som gjør de konfigurerte
           egenskaper ikke-redigerbare når oppgaven er kopiert til et annet kurs.
       no_copying_frozen: "Ikke tillat kopiering av \"fryste\" oppgaver."
     banner_grade_exchange_settings: 
@@ -11817,10 +11817,10 @@ nb:
         consumer_secret: Forbruker-secret
     webct_scraper_settings: 
       description: |-
-          Dersom institusjonen ikke bruker WebCTs "Læringsmoduler" (inkludert institusjoner som adopterte WebCT 
-          før versjon 4.0, når modulene ble gjort tilgjengelig), kan kursflyttinger forbedres ved å importere "Kursinnholdet" 
-          som Canvas-moduler i stedet for "Læringsmoduler". Denne siden gjør det mulig å sette standard oppførsel for WebCT-migrator 
-          med hensyn til innholdsmoduler. Det er viktig å huske på at mens enkelte kursflyttinger beholder muligheten 
+          Dersom institusjonen ikke bruker WebCTs "Læringsmoduler" (inkludert institusjoner som adopterte WebCT
+          før versjon 4.0, når modulene ble gjort tilgjengelig), kan kursflyttinger forbedres ved å importere "Kursinnholdet"
+          som Canvas-moduler i stedet for "Læringsmoduler". Denne siden gjør det mulig å sette standard oppførsel for WebCT-migrator
+          med hensyn til innholdsmoduler. Det er viktig å huske på at mens enkelte kursflyttinger beholder muligheten
           til å velge, vil samlet flytting alltid benytte verdien som er konfigurert her, og kan ikke endres for hver flytting.
       labels: 
         allow_outline_selection: "Vis valget for å bruke Kursinnhold som moduler i flytteveiviseren"
@@ -16693,7 +16693,7 @@ nb:
       unpublished_courses_message: |-
           Du har meldt deg på ett eller flere kurs som ikke har startet enda. Når
           disse kursene er tilgjengelig, finner du informasjon om dem her
-          og i toppmenyen. I mellomtiden kan du melde deg på 
+          og i toppmenyen. I mellomtiden kan du melde deg på
           flere kurs eller fylle inn informasjon i din profil.
       welcome_to_happiness: "Velkommen til Canvas!"
   users_d1b60cb0: Brukere
