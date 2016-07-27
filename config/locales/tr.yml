@@ -813,15 +813,15 @@ tr:
             field: "Bölüm Numarası"
     settings: 
       about_google_docs: |-
-          Google Docs Önizleme kullanıcıların dosyaları indirip ilgili 
-          programlarda (Word veya Excel gibi) açmaları yerine 
-          Canvas içinde bu belgelerin görüntülenmesini sağlar. 
+          Google Docs Önizleme kullanıcıların dosyaları indirip ilgili
+          programlarda (Word veya Excel gibi) açmaları yerine
+          Canvas içinde bu belgelerin görüntülenmesini sağlar.
           
-          Google Docs Önizleme ayrıca Canvas belge önizleyiciler 
-          tarafından desteklenmeyen dosya türlerini de dönüştürür. 
+          Google Docs Önizleme ayrıca Canvas belge önizleyiciler
+          tarafından desteklenmeyen dosya türlerini de dönüştürür.
           
-          Bu hizmeti kullanarak buradaki 
-          [Google Drive Viewer Terms of Service](%{terms_url}) 
+          Bu hizmeti kullanarak buradaki
+          [Google Drive Viewer Terms of Service](%{terms_url})
           kullanım sözleşmesini okuyup kabul etmiş sayılırsınız.
       about_google_docs_tooltip: "Google Docs Önizlemeleri Hakkında"
       account_admins_title: "Hesap Yöneticileri"
@@ -996,7 +996,7 @@ tr:
       page_title: "Hesap Ayarları"
       quiz_ip_filters_delete: "Filtreyi Kaldır"
       quiz_ip_filters_help_message: |-
-          Kısa sınav IP filtreleri, kısa sınavlara belirli IP aralığındaki bilgisayarlar tarafından erişimi sağlama yöntemidir. 
+          Kısa sınav IP filtreleri, kısa sınavlara belirli IP aralığındaki bilgisayarlar tarafından erişimi sağlama yöntemidir.
           
           Öğretmenlerin kısa sınavlara erişimi kontrol edebilmesi için birkaç tane IP adresi belirleyin. Filtreler virgül ile ayrılmış IP adresleri ya da IP adresinden sonra belirtilen bir ağ maskesi şeklinde olabilir ("192.168.217.1/24" ya da "192.168.217.1/255.255.255.0")."
       quiz_ip_filters_help_title: "Kısa Sınavlar için hangi IP'ler filtrelenecek?"
@@ -1097,7 +1097,7 @@ tr:
       add_sis_stickiness_instructions: "Bu tercih seçildiğinde, burada değiştirilen alanlardan gelen sonradan üzerine yazılamayan ÖBS içe aktarmalar engellenerek ÖBS içe aktarma ile yapılan değişiklikler Kullanıcı Arabirimi değişiklikleri gibi işlem görecektir."
       add_sis_stickiness_label: "Arayüz Değişim Süreçleri "
       batch_import_instructions: |-
-          Bu alan seçilirse, yukarıda seçili içe aktarma dosyasında olmayan tüm dersler ve öğrenci kayıtlarını içeren bu ifade ile ilgili herşey silinir. 
+          Bu alan seçilirse, yukarıda seçili içe aktarma dosyasında olmayan tüm dersler ve öğrenci kayıtlarını içeren bu ifade ile ilgili herşey silinir.
           Ayrıntılı bilgi için belgelere bakın.
       batch_mode_label: "Bu, tam bir toplu güncellemedir"
       clear_sis_stickiness_instructions: "Bu tercih seçildiğinde, bu ÖBS içe aktarımından etkilenen kayıtlardaki tüm alanlar ileride ÖBS içe aktarmada üzerine yazılmayarak değiştirilebilecektir."
@@ -1111,7 +1111,7 @@ tr:
       imported_with_messages_message: "ÖBS verileri aktarıldı, fatat şu aktarım mesajı oluşturuldu:"
       last_batch_title: "Son Toplu İşler "
       override_sis_stickiness_instructions: |-
-          Varsayılan olarak Kullanıcı Arabirimindeki değişikliklerin ÖBS içe aktarmadaki değişikliklere göre önceliği vardır; çoğu alan için eğer yönetici bir alanı Kullanıcı Arabiriminden değiştirmişse ÖBS içe aktarımı bu alandaki verileri değiştirmeyecektir. Bu tercihi seçerseniz SIS aktarımındaki değişiklikler Kullanıcı Arabirimindekilerin üzerine yazılır. 
+          Varsayılan olarak Kullanıcı Arabirimindeki değişikliklerin ÖBS içe aktarmadaki değişikliklere göre önceliği vardır; çoğu alan için eğer yönetici bir alanı Kullanıcı Arabiriminden değiştirmişse ÖBS içe aktarımı bu alandaki verileri değiştirmeyecektir. Bu tercihi seçerseniz SIS aktarımındaki değişiklikler Kullanıcı Arabirimindekilerin üzerine yazılır.
           Ayrıntılar için belgelere bakın.
       override_sis_stickiness_label: "Arayüz değişikliklerinin üzerine yaz"
       page_title: "ÖBS İçe Aktarımı"
@@ -3092,18 +3092,21 @@ tr:
             Sadece
             Canvas'tan Sil
         delete_from_google_docs: |-
-            Ayrıca Google  
+            Ayrıca Google
             Docs'dan da Sil
         start_collaborating: "İşbirliğini Başlat"
         update: "İşbirliğini Güncelle"
       collaboration_name: "%{course_or_group_name} İşbirliği"
       descriptions: 
         etherpad: |-
-            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.  
-              
+            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.
+            
             **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
-        google_docs: "Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
-            **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
+        google_docs: |-
+            Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz.
+            
+            
+            **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı.
       labels: 
         collaboration_type: "Şunu kullanarak işbirliği yap:"
         description: "Açıklama:"
@@ -3123,16 +3126,16 @@ tr:
           üzerinde birlikte
           çalışmakta kullanılan web-tabanlı araçları kastediyoruz. [Google Docs](%{google_url})
           gibi kaynakları grup yayınları
-          veya not tutma gibi etkinliklerde işbirliği halinde çalışmak için kullanabilirsiniz. 
-          Bu sayfada 
-          bu işbirliklerinin takibini kolayca yapılabilir ve eposta 
+          veya not tutma gibi etkinliklerde işbirliği halinde çalışmak için kullanabilirsiniz.
+          Bu sayfada
+          bu işbirliklerinin takibini kolayca yapılabilir ve eposta
           adreslerini alma ile uğraşmadan bu kaynaklar oluşturulabilir.
       description_teacher: |-
           **İşbirliği ile neyi kastediyoruz?**  Paylaşılan bir belge üzerinde birlikte çalışmak için öğrencilerinizin
-          büyük ihtimalle bildiği Web tabanlı araçları kastediyoruz. Grup yayınları veya 
-          not tutma gibi etkinliklerde 
-          işbirliği halinde çalışmak için [Google Docs](%{google_url}) gibi kaynakları kullanabilirsiniz. 
-          Bu sayfada öğrenciler (ve siz) bu işbirliklerinin takibini kolayca yapabilir ve eposta 
+          büyük ihtimalle bildiği Web tabanlı araçları kastediyoruz. Grup yayınları veya
+          not tutma gibi etkinliklerde
+          işbirliği halinde çalışmak için [Google Docs](%{google_url}) gibi kaynakları kullanabilirsiniz.
+          Bu sayfada öğrenciler (ve siz) bu işbirliklerinin takibini kolayca yapabilir ve eposta
           adreslerini alma ile uğraşmadan bu kaynakları oluşturabilirsiniz.
       google: 
         drive: 
@@ -5997,7 +6000,7 @@ tr:
   enable_feature_title_987d8e9a: "Şu özelliği etkinleştir: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Öğrencileri Not Defterinde sıralanmış isimleri ile listeleyin. Sıralanmış isimler varsayılan olarak 'Soy adı, Adı' şeklindedir fakat ayarlarda değiştirilebilir."
   enable_multiple_grading_periods: |-
-      Çoklu Notlandırma Peryotları öğretmenlerin ve yöneticilerin son işlem tarihli notlandorma 
+      Çoklu Notlandırma Peryotları öğretmenlerin ve yöneticilerin son işlem tarihli notlandorma
       peryot setleri oluşturmalarını sağlar. Ödevler not defterinde bu notlandırma tarihlerine göre filtrelenebilir.
   enable_or_condition_for_modules_a16f02d8: "Modüller için \"VEYA\" Şartını Etkinleştir"
   enable_reregistration_for_lti_2_b2a10444: "LTI2 için yeniden kaydı etkinleştir"
@@ -6264,8 +6267,8 @@ tr:
       page_title: ePortfolyolarım
       what: 
         details1: |-
-            ePortfolyolar, öğrenme sürecinizde gerçekleşen önemli gönderileri ve 
-            deneyimleri gösterip paylaşabileceğiniz bir yerdir. ePortfolyoyu şu 
+            ePortfolyolar, öğrenme sürecinizde gerçekleşen önemli gönderileri ve
+            deneyimleri gösterip paylaşabileceğiniz bir yerdir. ePortfolyoyu şu
             durumlarda kullanabilirsiniz:
             
             * Öğretmeniniz dışındakilere göstermekten gurur duyacağınız çalışmaları göstermek
@@ -6787,7 +6790,7 @@ tr:
   google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       Google Docs Alan Adı Sınırlaması Google Docs gönderileri ve işbirliklerinin tek bir alan
-      adı altında toplanmasına izin verir. Onaylanmamış alan adı üzerinden ödev göndermeye 
+      adı altında toplanmasına izin verir. Onaylanmamış alan adı üzerinden ödev göndermeye
       çalışan ya da işbirliğine katılmaya çalışan öğrenciler, Google Docs entegrasyonlarını güncellemeleri
       gerektiği yönünde bir uyarı mesajı alacaklar.
   google_docs_preview_9f41b23c: "Google Docs Önizlemesi"
@@ -6832,7 +6835,7 @@ tr:
       unsaved_changes: |-
           Aşağıdaki öğrencilerin kısa sınavlarında kaydedilmemiş değişiklikler var:
           
-           %{users}
+          %{users}
           Devam edilsin mi?
     crocodoc_expiring: "Crocodoc oturumunuz yakında sona erecek. Çalışmalarınız kaybetmemek için lütfen pencereyi yeniden yükleyin."
     dialog_button: 
@@ -7437,7 +7440,7 @@ tr:
       self_signup_help_message: |-
           Öğrencilerin kendilerini kaydedebildikleri grup setleri oluşturabilirsiniz.
           Öğrenciler hala yalnızca bir grubun içinde olabilirler fakat bu şekilde
-          öğretmenin yapmasına gerek kalmadan öğrenciler kendilerini gruplar içinde 
+          öğretmenin yapmasına gerek kalmadan öğrenciler kendilerini gruplar içinde
           organize edebilirler. Grup üyelerinin aynı ders bölümünden olmalarını da
           sağlayabilirsiniz.
           
@@ -7757,10 +7760,11 @@ tr:
     unassigned_students: "Atanmamış Öğrenciler (%{count})"
     unassigned_users: "Atanmamış Kullanıcılar (%{count})"
   groups_6c90e26a: Gruplar
-  groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Gruplar projelerde işbirliği yapmak veya çalışma oturumları ve benzer şeyleri yapmak için idealdir.\n\
-      Her grup için takvim, wiki, tartışma ve biraz dosyalama alanı sağlanmaktadır. Gruplar bu belgeler\n\
-      üzerinde işbirliği yapabilir ve hatta web üzerinden canlı dersler düzenleyebilirler. Aslında daha çok\n\
-      proje odaklı olarak az sayıda öğrenci ile çalışabileceğiniz küçük bir derse benzetebiliriz. "
+  groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
+      Gruplar projelerde işbirliği yapmak veya çalışma oturumları ve benzer şeyleri yapmak için idealdir.
+      Her grup için takvim, wiki, tartışma ve biraz dosyalama alanı sağlanmaktadır. Gruplar bu belgeler
+      üzerinde işbirliği yapabilir ve hatta web üzerinden canlı dersler düzenleyebilirler. Aslında daha çok
+      proje odaklı olarak az sayıda öğrenci ile çalışabileceğiniz küçük bir derse benzetebiliriz.
   help_4c4968b1: Yardım
   help_dialog: 
     Back: Geri
@@ -7898,7 +7902,7 @@ tr:
       Önceden indirdiğiniz öğrenci ödev dosyalarında değişiklikler yaptıysanız
       bunları .zip dosyası olarak sıkıştırın ve aşağıdaki form ile birlikte
       sıkıştırılmış dosyayı yükleyin. Öğrenciler gönderdikleri ödevde yorumlar bölümünde
-      bu düzenlenmiş dosyayı görecekler 
+      bu düzenlenmiş dosyayı görecekler
       
       *Gönderilen dosyaların adlarını değiştirmeyin ki sistem bu dosyaları tanımlayabilsin.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Başka bir öğrenme yönetim sistemi kullanıyorsanız buradaki malzemelerinizi Canvas'a taşımak isteyebilirsiniz. İçeriğinizi Canvas'a kolayca aktarma sürecini birlikte yapalım."
@@ -8207,10 +8211,10 @@ tr:
   learn_more_about_collaborations_2978f66d: ""
   learning_mastery_5fc34276: "Öğrenme Yeterliği"
   learning_mastery_gradebook_description: |-
-      Öğrenme Yeterliliği Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve 
-      ders 
-      ilerleme durumunu hızlı bir şekilde incelemelerini sağlar. Öğrenme çıktıları Not defterine 
-      benzer bir formatta sunulur ve öğrenci ilerlemesi hem sayısal değer hem de yeterli/yeterli 
+      Öğrenme Yeterliliği Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve
+      ders
+      ilerleme durumunu hızlı bir şekilde incelemelerini sağlar. Öğrenme çıktıları Not defterine
+      benzer bir formatta sunulur ve öğrenci ilerlemesi hem sayısal değer hem de yeterli/yeterli
       sayılır/telafi olarak gösterilir.
   learning_outcome: 
     no_comment: "Yorum Yok"
@@ -8280,15 +8284,15 @@ tr:
         body: |-
             "%{subject}" başlıklı mesajınız iletilemedi. Mesaj bilinmeyen bir eposta adresine gönderildi. Canvas üzerinden birisi lie iletişime geçmeye çalışıyorsanız hesabınıza giriş yapıp Gelen Kutusu aracını kullanarak onlara mesaj göndermeyi deneyin.
             
-                      Teşekkürler,
-                      Canvas Destek
+            Teşekkürler,
+            Canvas Destek
         subject: "Mesaj Yanıtlama İşleminde Hata : %{subject}"
       locked_topic: 
         body: |-
             Tartışma konusu kilitli olduğu için "%{subject}" başlıklı mesajınız gönderilemdi. Canvas üzerinden birisi lie iletişime geçmeye çalışıyorsanız hesabınıza giriş yapıp Gelen Kutusu aracını kullanarak onlara mesaj göndermeyi deneyin.
             
-                      Teşekkürler,
-                      Canvas Destek
+            Teşekkürler,
+            Canvas Destek
         subject: "Mesaj Yanıtlama İşleminde Hata : %{subject}"
     progress_runner: 
       completed_message: 
@@ -8430,10 +8434,10 @@ tr:
           verify: Onay
         details: 
           mfa_enrollment: |-
-              Çok faktörlü kimlik doğrulama, Canvas'ta oturum açmak için şifrenize ek olarak fiziksel olarak bir şeye sahip 
-              olduğunuzu gerektirdiği için güvenliği artırır. Bu şey, doğrulama kodları oluşturan bir araç ya da mesaj 
-              gönderilen bir cep telefonu olabilir. [iPhone için](%{iphone_url})  ya da 
-              [Android için](%{android_url}) 
+              Çok faktörlü kimlik doğrulama, Canvas'ta oturum açmak için şifrenize ek olarak fiziksel olarak bir şeye sahip
+              olduğunuzu gerektirdiği için güvenliği artırır. Bu şey, doğrulama kodları oluşturan bir araç ya da mesaj
+              gönderilen bir cep telefonu olabilir. [iPhone için](%{iphone_url})  ya da
+              [Android için](%{android_url})
               Google Kimlik Doğrulayıcı aşağıdaki QR Kod taranarak yapılandırılabilir. Diğer token'lar gizli anahtar **%{secret_key}**
               girilerek yapılandırılabilir.
           mfa_required: "Çoklu faktör yetkilendirme ayarlamanız gerekiyor."
@@ -9190,11 +9194,11 @@ tr:
             Ayrıntılı bilgi için : %{link}
       summary: 
         body: |-
-            %{course_or_group} dersi %{document} dökümanını üzerinde işbirlikli 
+            %{course_or_group} dersi %{document} dökümanını üzerinde işbirlikli
             çalışmanız için davet edildiniz. Bu dökümanı %{service} servisinde oluşturdu
             ve davet e-posta adresi olarak %{email} adresi kullanıldı.
         body_with_user: |-
-            %{course_or_group} dersi %{document} dökümanını üzerinde işbirlikli 
+            %{course_or_group} dersi %{document} dökümanını üzerinde işbirlikli
             çalışmanız için davet edildiniz. Bu dökümanı %{user} kullanıcısı tarafından
             %{service} servisinde oluşturdu ve davet e-posta adresi olarak %{email} adresi kullanıldı.
         subject: "İşbirliği Daveti Daveti: %{course_or_group}"
@@ -10694,7 +10698,7 @@ tr:
     added_to_conversation_description: "Bu mesajlaşmaya eklendiniz"
     added_to_conversation_display: "Mesajlaşmalara Eklendi"
     all_submissions_description: |-
-        *Sadece Eğitmen ve Yönetici* 
+        *Sadece Eğitmen ve Yönetici*
         
         Ödev gönder / tekrar gönder
     all_submissions_display: "Tüm Gönderiler"
@@ -11338,7 +11342,7 @@ tr:
       name: "Ödev Özelliği Dondurma"
     assignment_freezer_settings: 
       description: |-
-          Bu eklenti yöneticilerin, ödev başka bir derse kopyalandığında ödevlerdeki yapılandırılmış 
+          Bu eklenti yöneticilerin, ödev başka bir derse kopyalandığında ödevlerdeki yapılandırılmış
           özellikleri düzenlenemez yapan  bir özelliği kontrol etmelerini sağlar.
       no_copying_frozen: "Dondurulmuş ödevlerin kopyalanmasına izin verme."
     banner_grade_exchange_settings: 
@@ -11657,10 +11661,10 @@ tr:
     webct_scraper_settings: 
       description: |-
           Eğer kurum WebCT'nin "Öğrenme Modülleri"ni kullanmıyorsa (WebCT'yi modüllerin kullanılmadığı
-          4.0 versiyonundan önce kullanan okullar dahil), ders aktarımları "Ders İçeriğini" "Öğrenme Modülleri" yerine 
+          4.0 versiyonundan önce kullanan okullar dahil), ders aktarımları "Ders İçeriğini" "Öğrenme Modülleri" yerine
           Canvas Modülleri
           olarak yapılarak iyileştirilebilir. Bu sayfada, içerik modülleri ile ilgili WebCT aktarıcının varsayılan davranışı
-          ayarlanabilir. Şunu unutmamak gerekir ki, bireysel ders aktarımlarında seçme özelliği korunurken, çoklu 
+          ayarlanabilir. Şunu unutmamak gerekir ki, bireysel ders aktarımlarında seçme özelliği korunurken, çoklu
           aktarıcı
           her zaman burada yapılandırılan değerleri esas alır ve her bir aktarım için değiştirilemez.
       labels: 
@@ -11732,7 +11736,7 @@ tr:
   post_grades_39c52870: "Notları Gönder"
   post_grades_description: |-
       Notları Gönder seçeneği ile öğretmenler etkinleştirilmiş ÖBS'lere notları gönderebilir:
-      GradingCategory, GradingAssigngment ve GradingAssignmentScore gibi SIF öğelerini kabul eden 
+      GradingCategory, GradingAssigngment ve GradingAssignmentScore gibi SIF öğelerini kabul eden
       Powerschool, Aspire (SIS2000), JMC ve diğer SIF-etkin ÖBS'leri.
   post_grades_to_sis_97ece878: "Notları ÖBS'ye Gönder"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: ""
@@ -11853,7 +11857,7 @@ tr:
       generate_access_token_description: |-
           Access token'ları, sizin adınıza Canvas kaynaklarına erişim için üçüncü parti
           uygulamalara izin verirler. Bu token'lar normalde ihtiyaç oldukça uygulamalar
-          için otomatik oluşturulurlar fakat [yeni ya da sınırlı bir proje 
+          için otomatik oluşturulurlar fakat [yeni ya da sınırlı bir proje
           geliştiriyorsanız](%{documentation_url}) buradan token oluşturabilirsiniz.
       google_docs_description: "Google Docs'ınıza erişime izin verdikten sonra ödevlerinizi doğrudan Google Docs'dan gönderebilecek ve sınıfınızdaki katılımcılar ile belge oluşturup paylaşabileceksiniz."
       google_drive_description: "Google Drive ınızı görmemize yetki verdiğinizde ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıflarınızdaki arkadaşlarınızla belgeler oluşturup paylaşabieceksiniz."
@@ -11970,7 +11974,7 @@ tr:
       yo_description: |-
           Yo tek sekmeli sıfır karakter iletişim aracıdır.
           Yo hesabınız varsa burada kaydettirebilirsiniz. Sonrasında
-          ders/grup 
+          ders/grup
           arkadaşlarınızın kayıt olduğunuz hizmetleri görmelerine izin verirseniz Yo hesabınıza
           kolayca bağlanabilirler.
           
@@ -14249,10 +14253,10 @@ tr:
   settings: 
     recaptcha_settings: 
       instructions: |-
-          ReCAPTCHA eklentisini kullanmadan önce 
+          ReCAPTCHA eklentisini kullanmadan önce
           [ReCAPTCHA adresinde hesap oluşturmalısınız](%{url}). Site alan adınızı
           (adlarınızı) yönetmek için alan adınızı doğruyapılandırdığınıza emin olun.
-          Hesap oluşturduktan sonra aşağıdaki alanlara açık ve gizli 
+          Hesap oluşturduktan sonra aşağıdaki alanlara açık ve gizli
           anahtarlarınızı girin.
           
           **Not:** Bu ayarlarda yaptığınız değişiklikler sunucunuzu yeniden
@@ -16304,9 +16308,9 @@ tr:
       are_you_sure_start: "Bu kullanıcının yerine geçmek istediğinize emin misiniz?"
       are_you_sure_stop: "Rolünüze dönmek istediğinize emin misiniz?"
       details: |-
-          Başkası olarak giriş yapma aslında şifreye ihtiyaç olmadan bir başka kullanıcı 
-          olarak giriş yapmadır. Bu kullanıcıymış gibi herşeyi yapabilirsiniz ve başkaları yapılan herşeyi sanki 
-          o kullanıcı yapmış gibi görürler. Fakat, hesap inceleme kayıtlarında, o kullanıcı adına 
+          Başkası olarak giriş yapma aslında şifreye ihtiyaç olmadan bir başka kullanıcı
+          olarak giriş yapmadır. Bu kullanıcıymış gibi herşeyi yapabilirsiniz ve başkaları yapılan herşeyi sanki
+          o kullanıcı yapmış gibi görürler. Fakat, hesap inceleme kayıtlarında, o kullanıcı adına
           etkinlikleri yapanın aslında **siz** olduğu gerçeği kayıtlıdır.
       masquerade_as: "%{user_name} kullanıcısının yerine geç"
       page_title_header: "Kullanıcı Gibi Kullan"
@@ -16419,12 +16423,12 @@ tr:
     welcome: 
       no_courses_message: |-
           Şuanda hiç dersiniz yok, bu yüzden bu sayfa pek ilgi çekici görünmüyor.
-                  Ders oluşturup ya da derslere kayıt oldukça, tüm sınıflarınızdan
-                  karşılıklı mesajlar göreceksiniz.
+          Ders oluşturup ya da derslere kayıt oldukça, tüm sınıflarınızdan
+          karşılıklı mesajlar göreceksiniz.
       unpublished_courses_message: |-
           Henüz başlamamış bir veya daha fazla derse kaydoldunuz. Bu dersler
           başladığında onlarla ilgili bilgiyi burada ve üst gezinme bölümünde
-          göreceksiniz. Bu arada, daha fazla derse kayıt yaptırabilir ya da 
+          göreceksiniz. Bu arada, daha fazla derse kayıt yaptırabilir ya da
           profilinizi ayarlayabilirsiniz.
       welcome_to_happiness: "Canvas'a Hoşgeldiniz"
   users_d1b60cb0: Kullanıcılar
