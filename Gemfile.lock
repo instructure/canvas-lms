@@ -25,11 +25,19 @@ GIT
       redcarpet
 
 GIT
-  remote: https://github.com/instructure/testrailtagging
-  revision: 002c483ad2f0d2a288c96bde30ff70ed92f1fa50
-  ref: 002c483ad2f0d2a288c96bde30ff70ed92f1fa50
+  remote: https://github.com/instructure/nokogiri-xmlsec-me-harder.git
+  revision: 3236a249986413c6c399ef3477132a0af0410bb7
+  ref: 3236a249986413c6c399ef3477132a0af0410bb7
   specs:
-    testrailtagging (0.3.1)
+    nokogiri-xmlsec-me-harder (0.9.3pre)
+      nokogiri
+
+GIT
+  remote: https://github.com/instructure/testrailtagging
+  revision: 3b5c811c5749e46ac12dc38b22a7762e2397517e
+  ref: master
+  specs:
+    testrailtagging (0.3.6.7)
       parser
       rspec
       testrail_client
@@ -158,7 +166,7 @@ PATH
 PATH
   remote: gems/canvas_partman
   specs:
-    canvas_partman (1.0.0)
+    canvas_partman (2.0.0)
       activerecord (>= 3.2, < 4.3)
       pg (~> 0.17)
 
@@ -348,7 +356,7 @@ PATH
   remote: gems/plugins/moodle_importer
   specs:
     moodle_importer (1.0.0)
-      moodle2cc (= 0.2.31)
+      moodle2cc (= 0.2.33)
       rails (>= 3.2, < 4.3)
 
 PATH
@@ -384,6 +392,12 @@ PATH
       activerecord (>= 3.2, < 4.3)
       activesupport (>= 3.2, < 4.3)
       aws-sdk (~> 1.63.0)
+      globby (>= 0.1.2)
+
+PATH
+  remote: gems/stringify_ids
+  specs:
+    stringify_ids (1.0.0)
 
 PATH
   remote: gems/twitter
@@ -446,7 +460,7 @@ GEM
       rake (>= 0.9.2)
     after_transaction_commit (1.0.1)
       activerecord (>= 3.2)
-    airbrussh (1.0.2)
+    airbrussh (1.1.0)
       sshkit (>= 1.6.1, != 1.7.0)
     arel (4.0.2)
     aroi (0.0.3)
@@ -477,7 +491,7 @@ GEM
       activesupport (>= 3.0.0)
       redcarpet (>= 3.0.0)
       uniform_notifier (~> 1.9.0)
-    byebug (8.2.5)
+    byebug (9.0.5)
     canvas_connect (0.3.10)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
@@ -486,7 +500,7 @@ GEM
       statsd-ruby (= 1.0.0)
     canvas_webex (0.17)
       railties
-    capistrano (3.5.0)
+    capistrano (3.6.0)
       airbrussh (>= 1.0.0)
       capistrano-harrow
       i18n
@@ -510,7 +524,7 @@ GEM
       execjs
     coffee-script-source (1.6.2)
     colored (1.2)
-    colorize (0.7.7)
+    colorize (0.8.1)
     concurrent-ruby (1.0.2)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -537,7 +551,7 @@ GEM
       faraday (>= 0.7.4, < 0.10)
     fast_stack (0.2.0)
     ffi (1.1.5)
-    ffi-compiler (0.1.3)
+    ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
     ffi-icu (0.1.10)
@@ -605,12 +619,12 @@ GEM
       ya2yaml (= 0.31)
     icalendar (1.5.4)
     iconv (1.0.4)
-    ims-lti (2.0.0.beta.39)
+    ims-lti (2.1.0.beta.3)
       builder
       faraday (~> 0.8)
       faraday_middleware (~> 0.8)
       simple_oauth (= 0.2)
-    inst-jobs (0.11.1)
+    inst-jobs (0.11.2)
       after_transaction_commit (= 1.0.1)
       rails (>= 3.2)
       redis (> 3.0)
@@ -649,7 +663,7 @@ GEM
     mini_magick (4.2.7)
     mini_portile (0.6.2)
     minitest (4.7.5)
-    moodle2cc (0.2.31)
+    moodle2cc (0.2.33)
       builder
       instructure-happymapper (~> 0.5.10)
       nokogiri
@@ -687,7 +701,7 @@ GEM
     powerpack (0.1.1)
     protected_attributes (1.0.8)
       activemodel (>= 4.0.1, < 5.0)
-    pry (0.10.3)
+    pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
@@ -753,32 +767,29 @@ GEM
     ritex (1.0.1)
     rotp (1.6.1)
     rqrcode (0.4.2)
-    rspec (3.2.0)
-      rspec-core (~> 3.2.0)
-      rspec-expectations (~> 3.2.0)
-      rspec-mocks (~> 3.2.0)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
     rspec-collection_matchers (1.1.2)
       rspec-expectations (>= 2.99.0.beta1)
-    rspec-core (3.2.3)
-      rspec-support (~> 3.2.0)
-    rspec-expectations (3.2.1)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-legacy_formatters (1.0.0)
-      rspec-core (>= 3.0.0.beta2)
-      rspec-support (>= 3.0.0.beta2)
-    rspec-mocks (3.2.1)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-rails (3.2.3)
+      rspec-support (~> 3.4.0)
+    rspec-rails (3.4.1)
       actionpack (>= 3.0, < 4.3)
       activesupport (>= 3.0, < 4.3)
       railties (>= 3.0, < 4.3)
-      rspec-core (~> 3.2.0)
-      rspec-expectations (~> 3.2.0)
-      rspec-mocks (~> 3.2.0)
-      rspec-support (~> 3.2.0)
-    rspec-support (3.2.2)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     rubocop (0.35.1)
       astrolabe (~> 1.3)
       parser (>= 2.2.3.0, < 3.0)
@@ -792,7 +803,7 @@ GEM
       i18n
       iso8601
     ruby-progressbar (1.7.5)
-    ruby-saml-mod (0.3.0)
+    ruby-saml-mod (0.3.1)
       ffi
       nokogiri (~> 1.6)
     ruby2ruby (2.0.8)
@@ -805,6 +816,10 @@ GEM
     rubyzip (1.1.1)
     rufus-scheduler (3.1.2)
     safe_yaml (1.0.4)
+    saml2 (1.0.7)
+      activesupport (>= 3.2, < 5.1)
+      nokogiri (>= 1.5.8, < 1.7)
+      nokogiri-xmlsec-me-harder (~> 0.9, >= 0.9.3pre)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
     scrypt (2.1.1)
@@ -842,10 +857,10 @@ GEM
     soap4r-middleware (0.8.3)
       soap4r-ruby1.9 (= 2.0.0)
     soap4r-ruby1.9 (2.0.0)
-    spring (1.7.1)
+    spring (1.7.2)
     spring-commands-rspec (1.0.2)
       spring (>= 0.9.1)
-    sprockets (3.6.2)
+    sprockets (3.7.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (2.3.3)
@@ -859,10 +874,10 @@ GEM
     stackprof (0.2.7)
     statsd-ruby (1.0.0)
     subexec (0.0.4)
-    switchman (1.5.3)
-      activerecord (>= 4.0, < 5.1)
+    switchman (1.5.13)
+      activerecord (>= 4.0, <= 5.0.0.beta3)
       open4 (= 1.3.0)
-      railties (>= 4.0, < 5.1)
+      railties (>= 4.0, <= 5.0.0.beta3)
       shackles (~> 1.1.0)
     syck (1.0.4)
     test_after_commit (0.4.2)
@@ -933,7 +948,7 @@ DEPENDENCIES
   builder (= 3.1.4)
   bullet_instructure (= 4.14.8)
   bundler (>= 1.8.0, <= 1.11.2)
-  byebug (~> 8.2)
+  byebug (~> 9.0)
   canvas_breach_mitigation!
   canvas_cassandra!
   canvas_color!
@@ -1007,9 +1022,9 @@ DEPENDENCIES
   i18nliner (= 0.0.12)
   icalendar (= 1.5.4)
   iconv (= 1.0.4)
-  ims-lti (= 2.0.0.beta.39)
+  ims-lti (= 2.1.0.beta.3)
   incoming_mail_processor!
-  inst-jobs (= 0.11.1)
+  inst-jobs (= 0.11.2)
   jira_ref_parser (= 1.0.0)
   json (= 1.8.2)
   json-jwt (= 1.5.1)
@@ -1033,6 +1048,7 @@ DEPENDENCIES
   net-ldap (= 0.10.1)
   netaddr (= 1.5.0)
   nokogiri (= 1.6.6.2.20150813143452)!
+  nokogiri-xmlsec-me-harder (= 0.9.3pre)!
   oauth-instructure (= 0.4.10)
   oauth2 (= 1.0.0)
   oj (= 2.14.1)
@@ -1066,22 +1082,22 @@ DEPENDENCIES
   ritex (= 1.0.1)
   rotp (= 1.6.1)
   rqrcode (= 0.4.2)
-  rspec (= 3.2.0)
+  rspec (= 3.4.0)
   rspec-collection_matchers (= 1.1.2)
-  rspec-legacy_formatters (= 1.0.0)
-  rspec-rails (= 3.2.3)
+  rspec-rails (= 3.4.1)
   rubocop
   rubocop-canvas!
   rubocop-rspec
   ruby-duration (= 3.2.0)
   ruby-progressbar (= 1.7.5)
-  ruby-saml-mod (= 0.3.0)
+  ruby-saml-mod (= 0.3.1)
   ruby2ruby (= 2.0.8)
   ruby_parser (= 3.7.0)
   rubycas-client (= 2.3.9)
   rubyzip (= 1.1.1)
   rufus-scheduler (= 3.1.2)
   safe_yaml (= 1.0.4)
+  saml2 (= 1.0.7)
   sanitize (= 2.1.0)
   scrypt (= 2.1.1)
   selenium-webdriver (= 2.53.0)
@@ -1098,12 +1114,13 @@ DEPENDENCIES
   spring-commands-rspec (= 1.0.2)
   sqlite3 (= 1.3.9)
   stackprof (= 0.2.7)
+  stringify_ids!
   subexec (= 0.0.4)
-  switchman (= 1.5.3)
+  switchman (= 1.5.13)
   syck (= 1.0.4)
   test_after_commit (= 0.4.2)
   testingbot
-  testrailtagging (~> 0.3.1)!
+  testrailtagging (~> 0.3.6.5)!
   thin (= 1.6.3)
   thrift (= 0.8.0)
   thrift_client (= 0.8.4)
