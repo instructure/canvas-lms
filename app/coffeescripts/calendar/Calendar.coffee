@@ -174,6 +174,7 @@ define [
 
     # FullCalendar callbacks
     getEvents: (start, end, timezone, donecb, datacb) =>
+      @gettingEvents = true
       @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
@@ -185,8 +186,10 @@ define [
               event.removeClass('current-appointment-group')
             for event in aEvents
               event.addClass('current-appointment-group')
+            @gettingEvents = false
             donecb(calendarEventFilter(@displayAppointmentEvents, events.concat(aEvents)))
         else
+          @gettingEvents = false
           if (datacb?)
             donecb([])
           else
@@ -246,7 +249,7 @@ define [
           .find('.ui-resizable-handle').remove()
       if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
         element.find('.fc-time').empty()
-      if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
+      if event.eventType == 'calendar_event' && @options?.activateEvent && !@gettingEvents && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
           # fake up the jsEvent
