@@ -12,19 +12,22 @@ module CustomWaitMethods
   end
 
   def wait_for_dom_ready
-    driver.execute_async_script(<<-JS)
-     var callback = arguments[arguments.length - 1];
-     var pollForJqueryAndRequire = function(){
-        if (window.jQuery && window.require && !window.requirejs.s.contexts._.defQueue.length) {
-          jQuery(function(){
-            setTimeout(callback, 1);
-          });
-        } else {
-          setTimeout(pollForJqueryAndRequire, 1);
+    result = driver.execute_async_script(<<-JS)
+      var callback = arguments[arguments.length - 1];
+      if (document.readyState === "complete") {
+        callback(0);
+      } else {
+        var leftPageBeforeDomReady = callback.bind(null, -1);
+        window.addEventListener("beforeunload", leftPageBeforeDomReady);
+        document.onreadystatechange = function() {
+          if (document.readyState === "complete") {
+            window.removeEventListener("beforeunload", leftPageBeforeDomReady);
+            callback(0);
+          }
         }
-      }
-      pollForJqueryAndRequire();
+      };
     JS
+    raise "left page before domready" if result != 0
   end
 
   def wait_for_ajax_requests(wait_start = 0)
@@ -119,18 +122,17 @@ module CustomWaitMethods
   end
 
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
-    frd_error = nil
-    Selenium::WebDriver::Wait.new(timeout: seconds).until do
+    frd_error = Selenium::WebDriver::Error::TimeOutError
+    wait_for(timeout: seconds, method: :keep_trying_until) do
       begin
-        frd_error = nil
         yield
+      rescue SeleniumExtensions::Error, Selenium::WebDriver::Error::StaleElementReferenceError # don't keep trying, abort ASAP
+        raise
       rescue StandardError, RSpec::Expectations::ExpectationNotMetError
         frd_error = $ERROR_INFO
         nil
       end
-    end
-  rescue Selenium::WebDriver::Error::TimeOutError
-    raise frd_error || $ERROR_INFO
+    end or raise frd_error
   end
 
   # pass in an Element pointing to the textarea that is tinified.
@@ -147,5 +149,36 @@ module CustomWaitMethods
       end
     }
     tiny_frame
+  end
+
+  def disable_implicit_wait
+    driver.manage.timeouts.implicit_wait = 0
+    yield
+  ensure
+    driver.manage.timeouts.implicit_wait = SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT
+  end
+
+  # little wrapper around Selenium::WebDriver::Wait, notably it:
+  # * is less verbose
+  # * returns false (rather than raising) if the block never returns true
+  # * doesn't rescue :allthethings: like keep_trying_until
+  # * prevents nested waiting, cuz that's terrible
+  def wait_for(timeout: SeleniumDriverSetup::IMPLICIT_WAIT_TIMEOUT, method: nil, ignore: nil)
+    driver.prevent_nested_waiting(method) do
+      Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until do
+        yield
+      end
+    end
+  rescue Selenium::WebDriver::Error::TimeOutError
+    false
+  end
+
+  def wait_for_no_such_element(method: nil)
+    wait_for(method: method, ignore: []) do
+      yield
+      false
+    end
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    true
   end
 end

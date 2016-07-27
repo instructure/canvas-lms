@@ -37,7 +37,7 @@ describe "new account user search" do
 
     click_tab
 
-    expect(f('button.add_user')).to be_blank
+    expect(f("#content")).not_to contain_css('button.add_user')
   end
 
   it "should be able to create users" do
@@ -86,7 +86,7 @@ describe "new account user search" do
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 11
-    expect(f(".load_more")).to be_nil
+    expect(f("#content")).not_to contain_css(".load_more")
   end
 
   it "should search by name" do
@@ -115,7 +115,7 @@ describe "new account user search" do
     f('#peopleOptionsBtn').click
     f('#manageStudentsLink').click
 
-    expect(driver.current_url).to include_text("/accounts/#{@account.id}/avatars")
+    expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
   end
 
   it "should link to the user group page" do
@@ -128,6 +128,6 @@ describe "new account user search" do
     f('#peopleOptionsBtn').click
     f('#viewUserGroupLink').click
 
-    expect(driver.current_url).to include_text("/accounts/#{@account.id}/groups")
+    expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 end

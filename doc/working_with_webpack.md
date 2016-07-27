@@ -85,7 +85,7 @@ To build the test bundle, you can run:
 Once you have the test bundle built, karma should work normally.  I prefer
 to run it headless in a container, so I run it with:
 
-`docker-compose run js-tests`
+`docker-compose run --rm js-tests`
 
 which spools up the "js-tests" container specified in docker-compose.yml, which
 has an entry point that knows how to kick off karma with a headless runner.

@@ -1,63 +1,47 @@
-$courses-dropdown-menu-bg: $ic-color-light;
-$course-dropdown-text-color: $ic-color-dark;
-$masquerade-link-color: $ic-color-alert;
+// TODO: remove this file when we only $use_new_styles
+@if not $use_new_styles {
 
-@if $use_high_contrast {
-  $masquerade-link-color: $ic-color-light;
-}
-
-#skip_navigation_link {
-  @include accessibility-prompt;
-  position: absolute;
-  left: -10000px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  &:focus {
-    left: 0;
-    top: 0;
-    width: auto;
-    height: auto;
-    z-index: 1;
+  $courses-dropdown-menu-bg: $ic-color-light;
+  $course-dropdown-text-color: $ic-color-dark;
+  $masquerade-link-color: $ic-color-alert;
+  @if $use_high_contrast {
+    $masquerade-link-color: $ic-color-light;
   }
-}
 
-// the #header.no-user #header-logo part here is so that it overrides the byuh logo
-#header-logo, #header.no-user #header-logo {
-  @include bg-image("canvas/header_canvas_logo", "png", no-repeat, left, top, transparent, 110px, 26px);
-  width: 135px;
-  height: 26px;
-  left: 16px;
-  bottom: 21px;
-  position: absolute;
-  text-indent: -9999px;
-}
+  // the #header.no-user #header-logo part here is so that it overrides the byuh logo
+  #header-logo, #header.no-user #header-logo {
+    @include bg-image("canvas/header_canvas_logo", "png", no-repeat, left, top, transparent, 110px, 26px);
+    width: 135px;
+    height: 26px;
+    left: 16px;
+    bottom: 21px;
+    position: absolute;
+    text-indent: -9999px;
+  }
 
-// TODO: remove this style once people have time to update their logo-related custom
-// css. See related code in app/coffeescripts/bundles/common.coffee too.
-#header-logo.original, #header.no-user #header-logo.original {
-  bottom: 12px;
-}
+  // TODO: remove this style once people have time to update their logo-related custom
+  // css. See related code in app/coffeescripts/bundles/common.coffee too.
+  #header-logo.original, #header.no-user #header-logo.original {
+    bottom: 12px;
+  }
 
-#header-logo-secondary {
-  display: none;
-  @include bg-image("canvas/header_canvas_logo", "png", no-repeat, left, top, transparent, 110px, 26px);
-  width: 135px;
-  height: 26px;
-  right: 26px;
-  bottom: 6px;
-  position: absolute;
-}
+  #header-logo-secondary {
+    display: none;
+    @include bg-image("canvas/header_canvas_logo", "png", no-repeat, left, top, transparent, 110px, 26px);
+    width: 135px;
+    height: 26px;
+    right: 26px;
+    bottom: 6px;
+    position: absolute;
+  }
 
-#header-inner {
-  padding-top: 26px;
-  max-width: $max_main_width;
-  position: relative;
-}
+  #header-inner {
+    padding-top: 26px;
+    max-width: $max_main_width;
+    position: relative;
+  }
 
-#header {
-  @if $use_new_styles == false {
+  #header {
     position: relative;
     z-index: 11;
     background-color: $ic-header-background;
@@ -73,102 +57,99 @@ $masquerade-link-color: $ic-color-alert;
       }
     }
   }
-}
 
-#topbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100%;
-  overflow: hidden;
-}
-
-#identity {
-  @include reset-list;
-
-
-  float: right;
-  @include fontSize($ic-font-size--xsmall);
-  margin-right: $right_side_margin;
-  // make room for the drop shadow
-  margin-bottom: 4px;
-  padding: 0 11px;
-  @if $use_high_contrast {
-    background-color: #555;
+  #topbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    overflow: hidden;
   }
-  @else {
-    background-color: #31383e;
-  }
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-top: 0;
 
-  li {
-      color: white;
-      float: left;
-      line-height: 1em;
-      margin: 5px 8px 7px 0;
-      padding-left: 8px;
-      padding-top: 5px;
+  #identity {
+    @include reset-list;
 
-    &.first, &#identity-help-container {
-      border-left: none;
-    }
-    form {
-      margin: 0;
-    }
-  }
-  .user_name {
 
-    margin-right: 15px;
-
-  }
-  a {
-    color: $ic-color-light;
+    float: right;
+    @include fontSize($ic-font-size--xsmall);
+    margin-right: $right_side_margin;
+    // make room for the drop shadow
+    margin-bottom: 4px;
+    padding: 0 11px;
     @if $use_high_contrast {
-      text-decoration: none;
+      background-color: #555;
     }
-    &:hover, &:focus {
-      text-decoration: underline;
+    @else {
+      background-color: #31383e;
     }
-  }
-  .emphasize-name {
-    color: $masquerade-link-color;
-  }
-  .inbox a {
-    text-decoration: none;
-    &:hover, &:active {
-      span {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top: 0;
+
+    li {
+        color: white;
+        float: left;
+        line-height: 1em;
+        margin: 5px 8px 7px 0;
+        padding-left: 8px;
+        padding-top: 5px;
+
+      &.first, &#identity-help-container {
+        border-left: none;
+      }
+      form {
+        margin: 0;
+      }
+    }
+    .user_name {
+
+      margin-right: 15px;
+
+    }
+    a {
+      color: $ic-color-light;
+      @if $use_high_contrast {
+        text-decoration: none;
+      }
+      &:hover, &:focus {
         text-decoration: underline;
       }
     }
-    .unread-messages-count {
-      @include ic-badge-maker(14px);
-      padding: 1px 5px;
-      vertical-align: top;
-      margin-top: -2px;
+    .emphasize-name {
+      color: $masquerade-link-color;
+    }
+    .inbox a {
+      text-decoration: none;
+      &:hover, &:active {
+        span {
+          text-decoration: underline;
+        }
+      }
+      .unread-messages-count {
+        @include ic-badge-maker(14px);
+        padding: 1px 5px;
+        vertical-align: top;
+        margin-top: -2px;
 
-      @if $use_high_contrast {
-        box-shadow: 0 0 0 2px $ic-color-light;
+        @if $use_high_contrast {
+          box-shadow: 0 0 0 2px $ic-color-light;
+        }
       }
     }
+    #identity-help-container a {
+      padding: 1px 8px;
+    }
   }
-  #identity-help-container a {
-    padding: 1px 8px;
-  }
-}
 
-@if $use_new_styles == false {
+
   #menu {
     @include pie-clearfix;
     @include reset-list;
     padding-top: 3px;
     margin-left: $left_side_width;
   }
-}
 
-.menu-item {
-  @if $use_new_styles == false {
+  .menu-item {
     position: relative;
     display: block;
     float: left;
@@ -176,38 +157,30 @@ $masquerade-link-color: $ic-color-alert;
   .menu-item-title, .menu-item-no-drop {
     position: relative;
     text-decoration: none;
-    @if $use_new_styles == false {
-      z-index: 100;
-      color: #fff;
-      border: 1px solid transparent;
-      border-bottom: 0 none;
-      display: block;
-      padding: 6px 17px 5px;
-      height: 29px;
-      color: #fff;
-      @include fontSize(15px);
-    }
+    z-index: 100;
+    color: #fff;
+    border: 1px solid transparent;
+    border-bottom: 0 none;
+    display: block;
+    padding: 6px 17px 5px;
+    height: 29px;
+    color: #fff;
+    @include fontSize(15px);
   }
   .menu-item-no-drop, .menu-item-title {
-    @if $use_new_styles == false {
-      &:hover, &:focus { text-decoration: underline; }
-    }
+    &:hover, &:focus { text-decoration: underline; }
   }
   &.hover {
     .menu-item-title {
       text-shadow: none;
-      @if $use_new_styles == false {
-        color: $course-dropdown-text-color;
-        border-top-color: $ic-border-color;
-        border-left-color: $ic-border-color;
-        border-right-color: $ic-border-color;
-        background-color: $courses-dropdown-menu-bg;
-      }
+      color: $course-dropdown-text-color;
+      border-top-color: $ic-border-color;
+      border-left-color: $ic-border-color;
+      border-right-color: $ic-border-color;
+      background-color: $courses-dropdown-menu-bg;
     }
-    @if $use_new_styles == false {
-      // bring it back on screen so you can see it
-      .menu-item-drop { left: 0; }
-    }
+    // bring it back on screen so you can see it
+    .menu-item-drop { left: 0; }
   }
 
   .menu-item-drop {
@@ -303,104 +276,105 @@ $masquerade-link-color: $ic-color-alert;
       }
     }
   }
-}
 
-.customListContent li.customListItem:hover {
-  background-color: transparent;
-}
 
-.menu-item-drop-column-list, .customListGhost {
-  @include reset-list;
-  width: 270px;
-  li {
-    &:hover {
-      .name {
-        color: $ic-link-color-hover;
-      }
-    }
-    a {
-      display: block;
-      line-height: 1.2;
-      text-decoration: none;
-      padding: 6px 12px;
-    }
+  .customListContent li.customListItem:hover {
+    background-color: transparent;
   }
-}
 
-.menu-item-drop.menuCustomListEditing {
-  min-width: 589px;
-}
-
-#menu_enrollments {
-  .customListWrapper {
-    background: #fff;
-    padding: 10px;
-    border: solid 1px #ccc;
-    position: absolute;
-    left: 0;
-    opacity: 0;
-    top: 10px;
-    bottom: 10px;
+  .menu-item-drop-column-list, .customListGhost {
+    @include reset-list;
     width: 270px;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    transition: all 200ms ease;
-    transform: scale(0.5);
-    .customListRestore {
-      float: left;
-    }
-    .customListClose {
-      float: right;
-      display: block;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      text-decoration: none;
-      background: url(/images/close-button.png) no-repeat top left;
-    }
-    ul {
-      position: absolute;
-      top: 40px;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      overflow: auto;
-      a {
-        padding-left: 30px;
-        background: url(/images/checkboxes-customlist.png) no-repeat -8px 6px;
-        &:hover {
-          background-position: (-8px) -88px;
+    li {
+      &:hover {
+        .name {
+          color: $ic-link-color-hover;
         }
       }
-      .on a {
-        background-position: (-8px) -41px;
+      a {
+        display: block;
+        line-height: 1.2;
+        text-decoration: none;
+        padding: 6px 12px;
       }
     }
   }
-  .customListOpen {
-    @include fontSize(11px);
-    color: $ic-link-color;
+
+  .menu-item-drop.menuCustomListEditing {
+    min-width: 589px;
   }
-}
 
-.customListEditing ul {
-  min-height: 350px;
-}
+  #menu_enrollments {
+    .customListWrapper {
+      background: #fff;
+      padding: 10px;
+      border: solid 1px #ccc;
+      position: absolute;
+      left: 0;
+      opacity: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 270px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      transition: all 200ms ease;
+      transform: scale(0.5);
+      .customListRestore {
+        float: left;
+      }
+      .customListClose {
+        float: right;
+        display: block;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        text-decoration: none;
+        background: url(/images/close-button.png) no-repeat top left;
+      }
+      ul {
+        position: absolute;
+        top: 40px;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        overflow: auto;
+        a {
+          padding-left: 30px;
+          background: url(/images/checkboxes-customlist.png) no-repeat -8px 6px;
+          &:hover {
+            background-position: (-8px) -88px;
+          }
+        }
+        .on a {
+          background-position: (-8px) -41px;
+        }
+      }
+    }
+    .customListOpen {
+      @include fontSize(11px);
+      color: $ic-link-color;
+    }
+  }
 
-.customListEditing .customListWrapper ul {
-  min-height: 300px;
-}
+  .customListEditing ul {
+    min-height: 350px;
+  }
 
-#menu_enrollments.customListEditing .customListWrapper {
-  transform: scale(1);
-  left: 270px;
-  opacity: 1;
-}
+  .customListEditing .customListWrapper ul {
+    min-height: 300px;
+  }
 
-.menu-item-drop .customListOpen {
-  cursor: pointer;
-}
+  #menu_enrollments.customListEditing .customListWrapper {
+    transform: scale(1);
+    left: 270px;
+    opacity: 1;
+  }
 
-.customListGhost {
-  position: absolute;
-  z-index: 100;
+  .menu-item-drop .customListOpen {
+    cursor: pointer;
+  }
+
+  .customListGhost {
+    position: absolute;
+    z-index: 100;
+  }
 }

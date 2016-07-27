@@ -25,20 +25,20 @@ define([
     page(`/search?search_term=${searchTerm}`);
   };
 
-  Toolbar.renderUploadAddFolderButtons = function () {
+  Toolbar.renderUploadAddFolderButtons = function (canManage) {
     var phoneHiddenSet = classnames({
       'hidden-phone' : this.showingButtons
     });
-    if (this.props.userCanManageFilesForContext) {
+    if (canManage) {
       return (
         <div className='ef-actions'>
           <button
             type= 'button'
             onClick= {this.addFolder}
             className='btn btn-add-folder'
-            ariaLabel= {I18n.t('Add Folder')}
+            aria-label= {I18n.t('Add Folder')}
           >
-            <i className='icon-plus' />
+            <i className='icon-plus' />&nbsp;
             <span className= {phoneHiddenSet} >
               {I18n.t('Folder')}
             </span>
@@ -54,8 +54,8 @@ define([
       );
     }
   }
-  Toolbar.renderDeleteButton = function () {
-    if (this.props.userCanManageFilesForContext) {
+  Toolbar.renderDeleteButton = function (canManage) {
+    if (canManage) {
       return (
         <button
           type= 'button'
@@ -67,7 +67,7 @@ define([
           }.bind(this)
           }
           title= {I18n.t('Delete')}
-          ariaLabel= {I18n.t('Delete')}
+          aria-label= {I18n.t('Delete')}
           dataTooltip= ''
         >
           <i className='icon-trash' />
@@ -85,7 +85,7 @@ define([
           className= 'Toolbar__ManageUsageRights ui-button btn-rights'
           onClick= {this.openUsageRightsDialog}
           title= {I18n.t('Manage Usage Rights')}
-          ariaLabel= {I18n.t('Manage Usage Rights')}
+          aria-label= {I18n.t('Manage Usage Rights')}
           dataTooltip= ''
         >
           <i className= 'icon-files-copyright' />
@@ -93,8 +93,8 @@ define([
       );
     }
   }
-  Toolbar.renderCopyCourseButton = function () {
-    if (this.props.userCanManageFilesForContext) {
+  Toolbar.renderCopyCourseButton = function (canManage) {
+    if (canManage) {
       return (
         <button
           type='button'
@@ -110,10 +110,10 @@ define([
             })
           }.bind(this)}
           title= {I18n.t('Move')}
-          ariaLabel= {I18n.t('Move')}
+          aria-label= {I18n.t('Move')}
           dataTooltip= ''
         >
-          <i className='icon-copy-course' />
+          <i className='icon-updown' />
         </button>
       );
     }
@@ -129,7 +129,7 @@ define([
             href= {this.props.selectedItems[0].get('url')}
             download= {true}
             title= {this.downloadTitle}
-            ariaLabel= {this.downloadTitle}
+            aria-label= {this.downloadTitle}
             dataTooltip= ''
           >
             <i className='icon-download' />
@@ -143,7 +143,7 @@ define([
             className='ui-button btn-download'
             onClick= {this.downloadSelectedAsZip}
             title= {this.downloadTitle}
-            ariaLabel= {this.downloadTitle}
+            aria-label= {this.downloadTitle}
             dataTooltip= ''
           >
             <i className='icon-download'/>
@@ -153,8 +153,14 @@ define([
     }
   }
 
-  Toolbar.renderRestrictedAccessButtons = function () {
-    if (this.props.userCanManageFilesForContext){
+  Toolbar.componentDidUpdate = function (prevProps) {
+    if (prevProps.selectedItems.length !== this.props.selectedItems.length){
+      $.screenReaderFlashMessageExclusive(I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: this.props.selectedItems.length}))
+    }
+  }
+
+  Toolbar.renderRestrictedAccessButtons = function (canManage) {
+    if (canManage){
       return (
         <button
           type= 'button'
@@ -162,7 +168,7 @@ define([
           className= 'ui-button btn-restrict'
           onClick= {this.openRestrictedDialog}
           title= {I18n.t('Manage Access')}
-          ariaLabel= {I18n.t('Manage Access')}
+          aria-label= {I18n.t('Manage Access')}
           dataTooltip= ''
         >
           <i className= 'icon-cloud-lock' />
@@ -175,6 +181,11 @@ define([
     var selectedItemIsFolder = this.props.selectedItems.every(function(item) {
       return item instanceof Folder;
     });
+    var submissionsFolderSelected = this.props.currentFolder && this.props.currentFolder.get('for_submissions');
+    submissionsFolderSelected = submissionsFolderSelected || this.props.selectedItems.some(function(item) {
+      return item.get('for_submissions');
+    });
+    var canManage = this.props.userCanManageFilesForContext && !submissionsFolderSelected;
 
     this.showingButtons = this.props.selectedItems.length
     if(!this.showingButtons || selectedItemIsFolder){
@@ -207,7 +218,7 @@ define([
       <header
         className='ef-header'
         role='region'
-        ariaLabel= {I18n.t('Files Toolbar')}
+        aria-label= {I18n.t('Files Toolbar')}
       >
         <form
           className= { formClassName }
@@ -215,7 +226,7 @@ define([
         >
           <input
             placeholder= {I18n.t('Search for files')}
-            ariaLabel= {I18n.t('Search for files')}
+            aria-label= {I18n.t('Search for files')}
             type= 'search'
             ref='searchTerm'
             className='ic-Input'
@@ -241,7 +252,7 @@ define([
               className= {viewBtnClasses}
               title= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               role= 'button'
-              ariaLabel= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
+              aria-label= {selectedItemIsFolder ? I18n.t('Viewing folders is not available') : I18n.t('View')}
               dataTooltip= ''
               ariaDisabled= {!this.showingButtons || selectedItemIsFolder}
               disabled= {!this.showingButtons || selectedItemIsFolder}
@@ -250,16 +261,16 @@ define([
               <i className= 'icon-eye' />
             </a>
 
-            { this.renderRestrictedAccessButtons() }
+            { this.renderRestrictedAccessButtons(canManage) }
             { this.renderDownloadButton() }
-            { this.renderCopyCourseButton() }
-            { this.renderManageUsageRightsButton() }
-            { this.renderDeleteButton() }
+            { this.renderCopyCourseButton(canManage) }
+            { this.renderManageUsageRightsButton(canManage) }
+            { this.renderDeleteButton(canManage) }
           </div>
           <span className= 'ef-selected-count hidden-tablet hidden-phone'>
             {I18n.t({one: '%{count} item selected', other: '%{count} items selected'}, {count: this.props.selectedItems.length})}
           </span>
-          { this.renderUploadAddFolderButtons() }
+          { this.renderUploadAddFolderButtons(canManage) }
         </div>
       </header>
     );

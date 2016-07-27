@@ -167,6 +167,9 @@ class ConversationsController < ApplicationController
   #   paged conversation data, and "conversation_ids" which will contain the
   #   ids of all conversations under this scope/filter in the same order.
   #
+  # @argument include[] [Optional, String, "participant_avatars"]
+  #   "participant_avatars":: Optionally include an "avatar_url" key for each user participanting in the conversation
+  #
   # @response_field id The unique identifier for the conversation.
   # @response_field subject The subject of the conversation.
   # @response_field workflow_state The current state of the conversation
@@ -194,7 +197,9 @@ class ConversationsController < ApplicationController
   # @response_field avatar_url URL to appropriate icon for this conversation
   #   (custom, individual or group avatar, depending on audience)
   # @response_field participants Array of users (id, name) participating in
-  #   the conversation. Includes current user.
+  #   the conversation. Includes current user. If `include[]=participant_avatars`
+  #   was passed as an argument, each user in the array will also have an
+  #   "avatar_url" field
   # @response_field visible Boolean, indicates whether the conversation is
   #   visible under the current scope and filter. This attribute is always
   #   true in the index API response, and is primarily useful in create/update
@@ -232,7 +237,7 @@ class ConversationsController < ApplicationController
       # optimize loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       @conversations_json = conversations_json(conversations, @current_user,
-        session, include_participant_avatars: false,
+        session, include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
         include_participant_contexts: false, visible: true,
         include_context_name: true, include_beta: params[:include_beta])
 

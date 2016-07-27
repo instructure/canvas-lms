@@ -13,21 +13,16 @@
     <div class="ic-Login__content">
       <div class="ic-Login__innerContent">
 
-        <div class="ic-Login__header">
+        <div class="ic-Login-header">
           <%= render :partial => 'login/shared/header_logo' %>
-          <div>
-            <div>
-              <%= render "login/canvas/login_banner" %>
-              <% if @domain_root_account.feature_enabled?(:course_catalog) %>
-                <div class="ic-Login__headerBrowse">
-                    <a href="/search/all_courses" class="ic-Login__link">
-                      <%= t('browse_courses', 'Browse courses') %>
-                    </a>
-                </div>
-              <% end %>
-            </div>
+          <div class="ic-Login-header__links">
+            <%= render "login/canvas/login_banner" %>
+            <% if @domain_root_account.feature_enabled?(:course_catalog) %>
+              <a href="/search/all_courses" class="ic-Login__link">
+                <%= t('browse_courses', 'Browse courses') %>
+              </a>
+            <% end %>
           </div>
-
         </div>
 
         <div class="ic-Login__body">

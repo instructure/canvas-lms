@@ -5,27 +5,28 @@ class SpecFriendlyThinServer
   def self.run(app, options = {})
     bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
     port = options[:Port]
+    @port_ok = true
     start_server(app, bind_address, port)
     wait_for_server(bind_address, port)
+  end
+
+  class NoAcceptorError
+    def self.===(exception)
+      exception.message =~ /no acceptor/
+    end
   end
 
   def self.start_server(app, bind_address, port)
     @server = Thin::Server.new(bind_address, port, app, signals: false)
     Thin::Logging.logger = Rails.logger
     Thread.new do
-      Thread.current.abort_on_exception = true
-
-      max_attempts = 2
-      retry_count = 0
-
       begin
-        @server.start
-      rescue
-        raise unless $ERROR_INFO.message =~ /no acceptor/ && retry_count <= max_attempts
-        puts "Got `#{$ERROR_INFO.message}`, retrying"
-        sleep 1
-        retry_count += 1
-        retry
+        SeleniumDriverSetup.with_retries error_class: NoAcceptorError, failure_proc: -> { @port_ok = false } do
+          @server.start
+        end
+      rescue # anything else just bail w/o retrying
+        $stderr.puts "Unexpected thin server error: #{$ERROR_INFO.message}"
+        exit! 1
       end
     end
   end
@@ -33,7 +34,7 @@ class SpecFriendlyThinServer
   def self.wait_for_server(bind_address, port)
     print "Starting thin server..."
     max_time = Time.now + MAX_SERVER_START_TIME
-    while Time.now < max_time
+    while Time.now < max_time && @port_ok
       response = HTTParty.get("http://#{bind_address}:#{port}/health_check") rescue nil
       if response && response.success?
         SeleniumDriverSetup.disallow_requests!
@@ -45,7 +46,7 @@ class SpecFriendlyThinServer
     end
     puts "Failed!"
     $stderr.puts "unable to start thin server within #{MAX_SERVER_START_TIME} seconds!"
-    raise SeleniumDriverSetup::ServerStartupError
+    raise SeleniumDriverSetup::ServerStartupError # we'll rescue and retry on a new port
   end
 
   def self.shutdown

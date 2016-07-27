@@ -155,7 +155,7 @@ describe ApplicationController do
     end
 
     it 'gets appropriate settings from the root account' do
-      root_account = stub(global_id: 1, feature_enabled?: false, open_registration?: true)
+      root_account = stub(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {})
       HostUrl.stubs(file_host: 'files.example.com')
       controller.instance_variable_set(:@domain_root_account, root_account)
       expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
@@ -398,6 +398,62 @@ describe ApplicationController do
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
+    it 'redirects for an assignment' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Assignment')
+      controller.expects(:named_context_url).with(Account.default, :context_assignment_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a quiz' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: true, content_type: 'Quizzes::Quiz')
+      controller.expects(:named_context_url).with(Account.default, :context_quiz_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a discussion topic' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'DiscussionTopic')
+      controller.expects(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a wikipage' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'WikiPage', content: {})
+      controller.expects(:polymorphic_url).with([Account.default, tag.content], {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a rubric' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Rubric')
+      controller.expects(:named_context_url).with(Account.default, :context_rubric_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for a question bank' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'AssessmentQuestionBank')
+      controller.expects(:named_context_url).with(Account.default, :context_question_bank_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
+    it 'redirects for an attachment' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Attachment')
+      controller.expects(:named_context_url).with(Account.default, :context_file_url, 44, {:module_item_id => 42}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+
     context 'ContextExternalTool' do
 
       let(:course){ course_model }
@@ -628,6 +684,39 @@ describe ApplicationController do
       group_scope.expects(:none).returns(Group.none)
       @user.stubs(:current_groups).returns(group_scope)
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
+    end
+  end
+
+  describe '#discard_flash_if_xhr' do
+    before do
+      flash[:notice] = 'A flash notice'
+    end
+    subject(:discard) do
+      flash.instance_variable_get('@discard')
+    end
+
+    it 'sets flash discard if request is xhr' do
+      controller.request.stubs(xhr?: true)
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to all(match(/^notice$/))
+    end
+
+    it 'sets flash discard if request format is text/plain' do
+      controller.request.stubs(xhr?: false, format: 'text/plain')
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to all(match(/^notice$/))
+    end
+
+    it 'leaves flash as is if conditions are not met' do
+      controller.request.stubs(xhr?: false, format: 'text/html')
+
+      expect(discard).to be_empty, 'precondition'
+      controller.send(:discard_flash_if_xhr)
+      expect(discard).to be_empty
     end
   end
 end

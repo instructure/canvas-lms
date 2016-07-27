@@ -71,10 +71,15 @@ describe AssessmentQuestionBank do
 
     it "shuffles _after_ iteration has happened" do
       class FakeAq
-        attr_reader :called_at
+        @times_called = 0
+        class << self
+          attr_accessor :times_called
+        end
+
+        attr_reader :caller_number
         def find_or_create_quiz_question(_quiz_id, _exclude_qq_ids)
-          @called_at = Time.zone.now
-          Timecop.travel(Time.zone.now + 2.seconds)
+          @caller_number = FakeAq.times_called
+          FakeAq.times_called += 1
           self
         end
       end
@@ -82,8 +87,8 @@ describe AssessmentQuestionBank do
       ordered_aqs = stub(order: aqs, pluck: [1,2,3], shuffle: aqs.shuffle)
       AssessmentQuestion.stubs(:where).returns(ordered_aqs)
       @bank.select_for_submission(@quiz.id, 3)
-      expect(aqs[0].called_at < aqs[1].called_at).to be_truthy
-      expect(aqs[1].called_at < aqs[2].called_at).to be_truthy
+      expect(aqs[0].caller_number < aqs[1].caller_number).to be_truthy
+      expect(aqs[1].caller_number < aqs[2].caller_number).to be_truthy
     end
   end
 

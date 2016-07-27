@@ -26,11 +26,17 @@ describe BrandableCSS do
 
     it "includes image_url asset path for default images" do
       # un-memoize so it calls image_url stub
-      BrandableCSS.remove_instance_variable(:@variables_map_with_image_urls)
-      image_name = "image.png"
-      BrandableCSS.stubs(:image_url).returns(image_name)
+      if BrandableCSS.instance_variable_get(:@variables_map_with_image_urls)
+        BrandableCSS.remove_instance_variable(:@variables_map_with_image_urls)
+      end
+      url = "https://test.host/image.png"
+      if CANVAS_RAILS4_0
+        DummyControllerWithCorrectAssetUrls.helpers.stubs(:image_url).returns(url)
+      else
+        ActionController::Base.helpers.stubs(:image_url).returns(url)
+      end
       tile_wide = BrandableCSS.all_brand_variable_values["ic-brand-msapplication-tile-wide"]
-      expect(tile_wide).to eq image_name
+      expect(tile_wide).to eq url
     end
 
     describe "when called with a brand config" do

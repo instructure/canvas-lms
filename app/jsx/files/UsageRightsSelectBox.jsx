@@ -27,7 +27,7 @@ define([
 
   UsageRightsSelectBox.renderContentOptions = function () {
     return CONTENT_OPTIONS.map((contentOption) => {
-      return (<option value={contentOption.value}>{contentOption.display}</option>);
+      return (<option key={contentOption.value} value={contentOption.value}>{contentOption.display}</option>);
     });
   };
 
@@ -37,7 +37,7 @@ define([
     });
 
     return onlyCC.map((license) => {
-      return (<option value={license.id}>{license.name}</option>);
+      return (<option key={license.id} value={license.id}>{license.name}</option>);
     });
   };
 

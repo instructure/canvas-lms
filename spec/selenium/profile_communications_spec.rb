@@ -96,8 +96,9 @@ describe "profile communication settings" do
     get "/profile/communication"
     wait_for_ajaximations
     cell = find_frequency_cell("grading", sns_channel.id)
-    buttons = ffj('.frequency', cell)
-    expect(buttons.map {|b| b.attribute(:'data-value')}).to eq %w(immediately never)
+    buttons = ff('.frequency', cell)
+    expect(buttons[0]).to have_attribute('data-value', 'immediately')
+    expect(buttons[1]).to have_attribute('data-value', 'never')
   end
 
   it "should load the initial state of a user-pref checkbox" do

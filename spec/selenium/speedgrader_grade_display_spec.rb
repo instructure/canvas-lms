@@ -30,16 +30,5 @@ describe "speed grader - grade display" do
     expect(f("#x_of_x_graded")).to include_text("1 / 2 Graded")
   end
 
-  it "displays average submission grade for total assignment submissions", priority: "1", test_id: 283995 do
-    skip('testbot fragile')
-    create_and_enroll_students(2)
-
-    submit_and_grade_homework(@students[0], 10)
-    submit_and_grade_homework(@students[1], 0)
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    expect(f("#average_score")).to include_text("5 / 10 (50%)")
-  end
+  it "displays average submission grade for total assignment submissions", priority: "1", test_id: 283995
 end

@@ -39,7 +39,7 @@ describe "account admin courses tab" do
         wait_for_ajaximations
         f("#add_course_form #course_name").send_keys(course_name)
         f("#course_course_code").send_keys(course_code)
-        submit_form("#add_course_form")
+        submit_dialog_form("#add_course_form")
         refresh_page # we need to refresh the page so the course shows up
         course = Course.where(name: course_name).first
         expect(course).to be_present
@@ -63,9 +63,8 @@ describe "account admin courses tab" do
       name = name.split(" ")
       f("#course_name").send_keys(name[0])
       f("#course_name").send_keys(" "+name[1])
-      ff(".ui-menu-item .ui-corner-all").count > 0
-      keep_trying_until { expect(fj(".ui-menu-item .ui-corner-all:visible").text).to include_text(course.name) }
-      expect_new_page_load { fj("#new_course button").click }
+      expect(fj(".ui-menu-item .ui-corner-all:visible")).to include_text(course.name)
+      expect_new_page_load { f("#new_course button").click }
       expect(f("#crumb_course_#{course.id}")).to be_displayed
     end
 
@@ -75,7 +74,7 @@ describe "account admin courses tab" do
       name = name.split(" ")
       f("#course_name").send_keys(name[0])
       f("#course_name").send_keys(" "+name[1])
-      expect(ff(".ui-menu-item .ui-corner-all").count).to eq 0
+      expect(f("body")).not_to contain_css(".ui-menu-item .ui-corner-all")
     end
 
     it "should hide enrollmentless courses" do
@@ -86,7 +85,7 @@ describe "account admin courses tab" do
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests
-      expect(f("#course_#{course.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#course_#{course.id}")
       expect(f("#course_#{course2.id}")).to be_displayed
     end
 
@@ -96,7 +95,7 @@ describe "account admin courses tab" do
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests
-      expect(f("#course_#{course.id}")).to be_nil
+      expect(f("#content")).not_to contain_css("#course_#{course.id}")
       f("#enroll_filter_checkbox").click
       f(".filter_button").click
       wait_for_ajax_requests

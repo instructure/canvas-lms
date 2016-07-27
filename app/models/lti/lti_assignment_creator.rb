@@ -3,8 +3,9 @@ module Lti
     SUBMISSION_TYPES_MAP = {
         'online_upload' => 'file',
         'online_url' => 'url',
-        'external_tool' => ['url', 'text']
-    }
+        'external_tool' => ['url', 'text'].freeze,
+        'basic_lti_launch' => 'url'
+    }.freeze
 
     def initialize(assignment, source_id = nil)
       @assignment = assignment

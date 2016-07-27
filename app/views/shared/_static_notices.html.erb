@@ -1,5 +1,8 @@
 <noscript>
   <div role="alert" class="ic-flash-static ic-flash-error">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
     <h1><%= t :javascript_required, "You need to have JavaScript enabled in order to access this site." %></h1>
   </div>
 </noscript>
@@ -24,6 +27,9 @@
 
 <% if @current_user.try(:show_bouncing_channel_message?) %>
   <div role="alert" class="ic-flash-static ic-flash-warning">
-  <%= t(:bouncing_communication_channels, "There appears to be a problem with one of your contact methods. Please check your *Settings Page*.", wrapper: link_to('\1', settings_profile_path)) %>
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
+    <%= t(:bouncing_communication_channels, "There appears to be a problem with one of your contact methods. Please check your *Settings Page*.", wrapper: link_to('\1', settings_profile_path)) %>
   </div>
 <% end %>

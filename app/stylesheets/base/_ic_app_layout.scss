@@ -16,6 +16,105 @@ $ic-left-side-width: $ic-sp*15;
   @else { background: $ic-border-dark; }
 }
 
+body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
+  box-sizing: border-box;
+  flex: 1;
+  // Fix Firefox and IE Edge issues with contents breaking out of flex container
+  min-width: 1px;
+}
+
+.ic-app-main-content__primary {
+  box-sizing: border-box;
+}
+.ic-app-main-content__secondary {
+  box-sizing: border-box;
+  padding: $ic-sp*2;
+  position: relative; // note: this is also set for #right-side-wrapper in _#right-side.scss
+  // prevent safari bug where content disappears on scroll
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+/// Below are the shared styles for our content pieces. Because our layout
+/// changes based on whether our course menu is open or shut
+/// we needed to ensure we share the right styles with these sections, but
+/// still enforce different breakpoints when needed
+
+@mixin shared-main-content {display: flex;}
+@mixin shared-primary {
+  flex: 1;
+  // Fix Firefox and IE Edge issues with contents breaking out of flex container
+  min-width: 1px;
+}
+@mixin shared-secondary {
+  flex: 0 0 $ic-sp*24;
+  padding-left: $ic-sp*2;
+}
+
+/// Layout when the course nav IS OPEN
+body.course-menu-expanded {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
+    @include breakpoint(desktop--nav-open) { @include shared-main-content; }
+  }
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content__primary {
+    @include breakpoint(desktop--nav-open) {
+      @include shared-primary;
+    }
+  }
+  .ic-app-main-content__secondary {
+    @include breakpoint(desktop--nav-open) {
+      @include shared-secondary;
+    }
+  }
+}
+
+/// Layout when the course nav IS CLOSED
+body:not(.course-menu-expanded) {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
+    @include breakpoint(desktop) { @include shared-main-content; }
+  }
+  &:not(.ic-no-flex-layout):not(.embedded)  .ic-app-main-content__primary {
+    @include breakpoint(desktop) {
+      @include shared-primary;
+    }
+  }
+  .ic-app-main-content__secondary {
+    @include breakpoint(desktop) {
+      @include shared-secondary;
+    }
+  }
+}
+
+
+
+.ic-app-footer {
+  box-sizing: border-box;
+  padding: $ic-sp 0;
+  margin: 0 $ic-sp*2;
+  border-top: 1px solid $ic-border-light;
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+  body.modal & {
+    margin: 0;
+    padding: $ic-sp $ic-sp*2;
+  }
+}
+
+.ic-app-footer__links {
+  flex: 1;
+  display: flex;
+  a {
+    color: $ic-font-color--subdued;
+    margin-right: $ic-sp;
+    @include fontSize($ic-font-size--xsmall);
+  }
+  @include breakpoint(desktop) {
+    justify-content: flex-end;
+    a { margin-right: 0; margin-left: $ic-sp; }
+  }
+}
+
 .ic-app {
   box-sizing: border-box;
   min-height: 100vh;
@@ -100,71 +199,6 @@ $ic-left-side-width: $ic-sp*15;
   body.course-menu-expanded & {
     opacity: 1;
     transform: translate3d(0,0,0);
-  }
-}
-
-.ic-app-main-content {
-  body:not(.ic-no-flex-layout):not(.embedded) & {
-    box-sizing: border-box;
-    flex: 1;
-    @include breakpoint(desktop) { display: flex; }
-
-    // Fix Firefox and IE Edge issues with contents breaking out of flex container
-    min-width: 1px;
-  }
-}
-
-.ic-app-main-content__primary {
-  box-sizing: border-box;
-  @include breakpoint(desktop) {
-    body:not(.ic-no-flex-layout):not(.embedded) & {
-      flex: 1;
-
-      // Fix Firefox and IE Edge issues with contents breaking out of flex container
-      min-width: 1px;
-    }
-  }
-}
-
-.ic-app-main-content__secondary {
-  box-sizing: border-box;
-  padding: $ic-sp*2;
-  @include breakpoint(desktop) {
-    flex: 0 0 $ic-sp*24;
-    padding-left: $ic-sp*2;
-  }
-
-  position: relative; // note: this is also set for #right-side-wrapper in _#right-side.scss
-  // prevent safari bug where content disappears on scroll
-  -webkit-transform: translate3d(0, 0, 0);
-}
-
-.ic-app-footer {
-  box-sizing: border-box;
-  padding: $ic-sp 0;
-  margin: 0 $ic-sp*2;
-  border-top: 1px solid $ic-border-light;
-  @include breakpoint(desktop) {
-    display: flex;
-    align-items: center;
-  }
-  body.modal & {
-    margin: 0;
-    padding: $ic-sp $ic-sp*2;
-  }
-}
-
-.ic-app-footer__links {
-  flex: 1;
-  display: flex;
-  a {
-    color: $ic-font-color--subdued;
-    margin-right: $ic-sp;
-    @include fontSize($ic-font-size--xsmall);
-  }
-  @include breakpoint(desktop) {
-    justify-content: flex-end;
-    a { margin-right: 0; margin-left: $ic-sp; }
   }
 }
 

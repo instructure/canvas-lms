@@ -21,8 +21,10 @@ module Utils
   describe RelativeDate do
 
     let(:today) { Date.parse("2014-10-1") }
-    before { Timecop.travel(today) }
-    after { Timecop.return }
+
+    around do |example|
+      Timecop.freeze(today, &example)
+    end
 
     it 'can tell if its today' do
       expect(RelativeDate.new(today).today?).to be(true)

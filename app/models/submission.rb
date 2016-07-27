@@ -482,6 +482,10 @@ class Submission < ActiveRecord::Base
     turnitin_data.select{|_, v| v.is_a?(Hash) && v.key?(:outcome_response)}.any?
   end
 
+  def external_tool_url
+    URI.encode(url) if self.submission_type == 'basic_lti_launch'
+  end
+
   def touch_graders
     self.class.connection.after_transaction_commit do
       if self.assignment && self.user && self.assignment.context.is_a?(Course)
@@ -654,17 +658,19 @@ class Submission < ActiveRecord::Base
   end
 
   def submission_history
-    res = []
-    last_submitted_at = nil
-    self.versions.sort_by(&:created_at).reverse_each do |version|
-      model = version.model
-      if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
-        res << model
-        last_submitted_at = model.submitted_at
+    @submission_histories ||= begin
+      res = []
+      last_submitted_at = nil
+      self.versions.sort_by(&:created_at).reverse_each do |version|
+        model = version.model
+        if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
+          res << model
+          last_submitted_at = model.submitted_at
+        end
       end
+      res = self.versions.to_a[0,1].map(&:model) if res.empty?
+      res.sort_by{ |s| s.submitted_at || CanvasSort::First }
     end
-    res = self.versions.to_a[0,1].map(&:model) if res.empty?
-    res.sort_by{ |s| s.submitted_at || CanvasSort::First }
   end
 
   def check_url_changed
@@ -720,30 +726,59 @@ class Submission < ActiveRecord::Base
   # use this method to pre-load the versioned_attachments for a bunch of
   # submissions (avoids having O(N) attachment queries)
   # NOTE: all submissions must belong to the same shard
-  def self.bulk_load_versioned_attachments(submissions)
-    attachment_ids_by_submission = Hash[
-      submissions.map { |s|
-        attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-        attachment_ids << s.attachment_id if s.attachment_id
-        [s, attachment_ids]
-      }
-    ]
+  def self.bulk_load_versioned_attachments(submissions, preloads: [:thumbnail, :media_object])
+    # The index of the submission is considered part of the key for
+    # the hash that is built. This is needed for bulk loading
+    # submission_histories where multiple submission histories will
+    # look equal to the Hash key and the attachments for the last one
+    # will cancel out the former ones.
+    submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
+      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+      attachment_ids << s.attachment_id if s.attachment_id
+      [[s, index], attachment_ids]
+    end
+    attachment_ids_by_submission_and_index = Hash[submissions_with_index_and_attachment_ids]
 
-    bulk_attachment_ids = attachment_ids_by_submission.values.flatten
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
       attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                          .preload(:thumbnail, :media_object)
+                          .preload(preloads)
                           .group_by(&:id)
     end
 
-    submissions.each { |s|
-      s.versioned_attachments = attachments_by_id.values_at(
-        *attachment_ids_by_submission[s]
-      ).flatten
-    }
+    submissions.each_with_index do |s, index|
+      s.versioned_attachments =
+        attachments_by_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten
+    end
+  end
+
+  # Avoids having O(N) attachment queries.  Returns a hash of
+  # submission to attachements.
+  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
+    submissions = Array(submissions)
+    attachment_ids_by_submission =
+      Hash[submissions.map { |s| [s, s.attachment_associations.map(&:attachment_id)] }]
+    bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
+
+    if bulk_attachment_ids.empty?
+      attachments_by_id = {}
+    else
+      attachments_by_id = Attachment.where(id: bulk_attachment_ids)
+      attachments_by_id = attachments_by_id.preload(*preloads) unless preloads.nil?
+      attachments_by_id = attachments_by_id.group_by(&:id)
+    end
+
+    attachments_by_submission = submissions.map do |s|
+      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.uniq]
+    end
+    Hash[attachments_by_submission]
+  end
+
+  def includes_attachment?(attachment)
+    self.versions.map(&:model).any? { |v| (v.attachment_ids || "").split(',').map(&:to_i).include?(attachment.id) }
   end
 
   def <=>(other)
@@ -848,7 +883,7 @@ class Submission < ActiveRecord::Base
   private :validate_single_submission
 
   def grade_change_audit
-    return true unless self.grade_changed?
+    return true unless self.grade_changed? || self.excused_changed?
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -1014,9 +1049,9 @@ class Submission < ActiveRecord::Base
 
   def add_comment(opts={})
     opts = opts.symbolize_keys
-    opts[:author] = opts.delete(:commenter) || opts.delete(:author) || opts.delete(:user) || self.user
+    opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
-    opts[:attachments] ||= opts.delete :comment_attachments
+    opts[:attachments] ||= opts[:comment_attachments]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = t('media_comment', "This is a media comment.")
@@ -1024,8 +1059,8 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    if opts.delete(:provisional)
-      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts.delete(:final))
+    if opts[:provisional]
+      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts[:final])
       opts[:provisional_grade_id] = pg.id
     end
     if self.new_record?

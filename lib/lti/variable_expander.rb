@@ -27,7 +27,8 @@ module Lti
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
-                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment
+                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment,
+                  :collaboration
 
     def self.register_expansion(name, permission_groups, proc, guard = -> { true })
       @expansions ||= {}
@@ -47,6 +48,7 @@ module Lti
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
+    COLLABORATION_GUARD = -> { @collaboration }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
@@ -89,90 +91,206 @@ module Lti
       end
     end
 
+    # returns the canvas domain for the current context.
+    # @example
+    #   ```
+    #   canvas.instructure.com
+    #   ```
     register_expansion 'Canvas.api.domain', [],
                        -> { HostUrl.context_host(@root_account, @request.host) }
 
+    # returns the api url for the members of the collaboration
+    # @example
+    #  ```
+    #  https://canvas.instructure.com/api/v1/collaborations/1/members
+    #  ```
+    register_expansion 'Canvas.api.collaborationMembers.url', [],
+                       -> { @controller.api_v1_collaboration_members_url(@collaboration) },
+                       COLLABORATION_GUARD
+    # returns the base URL for the current context.
+    # @example
+    #   ```
+    #   https://canvas.instructure.com
+    #   ```
     register_expansion 'Canvas.api.baseUrl', [],
                        -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" }
 
-    register_expansion 'Canvas.api.membershipServiceUrl', [],
-                       -> { @controller.course_membership_service_url(@context) },
-                       COURSE_GUARD
+    # returns the URL for the membership service associated with the current context
+    # @example
+    #   ```
+    #   https://canvas.instructure.com/api/lti/courses/1/membership_service
+    #   ```
+    register_expansion 'ToolProxyBinding.memberships.url', [],
+                       -> { @controller.polymorphic_url([@context, :membership_service]) },
+                       -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
+    # returns the account id for the current context.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.account.id', [],
                        -> { lti_helper.account.id }
 
+    # returns the account name for the current context.
+    # @example
+    #   ```
+    #   School Name
+    #   ```
     register_expansion 'Canvas.account.name', [],
                        -> { lti_helper.account.name }
 
+    # returns the account's sis source id for the current context.
     register_expansion 'Canvas.account.sisSourceId', [],
                        -> { lti_helper.account.sis_source_id }
 
+    # returns the Root Account ID for the current context.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.rootAccount.id', [],
                        -> { @root_account.id }
 
+    # returns the root account's sis source id for the current context.
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
+    # returns the URL for the external tool that was launched.
+    # @example
+    #   ```
+    #   http://example.url/path
+    #   ```
     register_expansion 'Canvas.externalTool.url', [],
                        -> { @controller.named_context_url(@context, :api_v1_context_external_tools_update_url,
                                                           @tool.id, include_host:true) },
                        LTI1_GUARD
 
+    # returns the URL for the external tool that was launched.
+    # @example
+    #   ```
+    #   http://example.url/path.css
+    #   ```
     register_expansion 'Canvas.css.common', [],
                        -> { URI.parse(@request.url)
                                .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
+    # returns the shard id for the current context.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.shard.id', [],
                        -> { Shard.current.id }
+
+    # returns the root account's global id for the current context.
+    # @example
+    #   ```
+    #   123400000000123
+    #   ```
     register_expansion 'Canvas.root_account.global_id', [],
                        -> { @root_account.global_id }
-    ##### Deprecated Substitutions #####
 
+    # returns the root account id for the current context.
+    # @deprecated
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.root_account.id', [],
                        -> { @root_account.id }
 
+    # returns the root account sis source id for the current context.
+    # @deprecated
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.root_account.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
-
+    # returns the current course id.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.course.id', [],
                        -> { @context.id },
                        COURSE_GUARD
 
+    # returns the current course sis source id.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.course.sisSourceId', [],
                        -> { @context.sis_source_id },
                        COURSE_GUARD
 
+    # returns the current course start date.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.course.startAt', [],
                        -> { @context.start_at },
                        COURSE_GUARD
 
+    # returns the current course's term start date.
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.term.startAt', [],
                        -> { @context.enrollment_term.start_at },
                        TERM_START_DATE_GUARD
 
+    # returns the current course section sis source id
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'CourseSection.sourcedId', [],
                        -> { @context.sis_source_id },
                        COURSE_GUARD
 
+    # returns the current course enrollment state
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.enrollment.enrollmentState', [],
                        -> { lti_helper.enrollment_state },
                        COURSE_GUARD
 
+    # returns the current course membership roles
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.membership.roles', [],
                        -> { lti_helper.current_canvas_roles },
                        ROLES_GUARD
 
-    #This is a list of IMS LIS roles should have a different key
+    # This is a list of IMS LIS roles should have a different key
     register_expansion 'Canvas.membership.concludedRoles', [],
                        -> { lti_helper.concluded_lis_roles },
                        COURSE_GUARD
 
+    # returns the current course enrollment state
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.course.previousContextIds', [],
                        -> { lti_helper.previous_lti_context_ids },
                        COURSE_GUARD
 
+    # returns the current course enrollment state
+    # @example
+    #   ```
+    #   1234
+    #   ```
     register_expansion 'Canvas.course.previousCourseIds', [],
                        -> { lti_helper.previous_course_ids },
                        COURSE_GUARD
@@ -213,6 +331,17 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
 
+    # returns the context ids for the groups the user belongs to in the course.
+    # @example
+    #   ```
+    #   1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
+    #   ```
+    register_expansion 'Canvas.group.contextIds', [],
+                       -> { @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
+                              Lti::Asset.opaque_identifier_for(g)
+                            end.join(',') },
+                       -> { @current_user && @context.is_a?(Course) }
+
     register_expansion 'Membership.role', [],
                        -> { lti_helper.all_roles('lis2') },
                        USER_GUARD
@@ -227,7 +356,6 @@ module Lti
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
-
     register_expansion 'User.username', [],
                        -> { sis_pseudonym.unique_id },
                        PSEUDONYM_GUARD
@@ -301,17 +429,17 @@ module Lti
     register_expansion 'Canvas.assignment.pointsPossible', [],
                        -> { TextHelper.round_if_whole(@assignment.points_possible) },
                        ASSIGNMENT_GUARD
-    #deprecated in favor of ISO8601
+    # @deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.unlockAt', [],
                        -> { @assignment.unlock_at },
                        ASSIGNMENT_GUARD
 
-    #deprecated in favor of ISO8601
+    # @deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.lockAt', [],
                        -> { @assignment.lock_at },
                        ASSIGNMENT_GUARD
 
-    #deprecated in favor of ISO8601
+    # @deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.dueAt', [],
                        -> { @assignment.due_at },
                        ASSIGNMENT_GUARD
@@ -328,6 +456,10 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> {@assignment && @assignment.due_at.present?}
 
+    register_expansion 'Canvas.assignment.published', [],
+                       -> { @assignment.workflow_state == 'published' },
+                       ASSIGNMENT_GUARD
+
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
                        -> { @tool_setting_link_id }
@@ -342,7 +474,7 @@ module Lti
 
     register_expansion 'ToolConsumerProfile.url', [],
                        -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
-                       -> { @tool }
+                       -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
     register_expansion 'Canvas.file.media.id', [],
                        -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },

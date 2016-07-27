@@ -7,7 +7,7 @@ describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
-  
+
   context "Navigation" do
     def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
@@ -59,13 +59,14 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}"
       wait_for_ajaximations
       # validations
-      expect(element_exists('.al-trigger')).to be_truthy
+      expect(f('.al-trigger')).to be_present
       expect(f('.course-title')).to include_text 'Unnamed Course'
-      expect(element_exists('span.front-page.label')).to be_falsey
-      expect(element_exists('button.btn.btn-published')).to be_falsey
+      content = f("#content")
+      expect(content).not_to contain_css('span.front-page.label')
+      expect(content).not_to contain_css('button.btn.btn-published')
       f('.al-trigger').click
-      expect(element_exists('.icon-trash')).to be_falsey
-      expect(element_exists('.icon-clock')).to be_truthy
+      expect(content).not_to contain_css('.icon-trash')
+      expect(f('.icon-clock')).to be_present
     end
 
     it "navigates to the wiki pages edit page from the show page" do
@@ -80,7 +81,7 @@ describe "Wiki Pages" do
 
     it "should alert a teacher when accessing a non-existant page", priority: "1", test_id: 126842 do
       get "/courses/#{@course.id}/pages/fake"
-      expect(flash_message_present?(:info)).to be_truthy
+      expect_flash_message :info
     end
 
     it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
@@ -93,7 +94,7 @@ describe "Wiki Pages" do
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
       switch_editor_views(wiki_page_body)
-      expect(f('textarea').text).to include_text('test')
+      expect(f('textarea')).to include_text('test')
     end
   end
 
@@ -108,12 +109,11 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages"
       f('.al-trigger').click
       f('.edit-menu-item').click
-      expect(f('.edit-control-text').attribute(:value)).to include_text('B-Team')
+      expect(f('.edit-control-text').attribute(:value)).to include('B-Team')
       f('.edit-control-text').clear()
       f('.edit-control-text').send_keys('A-Team')
       fj('button:contains("Save")').click
-      wait_for_ajaximations
-      expect(f('.collectionViewItems').text).to include('A-Team')
+      expect(f('.collectionViewItems')).to include_text('A-Team')
     end
 
     it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
@@ -124,7 +124,7 @@ describe "Wiki Pages" do
       fj('button:contains("Delete")').click
       wait_for_ajaximations
       get "/courses/#{@course.id}/pages/deleted"
-      expect(flash_message_present?(:info)).to be_truthy
+      expect_flash_message :info
     end
   end
 
@@ -139,12 +139,12 @@ describe "Wiki Pages" do
       page.workflow_state = 'deleted'
       page.save!
       get "/courses/#{@course.id}/pages/delete_deux"
-      expect(flash_message_present?(:warning)).to be_truthy
+      expect_flash_message :warning
     end
 
     it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
       get "/courses/#{@course.id}/pages/non-existant"
-      expect(flash_message_present?(:warning)).to be_truthy
+      expect_flash_message :warning
     end
   end
 
@@ -485,7 +485,7 @@ describe "Wiki Pages" do
       foo = @course.wiki.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
-      expect(f('.view_all_pages')).to be_nil
+      expect(f("#content")).not_to contain_css('.view_all_pages')
 
     end
   end
@@ -499,6 +499,7 @@ describe "Wiki Pages" do
       Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
 
       @course.is_public = true
+      @course.workflow_state = 'available'
       @course.save!
 
       title = "foo"

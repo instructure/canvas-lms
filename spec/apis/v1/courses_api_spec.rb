@@ -601,6 +601,15 @@ describe CoursesController, type: :request do
         expect(new_course).to be_available
       end
 
+      it "doesn't offer a course if passed a false 'offer' parameter" do
+        json = api_call(:post, @resource_path,
+                        @resource_params,
+                        { :account_id => @account.id, :offer => false, :course => { :name => 'Test Course' } }
+        )
+        new_course = Course.find(json['id'])
+        expect(new_course).not_to be_available
+      end
+
       it "should allow setting sis_course_id without offering the course" do
         Auditors::Course.expects(:record_created).once
         Auditors::Course.expects(:record_published).never
@@ -1334,7 +1343,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course1.enrollment_term_id,
       'name' => @course1.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
 
@@ -1345,7 +1353,6 @@ describe CoursesController, type: :request do
     expect(courses[0]['term']).to include(
       'id' => @course2.enrollment_term_id,
       'name' => @course2.enrollment_term.name,
-      'sis_term_id' => nil,
       'workflow_state' => 'active',
     )
   end
@@ -2519,6 +2526,7 @@ describe CoursesController, type: :request do
         'id' => @course1.id,
         'name' => @course1.name,
         'account_id' => @course1.account_id,
+        'root_account_id' => @course1.root_account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
         'grading_standard_id' => nil,

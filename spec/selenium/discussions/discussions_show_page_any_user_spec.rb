@@ -44,13 +44,13 @@ describe "discussions" do
           expect(f('.new-and-total-badge .new-items').text).to eq reply_count.to_s
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
-          keep_trying_until { expect(ff('.discussion_entry.unread')).to be_empty }
+          scroll_into_view ".entry-content:last"
+          expect(f("#content")).not_to contain_css('.discussion_entry.unread')
           expect(ff('.discussion_entry.read').length).to eq reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
           # refresh page and make sure nothing is unread and everthing is .read
           get url
-          expect(ff(".discussion_entry.unread")).to be_empty
+          expect(f("#content")).not_to contain_css('.discussion_entry.unread')
           expect(f('.new-and-total-badge .new-items').text).to eq ''
 
           # Mark one as unread manually, and create a new reply. The new reply
@@ -64,8 +64,8 @@ describe "discussions" do
           expect(ff(".discussion_entry.unread").size).to eq 2
           expect(f('.new-and-total-badge .new-items').text).to eq '2'
 
-          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
-          keep_trying_until { ff('.discussion_entry.unread').size < 2 }
+          scroll_into_view '.entry-content:last'
+          expect(ff('.discussion_entry.unread')).to have_size(1)
           wait_for_ajaximations
           expect(ff(".discussion_entry.unread").size).to eq 1
         end
@@ -85,12 +85,12 @@ describe "discussions" do
           get url
 
           expect(ff('.discussion-entries .unread').length).to eq reply_count
-          expect(ff('.discussion-entries .read').length).to eq 0
+          expect(f("#content")).not_to contain_css('.discussion-entries .read')
 
           f("#discussion-managebar .al-trigger").click
           f('.mark_all_as_read').click
           wait_for_ajaximations
-          expect(ff('.discussion-entries .unread').length).to eq 0
+          expect(f('.discussion-entries')).not_to contain_css('.unread')
           expect(ff('.discussion-entries .read').length).to eq reply_count
         end
 
@@ -168,7 +168,7 @@ describe "discussions" do
         it "should collapse and expand reply", priority: "1", test_id: 150486 do
           f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
-          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")
           f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
@@ -177,45 +177,36 @@ describe "discussions" do
         it "should show the appropriate replies from the search by option", priority: "1", test_id: 150487 do
           expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
           expect(f('#discussion-search')).to be_present
+
           replace_content(f('#discussion-search'), 'somebody')
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('somebody')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('somebody')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
+
           replace_content(f('#discussion-search'), 'Reply by')
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('teacher')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('teacher')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
         end
 
         it "should show unread replies on clicking the unread button", priority: "1", test_id: 150489 do
-          keep_trying_until do
-            expect(f('.new-and-total-badge .new-items').text).to eq('1')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
-          end
+          expect(f('.new-and-total-badge .new-items')).to include_text('1')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(2)
+
           # click unread button
           f('.ui-button').click
           wait_for_ajaximations
-          keep_trying_until do
-            expect(f("#filterResults .discussion-title").text).to include('teacher')
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
-          end
+          expect(f("#filterResults .discussion-title")).to include_text('teacher')
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(1)
+
           # click unread button again
           f('.ui-button').click
-          wait_for_ajaximations
-          keep_trying_until do
-            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
-          end
+          expect(ffj('.discussion-entries .entry:visible')).to have_size(2)
         end
 
         it "should collapse and expand multiple replies", priority: "1", test_id: 150490 do
           f('#collapseAll').click
           wait_for_ajaximations
-          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
-          expect(fj("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")
+          expect(f("#content")).not_to contain_jqcss("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")
           f('#expandAll').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
@@ -227,7 +218,7 @@ describe "discussions" do
         message = %{<p><object width="425" height="350" data="http://www.example.com/swf/software/flash/about/flash_animation.swf" type="application/x-shockwave-flash</object></p>"}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        expect(f('#content object')).not_to be_present
+        expect(f("#content")).not_to contain_css("object")
         iframe = f('#content iframe.user_content_iframe')
         expect(iframe).to be_present
         # the sizing isn't exact due to browser differences
@@ -236,7 +227,7 @@ describe "discussions" do
         form = f('form.user_content_post_form')
         expect(form).to be_present
         expect(form['target']).to eq iframe['name']
-        in_frame(iframe) do
+        in_frame(iframe[:name]) do
           keep_trying_until do
             src = driver.page_source
             doc = Nokogiri::HTML::DocumentFragment.parse(src)
@@ -262,8 +253,8 @@ describe "discussions" do
         message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
-        expect(f('#content object')).not_to be_present
-        expect(f('#content embed')).not_to be_present
+        expect(f("#content")).not_to contain_css("object")
+        expect(f("#content")).not_to contain_css("embed")
         iframe = f('#content iframe.user_content_iframe')
         expect(iframe).to be_present
         forms = ff('form.user_content_post_form')
@@ -281,7 +272,7 @@ describe "discussions" do
 
       it "should display the current username when adding a reply", priority: "1", test_id: 150485 do
         get url
-        expect(get_all_replies.count).to eq 0
+        expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
         expect(get_all_replies.count).to eq 1
         expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name
@@ -320,10 +311,8 @@ describe "discussions" do
 
           last_entry = DiscussionEntry.last
           expect(last_entry.depth).to eq 2
-          expect(last_entry.message).to include_text(side_comment_text)
-          keep_trying_until do
-            expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
-          end
+          expect(last_entry.message).to include(side_comment_text)
+          expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
         end
 
         it "should create multiple side comments but only show 10 and expand the rest", priority: "1", test_id: 345489 do
@@ -331,11 +320,9 @@ describe "discussions" do
           side_comment_number.times { |i| topic.discussion_entries.create!(:user => student, :message => "new side comment #{i} from student", :parent_entry => entry) }
           get url
           expect(DiscussionEntry.last.depth).to eq 2
-          keep_trying_until do
-            expect(ff('.discussion-entries .entry').count).to eq 12 # +1 because of the initial entry
-          end
+          expect(ff('.discussion-entries .entry')).to have_size(12) # +1 because of the initial entry
           f('.showMore').click
-          expect(ff('.discussion-entries .entry').count).to eq(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
+          expect(ff('.discussion-entries .entry')).to have_size(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end
 
         it "should delete a side comment", priority: "1", test_id: 345490 do
@@ -350,9 +337,7 @@ describe "discussions" do
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
           expect(topic.discussion_entries.last.message).to eq text
           get url
-          keep_trying_until do
-            validate_entry_text(entry, text)
-          end
+          validate_entry_text(entry, text)
           edit_entry(entry, edit_text)
         end
 

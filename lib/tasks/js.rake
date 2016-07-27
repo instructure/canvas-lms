@@ -4,7 +4,7 @@ require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
-  desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
+  desc 'run Karma as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
     app = nil if app == 'NA'
@@ -17,7 +17,7 @@ namespace :js do
         exit
       end
     end
-    Rake::Task['js:generate_runner'].invoke
+    build_runner
     exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
@@ -59,7 +59,7 @@ namespace :js do
 
     matcher = Canvas::RequireJs.matcher
     tests = Dir[
-      "public/javascripts/#{matcher}",
+      "public/javascripts/*[!bower]/#{matcher}",
       "spec/javascripts/compiled/#{matcher}",
       "spec/plugins/*/javascripts/compiled/#{matcher}"
     ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
@@ -129,8 +129,7 @@ namespace :js do
         end
         puts "--> executing browser tests with Karma"
         build_runner
-        karma_output = `./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter} 2>&1`
-        puts karma_output
+        system "./node_modules/karma/bin/karma start --browsers Chrome --single-run --reporters progress,#{reporter}"
 
         if $?.exitstatus != 0
           puts 'some specs failed'
@@ -367,14 +366,4 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
-
-  #def npm_run(command)
-    #puts "Running npm script `#{command}`"
-    #msg = `$(npm bin)/#{command} 2>&1`
-    #unless $?.success?
-      #raise msg
-    #end
-    #msg
-  #end
-
 end

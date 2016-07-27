@@ -57,6 +57,7 @@ describe PageViewsController do
       get 'index', :user_id => @user.id, :format => 'csv'
       expect(response).to be_success
     end
+
     it "should order rows by created_at in DESC order" do
       pv2 = page_view(@user, '/somewhere/in/app', :created_at => 2.days.ago)    # 2nd day
       pv1 = page_view(@user, '/somewhere/in/app/1', :created_at => 1.day.ago)  # 1st day
@@ -85,9 +86,8 @@ describe PageViewsController do
         pv = page_view(@student, '/somewhere/in/app/1', :created_at => 1.day.ago)
 
         user_session(@student)
-        expect {
-          xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
-        }.not_to change { ErrorReport.count }
+        xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
+        expect(response.status).to eq 200
       end
     end
   end

@@ -112,13 +112,16 @@ class ApplicationController < ActionController::Base
         current_user_id: @current_user.try(:id),
         current_user: user_display_json(@current_user, :profile),
         current_user_roles: @current_user.try(:roles, @domain_root_account),
+        current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
         files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         use_new_styles: use_new_styles?,
         k12: k12?,
+        help_link_name: help_link_name,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         SETTINGS: {
-          open_registration: @domain_root_account.try(:open_registration?)
+          open_registration: @domain_root_account.try(:open_registration?),
+          eportfolios_enabled: @current_user.try(:eportfolios_enabled?)
         }
       }
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
@@ -212,20 +215,30 @@ class ApplicationController < ActionController::Base
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
-  helper_method 'k12?'
+  helper_method :k12?
 
   def use_new_styles?
     @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
   end
-  helper_method 'use_new_styles?'
+  helper_method :use_new_styles?
 
   def multiple_grading_periods?
-    is_account_and_mgp_is_allowed = !!(@context &&
-                                       @context.is_a?(Account) &&
-                                       @context.feature_allowed?(:multiple_grading_periods))
-    (@context && @context.feature_enabled?(:multiple_grading_periods)) || is_account_and_mgp_is_allowed
+    account_and_grading_periods_allowed? ||
+      context_grading_periods_enabled?
   end
-  helper_method 'multiple_grading_periods?'
+  helper_method :multiple_grading_periods?
+
+  def account_and_grading_periods_allowed?
+    @context.is_a?(Account) &&
+      @context.feature_allowed?(:multiple_grading_periods)
+  end
+  private :account_and_grading_periods_allowed?
+
+  def context_grading_periods_enabled?
+    @context.present? &&
+      @context.feature_enabled?(:multiple_grading_periods)
+  end
+  private :context_grading_periods_enabled?
 
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
@@ -581,7 +594,8 @@ class ApplicationController < ActionController::Base
         params[:context_id] = params[:course_section_id]
         params[:context_type] = "CourseSection"
         @context = api_find(CourseSection, params[:course_section_id])
-      elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/)
+      elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/) || request.path == '/api/v1/calendar_events/visible_contexts'
+        # ^ this should be split out into things on the individual controllers
         @context = @current_user
         @context_membership = @context
       end
@@ -917,8 +931,6 @@ class ApplicationController < ActionController::Base
   def discard_flash_if_xhr
     if request.xhr? || request.format.to_s == 'text/plain'
       flash.discard
-    else
-      flash.keep
     end
   end
 
@@ -1060,8 +1072,7 @@ class ApplicationController < ActionController::Base
       if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
         @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
         @accessed_asset[:level] ||= 'view'
-        access_context = @context.is_a?(UserProfile) ? @context.user : @context
-        @access.log access_context, @accessed_asset
+        @access.log @context, @accessed_asset
 
         if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
           generate_page_view(user)
@@ -1081,6 +1092,7 @@ class ApplicationController < ActionController::Base
       if @page_view && @page_view_update
         @page_view.context = @context if !@page_view.context_id
         @page_view.account_id = @domain_root_account.id
+        @page_view.developer_key_id = @access_token.try(:developer_key_id)
         @page_view.store
         RequestContextGenerator.store_page_view_meta(@page_view)
       end
@@ -1088,6 +1100,7 @@ class ApplicationController < ActionController::Base
       @page_view.destroy if @page_view && !@page_view.new_record?
     end
   rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+    Canvas::Errors.capture_exception(:page_view, e)
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true
@@ -1333,7 +1346,10 @@ class ApplicationController < ActionController::Base
       redirect_to named_context_url(context, :context_discussion_topic_url, tag.content_id, url_params)
     elsif tag.content_type == 'Rubric'
       redirect_to named_context_url(context, :context_rubric_url, tag.content_id, url_params)
+    elsif tag.content_type == 'AssessmentQuestionBank'
+      redirect_to named_context_url(context, :context_question_bank_url, tag.content_id, url_params)
     elsif tag.content_type == 'Lti::MessageHandler'
+      url_params[:module_item_id] = params[:module_item_id] if params[:module_item_id]
       url_params[:resource_link_fragment] = "ContentTag:#{tag.id}"
       redirect_to named_context_url(context, :context_basic_lti_launch_request_url, tag.content_id, url_params)
     elsif tag.content_type == 'ExternalUrl'
@@ -1725,7 +1741,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    stringify_json_ids? ? Api.recursively_stringify_json_ids(obj) : obj
+    stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -1752,6 +1768,13 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
+    super
+  end
+
+  # flash is normally only preserved for one redirect; make sure we carry
+  # it along in case there are more
+  def redirect_to(*)
+    flash.keep
     super
   end
 
@@ -1953,7 +1976,7 @@ class ApplicationController < ActionController::Base
 
     if @page
       hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true)
-      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? Api.stringify_json_id(current_version.number) : nil
+      hash[:WIKI_PAGE_REVISION] = (current_version = @page.versions.current) ? StringifyIds.stringify_id(current_version.number) : nil
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
       hash[:WIKI_PAGE_EDIT_PATH] = named_context_url(@context, :edit_context_wiki_page_path, @page)
       hash[:WIKI_PAGE_HISTORY_PATH] = named_context_url(@context, :context_wiki_page_revisions_path, @page)
@@ -2083,6 +2106,7 @@ class ApplicationController < ActionController::Base
       ctx[:session_id] = tctx[:session_id]
     end
 
+    StringifyIds.recursively_stringify_ids(ctx)
     LiveEvents.set_context(ctx)
   end
 

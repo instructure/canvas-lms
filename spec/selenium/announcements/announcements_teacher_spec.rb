@@ -6,20 +6,28 @@ describe "announcements" do
   include AnnouncementsCommon
 
   context "announcements as a teacher" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before :once do
+      @teacher = user_with_pseudonym(active_user: true)
+      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+    end
+
+    before :each do
+      user_session(@teacher)
     end
 
     describe "shared bulk topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
 
-      before (:each) do
+      before :once do
         @context = @course
         5.times do |i|
           title = "new #{i.to_s.rjust(3, '0')}"
           what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => title, :user => @user) : announcement_model(:title => title, :user => @user)
         end
+      end
+
+      before :each do
         get url
         @checkboxes = ff('.toggleSelected')
       end
@@ -29,7 +37,7 @@ describe "announcements" do
         f('#delete').click
         driver.switch_to.alert.accept
         wait_for_ajax_requests
-        expect(ff('.discussion-topic').count).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
         expect(what_to_create.where(:workflow_state => 'active').count).to eq 0
       end
 
@@ -59,6 +67,11 @@ describe "announcements" do
         refresh_and_filter(:string, 'jake', user_name)
       end
 
+      it "should search an entire phrase" do
+        replace_content(f('#searchTerm'), 'new 001')
+        expect(ff('.discussionTopicIndexList .discussion-topic').count).to eq 1
+      end
+
       it "should return multiple items in the search", priority: "1", test_id: 220362 do
         new_title = 'updated'
         what_to_create.first.update_attributes(:title => "#{new_title} first")
@@ -68,7 +81,7 @@ describe "announcements" do
 
       it "should filter by unread", priority: "1", test_id: 220363 do
         what_to_create.last.change_read_state('unread', @user)
-        refresh_and_filter(:css, '#onlyUnread', 'new 004')
+        refresh_and_filter(:css, '#discussionsFilter', 'new 004')
       end
     end
 
@@ -76,7 +89,7 @@ describe "announcements" do
       let(:url) { "/courses/#{@course.id}/announcements/" }
       let(:what_to_create) { Announcement }
 
-      before (:each) do
+      before :once do
         @topic_title = 'new discussion'
         @context = @course
       end
@@ -86,7 +99,7 @@ describe "announcements" do
         announcement_model(:title => title, :user => @user)
         get url
 
-        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
         f('.discussion-actions .al-trigger').click
         wait_for_ajaximations
         f('.al-options li a.icon-lock').click
@@ -96,7 +109,7 @@ describe "announcements" do
         wait_for_ajaximations
         f('.al-options li a.icon-lock').click
         wait_for_ajaximations
-        expect(f('.discussion-info-icons .icon-lock')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-info-icons .icon-lock')
       end
 
       it "should remove an announcement when it is deleted from the delete option in the cog menu", priority: "1", test_id: 220364 do
@@ -111,7 +124,7 @@ describe "announcements" do
         alert = driver.switch_to.alert
         expect(alert.text).to match "Are you sure you want to delete this announcement?"
         alert.accept
-        expect(f('.discussion-topic')).to be_nil
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should start a new topic", priority: "1", test_id: 150528 do
@@ -175,21 +188,7 @@ describe "announcements" do
         driver.switch_to.alert.accept
         wait_for_ajaximations
         expect(what_to_create.last.workflow_state).to eq 'deleted'
-        expect(f('.discussionTopicIndexList')).to be_nil
-      end
-
-      it "should reorder topics", priority: "1", test_id: 220368 do
-        3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
-        get url
-
-        topics = ff('.discussion-topic')
-        driver.action.move_to(topics[0]).perform
-        # drag first topic to second place
-        # (using topics[2] as target to get the dragging to work)
-        driver.action.drag_and_drop(fj('.discussion-drag-handle:visible', topics[0]), topics[2]).perform
-        wait_for_ajax_requests
-        new_topics = ffj('.discussion-topic') # using ffj to avoid selenium caching
-        expect(new_topics[0]).not_to include_text('new topic 0')
+        expect(f("#content")).not_to contain_css('.discussionTopicIndexList')
       end
     end
 
@@ -241,7 +240,7 @@ describe "announcements" do
       expect {
         f('.external_feed .close').click
         wait_for_ajax_requests
-        expect(element_exists('.external_feed')).to be_falsey
+        expect(f("#content")).not_to contain_css('.external_feed')
       }.to change(ExternalFeed, :count).by(-1)
     end
 
@@ -257,18 +256,14 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "should have a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
-      skip "delayed jobs"
+    it "lets a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
       create_announcement
       get [@course, @announcement]
-
-      f('#content .add_entry_link').click
+      f('.discussion-reply-action').click
       entry_text = 'new entry text'
-      type_in_tiny('textarea[name=message]', entry_text)
-      expect_new_page_load { submit_form('.form-actions') }
-      expect(f('#entry_list .discussion_entry .content')).to include_text(entry_text)
-      f('#left-side .announcements').click
-      expect(f('.topic_reply_count').text).to eq '1'
+      type_in_tiny('textarea', entry_text)
+      fj("button[type=submit]").click
+      expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
     it "should show announcements to student view student", priority: "1", test_id: 220373 do
@@ -289,8 +284,7 @@ describe "announcements" do
       # Create reply as a student
       enter_student_view
       reply_to_announcement(@announcement.id, student_entry)
-      f('.logout').click
-      wait_for_ajaximations
+      expect_logout_link_present.click
 
       #As a teacher, verify that you can see the student's reply even though you have not responded
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"

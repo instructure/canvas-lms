@@ -1,6 +1,6 @@
 <% current_conference ||= nil %>
 <% conference = current_conference %>
-<% if conference.active? && can_do(conference, @current_user, :join) %>
+<% if conference.active?(false, false) && can_do(conference, @current_user, :join) %>
 <div class="ic-notification conference">
   <div class="ic-notification__icon" role="presentation">
     <i class="icon-invitation"></i>

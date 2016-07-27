@@ -10,13 +10,4 @@ module Selenium::WebDriver::SearchContext
   rescue Selenium::WebDriver::Error::NoSuchElementError
     []
   end
-
-  # returns true if the current node does not contain
-  # the specified css selector
-  def not_found(css)
-    raise "The selector, #{css} was found" if find_element(:css, css)
-
-  rescue Selenium::WebDriver::Error::NoSuchElementError
-    true
-  end
 end

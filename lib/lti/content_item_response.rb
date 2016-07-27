@@ -20,6 +20,11 @@
 # Likewise, all the methods added will be available for all controllers.
 
 module Lti
+  class UnauthorizedError < StandardError; end
+  class UnsupportedExportTypeError < StandardError; end
+  class UnsupportedMessageTypeError < StandardError; end
+  class InvalidMediaTypeError < StandardError; end
+
   class ContentItemResponse
 
     MEDIA_TYPES = [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes, :files]
@@ -27,11 +32,12 @@ module Lti
 
     def initialize(context, controller, current_user, media_types, export_type)
       @context = context
-      @media_types = media_types.with_indifferent_access
-      @canvas_media_type = @media_types.keys.size == 1 ? @media_types.keys.first.to_s.singularize : 'course'
-      @current_user = current_user
       @controller = controller #for url generation
+      @current_user = current_user
+      @media_types = media_types.with_indifferent_access
       @export_type = export_type || 'common_cartridge' #legacy API behavior defaults to common cartridge
+
+      raise Lti::InvalidMediaTypeError unless media_types_valid?
       raise Lti::UnsupportedExportTypeError unless SUPPORTED_EXPORT_TYPES.include? @export_type
     end
 
@@ -47,7 +53,7 @@ module Lti
 
     def media_type
       unless @media_type
-        if @canvas_media_type == 'module_item'
+        if canvas_media_type == 'module_item'
           case tag.content
             when Assignment
               @media_type = 'assignment'
@@ -59,7 +65,7 @@ module Lti
               @media_type = 'page'
           end
         else
-          @media_type = @canvas_media_type
+          @media_type = canvas_media_type
         end
       end
       @media_type
@@ -92,7 +98,7 @@ module Lti
     end
 
     def title
-      @title ||= case @canvas_media_type
+      @title ||= case canvas_media_type
                    when 'file'
                      file.display_name
                    when 'assignment'
@@ -134,6 +140,38 @@ module Lti
 
     private
 
+    def canvas_media_type
+      @canvas_media_type ||= if @media_types.keys.size == 1
+        @media_types.keys.first.to_s.singularize
+      else
+        'course'
+      end
+    end
+
+    def media_types_valid?
+      @media_types.each do |type, ids|
+        scope = case type
+                when 'files'
+                  Attachment
+                when 'assignments'
+                  @context.assignments
+                when 'discussion_topics'
+                  @context.discussion_topics
+                when 'modules'
+                  @context.context_modules
+                when 'pages'
+                  @context.wiki.wiki_pages
+                when 'module_items'
+                  @context.context_module_tags
+                when 'quizzes'
+                  @context.quizzes
+                end
+
+        return false if scope.where(:id => ids).count != ids.count
+      end
+      true
+    end
+
     ##
     # This message type is deprecated, please use content_item_selection_json
     ##
@@ -170,14 +208,4 @@ module Lti
     end
 
   end
-
-  class UnauthorizedError < StandardError
-  end
-
-  class UnsupportedExportTypeError < StandardError
-  end
-
-  class UnsupportedMessageTypeError < StandardError
-  end
-
 end

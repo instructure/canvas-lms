@@ -143,7 +143,7 @@ class ProfileController < ApplicationController
   before_filter :require_user, :only => [:settings, :communication, :communication_update]
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
-  before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
+  before_filter :require_password_session, :only => [:communication, :communication_update, :update]
 
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel
@@ -172,7 +172,7 @@ class ProfileController < ApplicationController
 
     known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
-      add_crumb(t('crumbs.settings_frd', "%{user}'s settings", :user => @user.short_name), user_profile_path(@user))
+      add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", :user => @user.short_name), user_profile_path(@user))
       render
     else
       render :unauthorized
@@ -191,6 +191,7 @@ class ProfileController < ApplicationController
       @user = api_find(User, params[:user_id])
       return unless authorized_action(@user, @current_user, :read_profile)
     else
+      return unless require_password_session
       @user = @current_user
       @user.dismiss_bouncing_channel_message!
     end

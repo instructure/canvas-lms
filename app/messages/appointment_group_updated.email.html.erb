@@ -23,9 +23,10 @@
         <td valign="top"><%= date_string(asset.start_at, asset.end_at, :no_words) %></td>
     </tr>
     <tr>
-        <td style="padding-right: 10px;" valign="top"><%= asset.participant_type == 'Group' ?
-                                                              t(:group_signup, "Group (%{group_category})", :group_category => asset.sub_contexts.first.name) :
-                                                              t(:individual_signup, "Individual") %></td>
+        <td style="padding-right: 10px;" valign="top"><%= t "Signup Type" %>:</td>
+        <td valign="top"><%= asset.participant_type == 'Group' ?
+                             t(:group_signup, "Group (%{group_category})", :group_category => asset.sub_contexts.first.name) :
+                             t(:individual_signup, "Individual") %></td>
     </tr>
     <tr>
         <td style="padding-right: 10px;" valign="top"><%= t :course, "Course" %>:</td>

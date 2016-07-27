@@ -64,6 +64,8 @@
 
 .custom_help_link {
   border-top: 1px solid #ccc;
+  padding-top: $ic-sp;
+
   .delete {
     float: right;
   }
@@ -137,7 +139,7 @@
 }
 
 #account_settings_tabs {
-  legend {
+  legend:not(.ic-Legend) {
     @include fontSize(15px);
     font-weight: bold;
   }
@@ -155,7 +157,8 @@
   input#account_notification_months_in_display_cycle {
     width: 25px;
     padding: 0;
-    margin-top: 6px;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
 

@@ -124,7 +124,7 @@ describe "Feature Flags API", type: :request do
     describe "hidden" do
       it "should show hidden features on site admin" do
         json = api_call_as_user(site_admin_user, :get, "/api/v1/accounts/#{t_site_admin.id}/features",
-                        { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.to_param })
+                        { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_site_admin.id.to_s })
         expect(json.map { |f| f['feature'] }.sort).to eql %w(account_feature course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature)
         expect(json.find { |f| f['feature'] == 'hidden_feature' }['feature_flag']['hidden']).to eq true
       end
@@ -314,7 +314,7 @@ describe "Feature Flags API", type: :request do
     describe "hidden" do
       it "should create a site admin feature flag" do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
-                 { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.to_param, feature: 'hidden_feature' })
+                 { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.id.to_s, feature: 'hidden_feature' })
         expect(t_site_admin.feature_flags.where(feature: 'hidden_feature').count).to eql 1
       end
 
@@ -344,7 +344,7 @@ describe "Feature Flags API", type: :request do
 
         it "should not create a site admin feature flag" do
           api_call_as_user(@site_admin_member, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
-                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.to_param, feature: 'hidden_feature' },
+                           { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_site_admin.id.to_s, feature: 'hidden_feature' },
                            {}, {}, { expected_status: 401 })
           expect(t_site_admin.feature_flags.where(feature: 'hidden_feature')).not_to be_any
         end

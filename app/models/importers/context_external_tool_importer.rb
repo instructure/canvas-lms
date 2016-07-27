@@ -32,7 +32,7 @@ module Importers
       end
 
       item ||= ContextExternalTool.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.context_external_tools.new
+      item ||= context.context_external_tools.temp_record
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
       item.description = hash[:description]

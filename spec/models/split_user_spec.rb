@@ -170,14 +170,17 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq user2
     end
 
-    it 'should restore admins' do
+    it 'should restore admins even with stale data' do
       admin = account1.account_users.create(user: user1)
-      admin2 = sub_account.account_users.create(user: user2)
+      admin2 = sub_account.account_users.create(user: user1)
+      admin3 = sub_account.account_users.create(user: user2)
       UserMerge.from(user1).into(user2)
+      admin.reload.destroy
       SplitUsers.split_db_users(user2)
 
-      expect(admin.reload.user).to eq user1
-      expect(admin2.reload.user).to eq user2
+      expect{admin.reload}.to raise_error(ActiveRecord::RecordNotFound)
+      expect(admin2.reload.user).to eq user1
+      expect(admin3.reload.user).to eq user2
     end
 
     context 'sharding' do

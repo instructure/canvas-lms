@@ -8,8 +8,7 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-  '../utils/forceScreenreaderToReparse'
-], ($, React, page, _, I18n, filesEnv, getAllPages, updateAPIQuerySortParams, Folder, forceScreenreaderToReparse) ->
+], ($, React, page, _, I18n, filesEnv, getAllPages, updateAPIQuerySortParams, Folder) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
@@ -65,9 +64,7 @@ define [
       @unregisterListeners()
 
     componentDidUpdate: ->
-      # hooray for a11y
       @redirectToCourseFiles() if not @props.currentFolder? or @props.currentFolder?.get('locked_for_user')
-      forceScreenreaderToReparse(@getDOMNode())
 
     componentWillReceiveProps: (newProps) ->
       @unregisterListeners()

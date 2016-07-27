@@ -158,9 +158,7 @@ describe "scheduler" do
           expect(form.find_all('.participant_list li')).not_to be_empty
           set_value(form.find('#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
-          wait_for_ajaximations
-          # using fj to avoid selenium caching
-          keep_trying_until { expect(f('#message_participants_form')).to be_nil }
+          expect(f("body")).not_to contain_css('#message_participants_form')
         end
       end
       expect(student1.conversations.first.messages.size).to eq 6 # registered/all * 3
@@ -198,9 +196,7 @@ describe "scheduler" do
       expect(form.find_all('.participant_list li')).not_to be_empty
       set_value(form.find('#body'), 'hello')
       submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
-      wait_for_ajaximations
-      # using fj to avoid selenium caching
-      keep_trying_until { expect(f('#message_participants_form')).to be_nil }
+      expect(f("body")).not_to contain_css('#message_participants_form')
 
       part1 = student1.conversations.first
       expect(part1.tags).to eq ["course_#{first_course.id}"]
@@ -215,7 +211,20 @@ describe "scheduler" do
       wait_for_ajaximations
       click_appointment_link
       wait_for_ajaximations
-      expect(element_exists('.agenda-event .ig-row')).to be_truthy
+      expect(f('.agenda-event .ig-row')).to be_present
+    end
+
+    it "should validate the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
+      create_appointment_group
+      ag = AppointmentGroup.first
+      student_in_course(course: @course, active_all: true)
+      ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
+      load_month_view
+      expect(f('.fc-content .fc-title').text).to include('new appointment group')
+      f('#week').click
+      expect(f('.fc-content .fc-title').text).to include('new appointment group')
+      f('#agenda').click
+      expect(f('.agenda-event .ig-title').text).to include('new appointment group')
     end
 
     it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do
@@ -246,7 +255,7 @@ describe "scheduler" do
 
       wait_for_ajaximations
 
-      keep_trying_until { expect(ffj('#attendees li').size).to eq 1 }
+      expect(ff('#attendees li')).to have_size(1)
 
       expect(f('.event-details-content')).to include_text "this is important"
     end
@@ -266,28 +275,21 @@ describe "scheduler" do
 
 
       f(".appointment-group-item:nth-child(1) .view_calendar_link").click
-      wait_for_ajaximations
-      sleep 1
 
-      #driver.execute_script("$('.fc-event-title').hover().click()")
-      #
+      f('.agenda-event .ig-row').click
 
-      fj('.agenda-event .ig-row').click
-
-      wait_for_ajaximations
-
-      keep_trying_until { expect(ffj('#attendees li').size).to eq 2 }
+      expect(ff('#attendees li')).to have_size(2)
 
       # delete the first appointment
-      driver.execute_script("$('.cancel_appointment_link:eq(1)').trigger('click')")
+      fj('.cancel_appointment_link:eq(1)').click
       wait_for_ajaximations
-      driver.execute_script("$('.ui-dialog-buttonset .btn-primary').trigger('click')")
+      f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
-      expect(ff('#attendees li').size).to eq 1
+      expect(ff('#attendees li')).to have_size(1)
 
-      fj('.agenda-event .ig-row').click
+      f('.agenda-event .ig-row').click
 
-      keep_trying_until { expect(ff('#attendees li').size).to eq 1 }
+      expect(ff('#attendees li')).to have_size(1)
       f('.scheduler_done_button').click
     end
 
@@ -329,37 +331,8 @@ describe "scheduler" do
       f('.scheduler_done_button').click
     end
 
-    it "should allow me to create a course with multiple contexts" do
-      skip('fragile')
-      course1 = @course
-      course_with_teacher(:user => @teacher, :active_all => true)
-      get "/calendar2"
-      click_scheduler_link
-      fill_out_appointment_group_form('multiple contexts')
-      f('.ag_contexts_selector').click
-      ff('.ag_sections_toggle').last.click
-      f("[value=#{course1.asset_string}]").click
-
-      # sections should get checked by their parent
-      section_box = f("[value=#{@course.course_sections.first.asset_string}]")
-      expect(section_box[:checked]).to be_truthy
-
-      # unchecking all sections should uncheck their parent
-      course_box = f("[value=#{@course.asset_string}]")
-      section_box.click
-      expect(course_box[:checked]).to be_falsey
-
-      # checking all sections should check parent
-      section_box.click
-      expect(course_box[:checked]).to be_truthy
-
-      f('.ui-dialog-buttonset .btn-primary').click
-      wait_for_ajaximations
-      ag = AppointmentGroup.first
-      expect(ag.contexts).to include course1
-      expect(ag.contexts).to include @course
-      expect(ag.sub_contexts).to eq []
-    end
+    # TODO reimplement per CNVS-29591, but make sure we're testing at the right level
+    it "should allow me to create a course with multiple contexts"
 
     it "should allow me to override the participant limit on a slot-by-slot basis" do
       create_appointment_group :participants_per_appointment => 2

@@ -27,7 +27,7 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'shows the comment' do
-    @assignment.grade_student(@user, comment: 'bunch of random stuff', grader: @teacher)
+    @assignment.update_submission(@user, comment: 'bunch of random stuff', commenter: @teacher)
     @submission.reload
 
     render partial: "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
@@ -45,7 +45,8 @@ describe "/courses/_recent_feedback" do
   end
 
   it 'shows the grade and the comment' do
-    @assignment.grade_student(@user, grade: 25734, comment: 'something different', grader: @teacher)
+    @assignment.grade_student(@user, grade: 25734, grader: @teacher)
+    @assignment.update_submission(@user, comment: 'something different', commenter: @teacher)
     @submission.reload
 
     render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}

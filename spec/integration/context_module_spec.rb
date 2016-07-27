@@ -197,7 +197,6 @@ describe ContextModule do
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
           @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
           expect(@tag2).to be_published
-          @test_content_length = 1
         end
       end
     end

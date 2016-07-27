@@ -172,6 +172,7 @@ describe User do
     expect(@user.recent_stream_items.size).to eq 1
     @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
     @enrollment.save!
+    @user = User.find(@user.id)
     expect(@user.recent_stream_items.size).to eq 0
   end
 
@@ -2111,27 +2112,42 @@ describe User do
       expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
     end
 
-    it "should work for two levels of sub accounts" do
-      root_acct = root_acct1
-      sub_acct1 = Account.create!(:parent_account => root_acct)
-      sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
-      sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
-      sub_acct2 = Account.create!(:parent_account => root_acct)
+    context "two levels of sub accounts" do
+      let_once(:root_acct) { root_acct1 }
+      let_once(:sub_acct1) { Account.create!(:parent_account => root_acct) }
+      let_once(:sub_sub_acct1) { Account.create!(:parent_account => sub_acct1) }
+      let_once(:sub_sub_acct2) { Account.create!(:parent_account => sub_acct1) }
+      let_once(:sub_acct2) { Account.create!(:parent_account => root_acct) }
 
-      @user.user_account_associations.create!(:account_id => root_acct.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+      it "finds the correct branch point" do
+        @user.user_account_associations.create!(:account_id => root_acct.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
 
-      @user.user_account_associations.create!(:account_id => sub_acct1.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_acct2.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+        @user.user_account_associations.create!(:account_id => sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+      end
+
+      it "breaks early if a user has an enrollment partway down the chain" do
+        course_with_student(user: @user, account: sub_acct1, active_all: true)
+        @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+        @user.reload
+
+        full_chain = [root_acct, sub_acct1, sub_sub_acct1]
+        overlap = @user.user_account_associations.map(&:account_id) & full_chain.map(&:id)
+        expect(overlap.sort).to eql full_chain.map(&:id)
+        expect(@user.common_account_chain(root_acct)).to(
+          eql([root_acct, sub_acct1])
+        )
+      end
     end
   end
 
@@ -2952,5 +2968,39 @@ describe User do
     @user.report_avatar_image!
     @user.reload
     expect(@user.avatar_state).to eq :reported
+  end
+
+  describe "submissions_folder" do
+    before(:once) do
+      student_in_course
+    end
+
+    it "creates the root submissions folder on demand" do
+      f = @user.submissions_folder
+      expect(@user.submissions_folders.where(parent_folder_id: Folder.root_folders(@user).first, name: 'Submissions').first).to eq f
+    end
+
+    it "finds the existing root submissions folder" do
+      f = @user.folders.build
+      f.parent_folder_id = Folder.root_folders(@user).first
+      f.name = 'blah'
+      f.submission_context_code = 'root'
+      f.save!
+      expect(@user.submissions_folder).to eq f
+    end
+
+    it "creates a submissions folder for a course" do
+      f = @user.submissions_folder(@course)
+      expect(@user.submissions_folders.where(submission_context_code: @course.asset_string, parent_folder_id: @user.submissions_folder, name: @course.name).first).to eq f
+    end
+
+    it "finds an existing submissions folder for a course" do
+      f = @user.folders.build
+      f.parent_folder_id = @user.submissions_folder
+      f.name = 'bleh'
+      f.submission_context_code = @course.asset_string
+      f.save!
+      expect(@user.submissions_folder(@course)).to eq f
+    end
   end
 end

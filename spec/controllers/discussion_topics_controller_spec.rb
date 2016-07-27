@@ -41,6 +41,7 @@ describe DiscussionTopicsController do
     end
 
     @topic.save
+    @topic.reload
     @topic
   end
 
@@ -345,6 +346,45 @@ describe DiscussionTopicsController do
 
         get 'show', :course_id => @course.id, :id => @topic.id
         expect(assigns[:groups].size).to eql(2)
+      end
+
+      it "should only show applicable groups if DA applies" do
+        user_session(@teacher)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        asmt = @topic.assignment
+        asmt.only_visible_to_overrides = true
+        override = asmt.assignment_overrides.build
+        override.set = @group2
+        override.save!
+        asmt.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(response).to be_success
+        expect(assigns[:groups]).to eq([@group2])
+      end
+
+      it "should redirect to group for student if DA applies to section" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        asmt = @topic.assignment
+        asmt.only_visible_to_overrides = true
+        override = asmt.assignment_overrides.build
+        override.set = @course.default_section
+        override.save!
+        asmt.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
       end
 
       it "should redirect to the student's group" do
@@ -669,7 +709,7 @@ describe DiscussionTopicsController do
 
     it "should not change the editor if only pinned was changed" do
       put('update', course_id: @course.id, topic_id: @topic.id,
-        format: 'json', pinned: true)
+        format: 'json', pinned: '1')
       @topic.reload
       expect(@topic.pinned).to be_truthy
       expect(@topic.editor).to_not eq @teacher

@@ -39,7 +39,8 @@ define([
         host: ENV.RICH_CONTENT_APP_HOST,
         canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
         contextType: context[0],
-        contextId: context[1]
+        contextId: context[1],
+        themeUrl: ENV.active_brand_config_json_url
       }
       this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {

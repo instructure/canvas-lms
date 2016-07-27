@@ -1,16 +1,12 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
-skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') &&
-    !ENV['RAILS_LOAD_ALL_LOCALES'] && !ENV['RAILS_LOAD_LOCAL_LOCALES']
+skip_locale_loading = (Rails.env.development? || Rails.env.test? || $PROGRAM_NAME == 'irb') &&
+    !ENV['RAILS_LOAD_ALL_LOCALES']
 load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
-end
-
-if ENV['RAILS_LOAD_LOCAL_LOCALES']
-  load_path.reject! { |x| x =~ %r{gems/plugins} }
 end
 
 Rails.application.config.i18n.backend = I18nema::Backend.new

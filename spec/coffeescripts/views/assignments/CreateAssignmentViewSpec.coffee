@@ -16,18 +16,6 @@ define [
 
   fixtures = $('#fixtures')
 
-  assignment1 = ->
-    new Assignment(buildAssignment1())
-
-  assignment2 = ->
-    new Assignment(buildAssignment2())
-
-  assignment3 = ->
-    new Assignment(buildAssignment3())
-
-  assignment4 = ->
-    new Assignment(buildAssignment4())
-
   buildAssignment1 = ->
     date1 =
       "due_at": new Date("2103-08-28T00:00:00").toISOString()
@@ -75,6 +63,16 @@ define [
       "position":4
     )
 
+  buildAssignment5 = ->
+    buildAssignment(
+      "id": 6
+      "name": "Page assignment"
+      "submission_types":['wiki_page']
+      "grading_type": "not_graded"
+      "points_possible": null
+      "position": 5
+    )
+
   buildAssignment = (options) ->
     options ?= {}
 
@@ -111,10 +109,11 @@ define [
 
   module 'CreateAssignmentView',
     setup: ->
-      @assignment1 = assignment1()
-      @assignment2 = assignment2()
-      @assignment3 = assignment3()
-      @assignment4 = assignment4()
+      @assignment1 = new Assignment(buildAssignment1())
+      @assignment2 = new Assignment(buildAssignment2())
+      @assignment3 = new Assignment(buildAssignment3())
+      @assignment4 = new Assignment(buildAssignment4())
+      @assignment5 = new Assignment(buildAssignment5())
       @group       = assignmentGroup()
 
       @snapshot = tz.snapshot()
@@ -154,6 +153,11 @@ define [
     view = createView(@assignment1)
     equal view.$("#ag_1_assignment_type").length, 0
     equal view.$("#assign_1_assignment_type").length, 0
+
+  test "render hides date picker and points_possible for pages", ->
+    view = createView(@assignment5)
+    equal view.$('.date_field_container').length, 0
+    equal view.$('input[name=points_possible]').length, 0
 
   test "onSaveSuccess adds model to assignment group for creation", ->
     @stub(DialogFormView.prototype, "close", ->)
@@ -278,9 +282,12 @@ define [
     equal data.submission_types, 'none'
 
   test 'validates due date against date range', ->
+    start_at = {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
+    end_at = {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+
     ENV.VALID_DATE_RANGE = {
-      start_at: {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
-      end_at: {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+      start_at: start_at
+      end_at: end_at
     }
     view = createView(@assignment3)
     data =
@@ -295,6 +302,9 @@ define [
     errors = view.validateBeforeSave(data, [])
     ok errors["due_at"]
     equal errors['due_at'][0]['message'], 'Due date cannot be before term start'
+
+    equal start_at, ENV.VALID_DATE_RANGE.start_at
+    equal end_at,   ENV.VALID_DATE_RANGE.end_at
 
   test 'validates due date for lock and unlock', ->
     view = createView(@assignment4)

@@ -19,8 +19,8 @@
 module SIS
   module CSV
     class TermImporter < CSVBaseImporter
-    
-      def self.is_term_csv?(row)
+
+      def self.term_csv?(row)
         #This matcher works because a course has long_name/short_name
         row.include?('term_id') && row.include?('name')
       end
@@ -28,7 +28,7 @@ module SIS
       def self.identifying_fields
         %w[term_id].freeze
       end
-    
+
       # expected columns
       # account_id,parent_account_id,name,status
       def process(csv)

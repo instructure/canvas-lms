@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile" do
@@ -7,7 +7,7 @@ describe "profile" do
   def click_edit
     f('.edit_settings_link').click
     edit_form = f('#update_profile_form')
-    keep_trying_until { expect(edit_form).to be_displayed }
+    expect(edit_form).to be_displayed
     edit_form
   end
 
@@ -24,7 +24,7 @@ describe "profile" do
     f('.add_access_token_link').click
     access_token_form = f('#access_token_form')
     access_token_form.find_element(:id, 'access_token_purpose').send_keys(purpose)
-    submit_form(access_token_form)
+    submit_dialog_form(access_token_form)
     wait_for_ajax_requests
     details_dialog = f('#token_details_dialog')
     expect(details_dialog).to be_displayed
@@ -109,8 +109,7 @@ describe "profile" do
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")
-      keep_trying_until { expect(confirmation_dialog).to be_displayed }
-      expect(driver.execute_script("return INST.errorCount;")).to eq 0
+      expect(confirmation_dialog).to be_displayed
       submit_dialog(confirmation_dialog, '.cancel_button')
       expect(confirmation_dialog).not_to be_displayed
       expect(f('.email_channels')).to include_text(test_email)
@@ -123,7 +122,7 @@ describe "profile" do
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")
-      link = f("#channel_#{channel.id} td:first-child a")
+      link = f("#channel_#{channel.id} td:first-of-type a")
       link.click
       wait_for_ajaximations
       expect(row).to have_class("default")
@@ -136,7 +135,7 @@ describe "profile" do
       replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
-      keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
+      expect(f('.full_name')).to include_text new_user_name
     end
 
     it "should edit display name and validate" do
@@ -145,9 +144,8 @@ describe "profile" do
       edit_form = click_edit
       replace_content(edit_form.find_element(:id, 'user_short_name'), new_display_name)
       submit_form(edit_form)
-      wait_for_ajaximations
       refresh_page
-      keep_trying_until { expect(f('#topbar li.user_name').text).to eq new_display_name }
+      expect(displayed_username).to eq(new_display_name)
     end
 
     it "should change the language" do
@@ -180,11 +178,11 @@ describe "profile" do
       register_form = f('#register_sms_number')
       register_form.find_element(:css, '.sms_number').send_keys(test_cell_number)
       click_option('select.user_selected.carrier', 'AT&T')
+      driver.action.send_keys(:tab).perform
       submit_form(register_form)
-      sleep 1 # wait a moment before we close any dialogs, since this spec fails intermittently ... this way we can catch any formError thingies in the video capture
       wait_for_ajaximations
       close_visible_dialog
-      keep_trying_until { expect(f('.other_channels .path')).to include_text(test_cell_number) }
+      expect(f('.other_channels .path')).to include_text(test_cell_number)
     end
 
     it "should register a service" do
@@ -272,11 +270,9 @@ describe "profile" do
 
     it "should link back to profile/settings in oauth callbacks" do
       get "/profile/settings"
-      links = ffj('#unregistered_services .service .content a')
+      links = ff('#unregistered_services .service .content a')
       links.each do |l|
-        url = l.attribute('href')
-        query = URI.parse(url).query
-        expect(CGI.unescape(query)).to match /profile\/settings/
+        expect(l).to have_attribute('href', 'profile%2Fsettings')
       end
     end
   end
@@ -295,47 +291,8 @@ describe "profile" do
       expect(is_checked('#account_services_avatars')).to be_truthy
     end
 
-    it "should successfully upload profile pictures" do
-      skip("intermittently fails")
-      course_with_teacher_logged_in
-      a = Account.default
-      a.enable_service('avatars')
-      a.save!
-      image_src = ''
-
-      get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
-      dialog = f("#profile_pic_dialog")
-      expect(dialog).to be_displayed
-      dialog.find_element(:css, ".add_pic_link").click
-      filename, fullpath, data = get_file("graded.png")
-      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      # Make ajax request slow down to verify transitional state
-      FilesController.before_filter { sleep 5; true }
-
-      submit_form('#add_pic_form')
-
-      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
-
-      FilesController._process_action_callbacks.pop
-
-      keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-        image_src = uploaded_image.attribute('src')
-        expect(image_src).to match %r{/images/thumbnails/}
-        expect(new_image.attribute('alt')).to match /graded/
-      end
-      dialog.find_element(:css, '.select_button').click
-      wait_for_ajaximations
-      keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
-        expect(profile_pic).to have_attribue('src', image_src)
-      end
-      expect(Attachment.last.folder).to eq @user.profile_pics_folder
-    end
+    # TODO reimplement per CNVS-29610, but make sure we're testing at the right level
+    it "should successfully upload profile pictures"
 
     it "should allow users to choose an avatar from their profile page" do
       course_with_teacher_logged_in
@@ -356,51 +313,8 @@ describe "profile" do
   end
 
   describe "profile pictures s3 tests" do
-    before do
-      s3_storage!(:stubs => false)
-    end
-
-    it "should successfully upload profile pictures" do
-      skip("intermittently fails")
-      course_with_teacher_logged_in
-      a = Account.default
-      a.enable_service('avatars')
-      a.save!
-      image_src = ''
-
-      get "/profile/settings"
-      keep_trying_until { f(".profile_pic_link") }.click
-      dialog = f("#profile_pic_dialog")
-      expect(dialog).to be_displayed
-      dialog.find_element(:css, ".add_pic_link").click
-      filename, fullpath, data = get_file("graded.png")
-      dialog.find_element(:id, 'attachment_uploaded_data').send_keys(fullpath)
-      # Make ajax request slow down to verify transitional state
-      FilesController.before_filter { sleep 5; true }
-
-      submit_form('#add_pic_form')
-
-      new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
-      expect(new_image.attribute('src')).not_to match %r{/images/thumbnails/}
-
-      FilesController._process_action_callbacks.pop
-
-      keep_trying_until do
-        spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
-        spans.last.attribute('class') =~ /selected/
-        uploaded_image = ffj("#profile_pic_dialog .profile_pic_list span.img img").last
-        image_src = uploaded_image.attribute('src')
-        expect(image_src).to match %r{/images/thumbnails/}
-        expect(new_image.attribute('alt')).to match /graded/
-      end
-      dialog.find_element(:css, '.select_button').click
-      wait_for_ajaximations
-      keep_trying_until do
-        profile_pic = fj('.profile_pic_link img')
-        expect(profile_pic).to have_attribue('src', image_src)
-      end
-      expect(Attachment.last.folder).to eq @user.profile_pics_folder
-    end
+    # TODO reimplement per CNVS-29611, but make sure we're testing at the right level
+    it "should successfully upload profile pictures"
   end
 
   describe "avatar reporting" do

@@ -62,7 +62,6 @@ module Canvas::Security
     end
 
     describe "initialization" do
-      after{ Timecop.return }
       let(:jwt_string){ ServicesJwt.generate(sub: 1) }
 
       it "uses SecureRandom for generating the JWT" do
@@ -72,9 +71,10 @@ module Canvas::Security
       end
 
       it "expires in an hour" do
-        Timecop.freeze(Time.utc(2013,3,13,9,12))
-        jwt = ServicesJwt.new(jwt_string, false)
-        expect(jwt.expires_at).to eq(1363169520)
+        Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+          jwt = ServicesJwt.new(jwt_string, false)
+          expect(jwt.expires_at).to eq(1363169520)
+        end
       end
 
       describe "via .generate" do

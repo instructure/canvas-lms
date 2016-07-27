@@ -36,5 +36,22 @@ define ['collaborations'], (collaborations) ->
     equal $.screenReaderFlashMessage.callCount, 1
 
   test "returns a collaboration url", ->
-    url = collaborations.Util.collaborationUrl(1);
+    url = collaborations.Util.collaborationUrl(1)
     equal url, window.location.toString() + "/1"
+
+  test "it calls updateCollaboration when a service id is in the data parameter", ->
+    @stub(collaborations.Events, 'updateCollaboration')
+    collaborations.Events.onExternalContentReady({}, {service_id: 1, contentItems: {}})
+    equal collaborations.Events.updateCollaboration.callCount, 1
+
+  test "it calls createCollaboration", ->
+    @stub(collaborations.Events, 'createCollaboration')
+    collaborations.Events.onExternalContentReady({}, {contentItems: {}})
+    equal collaborations.Events.createCollaboration.callCount, 1
+
+  test "it makes an ajax request to the correct update endpoint", ->
+    dom = $('<div class="collaboration_1"><a class="title" href="http://url/"></a></div>')
+    $("#fixtures").append(dom)
+    $.ajaxJSON = (url, method, data, callback)->
+      equal url, 'http://url/'
+    collaborations.Events.onExternalContentReady({}, {service_id: 1, contentItems: {}})

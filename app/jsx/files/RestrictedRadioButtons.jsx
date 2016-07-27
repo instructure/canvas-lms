@@ -5,7 +5,8 @@ define([
   'jquery',
   'compiled/react_files/modules/customPropTypes',
   'compiled/models/Folder',
-  'compiled/react/shared/utils/withReactElement'
+  'compiled/react/shared/utils/withReactElement',
+  'jquery.instructure_date_and_time'
 ], function (_, React, I18n, $, customPropTypes, Folder, withReactElement) {
 
   var RestrictedRadioButtons = React.createClass({

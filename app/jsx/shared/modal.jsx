@@ -8,7 +8,23 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
-  var Modal = React.createClass({
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
+  const Modal = React.createClass({
 
     getInitialState() {
       return {
@@ -21,25 +37,31 @@ define([
       }
     },
     componentWillReceiveProps(props){
-      this.setState({modalIsOpen: props.isOpen});
+      let callback
+      if (this.props.isOpen && !props.isOpen) callback = this.cleanupAfterClose
+      this.setState({modalIsOpen: props.isOpen}, callback);
     },
 
     openModal() {
       this.setState({modalIsOpen: true});
     },
-    closeModal() {
-      this.setState({modalIsOpen: false}, function(){
-        this.props.onRequestClose();
-        $(this.getAppElement()).removeAttr('aria-hidden');
-      });
+
+    cleanupAfterClose () {
+      if (this.props.onRequestClose) this.props.onRequestClose();
+      $(this.getAppElement()).removeAttr('aria-hidden');
     },
+
+    closeModal() {
+      this.setState({modalIsOpen: false}, this.cleanupAfterClose);
+    },
+
     closeWithX() {
       if(_.isFunction(this.props.closeWithX))
         this.props.closeWithX()
       this.closeModal();
     },
     onSubmit(){
-      var promise = this.props.onSubmit();
+      const promise = this.props.onSubmit();
       $(this.refs.modal.getDOMNode()).disableWhileLoading(promise);
     },
     getAppElement () {
@@ -47,8 +69,8 @@ define([
       return this.props.appElement || document.getElementById('application');
     },
     processMultipleChildren(props){
-      var content = null;
-      var buttons = null;
+      let content = null;
+      let buttons = null;
 
       React.Children.forEach(props.children, function(child){
         if(child.type == ModalContent){
@@ -83,12 +105,13 @@ define([
       return (
         <div className="canvasModal">
           <ReactModal
-                 ariaHideApp={this.state.modalIsOpen}
-                 isOpen={this.state.modalIsOpen}
-                 onRequestClose={this.closeModal}
-                 className={this.props.className}
-                 overlayClassName={this.props.overlayClassName}
-                 appElement={this.getAppElement()}>
+            ariaHideApp={!!this.state.modalIsOpen}
+            isOpen={!!this.state.modalIsOpen}
+            onRequestClose={this.closeModal}
+            className={this.props.className}
+            style={modalOverrides}
+            overlayClassName={this.props.overlayClassName}
+            appElement={this.getAppElement()}>
             <div ref="modal" className="ReactModal__Layout">
 
               <div className="ReactModal__Header">

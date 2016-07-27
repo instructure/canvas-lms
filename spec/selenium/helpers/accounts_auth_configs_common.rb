@@ -17,7 +17,8 @@ module AccountsAuthConfigsCommon
     set_value(f("#sso_settings_login_handle_name"), 'login')
     set_value(f("#sso_settings_change_password_url"), sso_url)
     set_value(f("#sso_settings_auth_discovery_url"), sso_url)
-    submit_form(sso_form)
+    f("button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_ldap_config(*)
@@ -31,7 +32,8 @@ module AccountsAuthConfigsCommon
     ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('filter')
     ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username')
     ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('password')
-    submit_form(ldap_form)
+    f("#new_ldap button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def clear_ldap_form
@@ -54,7 +56,8 @@ module AccountsAuthConfigsCommon
     set_value(f("#authentication_provider_log_in_url"), 'login.example.dev')
     set_value(f("#authentication_provider_log_out_url"), 'logout.example.dev')
     set_value(f("#authentication_provider_certificate_fingerprint"), 'abc123')
-    submit_form(saml_form)
+    f("#new_saml button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def start_saml_debug
@@ -69,7 +72,8 @@ module AccountsAuthConfigsCommon
     add_auth_type('CAS')
     cas_form = f("#new_cas")
     cas_form.find_element(:id, 'authentication_provider_auth_base').send_keys('http://auth.base.dev')
-    submit_form(cas_form)
+    f("#new_cas button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_facebook_config
@@ -77,7 +81,8 @@ module AccountsAuthConfigsCommon
     add_auth_type('Facebook')
     facebook_form = f("#new_facebook")
     set_value(f("#authentication_provider_app_id"), '123')
-    submit_form(facebook_form)
+    f("#new_facebook button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_github_config
@@ -86,7 +91,8 @@ module AccountsAuthConfigsCommon
     github_form = f("#new_github")
     set_value(f("#authentication_provider_domain"), 'github.com')
     github_form.find_element(:id, 'authentication_provider_client_id').send_keys('1234')
-    submit_form(github_form)
+    f("#new_github button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_google_config
@@ -94,7 +100,8 @@ module AccountsAuthConfigsCommon
     add_auth_type('Google')
     google_form = f("#new_google")
     google_form.find_element(:id, 'authentication_provider_client_id').send_keys('1234')
-    submit_form(google_form)
+    f("#new_google button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_linkedin_config
@@ -102,7 +109,8 @@ module AccountsAuthConfigsCommon
     add_auth_type('LinkedIn')
     linkedin_form = f("#new_linkedin")
     linkedin_form.find_element(:id, 'authentication_provider_client_id').send_keys('1234')
-    submit_form(linkedin_form)
+    f("#new_linkedin button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_microsoft_config
@@ -110,7 +118,8 @@ module AccountsAuthConfigsCommon
     add_auth_type('Microsoft')
     microsoft_form = f('#new_microsoft')
     microsoft_form.find_element(:id, 'authentication_provider_application_id').send_keys('1234')
-    submit_form(microsoft_form)
+    f("#new_microsoft button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_openid_connect_config
@@ -122,7 +131,8 @@ module AccountsAuthConfigsCommon
     set_value(f("#authentication_provider_token_url"), 'http://token.url.dev')
     set_value(f("#authentication_provider_scope"), 'scope')
     replace_content(openid_connect_form.find_element(:id, 'authentication_provider_login_attribute'), 'sub')
-    submit_form(openid_connect_form)
+    f("#new_openid_connect button[type='submit']").click
+    wait_for_ajaximations
   end
 
   def add_twitter_config
@@ -130,6 +140,7 @@ module AccountsAuthConfigsCommon
     add_auth_type('Twitter')
     twitter_form = f("#new_twitter")
     twitter_form.find_element(:id, 'authentication_provider_consumer_key').send_keys('1234')
-    submit_form(twitter_form)
+    f("#new_twitter button[type='submit']").click
+    wait_for_ajaximations
   end
 end

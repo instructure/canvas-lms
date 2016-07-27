@@ -4,11 +4,7 @@
   <meta http-equiv=Content-type content="text/html; charset=utf-8">
   <title>Tests</title>
   <link rel="stylesheet" href="support/qunit/qunit.css" type="text/css">
-  <link rel="stylesheet" href="../../public/stylesheets_compiled/legacy_normal_contrast/g_base.css" type="text/css">
   <style>
-  body {
-    font-family: 'Helvetica', 'Verdana';
-  }
   code {
     font-size: 120%;
     background-color: rgba(255, 255, 255, 0.75);
@@ -18,10 +14,6 @@
     padding: 10px;
     margin: 10px 0;
     border: solid 1px #ccc;
-    -webkit-border-radius: 1em;
-    -moz-border-radius: 1em;
-    -ms-border-radius: 1em;
-    border-radius: 1em;
   }
   </style>
 </head>
@@ -37,9 +29,6 @@
   <script src="support/qunit/qunit.js"></script>
   <script src="support/sinon/sinon-1.17.2.js"></script>
   <script src="support/sinon/sinon-qunit-1.0.0.js"></script>
-  <script>
-    if (location.hash === '#testem') document.write('<script src="/testem.js"></'+'script>')
-  </script>
   <script>
     var require = {
       urlArgs: "bust=" +  (new Date()).getTime(),
@@ -102,7 +91,7 @@
     var onSpecsLoaded = null;
     require(<%=
       Dir[
-        "public/javascripts/#{matcher}",
+        "public/javascripts/*[!bower]/#{matcher}",
         "spec/javascripts/compiled/#{matcher}",
         "spec/plugins/*/javascripts/compiled/#{matcher}"
       ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }.inspect

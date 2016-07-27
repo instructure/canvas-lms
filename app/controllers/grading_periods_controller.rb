@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -73,10 +73,25 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      # FIXME: This action is no longer used with Accounts.
+      #
+      # Team question: What should we do if external clients are still
+      # potentially going to expect grading periods on accounts by calling
+      # to this endpoint?
+      if @context.is_a? Account
+        grading_periods = []
+      else
+        grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      end
+      read_only = grading_periods.present? && grading_periods.first.grading_period_group.account_id.present?
       paginated_grading_periods, meta = paginate_for(grading_periods)
-
-      render json: serialize_json_api(paginated_grading_periods, meta)
+      respond_to do |format|
+        format.json do
+          render json: serialize_json_api(paginated_grading_periods, meta)
+            .merge(index_permissions)
+            .merge(grading_periods_read_only: read_only)
+        end
+      end
     end
   end
 
@@ -95,36 +110,8 @@ class GradingPeriodsController < ApplicationController
     fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
 
     if authorized_action(grading_period, @current_user, :read)
-      render json: serialize_json_api(grading_period)
-    end
-  end
-
-  # @API Create a single grading period
-  # @beta
-  #
-  # Create a new grading period for the current user
-  #
-  # @argument grading_periods[][start_date] [Required, Date]
-  #   The date the grading period starts.
-  #
-  # @argument grading_periods[][end_date] [Required, Date]
-  #
-  # @argument grading_periods[][weight] [Number]
-  #   The percentage weight of how much the period should count toward the course grade.
-  #
-  # @example_response
-  #   {
-  #     "grading_periods": [GradingPeriod]
-  #   }
-  #
-  def create
-    grading_period_params = params[:grading_periods].first
-    grading_period = context_grading_period_group.grading_periods.build(grading_period_params)
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
-      if grading_period.save
-        render json: serialize_json_api(grading_period)
-      else
-        render json: grading_period.errors, status: :bad_request
+      respond_to do |format|
+        format.json { render json: serialize_json_api(grading_period) }
       end
     end
   end
@@ -149,13 +136,17 @@ class GradingPeriodsController < ApplicationController
   #
   def update
     grading_period = GradingPeriod.active.find(params[:id])
-    grading_period_params = params[:grading_periods][0]
+    grading_period_params = params[:grading_periods].first
 
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
-      if grading_period.update_attributes(grading_period_params)
-        render json: serialize_json_api(grading_period)
-      else
-        render json: grading_period.errors, status: :bad_request
+    if authorized_action(grading_period, @current_user, :update)
+      respond_to do |format|
+        if grading_period.update_attributes(grading_period_params)
+          format.json { render json: serialize_json_api(grading_period) }
+        else
+          format.json do
+            render json: grading_period.errors, status: :unprocessable_entity
+          end
+        end
       end
     end
   end
@@ -163,34 +154,95 @@ class GradingPeriodsController < ApplicationController
   # @API Delete a grading period
   # @beta
   #
-  # <b>204 No Content</b> response code is returned if the deletion was successful.
+  # <b>204 No Content</b> response code is returned if the deletion was
+  # successful.
   def destroy
     grading_period = GradingPeriod.active.find(params[:id])
+    unless can_destroy_in_context?(grading_period)
+      return render_unauthorized_action
+    end
 
-    if grading_period && authorized_action(grading_period, @current_user, :manage)
+    if authorized_action(grading_period, @current_user, :delete)
       grading_period.destroy
-      head :no_content
+      respond_to do |format|
+        format.json { head :no_content }
+      end
     end
   end
 
   def batch_update
-    periods = find_or_build_periods_with_params(params[:grading_periods])
-    @context.grading_periods.transaction do
-      periods.each { |period| authorized_action(period, @current_user, :manage) }
-      errors = no_overlapping_for_new_periods_validation_errors(periods)
-        .concat(validation_errors(periods))
-
-      if errors.present?
-        render json: {errors: errors}, status: :bad_reqeust
-      else
-        periods.each(&:save!)
-        paginated_periods, meta = paginate_for(periods)
-        render json: serialize_json_api(paginated_periods, meta)
+    if authorized_action(@context, @current_user, :manage_grades)
+      case @context
+      when Account
+        account_batch_update
+      when Course
+        course_batch_update
       end
     end
   end
 
   private
+
+  def account_batch_update
+    periods = find_or_build_periods_for_account(params[:grading_periods])
+    unless batch_update_rights?(periods)
+      return render_unauthorized_action
+    end
+
+    grading_period_group.grading_periods.transaction do
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
+
+      respond_to do |format|
+        if errors.present?
+          format.json do
+            render json: {errors: errors}, status: :unprocessable_entity
+          end
+        else
+          periods.each(&:save!)
+          format.json do
+            render json: unpaginated_json_api(periods)
+          end
+        end
+      end
+    end
+  end
+
+  def course_batch_update
+    periods = find_or_build_periods_for_course(params[:grading_periods])
+    unless batch_update_rights?(periods)
+      return render_unauthorized_action
+    end
+    unless can_batch_update_in_context?(periods)
+      return render_unauthorized_action
+    end
+
+    @context.grading_periods.transaction do
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
+
+      respond_to do |format|
+        if errors.present?
+          format.json do
+            render json: {errors: errors}, status: :unprocessable_entity
+          end
+        else
+          periods.each(&:save!)
+          paginated_periods, meta = paginate_for(periods)
+          format.json do
+            render json: serialize_json_api(paginated_periods, meta)
+          end
+        end
+      end
+    end
+  end
+
+  def get_context
+    return super unless params[:set_id].present?
+
+    term_subquery = EnrollmentTerm.select(:root_account_id).where(grading_period_group_id: params[:set_id])
+    @context = Account.active.where(id: term_subquery).take
+  end
 
   # model level validations
   def validation_errors(periods)
@@ -211,17 +263,44 @@ class GradingPeriodsController < ApplicationController
     sorted_periods.select { |period| period.errors.present? }.map(&:errors)
   end
 
-  def find_or_build_periods_with_params(periods_params)
+  def find_or_build_periods_for_account(periods_params)
     periods_params.map do |period_params|
-      if (period = @context.grading_periods.active.where(id: period_params[:id]).first)
-        period.assign_attributes(period_params.except(:id))
-        period
-      else
-        context_grading_period_group
-          .grading_periods
-          .build(period_params.except(:id))
-      end
+      period = grading_period_group.grading_periods.find(period_params[:id]) if period_params[:id].present?
+      period ||= grading_period_group.grading_periods.build
+      period.assign_attributes(period_params.except(:id))
+      period
     end
+  end
+
+  def find_or_build_periods_for_course(periods_params)
+    periods_params.map do |period_params|
+      period = GradingPeriod.context_find(@context, period_params[:id])
+      period ||= context_grading_period_group.grading_periods.build
+      period.assign_attributes(period_params.except(:id))
+      period
+    end
+  end
+
+  def batch_update_rights?(periods)
+    new_periods, existing_periods = periods.partition(&:new_record?)
+    current_user_can_create?(new_periods) &&
+      current_user_can_update?(existing_periods)
+  end
+
+  def current_user_can_create?(periods)
+    periods.all? { |p| p.grants_right?(@current_user, :create) }
+  end
+
+  def current_user_can_update?(periods)
+    periods.all? { |p| p.grants_right?(@current_user, :update) }
+  end
+
+  def can_batch_update_in_context?(periods)
+    periods.empty? || periods.first.grading_period_group.account_id.blank?
+  end
+
+  def can_destroy_in_context?(period)
+    @context.is_a?(Account) || period.grading_period_group.account_id.blank?
   end
 
   def context_grading_period_group
@@ -232,6 +311,18 @@ class GradingPeriodsController < ApplicationController
     paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
     meta[:primaryCollection] = 'grading_periods'
     [paginated_grading_periods, meta]
+  end
+
+  def unpaginated_json_api(grading_periods)
+    grading_periods = Array.wrap(grading_periods)
+
+    Canvas::APIArraySerializer.new(grading_periods, {
+      each_serializer: GradingPeriodSerializer,
+      controller: self,
+      root: :grading_periods,
+      scope: @current_user,
+      include_root: false
+    }).as_json
   end
 
   def serialize_json_api(grading_periods, meta = {})
@@ -245,5 +336,20 @@ class GradingPeriodsController < ApplicationController
       scope: @current_user,
       include_root: false
     }).as_json
+  end
+
+  def index_permissions
+    can_create_grading_periods = @context.is_a?(Account) &&
+      @context.root_account? && @context.grants_right?(@current_user, :manage)
+    can_toggle_grading_periods = @domain_root_account.grants_right?(@current_user, :manage) ||
+      @context.feature_allowed?(:multiple_grading_periods, exclude_enabled: true)
+    {
+      can_create_grading_periods: can_create_grading_periods,
+      can_toggle_grading_periods: can_toggle_grading_periods
+    }.as_json
+  end
+
+  def grading_period_group
+    @grading_period_group ||= GradingPeriodGroup.active.find(params[:set_id]) if params[:set_id].present?
   end
 end

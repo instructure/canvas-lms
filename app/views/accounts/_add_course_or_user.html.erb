@@ -91,7 +91,7 @@
         <td><%= f.blabel :course_code, :en => "Reference Code" %></td>
         <td><%= f.text_field :course_code, :style => "width: 100px;" %></td>
       </tr><tr>
-        <td><%= f.blabel :account_id, :en => "Department" %></td>
+        <td><%= f.blabel :account_id, :en => "Subaccount" %></td>
         <td><%= f.select :account_id, @account.sub_accounts_as_options, :selected => @term && @term.id %></td>
       </tr><tr>
         <td><%= f.label :enrollment_term_id, :en => "Enrollment Term" %></td>

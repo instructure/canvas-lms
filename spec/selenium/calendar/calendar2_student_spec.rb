@@ -23,7 +23,7 @@ describe "calendar2" do
 
         # first context is the user's calendar
         driver.execute_script(%{$(".context_list_context:nth-child(2)").addClass('hovering')})
-        expect(fj('ul#context-list > li:nth-child(2) button')).to be_nil # no button, can't add events
+        expect(f("ul#context-list > li:nth-child(2)")).not_to contain_css('button') # no button, can't add events
       end
     end
 

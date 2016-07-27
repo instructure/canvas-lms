@@ -214,6 +214,7 @@ module CC
         node.external_tool_url assignment.external_tool_tag.url
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
       end
+      node.tag!(:turnitin_settings, (assignment.send(:turnitin_settings).to_json)) if assignment.turnitin_enabled
     end
 
   end

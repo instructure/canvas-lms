@@ -43,6 +43,9 @@ define [
       @inFindDialog = opts.inFindDialog
       @readOnly = opts.readOnly
       @parent = opts.parent
+      outcomeGroupTitle = opts.outcomeGroup.attributes.title
+      ariaLabel = 'directory ' + outcomeGroupTitle + ': depth ' + opts.directoryDepth + ','
+      @$el.attr('aria-label', ariaLabel)
       # the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
       # and SidebarView can cause items to become unselectable following a move. The
       # below attribute is using brute-force to make the view reset to address this problem
@@ -59,7 +62,7 @@ define [
 
         unless @outcomes
           @outcomes = new OutcomeCollection
-          @outcomes.url = @outcomeGroup.get('outcomes_url')
+          @outcomes.url = @outcomeGroup.get('outcomes_url')+'?outcome_style=full'
         @outcomes.on 'add remove reset', @reset, this
 
       # for PaginatedView

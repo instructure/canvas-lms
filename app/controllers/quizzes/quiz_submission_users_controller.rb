@@ -115,7 +115,7 @@ module Quizzes
     # @API Send a message to unsubmitted or submitted users for the quiz
     # @beta
     #
-    # @param conversations [QuizUserConversation] - Body and recipients to send the message to.
+    # @argument conversations [QuizUserConversation] - Body and recipients to send the message to.
     #
     # @model QuizUserConversation
     #

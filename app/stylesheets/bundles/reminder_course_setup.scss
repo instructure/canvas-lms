@@ -1,0 +1,23 @@
+@import "base/environment";
+
+.Reminder__course-setup {
+  .Reminder__course-setup-title {
+    text-align: left;
+  }
+  .Reminder__course-setup-subttitle {
+    float: right;
+    @include fontSize(11px);
+    text-transform: capitalize;
+  }
+  .Reminder__course-setup-body {
+    text-align: center;
+    p {
+      @include fontSize(15px);
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    a {
+      margin: 0 0 10px 0;
+    }
+  }
+}

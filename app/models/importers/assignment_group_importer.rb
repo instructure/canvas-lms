@@ -41,7 +41,7 @@ module Importers
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.assignment_groups.where(name: hash[:title], migration_id: nil).first
-      item ||= context.assignment_groups.new
+      item ||= context.assignment_groups.temp_record
       migration.add_imported_item(item)
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?

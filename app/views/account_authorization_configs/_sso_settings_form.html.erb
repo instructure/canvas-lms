@@ -1,7 +1,7 @@
 <h2><%= t 'SSO Settings' %></h2>
 <div class="content-box">
   <div class="grid-row">
-    <div class="col-xs-12 col-md-8 off-md-2">
+    <div class="col-xs-12 col-lg-8 off-lg-1">
       <%= form_for(account, as: :sso_settings,
                    url: account_update_sso_settings_path(account),
                    method: :put,
@@ -12,7 +12,7 @@
           <%= f.text_field :login_handle_name,
                            placeholder: presenter.login_placeholder,
                            class: 'ic-Input' %>
-          <div class="help-box">
+          <div class="ic-Form-help-text">
             <%= t(:login_handle_name_description,
                   "The label used for unique login identifiers. Examples: "\
                   "Login, Username, Student ID, etc.") %>
@@ -22,7 +22,7 @@
           <%= f.label :change_password_url, t("Forgot Password URL"),
                       class: 'ic-Label' %>
           <%= f.text_field :change_password_url, class: 'ic-Input' %>
-          <div class="help-box">
+          <div class="ic-Form-help-text">
             <%= t(:change_password_url_help,
                   "Leave blank for default Canvas behavior") %>
           </div>
@@ -31,7 +31,7 @@
           <%= f.label :auth_discovery_url, t("Discovery URL"),
                       class: 'ic-Label' %>
           <%= f.text_field :auth_discovery_url, class: 'ic-Input' %>
-          <div class="help-box">
+          <div class="ic-Form-help-text">
             <%= t('discovery_url_description', <<-TEXT)
 If a discovery URL is set, Canvas will forward all users to that URL when they need to be authenticated.
 That page will need to then help the user figure out where they need to go to log in.
@@ -47,7 +47,7 @@ If no discovery URL is configured, the first configuration will be used to attem
             <%= f.text_field :unknown_user_url,
                              placeholder: login_url,
                              class: 'ic-Input' %>
-            <div class="help-box">
+            <div class="ic-Form-help-text">
               <%= t(:unknown_user_url_description,
                     "The url to redirect to when an authenticated user is not "\
                     "found in Canvas.") %>

@@ -18,7 +18,7 @@
 module Quizzes
   class ScopedToUser < ScopeFilter
     def scope
-      concat_scope { @relation.available unless can?(:manage_assignments) }
+      concat_scope { @relation.available unless can?(:read_as_admin) }
       concat_scope do
         DifferentiableAssignment.scope_filter(@relation, user, context)
       end

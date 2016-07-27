@@ -58,6 +58,7 @@ class CollaborationsController < ApplicationController
   before_filter { |c| c.active_tab = "collaborations" }
 
   include Api::V1::Collaborator
+  include Api::V1::Collaboration
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -80,6 +81,39 @@ class CollaborationsController < ApplicationController
            :collaboration_types => Collaboration.collaboration_types
   end
 
+  # @API List collaborations
+  # List collaborations the current user has access to in the context of the course
+  # provided in the url
+  #
+  #   curl https://<canvas>/api/v1/courses/1/collaborations/
+  #
+  # @returns [Collaboration]
+  def api_index
+    return unless authorized_action(@context, @current_user, :read) &&
+      (tab_enabled?(@context.class::TAB_COLLABORATIONS) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW))
+
+    url = @context.instance_of?(Course) ? api_v1_course_collaborations_index_url : api_v1_group_collaborations_index_url
+
+    collaborations_query = @context.collaborations.active.
+                             eager_load(:user).
+                             where(type: 'ExternalToolCollaboration')
+
+    unless @context.grants_right?(@current_user, session, :manage_content)
+      collaborations_query = collaborations_query.
+                                eager_load(:collaborators).
+                                where(Collaboration.arel_table[:user_id].eq(@current_user.id).
+                                or(Collaborator.arel_table[:user_id].eq(@current_user.id)))
+    end
+
+    collaborations = Api.paginate(
+      collaborations_query,
+      self,
+      url
+    )
+
+    render :json => collaborations.map { |c| collaboration_json(c, @current_user, session) }
+  end
+
   def show
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :read)
@@ -88,7 +122,12 @@ class CollaborationsController < ApplicationController
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
-          redirect_to @collaboration.url
+          if @collaboration.is_a? ExternalToolCollaboration
+            url = external_tool_launch_url(@collaboration.url)
+          else
+            url = @collaboration.url
+          end
+          redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
           redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
         else
@@ -103,13 +142,33 @@ class CollaborationsController < ApplicationController
     end
   end
 
+  def lti_index
+    return unless authorized_action(@context, @current_user, :read) &&
+      tab_enabled?(@context.class::TAB_COLLABORATIONS)
+
+    @page_title = t('lti_collaborations', 'LTICollaborations')
+    @body_classes << 'full-width padless-content'
+    js_bundle :react_collaborations
+    css_bundle :react_collaborations
+
+    add_crumb(t('#crumbs.collaborations', "Collaborations"),  polymorphic_path([@context, :lti_collaborations]))
+
+    if @context.instance_of? Group
+      parent_context = @context.context
+      js_env :PARENT_CONTEXT => {
+        :context_asset_string => parent_context.try(:asset_string)
+      }
+    end
+
+    render :text => "".html_safe, :layout => true
+  end
+
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create)
     content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     if content_item
       @collaboration = collaboration_from_content_item(content_item)
-      users = []
-      group_ids = []
+      users, group_ids = content_item_visibility(content_item)
     else
       users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
@@ -137,14 +196,21 @@ class CollaborationsController < ApplicationController
   def update
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
+    content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
     begin
-      users     = User.where(:id => Array(params[:user])).to_a
-      group_ids = Array(params[:group])
-      params[:collaboration].delete :collaboration_type
-      @collaboration.attributes = params[:collaboration]
+      if content_item
+        @collaboration = collaboration_from_content_item(content_item, @collaboration)
+        users, group_ids = content_item_visibility(content_item)
+      else
+        users     = User.where(:id => Array(params[:user])).to_a
+        group_ids = Array(params[:group])
+        params[:collaboration].delete :collaboration_type
+        @collaboration.attributes = params[:collaboration]
+      end
       @collaboration.update_members(users, group_ids)
       respond_to do |format|
         if @collaboration.save
+          Lti::ContentItemUtil.new(content_item).success_callback if content_item
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.as_json(
                                  :methods => [:collaborator_ids],
@@ -154,6 +220,7 @@ class CollaborationsController < ApplicationController
                                  }
                                )}
         else
+          Lti::ContentItemUtil.new(content_item).failure_callback if content_item
           flash[:error] = t 'errors.update_failed', "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render :json => @collaboration.errors, :status => :bad_request }
@@ -186,6 +253,12 @@ class CollaborationsController < ApplicationController
   #
   # List the collaborators of a given collaboration
   #
+  # @argument include[] [String, "collaborator_lti_id"|"avatar_image_url"]
+  #   - "collaborator_lti_id": Optional information to include with each member.
+  #     Represents an identifier to be used for the member in an LTI context.
+  #   - "avatar_image_url": Optional information to include with each member.
+  #     The url for the avatar of a collaborator with type 'user'.
+  #
   # @example_request
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
@@ -193,12 +266,13 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
+    options = {:include => params[:include]}
     collaborators = @collaboration.collaborators.preload(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)
 
-    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session) }
+    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
   end
 
   private
@@ -212,7 +286,7 @@ class CollaborationsController < ApplicationController
   end
 
   def require_collaborations_configured
-    unless Collaboration.any_collaborations_configured?(@context)
+    unless Collaboration.any_collaborations_configured?(@context) || @domain_root_account.feature_enabled?(:new_collaborations)
       flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
       redirect_to named_context_url(@context, :context_url)
       return false
@@ -226,9 +300,21 @@ class CollaborationsController < ApplicationController
         user: @current_user
     }
     collaboration.data = content_item
-    collaboration.url = polymorphic_url([:retrieve, @context, :external_tools], url: content_item['url'], display: 'borderless')
+    collaboration.url = content_item['url']
     collaboration
   end
-  private :collaboration_from_content_item
+
+  def external_tool_launch_url(url)
+    polymorphic_url([:retrieve, @context, :external_tools], url: url, display: 'borderless')
+  end
+
+  def content_item_visibility(content_item)
+    visibility = content_item['ext_canvas_visibility']
+    lti_user_ids = visibility && visibility['users'] || []
+    lti_group_ids = visibility && visibility['groups'] || []
+    users = User.where(lti_context_id: lti_user_ids)
+    groups = Group.where(lti_context_id: lti_group_ids)
+    [users, groups]
+  end
 
 end

@@ -99,13 +99,11 @@ module QuizQuestionsCommon
   end
 
   def it_should_be_on_question(which_question)
-    keep_trying_until(3) do
-      body = f('body')
-      expect(body).to include_text which_question
-      questions = ['first question', 'second question', 'third question'] - [which_question]
-      questions.each do |question|
-        expect(body).not_to include_text question
-      end
+    body = f('body')
+    expect(body).to include_text which_question
+    questions = ['first question', 'second question', 'third question'] - [which_question]
+    questions.each do |question|
+      expect(body).not_to include_text question
     end
   end
 
@@ -138,15 +136,15 @@ module QuizQuestionsCommon
   end
 
   def it_should_not_show_previous_button
-    expect(f("button.previous-question")).to be_nil
+    expect(f("#content")).not_to contain_css("button.previous-question")
   end
 
   def it_should_not_show_next_button
-    expect(f("button.next-question")).to be_nil
+    expect(f("#content")).not_to contain_css("button.next-question")
   end
 
   def submit_the_quiz
-    fj("#submit_quiz_button").click
+    f("#submit_quiz_button").click
   end
 
   def submit_unfinished_quiz(alert_message=nil)
@@ -242,6 +240,6 @@ module QuizQuestionsCommon
     click_next_button
     answer_the_question_correctly
     submit_finished_quiz
-    keep_trying_until { it_should_show_two_correct_answers }
+    it_should_show_two_correct_answers
   end
 end

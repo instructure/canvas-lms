@@ -181,7 +181,7 @@ class Course < ActiveRecord::Base
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context
   has_many :web_conferences, -> { order('created_at DESC') }, as: :context, dependent: :destroy
-  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
+  has_many :collaborations, -> { order("#{Collaboration.quoted_table_name}.title, #{Collaboration.quoted_table_name}.created_at") }, as: :context, dependent: :destroy
   has_many :context_modules, -> { order(:position) }, as: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
   has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, class_name: 'ContextModule'
@@ -1229,7 +1229,7 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !e.admin?) || [:inactive, :completed].include?(e.state_based_on_date)}
+      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
@@ -1618,7 +1618,6 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         if e.workflow_state == 'deleted'
           e.sis_batch_id = nil
-          e.sis_source_id = nil
         end
         e.attributes = {
           :course_section => section,
@@ -1789,6 +1788,10 @@ class Course < ActiveRecord::Base
 
   def turnitin_pledge
     self.account.closest_turnitin_pledge
+  end
+
+  def turnitin_originality
+    self.account.closest_turnitin_originality
   end
 
   def all_turnitin_comments
@@ -2025,29 +2028,29 @@ class Course < ActiveRecord::Base
 
   def section_visibilities_for(user, opts={})
     RequestCache.cache('section_visibilities_for', user, self) do
-    shard.activate do
-      Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
-        workflow_not = opts[:excluded_workflows] || 'deleted'
+      shard.activate do
+        Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
+          workflow_not = opts[:excluded_workflows] || 'deleted'
 
-        enrollments = Enrollment.select([
-          :course_section_id,
-          :limit_privileges_to_course_section,
-          :type,
-          :associated_user_id])
-          .where("user_id=? AND course_id=?", user, self)
-          .where.not(workflow_state: workflow_not)
+          enrollments = Enrollment.select([
+            :course_section_id,
+            :limit_privileges_to_course_section,
+            :type,
+            :associated_user_id])
+            .where("user_id=? AND course_id=?", user, self)
+            .where.not(workflow_state: workflow_not)
 
-        enrollments.map do |e|
-          {
-            :course_section_id => e.course_section_id,
-            :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
-            :type => e.type,
-            :associated_user_id => e.associated_user_id,
-            :admin => e.admin?
-          }
+          enrollments.map do |e|
+            {
+              :course_section_id => e.course_section_id,
+              :limit_privileges_to_course_section => e.limit_privileges_to_course_section,
+              :type => e.type,
+              :associated_user_id => e.associated_user_id,
+              :admin => e.admin?
+            }
+          end
         end
       end
-    end
     end
   end
 
@@ -2076,9 +2079,9 @@ class Course < ActiveRecord::Base
 
     visibilities = section_visibilities_for(user)
     visibility_level = enrollment_visibility_level_for(user, visibilities)
-    account_admin = visibility_level == :full && visibilities.empty?
+
     # teachers, account admins, and student view students can see student view students
-    if !visibilities.any?{|v|v[:admin] || v[:type] == 'StudentViewEnrollment' } && !account_admin
+    unless visibility_level == :full || visibilities.any?{|v| v[:admin] || v[:type] == 'StudentViewEnrollment' }
       scope = scope.where("enrollments.type<>'StudentViewEnrollment'")
     end
 
@@ -2209,6 +2212,7 @@ class Course < ActiveRecord::Base
   TAB_ANNOUNCEMENTS = 14
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
+  TAB_COLLABORATIONS_NEW = 17
 
   def self.default_tabs
     [{
@@ -2290,6 +2294,11 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.collaborations', "Collaborations"),
         :css_class => 'collaborations',
         :href => :course_collaborations_path
+      }, {
+        :id => TAB_COLLABORATIONS_NEW,
+        :label => t('#tabs.collaborations', "Collaborations"),
+        :css_class => 'collaborations',
+        :href => :course_lti_collaborations_path
       }, {
         :id => TAB_SETTINGS,
         :label => t('#tabs.settings', "Settings"),
@@ -2465,28 +2474,6 @@ class Course < ActiveRecord::Base
       account = account.parent_account
     end
   end
-
-  # This will move the course to be in the specified account.
-  # All enrollments, sections, and other objects attached to the course will also be updated.
-  def move_to_account(new_root_account, new_sub_account=nil)
-    self.account = new_sub_account || new_root_account
-    self.save if new_sub_account
-    self.root_account = new_root_account
-    user_ids = []
-
-    CourseSection.where(:course_id => self).each do |cs|
-      cs.update_attribute(:root_account_id, new_root_account.id)
-    end
-
-    Enrollment.where(:course_id => self).each do |e|
-      e.update_attribute(:root_account_id, new_root_account.id)
-      user_ids << e.user_id
-    end
-
-    self.save
-    User.update_account_associations(user_ids)
-  end
-
 
   cattr_accessor :settings_options
   self.settings_options = {}

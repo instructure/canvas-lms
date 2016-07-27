@@ -79,6 +79,8 @@ define([
       return student;
     });
 
+    newState.selectedCount = newState.students.length;
+
     return newState;
   };
 
@@ -89,6 +91,8 @@ define([
       student.on_moderation_stage = false;
       return student;
     });
+
+    newState.selectedCount = 0;
 
     return newState;
   };
@@ -102,6 +106,7 @@ define([
     var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
       newState.students[studentIndex].on_moderation_stage = true;
+      newState.selectedCount += 1;
     }
     return newState;
   };
@@ -115,6 +120,7 @@ define([
     var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
       newState.students[studentIndex].on_moderation_stage = false;
+      newState.selectedCount += -1;
     }
     return newState;
   };
@@ -122,15 +128,19 @@ define([
   studentHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
     var newState = _.extend({}, state);
     var idsAdded = action.payload.students.map((student) => student.id);
+    var studentsUpdated = 0;
     newState.students = newState.students.map((student) => {
       if (_.contains(idsAdded, student.id)) {
         student.in_moderation_set = true;
         student.on_moderation_stage = false;
+        studentsUpdated += 1;
         return student;
       } else {
         return student;
       }
     });
+
+    newState.selectedCount -= studentsUpdated;
 
     return newState;
   };
@@ -229,12 +239,58 @@ define([
     return _.difference(state, idsAdded);
   };
 
+  /**
+   * Inflight Action Handlers
+   */
+  function __landAction(state, action_name) {
+    var newState = _.extend({}, state);
+    newState[action_name] = false;
+
+    return newState;
+  }
+
+  var inflightActionHandlers = {};
+
+  inflightActionHandlers[ModerationActions.ACTION_DISPATCHED] = (state, action) => {
+    var newState = _.extend({}, state);
+    newState[action.payload.name] = true;
+    return newState;
+  };
+
+  inflightActionHandlers[ModerationActions.PUBLISHED_GRADES] = (state, action) => {
+    return __landAction(state, 'publish');
+  };
+
+  inflightActionHandlers[ModerationActions.PUBLISHED_GRADES_FAILED] = (state, action) => {
+    return __landAction(state, 'publish');
+  };
+
+  inflightActionHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    return __landAction(state, 'review');
+  };
+
+  inflightActionHandlers[ModerationActions.UPDATE_MODERATION_SET_FAILED] = (state, action) => {
+    return __landAction(state, 'review');
+  };
+
+  function inflightAction (state, action) {
+    state = state || {};
+
+    var handler = inflightActionHandlers[action.type];
+
+    if (handler) return handler(state, action);
+
+    return state;
+  }
+
+
   function urls (state, action) {
     return state || {};
   }
 
   function studentList (state, action) {
     state = state || {
+      selectedCount: 0,
       students: [],
       sort: {
         direction: '',
@@ -266,10 +322,11 @@ define([
   }
 
   return combineReducers({
-   studentList,
-   urls,
-   flashMessage,
-   assignment
+    studentList,
+    urls,
+    flashMessage,
+    assignment,
+    inflightAction
   });
 
 });

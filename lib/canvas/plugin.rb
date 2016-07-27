@@ -24,7 +24,7 @@ module Canvas
 
   class Plugin
     @registered_plugins = {}
-    
+
     attr_accessor :meta, :settings
     attr_reader :id, :tag
 
@@ -55,16 +55,24 @@ module Canvas
       find(str)
     end
 
+    def encode_with(coder)
+      coder['id'] = self.id.to_s
+    end
+
+    Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
+      Canvas::Plugin.find(val.id)
+    end
+
     def default_settings
       settings = @meta[:settings]
       settings = settings.call if settings.respond_to?(:call)
       settings
     end
-    
+
     def saved_settings
       PluginSetting.settings_for_plugin(self.id, self)
     end
-    
+
     def settings
       saved_settings
     end
@@ -98,15 +106,15 @@ module Canvas
     def validator
       @meta[:validator]
     end
-    
+
     def version
       @meta[:version]
     end
-    
+
     def settings_partial
       @meta[:settings_partial]
     end
-    
+
     def has_settings_partial?
       !meta[:settings_partial].blank?
     end
@@ -158,7 +166,7 @@ module Canvas
       p.meta.merge! meta
       @registered_plugins[p.id] = p
     end
-    
+
     def self.all
       @registered_plugins.values.sort_by(&:name)
     end
@@ -185,7 +193,7 @@ module Canvas
       return value.to_i != 0
     end
   end
-  
+
   module Plugins
     module Validators
     end

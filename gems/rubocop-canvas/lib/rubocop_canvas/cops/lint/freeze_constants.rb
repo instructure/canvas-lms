@@ -43,7 +43,7 @@ module RuboCop
 
         def mark_offense!(node)
           add_offense(node, :expression, "data structure constants"\
-                                            " should be frozen")
+                                            " should be frozen", :warning)
         end
 
       end

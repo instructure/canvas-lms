@@ -82,7 +82,7 @@ describe "discussions" do
         # Student cannot reply to a closed discussion
         user_session(student)
         get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}"
-        expect(f('.discussion-reply-action')).not_to be_present
+        expect(f("#content")).not_to contain_css('.discussion-reply-action')
       end
 
 
@@ -156,7 +156,6 @@ describe "discussions" do
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
           expect(topic).not_to be_pinned
           get(url)
-          keep_trying_until { fj(".al-trigger") }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
@@ -199,7 +198,7 @@ describe "discussions" do
           driver.switch_to.alert.accept
           wait_for_ajaximations
           expect(topic.reload.workflow_state).to eq 'deleted'
-          expect(f('.discussion-list li.discussion')).to be_nil
+          expect(f("#content")).not_to contain_css('.discussion-list li.discussion')
         end
 
         it "should restore a deleted topic with replies", priority: "2", test_id: 927756 do
@@ -208,7 +207,7 @@ describe "discussions" do
           topic.save!
           get "/courses/#{@course.id}/undelete"
           expect(f('#deleted_items_list').text).to include('teacher topic title')
-          f('.restore_link').click
+          hover_and_click('.restore_link')
           driver.switch_to.alert.accept
           wait_for_ajaximations
           get url

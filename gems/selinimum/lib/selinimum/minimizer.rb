@@ -13,6 +13,8 @@ module Selinimum
 
     def filter(commit_files, spec_files)
       commit_files = Set.new(commit_files)
+      detectors.each { |detector| detector.commit_files = commit_files }
+
       if commit_files.any? { |file| !can_maybe_find_dependents?(file) }
         warn "SELINIMUM: some changed files are too global-y, testing all the things :("
         return spec_files

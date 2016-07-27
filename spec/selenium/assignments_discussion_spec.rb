@@ -29,9 +29,9 @@ describe "discussion assignments" do
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "More options created discussion", :points => '30', :more_options => true)}
       #check the content of the discussion page for our set point value and name and the URL to make sure were in /discussions
-      expect(driver.current_url).to include_text("discussion_topics/new?assignment_group_id=#{ag.id}&due_at=null&points_possible=30&title=More+options+created+discussion")
-      expect(f('#discussion-title').attribute(:value)).to eq "More options created discussion"
-      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "30"
+      expect(driver.current_url).to include("discussion_topics/new?assignment_group_id=#{ag.id}&due_at=null&points_possible=30&title=More+options+created+discussion")
+      expect(f('#discussion-title')).to have_value "More options created discussion"
+      expect(f('#discussion_topic_assignment_points_possible')).to have_value "30"
     end
   end
 
@@ -49,8 +49,8 @@ describe "discussion assignments" do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load{ edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
-      expect(f('#discussion-title').attribute(:value)).to eq "Rediscuss!"
-      expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "10"
+      expect(f('#discussion-title')).to have_value "Rediscuss!"
+      expect(f('#discussion_topic_assignment_points_possible')).to have_value "10"
     end
   end
 

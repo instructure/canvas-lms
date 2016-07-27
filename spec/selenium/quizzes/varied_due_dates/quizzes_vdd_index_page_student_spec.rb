@@ -21,7 +21,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
 
     it 'shows the availability dates for Section A', priority: "1", test_id: 282389 do
       expect(f('.date-available')).to include_text("Available until "\
-        "#{format_date_for_view(@lock_at_a)}")
+        "#{format_date_for_view(@lock_at_a, :short)}")
     end
   end
 
@@ -39,7 +39,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
 
     it 'shows the availability dates for Section B', priority: "1", test_id: 282391 do
       expect(f('.date-available')).to include_text("Not available until "\
-        "#{format_date_for_view(@unlock_at_b)}")
+        "#{format_date_for_view(@unlock_at_b, :short)}")
     end
   end
 end

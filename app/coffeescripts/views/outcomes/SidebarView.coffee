@@ -68,7 +68,8 @@ define [
       else
         parent = _.last @directories
         directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog}
+        i = _.indexOf @directories, @selectedDir()
+        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog, directoryDepth: i + 1}
         @firstDir = false
       @addDir dir
 

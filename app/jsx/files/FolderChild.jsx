@@ -14,13 +14,13 @@ define([
   'compiled/util/friendlyBytes'
 ], function(I18n, React, FolderChild, filesEnv, classnames, ItemCog, PublishCloud, FilesystemObjectThumbnail, UsageRightsIndicator, Folder, preventDefault, FriendlyDatetime, friendlyBytes) {
 
-  FolderChild.renderItemCog = function () {
+  FolderChild.renderItemCog = function (canManage) {
     if (!this.props.model.isNew() || this.props.model.get('locked_for_user')) {
       return (
         <ItemCog
           model= {this.props.model}
           startEditingName= {this.startEditingName}
-          userCanManageFilesForContext= {this.props.userCanManageFilesForContext}
+          userCanManageFilesForContext= {canManage}
           usageRightsRequiredForContext= {this.props.usageRightsRequiredForContext}
           externalToolsForContext= {this.props.externalToolsForContext}
           modalOptions= {this.props.modalOptions}
@@ -30,13 +30,13 @@ define([
       );
     }
   }
-  FolderChild.renderPublishCloud = function () {
+  FolderChild.renderPublishCloud = function (canManage) {
     if (!this.props.model.isNew()){
       return (
         <PublishCloud
           model= {this.props.model}
           ref= 'publishButton'
-          userCanManageFilesForContext= {this.props.userCanManageFilesForContext}
+          userCanManageFilesForContext= {canManage}
           usageRightsRequiredForContext= {this.props.usageRightsRequiredForContext}
         />
       );
@@ -128,6 +128,9 @@ define([
     var keyboardLabelClass = classnames({
       'screenreader-only': !this.state.hideKeyboardCheck
     })
+    var parentFolder = this.props.model.collection && this.props.model.collection.parentFolder;
+    var canManage = this.props.userCanManageFilesForContext && (!parentFolder || !parentFolder.get('for_submissions')) &&
+                    !this.props.model.get('for_submissions');
 
     return (
       <div {...this.getAttributesForRootNode()}>
@@ -173,8 +176,8 @@ define([
         { this.renderUsageRightsIndicator() }
 
         <div className= 'ef-links-col' role= 'gridcell'>
-          { this.renderPublishCloud() }
-          { this.renderItemCog() }
+          { this.renderPublishCloud(canManage) }
+          { this.renderItemCog(canManage) }
         </div>
       </div>
     );

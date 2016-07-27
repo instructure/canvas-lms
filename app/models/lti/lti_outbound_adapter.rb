@@ -51,8 +51,7 @@ module Lti
               user: lti_user,
               tool: lti_tool,
               account: lti_account,
-              variable_expander: variable_expander,
-              disable_lti_post_only: @root_account.feature_enabled?(:disable_lti_post_only)
+              variable_expander: variable_expander
           }
       )
       self
@@ -60,7 +59,13 @@ module Lti
 
     def generate_post_payload
       raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
-      @tool_launch.generate(@overrides)
+      hash = @tool_launch.generate(@overrides)
+      Lti::Security.signed_post_params(
+        hash,
+        @tool_launch.url,
+        @tool.consumer_key,
+        @tool.shared_secret,
+        @root_account.feature_enabled?(:disable_lti_post_only))
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)

@@ -59,7 +59,12 @@ describe Api::V1::SisAssignment do
       assignment_with_context.stubs(:active_assignment_overrides).returns(assignment_overrides)
       assignment_with_context.stubs(:only_visible_to_overrides).returns(true)
 
+      assignment_with_context.stubs(:unlock_at).returns(10.days.ago)
+      assignment_with_context.stubs(:lock_at).returns(10.days.from_now)
+
       assignment_overrides.stubs(:loaded?).returns(true)
+      assignment_overrides.stubs(:unlock_at).returns(15.days.ago)
+      assignment_overrides.stubs(:lock_at).returns(2.days.from_now)
 
       course_section_1.stubs(:id).returns(1)
       course_section_2.stubs(:id).returns(2)
@@ -73,6 +78,16 @@ describe Api::V1::SisAssignment do
       course_sections.stubs(:loaded?).returns(true)
       course_sections.stubs(:active_course_sections).returns(course_sections)
       course_sections.stubs(:association).returns(OpenStruct.new(:loaded? => true))
+    end
+
+    it "assignment groups have name and sis_source_id" do
+      ag_name = 'chumba choo choo'
+      sis_source_id = "my super unique goo-id"
+      assignment_group = AssignmentGroup.new(name: ag_name, sis_source_id: sis_source_id)
+      assignment_1.stubs(:assignment_group).returns(assignment_group)
+      result = subject.sis_assignments_json([assignment_1])
+      expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
+      expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
     end
 
     it "returns an empty hash for 0 assignments" do
@@ -93,6 +108,20 @@ describe Api::V1::SisAssignment do
       expect(result[0]['sections'].size).to eq(2)
       expect(result[0]['sections'][0]["id"]).to eq(1)
       expect(result[0]['sections'][1]["id"]).to eq(2)
+    end
+
+    it "includes unlock_at and lock_at attributes" do
+      assignments = [assignment_with_context]
+      result = subject.sis_assignments_json(assignments)
+      expect(result[0].key?('unlock_at')).to eq(true)
+      expect(result[0].key?('lock_at')).to eq(true)
+    end
+
+    it "includes unlock_at and lock_at attributes in section overrides" do
+      assignments = [assignment_with_context]
+      result = subject.sis_assignments_json(assignments)
+      expect(result[0]['sections'][0]['override'].key?('unlock_at')).to eq(true)
+      expect(result[0]['sections'][0]['override'].key?('lock_at')).to eq(true)
     end
   end
 end

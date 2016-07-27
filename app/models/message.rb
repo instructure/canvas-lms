@@ -266,6 +266,8 @@ class Message < ActiveRecord::Base
   def link_root_account
     @root_account ||= begin
       context = self.context
+      context = self.asset_context if context.is_a?(CommunicationChannel) && self.asset_context
+
       context = context.assignment if context.respond_to?(:assignment) && context.assignment
       context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
       context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
@@ -459,10 +461,9 @@ class Message < ActiveRecord::Base
   # Returns message body
   def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
-
-      self.body = Erubis::Eruby.new(message_body_template,
-        bufvar: '@output_buffer', filename: filename).result(_binding)
-      self.html_body = apply_html_template(_binding) if path_type == 'email'
+    self.body = Erubis::Eruby.new(message_body_template,
+      bufvar: '@output_buffer', filename: filename).result(_binding)
+    self.html_body = apply_html_template(_binding) if path_type == 'email'
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
@@ -562,9 +563,6 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
-      if Setting.get("notification_service_traffic", nil).present?
-        send(delivery_method)
-      end
       enqueue_to_sqs
     else
       send(delivery_method)
@@ -582,7 +580,7 @@ class Message < ActiveRecord::Base
         path_type,
         target
       )
-      complete_dispatch if Setting.get("notification_service_traffic", nil).nil?
+      complete_dispatch
     end
   rescue AWS::SQS::Errors::Base => e
     Canvas::Errors.capture(
@@ -591,12 +589,10 @@ class Message < ActiveRecord::Base
       to: to,
       object: inspect.to_s
     )
-    if Setting.get("notification_service_traffic", nil).nil?
-      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      self.transmission_errors = error_string
-      self.errored_dispatch
-      raise
-    end
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    self.transmission_errors = error_string
+    self.errored_dispatch
+    raise
   end
 
   class RemoteConfigurationError < StandardError; end

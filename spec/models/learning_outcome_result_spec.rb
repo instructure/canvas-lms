@@ -24,13 +24,17 @@ describe LearningOutcomeResult do
     assignment_model
     outcome = @course.created_learning_outcomes.create!(title: 'outcome')
 
-    LearningOutcomeResult.new(alignment: ContentTag.create!(title: 'content', context: @course)).tap do |lor|
-      lor.association_object = quiz_model
-      lor.context = @course
-      lor.learning_outcome = outcome
-      lor.associated_asset = quiz_model
-      lor.save!
-    end
+    LearningOutcomeResult.new(
+      alignment: ContentTag.create!({
+        title: 'content',
+        context: @course,
+        learning_outcome: outcome})
+      ).tap do |lor|
+        lor.association_object = quiz_model
+        lor.context = @course
+        lor.associated_asset = quiz_model
+        lor.save!
+      end
   end
 
   describe '.association_type' do
@@ -110,5 +114,41 @@ describe LearningOutcomeResult do
       learning_outcome_result.alignment.save!
       expect(LearningOutcomeResult.active.count).to eq 0
     end
+  end
+
+  describe "#calculate percent!" do
+    it "properly calculates percent" do
+      learning_outcome_result.update_attribute(:score, 6)
+      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.60
+    end
+
+    it "returns accurate results" do
+      points_possible = 5.5
+      learning_outcome_result.learning_outcome.stubs({
+        points_possible: points_possible, mastery_points: 3.5
+      })
+      learning_outcome_result.alignment.stubs(mastery_score: 0.6)
+      learning_outcome_result.update_attribute(:score, 6)
+      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.calculate_percent!
+      mastery_score = (learning_outcome_result.percent * points_possible).round(2)
+      expect(mastery_score).to eq 3.5
+    end
+
+    it "properly scales score to parent outcome's mastery level" do
+      learning_outcome_result.learning_outcome.stubs({
+        points_possible: 5.0, mastery_points: 3.0
+      })
+      learning_outcome_result.alignment.stubs(mastery_score: 0.7)
+      learning_outcome_result.update_attribute(:score, 6)
+      learning_outcome_result.update_attribute(:possible, 10)
+      learning_outcome_result.calculate_percent!
+
+      expect(learning_outcome_result.percent).to eq 0.5143
+    end
+
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,11 +19,15 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod do
-  subject(:grading_period) { grading_period_group.grading_periods.build(params) }
-  let(:grading_period_group) { account.grading_period_groups.create!(account: account) }
+  let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+
   let(:account) { Account.create! }
+  let(:enrollment_term) { account.enrollment_terms.create! }
   let(:course) { Course.create! }
+  let(:grading_period_group) { group_helper.create_for_enrollment_term(enrollment_term) }
   let(:now) { Time.zone.now }
+
+  subject(:grading_period) { grading_period_group.grading_periods.build(params) }
 
   let(:params) do
     {
@@ -36,7 +40,7 @@ describe GradingPeriod do
   it { is_expected.to be_valid }
 
   it "requires a start_date" do
-    grading_period =  GradingPeriod.new(params.except(:start_date))
+    grading_period = GradingPeriod.new(params.except(:start_date))
     expect(grading_period).to_not be_valid
   end
 
@@ -67,32 +71,79 @@ describe GradingPeriod do
     end
   end
 
-  describe "#destroy_permanently!" do
-    before { subject.destroy_permanently! }
-
-    it { is_expected.to be_destroyed }
-  end
-
   describe ".for" do
-    context "when context is an account" do
-      let(:account) { Account.new }
-      let(:finder) { mock }
-
-      it "delegates calls" do
-        GradingPeriod::AccountGradingPeriodFinder.expects(:new).with(account).once.returns(finder)
-        finder.expects(:grading_periods).once
-        GradingPeriod.for(account)
-      end
+    let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
+    let(:period_helper) { Factories::GradingPeriodHelper.new }
+    let(:term) do
+      enrollment_term = @root_account.enrollment_terms.create!
+      @course.enrollment_term = enrollment_term
+      @course.save!
+      enrollment_term
     end
 
     context "when context is a course" do
-      let(:course) { Course.new }
-      let(:finder) { mock }
+      before(:once) do
+        @root_account = account_model
+        @sub_account = @root_account.sub_accounts.create!
+        @course = Course.create!(account: @sub_account)
+      end
 
-      it "delegates calls" do
-        GradingPeriod::CourseGradingPeriodFinder.expects(:new).with(course).once.returns(finder)
-        finder.expects(:grading_periods).once
-        GradingPeriod.for(course)
+      it "finds all grading periods on a course" do
+        group_1 = group_helper.create_for_course(@course)
+        group_2 = group_helper.create_for_course(@course)
+        period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
+        expect(GradingPeriod.for(@course)).to match_array([period_1, period_2])
+      end
+
+      it "ignores grading periods associated with unrelated courses" do
+        other_course = Course.create!(account: @sub_account)
+        group_1 = group_helper.create_for_course(@course)
+        group_2 = group_helper.create_for_course(other_course)
+        period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
+        period_helper.create_with_weeks_for_group(group_2, 3, 1)
+        expect(GradingPeriod.for(@course)).to match_array([period_1])
+      end
+
+      it "returns grading periods for the course enrollment term when the course has no grading period groups" do
+        group = group_helper.create_for_enrollment_term(term)
+        period = period_helper.create_with_weeks_for_group(group, 5, 3)
+        expect(GradingPeriod.for(@course)).to match_array([period])
+      end
+
+      it "returns grading periods for the course enrollment term when the course has no grading periods" do
+        group_helper.create_for_course(@course)
+        group_2 = group_helper.create_for_enrollment_term(term)
+        period = period_helper.create_with_weeks_for_group(group_2, 5, 3)
+        expect(GradingPeriod.for(@course)).to match_array([period])
+      end
+
+      it "returns an empty array when the course has no grading periods groups" do
+        expect(GradingPeriod.for(@course)).to match_array([])
+      end
+
+      it "returns an empty array when the course has no grading periods" do
+        group_helper.create_for_course(@course)
+        expect(GradingPeriod.for(@course)).to match_array([])
+      end
+
+      it "includes only 'active' grading periods from the course grading period group" do
+        group_1 = group_helper.create_for_course(@course)
+        group_2 = group_helper.create_for_course(@course)
+        period_1 = period_helper.create_with_weeks_for_group(group_1, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group_2, 3, 1)
+        period_2.workflow_state = :deleted
+        period_2.save
+        expect(GradingPeriod.for(@course)).to match_array([period_1])
+      end
+
+      it "includes only 'active' grading periods from the course enrollment term group" do
+        group = group_helper.create_for_enrollment_term(term)
+        period_1 = period_helper.create_with_weeks_for_group(group, 5, 3)
+        period_2 = period_helper.create_with_weeks_for_group(group, 3, 1)
+        period_2.workflow_state = :deleted
+        period_2.save
+        expect(GradingPeriod.for(@course)).to match_array([period_1])
       end
     end
   end
@@ -154,7 +205,7 @@ describe GradingPeriod do
         end_date:   4.months.from_now(now)
       )
     end
-    let(:grading_period_group) { course.grading_period_groups.create! }
+    let(:grading_period_group) { group_helper.create_for_course(course) }
 
     it "filters the first grading period" do
       assignments = first_grading_period.assignments(course.assignments)
@@ -222,7 +273,7 @@ describe GradingPeriod do
 
   context 'given an existing grading_period' do
     let(:course) { Course.create! }
-    let(:grading_period_group) { course.grading_period_groups.create! }
+    let(:grading_period_group) { group_helper.create_for_course(course) }
     let(:existing_grading_period) do
       grading_period_group.grading_periods.create!(
         title: 'a title',
@@ -281,13 +332,42 @@ describe GradingPeriod do
   end
 
   describe ".json_for" do
-    it "returns a list sorted by date with is_last" do
-      grading_period_group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
-      grading_period_group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
-      grading_period_group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
-      json = GradingPeriod.json_for(account, nil)
-      expect(json.map { |el| el['title'] }).to eq %w(A B C)
-      expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
+    context "when given a course" do
+      it "returns a list sorted by date with is_last" do
+        grading_period_group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
+        grading_period_group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
+        grading_period_group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
+        course.grading_period_groups << grading_period_group
+        json = GradingPeriod.json_for(course, nil)
+        expect(json.map { |el| el['title'] }).to eq %w(A B C)
+        expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
+      end
+    end
+  end
+
+  describe '#account_group?' do
+    context "given an account grading period group" do
+      it { is_expected.to be_account_group }
+    end
+
+    context "given a course grading period group" do
+      subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+      let(:grading_period_group) { group_helper.create_for_course(course) }
+
+      it { is_expected.not_to be_account_group }
+    end
+  end
+
+  describe '#course_group?' do
+    context "given a course grading period group" do
+      subject(:course_period) { grading_period_group.grading_periods.create!(params) }
+      let(:grading_period_group) { group_helper.create_for_course(course) }
+
+      it { is_expected.to be_course_group }
+    end
+
+    context "given an account grading period group" do
+      it { is_expected.not_to be_course_group }
     end
   end
 end

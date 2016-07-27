@@ -4,7 +4,18 @@ define [
   'compiled/editor/EditorToggle'
   'compiled/str/apiUserContent'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, EditorToggle, apiUserContent, {publish}) ->
+  'jsx/shared/rce/RichContentEditor'
+], (I18n, $, EditorToggle, apiUserContent, {publish}, RichContentEditor) ->
+
+  ###
+  xsslint safeString.property content
+  ###
+
+  # Simply returns a unique number with each call
+  _nextID = 0
+  nextID = ->
+    _nextID += 1
+    return "editor-toggle-"+_nextID
 
   ##
   # Makes an EntryView's model message editable with TinyMCE
@@ -19,9 +30,28 @@ define [
     ##
     # @param {EntryView} view
     constructor: (@view) ->
-      super @getEditingElement(), switchViews: true
+      super @getEditingElement(),
+        switchViews: true
+        rceOptions: {manageParent: true}
       @cancelButton = @createCancelButton()
       @done.addClass 'btn-small'
+
+    ##
+    # Overwrites parent and will be called by parent's display.
+    # Handles the problem of not having the correct reference to
+    # the textArea on the page when using RCS.
+    replaceTextArea: ->
+      newTextArea = RichContentEditor.freshNode(@textArea)
+      @el.insertBefore newTextArea
+      RichContentEditor.destroyRCE(@textArea)
+      newTextArea.detach()
+
+    ##
+    # Overwrites parent and will be called by parent's display.
+    # Makes sure the textArea reference has an ID (apparently
+    # tinyMCE will hold on to it otherwise)
+    renewTextAreaID: ->
+      @textArea.attr 'id', nextID()
 
     ##
     # Extends EditorToggle::display to save the model's message.
@@ -29,7 +59,7 @@ define [
     # @param {Bool} opts.cancel - doesn't submit
     # @api public
     display: (opts) ->
-      super
+      super opts
       @cancelButton.detach()
       if opts?.cancel isnt true
         @view.model.set('updated_at', (new Date).toISOString())
@@ -40,6 +70,16 @@ define [
         ,
           success: @onSaveSuccess
           error: @onSaveError
+
+    ##
+    # Makes sure the textarea has an id
+    # @api private
+    createTextArea: ->
+      result = super
+      if result.attr('id')
+        result
+      else
+        result.attr('id',nextID())
 
     createCancelButton: ->
       $('<a/>')
@@ -85,4 +125,3 @@ define [
       @view.model.set
         messageNotification: I18n.t('save_failed', 'Failed to save, please try again later')
       @edit()
-

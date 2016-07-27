@@ -9366,11 +9366,18 @@ function EventManager(options) { // assumed to be a calendar
 					reportEvents(cache);
 				}
 			}
+		}, function(eventInputs) {
+			if (fetchID == currentFetchID) {
+				for (i = 0; i < eventInputs.length; i++) {
+					cacheEvent(eventInputs[i]);
+				}
+				reportEvents(cache);
+			}
 		});
 	}
 	
 	
-	function _fetchEventSource(source, callback) {
+	function _fetchEventSource(source, callback, dataCallback) {
 		var i;
 		var fetchers = fc.sourceFetchers;
 		var res;
@@ -9408,7 +9415,8 @@ function EventManager(options) { // assumed to be a calendar
 					function(events) {
 						callback(events);
 						t.popLoading();
-					}
+					},
+					dataCallback
 				);
 			}
 			else if ($.isArray(events)) {
@@ -9609,7 +9617,33 @@ function EventManager(options) { // assumed to be a calendar
 		return !/^_|^(id|allDay|start|end)$/.test(name);
 	}
 
-	
+	// returns the expanded events that were created
+	// identical to renderEvent, but without the reportEvents(cache) at the end
+	function cacheEvent(eventInput, stick) {
+		var abstractEvent = buildEventFromInput(eventInput);
+		var events;
+		var i, event;
+
+		if (abstractEvent) { // not false (a valid input)
+			events = expandEvent(abstractEvent);
+
+			for (i = 0; i < events.length; i++) {
+				event = events[i];
+
+				if (!event.source) {
+					if (stick) {
+						stickySource.events.push(event);
+						event.source = stickySource;
+					}
+					cache.push(event);
+				}
+			}
+			return events;
+		}
+
+		return [];
+	}
+
 	// returns the expanded events that were created
 	function renderEvent(eventInput, stick) {
 		var abstractEvent = buildEventFromInput(eventInput);

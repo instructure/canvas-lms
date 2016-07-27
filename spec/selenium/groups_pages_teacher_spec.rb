@@ -55,7 +55,7 @@ describe "groups" do
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-topic').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
@@ -64,7 +64,7 @@ describe "groups" do
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         delete_via_gear_menu
-        expect(ff('.discussion-topic').size).to eq 0
+        expect(f("#content")).not_to contain_css('.discussion-topic')
       end
 
       it "should let teachers edit their own announcements", priority: "1", test_id: 312865 do
@@ -127,7 +127,7 @@ describe "groups" do
         f('.icon-trash.ui-corner-all').click
         driver.switch_to.alert.accept
         wait_for_animations
-        expect(fln('Group Discussion')).to be_nil
+        expect(f("#content")).not_to contain_link('Group Discussion')
       end
     end
 

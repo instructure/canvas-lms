@@ -21,7 +21,7 @@ module EportfoliosCommon
     end
 
     if opts[:content]
-      expect(entry.content.first[:content]).to include_text(opts[:content])
+      expect(entry.content.first[:content]).to include(opts[:content])
     end
   end
 end

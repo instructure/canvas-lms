@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2014-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,14 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative '../spec_helper'
 
 describe GradingPeriodGrade do
   context "Soft deletion" do
     let(:student) { User.create.student_enrollments.create! course: course }
 
     let(:account) { Account.create }
-    let(:group) { account.grading_period_groups.create! }
+    let(:term) { account.enrollment_terms.create! }
+    let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_enrollment_term(term) }
     let(:period) do
       group.grading_periods.create!(
         title: 'a period',

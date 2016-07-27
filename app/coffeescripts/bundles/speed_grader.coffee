@@ -1,2 +1,5 @@
-require ['speed_grader']
+require [
+  'speed_grader'
+], (speedGrader) ->
 
+  speedGrader.setup()

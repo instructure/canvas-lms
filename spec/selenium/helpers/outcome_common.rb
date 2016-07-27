@@ -8,13 +8,14 @@ module OutcomeCommon
   # when 'admin';   course_with_admin_logged_in
 
   def import_account_level_outcomes
+    button = f(".btn-primary")
     keep_trying_until do
-      f(".btn-primary").click
+      button.click
       expect(driver.switch_to.alert).not_to be nil
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
       true
     end
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
   end
 
   def traverse_nested_outcomes(outcome)
@@ -241,12 +242,12 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
     expect(f('.outcomes-content .title').text).to eq 'Setting up Outcomes'
     # db
     expect(LearningOutcome.where(id: @outcome).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ff('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
   def should_validate_mastery_points
@@ -343,10 +344,9 @@ module OutcomeCommon
     f('.submit_button').click
     wait_for_ajaximations
     scroll_page_to_top
-    driver.execute_script("$('.outcomes-content').scrollTo(0, 0)")
-    wait_for_ajaximations
+    scroll_element '.outcomes-content', 0
 
-    keep_trying_until { expect(fj('.error_text div').text).to eq "Cannot be blank" }
+    expect(f('.error_text div')).to include_text("Cannot be blank")
   end
 
   def should_validate_short_description_length
@@ -436,15 +436,12 @@ module OutcomeCommon
 
 
     fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click
-    wait_for_ajaximations
 
-    keep_trying_until do
-      driver.execute_script("$('.edit_button').click()")
-      expect(fj('.outcomes-content input[name=title]')).to be_displayed
-    end
+    f('.edit_button').click
+    expect(f('.outcomes-content input[name=title]')).to be_displayed
 
     replace_content f('.outcomes-content input[name=title]'), edited_title
-    driver.execute_script("$('.submit_button').click()")
+    f('.submit_button').click
     wait_for_ajaximations
 
     ## expect
@@ -471,11 +468,11 @@ module OutcomeCommon
 
     ## expect
     # should not be showing on page
-    expect(ffj('.outcomes-sidebar .outcome-level:first li')).to be_empty
-    expect(fj('.outcomes-content .title').text).to eq "Setting up Outcomes"
+    expect(f('.outcomes-sidebar')).not_to contain_jqcss('.outcome-level:first li')
+    expect(f('.outcomes-content .title').text).to eq "Setting up Outcomes"
     # db
     expect(LearningOutcomeGroup.where(id: @outcome_group).first.workflow_state).to eq 'deleted'
     refresh_page # to make sure it was correctly deleted
-    ffj('.learning_outcome').each { |outcome_element| expect(outcome_element).not_to be_displayed }
+    expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 end

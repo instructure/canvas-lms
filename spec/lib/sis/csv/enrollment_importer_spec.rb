@@ -103,15 +103,21 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
     )
-    process_csv_data_cleanly(
+    batch = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,active",
       "user_2,user2,User,Dos,user2@example.com,active",
       "user_3,user4,User,Tres,user3@example.com,active",
       "user_5,user5,User,Quatro,user5@example.com,active",
       "user_6,user6,User,Cinco,user6@example.com,active",
-      "user_7,user7,User,Siete,user7@example.com,active"
+      "user_7,user7,User,Siete,user7@example.com,active",
+      ",,,,,"
     )
+    expect(batch.errors).to eq []
+    expect(batch.warnings).to eq []
+    # should skip empty lines without error or warning
+    expect(batch.counts[:users]).to eq 6
+
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
       "S001,test_1,Sec1,active,,"
@@ -132,7 +138,6 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
     expect(course.observer_enrollments.first.associated_user_id).to eq course.students.first.id
-    expect(course.observer_enrollments.first.sis_source_id).to eq "test_1:user_5:#{observer_role.id}:Sec1"
     expect(course.users.where(enrollments: { type: 'DesignerEnrollment' }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil

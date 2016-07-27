@@ -9,11 +9,16 @@ require [
 
   store = configureStore({
     studentList: {
+      selectedCount: 0,
       students: [],
       sort: {
         direction: 'asc',
         column: 'student_name'
       }
+    },
+    inflightAction: {
+      review: false,
+      publish: false
     },
     assignment: {
       published: window.ENV.GRADES_PUBLISHED,

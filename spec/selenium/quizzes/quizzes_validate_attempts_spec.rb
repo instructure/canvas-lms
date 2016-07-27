@@ -13,25 +13,16 @@ describe "quizzes question creation with attempts" do
   context 'quiz attempts' do
     def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
       click_settings_tab
+      set_value(f('#multiple_attempts_option'), false)
+      set_value(f('#multiple_attempts_option'), true)
+      set_value(f('#limit_attempts_option'), false)
+      set_value(f('#limit_attempts_option'), true)
+      replace_content(f('#quiz_allowed_attempts'), attempts)
       wait_for_ajaximations
-      quiz_attempt_field = lambda do
-        set_value(f('#multiple_attempts_option'), false)
-        set_value(f('#multiple_attempts_option'), true)
-        set_value(f('#limit_attempts_option'), false)
-        set_value(f('#limit_attempts_option'), true)
-        replace_content(f('#quiz_allowed_attempts'), attempts)
-        wait_for_ajaximations
-        driver.execute_script(%{$('#quiz_allowed_attempts').blur();}) unless alert_present?
-      end
-      keep_trying_until do
-        quiz_attempt_field.call
-        sleep 2
-        alert_present?
-      end
       alert = driver.switch_to.alert
       expect(alert.text).to eq alert_text
       alert.dismiss
-      expect(fj('#quiz_allowed_attempts')).to have_attribute('value', expected_attempt_text) # fj to avoid selenium caching
+      expect(f('#quiz_allowed_attempts')).to have_attribute('value', expected_attempt_text)
     end
 
     it "should not allow quiz attempts that are entered with letters", priority: '2', test_id: 206029 do
@@ -62,7 +53,7 @@ describe "quizzes question creation with attempts" do
       expect_new_page_load do
         f('.save_quiz_button').click
         wait_for_ajaximations
-        keep_trying_until { expect(f('.header-bar-right')).to be_truthy }
+        expect(f('.header-bar-right')).to be_truthy
       end
 
       expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i

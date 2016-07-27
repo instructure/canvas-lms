@@ -32,6 +32,7 @@
       </div>
     </div>
 
+    {{#if hasDueDate}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_due_at">
         {{#t "assignment_due_at"}}Due:{{/t}}
@@ -83,8 +84,9 @@
       {{/ifAny}}
       </div>
     </div>
+    {{/if}}
 
-    {{#unless isQuiz}}
+    {{#if hasPointsPossible}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_points">
         {{#t "assignment_points"}}Points:{{/t}}
@@ -99,7 +101,7 @@
           {{disabledIfIncludes frozenAttributes "points_possible"}}/>
       </div>
     </div>
-    {{/unless}}
+    {{/if}}
   </div>
 </div>
 <div class="form-controls">

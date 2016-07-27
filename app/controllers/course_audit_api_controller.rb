@@ -134,7 +134,11 @@
 #           "type": "array",
 #           "items": { "type": "boolean" }
 #         },
-#         "created_source": "manual|sis|api"
+#         "created_source": {
+#           "description": "The type of action that triggered the creation of the course.",
+#           "example": "manual|sis|api",
+#           "type": "string"
+#         }
 #       }
 #     }
 #

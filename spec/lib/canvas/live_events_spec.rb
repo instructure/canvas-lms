@@ -33,7 +33,7 @@ describe Canvas::LiveEvents do
 
     it "should not set old_title or old_body if they don't change" do
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
-        wiki_page_id: @page.global_id,
+        wiki_page_id: @page.global_id.to_s,
         title: "old title",
         body: "old body"
       })
@@ -45,7 +45,7 @@ describe Canvas::LiveEvents do
       @page.title = "new title"
 
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
-        wiki_page_id: @page.global_id,
+        wiki_page_id: @page.global_id.to_s,
         title: "new title",
         old_title: "old title",
         body: "old body"
@@ -58,7 +58,7 @@ describe Canvas::LiveEvents do
       @page.body = "new body"
 
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
-        wiki_page_id: @page.global_id,
+        wiki_page_id: @page.global_id.to_s,
         title: "old title",
         body: "new body",
         old_body: "old body"
@@ -73,13 +73,13 @@ describe Canvas::LiveEvents do
       quiz_with_graded_submission([])
 
       LiveEvents.expects(:post_event).with('grade_change', {
-        submission_id: @quiz_submission.submission.global_id,
-        assignment_id: @quiz_submission.submission.global_assignment_id,
+        submission_id: @quiz_submission.submission.global_id.to_s,
+        assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
         grade: @quiz_submission.submission.grade,
         old_grade: 0,
         grader_id: nil,
-        student_id: @quiz_submission.user.global_id,
-        user_id: @quiz_submission.user.global_id
+        student_id: @quiz_submission.user.global_id.to_s,
+        user_id: @quiz_submission.user.global_id.to_s
       })
 
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, 0)
@@ -90,13 +90,13 @@ describe Canvas::LiveEvents do
       submission = @course.assignments.first.submissions.first
 
       LiveEvents.expects(:post_event).with('grade_change', {
-        submission_id: submission.global_id,
-        assignment_id: submission.global_assignment_id,
+        submission_id: submission.global_id.to_s,
+        assignment_id: submission.global_assignment_id.to_s,
         grade: '10',
         old_grade: 0,
-        grader_id: @teacher.global_id,
-        student_id: @student.global_id,
-        user_id: @student.global_id
+        grader_id: @teacher.global_id.to_s,
+        student_id: @student.global_id.to_s,
+        user_id: @student.global_id.to_s
       })
 
       submission.grader = @teacher
@@ -110,8 +110,8 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('grade_change',
         has_entries(
-          assignment_id: submission.global_assignment_id,
-          user_id: @student.global_id
+          assignment_id: submission.global_assignment_id.to_s,
+          user_id: @student.global_id.to_s
         ))
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
@@ -124,8 +124,8 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('submission_updated',
         has_entries(
-          user_id: @student.global_id,
-          assignment_id: submission.global_assignment_id
+          user_id: @student.global_id.to_s,
+          assignment_id: submission.global_assignment_id.to_s
         ))
       Canvas::LiveEvents.submission_updated(submission)
     end
@@ -137,7 +137,7 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('asset_accessed', {
         asset_type: 'course',
-        asset_id: @course.global_id,
+        asset_id: @course.global_id.to_s,
         asset_subtype: nil,
         category: 'category',
         role: 'role',
@@ -152,7 +152,7 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('asset_accessed', {
         asset_type: 'course',
-        asset_id: @course.global_id,
+        asset_id: @course.global_id.to_s,
         asset_subtype: 'assignments',
         category: 'category',
         role: 'role',

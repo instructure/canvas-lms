@@ -43,14 +43,10 @@ module CC::Exporter::Epub::Converters
           if should_convert_file?(unescaped)
             match[attr] = converted_media_path(unescaped)
           else
-            match.replace(<<-SPAN_TAG)
-              <span>
-                #{I18n.t(<<-TEXT, filename: File.basename(unescaped))
-                  File %{filename} could not be included in the ePub document. Please see separate zip file for access.
-                TEXT
-                }
-              </span>
-            SPAN_TAG
+            message = I18n.t(<<-TEXT, filename: File.basename(unescaped))
+              File %{filename} could not be included in the ePub document. Please see separate zip file for access.
+            TEXT
+            match.replace(format('<span>%s</span>', ERB::Util.h(message)))
           end
         end
       end

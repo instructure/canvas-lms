@@ -245,6 +245,10 @@ require 'atom'
 #         "assignment": {
 #           "description": "The full assignment JSON data (See the Assignments API)",
 #           "$ref": "Assignment"
+#         },
+#         "assignment_overrides": {
+#           "description": "The list of AssignmentOverrides that apply to this event (See the Assignments API). This information is useful for determining which students or sections this assignment-due event applies to.",
+#           "$ref": "AssignmentOverride"
 #         }
 #       }
 #     }
@@ -708,6 +712,30 @@ class CalendarEventsApiController < ApplicationController
         render :text => feed.to_xml
       end
     end
+  end
+
+  def visible_contexts
+    get_context
+    get_all_pertinent_contexts(include_groups: true, favorites_first: true)
+    selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
+
+    contexts = @contexts.map do |context|
+      {
+        id: context.id,
+        name: context.nickname_for(@current_user),
+        asset_string: context.asset_string,
+        color: @current_user.custom_colors[context.asset_string],
+        selected: selected_contexts.include?(context.asset_string)
+      }
+    end
+
+    render json: {contexts: StringifyIds.recursively_stringify_ids(contexts)}
+  end
+
+  def save_selected_contexts
+    @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
+    @current_user.save!
+    render json: {status: 'ok'}
   end
 
   protected

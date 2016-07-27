@@ -35,7 +35,10 @@ define [
 
     onSelectFolder: (event, folder) ->
       event.preventDefault()
-      @setState(destinationFolder: folder, isCopyingFile: !@contextsAreEqual(folder, @props.thingsToMove))
+      if folder.get('for_submissions')
+        @setState(destinationFolder: null)
+      else
+        @setState(destinationFolder: folder, isCopyingFile: !@contextsAreEqual(folder, @props.thingsToMove))
 
     submit: () ->
       modelsBeingMoved = @props.thingsToMove

@@ -5,16 +5,16 @@ describe 'Viewing graded quizzes' do
   include_context 'in-process server selenium tests'
   include QuizzesCommon
 
-  def quiz_regrade_banner
-    fj('.regraded-warning')
+  def quiz_regrade_banner_css
+    '.regraded-warning'
   end
 
-  def quiz_question_regrade_banner
-    fj('div.ui-state-warning:nth-child(2)')
+  def quiz_question_regrade_banner_css
+    'div.ui-state-warning:nth-child(2)'
   end
 
   def quiz_question_points_summary
-    fj('.user_points', '.question_points_holder')
+    f('.question_points_holder .user_points')
   end
 
   before(:once) do
@@ -51,7 +51,7 @@ describe 'Viewing graded quizzes' do
       end
 
       it 'shows a regrade banner on the quiz show page', priority: "1", test_id: 140630 do
-        expect(quiz_regrade_banner).to include_text 'This quiz has been regraded; your score was affected.'
+        expect(f(quiz_regrade_banner_css)).to include_text 'This quiz has been regraded; your score was affected.'
       end
 
       it 'shows the correct quiz score after regrading', priority: "1", test_id: 140631 do
@@ -64,7 +64,7 @@ describe 'Viewing graded quizzes' do
       end
 
       it 'shows the correct quiz question score after regrading', priority: "1", test_id: 140632 do
-        expect(quiz_question_regrade_banner).to include_text 'This question has been regraded.'
+        expect(f(quiz_question_regrade_banner_css)).to include_text 'This question has been regraded.'
         expect(quiz_question_points_summary).to include_text 'Original Score: 1 / 1 pts'
         expect(quiz_question_points_summary).to include_text 'Regraded Score: 0 / 1 pts'
       end
@@ -72,9 +72,9 @@ describe 'Viewing graded quizzes' do
       it 'hides all regrade banners and regrade info after resubmitting', priority: "1", test_id: 140633 do
         take_and_answer_quiz
 
-        expect(quiz_regrade_banner).to be_nil
+        expect(f("#content")).not_to contain_css(quiz_regrade_banner_css)
 
-        expect(quiz_question_regrade_banner).to be_nil
+        expect(f("#content")).not_to contain_css(quiz_question_regrade_banner_css)
 
         expect(quiz_question_points_summary).to include_text '0 / 1 pts'
         expect(quiz_question_points_summary).not_to include_text 'Original Score'

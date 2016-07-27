@@ -8,6 +8,7 @@ describe 'quizzes question with html answers' do
   before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
+    driver.manage.window.maximize
   end
 
   def edit_first_html_answer(question_type=nil)
@@ -18,7 +19,13 @@ describe 'quizzes question with html answers' do
   end
 
   def close_first_html_answer
-    f('.edit_html_done').click
+    move_to_click('.btn.edit_html_done')
+  end
+
+  def check_for_no_edit_button(option)
+    click_option('.question_form:visible .question_type', option)
+    driver.execute_script "$('.answer').addClass('hover');"
+    expect(f("#content")).not_to contain_jqcss('.edit_html:visible')
   end
 
   it 'allows HTML answers for multiple choice', priority: "1", test_id: 209356 do
@@ -34,6 +41,7 @@ describe 'quizzes question with html answers' do
     click_questions_tab
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
+    wait_for_ajaximations
     expect(html).to eq '<p>HTML</p>'
   end
 
@@ -42,13 +50,8 @@ describe 'quizzes question with html answers' do
     click_questions_tab
     edit_first_html_answer
     close_first_html_answer
+    wait_for_ajaximations
     check_element_has_focus(fj('.edit_html:visible'))
-  end
-
-  def check_for_no_edit_button(option)
-    click_option('.question_form:visible .question_type', option)
-    driver.execute_script "$('.answer').addClass('hover');"
-    expect(fj('.edit_html:visible')).to be_nil
   end
 
   it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers', priority: "1", test_id: 209358 do

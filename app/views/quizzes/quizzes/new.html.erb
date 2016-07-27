@@ -7,15 +7,6 @@
 
 <% content_for :right_side do %>
   <%= render :partial => "shared/wiki_sidebar" %>
-
-  <ul class="page-action-list">
-    <li><%= link_to t('new_assignment', 'New Assignment'),
-            new_course_assignment_url(@context),
-            :class => 'icon-assignment' %></li>
-    <li><%= link_to t('new_discussion', 'New Discussion'),
-            new_course_discussion_topic_url(@context),
-            :class => 'icon-discussion-new' %></li>
-  </ul>
 <% end %>
 
 <h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>

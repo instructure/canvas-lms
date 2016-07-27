@@ -35,7 +35,7 @@ describe AdheresToPolicy::InstanceMethods do
 
   it "should have setup a series of methods on the instance" do
     %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
-      @some_class.new.should respond_to(method)
+      expect(@some_class.new).to respond_to(method)
     end
   end
 
@@ -61,9 +61,9 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    actor.rights_status(1, :read, :write).should == {:read => true, :write => true}
-    actor.rights_status(2, :read, :update, :delete).should == {:read => false, :update => true, :delete => true}
-    actor.rights_status(3, :read, :manage, :set_permissions).should == {:read => false, :manage => true, :set_permissions => true}
+    expect(actor.rights_status(1, :read, :write)).to eq({read: true, write: true})
+    expect(actor.rights_status(2, :read, :update, :delete)).to eq({read: false, update: true, delete: true})
+    expect(actor.rights_status(3, :read, :manage, :set_permissions)).to eq({read: false, manage: true, set_permissions: true})
   end
 
   it 'should check parent conditions' do
@@ -79,10 +79,10 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status([false, false])).to eq(:do_stuff => false)
-    expect(actor.rights_status([false, true])).to eq(:do_stuff => false)
-    expect(actor.rights_status([true, false])).to eq(:do_stuff => false)
-    expect(actor.rights_status([true, true])).to eq(:do_stuff => true)
+    expect(actor.rights_status([false, false])).to eq(do_stuff: false)
+    expect(actor.rights_status([false, true])).to eq(do_stuff: false)
+    expect(actor.rights_status([true, false])).to eq(do_stuff: false)
+    expect(actor.rights_status([true, true])).to eq(do_stuff: true)
   end
 
   it 'should check deeply nested parent conditions' do
@@ -102,14 +102,14 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    expect(actor.rights_status([false, false, false])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([false, false, true])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([false, true, false])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([false, true, true])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([true, false, false])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([true, false, true])).to eq(:do_stuff => false, :do_things => false)
-    expect(actor.rights_status([true, true, false])).to eq(:do_stuff => true, :do_things => false)
-    expect(actor.rights_status([true, true, true])).to eq(:do_stuff => true, :do_things => true)
+    expect(actor.rights_status([false, false, false])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([false, false, true])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([false, true, false])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([false, true, true])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([true, false, false])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([true, false, true])).to eq(do_stuff: false, do_things: false)
+    expect(actor.rights_status([true, true, false])).to eq(do_stuff: true, do_things: false)
+    expect(actor.rights_status([true, true, true])).to eq(do_stuff: true, do_things: true)
   end
 
   it "should execute all conditions when searching for all rights" do
@@ -134,8 +134,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    actor.rights_status(nil).should == {:read => true, :write => true, :update => true}
-    actor.total.should == 3
+    expect(actor.rights_status(nil)).to eq({read: true, write: true, update: true})
+    expect(actor.total).to eq 3
   end
 
   it "should skip duplicate conditions when searching for all rights" do
@@ -160,8 +160,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    actor.rights_status(nil).should == {:read => true, :write => true, :update => true}
-    actor.total.should == 2
+    expect(actor.rights_status(nil)).to eq({read: true, write: true, update: true})
+    expect(actor.total).to eq 2
   end
 
   it "should only execute relevant conditions when searching for specific rights" do
@@ -186,8 +186,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    actor.rights_status(nil, :read).should == {:read => true}
-    actor.total.should == 1
+    expect(actor.rights_status(nil, :read)).to eq({read: true})
+    expect(actor.total).to eq 1
   end
 
   it "should skip duplicate conditions when searching for specific rights" do
@@ -212,12 +212,12 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     actor = actor_class.new
-    actor.rights_status(nil, :read, :write).should == {:read => true, :write => true}
-    actor.total.should == 2
+    expect(actor.rights_status(nil, :read, :write)).to eq({read: true, write: true})
+    expect(actor.total).to eq 2
   end
 
   context "clear_permissions_cache" do
-    let (:sample_class) do
+    let :sample_class do
       Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -242,7 +242,7 @@ describe AdheresToPolicy::InstanceMethods do
   end
 
   context "grants_any_right?" do
-    let (:sample_class) do
+    let :sample_class do
       Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -264,12 +264,12 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "should return false if no specific ones are sought" do
       sample = sample_class.new
-      sample.grants_any_right?(1).should == false
+      expect(sample.grants_any_right?(1)).to eq false
     end
   end
 
   context "grants_all_rights?" do
-    let (:sample_class) do
+    let :sample_class do
       Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -292,7 +292,7 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "should return false if no specific ones are sought" do
       sample = sample_class.new
-      sample.grants_all_rights?(1).should == false
+      expect(sample.grants_all_rights?(1)).to eq false
     end
   end
 
@@ -316,8 +316,8 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       actor = actor_class.new
-      actor.rights_status(1, { count: 2 }, :read, :write).should == {:read => true, :write => true}
-      actor.total.should == 4
+      expect(actor.rights_status(1, { count: 2 }, :read, :write)).to eq({read: true, write: true})
+      expect(actor.total).to eq 4
     end
   end
 
@@ -344,7 +344,13 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "should return false if no specific ones are sought" do
       non_context = @actor_class.new
-      non_context.grants_right?("allowed actor").should == false
+      expect(non_context.grants_right?("allowed actor")).to eq false
+    end
+
+    it "should return false if no user is provided" do
+      non_context = @actor_class.new
+      expect(non_context.grants_right?("allowed actor", :read)).to eq true
+      expect(non_context.grants_right?(nil, :read)).to eq false
     end
 
     it "should raise argument exception if anything other then one right is provided" do
@@ -378,13 +384,13 @@ describe AdheresToPolicy::InstanceMethods do
 
         actor = actor_class.new
         actor.rights_status(actor, {})
-        actor.session.should_not be_nil
+        expect(actor.session).not_to be_nil
       end
 
       it "should change cache key based on session[:permissions_key]" do
         session = {
-          :permissions_key => 'permissions_key',
-          :session_id => 'session_id'
+          permissions_key: 'permissions_key',
+          session_id: 'session_id'
         }
         actor_class = Class.new do
           extend AdheresToPolicy::ClassMethods

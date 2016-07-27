@@ -22,11 +22,14 @@ describe "people" do
   end
 
   def create_student_group(group_text = "new student group")
-    expect_new_page_load { fln('View User Groups').click }
+    expect_new_page_load do
+      f("#people-options .Button").click
+      fln('View User Groups').click
+    end
     open_student_group_dialog
     inputs = ffj('input:visible')
     replace_content(inputs[0], group_text)
-    submit_form('#add_category_form')
+    submit_dialog_form('#add_category_form')
     wait_for_ajaximations
     expect(f('#category_list')).to include_text(group_text)
   end
@@ -71,8 +74,12 @@ describe "people" do
     expect(f("#{selector} .admin-links ul.al-options")).to be_displayed
   end
 
-  def dropdown_item_exists?(option, selector = ".rosterUser")
-    element_exists(f("#{selector} .admin-links ul.al-options li a[data-event=#{option}]"))
+  def expect_dropdown_item(option, selector = ".rosterUser")
+    expect(f("#{selector} .admin-links ul.al-options li a[data-event=#{option}]")).to be_truthy
+  end
+
+  def expect_no_dropdown_item(option, selector = ".rosterUser")
+    expect(f("#{selector} .admin-links ul.al-options")).not_to contain_css("li a[data-event=#{option}]")
   end
 
   # Returns visibility boolean, assumes existence
@@ -110,7 +117,6 @@ describe "people" do
       enroll_ta(@test_ta)
 
       get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
     end
 
     it "should have tabs" do
@@ -144,8 +150,8 @@ describe "people" do
 
     it "should display remove option for student with/without SIS id", priority: "1", test_id: 332576 do
       enroll_student(@student_2)
-      @student = user
-      @course.enroll_student(@student).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      @course.enroll_student(@student)
       @course.save
       get "/courses/#{@course.id}/users"
       # check 1st student
@@ -163,16 +169,15 @@ describe "people" do
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
+      f("#people-options .Button").click
       fln("Student Interactions Report").click
-      wait_for_ajaximations
-      user_name = f(".user_name").text
-      expect(f("h1").text).to eq "Teacher Activity Report for #{user_name}"
+      expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
     it "should not display Student Interaction button for a student", priority: "1", test_id: 244450  do
       user_session(@student_1)
       get "/courses/#{@course.id}/users"
-      expect(fln("Student Interactions Report")).not_to be_present
+      expect(f("#content")).not_to contain_link("Student Interactions Report")
     end
 
     it "should focus on the + Group Set button after the tabs" do
@@ -182,15 +187,17 @@ describe "people" do
       check_element_has_focus(fj('.group-categories-actions .btn-primary'))
     end
 
-    it "should make sure focus is set to the 'Done' button when adding users" do
+    it "should make sure focus is set to the X button each time the page changes" do
       f('#addUsers').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#user_list_textarea').send_keys('student2@test.com')
       f('#next-step').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#createUsersAddButton').click
       wait_for_ajaximations
-      check_element_has_focus(f('.dialog_closer'))
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
     end
 
     it "should validate the main page" do
@@ -200,6 +207,7 @@ describe "people" do
     end
 
     it "should navigate to registered services on profile page" do
+      f("#people-options .Button").click
       fln('View Registered Services').click
       fln('Link web services to my account').click
       expect(f('#unregistered_services')).to be_displayed
@@ -210,6 +218,7 @@ describe "people" do
     end
 
     it "should test self sign up help functionality" do
+      f("#people-options .Button").click
       expect_new_page_load { fln('View User Groups').click }
       open_student_group_dialog
       fj('.self_signup_help_link:visible').click
@@ -218,6 +227,7 @@ describe "people" do
     end
 
     it "should test self sign up functionality" do
+      f("#people-options .Button").click
       expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
@@ -227,11 +237,14 @@ describe "people" do
 
     it "should test self sign up / group structure functionality" do
       group_count = "4"
-      expect_new_page_load { fln('View User Groups').click }
+      expect_new_page_load do
+        f("#people-options .Button").click
+        fln('View User Groups').click
+      end
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
       expect(f('.group_count')).to include_text("#{group_count} Groups")
@@ -241,12 +254,15 @@ describe "people" do
       enroll_more_students
 
       group_count = "4"
-      expect_new_page_load { fln('View User Groups').click }
+      expect_new_page_load do
+        f("#people-options .Button").click
+        fln('View User Groups').click
+      end
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       replace_content(f('#category_split_group_count'), group_count)
       expect(@course.groups.count).to eq 0
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
       expect(ffj('.left_side .group_name:visible').count).to eq group_count.to_i
@@ -282,9 +298,12 @@ describe "people" do
       enroll_more_students
 
       group_count = 4
-      expect_new_page_load { fln('View User Groups').click }
+      expect_new_page_load do
+        f("#people-options .Button").click
+        fln('View User Groups').click
+      end
       open_student_group_dialog
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       group_count.times do
         f('.add_group_link').click
@@ -305,7 +324,10 @@ describe "people" do
     it "should test prior enrollment functionality" do
       @course.complete
       get "/courses/#{@course.id}/users"
-      expect_new_page_load { fln('View Prior Enrollments').click }
+      expect_new_page_load do
+        f("#people-options .Button").click
+        fln('View Prior Enrollments').click
+      end
       expect(f('#users')).to include_text(@student_1.name)
     end
 
@@ -344,22 +366,18 @@ describe "people" do
 
     it "should validate that the TA cannot delete / conclude or reset course" do
       get "/courses/#{@course.id}/settings"
-      expect(f('.delete_course_link')).to be_nil
-      expect(f('.reset_course_content_button')).to be_nil
+      expect(f("#content")).not_to contain_css('.delete_course_link')
+      expect(f("#content")).not_to contain_css('.reset_course_content_button')
       get "/courses/#{@course.id}/confirm_action?event=conclude"
       expect(f('.ui-state-error')).to include_text('Unauthorized')
     end
 
-    it "should validate that a TA cannot rename a teacher" do
-      skip('bug 7106 - do not allow TA to edit teachers name')
-      teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
-      get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
-      expect(f('.edit_user_link')).to_not be_displayed
-    end
+    # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
+    it "should validate that a TA cannot rename a teacher"
   end
 
   context "course with multiple sections", priority: "2" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       @section2 = @course.course_sections.create!(name: 'section2')
     end
@@ -395,7 +413,7 @@ describe "people" do
       student = create_user("student@example.com")
       enroll_student(student)
       get "/courses/#{@course.id}/users"
-      ff(".icon-settings")[1].click
+      f(".StudentEnrollment .icon-settings").click
       fln("Edit Sections").click
       f(".token_input.browsable").click
       section_input_element = driver.find_element(:name, "token_capture")
@@ -404,7 +422,7 @@ describe "people" do
       wait_for_ajaximations
       ff('.ui-button-text')[1].click
       wait_for_ajaximations
-      expect(ff(".StudentEnrollment")[0].text).to include_text("section2")
+      expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
@@ -412,17 +430,20 @@ describe "people" do
      @course.enroll_student(@student, allow_multiple_enrollments: true)
      @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
-     ff(".icon-settings")[1].click
+     f(".StudentEnrollment .icon-settings").click
      fln("Edit Sections").click
      fln("Remove user from section2").click
      ff('.ui-button-text')[1].click
      wait_for_ajaximations
-     expect(ff(".StudentEnrollment")[0].text).not_to include_text("section2")
+     expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
     it "should gray out sections the user doesn't have permission to remove" do
-      @student = user_with_pseudonym
-      @course.enroll_student(@student, allow_multiple_enrollments: true).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      e = @course.enroll_student(@student, allow_multiple_enrollments: true)
+      sis = @course.root_account.sis_batches.create
+      e.sis_batch_id = sis.id
+      e.save!
       get "/courses/#{@course.id}/users"
       ff(".icon-settings")[1].click
       fln("Edit Sections").click
@@ -496,7 +517,7 @@ describe "people" do
       get "/courses/#{@course.id}/users"
 
       open_dropdown_menu("#user_#{@teacher.id}")
-      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be true
+      expect_dropdown_item('editRoles', "#user_#{@teacher.id}")
     end
 
     it "should not let observers with associated users have their roles changed" do
@@ -507,7 +528,7 @@ describe "people" do
       get "/courses/#{@course.id}/users"
 
       open_dropdown_menu("#user_#{@teacher.id}")
-      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be false
+      expect_no_dropdown_item('editRoles', "#user_#{@teacher.id}")
     end
 
     def open_role_dialog(user)
@@ -532,7 +553,7 @@ describe "people" do
 
       open_role_dialog(@teacher)
       expect(f("#edit_roles #role_id option[value='#{ta_role.id}']")).to be_present
-      expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_nil
+      expect(f("#content")).not_to contain_css("#edit_roles #role_id option[value='#{student_role.id}']")
     end
 
     it "should retain the same enrollment state" do
@@ -622,20 +643,21 @@ describe "people" do
 
       get "/courses/#{@course.id}/users"
       open_dropdown_menu("#user_#{@teacher.id}")
-      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be false
+      expect_no_dropdown_item('editRoles', "#user_#{@teacher.id}")
     end
 
     it "should not show the option to edit roles for a SIS imported enrollment" do
+      sis = @course.root_account.sis_batches.create
       student = user_with_pseudonym(:active_all => true)
       enrollment = @course.enroll_teacher(student)
-      enrollment.sis_source_id = "something"
+      enrollment.sis_batch_id = sis.id
       enrollment.save!
 
       user_session(@teacher)
 
       get "/courses/#{@course.id}/users"
       open_dropdown_menu("#user_#{student.id}")
-      expect(dropdown_item_exists?('editRoles', "#user_#{student.id}")).to be false
+      expect_no_dropdown_item('editRoles', "#user_#{student.id}")
     end
   end
 end

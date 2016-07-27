@@ -15,13 +15,15 @@ describe ModeratedGrading::Selection do
   end
 
   it "is restricted to one selection per assignment/student pair" do
-    course_with_student
-    @assignment = @course.assignments.create!
-    s = @assignment.moderated_grading_selections.build
-    s.student_id = @student.id
-    s.save!
-    s2 = @assignment.moderated_grading_selections.build
-    s2.student_id = @student.id
-    expect { s2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    # Setup an existing record for shoulda-matcher's uniqueness validation since we have
+    # not-null constraints
+    course = Course.create!
+    assignment = course.assignments.create!
+    student = User.create!
+    assignment.moderated_grading_selections.create! do |sel|
+      sel.student_id = student.id
+    end
+
+    is_expected.to validate_uniqueness_of(:student_id).scoped_to(:assignment_id)
   end
 end

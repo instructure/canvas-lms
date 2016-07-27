@@ -7,9 +7,8 @@ describe 'unpublishing a quiz on the quiz show page' do
 
   def unpublish_quiz_via_ui
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    f('#quiz-publish-link').click
-    wait_for_ajaximations
     wait_for_quiz_publish_button_to_populate
+    f('#quiz-publish-link').click
   end
 
   context 'as a teacher' do
@@ -22,28 +21,27 @@ describe 'unpublishing a quiz on the quiz show page' do
       unpublish_quiz_via_ui
 
       # changes the button's text to |Unpublished|
-      driver.mouse.move_to f('#footer')
-      expect(f('#quiz-publish-link').text.strip!.split("\n")[1].split('.')[0]).to eq 'Unpublished'
+      driver.mouse.move_to f('#preview_quiz_button')
+      expect(f('#quiz-publish-link')).to include_text 'Unpublished'
 
       # changes the button text on hover to |Publish|
-      expect(f('#quiz-publish-link').text.strip!.split("\n")[0]).to eq 'Publish'
+      driver.mouse.move_to f('#quiz-publish-link')
+      expect(f('#quiz-publish-link')).to include_text 'Publish'
 
       # displays the 'This quiz is unpublished' message
-      expect(fj('.unpublished_warning', '.alert')).to be_displayed
+      expect(f('.alert .unpublished_warning')).to be_displayed
 
       # removes links from the right sidebar
-      links_text = []
-      ffj('li', 'ul.page-action-list').each { |link| links_text << link.text }
-      expect(links_text.size).to eq 0
+      expect(f("ul.page-action-list")).not_to contain_css("li")
 
       # retains both |Preview| buttons
       expect(ff('#preview_quiz_button').count).to eq 2
 
       # shows pre-published options when clicking the cog menu tool
-      fj('a.al-trigger', '.header-group-right').click
+      f('.header-group-right a.al-trigger').click
       wait_for_ajaximations
 
-      items = ffj('li.ui-menu-item', 'ul#toolbar-1')
+      items = ff('ul#toolbar-1 li.ui-menu-item')
       items_text = []
       items.each { |i| items_text << i.text.split("\n")[0] }
 

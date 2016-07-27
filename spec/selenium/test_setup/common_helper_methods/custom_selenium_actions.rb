@@ -13,82 +13,93 @@ module CustomSeleniumActions
   end
 
   def find(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find(css)
   end
 
   def find_all(css)
-    raise 'need to do a get to use find' unless @click_ready
     driver.find_all(css)
   end
 
-  def not_found(css)
-    raise 'need to do a get to use find' unless @click_ready
-    driver.not_found(css)
-  end
-
   def find_radio_button_by_value(value, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     fj("input[type=radio][value=#{value}]", scope)
   end
 
-  # f means "find" this is a shortcut to finding elements
+  # find an element via css selector
+  #
+  # like other selenium methods, this will wait until it finds the
+  # element on the page, and will eventually raise if it's not found
+  #
+  # if you need to assert the non-existence of something, instead
+  # consider using the contain_css matcher, as it will return as soon as
+  # it can (but wait if necessary), e.g.
+  #
+  #   expect(f('#content')).not_to contain_css('.this-should-be-gone')
   def f(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    begin
+    stale_element_protection do
       (scope || driver).find_element :css, selector
-    rescue
-      nil
     end
   end
 
   # short for find with link
   def fln(link_text, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    begin
+    stale_element_protection do
       (scope || driver).find_element :link, link_text
-    rescue
-      nil
     end
   end
 
-  # short for find with jquery
+  # find an element via fake-jquery-css selector
+  #
+  # useful for fake-jquery-css like `:visible`. if you're using
+  # vanilla css, prefer `f` over `fj`.
+  #
+  # like other selenium methods, this will wait until it finds the
+  # element on the page, and will eventually raise if it's not found
+  #
+  # if you need to assert the non-existence of something, instead consider
+  # using the contain_jqcss matcher, as it will return as soon as it
+  # can (but wait if necessary), e.g.
+  #
+  #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
   def fj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    begin
-      keep_trying_until { find_with_jquery selector, scope }
-    rescue
-      nil
+    stale_element_protection do
+      wait_for(method: :fj) do
+        find_with_jquery selector, scope
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
     end
   end
 
-  # same as `f` except tries to find several elements instead of one
+  # same as `f`, but returns all matching elements
+  #
+  # like other selenium methods, this will wait until it finds elements on
+  # the page, and will eventually raise if none are found
   def ff(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    begin
+    result = reloadable_collection do
       (scope || driver).find_elements :css, selector
-    rescue
-      []
     end
+    raise Selenium::WebDriver::Error::NoSuchElementError unless result.present?
+    result
   end
 
-  # same as find with jquery but tries to find several elements instead of one
+  # same as `fj`, but returns all matching elements
+  #
+  # like other selenium methods, this will wait until it finds elements on
+  # the page, and will eventually raise if none are found
   def ffj(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
-    begin
-      find_all_with_jquery selector, scope
-    rescue
-      []
+    reloadable_collection do
+      result = nil
+      wait_for(method: :ffj) do
+        result = find_all_with_jquery(selector, scope)
+        result.present?
+      end or raise Selenium::WebDriver::Error::NoSuchElementError
+      result
     end
   end
 
   def find_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
   def find_all_with_jquery(selector, scope = nil)
-    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
@@ -109,15 +120,18 @@ module CustomSeleniumActions
   end
 
   def in_frame(id)
+    f("[id=\"#{id}\"],[name=\"#{id}\"]") # ensure frame is loaded
     saved_window_handle = driver.window_handle
     driver.switch_to.frame(id)
-    yield
-  ensure
-    driver.switch_to.window saved_window_handle
+    begin
+      yield
+    ensure
+      driver.switch_to.window saved_window_handle
+    end
   end
 
   def is_checked(css_selector)
-    driver.execute_script('return $("'+css_selector+'").prop("checked")')
+    !!fj(css_selector)[:checked]
   end
 
   def get_value(selector)
@@ -128,8 +142,13 @@ module CustomSeleniumActions
     Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
-  def element_exists(css_selector)
-    !ffj(css_selector).empty?
+  # this is a smell; you should know what's on the page you're testing,
+  # so conditionally doing stuff based on elements == :poop:
+  def element_exists?(selector)
+    disable_implicit_wait { f(selector) }
+    true
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    false
   end
 
   def first_selected_option(select_element)
@@ -172,8 +191,10 @@ module CustomSeleniumActions
     driver.execute_script(src)
   end
 
-  def switch_views_available?
-    fj('a.switch_views:visible').present? || fj('a.toggle_question_content_views_link:visible').present?
+  def assert_can_switch_views!
+    fj('a.switch_views:visible,a.toggle_question_content_views_link:visible')
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    raise "switch views is not available!"
   end
 
   def switch_editor_views(tiny_controlling_element)
@@ -181,20 +202,14 @@ module CustomSeleniumActions
       tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
     end
     selector = tiny_controlling_element.to_s.to_json
-    keep_trying_until { switch_views_available? }
+    assert_can_switch_views!
     driver.execute_script(%Q{
       $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
     })
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id=nil)
-    if switch_views_available?
-      switch_editor_views(tiny_controlling_element)
-      tiny_controlling_element.clear
-      expect(tiny_controlling_element[:value]).to be_empty
-      switch_editor_views(tiny_controlling_element)
-    else
-      raise "Must provide iframe Id if we can't switch views" unless iframe_id
+    if iframe_id
       in_frame iframe_id do
         tinymce_element = f("body")
         while tinymce_element.text.length > 0 do
@@ -203,6 +218,12 @@ module CustomSeleniumActions
           tinymce_element = f("body")
         end
       end
+    else
+      assert_can_switch_views!
+      switch_editor_views(tiny_controlling_element)
+      tiny_controlling_element.clear
+      expect(tiny_controlling_element[:value]).to be_empty
+      switch_editor_views(tiny_controlling_element)
     end
   end
 
@@ -243,7 +264,9 @@ module CustomSeleniumActions
   end
 
   def hover(element)
-    driver.action.move_to(element).perform
+    element.with_stale_element_protection do
+      driver.action.move_to(element).perform
+    end
   end
 
   def set_value(input, value)
@@ -313,24 +336,19 @@ module CustomSeleniumActions
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'
     button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
-    # the button may have been hidden via fixDialogButtons
-    dialog = dialog_for(button)
-    if !button.displayed? && dialog
-      submit_dialog(dialog)
-    else
-      button.click
-    end
+    button.click
   end
 
-  def proceed_form(form)
-    proceed_button_css = 'button[type="button"]'
-    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, proceed_button_css) : f("#{form} #{proceed_button_css}")
+  def submit_dialog_form(form)
+    # used to be called submit_form, but it turns out that if you're searching for a dialog that doesn't exist it's suuuuuper slow
+    submit_button_css = 'button[type="submit"]'
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, submit_button_css) : f("#{form} #{submit_button_css}")
     # the button may have been hidden via fixDialogButtons
     dialog = dialog_for(button)
     if !button.displayed? && dialog
       submit_dialog(dialog)
     else
-      button.click
+      raise "use submit_form instead"
     end
   end
 
@@ -404,5 +422,45 @@ module CustomSeleniumActions
   def move_to_click(selector)
     el = driver.find_element :css, selector
     driver.action.move_to(el).click.perform
+  end
+
+  def scroll_to(element)
+    element_location = "#{element.location['y']}"
+    driver.execute_script('window.scrollTo(0, ' + element_location + ');')
+  end
+
+  def dismiss_flash_messages
+    ff("#flash_message_holder li").each(&:click)
+  end
+
+  def scroll_into_view(selector)
+    driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
+  end
+
+  # see public/javascripts/vendor/jquery.scrollTo.js
+  # target can be:
+  #  - A number position (will be applied to all axes).
+  #  - A string position ('44', '100px', '+=90', etc ) will be applied to all axes
+  #  - A string selector, that will be relative to the element to scroll ( 'li:eq(2)', etc )
+  #  - A hash { top:x, left:y }, x and y can be any kind of number/string like above.
+  #  - A percentage of the container's dimension/s, for example: 50% to go to the middle.
+  #  - The string 'max' for go-to-end.
+  def scroll_element(selector, target)
+    driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
+  end
+
+  def stale_element_protection
+    element = yield
+    element.finder_proc = proc do
+      disable_implicit_wait { yield }
+    end
+    element
+  end
+
+  def reloadable_collection
+    collection = yield
+    SeleniumExtensions::ReloadableCollection.new(collection, proc do
+      disable_implicit_wait { yield }
+    end)
   end
 end

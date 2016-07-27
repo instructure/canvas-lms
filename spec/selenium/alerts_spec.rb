@@ -50,8 +50,7 @@ describe "Alerts" do
     wait_for_ajaximations
     edit.click
     alert.find('.criteria .delete_item_link').click
-    wait_for_ajaximations
-    keep_trying_until { ffj('.alert .criteria li').length == 1 }
+    expect(ff('.alert .criteria li')).to have_size(1)
     submit.click
     wait_for_ajaximations
 
@@ -82,8 +81,7 @@ describe "Alerts" do
     find('#tab-alerts-link').click
     wait_for_ajaximations
     find("#edit_alert_#{alert.id} .delete_link").click
-    wait_for_ajaximations
-    keep_trying_until { fj("#edit_alert_#{alert.id}").blank? }
+    expect(f("#content")).not_to contain_css("#edit_alert_#{alert.id}")
 
     @alerts.reload
     expect(@alerts).to be_empty
@@ -98,7 +96,7 @@ describe "Alerts" do
     wait_for_ajaximations
     find('.alert.new .delete_link').click
     wait_for_ajaximations
-    keep_trying_until { expect(find_all(".alert.new")).to be_empty }
+    expect(f("#content")).not_to contain_css(".alert.new")
 
     expect(@alerts).to be_empty
   end
@@ -111,8 +109,7 @@ describe "Alerts" do
     find('.add_alert_link').click
     wait_for_ajaximations
     find('.alert.new .cancel_button').click
-    wait_for_ajaximations
-    keep_trying_until { expect(ffj(".alert.new")).to be_empty }
+    expect(f("#content")).not_to contain_css(".alert.new")
     expect(@alerts).to be_empty
   end
 
@@ -124,27 +121,25 @@ describe "Alerts" do
     wait_for_ajaximations
     alert = find('.alert.new')
     alert.find('input[name="repetition"][value="value"]').click
-    sleep 2 #need to wait for javascript to process
+
+    submit_form('#new_alert')
     wait_for_ajaximations
-    keep_trying_until do
-      submit_form('#new_alert')
-      wait_for_ajaximations
-      ffj('.error_box').length == 4
-    end
+    error_boxes = ff('.error_box')
+    expect(error_boxes).to have_size(4)
 
     # clicking "do not repeat" should remove the number of days error
     alert.find('input[name="repetition"][value="none"]').click
     wait_for_ajaximations
-    keep_trying_until { ffj('.error_box').length == 3 }
+    expect(error_boxes).to have_size(3)
 
     # adding recipient and criterion make the errors go away
     alert.find('.add_recipient_link').click
     alert.find('.add_criterion_link').click
-    keep_trying_until { ffj('.error_box').length == 1 }
+    expect(error_boxes).to have_size(1)
 
     alert.find('.criteria input[type="text"]').send_keys("abc")
     submit_form('#new_alert')
-    keep_trying_until { ffj('.error_box').length == 2 }
+    expect(error_boxes).to have_size(2)
   end
 
   context "recipients" do
@@ -158,10 +153,9 @@ describe "Alerts" do
       alert = find('.alert.new')
       link = alert.find('.add_recipient_link')
 
-      keep_trying_until { ffj('.alert.new .add_recipients_line select option').length > 1 }
+      expect(ff('.alert.new .add_recipients_line select option')).to have_size(3)
       alert.find_all('.add_recipients_line select option').each do
         link.click
-        wait_for_ajaximations
       end
       expect(find('.alert.new .add_recipient_link')).not_to be_displayed
     end
@@ -175,20 +169,20 @@ describe "Alerts" do
       alertElement = find("#edit_alert_#{alert.id}")
       alertElement.find(".edit_link").click
       wait_for_ajaximations
-      expect(fj("#edit_alert_#{alert.id} .add_recipient_link:visible")).to be_blank
+      expect(f("#edit_alert_#{alert.id}")).not_to contain_jqcss(".add_recipient_link:visible")
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
       alertElement.find('.recipients .delete_item_link').click
       wait_for_ajaximations
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
       expect(alertElement.find_all('.add_recipients_line select option').length).to eq 1
-      keep_trying_until { alertElement.find_all('.recipients li').length == 2 }
+      expect(ff('.recipients li', alertElement)).to have_size(2)
 
       # Do it again, with the same results
       alertElement.find('.recipients .delete_item_link').click
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
       expect(alertElement.find_all('.add_recipients_line select option').length).to eq 2
-      keep_trying_until { alertElement.find_all('.recipients li').length == 1 }
+      expect(ff('.recipients li', alertElement)).to have_size(1)
 
       # Clicking cancel should restore the LIs
       alertElement.find('.cancel_button').click

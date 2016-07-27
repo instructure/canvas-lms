@@ -70,9 +70,8 @@ describe "discussion assignments" do
       expect_new_page_load{fln('assignment topic title').click}
       expect(f('#breadcrumbs').text).to include('some group')
       f('.discussion-reply-action').click
-      assignment_form = f('#submit_online_text_entry_form')
       type_in_tiny 'textarea', 'something to submit'
-      submit_form(assignment_form)
+      f('button[type="submit"]').click
       wait_for_ajaximations
       user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"

@@ -86,7 +86,7 @@ define [
       # generate quoting clumps
       processedLines = []
       quoteBlock = []
-      for idx, line of message.split("\n")
+      for line in message.split("\n")
         if line.match /^(&gt;|>)/
           quoteBlock.push line
         else

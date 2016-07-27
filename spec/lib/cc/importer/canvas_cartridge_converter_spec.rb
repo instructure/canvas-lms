@@ -1402,7 +1402,7 @@ end
 describe "cc assignment extensions" do
   before(:all) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
-    unzipped_file_path = Dir.mktmpdir
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -1417,7 +1417,6 @@ describe "cc assignment extensions" do
   end
 
   after(:all) do
-    @converter.delete_unzipped_archive
     truncate_all_tables
   end
 
@@ -1452,7 +1451,7 @@ describe "matching question reordering" do
   before(:all) do
     skip unless Qti.qti_enabled?
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
-    unzipped_file_path = Dir.mktmpdir
+    unzipped_file_path = create_temp_dir!
     @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
     @converter.export
     @course_data = @converter.course.with_indifferent_access
@@ -1467,9 +1466,6 @@ describe "matching question reordering" do
   end
 
   after(:all) do
-    if Qti.qti_enabled?
-      @converter.delete_unzipped_archive
-    end
     truncate_all_tables
   end
 

@@ -117,7 +117,7 @@ module Canvas
         when "assignment"
           return I18n.t('messages.assignment_locked', "This assignment is currently locked.")
         when "topic"
-          return I18n.t('messages.topic_locked', "This topic is currently locked.")
+          return I18n.t("This topic is closed for comments.")
         when "file"
           return I18n.t('messages.file_locked', "This file is currently locked.")
         when "page"

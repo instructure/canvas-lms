@@ -25,7 +25,7 @@ describe "eportfolios" do
     it "should start the download of ePortfolio contents", priority: "1", test_id: 115980 do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
-      keep_trying_until { expect(f("#export_progress")).to be_displayed }
+      expect(f("#export_progress")).to be_displayed
     end
 
     it "should display the eportfolio wizard", priority: "1", test_id: 220019 do
@@ -59,10 +59,8 @@ describe "eportfolios" do
       fj('.done_editing_button:visible').click
       wait_for_ajaximations
       f('#content').click
-      keep_trying_until{
-        f("#page_sidebar").click
-        f("#page_list").text.include?(page_title)
-      }
+      f("#page_sidebar").click
+      expect(f("#page_list")).to include_text(page_title)
       get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
       wait_for_ajaximations
       expect(f('#section_pages')).to include_text(page_title)
@@ -83,57 +81,24 @@ describe "eportfolios" do
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name1"
       f('#edit_eportfolio_form #eportfolio_public').click
-      submit_form('#edit_eportfolio_form')
+      submit_dialog_form('#edit_eportfolio_form')
       wait_for_ajax_requests
       @eportfolio.reload
-      expect(@eportfolio.name).to include_text("new ePortfolio name1")
-    end
-
-    it "should validate time stamp on ePortfolio", priority: "2" do
-      # Freezes time to 2 days from today.
-      old_time = 2.days.from_now.utc.beginning_of_hour
-      Timecop.freeze(old_time) do
-        current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase
-        # Saves an entry to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-
-        # Freezes time to 3 days from previous date.
-        new_time = Timecop.freeze(Date.today + 3).utc
-        current_time = new_time.strftime('%b %-d at %-l') << new_time.strftime('%p').downcase
-        # Saves to initiate an update.
-        @eportfolio_entry.save!
-        # Checks for correct time, then unfreezes time.
-        get "/dashboard/eportfolios"
-        expect(f(".updated_at")).to include_text(current_time)
-      end
+      expect(@eportfolio.name).to include("new ePortfolio name1")
     end
 
     it "should have a working flickr search dialog" do
       get "/eportfolios/#{@eportfolio.id}"
       f("#page_list a.page_url").click
-      keep_trying_until {
-        expect(f("#page_list a.page_url")).to be_displayed
-      }
+      expect(f("#page_list a.page_url")).to be_displayed
       f("#page_sidebar .edit_content_link").click
-      keep_trying_until {
-        expect(f('.add_content_link.add_rich_content_link')).to be_displayed
-      }
+      expect(f('.add_content_link.add_rich_content_link')).to be_displayed
       f('.add_content_link.add_rich_content_link').click
-      wait_for_tiny(f('textarea.edit_section'))
-      keep_trying_until {
-        expect(f('.mce-container')).to be_displayed
-      }
+      expect(f('.mce-container')).to be_displayed
       f("div[aria-label='Embed Image'] button").click
-      keep_trying_until {
-        expect(f('a[href="#tabFlickr"]')).to be_displayed
-      }
+      expect(f('a[href="#tabFlickr"]')).to be_displayed
       f('a[href="#tabFlickr"]').click
-      keep_trying_until {
-        expect(f('form.FindFlickrImageView')).to be_displayed
-      }
+      expect(f('form.FindFlickrImageView')).to be_displayed
     end
 
     it "should not have new section option when adding submission" do
@@ -152,15 +117,12 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
-      keep_trying_until {
-        f("#delete_eportfolio_form").displayed?
-      }
+      wait_for_ajaximations
+      expect(f("#delete_eportfolio_form")).to be_displayed
       submit_form("#delete_eportfolio_form")
-      fj("#wrapper-container .eportfolios").click
-      keep_trying_until {
-        expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
-        expect(f("#portfolio_#{@eportfolio.id}")).to be_nil
-      }
+      f("#wrapper-container .eportfolios").click
+      expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
+      expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq 'deleted'
     end
 
@@ -176,8 +138,7 @@ describe "eportfolios" do
                       '.publish_step' => "Ready to get started?"}
       options_text.each do |option, text|
         f(option).click
-        wait_for_animations
-        expect(f('.wizard_details .details').text).to include_text text
+        expect(f('.wizard_details .details')).to include_text text
       end
     end
 
@@ -211,16 +172,14 @@ describe "eportfolios file upload" do
     expect_new_page_load { f(".icon-arrow-right").click }
     f("#right-side .edit_content_link").click
     wait_for_ajaximations
-    driver.execute_script "$('.add_file_link').click()"
+    f('.add_file_link').click
     fj(".file_upload:visible").send_keys(fullpath)
     wait_for_ajaximations
     f(".upload_file_button").click
-    wait_for_ajaximations
     submit_form(".form_content")
-    wait_for_ajax_requests
-    download = f("a.eportfolio_download")
+    download = fj("a.eportfolio_download:visible")
     expect(download).to be_displayed
-    expect(download.attribute('href')).not_to be_nil
+    expect(download).to have_attribute("href", /files/)
     #cannot test downloading the file, will check in the future
     #check_file(download)
   end

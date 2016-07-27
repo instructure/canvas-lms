@@ -9,4 +9,7 @@
   @else if $breakpoint == desktop {
     @media only screen and (min-width: 992px) { @content; }
   }
+  @else if $breakpoint == desktop--nav-open {
+    @media only screen and (min-width: 1140px) { @content; }
+  }
 }
