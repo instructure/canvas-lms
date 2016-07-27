@@ -2270,7 +2270,7 @@ zh-Hant:
         syllabus: |-
             教學大綱頁面顯示課程表的表式檢視，以及課程分級的基礎知識。
             您可以新增您對課程結構、課程政策或其他任何東西的
-            任何其他註解、說明或想法。 
+            任何其他註解、說明或想法。
             
             要新增一些註解，按一下頂部的『編輯』連結。
       labels: 
@@ -3794,9 +3794,9 @@ zh-Hant:
         course_modules: 課程模組
       help: 
         create: |-
-            課程模組可用於將您的任務、頁面、檔案等整理成更小的部分或單位。模組可以圍繞一個主題為中心，專注於一個特定的主題，或者甚至只是按時間順序進行分組。 
+            課程模組可用於將您的任務、頁面、檔案等整理成更小的部分或單位。模組可以圍繞一個主題為中心，專注於一個特定的主題，或者甚至只是按時間順序進行分組。
             
-            也可以通過為每個模組定義標準和先決條件來排序模組。在學生們解除鎖定其所有先決條件之前，其將無法存取模組。這樣一來就可以防止學生存取某些內容或檔案，直到其（例如）在複習測驗中得分至少 75％。 
+            也可以通過為每個模組定義標準和先決條件來排序模組。在學生們解除鎖定其所有先決條件之前，其將無法存取模組。這樣一來就可以防止學生存取某些內容或檔案，直到其（例如）在複習測驗中得分至少 75％。
             
             要開始將您的課程整理進模組，按一下右側的『%{button}』按鈕。
         no_modules: 尚無為這門課程定義的模組。
@@ -6304,10 +6304,10 @@ zh-Hant:
         details1: |-
             電子檔案袋可用於顯示和討論在您的學習過程中產生的重要意見和經驗。您可以使用電子檔案袋：
             
-            * 不僅僅顯示您感到驕傲的檔案給您的導師  
-            * 談論您的班級意見書中的所有思想和工作 
-            * 收集您的教育經驗的概述作為一個整體  
-            * 與朋友、未來雇主等分享您的工作  
+            * 不僅僅顯示您感到驕傲的檔案給您的導師
+            * 談論您的班級意見書中的所有思想和工作
+            * 收集您的教育經驗的概述作為一個整體
+            * 與朋友、未來雇主等分享您的工作
             
             電子檔案袋可以公開給大家看，或者私有，以便只有那些您允許的人可以看到，您可以在任何時間更改此設定。
             
@@ -6885,7 +6885,7 @@ zh-Hant:
     confirms: 
       delete_comment: 是否確定要刪除此註解？
       unsaved_changes: |-
-          以下的學生還沒有儲存自己的測驗提交件：%{users}	
+          以下的學生還沒有儲存自己的測驗提交件：%{users}
           仍然繼續？
     crocodoc_expiring: "您的 Crocodoc 課程即將過期。請重新加載窗口，以免丟失工作。"
     dialog_button: 
@@ -7809,7 +7809,7 @@ zh-Hant:
     unassigned_students: "未指派的學生 (%{count})"
     unassigned_users: "未指派的使用者 (%{count})"
   groups_6c90e26a: 群組
-  groups_are_a_good_place_to_collaborate_on_projects_7386830f: "群組可用於進行專案協作，或說明學期的計劃安排等。每個群組都有一個月曆、一個 Wiki、討論和儲存檔案的一點空間。群組可以協作處理文件，甚至安排 Web 會議。這真的就像一個小型的課程，您可以與數量較少的學生一起致力於更有針對性的專案。 "
+  groups_are_a_good_place_to_collaborate_on_projects_7386830f: "群組可用於進行專案協作，或說明學期的計劃安排等。每個群組都有一個月曆、一個 Wiki、討論和儲存檔案的一點空間。群組可以協作處理文件，甚至安排 Web 會議。這真的就像一個小型的課程，您可以與數量較少的學生一起致力於更有針對性的專案。"
   groupweight_of_total_9579ae8c: "佔總分的 %{groupWeight}% o"
   help_4c4968b1: 說明
   help_dialog: 
@@ -9360,7 +9360,7 @@ zh-Hant:
             
             為了幫助確保您能從該課程中學到更多的知識，您應該查看由導師列出的任何特別指示或教材。您可以在 Canvas Network 上的課程詳細資料頁面上查看，或者直接按一下以下連結。
             
-            %{url}	
+            %{url}
             
             保持不斷學習！
             
@@ -10859,9 +10859,9 @@ zh-Hant:
         逾期任務提交
     late_grading_display: 逾期評分
     membership_update_description: |-
-        *僅管理員：擱置註冊已啟動* 
+        *僅管理員：擱置註冊已啟動*
         
-        * 群組註冊	
+        * 群組註冊
         * 已接受/已拒絕
     membership_update_display: 成員資格更新
     missing_description_description: "針對 %{category} 通知"
@@ -10941,11 +10941,11 @@ zh-Hant:
     other_description: |-
         *僅導師和管理員：*
         
-        * 課程註冊 
+        * 課程註冊
         * 已生成報告
         * 內容匯出
         * 遷移報告
-        * 新帳戶使用者 
+        * 新帳戶使用者
         * 新教師註冊
         * 新學生群組
     other_display: 管理通知
@@ -11540,7 +11540,7 @@ zh-Hant:
     facebook_settings: 
       description: |-
           您需要 [在Facebook上創建新應用程式](%{facebook_url})，然後進入高級設定，允許客戶端 OAuth登入。
-           您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
+          您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
           在您保存應用程式后，保存好您的應用ID和密碼，並在此輸入。
       labels: 
         app_id: "應用程式 ID"
@@ -11583,7 +11583,7 @@ zh-Hant:
           
           『publisher_id』，『publisher_sis_id』，『course_id』，『course_sis_id』，『section_id』，『section_sis_id』，『student_id』，『student_sis_id』，『enrollment_id』，『enrollment_status』，『分數』以及『成績』
           
-           (注：『成績』欄僅在課程已指定一個評分標準的前提下才返回)
+          (注：『成績』欄僅在課程已指定一個評分標準的前提下才返回)
           
           對於即將發佈課程中的每位學生而言，在發佈的 CSV 中均將設有1 行或多行。具體而言，每位學生在該課程根帳戶中的每次登入均將記錄1行。多數情況下，這將導致每位學生1行，但若一位學生有多次登入，則將為每次登入單獨設一行。
       labels: 
@@ -11695,9 +11695,10 @@ zh-Hant:
     microsoft: 
       description: 微軟登入
     microsoft_settings: 
-      description: "您需要[在微軟上創建新應用t](%{ms_app_url}).\n\
-          您需要將 %{callback_url} 配置為重定向URL。\n\
-          在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。 "
+      description: |-
+          您需要[在微軟上創建新應用t](%{ms_app_url}).
+          您需要將 %{callback_url} 配置為重定向URL。
+          在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。
       labels: 
         application_id: 應用程式ID
         application_secret: 應用程式密碼
@@ -12058,7 +12059,7 @@ zh-Hant:
           然後，如果您允許課程/群組同伴成員查看您註冊的服務，
           他們就可以輕鬆聯繫您的 Twitter 帳戶。
           
-          您還可以通過註冊將通知發送到您的 Twitter 帳戶。 
+          您還可以通過註冊將通知發送到您的 Twitter 帳戶。
           這些通知將以直接訊息的方式自己發送給自己，
           而不會顯示在公共流之中。
       unknown_service: 未知
@@ -15709,8 +15710,8 @@ zh-Hant:
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       您發送的主題為"%{subject}" 的郵件未能投遞。 要通過本郵件向Canvas 回复郵件，您的Canvas檔案中必須有經確認的通訊渠道。請訪問您的檔案，並向下列地址再次發送確認郵件 [See https://community.canvaslms.com/docs/DOC-2281]. 您還可以通過Canvas 收件箱聯繫相關個人 [See https://community.canvaslms.com/docs/DOC-2670].
       
-                謝謝,
-                Canvas 支援團隊
+      謝謝,
+      Canvas 支援團隊
   the_module_item_is_locked_27fe420b: 該模組項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
   the_profile_picture_has_been_reported_d609d6dd: 個人檔案圖片已報告
@@ -16986,15 +16987,16 @@ zh-Hant:
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: 本頁將跳轉至登陸頁面，您需要使用您孩子的密碼登錄。
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       您需要 [在Facebook上創建新應用](%{facebook_url})，然後進入高級設定，允許 Client OAuth登入。
-       您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
+      您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
       在您保存應用后，保存好您的應用ID和密碼，並在此輸入。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       你需要在[Google開發者控制臺](%{google_url})上創建一個新的在綫申請。
       您需要將%{callback_url}增添為一個重定向URL.
       完成創建程式后，保存好您的客戶ID和客戶密碼，並在此輸入。
-  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: "您需要[在微軟上創建新應用t](%{ms_app_url}).\n\
-      您需要將 %{callback_url} 配置為重定向URL。\n\
-      在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。 "
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      您需要[在微軟上創建新應用t](%{ms_app_url}).
+      您需要將 %{callback_url} 配置為重定向URL。
+      在您保存應用之後，請保存好您的應用ID和密碼，並在此輸入。
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
       您需要 [在 Clever上新建一個應用](%{clever_url})。
       您需要將 %{callback_url} 配置為重定向URL。
