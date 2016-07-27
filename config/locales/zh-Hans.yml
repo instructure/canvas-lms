@@ -823,7 +823,7 @@ zh-Hans:
           
           要使用此服务，您
           就要确认您已经阅读并同意
-           [谷歌文档查看器的服务条款](%{terms_url})。
+          [谷歌文档查看器的服务条款](%{terms_url})。
       about_google_docs_tooltip: "关于 Google Docs Previews"
       account_admins_title: 帐户管理员
       account_quotas: 
@@ -1100,7 +1100,7 @@ zh-Hans:
       add_sis_stickiness_instructions: "选择此选项后，通过此 SIS 导入所执行的更改将被处理为 UI 更改，以防止后续的非覆盖 SIS 导入改变这里更改的字段。"
       add_sis_stickiness_label: "处理为 UI 更改"
       batch_import_instructions: |-
-          选择后，将会删除所选学期之前 SIS 导入的数据。  
+          选择后，将会删除所选学期之前 SIS 导入的数据。
           有关详细信息，请参阅相关文档。
       batch_mode_label: 这是整批更新
       clear_sis_stickiness_instructions: "选择此选项后，此 SIS 导入接触过的所有记录中的所有字段在未来的非覆盖 SIS 导入中都可以更改。"
@@ -1114,7 +1114,7 @@ zh-Hans:
       imported_with_messages_message: "SIS 数据已导入，但显示下列消息:"
       last_batch_title: 最后批次
       override_sis_stickiness_instructions: |-
-          默认情况下，UI 更改优先于 SIS 导入更改；对于许多字段，如果管理员通过 UI 更改了字段，SIS 导入不会改变该字段的数据。如果选择此选项，此 SIS 导入将覆盖 UI 更改。  
+          默认情况下，UI 更改优先于 SIS 导入更改；对于许多字段，如果管理员通过 UI 更改了字段，SIS 导入不会改变该字段的数据。如果选择此选项，此 SIS 导入将覆盖 UI 更改。
           有关详细信息，请参阅相关文档。
       override_sis_stickiness_label: "覆盖 UI 更改"
       page_title: "SIS 导入"
@@ -1124,7 +1124,7 @@ zh-Hans:
       pending_batches_title: 待处理批次
       process_data_button: 处理数据
       select_file_instructions: |-
-          选择要导入的压缩文件。  
+          选择要导入的压缩文件。
           有关如何生成这些压缩文件的说明，[请参阅本文档](%{url})。
       sis_import_crumb: "SIS 导入"
       started_at_message: "开始时间: %{started_at}"
@@ -2121,7 +2121,7 @@ zh-Hans:
     positive_number: 您必须使用正数
     redirect_page: 
       redirect_message: |-
-          此提交为 url，我们立即带您前往 url 链接。  
+          此提交为 url，我们立即带您前往 url 链接。
           [单击此处转到提交作业](%{url})
     remove_never_drop_rule: 删除永不放弃的规则
     remove_unsaved_never_drop_rule: 删除永不放弃的未保存规则
@@ -2269,10 +2269,10 @@ zh-Hans:
       instructions: 
         syllabus: |-
             教学大纲页面显示了课程表的导向表格视图，以及课程评分的基础。
-             您可以添加其它评论、注释或有关课程结构的想法，
+            您可以添加其它评论、注释或有关课程结构的想法，
             课程条款或其它等。
             
-             要添加一些评论，点击顶部的“编辑”链接。
+            要添加一些评论，点击顶部的“编辑”链接。
       labels: 
         syllabus_body: 大纲说明
       links: 
@@ -3118,21 +3118,21 @@ zh-Hans:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            只删除  
+            只删除
             从 Canvas
         delete_from_google_docs: |-
-            同时删除自  
+            同时删除自
             Google Docs
         start_collaborating: 开始协作
         update: 更新协作
       collaboration_name: "%{course_or_group_name} 协作"
       descriptions: 
         etherpad: |-
-            EtherPad 是一个开放源码项目，可让您快速设置共享文档。其速度很快，足以让您看到他人键入的过程。另一方面，“填充位”无密码保护，因此与其链接的任何人都可以编辑它们。如果您希望支持匿名和/或允许没有 Google 帐户的人参与，EtherPad 比 Google Docs 更适合。 
-              
+            EtherPad 是一个开放源码项目，可让您快速设置共享文档。其速度很快，足以让您看到他人键入的过程。另一方面，“填充位”无密码保护，因此与其链接的任何人都可以编辑它们。如果您希望支持匿名和/或允许没有 Google 帐户的人参与，EtherPad 比 Google Docs 更适合。
+            
             **警告**：请务必熟悉 [EtherPad 的删除政策](%{etherpad_deletion_policy_url})，以确保保留您的工作成果。
         google_docs: |-
-            Google Docs 是协作处理组项目的极佳方式。它像 Microsoft Word，但可让您同时与他人合作处理同一文件，而无需发送电子邮件。  
+            Google Docs 是协作处理组项目的极佳方式。它像 Microsoft Word，但可让您同时与他人合作处理同一文件，而无需发送电子邮件。
             
             **警告**: 您（及您的协作人员）必须具有 Google 帐户才可参与任何 Google Docs 协作。
       labels: 
@@ -3234,7 +3234,7 @@ zh-Hans:
         account_exists: |-
             已存在与 %{email} 关联的用户帐户。
             
-              **您是否为 %{name}？**
+            **您是否为 %{name}？**
         account_needed: "您已获邀请参加 **%{course}**。要接受此请求，您需要 Canvas 帐户。单击下面的链接创建 Canvas 帐户。"
         add_email: 是否要将此电子邮件地址添加到您当前的帐户?
         choose_login: 选择要登录的位置。
@@ -6905,7 +6905,7 @@ zh-Hans:
     confirms: 
       delete_comment: 是否确定要删除此评论?
       unsaved_changes: |-
-          以下学生的测验提交文件中有未保存的更改: 
+          以下学生的测验提交文件中有未保存的更改:
           
           %{users}
           是否仍要继续?
@@ -7832,10 +7832,10 @@ zh-Hans:
   groups_6c90e26a: 组
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       组是项目协作或安排学习时间之类活动的良好场所。
-                      每个组都有一份日历、一个维基页面、若干讨论和存储文件用的一些空间。
-                      各组可协作处理文档，甚至安排网络会议。
-                      它就像一个小型班级，学生数量更少，可开展
-                      更有针对性的项目。
+      每个组都有一份日历、一个维基页面、若干讨论和存储文件用的一些空间。
+      各组可协作处理文档，甚至安排网络会议。
+      它就像一个小型班级，学生数量更少，可开展
+      更有针对性的项目。
   groupweight_of_total_9579ae8c: "合计的%{groupWeight}% o"
   help_4c4968b1: 帮忙
   help_dialog: 
@@ -7979,10 +7979,10 @@ zh-Hans:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "如果您离开，目前正在准备的 zip 文件下载将被取消。"
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       如果您更改了您以前下载的学生提交文件
-       您仅仅压缩了他们的备份和上传以下的压缩形式。
+      您仅仅压缩了他们的备份和上传以下的压缩形式。
       学生们将在他们的提交评论栏中看到已修改的文件。
       
-       *请确保您没有更改提交文件的名称，以便我们可以识别它们。*
+      *请确保您没有更改提交文件的名称，以便我们可以识别它们。*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您曾使用其他课程管理系统，则可能需要将其中的材料转移到 Canvas 中。我们可以引导您轻松将内容迁移到 Canvas。"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: 如果您想保存未提交的评论，请在离开导航页面前保存它们。
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: 如果您想在帮助对话框里链接自己的校园支持网站，您可以在此进行。
@@ -8376,10 +8376,10 @@ zh-Hans:
         subject: "邮件回复失败: %{subject}"
       locked_topic: 
         body: |-
-            标题为“%{subject}”的邮件无法送达，因为讨论主题已被锁定。如果您尝试通过 Canvas 联系某人，可以尝试登录您的帐户，使用“收件箱”工具向其发送邮件。⏎ 
+            标题为“%{subject}”的邮件无法送达，因为讨论主题已被锁定。如果您尝试通过 Canvas 联系某人，可以尝试登录您的帐户，使用“收件箱”工具向其发送邮件。⏎
             
-                      谢谢！
-                      Canvas 支持部门
+            谢谢！
+            Canvas 支持部门
         subject: "邮件回复失败: %{subject}"
     progress_runner: 
       completed_message: 
@@ -9056,9 +9056,9 @@ zh-Hans:
     assignment_changed: 
       email: 
         body: |-
-            %{course} 的作业"%{title}"已更改。  
+            %{course} 的作业"%{title}"已更改。
             
-            单击此处查看作业: 
+            单击此处查看作业:
             %{url}
         html: 
           body: "%{course} 的作业“%{title}”已更改。"
@@ -9268,7 +9268,7 @@ zh-Hans:
             %{course_or_group})。该文档由 %{user}
             在 %{service} 中创建并通过您的电子邮件地址 %{email} 邀请您。
             
-            如果针对此类型协作的电子邮件地址错误，您将需要 
+            如果针对此类型协作的电子邮件地址错误，您将需要
             更改个人资料设置或向 %{service} 注册。
             
             您可在此处查看详细信息:
@@ -12525,7 +12525,7 @@ zh-Hans:
       page_header: 答案序列
   quiz_log_auditing_desc: |-
       对测验提交项启用活动跟踪功能，以及
-            一旦提交即可查看这些活动的日志的功能。
+      一旦提交即可查看这些活动的日志的功能。
   quiz_lti_plugin_a189607f: "测验 LTI 插件"
   quiz_lti_plugin_a6256549: "测验 LTI 的插件"
   quiz_menu_4fcd5e61: 测验菜单
@@ -13028,7 +13028,7 @@ zh-Hans:
           multiple_dropdowns: 输入您的问题，指定每个下拉列表应转至的位置。然后定义每个下拉列表可能的答案，每个下拉列表有一个正确答案。
           numerical: 将正确答案定义为范围内的任何数字，或数字加上或减去一些误差。系统将向学生提供一个空文本框用于键入其数值答案。
           short_answer: |-
-              输入您的问题文本，然后定义空格所有可能的正确答案。  
+              输入您的问题文本，然后定义空格所有可能的正确答案。
               学生将看到问题，后跟一个小文本框用于键入其答案。
           text_only: 此"问题"将不会评分，但在引入一组相关问题时非常有用。
           true_false: "输入您的问题文本，然后选择 True 或 False 作为正确答案。"
@@ -16999,7 +16999,7 @@ zh-Hans:
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
       您将丢失所有未保存变更.
       
-       您仍然想继续吗？
+      您仍然想继续吗？
   you_are_currently_logged_into_student_view_3e8a1da: 您目前正登录到学生视图
   you_are_currently_masquerading_as_user_name_f4a00ade: "您正在伪装成 %{user_name}"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
