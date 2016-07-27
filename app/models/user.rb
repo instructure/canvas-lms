@@ -176,10 +176,12 @@ class User < ActiveRecord::Base
   scope :name_like, lambda { |name|
     next none if name.strip.empty?
     scopes = []
-    scopes << unscoped.where(wildcard('users.name', name))
-    scopes << unscoped.where(wildcard('users.short_name', name))
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    all.primary_shard.activate do
+      scopes << unscoped.where(wildcard('users.name', name))
+      scopes << unscoped.where(wildcard('users.short_name', name))
+      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
+      scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    end
 
     scopes.map!(&:to_sql)
     self.from("(#{scopes.join("\nUNION\n")}) users")
