@@ -1102,7 +1102,7 @@ en-GB:
       add_sis_stickiness_instructions: "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here."
       add_sis_stickiness_label: "Process as UI changes"
       batch_import_instructions: |-
-          If selected, this will delete everything for this term, which includes all courses and enrolments that are not in the selected import file above.  
+          If selected, this will delete everything for this term, which includes all courses and enrolments that are not in the selected import file above.
           See the documentation for details.
       batch_mode_label: "This is a full batch update"
       clear_sis_stickiness_instructions: "With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports."
@@ -1116,7 +1116,7 @@ en-GB:
       imported_with_messages_message: "The SIS data was imported but with these messages:"
       last_batch_title: "Last batch"
       override_sis_stickiness_instructions: |-
-          By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  
+          By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.
           See the documentation for details.
       override_sis_stickiness_label: "Override UI changes"
       page_title: "SIS import"
@@ -1126,7 +1126,7 @@ en-GB:
       pending_batches_title: "Pending batches"
       process_data_button: "Process data"
       select_file_instructions: |-
-          Select the zip file that you want imported.  
+          Select the zip file that you want imported.
           For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS import"
       started_at_message: "Started: %{started_at}"
@@ -2120,7 +2120,7 @@ en-GB:
     positive_number: "You must use a positive number"
     redirect_page: 
       redirect_message: |-
-          This submission was a url, we're taking you to the url link now.  
+          This submission was a url, we're taking you to the url link now.
           [Click Here to go to the submission](%{url})
     remove_never_drop_rule: "Remove never drop rule"
     remove_unsaved_never_drop_rule: "Remove unsaved never drop rule"
@@ -3117,22 +3117,22 @@ en-GB:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Just delete  
+            Just delete
             from Canvas
         delete_from_google_docs: |-
-            Also delete from  
+            Also delete from
             Google Docs
         start_collaborating: "Start collaborating"
         update: "Update collaboration"
       collaboration_name: "%{course_or_group_name} collaboration"
       descriptions: 
         etherpad: |-
-            EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.  
-              
+            EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.
+            
             **Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved.
         google_docs: |-
-            Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  
-              
+            Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.
+            
             **Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations.
       labels: 
         collaboration_type: "Collaborate using:"
@@ -3156,7 +3156,7 @@ en-GB:
           an easy place to keep track of those collaborations and also to set them
           up without having to swap emails.
       description_teacher: |-
-          **What do we mean by collaborations?** We are talking about web-based tools with which 
+          **What do we mean by collaborations?** We are talking about web-based tools with which
           your students are most likely already familiar. Students can use resources like
           [Google Docs](%{google_url})
           to work collaboratively on tasks like group papers or note taking. This page gives them
@@ -3233,7 +3233,7 @@ en-GB:
         account_exists: |-
             There's a user account already associated with %{email}.
             
-              **Are you %{name}?**
+            **Are you %{name}?**
         account_needed: "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account."
         add_email: "Would you like to add this email address to your current account?"
         choose_login: "Select where you would like to log in at."
@@ -3803,7 +3803,7 @@ en-GB:
             
             You can also sequence modules by defining criteria and prerequisites for each module. Students won't be able to access modules until they have unlocked all their prerequisites. That way you can prevent students from accessing certain content or files until they have, for example, obtained at least 75% on a review quiz.
             
-             To start organising your course into modules, click the "%{button}" button to the right.
+            To start organising your course into modules, click the "%{button}" button to the right.
         no_modules: "No modules have been defined for this course."
       images: 
         alt: 
@@ -6899,9 +6899,9 @@ en-GB:
     confirms: 
       delete_comment: "Are you sure you want to delete this comment?"
       unsaved_changes: |-
-          The following students have unsaved changes to their quiz submissions: 
+          The following students have unsaved changes to their quiz submissions:
           
-           %{users}
+          %{users}
           Continue anyway?
     crocodoc_expiring: "Your Crocodoc session is expiring soon.  Please reload the window to avoid losing any work."
     dialog_button: 
@@ -8374,15 +8374,15 @@ en-GB:
         body: |-
             The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
             
-                      Thank you,
-                      Canvas Support
+            Thank you,
+            Canvas Support
         subject: "Message reply failed: %{subject}"
       locked_topic: 
         body: |-
             The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
             
-                      Thank you,
-                      Canvas Support
+            Thank you,
+            Canvas Support
         subject: "Message reply failed: %{subject}"
     progress_runner: 
       completed_message: 
@@ -8529,10 +8529,10 @@ en-GB:
           verify: Verify
         details: 
           mfa_enrollment: |-
-              Multi-factor authentication increases security by requiring that you have something in your physical possession, 
-              in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate 
+              Multi-factor authentication increases security by requiring that you have something in your physical possession,
+              in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
               verification codes, or a phone that can receive text messages. The Google Authenticator app for [iPhone](%{iphone_url}) or
-               [Android](%{android_url}) can be configured by scanning the QR Code below. Other tokens can be configured by entering the
+              [Android](%{android_url}) can be configured by scanning the QR Code below. Other tokens can be configured by entering the
               secret key **%{secret_key}**.
           mfa_required: "You are required to set up multi-factor authentication."
           otp_on_device: "Please enter the verification code shown by your token."
@@ -9062,9 +9062,9 @@ en-GB:
     assignment_changed: 
       email: 
         body: |-
-            The assignment "%{title}" for %{course} has changed.  
+            The assignment "%{title}" for %{course} has changed.
             
-            Click here to view the assignment: 
+            Click here to view the assignment:
             %{url}
         html: 
           body: "The assignment \"%{title}\" for %{course} has changed."
@@ -9274,7 +9274,7 @@ en-GB:
             %{course_or_group}.  The document was created by %{user}
             in %{service} and you were invited using your email address, %{email}.
             
-            If that's the wrong email address for this type of collaboration, you'll need to 
+            If that's the wrong email address for this type of collaboration, you'll need to
             change your profile settings or register with %{service}.
             
             You can see the details here:
@@ -11827,10 +11827,10 @@ en-GB:
     webct_scraper_settings: 
       description: |-
           If the institution does not use WebCT's "Learning Modules" (including schools who adopted WebCT
-            prior to version 4.0, when modules were made available), course migrations can be improved by importing the "Course Content"
-            as Canvas modules instead of the "Learning Modules". This page allows one to set the default behavior of the WebCT migrator
-            with respect to content modules. It is important to remember that, while individual course migrations retain the ability
-            to choose, the bulk migrator always utilises the value configured here and cannot be changed per migration.
+          prior to version 4.0, when modules were made available), course migrations can be improved by importing the "Course Content"
+          as Canvas modules instead of the "Learning Modules". This page allows one to set the default behavior of the WebCT migrator
+          with respect to content modules. It is important to remember that, while individual course migrations retain the ability
+          to choose, the bulk migrator always utilises the value configured here and cannot be changed per migration.
       labels: 
         allow_outline_selection: "Display option to use Course content as modules in the migration wizard"
         folders_as_outline: "Use WebCT \"Course Content\" for modules as the default"
@@ -12528,7 +12528,7 @@ en-GB:
       page_header: "Answer sequence"
   quiz_log_auditing_desc: |-
       Enable the tracking of events for a quiz submission, and the ability
-            to view a log of those events once a submission is made.
+      to view a log of those events once a submission is made.
   quiz_lti_plugin_a189607f: "Quiz LTI plugin"
   quiz_lti_plugin_a6256549: "Quiz LTI plugin"
   quiz_menu_4fcd5e61: "Quiz menu"
@@ -13020,7 +13020,7 @@ en-GB:
           multiple_dropdowns: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown, with one correct answer per dropdown."
           numerical: "Define the correct answer as any number within a range, or a number plus or minus some error margin. Student will be given an empty text box to type their numerical answer."
           short_answer: |-
-              Enter your question text, then define all possible correct answers for the blank.  
+              Enter your question text, then define all possible correct answers for the blank.
               Students will see the question followed by a small text box to type their answer.
           text_only: "This \"question\" will not be scored, but can be useful for introducing a set of related questions."
           true_false: "Enter your question text, then select if True or False is the correct answer."
@@ -16712,9 +16712,9 @@ en-GB:
       no_courses_message: "You don't have any courses, so this page won't be very exciting for now. Once you've created or signed up for courses, you'll start to see conversations from all of your classes."
       unpublished_courses_message: |-
           You've enrolled in one or more courses that have not started yet. Once
-                  those courses are available, you will see information about them here
-                  and in the top navigation. In the meantime, feel free to sign up for
-                  more courses or set up your profile.
+          those courses are available, you will see information about them here
+          and in the top navigation. In the meantime, feel free to sign up for
+          more courses or set up your profile.
       welcome_to_happiness: "Welcome to Canvas!"
   users_d1b60cb0: Users
   users_matching_search_term_c604db9e: "Users matching '%{search_term}'"
