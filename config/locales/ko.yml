@@ -1071,7 +1071,7 @@ ko:
       add_sis_stickiness_instructions: "이 옵션을 선택하면 SIS 가져오기를 통해 변경된 내용이 UI 변경과 마찬가지로 처리되어 여기에서 변경한 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 없습니다."
       add_sis_stickiness_label: "UI 변경으로 처리"
       batch_import_instructions: |-
-          이를 선택하면 위에서 선택한 가져오기 파일에 없는 모든 과목 및 등록을 포함하여 이 학기의 모든 자료를 삭제합니다.  
+          이를 선택하면 위에서 선택한 가져오기 파일에 없는 모든 과목 및 등록을 포함하여 이 학기의 모든 자료를 삭제합니다.
           자세한 내용은 설명서를 참고하십시오.
       batch_mode_label: "전체 일괄 처리임"
       clear_sis_stickiness_instructions: "이 옵션을 선택하면 SIS 가져오기가 변경한 모든 레코드의 모든 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 있습니다."
@@ -1085,7 +1085,7 @@ ko:
       imported_with_messages_message: "SIS 자료를 가져왔으나 다음 메시지가 출력되었습니다:"
       last_batch_title: "마지막 일괄 처리"
       override_sis_stickiness_instructions: |-
-          기본 값으로 UI 변경이 SIS 가져오기 변경에 대해 더 높은 우선 순위를 갖습니다. 필드 수의 경우, 관리자가 UI를 통해 해당 필드를 변경한 경우에 SIS 가져오기는 해당 필드의 자료를 변경하지 않습니다. 이 옵션을 선택하면 SIS 가져오기는 UI 변경을 재정의합니다.  
+          기본 값으로 UI 변경이 SIS 가져오기 변경에 대해 더 높은 우선 순위를 갖습니다. 필드 수의 경우, 관리자가 UI를 통해 해당 필드를 변경한 경우에 SIS 가져오기는 해당 필드의 자료를 변경하지 않습니다. 이 옵션을 선택하면 SIS 가져오기는 UI 변경을 재정의합니다.
           자세한 내용은 설명서를 참고하십시오.
       override_sis_stickiness_label: "UI 변경 재정의"
       page_title: "SIS 가져오기"
@@ -2031,7 +2031,7 @@ ko:
     positive_number: "양수를 사용해야 함"
     redirect_page: 
       redirect_message: |-
-          이 제출물은 URL이며 지금 해당 URL 링크로 갈 수 있습니다.  
+          이 제출물은 URL이며 지금 해당 URL 링크로 갈 수 있습니다.
           [제출물로 가려면 여기를 클릭하십시오](%{url})
     remove_never_drop_rule: ""
     remove_unsaved_never_drop_rule: ""
@@ -2981,8 +2981,8 @@ ko:
             
             **주의**: 여러분의 작업을 확실하게 보존하려면 [EtherPad 삭제 정책](%{etherpad_deletion_policy_url})을 숙지해야 합니다.
         google_docs: |-
-            Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.  
-              
+            Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.
+            
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
       labels: 
         collaboration_type: "협업에 사용:"
@@ -3059,7 +3059,7 @@ ko:
         account_exists: |-
             %{email}와(과) 연결된 계정이 있습니다.
             
-              **%{name}님이십니까?**
+            **%{name}님이십니까?**
         account_needed: "**%{course}**에 참여하도록 초대되었습니다. 이 요청을 수락하려면 Canvas 계정이 필요합니다. Canvas 계정을 만드려면 아래 링크를 클릭하십시오."
         add_email: "현재 계정에 이메일 주소를 추가하시겠습니까?"
         choose_login: "어디에서 로그인하려는 지 선택하십시오."
@@ -6456,9 +6456,9 @@ ko:
     confirms: 
       delete_comment: "이 의견을 삭제하시겠습니까?"
       unsaved_changes: |-
-          다음 학생의 퀴즈 제출물에 저장되지 않은 변경 내용이 있습니다: 
+          다음 학생의 퀴즈 제출물에 저장되지 않은 변경 내용이 있습니다:
           
-           %{users}
+          %{users}
           계속 진행하시겠습니까?
     crocodoc_expiring: ""
     dialog_button: 
@@ -7973,7 +7973,7 @@ ko:
           mfa_enrollment: |-
               다단계 인증은 Canvas에 로그인하기 위해서 암호를 아는 것 이외에 물리적으로 소유하고 있는 어떤 것을 요구함으로써 보안을 강화합니다.
               이는 인증 코드를 생성하는 장치나 문자 메시지를 받는 전화일 수 있습니다. 아래 QR 코드를 스캔하면
-              [iPhone](%{iphone_url})이나 [Android](%{android_url})를 위한 Google 인증 앱을 구성할 수 있습니다. 
+              [iPhone](%{iphone_url})이나 [Android](%{android_url})를 위한 Google 인증 앱을 구성할 수 있습니다.
               다른 토큰은 시크릿 키 **%{secret_key}**을(를) 입력해서 구성할 수 있습니다.
           mfa_required: "다단계 인증을 설정해야 합니다."
           otp_on_device: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
@@ -8468,9 +8468,9 @@ ko:
     assignment_changed: 
       email: 
         body: |-
-            %{course}의 "%{title}" 과제가 변경되었습니다.  
+            %{course}의 "%{title}" 과제가 변경되었습니다.
             
-            여기를 클릭하여 과제 보기: 
+            여기를 클릭하여 과제 보기:
             %{url}
         html: 
           body: "%{course}의 \"%{title}\" 과제가 변경되었습니다."
@@ -8845,7 +8845,7 @@ ko:
       title: "회신 메시지 보내기"
     email: 
       footer: |-
-          Canvas를 이용해서 하나 이상의 수업에 참여하고 있기 때문에 이 메일을 받았습니다. 이메일 알림을 끄거나 바꾸려면 다음 URL을 방문하십시오: 
+          Canvas를 이용해서 하나 이상의 수업에 참여하고 있기 때문에 이 메일을 받았습니다. 이메일 알림을 끄거나 바꾸려면 다음 URL을 방문하십시오:
           %{url}
     enrollment_accepted: 
       email: 
