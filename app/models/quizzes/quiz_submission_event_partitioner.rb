@@ -6,7 +6,7 @@ class Quizzes::QuizSubmissionEventPartitioner
       log '*' * 80
       log '-' * 80
 
-      partman = CanvasPartman::PartitionManager.new(Quizzes::QuizSubmissionEvent)
+      partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
 
       partman.ensure_partitions(Setting.get('quiz_events_partitions_precreate_months', 2).to_i)
 

@@ -61,7 +61,7 @@ module Importers
           end
         else
           item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-          item ||= context.created_learning_outcomes.new
+          item ||= context.created_learning_outcomes.temp_record
           item.context = context
         end
         item.migration_id = hash[:migration_id]

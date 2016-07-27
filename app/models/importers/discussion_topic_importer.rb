@@ -115,6 +115,7 @@ module Importers
       end
 
       if options[:has_group_category]
+        item.group_category ||= context.group_categories.active.where(:name => options[:group_category]).first
         item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
       end
 

@@ -1180,9 +1180,10 @@ class Attachment < ActiveRecord::Base
     true
   end
 
-  def make_childless
-    child = children.take
+  def make_childless(preferred_child = nil)
+    child = preferred_child || children.take
     return unless child
+    raise "must be a child" unless child.root_attachment_id == id
     child.root_attachment_id = nil
     child.filename ||= filename
     if Attachment.s3_storage?
@@ -1190,7 +1191,10 @@ class Attachment < ActiveRecord::Base
         s3object.copy_to(child.s3object)
       end
     else
+      old_content_type = self.content_type
+      Attachment.where(:id => self).update_all(:content_type => "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
       child.uploaded_data = open
+      Attachment.where(:id => self).update_all(:content_type => old_content_type)
     end
     child.save!
     Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child)
@@ -1260,7 +1264,7 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload annotatable: opts[:wants_annotation]
+      doc.upload annotatable: opts[:wants_annotation], preferred_renders: opts[:preferred_renders]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e

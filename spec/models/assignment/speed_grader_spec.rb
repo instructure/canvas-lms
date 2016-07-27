@@ -273,9 +273,13 @@ describe Assignment::SpeedGrader do
       expect(@assignment.representatives(@teacher)).to include g1rep
     end
 
-    it "prefers people who aren't excused" do
+    it "prefers people who aren't excused when submission exists" do
       g1, _ = @groups
       g1rep, *others = g1.users.to_a.shuffle
+      @assignment.submit_homework(g1rep, {
+        submission_type: 'online_text_entry',
+        body: 'hi'
+      })
       others.each { |u|
         @assignment.grade_student(u, excuse: true)
       }
@@ -364,7 +368,7 @@ describe Assignment::SpeedGrader do
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
 
       @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
-      @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
+      @assignment.update_submission(@student, :comment => 'real comment', :score => 1, :commenter => @student)
 
       selection = @assignment.moderated_grading_selections.create!(:student => @student)
 

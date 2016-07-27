@@ -2,7 +2,6 @@ require_relative '../assignment'
 
 class Assignment
   class SpeedGrader
-
     def initialize(assignment, user, avatars: false, grading_role: :grader)
       @assignment = assignment
       @user = user
@@ -131,7 +130,7 @@ class Assignment
 
       res[:submissions] = submissions.map do |sub|
         json = sub.as_json(:include_root => false,
-          :methods => [:submission_history, :late],
+          :methods => [:submission_history, :late, :external_tool_url],
           :only => submission_fields
         ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 

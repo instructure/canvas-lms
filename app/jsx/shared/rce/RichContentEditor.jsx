@@ -45,6 +45,10 @@ define([
     }
   }
 
+  function hideResizeHandleForScreenReaders() {
+    $('.mce-resizehandle').attr('aria-hidden', true)
+  }
+
   const RichContentEditor = {
     /**
      * start the remote module (if the feature flag is on) loading so that it's
@@ -112,6 +116,8 @@ define([
       } else {
         loadLegacyRCE(target, tinyMCEInitOptions, callback)
       }
+
+      hideResizeHandleForScreenReaders()
 
       // listen for editor_box_focus events on our target, and trigger
       // activateRCE from them

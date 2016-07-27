@@ -62,6 +62,7 @@ module AccountReports
       headers << I18n.t('account sis id')
       headers << I18n.t('account name')
       headers << I18n.t('storage used in MB')
+      headers << I18n.t('sum of all files in MB')
       write_report headers do |csv|
 
         @total = courses.count(:all)
@@ -77,6 +78,10 @@ module AccountReports
           row << c.account.sis_source_id
           row << c.account.name
           row << c.storage_quota_used_mb.round(2)
+          scope = c.attachments.active
+          min = Attachment.minimum_size_for_quota
+          all_course_files_size = scope.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
+          row << (all_course_files_size.to_f / 1.megabyte).round(2)
           csv << row
           i += 1
           if i % 5 == 0

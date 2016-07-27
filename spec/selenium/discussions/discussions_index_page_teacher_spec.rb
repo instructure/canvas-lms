@@ -156,7 +156,6 @@ describe "discussions" do
           topic = DiscussionTopic.where(context_id: course.id).order('id DESC').last
           expect(topic).not_to be_pinned
           get(url)
-          keep_trying_until { fj(".al-trigger") }
           fj("[data-id=#{topic.id}] .al-trigger").click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
@@ -208,7 +207,7 @@ describe "discussions" do
           topic.save!
           get "/courses/#{@course.id}/undelete"
           expect(f('#deleted_items_list').text).to include('teacher topic title')
-          f('.restore_link').click
+          hover_and_click('.restore_link')
           driver.switch_to.alert.accept
           wait_for_ajaximations
           get url

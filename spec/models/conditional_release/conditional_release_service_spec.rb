@@ -107,29 +107,32 @@ describe ConditionalRelease::Service do
     before do
       Service.stubs(:enabled_in_context?).returns(true)
       Service.stubs(:jwt_for).returns(:jwt)
+      course_with_student_logged_in(active_all: true)
     end
 
     it 'returns no jwt or env if not enabled' do
       Service.stubs(:enabled_in_context?).returns(false)
-      course_with_student_logged_in(active_all: true)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
       expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
     it 'returns no jwt or env if user not specified' do
-      course_model
       env = Service.env_for(@course)
       expect(env).not_to have_key :CONDITIONAL_RELEASE_ENV
     end
 
     it 'returns an env with jwt if everything enabled' do
-      course_with_student_logged_in(active_all: true)
       env = Service.env_for(@course, @student, domain: 'foo.bar')
       expect(env[:CONDITIONAL_RELEASE_ENV][:jwt]).to eq :jwt
     end
 
+    it 'returns an env with current locale' do
+      I18n.stubs(:locale).returns('en-PI')
+      env = Service.env_for(@course, @student, domain: 'foo.bar')
+      expect(env[:CONDITIONAL_RELEASE_ENV][:locale]).to eq 'en-PI'
+    end
+
     it 'includes assignment data when an assignment is specified' do
-      course_with_student_logged_in(active_all: true)
       assignment_model course: @course
       env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
@@ -138,6 +141,20 @@ describe ConditionalRelease::Service do
       expect(cr_env[:assignment][:points_possible]).to eq @assignment.points_possible
       expect(cr_env[:assignment][:grading_type]).to eq @assignment.grading_type
       expect(cr_env[:assignment][:submission_types]).to eq @assignment.submission_types
+    end
+
+    it 'includes a grading scheme when assignment uses it' do
+      assignment_model course: @course, grading_type: 'letter_grade'
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment)
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env[:assignment][:grading_scheme]).not_to be_nil
+    end
+
+    it 'does not include a grading scheme when the assignment does not use it' do
+      assignment_model course: @course, grading_type: 'points'
+      env = Service.env_for(@course, @student, domain: 'foo.bar', assignment: @assignment)
+      cr_env = env[:CONDITIONAL_RELEASE_ENV]
+      expect(cr_env[:assignment][:grading_scheme]).to be_nil
     end
   end
 

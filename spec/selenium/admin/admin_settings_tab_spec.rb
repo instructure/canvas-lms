@@ -78,7 +78,7 @@ describe "admin settings tab" do
   end
 
   def click_submit
-    submit_form("#account_settings")
+    f("#account_settings button[type=submit]").click
     wait_for_ajax_requests
   end
 
@@ -94,7 +94,7 @@ describe "admin settings tab" do
       f("#account_default_time_zone option[value='Lima']").click
       click_submit
       expect(Account.default.default_time_zone.name).to eq "Lima"
-      expect(f("#account_default_time_zone option[value='Lima']").attribute("selected")).to be_truthy
+      expect(f("#account_default_time_zone option[value='Lima']")).to have_attribute("selected", "true")
     end
 
     describe "allow self-enrollment" do
@@ -135,16 +135,18 @@ describe "admin settings tab" do
       set_value f("#account_settings_trusted_referers"), trusted_referers
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to eq trusted_referers
-      expect(f("#account_settings_trusted_referers").attribute('value')).to eq trusted_referers
+      expect(f("#account_settings_trusted_referers")).to have_value trusted_referers
 
       set_value f("#account_settings_trusted_referers"), ''
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to be_nil
-      expect(f("#account_settings_trusted_referers").attribute('value')).to eq ''
+      expect(f("#account_settings_trusted_referers")).to have_value ''
     end
   end
 
   context "global includes" do
+    before { skip('global css/js happens in theme editor in newUI') if ENV['CANVAS_FORCE_USE_NEW_STYLES'] }
+
     it "should not have a global includes section by default" do
       expect(f("#account_settings")).not_to contain_jqcss('#account_settings_global_includes_settings:visible')
     end
@@ -188,23 +190,31 @@ describe "admin settings tab" do
       filter_hash
     end
 
-    it "should click on the quiz help link" do
-      f(".ip_help_link").click
-      expect(f("#ip_filters_dialog").text).to include_text "What are Quiz IP Filters?"
+    def create_quiz_filter(name="www.canvas.instructure.com", value="192.168.217.1/24")
+      Account.default.tap do |a|
+        a.settings[:ip_filters] ||= []
+        a.settings[:ip_filters] << {name => value}
+        a.save!
+      end
     end
 
-    it "should add a quiz filter " do
+    it "should click on the quiz help link" do
+      f(".ip_help_link").click
+      expect(f("#ip_filters_dialog")).to include_text "What are Quiz IP Filters?"
+    end
+
+    it "should add a quiz filter" do
       add_quiz_filter
     end
 
     it "should add another quiz filter" do
-      add_quiz_filter
+      create_quiz_filter
       f(".add_ip_filter_link").click
       add_quiz_filter "www.canvas.instructure.com/tests", "129.186.127.12/4"
     end
 
-    it "should edit a quiz filter " do
-      add_quiz_filter
+    it "should edit a quiz filter" do
+      create_quiz_filter
       new_name = "www.example.org"
       new_value = "10.192.124.12/8"
       replace_content(fj("#ip_filters .name:visible"), new_name)
@@ -217,13 +227,12 @@ describe "admin settings tab" do
     end
 
     it "should delete a quiz filter" do
-      skip("bug #8348 - cannot remove quiz IP address filter")
       filter_hash = add_quiz_filter
       f("#ip_filters .delete_filter_link").click
       click_submit
       expect(f("#account_settings")).not_to contain_css("#ip_filters .value[value='#{filter_hash.values.first}']")
       expect(f("#account_settings")).not_to contain_css("#ip_filters .name[value='#{filter_hash.keys.first}']")
-      expect(Account.default.settings[:ip_filters]).to be_nil
+      expect(Account.default.settings[:ip_filters]).to be_blank
     end
   end
 
@@ -402,6 +411,29 @@ describe "admin settings tab" do
       ]
     end
 
+    it "should set custom help link text and icon" do
+      Account.default.enable_feature! :use_new_styles
+      Setting.set('show_feedback_link', 'true')
+
+      link_name = 'Links'
+      icon = 'cog'
+      help_link_name_input = '[name="account[settings][help_link_name]"]'
+      help_link_icon_option = '[data-icon-value="cog"]'
+
+      get "/accounts/#{Account.default.id}/settings"
+
+      f(help_link_name_input).send_keys(link_name)
+      f(help_link_icon_option).click
+
+      click_submit
+
+      expect(Account.default.settings[:help_link_name]).to eq link_name
+      expect(Account.default.settings[:help_link_icon]).to eq icon
+
+      expect(f(help_link_name_input)).to have_value link_name
+      expect(is_checked(f("#{help_link_icon_option} input"))).to be_truthy
+    end
+
     it "should not delete all of the pre-existing custom help links if notifications tab is submitted" do
       Account.default.settings[:custom_help_links] = [
           {"text"=>"text", "subtext"=>"subtext", "url"=>"http://www.example.com/example", "available_to"=>["user", "student", "teacher"]}]
@@ -411,7 +443,7 @@ describe "admin settings tab" do
       get "/accounts/#{Account.default.id}/settings"
 
       f("#tab-notifications-link").click
-      submit_form("#account_settings_notifications")
+      f("#account_settings_notifications button[type=submit]").click
       wait_for_ajax_requests
 
       expect(Account.default.settings[:custom_help_links]).to eq [
@@ -459,7 +491,7 @@ describe "admin settings tab" do
       expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
       expect(f("#account_settings")).not_to contain_css("label[for='account_external_integration_keys_external_key2']")
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+      expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
       expect(f("#external_integration_keys span").text).to eq key_value
       expect(f("#account_settings")).not_to contain_css("#account_external_integration_keys_external_key2")
     end
@@ -468,12 +500,12 @@ describe "admin settings tab" do
       set_value f("#account_external_integration_keys_external_key0"), key_value
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq key_value
+      expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
 
       set_value f("#account_external_integration_keys_external_key0"), ''
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0").attribute('value')).to eq ''
+      expect(f("#account_external_integration_keys_external_key0")).to have_value ''
     end
   end
 
@@ -502,8 +534,9 @@ describe "admin settings tab" do
     expect(f("#account_settings_sis_app_token")).to be_displayed
     f("#account_settings_sis_app_token").send_keys(sis_token)
     f(".btn-primary").click
+    token = f("#account_settings_sis_app_token")
     keep_trying_until{
-      expect(f("#account_settings_sis_app_token").attribute("value")).to eq sis_token
+      expect(token.attribute("value")).to eq sis_token
     }
     go_to_feature_options(Account.default.id)
     move_to_click("label[for=ff_off_post_grades]")

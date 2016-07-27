@@ -6,8 +6,8 @@ define([
   'bower/react-tokeninput/dist/react-tokeninput',
   'i18n!assignments',
   'jquery',
-  'compiled/regexp/rEscape'
-], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $, rEscape) => {
+  'jsx/shared/helpers/searchHelpers'
+], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $, SearchHelpers) => {
 
   var ComboboxOption = TokenInput.Option;
 
@@ -112,18 +112,6 @@ define([
     //      Helpers
     // -------------------
 
-    exactMatchRegex(string){
-      return new RegExp('^' + rEscape(string) + '$', 'i')
-    },
-
-    startOfStringRegex(string){
-      return new RegExp('^' + rEscape(string), 'i')
-    },
-
-    substringMatchRegex(string){
-      return new RegExp(rEscape(string), 'i')
-    },
-
     findMatchingOption(userInput){
       if(typeof userInput !== 'string') { return userInput }
       return this.findBestMatch(userInput)
@@ -131,9 +119,9 @@ define([
 
     sortedMatches(userInput){
       var optsByMatch = _.groupBy(this.props.potentialOptions, (dropdownObj) => {
-        if (this.exactMatchRegex(userInput).test(dropdownObj.name)) { return "exact" }
-        if (this.startOfStringRegex(userInput).test(dropdownObj.name)) { return "start" }
-        if (this.substringMatchRegex(userInput).test(dropdownObj.name)) { return "substring" }
+        if (SearchHelpers.exactMatchRegex(userInput).test(dropdownObj.name)) { return "exact" }
+        if (SearchHelpers.startOfStringRegex(userInput).test(dropdownObj.name)) { return "start" }
+        if (SearchHelpers.substringMatchRegex(userInput).test(dropdownObj.name)) { return "substring" }
       });
       return _.union(
         optsByMatch.exact, optsByMatch.start, optsByMatch.substring
@@ -141,9 +129,9 @@ define([
     },
 
     findBestMatch(userInput){
-      return _.find(this.props.potentialOptions, (item) => this.exactMatchRegex(userInput).test(item.name)) ||
-      _.find(this.props.potentialOptions, (item) => this.startOfStringRegex(userInput).test(item.name)) ||
-      _.find(this.props.potentialOptions, (item) => this.substringMatchRegex(userInput).test(item.name))
+      return _.find(this.props.potentialOptions, (item) => SearchHelpers.exactMatchRegex(userInput).test(item.name)) ||
+      _.find(this.props.potentialOptions, (item) => SearchHelpers.startOfStringRegex(userInput).test(item.name)) ||
+      _.find(this.props.potentialOptions, (item) => SearchHelpers.substringMatchRegex(userInput).test(item.name))
     },
 
     filteredTags() {

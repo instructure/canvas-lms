@@ -113,6 +113,19 @@ describe ConversationsController, type: :request do
       ]
     end
 
+    it "should properly respond to include[]=participant_avatars" do
+      conversation(@bob, :workflow_state => 'read')
+
+      json = api_call(:get, "/api/v1/conversations.json",
+              { :controller => 'conversations', :action => 'index',
+                :format => 'json', :include => ["participant_avatars"] })
+      json.each do |conversation|
+        conversation["participants"].each do |user|
+          expect(user).to have_key "avatar_url"
+        end
+      end
+    end
+
     it "should stringify audience ids if requested" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)

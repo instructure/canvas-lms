@@ -61,7 +61,7 @@ class GradebooksController < ApplicationController
     gp_id = nil
     if multiple_grading_periods?
       set_current_grading_period
-      @grading_periods = active_grading_periods
+      @grading_periods = active_grading_periods_json
       gp_id = @current_grading_period_id unless view_all_grading_periods?
     end
 
@@ -279,18 +279,19 @@ class GradebooksController < ApplicationController
   end
 
   def active_grading_periods
-    @active_grading_periods ||= GradingPeriod.json_for(@context, @current_user)
+    @active_grading_periods ||= GradingPeriod.for(@context).sort_by(&:start_date)
+  end
+
+  def active_grading_periods_json
+    @agp_json ||= GradingPeriod.periods_json(active_grading_periods, @current_user)
   end
 
   def latest_end_date_of_admin_created_grading_periods_in_the_past
     periods = active_grading_periods.select do |period|
-      # false if current user is an admin
-      admin_created = period["permissions"]["manage"] == false
-      in_the_past = period["end_date"] <= Time.zone.now
-
-      admin_created && in_the_past
+      admin_created = period.account_group?
+      admin_created && period.end_date.past?
     end
-    periods.map { |period| period["end_date"] }.compact.sort.last
+    periods.map(&:end_date).compact.sort.last
   end
   private :latest_end_date_of_admin_created_grading_periods_in_the_past
 
@@ -349,7 +350,7 @@ class GradebooksController < ApplicationController
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :active_grading_periods => active_grading_periods,
+      :active_grading_periods => active_grading_periods_json,
       :latest_end_date_of_admin_created_grading_periods_in_the_past => latest_end_date_of_admin_created_grading_periods_in_the_past,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
@@ -437,22 +438,35 @@ class GradebooksController < ApplicationController
           submission[:comment_attachments] = attachments
         end
         begin
-          # if it's a percentage graded assignment, we need to ensure there's a
-          # percent sign on the end. eventually this will probably be done in
-          # the javascript.
-          if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
-            submission[:grade] = "#{submission[:grade]}%"
-          end
-
-          submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
-          submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
-          subs = @assignment.grade_student(@user, submission)
-          if submission[:provisional]
-            subs.each do |sub|
-              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+          if [:grade, :score, :excuse, :excused].any? { |k| submission.key? k }
+            # if it's a percentage graded assignment, we need to ensure there's a
+            # percent sign on the end. eventually this will probably be done in
+            # the javascript.
+            if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
+              submission[:grade] = "#{submission[:grade]}%"
             end
+
+            submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
+            submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
+            subs = @assignment.grade_student(@user, submission)
+            if submission[:provisional]
+              subs.each do |sub|
+                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+              end
+            end
+            @submissions += subs
           end
-          @submissions += subs
+          if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
+            submission[:commenter] = @current_user
+            submission[:hidden] = @assignment.muted?
+            subs = @assignment.update_submission(@user, submission)
+            if submission[:provisional]
+              subs.each do |sub|
+                sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
+              end
+            end
+            @submissions += subs
+          end
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           @error_message = e.to_s
@@ -485,9 +499,7 @@ class GradebooksController < ApplicationController
   def submissions_json
     @submissions.map do |s|
       json = s.as_json(Submission.json_serialization_full_parameters)
-      if pg_id = s.provisional_grade_id
-        json['submission']['provisional_grade_id'] = pg_id
-      end
+      json['submission']['provisional_grade_id'] = s.provisional_grade_id if s.provisional_grade_id
       json
     end
   end
@@ -559,6 +571,11 @@ class GradebooksController < ApplicationController
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
         end
+
+        if @assignment.external_tool?
+          env[:lti_retrieve_url] = retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless')
+        end
+
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
                                                             @assignment.quiz.id,

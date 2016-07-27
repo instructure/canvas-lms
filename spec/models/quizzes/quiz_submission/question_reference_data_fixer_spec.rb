@@ -189,11 +189,10 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       # ... but only if it's our question:
       it 'should do nothing for a QuizQuestion reference' do
         run_with_submission_data({
-          "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.id}",
+          "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.assessment_question_id}"
         })
-
         expect(submission_data).to include({
-          "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.id}"
+          "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.assessment_question_id}"
         })
       end
     end # context: OQAAT quizzes
@@ -212,11 +211,10 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
 
       it 'should do nothing for a QuizQuestion reference' do
         run_with_submission_data({
-          "last_question_id" => "#{@qq.id}",
+          "last_question_id" => "#{@qq.assessment_question_id}"
         })
-
         expect(submission_data).to include({
-          "last_question_id" => "#{@qq.id}"
+          "last_question_id" => "#{@qq.assessment_question_id}"
         })
       end
     end # context: OQAAT + CantGoBack quizzes

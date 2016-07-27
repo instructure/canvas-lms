@@ -342,6 +342,7 @@ describe ContentMigrationsController, type: :request do
         expect(json["workflow_state"]).to eq 'pre_processing'
         migration = ContentMigration.find json['id']
         expect(migration.workflow_state).to eq "pre_processing"
+        expect(json["progress_url"]).not_to be_nil
       end
 
       it "should error if upload file required but not provided" do

@@ -345,7 +345,7 @@ describe "security" do
 
       it "should be limited for the same ip" do
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.5")
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
@@ -357,9 +357,9 @@ describe "security" do
 
       it "should have a higher limit for other ips" do
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.6") # different IP, so allowed
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail
@@ -371,7 +371,7 @@ describe "security" do
 
       it "should not block other users with the same ip" do
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
 
         # schools like to NAT hundreds of people to the same IP, so we don't
         # ever block the IP address as a whole
@@ -388,9 +388,9 @@ describe "security" do
         @pseudonym.account = account
         @pseudonym.save!
         bad_login("5.5.5.5")
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.6") # different IP, so allowed
-        expect(response.body).to match(/Incorrect username/)
+        expect(response.body).to match(/Invalid username/)
         bad_login("5.5.5.7") # different IP, but too many total failures
         expect(response.body).to match(/Too many failed login attempts/)
         # should still fail

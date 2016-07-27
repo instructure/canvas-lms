@@ -53,9 +53,15 @@ class ExternalContentController < ApplicationController
         end
       end
     end
+    if params[:id]
+      message_auth = Lti::MessageAuthenticator.new(request.original_url, request.GET.merge(request.POST))
+      render_unauthorized_action and return unless message_auth.valid?
+      render_unauthorized_action and return unless json_data[:content_item_id] == params[:id]
+      render_unauthorized_action and return unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
+    end
     @headers = false
     js_env(retrieved_data: (@retrieved_data || {}), lti_response_messages: lti_response_messages,
-           service: params[:service])
+           service: params[:service], service_id: params[:id])
   end
 
 
@@ -105,7 +111,8 @@ class ExternalContentController < ApplicationController
     content_item_selection.map do |item|
       item.placement_advice ||= default_placement_advice
       if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
-        url_gen_params = {url: item.url}
+        launch_url = item.url || json_data[:default_launch_url]
+        url_gen_params = {url: launch_url}
         url_gen_params[:display] = 'borderless' if item.placement_advice.presentation_document_target == 'iframe'
         item.canvas_url = named_context_url(@context, :retrieve_context_external_tools_path, url_gen_params)
       end
@@ -155,6 +162,10 @@ class ExternalContentController < ApplicationController
         display_height: 600,
         display_width: 800
     )
+  end
+
+  def json_data
+    @json_data ||= ((params[:data] && Canvas::Security.decode_jwt(params[:data])) || {}).with_indifferent_access
   end
 
 end

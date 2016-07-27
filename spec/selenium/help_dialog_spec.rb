@@ -34,7 +34,7 @@ describe "help dialog" do
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      expect(ff('.help_dialog_trigger').length).to eq 2
+      expect(ff('.help_dialog_trigger').length).to eq(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? 1 : 2)
       expect(f("body")).not_to contain_css('#help-dialog')
       f('.help_dialog_trigger').click
       wait_for_ajaximations
@@ -55,13 +55,12 @@ describe "help dialog" do
       get "/dashboard"
       link = f('.support_url')
       expect(link['href']).to eq support_url
-      expect(link['class']).not_to match 'help_dialog_trigger'
+      expect(link).not_to have_class 'help_dialog_trigger'
 
       # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      f("#footer-links a[href='#{support_url}']").click
-      wait_for_ajaximations
+      f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '.ic-app-header__menu-list-link.support_url' : "#footer-links a[href='#{support_url}']").click
       expect(f("#help-dialog")).to be_displayed
     end
 
@@ -90,33 +89,12 @@ describe "help dialog" do
       expect(cm.body).to match(/test message/)
     end
 
-    it "should allow submitting a ticket" do
-      skip('193')
-      Setting.set('show_feedback_link', 'true')
-      get "/dashboard"
-      f('.help_dialog_trigger').click
-      wait_for_ajaximations
-      create_ticket_link = f("#help-dialog a[href='#create_ticket']")
-      expect(create_ticket_link).to be_displayed
-      create_ticket_link.click
-      create_ticket_form = f("#help-dialog #create_ticket")
-      create_ticket_form.find_element(:css, 'input[name="error[subject]"]').send_keys('test subject')
-      create_ticket_form.find_element(:css, 'textarea[name="error[comments]"]').send_keys('test comments')
-      severity = 'blocks_what_i_need_to_do'
-      set_value(create_ticket_form.find_element(:css, '[name="error[user_perceived_severity]"]'), severity)
-      submit_form(create_ticket_form)
-      wait_for_ajaximations
-      expect(create_ticket_form).not_to be_displayed
-      er = ErrorReport.last
-      expect(er.subject).to eq 'test subject'
-      expect(er.comments).to eq 'test comments'
-      expect(er.data['user_perceived_severity']).to eq severity
-      expect(er.guess_email).to eq @user.email
-    end
+    # TODO reimplement per CNVS-29608, but make sure we're testing at the right level
+    it "should allow submitting a ticket"
   end
 
   context "help dialog as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in(:active_all => true)
     end
 

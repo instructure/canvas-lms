@@ -28,9 +28,9 @@ describe 'quiz restrictions as a teacher' do
 
     it 'should show a password field when checking the checkbox', priority: "1", test_id: 474274 do
       get "/courses/#{@course.id}/quizzes/new"
-      expect(f('#quiz_access_code').attribute('tabindex')).to include_text('-1')
+      expect(f('#quiz_access_code')).to have_attribute('tabindex', '-1')
       f('#enable_quiz_access_code').click
-      expect(f('#quiz_access_code').attribute('tabindex')).to include_text('0')
+      expect(f('#quiz_access_code')).to have_attribute('tabindex', '0')
     end
 
     it 'should not allow a blank restrict access code password', priority: "1", test_id: 474275 do
@@ -78,9 +78,9 @@ describe 'quiz restrictions as a teacher' do
 
     it 'should show a password field when checking the checkbox', priority: "1", test_id: 474279 do
       get "/courses/#{@course.id}/quizzes/new"
-      expect(f('#quiz_ip_filter').attribute('tabindex')).to include_text('-1')
+      expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '-1')
       f('#enable_quiz_ip_filter').click
-      expect(f('#quiz_ip_filter').attribute('tabindex')).to include_text('0')
+      expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '0')
     end
 
     it 'should not allow a blank ip address', priority: "1", test_id: 474280 do

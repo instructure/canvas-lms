@@ -71,10 +71,8 @@ module DiscussionsCommon
 
     submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))
     wait_for_ajaximations
-    keep_trying_until do
-      id = DiscussionEntry.last.id
-      @last_entry = f "#entry-#{id}"
-    end
+    id = DiscussionEntry.last.id
+    @last_entry = f "#entry-#{id}"
   end
 
   def get_all_replies
@@ -82,9 +80,7 @@ module DiscussionsCommon
   end
 
   def validate_entry_text(discussion_entry, text)
-    keep_trying_until do
-      f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
-    end
+    expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)
@@ -157,7 +153,7 @@ module DiscussionsCommon
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', message)
     expect_new_page_load { submit_form('.form-actions') }
-    expect(f('#discussion_topic .discussion-title').text).to include_text(title)
+    expect(f('#discussion_topic .discussion-title')).to include_text(title)
   end
 
   def topic_index_element(topic)
@@ -221,14 +217,8 @@ module DiscussionsCommon
   end
 
   def wait_for_subscription_icon_to_load(expected_class)
-    wait = Selenium::WebDriver::Wait.new(timeout: 5)
-    wait.until do
-      f(".subscription-toggler").present?
-    end
+    expect(f(".subscription-toggler")).to be
     driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
-    wait.until do
-      f(".subscription-toggler").attribute("class").include?(expected_class) &&
-      f(".#{expected_class}").present?
-    end
+    expect(f(".subscription-toggler")).to have_class(expected_class)
   end
 end

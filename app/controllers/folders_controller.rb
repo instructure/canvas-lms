@@ -380,7 +380,9 @@ class FoldersController < ApplicationController
           folder_params[:hidden] = true
         end
         if parent_folder_id = folder_params.delete(:parent_folder_id)
-          folder_params[:parent_folder] = @context.folders.active.find(parent_folder_id)
+          parent_folder = @context.folders.active.find(parent_folder_id)
+          return unless authorized_action(parent_folder, @current_user, :manage_contents)
+          folder_params[:parent_folder] = parent_folder
         end
         if @folder.update_attributes(folder_params)
           if !@folder.parent_folder_id || !@context.folders.where(id: @folder).first
@@ -472,6 +474,7 @@ class FoldersController < ApplicationController
         return
       end
     end
+    return if parent_folder && !authorized_action(parent_folder, @current_user, :manage_contents)
     folder_params[:parent_folder] = parent_folder
 
     @folder = @context.folders.build(folder_params)
@@ -647,6 +650,7 @@ class FoldersController < ApplicationController
       return render :json => {:message => "source_folder_id must be provided"}, :status => :bad_request
     end
     @dest_folder = Folder.find(params[:dest_folder_id])
+    return unless authorized_action(@dest_folder, @current_user, :manage_contents)
     @context = @dest_folder.context
     @source_folder = Folder.find(params[:source_folder_id])
     unless @source_folder.shard == @dest_folder.shard

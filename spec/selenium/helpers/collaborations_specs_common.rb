@@ -58,7 +58,7 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
 
-    keep_trying_until { expect(ffj('.available-users:visible li').length).to eq 1 }
+    expect(ffj('.available-users:visible li')).to have_size(1)
   end
 
   def select_collaborators(type)
@@ -71,7 +71,7 @@ module CollaborationsSpecsCommon
     wait_for_ajaximations
 
     fj('.available-users:visible a').click
-    keep_trying_until { expect(ffj('.members-list li').length).to eq 1 }
+    expect(ff('.members-list li')).to have_size(1)
   end
 
   def select_from_all_course_groups(type, title)
@@ -90,7 +90,7 @@ module CollaborationsSpecsCommon
     groups.first.click
     wait_for_ajaximations
 
-    keep_trying_until { expect(ffj('.members-list li').length).to eq 1 }
+    expect(ff('.members-list li')).to have_size(1)
     expect_new_page_load do
       submit_form('.edit_collaboration')
     end

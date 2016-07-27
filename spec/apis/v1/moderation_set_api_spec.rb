@@ -57,6 +57,24 @@ describe 'Moderated Grades API', type: :request do
   end
 
   describe 'POST create' do
+    context 'when no student_ids are passed in' do
+      before(:each) do
+        @parsed_json = api_call :post,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
+          {controller: 'moderation_set', action: 'create',
+            format: 'json', course_id: @course.id, assignment_id: @assignment.id}, {}, {},
+          { expected_status: 400 }
+      end
+
+      it 'responds with a bad request' do
+        expect(response).to be_bad_request
+      end
+
+      it 'responds with an empty list' do
+        expect(@parsed_json.size).to eq(0)
+      end
+    end
+
     it "creates student selections" do
       json = api_call :post,
         "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students",
@@ -77,8 +95,10 @@ describe 'Moderated Grades API', type: :request do
         student_ids: [@student1.id, @student2.id]
 
       expect(response).to be_success
-      expect(json.size).to eq 1
-      expect(json.first["id"]).to eq @student2.id
+      expect(json.size).to eq 2
+      json_student_ids = json.map { |user| user['id'] }
+
+      expect(json_student_ids).to match_array([@student1.id, @student2.id])
     end
 
     it "creates a single selection for students in multiple sections" do

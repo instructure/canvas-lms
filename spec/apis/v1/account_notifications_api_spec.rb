@@ -44,6 +44,24 @@ describe 'Account Notification API', type: :request do
     end
   end
 
+  describe 'show' do
+    before do
+      @an = account_notification(message: 'default')
+      @path = "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications/#{@an.id}"
+      @api_params = {controller: 'account_notifications',
+                     action: 'show',
+                     format: 'json',
+                     user_id: @admin.id,
+                     id: @an.id,
+                     account_id: @admin.account.id.to_s}
+    end
+
+    it "should show a notification" do
+      json = api_call(:get, @path, @api_params,)
+      expect(json["id"]).to eq @an.id
+    end
+  end
+
   describe 'user_close_notification' do
     before do
       @a = account_notification(message: 'default')

@@ -36,7 +36,7 @@ module GradingSchemesCommon
     replace_content(f('.scheme_name'), edit_name)
     save_and_reload_changes(grading_standard)
     expect(grading_standard.title).to eq edit_name
-    expect(fj(".title span:eq(1)").text).to include_text(edit_name) # fj to avoid selenium caching
+    expect(fj(".title span:eq(1)")).to include_text(edit_name)
   end
 
   def should_delete_a_grading_scheme(context, url)
@@ -95,18 +95,5 @@ module GradingSchemesCommon
     expect(@grading_standard.data.count).to eq data_count - 1
     expect(@grading_standard.data[0][0]).to eq 'B'
     # TODO: check that changing upped limit of next row item changes to lower limit of line above
-  end
-
-  def should_contain_a_tab_for_grading_schemes_and_periods(url)
-    @course.root_account.allow_feature!(:multiple_grading_periods)
-    @course.account.enable_feature!(:multiple_grading_periods)
-    get url
-    expect(f(".grading_periods_tab")).to be_displayed
-    f(".grading_periods_tab").click
-    expect(f(".new-grading-period")).to be_displayed
-
-    expect(f(".grading_standards_tab")).to be_displayed
-    f(".grading_standards_tab").click
-    expect(f(".add_standard_button")).to be_displayed
   end
 end

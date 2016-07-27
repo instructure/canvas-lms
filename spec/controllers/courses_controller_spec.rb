@@ -1010,6 +1010,26 @@ describe CoursesController do
       expect(response.status).to eq 401
     end
 
+    context "page views enabled" do
+      before do
+        Setting.set('enable_page_views', 'db')
+        @old_thread_context = Thread.current[:context]
+        Thread.current[:context] = { request_id: SecureRandom.uuid }
+      end
+
+      after do
+        Thread.current[:context] = @old_thread_context
+      end
+
+      it "should log an AUA with membership_type" do
+        user_session(@student)
+        get 'show', :id => @course.id
+        expect(response).to be_success
+        aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
+        expect(aua.asset_category).to eq 'home'
+        expect(aua.membership_type).to eq 'StudentEnrollment'
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do

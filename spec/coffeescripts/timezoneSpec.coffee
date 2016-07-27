@@ -309,6 +309,9 @@ define [
     fancyMidnight = tz.changeToTheSecondBeforeMidnight(epoch)
     equal fancyMidnight.toGMTString(), "Thu, 01 Jan 1970 23:59:59 GMT"
 
+  test "mergeTimeAndDate() finds the given time of day on the given date.", ->
+    equal +tz.mergeTimeAndDate(moonwalk, epoch), +(new Date(Date.UTC(1970, 0, 1, 2, 56)))
+
   module 'english tz',
     setup: ->
       @snapshot = tz.snapshot()

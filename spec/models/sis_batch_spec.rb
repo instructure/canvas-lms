@@ -365,11 +365,12 @@ s2,test_1,section2,active},
       expect(@enrollment1).to be_active
 
       # only supply enrollments; course and section are left alone
-      process_csv_data(
-          [%{section_id,user_id,role,status
-          section_1,user_1,teacher,active}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{section_id,user_id,role,status
+           section_1,user_1,teacher,active}],
+        :batch_mode => true, :batch_mode_term => @term)
 
+      expect(b.data[:counts][:batch_enrollments_deleted]).to eq 1
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_active
       expect(@course.reload).to be_claimed
@@ -378,20 +379,22 @@ s2,test_1,section2,active},
       expect(@enrollment2).to be_active
 
       # only supply sections; course left alone
-      process_csv_data(
-          [%{section_id,course_id,name}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{section_id,course_id,name}],
+        :batch_mode => true, :batch_mode_term => @term)
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
       @section.enrollments.not_fake.each do |e|
         expect(e).to be_deleted
       end
       expect(@course.reload).to be_claimed
+      expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
       # only supply courses
-      process_csv_data(
-          [%{course_id,short_name,long_name,term_id}],
-          :batch_mode => true, :batch_mode_term => @term)
+      b = process_csv_data(
+        [%{course_id,short_name,long_name,term_id}],
+        :batch_mode => true, :batch_mode_term => @term)
+      expect(b.data[:counts][:batch_courses_deleted]).to eq 1
       expect(@course.reload).to be_deleted
     end
 

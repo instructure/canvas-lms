@@ -16,11 +16,12 @@
     <% end %>
 
     <% if @presenter.auth? %>
-      <%= link_to(image_tag("delete.png", :alt => '') + t(:delete_auth_link, "Remove All Authentication"),
-                  account_remove_all_authentication_providers_url(@account),
-                  confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
-                  method: :delete,
-                  class: "delete_auth_link btn button-sidebar-wide")%>
+      <%= link_to(account_remove_all_authentication_providers_url(@account),
+          confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
+          method: :delete,
+          class: "delete_auth_link btn icon-trash button-sidebar-wide") do %>
+          <%= t(:delete_auth_link, "Remove All Authentication") %>
+      <% end %>
     <% end %>
 
     <div id="add-authentication-provider"

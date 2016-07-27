@@ -17,7 +17,6 @@ require [
   'instructure'
   'ajax_errors'
   'page_views'
-  'compiled/license_help'
   'compiled/behaviors/authenticity_token'
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/admin-links'

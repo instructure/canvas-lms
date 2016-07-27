@@ -18,6 +18,7 @@ module Lti
   class MembershipServiceController < ApplicationController
     before_filter :require_context
     before_filter :require_user
+    before_filter :check_authorized_action
 
     def course_index
       render_page_presenter
@@ -28,6 +29,10 @@ module Lti
     end
 
     private
+
+    def check_authorized_action
+      authorized_action(@context, @current_user, :read)
+    end
 
     def render_page_presenter
       @page = MembershipService::PagePresenter.new(@context,

@@ -332,8 +332,10 @@ class DiscussionTopicsController < ApplicationController
                   named_context_url(@context, :context_discussion_topics_url))
 
         locked_topics, open_topics = @topics.partition do |topic|
-          topic.locked? || topic.locked_for?(@current_user)
+          locked = topic.locked? || topic.locked_for?(@current_user)
+          locked.is_a?(Hash) ? locked[:can_view] : locked
         end
+
         hash = {USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
                 openTopics: open_topics,
                 lockedTopics: locked_topics,
@@ -469,21 +471,29 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    if authorized_action(@topic, @current_user, :read)
-      return unless enforce_assignment_visible(@topic)
+    unless @topic.grants_right?(@current_user, session, :read)
+      respond_to do |format|
+        flash[:error] = t 'You do not have access to the requested discussion.'
+        format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+      end
+    else
       @headers = !params[:headless]
-      @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
+      # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
+      @locked = @topic.locked_for?(@current_user, :check_policies => false, :deep_check_if_needed => true)
       @unlock_at = @topic.available_from_for(@current_user)
-      @topic.change_read_state('read', @current_user) if @topic.visible_for?(@current_user)
+      @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
 
         group_scope = @topic.group_category.groups.active
         if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
           @groups = group_scope.where(:id => @topic.assignment.assignment_overrides.active.where(:set_type => "Group").pluck(:set_id)).to_a
+          if @groups.empty?
+            @groups = group_scope.to_a # revert to default if we're not using Group overrides
+          end
         else
           @groups = group_scope.to_a
         end
-        @groups.select!{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
+        @groups.select!{ |g| g.grants_any_right?(@current_user, session, :post_to_forum, :read_as_admin) }
         @groups.sort_by!(&:id)
 
         topics = @topic.child_topics.to_a
@@ -499,10 +509,7 @@ class DiscussionTopicsController < ApplicationController
 
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
-        if @topic.deleted?
-          flash[:notice] = t :deleted_topic_notice, "That topic has been deleted"
-          format.html { redirect_to named_context_url(@context, :discussion_topics_url) }
-        elsif topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
+        if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, :root_discussion_topic_id => @topic.id) }
         else
           format.html do
@@ -1018,8 +1025,10 @@ class DiscussionTopicsController < ApplicationController
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
   def process_pin_parameters(discussion_topic_hash)
-    return unless params.has_key?(:pinned) && params[:pinned] != @topic.pinned?
-    @topic.pinned = params[:pinned]
+    return unless params.key?(:pinned)
+    pinned = value_to_boolean(params[:pinned])
+    return unless pinned != @topic.pinned?
+    @topic.pinned = pinned
     @topic.position = nil
     @topic.add_to_list_bottom
   end

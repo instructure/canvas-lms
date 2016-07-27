@@ -18,6 +18,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'delayed/testing'
 
 describe BrandConfigHelpers do
   def setup_account_family_with_configs
@@ -78,49 +79,18 @@ describe BrandConfigHelpers do
     it "should work when parent is a not root account" do
       expect(@grand_child_account.first_parent_brand_config).to eq @child_config
     end
-  end
 
-  def get_equivalent_md5(config, new_parent_config_md5)
-    config.instance_eval do
-      Digest::MD5.hexdigest([
-        variables.to_s,
-        css_overrides,
-        js_overrides,
-        new_parent_config_md5
-      ].join)
-    end
-  end
+    it "should work with site_admin" do
+      Account.site_admin.enable_feature!(:use_new_styles)
+      site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
+      site_admin_config.save!
+      regenerator = BrandConfigRegenerator.new(Account.site_admin, user, site_admin_config)
 
-  describe "get_descendant_configs_by_account_id" do
-    before :once do
-      setup_account_family_with_configs
-    end
-    it "return hash with both children and grand children with new md5s" do
-      @new_parent_config = BrandConfig.for(
-        variables: {"ic-brand-primary" => "purple"},
-        js_overrides: nil,
-        css_overrides: nil,
-        mobile_js_overrides: nil,
-        mobile_css_overrides: nil,
-        parent_md5: nil
-      )
-      @new_parent_config.save!
-      new_parent_config_md5 = @new_parent_config.md5
-      @parent_account.brand_config_md5 = new_parent_config_md5
-      @parent_account.save!
+      brandable_css_stub = BrandableCSS.stubs(:compile_brand!)
+      Delayed::Testing.drain
 
-      new_configs = @parent_account.get_descendant_configs_by_account_id(new_parent_config_md5, is_base_theme: true, base_md5: new_parent_config_md5)
-
-      # expect(new_configs.keys.include?(@parent_account.id)).to be_truthy
-      expect(new_configs.keys.include?(@child_account.id)).to be_truthy
-      expect(new_configs.keys.include?(@grand_child_account.id)).to be_truthy
-
-      equivalent_child_md5 = get_equivalent_md5(@child_config, new_parent_config_md5)
-      equivalent_grand_child_md5 = get_equivalent_md5(@grand_child_config, equivalent_child_md5)
-
-      # expect(new_configs[@parent_account.id].md5).to eq(new_parent_config_md5)
-      expect(new_configs[@child_account.id].md5).to eq(equivalent_child_md5)
-      expect(new_configs[@grand_child_account.id].md5).to eq(equivalent_grand_child_md5)
+      expect(@parent_account.first_parent_brand_config).to eq site_admin_config
+      expect(Account.site_admin.first_parent_brand_config).to be_nil
     end
   end
 end

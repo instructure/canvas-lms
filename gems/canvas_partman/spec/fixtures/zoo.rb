@@ -5,11 +5,15 @@ class CanvasPartmanTest::Zoo < ActiveRecord::Base
     class_name: 'CanvasPartmanTest::Animal',
     dependent: :destroy
 
+  has_many :trails,
+           class_name: 'CanvasPartmanTest::Trail',
+           dependent: :destroy
+
   def self.create_schema
     self.drop_schema
 
     SchemaHelper.create_table :partman_zoos do |t|
-      t.timestamps
+      t.timestamps null: false
     end
   end
 

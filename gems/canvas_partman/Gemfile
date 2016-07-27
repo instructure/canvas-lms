@@ -7,7 +7,7 @@ platforms :ruby_19 do
   gem 'debugger'
 end
 
-platforms :ruby_21, :ruby_22 do
+platforms :ruby_21, :ruby_22, :ruby_23 do
   gem 'byebug', require: false
 end
 

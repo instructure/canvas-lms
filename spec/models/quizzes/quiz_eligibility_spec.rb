@@ -119,8 +119,11 @@ describe Quizzes::QuizEligibility do
         create_course_section(start_at, end_at, true)
       end
 
-      let!(:now)                { Timecop.freeze(Time.zone.now) }
-      after { Timecop.return }
+      let!(:now) { Time.zone.now }
+
+      around do |example|
+        Timecop.freeze(now, &example)
+      end
 
       let(:three_days_ago)      { now - 3.days }
       let(:six_days_ago)        { now - 6.days }

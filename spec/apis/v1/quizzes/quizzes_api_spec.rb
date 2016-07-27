@@ -42,106 +42,167 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes (index)" do
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}"} }
+
     before(:once) { teacher_in_course(:active_all => true) }
 
-    it "should return list of quizzes" do
-      quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
-
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
-                      :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}")
-
-      quiz_ids = json.collect { |quiz| quiz['id'] }
-      expect(quiz_ids).to eq quizzes.map(&:id)
+    before do
+      quizzes
     end
 
-    it "should search for quizzes by title" do
-      2.times{ |i| @course.quizzes.create! :title => "first_#{i}" }
-      ids = @course.quizzes.map(&:id)
-      2.times{ |i| @course.quizzes.create! :title => "second_#{i}" }
+    context 'as a teacher' do
+      subject do
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/quizzes",
+                 controller: "quizzes/quizzes_api",
+                 action: "index",
+                 format: "json",
+                 course_id: "#{@course.id}")
+      end
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes?search_term=fir",
-                      :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
-                      :search_term => 'fir')
+      it "should return list of quizzes" do
+        quiz_ids = subject.collect { |quiz| quiz['id'] }
+        expect(quiz_ids).to eq quizzes.map(&:id)
+      end
 
-      expect(json.map{|h| h['id'] }.sort).to eq ids.sort
-    end
+      it 'should not be able to take quiz' do
+        actual_values = subject.map { |quiz| quiz['locked_for_user'] }
+        expected_values = Array.new(actual_values.count, true)
+        expect(actual_values).to eq(expected_values)
+      end
 
-    it "should deterministically order quizzes for pagination" do
-      quiz_number = 10
-      quiz_number.times{ @course.quizzes.create! :title => "the same title" }
-      found_quiz_ids = []
+      describe 'search_term query param' do
+        let(:search_term) { 'waldo' }
+        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "#{search_term}_#{i}" } }
+        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+        let(:quizzes) { quizzes_with_search_term + quizzes_without_search_term }
 
-      quiz_number.times do |i|
-        page_num = i + 1
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes?page=#{page_num}&per_page=1",
-          :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
-          :per_page => 1, :page => page_num)
+        it "should search for quizzes by title" do
+          response = api_call(:get,
+                              "/api/v1/courses/#{@course.id}/quizzes?search_term=#{search_term}",
+                              controller: "quizzes/quizzes_api",
+                              action: "index",
+                              format: "json",
+                              course_id: "#{@course.id}",
+                              search_term: search_term)
 
-        id = json[0]["id"]
-        id_already_found = found_quiz_ids.include?(id)
-        expect(id_already_found).to be_falsey
-        found_quiz_ids << id
+          response_quiz_ids = response.map { |quiz| quiz['id'] }
+
+          expect(response_quiz_ids.sort).to eq(quizzes_with_search_term.map(&:id).sort)
+        end
+      end
+
+      context 'quizzes with the same title' do
+        let(:quiz_count) { 10 }
+        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
+
+        it "should deterministically order quizzes for pagination" do
+          found_quiz_ids = []
+          quiz_count.times do |i|
+            page_num = i + 1
+            response = api_call(:get,
+                                "/api/v1/courses/#{@course.id}/quizzes?page=#{page_num}&per_page=1",
+                                controller: "quizzes/quizzes_api",
+                                action: "index",
+                                format: "json",
+                                course_id: "#{@course.id}",
+                                per_page: 1,
+                                page: page_num)
+
+            id = response.first["id"]
+            id_already_found = found_quiz_ids.include?(id)
+            expect(id_already_found).to be_falsey
+            found_quiz_ids << id
+          end
+        end
+      end
+
+      context "jsonapi style" do
+        it "renders a jsonapi style response" do
+          response = api_call(:get,
+                              "/api/v1/courses/#{@course.id}/quizzes",
+                              {
+                                controller: "quizzes/quizzes_api",
+                                action: "index",
+                                format: "json",
+                                course_id: "#{@course.id}"
+                              },
+                              {},
+                              'Accept' => 'application/vnd.api+json')
+          meta = response['meta']
+          expect(meta['permissions']['quizzes']['create']).to eq(true)
+
+          quizzes_json = response['quizzes']
+          quiz_ids = quizzes_json.collect { |quiz| quiz['id'] }
+          expect(quiz_ids).to eq quizzes.map(&:id).map(&:to_s)
+        end
       end
     end
 
-    it "should return unauthorized if the quiz tab is disabled" do
-      @course.tab_configuration = [ { :id => Course::TAB_QUIZZES, :hidden => true } ]
-      @course.save!
-      student_in_course(:active_all => true, :course => @course)
-      raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
-                   :controller => "quizzes/quizzes_api",
-                   :action => "index",
-                   :format => "json",
-                   :course_id => "#{@course.id}")
-      assert_status(404)
-    end
-    it "limits student requests to published quizzes" do
-      student_in_course(:active_all => true)
-      quizzes = (0..1).map { |i| @course.quizzes.create! :title => "quiz_#{i}"}
-      published_quiz = quizzes.first
-      published_quiz.publish!
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
-                      :controller => 'quizzes/quizzes_api',
-                      :action => 'index',
-                      :format => 'json',
-                      :course_id => "#{@course.id}")
-      quiz_ids = json.collect { |quiz| quiz['id'] }
-      expect(quiz_ids).to eq [ published_quiz.id]
-    end
+    context 'as a student' do
+      before(:once) { student_in_course(:active_all => true) }
 
-    context "jsonapi style" do
+      context 'quiz tab is disabled' do
+        before do
+          @course.tab_configuration = [{ :id => Course::TAB_QUIZZES, :hidden => true }]
+          @course.save!
+        end
 
-      it "renders a jsonapi style response" do
-        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
-
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
-                        {:controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
-                        {},
-                        'Accept' => 'application/vnd.api+json')
-        meta = json['meta']
-        meta = json['meta']
-        expect(meta['permissions']['quizzes']['create']).to eq true
-
-        json = json['quizzes']
-        quiz_ids = json.collect { |quiz| quiz['id'] }
-        expect(quiz_ids).to eq quizzes.map(&:id).map(&:to_s)
-
+        it "should return unauthorized" do
+          raw_api_call(:get,
+                       "/api/v1/courses/#{@course.id}/quizzes",
+                       controller: "quizzes/quizzes_api",
+                       action: "index",
+                       format: "json",
+                       course_id: "#{@course.id}")
+          assert_status(404)
+        end
       end
 
-      it "limits student requests to available quizzes" do
-        student_in_course(:active_all => true)
-        quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
-        available_quiz = quizzes.first
-        available_quiz.workflow_state = 'available'
-        available_quiz.save!
+      context 'a published quiz' do
+        let(:published_quiz) { quizzes.first }
 
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
-                        {:controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}"},
-                        {},
-                        'Accept' => 'application/vnd.api+json')
-        json = json['quizzes']
-        quiz_ids = json.collect { |quiz| quiz['id'] }
-        expect(quiz_ids).to eq [ available_quiz.id.to_s ]
+        before do
+          published_quiz.publish!
+        end
+
+        subject do
+          api_call(:get,
+                   "/api/v1/courses/#{@course.id}/quizzes",
+                   controller: 'quizzes/quizzes_api',
+                   action: 'index',
+                   format: 'json',
+                   course_id: "#{@course.id}")
+        end
+
+        it "only returns published quizzes" do
+          quiz_ids = subject.map { |quiz| quiz['id'] }
+          expect(quiz_ids).to eq([published_quiz.id])
+        end
+
+        it 'should be able to take quiz' do
+          actual_values = subject.map { |quiz| quiz['locked_for_user'] }
+          expected_values = [false]
+          expect(actual_values).to eq(expected_values)
+        end
+
+        context "jsonapi style" do
+          it "only returns published quizzes" do
+            response = api_call(:get,
+                                "/api/v1/courses/#{@course.id}/quizzes",
+                                {
+                                  controller: "quizzes/quizzes_api",
+                                  action: "index",
+                                  format: "json",
+                                  course_id: "#{@course.id}"
+                                },
+                                {},
+                                'Accept' => 'application/vnd.api+json')
+            quizzes_json = response['quizzes']
+            quiz_ids = quizzes_json.collect { |quiz| quiz['id'] }
+            expect(quiz_ids).to eq([published_quiz.id.to_s])
+          end
+        end
       end
     end
   end

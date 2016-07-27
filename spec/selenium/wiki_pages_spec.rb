@@ -7,7 +7,7 @@ describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
-  
+
   context "Navigation" do
     def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
@@ -94,7 +94,7 @@ describe "Wiki Pages" do
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
       switch_editor_views(wiki_page_body)
-      expect(f('textarea').text).to include_text('test')
+      expect(f('textarea')).to include_text('test')
     end
   end
 
@@ -109,12 +109,11 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages"
       f('.al-trigger').click
       f('.edit-menu-item').click
-      expect(f('.edit-control-text').attribute(:value)).to include_text('B-Team')
+      expect(f('.edit-control-text').attribute(:value)).to include('B-Team')
       f('.edit-control-text').clear()
       f('.edit-control-text').send_keys('A-Team')
       fj('button:contains("Save")').click
-      wait_for_ajaximations
-      expect(f('.collectionViewItems').text).to include('A-Team')
+      expect(f('.collectionViewItems')).to include_text('A-Team')
     end
 
     it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
@@ -500,6 +499,7 @@ describe "Wiki Pages" do
       Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
 
       @course.is_public = true
+      @course.workflow_state = 'available'
       @course.save!
 
       title = "foo"

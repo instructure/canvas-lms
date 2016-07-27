@@ -100,7 +100,6 @@ describe "assignments" do
 
     it "should verify due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments"
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
       due_date_assignment.update_attributes(:due_at => 2.days.from_now)
@@ -112,7 +111,6 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'locked assignment',
                                                :due_at => 5.days.ago,
                                                :lock_at => 3.days.ago)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
@@ -124,7 +122,6 @@ describe "assignments" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
                                                :unlock_at => 3.days.from_now)
-      driver.current_url
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css(".student-assignment-overview")
@@ -194,14 +191,12 @@ describe "assignments" do
         submission_input = f('.submission_attachment input')
         ext_error = f('.bad_ext_msg')
 
-        keep_trying_until do
-          submission_input.send_keys(fullpath_txt)
-          expect(ext_error).not_to be_displayed
-          expect(submit_file_button['disabled']).to be_nil
-          submission_input.send_keys(fullpath_zip)
-          expect(ext_error).to be_displayed
-          expect(submit_file_button).to have_attribute(:disabled, "true")
-        end
+        submission_input.send_keys(fullpath_txt)
+        expect(ext_error).not_to be_displayed
+        expect(submit_file_button['disabled']).to be_nil
+        submission_input.send_keys(fullpath_zip)
+        expect(ext_error).to be_displayed
+        expect(submit_file_button).to be_disabled
       end
     end
 

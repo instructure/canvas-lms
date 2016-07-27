@@ -36,10 +36,6 @@ class Tableless < ActiveRecord::Base
     validate ? valid? : true
   end
 
-  def self.tableless?
-    true
-  end
-
   def self.sharded_primary_key?
     false
   end

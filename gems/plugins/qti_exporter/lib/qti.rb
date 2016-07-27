@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'qti/qti_plugin_validator'
+require 'shellwords'
 
 module Qti
   PYTHON_MIGRATION_EXECUTABLE = 'migrate.py'
@@ -97,7 +98,7 @@ module Qti
 
   def self.get_conversion_command(out_dir, manifest_file, file_path_prepend = nil)
     prepend = file_path_prepend ? "--pathprepend=\"#{file_path_prepend}\" " : ""
-    "\"#{@migration_executable}\" #{prepend}--ucvars --nogui --overwrite --cpout=#{out_dir.gsub(/ /, "\\ ")} #{manifest_file.gsub(/ /, "\\ ")} 2>&1"
+    "\"#{@migration_executable}\" #{prepend}--ucvars --nogui --overwrite --cpout=#{Shellwords.escape(out_dir)} #{Shellwords.escape(manifest_file)} 2>&1"
   end
 
 end

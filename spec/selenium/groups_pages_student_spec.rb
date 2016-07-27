@@ -75,7 +75,7 @@ describe "groups" do
         wait_for_ajaximations
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        expect(f('.discussion-summary').text).to include_text('Rey is Yodas daughter')
+        expect(f('.discussion-summary')).to include_text('Rey is Yodas daughter')
       end
 
       it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do
@@ -186,7 +186,7 @@ describe "groups" do
         type_in_tiny('textarea[name=message]','The slopes are ready,')
         f('.btn-primary').click
         wait_for_ajaximations
-        expect(f('.user_content').text).to include_text('The slopes are ready,')
+        expect(f('.user_content')).to include_text('The slopes are ready,')
       end
 
       it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
@@ -318,13 +318,11 @@ describe "groups" do
         replace_content(find('#collaboration_description'), "c1 description")
         fj('.available-users li:contains("1, Test Student") .icon-user').click
         fj('.btn:contains("Start Collaborating")').click
-        keep_trying_until do
-          # verifies collaboration will be displayed on main window
-          tab1 = driver.window_handles.first
-          driver.switch_to.window(tab1)
-          expect(fj('.collaboration .title:contains("c1")')).to be_present
-          expect(fj('.collaboration .description:contains("c1 description")')).to be_present
-        end
+        # verifies collaboration will be displayed on main window
+        tab1 = driver.window_handles.first
+        driver.switch_to.window(tab1)
+        expect(fj('.collaboration .title:contains("c1")')).to be_present
+        expect(fj('.collaboration .description:contains("c1 description")')).to be_present
       end
 
       it 'can invite people within your group', priority: "1", test_id: 273642 do

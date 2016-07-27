@@ -144,6 +144,38 @@ describe Api::V1::User do
 
     end
 
+    it 'should show SIS data to teachers in groups in their courses' do
+      student = User.create!(:name => 'User')
+      student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+
+      teacher = user
+      course1 = course(:active_all => true)
+      course1.enroll_user(teacher, "TeacherEnrollment").accept!
+      course2 = course(:active_all => true)
+      course2.enroll_user(teacher, "StudentEnrollment").accept!
+      group1 = course1.groups.create!(:name => 'Group 1')
+      group2 = course2.groups.create!(:name => 'Group 2')
+
+      expect(@test_api.user_json(student, teacher, {}, [], group1)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User',
+        'sis_user_id' => 'xyz',
+        'integration_id' => nil,
+        'login_id' => 'xyz',
+        'sis_login_id' => 'xyz'
+      })
+
+      expect(@test_api.user_json(student, teacher, {}, [], group2)).to eq({
+        'name' => 'User',
+        'sortable_name' => 'User',
+        'id' => student.id,
+        'short_name' => 'User'
+      })
+
+    end
+
     it 'should use the SIS pseudonym instead of another pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!

@@ -57,8 +57,8 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       start = ff(".discussionTopicIndexList .discussion-topic").length
-      driver.execute_script('window.scrollTo(0, 100000)')
-      keep_trying_until { ffj(".discussionTopicIndexList .discussion-topic").length > start }
+      scroll_page_to_bottom
+      expect(ff(".discussionTopicIndexList .discussion-topic")).not_to have_size(start)
 
       expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
     end
@@ -111,6 +111,7 @@ describe "announcements" do
         @student.enrollments.first.update_attribute(:workflow_state, 'active')
         @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')
         get "/"
+        f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
         expect(ff('.title .count')[0].text).to eq '1'
         @student.enrollments.first.update_attribute(:workflow_state, 'deleted')
         get "/"

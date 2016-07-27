@@ -27,7 +27,8 @@ module Lti
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
-                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment
+                  :tool_setting_link_id, :tool_setting_binding_id, :tool_setting_proxy_id, :tool, :attachment,
+                  :collaboration
 
     def self.register_expansion(name, permission_groups, proc, guard = -> { true })
       @expansions ||= {}
@@ -47,6 +48,7 @@ module Lti
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
+    COLLABORATION_GUARD = -> { @collaboration }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
@@ -97,6 +99,14 @@ module Lti
     register_expansion 'Canvas.api.domain', [],
                        -> { HostUrl.context_host(@root_account, @request.host) }
 
+    # returns the api url for the members of the collaboration
+    # @example
+    #  ```
+    #  https://canvas.instructure.com/api/v1/collaborations/1/members
+    #  ```
+    register_expansion 'Canvas.api.collaborationMembers.url', [],
+                       -> { @controller.api_v1_collaboration_members_url(@collaboration) },
+                       COLLABORATION_GUARD
     # returns the base URL for the current context.
     # @example
     #   ```
@@ -105,7 +115,12 @@ module Lti
     register_expansion 'Canvas.api.baseUrl', [],
                        -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" }
 
-    register_expansion 'Canvas.api.membershipServiceUrl', [],
+    # returns the URL for the membership service associated with the current context
+    # @example
+    #   ```
+    #   https://canvas.instructure.com/api/lti/courses/1/membership_service
+    #   ```
+    register_expansion 'ToolProxyBinding.memberships.url', [],
                        -> { @controller.polymorphic_url([@context, :membership_service]) },
                        -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
@@ -316,6 +331,17 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? 'true' : 'false' },
                        USER_GUARD
 
+    # returns the context ids for the groups the user belongs to in the course.
+    # @example
+    #   ```
+    #   1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
+    #   ```
+    register_expansion 'Canvas.group.contextIds', [],
+                       -> { @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
+                              Lti::Asset.opaque_identifier_for(g)
+                            end.join(',') },
+                       -> { @current_user && @context.is_a?(Course) }
+
     register_expansion 'Membership.role', [],
                        -> { lti_helper.all_roles('lis2') },
                        USER_GUARD
@@ -430,6 +456,10 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> {@assignment && @assignment.due_at.present?}
 
+    register_expansion 'Canvas.assignment.published', [],
+                       -> { @assignment.workflow_state == 'published' },
+                       ASSIGNMENT_GUARD
+
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },
                        -> { @tool_setting_link_id }
@@ -444,7 +474,7 @@ module Lti
 
     register_expansion 'ToolConsumerProfile.url', [],
                        -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
-                       -> { @tool }
+                       -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
     register_expansion 'Canvas.file.media.id', [],
                        -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },

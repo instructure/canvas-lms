@@ -53,7 +53,7 @@
     &.ic-app-header__menu-list-item--active {
       .ic-app-header__menu-list-link { background: $ic-color-light; }
       .menu-item__text { color: $ic-brand-global-nav-menu-item__text-color--active; }
-      .ic-icon-svg path { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
+      .ic-icon-svg { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
       .ic-avatar {
         border-color: $ic-border-light;
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
@@ -103,23 +103,31 @@
       width: 26px;
       display: inline-block;
       vertical-align: middle;
-      path { fill: $ic-brand-global-nav-ic-icon-svg-fill; }
+      fill: $ic-brand-global-nav-ic-icon-svg-fill;
     }
 
-    // Need to provide heights for IE10 and 11
+    // Need to provide heights for IE11
     .ic-icon-svg--dashboard { height: 30px; }
     .ic-icon-svg--calendar,
     .ic-icon-svg--inbox,
     .ic-icon-svg--apps { height: 28px; }
     .ic-icon-svg--courses { height: 26px; }
     .ic-icon-svg--grades { height: 30px; }
-    .ic-icon-svg--commons { height: 21px; }
     .ic-icon-svg--arrow-right { width: 24px; height: 24px; }
     .ic-icon-svg--groups { width: 32px; height: 21.6px; }
     .ic-icon-svg--accounts { width: 26px; height: 29px; }
     .ic-icon-svg--login { width: 26px; height: 29px; }
     .ic-icon-svg--lti { width: 26px; height: 29px; }
     .ic-icon-svg--help { height: 26px; }
+
+    // IE11 height rules for custom help icons
+    .svg-icon-lifepreserver,
+    .svg-icon-help,
+    .svg-icon-information,
+    .svg-icon-folder,
+    .svg-icon-cog {
+      height: 26px;
+    }
   }
 
   .ic-app-header__primary {

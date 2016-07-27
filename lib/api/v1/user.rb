@@ -228,7 +228,6 @@ module Api::V1::User
         json[:grades] = grades_hash(enrollment, user, opts[:grading_period])
       end
       if user_can_read_sis_data?(@current_user, enrollment.course)
-        json[:sis_source_id] = enrollment.sis_source_id
         json[:sis_course_id] = enrollment.course.sis_source_id
         json[:course_integration_id] = enrollment.course.integration_id
         json[:sis_section_id] = enrollment.course_section.sis_source_id
@@ -301,8 +300,18 @@ module Api::V1::User
       context.groups.map(&:id)
   end
 
+  def sis_id_context(context)
+    case context
+    when Account, Course
+      context
+    when Group
+      context.context
+    else
+      @domain_root_account
+    end
+  end
+
   def user_can_read_sis_data?(user, context)
-    sis_id_context = (context.is_a?(Course) || context.is_a?(Account)) ? context : @domain_root_account
-    sis_id_context.grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
+    sis_id_context(context).grants_right?(user, :read_sis) || @domain_root_account.grants_right?(user, :manage_sis)
   end
 end

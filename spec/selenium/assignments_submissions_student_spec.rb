@@ -76,7 +76,7 @@ describe "submissions" do
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
-      expect(f('#media_comment_submit_button')).to have_attribute('disabled', 'true')
+      expect(f('#media_comment_submit_button')).to be_disabled
       # leave so the "are you sure?!" message doesn't freeze up selenium
       f('#section-tabs .home').click
       driver.switch_to.alert.accept
@@ -93,10 +93,8 @@ describe "submissions" do
       f('#submission_comment').send_keys("hello comment")
       expect_new_page_load { f('#submit_file_button').click }
 
-      keep_trying_until do
-        expect(f('#sidebar_content .header')).to include_text "Turned In!"
-        expect(f('.details .file-big')).to include_text "testfile1"
-      end
+      expect(f('#sidebar_content .header')).to include_text "Turned In!"
+      expect(f('.details .file-big')).to include_text "testfile1"
       @submission = @assignment.reload.submissions.where(user_id: @student).first
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
@@ -291,21 +289,7 @@ describe "submissions" do
     end
 
 
-    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029 do
-      skip "BUG 6783 - Coming Up assignments update error"
-      @assignment.update_attributes(:submission_types => 'online_url')
-      @submission = @assignment.submit_homework(@student)
-      @submission.submission_type = "online_url"
-      @submission.save!
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      expect(f('.details .header')).to include_text('Turned In!')
-      get "/courses/#{@course.id}"
-      driver.execute_script("$('.tooltip_text').css('visibility', 'visible')")
-      tooltip_text_elements = ff('.tooltip_text > span')
-      expect(f('.tooltip_text')).to be_displayed
-      expect(tooltip_text_elements[1].text).to eq 'submitted'
-    end
+    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029
 
     context 'with Canvadocs enabled' do
       before(:once) do
@@ -369,28 +353,15 @@ describe "submissions" do
         wait_for_ajaximations
 
         # traverse the tree
-        begin
-          keep_trying_until do
-            f('#uploaded_files > ul > li.folder > .sign').click
-            wait_for_ajaximations
-            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-          end
-          f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_ajaximations
-        rescue => err
-          # prevent the confirm dialog that pops up when you navigate away
-          # from the page from showing.
-          # TODO: actually figure out why the spec intermittently fails.
-          driver.execute_script "window.onbeforeunload = null;"
-          raise err
-        end
+        f('#uploaded_files > ul > li.folder > .sign').click
+        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
+        f('#uploaded_files > ul > li.folder .file .name').click
+        wait_for_ajaximations
 
         expect_new_page_load { f('#submit_file_button').click }
 
-        keep_trying_until do
-          expect(f('.details .header')).to include_text "Turned In!"
-          expect(f('.details .file-big')).to include_text "html-editing-test.html"
-        end
+        expect(f('.details .header')).to include_text "Turned In!"
+        expect(f('.details .file-big')).to include_text "html-editing-test.html"
       end
 
       it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
@@ -417,23 +388,11 @@ describe "submissions" do
         wait_for_ajaximations
 
         # traverse the tree
-        begin
-          keep_trying_until do
-            f('#uploaded_files > ul > li.folder > .sign').click
-            wait_for_ajaximations
-            # How does it know which name we're looking for?
-            expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-          end
-          f('#uploaded_files > ul > li.folder .file .name').click
-          wait_for_ajaximations
-          f('#submit_file_button').click
-        rescue => err
-          # prevent the confirm dialog that pops up when you navigate away
-          # from the page from showing.
-          # TODO: actually figure out why the spec intermittently fails.
-          driver.execute_script "window.onbeforeunload = null;"
-          raise err
-        end
+        f('#uploaded_files > ul > li.folder > .sign').click
+        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
+        f('#uploaded_files > ul > li.folder .file .name').click
+        wait_for_ajaximations
+        f('#submit_file_button').click
 
         # Make sure the flash message is being displayed
         expect_flash_message :error

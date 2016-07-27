@@ -1,4 +1,4 @@
-<div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
+<%= content_tag :div, class: "collaboration #{collaboration.style_class} collaboration_#{collaboration.id}", data: data_attributes do %>
   <div class="collaboration-header clearfix">
     <h2>
       <a class="title" href="<%= context_url(@context, :context_collaboration_url, collaboration.id) %>" target="_blank"><%= collaboration.title %></a>
@@ -7,4 +7,4 @@
   </div>
   <div class="description"><%= collaboration.description %></div>
   <%= render 'collaborations/collaboration_footer', collaboration: collaboration %>
-</div>
+<% end %>

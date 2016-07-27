@@ -301,11 +301,12 @@
   border: 1px solid #aaa;
 }
 
+#assignments-not-weighted,
+#whatif-score-description,
+#student-grades-show-all,
 #only_consider_graded_assignments_wrapper {
-  label {
-    font-size: 0.8em;
-    display: block;
-  }
+  display: block;
+  margin: $ic-sp/2 0;
 }
 
 .score_details_table {

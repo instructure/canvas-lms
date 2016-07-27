@@ -17,12 +17,22 @@ describe "site admin jobs ui" do
     driver.switch_to.alert.accept
     wait_for_ajax_requests
     keep_trying_until do
-      @all_jobs.each { |j| j.reload rescue nil }
-      expect(@all_jobs.count { |j| j.locked_by == 'on hold' }).to eq count
+      expect(jobs_on_hold.count).to eq count
     end
 
     status_cells = ff('.r2')
     status_cells.each { |status_cell| expect(status_cell.find_element(:css, 'span')).to have_class('on-hold') }
+  end
+
+  def jobs_on_hold
+    @all_jobs.select do |job|
+      begin
+        job.reload
+        job.locked_by == 'on hold'
+      rescue ActiveRecord::RecordNotFound
+        false
+      end
+    end
   end
 
   def validate_all_jobs_selected
@@ -32,15 +42,12 @@ describe "site admin jobs ui" do
   end
 
   def first_jobs_cell_displayed?
-    !expect(ff('#jobs-grid .slick-cell')).not_to be_empty
+    expect(f('#jobs-grid .slick-cell')).to be
   end
 
   def load_jobs_page
     get "/jobs"
-    wait_for_ajaximations
-    keep_trying_until do
-      first_jobs_cell_displayed?
-    end
+    first_jobs_cell_displayed?
   end
 
   def filter_jobs(job_flavor_text)
@@ -74,14 +81,13 @@ describe "site admin jobs ui" do
   context "search" do
 
     it "should only action the individual job when it has been searched for" do
-      j = Delayed::Job.list_jobs(:current, 1).first
-      get "/jobs?flavor=id&q=#{j.id}"
-      wait_for_ajax_requests
-      keep_trying_until { ffj('#jobs-grid .slick-cell').count > 0 }
+      job = Delayed::Job.list_jobs(:current, 1).first
+      get "/jobs?flavor=id&q=#{job.id}"
+      expect(f('#jobs-grid .slick-cell')).to be
       f("#hold-jobs").click
       wait_for_ajax_requests
-      expect(j.reload.locked_by).to eq 'on hold'
-      expect(@all_jobs.count { |j| (j.reload rescue nil).try(:locked_by) == 'on hold' }).to eq 1
+      expect(job.reload.locked_by).to eq 'on hold'
+      expect(jobs_on_hold.count).to eq 1
     end
 
     it "should load handler via ajax" do
@@ -91,18 +97,18 @@ describe "site admin jobs ui" do
       ff("#jobs-grid .slick-row .l0.r0").find do |element|
         element.click if element.text == job.id.to_s
       end
-      expect(fj('#job-id').text).to eq job.id.to_s
-      fj('#job-handler-show').click()
+      expect(f('#job-id').text).to eq job.id.to_s
+      f('#job-handler-show').click
       wait_for_ajax_requests
       expect(get_value('#job-handler')).to eq job.handler
-      fj('a.ui-dialog-titlebar-close').click()
+      f('a.ui-dialog-titlebar-close').click
 
       # also for failed job
       filter_jobs(FlavorTags::FAILED)
       wait_for_ajax_requests
-      fj('#jobs-grid .slick-row .l0.r0').click()
-      expect(fj('#job-id').text).to eq @failed_job.id.to_s
-      fj('#job-handler-show').click()
+      f('#jobs-grid .slick-row .l0.r0').click
+      expect(f('#job-id').text).to eq @failed_job.id.to_s
+      f('#job-handler-show').click
       wait_for_ajax_requests
       expect(get_value('#job-handler')).to eq @failed_job.handler
     end
@@ -120,13 +126,15 @@ describe "site admin jobs ui" do
         expect(f("#jobs-grid .even")).to be_displayed
         expect(f("#jobs-total").text).to eq(future_jobs.count.to_s)
 
+        delete = f("#delete-jobs")
         keep_trying_until do
-          fj("#delete-jobs").click
+          delete.click
           expect(driver.switch_to.alert).not_to be_nil
           driver.switch_to.alert.accept
-          wait_for_ajaximations
-          expect(future_jobs.count).to eq(0)
         end
+
+        wait_for_ajaximations
+        expect(future_jobs.count).to eq(0)
 
         expect(f("#content")).not_to contain_css("#jobs-grid .odd")
         expect(f("#content")).not_to contain_css("#jobs-grid .even")
@@ -134,24 +142,19 @@ describe "site admin jobs ui" do
 
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
-        keep_trying_until do
-          expect(f("#tags-grid .slick-row:nth-child(1) .r0").text).to eq "String#reverse"
-          expect(f("#tags-grid .slick-row:nth-child(1) .r1").text).to eq "2"
-        end
+        expect(f("#tags-grid .slick-row:nth-child(1) .r0")).to include_text "String#reverse"
+        expect(f("#tags-grid .slick-row:nth-child(1) .r1")).to include_text "2"
       end
 
       it "should check all popular tags", priority: "2" do
         filter_tags(FlavorTags::ALL)
-        keep_trying_until do
-          tags = ff("#tags-grid .slick-row .r0").map(&:text)
-          expect(tags).to include("String#reverse")
-          expect(tags).to include("String#capitalize")
-          ff("#tags-grid .slick-row").each do |row|
-            if row.find_element(:css, ".r0").text == "String#reverse"
-              expect(row.find_element(:css, ".r1").text).to eq("2")
-            elsif row.find_element(:css, ".r0").text == "String#capitalize"
-              expect(row.find_element(:css, ".r1").text).to eq("1")
-            end
+        expect(f("#tags-grid")).to include_text("String#reverse")
+        expect(f("#tags-grid")).to include_text("String#capitalize")
+        ff("#tags-grid .slick-row").each do |row|
+          if row.find_element(:css, ".r0").text == "String#reverse"
+            expect(row.find_element(:css, ".r1").text).to eq("2")
+          elsif row.find_element(:css, ".r0").text == "String#capitalize"
+            expect(row.find_element(:css, ".r1").text).to eq("1")
           end
         end
       end
@@ -160,7 +163,7 @@ describe "site admin jobs ui" do
         f("#hold-jobs").click
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
-        expect(@all_jobs.count { |j| (j.reload rescue nil).try(:locked_by) == 'on hold' }).to eq 0
+        expect(jobs_on_hold.count).to eq 0
       end
 
       it "should confirm that all current rows were selected and put on hold", priority: "2" do
@@ -174,12 +177,9 @@ describe "site admin jobs ui" do
         f("#un-hold-jobs").click
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
-        wait_for_ajax_requests
-        keep_trying_until do
-          expect(f("#jobs-grid .even .r2").text).to eq "0/ 15"
-          expect(f("#jobs-grid .odd .r2").text).to eq "0/ 15"
-          expect(@all_jobs.count { |j| (j.reload rescue nil).try(:locked_by) == 'on hold' }).to eq 0
-        end
+        expect(f("#jobs-grid .even .r2")).to include_text "0/ 15"
+        expect(f("#jobs-grid .odd .r2")).to include_text "0/ 15"
+        expect(jobs_on_hold.count).to eq 0
       end
 
       it "should confirm that future jobs were selected" do
@@ -195,7 +195,7 @@ describe "site admin jobs ui" do
         f("#jobs-refresh").click
         wait_for_ajax_requests
         expect(ff("#jobs-grid .slick-row").count).to eq 1
-        expect(f("#jobs-grid .r1").text).to include_text "String#downcase"
+        expect(f("#jobs-grid .r1")).to include_text "String#downcase"
       end
 
       it "should confirm that clicking on delete button should delete all future jobs" do
@@ -208,12 +208,13 @@ describe "site admin jobs ui" do
         expect(future_jobs.count).to eq 3
         num_of_jobs = Delayed::Job.all.count
 
-         keep_trying_until do
-            f("#delete-jobs").click
-            expect(driver.switch_to.alert).not_to be_nil
-            driver.switch_to.alert.accept
-           true
-         end
+        delete = f("#delete-jobs")
+        keep_trying_until do
+          delete.click
+          expect(driver.switch_to.alert).not_to be_nil
+          driver.switch_to.alert.accept
+          true
+        end
         wait_for_ajaximations
         expect(Delayed::Job.count).to eq num_of_jobs - 3
 
@@ -227,11 +228,9 @@ describe "site admin jobs ui" do
     it "should display running jobs in the workers grid" do
       Delayed::Job.get_and_lock_next_available('my test worker')
       load_jobs_page
-      expect(ffj('#running-grid .slick-row').size).to eq 1
-      keep_trying_until do
-        first_cell = fj('#running-grid .slick-cell.l0.r0')
-        expect(first_cell.text).to eq 'my test worker'
-      end
+      expect(ff('#running-grid .slick-row').size).to eq 1
+      first_cell = f('#running-grid .slick-cell.l0.r0')
+      expect(first_cell).to include_text 'my test worker'
     end
 
     it "should sort by runtime by default" do
@@ -240,14 +239,11 @@ describe "site admin jobs ui" do
       j2.update_attribute(:locked_at, 48.hours.ago)
 
       load_jobs_page
-      expect(ffj('#running-grid .slick-row').size).to eq 2
-      keep_trying_until do
-        first_cell = fj('#running-grid .slick-cell.l0.r0')
-        expect(first_cell.text).to eq 'my test worker 2'
-        last_cell = fj('#running-grid .slick-cell.l6.r6 .super-slow')
-        expect(last_cell).not_to be_nil
-        true
-      end
+      expect(ff('#running-grid .slick-row').size).to eq 2
+      first_cell = f('#running-grid .slick-cell.l0.r0')
+      expect(first_cell).to include_text 'my test worker 2'
+      last_cell = f('#running-grid .slick-cell.l6.r6 .super-slow')
+      expect(last_cell).not_to be_nil
     end
 
     it "should sort dynamically" do
@@ -255,21 +251,17 @@ describe "site admin jobs ui" do
       Delayed::Job.get_and_lock_next_available('my test worker 2')
 
       load_jobs_page
-      expect(ffj('#running-grid .slick-row').size).to eq 2
+      expect(ff('#running-grid .slick-row').size).to eq 2
       # sort ASC
-      worker_header = fj("#running-grid .slick-header div[id*='worker'] .slick-column-name")
+      worker_header = f("#running-grid .slick-header div[id*='worker'] .slick-column-name")
       worker_header.click
-      keep_trying_until do
-        first_cell = fj('#running-grid .slick-cell.l0.r0')
-        expect(first_cell.text).to eq 'my test worker 1'
-      end
+      first_cell = f('#running-grid .slick-cell.l0.r0')
+      expect(first_cell).to include_text 'my test worker 1'
 
       # sort DESC
       worker_header.click
-      keep_trying_until do
-        first_cell = fj('#running-grid .slick-cell.l0.r0')
-        expect(first_cell.text).to eq 'my test worker 2'
-      end
+      first_cell = f('#running-grid .slick-cell.l0.r0')
+      expect(first_cell).to include_text 'my test worker 2'
     end
   end
 end

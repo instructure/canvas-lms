@@ -103,6 +103,7 @@
       <xs:element name="submission_types" type="xs:string" minOccurs="0"/>
       <xs:element name="position" type="xs:integer" minOccurs="0"/>
       <xs:element name="turnitin_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="turnitin_settings" type="xs:string" minOccurs="0"/>
       <xs:element name="peer_review_count" type="xs:integer" minOccurs="0"/>
       <xs:element name="peer_reviews_assigned" type="xs:boolean" minOccurs="0"/>
       <xs:element name="peer_reviews" type="xs:boolean" minOccurs="0"/>
@@ -149,6 +150,7 @@
         <xs:element name="attachment_identifierref" type="xs:string" minOccurs="0"/>
         <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>
         <xs:element name="has_group_category" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="group_category" type="xs:string" minOccurs="0"/>
         <xs:element name="allow_rating" type="xs:boolean" minOccurs="0"/>
         <xs:element name="only_graders_can_rate" type="xs:boolean" minOccurs="0"/>
         <xs:element name="sort_by_rating" type="xs:boolean" minOccurs="0"/>

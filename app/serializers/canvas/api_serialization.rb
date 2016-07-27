@@ -2,7 +2,7 @@ module Canvas
   module APISerialization
     def stringify!(hash)
       return hash unless stringify_ids?
-      Api.stringify_json_ids(hash)
+      StringifyIds.stringify_ids(hash)
       if (links = hash['links']).present?
         links.each do |key, value|
           next if value.nil?

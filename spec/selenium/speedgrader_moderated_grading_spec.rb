@@ -20,10 +20,8 @@ describe "speed grader" do
 
   shared_examples_for "moderated grading" do
     def add_rubric_assessment(score, comment)
-      keep_trying_until do
-        f('.toggle_full_rubric').click
-        expect(f('#rubric_full')).to be_displayed
-      end
+      f('.toggle_full_rubric').click
+      expect(f('#rubric_full')).to be_displayed
       f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
 
       f('textarea.criterion_comments').send_keys(comment)
@@ -136,7 +134,7 @@ describe "speed grader" do
 
       anchor_tag = CGI.escape("{\"student_id\":#{@student.id},\"provisional_grade_id\":#{pg2.id}}")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}##{anchor_tag}"
-      keep_trying_until { f('#speedgrader_iframe') }
+      f('#speedgrader_iframe')
 
       tab = f('#moderation_tabs li.ui-state-active')
       expect(tab).to be_displayed
@@ -455,7 +453,7 @@ describe "speed grader" do
         student_submission
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        keep_trying_until { f('#speedgrader_iframe') }
+        f('#speedgrader_iframe')
 
         # doesn't show any tabs because there are no marks
         expect(f('#moderation_tabs')).to_not be_displayed
@@ -514,7 +512,7 @@ describe "speed grader" do
         student_submission
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        keep_trying_until { f('#speedgrader_iframe') }
+        f('#speedgrader_iframe')
 
         icons = ff('#moderation_tabs .selected_icon')
         expect(icons[0]).to be_displayed
@@ -543,7 +541,7 @@ describe "speed grader" do
         other_student = course_with_student(:course => @course, :active_all => true).user
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        keep_trying_until { f('#speedgrader_iframe') }
+        f('#speedgrader_iframe')
 
         f('#gradebook_header a.next').click
         wait_for_ajaximations
@@ -705,7 +703,7 @@ describe "speed grader" do
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      keep_trying_until { f('#speedgrader_iframe') }
+      f('#speedgrader_iframe')
       # not locked yet
       expect(f('#grading-box-extended')).to be_displayed
       expect(f('#not_gradeable_message')).to_not be_displayed

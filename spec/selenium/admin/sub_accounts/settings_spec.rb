@@ -14,10 +14,10 @@ describe "sub account basic settings" do
 
     get account_settings_url
 
-    expect(f('#account_settings_restrict_student_past_view_value').attribute('disabled')).to be_nil
+    expect(f('#account_settings_restrict_student_past_view_value')).not_to be_disabled
     expect(f('#account_settings_restrict_student_past_view_locked')).not_to be_nil
 
-    expect(f('#account_settings_restrict_student_future_view_value').attribute('disabled')).not_to be_nil
+    expect(f('#account_settings_restrict_student_future_view_value')).to be_disabled
     expect(f("#account_settings")).not_to contain_css('#account_settings_restrict_student_future_view_locked') # don't even show the locked checkbox
 
     expect(is_checked('#account_settings_restrict_student_future_view_value')).to be_truthy

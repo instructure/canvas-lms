@@ -168,6 +168,7 @@ Rails.application.config.after_initialize do
       all.each do |db|
         next if regions.include?(db.config[:region]) || !db.config[:region]
         next if db.shards.empty?
+        regions << db.config[:region]
         db.shards.first.activate do
           klass.send_later_enqueue_args(method, enqueue_args, *args)
         end

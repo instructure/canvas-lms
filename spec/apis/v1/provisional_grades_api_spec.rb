@@ -164,6 +164,10 @@ describe 'Provisional Grades API', type: :request do
         @assignment.update_attribute :moderated_grading, true
       end
 
+      it "responds with a 200 for a valid request" do
+        api_call_as_user(@teacher, :post, @path, @params, {}, {}, expected_status: 200)
+      end
+
       it "requires moderate_grades permissions" do
         api_call_as_user(@ta, :post, @path, @params, {}, {}, { :expected_status => 401 })
       end
@@ -221,6 +225,21 @@ describe 'Provisional Grades API', type: :request do
           expect(@submission.reload.workflow_state).to eq 'graded'
           expect(@submission.grader).to eq @other_ta
           expect(@submission.score).to eq 90
+        end
+      end
+
+      context "with partial provisional grades" do
+        it "publishes the first provisional grade if none have been explicitly selected" do
+          course_with_user("TaEnrollment", course: @course, active_all: true)
+          second_ta = @user
+          @submission = @assignment.submit_homework(@student, body: "hello")
+          @assignment.moderated_grading_selections.create!(student: @student)
+          @assignment.grade_student(@student, grader: @ta, score: 72, provisional: true)
+          @assignment.grade_student(@student, grader: second_ta, score: 88, provisional: true)
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@submission.reload.score).to eq 72
         end
       end
     end

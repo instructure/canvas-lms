@@ -113,11 +113,32 @@ describe NotificationMessageCreator do
       expect(channels).not_to include(a)
     end
 
+    it 'uses the default channel and the push channel if only the push channel has a policy' do
+      assignment_model
+      @user = user_model(:workflow_state => 'registered')
+      a = @user.communication_channels.create(:path => "a@example.com", :path_type => 'email')
+      a.confirm!
+      b = @user.communication_channels.create(:path => "b@example.com", :path_type => 'push')
+      b.confirm!
+      @n = Notification.create!(:name => "New notification", :category => 'TestImmediately')
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
+      channels = messages.collect(&:communication_channel)
+      expect(channels).to include(a)
+      expect(channels).not_to include(b)
+
+      b.notification_policies.create!(:notification => @n, :frequency => 'immediately')
+      messages = NotificationMessageCreator.new(@n, @assignment, :to_list => @user).create_message
+      channels = messages.collect(&:communication_channel)
+      expect(channels).to include(b)
+      expect(channels).to include(a)
+    end
+
     it "should not send dispatch messages for pre-registered users" do
+      course
       notification_model
       u1 = user_model(:name => "user 2")
       u1.communication_channels.create(:path => "user2@example.com").confirm!
-      @a = Assignment.create
+      @a = @course.assignments.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).to be_empty
     end
@@ -140,10 +161,11 @@ describe NotificationMessageCreator do
     end
 
     it "should send dashboard and dispatch messages for registered users based on default policies" do
+      course
       notification_model(:category => 'TestImmediately')
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
-      @a = Assignment.create
+      @a = @course.assignments.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).not_to be_empty
       expect(messages.length).to eql(2)
@@ -215,11 +237,12 @@ describe NotificationMessageCreator do
     end
 
     it "should send dashboard (but not dispatch messages) for registered users based on default policies" do
+      course
       notification_model(:category => 'TestNever', :name => "Show In Feed")
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
-      @a = Assignment.create
+      @a = @course.assignments.create()
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).not_to be_empty
       expect(messages.length).to eql(1)
@@ -227,11 +250,12 @@ describe NotificationMessageCreator do
     end
 
     it "should not send dashboard messages for non-feed or non-dashboard messages" do
+      course
       notification_model(:category => 'TestNever', :name => "Don't Show In Feed")
       expect(@notification.default_frequency).to eql("never")
       u1 = user_model(:name => "user 1", :workflow_state => "registered")
       u1.communication_channels.create(:path => "user1@example.com").confirm!
-      @a = Assignment.create
+      @a = @course.assignments.create
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => u1).create_message
       expect(messages).to be_empty
       @notification.name = "Show In Feed"
@@ -440,7 +464,36 @@ describe NotificationMessageCreator do
       NotificationMessageCreator.new(@notification, @user, :to_list => @user).create_message
       expect(@cc.notification_policies.reload).not_to be_empty
       expect(@cc.delayed_messages.reload).not_to be_empty
+    end
 
+    it "should properly find the root account for cross-shard summary messages" do
+      Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
+      notification_model(:name => 'Assignment Created')
+
+      @user = User.create!
+      @cc = @user.communication_channels.create!(path: "user@example.com")
+      @cc.confirm!
+
+      notification_policy_model(:notification => @notification, :communication_channel => @cc)
+      @notification_policy.frequency = 'daily'
+      @notification_policy.save!
+
+      @shard1.activate do
+        @cs_account = Account.new
+        @cs_account.settings[:outgoing_email_default_name] = "OutgoingName"
+        @cs_account.save!
+        course(:active_all => true, :account => @cs_account)
+        @course.enroll_student(@user).accept!
+        assignment_model(:course => @course)
+      end
+
+      dm = @cc.delayed_messages.reload.first
+      expect(dm).to_not be_nil
+
+      DelayedMessage.summarize([dm])
+      message = @user.messages.reload.last
+      expect(message.root_account).to eq @cs_account
+      expect(message.from_name).to eq "OutgoingName"
     end
 
     it "should find an already existing notification policy" do

@@ -117,7 +117,7 @@ describe "courses" do
       def go_to_checklist
         get "/courses/#{@course.id}"
         f(".wizard_popup_link").click()
-        keep_trying_until { expect(f(".ic-wizard-box")).to be_displayed }
+        expect(f(".ic-wizard-box")).to be_displayed
         wait_for_ajaximations(500)
       end
 
@@ -240,7 +240,6 @@ describe "courses" do
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
       replace_content(quota_input, "10")
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
 
@@ -250,7 +249,6 @@ describe "courses" do
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
       submit_form(form)
-      keep_trying_until { f(".loading_image_holder").nil? rescue true }
       form = f("#course_form")
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
@@ -282,7 +280,7 @@ describe "courses" do
       expect(options.length).to eq 2
       wait_for_ajaximations
       expect_new_page_load{ click_option('#course_url', course2.name) }
-      expect(f('#section-tabs-header').text).to match course2.name
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#breadcrumbs .home + li a' : '#section-tabs-header')).to include_text(course2.name)
     end
 
     it "should load the users page using ajax" do
@@ -374,14 +372,14 @@ describe "courses" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should include launch type parameter (draft state on)" do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
-        expect(f('.course-home-sub-navigation-lti').attribute("href")).to match(/launch_type=course_home_sub_navigation/)
+        expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
       it "should only display active tools" do

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 Instructure, Inc.
+# Copyright (C) 2015-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,90 +19,187 @@
 require_relative '../spec_helper'
 
 describe GradingPeriod, "permissions:" do
+  let(:period_helper) { Factories::GradingPeriodHelper.new }
+  let(:permissions) { [:read, :create, :update, :delete] }
+
   context "course belonging to root account" do
     before(:once) do
       @root_account = Account.default
+      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @root_account, active_all: true)
       course_with_student(course: @course, active_all: true)
-      @root_account_period = grading_periods(context: @root_account, count: 1).first
-      @sub_account_period = grading_periods(context: @sub_account, count: 1).first
-      @course_period = grading_periods(context: @course, count: 1).first
+      @root_account_period = period_helper.create_with_group_for_account(@root_account)
+      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
+      @course_period = period_helper.create_with_group_for_course(@course)
     end
 
     context "root-account admin" do
       before(:once) do
         account_admin_user(account: @root_account)
+        @root_account_admin = @admin
       end
 
-      it "should be able to read and manage root-account level grading periods" do
-        expect(@root_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, create, update, and delete root-account level " \
+       "grading periods" do
+        expect(@root_account_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
-      it "should be able to read and manage sub-account level grading periods" do
-        expect(@sub_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, create, update, and delete sub-account level " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
-      it "should be able to read and manage course level grading periods" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, update and delete but NOT create course level " \
+        "grading periods" do
+        expect(@course_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: true,
+          delete: true
+        })
       end
     end
 
     context "sub-account admin" do
       before(:once) do
         account_admin_user(account: @sub_account)
+        @sub_account_admin = @admin
       end
 
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: false })
+      it "can read but NOT create, update, nor delete root-account " \
+        "grading periods" do
+        expect(@root_account_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should be able to read and manage sub-account level grading periods" do
-        expect(@sub_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, create, update, and delete sub-account level " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
 
-      it "should NOT be able to read or manage course level grading periods, when the course is under the root-account" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({ read: false, manage: false })
+      it "can NOT read, create, update, nor delete course level " \
+        "grading periods, when the course is under the root-account" do
+        expect(@course_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   false,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
     end
 
     context "teacher" do
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@teacher, :read, :manage)).to eq({ read: true, manage: false })
+      it "can read but NOT create, update, nor delete root-account " \
+        "grading periods" do
+        expect(@root_account_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to read or manage sub-account level grading period" do
-        expect(@sub_account_period.rights_status(@teacher, :read, :manage)).to eq({ read: false, manage: false })
+      it "can NOT read, create, update, nor delete sub-account level " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   false,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should be able to read and manage course level grading periods" do
-        expect(@course_period.rights_status(@teacher, :read, :manage)).to eq({ read: true, manage: true})
+      it "can read, update, and delete but NOT create course level " \
+       "grading periods" do
+        expect(@course_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: true,
+          delete: true
+        })
       end
     end
 
     context "student" do
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@student, :read, :manage)).to eq({ read: true, manage: false })
+      it "can read but NOT create, update, nor delete root-account " \
+        "grading periods" do
+        expect(@root_account_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to read or manage sub-account level grading period" do
-        expect(@sub_account_period.rights_status(@student, :read, :manage)).to eq({ read: false, manage: false })
+      it "can NOT read, create, update, nor delete sub-account " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   false,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to manage course level grading periods, but should be able to read them" do
-        expect(@course_period.rights_status(@student, :read, :manage)).to eq({ read: true, manage: false})
+      it "can read but NOT create, update, nor delete course level " \
+        "grading periods" do
+        expect(@course_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
     end
 
     context "multiple grading periods feature flag turned off" do
       before(:once) do
         account_admin_user(account: @root_account)
+        @root_account_admin = @admin
         @root_account.disable_feature! :multiple_grading_periods
       end
 
-      it "should return false for all permissions" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({ read: false, manage: false })
+      it "can not do anything" do
+        expect(@course_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   false,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
     end
   end
@@ -110,90 +207,181 @@ describe GradingPeriod, "permissions:" do
   context "course belonging to sub-account" do
     before(:once) do
       @root_account = Account.default
+      Account.default.enable_feature!(:multiple_grading_periods)
       @sub_account = @root_account.sub_accounts.create!
       course_with_teacher(account: @sub_account, active_all: true)
       course_with_student(course: @course, active_all: true)
-      @root_account_period = grading_periods(context: @root_account, count: 1).first
-      @sub_account_period = grading_periods(context: @sub_account, count: 1).first
-      @course_period = grading_periods(context: @course, count: 1).first
+      @root_account_period = period_helper.create_with_group_for_account(@root_account)
+      @sub_account_period = period_helper.create_with_group_for_account(@sub_account)
+      @course_period = period_helper.create_with_group_for_course(@course)
     end
 
     context "root-account admin" do
       before(:once) do
         account_admin_user(account: @root_account)
+        @root_account_admin = @admin
       end
 
-      it "should be able to read and manage root-account level grading periods" do
-        expect(@root_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, create, update, and delete root-account level " \
+        "grading periods" do
+        expect(@root_account_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
-      it "should be able to read and manage sub-account level grading periods" do
-        expect(@sub_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, create update, and delete sub-account level " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
-
-      it "should be able to read and manage course level grading periods" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, update, and delete but NOT create course level " \
+        "grading periods" do
+        expect(@course_period.
+          rights_status(@root_account_admin, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: true,
+          delete: true
+        })
       end
     end
 
     context "sub-account admin" do
       before(:once) do
         account_admin_user(account: @sub_account)
+        @sub_account_admin = @admin
       end
 
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@admin, :read, :manage)).to eq({ read: true, manage: false })
+      it "can NOT create, update, nor delete root-account level grading " \
+        "periods, but can read them" do
+        expect(@root_account_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should be able to read and manage sub-account level grading periods" do
-        expect(@sub_account_period.rights_status(@admin, :read, :manage)).to eq({read: true, manage: true })
+      it "can read, create, update, and delete sub-account level grading " \
+        "periods" do
+        expect(@sub_account_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   true,
+          create: true,
+          update: true,
+          delete: true
+        })
       end
 
-
-      it "should be able to read and manage course level grading periods, when the course is under the sub-account" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({read: true, manage: true })
+      it "can NOT create course level grading periods when the course is " \
+        "under the sub-account, but can read, update, and delete" do
+        expect(@course_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: true,
+          delete: true
+        })
       end
     end
 
     context "teacher" do
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@teacher, :read, :manage)).to eq({ read: true, manage: false })
+      it "can NOT create, update, nor delete root-account level grading " \
+        "periods, but can read them" do
+        expect(@root_account_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to manage sub-account level grading periods, but should be able to read them" do
-        expect(@sub_account_period.rights_status(@teacher, :read, :manage)).to eq({ read: true, manage: false })
+      it "can NOT create, update, nor delete sub-account level grading " \
+        "periods, but can read them" do
+        expect(@sub_account_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should be able to read and manage course level grading periods" do
-        expect(@course_period.rights_status(@teacher, :read, :manage)).to eq({ read: true, manage: true })
+      it "can read, update, and delete but NOT create course level " \
+        "grading periods" do
+        expect(@course_period.
+          rights_status(@teacher, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: true,
+          delete: true
+        })
       end
     end
 
     context "student" do
-      it "should NOT be able to manage root-account level grading periods, but should be able to read them" do
-        expect(@root_account_period.rights_status(@student, :read, :manage)).to eq({ read: true, manage: false })
+      it "can read but NOT create, update, nor delete root-account level " \
+        "grading periods" do
+        expect(@root_account_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to manage sub-account level grading periods, but should be able to read them" do
-        expect(@sub_account_period.rights_status(@student, :read, :manage)).to eq({ read: true, manage: false })
+      it "can read but NOT create, update, nor delete sub-account level " \
+        "grading periods" do
+        expect(@sub_account_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
 
-      it "should NOT be able to manage course level grading periods, but should be able to read them" do
-        expect(@course_period.rights_status(@student, :read, :manage)).to eq({ read: true, manage: false})
+      it "can read but NOT create, update, nor delete course level " \
+        "grading periods" do
+        expect(@course_period.
+          rights_status(@student, *permissions)).to eq({
+          read:   true,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
     end
 
     context "multiple grading periods feature flag turned off" do
       before(:once) do
         account_admin_user(account: @sub_account)
+        @sub_account_admin = @admin
         @root_account.disable_feature! :multiple_grading_periods
       end
 
-      it "should return false for all permissions" do
-        expect(@course_period.rights_status(@admin, :read, :manage)).to eq({ read: false, manage: false })
+      it "cannot do anything with grading periods" do
+        expect(@course_period.
+          rights_status(@sub_account_admin, *permissions)).to eq({
+          read:   false,
+          create: false,
+          update: false,
+          delete: false
+        })
       end
     end
   end
 end
-

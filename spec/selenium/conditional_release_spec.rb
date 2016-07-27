@@ -9,8 +9,5 @@ describe "conditional_release" do
       course_with_teacher_logged_in
       get course_settings_path @course.id
     end
-    it "should show conditional release button on Course Settings", priority: '1',test_id: 946816 do
-      expect(f('.btn.button-sidebar-wide.conditional-release-button')).to be_displayed
-    end
   end
 end

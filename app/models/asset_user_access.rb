@@ -205,11 +205,13 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def asset
-    return nil unless asset_code
-    asset_code, general = self.asset_code.split(":").reverse
-    asset = Context.find_asset_by_asset_string(asset_code, context)
-    asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
-    asset
+    unless @asset
+      return nil unless asset_code
+      asset_code, general = self.asset_code.split(":").reverse
+      @asset = Context.find_asset_by_asset_string(asset_code, context)
+      @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
+    end
+    @asset
   end
 
   def asset_class_name

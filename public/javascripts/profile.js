@@ -44,7 +44,7 @@ define([
     $(this).hide();
     $profile_table.addClass('editing')
       .find(".edit_data_row").show().end()
-      .find(":text:first").focus().select();
+      .find(":focusable:first").focus().select();
   return false;
   });
 

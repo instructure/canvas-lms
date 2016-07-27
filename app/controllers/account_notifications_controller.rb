@@ -91,6 +91,25 @@ class AccountNotificationsController < ApplicationController
     render :json => account_notifications_json(notifications, @current_user, session)
   end
 
+  # @API Show a global notification
+  # Returns a global notification
+  # A notification that has been closed by the user will not be returned
+  #
+  # @example_request
+  #   curl -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/2/users/4/account_notifications/4
+  #
+  # @returns [AccountNotification]
+  def show
+    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
+    notification = AccountNotification.find(params[:id])
+    if notifications.include? notification
+      render json: account_notification_json(notification, @current_user, session)
+    else
+      render_unauthorized_action
+    end
+  end
+
   # @API Close notification for user
   # If the user no long wants to see this notification it can be excused with this call
   #

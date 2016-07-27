@@ -30,7 +30,13 @@ class CanvadocSessionsController < ApplicationController
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.canvadocable?
-      attachment.submit_to_canvadocs unless attachment.canvadoc_available?
+      opts = {
+        preferred_renders: []
+      }
+      if @domain_root_account.settings[:canvadocs_prefer_office_online]
+        opts[:preferred_renders].unshift Canvadocs::RENDER_O365
+      end
+      attachment.submit_to_canvadocs(1, opts) unless attachment.canvadoc_available?
       url = attachment.canvadoc.session_url(user: @current_user)
 
       # For the purposes of reporting student viewership, we only

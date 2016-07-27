@@ -42,12 +42,12 @@ class SisBatch < ActiveRecord::Base
 
   def self.valid_import_types
     @valid_import_types ||= {
-        "instructure_csv" => {
-            :name => lambda { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
-            :callback => lambda {|batch| batch.process_instructure_csv_zip},
-            :default => true
-          }
+      "instructure_csv" => {
+        :name => lambda { t(:instructure_csv, "Instructure formatted CSV or zipfile of CSVs") },
+        :callback => lambda { |batch| batch.process_instructure_csv_zip },
+        :default => true
       }
+    }
   end
 
   # If you are going to change any settings on the batch before it's processed,
@@ -88,6 +88,7 @@ class SisBatch < ActiveRecord::Base
     state :initializing
     state :created
     state :importing
+    state :cleanup_batch
     state :imported
     state :imported_with_messages
     state :failed
@@ -117,9 +118,9 @@ class SisBatch < ActiveRecord::Base
 
   def self.queue_job_for_account(account)
     process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
-                 :priority => Delayed::LOW_PRIORITY,
-                 :max_attempts => 1 }
+    job_args = {:singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
+                :priority => Delayed::LOW_PRIORITY,
+                :max_attempts => 1}
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end
@@ -136,7 +137,7 @@ class SisBatch < ActiveRecord::Base
       end
 
       job_args = {
-        singleton: "account:update_account_associations:#{Shard.birth.activate{ account.id }}",
+        singleton: "account:update_account_associations:#{Shard.birth.activate { account.id }}",
         priority: Delayed::LOW_PRIORITY,
         max_attempts: 1,
       }
@@ -198,7 +199,9 @@ class SisBatch < ActiveRecord::Base
   end
 
   def importing?
-    self.workflow_state == 'importing' || self.workflow_state == 'created'
+    self.workflow_state == 'importing' ||
+      self.workflow_state == 'created' ||
+      self.workflow_state == 'cleanup_batch'
   end
 
   def process_instructure_csv_zip
@@ -206,7 +209,7 @@ class SisBatch < ActiveRecord::Base
     download_zip
     generate_diff
 
-    importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
+    importer = SIS::CSV::Import.process(self.account, :files => [@data_file.path], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
     finish importer.finished
   end
 
@@ -259,45 +262,88 @@ class SisBatch < ActiveRecord::Base
     self.save
   end
 
+  def non_batch_courses_scope
+    if data[:supplied_batches].include?(:course)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope.where(enrollment_term_id: self.batch_mode_term)
+    end
+  end
+
+  def remove_non_batch_courses(courses, total_rows)
+    # delete courses that weren't in this batch, in the selected term
+    current_row = 0
+    courses.find_each do |course|
+      course.clear_sis_stickiness(:workflow_state)
+      course.skip_broadcasts = true
+      course.destroy
+      current_row += 1
+      self.fast_update_progress(current_row.to_f/total_rows * 100)
+    end
+    self.data[:counts][:batch_courses_deleted] = current_row
+    current_row
+  end
+
+  def non_batch_sections_scope
+    if data[:supplied_batches].include?(:section)
+      scope = self.account.course_sections.active.where(courses: {enrollment_term_id: self.batch_mode_term})
+      scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
+    end
+  end
+
+  def remove_non_batch_sections(sections, total_rows, current_row)
+    section_count = 0
+    current_row = 0 unless current_row
+    # delete sections who weren't in this batch, whose course was in the selected term
+    sections.find_each do |section|
+      section.destroy
+      section_count += 1
+      current_row += 1
+      self.fast_update_progress(current_row.to_f/total_rows * 100)
+    end
+    self.data[:counts][:batch_sections_deleted] = section_count
+    current_row
+  end
+
+  def non_batch_enrollments_scope
+    if data[:supplied_batches].include?(:enrollment)
+      scope = self.account.enrollments.active.joins(:course).readonly(false)
+      scope = scope.where.not(sis_batch_id: nil).where.not(sis_batch_id: self)
+      scope.where(courses: {enrollment_term_id: self.batch_mode_term})
+    end
+  end
+
+  def remove_non_batch_enrollments(enrollments, total_rows, current_row)
+    enrollment_count = 0
+    current_row = 0 unless current_row
+    # delete enrollments for courses that weren't in this batch, in the selected term
+    enrollments.find_each do |enrollment|
+      enrollment.destroy
+      enrollment_count += 1
+      current_row += 1
+      self.fast_update_progress(current_row.to_f/total_rows * 100)
+    end
+    self.data[:counts][:batch_enrollments_deleted] = enrollment_count
+  end
+
   def remove_previous_imports
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term
     return unless data[:supplied_batches]
+    SisBatch.where(id: self).update_all(workflow_state: 'cleanup_batch')
 
-    if data[:supplied_batches].include?(:course)
-      # delete courses that weren't in this batch, in the selected term
-      scope = Course.active.for_term(self.batch_mode_term).where(:root_account_id => self.account)
-      scope.where("sis_batch_id IS NOT NULL AND sis_batch_id<>?", self).find_each do |course|
-        course.clear_sis_stickiness(:workflow_state)
-        course.skip_broadcasts = true
-        course.destroy
-      end
-    end
+    count = 0
+    courses = non_batch_courses_scope
+    sections = non_batch_sections_scope
+    enrollments = non_batch_enrollments_scope
 
-    if data[:supplied_batches].include?(:section)
-      # delete sections who weren't in this batch, whose course was in the selected term
-      scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
-      scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
-      scope = scope.where(:courses => { :enrollment_term_id => self.batch_mode_term })
-      scope.find_each do |section|
-        section.destroy
-      end
-    end
+    count += courses.count if courses
+    count += sections.count if sections
+    count += enrollments.count if enrollments
 
-    if data[:supplied_batches].include?(:enrollment)
-      # delete enrollments for courses that weren't in this batch, in the selected term
-
-      scope = Enrollment.active.joins(:course).readonly(false)
-      params = {root_account: self.account, batch: self, term: self.batch_mode_term}
-      scope = scope.where("courses.root_account_id=:root_account
-                           AND enrollments.sis_batch_id IS NOT NULL
-                           AND enrollments.sis_batch_id<>:batch
-                           AND courses.enrollment_term_id=:term", params)
-
-      scope.find_each do |enrollment|
-        enrollment.destroy
-      end
-    end
+    row = remove_non_batch_courses(courses, count) if courses
+    row = remove_non_batch_sections(sections, count, row) if sections
+    remove_non_batch_enrollments(enrollments, count, row) if enrollments
   end
 
   def as_json(options={})
@@ -339,14 +385,15 @@ class SisBatch < ActiveRecord::Base
     %w[processing_warnings processing_errors].each do |field|
       if self.send("#{field}_changed?") && (self.send(field).try(:size) || 0) > max_messages
         limit_message = case field
-        when "processing_warnings"
-          t 'errors.too_many_warnings', "There were %{count} more warnings", count: (processing_warnings.size - max_messages + 1)
-        when "processing_errors"
-          t 'errors.too_many_errors', "There were %{count} more errors", count: (processing_errors.size - max_messages + 1)
-        end
+                        when "processing_warnings"
+                          t 'errors.too_many_warnings', "There were %{count} more warnings", count: (processing_warnings.size - max_messages + 1)
+                        when "processing_errors"
+                          t 'errors.too_many_errors', "There were %{count} more errors", count: (processing_errors.size - max_messages + 1)
+                        end
         self.send("#{field}=", self.send(field)[0, max_messages-1] + [['', limit_message]])
       end
     end
     true
   end
+
 end

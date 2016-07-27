@@ -4,9 +4,6 @@ Datafixup/EagerLoad: &Datafixup
     - "**/db/migrate/*.rb"
     - "**/lib/data_fixup/*.rb"
 
-Datafixup/FindIds:
-  <<: *Datafixup
-
 Lint/FreezeConstants:
   Enabled: true
 
@@ -20,6 +17,27 @@ Migration/ConcurrentIndex: &Migration
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
+
+Migration/ModelBehavior:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+    - "lib/data_fixup/*.rb"
+  Whitelist: [
+    Canvas
+    DataFixup
+    Switchman
+    Shard
+    Account.default
+    Account.site_admin
+    *.quoted_table_name
+    *.connection
+    *.transaction
+    *.find_ids_in_batches
+    *.find_ids_in_ranges
+    *.update_all
+    *.delete_all
+  ]
 
 Migration/PrimaryKey:
   <<: *Migration

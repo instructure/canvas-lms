@@ -29,8 +29,9 @@ describe "sections" do
     it "does not include X buttons for enrollments that can't be removed" do
       course_with_teacher_logged_in(:active_all => true)
       e1 = student_in_course(:active_all => true, :name => "Mr. Bland")
-      e2 = student_in_course(:active_all => true, :name => "Señor Havin' A Little Trouble")
-      e2.sis_source_id = '21grapes'
+      e2 = student_in_course(active_all: true, name: "Señor Havin' A Little Trouble")
+      sis = e2.course.root_account.sis_batches.create
+      e2.sis_batch_id = sis.id
       e2.save!
 
       get "/courses/#{@course.id}/sections/#{@course.default_section.id}"

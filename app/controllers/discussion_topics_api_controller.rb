@@ -111,7 +111,7 @@ class DiscussionTopicsApiController < ApplicationController
       # we assume that json_structure will typically be served to users requesting string IDs
       unless stringify_json_ids?
         entries = JSON.parse(structure)
-        Api.recursively_stringify_json_ids(entries, reverse: true)
+        StringifyIds.recursively_stringify_ids(entries, reverse: true)
         structure = entries.to_json
       end
 

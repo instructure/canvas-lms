@@ -14,4 +14,9 @@ Rails.configuration.to_prepare do
     { quiz: 'Quizzes::Quiz',
       quiz_submission: 'Quizzes::QuizSubmission' }]
   Version.add_polymorph_methods(reflection)
+
+  Version.include(CanvasPartman::Concerns::Partitioned)
+  Version.partitioning_strategy = :by_id
+  Version.partitioning_field = 'versionable_id'
+  Version.partition_size = 5_000_000
 end

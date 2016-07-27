@@ -66,8 +66,8 @@ describe "post grades to sis" do
       expect(f('#assignment-errors').text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))
       f(' .form-dialog-content').click
-      proceed_form('.form-controls')
-      expect(f('.assignments-to-post-count').text).to include("You are ready to post 1 assignment")
+      f('.form-controls button[type=button]').click
+      expect(f('.assignments-to-post-count')).to include_text("You are ready to post 1 assignment")
     end
   end
 end

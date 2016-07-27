@@ -27,14 +27,12 @@ describe "student groups" do
 
       get "/groups/#{g1.id}"
 
-      keep_trying_until do
-        f('#edit_group').click
-        set_value f('#group_name'), "new group name"
-        f('#ui-id-2').find_element(:css, 'button[type=submit]').click
-        wait_for_ajaximations
-      end
+      f('#edit_group').click
+      set_value f('#group_name'), "new group name"
+      f('#ui-id-2').find_element(:css, 'button[type=submit]').click
+      wait_for_ajaximations
 
-      expect(g1.reload.name).to include_text("new group name")
+      expect(g1.reload.name).to include("new group name")
     end
 
     it "should show locked student organized, invite only groups", priority: "1", test_id: 180671 do
@@ -169,16 +167,14 @@ describe "student groups" do
         expect(f(".student-group-students")).to include_text("1 student")
 
         f(".student-group-join a").click
-        wait_for_ajaximations
 
-        keep_trying_until {expect(f(".student-group-students")).to include_text("0 students") }
+        expect(f(".student-group-students")).to include_text("0 students")
       end
 
       it "leaving the group should change the dialog to join", priority:"2", test_id: 180683 do
         f(".student-group-join a").click
-        wait_for_ajaximations
 
-        keep_trying_until { expect(f(".student-group-join a")).to include_text("JOIN") }
+        expect(f(".student-group-join a")).to include_text("JOIN")
       end
 
       it "student should be able to leave a group and rejoin", priority: "1", test_id: 180679 do
@@ -187,13 +183,11 @@ describe "student groups" do
 
         # leave group and verify leaving
         f(".student-group-join a").click
-        wait_for_ajaximations
-        keep_trying_until { expect(f(".student-group-join a")).to include_text("JOIN") }
+        expect(f(".student-group-join a")).to include_text("JOIN")
 
         # rejoin group
         f(".student-group-join a").click
-        wait_for_ajaximations
-        keep_trying_until { expect(f(".student-group-join a")).to include_text("LEAVE") }
+        expect(f(".student-group-join a")).to include_text("LEAVE")
       end
 
       it "should visit the group", priority: "1", test_id: 180680 do
@@ -218,8 +212,7 @@ describe "student groups" do
 
         # join group
         f(".student-group-join a").click
-        wait_for_ajaximations
-        keep_trying_until { expect(f(".student-group-join a")).to include_text("LEAVE") }
+        expect(f(".student-group-join a")).to include_text("LEAVE")
       end
     end
 
@@ -243,11 +236,10 @@ describe "student groups" do
         addition = "CRIT"
         f("#group_name").send_keys(addition.to_s)
         wait_for_ajaximations
-        fj('button.confirm-dialog-confirm-btn').click
-        wait_for_ajaximations
+        f('button.confirm-dialog-confirm-btn').click
 
         new_group_name = group_name.to_s + addition.to_s
-        keep_trying_until(3) {expect(fj(".student-group-title")).to include_text(new_group_name.to_s) }
+        expect(f(".student-group-title")).to include_text(new_group_name.to_s)
       end
 
       it "should add users to group", priority: "1", test_id: 180718 do
@@ -295,21 +287,15 @@ describe "student groups" do
         second_student_checkbox.click
         wait_for_animations
 
-        fj('button.confirm-dialog-confirm-btn').click
-        wait_for_ajaximations
+        f('button.confirm-dialog-confirm-btn').click
 
         # expect plural of the word 'student'
-        keep_trying_until(2) do
-          expect(f(".student-group-students")).to include_text("students")
-        end
+        expect(f(".student-group-students")).to include_text("students")
 
         # leave the group
-        fj(".student-group-join a").click
-        wait_for_ajaximations
+        f(".student-group-join a").click
 
-        keep_trying_until(2) do
-          expect(fj(".student-group-students")).to include_text("1 student")
-        end
+        expect(f(".student-group-students")).to include_text("1 student")
       end
     end
   end

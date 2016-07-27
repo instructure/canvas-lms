@@ -51,7 +51,7 @@ module Importers
         question_bank = bank_map[bank_mig_id]
 
         if !question_bank
-          question_bank = migration.context.assessment_question_banks.new
+          question_bank = migration.context.assessment_question_banks.temp_record
           if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == bank_mig_id}
             question_bank.title = bank_hash['title']
           end
@@ -118,6 +118,12 @@ module Importers
 
     def self.prep_for_import(hash, migration, item_type)
       return hash if hash[:prepped_for_import]
+
+      if hash[:question_text] && hash[:question_text].length > 16.kilobytes
+        hash[:question_text] = t("The imported question text for this question was too long.")
+        migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
+          :question_name => hash[:question_name]))
+      end
 
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         if hash[field].present?

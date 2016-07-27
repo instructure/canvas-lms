@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,7 @@
 #
 
 require_relative '../spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
+require_relative '../apis/api_spec_helper'
 
 describe AssignmentGroupsController do
   def course_group
@@ -67,7 +67,7 @@ describe AssignmentGroupsController do
         )
       end
 
-      let(:grading_period_group) { course.grading_period_groups.create! }
+      let(:grading_period_group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
       let(:course) do
         course = sub_account.courses.create!
         course.offer!

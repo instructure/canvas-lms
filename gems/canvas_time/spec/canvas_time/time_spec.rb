@@ -2,17 +2,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CanvasTime do
 
-  before { Timecop.freeze(Time.local(2010,10,1,0,0)) }
-  after { Timecop.return }
+  around do |example|
+    Timecop.freeze(Time.zone.local(2010,10,1,0,0), &example)
+  end
 
   describe "fancy_midnight" do
     it "returns the given date at 11:59pm if date is at 12:00 am" do
-      time = Time.now
+      time = Time.zone.now
       CanvasTime.fancy_midnight(time).should == time.end_of_day
     end
 
     it "returns the given date if the date is not at 12:00 am" do
-      time = Time.now - 1.second
+      time = Time.zone.now - 1.second
       CanvasTime.fancy_midnight(time).should == time
     end
 

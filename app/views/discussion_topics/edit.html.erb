@@ -7,27 +7,12 @@
 
 <% content_for(:right_side) do %>
   <%= render :partial => 'shared/wiki_sidebar' %>
-
-  <% if @topic.new_record? && @context.is_a?(Course) %>
-    <ul class="page-action-list">
-      <% if can_do(@context.assignments.build, @current_user, :create) %>
-        <li><%= link_to t('new_assignment', 'New Assignment'),
-                        new_course_assignment_url(@context),
-                        :class => 'icon-assignment' %></li>
-      <% end %>
-      <% if can_do(@context.quizzes.build, @current_user, :create) %>
-        <li><%= link_to t('new_quiz', 'New Quiz'),
-                        new_course_quiz_url(@context),
-                        :class => 'icon-quiz' %></li>
-      <% end %>
-    </ul>
-  <% end %>
 <% end %>
 
 <% if @context.is_a?(Course) %>
 <%= render :partial => "groups/add_group_category" %>
 <div id="edit_letter_grades_form" style="display: none;">
-  <%= render partial: "shared/grading_standard", object: @topic.assignment.try(:grading_standard) %>
+  <%= render partial: "shared/grading_standard", object: @topic.assignment.try(:grading_standard), locals: {read_only: false} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
 </div>

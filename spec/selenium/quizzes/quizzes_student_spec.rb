@@ -107,17 +107,16 @@ describe 'quizzes' do
           expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
           # now kill our session (like logging out)
           destroy_session
+          sleep 1 # updateSubmission throttles itself at 1 sec (quite
+                  # unintelligently, cuz it ignores calls in that second,
+                  # so you'd have to wait 15-30 sec for the periodic
+                  # update to hit)
 
-          index = 1
-          keep_trying_until do
-            # and try answering another question
-            ff('.answers .answer_input input')[index].click
-            wait_for_ajaximations
+          # and try answering another question
+          ff('.answers .answer_input input')[1].click
 
-            # we should get notified that we are logged out
-            expect(fj('#deauthorized_dialog:visible')).to be_present
-            index = (index + 1) % 2
-          end
+          # we should get notified that we are logged out
+          expect(fj('#deauthorized_dialog:visible')).to be_present
 
           expect_new_page_load { submit_dialog('#deauthorized_dialog') }
         end
@@ -153,35 +152,7 @@ describe 'quizzes' do
   end
 
   context 'when a student closes the session without submitting' do
-
-    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415 do
-      skip('disabled because of regression')
-
-      job_tag = 'Quizzes::QuizSubmission#grade_if_untaken'
-
-      prepare_quiz
-
-      expect(Delayed::Job.find_by_tag(job_tag)).to eq nil
-
-      take_and_answer_quiz(submit: false)
-
-      driver.execute_script('window.close()')
-
-      quiz_sub = @quiz.quiz_submissions.where(user_id: @user).first
-      expect(quiz_sub).to be_present
-      expect(quiz_sub.workflow_state).to eq 'untaken'
-
-      job = Delayed::Job.find_by_tag(job_tag)
-      expect(job).to be_present
-
-      # okay, we will manually "run" the job because we can't afford to wait
-      # for it to be picked up by DJ in a spec:
-      auto_grader = YAML.parse(job.handler).transform
-      auto_grader.perform
-
-      quiz_sub.reload
-      expect(quiz_sub.workflow_state).to eq 'complete'
-    end
+    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415
   end
 
   context 'when the \'show correct answers\' setting is on' do

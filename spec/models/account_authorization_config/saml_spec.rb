@@ -110,6 +110,22 @@ describe AccountAuthorizationConfig::SAML do
     @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "anything")
     expect(@aac.requested_authn_context).to eq "anything"
   end
+
+  describe "download_metadata" do
+    it 'requires an entity id for InCommon' do
+      saml = Account.default.authentication_providers.new(auth_type: 'saml',
+        metadata_uri: AccountAuthorizationConfig::SAML::InCommon::URN)
+      expect(saml).not_to be_valid
+      expect(saml.errors.first.first).to eq :idp_entity_id
+    end
+
+    it 'changes InCommon URI to the URN for it' do
+      saml = Account.default.authentication_providers.new(auth_type: 'saml',
+                                                          metadata_uri: AccountAuthorizationConfig::SAML::InCommon.endpoint)
+      expect(saml).not_to be_valid
+      expect(saml.metadata_uri).to eq AccountAuthorizationConfig::SAML::InCommon::URN
+    end
+  end
 end
 
 describe '.resolve_saml_key_path' do

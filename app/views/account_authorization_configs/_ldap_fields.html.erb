@@ -17,20 +17,25 @@
   <%= f.label :auth_port, t('Port'), class: 'ic-Label' %>
   <%= f.text_field :auth_port, class: 'ic-Input', style: 'width: 50px;' %>
 </div>
-<div class="ic-Form-control ic-Form-control--radio" %>
-  <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, 'start_tls', id: "start_tls_#{aac.id}", checked: aac.auth_over_tls == 'start_tls' %>
-    <%= f.label :auth_over_tls, t('Start TLS'), for: "start_tls_#{aac.id}", class: 'ic-Label' %>
+<fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+  <legend class="ic-Legend">
+    <%= t('TLS') %>
+  </legend>
+  <div class="ic-Form-control ic-Form-control--radio">
+    <div class="ic-Radio">
+      <%= f.radio_button :auth_over_tls, 'start_tls', id: "start_tls_#{aac.id}", checked: aac.auth_over_tls == 'start_tls' %>
+      <%= f.label :auth_over_tls, t('Start TLS'), for: "start_tls_#{aac.id}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :auth_over_tls, 'simple_tls', id: "simple_tls_#{aac.id}", checked: aac.auth_over_tls == 'simple_tls' %>
+      <%= f.label :auth_over_tls, t('Simple TLS'), for: "simple_tls_#{aac.id}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :auth_over_tls, false, id: "no_tls_#{aac.id}", checked: !aac.auth_over_tls %>
+      <%= f.label :auth_over_tls, t('No TLS'), for: "no_tls_#{aac.id}", class: 'ic-Label' %>
+    </div>
   </div>
-  <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, 'simple_tls', id: "simple_tls_#{aac.id}", checked: aac.auth_over_tls == 'simple_tls' %>
-    <%= f.label :auth_over_tls, t('Simple TLS'), for: "simple_tls_#{aac.id}", class: 'ic-Label' %>
-  </div>
-  <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, false, id: "no_tls_#{aac.id}", checked: !aac.auth_over_tls %>
-    <%= f.label :auth_over_tls, t('No TLS'), for: "no_tls_#{aac.id}", class: 'ic-Label' %>
-  </div>
-</div>
+</fieldset>
 <div class="ic-Form-control">
   <%= f.label :auth_base, t('Base'), class: 'ic-Label' %>
   <%= f.text_field :auth_base, class: 'ic-Input' %>
@@ -38,7 +43,7 @@
 <div class="ic-Form-control">
   <%= f.label :auth_filter, t('Filter'), class: 'ic-Label' %>
   <%= f.text_field :auth_filter, class: 'ic-Input' %>
-  <div class="help-block">
+  <div class="ic-Form-help-text">
     <%= t(:auth_filter_description,
           "Use *%{placeholder}* as a placeholder for the username "\
           "supplied by the user. \nFor example: "\
@@ -50,7 +55,7 @@
 <div class="ic-Form-control">
   <%= f.label :identifier_format, t('Login Attribute'), class: 'ic-Label' %>
   <%= f.text_field :identifier_format, class: 'ic-Input' %>
-  <div class="help-block">
+  <div class="ic-Form-help-text">
     <%= t(:identifer_format_description,
           "The LDAP attribute to use to look up the Canvas login. "\
           "Leave blank to use the username supplied by the user.") %>

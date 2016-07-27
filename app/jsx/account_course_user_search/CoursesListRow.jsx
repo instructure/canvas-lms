@@ -96,8 +96,8 @@ define([
 
       return (
         <div role='row' className="grid-row pad-box-mini border border-b">
-          <div className="col-md-3">
-            <div role='gridcell' className="grid-row">
+          <div className="col-xs-5">
+            <div role='gridcell' className="grid-row middle-xs">
               <div className="col-xs-2">{isPublished && (<i className="icon-publish courses-list__published-icon" />)}</div>
               <div className="col-xs-10">
                 <div className="courseName">
@@ -111,24 +111,27 @@ define([
             <div className="courseSIS">{sis_course_id}</div>
           </div>
 
-          <div className="col-md-3" role='gridcell'>
+          <div className="col-xs-3" role='gridcell'>
             {this.state.teachersToShow && this.state.teachersToShow.map((teacher) => <UserLink key={teacher.id} {...teacher} />)}
             { this.showMoreLink() }
           </div>
 
-          <div className="col-md-3" role='gridcell'>
+          <div className="col-xs-1" role='gridcell'>
             <div className="totalStudents">{total_students}</div>
           </div>
-          <div className="col-md-2" role='gridcell'>
-            <div className="grid-row" style={{justifyContent: "flex-end"}}>
-              <a className="al-trigger-gray icon-plus" href="#" onClick={this.addUserToCourse} role="button">
+          <div className="col-xs-2" role='gridcell'>
+            <div className="courses-user-list-actions">
+              <button className="Button Button--icon-action" onClick={this.addUserToCourse} type="button">
                 <span className="screenreader-only">{I18n.t("Add Users to %{name}", {name: this.props.name})}</span>
-              </a>
-              <a className="al-trigger-gray icon-stats" href={`/courses/${this.props.id}/statistics`}>
+                <i className="icon-plus" aria-hidden="true"></i>
+              </button>
+              <a className="Button Button--icon-action" href={`/courses/${this.props.id}/statistics`}>
                 <span className="screenreader-only">{I18n.t("Go to statistics for %{name}", {name: this.props.name})}</span>
+                <i className="icon-stats" aria-hidden="true"></i>
               </a>
-              <a className="al-trigger-gray icon-settings" href={`/courses/${this.props.id}/settings`}>
+              <a className="Button Button--icon-action" href={`/courses/${this.props.id}/settings`}>
                 <span className="screenreader-only">{I18n.t("Go to settings for %{name}", {name: this.props.name})}</span>
+                <i className="icon-settings" aria-hidden="true"></i>
               </a>
             </div>
           </div>

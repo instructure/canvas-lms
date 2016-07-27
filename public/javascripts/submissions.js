@@ -72,6 +72,9 @@ define([
           }
         }
         $(".comments .comment_list").append($comment.show()).scrollTop(10000);
+        if ($(".grading_comment").val() === comment.comment) {
+          $(".grading_comment").val("");
+        }
       }
       $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
       $(".save_comment_button").attr('disabled',null);
@@ -80,7 +83,6 @@ define([
         $(".submission_details").fillTemplateData({
           data: submission
         });
-        $(".grading_comment").val(""); //submission.comment);
         $("#add_comment_form .comment_attachments").empty();
       }
     }
@@ -145,187 +147,219 @@ define([
     ariaSetting = $rubric.is(":visible");
     $("#application").find("[data-hide_from_rubric]").attr("aria-hidden", ariaSetting)
   }
-  $(document).ready(function() {
-    $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
-    $(window).bind('resize', function() {
-      var $frame = $("#preview_frame");
-      var top = $frame.offset().top;
-      var height = $(window).height() - top;
-      $frame.height(height);
-      $("#rubric_holder").css({'maxHeight': height - 50, 'overflow': 'auto', 'zIndex': 5});
-      $(".comments").height(height);
-    }).triggerHandler('resize');
-    $(".comments_link").click(function(event) {
-      event.preventDefault();
-      $(".comments").slideToggle(function() {
-        $(".comments .media_comment_content").empty();
-        $(".comments textarea:visible").focus().select();
+  var windowResize = function() {
+    var $frame = $("#preview_frame");
+    var top = $frame.offset().top;
+    var height = $(window).height() - top;
+    $frame.height(height);
+    $("#rubric_holder").css({'maxHeight': height - 50, 'overflow': 'auto', 'zIndex': 5});
+    $(".comments").height(height);
+  };
+  var SubmissionsObj = {};
+  // This `setup` function allows us to control when the setup is triggered.
+  // submissions.coffee requires this file and then immediately triggers it,
+  // while submissionsSpec.jsx triggers it after setup is complete.
+  SubmissionsObj.setup = function() {
+    $(document).ready(function() {
+      $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
+      $(window).bind('resize', windowResize).triggerHandler('resize');
+      $(".comments_link").click(function(event) {
+        event.preventDefault();
+        $(".comments").slideToggle(function() {
+          $(".comments .media_comment_content").empty();
+          $(".comments textarea:visible").focus().select();
+        });
       });
-    });
-    $(".save_comment_button").click(function(event) {
-      $(document).triggerHandler('grading_change');
-    });
-    $(".cancel_comment_button").click(function(event) {
-      $(".grading_comment").val("");
-      $(".comments_link").click();
-    });
-    $(".grading_value").change(function(event) {
-      $(document).triggerHandler('grading_change');
-    });
-    $(document).bind('grading_change', function(event) {
-      $(".save_comment_button").attr('disabled','disabled');
-      $(".submission_header").loadingImage();
-      var url = $(".update_submission_url").attr('href');
-      var method = $(".update_submission_url").attr('title');
-      var formData = {
-        'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
-        'submission[user_id]': ENV.SUBMISSION.user_id,
-        'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0")
-      };
-      if($(".grading_value:visible").length > 0) {
-        formData['submission[grade]'] = $(".grading_value").val();
-      }
-      if($("#media_media_recording:visible").length > 0) {
-        var comment_id = $("#media_media_recording").data('comment_id');
-        var comment_type = $("#media_media_recording").data('comment_type');
-        formData['submission[media_comment_type]'] = comment_type || 'video';
-        formData['submission[media_comment_id]'] = comment_id;
-      } else {
-        if($(".grading_comment").val() && $(".grading_comment").val != "") {
-          formData['submission[comment]'] = $(".grading_comment").val();
-        }
-        if(!formData['submission[comment]'] && $("#add_comment_form input[type='file']").length > 0) {
-          formData['submission[comment]'] = formData['submission[comment]'] || I18n.t("see_attached_files", "See attached files");
-        }
-      }
-      if(!formData['submission[comment]'] && !formData['submission[grade]'] && !formData['submission[media_comment_id]']) {
-        return;
-      }
-      if($("#add_comment_form input[type='file']").length > 0) {
-        $.ajaxJSONFiles(url + ".text", method, formData, $("#add_comment_form input[type='file']"), submissionLoaded);
-      } else {
-        $.ajaxJSON(url, method, formData, submissionLoaded);
-      }
-    });
-    $(".attach_comment_file_link").click(function(event) {
-      event.preventDefault();
-      var $attachment = $("#comment_attachment_input_blank").clone(true).removeAttr('id');
-      $attachment.find("input").attr('name', 'attachments[' + (fileIndex++) + '][uploaded_data]');
-      $("#add_comment_form .comment_attachments").append($attachment.slideDown());
-    });
-    $(".delete_comment_attachment_link").click(function(event) {
-      event.preventDefault();
-      $(this).parents(".comment_attachment_input").slideUp(function() {
-        $(this).remove();
+      $(".save_comment_button").click(function(event) {
+        $(document).triggerHandler('comment_change');
       });
-    });
-    $(".save_rubric_button").click(function() {
-      var $rubric = $(this).parents("#rubric_holder").find(".rubric");
-      var data = rubricAssessment.assessmentData($rubric);
-      var url = $(".update_rubric_assessment_url").attr('href');
-      var method = "POST";
-      $rubric.loadingImage();
-      $.ajaxJSON(url, method, data, function(data) {
-        $rubric.loadingImage('remove');
-        var assessment = data;
-        var found = false;
-        if(assessment.rubric_association) {
-          rubricAssessment.updateRubricAssociation($rubric, data.rubric_association);
-          delete assessment.rubric_association;
-        }
-        for(var idx in rubricAssessments) {
-          var a = rubricAssessments[idx].rubric_assessment;
-          if(a && assessment && assessment.id == a.id) {
-            rubricAssessments[idx].rubric_assessment = assessment;
-            found = true;
+      // post new comment but no grade
+      $(document).bind('comment_change', function(event) {
+        $(".save_comment_button").attr('disabled','disabled');
+        $(".submission_header").loadingImage();
+        var url = $(".update_submission_url").attr('href');
+        var method = $(".update_submission_url").attr('title');
+        var formData = {
+          'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
+          'submission[user_id]': ENV.SUBMISSION.user_id,
+          'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0")
+        };
+        if($("#media_media_recording:visible").length > 0) {
+          var comment_id = $("#media_media_recording").data('comment_id');
+          var comment_type = $("#media_media_recording").data('comment_type');
+          formData['submission[media_comment_type]'] = comment_type || 'video';
+          formData['submission[media_comment_id]'] = comment_id;
+        } else {
+          if($(".grading_comment").val() && $(".grading_comment").val != "") {
+            formData['submission[comment]'] = $(".grading_comment").val();
+          }
+          if(!formData['submission[comment]'] && $("#add_comment_form input[type='file']").length > 0) {
+            formData['submission[comment]'] = I18n.t("see_attached_files", "See attached files");
           }
         }
-        if(!found) {
-          if (!data.rubric_assessment) {
-            data = { rubric_assessment: data };
+        if(!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {
+          $(".submission_header").loadingImage('remove');
+          $(".save_comment_button").attr('disabled',null);
+          return;
+        }
+        if($("#add_comment_form input[type='file']").length > 0) {
+          $.ajaxJSONFiles(url + ".text", method, formData, $("#add_comment_form input[type='file']"), submissionLoaded);
+        } else {
+          $.ajaxJSON(url, method, formData, submissionLoaded);
+        }
+      });
+      $(".cancel_comment_button").click(function(event) {
+        $(".grading_comment").val("");
+        $(".comments_link").click();
+      });
+      $(".grading_value").change(function(event) {
+        $(document).triggerHandler('grading_change');
+      });
+      // post new grade but no comments
+      $(document).bind('grading_change', function(event) {
+        $(".save_comment_button").attr('disabled','disabled');
+        $(".submission_header").loadingImage();
+        var url = $(".update_submission_url").attr('href');
+        var method = $(".update_submission_url").attr('title');
+        var formData = {
+          'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
+          'submission[user_id]': ENV.SUBMISSION.user_id,
+          'submission[group_comment]': ($("#submission_group_comment").attr('checked') ? "1" : "0")
+        };
+        if($(".grading_value:visible").length > 0) {
+          formData['submission[grade]'] = $(".grading_value").val();
+          $.ajaxJSON(url, method, formData, submissionLoaded);
+        } else {
+          $(".submission_header").loadingImage('remove');
+          $(".save_comment_button").attr('disabled',null);
+        }
+      });
+      $(".attach_comment_file_link").click(function(event) {
+        event.preventDefault();
+        var $attachment = $("#comment_attachment_input_blank").clone(true).removeAttr('id');
+        $attachment.find("input").attr('name', 'attachments[' + (fileIndex++) + '][uploaded_data]');
+        $("#add_comment_form .comment_attachments").append($attachment.slideDown());
+      });
+      $(".delete_comment_attachment_link").click(function(event) {
+        event.preventDefault();
+        $(this).parents(".comment_attachment_input").slideUp(function() {
+          $(this).remove();
+        });
+      });
+      $(".save_rubric_button").click(function() {
+        var $rubric = $(this).parents("#rubric_holder").find(".rubric");
+        var data = rubricAssessment.assessmentData($rubric);
+        var url = $(".update_rubric_assessment_url").attr('href');
+        var method = "POST";
+        $rubric.loadingImage();
+        $.ajaxJSON(url, method, data, function(data) {
+          $rubric.loadingImage('remove');
+          var assessment = data;
+          var found = false;
+          if(assessment.rubric_association) {
+            rubricAssessment.updateRubricAssociation($rubric, data.rubric_association);
+            delete assessment.rubric_association;
           }
-          rubricAssessments.push(data);
-          var $option = $(document.createElement('option'));
-          $option.val(assessment.id).text(assessment.assessor_name).attr('id', 'rubric_assessment_option_' + assessment.id);
-          $("#rubric_assessments_select").prepend($option).val(assessment.id);
-        }
-        $("#rubric_assessment_option_" + assessment.id).text(assessment.assessor_name);
-        $("#new_rubric_assessment_option").remove();
-        $("#rubric_assessments_list").show();
-        rubricAssessment.populateRubric($rubric, assessment);
-        submission = assessment.artifact;
-        if (submission) {
-          showGrade(submission);
-        }
+          for(var idx in rubricAssessments) {
+            var a = rubricAssessments[idx].rubric_assessment;
+            if(a && assessment && assessment.id == a.id) {
+              rubricAssessments[idx].rubric_assessment = assessment;
+              found = true;
+            }
+          }
+          if(!found) {
+            if (!data.rubric_assessment) {
+              data = { rubric_assessment: data };
+            }
+            rubricAssessments.push(data);
+            var $option = $(document.createElement('option'));
+            $option.val(assessment.id).text(assessment.assessor_name).attr('id', 'rubric_assessment_option_' + assessment.id);
+            $("#rubric_assessments_select").prepend($option).val(assessment.id);
+          }
+          $("#rubric_assessment_option_" + assessment.id).text(assessment.assessor_name);
+          $("#new_rubric_assessment_option").remove();
+          $("#rubric_assessments_list").show();
+          rubricAssessment.populateRubric($rubric, assessment);
+          submission = assessment.artifact;
+          if (submission) {
+            showGrade(submission);
+          }
+          closeRubric();
+        });
+      });
+      $("#rubric_holder .rubric").css({'width': 'auto', 'marginTop': 0});
+      makeRubricAccessible($("#rubric_holder"));
+      $(".hide_rubric_link").click(function(event) {
+        event.preventDefault();
         closeRubric();
       });
-    });
-    $("#rubric_holder .rubric").css({'width': 'auto', 'marginTop': 0});
-    makeRubricAccessible($("#rubric_holder"));
-    $(".hide_rubric_link").click(function(event) {
-      event.preventDefault();
-      closeRubric();
-    });
-    $(".assess_submission_link").click(function(event) {
-      event.preventDefault();
-      $("#rubric_assessments_select").change();
-      openRubric();
-    });
-    $("#rubric_assessments_select").change(function() {
-      var id = $(this).val();
-      var found = null;
-      for(var idx in rubricAssessments) {
-        var assessment = rubricAssessments[idx].rubric_assessment;
-        if(assessment.id == id) {
-          found = assessment;
-        }
-      }
-      rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
-      var current_user = (!found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id);
-      $("#rubric_holder .save_rubric_button").showIf(current_user);
-    }).change();
-    $(".media_comment_link").click(function(event) {
-      event.preventDefault();
-      $("#add_comment_form").hide();
-      $("#media_media_recording").show();
-      $recording = $("#media_media_recording").find(".media_recording");
-      $recording.mediaComment('create', 'any', function(id, type) {
-        $("#media_media_recording").data('comment_id', id).data('comment_type', type);
-        $(document).triggerHandler('grading_change');
-        $("#add_comment_form").show();
-        $("#media_media_recording").hide();
-        $recording.empty();
-      }, function() {
-        $("#add_comment_form").show();
-        $("#media_media_recording").hide();
-      });
-    });
-    $("#media_recorder_container a").live('click', function(event) {
-      $("#add_comment_form").show();
-      $("#media_media_recording").hide();
-    });
-    $(".comments .comment_list")
-      .delegate(".play_comment_link", 'click', function(event) {
+      $(".assess_submission_link").click(function(event) {
         event.preventDefault();
-        var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
-        if(comment_id) {
-          $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video');
-        }
-      })
-
-      // this is to prevent the default behavior of loading the video inline from happening
-      // the .delegate(".play_comment_link"... and the .delegate('a.instructure_inline_media_comment'...
-      // are actually selecting the same links I just wanted to use the different selectors because
-      // instructure.js uses 'a.instructure_inline_media_comment' as the selector for its .live handler
-      // to show things inline.
-      .delegate('a.instructure_inline_media_comment', 'click', function(e){
-        // dont let it bubble past this so it doesnt get to the .live handler to show the video inline
-        e.preventDefault();
-        e.stopPropagation();
+        $("#rubric_assessments_select").change();
+        openRubric();
       });
+      $("#rubric_assessments_select").change(function() {
+        var id = $(this).val();
+        var found = null;
+        for(var idx in rubricAssessments) {
+          var assessment = rubricAssessments[idx].rubric_assessment;
+          if(assessment.id == id) {
+            found = assessment;
+          }
+        }
+        rubricAssessment.populateRubric($("#rubric_holder .rubric"), found);
+        var current_user = (!found || found.assessor_id == ENV.RUBRIC_ASSESSMENT.assessor_id);
+        $("#rubric_holder .save_rubric_button").showIf(current_user);
+      }).change();
+      $(".media_comment_link").click(function(event) {
+        event.preventDefault();
+        $("#add_comment_form").hide();
+        $("#media_media_recording").show();
+        $recording = $("#media_media_recording").find(".media_recording");
+        $recording.mediaComment('create', 'any', function(id, type) {
+          $("#media_media_recording").data('comment_id', id).data('comment_type', type);
+          $(document).triggerHandler('comment_change');
+          $("#add_comment_form").show();
+          $("#media_media_recording").hide();
+          $recording.empty();
+        }, function() {
+          $("#add_comment_form").show();
+          $("#media_media_recording").hide();
+        });
+      });
+      $("#media_recorder_container a").live('click', function(event) {
+        $("#add_comment_form").show();
+        $("#media_media_recording").hide();
+      });
+      $(".comments .comment_list")
+        .delegate(".play_comment_link", 'click', function(event) {
+          event.preventDefault();
+          var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
+          if(comment_id) {
+            $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video');
+          }
+        })
 
-      showGrade(ENV.SUBMISSION.submission);
-  });
+        // this is to prevent the default behavior of loading the video inline from happening
+        // the .delegate(".play_comment_link"... and the .delegate('a.instructure_inline_media_comment'...
+        // are actually selecting the same links I just wanted to use the different selectors because
+        // instructure.js uses 'a.instructure_inline_media_comment' as the selector for its .live handler
+        // to show things inline.
+        .delegate('a.instructure_inline_media_comment', 'click', function(e){
+          // dont let it bubble past this so it doesnt get to the .live handler to show the video inline
+          e.preventDefault();
+          e.stopPropagation();
+        });
+
+        showGrade(ENV.SUBMISSION.submission);
+    });
+  };
+  // necessary for tests
+  SubmissionsObj.teardown = function() {
+    $(window).unbind('resize', windowResize);
+    $(document).unbind('comment_change');
+    $(document).unbind('grading_change');
+  };
   $(document).fragmentChange(function(event, hash) {
     if(hash == '#rubric') {
       $(".assess_submission_link:visible:first").click();
@@ -346,5 +380,6 @@ define([
       $.ajaxJSON(url, 'GET', {}, submissionLoaded);
     }, 500);
   };
-});
 
+  return SubmissionsObj;
+});

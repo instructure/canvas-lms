@@ -93,6 +93,26 @@ describe SectionTabHelper do
               tab[:id]
             end).to_not include(Course::TAB_COLLABORATIONS)
           end
+
+          it 'should not include TAB_COLLABORATIONS when new_collaborations feature flag has been enabled' do
+            domain_root_account.set_feature_flag!(:new_collaborations, "on")
+            Collaboration.stubs(:any_collaborations_configured?).returns(true)
+            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS)
+          end
+        end
+
+        context 'and tabs include TAB_COLLABORATIONS_NEW' do
+          it 'should include TAB_COLLABORATIONS_NEW if new_collaborations feature flag has been enabled' do
+            domain_root_account.set_feature_flag!(:new_collaborations, "on")
+            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).to include(Course::TAB_COLLABORATIONS_NEW)
+            domain_root_account.set_feature_flag!(:new_collaborations, "off")
+          end
+
+
+          it 'should not include TAB_COLLABORATIONS if new_collaborations feature flas has been disabled' do
+            domain_root_account.set_feature_flag!(:new_collaborations, "off")
+            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS_NEW)
+          end
         end
       end
     end

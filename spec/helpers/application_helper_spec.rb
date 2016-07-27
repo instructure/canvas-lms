@@ -88,15 +88,17 @@ describe ApplicationHelper do
   end
 
   describe "Time Display Helpers" do
-    before do
+    before :each do
       @zone = Time.zone
       Time.zone = "Alaska"
-      Timecop.freeze(Time.utc(2013,3,13,9,12))
     end
 
-    after do
-      Timecop.return
+    after :each do
       Time.zone = @zone
+    end
+
+    around do |example|
+      Timecop.freeze(Time.zone.local(2013,3,13,9,12), &example)
     end
 
     describe '#context_sensitive_datetime_title' do
@@ -508,9 +510,10 @@ describe ApplicationHelper do
 
               includes = helper.get_global_includes
               expect(includes).to eq [{js: '/path/to/js'}]
+            end
 
-              # a little time passes, so updated_at changes
-              Timecop.freeze(now + 5.seconds)
+            # a little time passes, so updated_at changes
+            Timecop.freeze(now + 5.seconds) do
 
               @domain_root_account.settings = @domain_root_account.settings.merge(
                 global_javascript: '/path/to/new/js'
@@ -637,7 +640,7 @@ describe ApplicationHelper do
             expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
           end
 
-          it "should work using common_account_chain starting from lowest common account context" do
+          it "should work using common_account_chain starting from lowest common account context with enrollments" do
             course1 = @child_account.courses.create!
             course1.offer!
             course2 = @grandchild_account.courses.create!
@@ -648,7 +651,7 @@ describe ApplicationHelper do
             @current_user = @user
             output = helper.include_account_css
             expect(output).to have_tag 'link'
-            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child']]
           end
 
           it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
@@ -730,6 +733,44 @@ describe ApplicationHelper do
           end
         end
       end
+    end
+  end
+
+  describe "help link" do
+    before :once do
+      Setting.set('show_feedback_link', 'true')
+    end
+
+    it "should configure the help link to display the dialog by default" do
+      expect(helper.show_help_link?).to eq true
+      expect(helper.help_link_url).to eq '#'
+      expect(helper.help_link_classes).to eq 'help_dialog_trigger'
+    end
+
+    it "should override default help link with the configured support url" do
+      support_url = 'http://instructure.com'
+      Account.default.update_attribute(:settings, { :support_url => support_url })
+      Setting.set('show_feedback_link', 'false')
+
+      expect(helper.support_url).to eq support_url
+      expect(helper.show_help_link?).to eq true
+      expect(helper.help_link_url).to eq support_url
+      expect(helper.help_link_icon).to eq 'help'
+      expect(helper.help_link_classes).to eq 'support_url'
+    end
+
+    it "should return the configured icon" do
+      icon = 'inbox'
+      Account.default.update_attribute(:settings, { :help_link_icon => icon })
+
+      expect(helper.help_link_icon).to eq icon
+    end
+
+    it "should return the configured help link name" do
+      link_name = 'Links'
+      Account.default.update_attribute(:settings, { :help_link_name => link_name })
+
+      expect(helper.help_link_name).to eq link_name
     end
   end
 
@@ -940,10 +981,43 @@ describe ApplicationHelper do
 
   describe 'brand_config_for_account' do
     it "handles not having @domain_root_account set" do
-      helper.stubs(:k12?).returns(false)
       expect(helper.send(:brand_config_for_account)).to be_nil
     end
   end
+
+  describe "active_brand_config" do
+    it "returns nil if new styles are turned off" do
+      helper.stubs(:use_new_styles?).returns(false)
+      expect(helper.send(:active_brand_config)).to be_nil
+    end
+
+    it "returns nil if user prefers high contrast" do
+      helper.stubs(:use_new_styles?).returns(true)
+      @current_user = user
+      @current_user.enable_feature!(:high_contrast)
+      expect(helper.send(:active_brand_config)).to be_nil
+    end
+
+    it "returns 'K12 Theme' by default for a k12 school" do
+      helper.stubs(:use_new_styles?).returns(true)
+      helper.stubs(:k12?).returns(true)
+      BrandConfig.stubs(:k12_config)
+      expect(helper.send(:active_brand_config)).to eq BrandConfig.k12_config
+    end
+
+    it "returns 'K12 Theme' if a k12 school has chosen 'canvas default' in Theme Editor" do
+      helper.stubs(:use_new_styles?).returns(true)
+      helper.stubs(:k12?).returns(true)
+      BrandConfig.stubs(:k12_config)
+
+      # this is what happens if you pick "Canvas Default" from the theme picker
+      session[:brand_config_md5] = false
+
+      expect(helper.send(:active_brand_config)).to eq BrandConfig.k12_config
+    end
+
+  end
+
 
   describe "include_js_bundles" do
     before :each do

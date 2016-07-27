@@ -104,16 +104,6 @@ describe Quizzes::QuizSerializer do
     expect(@serializer.as_json[:quiz]).not_to have_key :speed_grader_url
   end
 
-  it "doesn't include the access code unless the user can grade" do
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns true
-    expect(serializer.as_json[:quiz]).to have_key :access_code
-
-    quiz.expects(:grants_right?).with(@user, @session, :grade).
-      at_least_once.returns false
-    expect(serializer.as_json[:quiz]).not_to have_key :access_code
-  end
-
   it "doesn't include the section count unless the user can grade" do
     quiz.expects(:grants_right?).with(@user, @session, :grade).
       at_least_once.returns true
@@ -137,6 +127,28 @@ describe Quizzes::QuizSerializer do
 
     quiz.expects(:grants_right?).at_least_once.returns false
     expect(serializer.as_json[:quiz]).not_to have_key :message_students_url
+  end
+
+  describe "access code" do
+    it "is included if the user can grade" do
+      quiz.expects(:grants_right?).with(@user, @session, :grade).
+        at_least_once.returns true
+      expect(serializer.as_json[:quiz]).to have_key :access_code
+    end
+
+    it "is included if the user can manage" do
+      quiz.expects(:grants_right?).with(@user, @session, :manage).
+        at_least_once.returns true
+      expect(serializer.as_json[:quiz]).to have_key :access_code
+    end
+
+    it "is not included if the user can't grade or manage" do
+      quiz.expects(:grants_right?).with(@user, @session, :grade).
+        at_least_once.returns false
+      quiz.expects(:grants_right?).with(@user, @session, :manage).
+        at_least_once.returns false
+      expect(serializer.as_json[:quiz]).not_to have_key :access_code
+    end
   end
 
   describe "id" do

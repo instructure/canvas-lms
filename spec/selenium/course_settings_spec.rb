@@ -104,8 +104,8 @@ describe "course settings" do
         el.text != ""
       end
       message = f('.self_enrollment_message')
-      expect(message.text).to include(code)
-      expect(message.text).not_to include('self_enrollment_code')
+      expect(message).to include_text(code)
+      expect(message).not_to include_text('self_enrollment_code')
     end
   end
 
@@ -156,10 +156,8 @@ describe "course settings" do
       get "/courses/#{@course.id}/settings#tab-sections"
 
       section_input = nil
-      keep_trying_until do
-        section_input = f('#course_section_name')
-        expect(section_input).to be_displayed
-      end
+      section_input = f('#course_section_name')
+      expect(section_input).to be_displayed
       replace_content(section_input, section_name)
       submit_form('#add_section_form')
       wait_for_ajaximations
@@ -171,17 +169,12 @@ describe "course settings" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Delete Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Delete Section')
 
       f('.delete_section_link').click
-      keep_trying_until do
-        expect(driver.switch_to.alert).not_to be_nil
-        driver.switch_to.alert.accept
-        true
-      end
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(ff('#sections > .section').count).to eq 1
     end
@@ -191,35 +184,20 @@ describe "course settings" do
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Edit Section')
-      end
+      body = f('body')
+      expect(body).to include_text('Edit Section')
 
       f('.edit_section_link').click
       section_input = f('#course_section_name_edit')
-      keep_trying_until { expect(section_input).to be_displayed }
+      expect(section_input).to be_displayed
       replace_content(section_input, edit_text)
       section_input.send_keys(:return)
       wait_for_ajaximations
       expect(ff('#sections > .section')[0]).to include_text(edit_text)
     end
 
-    it "should move a nav item to disabled" do
-      skip('fragile')
-      get "/courses/#{@course.id}/settings#tab-navigation"
-      keep_trying_until do
-        body = f('body')
-        expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')
-      end
-      disabled_div = f('#nav_disabled_list')
-      announcements_nav = f('#nav_edit_tab_id_14')
-      driver.action.click_and_hold(announcements_nav).
-          move_to(disabled_div).
-          release(disabled_div).
-          perform
-      keep_trying_until { expect(f('#nav_disabled_list')).to include_text(announcements_nav.text) }
-    end
+    # TODO reimplement per CNVS-29605, but make sure we're testing at the right level
+    it "should move a nav item to disabled"
   end
 
   context "right sidebar" do
@@ -227,8 +205,7 @@ describe "course settings" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
       f(".student_view_button").click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @fake_student.name
+      expect(displayed_username).to include(@fake_student.name)
     end
 
     it "should allow leaving student view" do
@@ -236,8 +213,7 @@ describe "course settings" do
       stop_link = f("#masquerade_bar .leave_student_view")
       expect(stop_link).to include_text "Leave Student View"
       stop_link.click
-      wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text @teacher.name
+      expect(displayed_username).to eq(@teacher.name)
     end
 
     it "should allow resetting student view" do
@@ -278,8 +254,8 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f('#course_restrict_student_past_view').attribute('disabled')).to be_nil
-    expect(f('#course_restrict_student_future_view').attribute('disabled')).to_not be_nil
+    expect(f('#course_restrict_student_past_view')).not_to be_disabled
+    expect(f('#course_restrict_student_future_view')).to be_disabled
 
     expect(is_checked('#course_restrict_student_future_view')).to be_truthy
   end
@@ -295,7 +271,7 @@ describe "course settings" do
     get "/courses/#{@course.id}/settings"
 
     ffj("#tab-details input:visible").each do |input|
-      expect(input.attribute('disabled')).to be_present
+      expect(input).to be_disabled
     end
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
@@ -341,10 +317,8 @@ describe "course settings" do
       wait_for_ajaximations
       run_jobs
 
-      keep_trying_until do
-        wait_for_ajaximations
-        expect(f("#all-results")).to be_displayed
-      end
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 17 unresponsive links")
 
@@ -389,10 +363,8 @@ describe "course settings" do
       wait_for_ajaximations
       run_jobs
 
-      keep_trying_until do
-        wait_for_ajaximations
-        expect(f("#all-results")).to be_displayed
-      end
+      wait_for_ajaximations
+      expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 3 unresponsive links")
       syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}

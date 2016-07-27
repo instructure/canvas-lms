@@ -31,7 +31,7 @@ module CanvasPartman
     private
 
     def partition_manager
-      @partition_manager ||= PartitionManager.new(self.class.base_class)
+      @partition_manager ||= PartitionManager.create(self.class.base_class)
     end
 
     def find_partition_tables

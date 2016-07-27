@@ -83,6 +83,10 @@ class ApiRouteSet
     route(:delete, path, opts)
   end
 
+  def patch(path, opts = {})
+    route(:patch, path, opts)
+  end
+
   def resources(resource_name, opts = {}, &block)
     resource_name = resource_name.to_s
 

@@ -601,6 +601,15 @@ describe CoursesController, type: :request do
         expect(new_course).to be_available
       end
 
+      it "doesn't offer a course if passed a false 'offer' parameter" do
+        json = api_call(:post, @resource_path,
+                        @resource_params,
+                        { :account_id => @account.id, :offer => false, :course => { :name => 'Test Course' } }
+        )
+        new_course = Course.find(json['id'])
+        expect(new_course).not_to be_available
+      end
+
       it "should allow setting sis_course_id without offering the course" do
         Auditors::Course.expects(:record_created).once
         Auditors::Course.expects(:record_published).never

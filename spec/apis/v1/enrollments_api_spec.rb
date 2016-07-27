@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2015 Instructure, Inc.
+# Copyright (C) 2011 - 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -75,7 +75,6 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
-          'sis_source_id'                      => new_enrollment.sis_source_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -583,7 +582,6 @@ describe EnrollmentsApiController, type: :request do
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
-          'sis_source_id'                      => new_enrollment.sis_source_id,
           'section_integration_id'             => @section.integration_id,
           'start_at'                           => nil,
           'end_at'                             => nil
@@ -738,7 +736,8 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "grading periods" do
-      let(:grading_period_group) { @course.grading_period_groups.create! }
+      let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
+      let(:grading_period_group) { group_helper.create_for_course(@course) }
       let(:now) { Time.zone.now }
 
       before :once do
@@ -780,7 +779,7 @@ describe EnrollmentsApiController, type: :request do
 
           it "returns an error if the user is not in the grading period" do
             course = Course.create!
-            grading_period_group = course.grading_period_groups.create!
+            grading_period_group = group_helper.create_for_course(course)
             grading_period = grading_period_group.grading_periods.create!(
               title: "unconnected to the user's course",
               start_date: 2.months.ago,
@@ -889,7 +888,6 @@ describe EnrollmentsApiController, type: :request do
             'sis_import_id'                      => @enrollment.sis_batch_id,
             'sis_course_id'                      => nil,
             'sis_section_id'                     => nil,
-            'sis_source_id'                      => @enrollment.sis_source_id,
             'course_integration_id'              => nil,
             'section_integration_id'             => nil,
             'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
@@ -956,7 +954,6 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             },
-            'sis_source_id' => e.sis_source_id,
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
             'created_at'  => e.created_at.xmlschema,
@@ -1033,7 +1030,6 @@ describe EnrollmentsApiController, type: :request do
               'final_grade' => nil,
               'current_grade' => nil,
             },
-            'sis_source_id' => e.sis_source_id,
             'associated_user_id' => nil,
             'updated_at'         => e.updated_at.xmlschema,
             'created_at'         => e.created_at.xmlschema,
@@ -1425,7 +1421,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           }
           h['grades'] = {
@@ -1682,7 +1677,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           })
         end
@@ -1739,7 +1733,6 @@ describe EnrollmentsApiController, type: :request do
             'course_integration_id' => nil,
             'sis_course_id' => nil,
             'sis_section_id' => nil,
-            'sis_source_id' => nil,
             'section_integration_id' => nil
           })
         end

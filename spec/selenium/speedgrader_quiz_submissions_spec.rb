@@ -40,7 +40,7 @@ describe "speed grader - quiz submissions" do
       s.click
       submission_date = s.text
       in_frame('speedgrader_iframe') do
-        keep_trying_until { expect(fj('.quiz-submission').text).to include submission_date }
+        expect(f('.quiz-submission')).to include_text submission_date
       end
     end
   end
@@ -53,7 +53,6 @@ describe "speed grader - quiz submissions" do
     expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
     wait_for_ajaximations
 
-    keep_trying_until { f('#speedgrader_iframe') }
     in_frame 'speedgrader_iframe' do
       expect(f('#main')).to include_text("Quiz Results for Student")
     end
@@ -100,9 +99,7 @@ describe "speed grader - quiz submissions" do
     qs.start_grading
     qs.complete
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    keep_trying_until do
-      expect(fj('#this_student_has_a_submission')).to be_displayed
-    end
+    expect(f('#this_student_has_a_submission')).to be_displayed
   end
 
   it "updates quiz grade automatically when the update button is clicked", priority: "1", test_id: 283739 do
@@ -133,13 +130,13 @@ describe "speed grader - quiz submissions" do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
     in_frame('speedgrader_iframe') do
       question_inputs = ff('.header .question_input')
       question_inputs.each { |qi| replace_content(qi, 3) }
       submit_form('#update_history_form')
     end
-    keep_trying_until { expect(f('#grade_container input')).to have_attribute('value', expected_points) }
+    input = f('#grade_container input')
+    expect(input).to have_attribute('value', expected_points)
   end
 
   it "properly displays student quiz results when the teacher also " \

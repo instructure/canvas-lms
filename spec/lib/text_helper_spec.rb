@@ -40,8 +40,9 @@ describe TextHelper do
   end
 
   context "time_string" do
-    before { Timecop.freeze(Time.utc(2010, 8, 18, 12, 21)) }
-    after { Timecop.return }
+    around do |example|
+      Timecop.freeze(Time.utc(2010, 8, 18, 12, 21), &example)
+    end
 
     it "should be formatted properly" do
       time = Time.zone.now

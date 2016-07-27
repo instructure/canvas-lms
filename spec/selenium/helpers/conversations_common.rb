@@ -99,30 +99,21 @@ module ConversationsCommon
   end
 
   def click_star_toggle_menu_item
-    keep_trying_until do
-      driver.execute_script("$('#admin-btn').hover().click()")
-      sleep 1
-      driver.execute_script("$('#star-toggle-btn').hover().click()")
-      wait_for_ajaximations
-    end
+    hover_and_click '#admin-btn'
+    hover_and_click '#star-toggle-btn:visible'
+    wait_for_ajaximations
   end
 
   def click_unread_toggle_menu_item
-    keep_trying_until do
-      driver.execute_script("$('#admin-btn').hover().click()")
-      sleep 1
-      driver.execute_script("$('#mark-unread-btn').hover().click()")
-      wait_for_ajaximations
-    end
+    hover_and_click '#admin-btn'
+    hover_and_click '#mark-unread-btn:visible'
+    wait_for_ajaximations
   end
 
   def click_read_toggle_menu_item
-    keep_trying_until do
-      driver.execute_script("$('#admin-btn').hover().click()")
-      sleep 1
-      driver.execute_script("$('#mark-read-btn').hover().click()")
-      wait_for_ajaximations
-    end
+    hover_and_click '#admin-btn'
+    hover_and_click '#mark-read-btn:visible'
+    wait_for_ajaximations
   end
 
   def select_message_course(new_course, is_group = false)
@@ -139,9 +130,9 @@ module ConversationsCommon
     synthetic = !(to.instance_of?(User) || to.instance_of?(String))
     to = to.name if to.respond_to?(:name)
     message_recipients_input.send_keys(to)
-    keep_trying_until { fj(".ac-result:contains('#{to}')") }.click
+    fj(".ac-result:contains('#{to}')").click
     return unless synthetic
-    keep_trying_until { fj(".ac-result:contains('All in #{to}')") }.click
+    fj(".ac-result:contains('All in #{to}')").click
   end
 
   def write_message_subject(subject)

@@ -26,8 +26,7 @@ define([
   'jsx/shared/rce/RceCommandShim',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
-  'jquery.instructure_misc_plugins',
-  'underscore'
+  'jquery.instructure_misc_plugins'
 ], function(tinymce, I18n, $, htmlEscape,
             TinyMCEContentItem, ExternalToolsHelper, RceCommandShim) {
 
@@ -111,7 +110,7 @@ define([
       url += (url.indexOf('?') > -1 ? '&' : '?') + "selection=" + encodeURIComponent(selection)
       $dialog.find("iframe").attr('src', url);
     }
-    for(var idx in _INST.editorButtons) {
+    for (var idx = 0; _INST.editorButtons && (idx < _INST.editorButtons.length); idx++) {
       var current_button = _INST.editorButtons[idx];
       if(_INST.editorButtons.length > _INST.maxVisibleEditorButtons && idx >= _INST.maxVisibleEditorButtons - 1) {
         clumpedButtons.push(current_button);

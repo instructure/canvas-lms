@@ -3,7 +3,7 @@ define [
   'jquery'
 ], (I18n, $) ->
 
-  deleteStuff = (filesAndFolders) ->
+  deleteStuff = (filesAndFolders, args) ->
     isDeletingAnUnemptyFolder = filesAndFolders.some (item) ->
       item.get('folders_count') or item.get('files_count')
     message = if isDeletingAnUnemptyFolder
@@ -46,3 +46,5 @@ define [
         count: filesAndFolders.length
         name: filesAndFolders[0]?.displayName()
       }))
+      if (args?.returnFocusTo?)
+        $(args.returnFocusTo).focus()

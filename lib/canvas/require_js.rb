@@ -22,9 +22,10 @@ module Canvas
       # get all regular canvas (and plugin) bundles
       def app_bundles
         app_bundles = (
-          Dir["#{JS_ROOT}/compiled/bundles/*.js"] +
-          Dir["#{JS_ROOT}/plugins/*/compiled/bundles/*.js"]
-        ).inject({}) { |hash, file|
+          Dir["#{JS_ROOT}/compiled/bundles/**/*.js"] +
+          Dir["#{JS_ROOT}/plugins/*/compiled/bundles/**/*.js"]
+        ).reject { |file| file =~ %r{/bundles/modules/} }
+        .inject({}) { |hash, file|
             # plugins have their name prepended, since that's how we do the paths
             name = file.sub(PATH_REGEX, '\2')
             unless name == 'compiled/bundles/common'

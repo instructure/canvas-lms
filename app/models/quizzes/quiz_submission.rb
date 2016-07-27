@@ -165,31 +165,32 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.submission_data
   end
 
-  def results_visible?
-    return true unless quiz
-    return false if quiz.restrict_answers_for_concluded_course?
-    return false if quiz.one_time_results && self.has_seen_results?
+  def results_visible?(user: nil)
+    return true unless quiz.present?
+    return true if quiz.grants_right?(user, :review_grades)
+    return false if quiz.restrict_answers_for_concluded_course?(user: user)
+    return false if quiz.one_time_results && has_seen_results?
+    return false if quiz.hide_results == 'always'
 
-    if quiz.hide_results == 'always'
-      false
-    elsif quiz.hide_results == 'until_after_last_attempt'
-      # Visible if quiz has unlimited attempts (no way to get to last
-      # attempts), if this attempt is higher than the allowed attempts
-      # (once you get into extra attempts), or if this attempt is
-      # the last attempt and has been taken (checking for completion
-      # prevents the student from starting to take the quiz for the last
-      # time, then opening a new tab and looking at the results from
-      # a prior attempt)
-      !quiz.allowed_attempts || quiz.allowed_attempts < 1 || attempt > quiz.allowed_attempts || last_attempt_completed?
-    else
-      true
-    end
+    results_visible_for_attempt?
   end
 
-  def results_visible_for_user?(user)
-    return true if user && self.quiz.grants_right?(user, :review_grades)
-    results_visible?
+  def results_visible_for_attempt?
+    return true unless quiz.hide_results == 'until_after_last_attempt'
+
+    # Visible if quiz has unlimited attempts (no way to get to last
+    # attempts), if this attempt is higher than the allowed attempts
+    # (once you get into extra attempts), or if this attempt is
+    # the last attempt and has been taken (checking for completion
+    # prevents the student from starting to take the quiz for the last
+    # time, then opening a new tab and looking at the results from
+    # a prior attempt)
+    !quiz.allowed_attempts ||
+      quiz.allowed_attempts < 1 ||
+      attempt > quiz.allowed_attempts ||
+      last_attempt_completed?
   end
+  private :results_visible_for_attempt?
 
   def last_attempt_completed?
     completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts

@@ -211,13 +211,14 @@ class ProvisionalGradesController < ApplicationController
           # student in moderation: choose the selected provisional grade
           selected_provisional_grade = submission.provisional_grades
             .detect { |pg| pg.id == selection.selected_provisional_grade_id }
-        else
-          # student not in moderation: choose the first one with a grade (there should only be one)
-          selected_provisional_grade = submission.provisional_grades
-            .select { |pg| pg.graded_at.present? }
-            .sort_by { |pg| pg.created_at }
-            .first
         end
+
+        # either the student is not in moderation, or not all provisional grades were entered
+        # choose the first one with a grade (there should only be one)
+        selected_provisional_grade ||= submission.provisional_grades
+          .select { |pg| pg.graded_at.present? }
+          .sort_by(&:created_at)
+          .first
 
         if selected_provisional_grade
           selected_provisional_grade.publish!
