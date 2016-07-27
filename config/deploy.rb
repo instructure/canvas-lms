@@ -1,5 +1,5 @@
 # config valid only for Capistrano 3.1
-lock '3.4.0'
+lock '3.5.0'
 
 set :application, 'canvas'
 set :repo_url, 'git@github.com:beyond-z/canvas-lms.git'
@@ -82,7 +82,7 @@ Rake::Task["deploy:rollback_assets"].clear_actions
 
 Rake::Task["deploy:restart"].clear_actions
 
-#Rake::Task["deploy:migrate"].clear_actions
+Rake::Task["deploy:migrate"].clear_actions
 
 namespace :deploy do
 
@@ -136,18 +136,20 @@ namespace :deploy do
   before :updated, :clone_data_analytics
   before :updated, :clone_qtimigrationtool
 
-  #desc "Migrate database"
-  #task :migrate do
-  #  on roles(:app) do
-  #    within release_path do
-  #      with rails_env: fetch(:rails_env) do
-          # If we skip compile assets and copy them over, some symlinks get broken and fail to recreate b/c of 
-          # permissions errors, so we use sudo.  Note: the error I saw was in public/javascripts/client_app
-          # TODO: still didnt' work b/c db:migrate can't be run as root.
-  #      end
-  #    end
-  #  end
-  #end
+  desc "Migrate database"
+  task :migrate do
+    on roles(:app) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          # Have to run predeploy sometimes when pulling in lots of changes b/c
+          # predeploy puts in place some dependencies that deploy needs. This was a problem
+          # when pulling in updated code from Instructure after an 8 month lapse on 7/27/16
+          execute :rake, 'db:migrate:predeploy', '--trace'
+          execute :rake, 'db:migrate', '--trace'
+        end
+      end
+    end
+  end
 
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
