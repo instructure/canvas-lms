@@ -1,4 +1,5 @@
 define [
+  'i18n!conferences'
   'jquery'
   'underscore'
   'timezone'
@@ -7,7 +8,7 @@ define [
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
   'compiled/behaviors/authenticity_token'
-], ($, _, tz, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
+], (I18n, $, _, tz, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
 
   class EditConferenceView extends DialogBaseView
 
@@ -43,9 +44,14 @@ define [
           alert('Save failed.')
       )
 
-    show: (model) ->
+    show: (model, opts = {}) ->
       @model = model
       @render()
+      if (opts.isEditing)
+        newTitle = I18n.t('Edit "%{conference_title}"', conference_title: model.get('title'))
+        @$el.dialog('option', 'title', newTitle)
+      else
+        @$el.dialog('option', 'title', I18n.t('New Conference'))
       super
 
     update: =>
