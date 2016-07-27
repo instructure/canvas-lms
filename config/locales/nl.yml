@@ -815,7 +815,7 @@ nl:
     settings: 
       about_google_docs: |-
           Google Docs Previews stelt gebruikers in staat om documenten te bekijken
-          op Canvas, in plaats van ze te  downloaden en het bijbehorende programma 
+          op Canvas, in plaats van ze te  downloaden en het bijbehorende programma
           (bijvoorbeeld Word of Excel) te openen.
           
           Google Docs Previews kan ook bestandtypen weergeven die
@@ -1098,8 +1098,9 @@ nl:
     sis_import: 
       add_sis_stickiness_instructions: "Indien deze optie is geselecteerd, zullen wijzigingen die zijn doorgevoerd door deze SIS-import verwerkt worden alsof het UI-wijzigingen zijn. Zo wordt voorkomen dat de gewijzigde velden gewijzigd worden bij volgende, niet-doorslaggevende SIS-imports."
       add_sis_stickiness_label: "Als UI-wijzigingen verwerken"
-      batch_import_instructions: "Als deze optie is geselecteerd, wordt alles voor deze periode verwijderd, inclusief alle cursussen en inschrijvingen die niet in het hierboven geselecteerde importbestand zijn opgenomen. \n\
-          Zie de documentatie voor details.      "
+      batch_import_instructions: |-
+          Als deze optie is geselecteerd, wordt alles voor deze periode verwijderd, inclusief alle cursussen en inschrijvingen die niet in het hierboven geselecteerde importbestand zijn opgenomen.
+          Zie de documentatie voor details.
       batch_mode_label: "Dit is een volledige batch update"
       clear_sis_stickiness_instructions: "Indien deze optie is geselecteerd, zullen alle velden in alle records die door deze SIS-import gewijzigd zijn, in de toekomst gewijzigd kunnen worden door niet-doorslaggevende SIS-imports."
       clear_sis_stickiness_label: "UI-gewijzigde status wissen"
@@ -1111,7 +1112,7 @@ nl:
       imported_message: "Alle SIS-gegevens zijn succesvol geïmporteerd."
       imported_with_messages_message: "De SIS-gegevens zijn geïmporteerd, maar met de volgende berichten aangegeven:"
       last_batch_title: "Laatste batch"
-      override_sis_stickiness_instructions: "UI-wijzigingen hebben standaard voorrang op SIS-importwijzigingen. Dit betekent dat de gegevens van een aantal velden bij een SIS-import niet gewijzigd worden als een beheerder dat veld via de UI gewijzigd heeft. Als je deze optie selecteert, zal deze SIS-import de UI-wijzigingen overschrijven. Zie de documentatie voor details. "
+      override_sis_stickiness_instructions: "UI-wijzigingen hebben standaard voorrang op SIS-importwijzigingen. Dit betekent dat de gegevens van een aantal velden bij een SIS-import niet gewijzigd worden als een beheerder dat veld via de UI gewijzigd heeft. Als je deze optie selecteert, zal deze SIS-import de UI-wijzigingen overschrijven. Zie de documentatie voor details."
       override_sis_stickiness_label: "UI-wijzigingen overschrijven"
       page_title: SIS-import
       pending_batches_count: 
@@ -3127,13 +3128,13 @@ nl:
       collaboration_name: "Samenwerking %{course_or_group_name}"
       descriptions: 
         etherpad: |-
-            EtherPad is een open bron project waarmee je gemakkelijk gedeelde documenten kunt opstellen. Het is zo snel dat je onmiddellijk kunt zien wat anderen aan het typen zijn. Aan de andere kant worden de gedeelde documenten ("pads") echter niet beveiligd met een wachtwoord zodat iedereen met een link het document kan wijzigen. EtherPad is beter geschikt dan Google Docs wanneer je jouw anonimiteit wilt waarborgen en/of mensen zonder Google-account wilt laten deelnemen. 
+            EtherPad is een open bron project waarmee je gemakkelijk gedeelde documenten kunt opstellen. Het is zo snel dat je onmiddellijk kunt zien wat anderen aan het typen zijn. Aan de andere kant worden de gedeelde documenten ("pads") echter niet beveiligd met een wachtwoord zodat iedereen met een link het document kan wijzigen. EtherPad is beter geschikt dan Google Docs wanneer je jouw anonimiteit wilt waarborgen en/of mensen zonder Google-account wilt laten deelnemen.
             
             **Waarschuwing**: zorg ervoor dat je bekend bent met het [verwijderbeleid van EtherPad](%{etherpad_deletion_policy_url}) om er zeker van te zijn dat jouw werk behouden blijft.
         google_docs: |-
             Google Docs is zeer geschikt voor het samen werken aan een groepsproject. Het werkt hetzelfde als Microsoft Word, met het verschil dat je tegelijkertijd met meerdere mensen aan hetzelfde document kunt werken zonder dat je steeds naar elkaar hoeft te mailen.
             
-             **Waarschuwing**: je moet (evenals al je mede- deelnemers) over een Google-account beschikken om via Google Docs te kunnen samenwerken.
+            **Waarschuwing**: je moet (evenals al je mede- deelnemers) over een Google-account beschikken om via Google Docs te kunnen samenwerken.
       labels: 
         collaboration_type: "Samenwerken via:"
         description: "Beschrijving:"
@@ -3153,7 +3154,7 @@ nl:
           samen te werken op een gedeeld document. Je kunt bronnen gebruiken als
           [Google Docs](%{google_url})
           om samen te werken aan taken, zoals groepwerkstukken of aantekeningen maken. Deze
-          pagina is een gemakkelijke plek om deze samenwerkingen bij te houden en ook om ze 
+          pagina is een gemakkelijke plek om deze samenwerkingen bij te houden en ook om ze
           in te stellen zonder e-mails uit te wisselen.
       description_teacher: |-
           **Wat bedoelen we met samenwerkingen?** We praten over web-gebaseerde tools die
@@ -3233,7 +3234,7 @@ nl:
         account_exists: |-
             Er is al een gebruikersaccount gekoppeld aan %{email}.
             
-              **Bent u %{name}?**
+            **Bent u %{name}?**
         account_needed: "Je bent uitgenodigd om deel te nemen aan **%{course}**. Om dit verzoek te kunnen accepteren heb je een Canvas-account nodig. Op de onderstaande link klikken om een Canvas-account te maken."
         add_email: "Wil je dit e-mailadres  aan jouw huidige account toevoegen?"
         choose_login: "Selecteren waar je op wilt aanmelden. "
@@ -3800,9 +3801,9 @@ nl:
         course_modules: Cursusmodules
       help: 
         create: |-
-            Met cursusmodules kun je jouw opdrachten, pagina's, bestanden, etc.  in kleinere secties of eenheden opsplitsen. Modules kunnen rond een thema  gecentreerd worden, kunnen op een specificiek onderwerp gericht worden, of kunnen alleen maar chronologisch gegroepeerd worden. 
+            Met cursusmodules kun je jouw opdrachten, pagina's, bestanden, etc.  in kleinere secties of eenheden opsplitsen. Modules kunnen rond een thema  gecentreerd worden, kunnen op een specificiek onderwerp gericht worden, of kunnen alleen maar chronologisch gegroepeerd worden.
             
-            Je kunt modules in een volgorde plaatsen door criteria en eerste vereisten voor iedere module op te stellen. Cursisten kunnen de modules dan pas openen als ze aan alle eerste vereisten voldaan hebben. Hierdoor kunnen cursisten bijvoorbeeld een bepaalde inhoud of bestanden pas bekijken als ze, laten we zeggen, minstens 75% behaald hebben in een review toets. 
+            Je kunt modules in een volgorde plaatsen door criteria en eerste vereisten voor iedere module op te stellen. Cursisten kunnen de modules dan pas openen als ze aan alle eerste vereisten voldaan hebben. Hierdoor kunnen cursisten bijvoorbeeld een bepaalde inhoud of bestanden pas bekijken als ze, laten we zeggen, minstens 75% behaald hebben in een review toets.
             
             Op de knop "%{button}" aan de rechterkant klikken om jouw cursus in modules beginnen op te delen.
         no_modules: "Er zijn  voor deze cursus geen modules gedefinieërd."
@@ -6323,7 +6324,7 @@ nl:
             * Het krijgen van een overzicht van jouw onderwijservaring als geheel
             * Het delen van je werk met vrienden, toekomstige werkgevers, etc.
             
-            ePortfolios kunnen  voor iedereen openbaar zijn of ze kunnen alleen toegankelijk zijn voor hen die je zelf kiest. 
+            ePortfolios kunnen  voor iedereen openbaar zijn of ze kunnen alleen toegankelijk zijn voor hen die je zelf kiest.
             Je kunt die instelling daarvoor te allen tijde wijzigen.
             
             Klaar om te beginnen? Klik op de knop.
@@ -6857,7 +6858,7 @@ nl:
   good_score_b02f3587: "Goede score"
   google_apps_domain_eddc8dee: "Google Apps domein"
   google_docs_40374e65: "Google Docs"
-  google_docs_domain_restriction_description: "Beperking van Google Docs Domein staat toe dat inzendingen en amenwerkingen in Google Docs beperkt worden tot een enkel domein. Cursisten die proberen opdrachten of samenwerkingen in een niet goedgekeurd domein in te leveren zullen een foutbericht ontvangen om ze te waarschuwen dat ze hun Google Docs integratie moeten bijwerken. "
+  google_docs_domain_restriction_description: "Beperking van Google Docs Domein staat toe dat inzendingen en amenwerkingen in Google Docs beperkt worden tot een enkel domein. Cursisten die proberen opdrachten of samenwerkingen in een niet goedgekeurd domein in te leveren zullen een foutbericht ontvangen om ze te waarschuwen dat ze hun Google Docs integratie moeten bijwerken."
   google_docs_preview_9f41b23c: "Voorbeeldweergave in Google Docs."
   google_drive_7cb003c9: "Google Drive"
   goto_first_page_650f1638: "Ga naar eerste pagina"
@@ -7512,7 +7513,7 @@ nl:
       restricted_self_signup: "Groepsleden moeten zich in dezelfde sectie bevinden"
       self_signup_help_message: |-
           Je kunt reeksen van groepen maken waar cursisten zichzelf voor kunnen inschrijven.
-          Cursisten kunnen zich maar voor een groep uit de reeks inschrijven, maar op deze manier kunnen cursisten de groepsindelingen onderling regelen zonder hulp van de docent. 
+          Cursisten kunnen zich maar voor een groep uit de reeks inschrijven, maar op deze manier kunnen cursisten de groepsindelingen onderling regelen zonder hulp van de docent.
           Het is ook mogelijk om als eis te stellen dat groepsgenoten in dezelfde cursussectie moeten zitten.
           
           Houd in gedachten dat cursisten zich van de ene groep naar de andere groep kunnen verplaatsen. Dus als jouw cursisten klaar zijn met indelen, wil je misschien zelfinschrijvingen uitschakelen.
@@ -7830,10 +7831,11 @@ nl:
     unassigned_students: "Niet-toegewezen cursisten (%{count})"
     unassigned_users: "Niet-toegewezen gebruikers (%{count})"
   groups_6c90e26a: "Groepen "
-  groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Groepen zijn een goede plaats om aan projecten te werken of om schema's van studie sessies en dat soort dingen \n\
-      uit te werken. Iedere groep krijgt een kalender, een wiki, discussies, en wat opslagruimte om\n\
-      bestanden op te slaan. Groepen kunnen samenwerken aan documenten , of zelfs vergaderingen via het web plannen.\n\
-      Het is net een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht project  kunt werken. "
+  groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
+      Groepen zijn een goede plaats om aan projecten te werken of om schema's van studie sessies en dat soort dingen
+      uit te werken. Iedere groep krijgt een kalender, een wiki, discussies, en wat opslagruimte om
+      bestanden op te slaan. Groepen kunnen samenwerken aan documenten , of zelfs vergaderingen via het web plannen.
+      Het is net een mini-cursus waar je met een kleiner aantal cursisten aan een meer gericht project  kunt werken.
   groupweight_of_total_9579ae8c: "%{groupWeight}% of Total"
   help_4c4968b1: Help
   help_dialog: 
@@ -8298,10 +8300,11 @@ nl:
       log_in_to_canvas: "Aanmelden op Canvas"
   learn_more_about_collaborations_2978f66d: "Meer informatie over samenwerkingen"
   learning_mastery_5fc34276: "Meesterschap leren"
-  learning_mastery_gradebook_description: "De cijferlijst bekwaam leren biedt een manier aan docenten om snel de voortgang van cusrsist en cursus  \n\
-      op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige \n\
-      formaat gepresenteerd en voortgang van cursist wordt als een numerieke score en als bekwaam/bijna \n\
-      bekwaam/verbetering weergegeven. "
+  learning_mastery_gradebook_description: |-
+      De cijferlijst bekwaam leren biedt een manier aan docenten om snel de voortgang van cusrsist en cursus
+      op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige
+      formaat gepresenteerd en voortgang van cursist wordt als een numerieke score en als bekwaam/bijna
+      bekwaam/verbetering weergegeven.
   learning_outcome: 
     no_comment: "Geen opmerking"
     no_description: "Geen beschrijving"
@@ -8338,7 +8341,7 @@ nl:
     basic_lti: 
       bad_score: "Score ligt niet tussen 0 en 1"
       no_points_comment: |-
-          Een extern hulpprogramma geprobeerd om deze opdracht te beoordelen als %{grade} maar 
+          Een extern hulpprogramma geprobeerd om deze opdracht te beoordelen als %{grade} maar
           , maar was niet mogelijk omdat de opdracht geen maximaal aantal punten heeft.
       no_points_possible: "Opdracht heeft geen maximaal aantal punten."
       no_score: "Geen score gegeven"
@@ -8368,16 +8371,16 @@ nl:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Het bericht met de titel "%{subject}" kon niet  afgeleverd worden. Dit bericht is naar een onbekend adres verzonden. Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en dan aan die personen via jouw Inbox een bericht te zenden. 
+            Het bericht met de titel "%{subject}" kon niet  afgeleverd worden. Dit bericht is naar een onbekend adres verzonden. Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en dan aan die personen via jouw Inbox een bericht te zenden.
             
-            Bedankt! 
+            Bedankt!
             Canvas Ondersteuning
         subject: "Antwoord op bericht mislukt: %{subject}"
       locked_topic: 
         body: |-
-            Het bericht met de titel "%{subject}" kon niet worden afgeleverd omdat het discussie-onderwerp vergrendeld is . Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en dan aan die personen via jouw Inbox een bericht te zenden. 
+            Het bericht met de titel "%{subject}" kon niet worden afgeleverd omdat het discussie-onderwerp vergrendeld is . Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en dan aan die personen via jouw Inbox een bericht te zenden.
             
-            Bedankt! 
+            Bedankt!
             Canvas Ondersteuning
         subject: "Antwoord op bericht mislukt: %{subject}"
     progress_runner: 
@@ -8525,7 +8528,7 @@ nl:
           verify: Verifieren
         details: 
           mfa_enrollment: |-
-              Multi-Factor-verificatie verhoogt de beveiliging door iets physieks in je bezit toe te voegen aan het wachtwoord om op Canvas aan te melden. 
+              Multi-Factor-verificatie verhoogt de beveiliging door iets physieks in je bezit toe te voegen aan het wachtwoord om op Canvas aan te melden.
               Dit kan een apparaat zijn dat verificatiescodes genereert, maar ook een mobiele telefoon die tekstberichten
               kan ontvangen. De Google-verificatie-app voor [iPhone](%{iphone_url}) of [Android](%{android_url}) kan
               geconfigureerd worden door de onderstaande QR-code te scannen. Andere tokens kunnen geconfigureerd worden door
@@ -9286,7 +9289,7 @@ nl:
       summary: 
         body: |-
             Je bent uitgenodigd om samen  aan een document te werken%{document} voor
-            %{course_or_group}. Het document is gemaakt met %{service}. Je bent via jouw 
+            %{course_or_group}. Het document is gemaakt met %{service}. Je bent via jouw
             e-mailadres %{email} uitgenodigd.
         body_with_user: |-
             Je bent uitgenodigd om samen  aan een document te werken %{document} voor
@@ -9319,7 +9322,7 @@ nl:
     content_export_failed: 
       email: 
         body: |-
-            Er is  tijdens het exporteren van de cursus "%{course}" een probleem opgetreden. 
+            Er is  tijdens het exporteren van de cursus "%{course}" een probleem opgetreden.
             Waarschuw jouw systeembeheerder en geef deze de volgende export-ID: %{id}.
         html: 
           body2: "Er is tijdens het exporteren van de cursus *%{course}*e en probleem opgetreden. Waarschuw jouw systeembeheerder en geef deze de volgende export-ID:"
@@ -9399,7 +9402,7 @@ nl:
             
             %{course}, jouw cursus op het netwerk van Canvas, is een paar dagen geleden gestart en we hebben gemerkt dat jij je nog niet hebt aangemeld. We wilden jou nog een laatste herinnering sturen voor het geval dat je het vergeten bent.
             
-            Ga naar %{site} en voer jouw gebruikersnaam en wachtwoord in om aan te melden. Als je nog geen wachtwoord hebt ingesteld kun je dat hier doen: %{password_url}. 
+            Ga naar %{site} en voer jouw gebruikersnaam en wachtwoord in om aan te melden. Als je nog geen wachtwoord hebt ingesteld kun je dat hier doen: %{password_url}.
             
             Als je gewoonweg deze bepaalde cursus niet kunt doen, voel je dan vrij om door onze catalogus te bladeren op %{site} om iets anders te zoeken dat je interesseert. Er worden regelmatig nieuwe cursussen toegevoegd!
             
@@ -9440,7 +9443,7 @@ nl:
         body: |-
             %{user},
             
-            Het is bijna tijd! %{course}, een cursus in Canvas Network waar je je voor hebt ingeschreven , begint volgende week. Je bent zeker even opgewonden als wij. 
+            Het is bijna tijd! %{course}, een cursus in Canvas Network waar je je voor hebt ingeschreven , begint volgende week. Je bent zeker even opgewonden als wij.
             
             Wat kun je doen om je voor te bereiden?
             
@@ -9456,7 +9459,7 @@ nl:
       title: "Een antwoordbericht sturen"
     email: 
       footer: |-
-          Je hebt deze mail ontvangen omdat je deelneemt aan een of meer groepen die van Canvas gebruikmaken. Om e-mailmeldingen te wijzigen of uit te zetten, bezoek: 
+          Je hebt deze mail ontvangen omdat je deelneemt aan een of meer groepen die van Canvas gebruikmaken. Om e-mailmeldingen te wijzigen of uit te zetten, bezoek:
           %{url}
     enrollment_accepted: 
       email: 
@@ -10890,12 +10893,17 @@ nl:
     due_date_display: Inleverdatum
     files_description: "Nieuw bestand aan jouw cursus  toegevoegd "
     files_display: Bestanden
-    grading_description: "Inclusief:\n\n\
-        * Cijfer van opdracht/inzending ingevoerd/gewijzigd\n\
-        * Ongewijzigde cijfer van opdracht\n\
-        * Gemiddelde cijfer gewijzigd\n\n\n\n\
-        'Scoren opnemen wanneer er waarschuwingen zijn van cijfer wijzigingen' aanvinken als je jouw cijfers in de meldingen wilt zien.\n\
-        Als jouw e-mail geen e-mail van de instelling is dan betekent dit dat gevoelige inhoud naar buiten de instelling verzonden zal worden.  "
+    grading_description: |-
+        Inclusief:
+        
+        * Cijfer van opdracht/inzending ingevoerd/gewijzigd
+        * Ongewijzigde cijfer van opdracht
+        * Gemiddelde cijfer gewijzigd
+        
+        
+        
+        'Scoren opnemen wanneer er waarschuwingen zijn van cijfer wijzigingen' aanvinken als je jouw cijfers in de meldingen wilt zien.
+        Als jouw e-mail geen e-mail van de instelling is dan betekent dit dat gevoelige inhoud naar buiten de instelling verzonden zal worden.
     grading_display: Beoordeling
     grading_notify_include_grade: "Scores insluiten wanneer waarschuwingen over wijzigingen in cijfers worden verstuurd."
     grading_policies_description: "Gewijzigd beleid voor het beoordelen van cursussen"
@@ -11393,8 +11401,10 @@ nl:
     save_button: Opslaan
     saving_button: "Bezig met opslaan..."
     warnings: 
-      overwrite_changes: "Je gaat andere wijzigingen overschrijven die aangebracht zijn  sinds je met het bewerken bent begonnen.\n\n\
-          Deze wijzigingen overschrijven?  "
+      overwrite_changes: |-
+          Je gaat andere wijzigingen overschrijven die aangebracht zijn  sinds je met het bewerken bent begonnen.
+          
+          Deze wijzigingen overschrijven?
       unsaved_changes: "Je hebt veranderingen die niet opgeslagen zijn. Wil je doorgaan zonder deze veranderingen op te slaan?"
   paginated_collection: 
     no_items: "Geen items."
@@ -11819,9 +11829,9 @@ nl:
     webct_scraper_settings: 
       description: |-
           Als de instelling geen WebCT-"leermodules" gebruikt (inclusief scholen die WebCT
-          in een eerdere versie dan versie 4.0 gebruikten, toen modules beschikbaar kwamen) kunnen cursusmigraties verbeterd worden door de "Cursusinhoud" 
-          als Canvas-modules te importeren in plaats van als "Leermodules". Deze pagina maakt het mogelijk om het standaardgedrag van de WebCT-migrator 
-          in te stellen met betrekking tot de inhoudsmodules/modules met inhoud. Het is belangrijk om dat te onthouden terwijl bij individuele cursusmigraties de mogelijkheid 
+          in een eerdere versie dan versie 4.0 gebruikten, toen modules beschikbaar kwamen) kunnen cursusmigraties verbeterd worden door de "Cursusinhoud"
+          als Canvas-modules te importeren in plaats van als "Leermodules". Deze pagina maakt het mogelijk om het standaardgedrag van de WebCT-migrator
+          in te stellen met betrekking tot de inhoudsmodules/modules met inhoud. Het is belangrijk om dat te onthouden terwijl bij individuele cursusmigraties de mogelijkheid
           om te kiezen behouden blijft, gebruikt de bulkmigrator altijd de waarde  die hier geconfigureerd is en per migratie niet gewijzigd kan worden.
       labels: 
         allow_outline_selection: "Optie weergeven om cursusinhoud als modules te gebruiken in de migratiewizard"
@@ -11891,11 +11901,11 @@ nl:
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Cijfer bekend maken op SIS uitgeschakeld. Klik om aan/uit te zetten."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Cijfer bekend maken op SIS ingeschakeld. Klik om aan/uit te zetten."
   post_grades_39c52870: "Cijfers bekend maken/posten "
-  post_grades_description: "Cijfers publiceren laat docenten toe cijfers in ingeschakelde SIS systemen te publiceren: Powerschool,\n\
-      Aspire (SIS2000), JMC, en enig ander SIF ingeschakelde SIS die de SIF onderdelen \n\
-      BeoordelingsCategorie,\n\
-      OpdrachtBeoordeling, OpdrachtBeoordelingsCijfer accepteert.\n\
-      \x20"
+  post_grades_description: |
+      Cijfers publiceren laat docenten toe cijfers in ingeschakelde SIS systemen te publiceren: Powerschool,
+      Aspire (SIS2000), JMC, en enig ander SIF ingeschakelde SIS die de SIF onderdelen
+      BeoordelingsCategorie,
+      OpdrachtBeoordeling, OpdrachtBeoordelingsCijfer accepteert.
   post_grades_to_sis_97ece878: "Cijfers op SIS posten "
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "Vakje \"Cijfers op SIS posten\" is standaard ingeschakeld voor opdrachten, beoordeelde gesprekken en toetsen"
   powerschool_a30f0bfc: PowerSchool
@@ -12124,11 +12134,13 @@ nl:
           jezelf, en verschijnen niet in je openbare stream.
       unknown_service: Onbekend"
       web_services: "Canvas kan jouw leven een stuk gemakkelijker maken door veel te integreren met webhulpmiddelen die je al gebruikt. Op welke dienst dan ook in \"Andere services\" klikken om te zien wat we daarmee bedoelen."
-      yo_description: "Yo is een communicatietool zonder tik karakter.\n\
-          Als je een Yo account hebt, dan kun je deze hier registreren. Als je dan\n\
-          medecursisten/groepsleden toelaat om de registreerde services te zien, kunnen ze\n\
-          makkelijk met jouw Yo account verbinding maken.\n\n\
-          Je kunt je ook aanmelden om notificaties naar jouw Yo account te sturen. "
+      yo_description: |-
+          Yo is een communicatietool zonder tik karakter.
+          Als je een Yo account hebt, dan kun je deze hier registreren. Als je dan
+          medecursisten/groepsleden toelaat om de registreerde services te zien, kunnen ze
+          makkelijk met jouw Yo account verbinding maken.
+          
+          Je kunt je ook aanmelden om notificaties naar jouw Yo account te sturen.
     purpose_required: "Doel is vereist"
     resending: "Bezig met opnieuw versturen..."
     secondary_nav: 
@@ -12514,8 +12526,9 @@ nl:
         invert: Omkeren
         truncate: "Tekstuele antwoorden afbreken "
       page_header: "Sequentie van het antwoord "
-  quiz_log_auditing_desc: "Het bijhouden van gebeurtenissen voor een toets inzending inschakelen, en de mogelijkheid\n\
-      om een logboek van die gebeurtenissen te bekijken eenmaal een inzending is gedaan. "
+  quiz_log_auditing_desc: |-
+      Het bijhouden van gebeurtenissen voor een toets inzending inschakelen, en de mogelijkheid
+      om een logboek van die gebeurtenissen te bekijken eenmaal een inzending is gedaan.
   quiz_lti_plugin_a189607f: "Toets LTI plugin"
   quiz_lti_plugin_a6256549: "Toets LTI plugin"
   quiz_menu_4fcd5e61: "Test Menu"
@@ -12797,8 +12810,10 @@ nl:
     question_count: 
       one: "1 vraag"
       other: "%{count} vragen"
-    question_limit_reached: "Je hebt het maximum aantal toegelaten vragen voor een toets (%{count}/%{limit}) bereikt.\n\n\
-        Overweeg, als oplossing, de materie over meerdere toetsen te verspreiden. "
+    question_limit_reached: |-
+        Je hebt het maximum aantal toegelaten vragen voor een toets (%{count}/%{limit}) bereikt.
+        
+        Overweeg, als oplossing, de materie over meerdere toetsen te verspreiden.
     quiz: 
       current_filter: "Huidig filter"
       default_question_input: "[ Selecteer ]"
@@ -13005,7 +13020,7 @@ nl:
           multiple_dropdowns: "Voer jouw vraag in en specificeer waar de vervolgkeuzelijst moet komen. Definieer daarna mogelijke antwoorden voor elke vervolgkeuzelijst, met een juist antwoord per vervolgkeuzelijst."
           numerical: "Definieer het juiste antwoord als elk getal binnen een bepaald bereik of als een getal met een bepaalde foutmarge. Cursisten zullen een leeg tekstvakje krijgen om zijn/haar getal numeriek antwoord in te typen."
           short_answer: |-
-              Voer de tekst van jouw vraag in en definieer alle mogelijke juiste antwoorden.  
+              Voer de tekst van jouw vraag in en definieer alle mogelijke juiste antwoorden.
               Cursisten zullen de vraag, gevolgd door een klein tekstveld waarin ze het antwoord kunnen intypen, zien.
           text_only: "Deze \"vraag\" zal niet beoordeeld worden, maar kan nuttig zijn om een set gerelateerde vragen te introduceren."
           true_false: "Voer de tekst van jouw vraag in en selecteer daarna of het antwoord juist of onjuist is."
@@ -14442,11 +14457,13 @@ nl:
   set_some_up_now_1749bb44: "Nu iets opstellen"
   settings: 
     recaptcha_settings: 
-      instructions: "Voordat u de ReCAPTCHA plugin kunt gebruiken moet je je aanmelden  bij\n\
-          [registreren voor een account op ReCAPTCHA](%{url}). Zorg ervoor dat je je domein\n\
-          goed instelt om je site domein(en) te beheren. Nadat je een\n\
-          account hebt opgesteld/ingesteld, voer dan jouw openbare en privé sleutels hieronder in.\n\n\
-          **Let op:** Iedere verandering die je aan deze instellingen  maakt wordt pas bijgewerkt als je de server opnieuw start. "
+      instructions: |-
+          Voordat u de ReCAPTCHA plugin kunt gebruiken moet je je aanmelden  bij
+          [registreren voor een account op ReCAPTCHA](%{url}). Zorg ervoor dat je je domein
+          goed instelt om je site domein(en) te beheren. Nadat je een
+          account hebt opgesteld/ingesteld, voer dan jouw openbare en privé sleutels hieronder in.
+          
+          **Let op:** Iedere verandering die je aan deze instellingen  maakt wordt pas bijgewerkt als je de server opnieuw start.
       labels: 
         recaptcha_private_key: "ReCAPTCHA-privésleutel "
         recaptcha_public_key: "Openbare ReCAPTCHA-sleutel "
@@ -14752,7 +14769,7 @@ nl:
       mute_dialog: |-
           Weet je zeker dat je deze opdracht wilt verbergen? Wanneer deze opdracht is verborgen, zullen cursisten geen nieuwe meldingen ontvangen of in staat zijn om het volgende te zien:
           
-          * Meldingen van wijzigingen in cijfers 
+          * Meldingen van wijzigingen in cijfers
           * Opmerkingen op de inzendingen
           * Bijstellingen van beoordelingen
           * Meldingen over scoreveranderingen
@@ -15377,8 +15394,8 @@ nl:
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Namen van cursisten moeten verborgen zijn omdat anoniem beoordelen verplicht is."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Namen van cursisten moeten verborgen zijn omdat dit een anonieme enquête is."
   student_outcome_gradebook_description: |-
-      De cijferlijst bekwaam leren cursisten biedt een manier aan cursisten om snel hun voortgang 
-      op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige format gepresenteerd en voortgang 
+      De cijferlijst bekwaam leren cursisten biedt een manier aan cursisten om snel hun voortgang
+      op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige format gepresenteerd en voortgang
       wordt als een numerieke score en als bekwaam/bijna bekwaam/verbetering weergegeven.
   student_summary: 
     student_summary_table_ascending: "Cursist samenvattingstabel oplopend gesorteerd door %{sortText}"
@@ -15763,9 +15780,9 @@ nl:
       Bedankt! 
       Canvas Ondersteuning
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      Het bericht met de titel "%{subject}" kon niet worden afgeleverd omdat het discussie-onderwerp verwijderd is . Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en hem dan via je postbus een bericht zenden. 
+      Het bericht met de titel "%{subject}" kon niet worden afgeleverd omdat het discussie-onderwerp verwijderd is . Als je iemand via Canvas wilt benaderen, kun je proberen aan te melden en hem dan via je postbus een bericht zenden.
       
-      Bedankt! 
+      Bedankt!
       Canvas Ondersteuning
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Het bericht dat je stuurde met onderwerpregel "%{subject}"  is niet afgeleverd. Om de Canvas berichten vanaf deze e-mail te beantwoorden, moet het eerst een bevestigd communcatiekanaal in je Canvas profiel zijn. Ga naar je profiel en stuur de bevestigingsmail voor dit e-mailadres [Zie https://community.canvaslms.com/docs/DOC-2281].  Je kunt ook contact opnemen met deze persoon via de Canvas postbus [See https://community.canvaslms.com/docs/DOC-2670].
