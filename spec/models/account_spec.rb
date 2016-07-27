@@ -1525,4 +1525,19 @@ describe Account do
     end
   end
 
+  describe "#users_name_like" do
+    context 'sharding' do
+      specs_require_sharding
+
+      it "should work cross-shard" do
+        ActiveRecord::Base.connection.stubs(:use_qualified_names?).returns(true)
+        @shard1.activate do
+          @account = Account.create!
+          @user = user(:name => "silly name")
+          @user.account_users.create(:account => @account)
+        end
+        expect(@account.users_name_like("silly").first).to eq @user
+      end
+    end
+  end
 end
