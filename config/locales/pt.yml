@@ -1100,7 +1100,7 @@ pt:
       add_sis_stickiness_instructions: "Com esta opção selecionada, as alterações feitas através desta importação do SIS serão processadas como se fossem alterações de UI, evitando que importações de não substituição subsequentes alterem os campos aqui alterados."
       add_sis_stickiness_label: "Processar à medida que a UI é alterada"
       batch_import_instructions: |-
-          Se for selecionada, todos os dados referentes a este período serão eliminados, incluindo todas as disciplinas e inscrições que não estão no ficheiro de importação selecionado acima.  
+          Se for selecionada, todos os dados referentes a este período serão eliminados, incluindo todas as disciplinas e inscrições que não estão no ficheiro de importação selecionado acima.
           Consulte a documentação para obter detalhes.
       batch_mode_label: "Esta é uma atualização em lote completa"
       clear_sis_stickiness_instructions: "Com esta opção selecionada, todos os campos em todos os registros atingidos por esta importação do SIS poderão ser mudados em futuras importações do SIS sem substituição."
@@ -1114,7 +1114,7 @@ pt:
       imported_with_messages_message: "Os dados do SIS foram importados, mas com estas mensagens:"
       last_batch_title: "Último lote"
       override_sis_stickiness_instructions: |-
-          Por predefinição, as alterações de UI têm prioridade sobre as alterações de importação do SIS; a importação do SIS não alterará os dados de determinados campos se um administrador tiver alterado o campo através da UI. Se selecionar esta opção, a importação do SIS vai substituir as alterações de UI.  
+          Por predefinição, as alterações de UI têm prioridade sobre as alterações de importação do SIS; a importação do SIS não alterará os dados de determinados campos se um administrador tiver alterado o campo através da UI. Se selecionar esta opção, a importação do SIS vai substituir as alterações de UI.
           Consulte a documentação para obter detalhes.
       override_sis_stickiness_label: "Substituir as alterações de UI"
       page_title: "Importação de SIS"
@@ -1124,7 +1124,7 @@ pt:
       pending_batches_title: "Lotes pendentes"
       process_data_button: "Processar dados"
       select_file_instructions: |-
-          Selecione o ficheiro zip que pretende importar.  
+          Selecione o ficheiro zip que pretende importar.
           Para ver uma descrição de como gerar estes ficheiros zip, [consulte esta documentação](%{url}).
       sis_import_crumb: "Importação de SIS"
       started_at_message: "Iniciado: %{started_at}"
@@ -3119,22 +3119,22 @@ pt:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Eliminar apenas  
+            Eliminar apenas
             do Canvas
         delete_from_google_docs: |-
-            Eliminar também do  
+            Eliminar também do
             Google Docs
         start_collaborating: "Iniciar colaboração"
         update: "Atualizar colaboração"
       collaboration_name: "%{course_or_group_name} Colaboração"
       descriptions: 
         etherpad: |-
-            O EtherPad é um projeto "open source" que permite configurar rapidamente documentos partilhados. É tão rápido que até consegue ver o que as outras pessoas estão a escrever à medida que escrevem. Por outro lado, os "blocos" não são protegidos por palavra-passe, o que significa que qualquer pessoa com uma ligação pode editá-los. O EtherPad é mais adequado do que o Google Docs se pretender a função de anonimato e/ou permitir a participação de pessoas sem contas Google.  
-              
+            O EtherPad é um projeto "open source" que permite configurar rapidamente documentos partilhados. É tão rápido que até consegue ver o que as outras pessoas estão a escrever à medida que escrevem. Por outro lado, os "blocos" não são protegidos por palavra-passe, o que significa que qualquer pessoa com uma ligação pode editá-los. O EtherPad é mais adequado do que o Google Docs se pretender a função de anonimato e/ou permitir a participação de pessoas sem contas Google.
+            
             **Aviso**: certifique-se de que está familiarizado com a [política de eliminação do EtherPad](%{etherpad_deletion_policy_url}) para assegurar a preservação do seu trabalho.
         google_docs: |-
-            O Google Docs é um bom local para colaborar num projeto de grupo.  É semelhante ao Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo ficheiro, ao mesmo tempo, sem ser necessário enviar o ficheiro por e-mail.  
-              
+            O Google Docs é um bom local para colaborar num projeto de grupo.  É semelhante ao Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo ficheiro, ao mesmo tempo, sem ser necessário enviar o ficheiro por e-mail.
+            
             **Aviso**: você (e todos os seus colaboradores) precisarão de uma conta no Google para poder participar em qualquer colaboração no Google Docs.
       labels: 
         collaboration_type: "Colaborar utilizando:"
@@ -3235,7 +3235,7 @@ pt:
         account_exists: |-
             Já existe uma conta de utilizador associada a %{email}.
             
-              **O seu nome é %{name}?**
+            **O seu nome é %{name}?**
         account_needed: "Foi convidado para aderir a **%{course}**. Para aceitar este pedido, é necessária uma conta do Canvas. Clique na ligação abaixo para criar uma conta do Canvas."
         add_email: "Deseja adicionar este endereço de e-mail à sua conta atual?"
         choose_login: "Selecione onde deseja iniciar sessão."
@@ -6901,9 +6901,9 @@ pt:
     confirms: 
       delete_comment: "Tem certeza de que deseja excluir este comentário?"
       unsaved_changes: |-
-          Os seguintes alunos têm alterações não guardadas nos testes enviados: 
+          Os seguintes alunos têm alterações não guardadas nos testes enviados:
           
-           %{users}
+          %{users}
           Continuar à mesma?
     crocodoc_expiring: "A sua sessão Crocodoc está prestes a expirar. Recarregue a janela para evitar perder qualquer trabalho."
     dialog_button: 
@@ -8372,15 +8372,15 @@ pt:
         body: |-
             Não foi possível entregar a mensagem com o título "%{subject}".  A mensagem foi enviada para um endereço desconhecido.  Se está a tentar contactar alguém através do Canvas, pode tentar iniciar sessão na sua conta e enviar uma mensagem a essa pessoa utilizando a ferramenta de Caixa de entrada.
             
-                      Obrigado,
-                      Suporte do Canvas
+            Obrigado,
+            Suporte do Canvas
         subject: "Falha na resposta de mensagem: %{subject}"
       locked_topic: 
         body: |-
             Não foi possível entregar a mensagem com o título "%{subject}" porque o tópico de discussão está bloqueado. Se está a tentar contactar alguém através do Canvas, pode tentar iniciar sessão na sua conta e enviar uma mensagem a essa pessoa utilizando a ferramenta de Caixa de entrada.
             
-                      Obrigado,
-                      Suporte do Canvas
+            Obrigado,
+            Suporte do Canvas
         subject: "Falha na resposta de mensagem: %{subject}"
     progress_runner: 
       completed_message: 
@@ -9060,9 +9060,9 @@ pt:
     assignment_changed: 
       email: 
         body: |-
-            A tarefa "%{title}" para %{course} foi alterada.  
+            A tarefa "%{title}" para %{course} foi alterada.
             
-            Clique aqui para ver a tarefa: 
+            Clique aqui para ver a tarefa:
             %{url}
         html: 
           body: "A tarefa %{title} para %{course} foi alterada."
@@ -13029,7 +13029,7 @@ pt:
           multiple_dropdowns: "Introduza a sua pergunta, especificando onde deve ficar cada menu pendente. Em seguida, defina as respostas possíveis em cada menu pendente, com uma resposta correta por cada menu pendente."
           numerical: "Defina a resposta correta como qualquer número dentro de um intervalo ou um número mais ou menos alguma margem de erro. O aluno terá à disposição uma caixa de texto vazia para digitar a sua resposta numérica."
           short_answer: |-
-              Introduza o texto da pergunta e depois defina todas as respostas corretas possíveis para o espaço em branco.  
+              Introduza o texto da pergunta e depois defina todas as respostas corretas possíveis para o espaço em branco.
               Os alunos verão a pergunta seguida de uma caixa de texto pequena para digitarem a sua resposta.
           text_only: "Esta \"pergunta\" não será pontuada, mas pode ser útil para apresentar um conjunto de perguntas relacionadas."
           true_false: "Introduza o texto da pergunta e depois selecione se a resposta correta é \"Verdadeiro\" ou \"Falso\"."
@@ -14776,8 +14776,8 @@ pt:
         mute_assignment: "Silenciar tarefa"
       mute_dialog: |-
           Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa
-           estiver silenciada, os alunos não receberão novas notificações sobre ela,
-           nem poderão ver:
+          estiver silenciada, os alunos não receberão novas notificações sobre ela,
+          nem poderão ver:
           
           *  Notificações de alteração de nota
           *  Comentários do envio
@@ -14787,7 +14787,7 @@ pt:
           Os alunos poderão ver que esta tarefa foi silenciada.
           
           Uma vez que silenciar esta tarefa, é possível começar a enviar
-           notificações novamente clicando no link "Dessilenciar tarefa".
+          notificações novamente clicando no link "Dessilenciar tarefa".
     new_course_form: 
       cancel: Cancelar
       course_cose_explanation: "Isto será apresentado em locais com pouco espaço"
@@ -15797,8 +15797,8 @@ pt:
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       Não foi possível entregar a mensagem com o título "%{subject}" porque o tópico de discussão está bloqueado. Se está a tentar contactar alguém através do Canvas, pode tentar iniciar sessão na sua conta e enviar uma mensagem a essa pessoa utilizando a ferramenta de Caixa de entrada.
       
-                Obrigado,
-                Suporte do Canvas
+      Obrigado,
+      Suporte do Canvas
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       A mensagem que enviou com o assunto "%{subject}" não foi entregue. Para responder às mensagens Canvas do seu email, primeiro tem de confirmar o canal de comunicação no seu perfil Canvas. Por favor consulte o seu perfil e reenvie o email de confirmação para este endereço de email [See https://community.canvaslms.com/docs/DOC-2281]. Também pode contatar esta pessoa via Caixa de Entrada Canvas [See https://community.canvaslms.com/docs/DOC-2670].
       
@@ -16727,9 +16727,9 @@ pt:
       no_courses_message: "Não tem nenhuma disciplina, por isso esta página não será muito empolgante de momento. Ao criar ou inscrever-se em disciplinas, começará a ver as conversas de todas as suas aulas."
       unpublished_courses_message: |-
           Inscreveu-se numa ou mais disciplinas que ainda não começaram. Assim
-                  que essas disciplinas ficarem disponíveis, poderá ver informação sobre as mesmas aqui
-                  e na navegação superior. Entretanto, pode sempre inscrever-se
-                  em mais disciplinas ou configurar o seu perfil.
+          que essas disciplinas ficarem disponíveis, poderá ver informação sobre as mesmas aqui
+          e na navegação superior. Entretanto, pode sempre inscrever-se
+          em mais disciplinas ou configurar o seu perfil.
       welcome_to_happiness: "Bem-vindo ao Canvas!"
   users_d1b60cb0: utilizadores
   users_matching_search_term_c604db9e: "Utilizadores correspondentes \"%{search_term}\""
@@ -17089,9 +17089,10 @@ pt:
       Vai precisar de criar uma aplicação web na [Consola de Desenvolvimento Google](%{google_url}).
       Deve adicionar %{callback_url} como um URL de redirecionamento.
       Depois de criar a sua aplicação, crie uma nota para a ID Cliente e a Palavra Secreta, e insira-os aqui.
-  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: "Vai precisar de registar uma [nova app com Microsoft](%{ms_app_url}).\n\
-      Deve configurar %{callback_url} como o URL de Redirecionamento.\n\
-      Depois de guardar a sua app, tome nota da ID da Aplicação e a Palavra chave, e insira-as aqui. "
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Vai precisar de registar uma [nova app com Microsoft](%{ms_app_url}).
+      Deve configurar %{callback_url} como o URL de Redirecionamento.
+      Depois de guardar a sua app, tome nota da ID da Aplicação e a Palavra chave, e insira-as aqui.
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
       Vai precisar de [registar uma aplicação em Clever](%{clever_url}).
       Deve configurar %{callback_url} como o URL de Autorização.
