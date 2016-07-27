@@ -1283,17 +1283,6 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/authentication_providers', action: :create, as: 'account_create_ap'
       put 'accounts/:account_id/authentication_providers/:id', action: :update, as: 'account_update_ap'
       delete 'accounts/:account_id/authentication_providers/:id', action: :destroy, as: 'account_delete_ap'
-
-      # deprecated
-      get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
-      put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
-      delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
-
-      get 'accounts/:account_id/account_authorization_configs', action: :index
-      get 'accounts/:account_id/account_authorization_configs/:id', action: :show
-      post 'accounts/:account_id/account_authorization_configs', action: :create, as: 'account_create_aac'
-      put 'accounts/:account_id/account_authorization_configs/:id', action: :update, as: 'account_update_aac'
-      delete 'accounts/:account_id/account_authorization_configs/:id', action: :destroy, as: 'account_delete_aac'
     end
 
     get 'users/:user_id/page_views', controller: :page_views, action: :index, as: 'user_page_views'

@@ -17,20 +17,12 @@
 #
 
 # @API Authentication Providers
-# Authentication providers were previously known as account authorization
-# configs. They are being renamed. The urls with account_authorization_configs
-# are all deprecated as of 2015-07-16. Please use the authentication_providers
-# version instead.
 #
 # @model AuthenticationProvider
 #     {
 #       "id": "1",
 #       "description": "",
 #       "properties": {
-#         "login_handle_name": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting ] Valid for SAML and CAS providers.",
-#           "type": "string"
-#         },
 #         "identifier_format": {
 #           "description": "Valid for SAML providers.",
 #           "example": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
@@ -59,10 +51,6 @@
 #         "certificate_fingerprint": {
 #           "description": "Valid for SAML providers.",
 #           "example": "111222",
-#           "type": "string"
-#         },
-#         "change_password_url": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML providers.",
 #           "type": "string"
 #         },
 #         "requested_authn_context": {
@@ -111,29 +99,12 @@
 #           "example": "nameid",
 #           "type": "string"
 #         },
-#         "unknown_user_url": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS providers.",
-#           "example": "https://canvas.instructure.com/login",
-#           "type": "string"
-#         },
 #         "jit_provisioning": {
 #           "description": "Just In Time provisioning. Valid for all providers except Canvas (which has the similar in concept self_registration setting).",
 #           "type": "boolean"
 #         },
 #         "federated_attributes": {
 #           "type": "FederatedAttributesConfig"
-#         }
-#       }
-#     }
-#
-# @model DiscoveryUrl
-#     {
-#       "id": "DiscoveryUrl",
-#       "description": "",
-#       "properties": {
-#         "discovery_url": {
-#           "example": "http://...",
-#           "type": "string"
 #         }
 #       }
 #     }
@@ -255,15 +226,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   # recognized parameters depend on this auth_type; unrecognized parameters are discarded.
   # Provider specifications not specifying a valid auth_type are ignored.
   #
-  # _Deprecated_[2015-05-08] Any provider specification may include an
-  # optional 'login_handle_name' parameter. This parameter specifies the
-  # label used for unique login identifiers; for example: 'Login',
-  # 'Username', 'Student ID', etc. The default is 'Email'.
-  # _Deprecated_[2015-05-20] Any provider specification besides LDAP may include
-  # an optional 'unknown_user_url' parameters. This parameters specifies a url
-  # to redirect to when a user is authorized but is not found in Canvas.
-  # _Deprecated_ [Use update_sso_settings instead]
-  #
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default. You can set 'jit_provisioning' for any configuration
   # besides Canvas.
@@ -284,11 +246,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   An alternate SSO URL for logging into CAS. You probably should not set
   #   this.
-  #
-  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
-  #
-  #   A url to redirect to when a user is authorized through CAS but is not
-  #   found in Canvas.
   #
   # For Clever, the additional recognized parameters are:
   #
@@ -434,10 +391,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   Password
   #
-  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
-  #
-  #   Forgot Password URL. Leave blank for default Canvas behavior.
-  #
   # For LinkedIn, the additional recognized parameters are:
   #
   # - client_id [Required]
@@ -571,15 +524,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - certificate_fingerprint
   #
   #   The SAML service's certificate fingerprint.
-  #
-  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
-  #
-  #   Forgot Password URL. Leave blank for default Canvas behavior.
-  #
-  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
-  #
-  #   A url to redirect to when a user is authorized through SAML but is not
-  #   found in Canvas.
   #
   # - identifier_format
   #
@@ -785,64 +729,6 @@ class AccountAuthorizationConfigsController < ApplicationController
       format.json { render json: aac_json(aac) }
     end
   end
-
-  # @API GET discovery url _Deprecated_[2015-05-08]
-  # Get the discovery url _Deprecated_[2015-05-08]
-  #
-  # [Use update_sso_settings instead]
-  #
-  # @example_request
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
-  #        -H 'Authorization: Bearer <token>'
-  #
-  # @returns DiscoveryUrl
-  def show_discovery_url
-    render :json => {:discovery_url => @account.auth_discovery_url}
-  end
-
-  # @API Set discovery url _Deprecated_[2015-05-08]
-  #
-  # [Use update_sso_settings instead]
-  #
-  # If you have multiple IdPs configured, you can set a `discovery_url`.
-  # If that is set, canvas will forward all users to that URL when they need to
-  # be authenticated. That page will need to then help the user figure out where
-  # they need to go to log in.
-  #
-  # If no discovery url is configured, the 1st auth config will be used to
-  # attempt to authenticate the user.
-  #
-  # @example_request
-  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
-  #        -F 'discovery_url=<new_url>' \
-  #        -H 'Authorization: Bearer <token>'
-  #
-  # @returns DiscoveryUrl
-  def update_discovery_url
-    @account.auth_discovery_url = params[:discovery_url].presence
-
-    if @account.save
-      render :json => {:discovery_url => @account.auth_discovery_url}
-    else
-      render :json => @account.errors, :status => :bad_request
-    end
-  end
-
-  # @API Delete discovery url _Deprecated_[2015-05-08]
-  # Clear discovery url _Deprecated_[2015-05-08]
-  #
-  # [Use update_sso_settings instead]
-  #
-  # @example_request
-  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
-  #        -H 'Authorization: Bearer <token>'
-  #
-  def destroy_discovery_url
-    @account.auth_discovery_url = nil
-    @account.save!
-    render :json => {:discovery_url => @account.auth_discovery_url}
-  end
-
 
   def sso_settings_json(account)
     {
