@@ -182,7 +182,7 @@ es:
     linkedin_fields: 
       description: |-
           Usted necesitará [registrar una aplicación en LinkedIn](%{linkedin_url}).
-          Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live 
+          Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live
           Después de crear su aplicación, anote el ID del cliente y cliente secreto e ingréselos aquí.
     login_required: "debe ser suministrado"
     no_changing_auth_types: "No se puede cambiar el tipo de configuración de la autorización, elimínelo y cree una configuración nueva."
@@ -817,14 +817,14 @@ es:
     settings: 
       about_google_docs: |-
           La vista previa de Google Docs permite que los usuarios vean los documentos desde
-          dentro de Canvas, en lugar de tener que descargarlos y 
+          dentro de Canvas, en lugar de tener que descargarlos y
           abrir el programa correspondiente (por ejemplo Word o Excel).
           
-          La vista previa de Google Docs también puede reproducir los tipos de archivos 
+          La vista previa de Google Docs también puede reproducir los tipos de archivos
           no compatibles con la vista previa de los documentos de Canvas.
           
-          Al usar este servicio usted 
-          acepta que ha leído y aceptado las 
+          Al usar este servicio usted
+          acepta que ha leído y aceptado las
           [Condiciones del servicio de Google Docs Viewer](%{terms_url}).
       about_google_docs_tooltip: "Acerca de vista previa en Google Docs"
       account_admins_title: "Administradores de Cuenta"
@@ -1104,7 +1104,7 @@ es:
       add_sis_stickiness_instructions: "Con la selección de esta opción, cambios hechos a traves de esta importación SIS serán procesados como si fueran cambios UI, previniendo que importaciones SIS subsecuentes que no sobrescriban hagan cambios a los campos cambiados aquí."
       add_sis_stickiness_label: "Procesar como cambios UI"
       batch_import_instructions: |-
-          Si se selecciona, la información de SIS importada previamente para el término selecto será borrada.  
+          Si se selecciona, la información de SIS importada previamente para el término selecto será borrada.
           Vea la documentación para los detalles.
       batch_mode_label: "Esta es una actualización completa de grupo"
       clear_sis_stickiness_instructions: "Con la selección de esta opción, todos los campos en todos los registros modificados por esta importación SIS podrán cambiarse en importaciones SIS futuras."
@@ -1128,7 +1128,7 @@ es:
       pending_batches_title: "Grupos Pendientes"
       process_data_button: "Información de Proceso"
       select_file_instructions: |-
-          Seleccione el archivo zip que desea importar.  
+          Seleccione el archivo zip que desea importar.
           Para obtener una descripción sobre cómo crear estos archivos zip, [consulte esta documentación](%{url}).
       sis_import_crumb: "Importación SIS"
       started_at_message: "Comenzó: %{started_at}"
@@ -2128,7 +2128,7 @@ es:
     positive_number: "Debe utilizar un número positivo"
     redirect_page: 
       redirect_message: |-
-          Este envío era un url, lo estamos llevando al url ahora.  
+          Este envío era un url, lo estamos llevando al url ahora.
           [Haga clic para ir al envio](%{url})
     remove_never_drop_rule: "Eliminar regla de no abandonar"
     remove_unsaved_never_drop_rule: "Eliminar la regla de no abandonar no guardada"
@@ -3154,9 +3154,9 @@ es:
           **¿Qué queremos decir con colaboraciones?**  Estamos hablando de herramientas en-línea para trabajar juntos en un documento compartido. Puede usar recursos como
           [Google Docs](%{google_url}) para trabajar colaborativamente en tareas como trabajos en grupo y toma de notas. Esta página es un lugar fácil para seguirle la pista a estas colaboraciones, y también 	para establecerlas sin tener que intercambiar correos electrónicos.
       description_teacher: |-
-          **¿Qué queremos decir con colaboraciones?**  Estamos hablando de herramientas en-línea que sus estudiantes probablemente ya conocen.  Los estudiantes pueden usar recursos como [Google Docs](%{google_url}) 
+          **¿Qué queremos decir con colaboraciones?**  Estamos hablando de herramientas en-línea que sus estudiantes probablemente ya conocen.  Los estudiantes pueden usar recursos como [Google Docs](%{google_url})
           para trabajar colaborativamente en tareas como trabajos escritos en grupo o toma de notas.  Esta página les da
-          (y a usted) un lugar para seguirle la pista a estas colaboraciones y también para establecerlas 
+          (y a usted) un lugar para seguirle la pista a estas colaboraciones y también para establecerlas
           sin tener que intercambiar correos electrónicos.
       google: 
         drive: 
@@ -3229,7 +3229,7 @@ es:
         account_exists: |-
             Ya existe una cuenta de usuario asociada con %{email}.
             
-              **¿Es usted %{name}?**
+            **¿Es usted %{name}?**
         account_needed: "Ha sido invitado a unirse a **%{course}**. Para aceptar esta solicitud necesita una cuenta de Canvas. Haga clic a continuación para crear una cuenta de Canvas."
         add_email: "¿Le gustaría agregar esta cuenta de correo electrónico a su cuenta actual?"
         choose_login: "Seleccione donde le gustaría iniciar sesión."
@@ -3795,9 +3795,12 @@ es:
         add_prerequisite: "Agregar Prerrequisito a %{name}"
         course_modules: "Módulos del curso"
       help: 
-        create: "Los módulos del curso le permiten organizar sus tareas, páginas, archivos, etc. en secciones más pequeñas o unidades. Los módulos pueden centrarse alrededor de un tema, tratar de un tema específico o, simplemente, estar agrupados cronológicamente.\n\n\
-            Puede también ordenar los módulos definiendo los criterios y requisitos previos para cada módulo. Los alumnos no podrán tener acceso a los módulos hasta que hayan desbloqueado todos sus requisitos previos. Así podrá evitar que los estudiantes tengan acceso a cierto contenido o archivos hasta que hayan obtenido un 75% en una evaluación de revisión.\n\n\
-            Para comenzar a organizar su curso en módulos, haga clic en el botón \"%{button}\" que aparece a la derecha. "
+        create: |-
+            Los módulos del curso le permiten organizar sus tareas, páginas, archivos, etc. en secciones más pequeñas o unidades. Los módulos pueden centrarse alrededor de un tema, tratar de un tema específico o, simplemente, estar agrupados cronológicamente.
+            
+            Puede también ordenar los módulos definiendo los criterios y requisitos previos para cada módulo. Los alumnos no podrán tener acceso a los módulos hasta que hayan desbloqueado todos sus requisitos previos. Así podrá evitar que los estudiantes tengan acceso a cierto contenido o archivos hasta que hayan obtenido un 75% en una evaluación de revisión.
+            
+            Para comenzar a organizar su curso en módulos, haga clic en el botón "%{button}" que aparece a la derecha.
         no_modules: "Ningún modulo ha sido definido para este curso."
       images: 
         alt: 
@@ -6301,12 +6304,12 @@ es:
       page_title: "Mis ePortafolios"
       what: 
         details1: |-
-            ePortafolios son un lugar donde se pueden mostrar y discutir los envíos significantes y 
+            ePortafolios son un lugar donde se pueden mostrar y discutir los envíos significantes y
             experiencias que están sucediendo durante su proceso de aprendizaje. Puede usar un ePortafolio para:
             
             * Muestre los trabajos que lo enorgullecen para que todos los vean
-            * Hable acerca de todo lo que tomó para completar sus tareas 
-            * Recopilar un resumen de su experiencia educacional 
+            * Hable acerca de todo lo que tomó para completar sus tareas
+            * Recopilar un resumen de su experiencia educacional
             * Compartir su trabajo con sus amigos, empleados futuros, etc.
             
             ePortafolios pueden ser públicos o privados, para aquellos a los que autoriza, y puede cambiar esa configuración en cualquier momento.
@@ -6885,7 +6888,7 @@ es:
     confirms: 
       delete_comment: "¿Seguro que quiere borrar este comentario?"
       unsaved_changes: |-
-          Los siguientes estudiantes tienen cambios no guardados en los envíos de sus evaluaciones: 
+          Los siguientes estudiantes tienen cambios no guardados en los envíos de sus evaluaciones:
           %{users}
           ¿Continuar?
     crocodoc_expiring: "Su sesión Crocodoc está a punto de caducar. Vuelva a cargar la pantalla para no perder su trabajo. "
@@ -7494,10 +7497,10 @@ es:
       restricted_self_signup: "Requerir que miembros del grupo estén en la misma sección"
       self_signup_help_message: |-
           Puede crear conjuntos de grupos donde los alumnos se pueden registrar solos.
-          Los alumnos todavía están limitados a pertenecer a un grupo del conjunto, pero de esta forma los alumnos se pueden organizar en grupos en vez de hacerlo el profesor. 
+          Los alumnos todavía están limitados a pertenecer a un grupo del conjunto, pero de esta forma los alumnos se pueden organizar en grupos en vez de hacerlo el profesor.
           Puede hacer también que los miembros de un grupo coincidan con la misma sección del curso.
           Recuerde que los alumnos pueden moverse de un grupo a otro, así que una vez que
-          los alumnos hayan terminado, podrá desactivar el 
+          los alumnos hayan terminado, podrá desactivar el
           auto-registro.
       self_signup_help_tooltip: "¿Qué son Grupos con Auto-Inscripción?"
     button: 
@@ -7815,10 +7818,10 @@ es:
   groups_6c90e26a: Grupos
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Los grupos son ideales para colaborar en proyectos o para determinar horarios para sesiones de estudio
-                      y similares.  Cada grupo tiene un calendario, un wiki, foros y cierto espacio para guardar
-                      archivos.  Los grupos pueden colaborar en documentos o incluso programar conferencias web.
-                      En realidad es como un minicurso en el que puede trabajar con una cantidad inferior de alumnos para centrarse
-                      más en un proyecto determinado.
+      y similares.  Cada grupo tiene un calendario, un wiki, foros y cierto espacio para guardar
+      archivos.  Los grupos pueden colaborar en documentos o incluso programar conferencias web.
+      En realidad es como un minicurso en el que puede trabajar con una cantidad inferior de alumnos para centrarse
+      más en un proyecto determinado.
   groupweight_of_total_9579ae8c: "%{groupWeight}% del total"
   help_4c4968b1: Ayuda
   help_dialog: 
@@ -7959,8 +7962,8 @@ es:
   if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "Si sigue teniendo problemas, haga clic en el enlace \"%{link}\" de abajo para buscar las guías o para hacernos saber lo que está pasando."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Si decide abandonar, se cancelará la descarga del archivo zip que se está preparándose en ese momento."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
-      Si hizo cambios a los archivos enviados por los estudiantes que descargó 
-      antes, solo comprímalos nuevamente y suba el archivo comprimido con el formulario debajo. 
+      Si hizo cambios a los archivos enviados por los estudiantes que descargó
+      antes, solo comprímalos nuevamente y suba el archivo comprimido con el formulario debajo.
       Los estudiantes verán los archivos modificados en sus comentarios para el envío.
       
       *Asegúrese de no cambiar los nombres de los archivos del envío para que podamos reconocerlos.*
@@ -8345,14 +8348,18 @@ es:
       default_document_name: "Documento de Instructure"
     incoming_message_processor: 
       failure_message: 
-        body: "El mensaje titulado \"%{subject}\" no se ha podido entregar. Este mensaje se ha enviado a una dirección de correo electrónico desconocida. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
-            Gracias.\n\
-            Asistencia técnica de Canvas "
+        body: |-
+            El mensaje titulado "%{subject}" no se ha podido entregar. Este mensaje se ha enviado a una dirección de correo electrónico desconocida. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.
+            
+            Gracias.
+            Asistencia técnica de Canvas
         subject: "Respuesta al Mensaje Falló: %{subject}"
       locked_topic: 
-        body: "El mensaje títulado \"%{subject}\" no se ha podido entregar porque el tema de foro está bloqueado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
-            Gracias.\n\
-            Asistencia técnica de Canvas "
+        body: |-
+            El mensaje títulado "%{subject}" no se ha podido entregar porque el tema de foro está bloqueado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.
+            
+            Gracias.
+            Asistencia técnica de Canvas
         subject: "Respuesta al Mensaje Falló: %{subject}"
     progress_runner: 
       completed_message: 
@@ -8500,8 +8507,8 @@ es:
         details: 
           mfa_enrollment: |-
               La autenticación de factores múltiples aumenta la seguridad al requerir que posea algo físicamente,
-              además de conocer su contraseña, para poder ingresar en Canvas. Esto puede ser un aparato que genere 
-              códigos de verificación, o un teléfono que reciba mensajes de texto. La aplicación Google Authenticator para el [iPhone](%{iphone_url}) o 
+              además de conocer su contraseña, para poder ingresar en Canvas. Esto puede ser un aparato que genere
+              códigos de verificación, o un teléfono que reciba mensajes de texto. La aplicación Google Authenticator para el [iPhone](%{iphone_url}) o
               [Android](%{android_url}) puede configurarse al escanear el código QR que aparece a continuación. Otros tokens pueden configurarse al introducirse la clave secreta **%{secret_key}**.
           mfa_required: "Es obligatorio configurar una autenticación de factores múltiples"
           otp_on_device: "Introduzca el código de verificación que aparece en su token"
@@ -9029,7 +9036,7 @@ es:
     assignment_changed: 
       email: 
         body: |-
-            La tarea "%{title}" para %{course} ha cambiado.  
+            La tarea "%{title}" para %{course} ha cambiado.
             
             Haga clic aquí para ver la tarea: %{url}
         html: 
@@ -9367,14 +9374,14 @@ es:
     course_already_started: 
       email: 
         body: |-
-            Hola, %{user}:⏎ 
-            ⏎ 
-            %{course}, su curso en Canvas Network, empezó hace un par de días y nos hemos dado cuenta de que aún no ha iniciado sesión. Solo queríamos enviarle un recordatorio en caso de que lo haya olvidado.⏎ 
-            ⏎ 
-            Para iniciar sesión, vaya a %{site} e introduzca su nombre de usuario y contraseña. Si no ha configurado una contraseña todavía, podrá hacerlo aquí: %{password_url}. Si simplemente no puede realizar este curso en particular, le invitamos a que navegue por nuestro catálogo de cursos en %{site} para encontrar algún otro que le inspire. ¡Cada día se añaden nuevos cursos!⏎ 
-            ⏎ 
-            Esperamos verle pronto.⏎ 
-            ⏎ 
+            Hola, %{user}:⏎
+            ⏎
+            %{course}, su curso en Canvas Network, empezó hace un par de días y nos hemos dado cuenta de que aún no ha iniciado sesión. Solo queríamos enviarle un recordatorio en caso de que lo haya olvidado.⏎
+            ⏎
+            Para iniciar sesión, vaya a %{site} e introduzca su nombre de usuario y contraseña. Si no ha configurado una contraseña todavía, podrá hacerlo aquí: %{password_url}. Si simplemente no puede realizar este curso en particular, le invitamos a que navegue por nuestro catálogo de cursos en %{site} para encontrar algún otro que le inspire. ¡Cada día se añaden nuevos cursos!⏎
+            ⏎
+            Esperamos verle pronto.⏎
+            ⏎
             Canvas Network
         course_already_started: "Su curso ya ha comenzado"
     course_required_materials: 
@@ -11654,7 +11661,7 @@ es:
           Necesitará una cuenta ya sea en [Kaltura.com](%{kaltura_url})
           o con un instancia independiente de Kaltura.
           
-          **Nota:** una vez que haya configurado Kaltura dentro de Canvas, 
+          **Nota:** una vez que haya configurado Kaltura dentro de Canvas,
           necesita ir a la Consola de Administración de Kaltura y bajo "Configuración ->
           Configuraciones de la integración" habilitar las notificaciones del servidor con una
           URL de notificación de:
@@ -14419,7 +14426,7 @@ es:
   settings: 
     recaptcha_settings: 
       instructions: |-
-          Antes de que pueda utilizar el complemento ReCAPTCHA, tendrá que 
+          Antes de que pueda utilizar el complemento ReCAPTCHA, tendrá que
           [registrarse en ReCAPTCHA](%{url}). Asegúrese de configurar su dominio correctamente para poder controlar todos sus dominios de sitios. Una vez haya creado su cuenta, introduzca sus claves públicas y privadas a continuación.
           
           **Nota:** Los cambios que realice en estas configuraciones no se actualizarán hasta que reinicie sus servidor.
@@ -15352,7 +15359,7 @@ es:
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Los nombres de los estudiantes deben ser ocultos debido a que se requiere que la calificación sea anónima."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Los nombres de los estudiantes deben ser ocultos debido a que esta es una encuesta anónima."
   student_outcome_gradebook_description: |-
-      El libro de calificaciones de dominio del aprendizaje del alumno sirve para que los alumnos pueden ver su progreso 
+      El libro de calificaciones de dominio del aprendizaje del alumno sirve para que los alumnos pueden ver su progreso
       en los resultados del curso. Los resultados aparecen en un formato similar al de un libro de calificaciones y el progreso se muestra tanto en formato numérico como con la clasificación dominado/casi dominio/medidas correctoras.
   student_summary: 
     student_summary_table_ascending: "Tabla de resumen del alumno en orden ascendente por %{sortText}"
@@ -15734,9 +15741,11 @@ es:
   the_message_titled_subject_could_not_be_delivered__8c6cbbe3: "El mensaje titulado \"%{subject}\" no se ha podido entregar. Este mensaje fue enviado desde una dirección que no está vinculada con su cuenta de Canvas. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión en su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
       Gracias.\n\
       Asistencia técnica de Canvas "
-  the_message_titled_subject_could_not_be_delivered__f063857e: "El mensaje títulado \"%{subject}\" no se ha podido entregar porque el tema de disusión está siendo borrado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.\n\n\
-      Gracias.\n\
-      Asistencia técnica de Canvas "
+  the_message_titled_subject_could_not_be_delivered__f063857e: |-
+      El mensaje títulado "%{subject}" no se ha podido entregar porque el tema de disusión está siendo borrado. Si está intentando ponerse en contacto con alguien a través de Canvas, puede intentar iniciar sesión desde su cuenta y enviar el mensaje utilizando la herramienta de Bandeja de entrada.
+      
+      Gracias.
+      Asistencia técnica de Canvas
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       El mensaje que envió con el asunto "%{subject}" no fue enviado. Para responder a los mensajes  de Canvas desde este correo electrónico, primero debe ser un canal de comunicación confirmado en su perfil de Canvas. Por favor, visite su perfil y vuelva a enviar el correo electrónico de confirmación para esta dirección de correo electrónico [Vea https://community.canvaslms.com/docs/DOC-2281]. También puede comunicarse con esta persona a través de la bandeja de entrada de Canvas. [Vea https://community.canvaslms.com/docs/DOC-2670].
       
@@ -17036,7 +17045,7 @@ es:
       Después de haber creado su aplicación, anote el ID del cliente y el secreto del cliente, e ingréselos aquí.
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       Usted necesitará [registrar una aplicación en LinkedIn](%{linkedin_url}).
-      Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live 
+      Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live
       Después de crear su aplicación, anote el ID del cliente y secreto del cliente e ingréselos aquí.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       Usted necesitará [registrar una aplicación en Twitter](%{twitter_url})..
