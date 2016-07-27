@@ -1100,7 +1100,7 @@ pt-BR:
       add_sis_stickiness_instructions: "Com esta opção selecionada, as alterações feitas através desta importação do SIS serão processadas como se fossem alterações de UI, evitando que importações de não substituição subsequentes alterem os campos aqui alterados."
       add_sis_stickiness_label: "Processar à medida que a IU é alterada"
       batch_import_instructions: |-
-          Se for selecionada, os dados do SIS importados anteriormente para o período selecionado serão excluídos.  
+          Se for selecionada, os dados do SIS importados anteriormente para o período selecionado serão excluídos.
           Consulte a documentação para obter detalhes.
       batch_mode_label: "Esta é uma atualização em lote completa"
       clear_sis_stickiness_instructions: "Com esta opção selecionada, todos os campos em todos os registros atingidos por esta importação do SIS poderão ser mudados em futuras importações do SIS sem substituição."
@@ -1114,7 +1114,7 @@ pt-BR:
       imported_with_messages_message: "Os dados do SIS foram importados, mas com estas mensagens:"
       last_batch_title: "Último lote"
       override_sis_stickiness_instructions: |-
-          Como padrão, as alterações de IU têm prioridade sobre as alterações de importação do SIS; a importação do SIS não alterará os dados deste campo, se um administrador alterou este campo através da IU. Se esta opção for selecionada, a importação do SIS vai substituir as alterações da IU.  
+          Como padrão, as alterações de IU têm prioridade sobre as alterações de importação do SIS; a importação do SIS não alterará os dados deste campo, se um administrador alterou este campo através da IU. Se esta opção for selecionada, a importação do SIS vai substituir as alterações da IU.
           Consulte a documentação para obter detalhes.
       override_sis_stickiness_label: "Substituir as alterações da IU"
       page_title: "Importação de SIS"
@@ -1124,7 +1124,7 @@ pt-BR:
       pending_batches_title: "Lotes pendentes"
       process_data_button: "Processar dados"
       select_file_instructions: |-
-          Selecione o arquivo zip que você deseja importar.  
+          Selecione o arquivo zip que você deseja importar.
           Para obter uma descrição sobre como gerar esses arquivos zip, [consulte essa documentação](%{url}).
       sis_import_crumb: "Importação de SIS"
       started_at_message: "Iniciado: %{started_at}"
@@ -2124,7 +2124,7 @@ pt-BR:
     positive_number: "Você deve utilizar um número positivo"
     redirect_page: 
       redirect_message: |-
-          Este envio era um URL, agora estamos levando você para o link do URL.  
+          Este envio era um URL, agora estamos levando você para o link do URL.
           [Clique aqui para ir ao envio](%{url})
     remove_never_drop_rule: "Remover a regra nunca eliminar"
     remove_unsaved_never_drop_rule: "Remover a regra nunca eliminar não salva"
@@ -3121,22 +3121,22 @@ pt-BR:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Excluir apenas  
+            Excluir apenas
             do Canvas
         delete_from_google_docs: |-
-            Também excluir do  
+            Também excluir do
             Google Docs
         start_collaborating: "Iniciar colaboração"
         update: "Atualizar colaboração"
       collaboration_name: "%{course_or_group_name} Colaboração"
       descriptions: 
         etherpad: |-
-            O EtherPad é um projeto open source que permite iniciar rapidamente documentos compartilhados. Ele é rápido o bastante para que você possa ver o que os outros estão digitando à medida que digitam. Por outro lado, os "pads" não são protegidos por senha, assim qualquer pessoa com um link pode editá-los. O EtherPad é mais adequado que o Google Docs se você deseja preservar o anonimato e/ou permitir que pessoas sem conta do Google participem. 
-              
+            O EtherPad é um projeto open source que permite iniciar rapidamente documentos compartilhados. Ele é rápido o bastante para que você possa ver o que os outros estão digitando à medida que digitam. Por outro lado, os "pads" não são protegidos por senha, assim qualquer pessoa com um link pode editá-los. O EtherPad é mais adequado que o Google Docs se você deseja preservar o anonimato e/ou permitir que pessoas sem conta do Google participem.
+            
             **Aviso**: certifique-se de que você conhece a [política de exclusão do EtherPad](%{etherpad_deletion_policy_url}) para garantir que seu trabalho esteja protegido.
         google_docs: |-
-            O Google Docs é um bom local para colaborar em um projeto de grupo.  Ele é como o Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo arquivo, ao mesmo tempo, sem ter que ficar enviando por email.  
-              
+            O Google Docs é um bom local para colaborar em um projeto de grupo.  Ele é como o Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo arquivo, ao mesmo tempo, sem ter que ficar enviando por email.
+            
             **Aviso**: você (e todos os seus colaboradores) precisarão de uma conta no Google para poder participar em qualquer colaboração no Google Docs.
       labels: 
         collaboration_type: "Colabore usando:"
@@ -3237,7 +3237,7 @@ pt-BR:
         account_exists: |-
             Já existe uma conta de usuário associada a %{email}.
             
-              **Você é o(a) %{name}?**
+            **Você é o(a) %{name}?**
         account_needed: "Você tem um convite para o curso **%{course}**. Para aceitar esta solicitação, é necessária uma conta do Canvas. Clique no link abaixo para criar uma conta do Canvas."
         add_email: "Você gostaria de adicionar este endereço de email a sua conta atual?"
         choose_login: "Selecione onde você gostaria de fazer login."
@@ -6045,7 +6045,7 @@ pt-BR:
   enable_feature_title_987d8e9a: "Ativar recurso: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Lista os alunos pelos nomes ordenados no Livro de Notas. O nome ordenável é padronizado para 'Sobrenome, Nome' e pode ser alterado nas configurações."
   enable_multiple_grading_periods: |-
-      Vários períodos de classificação permite que os professores e administradores criem períodos de classificação com datas fixas 
+      Vários períodos de classificação permite que os professores e administradores criem períodos de classificação com datas fixas
       do prazo de entregar. Tarefas podem ser filtrados por esses períodos de classificação no livro de notas.
   enable_or_condition_for_modules_a16f02d8: "Ativar Condição de \"OU\" para Módulos"
   enable_reregistration_for_lti_2_b2a10444: "Ativar reinscrição para LTI 2"
@@ -6908,9 +6908,9 @@ pt-BR:
     confirms: 
       delete_comment: "Tem certeza que deseja excluir este comentário?"
       unsaved_changes: |-
-          Os seguintes alunos têm alterações não salvas em seus testes enviados: 
+          Os seguintes alunos têm alterações não salvas em seus testes enviados:
           
-           %{users}
+          %{users}
           Continue anyway?
     crocodoc_expiring: "Sua sessão Crocodoc logo expirará.  Recarregue a janela para evitar perder qualquer trabalho."
     dialog_button: 
@@ -7841,10 +7841,10 @@ pt-BR:
   groups_6c90e26a: Grupos
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Os grupos são um bom lugar para colaborar em projetos ou para entender os agendamentos para sessões de aluno
-                      e similares.  Cada grupo recebe um calendário, um wiki, discussões e um pouco de espaço para armazenar os
-                      arquivos.  Os grupos podem colaborar nos documentos ou até agendar conferências na web.
-                      É realmente como um mini-curso no qual você pode trabalhar com um número pequeno de alunos em um
-                      projeto mais focado.
+      e similares.  Cada grupo recebe um calendário, um wiki, discussões e um pouco de espaço para armazenar os
+      arquivos.  Os grupos podem colaborar nos documentos ou até agendar conferências na web.
+      É realmente como um mini-curso no qual você pode trabalhar com um número pequeno de alunos em um
+      projeto mais focado.
   groupweight_of_total_9579ae8c: "%{groupWeight}% do Total"
   help_4c4968b1: Ajuda
   help_dialog: 
@@ -9063,9 +9063,9 @@ pt-BR:
     assignment_changed: 
       email: 
         body: |-
-            A tarefa "%{title}" para %{course} foi alterada.  
+            A tarefa "%{title}" para %{course} foi alterada.
             
-            Clique aqui para exibir a tarefa: 
+            Clique aqui para exibir a tarefa:
             %{url}
         html: 
           body: "A tarefa \"%{title}\" para %{course} foi alterada."
@@ -11615,7 +11615,7 @@ pt-BR:
     facebook_settings: 
       description: |-
           Você irá precisar criar um [novo aplicativo no Facebook](%{facebook_url}), e ativar o Login de OAuth do Cliente
-          em configurações avançadas. Você deve configurar %{callback_url} como a URL OAuth Válida de redirecionar 
+          em configurações avançadas. Você deve configurar %{callback_url} como a URL OAuth Válida de redirecionar
           Depois de salvar o seu aplicativo, note a ID do Aplicatvo, e Segredo do Aplicativo e insira-os aqui.
       labels: 
         app_id: "ID do Aplicativo"
@@ -11843,10 +11843,10 @@ pt-BR:
     webct_scraper_settings: 
       description: |-
           Se a instituição não utiliza os "Módulos de Aprendizado" do WebCT (incluindo escolas que adotam o WebCT
-            anterior à versão 4.0, quando os módulos foram disponibilizados), a migração do curso pode ser melhorada através da importação do "Conteúdo do Curso"
-            como Módulos do Canvas em vez de "Módulos de Aprendizado". Esta página permite a configuração do comportamento padrão do migrador WebCT
-            referente aos módulos do conteúdo. É importante lembrar que, enquanto as migrações do curso individual mantiverem a capacidade
-            de escolher, o migrador em lote sempre utiliza o valor configurado aqui e não pode ser alterado por migração.
+          anterior à versão 4.0, quando os módulos foram disponibilizados), a migração do curso pode ser melhorada através da importação do "Conteúdo do Curso"
+          como Módulos do Canvas em vez de "Módulos de Aprendizado". Esta página permite a configuração do comportamento padrão do migrador WebCT
+          referente aos módulos do conteúdo. É importante lembrar que, enquanto as migrações do curso individual mantiverem a capacidade
+          de escolher, o migrador em lote sempre utiliza o valor configurado aqui e não pode ser alterado por migração.
       labels: 
         allow_outline_selection: "Exibir opção para utilizar o conteúdo do curso como módulos no assistente de migração"
         folders_as_outline: "Utilizar o \"Conteúdo do Curso\" do WebCT para módulos como padrão"
@@ -12035,7 +12035,7 @@ pt-BR:
       feature_options: "Opções de recurso"
       full_token_warning: |-
           **Copiar este token agora**. Assim que deixar esta página, não será mais possível
-          recuperar o token completo, você terá que gerá-lo novamente para obter um novo 
+          recuperar o token completo, você terá que gerá-lo novamente para obter um novo
           valor.
       generate_access_token_description: |-
           Os tokens de acesso permitem que aplicativos de terceiros acessem os recursos
@@ -12145,7 +12145,7 @@ pt-BR:
       twitter_description: |-
           O Twitter é um serviço para publicar e assinar mensagens curtas.
           Se você tiver uma conta no Twitter, poderá registrá-la aqui. Em seguida, se você permitir que
-          membros do grupo/curso vejam seus serviços registrados, eles poderão 
+          membros do grupo/curso vejam seus serviços registrados, eles poderão
           se conectar com facilidade à sua conta do Twitter.
           
           Você também pode se inscrever para que as notificações sejam enviadas à sua conta do Twitter.
@@ -13051,7 +13051,7 @@ pt-BR:
           multiple_dropdowns: "Insira sua pergunta, especificando onde cada menu suspenso deve ficar. Depois defina as respostas possíveis em cada menu suspenso, com uma resposta correta para cada menu suspenso."
           numerical: "Defina a resposta correta como qualquer número dentro de um âmbito ou um número mais ou menos alguma margem de erro. Será fornecida ao aluno uma caixa de texto vazia para digitar sua resposta numérica."
           short_answer: |-
-              Insira o texto de sua pergunta e depois defina todas as respostas corretas possíveis para esta lacuna.  
+              Insira o texto de sua pergunta e depois defina todas as respostas corretas possíveis para esta lacuna.
               Os alunos verão a pergunta seguida de uma caixa de texto pequena para digitarem sua resposta.
           text_only: "Esta \"pergunta\" não contará pontos, mas pode ser útil para apresentar um conjunto de perguntas relacionadas."
           true_false: "Insira o texto da sua pergunta e depois selecione se a resposta correta é \"Verdadeiro\" ou \"Falso\"."
@@ -14795,8 +14795,8 @@ pt-BR:
         mute_assignment: "Silenciar tarefa"
       mute_dialog: |-
           Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa
-           estiver silenciada, os alunos não receberão novas notificações sobre ela,
-           nem poderão ver:
+          estiver silenciada, os alunos não receberão novas notificações sobre ela,
+          nem poderão ver:
           
           *  Notificações de alteração de nota
           *  Comentários do envio
@@ -14806,7 +14806,7 @@ pt-BR:
           Os alunos poderão ver que esta tarefa foi silenciada.
           
           Uma vez que silenciar esta tarefa, é possível começar a enviar
-           notificações novamente clicando no link "Dessilenciar tarefa".
+          notificações novamente clicando no link "Dessilenciar tarefa".
     new_course_form: 
       cancel: Cancelar
       course_cose_explanation: "Isto não será mostrado em lugares com pouco espaço"
@@ -15785,7 +15785,7 @@ pt-BR:
   the_app_was_deactivated_573520ab: "O aplicativo foi desativado"
   the_app_was_updated_successfully_3d71cd1b: "O app foi atualizado com êxito"
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
-      A ID da Entidade SAML do Canvas é %{metadata_url} e o Provedor de Serviço de metadata 
+      A ID da Entidade SAML do Canvas é %{metadata_url} e o Provedor de Serviço de metadata
       está disponível naquela URL.
   the_course_link_validator_searches_through_course__76f0bc63: "O validador de links do curso procura pelo conteúdo do curso e retorna cada link inválido ou sem resposta que se depara. Por favor perceba que alguns links sinalizados como sem resposta estão apenas inacessíveis de nossos servidores e ainda continuarão a funcionar para os estudantes."
   the_error_stack_trace_if_there_is_one_b7e008a1: "A stack trace do erro, se houver"
@@ -15812,7 +15812,7 @@ pt-BR:
       Obrigado
       Apoio do Canvas
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
-      A mensagem intitulada "%{subject}" não pôde ser entregue porque o tópico de discussão foi excluido. Se você está tentando entrar em contato com alguém através do Canvas você pode tentar fazer login em sua conta e enviar-lhes uma mensagem usando a ferramenta de Caixa de Entrada. [] 
+      A mensagem intitulada "%{subject}" não pôde ser entregue porque o tópico de discussão foi excluido. Se você está tentando entrar em contato com alguém através do Canvas você pode tentar fazer login em sua conta e enviar-lhes uma mensagem usando a ferramenta de Caixa de Entrada. []
       []
       Obrigado,[]
       Apoio do Canvas
@@ -16744,9 +16744,9 @@ pt-BR:
       no_courses_message: "Você não tem nenhum curso, assim esta página não será muito empolgante no momento. Ao criar ou se inscrever nos cursos, você começará a ver as conversas de todas suas aulas."
       unpublished_courses_message: |-
           Você se inscreveu em um ou mais cursos que ainda não começaram. Quando
-                  esses cursos estiverem disponíveis, você verá informações sobre eles aqui
-                  e na navegação na parte superior. Enquanto isso, fique à vontade para se inscrever em
-                  mais cursos ou configurar seu perfil.
+          esses cursos estiverem disponíveis, você verá informações sobre eles aqui
+          e na navegação na parte superior. Enquanto isso, fique à vontade para se inscrever em
+          mais cursos ou configurar seu perfil.
       welcome_to_happiness: "Bem-vindo ao Canvas!"
   users_d1b60cb0: Usuários
   users_matching_search_term_c604db9e: "Usuários Correspondentes \"%{search_term}\""
@@ -17098,9 +17098,10 @@ pt-BR:
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Você tem um convite para o curso, %{course}. Função no curso: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Você foi lembrado para avaliar %{rubric}, %{context}."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Você será redirecionado para uma página de Login, onde você precisará fazer login com as credenciais de seu filho."
-  you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: "Você irá precisar criar um [novo aplicativo no Facebook](%{facebook_url}), e ativar o Login de OAuth do Cliente\n\
-      em configurações avançadas. Você deve configurar %{callback_url} como a URL OAuth Válida de redirecionar \n\
-      Depois de salvar o seu aplicativo, note a ID do Aplicatvo, e Segredo do Aplicativo e insira-os aqui. "
+  you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
+      Você irá precisar criar um [novo aplicativo no Facebook](%{facebook_url}), e ativar o Login de OAuth do Cliente
+      em configurações avançadas. Você deve configurar %{callback_url} como a URL OAuth Válida de redirecionar
+      Depois de salvar o seu aplicativo, note a ID do Aplicatvo, e Segredo do Aplicativo e insira-os aqui.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Você precisará criar um aplicativo do web no [Google Developer Console](%{google_url}).
       Você deve adicionar %{callback_url} como uma URL de redirecionar.
@@ -17129,10 +17130,11 @@ pt-BR:
       Você irá precisar [registrar um aplicativo no Twitter](%{twitter_url}).
       Você deve configurar %{callback_url} como a URL de Callback.
       Depois de criar o seu aplicativo, note a ID do Cliente e o Segredo do Cliente, e insira-os aqui.
-  you_will_need_to_register_an_application_on_twitte_95e7b621: "Você irá precisar [registrar um aplicativo no Twitter](%{twitter_url}).\n\
-      Você deve configurar %{callback_url} como a URL de Callback, e definir o Nível de Acesso a\n\
-      Ler, Escrever, e Acessar mensagens diretas\n\
-      Depois de criar o seu aplicativo, note a Chave do Consumidor e o Segredo do Consumidor, e insira-os aqui. "
+  you_will_need_to_register_an_application_on_twitte_95e7b621: |-
+      Você irá precisar [registrar um aplicativo no Twitter](%{twitter_url}).
+      Você deve configurar %{callback_url} como a URL de Callback, e definir o Nível de Acesso a
+      Ler, Escrever, e Acessar mensagens diretas
+      Depois de criar o seu aplicativo, note a Chave do Consumidor e o Segredo do Consumidor, e insira-os aqui.
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "Você não será capaz de visualizar suas alterações"
   your_answer_8dad6ea4: "Sua Resposta:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "A sua lista de Tarefas pode agora ser encontrada na página *Calendário* ."
