@@ -818,7 +818,7 @@ de:
           innerhalb Canvas ansehen, anstatt sie herunterladen und
           sie in einem entsprechenden Programm (z.B. Word oder Excel) öffnen zu müssen.
           
-          Google Docs Vorschau liefert auch nicht vom 
+          Google Docs Vorschau liefert auch nicht vom
           Canvas Document Previewer unterstützte Dateitypen.
           
           Durch Nutzen dieses Dienstes erklären Sie,
@@ -1116,7 +1116,7 @@ de:
       pending_batches_title: "Noch unverarbeitete Batches"
       process_data_button: "Daten verarbeiten"
       select_file_instructions: |-
-          Wählen Sie die zu importierende ZIP-Datei aus.  
+          Wählen Sie die zu importierende ZIP-Datei aus.
           Eine Beschreibung darüber, wie Sie diese ZIP-Dateien generieren, [finden Sie in dieser Dokumentation](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Beginn: %{started_at}"
@@ -2116,7 +2116,7 @@ de:
     positive_number: "Sie müssen eine positive Zahl verwenden"
     redirect_page: 
       redirect_message: |-
-          Diese Einsendung ist eine URL, zu der Sie jetzt weitergeleitet werden.  
+          Diese Einsendung ist eine URL, zu der Sie jetzt weitergeleitet werden.
           [Hier klicken, um die Einsendung aufzurufen](%{url})
     remove_never_drop_rule: "Regel für 'Nie verwerfen' entfernen"
     remove_unsaved_never_drop_rule: "Nicht gespeicherte Regel für 'Nie verwerfen' entfernen"
@@ -3113,10 +3113,10 @@ de:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Nur  
+            Nur
             von Canvas löschen
         delete_from_google_docs: |-
-            Auch 
+            Auch
             von Google Docs löschen
         start_collaborating: "Kollaborationen starten"
         update: "Kollaboration aktualisieren"
@@ -3124,11 +3124,11 @@ de:
       descriptions: 
         etherpad: |-
             EtherPad ist ein Open Source-Projekt, mit dem Sie schnell gemeinsam verwendete Dokumente einrichten können. Das Programm ist so schnell, dass Sie sehen können, was andere Benutzer schreiben, während diese den Text eingeben. Allerdings sind die "Pads" nicht passwortgeschützt, sodass alle Benutzer, die über einen Link zu diesen verfügen, die Pads bearbeiten können. EtherPad ist besser geeignet als Google Docs, wenn Sie die Anonymität der Benutzer aufrechterhalten und/oder Benutzern ohne Google-Konten die Teilnahme ermöglichen möchten.  ⏎
-              
+            
             **Warnung**: Stellen Sie sicher, dass Sie mit der [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) vertraut sind, damit Ihre Arbeit nicht verloren geht.
         google_docs: |-
-            Google Docs ist eine hervorragende Möglichkeit, gemeinsam an einem Gruppenprojekt zu arbeiten.  Google Docs ist Microsoft Word sehr ähnlich, erlaubt aber die gemeinsame, gleichzeitige Bearbeitung derselben Datei, ohne diese per E-mail an die übrigen Gruppenmitglieder verschicken zu müssen.  
-              
+            Google Docs ist eine hervorragende Möglichkeit, gemeinsam an einem Gruppenprojekt zu arbeiten.  Google Docs ist Microsoft Word sehr ähnlich, erlaubt aber die gemeinsame, gleichzeitige Bearbeitung derselben Datei, ohne diese per E-mail an die übrigen Gruppenmitglieder verschicken zu müssen.
+            
             **Achtung**: Sie (und alle anderen Mitglieder Ihrer Kollaboration) benötigen ein Google-benutzerkonto, um an Google Docs-kollaborationen teilnehmen zu können.
       labels: 
         collaboration_type: "Zusammenarbeiten mithilfe von:"
@@ -3147,14 +3147,14 @@ de:
       description_student: |-
           **Was verstehen wir unter Arbeitsgruppen?**  Im Mittelpunkt stehen Webtools für die Teamarbeit
           an einem gemeinsamen Dokument.  Sie können Ressourcen wie
-          [Google Docs](%{google_url}) 
+          [Google Docs](%{google_url})
           einsetzen, um als Team an Gruppenaufsätzen zu arbeiten und gemeinsame Notizen zu erstellen.  Diese Seite
           bietet eine klare Übersicht über diese Arbeitsgruppen und erleichtert deren Einrichtung,
           ohne E-Mails mit allen Gruppenmitgliedern austauschen zu müssen.
       description_teacher: |-
           **Was verstehen wir unter Arbeitsgruppen?**  Gemeint sind Webtools, die den
           meisten Studenten bereits vertraut sind.  Die Studenten können Ressourcen wie
-          [Google Docs](%{google_url}) 
+          [Google Docs](%{google_url})
           einsetzen, um als Team an Gruppenaufgaben zu arbeiten und gemeinsame Notizen zu erstellen.  Diese Seite
           bietet Studenten (und Ihnen) eine klare Übersicht über die bestehenden Arbeitsgruppen und deren Erstellung
           ohne dafür E-Mails mit allen Gruppenmitgliedern austauschen zu müssen.
@@ -3229,7 +3229,7 @@ de:
         account_exists: |-
             Es existiert bereits ein Konto für %{email}.
             
-              **Sind Sie %{name}?**
+            **Sind Sie %{name}?**
         account_needed: "Sie sind eingeladen, an **%{course}** teilzunehmen. Um diese Einladung akzeptieren zu können, benötigen Sie ein Konto bei Canvas. Klicken Sie auf den unten stehenden Link, um ein Canvas-konto einzurichten."
         add_email: "Möchten Sie diese E-mailadresse Ihrem aktuellen Konto hinzufügen?"
         choose_login: "Wählen Sie aus, wo Sie sich anmelden wollen."
@@ -7815,10 +7815,10 @@ de:
   groups_6c90e26a: Gruppen
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Gruppen eignen sich zur gemeinsamen Arbeit an Projekten oder um Zeitpläne für Studiensitzungen
-                      und Ähnliches festzulegen. Jede Gruppe erhält einen Kalender, ein Wiki, Diskussionen und ein gewisses Speicherkontingent zum Speichern von
-                      Dateien.  Gruppen können gemeinsam an Dokumenten arbeiten oder sogar Webkonferenzen planen.
-                      Sie sind wie ein Minikurs, bei dem Sie mit einer geringeren Anzahl von Studenten gezielt an
-                      einem Projekt arbeiten können.
+      und Ähnliches festzulegen. Jede Gruppe erhält einen Kalender, ein Wiki, Diskussionen und ein gewisses Speicherkontingent zum Speichern von
+      Dateien.  Gruppen können gemeinsam an Dokumenten arbeiten oder sogar Webkonferenzen planen.
+      Sie sind wie ein Minikurs, bei dem Sie mit einer geringeren Anzahl von Studenten gezielt an
+      einem Projekt arbeiten können.
   groupweight_of_total_9579ae8c: "%{groupWeight}% von Gesamt"
   help_4c4968b1: Hilfe
   help_dialog: 
@@ -7962,7 +7962,7 @@ de:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Beim Verlassen der Seite wird der gerade vorbereitete Herunterladevorgang für die ZIP-Datei abgebrochen."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       Wenn Sie Änderungen an den zuvor heruntergeladenen Dateien mit Einsendungen der Studenten
-      vorgenommen haben, 
+      vorgenommen haben,
       komprimieren Sie die Dateien erneut und laden Sie die Zip-Datei über das unten stehende Formular hoch.
       
       Die geänderten Dateien werden den Studenten in den Kommentaren zur Einsendung angezeigt.
@@ -9039,8 +9039,8 @@ de:
     assignment_changed: 
       email: 
         body: |-
-            Die Aufgabe "%{title}" für %{course} wurde geändert.  
-            Klicken Sie hier, um die Aufgabe anzuzeigen: 
+            Die Aufgabe "%{title}" für %{course} wurde geändert.
+            Klicken Sie hier, um die Aufgabe anzuzeigen:
             %{url}
         html: 
           body: "Die Aufgabe \"%{title}\" für %{course} wurde geändert."
@@ -9234,7 +9234,7 @@ de:
       email: 
         body: |-
             Sie wurden eingeladen, an der Kollaboration für das Dokument %{document} in %{course_or_group} teilzunehmen.  Das Dokument wurde erstellt in %{service}, und Sie wurden über Ihre E-mailadresse %{email} zur Mitarbeit eingeladen.
-            Falls diese E-mailadresse für eine solche Kollaboration falsch oder ungeeignet ist, ändern Sie bitte Ihre Profileinstellungen oder registrieren Sie sich für %{service}. 
+            Falls diese E-mailadresse für eine solche Kollaboration falsch oder ungeeignet ist, ändern Sie bitte Ihre Profileinstellungen oder registrieren Sie sich für %{service}.
             Die Details können Sie hier aufrufen: %{link}
         body_with_user: |-
             Sie wurden eingeladen, an der Kollaboration für das Dokument %{document} in %{course_or_group} teilzunehmen.  Das Dokument wurde von %{user}in %{service} erstellt und Sie wurden über Ihre E-mailadresse %{email} zur Mitarbeit eingeladen.
@@ -10859,7 +10859,7 @@ de:
         
         ​
         
-        Wenn Sie Ihre Noten in den Benachrichtigungen sehen möchten, aktivieren Sie die Option 'Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen'. 
+        Wenn Sie Ihre Noten in den Benachrichtigungen sehen möchten, aktivieren Sie die Option 'Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen'.
         Wenn es sich bei Ihrer E-Mail-Adresse nicht um eine E-Mail-Adresse der Institution handelt, werden vertrauliche Inhalte an Empfänger außerhalb der Institution gesendet.
     grading_display: Benotung
     grading_notify_include_grade: "Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen"
@@ -11782,10 +11782,10 @@ de:
     webct_scraper_settings: 
       description: |-
           Wenn die Institution nicht die Lernmodule von WebCT nutzt (einschließlich der Schulen, die WebCT-Versionen⏎
-            vor Version 4.0, eingeführt haben, bei der Module bereitgestellt wurden), kann die Migration von Kursen verbessert werden, indem Kursinhalte⏎
-            als Canvas-Module anstatt als Lernmodule importiert werden. Auf dieser Seite können Sie das Standardverhalten des WebCT-Migrations-Tools⏎
-            für Inhaltsmodule festlegen. Dabei ist zu beachten, dass bei der Migration einzelner Kurse zwar weiterhin eine Auswahl getroffen werden kann,⏎
-            dass das Tool zur Massenmigration jedoch immer den hier konfigurierten Wert verwendet, der bei einer Migration nicht geändert werden kann.
+          vor Version 4.0, eingeführt haben, bei der Module bereitgestellt wurden), kann die Migration von Kursen verbessert werden, indem Kursinhalte⏎
+          als Canvas-Module anstatt als Lernmodule importiert werden. Auf dieser Seite können Sie das Standardverhalten des WebCT-Migrations-Tools⏎
+          für Inhaltsmodule festlegen. Dabei ist zu beachten, dass bei der Migration einzelner Kurse zwar weiterhin eine Auswahl getroffen werden kann,⏎
+          dass das Tool zur Massenmigration jedoch immer den hier konfigurierten Wert verwendet, der bei einer Migration nicht geändert werden kann.
       labels: 
         allow_outline_selection: "Anzeigeoption zum Verwenden von Kursinhalten als Module im Migrationsassistenten"
         folders_as_outline: "WebCT-Kursinhalte standardmäßig für Module verwenden"
@@ -12478,7 +12478,7 @@ de:
       page_header: Antwortsequenz
   quiz_log_auditing_desc: |-
       Aktivieren Sie die Funktion zum Verfolgen von Events für eine Quiz-Einsendung sowie die Funktion
-            zum Anzeigen eines Protokolls der Events nach der Einsendung.
+      zum Anzeigen eines Protokolls der Events nach der Einsendung.
   quiz_lti_plugin_a189607f: "Quiz LTI-Plugin"
   quiz_lti_plugin_a6256549: "Quiz LTI-Plugin"
   quiz_menu_4fcd5e61: Quiz-Menü
@@ -12974,7 +12974,7 @@ de:
           multiple_dropdowns: "Geben Sie die Frage ein, und legen Sie dabei die Position der einzelnen Dropdownlisten fest. Bestimmen Sie dann mögliche Antworten für jede Dropdownliste, wobei jede Liste eine richtige Antwort enthalten muss."
           numerical: "Definieren Sie die richtige Antwort als beliebige Zahl innerhalb eines Wertebereichs oder als eine Zahl plus oder minus einer Fehlermarge. Der Student gibt seine numerische Antwort dann in ein leeres Textfeld ein."
           short_answer: |-
-              Geben Sie den Fragentext ein, und definieren Sie anschließend alle möglichen richtigen Antworten für das Leerfeld.  
+              Geben Sie den Fragentext ein, und definieren Sie anschließend alle möglichen richtigen Antworten für das Leerfeld.
               Den Studenten wird die Frage gefolgt von einem kleinen Textfeld angezeigt, in das sie ihre Antwort eingeben können.
           text_only: "Diese \"Frage\" wird nicht bewertet, kann aber als Einführung für mehrere zusammenhängende Fragen nützlich sein."
           true_false: "Geben Sie den Fragetext ein, und entscheiden Sie dann, ob die richtige Antwort 'Richtig' oder 'Falsch' lautet."
@@ -14413,7 +14413,7 @@ de:
       instructions: |-
           Bevor Sie das ReCAPTCHA-Plug-in verwenden können, müssen Sie sich
           [sign up for an account on ReCAPTCHA](%{url}). Stellen Sie sicher, dass Sie Ihre
-          Domain richtig einrichten, damit diese Ihre Website-Domain(s) verarbeiten kann. 
+          Domain richtig einrichten, damit diese Ihre Website-Domain(s) verarbeiten kann.
           Wenn Sie ein Konto eingerichtet haben, geben Sie unten Ihre öffentlichen und privaten Schlüssel ein.
           
           **Hinweis:** Alle an diesem Einstellungen vorgenommenen Änderungen werden
@@ -15739,8 +15739,8 @@ de:
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Die von Ihnen abgeschickte Nachricht mit dem Betreff "%{subject}" wurde nicht zugestellt. Um von dieser E-Mail auf Canvas-Nachrichten zu antworten, muss sie zuerst ein bestätigter Kommunikationskanal in Ihrem Canvas-Profil sein. Bitte gehen Sie zu Ihrem Profil und schicken die Bestätigungs-E-Mail für diese E-Mail erneut  [vgl. https://community.canvaslms.com/docs/DOC-2281]. Sie können diese Person auch via der Canvas-Inbox kontaktieren [vgl. https://community.canvaslms.com/docs/DOC-2670].
       
-                Vielen Dank,
-                Ihr Canvas Support
+      Vielen Dank,
+      Ihr Canvas Support
   the_module_item_is_locked_27fe420b: "Das Modulelement ist gesperrt."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Die jüngsten Punkte für Anwender %{current_user_name} sowie Ergebnis %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Das Profilbild wurde berichtet"
