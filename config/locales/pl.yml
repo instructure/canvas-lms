@@ -821,14 +821,14 @@ pl:
     settings: 
       about_google_docs: |-
           Google Docs Previews pozwala użytkownikom na podgląd dokumentów z poziomu
-          Canvas, zamiast potrzeby ich pobierania i 
+          Canvas, zamiast potrzeby ich pobierania i
           otwierania odpowiedniego programu (np. Word czy excel).
           
           Google Docs Previews może również odtwarzać pliki z rodzajów
           nie obsługiwanych przez przeglądarkę dokumentów Canvas.
           
-          Korzystanie z tego serwisu 
-          jest jednoznaczne z przeczytaniem i zaakceptowaniem 
+          Korzystanie z tego serwisu
+          jest jednoznaczne z przeczytaniem i zaakceptowaniem
           [Google Docs Viewer Terms of Service](%{terms_url}).
       about_google_docs_tooltip: "Informacje o podglądzie w programie Google Docs"
       account_admins_title: "Administratorzy kont"
@@ -1106,7 +1106,7 @@ pl:
       add_sis_stickiness_instructions: "Wybór tej opcji umożliwi przetwarzanie zmian wprowadzonych za pośrednictwem importowanych danych SIS w taki sam sposób, jak przetwarzanie zmian UI, zapobiegając przed modyfikacją zmienionych tu pól przez kolejne nienadrzędne importowane dane SIS."
       add_sis_stickiness_label: "Przetwórz tak jak zmiany UI"
       batch_import_instructions: |-
-          W przypadku wyboru tej opcji poprzednio zaimportowane dane SIS dla wybranego terminu zostaną usunięte.  
+          W przypadku wyboru tej opcji poprzednio zaimportowane dane SIS dla wybranego terminu zostaną usunięte.
           Szczegółowe informacje znajdują się w dokumentacji.
       batch_mode_label: "Operacja umożliwia pełną aktualizację wsadową"
       clear_sis_stickiness_instructions: "W przypadku wyboru tej opcji wszystkie pola we wszystkich rekordach zmienionych przez import danych SIS będzie można zmodyfikować w przyszłości przez nienadrzędny import danych SIS."
@@ -1120,7 +1120,7 @@ pl:
       imported_with_messages_message: "Dane SIS zostały zaimportowane. Pojawiły się następujące komunikaty:"
       last_batch_title: "Ostatnie działanie wsadowe"
       override_sis_stickiness_instructions: |-
-          Domyślnie wszystkie zmiany UI są nadrzędne względem zmian związanych z importowaniem danych SIS; w przypadku pewnych pól importowanie SIS nie zmieni danych znajdujących się w polach, jeśli administrator zmienił pola za pomocą UI. W przypadku wyboru tej opcji importowanie danych SIS zastąpi zmiany UI.  
+          Domyślnie wszystkie zmiany UI są nadrzędne względem zmian związanych z importowaniem danych SIS; w przypadku pewnych pól importowanie SIS nie zmieni danych znajdujących się w polach, jeśli administrator zmienił pola za pomocą UI. W przypadku wyboru tej opcji importowanie danych SIS zastąpi zmiany UI.
           Szczegółowe informacje znajdują się w dokumentacji.
       override_sis_stickiness_label: "Zastąp zmiany UI"
       page_title: "Importowanie danych SIS"
@@ -2142,7 +2142,7 @@ pl:
     positive_number: "Należy wpisać liczbę dodatnią"
     redirect_page: 
       redirect_message: |-
-          Zadanie zostało przesłane w formie adresu URL — nastąpi teraz przekierowanie do podanego łącza.  
+          Zadanie zostało przesłane w formie adresu URL — nastąpi teraz przekierowanie do podanego łącza.
           [Kliknij tutaj, aby przejść do przesłanego zadania](%{url})
     remove_never_drop_rule: "Usuń zasadę Nigdy nie pomijaj"
     remove_unsaved_never_drop_rule: "Usuń niezapisaną zasadę Nigdy nie pomijaj"
@@ -3145,7 +3145,7 @@ pl:
             z programu Canvas
         delete_from_google_docs: |-
             Usuń również z programu
-              Google Docs
+            Google Docs
         start_collaborating: "Rozpocznij współpracę"
         update: "Aktualizuj projekt współpracy"
       collaboration_name: "Projekt współpracy %{course_or_group_name}"
@@ -3155,8 +3155,8 @@ pl:
             
             **Ostrzeżenie**: pamiętaj, aby zapoznać się z [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) w celu zachowania dotychczasowych postępów w pracy.
         google_docs: |-
-            Google Docs to doskonałe miejsce do współpracy nad projektem grupowym.  Działa na takiej zasadzie jak program Microsoft Word, ale umożliwia wspólną pracę nad tym samym plikiem w tym samym czasie bez konieczności przesyłania pliku pocztą elektroniczną.  
-              
+            Google Docs to doskonałe miejsce do współpracy nad projektem grupowym.  Działa na takiej zasadzie jak program Microsoft Word, ale umożliwia wspólną pracę nad tym samym plikiem w tym samym czasie bez konieczności przesyłania pliku pocztą elektroniczną.
+            
             **Ostrzeżenie**: Aby wspólnie pracować nad zadaniem za pośrednictwem programu Google Docs, każdy z uczestników musi posiadać konto Google.
       labels: 
         collaboration_type: "Współpracuj z użyciem:"
@@ -6112,7 +6112,7 @@ pl:
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
   enable_multiple_grading_periods: |-
       Wielokrotne Okresy Klasyfikacyjne pozwalają nauczycielom i administratorom na tworzenie okresów klasyfikacyjnych z ustalonymi
-       data końcowymi. Zadania mogą być filtrowane przez te okresy klasyfikacyjne w Dzienniku Ocen.
+      data końcowymi. Zadania mogą być filtrowane przez te okresy klasyfikacyjne w Dzienniku Ocen.
   enable_or_condition_for_modules_a16f02d8: "Włącz warunek \"LUB\" dla modułów"
   enable_reregistration_for_lti_2_b2a10444: "Umożliwienie powtórnej rejestracji dla LTI 2"
   enabled_links_be110215: "Włączone linki"
@@ -6976,9 +6976,9 @@ pl:
     confirms: 
       delete_comment: "Czy na pewno chcesz usunąć ten komentarz?"
       unsaved_changes: |-
-          Następujący uczestnicy nie zapisali zmian w rozwiązanych testach: 
+          Następujący uczestnicy nie zapisali zmian w rozwiązanych testach:
           
-           %{users}
+          %{users}
           Continue anyway?
     crocodoc_expiring: "Sesja Crocodoc wkrótce wygaśnie. Załaduj ponownie okno, aby nie utracic danych."
     dialog_button: 
@@ -7592,12 +7592,13 @@ pl:
         name_for_groups: "Nazwy grup"
         self_signup: "Samodzielne zapisy"
       restricted_self_signup: "Wymagaj, aby członkowie grupy znajdowali się w tej samej sekcji"
-      self_signup_help_message: "Możesz tworzyć zestawy grup, w których studenci mogą zapisywać się na własną rękę.\n\
-          Uczestnicy są nadal ograniczeni do bycia tylko w jednej grupie w zestawie, ale w ten sposób\n\
-          mogą organizować się w grupy, wyręczając w tej czynności nauczyciela.\n\
-          Możesz również wymagać, aby wszyscy członkowie grupy byli częścią tej samej sekcji kursu.\n\
-          Pamiętaj, uczestnicy mogą przenosić się z jednej grupy do drugiej, więc kiedy\n\
-          uczniowie zakończą organizowanie się, możesz zablokować samodzielne zapisy. "
+      self_signup_help_message: |-
+          Możesz tworzyć zestawy grup, w których studenci mogą zapisywać się na własną rękę.
+          Uczestnicy są nadal ograniczeni do bycia tylko w jednej grupie w zestawie, ale w ten sposób
+          mogą organizować się w grupy, wyręczając w tej czynności nauczyciela.
+          Możesz również wymagać, aby wszyscy członkowie grupy byli częścią tej samej sekcji kursu.
+          Pamiętaj, uczestnicy mogą przenosić się z jednej grupy do drugiej, więc kiedy
+          uczniowie zakończą organizowanie się, możesz zablokować samodzielne zapisy.
       self_signup_help_tooltip: "Co to są grupy z samodzielnymi zapisami?"
     button: 
       create_category: "Utwórz kategorię"
@@ -8064,8 +8065,8 @@ pl:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Jeśli wyjdziesz z programu, aktualnie przygotowywany do pobrania plik zip zostanie anulowany."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       W przypadku wprowadzenia zmian do pobranych wcześniej plików z zadaniami
-      należy spakować je ponownie i przekazać paczkę wraz z poniższym formularzem. 
-      Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania. 
+      należy spakować je ponownie i przekazać paczkę wraz z poniższym formularzem.
+      Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania.
       
       *Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
@@ -9158,9 +9159,9 @@ pl:
     assignment_changed: 
       email: 
         body: |-
-            Zadanie o nazwie „%{title}” dla kursu %{course} zostało zmienione.  
+            Zadanie o nazwie „%{title}” dla kursu %{course} zostało zmienione.
             
-            Kliknij tutaj, aby wyświetlić zadanie: 
+            Kliknij tutaj, aby wyświetlić zadanie:
             %{url}
         html: 
           body: "Zadanie o nazwie \"%{title}\" dla kursu %{course} zostało zmienione."
@@ -11757,7 +11758,7 @@ pl:
       description: "Eksport ocen do systemu SIS"
       name: "Eksport ocen"
     grade_export_settings: 
-      description: "Wtyczka ta umożliwia opublikowanie końcowych ocen w systemie informacji o uczestnikach (SIS). W przypadku jej uaktywnienia uzytkownik będzie mieć w dzienniczku możliwość publikowania tych ocen. Odbędzie się to za pośrednictwem żądania POST wysyłanego do określonego punktu końcowego publikacji. "
+      description: "Wtyczka ta umożliwia opublikowanie końcowych ocen w systemie informacji o uczestnikach (SIS). W przypadku jej uaktywnienia uzytkownik będzie mieć w dzienniczku możliwość publikowania tych ocen. Odbędzie się to za pośrednictwem żądania POST wysyłanego do określonego punktu końcowego publikacji."
       labels: 
         format_type: "Typ formatu wyjściowego"
         publish_endpoint: "Punkt końcowy, na którym ma być publikowana zawartość"
@@ -13156,7 +13157,7 @@ pl:
           multiple_dropdowns: "Wprowadź pytanie, określając rozmieszczenie list rozwijanych. Następnie utwórz listę możliwych odpowiedzi, z których jedna jest poprawna."
           numerical: "Określ poprawną odpowiedź jako numer z zakresu lub jako numer z danym marginesem błędu. Uczestnicy poprawny numer odpowiedzi wprowadzają w podane puste pole tekstowe."
           short_answer: |-
-              Wprowadź treść pytania, a następnie określ wszystkie możliwe poprawne odpowiedzi dla każdej luki.  
+              Wprowadź treść pytania, a następnie określ wszystkie możliwe poprawne odpowiedzi dla każdej luki.
               Dla uczestników obok pytania zostanie wyświetlone niewielkie pole tekstowe, do którego należy wprowadzić odpowiedź.
           text_only: "To „pytanie” nie będzie punktowane, ale może posłużyć do wprowadzenia zestawu powiązanych pytań."
           true_false: "Wprowadź treść pytania, a następnie określ, czy prawidłowa odpowiedź to Prawda czy Fałsz."
@@ -17266,16 +17267,18 @@ pl:
       Musisz stworzyć aplikację internetową w [Google Developer Console](%{google_url}).
       Musisz dodać %{callback_url}  jako adres URL do przekierowania.
       Po stworzeniu własnej aplikacji, zanotuj Identyfikator klienta i Tajny klucz klienta i wpisz je poniżej.
-  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: "Musisz zarejestrować [nową aplikację w Microsoft](%{ms_app_url}).\n\
-      Powinieneś skonfigurować %{callback_url}  jako Przekierowanie URL.\n\
-      Po zapisaniu aplikacji, zanotuj Identyfikator Klienta i Tajny klucz Klienta i wpisz je poniżej. "
+  you_will_need_to_register_a_new_app_with_microsoft_53e97ced: |-
+      Musisz zarejestrować [nową aplikację w Microsoft](%{ms_app_url}).
+      Powinieneś skonfigurować %{callback_url}  jako Przekierowanie URL.
+      Po zapisaniu aplikacji, zanotuj Identyfikator Klienta i Tajny klucz Klienta i wpisz je poniżej.
   you_will_need_to_register_an_application_on_clever_ecdb9faf: |-
       Musisz [zarejestrować aplikację w systemie Clever](%{clever_url}).
       Powinieneś skonfigurować %{callback_url} jako Przekierowanie URL.
       Po stworzeniu aplikacji, zanotuj Identyfikator klienta i Tajny klucz klienta i wpisz je poniżej.
-  you_will_need_to_register_an_application_on_clever_f412c7b8: "Musisz [zarejestrować aplikację w systemie Clever](%{clever_url}).\n\
-      Powinieneś skonfigurować %{callback_url} jako Przekierowanie URL.\n\
-      Po stworzeniu aplikacji, zanotuj Identyfikator klienta i Tajny klucz klienta i wpisz je poniżej. "
+  you_will_need_to_register_an_application_on_clever_f412c7b8: |-
+      Musisz [zarejestrować aplikację w systemie Clever](%{clever_url}).
+      Powinieneś skonfigurować %{callback_url} jako Przekierowanie URL.
+      Po stworzeniu aplikacji, zanotuj Identyfikator klienta i Tajny klucz klienta i wpisz je poniżej.
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       Musisz [zarejestrować aplikację w GitHub](%{github_url}).
       Musisz skonfigurować %{callback_url}  jako Autoryzowany zwrotny adres URL.
