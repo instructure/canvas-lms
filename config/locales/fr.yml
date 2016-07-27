@@ -180,9 +180,10 @@ fr:
       test_ldap_search_help_header: "Canvas ne peut pas effectuer de recherche dans votre instance LDAP."
       test_ldap_search_label: "Test de recherche LDAP..."
     linkedin_fields: 
-      description: "Vous allez devoir [enregistrer une application sur LinkedIn](%{linkedin_url}).\n\
-          Vous devriez ajouter %{callback_url} comme URL de redirection autorisée OAuth 2.0, et définir le statut de l'application sur Actif\n\
-          Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici. "
+      description: |-
+          Vous allez devoir [enregistrer une application sur LinkedIn](%{linkedin_url}).
+          Vous devriez ajouter %{callback_url} comme URL de redirection autorisée OAuth 2.0, et définir le statut de l'application sur Actif
+          Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
     login_required: "est obligatoire"
     no_changing_auth_types: "Impossible de changer le type de configuration des autorisations. Veuillez supprimer celle-ci et créer une nouvelle configuration."
     password_required: "est obligatoire"
@@ -813,7 +814,7 @@ fr:
             field: "ID section"
     settings: 
       about_google_docs: |-
-          Les Google Docs Previews permettent aux utilisateurs de voir les documents 
+          Les Google Docs Previews permettent aux utilisateurs de voir les documents
           directement depuis Canvas, plutôt que d'avoir à les téléverser et
           d'avoir à les ouvrir avec le logiciel approprié (p.ex. Word ou Excel).
           
@@ -1099,7 +1100,7 @@ fr:
       add_sis_stickiness_instructions: "Si cette option est sélectionnée, les modifications apportées durant l’importation SIS seront traitées comme des modifications de l’interface utilisateur, empêchant les importations SIS sans remplacement suivantes de modifier les champs modifiés ici."
       add_sis_stickiness_label: "Traiter comme modifications de l’IU"
       batch_import_instructions: |-
-          Si cette option est sélectionnée, les données SIS importées précédemment pour le trimestre sélectionné seront supprimées. 
+          Si cette option est sélectionnée, les données SIS importées précédemment pour le trimestre sélectionné seront supprimées.
           Pour obtenir plus d’informations, voir la documentation.
       batch_mode_label: "Correspond à une mise à jour du lot complet"
       clear_sis_stickiness_instructions: "Si cette option est sélectionnée, tous les champs de tous les enregistrements modifiés par cette importation SIS pourront être modifiés dans les importations SIS sans remplacement suivantes."
@@ -1113,7 +1114,7 @@ fr:
       imported_with_messages_message: "Les données SIS ont été importées avec ces messages :"
       last_batch_title: "Dernier lot"
       override_sis_stickiness_instructions: |-
-          Par défaut, les modifications de l’interface utilisateur ont priorité sur les modifications de l’importation SIS ; l’importation SIS ne modifiera pas les données d’un certain nombre de champs si l’administrateur a modifié ces champs via l’interface utilisateur. Si vous sélectionnez cette option, l’importation SIS remplacera les modifications de l’interface utilisateur.  
+          Par défaut, les modifications de l’interface utilisateur ont priorité sur les modifications de l’importation SIS ; l’importation SIS ne modifiera pas les données d’un certain nombre de champs si l’administrateur a modifié ces champs via l’interface utilisateur. Si vous sélectionnez cette option, l’importation SIS remplacera les modifications de l’interface utilisateur.
           Pour obtenir plus d’informations, voir la documentation.
       override_sis_stickiness_label: "Remplacer les modifications de l’IU"
       page_title: "Importation SIS"
@@ -1123,7 +1124,7 @@ fr:
       pending_batches_title: "Lots en attente"
       process_data_button: "Traiter les données"
       select_file_instructions: |-
-          Sélectionnez le fichier zip à importer.  
+          Sélectionnez le fichier zip à importer.
           Pour en savoir plus sur la création de ces fichiers zip, [consultez cette documentation](%{url}).
       sis_import_crumb: "Importation SIS"
       started_at_message: "Début : %{started_at}"
@@ -2124,7 +2125,7 @@ fr:
     positive_number: "Vous devez utiliser un nombre positif"
     redirect_page: 
       redirect_message: |-
-          Cet envoi était une URL ; nous vous dirigeons maintenant vers le lien de l’URL.  
+          Cet envoi était une URL ; nous vous dirigeons maintenant vers le lien de l’URL.
           [Cliquez ici pour accéder à l’envoi](%{url})
     remove_never_drop_rule: "Retirer la règle Ne jamais supprimer"
     remove_unsaved_never_drop_rule: "Retirer la règle Ne jamais supprimer qui n’est pas enregistrée"
@@ -2270,10 +2271,12 @@ fr:
         date: Date
         details: Informations
       instructions: 
-        syllabus: "La page du programme présente une vue en tableau du calendrier du cours, et les bases de \n\
-            notation du cours. Vous pouvez y ajouter d'autres commentaires, notes ou idées que vous auriez à propos \n\
-            de la structure du cours, de ses politiques ou tout autre chose.\n\n\
-            Pour ajouter des commentaires, cliquer le lien \"Modifier\" situé tout en haut. "
+        syllabus: |-
+            La page du programme présente une vue en tableau du calendrier du cours, et les bases de
+            notation du cours. Vous pouvez y ajouter d'autres commentaires, notes ou idées que vous auriez à propos
+            de la structure du cours, de ses politiques ou tout autre chose.
+            
+            Pour ajouter des commentaires, cliquer le lien "Modifier" situé tout en haut.
       labels: 
         syllabus_body: "Description du programme"
       links: 
@@ -3119,22 +3122,22 @@ fr:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Supprimer seulement  
+            Supprimer seulement
             de Canvas
         delete_from_google_docs: |-
-            Supprimer également de  
+            Supprimer également de
             Google Docs
         start_collaborating: "Démarrer la collaboration"
         update: "Mettre à jour la collaboration"
       collaboration_name: "Collaboration %{course_or_group_name}"
       descriptions: 
         etherpad: |-
-            EtherPad est un projet libre et ouvert (Open Source) qui permet de créer rapidement des documents partagés. Il est suffisamment rapide pour vous permettre de voir ce que les autres personnes tapent en temps réel. En revanche, les « pads » ne sont pas protégés par mot de passe, par conséquent, quiconque possède un lien vers ceux-ci peut les modifier. EtherPad est mieux adapté que Google Docs si vous souhaitez préserver l’anonymat et/ou permettre aux utilisateurs ne disposant pas d’un compte Google de participer.  
-              
+            EtherPad est un projet libre et ouvert (Open Source) qui permet de créer rapidement des documents partagés. Il est suffisamment rapide pour vous permettre de voir ce que les autres personnes tapent en temps réel. En revanche, les « pads » ne sont pas protégés par mot de passe, par conséquent, quiconque possède un lien vers ceux-ci peut les modifier. EtherPad est mieux adapté que Google Docs si vous souhaitez préserver l’anonymat et/ou permettre aux utilisateurs ne disposant pas d’un compte Google de participer.
+            
             **Avertissement**  : vous devez connaître la [politique de suppression d’EtherPad](%{etherpad_deletion_policy_url}) pour éviter de perdre votre travail.
         google_docs: |-
-            Google Docs est un excellent endroit pour collaborer à un projet de groupe. Il fonctionne comme Microsoft Word, mais permet de travailler à plusieurs en même temps sur un même fichier, sans l’envoyer par e-mail aux autres participants. 
-              
+            Google Docs est un excellent endroit pour collaborer à un projet de groupe. Il fonctionne comme Microsoft Word, mais permet de travailler à plusieurs en même temps sur un même fichier, sans l’envoyer par e-mail aux autres participants.
+            
             **Avertissement** : vous (et vos collaborateurs) aurez besoin d’un compte Google pour participer aux collaborations Google Docs.
       labels: 
         collaboration_type: "Collaborer à l’aide de :"
@@ -3148,21 +3151,21 @@ fr:
       file_not_found: "Fichier de collaboration introuvable"
     index: 
       description_rs: |-
-          Les outils en ligne gratuits tels que [Google Docs](%{google_url}) sont pour les étudiants, des sites fantastiques pour travailler sur des projets ou des essais de groupe, pour prendre des notes partagées, etc. 
+          Les outils en ligne gratuits tels que [Google Docs](%{google_url}) sont pour les étudiants, des sites fantastiques pour travailler sur des projets ou des essais de groupe, pour prendre des notes partagées, etc.
           L’enseignant *ou* les étudiants peuvent configurer des collaborations de groupes.
       description_student: |-
           **Qu’entendons-nous par collaborations ?** Nous parlons d'outils en ligne pour
           travailler ensemble sur un document partagé. Vous pouvez utiliser des ressources telles
-          [Google Docs](%{google_url}) 
+          [Google Docs](%{google_url})
           pour travailler de manière collaborative sur des tâches telles que des essais de groupe ou des prises de note partagées. Cette page est
-          un emplacement qui garde facilement trace de ces collaborations, et permet aussi 
+          un emplacement qui garde facilement trace de ces collaborations, et permet aussi
           de les configurer sans avoir à échanger de courriels.
       description_teacher: |-
           **Qu’entendons-nous par collaborations ?** Nous parlons d'outils en ligne que la plupart
           de vos étudiants connaissent probablement déjà. Les étudiants peuvent utiliser des ressources telles
-          [Google Docs](%{google_url}) 
+          [Google Docs](%{google_url})
           pour travailler de manière collaborative sur des tâches telles que des essais de groupe ou des prises de note partagées. Cette page leur propose
-          (et à vous aussi) un emplacement pour facilement garder trace de ces collaborations, et permet aussi 
+          (et à vous aussi) un emplacement pour facilement garder trace de ces collaborations, et permet aussi
           de les configurer sans avoir à échanger de courriels.
       google: 
         drive: 
@@ -3798,9 +3801,9 @@ fr:
         create: |-
             Les modules de cours permettent d’organiser les travaux personnels, les pages, les fichiers, etc. en sections ou blocs plus petits. Ils peuvent être axés sur un thème, ciblés en fonction d’un sujet spécifique ou simplement groupés chronologiquement.
             
-              Vous pouvez aussi classer les modules en définissant des critères ou des prérequis pour chacun d’eux. Les étudiants ne pourront pas accéder aux modules avant d’en avoir terminé avec tous les prérequis. Cette mesure permet de les empêcher d’accéder à certains contenus ou fichiers avant d’avoir, par exemple, obtenu 75 % à un questionnaire de révision.
+            Vous pouvez aussi classer les modules en définissant des critères ou des prérequis pour chacun d’eux. Les étudiants ne pourront pas accéder aux modules avant d’en avoir terminé avec tous les prérequis. Cette mesure permet de les empêcher d’accéder à certains contenus ou fichiers avant d’avoir, par exemple, obtenu 75 % à un questionnaire de révision.
             
-              Pour commencer à organiser votre cours en différents modules, cliquez sur le bouton %{button} à droite.
+            Pour commencer à organiser votre cours en différents modules, cliquez sur le bouton %{button} à droite.
         no_modules: "Aucun module n’a été défini pour ce cours."
       images: 
         alt: 
@@ -6039,7 +6042,7 @@ fr:
   enable_feature_title_987d8e9a: "Activer la fonctionnalité : %{title}"
   enable_gradebook_list_students_by_sortable_name: "Affichez la liste des étudiants triée d’après leur nom dans le relevé de notes. Par défaut, le tri s’effectue d’après les données « Nom, prénom », mais vous pouvez modifier ces paramètres."
   enable_multiple_grading_periods: |-
-      Plusieurs périodes de notation permettent aux professeurs et administrateurs  de créer des périodes de notation avec des 
+      Plusieurs périodes de notation permettent aux professeurs et administrateurs  de créer des périodes de notation avec des
       dates butoir fixes. Les travaux peuvent être filtrés par ces périodes de notation dans le relevé de notes.
   enable_or_condition_for_modules_a16f02d8: "Activer la condition \"OU\" pour les modules"
   enable_reregistration_for_lti_2_b2a10444: "Activer la réinscription pour LTI 2"
@@ -6896,9 +6899,9 @@ fr:
     confirms: 
       delete_comment: "Voulez-vous vraiment supprimer ce commentaire ?"
       unsaved_changes: |-
-          Les étudiants suivants ont des modifications non enregistrées pour leurs envois de questionnaire : 
+          Les étudiants suivants ont des modifications non enregistrées pour leurs envois de questionnaire :
           
-           %{users}
+          %{users}
           Continue anyway?
     crocodoc_expiring: "Votre session Crocodoc expire bientôt. Rafraîchissez la fenêtre pour éviter de perdre votre travail."
     dialog_button: 
@@ -7966,9 +7969,9 @@ fr:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Si vous quittez, le téléchargement du fichier zip qui se prépare sera annulé."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       Si vous aviez apporté des modifications aux fichiers soumis par l’étudiant
-      que vous auriez téléchargés précédemment, il vous suffit de les recompresser 
-      puis de télécharger le fichier zip résultant accompagné du formulaire ci-dessous. 
-      Les étudiants verront les fichiers modifiés dans la zone des commentaires de leur soumission. 
+      que vous auriez téléchargés précédemment, il vous suffit de les recompresser
+      puis de télécharger le fichier zip résultant accompagné du formulaire ci-dessous.
+      Les étudiants verront les fichiers modifiés dans la zone des commentaires de leur soumission.
       
       *Assurez-vous de ne pas modifier les noms des fichiers soumis afin que nous puissions les reconnaître.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Si vous avez utilisé un autre système de gestion des cours, vous avez probablement des éléments à transférer dans Canvas. Nous pouvons vous guider tout au long de la migration de votre contenu vers Canvas."
@@ -8239,7 +8242,7 @@ fr:
       previous: Précédent
   just_in_time_provisioning_382a0354: "Mise en service juste à temps"
   k12_description: |-
-      Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela 
+      Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela
       applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
   k_2521301c: k
   keep_submissions_anonymous_5cbaf419: "Conserver l'anonymat des soumissions"
@@ -8289,8 +8292,8 @@ fr:
   learn_more_about_collaborations_2978f66d: "Apprenez-en davantage sur les collaborations"
   learning_mastery_5fc34276: "Maîtrise de l’apprentissage"
   learning_mastery_gradebook_description: |-
-      Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement 
-      la progression des étudiants et du cours dans les différents apprentissages. 
+      Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement
+      la progression des étudiants et du cours dans les différents apprentissages.
       Les acquis sont présentés comme un relevé de notes et les progrès des étudiants sont exprimés à la fois sous la forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
   learning_outcome: 
     no_comment: "Aucun commentaire"
@@ -8365,8 +8368,8 @@ fr:
         body: |-
             Le message intitulé « %{subject} » n’a pas pu être remis, car le sujet de discussion est verrouillé. Si vous souhaitez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et d’envoyer un message à cette personne avec l’outil Boîte de réception.
             
-                    Merci,
-                    L’assistance technique Canvas
+            Merci,
+            L’assistance technique Canvas
         subject: "Échec de réponse au message : %{subject}"
     progress_runner: 
       completed_message: 
@@ -9045,9 +9048,9 @@ fr:
     assignment_changed: 
       email: 
         body: |-
-            La tâche « %{title} » pour %{course} a été modifiée. 
+            La tâche « %{title} » pour %{course} a été modifiée.
             
-            Cliquez ici pour afficher cette tâche : 
+            Cliquez ici pour afficher cette tâche :
             %{url}
         html: 
           body: "La tâche « %{title} » du cours %{course} a été modifiée."
@@ -9387,12 +9390,18 @@ fr:
         tweet: "Alerte Canvas - Message de %{user_name}."
     course_already_started: 
       email: 
-        body: "Bonjour %{user},\n\n\
-            Votre cours %{course} sur le réseau Canvas a commencé il y a quelques jours et nous avons remarqué que vous ne vous étiez pas encore connecté. Nous vous envoyons donc un dernier rappel au cas où il s’agirait d’un oubli.\n\n\
-            Pour vous connecter, accédez à %{site} et spécifiez votre nom d’utilisateur et votre mot de passe. Si vous n’avez pas encore de mot de passe, vous pouvez en définir un ici : %{password_url}\n\n\
-            Si vous n’êtes simplement pas en mesure de suivre ce cours, n’hésitez pas à consulter notre catalogue sur le site %{site} pour chercher une autre formation. Nous ajoutons constamment de nouveaux cours !\n\n\
-            Nous espérons vous voir bientôt,\n\n\
-            Le réseau Canvas "
+        body: |-
+            Bonjour %{user},
+            
+            Votre cours %{course} sur le réseau Canvas a commencé il y a quelques jours et nous avons remarqué que vous ne vous étiez pas encore connecté. Nous vous envoyons donc un dernier rappel au cas où il s’agirait d’un oubli.
+            
+            Pour vous connecter, accédez à %{site} et spécifiez votre nom d’utilisateur et votre mot de passe. Si vous n’avez pas encore de mot de passe, vous pouvez en définir un ici : %{password_url}
+            
+            Si vous n’êtes simplement pas en mesure de suivre ce cours, n’hésitez pas à consulter notre catalogue sur le site %{site} pour chercher une autre formation. Nous ajoutons constamment de nouveaux cours !
+            
+            Nous espérons vous voir bientôt,
+            
+            Le réseau Canvas
         course_already_started: "Votre cours a déjà commencé"
     course_required_materials: 
       email: 
@@ -11670,14 +11679,14 @@ fr:
       cache_explanation: "L’absence de paramètre indique une mise en cache sans limites, 0 indique qu’il n’y a pas de mise en cache."
       description: |-
           Vous aurez besoin d’un compte, soit sur [Kaltura.com](%{kaltura_url})
-           soit avec une instance auto-hébergée de Kaltura.
+          soit avec une instance auto-hébergée de Kaltura.
           
-           **Note :** une fois que vous aurez configuré Kaltura dans Canvas,
-           vous devrez accéder à la console de gestion de Kaltura, puis sous « Paramètres->
-           Paramètres d’intégration », activez les notifications du serveur avec une 
-           URL de notification : 
+          **Note :** une fois que vous aurez configuré Kaltura dans Canvas,
+          vous devrez accéder à la console de gestion de Kaltura, puis sous « Paramètres->
+          Paramètres d’intégration », activez les notifications du serveur avec une
+          URL de notification :
           
-           %{notification_url} 
+          %{notification_url}
           
           Puis, cochez les cases d'« Ajout d'entrée » et  de « Suppression d'entrée » dans la colonne « Envoyé par le serveur ».
       headers: 
@@ -11811,10 +11820,10 @@ fr:
     webct_scraper_settings: 
       description: |-
           Les institutions qui n’utilisent pas les modules d’apprentissage de WebCT (y compris les établissements ayant adopté une version de WebCT
-           antérieure à 4.0, lorsque les modules ont été mis à leur disposition) peuvent améliorer les migrations de cours en important le contenu du cours
-           en tant que modules Canvas au lieu des modules d’apprentissage. Cette page permet de définir le comportement par défaut de l’outil de migration WebCT
-           concernant les modules de contenu. N’oubliez pas qu’il est possible de
-           choisir le comportement lors de migrations de cours individuels, mais pas lors de migrations en bloc.
+          antérieure à 4.0, lorsque les modules ont été mis à leur disposition) peuvent améliorer les migrations de cours en important le contenu du cours
+          en tant que modules Canvas au lieu des modules d’apprentissage. Cette page permet de définir le comportement par défaut de l’outil de migration WebCT
+          concernant les modules de contenu. N’oubliez pas qu’il est possible de
+          choisir le comportement lors de migrations de cours individuels, mais pas lors de migrations en bloc.
       labels: 
         allow_outline_selection: "Afficher l’option permettant d’utiliser le contenu du cours en tant que modules dans l’assistant de migration"
         folders_as_outline: "Utiliser par défaut le contenu du cours WebCT pour les modules"
@@ -11884,7 +11893,7 @@ fr:
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Affichage de la note sur SIS activé. Cliquer pour basculer."
   post_grades_39c52870: "Publier les notes"
   post_grades_description: |-
-      L’option Publier les notes permet aux enseignants de renvoyer les notes sur les systèmes SIS activés : 
+      L’option Publier les notes permet aux enseignants de renvoyer les notes sur les systèmes SIS activés :
       Powerschool, Aspire (SIS2000), JMC et tout autre système SIS acceptant les éléments SIF GradingCategory,
       , GradingAssignment, GradingAssignmentScore.
   post_grades_to_sis_97ece878: "Publier les notes sur SIS"
@@ -12118,7 +12127,7 @@ fr:
           vous avez enregistrés, ceux-ci pourront facilement vous contacter via votre compte Twitter.
           
           Vous pouvez également vous inscrire pour faire envoyer des notifications sur votre compte Twitter.
-          Ces notifications vous seront envoyées sous forme de messages directs par 
+          Ces notifications vous seront envoyées sous forme de messages directs par
           vous-même. Elles ne seront pas affichées dans vos messages publics.
       unknown_service: Inconnu
       web_services: "Canvas peut vous simplifier la vie en se jumelant aux outils Web que vous utilisez déjà. Cliquez sur un service dans Autres services pour le constater par vous-même."
@@ -12515,7 +12524,7 @@ fr:
       page_header: "Séquence des réponses"
   quiz_log_auditing_desc: |-
       Permet de suivre les événements liés à l’envoi d’un questionnaire et donne la possibilité
-            de consulter un journal de ces événements une fois l’envoi effectué.
+      de consulter un journal de ces événements une fois l’envoi effectué.
   quiz_lti_plugin_a189607f: "Plugin LTI de questionnaire"
   quiz_lti_plugin_a6256549: "Plugin de questionnaire LTI "
   quiz_menu_4fcd5e61: "Menu du questionnaire"
@@ -13017,7 +13026,7 @@ fr:
           multiple_dropdowns: "Entrez votre question en spécifiant l’emplacement de chaque liste déroulante. Ensuite, définissez les réponses possibles pour chaque liste déroulante, avec une réponse correcte par liste."
           numerical: "Pour la réponse correcte, définissez un nombre dans une plage de nombres, ou un nombre avec une marge d’erreur inférieure ou supérieure. L’étudiant verra une zone de texte vide dans laquelle il pourra taper le numéro de sa réponse."
           short_answer: |-
-              Entrez le texte de votre question, puis définissez toutes les réponses correctes possibles pour l’emplacement vide. 
+              Entrez le texte de votre question, puis définissez toutes les réponses correctes possibles pour l’emplacement vide.
               Les étudiants verront une question suivie d’une petite zone de texte dans laquelle entrer leur réponse.
           text_only: "Cette « question » n’est pas notée, mais peut se révéler utile pour présenter un ensemble de questions connexes."
           true_false: "Entrez le texte de votre question, puis sélectionnez la valeur Vrai ou Faux comme réponse correcte."
@@ -15397,7 +15406,7 @@ fr:
   student_outcome_gradebook_description: |-
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux étudiants de voir rapidement
       leurs progrès dans les différents apprentissages du cours. Ces acquis sont présentés
-      dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la 
+      dans un format analogue à un relevé de notes et la progression est indiquée à la fois sous la
       forme d’une valeur numérique et avec les appréciations maîtrisé/presque maîtrisé/soutien.
   student_summary: 
     student_summary_table_ascending: "Tableau récapitulatif des étudiants trié par ordre croissant par %{sortText}"
@@ -15755,7 +15764,7 @@ fr:
   the_app_was_deactivated_573520ab: "L’application était désactivée"
   the_app_was_updated_successfully_3d71cd1b: "L’application a bien été mise à jour"
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
-      L'ID de Canvas SAML Entity est %{metadata_url}, et les métadonnées du fournisseur de service 
+      L'ID de Canvas SAML Entity est %{metadata_url}, et les métadonnées du fournisseur de service
       sont disponibles à cette URL.
   the_course_link_validator_searches_through_course__76f0bc63: "Le validateur de lien du cours explore le contenu du cours et retourne chaque lien invalide ou non-réactif qu'il rencontre. Veuillez noter que certains liens indiqués comme étant non-réactifs, sont seulement inaccessibles depuis nos serveurs et fonctionneront correctement pour les étudiants. "
   the_error_stack_trace_if_there_is_one_b7e008a1: "La trace d'appels de l'erreur, s'il y en a une"
@@ -15784,8 +15793,8 @@ fr:
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       Le message intitulé « %{subject} » n’a pas pu être remis, car le sujet de discussion a été supprimé. Si vous souhaitez contacter quelqu’un via Canvas, vous pouvez essayer de vous connecter à votre compte et d’envoyer un message à cette personne avec l’outil Boîte de réception.
       
-              Merci,
-              L’assistance technique Canvas
+      Merci,
+      L’assistance technique Canvas
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Le message que vous avez envoyé avec le sujet "%{subject}" n'a pu être délivré. Pour répondre aux messages Canvas depuis cette adresse courriel, il doit tout d'abord  être un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse [Voir https://community.canvaslms.com/docs/DOC-2281]. Vous pouvez aussi contacter cette personne via la boîte de réception [Voir https://community.canvaslms.com/docs/DOC-2670].
       
@@ -16714,9 +16723,9 @@ fr:
       no_courses_message: "Vous n’avez pas de cours, par conséquent cette page n’est pas très intéressante pour l’instant. Lorsque vous aurez créé un cours ou quand vous vous serez inscrit à des cours, vous verrez des conversations apparaître pour toutes vos classes."
       unpublished_courses_message: |-
           Vous êtes inscrit à un ou plusieurs cours qui n’ont pas encore commencé. Dès
-                  qu’ils seront disponibles, vous verrez des informations à leur sujet ici
-                  et dans la barre de navigation en haut. Entre-temps, vous pouvez vous inscrire
-                  à d’autres cours ou définir votre profil.
+          qu’ils seront disponibles, vous verrez des informations à leur sujet ici
+          et dans la barre de navigation en haut. Entre-temps, vous pouvez vous inscrire
+          à d’autres cours ou définir votre profil.
       welcome_to_happiness: "Bienvenue dans Canvas !"
   users_d1b60cb0: Utilisateurs
   users_matching_search_term_c604db9e: "Les utilisateurs correspondant à \"%{search_term}\""
@@ -17092,9 +17101,10 @@ fr:
       Vous allez devoir [enregistrer une application sur GitHub](%{github_url}).
       Vous devriez configurer %{callback_url} comme URL de redirection autorisée.
       Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
-  you_will_need_to_register_an_application_on_linked_26ecb18d: "Vous allez devoir [enregistrer une application sur LinkedIn](%{linkedin_url}).\n\
-      Vous devriez ajouter %{callback_url} comme URL de redirection autorisée OAuth 2.0, et définir le statut de l'application sur Actif\n\
-      Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici. "
+  you_will_need_to_register_an_application_on_linked_26ecb18d: |-
+      Vous allez devoir [enregistrer une application sur LinkedIn](%{linkedin_url}).
+      Vous devriez ajouter %{callback_url} comme URL de redirection autorisée OAuth 2.0, et définir le statut de l'application sur Actif
+      Une fois que vous avez créé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       Vous allez devoir [enregistrer une application sur Twitter](%{twitter_url}).
       Vous devriez configurer %{callback_url} comme URL de redirection.
