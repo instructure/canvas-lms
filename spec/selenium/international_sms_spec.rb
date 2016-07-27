@@ -37,7 +37,7 @@ describe "international sms" do
 
       get '/profile/settings'
       make_full_screen
-      find('.add_contact_link.icon-add').click
+      find('.add_contact_link').click
       wait_for_ajaximations
 
       list_of_countries = find_all('.controls .user_selected.country option')
@@ -58,15 +58,15 @@ describe "international sms" do
     it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
       get '/profile/settings'
       make_full_screen
-      find('.add_contact_link.icon-add').click
+      find('.add_contact_link').click
       wait_for_ajaximations
 
-      set_value fj(".user_selected.country"), '54'
-      set_value fj('#communication_channel_sms_number'), '12345'
+      set_value f(".user_selected.country"), '54'
+      set_value f('#communication_channel_sms_number'), '12345'
       fj('#register_sms_number button[type="submit"]').click
       wait_for_ajaximations
 
-      expect(fj('#sms_confirmation_instructions')).to be_displayed
+      expect(f('#sms_confirmation_instructions')).to be_displayed
     end
   end
 end

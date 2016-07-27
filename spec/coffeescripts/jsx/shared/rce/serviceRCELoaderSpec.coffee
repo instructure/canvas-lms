@@ -183,3 +183,9 @@ define [
     ok @rce.renderSidebarIntoDiv.called
     props = @rce.renderSidebarIntoDiv.args[0][1]
     equal(typeof props.refreshToken, 'function')
+
+  test 'passes brand config json url', ->
+    ENV.active_brand_config_json_url = {}
+    RCELoader.loadSidebarOnTarget(@$div, ->)
+    props = @rce.renderSidebarIntoDiv.args[0][1]
+    equal props.themeUrl, ENV.active_brand_config_json_url

@@ -36,16 +36,6 @@ define([
       $(this).loadingImage('remove');
     }
   });
-  $(".forgot_password_link").click(function(event) {
-    event.preventDefault();
-    $("#login_form").hide();
-    $("#forgot_password_form").show();
-  });
-  $(".login_link").click(function(event) {
-    event.preventDefault();
-    $("#login_form").show();
-    $("#forgot_password_form").hide();
-  });
 
   $("#login_form")
     .submit(function(event) {

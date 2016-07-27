@@ -27,22 +27,50 @@
 ```html
 <p>
   <div class="ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
     Info: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-success">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-check"></i>
+    </div>
     Success: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-warning">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
     Warning: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 <p>
   <div class="ic-flash-error">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-warning"></i>
+    </div>
     Error: Sample flash notice style.
+    <button type="button" class="Button Button--icon-action close_link">
+      <i class="icon-x" aria-hidden="true"></i>
+      <span class="screenreader-only">Close</span>
+    </button>
   </div>
 </p>
 ```
@@ -97,69 +125,81 @@
 
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
-  color: $ic-color-light;
-  font-weight: bold;
-  padding: 6px 40px 6px 8px;
+  box-sizing: border-box;
+  padding: $ic-sp/2 40px $ic-sp/2 $ic-sp*4;
   margin: 0 auto;
   width: 475px;
   min-height: 20px;
+  line-height: 1.3;
   z-index: 2;
-  zoom: 1;
   vertical-align: middle;
-  text-align: center;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
-  border-bottom-color: rgba(0, 0, 0, 0.5);
-  @if $use_new_styles { font-weight: 500; }
-  @else { font-weight: bold; }
+  box-shadow: 0 1px 8px rgba(black, 0.25);
+  border: 2px solid;
+  border-radius: $baseBorderRadius*2;
+  background-color: $ic-color-light;
 
-  a {
-    text-decoration: underline;
-    color: inherit;
-    &:focus, &:hover { color: inherit; }
-  }
-  a.close_link {
+  .close_link {
     position: absolute;
-    right: 10px;
+    right: $ic-sp/3;
     top: 50%;
-    width: 20px;
-    height: 20px;
-    overflow: hidden;
-    margin-top: -11px;
-    color: white;
+    margin-top: -12px;
     text-decoration: none;
   }
-  &.no_close a.close_link {
+
+  &.no_close .close_link {
     display: none;
   }
 
-  i {
-    height: 20px;
-    margin-right: 2px;
+  .ic-flash__icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $ic-sp*3;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $ic-color-light;
+
+    i[class*=icon-],
+    i[class^=icon-] {
+      &:before {
+        left: -1px; // account for left border, so icon looks centered
+      }
+    }
+
   }
 
   &.ic-flash-static {
     width: auto;
+    border-radius: 0; // corners look bad when msg is full-width
   }
 }
 
 .ic-flash-info {
-  background-color: #3a87ad;
+  border-color: $ic-brand-primary;
+  .ic-flash__icon { background-color: $ic-brand-primary; }
 }
 
 .ic-flash-success {
-  background-color: $ic-color-success;
+  border-color: $ic-color-success;
+  .ic-flash__icon { background-color: $ic-color-success; }
 }
 
 .ic-flash-warning {
-  background-color: $ic-color-alert;
+  border-color: $ic-color-alert;
+  .ic-flash__icon { background-color: $ic-color-alert; }
 }
 
 .ic-flash-error {
-  background-color: $ic-color-danger;
+  border-color: $ic-color-danger;
+  .ic-flash__icon { background-color: $ic-color-danger; }
 }
 
 .ic-flash--Theme-Editor {
-  background-color: $ic-color-dark;
+  border-color: $ic-color-dark;
+  text-align: center; // need this or text is obscured by theme editor sidebar
+  .ic-flash__icon { background-color: $ic-color-dark; }
 }
 
 .ic-flash__headline {

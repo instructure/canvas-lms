@@ -230,6 +230,5 @@ module.exports = {
     new webpack.PrefetchPlugin("./public/javascripts/axios.js"),
     new webpack.PrefetchPlugin("./public/javascripts/bower/k5uploader/lib/ui_config_from_node.js"),
     new webpack.PrefetchPlugin("./public/javascripts/bower/reflux/dist/reflux.min.js")
-
   ]
 };

@@ -126,7 +126,8 @@ class AssignmentOverride < ActiveRecord::Base
     joins(:assignment_override_students).
     where(
       assignment_override_students: { user_id: visible_ids },
-    )
+    ).
+    distinct
   end
 
   before_validation :default_values
@@ -229,6 +230,12 @@ class AssignmentOverride < ActiveRecord::Base
 
   def lock_at=(new_lock_at)
     write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
+  end
+
+  def availability_expired?
+    lock_at_overridden &&
+      lock_at.present? &&
+      lock_at <= Time.zone.now
   end
 
   def as_hash

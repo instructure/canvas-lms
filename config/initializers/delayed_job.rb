@@ -50,11 +50,13 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     :session_id => worker.name,
   }
 
-  LiveEvents.set_context({
+  live_events_ctx = {
     :root_account_id => job.respond_to?(:global_account_id) ? job.global_account_id : nil,
     :job_id => job.global_id,
     :job_tag => job.tag
-  })
+  }
+  StringifyIds.recursively_stringify_ids(live_events_ctx)
+  LiveEvents.set_context(live_events_ctx)
 
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()

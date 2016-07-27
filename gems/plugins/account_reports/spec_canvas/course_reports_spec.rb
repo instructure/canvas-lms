@@ -236,6 +236,10 @@ describe "Course Account Reports" do
       a.update_attribute(:size, 4.6521.megabyte)
       a = attachment_obj_with_context(@course5)
       a.update_attribute(:size, 80.megabyte)
+      child = attachment_obj_with_context(@course1)
+      child.update_attribute(:size, 80.megabyte)
+      child.root_attachment_id = a.id
+      child.save!
     end
 
     it 'should add up storage for courses' do
@@ -246,14 +250,14 @@ describe "Course Account Reports" do
 
       expect(parsed[0]).to eq [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
                                'English 101', @sub_account.id.to_s, 'sub1',
-                               'Math', '1.23']
+                               'Math', '1.23', '81.23']
       expect(parsed[1]).to eq [@course3.id.to_s, 'SIS_COURSE_ID_3', 'SCI101',
                                'Science 101', @account.id.to_s, nil,
-                               @account.name, '0.0']
+                               @account.name, '0.0', '0.0']
       expect(parsed[2]).to eq [@course5.id.to_s, nil, 'Tal101', 'talking 101',
-                               @account.id.to_s, nil, @account.name, '92.0']
+                               @account.id.to_s, nil, @account.name, '92.0', '92.0']
       expect(parsed[3]).to eq [@course4.id.to_s, nil, 'self', 'self help',
-                               @account.id.to_s, nil, @account.name, '4.65']
+                               @account.id.to_s, nil, @account.name, '4.65', '4.65']
     end
 
     it 'should add up storage for courses in sub account' do
@@ -261,7 +265,7 @@ describe "Course Account Reports" do
       expect(parsed.length).to eq 1
       expect(parsed[0]).to eq [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
                                'English 101', @sub_account.id.to_s, 'sub1',
-                               'Math', '1.23']
+                               'Math', '1.23', '81.23']
     end
   end
 

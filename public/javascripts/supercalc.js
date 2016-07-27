@@ -66,6 +66,7 @@ define([
                       "</table>");
 
       $entryBox.attr('aria-labelledby', 'headings.formula');
+      $entryBox.css('width', '220px');
       $(this).data('table', $table);
       $entryBox.before($table);
       $table.find("tfoot tr:last td:first").append($entryBox);

@@ -20,7 +20,7 @@ module Quizzes::QuizQuestion::AnswerParsers
   class Calculated < AnswerParser
     def parse(question)
       question[:formulas] = format_formulas(question[:formulas])
-      question[:variables] = format_variables(question[:variables])
+      question[:variables] = parse_variables(question[:variables])
 
       @answers.map_with_group! do |answer_group, answer|
         answer_params = {:weight => 100, :variables => []}
@@ -29,9 +29,11 @@ module Quizzes::QuizQuestion::AnswerParsers
         variables = hash_to_array(answer[:variables])
         variables.each do |variable|
           variable = Quizzes::QuizQuestion::RawFields.new(variable)
+          name = variable.fetch_with_enforced_length(:name)
+
           answer_params[:variables] << {
-            :name => variable.fetch_with_enforced_length(:name),
-            :value => variable.fetch_any(:value).to_f
+            :name => name,
+            :value => format_value(variable.fetch_any(:value).to_f, @scale_lookup_dictionary[name])
           }
         end
 
@@ -53,16 +55,28 @@ module Quizzes::QuizQuestion::AnswerParsers
       end
     end
 
-    def format_variables(variables)
+    def parse_variables(variables)
+      @scale_lookup_dictionary ||= {}
       hash_to_array(variables).map do |variable|
         variable = Quizzes::QuizQuestion::RawFields.new(variable.merge({name: trim_length(variable[:name])}))
+
+        # Setup a scale lookup dictionary
+        var_name = variable.fetch_with_enforced_length(:name)
+        scale = variable.fetch_any(:scale).to_i
+        @scale_lookup_dictionary[var_name] = scale
+
+        # Return the formatted variable
         {
-          name: variable.fetch_with_enforced_length(:name),
+          name: var_name,
           min: variable.fetch_any(:min).to_f,
           max: variable.fetch_any(:max).to_f,
-          scale: variable.fetch_any(:scale).to_i
+          scale: scale
         }
       end
+    end
+
+    def format_value(float_value, scale)
+      scale ? format("%.#{scale}f", float_value) : float_value
     end
 
     def trim_length(field)

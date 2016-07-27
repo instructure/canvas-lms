@@ -67,24 +67,20 @@ describe "managing developer keys" do
     f("#keys tbody tr.key .delete_link").click
     driver.switch_to.alert.accept
     driver.switch_to.default_content
-    keep_trying_until { ff("#keys tbody tr").length == 1 }
+    expect(ff("#keys tbody tr")).to have_size(1)
     expect(DeveloperKey.count).to eq 2
     expect(DeveloperKey.last).to be_deleted
   end
 
   it "should show the first 10 by default, with pagination working" do
     count = DeveloperKey.count
-    25.times { |i| DeveloperKey.create!(:name => "tool #{i}") }
+    11.times { |i| DeveloperKey.create!(:name => "tool #{i}") }
     get '/developer_keys'
     expect(f("#loading")).not_to have_class('loading')
-    expect(ff("#keys tbody tr").length).to eq 10
+    expect(ff("#keys tbody tr")).to have_size(10)
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
-    wait_for_ajaximations
-    keep_trying_until do
-      expect(f("#loading")).not_to have_class('loading')
-      true
-    end
-    expect(ff("#keys tbody tr").length).to eq count + 25
+    expect(f("#loading")).not_to have_class('loading')
+    expect(ff("#keys tbody tr")).to have_size(count + 11)
   end
 end

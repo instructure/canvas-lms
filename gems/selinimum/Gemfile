@@ -4,3 +4,4 @@ gemspec
 
 gem "aws-sdk", "1.63.0" # old cuz canvas
 gem "rspec"
+gem "byebug"

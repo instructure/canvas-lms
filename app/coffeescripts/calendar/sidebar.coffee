@@ -10,10 +10,11 @@ define [
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/EventDataSource'
+  'jsx/shared/helpers/forceScreenreaderToReparse'
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, React, ReactModal, ColorPickerComponent, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, _, React, ReactModal, ColorPickerComponent, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource, forceScreenreaderToReparse) ->
   ColorPicker = React.createFactory(ColorPickerComponent)
 
   class VisibleContextManager
@@ -102,7 +103,9 @@ define [
       React.render(ColorPicker({
         isOpen: true
         positions: positions
-        assetString: assetString
+        assetString: assetString,
+        afterClose: () ->
+          forceScreenreaderToReparse($('#application')[0])
         afterUpdateColor: (color) =>
           color = '#' + color
           $existingStyles = $('#calendar_color_style_overrides');

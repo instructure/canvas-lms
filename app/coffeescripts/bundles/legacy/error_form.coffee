@@ -7,6 +7,7 @@ require [
   "compiled/jquery.rails_flash_notifications"
 ], (I18n, $, htmlEscape) ->
   $(document).ready ->
+    $("#error_username").hide()
     requiredFields = []
     if window.ENV.current_user.display_name == undefined
       requiredFields = ['error[email]']

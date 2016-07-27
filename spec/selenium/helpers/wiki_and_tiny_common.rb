@@ -74,7 +74,7 @@ module WikiAndTinyCommon
 
   def validate_link(text)
     in_frame wiki_page_body_ifr_id do
-      link = keep_trying_until { f('#tinymce a') }
+      link = f('#tinymce a')
       expect(link.attribute('href')).to eq text
     end
   end
@@ -108,7 +108,7 @@ module WikiAndTinyCommon
   #only handles by #id's
   def validate_wiki_style_attrib(type, value, selectors)
     in_frame wiki_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute('style')).to eq "#{type}: #{value}\;"
+      expect(f("#tinymce #{selectors}").attribute('style')).to match("#{type}: #{value}\;")
     end
   end
 
@@ -120,11 +120,11 @@ module WikiAndTinyCommon
   def add_canvas_image(el, folder, filename)
     dialog = activate_editor_embed_image(el)
     f('a[href="#tabUploaded"]', dialog).click
-    keep_trying_until { expect(f('.treeLabel', dialog)).to be_displayed }
-    folder_el = ff('.treeLabel', dialog).detect { |el| el.text == folder }
+    expect(f('.treeLabel', dialog)).to be_displayed
+    folder_el = ff('.treeLabel', dialog).detect { |e| e.text == folder }
     expect(folder_el).not_to be_nil
     folder_el.click unless folder_el['class'].split.include?('expanded')
-    keep_trying_until { expect(f('.treeFile', dialog)).to be_displayed }
+    expect(f('.treeFile', dialog)).to be_displayed
     file_el = f(".treeFile[title=\"#{filename}\"]", dialog)
     expect(file_el).not_to be_nil
     file_el.click
@@ -144,7 +144,7 @@ module WikiAndTinyCommon
 
   def add_image_to_rce
     get "/courses/#{@course.id}/pages/front-page/edit"
-    wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+    wait_for_tiny(f("form.edit-form .edit-content"))
     clear_wiki_rce
     f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     f('.upload_new_image_link').click
@@ -159,7 +159,7 @@ module WikiAndTinyCommon
 
   def add_file_to_rce
     wiki_page_tools_file_tree_setup
-    wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
+    wait_for_tiny(f("form.edit-form .edit-content"))
     wiki_page_body = clear_wiki_rce
     f('#editor_tabs .ui-tabs-nav li:nth-child(2) a').click
     root_folders = @tree1.find_elements(:css, 'li.folder')

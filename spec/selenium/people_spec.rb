@@ -29,7 +29,7 @@ describe "people" do
     open_student_group_dialog
     inputs = ffj('input:visible')
     replace_content(inputs[0], group_text)
-    submit_form('#add_category_form')
+    submit_dialog_form('#add_category_form')
     wait_for_ajaximations
     expect(f('#category_list')).to include_text(group_text)
   end
@@ -117,7 +117,6 @@ describe "people" do
       enroll_ta(@test_ta)
 
       get "/courses/#{@course.id}/users"
-      wait_for_ajaximations
     end
 
     it "should have tabs" do
@@ -151,8 +150,8 @@ describe "people" do
 
     it "should display remove option for student with/without SIS id", priority: "1", test_id: 332576 do
       enroll_student(@student_2)
-      @student = user
-      @course.enroll_student(@student).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      @course.enroll_student(@student)
       @course.save
       get "/courses/#{@course.id}/users"
       # check 1st student
@@ -172,9 +171,7 @@ describe "people" do
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
       f("#people-options .Button").click
       fln("Student Interactions Report").click
-      wait_for_ajaximations
-      user_name = f(".user_name").text
-      expect(f("h1").text).to eq "Teacher Activity Report for #{user_name}"
+      expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
     it "should not display Student Interaction button for a student", priority: "1", test_id: 244450  do
@@ -190,15 +187,17 @@ describe "people" do
       check_element_has_focus(fj('.group-categories-actions .btn-primary'))
     end
 
-    it "should make sure focus is set to the 'Done' button when adding users" do
+    it "should make sure focus is set to the X button each time the page changes" do
       f('#addUsers').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#user_list_textarea').send_keys('student2@test.com')
       f('#next-step').click
       wait_for_ajaximations
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
       f('#createUsersAddButton').click
       wait_for_ajaximations
-      check_element_has_focus(f('.dialog_closer'))
+      check_element_has_focus(f('.ui-dialog-titlebar-close'))
     end
 
     it "should validate the main page" do
@@ -245,7 +244,7 @@ describe "people" do
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
       expect(f('.group_count')).to include_text("#{group_count} Groups")
@@ -263,7 +262,7 @@ describe "people" do
       dialog.find_element(:css, '#category_split_groups').click
       replace_content(f('#category_split_group_count'), group_count)
       expect(@course.groups.count).to eq 0
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
       expect(ffj('.left_side .group_name:visible').count).to eq group_count.to_i
@@ -304,7 +303,7 @@ describe "people" do
         fln('View User Groups').click
       end
       open_student_group_dialog
-      submit_form('#add_category_form')
+      submit_dialog_form('#add_category_form')
       wait_for_ajaximations
       group_count.times do
         f('.add_group_link').click
@@ -373,16 +372,12 @@ describe "people" do
       expect(f('.ui-state-error')).to include_text('Unauthorized')
     end
 
-    it "should validate that a TA cannot rename a teacher" do
-      skip('bug 7106 - do not allow TA to edit teachers name')
-      teacher_enrollment = teacher_in_course(:name => 'teacher@example.com')
-      get "/courses/#{@course.id}/users/#{teacher_enrollment.user.id}"
-      expect(f('.edit_user_link')).to_not be_displayed
-    end
+    # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
+    it "should validate that a TA cannot rename a teacher"
   end
 
   context "course with multiple sections", priority: "2" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       @section2 = @course.course_sections.create!(name: 'section2')
     end
@@ -427,7 +422,7 @@ describe "people" do
       wait_for_ajaximations
       ff('.ui-button-text')[1].click
       wait_for_ajaximations
-      expect(ff(".StudentEnrollment")[0].text).to include_text("section2")
+      expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
@@ -440,12 +435,15 @@ describe "people" do
      fln("Remove user from section2").click
      ff('.ui-button-text')[1].click
      wait_for_ajaximations
-     expect(ff(".StudentEnrollment")[0].text).not_to include_text("section2")
+     expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
     it "should gray out sections the user doesn't have permission to remove" do
-      @student = user_with_pseudonym
-      @course.enroll_student(@student, allow_multiple_enrollments: true).update_attribute(:sis_source_id, 'E001')
+      @student = user_with_managed_pseudonym
+      e = @course.enroll_student(@student, allow_multiple_enrollments: true)
+      sis = @course.root_account.sis_batches.create
+      e.sis_batch_id = sis.id
+      e.save!
       get "/courses/#{@course.id}/users"
       ff(".icon-settings")[1].click
       fln("Edit Sections").click
@@ -649,9 +647,10 @@ describe "people" do
     end
 
     it "should not show the option to edit roles for a SIS imported enrollment" do
+      sis = @course.root_account.sis_batches.create
       student = user_with_pseudonym(:active_all => true)
       enrollment = @course.enroll_teacher(student)
-      enrollment.sis_source_id = "something"
+      enrollment.sis_batch_id = sis.id
       enrollment.save!
 
       user_session(@teacher)

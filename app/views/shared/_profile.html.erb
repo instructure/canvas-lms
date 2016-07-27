@@ -22,12 +22,12 @@
       <% if @user_data[:can_edit_name] %>
         <h2 class="hide-if-editing"><%= @user_data[:short_name] %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:
-          <input class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
+          <input aria-label="<%= t 'Name' %>" id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
         </label>
         <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
-            <input class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+            <input aria-label="<%= t 'Title' %>" class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
           </label>
         </p>
       <% else %>
@@ -64,15 +64,11 @@
 
       <div class="hide-if-editing">
         <h3 class="profileHeader"><%= t :ways_to_contact_user, "Contact" %></h3>
-        <% if @user_data[:user_services].blank? %>
-          <% if @user != @current_user %>
-            <p><%= t('#profile.no_registered_services', "No registered services.") %></p>
-          <% else %>
-            <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
-          <% end %>
+        <% if @user_data[:user_services].blank? && @user == @current_user %>
+          <p><%= t('#profile.you_have_no_services', "No registered services, you can add some on the *settings* page.", :name => @user_data[:short_name], :wrapper => link_to('\1', settings_profile_path)) %></p>
         <% else %>
           <ul class="social-links">
-            <% if current_user_is_account_admin %>
+            <% if current_user_is_account_admin && @user != @current_user %>
               <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
             <% end %>
             <% if @user_data[:user_services].present? && @user.show_user_services %>

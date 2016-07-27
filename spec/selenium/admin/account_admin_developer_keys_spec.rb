@@ -84,18 +84,14 @@ describe 'developer keys' do
   end
 
   it "should be paginated", priority: "1", test_id: 344532 do
-    25.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
+    11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
     get "/accounts/#{Account.default.id}/developer_keys"
     expect(f("#loading")).not_to have_class('loading')
     # pagination should load 10 objects by default
-    expect(ff("#keys tbody tr").length).to eq 10
+    expect(ff("#keys tbody tr")).to have_size(10)
     expect(f('#loading')).to have_class('show_more')
     f("#loading .show_all").click
-    wait_for_ajaximations
-    keep_trying_until do
-      expect(f("#loading")).not_to have_class('loading')
-      true
-    end
-    expect(ff("#keys tbody tr").length).to eq 25
+    expect(f("#loading")).not_to have_class('loading')
+    expect(ff("#keys tbody tr")).to have_size(11)
   end
 end

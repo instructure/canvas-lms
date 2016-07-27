@@ -146,9 +146,8 @@ describe "discussions" do
           topic.child_topics[0].reply_from({:user => @student, :text => "I feel pretty"})
           @gc.destroy
           get url
-          wait_for_ajaximations
 
-          expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+          expect(f("#assignment_group_category_id")).to be_disabled
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
         end
 
@@ -170,9 +169,8 @@ describe "discussions" do
             topic.reply_from({:user => @student, :text => "I feel pretty"})
             @gc.destroy
             get url
-            wait_for_ajaximations
 
-            expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+            expect(f("#assignment_group_category_id")).to be_disabled
             expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
           end
         end
@@ -218,7 +216,7 @@ describe "discussions" do
 
           get url
 
-          keep_trying_until { expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed }
+          expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear

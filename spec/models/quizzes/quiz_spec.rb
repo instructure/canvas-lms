@@ -1444,59 +1444,88 @@ describe Quizzes::Quiz do
   end
 
   describe "#restrict_answers_for_concluded_course?" do
-    let(:account){Account.new}
-    let(:enrollment_term){EnrollmentTerm.new}
-    let(:course){Course.new(conclude_at: conclude_at, enrollment_term: enrollment_term, restrict_enrollments_to_course_dates: true)}
-    let(:quiz){Quizzes::Quiz.new(context: course)}
+    let(:account) { Account.default }
+    let(:course){ Course.create!(root_account: account) }
+    let(:quiz) { course.quizzes.create! }
 
-    before {account.settings[:restrict_quiz_questions] = restrict_quiz_settings}
-    before {enrollment_term.stubs(root_account: account)}
-    before {course.stubs(root_account: account)}
+    subject { quiz.restrict_answers_for_concluded_course? }
 
-    context 'When account setting is true' do
-      let(:restrict_quiz_settings){true}
+    before do
+      account.settings[:restrict_quiz_questions] = restrict_quiz_settings
+      account.save!
+    end
 
-      context 'and the course has concluded' do
-        let(:conclude_at){10.minutes.ago}
+    context 'account setting is true' do
+      let(:restrict_quiz_settings) { true }
 
-        it "should be true" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+      context 'course has not concluded' do
+        it { is_expected.to be(false) }
+
+        context 'concluded enrollment_term' do
+          let(:enrollment_term) { account.enrollment_terms.create!(end_at: 10.minutes.ago) }
+
+          before do
+            course.enrollment_term = enrollment_term
+            course.save!
+          end
+
+          it { is_expected.to be(true) }
         end
       end
 
-      context 'and the course has not concluded' do
-        let(:conclude_at){10.minutes.from_now}
+      context 'the course has soft-concluded' do
+        before do
+          course.conclude_at = 10.minutes.ago
+          course.save!
+        end
 
-        it "should be false" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
+        it { is_expected.to be(false) }
+
+        context 'course settings is true' do
+          before do
+            course.restrict_enrollments_to_course_dates = true
+            course.save!
+          end
+
+          it { is_expected.to be(true) }
+
+          context 'student in a section with extended time' do
+            let(:section_end_at) { 10.minutes.from_now }
+            let(:section_start_at) { 10.minutes.ago }
+            let(:section) do
+              course.course_sections.create!(
+                start_at: section_start_at,
+                end_at: section_end_at,
+                restrict_enrollments_to_section_dates: true)
+            end
+            let(:student) { student_in_section(section) }
+
+            subject { quiz.restrict_answers_for_concluded_course?(user: student) }
+
+            it { is_expected.to be(false) }
+          end
         end
       end
 
-      context 'and the course is hard-concluded' do
-        let(:conclude_at){10.minutes.from_now}
-        it "should be true" do
-          course.workflow_state = 'completed'
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+      context 'course is hard-concluded' do
+        before do
+          course.complete!
         end
-      end
 
-      context 'and the course does not have a conclude_at date but has a concluded enrollment_term' do
-        let(:enrollment_term){EnrollmentTerm.new(end_at: 10.minutes.ago)}
-        let(:conclude_at){nil}
-
-        it "should be true" do
-          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
-        end
+        it { is_expected.to be(true) }
       end
     end
 
-    context 'When account setting is false and the course has concluded' do
-      let(:restrict_quiz_settings){false}
-      let(:conclude_at){10.minutes.ago}
+    context 'account setting is false' do
+      let(:restrict_quiz_settings) { false }
 
-      it "should be false" do
-        expect(quiz.restrict_answers_for_concluded_course?).to be_falsey
-      end
+      it { is_expected.to be(false) }
+    end
+
+    context 'account setting is nil' do
+      let(:restrict_quiz_settings) { nil }
+
+      it { is_expected.to be(false) }
     end
   end
 
@@ -1669,6 +1698,13 @@ describe Quizzes::Quiz do
       expect(@quiz.grants_right?(@teacher, :read)).to eq true
     end
 
+    it "lets admins read quizzes that are unpublished even without management rights" do
+      @quiz.unpublish!.reload
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_assignments", :enabled => false)
+      @course.account.role_overrides.create!(:role => teacher_role, :permission => "manage_grades", :enabled => false)
+      expect(@quiz.grants_right?(@teacher, :read)).to eq true
+    end
+
     it "does let students read/submit quizzes that are published" do
       @quiz.publish!
       expect(@quiz.grants_right?(@student, :read)).to eq true
@@ -1741,6 +1777,131 @@ describe Quizzes::Quiz do
 
       participant.stubs(:anonymous?).returns true
       subject.generate_submission_for_participant(participant)
+    end
+  end
+
+  describe '#locked_for?' do
+    let(:quiz) { @course.quizzes.create! }
+    let(:student) { student_in_course(course: @course, active_enrollment: true).user }
+    let(:subject_user) { student }
+    let(:opts) { {} }
+
+    subject { quiz.locked_for?(subject_user, opts) }
+
+    before do
+      @course.offer!
+    end
+
+    shared_examples 'overrides' do
+      context 'when a user has a manually unlocked submission' do
+        before do
+          quiz_submission = quiz.generate_submission(subject_user)
+          quiz_submission.manually_unlocked = true
+          quiz_submission.save
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+
+    context '#unlock_at time has not yet occurred' do
+      before do
+        quiz.unlock_at = 1.hour.from_now
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :unlock_at }
+    end
+
+    context '#unlock_at time has passed' do
+      before do
+        quiz.unlock_at = 1.hour.ago
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context '#lock_at time as passed' do
+      before do
+        quiz.lock_at = 1.hour.ago
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :lock_at }
+    end
+
+    context '#lock_at time has not yet occurred' do
+      before do
+        quiz.lock_at = 1.hour.from_now
+      end
+
+      it { is_expected.to be false }
+    end
+
+    context 'quiz is for an assignment' do
+      let(:assignment_lock_info) { quiz.assignment.locked_for?(subject_user, opts) }
+
+      before do
+        # need the after_save hooks to run for fully-prepare the quiz
+        quiz.save!
+      end
+
+      context 'assignment is not locked' do
+        before do
+          expect(assignment_lock_info).not_to be_present
+        end
+
+        it { is_expected.to be false }
+      end
+
+      context 'assignment is locked' do
+        before do
+          quiz.assignment.unlock_at = 1.day.from_now
+          quiz.assignment.save
+        end
+
+        include_examples 'overrides'
+
+        it { is_expected.to be_truthy }
+
+        it 'returns the lock info for the assignment' do
+          expect(subject).to eq assignment_lock_info
+        end
+
+        context 'skipping assignments' do
+          let(:opts) { { skip_assignment: true } }
+
+          it { is_expected.to be false }
+        end
+      end
+    end
+
+    context 'modules are locked' do
+      before do
+        locked_module = @course.context_modules.create!(name: 'locked module', unlock_at: 1.day.from_now)
+        locked_module.add_item(id: quiz.id, type: 'quiz')
+      end
+
+      include_examples 'overrides'
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :context_module }
+    end
+
+    context 'user is not a student' do
+      let(:admin) { account_admin_user(account: @course.account) }
+      let(:subject_user) { admin }
+
+      it { is_expected.to be_truthy }
+
+      it { is_expected.to have_key :missing_permission }
     end
   end
 

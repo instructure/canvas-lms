@@ -45,7 +45,7 @@ module Importers
       hash = hash.with_indifferent_access
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
-      item ||= context.wiki.wiki_pages.new
+      item ||= context.wiki.wiki_pages.temp_record
       new_record = item.new_record?
       # force the url to be the same as the url_name given, since there are
       # likely other resources in the import that link to that url

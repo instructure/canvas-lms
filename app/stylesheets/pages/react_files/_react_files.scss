@@ -172,6 +172,9 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   position: relative;
   margin: 10px;
   flex: 3;
+  // long file names cause this container, of all things, to expand unreasonably even after they get elided. Work
+  // around that for the moment with this.
+  max-width: 75%;
   display: flex;
   flex-direction: column;
 

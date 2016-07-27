@@ -16,6 +16,10 @@ require [
         column: 'student_name'
       }
     },
+    inflightAction: {
+      review: false,
+      publish: false
+    },
     assignment: {
       published: window.ENV.GRADES_PUBLISHED,
       title: window.ENV.ASSIGNMENT_TITLE

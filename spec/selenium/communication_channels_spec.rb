@@ -12,7 +12,7 @@ describe "communication channel selenium tests" do
       expect_new_page_load {
         f('#registration_confirmation_form').submit
       }
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
     end
 
     it "should require the terms if configured to do so" do
@@ -37,7 +37,7 @@ describe "communication channel selenium tests" do
       u1.accept_terms
       u1.save
       # d'oh, now it's taken
-      u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
+      user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
 
       get "/register/#{u1.communication_channel.confirmation_code}"
       # they can set it...
@@ -49,12 +49,32 @@ describe "communication channel selenium tests" do
         f('#registration_confirmation_form').submit
       }
 
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
+    end
+
+    it 'confirms the communication channels', priority: "2", test_id: 193786 do
+      user_with_pseudonym({active_user: true})
+      create_session(@pseudonym)
+
+      get '/profile/settings'
+      expect(f('.email_channels')).to contain_css('.unconfirmed')
+      f('.email_channels .path').click
+      Notification.create!(name: 'Confirm Email Communication Channel', category: 'Registration')
+      f('#confirm_email_channel .re_send_confirmation_link').click
+      expect(Message.last.subject).to eq('Confirm Email: Canvas')
+      url = Message.last.url
+
+      # get the registration id from the url
+      get '/register/' + url.split('/')[4]
+      expect(f('#flash_message_holder')).to include_text 'Registration confirmed!'
+      get '/profile/settings'
+      # the email id does not have a link anymore
+      expect(f('.email_channels')).not_to contain_link('nobody@example.com')
     end
 
     it 'should show the bounce count reset button when a siteadmin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
       site_admin_logged_in
       masquerade_as(u)
 
@@ -65,7 +85,7 @@ describe "communication channel selenium tests" do
 
     it 'should not show the bounce count reset button when an account admin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
       admin_logged_in
       masquerade_as(u)
 
@@ -76,7 +96,7 @@ describe "communication channel selenium tests" do
 
     it 'should not show the bounce count reset button when the channel is not bouncing' do
       u = user_with_pseudonym(active_all: true)
-      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       site_admin_logged_in
       masquerade_as(u)
 

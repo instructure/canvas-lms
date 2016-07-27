@@ -172,6 +172,7 @@ describe User do
     expect(@user.recent_stream_items.size).to eq 1
     @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
     @enrollment.save!
+    @user = User.find(@user.id)
     expect(@user.recent_stream_items.size).to eq 0
   end
 
@@ -2111,27 +2112,42 @@ describe User do
       expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
     end
 
-    it "should work for two levels of sub accounts" do
-      root_acct = root_acct1
-      sub_acct1 = Account.create!(:parent_account => root_acct)
-      sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
-      sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
-      sub_acct2 = Account.create!(:parent_account => root_acct)
+    context "two levels of sub accounts" do
+      let_once(:root_acct) { root_acct1 }
+      let_once(:sub_acct1) { Account.create!(:parent_account => root_acct) }
+      let_once(:sub_sub_acct1) { Account.create!(:parent_account => sub_acct1) }
+      let_once(:sub_sub_acct2) { Account.create!(:parent_account => sub_acct1) }
+      let_once(:sub_acct2) { Account.create!(:parent_account => root_acct) }
 
-      @user.user_account_associations.create!(:account_id => root_acct.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+      it "finds the correct branch point" do
+        @user.user_account_associations.create!(:account_id => root_acct.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
 
-      @user.user_account_associations.create!(:account_id => sub_acct1.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+        @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
-      @user.user_account_associations.create!(:account_id => sub_acct2.id)
-      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+        @user.user_account_associations.create!(:account_id => sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+      end
+
+      it "breaks early if a user has an enrollment partway down the chain" do
+        course_with_student(user: @user, account: sub_acct1, active_all: true)
+        @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
+        @user.reload
+
+        full_chain = [root_acct, sub_acct1, sub_sub_acct1]
+        overlap = @user.user_account_associations.map(&:account_id) & full_chain.map(&:id)
+        expect(overlap.sort).to eql full_chain.map(&:id)
+        expect(@user.common_account_chain(root_acct)).to(
+          eql([root_acct, sub_acct1])
+        )
+      end
     end
   end
 

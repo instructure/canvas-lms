@@ -74,19 +74,16 @@ describe "outcomes as a teacher" do
       course_bulk_outcome_groups_course(num, num)
       course_outcome(num)
       get outcome_url
-      wait_for_ajaximations
-      keep_trying_until do
-        expect(ff(".outcome-level li").first).to have_class("outcome-group")
-        expect(ff(".outcome-level li").last).to have_class("outcome-link")
-      end
+      levels = ff(".outcome-level li")
+      expect(levels.first).to have_class("outcome-group")
+      expect(levels.last).to have_class("outcome-link")
     end
 
     it "should be able to display 20 groups" do
       num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
-      wait_for_ajaximations
-      keep_trying_until { expect(ff(".outcome-group").count).to eq 20 }
+      expect(ff(".outcome-group")).to have_size 20
     end
 
     it "should be able to display 20 nested outcomes" do
@@ -94,13 +91,8 @@ describe "outcomes as a teacher" do
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
 
-      # the way these outcomes are built, `wait_for_ajaximations` is not
-      # able to detect when they're done. this is a hacky way to get around
-      # the race condition that is caused by attempting to click on an outcome
-      # group while they're still getting rendered.
-      keep_trying_until { ff(".outcome-group")[0].click; true }
-      wait_for_ajaximations
-      keep_trying_until { expect(ff(".outcome-link").length).to eq 20 }
+      f(".outcome-group").click
+      expect(ff(".outcome-link")).to have_size 20
     end
 
     context "instructions" do
@@ -141,12 +133,9 @@ describe "outcomes as a teacher" do
       outcome = outcome_model
       group = outcome_group_model
       get outcome_url
-      wait_for_ajaximations
       f('.outcomes-sidebar .outcome-link').click
-      wait_for_ajaximations
 
       f(".move_button").click()
-      wait_for_ajaximations
 
       # should show modal tree
       expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move first new outcome?"
@@ -154,21 +143,16 @@ describe "outcomes as a teacher" do
 
       # move the outcome
       f('.treeLabel').click
-      wait_for_ajaximations
+      wait_for_animations
       ff('[role=treeitem] a span')[1].click
-      wait_for_ajaximations
       f('.form-controls .btn-primary').click
-      wait_for_ajaximations
 
-      keep_trying_until do
-        message = f('.ic-flash-success').text
-        expect(message).to include "Successfully moved #{outcome.title} to #{group.title}"
-      end
+      expect_flash_message :success, "Successfully moved #{outcome.title} to #{group.title}"
+      dismiss_flash_messages # so they don't interfere with subsequent clicks
 
-
+      scroll_page_to_top
       # check for proper updates in outcome group columns on page
-      fj('.outcomes-sidebar .outcome-level:first li').click
-      wait_for_ajaximations
+      fj('.outcomes-sidebar .outcome-level:first a').click
       expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
       expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
 
@@ -177,16 +161,13 @@ describe "outcomes as a teacher" do
 
       #confirm that error appears if moving into parent group it already belongs to
       f('.outcomes-sidebar .outcome-link').click
-      wait_for_ajaximations
       f(".move_button").click()
-      wait_for_ajaximations
 
       f('.treeLabel').click
       wait_for_ajaximations
 
       ff('[role=treeitem] a span')[1].click
       f('.form-controls .btn-primary').click
-      wait_for_ajaximations
 
       expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"
     end
@@ -214,12 +195,9 @@ describe "outcomes as a teacher" do
       f("[role=treeitem][data-id='#{group2.id}'] a span").click
       wait_for_ajaximations
       f('.form-controls .btn-primary').click
-      wait_for_ajaximations
 
-      keep_trying_until do
-        message = f('.ic-flash-success').text
-        expect(message).to include "Successfully moved #{group1.title} to #{group2.title}"
-      end
+      expect_flash_message :success, "Successfully moved #{group1.title} to #{group2.title}"
+      dismiss_flash_messages # so they don't interfere with subsequent clicks
 
       # check for proper updates in outcome group columns on page
       fj('.outcomes-sidebar .outcome-level:first li').click

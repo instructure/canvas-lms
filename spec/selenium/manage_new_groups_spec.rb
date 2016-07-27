@@ -29,11 +29,7 @@ describe "manage groups" do
 
         run_jobs
 
-        groups = nil
-        keep_trying_until {
-          groups = ff('.collectionViewItems > .group')
-          groups.present?
-        }
+        groups = ff('.collectionViewItems > .group')
         expect(groups.size).to eq 2
       end
     end
@@ -46,10 +42,8 @@ describe "manage groups" do
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
-      keep_trying_until do
-        fj("#add-group-set").click
-        wait_for_animations
-      end
+      f("#add-group-set").click
+      wait_for_animations
       f("#new_category_name").send_keys('Group Set 1')
       f("form.group-category-create").submit
       wait_for_ajaximations

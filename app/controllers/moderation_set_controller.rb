@@ -56,22 +56,36 @@ class ModerationSetController < ApplicationController
   # @returns [User]
   def create
     if authorized_action(@context, @current_user, :moderate_grades)
-      current_selections = @assignment.moderated_grading_selections.
-        pluck(:student_id)
-      new_student_ids = params[:student_ids].map(&:to_i) - current_selections
-
-      students = @context.students_visible_to(@current_user, include: :inactive).
-        where(id: new_student_ids).uniq.to_a
-
-      students.each do |student|
-        @assignment.moderated_grading_selections.create! student: student
+      unless params[:student_ids].present?
+        render json: [], status: :bad_request
+        return
       end
 
-      render json: students.map { |u| user_json(u, @current_user, session) }
+      all_student_ids = params[:student_ids].map(&:to_i)
+      all_students = visible_students.where(id: all_student_ids)
+
+      incremental_create(all_student_ids)
+
+      render json: all_students.map { |u| user_json(u, @current_user, session) }
     end
   end
 
   private
+
+  def incremental_create(student_ids)
+    current_selections = @assignment.moderated_grading_selections.pluck(:student_id)
+    new_student_ids = student_ids - current_selections
+
+    new_students = visible_students.where(id: new_student_ids).uniq
+
+    new_students.each do |student|
+      @assignment.moderated_grading_selections.create! student: student
+    end
+  end
+
+  def visible_students
+    @visible_students ||= @context.students_visible_to(@current_user, include: :inactive).uniq
+  end
 
   def load_assignment
     @context = api_find(Course, params[:course_id])

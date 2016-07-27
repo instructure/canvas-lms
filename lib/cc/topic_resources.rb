@@ -21,11 +21,7 @@ module CC
     def add_topics
       scope = @course.discussion_topics.active
       DiscussionTopic::ScopedToUser.new(@course, @user, scope).scope.each do |topic|
-        if topic.is_announcement
-          next unless export_object?(topic, 'announcements')
-        else
-          next unless export_object?(topic) || export_object?(topic.assignment)
-        end
+        next unless export_object?(topic) || export_object?(topic.assignment)
 
         title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 
@@ -122,6 +118,7 @@ module CC
       doc.pinned 'true' if topic.pinned
       doc.require_initial_post 'true' if topic.require_initial_post
       doc.has_group_category topic.has_group_category?
+      doc.group_category topic.group_category.name if topic.group_category
       doc.workflow_state topic.workflow_state
       doc.module_locked topic.locked_by_module_item?(@user, true).present?
       doc.allow_rating topic.allow_rating

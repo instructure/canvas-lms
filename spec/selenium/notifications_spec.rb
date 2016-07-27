@@ -53,9 +53,7 @@ describe "Notifications" do
         # Checks that the notification is there and has the correct "Notification Name" field
         fj('.ui-tabs-anchor:contains("Meta Data")').click
         expect(ff('.table-condensed.grid td').last).to include_text('Assignment Submitted')
-        keep_trying_until do
-          expect(ff('.table-condensed.grid td')[3]).to include_text("Re-Submission: #{@student.name}, #{@assignment.name}")
-        end
+        expect(ff('.table-condensed.grid td')[3]).to include_text("Re-Submission: #{@student.name}, #{@assignment.name}")
       end
 
       it "should not show the name of the reviewer for anonymous peer reviews", priority: "1", test_id: 360185 do
@@ -77,15 +75,11 @@ describe "Notifications" do
         # Checks that the notification is there and has the correct "Notification Name" field
         fj('.ui-tabs-anchor:contains("Meta Data")').click
         expect(ff('.table-condensed.grid td').last).to include_text('Submission Comment')
-        keep_trying_until do
-          expect(ff('.table-condensed.grid td')[7]).to include_text('Anonymous User')
-        end
+        expect(ff('.table-condensed.grid td')[7]).to include_text('Anonymous User')
 
         fj('.ui-tabs-anchor:contains("Plain Text")').click
-        keep_trying_until do
-          expect(f('.message-body').text).to include('Anonymous User just made a new comment on the '\
-                                                     'submission for User for assignment')
-        end
+        expect(f('.message-body')).to include_text('Anonymous User just made a new comment on the '\
+                                                   'submission for User for assignment')
       end
 
       context "observer notifications" do
@@ -152,9 +146,7 @@ describe "Notifications" do
         get "/users/#{@student.id}/messages"
         fj('.ui-tabs-anchor:contains("Meta Data")').click
         expect(ff('.table-condensed.grid td').last).to include_text('New Announcement')
-        keep_trying_until do
-          expect(ff('.table-condensed.grid td')[3]).to include_text("Announcement: #{@course.name}")
-        end
+        expect(ff('.table-condensed.grid td')[3]).to include_text("Announcement: #{@course.name}")
       end
     end
 

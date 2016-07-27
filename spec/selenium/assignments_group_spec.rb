@@ -111,7 +111,7 @@ describe "assignment groups" do
     f("#ag_#{assignment_group.id}_drop_highest").send_keys('2')
     #set assignment to never drop
     fj('.add_never_drop:visible').click
-    keep_trying_until { fj('.never_drop_rule select').present? }
+    expect(f('.never_drop_rule select')).to be
     click_option('.never_drop_rule select', assignment.title)
     #save it
     fj('.create_group:visible').click
@@ -137,9 +137,8 @@ describe "assignment groups" do
     fj('input[name="group_weight"]:visible').send_keys('50')
     #need to wait for the total to update
     fj('.create_group:visible').click
-    wait_for_ajaximations
 
-    keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('50% of Total') }
+    expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('50% of Total')
   end
 
   it "should round group weights to 2 decimal places", priority: "2", test_id: 120676 do
@@ -154,9 +153,8 @@ describe "assignment groups" do
     fj('input[name="group_weight"]:visible').send_keys('10.1111')
 
     fj('.create_group:visible').click
-    wait_for_ajaximations
 
-    keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('10.11% of Total') }
+    expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('10.11% of Total')
   end
 
   #This feels like it would be better suited here than in QUnit
@@ -286,11 +284,8 @@ describe "assignment groups" do
     fj('.create_assignment:visible').click
     wait_for_ajaximations
 
-    keep_trying_until do
-      fj("#assignment_group_#{ag.id} .add_assignment").click
-      wait_for_ajaximations
-      fj("#ag_#{ag.id}_assignment_name").displayed?
-    end
+    f("#assignment_group_#{ag.id} .add_assignment").click
+    expect(f("#ag_#{ag.id}_assignment_name")).to be_displayed
   end
 
   it "should correctly add group weights", priority: "2", test_id: 237014 do
@@ -319,8 +314,8 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     # validations
-    keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('50% of Total') }
-    keep_trying_until { expect(f("#assignment_group_#{ag2.id} .ag-header-controls").text).to include('40% of Total') }
+    expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('50% of Total')
+    expect(f("#assignment_group_#{ag2.id} .ag-header-controls")).to include_text('40% of Total')
 
     f("#assignmentSettingsCog").click
     wait_for_ajaximations
@@ -350,9 +345,9 @@ describe "assignment groups" do
         # title isn't locked, should allow editing
         f('#assignment_name').send_keys(' edit')
 
-        expect(f('#assignment_group_id').attribute('disabled')).to be_nil
-        expect(f('#assignment_peer_reviews').attribute('disabled')).to be_nil
-        expect(f('#assignment_description').attribute('disabled')).to be_nil
+        expect(f('#assignment_group_id')).not_to be_disabled
+        expect(f('#assignment_peer_reviews')).not_to be_disabled
+        expect(f('#assignment_description')).not_to be_disabled
         click_option('#assignment_group_id', "other")
       end
 

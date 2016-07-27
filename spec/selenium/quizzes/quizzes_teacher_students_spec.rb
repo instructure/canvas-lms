@@ -58,10 +58,10 @@ describe 'quizzes students' do
         fj("input[type=radio][value=#{q[:answers][0][:id]}]").click
         expect(fj("input[type=radio][value=#{q[:answers][0][:id]}]").selected?).to be_truthy
 
-        wait_for_js
-        driver.execute_script('$(\'#submit_quiz_form .btn-primary\').click()')
+        scroll_into_view '#submit_quiz_form .btn-primary'
+        f('#submit_quiz_form .btn-primary').click
 
-        keep_trying_until { expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed }
+        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
         quiz_sub = @fake_student.reload.submissions.where(assignment_id: @quiz.assignment).first
         expect(quiz_sub).to be_present
         expect(quiz_sub.workflow_state).to eq 'graded'

@@ -10,6 +10,15 @@
           <%= before_label :sis_id, "SIS ID" %> <span class="sis_source_id"><%= term.sis_source_id %></span>
         </div>
       <% end %>
+      <% if term.try(:grading_period_group).try(:active?) %>
+        <div style="font-size: 0.8em;">
+          <%= before_label :grading_period_set_title, "Grading Period Set" %>
+          <span class="grading_period_set_title">
+            <%= link_to grading_period_set_title(term.grading_period_group, term.root_account.name),
+                        context_url(@context, :context_grading_standards_url) %>
+          </span>
+        </div>
+      <% end %>
       <%= term && t(:course_count, "Course", :count => @course_counts_by_term[term.id] || 0) %><br/>
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>

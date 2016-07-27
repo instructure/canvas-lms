@@ -219,7 +219,8 @@ module Api::V1::Submission
       created_at = attachment.created_at
       updated_at ||= assignment.submissions.map { |s| s.submitted_at }.compact.max
 
-      if created_at < 1.hour.ago || (updated_at && created_at < updated_at)
+      ttl = Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago
+      if created_at < ttl || (updated_at && created_at < updated_at)
         attachment.destroy_permanently!
         attachment = nil
       end

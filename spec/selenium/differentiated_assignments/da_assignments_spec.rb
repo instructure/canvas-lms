@@ -35,7 +35,7 @@ describe "interaction with differentiated assignments" do
       it "should redirect back to assignment index from inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.") }
+        expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.")
         expect(driver.current_url).to match %r{/courses/\d+/assignments}
       end
       it "should show the assignment page with an override" do
@@ -56,7 +56,7 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
         in_frame('preview_frame') do
-          keep_trying_until { expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.") }
+          expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.")
         end
       end
     end
@@ -109,7 +109,7 @@ describe "interaction with differentiated assignments" do
       it "should redirect back to assignment index from inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
-        keep_trying_until { expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.") }
+        expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.")
         expect(driver.current_url).to match %r{/courses/\d+/assignments}
       end
       it "should show the assignment page with an override" do
@@ -130,7 +130,7 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}/submissions/#{@student.id}"
         # check the preview frame for the success banner and for your submission text
         in_frame('preview_frame') do
-          keep_trying_until { expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.") }
+          expect(f("#flash_message_holder")).to include_text("This assignment will no longer count towards your grade.")
         end
       end
     end

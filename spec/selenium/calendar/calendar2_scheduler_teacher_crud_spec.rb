@@ -38,7 +38,7 @@ describe "scheduler" do
       expect(f('.ag-x-of-x-signed-up')).to include_text('unpublished')
       open_edit_dialog
       edit_form = f('#edit_appointment_form')
-      keep_trying_until { expect(edit_form).to be_displayed }
+      expect(edit_form).to be_displayed
       f('.ui-dialog-buttonset .btn-primary').click
       wait_for_ajaximations
       new_appointment_group.reload
@@ -91,8 +91,8 @@ describe "scheduler" do
       fill_out_appointment_group_form("blah", :skip_contexts => true)
       f('.ag_contexts_selector').click
       expect(f('.ag_sections_toggle.ag-sections-expanded')).to_not be_nil # should already be expanded
-      expect(f('[name="context_codes[]"]').attribute("disabled")).to_not be_nil # course checkbox should be disabled
-      expect(ff("[name='sections[]']").count).to eq 1 # should only show one section
+      expect(f('[name="context_codes[]"]')).to be_disabled # course checkbox should be disabled
+      expect(ff("[name='sections[]']")).to have_size 1 # should only show one section
 
       f("[name='sections[]'][value='#{section.asset_string}']").click
       f('.ag_contexts_done').click
@@ -149,10 +149,10 @@ describe "scheduler" do
       click_scheduler_link
 
       # Index page should show correct elements for appointment groups
-      expect(f(".view_calendar_link").text).to include_text(title)
-      expect(f(".ag-context").text).to include @course.name.to_s #include context
-      expect(f(".ag-location").text).to include location
-      expect(f(".ag-x-of-x-signed-up").text).to include "people have signed up"
+      expect(f(".view_calendar_link")).to include_text(title)
+      expect(f(".ag-context")).to include_text @course.name.to_s
+      expect(f(".ag-location")).to include_text location
+      expect(f(".ag-x-of-x-signed-up")).to include_text "people have signed up"
       expect(f(".icon-settings")).not_to be_nil #Gear icon present
     end
   end

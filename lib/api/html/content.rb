@@ -94,19 +94,22 @@ module Api
       end
 
       def add_css_and_js_overrides
-        if @include_mobile && @account.root_account.feature_enabled?(:use_new_styles) && @account.effective_brand_config
-          overrides = @account.effective_brand_config.css_and_js_overrides
-          if (mobile_css_overrides = overrides[:mobile_css_overrides])
-            mobile_css_overrides.reverse_each do |url|
-              tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
-              parsed_html.prepend_child(tag)
-            end
+        return parsed_html unless @include_mobile
+        return parsed_html unless @account &&
+          @account.root_account.feature_enabled?(:use_new_styles) &&
+          @account.effective_brand_config
+
+        overrides = @account.effective_brand_config.css_and_js_overrides
+        if (mobile_css_overrides = overrides[:mobile_css_overrides])
+          mobile_css_overrides.reverse_each do |url|
+            tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
+            parsed_html.prepend_child(tag)
           end
-          if (mobile_js_overrides = overrides[:mobile_js_overrides])
-            mobile_js_overrides.each do |url|
-              tag = parsed_html.document.create_element('script', src: url)
-              parsed_html.add_child(tag)
-            end
+        end
+        if (mobile_js_overrides = overrides[:mobile_js_overrides])
+          mobile_js_overrides.each do |url|
+            tag = parsed_html.document.create_element('script', src: url)
+            parsed_html.add_child(tag)
           end
         end
         parsed_html

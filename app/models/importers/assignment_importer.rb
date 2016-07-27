@@ -20,8 +20,7 @@ module Importers
       migration_ids = assignments.map{|m| m['assignment_id'] }.compact
       conn = Assignment.connection
       cases = []
-      max = migration.context.assignments.map(&:position).compact.max || 0
-      migration.context.assignments
+      max = migration.context.assignments.pluck(:position).compact.max || 0
       assignments.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['assignment_id'])} THEN #{max + idx + 1} " if m['assignment_id'] }
       unless cases.empty?
         conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
@@ -33,7 +32,7 @@ module Importers
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.assignments.new #new(:context => context)
+      item ||= context.assignments.temp_record #new(:context => context)
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
@@ -108,6 +107,10 @@ module Importers
       end
       item.assignment_group ||= context.assignment_groups.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
+      if item.points_possible.to_i < 0
+        item.points_possible = 0
+      end
+
       item.save_without_broadcasting!
 
       rubric = nil
@@ -170,6 +173,11 @@ module Importers
        :position, :peer_review_count, :muted, :moderated_grading
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
+      end
+
+      if item.turnitin_enabled
+        settings = JSON.parse(hash[:turnitin_settings]).with_indifferent_access
+        item.turnitin_settings = settings
       end
 
       migration.add_imported_item(item)

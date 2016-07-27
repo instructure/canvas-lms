@@ -37,7 +37,7 @@ define([
     });
 
     return onlyCC.map((license) => {
-      return (<option value={license.id}>{license.name}</option>);
+      return (<option key={license.id} value={license.id}>{license.name}</option>);
     });
   };
 

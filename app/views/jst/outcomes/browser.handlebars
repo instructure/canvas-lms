@@ -8,16 +8,19 @@
 
     {{#if canManageOutcomes}}
     <a href="#" class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all" role="button">
-      <i class="icon-add"></i>
-      <span class="ui-button-text">{{#t "links.new_outcome"}}New Outcome{{/t}}</span>
+      <i class="icon-plus"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t "links.new_outcome"}}Outcome{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Add a New Outcome{{/t}}</span>
     </a>
     <a href="#" class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all" role="button">
-      <i class="icon-add"></i>
-      <span class="ui-button-text">{{#t "links.new_group"}}New Group{{/t}}</span>
+      <i class="icon-plus"></i>
+      <span class="ui-button-text" aria-hidden="true">{{#t "links.new_group"}}Group{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Add a New Outcome Group{{/t}}</span>
     </a>
     <a href="#" class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" role="button">
       <i class="icon-search"></i>
-      <span class="ui-button-text">{{#t "links.find"}}Find{{/t}}</span>
+      <span class="ui-button-text" aria-hidden="true">{{#t "links.find"}}Find{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Find an Outcome{{/t}}</span>
     </a>
     {{/if}}
     {{#if canManageRubrics }}

@@ -33,7 +33,7 @@ class CalendarEventsController < ApplicationController
     end
     if authorized_action(@event, @current_user, :read)
       # If param specifies to open event on calendar, redirect to view
-      if params[:calendar] == '1'
+      if params[:calendar] == '1' || @context.is_a?(CourseSection)
         return redirect_to calendar_url_for(@event.effective_context, :event => @event)
       end
       log_asset_access(@event, "calendar", "calendar")

@@ -115,7 +115,7 @@ describe "new account user search" do
     f('#peopleOptionsBtn').click
     f('#manageStudentsLink').click
 
-    expect(driver.current_url).to include_text("/accounts/#{@account.id}/avatars")
+    expect(driver.current_url).to include("/accounts/#{@account.id}/avatars")
   end
 
   it "should link to the user group page" do
@@ -128,6 +128,6 @@ describe "new account user search" do
     f('#peopleOptionsBtn').click
     f('#viewUserGroupLink').click
 
-    expect(driver.current_url).to include_text("/accounts/#{@account.id}/groups")
+    expect(driver.current_url).to include("/accounts/#{@account.id}/groups")
   end
 end

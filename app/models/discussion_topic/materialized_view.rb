@@ -132,7 +132,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         end
       end
     end
-    Api.recursively_stringify_json_ids(view)
+    StringifyIds.recursively_stringify_ids(view)
     return view.to_json, user_ids.to_a, entry_lookup.keys
   end
 end

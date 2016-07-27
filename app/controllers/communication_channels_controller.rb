@@ -406,7 +406,8 @@ class CommunicationChannelsController < ApplicationController
   # params[:enrollment_id] is optional
   def re_send_confirmation
     @user = User.find(params[:user_id])
-    @enrollment = params[:enrollment_id] && @user.enrollments.find(params[:enrollment_id])
+    # the active shard needs to be searched for the enrollment (not the user's shard)
+    @enrollment = params[:enrollment_id] && Enrollment.where(id: params[:enrollment_id], user_id: @user).first!
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
       @enrollment.re_send_confirmation!
     else

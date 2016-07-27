@@ -24,7 +24,7 @@ describe "conversations index page" do
       conversations
       name = @s2.name
       f('[role=main] header [role=search] input').send_keys(name)
-      keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
+      fj(".ac-result:contains('#{name}')").click
       expect(conversation_elements.length).to eq 1
     end
   end
@@ -70,30 +70,13 @@ describe "conversations index page" do
       expect(f('.messages')).not_to contain_css('li')
     end
 
-    it "should mark multiple conversations as unread" do
-      skip('breaks b/c jenkins is weird')
-      conversations
-      select_conversations
-      click_unread_toggle_menu_item
-      keep_trying_until { expect(ffj('.read-state[aria-checked=false]').count).to eq 3 }
-    end
+    # TODO reimplement per CNVS-29601, but make sure we're testing at the right level
+    it "should mark multiple conversations as unread"
 
-    it "should mark multiple conversations as unread" do
-      skip('breaks b/c jenkins is weird')
-      conversations
-      select_conversations
-      click_read_toggle_menu_item
-      keep_trying_until { expect(ffj('.read-state[aria-checked=true]').count).to eq 3 }
-    end
+    # TODO reimplement per CNVS-29602, but make sure we're testing at the right level
+    it "should mark multiple conversations as unread"
 
-    it "should star multiple conversations" do
-      skip('breaks b/c jenkins is weird')
-      conversations
-      select_conversations
-      click_star_toggle_menu_item
-      run_progress_job
-      keep_trying_until { expect(ff('.star-btn.active').count).to eq 3 }
-      @conversations.each { |c| expect(c.reload).to be_starred }
-    end
+    # TODO reimplement per CNVS-29603, but make sure we're testing at the right level
+    it "should star multiple conversations"
   end
 end

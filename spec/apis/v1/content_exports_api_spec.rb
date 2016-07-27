@@ -354,6 +354,41 @@ describe ContentExportsApiController, type: :request do
         expect(export.export_object?(announcement)).to be_truthy
       end
 
+      it "should select announcements even when specifically called as a discussion topic" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+          { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+          { :select => {:discussion_topics => [announcement.id]} })
+
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.settings['selected_content']['discussion_topics']).to eq({CC::CCHelper.create_key(announcement) => "1"})
+        expect(export.export_object?(announcement)).to be_truthy
+
+        run_jobs
+
+        export.reload
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
+
+        run_jobs
+
+        copied_ann = @course.announcements.where(migration_id: CC::CCHelper.create_key(announcement)).first
+        expect(copied_ann).to be_present
+      end
+
+      it "should not select announcements when selecting all discussion topics" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+          { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+          { :select => {:all_discussion_topics => "1"} })
+
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.export_object?(announcement)).to be_falsey
+      end
+
       it "should select using shortened collection names" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},

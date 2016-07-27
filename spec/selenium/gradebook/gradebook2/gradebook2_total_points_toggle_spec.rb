@@ -7,6 +7,7 @@ describe "gradebook2 - total points toggle" do
   let!(:setup) { gradebook_data_setup }
 
   def should_show_percentages
+    wait_for_ajaximations
     ff(".slick-row .slick-cell:nth-child(5)").each { |total| expect(total.text).to match(/%/) }
   end
 
@@ -45,7 +46,7 @@ describe "gradebook2 - total points toggle" do
     should_show_points
 
     group = AssignmentGroup.where(name: @group.name).first
-    set_group_weight(group, 50)
+    set_group_weight(group, 50, enable_scheme: true)
 
     disable_group_weight
     should_show_percentages

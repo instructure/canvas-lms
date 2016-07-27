@@ -96,14 +96,12 @@ describe 'creating a quiz' do
         get "/courses/#{@course.id}/quizzes"
         expect_new_page_load do
           f('.new-quiz-link').click
-          wait_for_ajaximations
         end
       end
 
       it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
         expect_new_page_load do
           click_save_settings_button
-          wait_for_ajax_requests
         end
         expect(f('#quiz_title')).to include_text 'Unnamed Quiz'
       end
@@ -124,7 +122,7 @@ describe 'creating a quiz' do
         # input name and description then save quiz
         replace_content(f('#quiz_title'), 'new quiz')
         description_text = 'new description'
-        keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
+        expect(f('#quiz_description_ifr')).to be_displayed
         type_in_tiny '#quiz_description', description_text
         in_frame 'quiz_description_ifr' do
           expect(f('#tinymce')).to include_text(description_text)

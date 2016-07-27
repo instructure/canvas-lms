@@ -13,6 +13,8 @@ define([
     SELECT_ALL_STUDENTS: 'SELECT_ALL_STUDENTS',
     UNSELECT_ALL_STUDENTS: 'UNSELECT_ALL_STUDENTS',
     SELECT_MARK: 'SELECT_MARK',
+    ACTION_DISPATCHED: 'ACTION_DISPATCHED',
+    ACTION_RETURNED: 'ACTION_RETURNED',
     UPDATED_MODERATION_SET: 'UPDATED_MODERATION_SET',
     UPDATE_MODERATION_SET_FAILED: 'UPDATE_MODERATION_SET_FAILED',
     PUBLISHED_GRADES: 'PUBLISHED_GRADES',
@@ -68,6 +70,24 @@ define([
       };
     },
 
+    moderationStarted () {
+      return {
+        type: this.ACTION_DISPATCHED,
+        payload: {
+          name: 'review'
+        }
+      };
+    },
+
+    moderationFinished () {
+      return {
+        type: this.ACTION_RETURNED,
+        payload: {
+          name: 'review'
+        }
+      };
+    },
+
     moderationSetUpdated (students) {
       return {
         type: this.UPDATED_MODERATION_SET,
@@ -94,6 +114,24 @@ define([
       return {
         type: this.GOT_STUDENTS,
         payload: { students }
+      };
+    },
+
+    publishStarted () {
+      return {
+        type: this.ACTION_DISPATCHED,
+        payload: {
+          name: 'publish'
+        }
+      };
+    },
+
+    publishFinished () {
+      return {
+        type: this.ACTION_RETURNED,
+        payload: {
+          name: 'publish'
+        }
       };
     },
 

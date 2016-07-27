@@ -43,11 +43,11 @@ describe "calendar2" do
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
         title = edit_event_form.find('#calendar_event_title')
-        keep_trying_until { title.displayed? }
+        expect(title).to be_displayed
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
         expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/  # passed in ISO format, not localized
-        expect(f('.title').attribute('value')).to eq event_title
+        expect(f('.title')).to have_value event_title
         expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
@@ -69,7 +69,7 @@ describe "calendar2" do
         fj("a:contains('#{event_title}')").click
         wait_for_ajaximations
 
-        keep_trying_until(5) {expect(fj('.event-details-header:visible')).to be_displayed}
+        expect(fj('.event-details-header:visible')).to be_displayed
         expect(f('.view_event_link')).to include_text(event_title)
       end
 
@@ -96,11 +96,11 @@ describe "calendar2" do
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
         title = edit_event_form.find('#calendar_event_title')
         replace_content(title, "Test Event")
-        replace_content(fj("input[type=text][name= 'start_time']"), "6:00am")
-        replace_content(fj("input[type=text][name= 'end_time']"), "6:00pm")
+        replace_content(f("input[type=text][name= 'start_time']"), "6:00am")
+        replace_content(f("input[type=text][name= 'end_time']"), "6:00pm")
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
-        expect(f('.title').attribute('value')).to eq "Test Event"
+        expect(f('.title')).to have_value "Test Event"
         f('#duplicate_event').click
         replace_content(f("input[type=number][name='duplicate_count']"), 2)
 

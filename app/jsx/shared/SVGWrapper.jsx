@@ -8,7 +8,8 @@ define([
 
   var SVGWrapper = React.createClass({
     propTypes: {
-      url: React.PropTypes.string.isRequired
+      url: React.PropTypes.string.isRequired,
+      fillColor: React.PropTypes.string
     },
 
     componentWillReceiveProps: function (newProps) {
@@ -32,6 +33,10 @@ define([
 
           if (this.svg.nodeType !== ELEMENT_NODE && this.svg.nodeName !== 'SVG') {
             throw new Error('SVGWrapper: SVG Element must be returned by request to ' + this.props.url);
+          }
+
+          if (this.props.fillColor) {
+            this.svg.setAttribute('style', 'fill:'+this.props.fillColor);
           }
 
           this.svg.setAttribute('focusable', false);

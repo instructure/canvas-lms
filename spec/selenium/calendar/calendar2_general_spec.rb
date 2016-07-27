@@ -80,7 +80,7 @@ describe "calendar2" do
       replace_content(f('.ui-dialog #assignment_title'), "Assignment 2!")
       submit_form('#edit_assignment_form')
       wait_for_ajaximations
-      expect(assignment2.reload.title).to include_text("Assignment 2!")
+      expect(assignment2.reload.title).to include("Assignment 2!")
       expect(assignment2.assignment_group).to eq group2
     end
 
@@ -89,7 +89,7 @@ describe "calendar2" do
       get "/calendar2"
       f('.fc-event').click
       wait_for_ajaximations
-      driver.execute_script("$('.edit_event_link').hover().click()")
+      hover_and_click '.edit_event_link'
       wait_for_ajaximations
       original_more_options = f('.more_options_link')['href']
       expect(original_more_options).not_to match(/undefined/)
@@ -98,30 +98,28 @@ describe "calendar2" do
       wait_for_ajaximations
       assignment.reload
       wait_for_ajaximations
-      expect(assignment.title).to include_text("edited title")
+      expect(assignment.title).to include("edited title")
 
-      fj('.fc-event').click
+      f('.fc-event').click
       wait_for_ajaximations
-      driver.execute_script("$('.edit_event_link').hover().click()")
+      hover_and_click '.edit_event_link'
       wait_for_ajaximations
-      expect(fj('.more_options_link')['href']).to match(original_more_options)
+      expect(f('.more_options_link')['href']).to match(original_more_options)
     end
 
     it "should make an assignment undated if you delete the start date" do
       skip_if_chrome('can not replace content')
       create_middle_day_assignment("undate me")
-      keep_trying_until do
-        fj('.fc-event').click
-        driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
-        f('.ui-dialog #assignment_due_at').displayed?
-      end
+      f('.fc-event:not(.event_pending)').click
+      hover_and_click '.popover-links-holder .edit_event_link'
+      expect(f('.ui-dialog #assignment_due_at')).to be_displayed
 
       replace_content(f('.ui-dialog #assignment_due_at'), "")
       submit_form('#edit_assignment_form')
       wait_for_ajax_requests
       f("#undated-events-button").click
       expect(f("#content")).not_to contain_css('.fc-event')
-      expect(f('.undated_event_title').text).to include_text("undate me")
+      expect(f('.undated_event_title')).to include_text("undate me")
     end
 
     context "event editing", priority: "1", test_id: 138853 do
@@ -140,7 +138,7 @@ describe "calendar2" do
         wait_for_ajaximations
 
         expect(ag.reload.appointments.first.description).to eq description
-        expect { f('.fc-event') }.not_to raise_error
+        expect(f('.fc-event')).to be
       end
     end
 
@@ -221,11 +219,9 @@ describe "calendar2" do
       f("#course_calendar_link").click
 
       # only the explicit context should be selected
-      keep_trying_until do
-        expect(f("#context-list li[data-context=course_#{unrelated_course.id}]")).to have_class('checked')
-        expect(f("#context-list li[data-context=course_#{@course.id}]")).to have_class('not-checked')
-        expect(f("#context-list li[data-context=user_#{@user.id}]")).to have_class('not-checked')
-      end
+      expect(f("#context-list li[data-context=course_#{unrelated_course.id}].checked")).to be
+      expect(f("#context-list li[data-context=course_#{@course.id}].not-checked")).to be
+      expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
     end
 
     it "should only consider active enrollments for upcoming events list", priority: "2", test_id: 854796 do
@@ -235,10 +231,8 @@ describe "calendar2" do
       term = EnrollmentTerm.find(@course.enrollment_term_id)
       term.end_at = Time.zone.now.advance(days: -5)
       term.save!
-      keep_trying_until do
-       refresh_page
-       expect(f('.coming_up').text).to include('Nothing for the next week')
-      end
+      refresh_page
+      expect(f('.coming_up')).to include_text('Nothing for the next week')
     end
 
     it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do

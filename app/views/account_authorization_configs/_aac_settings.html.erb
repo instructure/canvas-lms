@@ -2,7 +2,7 @@
      id="<%= "#{aac.auth_type}_form" if aac.new_record? %>"
      <%= hidden(true) if aac.new_record? %>>
   <div class="grid-row">
-    <div class="col-xs-12 col-md-8 off-md-2">
+    <div class="col-xs-12 col-lg-8 off-lg-1">
       <% url = aac.new_record? ? account_authentication_providers_url(account) :
               account_authentication_provider_url(account, aac) %>
 

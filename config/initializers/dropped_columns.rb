@@ -99,7 +99,8 @@ class ActiveRecord::Base
     'enrollments' => %w(invitation_email
                         can_participate_before_start_at
                         limit_priveleges_to_course_sections
-                        role_name).freeze,
+                        role_name
+                        sis_source_id).freeze,
     'eportfolio_entries' => %w(attachment_id artifact_type url).freeze,
     'eportfolios' => %w{context_id context_type}.freeze,
     'external_feeds' => %w(body_match feed_type feed_purpose).freeze,
@@ -160,7 +161,7 @@ class ActiveRecord::Base
   def self.instantiate_with_remove_dropped_columns(attributes, *args)
     (DROPPED_COLUMNS[self.table_name] || []).each do |attr|
       attributes.delete(attr)
-    end unless self.respond_to?(:tableless?)
+    end unless self < Tableless
     instantiate_without_remove_dropped_columns(attributes, *args)
   end
 

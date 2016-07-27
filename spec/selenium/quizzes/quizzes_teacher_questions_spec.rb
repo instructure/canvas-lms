@@ -46,7 +46,7 @@ describe "quizzes questions" do
 
       submit_form(question)
       question = f("#question_#{quest1.id}")
-      expect(question.find_element(:css, ".question_name").text).to include_text('edited question')
+      expect(question.find_element(:css, ".question_name")).to include_text('edited question')
       f('#show_question_details').click
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
@@ -80,10 +80,7 @@ describe "quizzes questions" do
       expect(ff("#question_form_template option.missing_word").length).to eq 1
 
       click_questions_tab
-      keep_trying_until do
-        f(".add_question .add_question_link").click
-        ff("#questions .question_holder").length > 0
-      end
+      f(".add_question .add_question_link").click
       expect(f("#questions")).not_to contain_css(".question_holder option.missing_word")
     end
 
@@ -182,11 +179,9 @@ describe "quizzes questions" do
 
       expect_new_page_load do
         f('.save_quiz_button').click
-        wait_for_ajaximations
       end
       expect_new_page_load do
         f('.quiz-publish-button').click
-        wait_for_ajaximations
       end
 
       user_session(@student)
@@ -265,16 +260,6 @@ describe "quizzes questions" do
       f("#take_quiz_link").click
 
       wait_for_ajax_requests
-    end
-
-    after do
-      # This step is to prevent selenium from freezing when the dialog appears when leaving the page
-      keep_trying_until do
-        f('#left-side .quizzes').click
-        confirm_dialog = driver.switch_to.alert
-        confirm_dialog.accept
-        true
-      end
     end
   end
 end

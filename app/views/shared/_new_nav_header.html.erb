@@ -3,7 +3,7 @@
     <div class="ic-app-header__layout">
       <div class="ic-app-header__primary">
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
-        <div role="navigation" class="ic-app-header__main-navigation">
+        <div role="region" class="ic-app-header__main-navigation" aria-label="<%= t('Main Navigation') %>">
         <% unless @current_user.try(:prefers_high_contrast?) %>
           <div class="ic-app-header__logomark-container">
             <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
@@ -11,10 +11,7 @@
             </a>
           </div>
         <% end %>
-          <ul role="menu" id="menu"
-            class="ic-app-header__menu-list"
-            aria-label="<%= t('Main Navigation') %>"
-          >
+          <ul id="menu" class="ic-app-header__menu-list">
             <% if @current_user %>
               <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
                 <a id="global_nav_profile_link" href="/profile" class="ic-app-header__menu-list-link">
@@ -109,17 +106,17 @@
           </ul>
         </div>
         <% if show_help_link? %>
-        <div role="navigation" class="ic-app-header__secondary-navigation">
-          <ul role="menu" class="ic-app-header__menu-list">
+        <div role="region" aria-label="<%= t('Secondary Navigation') %>" class="ic-app-header__secondary-navigation">
+          <ul class="ic-app-header__menu-list">
             <li class="ic-app-header__menu-list-item">
               <%= link_to help_link_url,
                     :class => help_link_classes(["ic-app-header__menu-list-link"]),
                     :data => help_link_data do %>
                 <div class="menu-item-icon-container" role="presentation">
-                  <%= svg_icon :help %>
+                  <%= svg_icon help_link_icon %>
                 </div>
                 <div class="menu-item__text">
-                  <%= t('Help') %>
+                  <%= help_link_name %>
                 </div>
               <% end %>
             </li>

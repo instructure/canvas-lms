@@ -67,7 +67,7 @@ class Quizzes::QuizzesController < ApplicationController
 
     # students only get to see published quizzes, and they will fetch the
     # overrides later using the API:
-    scope = scope.available unless can_manage
+    scope = scope.available unless @context.grants_right?(@current_user, session, :read_as_admin)
 
     scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
 

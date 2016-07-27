@@ -361,6 +361,29 @@ describe Account do
     end
   end
 
+  context "closest_turnitin_originality" do
+    before :each do
+        @root_account = Account.create!(:turnitin_pledge => "root")
+        @root_account.turnitin_originality = 'after_grading'
+        @root_account.save!
+    end
+
+    it "should find closest_turnitin_originality from root account" do
+      expect(@root_account.closest_turnitin_originality).to eq('after_grading')
+    end
+
+    it "should find closest_turnitin_originality from sub account" do
+      sub_account = Account.create(:name => 'sub', :parent_account => @root_account)
+      sub_account.turnitin_originality = 'never'
+      expect(sub_account.closest_turnitin_originality).to eq('never')
+    end
+
+    it "should find closest_turnitin_originality from sub account when set on root account" do
+      sub_account = Account.create(:name => 'sub', :parent_account => @root_account)
+      expect(sub_account.closest_turnitin_originality).to eq('after_grading')
+    end
+  end
+
   context "closest_turnitin_pledge" do
     it "should work for custom sub, custom root" do
       root_account = Account.create!(:turnitin_pledge => "root")

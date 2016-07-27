@@ -243,8 +243,8 @@ describe 'Excuse an Assignment' do
 
       expect(grade_row).to have_class '.excused'
       expect(grade).to eq 'EX'
-      expect(grade_row.attribute 'title').to eq 'This assignment is excused ' \
-       'and will not be considered in the total calculation'
+      expect(grade_row).to have_attribute('title', 'This assignment is excused ' \
+       'and will not be considered in the total calculation')
     end
 
     ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
@@ -318,7 +318,7 @@ describe 'Excuse an Assignment' do
       f('a.gradebook-cell-comment').click
       wait_for_ajaximations
 
-      expect(f("#student_grading_#{assignment.id}").attribute 'value').to eq 'EX'
+      expect(f("#student_grading_#{assignment.id}")).to have_value 'EX'
     end
 
     it 'assignments can be excused from grading modal', priority: "1", test_id: 217594 do

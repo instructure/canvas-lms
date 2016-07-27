@@ -33,53 +33,74 @@ define([
 
       var addUserButton;
       if (window.ENV.PERMISSIONS.can_create_users) {
-        addUserButton = <div className="ic-Form-actions">
-          <button className="btn add_user" type="button" onClick={this.addUser}>
+        addUserButton =
+          <button className="Button add_user" type="button" onClick={this.addUser}>
             <i className="icon-plus" />
             {" "}
             {I18n.t("People")}
           </button>
-        </div>
       }
 
       return (
         <div>
           <form
-            className="ic-Form-group ic-Form-group--inline user_search_bar"
-            style={{alignItems: "center", opacity: isLoading ? 0.5 : 1}}
+            className="user_search_bar"
+            style={{opacity: isLoading ? 0.5 : 1}}
             onSubmit={this.applyFilters}
             disabled={isLoading}
           >
-
-            <IcInput
-              value={search_term}
-              placeholder={I18n.t("Search users...")}
-              onChange={(e) => onUpdateFilters({search_term: e.target.value})}
-              error={errors.search_term}
-            />
-
-            <div className="ic-Form-control" style={{flexGrow: 2}}>
-              <button className="btn">
-                {I18n.t("Go")}
-              </button>
+            <div className="grid-row">
+              <div className="col-xs-12 col-md-9">
+                <div className="users-list-toolbar-form">
+                  <IcInput
+                    value={search_term}
+                    placeholder={I18n.t("Search users...")}
+                    onChange={(e) => onUpdateFilters({search_term: e.target.value})}
+                    error={errors.search_term}
+                  />
+                  &nbsp;
+                  <div className="ic-Form-control">
+                    <button className="Button">
+                      {I18n.t("Go")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="col-xs-12 col-md-3">
+                <div className="users-list-toolbar-actions">
+                  <div className="users-list-toolbar-actions__layout">
+                    {addUserButton}
+                    &nbsp;
+                    <div className="al-dropdown__container">
+                      <button id="peopleOptionsBtn" className="al-trigger Button" type="button">
+                        <i className="icon-more"></i>
+                        <span className="screenreader-only">{I18n.t('People Options')}</span>
+                      </button>
+                      <ul className="al-options" role="menu" aria-hidden="true">
+                        <li>
+                          <a
+                            href={`/accounts/${this.props.accountId}/avatars`}
+                            className="icon-student-view" id="manageStudentsLink"
+                            role="menuitem">
+                              {I18n.t('Manage profile pictures')}
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href={`/accounts/${this.props.accountId}/groups`}
+                            className="icon-group"
+                            id="viewUserGroupLink"
+                            role="menuitem">
+                              {I18n.t('View user groups')}
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-
-            {addUserButton}
-
-          <a id="peopleOptionsBtn" className="al-trigger btn" role="button" href="#" style={{"marginLeft": "10px", "paddingLeft": "12px", "paddingRight": "12px"}}>
-            <i className="icon-more"></i>
-            <span className="screenreader-only">{I18n.t('People Options')}</span>
-          </a>
-          <ul className="al-options" role="menu" aria-hidden="true">
-            <li>
-              <a href={`/accounts/${this.props.accountId}/avatars`} className="icon-student-view" id="manageStudentsLink" role="menuitem">{I18n.t('Manage profile pictures')}</a>
-            </li>
-            <li>
-              <a href={`/accounts/${this.props.accountId}/groups`} className="icon-group" id="viewUserGroupLink" role="menuitem">{I18n.t('View user groups')}</a>
-            </li>
-          </ul>
           </form>
-
           <NewUserModal ref="addUser" userList={this.props.userList} handlers={this.props.handlers} />
         </div>
       );

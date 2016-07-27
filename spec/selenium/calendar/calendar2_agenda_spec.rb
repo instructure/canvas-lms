@@ -197,8 +197,8 @@ describe "calendar2" do
         f(".ig-row").click
 
         #expect to find the location name and address
-        expect(f('.event-details-content').text).to include_text(location_name)
-        expect(f('.event-details-content').text).to include_text(location_address)
+        expect(f('.event-details-content')).to include_text(location_name)
+        expect(f('.event-details-content')).to include_text(location_address)
       end
 
       it "should bring up a calendar date picker when clicking on the agenda range", priority: "1", test_id: 140223 do
@@ -209,8 +209,8 @@ describe "calendar2" do
 
         # Expect that a the event picker is present
         # Check various elements to verify that the calendar looks good
-        expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-        expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+        expect(f('.ui-datepicker-header')).to include_text(Time.now.utc.strftime("%B"))
+        expect(f('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
       it "show quizes on agenda view", priority: "1", test_id: 138850 do
@@ -232,17 +232,17 @@ describe "calendar2" do
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 
         load_agenda_view
-        keep_trying_until { expect(ff('.ig-row').length).to eq 3 }
+        expect(ff('.ig-row')).to have_size(3)
 
         # Verify Titles include section name
         agenda_array = ff('.ig-row')
-        expect(f('.ig-title', agenda_array[1]).text).to include_text('Section1')
-        expect(f('.ig-title', agenda_array[2]).text).to include_text('Section2')
+        expect(f('.ig-title', agenda_array[1])).to include_text('Section1')
+        expect(f('.ig-title', agenda_array[2])).to include_text('Section2')
 
         # Verify Dates
         date_array = ff('.agenda-day')
-        expect(f('.agenda-date', date_array[1]).text).to include_text(format_date_for_view(s1_date, :short_with_weekday))
-        expect(f('.agenda-date', date_array[2]).text).to include_text(format_date_for_view(s2_date, :short_with_weekday))
+        expect(f('.agenda-date', date_array[1])).to include_text(format_date_for_view(s1_date, :short_with_weekday))
+        expect(f('.agenda-date', date_array[2])).to include_text(format_date_for_view(s2_date, :short_with_weekday))
       end
 
       context "with a graded discussion created" do
@@ -307,7 +307,7 @@ describe "calendar2" do
 
           # Verify edited title, description, and date
           load_agenda_view
-          keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
+          expect(ff('.ig-row')).to have_size(1)
           f('.ig-row').click
           wait_for_ajaximations
           expect(f('.view_event_link')).to include_text(test_title)

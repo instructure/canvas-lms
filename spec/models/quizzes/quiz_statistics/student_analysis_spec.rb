@@ -279,6 +279,24 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[9]).to eq '5'
     end
 
+    it 'should not error out when no answers are present in a calculated_question' do
+      @quiz.quiz_questions.create!(:question_data => { :name => "calculated_question",
+        :question_type => 'calculated_question',
+        :question_text => "[num1]"
+      })
+
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = {
+        "question_#{@quiz.quiz_questions[1].id}" => 'Pretend this is an essay question!'
+      }
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
+    end
+
     it 'should include primary domain if trust exists' do
       account2 = Account.create!
       HostUrl.stubs(:context_host).returns('school')

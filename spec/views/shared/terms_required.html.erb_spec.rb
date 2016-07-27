@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/shared/terms_required" do
   context "with custom stylesheet on account" do
     before do
+      skip('only tests OLD UI way of doing custom css') if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       assigns[:domain_root_account] = Account.default
       expect(Account.default.feature_enabled?(:use_new_styles)).to be_falsey
       expect(Account.default.feature_enabled?(:k12)).to be_falsey

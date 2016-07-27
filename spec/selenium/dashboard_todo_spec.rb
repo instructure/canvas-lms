@@ -17,10 +17,10 @@ describe "dashboard" do
 
       get "/"
 
-      keep_trying_until { expect(ffj(".to-do-list li:visible").size).to eq 5 + 1 } # +1 is the see more link
+      expect(ffj(".to-do-list li:visible")).to have_size(5 + 1) # +1 is the see more link
       f(".more_link").click
       wait_for_ajaximations
-      expect(ffj(".to-do-list li:visible").size).to eq 20
+      expect(ffj(".to-do-list li:visible")).to have_size(20)
     end
 
     it "should display assignments to do in to do list for a student", priority: "1", test_id: 216406 do
@@ -33,6 +33,7 @@ describe "dashboard" do
 
       get "/"
 
+      f('#dashboardToggleButton').click if ENV['CANVAS_FORCE_USE_NEW_STYLES']
       #verify assignment changed notice is in messages
       f('.stream-assignment .stream_header').click
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')

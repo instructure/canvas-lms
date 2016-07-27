@@ -1,0 +1,28 @@
+.Collaboration {
+  position: relative;
+  border-bottom: $ic-border-dark 1px solid;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.Collaboration:first-child {
+  border-top: $ic-border-dark 1px solid;
+}
+
+.Collaboration-title {
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+.Collaboration-description {
+  margin: 5px 0;
+}
+
+.Collaboration-author {
+  margin-right: 10px;
+}
+
+.Collaboration-actions {
+  min-width: 100px;
+}

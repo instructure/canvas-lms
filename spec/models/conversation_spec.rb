@@ -941,7 +941,6 @@ describe Conversation do
         conversation.add_message(student1, 'first message')
 
         @old_course.complete!
-        group.complete!
 
         conversation.add_message(student2, 'second message')
 

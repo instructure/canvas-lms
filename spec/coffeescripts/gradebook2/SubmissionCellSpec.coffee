@@ -66,3 +66,18 @@ define [
     student = { isConcluded: false }
     submissionCellResponse = SubmissionCell.formatter(0, 0, { grade: 10}, { }, student)
     equal submissionCellResponse.indexOf("grayed-out"), -1
+
+  test "#letter_grade.formatter, shows EX when submission is excused", ->
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('EX').returns('ok')
+    formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {excused:true}, {}, {})
+    equal formattedResponse, 'ok'
+
+  test "#letter_grade.formatter, shows the score and letter grade", ->
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('F<span class=\'letter-grade-points\'>0</span>').returns('ok')
+    formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {grade: 'F', score: 0 }, {}, {})
+    equal formattedResponse, 'ok'
+
+  test "#letter_grade.formatter, shows the letter grade", ->
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('B').returns('ok')
+    formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {grade: 'B'}, {}, {})
+    equal formattedResponse, 'ok'

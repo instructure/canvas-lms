@@ -25,14 +25,6 @@ describe "assignment column headers" do
     expect(grade_cells[4].find_element(:css, '.percentage').text).to eq @student_3_total_ignoring_ungraded
   end
 
-  it "should minimize a column and remember it" do
-    skip("dragging and dropping these does not work well in selenium")
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    first_dragger, second_dragger = ff('#gradebook_grid .slick-resizable-handle')
-    driver.action.drag_and_drop(second_dragger, first_dragger).perform
-  end
-
   it "should have a tooltip with the assignment name", priority: "1", test_id: 220025 do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
@@ -46,27 +38,7 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     # being 38px high means it did not wrap
-    expect(driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()')).to eq 38
-  end
-
-  it "should allow custom column ordering" do
-    skip("drag and drop doesn't seem to work")
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    columns = ff('.assignment-points-possible')
-    expect(columns).not_to be_empty
-    driver.action.drag_and_drop_by(columns[1], -300, 0).perform
-
-    first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    expect(first_row_cells[0].text).to eq @assignment_2_points
-    expect(first_row_cells[1].text).to eq @assignment_1_points
-    expect(first_row_cells[2].text).to eq "-"
-
-    # with a custom order, both sort options should be displayed
-    f('#gradebook_settings').click
-    arrange_settings = ff('input[name="arrange-columns-by"]')
-    expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
-    expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
+    expect(f("#gradebook_grid .slick-header-columns").size.height).to eq 38
   end
 
   it "should load custom column ordering", priority: "1", test_id: 220031 do

@@ -28,7 +28,7 @@ describe AssignmentOverride do
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
-    
+
     @override.destroy
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override.workflow_state).to eq 'deleted'
@@ -472,6 +472,49 @@ describe AssignmentOverride do
 
   end
 
+  describe '#availability_expired?' do
+    let(:override) { assignment_override_model }
+    subject { override.availability_expired? }
+
+    context 'without an overridden lock_at' do
+      before do
+        override.lock_at_overridden = false
+      end
+
+      it { is_expected.to be(false) }
+    end
+
+    context 'with an overridden lock_at' do
+      before do
+        override.lock_at_overridden = true
+      end
+
+      context 'never locks' do
+        before do
+          override.lock_at = nil
+        end
+
+        it { is_expected.to be(false) }
+      end
+
+      context 'not yet locked' do
+        before do
+          override.lock_at = 10.minutes.from_now
+        end
+
+        it { is_expected.to be(false) }
+      end
+
+      context 'already locked' do
+        before do
+          override.lock_at = 10.minutes.ago
+        end
+
+        it { is_expected.to be(true) }
+      end
+    end
+  end
+
   describe "default_values" do
     let(:override) { AssignmentOverride.new }
     let(:quiz) { Quizzes::Quiz.new }
@@ -737,7 +780,7 @@ describe AssignmentOverride do
     end
   end
 
-  describe '.only_visible_to' do
+  describe '.visible_students_only' do
     specs_require_sharding
 
     it "references tables correctly for an out of shard query" do
@@ -745,6 +788,13 @@ describe AssignmentOverride do
       # but the query executes on a different shard, but it should still be
       # well-formed (especially with qualified names)
       AssignmentOverride.visible_students_only([1, 2]).shard(@shard1).to_a
+    end
+
+    it "should not duplicate adhoc overrides containing multiple students" do
+      @override = assignment_override_model
+      students = Array.new(2) { @override.assignment_override_students.create(user: student_in_course.user) }
+
+      expect(AssignmentOverride.visible_students_only(students.map(&:user_id)).count).to eq 1
     end
   end
 

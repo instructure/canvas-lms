@@ -111,7 +111,11 @@ define [
 
     # public API
     setDate: (date) =>
-      @setFormattedDatetime(date, 'date.formats.medium')
+      if not @showDate
+        @implicitDate = date
+        @setFromValue()
+      else
+        @setFormattedDatetime(date, 'date.formats.medium')
 
     setTime: (date) =>
       @setFormattedDatetime(date, 'time.formats.tiny')
@@ -155,6 +159,8 @@ define [
     parseValue: ->
       value = @normalizeValue(@$field.val())
       @datetime = tz.parse(value)
+      if @datetime and not @showDate and @implicitDate
+        @datetime = tz.mergeTimeAndDate(@datetime, @implicitDate)
       @fudged = $.fudgeDateForProfileTimezone(@datetime)
       @showTime = @alwaysShowTime or (@allowTime and not tz.isMidnight(@datetime))
       @blank = not value

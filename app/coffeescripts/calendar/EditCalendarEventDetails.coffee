@@ -150,7 +150,7 @@ define [
       $end.data('instance').setTime(if @event.allDay then null else end)
 
       # couple start and end times so that end time will never precede start
-      coupleTimeFields($start, $end)
+      coupleTimeFields($start, $end, $date)
 
     formSubmit: (jsEvent) =>
       jsEvent.preventDefault()

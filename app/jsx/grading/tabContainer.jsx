@@ -10,12 +10,16 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
 
   var TabContainer = React.createClass({
 
+    propTypes: {
+      multipleGradingPeriodsEnabled: React.PropTypes.bool.isRequired
+    },
+
     componentDidMount: function() {
-      $(this.getDOMNode()).children(".ui-tabs-minimal").tabs();
+      $(React.findDOMNode(this)).children(".ui-tabs-minimal").tabs();
     },
 
     render: function () {
-      if(ENV.MULTIPLE_GRADING_PERIODS){
+      if(this.props.multipleGradingPeriodsEnabled) {
         return (
           <div>
             <div className="ui-tabs-minimal">
@@ -23,10 +27,10 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
                 <li><a href="#grading-periods-tab" className="grading_periods_tab"> {I18n.t('Grading Periods')}</a></li>
                 <li><a href="#grading-standards-tab" className="grading_standards_tab"> {I18n.t('Grading Schemes')}</a></li>
               </ul>
-              <div id="grading-periods-tab">
+              <div ref="gradingPeriods" id="grading-periods-tab">
                 <GradingPeriodCollection/>
               </div>
-              <div id="grading-standards-tab">
+              <div ref="gradingStandards" id="grading-standards-tab">
                 <GradingStandardCollection/>
               </div>
             </div>
@@ -34,7 +38,7 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
         );
       } else{
         return (
-          <div>
+          <div ref="gradingStandards">
             <h1 tabIndex="0">{I18n.t("Grading Schemes")}</h1>
             <GradingStandardCollection/>
           </div>
@@ -43,6 +47,6 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
     }
   });
 
-  React.render(<TabContainer/>, document.getElementById("react_grading_tabs"));
+  return TabContainer;
 
 });

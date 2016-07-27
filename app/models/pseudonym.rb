@@ -134,7 +134,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   scope :by_unique_id, lambda { |unique_id|
-    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id)
+    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id.to_s)
   }
 
   def self.to_lower_column(column)

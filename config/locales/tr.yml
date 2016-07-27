@@ -99,6 +99,7 @@ tr:
     sis_id_in_use: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
     tab_admin_tools: "Yönetici Araçları"
     tab_authentication: "Kimlik Doğrulama"
+    tab_brand_configs: Temalar
     tab_courses: Dersler
     tab_developer_keys: "Geliştirici Anahtarları"
     tab_faculty_journal: "Öğretim Üyesi Günlüğü"
@@ -393,7 +394,7 @@ tr:
       display_name_help: "İnsanlar bu ismi tartışmalar, mesajlar ve yorumlarda görecek."
       full_name_description: "Bu isim puanlandırmada öğretmenler tarafından kullanılacaktır."
       labels: 
-        account_id: Bölüm
+        account_id: "Alt hesap"
         course_code: "Referans Kodu"
         enrollment_term_id: "Kayıt Dönemi"
         full_name: "Tam Ad"
@@ -1282,6 +1283,7 @@ tr:
   add_an_identity_provider_to_this_account_c2644478: "Bu hesap için bir kimlik sağlayıcı ekleyin:"
   add_app_baf540f: "Uygulama Ekle"
   add_attachment_93868828: "Dosya Ekle"
+  add_collaboration_da9665ac: "İşbirliği Ekle"
   add_content_to_module_name_589a8d54: "%{module_name} Modülüne İçerik Ekle"
   add_course_406cb773: "Ders Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
@@ -1308,6 +1310,7 @@ tr:
   add_section_8b027a1c: "Bölüm Ekle"
   add_students_to_the_course_874be8fb: "Derse Öğrenci Ekle"
   add_tas_to_the_course_2aac6e02: "Derse Öğretim Elemanı Yardımcıları Ekle"
+  add_theme_32fa3d50: "Tema Ekle"
   add_user_e73e8e50: "Kullanıcı Ekle"
   add_users_to_name_b8109bbb: "%{name}'a Kullanıcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
@@ -1554,6 +1557,7 @@ tr:
   application_id_2aa1640f: "Uygulama ID"
   application_secret_e6803c7e: "Uygulama Gizli Anahtarı"
   apply_781a2546: Uygula
+  apply_theme_7af08387: "Temayı uygula"
   applying_new_styles_to_subaccounts_e8aeeef2: "Yeni stiller alt hesaplara uygulanıyor"
   appointment_group: 
     errors: 
@@ -3037,7 +3041,7 @@ tr:
       descriptions: 
         etherpad: |-
             EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.  
-              
+            
             **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
         google_docs: "Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
             **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
@@ -4680,7 +4684,7 @@ tr:
         previous_navigation_link: Aşağı
         toggle_navigation_dragging: Boşluk
       labels: 
-        account_id: Bölüm
+        account_id: "Alt hesap"
         allow_student_discussion_editing: "Öğrencilerin kendi tartışma gönderilerini silmesine ve düzenlemesine izin ver"
         allow_student_discussion_topics: "Öğrencilerin tartışma başlıkları oluşturmasına izin ver"
         allow_student_forum_attachments: "Öğrenciler tartışmalara dosya ekleyebilsin"
@@ -14747,6 +14751,7 @@ tr:
     sub_accounts_count: 
       one: "1 Alt Hesap"
       other: "%{count} Alt Hesap"
+  subaccount_91f4c279: "Alt hesap"
   subject_reply_to: "Ynt: %{subject}"
   submission: 
     atom_no_author: "Yazar Yok"
@@ -15019,6 +15024,7 @@ tr:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Belirtilen kullanıcı bu derste öğrenci değildir"
   the_state_parameter_is_required_ffadf213: "Bölge parametresi gereklidir"
   the_top_track_represents_days_on_which_the_student_2a347099: "Üst izleme dersin öğretim elemanına *öğrencinin mesaj gönderdiği* günleri göstermektedir. Alt izleme ise öğrenciye *öğretim elemanından gelen mesajlar* dır. "
+  themes_89bfe9c4: Temalar
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Listede 1 sonuç var"
     other: "Listede %{count} sonuç var"

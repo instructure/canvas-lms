@@ -56,9 +56,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'complete'
+      expect(f('#grading-box-extended')).to have_value 'complete'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'incomplete'
+      expect(f('#grading-box-extended')).to have_value 'incomplete'
     end
 
     it 'should display letter grades correctly', priority: "1", test_id: 164015 do
@@ -70,9 +70,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'A'
+      expect(f('#grading-box-extended')).to have_value 'A'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'C'
+      expect(f('#grading-box-extended')).to have_value 'C'
 
       clear_grade_and_validate
     end
@@ -86,9 +86,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq '75'
+      expect(f('#grading-box-extended')).to have_value '75'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq '50'
+      expect(f('#grading-box-extended')).to have_value '50'
 
       clear_grade_and_validate
     end
@@ -102,9 +102,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq '15'
+      expect(f('#grading-box-extended')).to have_value '15'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq '10'
+      expect(f('#grading-box-extended')).to have_value '10'
 
       clear_grade_and_validate
     end
@@ -118,9 +118,9 @@ describe 'Speedgrader' do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
-      expect(f('#grading-box-extended').attribute 'value').to eq 'A'
+      expect(f('#grading-box-extended')).to have_value 'A'
       f('a.next').click
-      expect(f('#grading-box-extended').attribute 'value').to eq 'D'
+      expect(f('#grading-box-extended')).to have_value 'D'
 
       clear_grade_and_validate
     end
@@ -136,17 +136,17 @@ describe 'Speedgrader' do
       end
 
       it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
-        expect(ff('#update_history_form .alert')[0].text).to include_text('The following questions need review:')
+        expect(ff('#update_history_form .alert')[0]).to include_text('The following questions need review:')
       end
 
       it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         questions_to_grade = ff('#questions_needing_review li a')
-        expect(questions_to_grade[0].text).to include_text('Question 2')
-        expect(questions_to_grade[1].text).to include_text('Question 3')
+        expect(questions_to_grade[0]).to include_text('Question 2')
+        expect(questions_to_grade[1]).to include_text('Question 3')
       end
 
       it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
-        expect(ff('#update_history_form .alert')[0].text).not_to include_text('Question 4')
+        expect(ff('#update_history_form .alert')[0]).not_to include_text('Question 4')
       end
     end
 
@@ -161,7 +161,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(0 / 0)')
+        expect(f('#grade_container label')).to include_text('(0 / 0)')
       end
 
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
@@ -169,7 +169,7 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
         let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
-        expect(fj('#grade_container label').text()).to include_text('(1 / 1)')
+        expect(f('#grade_container label')).to include_text('(1 / 1)')
       end
     end
 
@@ -199,8 +199,8 @@ describe 'Speedgrader' do
       end
 
       it 'in speedgrader', priority: "1", test_id: 164016 do
-        expect(f('#grading-box-extended').attribute('value')).to eq '15'
-        expect(f('#grading span.rubric_total').text).to eq '15'
+        expect(f('#grading-box-extended')).to have_value '15'
+        expect(f('#grading span.rubric_total')).to include_text '15'
       end
 
       it 'in assignment page ', priority: "1", test_id: 217611 do
@@ -215,14 +215,15 @@ describe 'Speedgrader' do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
 
-        expect(f('#criterion_crit1 input.criterion_points').attribute 'value').to eq '10'
-        expect(f('#criterion_crit2 input.criterion_points').attribute 'value').to eq '5'
+        expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
+        expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
 
         replace_content f('#criterion_crit1 input.criterion_points'), '5'
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
-        keep_trying_until { expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10' }
+        el = f("#student_grading_#{@assignment.id}")
+        expect(el).to have_value '10'
       end
     end
     context 'Using a rubric to grade' do
@@ -339,10 +340,10 @@ describe 'Speedgrader' do
       expect(ff('.quiz-nav-li').length).to eq 40
 
       # check scrolling
-      first_left = wrapper.css_value('left')
+      first_left = wrapper.css_value('left').to_f
 
       f('#nav-link-next').click
-      second_left = wrapper.css_value('left')
+      second_left = wrapper.css_value('left').to_f
       expect(first_left).to be > second_left
 
       # check anchors
@@ -387,7 +388,7 @@ describe 'Speedgrader' do
 
       # see first student
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-      keep_trying_until { f(selectedStudent).text.include?(@students[0].name) }
+      expect(f(selectedStudent)).to include_text(@students[0].name)
     end
 
     let(:selectedStudent) {'span.ui-selectmenu-item-header'}
@@ -489,14 +490,20 @@ describe 'Speedgrader' do
       )
     end
 
-    it 'displays keyboard shortcut modal when clicking blue info icon', priority: "2", test_id: 759319 do
+    it 'opens and closes keyboard shortcut modal via blue info icon', priority: "2", test_id: 759319 do
       user_session(teacher)
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      keyboard_shortcut_icon = f('#keyboard-shortcut-info-icon')
+      keyboard_modal = f('#keyboard_navigation')
+      expect(keyboard_shortcut_icon).to be_displayed
 
-      shortcut_modal = f('#keyboard_navigation')
-      f('#keyboard-shortcut-info-icon').click
+      # Open shortcut modal
+      keyboard_shortcut_icon.click
+      expect(keyboard_modal).to be_displayed
 
-      expect(shortcut_modal).to be_displayed
+      # Close shortcut modal
+      f('.ui-resizable .ui-dialog-titlebar-close').click
+      expect(keyboard_modal).not_to be_displayed
     end
   end
 end

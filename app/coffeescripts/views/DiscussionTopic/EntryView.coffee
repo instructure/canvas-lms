@@ -108,7 +108,7 @@ define [
       json.edited_at = $.datetimeString(json.updated_at)
       if json.editor
         json.editor_name = json.editor.display_name
-        json.editor_href = "href=\"#{json.editor.html_url}\""
+        json.editor_href = json.editor.html_url
       else
         json.editor_name = I18n.t 'unknown', 'Unknown'
         json.editor_href = ""
@@ -123,10 +123,8 @@ define [
       @addCountsToHeader() unless @addedCountsToHeader
       @$el.toggleClass 'collapsed'
       if @$el.hasClass('collapsed')
-        $el.attr('title', I18n.t('Expand Subdiscussion'))
         $el.find('.screenreader-only').text(I18n.t('Expand Subdiscussion'))
       else
-        $el.attr('title', I18n.t('Collapse Subdiscussion'))
         $el.find('.screenreader-only').text(I18n.t('Collapse Subdiscussion'))
 
     expand: ->

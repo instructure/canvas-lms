@@ -239,6 +239,51 @@ define([
     return _.difference(state, idsAdded);
   };
 
+  /**
+   * Inflight Action Handlers
+   */
+  function __landAction(state, action_name) {
+    var newState = _.extend({}, state);
+    newState[action_name] = false;
+
+    return newState;
+  }
+
+  var inflightActionHandlers = {};
+
+  inflightActionHandlers[ModerationActions.ACTION_DISPATCHED] = (state, action) => {
+    var newState = _.extend({}, state);
+    newState[action.payload.name] = true;
+    return newState;
+  };
+
+  inflightActionHandlers[ModerationActions.PUBLISHED_GRADES] = (state, action) => {
+    return __landAction(state, 'publish');
+  };
+
+  inflightActionHandlers[ModerationActions.PUBLISHED_GRADES_FAILED] = (state, action) => {
+    return __landAction(state, 'publish');
+  };
+
+  inflightActionHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    return __landAction(state, 'review');
+  };
+
+  inflightActionHandlers[ModerationActions.UPDATE_MODERATION_SET_FAILED] = (state, action) => {
+    return __landAction(state, 'review');
+  };
+
+  function inflightAction (state, action) {
+    state = state || {};
+
+    var handler = inflightActionHandlers[action.type];
+
+    if (handler) return handler(state, action);
+
+    return state;
+  }
+
+
   function urls (state, action) {
     return state || {};
   }
@@ -277,10 +322,11 @@ define([
   }
 
   return combineReducers({
-   studentList,
-   urls,
-   flashMessage,
-   assignment
+    studentList,
+    urls,
+    flashMessage,
+    assignment,
+    inflightAction
   });
 
 });

@@ -9,14 +9,20 @@
       <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %><% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
       <% if use_new_styles? %>
         <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
-          <%# TODO: Make it so individual tool logos show up (rather than all as Commons) once LTI has a decent way of doing logos %>
-          <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
+          <% svg_path = tool.extension_setting(:global_navigation, :icon_svg_path_64) %>
+          <% if svg_path %>
+            <svg version="1.1" class="ic-icon-svg ic-icon-svg--lti menu-item__icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 64">
+              <path d="<%= svg_path %>"/>
+            </svg>
+          <% else %>
+            <img src="<%= tool.extension_setting(:global_navigation, :icon_url) %>" alt="" />
+          <% end %>
           <div class="menu-item__text">
             <%= tool.label_for(:global_navigation) %>
           </div>
         </a>
       <% else %>
-        <a class='menu-item-no-drop' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
+        <a class='menu-item-no-drop' href="<%= tool_path %>">
           <%= tool.label_for(:global_navigation, I18n.locale) %>
         </a>
       <% end %>

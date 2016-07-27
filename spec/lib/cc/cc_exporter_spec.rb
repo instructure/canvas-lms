@@ -30,8 +30,7 @@ describe "Common Cartridge exporting" do
     include WebMock::API
 
     before do
-      course_with_teacher
-      @course.offer!
+      course_with_teacher(:active_all => true)
       @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
       @ce.user = @user

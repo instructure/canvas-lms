@@ -61,7 +61,7 @@ define([
 
       var addCourseButton;
       if (window.ENV.PERMISSIONS.can_create_courses) {
-        addCourseButton = <div className="ic-Form-actions">
+        addCourseButton = <div>
           <button className="btn" type="button" onClick={this.addCourse}>
             <i className="icon-plus"/>
             {" "}
@@ -73,41 +73,41 @@ define([
       return (
         <div>
           <form
-            className="ic-Form-group ic-Form-group--inline course_search_bar"
-            style={{alignItems: "center", opacity: isLoading ? 0.5 : 1}}
+            className="course_search_bar"
+            style={{opacity: isLoading ? 0.5 : 1}}
             onSubmit={this.applyFilters}
             disabled={isLoading}
           >
-            <IcSelect
-              value={enrollment_term_id}
-              onChange={(e) => onUpdateFilters({enrollment_term_id: e.target.value})}
-            >
-              {this.renderTerms()}
-            </IcSelect>
-
-            <IcInput
-              value={search_term}
-              placeholder={I18n.t("Search courses...")}
-              onChange={(e) => onUpdateFilters({search_term: e.target.value})}
-              error={errors.search_term}
-            />
-
-            <div className="ic-Form-control" style={{flexGrow: 0.3}}>
-              <button className="btn">
-                {I18n.t("Go")}
-              </button>
+            <div className="ic-Form-action-box courses-list-search-bar-layout">
+              <div className="ic-Form-action-box__Form">
+                <IcSelect
+                  value={enrollment_term_id}
+                  onChange={(e) => onUpdateFilters({enrollment_term_id: e.target.value})}
+                >
+                  {this.renderTerms()}
+                </IcSelect>
+                <IcInput
+                  value={search_term}
+                  placeholder={I18n.t("Search courses...")}
+                  onChange={(e) => onUpdateFilters({search_term: e.target.value})}
+                  error={errors.search_term}
+                />
+                <div className="ic-Form-control">
+                  <button className="btn">
+                    {I18n.t("Go")}
+                  </button>
+                </div>
+              </div>
+              <div className="ic-Form-action-box__Actions">
+                {addCourseButton}
+              </div>
             </div>
-
             <IcCheckbox
-              controlClassName="flex-grow-2"
               checked={with_students}
               onChange={(e) => onUpdateFilters({with_students: e.target.checked})}
               label={I18n.t("Hide courses without enrollments")}
             />
-
-            {addCourseButton}
           </form>
-
           <NewCourseModal
             ref="addCourse"
             terms={terms}

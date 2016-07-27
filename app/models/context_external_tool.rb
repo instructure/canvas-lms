@@ -101,7 +101,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[type] = {}.with_indifferent_access
 
     extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url, :canvas_icon_class,
-                      :selection_height, :selection_width, :text, :url, :message_type]
+                      :selection_height, :selection_width, :text, :url, :message_type, :icon_svg_path_64]
     if custom_keys = CUSTOM_EXTENSION_KEYS[type]
       extension_keys += custom_keys
     end
@@ -295,6 +295,7 @@ class ContextExternalTool < ActiveRecord::Base
   def icon_url
     settings[:icon_url]
   end
+
   def canvas_icon_class=(i_url)
     settings[:canvas_icon_class] = i_url
   end
@@ -542,9 +543,11 @@ class ContextExternalTool < ActiveRecord::Base
   def self.find_external_tool(url, context, preferred_tool_id=nil)
     contexts = contexts_to_search(context)
     preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
-    if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
+    if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
       return preferred_tool
     end
+
+    return nil unless url
 
     all_external_tools = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active.to_a
     sorted_external_tools = all_external_tools.sort_by { |t| [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }

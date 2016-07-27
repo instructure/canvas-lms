@@ -59,6 +59,20 @@ describe Login::CanvasController do
 
   end
 
+  it "should show sso buttons on load" do
+    aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
+    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    get 'new'
+    expect(assigns[:aacs_with_buttons]).to eq [aac]
+  end
+
+  it "should still show sso buttons on login error" do
+    aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
+    Canvas::Plugin.find(:facebook).stubs(:settings).returns({})
+    post 'create'
+    expect(assigns[:aacs_with_buttons]).to eq [aac]
+  end
+
   it "should re-render if no user" do
     post 'create'
     assert_status(400)

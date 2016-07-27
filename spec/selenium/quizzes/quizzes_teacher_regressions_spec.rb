@@ -22,46 +22,7 @@ describe 'quizzes regressions' do
     expect(cal.style('z-index')).to be > f('#main').style('z-index')
   end
 
-  it 'marks questions as answered when the window loses focus', priority: "1", test_id: 209959 do
-    skip('This spec is fragile')
-    @quiz = quiz_with_new_questions do |bank, quiz|
-      aq1 = bank.assessment_questions.create!
-      aq2 = bank.assessment_questions.create!
-      quiz.quiz_questions.create!(
-        question_data: {
-          name: 'numerical',
-          question_type: 'numerical_question',
-          answers: [],
-          points_possible: 1
-        },
-        assessment_question: aq1
-      )
-      quiz.quiz_questions.create!(
-        question_data: {
-          name: 'essay',
-          question_type: 'essay_question',
-          answers: [],
-          points_possible: 1
-        },
-        assessment_question: aq2
-      )
-    end
-
-    take_quiz do
-      wait_for_tiny f('.essay_question textarea.question_input')
-      input = f('.numerical_question_input')
-      input.click
-      input.send_keys('1')
-      in_frame f('.essay_question iframe')[:id] do
-        f('#tinymce').send_keys :shift # no content, but it gives the iframe focus
-      end
-      sleep 1
-      wait_for_ajaximations
-      keep_trying_until { expect(ff('#question_list .answered').size).to eq 1 }
-
-      expect(input).to have_attribute(:value, '1.0000')
-    end
-  end
+  it 'marks questions as answered when the window loses focus', priority: "1", test_id: 209959
 
   it 'quiz show page displays the quiz due date', priority: "1", test_id: 209960 do
     due_date = Time.zone.now + 4.days

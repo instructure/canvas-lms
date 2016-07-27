@@ -56,7 +56,7 @@ end
 shared_examples 'announcements_page' do |context|
   it "should center the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273606, teacher: 324936) do
     get announcements_page
-    expect(f('#content.container-fluid div')).to have_attribute(:style, 'text-align: center;')
+    expect(f('#content div')).to have_attribute(:style, 'text-align: center;')
     expect(f('.btn.btn-large.btn-primary')).to be_displayed
   end
 

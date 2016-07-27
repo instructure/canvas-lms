@@ -49,10 +49,10 @@ describe "conversations new" do
       time = format_time_for_view(UserNote.last.updated_at)
       remove_user_session
       get student_user_notes_url
-      expect(f('.subject').text).to include_text('Christmas')
+      expect(f('.subject')).to include_text('Christmas')
       expect(f('.user_content').text).to eq 'The Fat Man cometh.'
-      expect(f('.creator_name').text).to include_text(@teacher.name)
-      expect(f('.creator_name').text).to include_text(time)
+      expect(f('.creator_name')).to include_text(@teacher.name)
+      expect(f('.creator_name')).to include_text(time)
     end
 
     it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
@@ -80,20 +80,10 @@ describe "conversations new" do
       get student_user_notes_url
       expect(f('.subject').text).to eq 'FJ Title 2'
       expect(f('.user_content').text).to eq 'FJ Body text 2'
-      expect(f('.creator_name').text).to include_text(time)
+      expect(f('.creator_name')).to include_text(time)
     end
 
-    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518 do
-      skip('Currently Broken CNVS-12522')
-      get student_user_notes_url
-      f('#new_user_note_button').click
-      replace_content(f('#user_note_title'),'FJ Title')
-      replace_content(f('textarea'),'FJ Body text')
-      f('.cancel_button').click
-      f('#new_user_note_button').click
-      expect(f('#user_note_title').text).to eq ''
-      expect(f('textarea').text).to eq ''
-    end
+    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518
   end
 
   context "Faculty Journal" do
@@ -200,6 +190,7 @@ describe "conversations new" do
       expect_flash_message :success, /Message sent!/
       # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
       #   still lets teacher know it was sent successfully.
+      fj('.ic-flash-success:last').click
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: false
       add_message_recipient(@s2)
       expect(is_checked('.user_note')).to be_truthy

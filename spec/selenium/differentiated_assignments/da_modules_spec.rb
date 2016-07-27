@@ -49,11 +49,11 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
                                          @tag_quiz.id => {:type => 'must_view'}
                                          }
       @module.save
-      expect(@module.evaluate_for(@student).workflow_state).to include_text("unlocked")
+      expect(@module.evaluate_for(@student).workflow_state).to include("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"
       get "/courses/#{@course.id}/modules/items/#{@tag_quiz.id}"
       #confirm canvas believes this module is now completed despite the invisible assignment not having been viewed
-      expect(@module.evaluate_for(@student).workflow_state).to include_text("completed")
+      expect(@module.evaluate_for(@student).workflow_state).to include("completed")
     end
   end
 

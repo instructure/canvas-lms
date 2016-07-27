@@ -4,8 +4,9 @@
 define [
   "jquery"
   "i18nObj"
+  "helpers/I18nStubber"
   "jquery.instructure_misc_helpers" # for $.raw
-], ($, I18n) ->
+], ($, I18n, I18nStubber) ->
 
   scope = I18n.scoped('foo')
   t = (args...) -> scope.t(args...)
@@ -21,13 +22,20 @@ define [
       "ohai [missing %{name} value]"
 
   test "default locale fallback on lookup", ->
-    originalLocale = I18n.locale
-    try
-      $.extend(true, I18n, {locale: 'bad-locale', translations: {en: {foo: {fallback_message: 'this is in the en locale'}}}})
+    I18nStubber.stub 'en', {foo: {fallback_message: 'this is in the en locale'}}, ->
+      I18n.locale = 'bad-locale'
       equal scope.lookup('foo.fallback_message'),
         'this is in the en locale'
-    finally
-      I18n.locale = originalLocale
+
+  test "fallbacks should only include valid ancestors", ->
+    I18nStubber.stub {en: {}, fr: {}, "fr-CA": {}, "fr-FR": {}, "fr-FR-oh-la-la": {}, "zh-Hant": {}}, null, ->
+      deepEqual I18n.getLocaleAndFallbacks("fr-FR-oh-la-la"),
+                ["fr-FR-oh-la-la", "fr-FR", "fr", "en"]
+
+  test "fallbacks should not include the default twice", ->
+    I18nStubber.stub {en: {}, "en-GB": {}, "en-GB-x-custom": {}}, null, ->
+      deepEqual I18n.getLocaleAndFallbacks("en-GB-x-custom"),
+                ["en-GB-x-custom", "en-GB", "en"]
 
   test "html safety: should not html-escape translations or interpolations by default", ->
     equal t('bar', 'these are some tags: <input> and %{another}', {another: '<img>'}),

@@ -144,12 +144,12 @@ describe ContentParticipationCount do
     end
 
     it "should be unread after submission is commented on by teacher" do
-      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
     end
 
     it "should be read after viewing the submission comment" do
-      @submission = @assignment.grade_student(@student, { :grader => @teacher, :comment => "good!" }).first
+      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
       @submission.change_read_state("read", @student)
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end

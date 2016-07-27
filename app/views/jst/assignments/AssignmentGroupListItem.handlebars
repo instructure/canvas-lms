@@ -4,7 +4,7 @@
     {{#if ENV.PERMISSIONS.manage}}
       <span class="sortable-handle">
         <a href="#" class="icon-drag-handle">
-        <span class="screenreader-only accessibility-warning">{{#t "move_to_accessibility_warning"}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}</span>
+        <span class="screenreader-only accessibility-warning">{{#t}}Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.{{/t}}</span>
         </a>
       </span>
     {{/if}}
@@ -42,7 +42,7 @@
       {{#ifAny showWeight showRules}}
         <ul class="pill">
           {{#if showWeight}}
-            <li>{{#t "group_weight"}}{{groupWeight}}% of Total{{/t}}</li>
+            <li>{{#t}}{{groupWeight}}% of Total{{/t}}</li>
           {{/if}}
           {{#if showRules}}
             <li>
@@ -66,16 +66,16 @@
         <a
           href="#"
           class="btn add_assignment"
-          title='{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}'
+          title='{{#t}}Add Assignment to {{name}}{{/t}}'
         >
           {{! icon is separate from <a> tag because it is the only visible content in the button }}
-          <span class="screenreader-only">{{#t "add_assignment_to"}}Add Assignment to {{name}}{{/t}}</span>
+          <span class="screenreader-only">{{#t}}Add Assignment to {{name}}{{/t}}</span>
           <i class="icon-plus"></i>
         </a>
 
         <div class="inline-block">
           <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0" role="button">
-            <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+            <span class="screenreader-only">{{#t}}Manage {{name}}{{/t}}</span>
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           </a>
           <ul class="al-options">
@@ -83,18 +83,18 @@
               <a
                 href="#"
                 class="edit_group icon-edit"
-                aria-label="{{#t 'assignment_group_edit'}}Edit Assignment Group{{/t}}"
+                aria-label="{{#t}}Edit Assignment Group{{/t}}"
                 data-focus-returns-to="ag_{{id}}_manage_link"
-              >{{#t "edit"}}Edit{{/t}}</a>
+              >{{#t}}Edit{{/t}}</a>
             </li>
             {{#unless hasFrozenAssignments}}
               <li>
                 <a
                   href="#"
                   class="delete_group icon-trash"
-                  aria-label='{{#t "assignment_group_delete"}}Delete Assignment Group{{/t}}'
+                  aria-label='{{#t}}Delete Assignment Group{{/t}}'
                   data-focus-returns-to="ag_{{id}}_manage_link"
-                >{{#t "delete"}}Delete{{/t}}</a>
+                >{{#t}}Delete{{/t}}</a>
               </li>
             {{/unless}}
             {{#if canMove}}
@@ -102,9 +102,9 @@
               <a
                 href="#"
                 class="move_group icon-updown"
-                aria-label='{{#t "assignment_group_move"}}Move Assignment Group{{/t}}'
+                aria-label='{{#t}}Move Assignment Group{{/t}}'
                 data-focus-returns-to="ag_{{id}}_manage_link"
-              >{{#t "move"}}Move To…{{/t}}</a>
+              >{{#t}}Move To…{{/t}}</a>
             </li>
             {{/if}}
           </ul>

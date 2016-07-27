@@ -22,7 +22,7 @@ describe "users" do
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
-      new_login = ff('.login').find { |e| e.attribute(:class) !~ /blank/ }
+      new_login = f('.login:not(.blank)')
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
@@ -157,7 +157,7 @@ describe "users" do
       wait_for_ajaximations
       expect_new_page_load { f('.button-secondary').click }
       wait_for_ajaximations
-      expect(f('#courses_menu_item')).to be_displayed
+      expect(f(ENV['CANVAS_FORCE_USE_NEW_STYLES'] ? '#global_nav_courses_link' : '#courses_menu_item')).to be_displayed
       expect(@student_1.workflow_state).to eq 'registered'
       expect(@student_2.workflow_state).to eq 'registered'
     end
@@ -255,7 +255,7 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+      expect_logout_link_present
       expect(User.last.initial_enrollment_type).to eq 'student'
     end
 
@@ -280,7 +280,11 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+
+      # close the "check your email to confirm your account" dialog
+      f('.ui-dialog-titlebar-close').click
+      expect(displayed_username).to eq('teacher!')
+      expect_logout_link_present
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 
@@ -299,7 +303,11 @@ describe "users" do
 
       expect_new_page_load { form.submit }
       # confirm the user is authenticated into the dashboard
-      expect(f('#identity .logout')).to be_present
+
+      # close the "check your email to confirm your account" dialog
+      f('.ui-dialog-titlebar-close').click
+      expect_logout_link_present
+
       expect(User.last.initial_enrollment_type).to eq 'observer'
     end
   end
@@ -308,15 +316,15 @@ describe "users" do
     it "should masquerade as a user", priority: "1", test_id: 134743 do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
+
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
-      wait_for_ajaximations
-      expect(f('#identity .user_name')).to include_text 'The Student'
+      expect(displayed_username).to include('The Student')
+
       bar = f('#masquerade_bar')
       expect(bar).to include_text 'You are currently masquerading'
       bar.find_element(:css, '.stop_masquerading').click
-      wait_for_ajaximations
-      expect(f('#identity .user_name')).to include_text 'The Admin'
+      expect(displayed_username).to eq('The Admin')
     end
   end
 end
