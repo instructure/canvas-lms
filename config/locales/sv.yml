@@ -3159,11 +3159,11 @@ sv:
       collaboration_name: "%{course_or_group_name} Samarbete"
       descriptions: 
         etherpad: |-
-            EtherPad är ett "open source" projekt som låter dig dela dokument snabbt. Det är så snabbt att du kan se vad andra skriver medans de skriver det. "Pads" är däremot inte skyddade med lösenord så vem som helst som har en länk till dem kan redigera dem. EtherPad är bättre än Google Docs om du värnar om anonymitet och/eller tillåta personer utan ett Google-konto att medverka. 
+            EtherPad är ett "open source" projekt som låter dig dela dokument snabbt. Det är så snabbt att du kan se vad andra skriver medans de skriver det. "Pads" är däremot inte skyddade med lösenord så vem som helst som har en länk till dem kan redigera dem. EtherPad är bättre än Google Docs om du värnar om anonymitet och/eller tillåta personer utan ett Google-konto att medverka.
             
             **Varning**: se till att du är bekant med [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) för att försäkra dig om att ditt arbete skyddas.
         google_docs: |-
-            Google Docs fungerar är en utmärkt plats att samarbeta på under ett grupparbete. Det är som Microsoft Word, fast det låter både dig och andra arbeta på samma fil samtidigt utan att behöva skicka e-post mellan varandra. 
+            Google Docs fungerar är en utmärkt plats att samarbeta på under ett grupparbete. Det är som Microsoft Word, fast det låter både dig och andra arbeta på samma fil samtidigt utan att behöva skicka e-post mellan varandra.
             
             **Varning**: Du (och alla deltagare) måste har ett Google-konto för att medverka i Google Docs samarbeten.
       labels: 
@@ -3178,20 +3178,20 @@ sv:
       file_not_found: "Samarbetsfil kunde inte hittas"
     index: 
       description_rs: |-
-          Gratis webbverktyg såsom [Google Docs](%{google_url}) är 
+          Gratis webbverktyg såsom [Google Docs](%{google_url}) är
           en utmärkt plats för elever att arbeta med grupparbeten, uppsatser, dela anteckningar, etc.
           Lärare *eller* elever kan starta gruppsamarbeten.
       description_student: |-
           **Vad menar vi med samarbeten?** Vi pratar om webbaserade verktyg som
           kan användas dör att arbeta tillsammans eller dela dokument. Du kan använda resurser som
-           [Google Docs](%{google_url})
+          [Google Docs](%{google_url})
           för att samarbeta på uppgifter som grupparbeten eller anteckningar. Den här sidan är
           enkel att placera för att hålla reda på dessa samarbeten, och du kan och ställa in dem
           utan att skicka e-postmeddelanden.
       description_teacher: |-
           **Vad menar vi med samarbeten?** Vi pratar om webbbaserade verktyg som de flesta
           av dina elever redan är vana vid. Elever kan använda resurser som
-           [Google Docs](%{google_url})
+          [Google Docs](%{google_url})
           för att samarbeta på uppgifter som grupparbeten och anteckningar. Denna sida ger dem
           (och du) en plats att håll reda på dessa samarbeten, du kan dessutom ställa in dem
           utan att skicka e-postmeddelanden.
@@ -4666,7 +4666,7 @@ sv:
       buttons: 
         link: "Länk till student"
       details: |-
-          När en obeservatör är länkad till en elev kommer den har tillgång ill elevens betyg och kurssamspel. *Den här observatören är för närvarande länkad till eleven, %{student}.* 
+          När en obeservatör är länkad till en elev kommer den har tillgång ill elevens betyg och kurssamspel. *Den här observatören är för närvarande länkad till eleven, %{student}.*
           
           För att länka kursobservatören %{user} till en elev, väljer du elevens namn från listan nedanför.
       labels: 
@@ -6084,7 +6084,7 @@ sv:
   enable_feature_title_987d8e9a: "Aktivera funktion: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Ordna elever efter deras sorterbara namn i betygsboken. Sorterbara namn är förinställt som 'Efternamn, Förnamn' och kan ändras i inställningar."
   enable_multiple_grading_periods: |-
-      Flera betygsperioder tillåter lärare och administratörer att skapa betygsperioder med 
+      Flera betygsperioder tillåter lärare och administratörer att skapa betygsperioder med
       avbrytande datum. Uppgifter kan filtreras efter dessa betygsperioderna i betygsboken.
   enable_or_condition_for_modules_a16f02d8: "Aktivera \"ELLER\" skick för moduler"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
@@ -6898,10 +6898,11 @@ sv:
   good_score_b02f3587: "Bra poäng"
   google_apps_domain_eddc8dee: "Google Apps domän"
   google_docs_40374e65: "Google Docs"
-  google_docs_domain_restriction_description: "Google Docs domänbegränsningar tillåter att Google Docs inlämningar och samarbeten\n\
-      begränsas till en enskild domän. Elever som försöker lämna in uppgifter eller\n\
-      medverka i samarbeten på en icke tillåten domän kommer få ett felmeddelande som säger \n\
-      åt dem att de måste uppdatera sin Google Docs integrering. "
+  google_docs_domain_restriction_description: |-
+      Google Docs domänbegränsningar tillåter att Google Docs inlämningar och samarbeten
+      begränsas till en enskild domän. Elever som försöker lämna in uppgifter eller
+      medverka i samarbeten på en icke tillåten domän kommer få ett felmeddelande som säger
+      åt dem att de måste uppdatera sin Google Docs integrering.
   google_docs_preview_9f41b23c: "Google Docs Förhandsvisning"
   google_drive_7cb003c9: "Google Drive"
   goto_first_page_650f1638: "Gå till första sidan"
@@ -7564,7 +7565,7 @@ sv:
           göra jobbet. Du kan också kräva att gruppmedlemmar tillhör samma
           kurssektion.
           
-          Kom ihåg att eleverna kan flytta från en grupp til en annan, så när 
+          Kom ihåg att eleverna kan flytta från en grupp til en annan, så när
           dina elever är klara med att organisera sig själva rekommenderas det att du avaktiverar
           egen-anmälan.
       self_signup_help_tooltip: "Vad är egen-anmälansgrupper?"
@@ -7882,9 +7883,9 @@ sv:
     unassigned_users: "Icke tilldelade användare (%{count})"
   groups_6c90e26a: Grupper
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
-      Grupper är en bra plats att samarbeta på projekt eller planera stuidecirklar 
+      Grupper är en bra plats att samarbeta på projekt eller planera stuidecirklar
       och liknande. Varje grupp får en kalender, en wiki, diskussioner och lite utrymme att förvara
-      filer. Grupper kan samarbeta på dokument och planera webbkonferenser. 
+      filer. Grupper kan samarbeta på dokument och planera webbkonferenser.
       Det är som en mini-kurs där du kan arbeta med ett mindre antal elever på ett
       mer fokuserat projekt.
   groupweight_of_total_9579ae8c: "%{groupWeight}% av totalt"
@@ -7979,7 +7980,7 @@ sv:
   hide_student_names_3e59e862: "Dölj elevnamn"
   high_b5cbd048: Hög
   high_contrast_description: |-
-      Högupplösning förbättrar färgkontrasten på användargränssnittet (text, knappar, osv.), vilket gör dem 
+      Högupplösning förbättrar färgkontrasten på användargränssnittet (text, knappar, osv.), vilket gör dem
       tydligare och enklare att se. Notera att "Institution branding" kommer avaktiveras.
   high_score_47924c1a: "Hög: %{score}"
   highest_28ad71e6: Högsta
@@ -8357,7 +8358,7 @@ sv:
   learning_mastery_5fc34276: Inlärningsmästare
   learning_mastery_gradebook_description: |-
       Överblick för måluppfyllelse erbjuder ger läraren en överblick över elev- och kursutvecklingen
-       baserat på kursens lärandemål. Resultaten presenteras i ett betygsboksliknade
+      baserat på kursens lärandemål. Resultaten presenteras i ett betygsboksliknade
       format och elevns utveckling visas både i siffror och
       definierade kategorier.
   learning_outcome: 
@@ -9294,7 +9295,7 @@ sv:
     assignment_unmuted: 
       email: 
         body: |-
-            Din lärare har släppt betygsändringar och nya kommentarer 
+            Din lärare har släppt betygsändringar och nya kommentarer
             för %{title}. Dessa ändringar kan nu visas.
             
             Du kan se det här:
@@ -9308,10 +9309,10 @@ sv:
         subject: "Uppgift o-tystad: %{title}, %{course}"
       sms: 
         body: |-
-            Din lärare har släppt bedömning och kommentarer för 
+            Din lärare har släppt bedömning och kommentarer för
             %{title}, %{course}.
             
-             Mer info på %{website}
+            Mer info på %{website}
       summary: 
         subject: "Betyg och kommentarer släppta för: %{title}, %{course}"
     assignment_unpublished_module: "Den här uppgiften är en del av en avpublicerad modul och är därför inte tillgänglig än."
@@ -9386,8 +9387,9 @@ sv:
             %{website}
     content_export_failed: 
       email: 
-        body: "Ett problem uppstod när kursen \"%{course}\" exporterades.\n\
-            Vänligen kontakta din system-administratör, och ge dem följande export-indentifierare: %{id}. "
+        body: |-
+            Ett problem uppstod när kursen "%{course}" exporterades.
+            Vänligen kontakta din system-administratör, och ge dem följande export-indentifierare: %{id}.
         html: 
           body2: "Ett problem uppstod när kursen *%{course}* exporterades. Vänligen kontakta din system-administratör, och ge dem följande export-indentifierare:"
           link: "Klicka för att visa exporteringar"
@@ -9464,7 +9466,7 @@ sv:
         body: |-
             Hej %{user},
             
-            %{course}, din kurs på Canvas Network, började för ett par dagar sedan och vi har märkt att du inte har loggat in än. Vi ville bara skicka dig en sista påminnelse om det är så att du har glömt. 
+            %{course}, din kurs på Canvas Network, började för ett par dagar sedan och vi har märkt att du inte har loggat in än. Vi ville bara skicka dig en sista påminnelse om det är så att du har glömt.
             
             För att logga in går du till %{site}, där uppger du användarnamn och lösenord. Om du inte har valt ett lösenord än, kan du göra det här: %{password_url}
             
@@ -9479,12 +9481,12 @@ sv:
         body: |-
             Hej %{user},
             
-            ViBhar goda nyheter! %{course}, kursen du 
+            ViBhar goda nyheter! %{course}, kursen du
             anmälde dig för på Canvas Network, kommer börja snart.
             
-            För att få ut det mesta av din kurs bör du kontrollera om din 
-            lärare har gett speciella instruktioner eller kursmaterial. 
-            Detta kan du göra på kursens detaljsida på Canvas Network, 
+            För att få ut det mesta av din kurs bör du kontrollera om din
+            lärare har gett speciella instruktioner eller kursmaterial.
+            Detta kan du göra på kursens detaljsida på Canvas Network,
             eller via länken nedan
             
             %{url}
@@ -11562,8 +11564,9 @@ sv:
       description: "Frys uppgiftsegenskaper på kopia"
       name: "Frysning av uppgiftsegenskaper"
     assignment_freezer_settings: 
-      description: "Den här pluginen låter administratörer markera en egenskap på uppgifter som gör de konfigurerades\n\
-          egenskaperna o-redigerbara när uppgiften har kopierats till en annan kurs. "
+      description: |-
+          Den här pluginen låter administratörer markera en egenskap på uppgifter som gör de konfigurerades
+          egenskaperna o-redigerbara när uppgiften har kopierats till en annan kurs.
       no_copying_frozen: "Tillåt inte att frusta uppgifter kopieras."
     banner_grade_exchange_settings: 
       labels: 
@@ -11762,7 +11765,7 @@ sv:
           Du behöver antingen ett konto på [Kaltura.com](%{kaltura_url})
           eller med en egen-hostad Kaltura instans.
           
-          **Observera:** när du har konfigurerat Kaltura med Canvas, 
+          **Observera:** när du har konfigurerat Kaltura med Canvas,
           kommer du behöva gå till Kaltura Management Console och under "Inställningar ->
           intergreringsinställningar" aktivera serveraviseringar med en
           aviseringsURL av:
@@ -12202,19 +12205,21 @@ sv:
         register_skype: "Registrera Skype"
         remove_account_from_profile: "Ta bort konto från den här profilen"
         unregister_service: "Oregistrerad tjänst"
-      twitter_description: "Twitter är en tjänst där man skriver och prenumererar på korta meddelanden.\n\
-          Om du har ett Twitter-konto kan du registrera det här. Om den sedan låter\n\
-          dina kurs/grupp medlemmar se dina registrerade tjänster, kan de\n\
-          enkelt ansluta sig med ditt Twitter-konto.\n\n\
-          Du kan också välja att ha aviseringar skickade till ditt Twitter-konto. \n\
-          Dessa aviseringarna kommer skickas som direkta meddelanden till dig själv\n\
-          från dig själv, och kommer därför inte synas i det offentliga flödet. "
+      twitter_description: |-
+          Twitter är en tjänst där man skriver och prenumererar på korta meddelanden.
+          Om du har ett Twitter-konto kan du registrera det här. Om den sedan låter
+          dina kurs/grupp medlemmar se dina registrerade tjänster, kan de
+          enkelt ansluta sig med ditt Twitter-konto.
+          
+          Du kan också välja att ha aviseringar skickade till ditt Twitter-konto.
+          Dessa aviseringarna kommer skickas som direkta meddelanden till dig själv
+          från dig själv, och kommer därför inte synas i det offentliga flödet.
       unknown_service: Okänd
       web_services: "Canvas kan göra ert jobb mycket enklare genom att ansluta weebbverktygen ni redan använder. Klicka på tjänsterna i \"Andra tjänster\" för att se vad vi menar."
       yo_description: |-
           Yo är ett en-klick och karaktörslöst kommunikationsverkty.
           Om du har ett Yo-konto kan d uregistrear det här. Om du sedan låter
-          dina kurs/gruppmedlemmar se dina registrerade tjänster, kan de 
+          dina kurs/gruppmedlemmar se dina registrerade tjänster, kan de
           enkelt ansluta sif till ditt Yo-konto.
           
           Du kan också välja att få aviseringar skickar till ditt Yo-konto.
@@ -14856,7 +14861,7 @@ sv:
         mute_assignment: "Tysta uppgiften"
       mute_dialog: |-
           Är du säker på att du vill tysta den här uppgiften? När uppgiften är
-          tystad kommer elever inte längre ta emot aviseringar om eller 
+          tystad kommer elever inte längre ta emot aviseringar om eller
           kunna se:
           
           * Aviseringar om betygsändringar
@@ -14866,7 +14871,7 @@ sv:
           
           Elever kan se att uppgiften är tystad.
           
-          När du har tystat uppgiften kan du börja skicka 
+          När du har tystat uppgiften kan du börja skicka
           aviseringar igen genom att klicka på "Avtysta uppgift" 'länken.
     new_course_form: 
       cancel: Avbryt
@@ -15491,7 +15496,7 @@ sv:
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Elevnamn måste döljas eftersom anonym bedömning är aktiverad."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Elevnamn måste döljas efter som detta är en anonym undersökning."
   student_outcome_gradebook_description: |-
-      Elevöverblick för Måluppfyllelse ger eleven en överblick över kursutvecklingen 
+      Elevöverblick för Måluppfyllelse ger eleven en överblick över kursutvecklingen
       baserat på kursens lärandemål. Resultatet presenteras i ett Betygsboks-liknande
       format och utvecklingen visas i både siffror och definierade kategorier.
   student_summary: 
@@ -15888,8 +15893,8 @@ sv:
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Det här meddelandet med ämnet "%{subject}" levererades inte. För att svara på Canvas-meddelanden från den här e-posten, måste den först vara en bekräftad kommunikationskanal i din Canvasprofil. Besök din användarprofil och skicka bekräftelsemeddelandet för den här e-posten igen [Se https://community.canvaslms.com/docs/DOC-2281]. Du kan också kontakta den här personen via CanvasInkorgen [Se https://community.canvaslms.com/docs/DOC-2670].
       
-                Vänliga hälsningar,
-                Canvas Support
+      Vänliga hälsningar,
+      Canvas Support
   the_module_item_is_locked_27fe420b: "Modulföremålet är låst"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Den senaste poängen för användaren %{current_user_name} och bedömningen %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Profilbilden har rapporterats"
@@ -16225,7 +16230,7 @@ sv:
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "För att aktivera SMS, fyll i den fyrsiffriga bekräftelsekoden som skickades till %{sms_number}."
   to_c4c44f4b: till
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
-      För att konfigurera en OpenID Connect leverantör behöver du godkännings- och token urls, och få tag på en Klient ID och Klient hemlighet. 
+      För att konfigurera en OpenID Connect leverantör behöver du godkännings- och token urls, och få tag på en Klient ID och Klient hemlighet.
       
       Om leverantören kan konfigurera giltiga callback eller omdirigera URLs, använd %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "För att länka kursobservatör *%{name}* elev skriver du in elevens namn nedanför för att hitta dem och därefter klickar du på Uppdatera."
