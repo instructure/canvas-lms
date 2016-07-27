@@ -1114,8 +1114,9 @@ mi:
       imported_message: "I kawea pai te raraunga SIS katoa."
       imported_with_messages_message: "I kawemai te raraunga SIS engari ki enei karere:"
       last_batch_title: "Rourou Mutunga"
-      override_sis_stickiness_instructions: "Hei kōwhiringa aunoa, ka noho mataamua ngā paninotanga UI i ngā panonitanga SIS hūnuku; mō ētahi o ngā wāhanga, e kore te SIS hūnuku e whai pānga ki ngā mokamoka mehemea kua panonitia e tētahi kaiwhakahaere tērā wāhanga mā te UI. Mehemea ka tohua e koe tēnei kōwhiringa, ka noho mataamua tēnei hūnukutanga SIS i ngā panonitanga UI.\n\
-          Tirohia ngā kōnae taunaki mō ngā mokamoka. "
+      override_sis_stickiness_instructions: |-
+          Hei kōwhiringa aunoa, ka noho mataamua ngā paninotanga UI i ngā panonitanga SIS hūnuku; mō ētahi o ngā wāhanga, e kore te SIS hūnuku e whai pānga ki ngā mokamoka mehemea kua panonitia e tētahi kaiwhakahaere tērā wāhanga mā te UI. Mehemea ka tohua e koe tēnei kōwhiringa, ka noho mataamua tēnei hūnukutanga SIS i ngā panonitanga UI.
+          Tirohia ngā kōnae taunaki mō ngā mokamoka.
       override_sis_stickiness_label: "Whakaawe huringa UI"
       page_title: "Whakaurunga SIS"
       pending_batches_count: 
@@ -8978,7 +8979,7 @@ mi:
         body: |-
             Ke te ohipa "%{title}" mō te %{course} kua.
             
-            Pāwhiri ki konei kia te taumahi: 
+            Pāwhiri ki konei kia te taumahi:
             %{url}
         html: 
           body: "Ke te ohipa \"%{title}\" mō te %{course} kua."
@@ -9143,7 +9144,7 @@ mi:
         body: |-
             Kua tukua tō haapii huringa auroro me kōrero hou mō te %{title}. Ēnei whakarerekētanga e wātea inaianei.
             
-            Ka taea e tō tiro i te reira i konei: 
+            Ka taea e tō tiro i te reira i konei:
             %{url}
         html: 
           body: "Kua tukua tō haapii huringa auroro me kōrero hou mō te %{title}. Ēnei whakarerekētanga e wātea inaianei."
@@ -9191,7 +9192,7 @@ mi:
             Ētahi atu info i %{link}
       summary: 
         body: |-
-            I karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te 
+            I karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te
             %{course_or_group}. I hanga te tuhinga i roto i te %{service}
             a i karangatia e koe te whakamahi i tō wāhitau īmēra, %{email}.
         body_with_user: |-
@@ -11718,10 +11719,11 @@ mi:
         consumer_key: "kī Consumer"
         consumer_secret: "kiritaki Secret"
     webct_scraper_settings: 
-      description: "Mehemea kahore te wharewānanga e whakamahi i ngā \"Ngohe Ako\" WebCT's (me ngā kura kua tāpae i te WebCT ki roto i ā rātou mahi\n\
-          i mua i te 4.0, i te wā i wātea ngā ngohe), ka māmā ake te hūnuku kaupapa mā te hūnuku i te \"Kiko Kaupapa\"\n\
-          hei Ngohe Canvas, kaua hei \"Ngohe Ako\". Mā tēnei whārangi e tāea ai te panoni i ngā whakaritenga aunoa o te kaihūnuku WebCT\n\
-          kia hāngai ki ngā ngohe kiko. Kia mahara te tangata, ahakoa ka mau tonu te aheinga o ngā hūnukutanga kaupapa motuhake ki te kōwhiri, ka whakamahia rawatia e te kaihūnuku matua  te uara ka whakaritea i konei, e kore hoki e āhei kia panonitia i ia hūnukutanga.  "
+      description: |-
+          Mehemea kahore te wharewānanga e whakamahi i ngā "Ngohe Ako" WebCT's (me ngā kura kua tāpae i te WebCT ki roto i ā rātou mahi
+          i mua i te 4.0, i te wā i wātea ngā ngohe), ka māmā ake te hūnuku kaupapa mā te hūnuku i te "Kiko Kaupapa"
+          hei Ngohe Canvas, kaua hei "Ngohe Ako". Mā tēnei whārangi e tāea ai te panoni i ngā whakaritenga aunoa o te kaihūnuku WebCT
+          kia hāngai ki ngā ngohe kiko. Kia mahara te tangata, ahakoa ka mau tonu te aheinga o ngā hūnukutanga kaupapa motuhake ki te kōwhiri, ka whakamahia rawatia e te kaihūnuku matua  te uara ka whakaritea i konei, e kore hoki e āhei kia panonitia i ia hūnukutanga.
       labels: 
         allow_outline_selection: "Whakaatu kōwhiringa ki te whakamahi i Ihirangi Akoranga rite Kōwae i roto i te ruānuku hekenga"
         folders_as_outline: "Whakamahia te WebCT \"Kiko Kaupapa\" hei whakaritenga aunoa mō ngā ngohe"
