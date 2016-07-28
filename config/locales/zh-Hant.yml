@@ -12108,7 +12108,7 @@ zh-Hant:
         register_sms: 註冊簡訊
       carriers: 
         one: 其他承運人
-        other: c5cd9a04fead4ea4c00c3ecd0f353ba2_tr
+        other: 其他承運人
       confirming_contact: 正在確認…
       contact_types: 
         sms: 簡訊
