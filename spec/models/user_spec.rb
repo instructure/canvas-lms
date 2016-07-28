@@ -2718,6 +2718,19 @@ describe User do
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
       end
+
+      it 'checks all shards, even if not actually associated' do
+        target = user()
+        # create account on another shard
+        account = @shard1.activate{ Account.create! }
+        # associate target user with that account
+        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
+        # create seeking user as admin on that account
+        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
+        seeker.stubs(:associated_shards).returns([])
+        # ensure seeking user gets permissions it should on target user
+        expect(target.grants_right?(seeker, :view_statistics)).to eq true
+      end
     end
   end
 
