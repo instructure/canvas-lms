@@ -12174,7 +12174,7 @@ zh-Hans:
         register_sms: 注册短信
       carriers: 
         one: 其它运营商
-        other: c5cd9a04fead4ea4c00c3ecd0f353ba2_tr
+        other: 其他运营商
       confirming_contact: 正在确认...
       contact_types: 
         sms: sms
