@@ -102,6 +102,7 @@ class ContentExport < ActiveRecord::Base
     self.workflow_state = 'exporting'
     self.save
     begin
+      self.job_progress.try :reset!
       self.job_progress.try :start!
 
       @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
