@@ -11731,7 +11731,7 @@ fa:
         register_sms: "ثبت پیامک"
       carriers: 
         one: "حامل های دیگر"
-        other: c5cd9a04fead4ea4c00c3ecd0f353ba2_tr
+        other: "حامل های دیگر"
       confirming_contact: "درحال تأیید..."
       contact_types: 
         sms: پیامک
