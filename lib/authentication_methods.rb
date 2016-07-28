@@ -288,11 +288,8 @@ module AuthenticationMethods
       format.html {
         store_location
         flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
-# <<<<<<< HEAD
-        opts = {}
         if params[:canvas_login]
-          opts[:canvas_login] = 1
-          redirect_to login_url(opts)
+          redirect_to login_url(params.slice(:canvas_login, :authentication_provider))
           return
         else
           # This code is borrowed from the login/cas_controller
@@ -301,16 +298,15 @@ module AuthenticationMethods
         end
 
         if scope.empty?
-          redirect_to login_url(opts)
+          redirect_to login_url(params.slice(:canvas_login, :authentication_provider))
+          return
         else
           #... so if SSO is set, we can send them there directly, instead of through
           # two other Canvas middleman pages, shaving a noticiable amount of time off
           # for the user to experience
           redirect_to delegated_auth_redirect_uri(url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id))))
+          return
         end
-# =======
-        redirect_to login_url(params.slice(:canvas_login, :authentication_provider))
-# >>>>>>> 872f9b2ed3bc532908b77bdbf231e83979896e9f
       }
       format.json { render_json_unauthorized }
     end

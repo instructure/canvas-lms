@@ -194,7 +194,7 @@ namespace :deploy do
             # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
-            execute :npm, 'cache clear' # Was getting "npm ERR! cb() never called!".
+            execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
             execute :npm, 'install', '--silent'
             #execute :npm, '-d install' # print debug log of npm install
             execute :rake, 'canvas:compile_assets'
