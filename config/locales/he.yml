@@ -1149,8 +1149,10 @@ he:
       recently_started_courses_title: "קורסים שהחלו לאחרונה"
       started_at: "החל ב%{at}"
       title_data_point_over_time: "%{data_point}  לאורך זמן"
-      uploaded_data: ~
-      uploaded_file_storage_header: ""
+      uploaded_data: 
+        one: "%{file_size} *מתוך %{count} קבצים*"
+        other: "%{file_size} *מתוך %{count} קבצים*"
+      uploaded_file_storage_header: "אחסון קבצים שהועלו"
     student_assessment_scores_csv_parameters: 
       account_reports: 
         orbis: 
@@ -11968,7 +11970,9 @@ he:
       one: "שעה אחת"
       other: "%{count} שעות"
     duration_in_hours_and_minutes: "%{hours} ו %{minutes}"
-    duration_in_minutes: ~
+    duration_in_minutes: 
+      one: "%{count} דקות"
+      other: "%{count} דקות"
     duration_in_minutes_and_seconds: "%{minutes}  ו %{seconds}"
     duration_in_seconds: 
       one: "שניה אחת"
