@@ -294,7 +294,7 @@ module AuthenticationMethods
         else
           # This code is borrowed from the login/cas_controller
           # it looks up the SSO url...
-          scope = @domain_root_account.account_authorization_configs.where(auth_type: 'cas')
+          scope = @domain_root_account.authentication_providers.active.where(auth_type: 'cas')
         end
 
         if scope.empty?
