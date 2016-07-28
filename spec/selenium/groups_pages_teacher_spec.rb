@@ -21,11 +21,16 @@ describe "groups" do
   setup_group_page_urls
 
   context "as a teacher" do
-    before do
-      course_with_teacher_logged_in(active_all: true)
+    before :once do
+      @course = course_model.tap(&:offer!)
+      @teacher = teacher_in_course(course: @course, name: 'teacher', active_all: true).user
       group_test_setup(4,1,1)
       # adds all students to the group
       add_users_to_group(@students,@testgroup.first)
+    end
+
+    before :each do
+      user_session(@teacher)
     end
 
     #-------------------------------------------------------------------------------------------------------------------
@@ -88,6 +93,16 @@ describe "groups" do
         expect(ff('.student_roster .user_name').size).to eq 4
         expect(ff('.teacher_roster .user_name').size).to eq 2
       end
+
+      it "shows both active and inactive members in groups to teachers", priority: "2", test_id: 2771091 do
+        get people_page
+        expect(ff('.student_roster .user_name').size).to eq 4
+        student_enrollment = StudentEnrollment.last
+        student_enrollment.workflow_state = "inactive"
+        student_enrollment.save!
+        refresh_page
+        expect(ff('.student_roster .user_name').size).to eq 4
+      end
     end
 
     #-------------------------------------------------------------------------------------------------------------------
@@ -144,6 +159,20 @@ describe "groups" do
         @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
         # Verifies teacher can access the group page & that it's the correct page
         verify_member_sees_group_page
+      end
+
+      it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
+        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
+        get pages_page
+        expect(f('.index-content')).to contain_css('.wiki-page-link')
+
+        category = @course.group_categories.create!(:name => "Group Category")
+        @group_category.first.clone_groups_and_memberships(category)
+        category.reload
+        new_group = category.groups.first
+
+        get "/groups/#{new_group.id}/pages"
+        expect(f('.index-content')).not_to contain_css('.wiki-page-link')
       end
     end
 
