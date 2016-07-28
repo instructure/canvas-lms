@@ -12158,7 +12158,7 @@ ja:
         register_sms: "SMS の登録"
       carriers: 
         one: その他の通信事業者
-        other: c5cd9a04fead4ea4c00c3ecd0f353ba2_tr
+        other: その他の通信事業者
       confirming_contact: 確認しています...
       contact_types: 
         sms: SMS
