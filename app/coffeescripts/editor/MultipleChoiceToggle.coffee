@@ -1,4 +1,9 @@
-define ['jquery', 'str/htmlEscape', 'compiled/editor/EditorToggle'], ($, htmlEscape, EditorToggle) ->
+define [
+  'jquery',
+  'str/htmlEscape',
+  'compiled/editor/EditorToggle',
+  'jsx/shared/rce/RceCommandShim'
+  ], ($, htmlEscape, EditorToggle, RceCommandShim) ->
 
   ##
   # Toggles a multiple choice quiz answer between an editor and an element
@@ -41,9 +46,9 @@ define ['jquery', 'str/htmlEscape', 'compiled/editor/EditorToggle'], ($, htmlEsc
       id = @textArea.attr('id')
       @answerText.hide()
       if @content is ''
-        tinyMCE.get(id).setContent htmlEscape(@answerText.val())
+        RceCommandShim.send(@textArea, 'set_code', htmlEscape(@answerText.val()))
       else
-        tinyMCE.get(id).setContent @content
+        RceCommandShim.send(@textArea, 'set_code', @content)
 
     ##
     # Shows the original <input type=text> that the editor replaces and hides
@@ -74,4 +79,3 @@ define ['jquery', 'str/htmlEscape', 'compiled/editor/EditorToggle'], ($, htmlEsc
     # @api private
     isEmpty: ->
       $.trim(@content) is ''
-
