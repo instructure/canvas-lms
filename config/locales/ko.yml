@@ -11324,7 +11324,7 @@ ko:
         register_sms: "SMS 등록"
       carriers: 
         one: "다른 통신사"
-        other: c5cd9a04fead4ea4c00c3ecd0f353ba2_tr
+        other: "다른 통신사"
       confirming_contact: "확인 중..."
       contact_types: 
         sms: SMS
