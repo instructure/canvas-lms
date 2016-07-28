@@ -6880,8 +6880,10 @@ tr:
   gradebook2: 
     alerts: 
       11b259af82bf8e10c775e62a960a42ad_trall_sections: "Tüm Bölümler"
-      scores_updated: ~
-    all_sections: ""
+      scores_updated: 
+        one: "%{count} Öğrenci puanı güncellendi"
+        other: "%{count} Öğrenci puanı güncellendi"
+    all_sections: "Tüm Bölümler"
     assignment_muted: "Ödev bekletiliyor"
     column_header: 
       assignment_options: "Ödev Seçenekleri"
@@ -7570,8 +7572,10 @@ tr:
         leave_group: "bu gruptan ayrıl"
         switch_group: "bu gruba geçiş yap"
       group_full: "grup dolu"
-      member: ~
-      member_tooltip_show: ""
+      member: 
+        one: "%{count} üye"
+        other: "%{count} üye"
+      member_tooltip_show: "Grup listesini göster"
       no_members: "Hiç üye yok"
       one: "1 Grup"
       other: "%{count} Gruplar"
@@ -8675,10 +8679,12 @@ tr:
         html: 
           22cb2802d2a1a46dc03644e6c57fe720_trbody_student: ~
           bb1293c448399deb95383f47b10260e5_trinteraction_description: "%{count} gündür öğrenci/öğretmen etkileşimi yok"
-          body: ~
+          body: 
+            one: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
+            other: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
           body_student: 
             one: ""
-            other: ""
+            other: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
           interaction_description: "%{count} gündür öğrenci/öğretmen etkileşimi yok"
           subject: "Uyarı: %{user_name}"
           ungraded_count_description: "%{count} veya daha fazla gönderi henüz notlandırılmadı"
@@ -8696,15 +8702,17 @@ tr:
         more_info: "Daha fazla bilgi için %{url}"
       summary: 
         687d5e89f7426960611546e8d90b3bfe_trbody_student: ~
-        body: ~
+        body: 
+          one: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
+          other: "Aşağıdaki koşullar sağlandığı için %{student} için bir uyarı mesajı gönderildi:"
         body_student: 
           one: ""
-          other: ""
+          other: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
         e67827e04a8a403ca7c0fd5e171d44e0_trinteraction_description: 
           one: "Bir gündür öğrenci/öğretmen etkileşimi yok"
           other: "%{count} veya daha fazla gündür öğrenci/öğretmen etkileşimi yok"
         interaction_description: 
-          one: ""
+          one: "Bir gündür öğrenci/öğretmen etkileşimi yok"
           other: "%{count} veya daha fazla gündür öğrenci/öğretmen etkileşimi yok"
         subject: "Uyarı: %{user_name}"
         ungraded_count_description: 
@@ -11198,7 +11206,9 @@ tr:
       artifacts: 
         one: "1 eser"
         other: "%{count} eser"
-      attempts: ~
+      attempts: 
+        one: "%{count} hak"
+        other: "%{count} hak"
       attempts_from_artifacts: "*%{artifacts}'lardan* %{attempts}"
       labels: 
         see_results: "%{user_name}'ın sonuçlarını görün"
@@ -12430,7 +12440,9 @@ tr:
       one: "1 saat"
       other: "%{count} saat"
     duration_in_hours_and_minutes: "%{hours} ve %{minutes}"
-    duration_in_minutes: ~
+    duration_in_minutes: 
+      one: "%{count} dakika"
+      other: "%{count} dakika"
     duration_in_minutes_and_seconds: "%{minutes} ve %{seconds}"
     duration_in_seconds: 
       one: "1 saniye"
