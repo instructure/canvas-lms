@@ -1,11 +1,12 @@
 class SortsAssignments
 
-  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :upcoming, :future]
+  VALID_BUCKETS = [:past, :overdue, :undated, :ungraded, :unsubmitted, :upcoming, :future]
   AssignmentsSortedByDueDate = Struct.new(*VALID_BUCKETS)
 
   def self.by_due_date(opts)
     assignments = opts.fetch( :assignments )
     user = opts.fetch( :user )
+    current_user = opts[:current_user] || opts.fetch( :user )
     session = opts.fetch( :session )
     submissions = opts.fetch( :submissions )
     upcoming_limit = opts[:upcoming_limit] || 1.week.from_now
@@ -14,7 +15,8 @@ class SortsAssignments
       past(assignments),
       overdue(assignments, user, session, submissions),
       undated(assignments),
-      ungraded_for_user_and_session(assignments, user, session),
+      ungraded_for_user_and_session(assignments, user, current_user, session),
+      unsubmitted_for_user_and_session(assignments, user, current_user, session),
       upcoming(assignments, upcoming_limit),
       future(assignments)
     )
@@ -35,6 +37,15 @@ class SortsAssignments
     assignments.select{ |assignment| assignment.due_at == nil }
   end
 
+  def self.unsubmitted_for_user_and_session(assignments, user, current_user, session)
+    assignments ||= []
+    assignments.select do |assignment|
+      assignment.grants_right?(current_user, session, :grade) &&
+        assignment.expects_submission? &&
+        assignment.submission_for_student(user)[:id].blank?
+    end
+  end
+
   def self.upcoming(assignments, limit=1.week.from_now)
     assignments ||= []
     dated(assignments).select{ |a| due_between?(a,Time.now,limit) }
@@ -52,10 +63,10 @@ class SortsAssignments
     dated(assignments).select{ |assignment| assignment.due_at > time }
   end
 
-  def self.ungraded_for_user_and_session(assignments,user,session)
+  def self.ungraded_for_user_and_session(assignments, user, current_user, session)
     assignments ||= []
     assignments.select do |assignment|
-      assignment.grants_right?(user, session, :grade) &&
+      assignment.grants_right?(current_user, session, :grade) &&
         assignment.expects_submission? &&
         Assignments::NeedsGradingCountQuery.new(assignment, user).count > 0
     end
@@ -87,7 +98,7 @@ class SortsAssignments
       without_graded_submission(assignments, submissions)
   end
 
-  def self.bucket_filter(given_scope, bucket, session, user, context, submissions_for_user)
+  def self.bucket_filter(given_scope, bucket, session, user, current_user, context, submissions_for_user)
     overridden_assignments = given_scope.map{|a| a.overridden_for(user)}
 
     observed_students = ObserverEnrollment.observed_students(context, user)
@@ -100,10 +111,10 @@ class SortsAssignments
     sorted_assignments = self.by_due_date(
       :assignments => overridden_assignments,
       :user => user_for_sorting,
+      :current_user => current_user,
       :session => session,
       :submissions => submissions_for_user
     )
-
     filtered_assignment_ids = sorted_assignments.send(bucket).map(&:id)
     given_scope.where(id: filtered_assignment_ids)
   end

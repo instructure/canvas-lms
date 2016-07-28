@@ -797,6 +797,7 @@ class ApplicationController < ActionController::Base
     @upcoming_assignments = sorted.upcoming
     @future_assignments = sorted.future
     @overdue_assignments = sorted.overdue
+    @unsubmitted_assignments = sorted.unsubmitted
 
     condense_assignments if requesting_main_assignments_page?
 
@@ -810,7 +811,8 @@ class ApplicationController < ActionController::Base
       @past_assignments,
       @ungraded_assignments,
       @undated_assignments,
-      @future_assignments
+      @future_assignments,
+      @unsubmitted_assignments
     ]
   end
 
