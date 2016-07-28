@@ -1165,10 +1165,8 @@ define [
         $('#download_csv').prop('disabled', true)
         $('.icon-import').parent().focus()
         loading_interval = self.exportingGradebookStatus()
-        include_priors = $('#show_concluded_enrollments').prop('checked')
 
         params =
-          include_priors: include_priors
           grading_period_id: @getGradingPeriodToShow()
 
         $.ajaxJSON(

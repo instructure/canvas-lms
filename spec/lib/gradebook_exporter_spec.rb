@@ -26,7 +26,8 @@ describe GradebookExporter do
   end
 
   describe "#to_csv" do
-    let(:course)    { @course }
+    let(:course) { @course }
+    let(:teacher) { @teacher }
 
     def exporter(opts = {})
       GradebookExporter.new(course, @teacher, opts)
@@ -193,6 +194,15 @@ describe GradebookExporter do
 
       student1_enrollment.deactivate
       student2_enrollment.deactivate
+
+      teacher.preferences[:gradebook_settings] =
+      { course.id =>
+        {
+          'show_inactive_enrollments' => 'true',
+          'show_concluded_enrollments' => 'false'
+        }
+      }
+      teacher.save!
 
       csv = exporter.to_csv
       rows = CSV.parse(csv, headers: true)

@@ -18,6 +18,7 @@
 
 class GradebookExporter
   include GradebookTransformer
+  include GradebookSettingsHelpers
 
   def initialize(course, user, options = {})
     @course  = course
@@ -26,9 +27,9 @@ class GradebookExporter
   end
 
   def to_csv
-    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.admin_visible_student_enrollments
-    enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
-    student_enrollments = enrollments_for_csv(enrollments_scope, @options)
+    enrollment_scope = @course.apply_enrollment_visibility(gradebook_enrollment_scope, @user, nil,
+                                                           include: gradebook_includes)
+    student_enrollments = enrollments_for_csv(enrollment_scope, @options)
 
     student_section_names = {}
     student_enrollments.each do |enrollment|

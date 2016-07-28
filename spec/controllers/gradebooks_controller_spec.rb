@@ -454,7 +454,7 @@ describe GradebooksController do
           exporter = GradebookExporter.new(
             @course,
             @teacher,
-            { include_priors: false, include_sis_id: true }
+            { include_sis_id: true }
           )
           raw_csv = exporter.to_csv
           expect(raw_csv).to include("Déjà vu")
