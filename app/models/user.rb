@@ -1009,11 +1009,19 @@ class User < ActiveRecord::Base
     # check if the user we are given is an admin in one of this user's accounts
     return false unless user
     return true if Account.site_admin.grants_right?(user, sought_right)
-    # what shards do the seeker and target share? only check accounts on those
-    # shards, to avoid too many queries.
-    shards = self.associated_shards & user.associated_shards
-    return false if shards.empty?
-    return self.associated_accounts.shard(shards).any?{|a| a.grants_right?(user, sought_right) }
+    common_shards = associated_shards & user.associated_shards
+    search_method = ->(shard) do
+      associated_accounts.shard(shard).any?{|a| a.grants_right?(user, sought_right) }
+    end
+
+    # search shards the two users have in common first, since they're most likely
+    return true if common_shards.any?(&search_method)
+
+    # now do an exhaustive search, since it's possible to have admin permissions for accounts
+    # you're not associated with
+    return true if (associated_shards - common_shards).any?(&search_method)
+
+    false
   end
 
   set_policy do
