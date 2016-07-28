@@ -11,12 +11,6 @@ define [
   xsslint safeString.property content
   ###
 
-  # Simply returns a unique number with each call
-  _nextID = 0
-  nextID = ->
-    _nextID += 1
-    return "editor-toggle-"+_nextID
-
   ##
   # Makes an EntryView's model message editable with TinyMCE
   #
@@ -32,26 +26,8 @@ define [
     constructor: (@view) ->
       super @getEditingElement(),
         switchViews: true
-        rceOptions: {manageParent: true}
       @cancelButton = @createCancelButton()
       @done.addClass 'btn-small'
-
-    ##
-    # Overwrites parent and will be called by parent's display.
-    # Handles the problem of not having the correct reference to
-    # the textArea on the page when using RCS.
-    replaceTextArea: ->
-      newTextArea = RichContentEditor.freshNode(@textArea)
-      @el.insertBefore newTextArea
-      RichContentEditor.destroyRCE(@textArea)
-      newTextArea.detach()
-
-    ##
-    # Overwrites parent and will be called by parent's display.
-    # Makes sure the textArea reference has an ID (apparently
-    # tinyMCE will hold on to it otherwise)
-    renewTextAreaID: ->
-      @textArea.attr 'id', nextID()
 
     ##
     # Extends EditorToggle::display to save the model's message.
@@ -70,16 +46,6 @@ define [
         ,
           success: @onSaveSuccess
           error: @onSaveError
-
-    ##
-    # Makes sure the textarea has an id
-    # @api private
-    createTextArea: ->
-      result = super
-      if result.attr('id')
-        result
-      else
-        result.attr('id',nextID())
 
     createCancelButton: ->
       $('<a/>')
