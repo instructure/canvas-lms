@@ -9464,7 +9464,7 @@ es:
         body_student: "%{user} acaba de aceptar la invitación para patricipar en el curso, %{course}, como estudiante."
         body_ta: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como AP."
         body_teacher: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como profesor."
-        subject: "%{user} aceptó el Invitación al Curso"
+        subject: "%{user} aceptó la Invitación al Curso"
       twitter: 
         body: "Alerta de Canvas - Aceptado: %{user}, %{enrollment_type}, curso, %{course}"
     enrollment_invitation: 
