@@ -124,6 +124,26 @@ module Api
                                   '<script src="https://example.com/root/account.js"></script>' \
                                   '<script src="https://example.com/child/account.js"></script>'
         end
+
+        it "includes brand_config css & js from site admin even if no account in chain have a brand_config" do
+          string = "<div>stuff</div>"
+
+          site_admin_bc = Account.site_admin.create_brand_config!({
+            mobile_css_overrides: 'https://example.com/site_admin/account.css',
+            mobile_js_overrides: 'https://example.com/site_admin/account.js'
+          })
+
+          child_account = Account.default.sub_accounts.create!(name: 'child account')
+          child_account.save!
+          child_account.root_account.enable_feature! :use_new_styles
+
+          html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
+          expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/site_admin/account.css">' \
+                                  '<div>stuff</div>' \
+                                  '<script src="https://example.com/site_admin/account.js"></script>'
+        end
+
+
       end
     end
   end

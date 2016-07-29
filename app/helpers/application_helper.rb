@@ -784,6 +784,8 @@ module ApplicationHelper
     includes = if use_new_styles?
       if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
         abc.css_and_js_overrides[:js_overrides]
+      else
+        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :js_overrides)
       end
     else
       get_global_includes.each_with_object([]) do |global_include, memo|
@@ -825,6 +827,8 @@ module ApplicationHelper
     includes = if use_new_styles?
       if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
         abc.css_and_js_overrides[:css_overrides]
+      else
+        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :css_overrides)
       end
     else
       get_global_includes.each_with_object([]) do |global_include, css_includes|

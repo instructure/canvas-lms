@@ -591,13 +591,17 @@ describe ApplicationHelper do
             expect(output).to match %r{https://example.com/path/to/overrides.css}
           end
 
-          it "should include site admin css" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+          it "should include site_admin css even if there is no active brand" do
+            helper.stubs(:active_brand_config).returns nil
+            Account.site_admin.create_brand_config!({
+              css_overrides: 'https://example.com/site_admin/account.css',
+              js_overrides: 'https://example.com/site_admin/account.js'
+            })
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output).to match %r{https://example.com/site_admin/account.css}
           end
 
-          it "should include site admin css first" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
-          end
 
           it "should not include anything if param is set to 0" do
             helper.stubs(:active_brand_config).returns BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
@@ -670,9 +674,6 @@ describe ApplicationHelper do
             expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [["root"], ["child"], ["grandchild"]]
           end
 
-          it "should include site admin css/js" do
-            raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
-          end
         end
       end
 
@@ -698,12 +699,19 @@ describe ApplicationHelper do
             expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
           end
 
+          it "should include site_admin javascript even if there is no active brand" do
+            helper.stubs(:active_brand_config).returns nil
+            Account.site_admin.create_brand_config!({
+              css_overrides: 'https://example.com/site_admin/account.css',
+              js_overrides: 'https://example.com/site_admin/account.js'
+            })
+
+            output = helper.include_account_js
+            expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/site_admin\\/account.js}
+          end
+
           context "sub-accounts" do
             before { set_up_subaccounts }
-
-            it "should include site admin javascript" do
-              raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
-            end
 
             it "should just include domain root account's when there is no context or @current_user" do
               output = helper.include_account_js
