@@ -2533,12 +2533,12 @@ nn:
       create_event: "Opprett ny hending"
       done_go_back_to_list: "Fullført, du kan gå tilbake til lista"
       links: 
-        accessibility_warning: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke bruk dagsordenvisinga."
-        calendar_agenda: Dagsorden
+        accessibility_warning: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke listevisinga."
+        calendar_agenda: Listevising
         calendar_month: Månad
         calendar_scheduler: Planleggar
         calendar_week: Veke
-        improved_accessibility_recommend_agenda: "Åtvaring: Dersom du vil ha betre tilgang, kan du bruke \"Dagsordenvising\" i kalenderen."
+        improved_accessibility_recommend_agenda: "Åtvaring: Dersom du vil ha betre tilgang, kan du bruke \"Listevising\" i kalenderen."
       loading: Lastar
       my_appointment_groups: "Mine avtalegrupper"
     calendar_navigator: 
@@ -15461,7 +15461,7 @@ nn:
   warning_aacb8c24: Åtvaring
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Åtvaring: Crocodoc har avgrensa bruk i Firefox. Kommentarar vert ikkje alltid lagra."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Åtvaring: Dersom du vil ha betre tilgang til å flytte filer, kan du bruke Flytt til dialog-elementet som du finn i menyen."
-  warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke dagsordenvisinga."
+  warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke listevisinga."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere oppgåver og grupper, må du velje alternativet Flytt til dialog, i menyen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Åtvaring: Dersom du vil ha betre tilgang, kan du klikke her og bruke karakterbok med individuell vising. "
   warnings: 
