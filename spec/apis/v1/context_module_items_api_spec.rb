@@ -1024,6 +1024,99 @@ describe "Module Items API", type: :request do
       end
     end
 
+    context "index including mastery_paths (CYOE)" do
+      def has_assignment_model?(item)
+        rules = item.deep_symbolize_keys
+        return false unless rules[:mastery_paths].present?
+        rules[:mastery_paths][:assignment_sets].find do |set|
+          set[:assignments].find do |asg|
+            asg.key? :model
+          end
+        end
+      end
+
+      before :once do
+        @cyoe_module1 = @course.context_modules.create!(:name => "cyoe_module1")
+        @cyoe_module2 = @course.context_modules.create!(:name => "cyoe_module2")
+        @cyoe_module3 = @course.context_modules.create!(:name => "cyoe_module3")
+
+        [@cyoe_module1, @cyoe_module2, @cyoe_module3].each do |mod|
+          mod.add_item(:id => @assignment.id, :type => 'assignment')
+          mod.add_item(:id => @quiz.id, :type => 'quiz')
+          mod.add_item(:id => @topic.id, :type => 'discussion_topic')
+          mod.add_item(:id => @wiki_page.id, :type => 'wiki_page')
+        end
+      end
+
+      before :each do
+        Rails.cache.clear
+        resp = [{
+                  locked: false,
+                  trigger_assignment: @quiz.assignment_id,
+                  assignment_sets: [{
+                    id: 1,
+                    scoring_range_id: 1,
+                    created_at: @assignment.created_at,
+                    updated_at: @assignment.updated_at,
+                    position: 1,
+                    assignments: [{
+                      id: 1,
+                      assignment_id: @assignment.id,
+                      created_at: @assignment.created_at,
+                      updated_at: @assignment.updated_at,
+                      assignment_set_id: 1,
+                      position: 1
+                    }]
+                  }]
+                }]
+        ConditionalRelease::Service.stubs(headers_for: {}, submissions_for: [],
+          domain_for: "canvas.xyz", "enabled_in_context?" => true,
+          rules_summary_url: "cyoe.abc/rules", request_rules: resp)
+      end
+
+      describe "CYOE interaction" do
+        it "makes a request to the CYOE service when included" do
+          ConditionalRelease::Service.expects(:request_rules).once
+
+          api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module1.id}/items?include[]=mastery_paths",
+            :controller => "context_module_items_api", :action => "index", :format => "json",
+            :course_id => @course.id.to_s, :module_id => @cyoe_module1.id.to_s,
+            :include => ['mastery_paths'])
+        end
+      end
+
+      describe "module item list response data" do
+        it "includes conditional release information from CYOE" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
+          :controller => "context_module_items_api", :action => "index", :format => "json",
+          :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
+          mastery_paths = json.all? { |item| item.key? 'mastery_paths' }
+          expect(mastery_paths).to be_truthy
+        end
+
+        it "includes model data merge from Canvas" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
+            :controller => "context_module_items_api", :action => "index", :format => "json",
+            :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
+          models = json.any? { |item| has_assignment_model?(item) }
+          expect(models).to be_truthy
+        end
+      end
+
+      describe "caching CYOE data" do
+        it "uses the cache when requested again" do
+          ConditionalRelease::Service.expects(:request_rules).once
+
+          3.times do
+            api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
+              :controller => "context_module_items_api", :action => "index", :format => "json",
+              :course_id => @course.id.to_s, :module_id => @cyoe_module3.id.to_s,
+              :include => ['mastery_paths'])
+          end
+        end
+      end
+    end
+
     context 'show including content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
