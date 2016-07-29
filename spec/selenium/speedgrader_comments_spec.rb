@@ -187,11 +187,10 @@ describe "speed grader" do
           s.add_comment(author: @teacher1, comment: 'Just a comment by teacher1')
           s.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
         end
-
-        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       end
 
       it 'decreases the number of published comments' do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         delete_links = ff('#comments .comment > a.delete_comment_link').select(&:displayed?)
 
         expect {
@@ -203,6 +202,7 @@ describe "speed grader" do
       end
 
       it 'removes the deleted comment from the list of comments' do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         delete_links = ff('#comments .comment > a.delete_comment_link').select(&:displayed?)
 
         delete_links[0].click
