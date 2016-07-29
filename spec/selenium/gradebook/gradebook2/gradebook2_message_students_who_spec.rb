@@ -79,6 +79,7 @@ describe "gradebook2 - message students who" do
 
     # expect dialog to show 1 more student with the "Haven't been graded" option
     f('[data-action="messageStudentsWho"]').click
+    wait_for_ajaximations
     visible_students = ffj('.student_list li:visible')
     expect(visible_students.size).to eq 2
     expect(visible_students[0].text.strip).to include @student_name_1
