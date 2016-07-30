@@ -4,9 +4,10 @@ require 'net/https'
 require 'json'
 
 module Canvadocs
-  RENDER_O365 = 'office_365'
-  RENDER_BOX = 'box_view'
+  RENDER_O365     = 'office_365'
+  RENDER_BOX      = 'box_view'
   RENDER_CROCODOC = 'crocodoc'
+  RENDER_PDFJS    = 'pdfjs'
 
   # Public: A small ruby client that wraps the Box View api.
   #
