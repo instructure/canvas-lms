@@ -5,8 +5,6 @@ define([], () => {
     imageUrl: '',
     showModal: false,
     gettingImage: false,
-    removeImage: false,
-    hiddenInputName: ''
   };
 
   return initialState;

@@ -77,10 +77,11 @@ define([
     deepEqual(actual, expected, 'the objects match');
   });
 
-  test('prepareSetImage with a imageUrl calls setCourseImageId', () => {
-    sinon.spy(Actions, 'setCourseImageId');
-    Actions.prepareSetImage('http://imageUrl', 12);
-    ok(Actions.setCourseImageId.called, 'setCourseImageId was called');
+  test('prepareSetImage with a imageUrl calls putImageData', () => {
+    sinon.spy(Actions, 'putImageData');
+    Actions.prepareSetImage('http://imageUrl', 12, 0);
+    ok(Actions.putImageData.called, 'putImageData was called');
+    Actions.putImageData.restore();
   });
 
   asyncTest('prepareSetImage without a imageUrl calls the API to get the url', () => {
@@ -98,17 +99,12 @@ define([
       }
     };
 
-    const expectedAction = {
-      type: 'SET_COURSE_IMAGE_ID',
-      payload: {
-        imageUrl: 'http://imageUrl',
-        imageId: 1
-      }
-    };
+    sinon.spy(Actions, 'putImageData');
 
-    Actions.prepareSetImage(null, 1, fakeAjaxLib)((dispatched) => {
+    Actions.prepareSetImage(null, 1, 0, fakeAjaxLib)((dispatched) => {
       start();
-      deepEqual(dispatched, expectedAction, 'the proper action was dispatched');
+      ok(Actions.putImageData.called, 'putImageData was called indicating successfully hit API');
+      Actions.putImageData.restore();
     });
   });
 
@@ -177,17 +173,12 @@ define([
       preventDefault: () => {}
     };
 
-    const expectedAction = {
-      type: 'SET_COURSE_IMAGE_ID',
-      payload: {
-        imageUrl: 'http://fileDownloadUrl',
-        imageId: 1
-      }
-    };
+    sinon.spy(Actions, 'prepareSetImage');
 
     Actions.uploadFile(fakeDragonDropEvent, 1, fakeAjaxLib)((dispatched) => {
       start();
-      deepEqual(dispatched, expectedAction, 'the SET_COURSE_IMAGE_ID action was fired');
+      ok(Actions.prepareSetImage.called, 'prepareSetImage was called');
+      Actions.prepareSetImage.restore();
     });
   })
 

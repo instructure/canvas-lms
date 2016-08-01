@@ -19,23 +19,17 @@ define([
       state.imageUrl = action.payload.imageUrl;
       state.courseImage = action.payload.imageId;
       state.showModal = false;
-      state.removeImage = false;
-      state.hiddenInputName = "course[image_id]"
       return state;
     },
     SET_COURSE_IMAGE_URL (state, action) {
       state.imageUrl = action.payload.imageUrl;
       state.courseImage = action.payload.imageUrl;
       state.showModal = false;
-      state.removeImage = false;
-      state.hiddenInputName = "course[image_url]";
       return state;
     },
     REMOVE_IMAGE (state) {
       state.imageUrl = '';
       state.courseImage = 'abc';
-      state.removeImage = true;
-      state.hiddenInputName = "course[remove_image]";
       return state;
     }
   };

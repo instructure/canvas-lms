@@ -23,13 +23,6 @@ define([
     ok(component);
   });
 
-  test('the hidden input reflects the state value of the selector', () => {
-    const component = TestUtils.renderIntoDocument(
-      <CourseImageSelector store={fakeStore} />
-    );
-    equal(React.findDOMNode(component.refs.hiddenInput).value, initialState.courseImage, 'the input matches');
-  });
-
   test('it sets the background image style properly', () => {
     const dispatchStub = sinon.stub(fakeStore, 'getState').returns(Object.assign(initialState, {
       imageUrl: 'http://coolUrl'
