@@ -1416,7 +1416,7 @@ describe Submission do
         s = @assignment.submit_homework(@student1,
                                         submission_type: "online_upload",
                                         attachments: [@attachment])
-        expect(s.canvadocs).to eq [@attachment.canvadoc]
+        expect(@attachment.canvadoc.submissions).to eq [s]
       end
 
       it "create records for each group submission" do
@@ -1432,7 +1432,7 @@ describe Submission do
 
         [@student1, @student2].each do |student|
           submission = @assignment.submission_for_student(student)
-          expect(submission.canvadocs).to eq [@attachment.canvadoc]
+          expect(@attachment.canvadoc.submissions).to include submission
         end
       end
 
@@ -1446,8 +1446,8 @@ describe Submission do
         end
 
         it 'sets preferred plugin course id to the course ID' do
-          s = submit_homework.call
-          expect(s.canvadocs.first.preferred_plugin_course_id).to eq(@course.id.to_s)
+          submit_homework.call
+          expect(@attachment.canvadoc.preferred_plugin_course_id).to eq(@course.id.to_s)
         end
       end
     end
