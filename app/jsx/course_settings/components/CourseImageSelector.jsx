@@ -52,7 +52,7 @@ define([
     }
 
     removeImage() {
-      this.props.store.dispatch(Actions.removeImage());
+      this.props.store.dispatch(Actions.putRemoveImage(this.props.courseId));
     }
 
     imageControls () {
@@ -130,16 +130,8 @@ define([
         backgroundImage: `url(${this.state.imageUrl})`
       };
 
-      var value = this.state.removeImage ? true : this.state.courseImage;
-
       return (
         <div>
-          <input
-            ref="hiddenInput"
-            type="hidden"
-            name={this.state.hiddenInputName}
-            value={value}
-          />
           <div
             className="CourseImageSelector"
             style={(this.state.imageUrl) ? styles : {}}
@@ -155,7 +147,7 @@ define([
               courseId={this.props.courseId}
               handleClose={this.handleModalClose}
               handleFileUpload={(e, courseId) => this.props.store.dispatch(Actions.uploadFile(e, courseId))}
-              handleFlickrUrlUpload={(flickrUrl) => this.props.store.dispatch(Actions.setCourseImageUrl(flickrUrl))}
+              handleFlickrUrlUpload={(flickrUrl) => this.props.store.dispatch(Actions.putImageData(this.props.courseId, flickrUrl))}
             />
           </Modal>
         </div>

@@ -76,9 +76,37 @@ define ([
       };
     },
 
-    prepareSetImage (imageUrl, imageId, ajaxLib = axios) {
+    putImageData(courseId, imageUrl, imageId = null, ajaxLib = axios) {
+      const data = imageId ? {"course[image_id]": imageId} : 
+                             {"course[image_url]": imageUrl}; 
+
+      return (dispatch, getState) => {
+        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib) 
+          .then((response)=> {
+              dispatch(imageId ? this.setCourseImageId(imageUrl, imageId) : 
+                                 this.setCourseImageUrl(imageUrl)); 
+          })
+          .catch((response) => {
+            this.errorUploadingImage();
+          })
+      }
+    },
+
+    putRemoveImage(courseId, ajaxLib = axios) {
+      return (dispatch, getState) => {
+        this.ajaxPutFormData(`/api/v1/courses/${courseId}`, {"course[remove_image]": true}, ajaxLib) 
+          .then((response)=> {
+            dispatch(this.removeImage());   
+          })
+          .catch((response) => {
+            $.flashError(I18n.t("Error removing image"));
+          })
+      }
+    },
+
+    prepareSetImage (imageUrl, imageId, courseId, ajaxLib = axios) {
       if (imageUrl) {
-        return this.setCourseImageId(imageUrl, imageId);
+        return this.putImageData(courseId, imageUrl, imageId, ajaxLib);
       } else {
         // In this case the url field was blank so we could either
         // recreate it or hit the API to get it.  We hit the api
@@ -86,7 +114,7 @@ define ([
         return (dispatch, getState) => {
           ajaxLib.get(`/api/v1/files/${imageId}`)
                  .then((response) => {
-                   dispatch(this.setCourseImageId(response.data.url, imageId));
+                   dispatch(this.putImageData(courseId, response.data.url, imageId, ajaxLib));
                  })
                  .catch((response) => {
                    this.errorUploadingImage();
@@ -119,7 +147,7 @@ define ([
                     formData.append('file', file);
                     ajaxLib.post(response.data.upload_url, formData)
                            .then((response) => {
-                             dispatch(this.prepareSetImage(response.data.url, response.data.id));
+                             dispatch(this.prepareSetImage(response.data.url, response.data.id, courseId, ajaxLib));
                            })
                            .catch((response) => {
                               this.errorUploadingImage();
@@ -133,6 +161,22 @@ define ([
           $.flashWarning(I18n.t("'%{type}' is not a valid image type (try jpg, png, or gif)", {type}));
         }
       };
+    },
+
+    ajaxPutFormData(path, data, ajaxLib = axios) {
+      return (
+        ajaxLib.put(path, data, 
+          {
+            // TODO: this is a naive implementation,
+            // upgrading to axios@0.12.0 will make it unnecessary 
+            // by using URLSearchParams.
+            transformRequest: function (data, headers) {
+              return Object.keys(data).reduce((prev, key) => {
+                return prev + (prev ? '&' : '') + `${key}=${data[key]}`;
+              }, '');
+            }
+          })
+        );
     }
 
   };
