@@ -33,9 +33,26 @@ class MultiCache < ActiveSupport::Cache::Store
 
   def fetch(key, options = nil, &block)
     options ||= {}
-    # this makes the node "sticky" for read/write
-    options[:node] = @ring[rand(@ring.length)]
-    super(key, options, &block)
+    # an option to allow populating all nodes in the ring with the
+    # same data
+    if options[:node] == :all
+      calculated_value = nil
+      did_calculate = false
+      result = nil
+      @ring.each do |node|
+        options[:node] = node
+        result = super(key, options) do
+          calculated_value = yield unless did_calculate
+          did_calculate = true
+          calculated_value
+        end
+      end
+      result
+    else
+      # this makes the node "sticky" for read/write
+      options[:node] = @ring[rand(@ring.length)]
+      super(key, options, &block)
+    end
   end
 
   # for compatibility
