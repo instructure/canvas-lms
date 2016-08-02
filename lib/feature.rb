@@ -446,15 +446,6 @@ END
       applies_to: 'Course',
       beta: true,
       root_opt_in: true
-    },
-    'react_modules' =>
-    {
-      display_name: -> { I18n.t('New Modules Interface')},
-      description: -> {I18n.t('Use the new modules interface')},
-      applies_to: 'Course',
-      state: 'hidden_in_prod',
-      beta: true,
-      development: true,
     }
   )
 
