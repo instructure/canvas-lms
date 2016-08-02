@@ -112,16 +112,24 @@ define([
           establishParentNode(target)
         }
 
+        const originalOnFocus = tinyMCEInitOptions.onFocus
+        tinyMCEInitOptions.onFocus = (editor) => {
+          this.activateRCE(target)
+          if (typeof originalOnFocus === 'function') {
+            originalOnFocus(editor)
+          }
+        }
+
         loadServiceRCE(target, tinyMCEInitOptions, callback)
       } else {
         loadLegacyRCE(target, tinyMCEInitOptions, callback)
+
+        // listen for editor_box_focus events on our target, and trigger
+        // activateRCE from them
+        target.on('editor_box_focus', () => this.activateRCE(target))
       }
 
       hideResizeHandleForScreenReaders()
-
-      // listen for editor_box_focus events on our target, and trigger
-      // activateRCE from them
-      target.on('editor_box_focus', () => this.activateRCE(target))
     },
 
     /**

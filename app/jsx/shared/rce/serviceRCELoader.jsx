@@ -159,7 +159,8 @@ define([
         textareaId: textarea.id,
         textareaClassName: textarea.className,
         language: ENV.LOCALE,
-        mirroredAttrs: this._attrsToMirror(textarea)
+        mirroredAttrs: this._attrsToMirror(textarea),
+        onFocus: tinyMCEInitOptions.onFocus
       }
     },
 
