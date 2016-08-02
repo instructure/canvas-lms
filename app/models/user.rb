@@ -1802,7 +1802,7 @@ class User < ActiveRecord::Base
 
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
-      Rails.cache.fetch([self, 'participating_enrollments', :expires_in => 1.hour].cache_key) do
+      Rails.cache.fetch([self, 'participating_enrollments'].cache_key, :expires_in => 1.hour) do
         self.cached_current_enrollments(:preload_dates => true).select(&:participating?)
       end
     end
