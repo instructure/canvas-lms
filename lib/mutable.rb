@@ -50,9 +50,11 @@ module Mutable
           where(:asset_type => 'Submission', :asset_id => submissions).
           preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
-      associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
-      Shard.with_each_shard(associated_shards) do
-        StreamItemInstance.where(:stream_item_id => stream_items).
+      user_ids = submissions.map(&:user_id).uniq # hide stream items for submission owners, not instructors
+      # note: unfortunately this will hide items for an instructor if instructor (somehow) has a submission too
+
+      Shard.partition_by_shard(user_ids) do |user_ids_subset|
+        StreamItemInstance.where(:stream_item_id => stream_items, :user_id => user_ids_subset).
             update_all_with_invalidation(stream_item_contexts, :hidden => true)
       end
     end
