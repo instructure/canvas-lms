@@ -16,9 +16,11 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def ensure_current_state
-    self.recalculate_state if self.state_needs_recalculation?
-    self.recalculate_access if !self.access_is_current?
-    self.save! if self.changed?
+    Shackles.activate(:master) do
+      self.recalculate_state if self.state_needs_recalculation?
+      self.recalculate_access if !self.access_is_current?
+      self.save! if self.changed?
+    end
   end
 
   def get_effective_state
