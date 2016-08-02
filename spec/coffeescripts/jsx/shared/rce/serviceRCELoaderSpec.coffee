@@ -129,6 +129,11 @@ define [
     props = RCELoader.createRCEProps(@$textarea.get(0), opts)
     equal props.mirroredAttrs.name, "elementName"
 
+  test 'adds onFocus to props', ->
+    opts = {onFocus: ->}
+    props = RCELoader.createRCEProps(@$textarea.get(0), opts)
+    equal props.onFocus, opts.onFocus
+
   test 'renders with rce', ->
     RCELoader.loadOnTarget(@$div, {}, ()->)
     ok @rce.renderIntoDiv.calledWith(@$div.get(0))
