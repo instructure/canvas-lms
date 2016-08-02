@@ -187,7 +187,7 @@ class SearchController < ApplicationController
       .order('created_at')
     @search = params[:search]
     if @search.present?
-      @courses = @courses.where(@courses.wildcard('name', @search))
+      @courses = @courses.where(@courses.wildcard('name', @search.to_s))
     end
     @public_only = params[:public_only]
     if @public_only
