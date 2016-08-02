@@ -121,4 +121,12 @@ module Api::V1::Conversation
     result[:tags] = batch.local_tags
     result
   end
+
+  def deleted_conversation_json(conversation_message_participant, current_user, session)
+    hash = conversation_message_json(conversation_message_participant.conversation_message, current_user, session)
+    hash['deleted_at'] = conversation_message_participant.deleted_at
+    hash['user_id'] = conversation_message_participant.user_id
+    hash['conversation_id'] = conversation_message_participant.conversation_message.conversation_id
+    hash
+  end
 end

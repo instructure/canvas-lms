@@ -646,6 +646,32 @@ class ConversationsController < ApplicationController
     render :json => {}
   end
 
+  # internal api
+  def deleted_index
+    return render_unauthorized_action unless @current_user.roles(Account.site_admin).include? 'admin'
+
+    query = lambda {
+      participants = ConversationMessageParticipant.query_deleted(params['user_id'], params)
+
+      Api.paginate(
+        participants,
+        self,
+        api_v1_deleted_conversations_url
+      )
+
+      participants.map { |p| deleted_conversation_json(p, @current_user, session) }
+    }
+
+    if (params['conversation_id'])
+      conversation_messages = Conversation.find(params['conversation_id']).shard.activate { query.call }
+    else
+      conversation_messages = query.call
+    end
+
+    render :json => conversation_messages
+  end
+
+
   # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
   # the GET/show action, except that only includes the
