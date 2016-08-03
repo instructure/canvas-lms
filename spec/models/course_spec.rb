@@ -397,6 +397,7 @@ describe Course do
     end
 
     def make_date_completed
+      @enrollment.reload
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
