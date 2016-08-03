@@ -663,7 +663,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def enrollment_state
-    self.association(:enrollment_state).target ||=
+    state = self.association(:enrollment_state).target ||=
       self.shard.activate do
         Shackles.activate(:master) do
           EnrollmentState.unique_constraint_retry do
@@ -671,12 +671,13 @@ class Enrollment < ActiveRecord::Base
           end
         end
       end
-    super
+    state.association(:enrollment).target ||= self # ensure reverse association
+    state
   end
 
   def recalculate_enrollment_state
     if (self.changes.keys & %w{workflow_state start_at end_at}).any?
-      self.enrollment_state.reload
+      @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
     end
     self.enrollment_state.ensure_current_state
