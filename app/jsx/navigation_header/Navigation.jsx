@@ -20,7 +20,7 @@ define([
 
   var TYPE_URL_MAP = {
     courses: '/api/v1/users/self/favorites/courses?include=term',
-    groups: '/api/v1/users/self/groups',
+    groups: '/api/v1/users/self/groups?include[]=can_access',
     accounts: '/api/v1/accounts'
   };
 

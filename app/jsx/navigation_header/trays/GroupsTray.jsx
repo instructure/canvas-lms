@@ -26,7 +26,7 @@ define([
         );
       }
       var groups =  this.props.groups.map((group) => {
-        if (!group.concluded) {
+        if (group.can_access && !group.concluded) {
           return <li className="ReactTray-list-item" key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
         };
       });

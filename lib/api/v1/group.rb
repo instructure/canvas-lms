@@ -63,6 +63,10 @@ module Api::V1::Group
     hash['has_submission'] = group.submission?
     hash['concluded'] = group.context.concluded? || group.context.deleted?
     hash['tabs'] = tabs_available_json(group, user, session, ['external']) if includes.include?('tabs')
+
+    if includes.include?('can_access')
+      hash['can_access'] = group.grants_right?(@current_user, :read)
+    end
     hash
   end
 

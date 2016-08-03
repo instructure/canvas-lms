@@ -250,13 +250,19 @@ describe "dashboard" do
         group = Group.create!(:name => "group1", :context => @course)
         group.add_user(@user)
 
+        other_unpublished_course = course
+        other_group = Group.create!(:name => "group2", :context => other_unpublished_course)
+        other_group.add_user(@user)
+
         get "/"
 
         if ENV['CANVAS_FORCE_USE_NEW_STYLES']
           f('#global_nav_groups_link').click
           expect(fj(".ReactTray__headline:contains('Groups')")).to be_displayed
           wait_for_ajax_requests
-          expect(fj(".ReactTray-list-item a:contains('#{group.name}')")).to be_displayed
+          list = fj(".ReactTray__link-list")
+          expect(list).to include_text(group.name)
+          expect(list).to_not include_text(other_group.name)
         else
           driver.execute_script %{$('#courses_menu_item').addClass('hover');}
           expect(f('#courses_menu_item')).to include_text(group.name)
