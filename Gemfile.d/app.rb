@@ -56,7 +56,7 @@ gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.2'
-gem 'oj', '2.14.1'
+gem 'oj', '2.17.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'
