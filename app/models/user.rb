@@ -1483,7 +1483,7 @@ class User < ActiveRecord::Base
 
       courses = Course.find(options[:shard_course_ids])
       assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(self.id, courses.map(&:id)).
+        filter_by_visibilities_in_given_courses(id, courses.map(&:id)).
         published.
         due_between_with_overrides(due_after, due_before).
         expecting_submission.
@@ -1999,10 +1999,12 @@ class User < ActiveRecord::Base
 
   def select_available_assignments(assignments)
     return [] if assignments.empty?
-    enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id)).to_a
+    enrollments = Shard.partition_by_shard(assignments.map(&:context_id)) do |course_ids|
+      self.enrollments.shard(Shard.current).where(course_id: course_ids).to_a
+    end
     Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
-    enrollments.select!{|e| e.participating?}
-    assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}
+    enrollments.select! {|e| e.participating? }
+    assignments.select {|a| enrollments.any? {|e| e.course_id == a.context_id} }
   end
 
   def select_upcoming_assignments(assignments,opts)
