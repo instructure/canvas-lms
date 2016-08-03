@@ -5,6 +5,9 @@ module Gradebook2Common
     let(:gradebook_settings_cog) { f('#gradebook_settings') }
     let(:group_weights_menu) { f('[aria-controls="assignment_group_weights_dialog"]') }
     let(:show_notes) { fj('li a:contains("Show Notes Column")') }
+    let(:set_group_weights) { fj('li a:contains("Set Group Weights")') }
+    let(:save_button) { fj('button span:contains("Save")') }
+    let(:group_weighting_scheme) { f('#group_weighting_scheme') }
     let(:hide_notes) { f(".hide") }
   end
   shared_context 'reusable_course' do
