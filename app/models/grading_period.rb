@@ -29,7 +29,7 @@ class GradingPeriod < ActiveRecord::Base
   validate :close_date_is_not_before_end_date
   validate :not_overlapping, unless: :skip_not_overlapping_validator?
 
-  before_validation :ensure_close_date, on: :create
+  before_validation :ensure_close_date
 
   scope :current, -> do
     where("start_date <= :now AND end_date >= :now", now: Time.zone.now)
@@ -170,7 +170,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def ensure_close_date
-    self.close_date ||= self.end_date
+    self.close_date = self.end_date
   end
 
   def close_date_is_not_before_end_date
