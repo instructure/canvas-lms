@@ -29,6 +29,7 @@ module MultipleGradingPeriods
       let(:save_period_button) { f('button[aria-label="Save Grading Period"]')}
       let(:first_period) { f('.GradingPeriodList__period span') }
       let(:period_delete_button) { f('.GradingPeriodList .icon-trash')}
+      let(:period_edit_button) { f('.GradingPeriodList .icon-edit')}
     end
 
     def visit_account_grading_standards(account_id)
@@ -82,6 +83,13 @@ module MultipleGradingPeriods
 
     def period_present?(title)
       first_period.text == title
+    end
+
+    def edit_first_grading_period(title)
+      expand_first_set
+      period_edit_button.click
+      replace_content(period_title_input, title)
+      save_period_button.click
     end
   end
 end

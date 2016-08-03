@@ -41,6 +41,13 @@ describe "multiple grading periods account page" do
       add_grading_period("New Period")
       expect(period_present?("New Period")).to be true
     end
+
+    it "edits grading period", test_id: 2528655, priority: "1" do
+      period_helper.create_with_group_for_account(Account.default, title: "New Period")
+      visit_account_grading_standards(Account.default.id)
+      edit_first_grading_period("Edited Title")
+      expect(period_present?("Edited Title")).to be true
+    end
   end
 end
 
