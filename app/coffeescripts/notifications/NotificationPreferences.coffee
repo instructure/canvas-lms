@@ -149,7 +149,7 @@ define [
       selected = @findButtonDataForCode(selectedValue)
       selected['active'] = true
 
-      cellButtonData = if channel.type == 'push' then @limitedButtonData else @buttonData
+      cellButtonData = if channel.type == 'push' || channel.type == 'sms' || channel.type == 'twitter' then @limitedButtonData else @buttonData
 
       policyCellTemplate
         category:   category.category

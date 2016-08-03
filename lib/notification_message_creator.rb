@@ -85,7 +85,8 @@ class NotificationMessageCreator
 
         unless @notification.registration?
           if @notification.summarizable? && too_many_messages_for?(user) && no_daily_messages_in(delayed_messages)
-            delayed_messages << build_fallback_for(user)
+            fallback = build_fallback_for(user)
+            delayed_messages << fallback if fallback
           end
 
           unless user.pre_registered?
@@ -112,7 +113,8 @@ class NotificationMessageCreator
   end
 
   def build_fallback_for(user)
-    fallback_channel = immediate_channels_for(user).sort_by(&:path_type).first
+    fallback_channel = immediate_channels_for(user).find{ |cc| cc.path_type == 'email'}
+    return unless fallback_channel
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
       fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
@@ -203,9 +205,10 @@ class NotificationMessageCreator
     policies= []
     user_has_policy = unretired_policies_for(user).for(@notification).exists?
     if user_has_policy
-      policies += unretired_policies_for(user).for(@notification).by(['daily', 'weekly'])
+      policies += unretired_policies_for(user).for(@notification).by(['daily', 'weekly']).where("communication_channels.path_type='email'")
     elsif channel &&
-        channel.active? &&
+          channel.active? &&
+          channel.path_type == 'email' &&
         ['daily', 'weekly'].include?(@notification.default_frequency)
       policies << channel.notification_policies.create!(:notification => @notification,
                                             :frequency => @notification.default_frequency)
