@@ -43,6 +43,7 @@ describe "announcements" do
 
       it "should bulk lock topics", priority: "1", test_id: 220361 do
         5.times { |i| @checkboxes[i].click }
+        scroll_page_to_top # if we only scroll until it's in view, its tooltip can interfere with clicks
         move_to_click('label[for=lock]')
         wait_for_ajax_requests
         #TODO: check the UI to make sure the topics have a locked symbol
