@@ -85,7 +85,7 @@
             <span class="requirement_type min_score_requirement">
               <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
               <span class="unfulfilled">
-                <%= t 'min_score.unfulfilled', 'Score at least %{score}, :score => score_display' %>
+                <%= t 'min_score.unfulfilled', 'Score at least %{score}', :score => score_display %>
                 <span class="screenreader-only"><%= t 'Must score at least %{score} to complete this module item', :score => score_display %></span>
               </span>
               <span class="fulfilled">
