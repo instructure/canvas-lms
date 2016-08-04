@@ -313,8 +313,8 @@ class CollaborationsController < ApplicationController
     lti_user_ids = visibility && visibility['users'] || []
     lti_group_ids = visibility && visibility['groups'] || []
     users = User.where(lti_context_id: lti_user_ids)
-    groups = Group.where(lti_context_id: lti_group_ids)
-    [users, groups]
+    group_ids = Group.where(lti_context_id: lti_group_ids).map(&:id)
+    [users, group_ids]
   end
 
 end

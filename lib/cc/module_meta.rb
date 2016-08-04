@@ -47,6 +47,9 @@ module CC
             end
             next
           end
+
+          add_exported_asset(cm)
+
           mod_migration_id = CCHelper.create_key(cm)
           # context modules are in order and a pre-req can only reference
           # a previous module, so just adding as we go is okay

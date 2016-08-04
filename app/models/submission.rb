@@ -40,7 +40,9 @@ class Submission < ActiveRecord::Base
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
-  has_many :visible_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: false) }, class_name: 'SubmissionComment'
+  has_many :visible_submission_comments,
+    -> { published.visible.for_final_grade.order(:created_at, :id) },
+    class_name: 'SubmissionComment'
   has_many :hidden_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: true) }, class_name: 'SubmissionComment'
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
@@ -564,7 +566,7 @@ class Submission < ActiveRecord::Base
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
           submit_to_canvadocs = true
-          a.create_canvadoc! unless a.canvadoc
+          a.create_canvadoc!(canvadoc_params) unless a.canvadoc
           unless canvadocs.exists?(attachment: a)
             canvadocs << a.canvadoc
           end
@@ -882,8 +884,22 @@ class Submission < ActiveRecord::Base
   end
   private :validate_single_submission
 
+  def canvadoc_params
+    { preferred_plugin_course_id: preferred_plugin_course_id }
+  end
+  private :canvadoc_params
+
+  def preferred_plugin_course_id
+    if self.context && self.context.is_a?(Course)
+      self.context.id
+    else
+      nil
+    end
+  end
+  private :preferred_plugin_course_id
+
   def grade_change_audit
-    return true unless self.grade_changed? || self.excused_changed?
+    return true unless (self.changed & %w(grade score excused)).present? || self.assignment_changed_not_sub
     self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
@@ -996,31 +1012,32 @@ class Submission < ActiveRecord::Base
     pg ||= ModeratedGrading::NullProvisionalGrade.new(self, scorer.id, final)
   end
 
-  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false, source_provisional_grade: nil)
+  def find_or_create_provisional_grade!(scorer, attrs = {})
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
-      if final && !self.assignment.context.grants_right?(scorer, :moderate_grades)
+      if attrs[:final] && !self.assignment.context.grants_right?(scorer, :moderate_grades)
         raise Assignment::GradeError.new("User not authorized to give final provisional grades")
       end
 
-      pg = final ? self.provisional_grades.final.first : self.provisional_grades.not_final.where(scorer_id: scorer).first
-      unless pg
-        unless final || self.assignment.student_needs_provisional_grade?(self.user)
-          raise Assignment::GradeError.new("Student already has the maximum number of provisional grades")
-        end
-        if final &&  !self.provisional_grades.not_final.exists?
-          raise Assignment::GradeError.new("Cannot give a final mark for a student with no other provisional grades")
-        end
-        pg = self.provisional_grades.build
-      end
-      pg.scorer_id = scorer.id
-      pg.final = !!final
-      pg.grade = grade if grade
-      pg.score = score if score
-      pg.force_save = force_save
-      pg.source_provisional_grade = source_provisional_grade
-      pg.save! if force_save || pg.new_record? || pg.changed?
+      pg = find_existing_provisional_grade(scorer, attrs[:final]) || self.provisional_grades.build
+
+      update_provisional_grade(pg, scorer, attrs)
+      pg.save! if attrs[:force_save] || pg.new_record? || pg.changed?
       pg
     end
+  end
+
+  def update_provisional_grade(pg, scorer, attrs = {})
+    pg.scorer = scorer
+    pg.final = !!attrs[:final]
+    pg.grade = attrs[:grade] unless attrs[:grade].nil?
+    pg.score = attrs[:score] unless attrs[:score].nil?
+    pg.source_provisional_grade = attrs[:source_provisional_grade]
+    pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
+    pg.force_save = !!attrs[:force_save]
+  end
+
+  def find_existing_provisional_grade(scorer, final)
+    final ? self.provisional_grades.final.first : self.provisional_grades.not_final.find_by(scorer: scorer)
   end
 
   def crocodoc_whitelist
@@ -1052,6 +1069,7 @@ class Submission < ActiveRecord::Base
     opts[:author] ||= opts[:commenter] || opts[:author] || opts[:user] || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts[:comment_attachments]
+    opts[:draft] = opts[:draft_comment]
     if opts[:comment].empty?
       if opts[:media_comment_id]
         opts[:comment] = t('media_comment', "This is a media comment.")
@@ -1060,7 +1078,7 @@ class Submission < ActiveRecord::Base
       end
     end
     if opts[:provisional]
-      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts[:final])
+      pg = find_or_create_provisional_grade!(opts[:author], final: opts[:final])
       opts[:provisional_grade_id] = pg.id
     end
     if self.new_record?
@@ -1070,7 +1088,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :provisional_grade_id]
+                  :anonymous, :hidden, :provisional_grade_id, :draft]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end

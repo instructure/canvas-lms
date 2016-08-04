@@ -46,7 +46,7 @@ class Quizzes::QuizQuestionBuilder
 
   # Build the question data for a specific submission. This is what the user
   # will end up taking in their quiz.
-  # 
+  #
   # Based on the type of entries the quiz has in its quiz_data, each
   # submission's quiz_data construct may be unique since questions may be drawn
   # randomly out of pre-defined pools.
@@ -172,7 +172,7 @@ class Quizzes::QuizQuestionBuilder
       if q[:answers].first
         q[:answers].first[:variables].each do |variable|
           re = Regexp.new("\\[#{variable[:name]}\\]")
-          text = text.gsub(re, variable[:value].to_s)
+          text = text.gsub(re, TextHelper.round_if_whole(variable[:value]).to_s)
         end
       end
       q[:question_text] = text

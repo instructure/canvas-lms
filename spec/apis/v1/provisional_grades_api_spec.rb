@@ -42,7 +42,7 @@ describe 'Provisional Grades API', type: :request do
       json = api_call_as_user(@ta, :get, @path, @params)
       expect(json['needs_provisional_grade']).to be_truthy
 
-      @submission.find_or_create_provisional_grade!(scorer: @teacher)
+      @submission.find_or_create_provisional_grade!(@teacher)
       json = api_call_as_user(@ta, :get, @path, @params)
       expect(json['needs_provisional_grade']).to be_falsey
 
@@ -50,7 +50,7 @@ describe 'Provisional Grades API', type: :request do
       json = api_call_as_user(@ta, :get, @path, @params)
       expect(json['needs_provisional_grade']).to be_truthy
 
-      @submission.find_or_create_provisional_grade!(scorer: @ta)
+      @submission.find_or_create_provisional_grade!(@ta)
       json = api_call_as_user(@ta, :get, @path, @params)
       expect(json['needs_provisional_grade']).to be_falsey
     end
@@ -106,7 +106,7 @@ describe 'Provisional Grades API', type: :request do
       @assignment = @course.assignments.create! submission_types: 'online_text_entry', moderated_grading: true
       @assignment.moderated_grading_selections.create! student: @student
       @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'hallo')
-      @pg = @submission.find_or_create_provisional_grade! scorer: @ta, score: 80
+      @pg = @submission.find_or_create_provisional_grade!(@ta, score: 80)
       @submission.add_comment(:commenter => @ta, :comment => 'huttah!', :provisional => true)
 
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/copy_to_final_mark"

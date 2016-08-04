@@ -289,8 +289,11 @@ module SimplyVersioned
     alias_method :next, :next_version
 
     # Return the Version for this model with the next lower version
-    def previous_version( number )
-      populate_versionable reorder( 'number DESC' ).where( "number < ?", number ).limit(1).to_a.first
+    def previous_version(number = nil)
+      versions = reorder('number DESC')
+      versions = versions.where("number <= ?", number) if number
+      versions = versions.limit(2).to_a
+      populate_versionable versions.last if versions.length == 2
     end
     alias_method :previous, :previous_version
   end

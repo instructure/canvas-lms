@@ -31,7 +31,8 @@ class PseudonymsController < ApplicationController
   #
   # @response_field account_id The ID of the login's account.
   # @response_field id The unique, numeric ID for the login.
-  # @response_field sis_user_id The login's unique SIS id.
+  # @response_field sis_user_id The login's unique SIS ID.
+  # @response_field integration_id The login's unique integration ID.
   # @response_field unique_id The unique ID for the login.
   # @response_field user_id The unique ID of the login's user.
   # @response_field authentication_provider_id The ID of the authentication

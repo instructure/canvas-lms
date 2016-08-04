@@ -840,7 +840,13 @@ class FilesController < ApplicationController
     json_params = { omit_verifier_in_app: true }
 
     if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
-      json_params.merge!({ include: %w(enhanced_preview_url) })
+      json_params[:include] ||= []
+      json_params[:include] << 'enhanced_preview_url'
+    end
+
+    if @attachment.usage_rights_id.present?
+      json_params[:include] ||= []
+      json_params[:include] << 'usage_rights'
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)
@@ -899,7 +905,8 @@ class FilesController < ApplicationController
           end
         end
         if params[:attachment][:uploaded_data]
-          if Attachment.over_quota?(@context, params[:attachment][:uploaded_data].size)
+          if (@attachment.workflow_state_was != 'unattached' || params[:check_quota_after] != '0') &&
+              Attachment.over_quota?(@context, params[:attachment][:uploaded_data].size)
             @attachment.errors.add(:base, t('Upload failed, quota exceeded'))
           else
             success = @attachment.update_attributes(params[:attachment])

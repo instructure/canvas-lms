@@ -240,8 +240,8 @@ class GradingPeriodsController < ApplicationController
   def get_context
     return super unless params[:set_id].present?
 
-    term_subquery = EnrollmentTerm.select(:root_account_id).where(grading_period_group_id: params[:set_id])
-    @context = Account.active.where(id: term_subquery).take
+    set_subquery = GradingPeriodGroup.active.select(:account_id).where(id: params[:set_id])
+    @context = Account.active.where(id: set_subquery).take
   end
 
   # model level validations

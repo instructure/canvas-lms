@@ -783,6 +783,39 @@ describe Attachment do
       @a1.update_attribute(:replacement_attachment_id, nil)
       expect(@course.attachments.find(@a1.id)).to eql @a
     end
+
+    it "preserves hidden state" do
+      @a1.update_attribute(:file_state, 'hidden')
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      expect(@a.reload.file_state).to eq 'hidden'
+    end
+
+    it "preserves unpublished state" do
+      @a1.update_attribute(:locked, true)
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      expect(@a.reload.locked).to eq true
+    end
+
+    it "preserves lock dates" do
+      @a1.unlock_at = Date.new(2016, 1, 1)
+      @a1.lock_at = Date.new(2016, 4, 1)
+      @a1.save!
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      expect(@a.reload.unlock_at).to eq @a1.reload.unlock_at
+      expect(@a.lock_at).to eq @a1.lock_at
+    end
+
+    it "preserves usage rights" do
+      usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
+      @a1.usage_rights = usage_rights
+      @a1.save!
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      expect(@a.reload.usage_rights).to eq usage_rights
+    end
   end
 
   describe "make_unique_filename" do

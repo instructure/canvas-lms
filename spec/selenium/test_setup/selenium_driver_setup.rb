@@ -63,11 +63,9 @@ module SeleniumDriverSetup
     capture_screenshots? && run_headless?
   end
 
-  # prevents specs failing because tooltips are showing etc.
+  # prevents subsequent specs from failing because tooltips are showing etc.
   def move_mouse_to_known_position
-    if run_headless? && ENV["RESET_MOUSE_POSITION"]
-      raise "couldn't move mouse (xdotool missing?)" unless system('xdotool mousemove --sync 5000 0')
-    end
+    driver.mouse.move_to(f("body"), 0, 0) if driver.ready_for_interaction
   end
 
   def self.set_up_display_buffer

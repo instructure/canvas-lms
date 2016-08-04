@@ -60,7 +60,7 @@ define [
         @$placeholder = $('<span style="display:none;">').insertAfter(@$menu)
         @$menu.bind 'click', => @$placeholder.trigger arguments...
 
-      # passing a noifyMenuActiveOn option when initializing a kylemenu helps
+      # passing a notifyMenuActiveOn option when initializing a kylemenu helps
       # get around issue of page-specific parent elements needing to know when the menu
       # is active and removed. The value of the option is a CSS selector for a parent
       # element of the trigger.

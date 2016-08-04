@@ -608,7 +608,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_unread_count(direction=:up, user_id=self.user_id)
     User.where(:id => user_id).
-        update_all(["unread_conversations_count = unread_conversations_count + ?, updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
+        update_all(["unread_conversations_count = GREATEST(unread_conversations_count + ?, 0), updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
   end
 
   def update_unread_count_for_update

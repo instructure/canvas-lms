@@ -1,10 +1,12 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/grading/gradingPeriodTemplate'
-], (React, _, GradingPeriod) ->
+], (React, ReactDOM, _, GradingPeriod) ->
 
   TestUtils = React.addons.TestUtils
+  wrapper = document.getElementById('fixtures')
 
   module 'GradingPeriod with read-only permissions',
     renderComponent: (opts) ->
@@ -22,10 +24,10 @@ define [
 
       @props = _.defaults(opts || {}, defaultProps)
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
-      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
+      ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
-      React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
     gradingPeriod = @renderComponent()
@@ -53,17 +55,17 @@ define [
 
   test 'displays the correct title', ->
     gradingPeriod = @renderComponent()
-    titleNode = React.findDOMNode(gradingPeriod.refs.title)
+    titleNode = gradingPeriod.refs.title
     equal titleNode.textContent, "Spring"
 
   test 'displays the correct start date', ->
     gradingPeriod = @renderComponent()
-    startDateNode = React.findDOMNode(gradingPeriod.refs.startDate)
+    startDateNode = gradingPeriod.refs.startDate
     equal startDateNode.textContent, "Mar 1, 2015 at 12am"
 
   test 'displays the correct end date', ->
     gradingPeriod = @renderComponent()
-    endDateNode = React.findDOMNode(gradingPeriod.refs.endDate)
+    endDateNode = gradingPeriod.refs.endDate
     equal endDateNode.textContent, "May 31, 2015 at 12am"
 
   module "GradingPeriod with 'readOnly' set to true",
@@ -85,10 +87,10 @@ define [
 
       @props = _.defaults(opts || {}, defaultProps)
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
-      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
+      ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
-      React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
     gradingPeriod = @renderComponent()
@@ -116,17 +118,17 @@ define [
 
   test 'displays the correct title', ->
     gradingPeriod = @renderComponent()
-    titleNode = React.findDOMNode(gradingPeriod.refs.title)
+    titleNode = gradingPeriod.refs.title
     equal titleNode.textContent, "Spring"
 
   test 'displays the correct start date', ->
     gradingPeriod = @renderComponent()
-    startDateNode = React.findDOMNode(gradingPeriod.refs.startDate)
+    startDateNode = gradingPeriod.refs.startDate
     equal startDateNode.textContent, "Mar 1, 2015 at 12am"
 
   test 'displays the correct end date', ->
     gradingPeriod = @renderComponent()
-    endDateNode = React.findDOMNode(gradingPeriod.refs.endDate)
+    endDateNode = gradingPeriod.refs.endDate
     equal endDateNode.textContent, "May 31, 2015 at 12am"
 
   module 'editable GradingPeriod',
@@ -147,10 +149,10 @@ define [
         onTitleChange: ->
 
       GradingPeriodElement = React.createElement(GradingPeriod, @props)
-      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
+      @gradingPeriod = ReactDOM.render(GradingPeriodElement, wrapper)
 
     teardown: ->
-      React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(wrapper)
 
   test 'renders a delete button', ->
     ok @gradingPeriod.renderDeleteButton()
@@ -165,20 +167,20 @@ define [
     equal @gradingPeriod.renderEndDate().type, "input"
 
   test 'displays the correct title', ->
-    titleNode = React.findDOMNode(@gradingPeriod.refs.title)
+    titleNode = @gradingPeriod.refs.title
     equal titleNode.value, "Spring"
 
   test 'displays the correct start date', ->
-    startDateNode = React.findDOMNode(@gradingPeriod.refs.startDate)
+    startDateNode = @gradingPeriod.refs.startDate
     equal startDateNode.value, "Mar 1, 2015 at 12am"
 
   test 'displays the correct end date', ->
-    endDateNode = React.findDOMNode(@gradingPeriod.refs.endDate)
+    endDateNode = @gradingPeriod.refs.endDate
     equal endDateNode.value, "May 31, 2015 at 12am"
 
   module 'custom prop validation for editable periods',
     setup: ->
-      @consoleWarn = @stub(console, 'warn')
+      @consoleError = @stub(console, 'error')
       @props =
         title: "Spring"
         startDate: new Date("2015-03-01T00:00:00Z")
@@ -196,14 +198,14 @@ define [
 
   test 'does not warn of invalid props if all required props are present and of the correct type', ->
     React.createElement(GradingPeriod, @props)
-    ok @consoleWarn.notCalled
+    ok @consoleError.notCalled
 
   test 'warns if required props are missing', ->
     delete @props.disabled
     React.createElement(GradingPeriod, @props)
-    ok @consoleWarn.calledOnce
+    ok @consoleError.calledOnce
 
   test 'warns if required props are of the wrong type', ->
     @props.onDeleteGradingPeriod = "a/s/l?"
     React.createElement(GradingPeriod, @props)
-    ok @consoleWarn.calledOnce
+    ok @consoleError.calledOnce

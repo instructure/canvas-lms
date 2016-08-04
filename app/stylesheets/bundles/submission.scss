@@ -113,3 +113,9 @@
   @if $use_new_styles { @include fontSize(13px); }
   flex: 0 0 20%;
 }
+
+.omit-from-final-warning {
+  padding: 12px;
+  border-width: 1px;
+  margin: 5px;
+}

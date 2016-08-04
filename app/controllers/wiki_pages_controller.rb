@@ -83,7 +83,8 @@ class WikiPagesController < ApplicationController
     if @page.new_record?
       if @page.grants_any_right?(@current_user, session, :update, :update_content)
         flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
-        redirect_to polymorphic_url([@context, :wiki_page], id: @page_name || @page, titleize: params[:titleize], action: :edit)
+        encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
+        redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
       else
         wiki_page = @wiki.wiki_pages.deleted_last.where(url: @page.url).first
         if wiki_page && wiki_page.deleted?

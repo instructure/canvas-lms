@@ -42,7 +42,7 @@ describe "Groups API", type: :request do
       'storage_quota_mb' => group.storage_quota_mb,
       'leader' => group.leader,
       'has_submission' => group.submission?,
-      'concluded' => group.context.concluded?
+      'concluded' => group.context.concluded? || group.context.deleted?
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)
@@ -132,6 +132,18 @@ describe "Groups API", type: :request do
     expect(json).to eq [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
     expect(links.all?{ |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
+  end
+
+  it "should indicate if the context is deleted" do
+    course_with_student(:user => @member)
+    @group = @course.groups.create!(:name => "My Group")
+    @group.add_user(@member, 'accepted', true)
+    @course.destroy!
+    @group.reload
+
+    @user = @member
+    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
+    expect(json.detect{|g| g['id'] == @group.id}['concluded']).to be_truthy
   end
 
   it "should allow listing all a user's group in a given context_type" do
@@ -291,6 +303,11 @@ describe "Groups API", type: :request do
     expect(json['permissions']['create_announcement']).to be_truthy
   end
 
+  it 'includes tabs if requested' do
+    json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => [ "tabs" ]))
+    expect(json).to have_key 'tabs'
+    expect(json['tabs'].map{ |tab| tab['id']} ).to eq(["home", "announcements", "pages", "people", "discussions", "files"])
+  end
 
   it "should allow searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')

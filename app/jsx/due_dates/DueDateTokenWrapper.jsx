@@ -10,6 +10,7 @@ define([
 ], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $, SearchHelpers) => {
 
   var ComboboxOption = TokenInput.Option;
+  TokenInput = TokenInput.default;
 
   var DueDateWrapperConsts = {
     MINIMUM_SEARCH_LENGTH: 3,

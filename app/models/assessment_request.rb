@@ -26,7 +26,7 @@ class AssessmentRequest < ActiveRecord::Base
   belongs_to :assessor_asset, polymorphic: [:submission, :user], polymorphic_prefix: true
   belongs_to :assessor, :class_name => 'User'
   belongs_to :rubric_association
-  has_many :submission_comments
+  has_many :submission_comments, -> { published }
   has_many :ignores, as: :asset
   belongs_to :rubric_assessment
   validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state

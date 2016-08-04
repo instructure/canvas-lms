@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'compiled/react_files/modules/customPropTypes',
   'i18n!react_files',
   'compiled/react_files/modules/BBTreeBrowserView',
   'compiled/views/RootFoldersFinder'
-], function (React, customPropTypes, I18n, BBTreeBrowserView, RootFoldersFinder) {
+], function (React, ReactDOM, customPropTypes, I18n, BBTreeBrowserView, RootFoldersFinder) {
   var BBTreeBrowser = React.createClass({
     displayName: "BBTreeBrowser",
     propTypes: {
@@ -25,11 +26,11 @@ define([
         selectedStyleClass: 'MoveDialog__folderItem--selected'
       },
       {
-        element: this.refs.FolderTreeHolder.getDOMNode()
+        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder)
       }).index
 
       window.setTimeout(function(){
-        BBTreeBrowserView.getView(this.treeBrowserViewId).render().$el.appendTo(this.refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus()
+        BBTreeBrowserView.getView(this.treeBrowserViewId).render().$el.appendTo(ReactDOM.findDOMNode(this.refs.FolderTreeHolder)).find(':tabbable:first').focus()
       }.bind(this), 0);
     },
     componentWillUnmount(){

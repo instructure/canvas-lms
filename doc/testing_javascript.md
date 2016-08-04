@@ -63,3 +63,11 @@ Now navigate in your browser to http://phantom.docker and your tests will run in
 the browser you have open (in addition to PhantomJS).  This will give you the chance
 to debug them as well as see how they work in a fully functional browser.  Our JS
 specs currently run in Chrome so make sure that your tests pass there.
+
+## Javascript Test Coverage
+
+You can generate code coverage locally by first running `npm install` having webpack
+set up( `touch config/WEBPACK`) then running `bundle exec rake js:test` or `npm run webpack-test`.
+You should then have a folder in your root directory called `coverage-js`
+in which contains an `index.html` which if you open it will show you
+the test coverage for all javascript (js, coffee, jsx)

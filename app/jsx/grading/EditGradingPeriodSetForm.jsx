@@ -20,11 +20,6 @@ define([
     if (!(set.title || "").trim()) {
       return [I18n.t('All grading period sets must have a title')];
     }
-
-    if (_.isEmpty(set.enrollmentTermIDs)) {
-      return [I18n.t('All grading period sets must have at least one enrollment term')];
-    }
-
     return [];
   };
 

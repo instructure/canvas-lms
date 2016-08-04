@@ -88,7 +88,7 @@ describe GradebookExporter do
 
       let(:assignments) { course.assignments }
 
-      let!(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
+      let!(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
 
       let!(:first_period) do
         args = {

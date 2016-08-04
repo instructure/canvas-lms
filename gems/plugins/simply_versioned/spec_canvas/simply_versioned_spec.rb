@@ -130,6 +130,61 @@ describe 'simply_versioned' do
     end
   end
 
+  describe "#versions.current_version" do
+    before do
+      @woozel = Woozel.new name: 'test'
+    end
+
+    it "should return nil when no current version is available" do
+      expect(@woozel.versions.current_version).to be_nil
+
+      @woozel.with_versioning(explicit: true, &:save!)
+      expect(@woozel.versions.current_version).not_to be_nil
+    end
+
+    it "should return the latest version" do
+      @woozel.with_versioning(explicit: true, &:save!)
+      @woozel.name = 'testier'
+      @woozel.with_versioning(explicit: true, &:save!)
+      expect(@woozel.versions.current_version.model.name).to eq 'testier'
+    end
+  end
+
+  describe "#versions.previous_version" do
+    before do
+      @woozel = Woozel.new name: 'test'
+    end
+
+    it "should return nil when no previous version is available" do
+      expect(@woozel.versions.previous_version).to be_nil
+
+      @woozel.with_versioning(explicit: true, &:save!)
+      expect(@woozel.versions.previous_version).to be_nil
+
+      @woozel.with_versioning(explicit: true, &:save!)
+      expect(@woozel.versions.previous_version).not_to be_nil
+    end
+
+    context "with previous versions" do
+      before do
+        @woozel.with_versioning(explicit: true, &:save!)
+        @woozel.name = 'testier'
+        @woozel.with_versioning(explicit: true, &:save!)
+        @woozel.name = 'testiest'
+        @woozel.with_versioning(explicit: true, &:save!)
+      end
+
+      it "should return the previous version" do
+        expect(@woozel.versions.previous_version.model.name).to eq 'testier'
+      end
+
+      it "should return the previous version for a specific number" do
+        expect(@woozel.versions.previous_version(1)).to be_nil
+        expect(@woozel.versions.previous_version(2).model.name).to eq 'test'
+      end
+    end
+  end
+
   context "callbacks" do
     let(:woozel) { Woozel.create!(name: 'test') }
     context "on_load" do

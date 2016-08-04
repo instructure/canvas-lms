@@ -482,7 +482,7 @@ describe SisImportsApiController, type: :request do
           "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv' },
+            :import_type => 'instructure_csv', :attachment => 'blah' },
           {},
           { 'CONTENT_TYPE' => 'text/csv' })
     batch = SisBatch.last
@@ -495,7 +495,7 @@ describe SisImportsApiController, type: :request do
           "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
           { :controller => 'sis_imports_api', :action => 'create',
             :format => 'json', :account_id => @account.id.to_s,
-            :import_type => 'instructure_csv' },
+            :import_type => 'instructure_csv', :attachment => 'blah' },
           {},
           { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last

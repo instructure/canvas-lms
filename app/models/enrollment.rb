@@ -39,6 +39,8 @@ class Enrollment < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
+  has_one :enrollment_state, :dependent => :destroy
+
   has_many :role_overrides, :as => :context
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
@@ -69,9 +71,10 @@ class Enrollment < ActiveRecord::Base
   after_save :reset_notifications_cache
   after_save :update_assignment_overrides_if_needed
   after_save :dispatch_invitations_later
+  after_save :recalculate_enrollment_state
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :available_at, :soft_completed_at, :need_touch_user
+  attr_accessor :already_enrolled, :need_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -81,7 +84,7 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
 
   def self.not_yet_started(course)
-    collection = where(course_id: course)
+    collection = where(course_id: course).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(collection)
     collection.select do |enrollment|
       enrollment.effective_start_at > Time.zone.now
@@ -659,76 +662,47 @@ class Enrollment < ActiveRecord::Base
     @enrollment_dates
   end
 
-  def state_based_on_date
-    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
-      calculated_state_based_on_date
-    end
+  def enrollment_state
+    state = self.association(:enrollment_state).target ||=
+      self.shard.activate do
+        Shackles.activate(:master) do
+          EnrollmentState.unique_constraint_retry do
+            EnrollmentState.where(:enrollment_id => self).first_or_create
+          end
+        end
+      end
+    state.association(:enrollment).target ||= self # ensure reverse association
+    state
   end
 
-  def calculated_state_based_on_date
-    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
-      if self.restrict_past_view?
-        return :inactive
-      else
-        return :completed
-      end
+  def recalculate_enrollment_state
+    if (self.changes.keys & %w{workflow_state start_at end_at}).any?
+      @enrollment_dates = nil
+      self.enrollment_state.state_is_current = false
     end
+    self.enrollment_state.ensure_current_state
+  end
 
-    unless [:invited, :active].include?(state)
-      return state
-    end
-
-    ranges = self.enrollment_dates
-    now    = Time.now
-    ranges.each do |range|
-      start_at, end_at = range
-      # start_at <= now <= end_at, allowing for open ranges on either end
-      return state if (start_at || now) <= now && now <= (end_at || now)
-    end
-
-    # Not strictly within any range
-    return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
-    if global_start_at < now
-      self.soft_completed_at = ranges.map(&:last).compact.min
-      self.restrict_past_view? ? :inactive : :completed
-    elsif self.fake_student? # Allow student view students to use the course before the term starts
-      state
-    else
-      self.available_at = global_start_at
-      if view_restrictable? && !self.restrict_future_view?
-        if state == :active
-          # an accepted enrollment state means they still can't participate yet,
-          # but should be able to view just like an invited enrollment
-          :accepted
-        else
-          state
-        end
-      else
-        :inactive
-      end
+  def state_based_on_date
+    RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state) do
+      self.enrollment_state.get_effective_state
     end
   end
 
   def readable_state_based_on_date
     # when view restrictions are in place, the effective state_based_on_date is :inactive, but
     # to admins we should show that they are :completed or :pending
+    self.enrollment_state.get_display_state
+  end
 
-    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
-      :completed
-    else
-      date_state = state_based_on_date
-      if self.available_at
-        :pending
-      elsif self.soft_completed_at
-        :completed
-      else
-        date_state
-      end
+  def available_at
+    if self.enrollment_state.pending?
+      self.enrollment_state.state_valid_until
     end
   end
 
   def view_restrictable?
-    self.student? || self.observer?
+    (self.student? && !self.fake_student?) || self.observer?
   end
 
   def restrict_past_view?
@@ -764,8 +738,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def completed?
-    s = self.state_based_on_date
-    (s == :completed) || (s == :inactive && !!completed_at)
+    self.enrollment_state.get_display_state == :completed
   end
 
   def explicitly_completed?
@@ -773,7 +746,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def completed_at
-    self.read_attribute(:completed_at) || (self.state_based_on_date && self.soft_completed_at) # soft_completed_at is loaded through state_based_on_date
+    if date = self.read_attribute(:completed_at)
+      date
+    else
+      if completed?
+        self.enrollment_state.state_started_at
+      end
+    end
   end
 
   alias_method :destroy_permanently!, :destroy

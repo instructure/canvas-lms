@@ -390,6 +390,7 @@ s2,test_1,section2,active},
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
+      Auditors::Course.expects(:record_deleted).once.with(@course, anything, anything)
       # only supply courses
       b = process_csv_data(
         [%{course_id,short_name,long_name,term_id}],

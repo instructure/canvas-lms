@@ -31,6 +31,13 @@ returns the canvas domain for the current context. Should always be available.
 canvas.instructure.com
 ```
 
+## Canvas.api.collaborationMembers.url
+returns the api url for the members of the collaboration. 
+
+```
+https://canvas.instructure.com/api/v1/collaborations/1/members
+```
+
 ## Canvas.api.baseUrl
 returns the base URL for the current context. Should always be available.
 
@@ -39,7 +46,7 @@ https://canvas.instructure.com
 ```
 
 ## ToolProxyBinding.memberships.url
-returns the URL for the membership service associated with the current context.
+returns the URL for the membership service associated with the current context. 
 
 ```
 https://canvas.instructure.com/api/lti/courses/1/membership_service
@@ -208,7 +215,7 @@ Only available when launched by a logged in user.
 Only available when launched by a logged in user.
 
 ## Canvas.group.contextIds
-returns the context ids for the groups the user belongs to in the course.
+returns the context ids for the groups the user belongs to in the course. 
 
 ```
 1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
@@ -242,7 +249,7 @@ Only available when pseudonym is in use.
 
 ## Canvas.logoutService.url
 This is the pseudonym the user is actually logged in as
-it may not hold all the sis info needed in other launch substitutions.
+it may not hold all the sis info needed in other launch substitutions. 
 
 ## Canvas.masqueradingUser.id
 Only available when the user is being masqueraded.
@@ -294,8 +301,9 @@ deprecated in favor of ISO8601. Only available when launched as an assignment.
 
 ## Canvas.assignment.dueAt.iso8601
 
+
 ## Canvas.assignment.published
-Returns if the assignment is currently published as a boolean string value 'true', 'false'. Only available when launched as an assignment.
+Only available when launched as an assignment.
 
 ## LtiLink.custom.url
 

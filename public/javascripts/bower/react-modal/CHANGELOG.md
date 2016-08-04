@@ -1,7 +1,67 @@
+v1.3.0 - Tue, 17 May 2016 16:04:50 GMT
+--------------------------------------
+
+- [9089a2d](../../commit/9089a2d) [fixed] Make the modal portal render into body again (#176)
+
+
+v1.2.1 - Sat, 23 Apr 2016 19:09:46 GMT
+--------------------------------------
+
+- [aa66819](../../commit/aa66819) [fixed] Removes unneeded sanitizeProps function (#169)
+
+
+v1.2.0 - Thu, 21 Apr 2016 22:02:02 GMT
+--------------------------------------
+
+- [a10683a](../../commit/a10683a) [fixed] Make the non-minified dist build present again (#164)
+- [04db149](../../commit/04db149) [added] Propagate event on close request (#91)
+
+
+v1.1.2 - Tue, 19 Apr 2016 02:36:05 GMT
+--------------------------------------
+
+- [4509133](../../commit/4509133) [fixed] moved sanitizeProps out of the render calls. (#162)
+
+
+v1.1.1 - Fri, 15 Apr 2016 05:30:45 GMT
+--------------------------------------
+This release affects only the dist version of the library reducing size immensely.
+
+- [9823bc5](../../commit/9823bc5) Use -p flag in webpack for minification and exclude externals react and react-dom
+- [72c8498](../../commit/72c8498) Move to using webpack for building the library
+
+
+v1.1.0 - Tue, 12 Apr 2016 13:03:08 GMT
+--------------------------------------
+
+- [6c03d17](../../commit/6c03d17) [added] trigger onAfterOpen callback when available. (#154)
+
+
+v1.0.0 - Sat, 09 Apr 2016 05:03:25 GMT
+--------------------------------------
+
+- [4e2447a](../../commit/4e2447a) [changed] Updated to add support for React 15  (#152)
+- [0d4e600](../../commit/0d4e600) [added] module for default style
+- [cb53bca](../../commit/cb53bca) [fixed] Remove ReactModal__Body--open class when unmounting Modal
+- [63bee72](../../commit/63bee72) [fixed] Custom classnames override default styles
+
+
+v0.6.1 - Fri, 23 Oct 2015 18:03:54 GMT
+--------------------------------------
+
+- 
+
+
+v0.6.0 - Wed, 21 Oct 2015 21:39:48 GMT
+--------------------------------------
+
+- 
+
+
 v0.5.0 - Tue, 22 Sep 2015 19:19:44 GMT
 --------------------------------------
 
-- [4d25989](../../commit/4d25989) [added] Inline CSS for modal and overlay as well as props to override. [changed] injectCSS has been changed to a warning message in preperation for a future removal. lib/components/Modal.js [changed] setAppElement method is now optional. Defaults to document.body and now allows for a css selector to be passed in rather than the whole element.
+- [4d25989](../../commit/4d25989) [added] Inline CSS for modal and overlay as well as props to override. [changed] injectCSS has been changed to a warning message in preparation for a future removal. lib/components/Modal.js [changed] setAppElement method is now optional. Defaults to document.body and now allows for a css selector to be passed in rather than the whole element.
 - [02cf2c3](../../commit/02cf2c3) [fixed] Clear the closeWithTimeout timer before unmounting
 
 

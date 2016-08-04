@@ -1,12 +1,13 @@
 define([
   'underscore',
   'react',
+  'react-dom',
   'jquery',
   'i18n!upload_drop_zone',
   'compiled/react_files/modules/FileOptionsCollection',
   'compiled/models/Folder',
   'compiled/jquery.rails_flash_notifications'
-  ], function(_, React, $, I18n, FileOptionsCollection, Folder) {
+], function(_, React, ReactDOM, $, I18n, FileOptionsCollection, Folder) {
 
     var UploadDropZone = React.createClass({
       displayName: 'UploadDropZone',
@@ -83,7 +84,7 @@ define([
         // We are actually returning the parent's parent here because that
         // gives a much more consistently sized container to start displaying
         // the drop zone overlay with.
-        return this.getDOMNode().parentElement.parentElement;
+        return ReactDOM.findDOMNode(this).parentElement.parentElement;
       },
 
       buildNonActiveDropZone: function () {
@@ -128,4 +129,3 @@ define([
 
     return UploadDropZone;
 });
-

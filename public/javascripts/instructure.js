@@ -58,6 +58,105 @@ define([
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
+  function enhanceUserContent() {
+    var $content = $("#content");
+    $(".user_content:not(.enhanced):visible").addClass('unenhanced');
+    $(".user_content.unenhanced:visible")
+      .each(function() {
+        var $this = $(this);
+        $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
+        $this.data('unenhanced_content_html', $this.html());
+      })
+      .find(".enhanceable_content").show()
+        .filter(".dialog").each(function(){
+          var $dialog = $(this);
+          $dialog.hide();
+          $dialog.closest(".user_content").find("a[href='#" + $dialog.attr('id') + "']").click(function(event) {
+            event.preventDefault();
+            $dialog.dialog();
+          });
+        }).end()
+        .filter(".draggable").draggable().end()
+        .filter(".resizable").resizable().end()
+        .filter(".sortable").sortable().end()
+        .filter(".accordion").accordion().end()
+        .filter(".tabs").each(function() {
+          $(this).tabs();
+        }).end()
+      .end()
+      .find("a:not(.not_external, .external):external").each(function(){
+        var externalLink = htmlEscape(I18n.t('titles.external_link', 'Links to an external site.'));
+        $(this)
+          .not(":has(img)")
+          .addClass('external')
+          .html('<span>' + $(this).html() + '</span>')
+          .attr('target', '_blank')
+          .attr('rel', 'noreferrer')
+          .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
+          .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
+      }).end()
+        .find("a.instructure_file_link").each(function() {
+            var $link = $(this),
+                $span = $("<span class='instructure_file_link_holder link_holder'/>");
+            $link.removeClass('instructure_file_link').before($span).appendTo($span);
+            if($link.attr('target') != '_blank') {
+          $span.append("<a href='" + htmlEscape($link.attr('href')) + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
+              "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
+        }
+      });
+    if ($.filePreviewsEnabled()) {
+      $("a.instructure_scribd_file").not(".inline_disabled").each(function() {
+        var $link = $(this);
+        if ( $.trim($link.text()) ) {
+          var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
+                      $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
+                          "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
+                  $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
+                  $span.append($scribd_link);
+                  if($link.hasClass('auto_open')) {
+                      $scribd_link.click();
+                  }
+              }
+          });
+      }
+
+    $(".user_content.unenhanced a")
+      .find("img.media_comment_thumbnail").each(function() {
+        $(this).closest("a").addClass('instructure_inline_media_comment');
+      }).end()
+      .filter(".instructure_inline_media_comment").removeClass('no-underline').mediaCommentThumbnail('normal').end()
+      .filter(".instructure_video_link, .instructure_audio_link").mediaCommentThumbnail('normal', true).end()
+      .not(".youtubed").each(function() {
+        var $link = $(this),
+            href = $link.attr('href'),
+            id = $.youTubeID(href || "");
+        if($link.hasClass('inline_disabled')) {
+        } else if(id) {
+          var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)" alt="' + htmlEscape($link.data('preview-alt')) + '"/></a>')
+            .click(function(event) {
+              event.preventDefault();
+              var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
+              $video.find(".hide_youtube_embed_link").click(function(event) {
+                event.preventDefault();
+                $video.remove();
+                $after.show();
+                $.trackEvent('hide_embedded_content', 'hide_you_tube');
+              });
+              $(this).after($video).hide();
+            });
+          $.trackEvent('show_embedded_content', 'show_you_tube');
+          $link
+            .addClass('youtubed')
+            .after($after);
+        }
+      });
+    $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
+
+    setTimeout(function() {
+      $(".user_content form.user_content_post_form:not(.submitted)").submit().addClass('submitted');
+    }, 10);
+  }
+
   $(function() {
 
     // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
@@ -277,105 +376,6 @@ define([
         $dialog.dialog('open');
       });
     });
-
-    function enhanceUserContent() {
-      var $content = $("#content");
-      $(".user_content:not(.enhanced):visible").addClass('unenhanced');
-      $(".user_content.unenhanced:visible")
-        .each(function() {
-          var $this = $(this);
-          $this.find("img").css('maxWidth', Math.min($content.width(), $this.width()));
-          $this.data('unenhanced_content_html', $this.html());
-        })
-        .find(".enhanceable_content").show()
-          .filter(".dialog").each(function(){
-            var $dialog = $(this);
-            $dialog.hide();
-            $dialog.closest(".user_content").find("a[href='#" + $dialog.attr('id') + "']").click(function(event) {
-              event.preventDefault();
-              $dialog.dialog();
-            });
-          }).end()
-          .filter(".draggable").draggable().end()
-          .filter(".resizable").resizable().end()
-          .filter(".sortable").sortable().end()
-          .filter(".accordion").accordion().end()
-          .filter(".tabs").each(function() {
-            $(this).tabs();
-          }).end()
-        .end()
-        .find("a:not(.not_external, .external):external").each(function(){
-          var externalLink = htmlEscape(I18n.t('titles.external_link', 'Links to an external site.'));
-          $(this)
-            .not(":has(img)")
-            .addClass('external')
-            .html('<span>' + $(this).html() + '</span>')
-            .attr('target', '_blank')
-            .attr('rel', 'noreferrer')
-            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + $.raw(externalLink) + '"/>')
-            .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>');
-        }).end()
-          .find("a.instructure_file_link").each(function() {
-              var $link = $(this),
-                  $span = $("<span class='instructure_file_link_holder link_holder'/>");
-              $link.removeClass('instructure_file_link').before($span).appendTo($span);
-              if($link.attr('target') != '_blank') {
-            $span.append("<a href='" + htmlEscape($link.attr('href')) + "' target='_blank' title='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) +
-                "' style='padding-left: 5px;'><img src='/images/popout.png' alt='" + htmlEscape(I18n.t('titles.view_in_new_window', "View in a new window")) + "'/></a>");
-          }
-        });
-      if ($.filePreviewsEnabled()) {
-        $("a.instructure_scribd_file").not(".inline_disabled").each(function() {
-          var $link = $(this);
-          if ( $.trim($link.text()) ) {
-            var $span = $("<span class='instructure_scribd_file_holder link_holder'/>"),
-                        $scribd_link = $("<a class='scribd_file_preview_link' aria-hidden='true' tabindex='-1' href='" + htmlEscape($link.attr('href')) + "' title='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) +
-                            "' style='padding-left: 5px;'><img src='/images/preview.png' alt='" + htmlEscape(I18n.t('titles.preview_document', "Preview the document")) + "'/></a>");
-                    $link.removeClass('instructure_scribd_file').before($span).appendTo($span);
-                    $span.append($scribd_link);
-                    if($link.hasClass('auto_open')) {
-                        $scribd_link.click();
-                    }
-                }
-            });
-        }
-
-      $(".user_content.unenhanced a")
-        .find("img.media_comment_thumbnail").each(function() {
-          $(this).closest("a").addClass('instructure_inline_media_comment');
-        }).end()
-        .filter(".instructure_inline_media_comment").removeClass('no-underline').mediaCommentThumbnail('normal').end()
-        .filter(".instructure_video_link, .instructure_audio_link").mediaCommentThumbnail('normal', true).end()
-        .not(".youtubed").each(function() {
-          var $link = $(this),
-              href = $link.attr('href'),
-              id = $.youTubeID(href || "");
-          if($link.hasClass('inline_disabled')) {
-          } else if(id) {
-            var $after = $('<a href="'+ htmlEscape(href) +'" class="youtubed"><img src="/images/play_overlay.png" class="media_comment_thumbnail" style="background-image: url(//img.youtube.com/vi/' + htmlEscape(id) + '/2.jpg)"/></a>')
-              .click(function(event) {
-                event.preventDefault();
-                var $video = $("<span class='youtube_holder' style='display: block;'><object width='425' height='344'><param name='wmode' value='opaque'></param><param name='movie' value='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&'></param><param name='allowFullScreen' value='true'></param><param name='allowscriptaccess' value='always'></param><embed src='//www.youtube.com/v/" + htmlEscape(id) + "&autoplay=1&hl=en_US&fs=1&' type='application/x-shockwave-flash' allowscriptaccess='always' allowfullscreen='true' width='425' height='344' wmode='opaque'></embed></object><br/><a href='#' style='font-size: 0.8em;' class='hide_youtube_embed_link'>" + htmlEscape(I18n.t('links.minimize_youtube_video', "Minimize Video")) + "</a></span>");
-                $video.find(".hide_youtube_embed_link").click(function(event) {
-                  event.preventDefault();
-                  $video.remove();
-                  $after.show();
-                  $.trackEvent('hide_embedded_content', 'hide_you_tube');
-                });
-                $(this).after($video).hide();
-              });
-            $.trackEvent('show_embedded_content', 'show_you_tube');
-            $link
-              .addClass('youtubed')
-              .after($after);
-          }
-        });
-      $(".user_content.unenhanced").removeClass('unenhanced').addClass('enhanced');
-
-      setTimeout(function() {
-        $(".user_content form.user_content_post_form:not(.submitted)").submit().addClass('submitted');
-      }, 10);
-    };
     if ($.filePreviewsEnabled()) {
       $("a.scribd_file_preview_link").live('click', function(event) {
         event.preventDefault();
@@ -881,6 +881,7 @@ define([
           .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
+          .not(".exclude_external_icon")
           .addClass('external')
           .children("span.ui-icon-extlink").remove().end()
           .html('<span>' + $(this).html() + '</span>')
@@ -892,4 +893,11 @@ define([
   });
 
   $('input[placeholder], textarea[placeholder]').placeholder();
+
+  /**
+   * Expose functions for testing
+   */
+  return {
+    enhanceUserContent: enhanceUserContent
+  }
 });

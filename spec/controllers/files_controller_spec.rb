@@ -616,6 +616,26 @@ describe FilesController do
       expect(response.body).to include 'quota exceeded'
     end
 
+    it "does not check quota for local-storage submission uploads" do
+      local_storage!
+      user_session(@student)
+      Setting.set('user_default_quota', 7)
+      file = @student.attachments.build
+      file.file_state = 'deleted'
+      file.workflow_state = 'unattached'
+      file.save!
+      post 'create', :user_id => @student.id,
+           :format => 'json',
+           :check_quota_after => '0',
+           :filename => 'submission.doc',
+           :attachment => {
+             :unattached_attachment_id => file.id,
+             :uploaded_data => io
+           }
+      expect(response).to be_success
+      expect(file.reload).to be_available
+    end
+
     it "refuses to create a file in a submissions folder" do
       user_session(@student)
       post 'create', :user_id => @student.id, :format => :json, :attachment => {:display_name => 'blah', :uploaded_data => io, :folder_id => @student.submissions_folder.id}

@@ -1,6 +1,7 @@
 define([
   'i18n!react_files',
   'react',
+  'react-dom',
   'compiled/fn/preventDefault',
   'compiled/react_files/modules/customPropTypes',
   'compiled/react_files/modules/filesEnv',
@@ -12,7 +13,7 @@ define([
   'compiled/react_files/utils/downloadStuffAsAZip',
   'compiled/react_files/utils/deleteStuff',
   'jquery'
-], function (I18n, React, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialog, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) {
+], function (I18n, React, ReactDOM, preventDefault, customPropTypes, filesEnv, File, Folder, UsageRightsDialog, RestrictedDialogForm, openMoveDialog, downloadStuffAsAZip, deleteStuff, $) {
 
   var ItemCog = React.createClass({
     displayName: 'ItemCog',
@@ -59,7 +60,7 @@ define([
       );
 
       this.props.modalOptions.openModal(contents, () => {
-        this.refs.settingsCogBtn.getDOMNode().focus();
+        ReactDOM.findDOMNode(this.refs.settingsCogBtn).focus();
       });
     },
 
@@ -70,13 +71,13 @@ define([
           if (this.props.model.externalToolEnabled(tool)) {
             return (
               <li key={tool.title} role='presentation'>
-                <a href={`${tool.base_url}&files[]=${this.props.model.id}`} role='menuitem' tabindex='-1'>
+                <a href={`${tool.base_url}&files[]=${this.props.model.id}`} role='menuitem' tabIndex='-1'>
                   {tool.title}
                 </a>
               </li>
             );
           } else {
-            return (<li key={tool.title} role='presentation'><a href='#' className='disabled' role='menuitem' tabindex='-1' aria-disabled='true'>{tool.title}</a></li>);
+            return (<li key={tool.title} role='presentation'><a href='#' className='disabled' role='menuitem' tabIndex='-1' aria-disabled='true'>{tool.title}</a></li>);
           }
         });
       } else {
@@ -94,7 +95,7 @@ define([
           var args = {
             contextType,
             contextId,
-            returnFocusTo: this.refs.settingsCogBtn.getDOMNode()
+            returnFocusTo: ReactDOM.findDOMNode(this.refs.settingsCogBtn)
           };
 
           args = $.extend(args, params);

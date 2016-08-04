@@ -509,6 +509,17 @@ $gradebook_checkbox_width: 16px;
   }
 }
 
+.ui-menu .ui-menu-item.ui-state-disabled {
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.ui-menu-item.ui-state-disabled label {
+  margin-bottom: 0;
+  vertical-align: 0;
+}
+
 .post-grades-menu {
   li.external-tools-dialog,
   li.post-grades-placeholder {

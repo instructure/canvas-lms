@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "8b845892b37b1b69697b0cb6ad377c65b6adbcbe51a484f1de7681a2f028e896",
-    "current": "8b845892b37b1b69697b0cb6ad377c65b6adbcbe51a484f1de7681a2f028e896"
+    "previous": "72e85d758fd8bd6ee724d67cc1497748aa0fcde2e2c06ca5fd15bc5fd37a60c1",
+    "current": "72e85d758fd8bd6ee724d67cc1497748aa0fcde2e2c06ca5fd15bc5fd37a60c1"
   },
   "fonts": [
     "public/fonts/canvas/canvas-icons.ttf",
@@ -353,6 +353,10 @@
     "invitation": {
       "codepoint": 61775,
       "source": "public/fonts/icons/invitation.svg"
+    },
+    "keyboard-shortcuts": {
+      "codepoint": 61885,
+      "source": "public/fonts/icons/keyboard-shortcuts.svg"
     },
     "like": {
       "codepoint": 61776,

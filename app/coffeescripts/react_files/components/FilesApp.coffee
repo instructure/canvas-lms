@@ -63,6 +63,10 @@ define [
         retObj.only_preview = @state.selectedItems.map((item) -> item.id).join(',')
       if @props.query?.search_term
         retObj.search_term = @props.query.search_term
+      if @props.query?.sort
+        retObj.sort = @props.query.sort
+      if @props.query?.order
+        retObj.order = @props.query.order
       retObj
 
     openModal: (contents, afterClose) ->
@@ -73,5 +77,3 @@ define [
 
     closeModal: ->
       @setState(showingModal: false, -> @state.afterModalClose())
-
-

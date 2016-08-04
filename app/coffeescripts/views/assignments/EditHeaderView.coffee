@@ -14,7 +14,8 @@ define [
     events:
       'click .delete_assignment_link': 'onDelete'
       'change #grading_type_selector': 'onGradingTypeUpdate'
-      'change' : 'onChange'
+      'tabsbeforeactivate': 'onTabChange'
+
 
     messages:
       confirm: I18n.t('confirms.delete_assignment', 'Are you sure you want to delete this assignment?')
@@ -22,19 +23,18 @@ define [
     els:
       '#edit-assignment-header-tabs': '$headerTabs'
       '#edit-assignment-header-cr-tabs': '$headerTabsCr'
-      '#conditional-release-target': '$conditionalReleaseTarget'
+
+    initialize: (options) ->
+      super
+      @editView = options.views['edit_assignment_form']
+      @editView.on 'show-errors', @onShowErrors
 
     afterRender: ->
       # doubled for conditional release
       @$headerTabs.tabs()
       @$headerTabsCr.tabs()
-
       if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
         @toggleConditionalReleaseTab(@model.gradingType())
-        @conditionalReleaseEditor = ConditionalRelease.attach(
-          @$conditionalReleaseTarget.get(0),
-          I18n.t('assignment'),
-          ENV.CONDITIONAL_RELEASE_ENV)
 
     onDelete: (e) =>
       e.preventDefault()
@@ -64,12 +64,19 @@ define [
         else
           @$headerTabsCr.tabs("option", "disabled", false)
 
+    onTabChange: ->
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+        @editView.updateConditionalRelease()
+
+    onShowErrors: (errors) =>
+      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+        if errors['conditional_release']
+          @$headerTabsCr.tabs("option", "active", 1)
+          @editView.$conditionalReleaseTarget.get(0).scrollIntoView()
+        else
+          @$headerTabsCr.tabs("option", "active", 0)
+
     toJSON: ->
       json = @model.toView()
       json['CONDITIONAL_RELEASE_SERVICE_ENABLED'] = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       json
-
-    onChange: ->
-      if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !@assignmentDirty
-        @assignmentDirty = true
-        @conditionalReleaseEditor.setProps({ assignmentDirty: true })

@@ -67,7 +67,7 @@ describe AssignmentGroupsController do
         )
       end
 
-      let(:grading_period_group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
+      let(:grading_period_group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
       let(:course) do
         course = sub_account.courses.create!
         course.offer!

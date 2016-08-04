@@ -366,10 +366,11 @@ define([
 
       $("#new_page_drop_down").submit(function(event){
         event.preventDefault();
-        var pageName = encodeURIComponent($("#new_page_name").val());
+        var rawPageName = $("#new_page_name").val();
+        var encodedPageName = encodeURIComponent(rawPageName);
         wikiSidebar.editor.editorBox('create_link', {
-          title: htmlEscape($("#new_page_name").val()),
-          url: $("#new_page_url_prefix").val()+ "/" + pageName + "?titleize=0"
+          title: rawPageName,
+          url: $("#new_page_url_prefix").val()+ "/" + encodedPageName + "?titleize=0"
         });
         $('#new_page_drop_down').slideUp("fast");
         $("#new_page_name").val("");

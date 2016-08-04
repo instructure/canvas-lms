@@ -1,4 +1,4 @@
-var _element = document.body;
+var _element = typeof document !== 'undefined' ? document.body : null;
 
 function setElement(element) {
   if (typeof element === 'string') {
@@ -6,6 +6,7 @@ function setElement(element) {
     element = 'length' in el ? el[0] : el;
   }
   _element = element || _element;
+  return _element;
 }
 
 function hide(appElement) {
@@ -39,4 +40,3 @@ exports.setElement = setElement;
 exports.show = show;
 exports.hide = hide;
 exports.resetForTesting = resetForTesting;
-

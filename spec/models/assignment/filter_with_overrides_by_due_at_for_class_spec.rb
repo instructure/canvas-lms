@@ -25,7 +25,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
   end
   let(:account) { Account.create! }
   let(:course) { account.courses.create! }
-  let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
+  let(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
   let(:period) do
     group.grading_periods.create!(
       title: "a default period",

@@ -1,10 +1,11 @@
 define([
   'react',
   'underscore',
+  'jquery',
   'jsx/grading/GradingPeriodSetCollection',
   'compiled/api/gradingPeriodSetsApi',
   'compiled/api/enrollmentTermsApi'
-], (React, _, SetCollection, setsApi, termsApi) => {
+], (React, _, $, SetCollection, setsApi, termsApi) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -102,7 +103,7 @@ define([
   module("GradingPeriodSetCollection - API Data Load", {
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     stubTermsSuccess() {
@@ -124,7 +125,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -171,11 +172,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -258,11 +259,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -354,6 +355,30 @@ define([
       collection.changeSearchText("does not match");
       filteredIDs = _.pluck(collection.getVisibleSets(), "id");
       propEqual(collection.getVisibleSets(), []);
+      start();
+    });
+  });
+
+  asyncTest("announces number of search results for screen readers", function() {
+    let collection = this.renderComponent();
+
+    Promise.all([this.terms, this.sets]).then(function() {
+      sinon.spy($, "screenReaderFlashMessageExclusive");
+      collection.changeSearchText("201");
+      collection.getVisibleSets();
+      ok($.screenReaderFlashMessageExclusive.calledWith(I18n.t({
+          one: "1 set of grading periods found.",
+          other: "%{count} sets of grading periods found.",
+          zero: "No matching sets of grading periods found."
+        }, {count: 2}
+      )));
+
+      collection.changeSearchText("");
+      collection.getVisibleSets();
+      ok($.screenReaderFlashMessageExclusive.calledWith(I18n.t("Showing all sets of grading periods.")));
+
+      $.screenReaderFlashMessageExclusive.restore();
+
       start();
     });
   });
@@ -471,11 +496,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -522,11 +547,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -551,11 +576,11 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -619,7 +644,7 @@ define([
 
     renderComponent() {
       const element = React.createElement(SetCollection, props);
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       component.onTermsLoaded(exampleTerms);
       component.onSetsLoaded(exampleSets);
       Simulate.click(component.refs["show-grading-period-set-1"].refs.editButton);
@@ -631,7 +656,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

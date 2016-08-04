@@ -161,4 +161,28 @@ describe SearchController do
     end
   end
 
+  describe "GET 'all_courses'" do
+    before(:once) do
+      @c1 = course(course_name: 'foo', active_course: true)
+      @c2 = course(course_name: 'bar', active_course: true)
+      @c2.update_attribute(:indexed, true)
+    end
+
+    it "returns indexed courses" do
+      get 'all_courses'
+      expect(assigns[:courses].map(&:id)).to eq [@c2.id]
+    end
+
+    it "searches" do
+      @c1.update_attribute(:indexed, true)
+      get 'all_courses', search: 'foo'
+      expect(assigns[:courses].map(&:id)).to eq [@c1.id]
+    end
+
+    it "does not cache XHR requests" do
+      xhr :get, 'all_courses'
+      expect(response.headers["Pragma"]).to eq "no-cache"
+    end
+  end
+
 end

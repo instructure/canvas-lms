@@ -61,6 +61,7 @@ define [
         )
         @msfAnimation(options.animation) if options?.animation != undefined
         @show()
+        $(window).triggerHandler('resize');
 
       this
 

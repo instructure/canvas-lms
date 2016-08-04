@@ -39,7 +39,8 @@ describe "gradebook2 - multiple grading periods" do
     let!(:create_period_group_and_default_periods) do
       term = @course.root_account.enrollment_terms.create!
       @course.update_attributes(enrollment_term: term)
-      group = Factories::GradingPeriodGroupHelper.new.create_for_enrollment_term(term)
+      group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+      term.update_attribute(:grading_period_group_id, group)
       group.grading_periods.create(
         start_date: 4.months.ago,
         end_date:   2.months.ago,

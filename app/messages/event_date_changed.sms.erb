@@ -1,4 +1,4 @@
-<%= t('subject', '%{event_title}, %{course_name} changed to:', :event_title => asset.title, :course_name => asset.context.name) %>
+<%= t('%{event_title}, %{course_name} changed to', :event_title => asset.title, :course_name => asset.context.name) %>
 
 <% if !asset.start_at && !asset.end_at %>
   <%= t('no_time_set', 'No Time Set') %>

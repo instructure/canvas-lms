@@ -39,6 +39,48 @@ define([
     jQuery.fn.accordion.restore()
   })
 
+  test('Opens last used accordion tab', () => {
+    var options; // Stores the last object passed to $dom.accorion({...})
+    sinon.stub(jQuery.fn, 'accordion', (opts)=>{
+      // Allows us to save the last accordion call if it was an object
+      // Ex: it won't save if $dom.accordion('options','active') is called
+      if(typeof opts==='object'){
+        options = opts
+      }
+    })
+
+    var mem; // the saved index
+    var cur; // the current index
+    var dom = document.createElement('div')
+    var context = {
+      getDOMNode: ()=>{ return dom },
+      getStoredAccordionIndex: ()=>{ return mem || 0 },
+      rememberActiveIndex: ()=>{ mem = cur }
+    }
+    function initAccordion(){
+      ThemeEditorAccordion.prototype.initAccordion.call(context)
+    }
+    // Simulate opening a pane
+    function selectPane(index){
+      cur = index
+      options.activate()
+    }
+
+    initAccordion()
+    // The active pane index is expected to be 0 by default
+    equal(options.active, 0, 'Opens first pane if none previously recorded')
+
+    selectPane(1)
+    initAccordion() // Simulate page refresh
+    equal(options.active, 1, 'Remembers and opens second pane after refresh')
+
+    selectPane(2)
+    initAccordion()
+    equal(options.active, 2, 'Remembers and opens third pane after refresh')
+
+    jQuery.fn.accordion.restore()
+  })
+
   function testRenderRow (type, Component) {
     return () => {
       props.variableSchema = [{
@@ -182,9 +224,8 @@ define([
     const shallowRenderer = React.addons.TestUtils.createRenderer()
     shallowRenderer.render(<ThemeEditorAccordion {...props} />)
     const vdom = shallowRenderer.getRenderOutput()
-    const rows = vdom.props.children[0][1]._store.props.children
+    const rows = vdom.props.children[0][1].props.children
     equal(rows[0].type, ColorRow, 'renders color row')
     equal(rows[1].type, ImageRow, 'renders image row')
   })
 })
-

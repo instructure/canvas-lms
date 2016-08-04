@@ -37,6 +37,7 @@ define [
       fixtures.setup()
       @$target = fixtures.create('<textarea id="myEditor" />')
       sinon.stub(RCELoader, 'loadOnTarget')
+      @stub(Sidebar, 'show')
 
     teardown: ->
       fakeENV.teardown()
@@ -48,7 +49,7 @@ define [
     sinon.stub(RichContentEditor, 'freshNode').withArgs(@$target).returns(@$target)
     options = {}
     RichContentEditor.loadNewEditor(@$target, options)
-    ok RCELoader.loadOnTarget.calledWith(@$target, options)
+    ok RCELoader.loadOnTarget.calledWith(@$target, sinon.match(options))
     RichContentEditor.freshNode.restore()
 
   test 'calls editorBox and set_code when feature flag off', ->
@@ -76,15 +77,28 @@ define [
     # false so we don't have to stub out RCELoader.loadOnTarget
     ENV.RICH_CONTENT_SERVICE_ENABLED = false
     RichContentEditor.initSidebar()
-    sinon.spy(Sidebar, 'show')
     RichContentEditor.loadNewEditor(@$target, {focus: true})
     ok Sidebar.show.called
-    Sidebar.show.restore()
 
   test 'hides resize handle when called', ->
     $resize = fixtures.create('<div class="mce-resizehandle"></div>')
     RichContentEditor.loadNewEditor(@$target, {})
     equal $resize.attr('aria-hidden'), "true"
+
+  test 'passes onFocus to loadOnTarget', ->
+    options = {}
+    RichContentEditor.loadNewEditor(@$target, options)
+    onFocus = RCELoader.loadOnTarget.firstCall.args[1].onFocus
+    onFocus()
+    ok Sidebar.show.called
+
+  test 'onFocus calls options.onFocus if exists', ->
+    options = {onFocus: @spy()}
+    RichContentEditor.loadNewEditor(@$target, options)
+    onFocus = RCELoader.loadOnTarget.firstCall.args[1].onFocus
+    editor = {}
+    onFocus(editor)
+    ok options.onFocus.calledWith(editor)
 
   module 'RichContentEditor - callOnRCE',
     setup: ->

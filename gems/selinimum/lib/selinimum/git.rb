@@ -13,7 +13,7 @@ module Selinimum
       end
 
       def head
-        recent_shas.first
+        recent_shas.first || ENV["GERRIT_PATCHSET_REVISION"] || raise("no .git directory, and no revision specified!")
       end
 
       def normalize_sha(sha)

@@ -25,7 +25,7 @@ group :test do
 
   gem 'sequel', '4.5.0', require: false
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
-  gem 'selenium-webdriver', '2.53.0'
+  gem 'selenium-webdriver', '2.53.4'
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'

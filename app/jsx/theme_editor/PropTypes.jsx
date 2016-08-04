@@ -19,6 +19,8 @@ define([
     variable_name: React.PropTypes.string.isRequired,
   }
 
+  types.variables = React.PropTypes.objectOf(React.PropTypes.string).isRequired
+
   types.color = React.PropTypes.shape(_.extend({
     type: React.PropTypes.oneOf(['color']).isRequired
   }, baseVarDef))
@@ -38,11 +40,11 @@ define([
 
   types.brandConfig = React.PropTypes.shape({
     md5: types.md5,
-    variables: React.PropTypes.object.isRequired
+    variables: types.variables
   })
 
   types.sharedBrandConfig = React.PropTypes.shape({
-    account_id: React.PropTypes.number,
+    account_id: React.PropTypes.string,
     brand_config: types.brandConfig.isRequired,
     name: React.PropTypes.string.isRequired
   })

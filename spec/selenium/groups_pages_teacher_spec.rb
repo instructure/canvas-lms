@@ -154,7 +154,7 @@ describe "groups" do
       it "should allow teacher to add a new folder", priority: "2", test_id: 303703 do
         get files_page
         add_folder
-        expect(ff('.media-body').first.text).to eq 'new folder'
+        expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
       end
 
       it "should allow teacher to delete a folder", priority: "2", test_id: 304184 do

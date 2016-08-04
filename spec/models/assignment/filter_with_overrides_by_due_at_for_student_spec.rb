@@ -24,7 +24,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     before :once do
       @course = Course.create!
       @assignment = @course.assignments.create!
-      group = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
+      group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
       @grading_period = group.grading_periods.create!(
         title: 'testing is easy, he said',
         start_date: 1.month.ago,

@@ -131,6 +131,10 @@ class Role < ActiveRecord::Base
     @built_in_roles_by_id[shard.id] ||= built_in_roles(reload, shard).index_by(&:id)
   end
 
+  def self.clear_built_in_roles!
+    @built_in_roles.clear if @built_in_roles
+  end
+
   def self.built_in_course_roles
     built_in_roles.select{|role| role.course_role?}
   end

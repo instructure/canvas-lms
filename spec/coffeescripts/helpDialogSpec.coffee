@@ -38,7 +38,7 @@ define [
     helpDialog.initTriggers()
     $tester.click()
     ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"
-    equal $('.ui-dialog-title').text().trim(), 'Links'
+    equal $('.ui-dialog-title:contains("Links")').length, 1
     $tester.remove()
 
   test 'teacher feedback', ->

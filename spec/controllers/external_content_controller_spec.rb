@@ -185,6 +185,43 @@ describe ExternalContentController do
       expect(data.first.canvas_url).to include "http%3A%2F%2Fexample.com%2Flaunch"
     end
 
+    context 'lti_links' do
+      it "generates a canvas tool launch url" do
+        c = course
+        json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
+        post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+             lti_version: 'LTI-1p0' ,
+             content_items: json.to_json)
+
+        data = controller.js_env[:retrieved_data]
+        expect(data.first.canvas_url).to include "/external_tools/retrieve"
+        expect(data.first.canvas_url).to include "url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti"
+      end
+
+      it "generates a borderless launch url for iframe target" do
+        c = course
+        json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
+        json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'iframe'
+        post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+             lti_version: 'LTI-1p0' ,
+             content_items: json.to_json)
+
+        data = controller.js_env[:retrieved_data]
+        expect(data.first.canvas_url).to include "display=borderless"
+      end
+
+      it "generates a borderless launch url for window target" do
+        c = course
+        json = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')))
+        json['@graph'][0]['placementAdvice']['presentationDocumentTarget'] = 'window'
+        post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+             lti_version: 'LTI-1p0' ,
+             content_items: json.to_json)
+
+        data = controller.js_env[:retrieved_data]
+        expect(data.first.canvas_url).to include "display=borderless"
+      end
+    end
   end
 
 end

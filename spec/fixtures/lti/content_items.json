@@ -8,11 +8,11 @@
       "title": "Its your computer",
       "text": "Arch Linux",
       "mediaType": "application/vnd.ims.lti.v1.ltilink",
-      "windowTarget": "",
       "placementAdvice": {
         "displayWidth": 800,
         "presentationDocumentTarget": "iframe",
-        "displayHeight": 600
+        "displayHeight": 600,
+        "windowTarget": ""
       },
       "thumbnail": {
         "@id": "http://www.runeaudio.com/assets/img/banner-archlinux.png",

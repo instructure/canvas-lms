@@ -168,8 +168,12 @@ class UserMerge
       user_merge_data.add_more_data(account_users)
       account_users.update_all(user_id: target_user)
 
+      attachments = Attachment.where(user_id: from_user)
+      user_merge_data.add_more_data(attachments)
+      Attachment.send_later(:migrate_attachments, from_user, target_user)
+
       updates = {}
-      ['access_tokens', 'asset_user_accesses', 'attachments',
+      ['access_tokens', 'asset_user_accesses',
        'calendar_events', 'collaborations',
        'context_module_progressions',
        'group_memberships', 'page_comments',
@@ -198,8 +202,6 @@ class UserMerge
           Rails.logger.error "migrating #{table} column #{column} failed: #{e}"
         end
       end
-
-      Attachment.send_later(:migrate_attachments, from_user, target_user)
 
       context_updates = ['calendar_events']
       context_updates.each do |table|

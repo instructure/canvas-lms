@@ -50,6 +50,7 @@ body {
   outline: 0;
   margin-top: 6px;
   margin-bottom: 6px;
+  background-color: transparent;
 }
 
 .ic-token-label {
@@ -116,6 +117,8 @@ body {
 }
 
 .ic-tokens {
+  box-sizing: border-box;
+  position: relative;
   z-index: 1;
   list-style: none;
   padding: 6px 6px;
@@ -125,6 +128,18 @@ body {
   cursor: text;
   position: relative;
   will-change: transform;
+  flex-wrap: wrap;
+  min-height: 41px;
+}
+
+.ic-tokens-disabled {
+  border: 1px solid #CCCCCC;
+  background-color: #eee;
+  color: #eee;
+  cursor: default;
+  -moz-box-shadow:    inset 0 0 6px #ddd;
+  -webkit-box-shadow: inset 0 0 6px #ddd;
+  box-shadow:         inset 0 0 6px #ddd;
 }
 
 .ic-token {
@@ -134,6 +149,8 @@ body {
   border-radius: 3px;
   padding: 3px 8px;
   margin-right: 6px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .ic-token-delete-button {
@@ -163,4 +180,12 @@ body {
 
 .ic-tokeninput-button {
   display: none;
+}
+
+.ic-tokeninput-loading {
+  position: absolute;
+  bottom: 9px;
+  right: 2px;
+  align-items: center;
+  padding-right: 6px;
 }

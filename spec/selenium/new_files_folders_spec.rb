@@ -41,16 +41,16 @@ describe "better_file_browsing, folders" do
 
     it "should validate xss on folder text", priority: "1", test_id: 133113 do
      add_folder('<script>alert("Hi");</script>')
-     expect(ff('.media-body')[0].text).to eq '<script>alert("Hi");<_script>'
+     expect(ff('.ef-name-col__text')[0].text).to eq '<script>alert("Hi");<_script>'
     end
 
     it "should move a folder", priority: "1", test_id: 133125 do
-      ff('.media-body')[0].click
+      ff('.ef-name-col__text')[0].click
       wait_for_ajaximations
       add_folder("test folder")
       move("test folder", 0, :cog_icon)
       wait_for_ajaximations
-      expect(f("#flash_message_holder").text).to eq "test folder moved to course files\nClose"
+      expect(f("#flash_message_holder").text).to eq "test folder moved to course files"
       expect(ff(".treeLabel span")[2].text).to eq "test folder"
     end
 
@@ -122,19 +122,19 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
        create_new_folder
        add_folder("New Folder")
-       ff('.media-body')[1].click
+       ff('.ef-name-col__text')[1].click
        wait_for_ajaximations
        add_folder("New Folder 1.1")
        ff(".icon-folder")[1].click
-       expect(ff('.media-body')[0].text).to eq "New Folder 1.1"
+       expect(ff('.ef-name-col__text')[0].text).to eq "New Folder 1.1"
        get "/courses/#{@course.id}/files"
-       expect(ff('.media-body')[0].text).to eq "example.pdf"
+       expect(ff('.ef-name-col__text')[0].text).to eq "example.pdf"
        expect(f('.ef-folder-content')).to be_displayed
      end
 
      it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
        create_new_folder
-       f('.ef-name-col > a.media').click
+       f('.ef-name-col > a.ef-name-col__link').click
        wait_for_ajaximations
        1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"

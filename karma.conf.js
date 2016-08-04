@@ -1,5 +1,4 @@
 var fs = require("fs");
-var karmaFiles = [];
 
 var webpackFileExists = false;
 var webpackFilePath = __dirname + "/config/WEBPACK";
@@ -16,7 +15,8 @@ var usingWebpack = (process.env.USE_WEBPACK == 'True' ||
                     webpackFileExists);
 
 // If we're using webpack, we don't want to load all the requirejs stuff;
-if(usingWebpack){
+var karmaFiles;
+if (usingWebpack) {
   karmaFiles = [
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/axe.js',
@@ -59,7 +59,13 @@ var karmaConfig = {
   exclude: [],
 
   // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
-  reporters: ['progress'],
+  reporters: ['progress', 'coverage'],
+
+  coverageReporter: {
+    type: 'html',
+    dir: 'coverage-js/',
+    subdir: '.'
+  },
 
   port: 9876,
 

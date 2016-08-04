@@ -439,7 +439,6 @@ describe CoursesController do
       assigned_tool = assigns[:course_settings_sub_navigation_tools].first
       expect(assigned_tool.id).to eq active_tool.id
     end
-
   end
 
   describe "GET 'enrollment_invitation'" do
@@ -1028,6 +1027,28 @@ describe CoursesController do
         aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
         expect(aua.asset_category).to eq 'home'
         expect(aua.membership_type).to eq 'StudentEnrollment'
+      end
+    end
+
+    context "course_home_sub_navigation" do
+      before :once do
+        @course.root_account.enable_feature!(:lor_for_account)
+        @tool = @course.context_external_tools.create(consumer_key: 'test', shared_secret: 'secret', url: 'http://example.com/lti',
+          name: 'tool', course_home_sub_navigation: {enabled: true, visibility: 'admins'})
+      end
+
+      it "should show admin-level course_home_sub_navigation external tools for teachers" do
+        user_session(@teacher)
+
+        get 'show', :id => @course.id
+        expect(assigns[:course_home_sub_navigation_tools].size).to eq 1
+      end
+
+      it "should reject admin-level course_home_sub_navigation external tools for students" do
+        user_session(@student)
+
+        get 'show', :id => @course.id
+        expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
       end
     end
   end

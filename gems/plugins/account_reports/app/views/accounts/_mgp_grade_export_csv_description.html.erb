@@ -1,0 +1,83 @@
+<p><%= t(%{This report shows grading period grades (and overall course grades)
+for each student enrolled in a given term. The resulting csv file will have one
+row per enrollment.}) %></p>
+
+<h3><%= t("Example") %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t("student name") %></th>
+    <th><%= t("student id") %></th>
+    <th><%= t("student sis") %></th>
+    <th><%= t("course") %></th>
+    <th><%= t("course id") %></th>
+    <th><%= t("course sis") %></th>
+    <th><%= t("section") %></th>
+    <th><%= t("section id") %></th>
+    <th><%= t("section sis") %></th>
+    <th><%= t("term") %></th>
+    <th><%= t("term id") %></th>
+    <th><%= t("term sis") %></th>
+    <th><%= t("grading period set") %>
+    <th><%= t("grading period set id") %>
+    <th><%= t("Spring grading period id") %>
+    <th><%= t("Spring grading period current score") %>
+    <th><%= t("Spring grading period final score") %>
+    <th><%= t("Fall grading period id") %>
+    <th><%= t("Fall grading period current score") %>
+    <th><%= t("Fall grading period final score") %>
+    <th><%= t("current score") %></th>
+    <th><%= t("final score") %></th>
+    <th><%= t("enrollment state") %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>smith, heather</td>
+    <td>423945</td>
+    <td>u96872</td>
+    <td>Programming 330</td>
+    <td>3217</td>
+    <td>c5976</td>
+    <td>Section A</td>
+    <td>4985</td>
+    <td>s7854</td>
+    <td>Fall 2012</td>
+    <td>4561</td>
+    <td>t1649</td>
+    <td>1</td>
+    <td>70.5</td>
+    <td>68.5</td>
+    <td>2</td>
+    <td></td>
+    <td>0</td>
+    <td>96.3</td>
+    <td>79.8</td>
+    <td>active</td>
+  </tr>
+  <tr>
+    <td>smith, kacie</td>
+    <td>104837</td>
+    <td>u48956</td>
+    <td>English 101</td>
+    <td>4564</td>
+    <td>c7681</td>
+    <td>Section A</td>
+    <td>4563</td>
+    <td>s9456</td>
+    <td>Fall 2012</td>
+    <td>4561</td>
+    <td>t1649</td>
+    <td>1</td>
+    <td>75.0</td>
+    <td>73.2</td>
+    <td>2</td>
+    <td></td>
+    <td>0</td>
+    <td>91.1</td>
+    <td>70.9</td>
+    <td>concluded</td>
+  </tr>
+  </tbody>
+</table>

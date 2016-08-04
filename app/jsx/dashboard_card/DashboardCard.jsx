@@ -172,8 +172,8 @@ define([
           className="ic-DashboardCard"
           ref="cardDiv"
           style={{borderBottomColor: this.props.backgroundColor}}
+          aria-label={this.props.originalName}
         >
-
           <div className="ic-DashboardCard__header">
             <div
               className="ic-DashboardCard__header_hero"
@@ -209,9 +209,12 @@ define([
                 </span>
             </button>
           </div>
-          <div className="ic-DashboardCard__action-container">
+          <nav
+            className="ic-DashboardCard__action-container"
+            aria-label={ I18n.t("Actions for %{course}", { course: this.state.nicknameInfo.nickname}) }
+          >
             { this.linksForCard() }
-          </div>
+          </nav>
           { this.colorPickerIfEditing() }
         </div>
       );

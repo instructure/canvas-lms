@@ -68,9 +68,9 @@ describe ExternalToolsController, type: :request do
       error_call(@course)
     end
 
-    it "should give unauthorized response" do
+    it "should give authorized response" do
       course_with_student_logged_in(:active_all => true, :course => @course, :name => "student")
-      unauthorized_call(@course)
+      authorized_call(@course)
     end
 
     it "should paginate" do
@@ -413,6 +413,13 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'index',
                      :format => 'json', :"#{type}_id" => context.id.to_s})
     expect(response.code).to eq "401"
+  end
+
+  def authorized_call(context, type="course")
+    raw_api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json",
+                    {:controller => 'external_tools', :action => 'index',
+                     :format => 'json', :"#{type}_id" => context.id.to_s})
+    expect(response.code).to eq "200"
   end
 
   def paginate_call(context, type="course")

@@ -69,7 +69,7 @@ describe "assignments" do
       expect(f('.submit_online_upload_option')).to be_displayed
     end
 
-    it "should validate an assignment created with the type of external tool" do
+    it "should validate an assignment created with the type of external tool", priority: "1", test_id: 2624905 do
       t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
       external_tool_assignment = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
       external_tool_assignment.create_external_tool_tag(:url => t1.url)

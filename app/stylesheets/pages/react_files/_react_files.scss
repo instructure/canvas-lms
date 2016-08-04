@@ -194,12 +194,12 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
 
-.ef-item-row{
+.ef-item-row {
   display: flex;
-  padding: 5px;
+  align-items: center;
+  padding: 4px;
   user-select: none; /* so that we can shift-click to select */
   margin-bottom: 1px;
-  line-height: $ef-thumbnail-size;
   box-sizing: border-box;
   @if $use_high_contrast { border: 1px solid transparent; }
 
@@ -242,6 +242,10 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   }
 }
 
+.ef-big-icon-container {
+  margin-right: $ic-sp/2;
+  flex: 0 0 $ef-thumbnail-size;
+}
 
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
@@ -260,9 +264,27 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-name-col{
   flex: 8;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-right: $ic-sp/2;
+  box-sizing: border-box;
   a {
     @if $use_high_contrast { @extend .ef-plain-link; }
   }
+}
+
+.ef-name-col__link {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ef-name-col__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .ef-date-created-col{
@@ -289,6 +311,23 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
   flex: 1
 }
 
+.ef-name-col,
+.ef-date-created-col,
+.ef-date-modified-col,
+.ef-modified-by-col,
+.ef-size-col {
+  @include fontSize(13px);
+
+  &[role="columnheader"] {
+    @if $use_new_styles {
+      font-weight: $ic-font-weight;
+    }
+    @else {
+      font-weight: bold;
+    }
+  }
+}
+
 /* used to make sure the icons align nicely */
 .ef-usage-rights-col-offset {
   margin-left: 5px;
@@ -297,6 +336,7 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 .ef-links-col{
   display: flex;
   flex: 2 0 63px;
+  justify-content: flex-end;
 }
 
 .ef-thumbnail {
@@ -310,12 +350,13 @@ body:not(.with-left-side) & .ic-app-nav-toggle-and-crumbs--files {
 
 .ef-edit-name-form {
   position: relative;
-  margin-bottom: 0;
+  margin: 0 $ic-sp/3;
+  flex: 1;
 }
-.ef-edit-name-cancel {
-  position: absolute;
-  top: 0;
-  right: 0;
+
+.ef-edit-name-form__button {
+  padding-left: $ic-sp/2;
+  padding-right: $ic-sp/2;
 }
 
 .ef-footer {

@@ -45,6 +45,9 @@ require [
   $(".calendar-button").on "focusout", (e) =>
     $(e.target).find(".accessibility-warning").addClass("screenreader-only")
 
+  $(".rs-section .accessibility-warning").on "focus", (e) =>
+    $(e.target).removeClass("screenreader-only")
 
-
+  $(".rs-section .accessibility-warning").on "focusout", (e) =>
+    $(e.target).addClass("screenreader-only")
 

@@ -41,8 +41,8 @@ describe GradeCalculator do
       @assignment.points_possible = 5
       @assignment.save!
 
-      expect(@user.enrollments.first.computed_current_score).to eql(100.0)
-      expect(@user.enrollments.first.computed_final_score).to eql(100.0)
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
     end
 
     it "should recompute when an assignment group's weight changes'" do
@@ -65,6 +65,36 @@ describe GradeCalculator do
 
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
       expect(@user.enrollments.first.computed_final_score).to eql(60.0)
+    end
+
+    it "recomputes when an assignment is flagged as omit from final grade" do
+      course_with_student
+      @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
+      assignment = @course.assignments.create!(
+        title: "Some Assignment",
+        points_possible: 10,
+        assignment_group: @group
+      )
+      assignment2 = @course.assignments.create!(
+        title: "Some Assignment2",
+        points_possible: 10,
+        assignment_group: @group,
+        omit_from_final_grade: true
+      )
+      # grade first assignment for student
+      assignment.grade_student(@user, grade: "5")
+
+      # assert that at this point both current and final scores are 50%
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
+
+      # grade second assignment for same student with a different score
+      assignment2.grade_student(@user, grade: "10")
+
+      # assert that current and final scores have not changed since second assignment
+      # is flagged to be omitted from final grade
+      expect(@user.enrollments.first.computed_current_score).to eql(50.0)
+      expect(@user.enrollments.first.computed_final_score).to eql(50.0)
     end
 
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)

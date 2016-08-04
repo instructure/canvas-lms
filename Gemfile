@@ -15,5 +15,5 @@ source 'https://rubygems.org/'
 require File.expand_path("../config/canvas_rails4_2", __FILE__)
 
 Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
-  eval_gemfile(file)
+  eval(File.read(file), nil, file)
 end

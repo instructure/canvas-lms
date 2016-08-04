@@ -43,9 +43,7 @@ module Importers
 
     def self.can_import_topic?(topic, migration)
       migration.import_object?('discussion_topics', topic['migration_id']) ||
-          migration.import_object?("topics", topic['migration_id']) ||
-          (topic['type'] == 'announcement' &&
-              migration.import_object?('announcements', topic['migration_id']))
+          migration.import_object?("topics", topic['migration_id'])
     end
 
     def self.import_from_migration(hash, context, migration, item=nil)

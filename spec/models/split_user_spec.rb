@@ -78,6 +78,27 @@ describe SplitUsers do
         expect(user2.observers).to eq [observer2]
       end
 
+      it 'should handle attachments' do
+        attachment1 = Attachment.create!(user: user1,
+          context: user1,
+          filename: "test.txt",
+          uploaded_data: StringIO.new("first"))
+        attachment2 = Attachment.create!(user: user2,
+          context: user2,
+          filename: "test2.txt",
+          uploaded_data: StringIO.new("second"))
+
+        UserMerge.from(user1).into(user2)
+        run_jobs
+
+        expect(attachment1.reload.context).to eq user2
+        expect(user1.reload.attachments).to eq []
+
+        SplitUsers.split_db_users(user2)
+        expect(user1.reload.attachments).to eq [attachment1]
+        expect(user2.reload.attachments).to eq [attachment2]
+      end
+
       it 'should handle user_observees' do
         observee1 = user_model
         observee2 = user_model

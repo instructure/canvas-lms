@@ -132,9 +132,11 @@ define([
         event.stopPropagation();
         var $editor = $box.data('editor');
         var text = $(this).find(".prompt").val();
+        var alt = $box.find('.inst-link-preview-alt input').val()
         var classes = Links.buildLinkClasses(fetchClasses.call(), $box);
+        var dataAttrs = {'preview-alt': alt}
         $box.dialog("close");
-        linkableEditor.createLink(text, classes);
+        linkableEditor.createLink(text, classes, dataAttrs);
         done.call();
       });
     }
@@ -205,6 +207,7 @@ define([
             });
             $box.append("<p><em>This will make the selected text a link, or insert a new link if nothing is selected.</em></p> <label for='instructure_link_prompt_form_input'>Paste or type a url or wiki page in the box below:</label><form id='instructure_link_prompt_form' class='form-inline'><input type='text' id='instructure_link_prompt_form_input' class='prompt' class='btn' value='http://'/> <button type='submit' class='insert_button btn'>Insert Link</button></form>")
                 .append("<div class='actions'></div><div class='clear'></div>")
+                .append('<div class="inst-link-preview-alt" style="display: none;"><label>Alt text for inline preview: <input type="text" style="display: block;" /></label></div>')
                 .append("<div class='disable_enhancement' style='display: none;'><input type='checkbox' class='disable_inline_content' id='disable_inline_content'/><label for='disable_inline_content'> Disable inline previews for this link</label></div>")
                 .append("<div class='auto_show' style='display: none;'><input type='checkbox' class='auto_show_inline_content' id='auto_show_inline_content'/><label for='auto_show_inline_content'> Auto-open the inline preview for this link</label></div>");
 
@@ -223,12 +226,12 @@ define([
             });
             // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg
             $box.find(".actions").delegate('.embed_youtube_link', 'click', function(event) {
-              var $editor = $box.data('editor');
               event.preventDefault();
-              RceCommandShim.send($editor, 'create_link', $(event.target).closest('img').attr('alt'));
-              $box.dialog('close');
+              $box.find("#instructure_link_prompt_form").triggerHandler('submit')
             });
             $box.find("#instructure_link_prompt_form .prompt").bind('change keyup', function() {
+              var $alt = $box.find('.inst-link-preview-alt');
+              $alt.hide();
               $("#instructure_link_prompt .actions").empty();
               var val = $(this).val();
               // If the user changes the link then it should no longer
@@ -272,6 +275,7 @@ define([
                 $div.append($img);
                 $("#instructure_link_prompt .actions").append($div);
               } else if(val.match(INST.youTubeRegEx)) {
+                $alt.show();
                 var id = $.youTubeID(val); //val.match(INST.youTubeRegEx)[2];
                 var $div = $(document.createElement('div'));
                 $div.css('textAlign', 'center');
@@ -319,6 +323,7 @@ define([
           var $a = (e.nodeName == 'A' ? $(e) : null);
           if($a) {
             $box.find(".prompt").val($a.attr('href')).change();
+            $box.find('.inst-link-preview-alt input').val($a.data('preview-alt'));
             priorClasses = ($a.attr('class') || '').replace(/youtube_link_to_box/, '');
             var re = new RegExp("(" + inlineContentClasses.join('|') + ")");
             if(($a.attr('class') || '').match(re)) {
@@ -334,7 +339,8 @@ define([
               url: $a.attr('href'),
               for_inline_content: $box.hasClass('for_inline_content'),
               for_inline_content_can_auto_show: $box.hasClass('for_inline_content_can_auto_show'),
-              prior_classes: priorClasses
+              prior_classes: priorClasses,
+              preview_alt: $a.data('preview-alt')
             });
             $box.find(".disable_inline_content").attr('checked', $a.hasClass('inline_disabled')).triggerHandler('change');
             $box.find(".auto_show_inline_content").attr('checked', $a.hasClass('auto_open')).triggerHandler('change');

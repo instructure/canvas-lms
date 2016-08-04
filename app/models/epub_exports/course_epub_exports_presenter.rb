@@ -22,7 +22,7 @@ module EpubExports
         where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions).
         where(
         'enrollments.type IN (?) AND enrollments.user_id = ?',
-        [StudentEnrollment, TeacherEnrollment],
+        [StudentEnrollment, TeacherEnrollment, TaEnrollment],
         current_user
       ).to_a
     end

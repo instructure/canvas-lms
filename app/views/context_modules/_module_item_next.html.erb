@@ -84,30 +84,60 @@
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">
               <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
-              <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'Score at least %{score}', :score => score_display %></span>
-              <span class="fulfilled"><%= t 'min_score.fulfilled', 'Scored at least %{score}', :score => score_display %></span>
+              <span class="unfulfilled">
+                <%= t 'min_score.unfulfilled', 'Score at least %{score}', :score => score_display %>
+                <span class="screenreader-only"><%= t 'Must score at least %{score} to complete this module item', :score => score_display %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t 'min_score.fulfilled', 'Scored at least %{score}', :score => score_display %>
+                <span class="screenreader-only"><%= t 'Module item has been completed by scoring at least %{score}', :score => score_display %></span>
+              </span>
             </span>
             <span class="requirement_type must_view_requirement">
-              <span class="unfulfilled"><%= t('View') %></span>
-              <span class="fulfilled"><%= t('Viewed') %></span>
+              <span class="unfulfilled">
+                <%= t('View') %>
+                <span class="screenreader-only"><%= t('Must view in order to complete this module item') %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t('Viewed') %>
+                <span class="screenreader-only"><%= t('Module item has been viewed and is complete') %></span>
+              </span>
             </span>
             <span class="requirement_type must_mark_done_requirement">
-              <span class="unfulfilled"><%= t 'Mark done' %></span>
-              <span class="fulfilled"><%= t 'Marked done' %></span>
+              <span class="unfulfilled">
+                <%= t 'Mark done' %>
+                <span class="screenreader-only"><%= t 'Must mark this module item done in order to complete' %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t 'Marked done' %>
+                <span class="screenreader-only"><%= t 'Module item marked as done and is complete' %></span>
+              </span>
             </span>
             <span class="requirement_type must_contribute_requirement">
-              <span class="unfulfilled"><%= t('must_contribute.unfulfilled', 'Contribute') %></span>
-              <span class="fulfilled"><%= t('must_contribute.fulfilled', 'Contributed') %></span>
+              <span class="unfulfilled">
+                <%= t('must_contribute.unfulfilled', 'Contribute') %>
+                <span class="screenreader-only"><%= t('Must contribute to this module item to complete it') %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t('must_contribute.fulfilled', "Contributed") %>
+                <span class="screenreader-only"><%= t('Contributed to this module item and is complete') %></span>
+              </span>
             </span>
             <span class="requirement_type must_submit_requirement">
-              <span class="unfulfilled"><%= t('must_submit.unfulfilled', 'Submit') %></span>
-              <span class="fulfilled"><%= t('must_submit.fulfilled', 'Submitted') %></span>
+              <span class="unfulfilled">
+                <%= t('must_submit.unfulfilled', 'Submit') %>
+                <span class="screenreader-only"><%= t('Must submit this module item to complete it') %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t('must_submit.fulfilled', 'Submitted') %>
+                <span class="screenreader-only"><%= t('Module item submitted and is complete') %></span>
+              </span>
             </span>
           </span>
           </div> <!-- requirement description end -->
         </div>
         <% if !editable %>
-          <div class='module-item-status-icon'></div> <%# going to set this in JS-land, not here %>
+          <div class='module-item-status-icon' aria-hidden='true'></div> <%# going to set this in JS-land, not here %>
         <% end %>
       </div>
     </div>
@@ -182,4 +212,3 @@
 
   </div>
 </li>
-

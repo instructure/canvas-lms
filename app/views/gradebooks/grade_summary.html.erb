@@ -196,7 +196,12 @@
                 </span>
               <% end %>
             </span>
-            <span class="grade" tabindex="0">
+            <span
+              class="grade"
+              <% unless assignment_presenter.unchangeable? %>
+                tabindex="0"
+              <% end %>
+            >
               <% if assignment.muted? %>
                 <%= image_tag "sound_mute.png", :alt => t("#gradebooks.grade.muted", "Muted"), :class => "muted_icon" %>
               <% else %>
@@ -240,21 +245,68 @@
       <td class="possible points_possible" <%= "colspan='2'".html_safe if assignment.special_class %>><%= round_if_whole(assignment.points_possible) %></td>
       <% if !assignment.special_class %>
       <td class="details">
-        <a href="#" class="toggle_comments_link tooltip" aria-label="<%= t(:comment_count_screenreader, 'Read comments') %>" <% if assignment_presenter.has_comments? && !assignment_presenter.assignment.muted? %>aria-expanded="false" aria-controls="comments_thread_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> style="<%= 'visibility: hidden;' unless assignment_presenter.has_comments? && !assignment_presenter.assignment.muted? %>">
+        <a href="#"
+            class="toggle_final_grade_info tooltip"
+            aria-label="<%= t('This assignment does not count toward the final grade.') %>"
+          <% if assignment.omit_from_final_grade? && !assignment.muted? %>
+              aria-expanded="false"
+              aria-controls="final_grade_info_<%= assignment.id %>"
+          <% else %>
+              aria-hidden='true'
+              role='presentation'
+              tabindex='-1'
+              style='visibility: hidden;'
+          <% end %>>
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t(:comment_count, "comment", :count => (submission.visible_submission_comments.size rescue 0)) %></span>
+            <span class="tooltip_text"><%= t("Grade Info") %></span>
+          </span>
+          <i class="icon-warning standalone-icon"></i>
+        </a>
+        <a href="#"
+          class="toggle_comments_link tooltip"
+          aria-label="<%= t('Read comments') %>"
+          <% if assignment_presenter.has_comments? && !assignment.muted? %>
+            aria-expanded="false"
+            aria-controls="comments_thread_<%= assignment.id %>"
+          <% else %>
+            aria-hidden='true'
+            role='presentation'
+            tabindex='-1'
+            style='visibility: hidden;'
+          <% end %>>
+          <span class="tooltip_wrap right">
+            <span class="tooltip_text"><%= t("comment", count: (submission.visible_submission_comments.size rescue 0)) %></span>
           </span>
           <i class="icon-discussion standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_score_details_link tooltip" aria-label="<%= t(:see_scoring_details_screenreader, 'See scoring details') %>" <% if assignment_presenter.has_scoring_details? && can_view_distribution %>aria-expanded="false" aria-controls="grade_info_<%= assignment.id %>"<% else %>aria-hidden='true' role='presentation' tabindex='-1'<% end %> title="<%= t 'titles.view_scoring_details', 'View Scoring Details' %>" style="<%= 'visibility: hidden;' unless (assignment_presenter.has_scoring_details? && can_view_distribution) %>">
+        <a href="#"
+          class="toggle_score_details_link tooltip"
+          aria-label="<%= t('See scoring details') %>"
+        <% if assignment_presenter.has_scoring_details? && can_view_distribution %>
+          aria-expanded="false"
+          aria-controls="grade_info_<%= assignment.id %>"
+        <% else %>
+          aria-hidden='true'
+          role='presentation'
+          tabindex='-1'
+          style='visibility: hidden;'
+        <% end %>
+          title="<%= t('View Scoring Details') %>">
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t(:see_scoring_details, "See scoring details") %></span>
+            <span class="tooltip_text"><%= t("See scoring details") %></span>
           </span>
           <i class="icon-check-plus standalone-icon"></i>
         </a>
-        <a href="#" class="toggle_rubric_assessments_link tooltip" aria-label="<%= t(:see_rubric_results_screenreader, 'See rubric results') %>" aria-expanded='false' aria-controls="rubric_<%= assignment.id %>" tabindex='0' title="<%= t 'titles.view_rubric_evaluation', 'View Rubric Evaluation' %>" style="<%= 'visibility: hidden;' if !assignment_presenter.has_rubric_assessments? %>">
+        <a href="#"
+          class="toggle_rubric_assessments_link tooltip"
+          aria-label="<%= t('See rubric results') %>"
+          aria-expanded='false'
+          aria-controls="rubric_<%= assignment.id %>"
+          tabindex='0'
+          title="<%= t('View Rubric Evaluation') %>"
+          style="<%= 'visibility: hidden;' unless assignment_presenter.has_rubric_assessments? %>">
           <span class="tooltip_wrap right">
-            <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
+            <span class="tooltip_text"><%= t("See rubric results") %></span>
           </span>
           <i class="icon-rubric"></i>
         </a>
@@ -283,6 +335,34 @@
       <% end %>
     </tr>
     <%# always add row (even if empty) so javascript references work %>
+    <tr id="final_grade_info_<%= assignment.id %>"
+        class="comments <%= 'assignment_graded' if assignment_presenter.graded? %>"
+        style="display: none;">
+      <% if assignment.omit_from_final_grade? %>
+        <td colspan="5">
+          <table class="score_details_table">
+            <thead>
+              <tr>
+                <th colspan="3"><%= t("Final Grade Info") %></th>
+                <th>
+                  <a href="#"
+                    data-aria="final_grade_info_<%= assignment.id %>"
+                    aria-label="<%= t('Close grade info') %>"
+                    class="screenreader-toggle pull-right">
+                    <%= t("Close") %>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7"><%= t('This assignment does not count toward the final grade.') %></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      <% end %>
+    </tr>
     <tr id="grade_info_<%= assignment.id %>" class="comments grade_details <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
       <% if assignment_presenter.should_display_details? %>
         <td colspan="5" style="padding-bottom: 20px;">

@@ -2,13 +2,14 @@ define [
   'jquery'
   'i18n!folder_tree'
   'react'
+  'react-dom'
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   'compiled/react_files/modules/filesEnv',
   'page',
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
+], ($, I18n, React, ReactDOM, BBTreeBrowserView, RootFoldersFinder, customPropTypes, filesEnv, page) ->
 
   FolderTree =
     displayName: 'FolderTree'
@@ -35,7 +36,7 @@ define [
         },
         {
           render: true
-          element: @refs.FolderTreeHolder.getDOMNode()
+          element: ReactDOM.findDOMNode(@refs.FolderTreeHolder)
         }).index
 
       @expandTillCurrentFolder(@props)
@@ -48,8 +49,8 @@ define [
 
     onClick: (event, folder) ->
       event.preventDefault()
-      $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
-      $(@refs.FolderTreeHolder.getDOMNode()).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
+      $(ReactDOM.findDOMNode(@refs.FolderTreeHolder)).find('.' + @focusStyleClass).each( (key, value) => $(value).removeClass(@focusStyleClass))
+      $(ReactDOM.findDOMNode(@refs.FolderTreeHolder)).find('.' + @selectedStyleClass).each( (key, value) => $(value).removeClass(@selectedStyleClass))
       if folder.get('locked_for_user')
         message = I18n.t('This folder is currently locked and unavailable to view.')
         $.flashError message

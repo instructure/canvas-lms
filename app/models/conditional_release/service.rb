@@ -131,8 +131,6 @@ module ConditionalRelease
           title: assignment.title,
           description: assignment.description,
           points_possible: assignment.points_possible,
-          min_score: assignment.min_score,
-          max_score: assignment.max_score,
           grading_type: assignment.grading_type,
           submission_types: assignment.submission_types,
           grading_scheme: (assignment.grading_scheme if assignment.uses_grading_standard)

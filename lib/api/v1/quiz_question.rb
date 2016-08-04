@@ -44,6 +44,8 @@ module Api::V1::QuizQuestion
     answers
     variables
     formulas
+    answer_tolerance
+    formula_decimal_places
     matches
     matching_answer_incorrect_matches
   )

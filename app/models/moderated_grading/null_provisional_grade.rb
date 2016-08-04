@@ -12,6 +12,7 @@ class ModeratedGrading::NullProvisionalGrade
       'score' => nil,
       'graded_at' => nil,
       'scorer_id' => @scorer_id,
+      'graded_anonymously' => nil,
       'final' => @final,
       'grade_matches_current_submission' => true
     }

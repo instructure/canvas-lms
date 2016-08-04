@@ -1,9 +1,10 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'underscore',
   'jsx/grading/EditGradingPeriodSetForm'
-], (React, $, _, GradingPeriodSetForm) => {
+], (React, ReactDOM, $, _, GradingPeriodSetForm) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -23,11 +24,11 @@ define([
         onCancel: () => {}
       };
       const element = React.createElement(GradingPeriodSetForm, _.defaults(opts, defaults));
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -87,14 +88,6 @@ define([
     let spy = sinon.spy();
     let updatedSet = _.extend({}, exampleSet, { title: "", enrollmentTermIDs: ["1"] });
     let form = this.renderComponent({ onSave: spy, set: updatedSet });
-    let saveButton = React.findDOMNode(form.refs.saveButton);
-    Simulate.click(saveButton);
-    notOk(spy.called);
-  });
-
-  test("does not call 'onSave' when the set has no enrollment term ids", function() {
-    let spy = sinon.spy();
-    let form = this.renderComponent({ onSave: spy, enrollmentTerms: [{ id: "2", gradingPeriodGroupId: "2" }] });
     let saveButton = React.findDOMNode(form.refs.saveButton);
     Simulate.click(saveButton);
     notOk(spy.called);

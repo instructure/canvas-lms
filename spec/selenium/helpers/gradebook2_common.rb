@@ -96,7 +96,7 @@ module Gradebook2Common
   def toggle_muting(assignment)
     find_with_jquery(".gradebook-header-drop[data-assignment-id='#{assignment.id}']").click
     find_with_jquery('[data-action="toggleMuting"]').click
-    find_with_jquery('.ui-dialog-buttonpane .ui-button:visible').click
+    find_with_jquery('.ui-dialog-buttonpane [data-action$="mute"]:visible').click
     wait_for_ajaximations
   end
 

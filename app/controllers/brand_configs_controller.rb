@@ -16,8 +16,11 @@ class BrandConfigsController < ApplicationController
     css_bundle :brand_config_index
     js_bundle :brand_configs_index
 
+    base_brand_config = @account.parent_account.try(:effective_brand_config)
+    base_brand_config ||= BrandConfig.k12_config if k12?
 
     js_env brandConfigStuff: {
+      baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
       brandableVariableDefaults: BrandableCSS.variables_map,
       accountID: @account.id.to_s,
       sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: 'brand_config'),

@@ -21,7 +21,7 @@ module QTI
     include CC::CCHelper
 
     attr_accessor :exporter
-    delegate :add_error, :set_progress, :export_object?, :qti_export?, :course, :user, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :qti_export?, :course, :user, :to => :exporter
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(exporter)

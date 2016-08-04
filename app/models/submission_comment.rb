@@ -33,7 +33,7 @@ class SubmissionComment < ActiveRecord::Base
 
   attr_accessible :comment, :submission, :submission_id, :author, :context_id,
                   :context_type, :media_comment_id, :media_comment_type, :group_comment_id, :assessment_request,
-                  :attachments, :anonymous, :hidden, :provisional_grade_id
+                  :attachments, :anonymous, :hidden, :provisional_grade_id, :draft
 
   before_save :infer_details
   after_save :update_submission
@@ -45,6 +45,10 @@ class SubmissionComment < ActiveRecord::Base
   serialize :cached_attachments
 
   scope :visible, -> { where(:hidden => false) }
+  scope :draft, -> { where(draft: true) }
+  scope :published, -> {
+    where(SubmissionComment.arel_table[:draft].eq(nil).or(SubmissionComment.arel_table[:draft].eq(false)))
+  }
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
   scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
@@ -99,11 +103,13 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user,session| !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? }
+    given do |user,session|
+      !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? && !self.draft?
+    end
     can :read
 
     given {|user| self.author == user}
-    can :read and can :delete
+    can :read and can :delete and can :update
 
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
     can :read and can :delete
@@ -118,7 +124,9 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment
     p.to { ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author] }
     p.whenever {|record|
-      record.just_created &&
+      # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
+      # from draft to final
+      (!record.draft? && (record.just_created || record.draft_changed?)) &&
       record.provisional_grade_id.nil? &&
       record.submission.assignment &&
       record.submission.assignment.context.available? &&
@@ -130,7 +138,7 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
     p.whenever {|record|
-      record.just_created &&
+      (!record.draft? && (record.just_created || record.draft_changed?)) &&
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
@@ -220,9 +228,14 @@ class SubmissionComment < ActiveRecord::Base
 
   def update_submission
     return nil if hidden? || provisional_grade_id.present?
-    comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false,
-                                             :provisional_grade_id => provisional_grade_id).count
-    Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil
+
+    relevant_comments = SubmissionComment.published.
+      where(submission_id: submission_id).
+      where(hidden: false).
+      where(provisional_grade_id: provisional_grade_id)
+
+    comments_count = relevant_comments.count
+    Submission.where(id: submission_id).update_all(submission_comments_count: comments_count)
   end
 
   def formatted_body(truncate=nil)

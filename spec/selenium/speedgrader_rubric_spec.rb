@@ -21,23 +21,27 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
 
     # test opening and closing rubric
+    scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     expect(f('#rubric_full')).to be_displayed
     f('#rubric_holder .hide_rubric_link').click
     wait_for_ajaximations
     expect(f('#rubric_full')).not_to be_displayed
+    scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     rubric = f('#rubric_full')
     expect(rubric).to be_displayed
 
     # test rubric input
     rubric.find_element(:css, 'input.criterion_points').send_keys('3')
+    expand_right_pane
     rubric.find_element(:css, '.criterion_comments img').click
     f('textarea.criterion_comments').send_keys('special rubric comment')
     f('#rubric_criterion_comments_dialog .save_button').click
     second_criterion = rubric.find_element(:id, "criterion_#{@rubric.criteria[1][:id]}")
     second_criterion.find_element(:css, '.ratings .edge_rating').click
     expect(rubric.find_element(:css, '.rubric_total')).to include_text('8')
+    scroll_into_view('.save_rubric_button')
     f('#rubric_full .save_rubric_button').click
     expect(f('#rubric_summary_container > .rubric_container')).to be_displayed
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
@@ -56,11 +60,14 @@ describe "speed grader - rubrics" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
     to_comment = 'special rubric comment'
+    scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     expect(f('#rubric_full')).to be_displayed
+    expand_right_pane
     f('#rubric_full tr.learning_outcome_criterion .criterion_comments img').click
     f('textarea.criterion_comments').send_keys(to_comment)
     f('#rubric_criterion_comments_dialog .save_button').click
+    scroll_into_view('.save_rubric_button')
     f('#rubric_full .save_rubric_button').click
     wait_for_ajaximations
     saved_comment = f('#rubric_summary_container .rubric_table ' \
@@ -75,14 +82,17 @@ describe "speed grader - rubrics" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
+    scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     wait_for_ajaximations
     rubric = f('#rubric_full')
 
     # test rubric input
     rubric.find_element(:css, 'input.criterion_points').send_keys('SMRT')
+    scroll_into_view('button.save_rubric_button')
     f('#rubric_full .save_rubric_button').click
     wait_for_ajaximations
+    scroll_into_view('.toggle_full_rubric')
     f('.toggle_full_rubric').click
     wait_for_ajaximations
     expect(f('.rubric_container .criterion_points')).to have_value('')
@@ -118,9 +128,11 @@ describe "speed grader - rubrics" do
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
+    scroll_into_view('.toggle_full_rubric')
     f('button.toggle_full_rubric').click
     f(".rubric.assessing table.rubric_table tr:nth-child(1) table.ratings td:nth-child(1)").click
     f(".rubric.assessing table.rubric_table tr:nth-child(3) table.ratings td:nth-child(1)").click
+    scroll_into_view('.save_rubric_button')
     f("#rubric_holder button.save_rubric_button").click
     wait_for_ajaximations
 
@@ -152,10 +164,12 @@ describe "speed grader - rubrics" do
 
       expect(f('#rubric_full .rubric_total').text).to eq('2.01') # while entering scores
 
+      scroll_into_view('button.save_rubric_button')
       f('.save_rubric_button').click
       wait_for_ajaximations
       expect(f('#rubric_summary_holder .rubric_total').text).to eq('2.01') # seeing the summary after entering scores
 
+      scroll_into_view('.toggle_full_rubric')
       f('.toggle_full_rubric').click
       wait_for_ajaximations
       expect(f('#rubric_full .rubric_total').text).to eq('2.01') # after opening the rubric up again to re-score
@@ -166,10 +180,12 @@ describe "speed grader - rubrics" do
 
       expect(f('#rubric_full .rubric_total').text).to eq('2') # while entering scores
 
+      scroll_into_view('button.save_rubric_button')
       f('.save_rubric_button').click
       wait_for_ajaximations
       expect(f('#rubric_summary_holder .rubric_total').text).to eq('2') # seeing the summary after entering scores
 
+      scroll_into_view('.toggle_full_rubric')
       f('.toggle_full_rubric').click
       wait_for_ajaximations
       expect(f('#rubric_full .rubric_total').text).to eq('2') # after opening the rubric up again to re-score

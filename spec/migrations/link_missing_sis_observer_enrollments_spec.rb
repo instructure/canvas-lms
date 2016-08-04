@@ -13,7 +13,7 @@ describe 'DataFixup::LinkMissingSisObserverEnrollments' do
 
     observer.reload
     expect(observer.observer_enrollments.count).to eq 1
-    observer.enrollments.delete_all
+    observer.enrollments.each(&:destroy_permanently!)
 
     DataFixup::LinkMissingSisObserverEnrollments.run
 

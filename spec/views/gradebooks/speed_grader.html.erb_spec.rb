@@ -32,13 +32,25 @@ describe "/gradebooks/speed_grader" do
 
   it "should render" do
     render "gradebooks/speed_grader"
-    expect(response).not_to be_nil
+    expect(rendered).not_to be_nil
   end
 
   it "includes a link back to the gradebook (gradebook2 by default)" do
     render "gradebooks/speed_grader"
     course_id = @course.id
-    expect(response.body).to include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
+    expect(rendered).to include "a href=\"http://test.host/courses/#{course_id}/gradebook\""
+  end
+
+  it 'includes the comment auto-save message' do
+    render 'gradebooks/speed_grader'
+
+    expect(rendered).to include 'Your comment was auto-saved as a draft.'
+  end
+
+  it 'includes the link to publish' do
+    render 'gradebooks/speed_grader'
+
+    expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 end
 

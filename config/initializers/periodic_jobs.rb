@@ -158,4 +158,8 @@ Rails.configuration.after_initialize do
                                   singleton: 'AccountAuthorizationConfig::SAML::InCommon.refresh_providers')
     end
   end
+
+  Delayed::Periodic.cron 'EnrollmentState.recalculate_expired_states', '*/5 * * * *', :priority => Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(EnrollmentState, :recalculate_expired_states)
+  end
 end

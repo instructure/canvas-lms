@@ -368,18 +368,22 @@ module MigratorHelper
         assign[:error_message] = a[:error_message] if a[:error_message]
       end
     end
+    if @course[:announcements]
+      @overview[:announcements] = []
+      @course[:announcements].each do |t|
+        ann = {}
+        @overview[:announcements] << ann
+        ann[:title] = t[:title]
+        ann[:migration_id] = t[:migration_id]
+        ann[:error_message] = t[:error_message] if t[:error_message]
+      end
+    end
     if @course[:discussion_topics]
       @overview[:discussion_topics] = []
-      @overview[:announcements] = []
       @course[:discussion_topics].each do |t|
         topic = {}
-        if t[:type] == 'announcement'
-          @overview[:announcements] << topic
-        else
-          @overview[:discussion_topics] << topic
-        end
+        @overview[:discussion_topics] << topic
         topic[:title] = t[:title]
-        topic[:topic_type] = t[:type]
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
         if t[:assignment] && a_mig_id = t[:assignment][:migration_id]

@@ -18,6 +18,14 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
     GradingPeriod.where(grading_period_group_id: sub_sub_account_groups.select(:id))
   end
 
+  let(:legacy_group_for_sub_account) do
+    -> (sub_account) {
+      group = sub_account.grading_period_groups.build(group_helper.valid_attributes)
+      group.save(validate: false)
+      group
+    }
+  end
+
   before(:each) do
     @root_account = Account.create(name: 'new account')
     @sub_account = @root_account.sub_accounts.create!
@@ -26,7 +34,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
   describe "accounts" do
     context "root accounts" do
       before(:each) do
-        group = group_helper.legacy_create_for_account(@root_account)
+        group = group_helper.create_for_account(@root_account)
         period_helper.create_with_weeks_for_group(group, 4, -4)
         run_data_fixup
       end
@@ -44,7 +52,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
     context "sub accounts" do
       before(:each) do
-        group = group_helper.legacy_create_for_account(@sub_account)
+        group = legacy_group_for_sub_account.call(@sub_account)
         period_helper.create_with_weeks_for_group(group, 4, -4)
         run_data_fixup
       end
@@ -69,7 +77,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
     context " with grading periods" do
       before(:each) do
-        group = group_helper.create_for_course(@course)
+        group = group_helper.legacy_create_for_course(@course)
         period_helper.create_presets_for_group(group, :past, :current, :future)
         @periods_before_fixup = @course.grading_periods.to_a
       end
@@ -84,9 +92,9 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "root and sub accounts have grading periods" do
         it "does not have its grading periods altered in any way" do
-          root_group = group_helper.legacy_create_for_account(@root_account)
-          sub_group = group_helper.legacy_create_for_account(@sub_account)
-          sub_sub_group = group_helper.legacy_create_for_account(@sub_account_of_sub_account)
+          root_group = group_helper.create_for_account(@root_account)
+          sub_group = legacy_group_for_sub_account.call(@sub_account)
+          sub_sub_group = legacy_group_for_sub_account.call(@sub_account_of_sub_account)
           period_helper.create_presets_for_group(root_group, :current)
           period_helper.create_presets_for_group(sub_group, :current)
           period_helper.create_presets_for_group(sub_sub_group, :current)
@@ -98,8 +106,8 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "sub accounts have grading periods, root account does not" do
         it "does not have its grading periods altered in any way" do
-          sub_group = group_helper.legacy_create_for_account(@sub_account)
-          sub_sub_group = group_helper.legacy_create_for_account(@sub_account_of_sub_account)
+          sub_group = legacy_group_for_sub_account.call(@sub_account)
+          sub_sub_group = legacy_group_for_sub_account.call(@sub_account_of_sub_account)
           period_helper.create_presets_for_group(sub_group, :current)
           period_helper.create_presets_for_group(sub_sub_group, :current)
           run_data_fixup
@@ -110,7 +118,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "root account has grading periods, sub accounts do not" do
         it "does not have its grading periods altered in any way" do
-          group = group_helper.legacy_create_for_account(@root_account)
+          group = group_helper.create_for_account(@root_account)
           period_helper.create_presets_for_group(group, :current)
           run_data_fixup
           @course.reload
@@ -153,7 +161,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "root account has grading periods, sub accounts do not" do
         it "does not have its (non-existent) grading periods altered in any way" do
-          group = group_helper.legacy_create_for_account(@root_account)
+          group = group_helper.create_for_account(@root_account)
           period_helper.create_presets_for_group(group, :current)
           run_data_fixup
           expect(course_periods_attrs).to be_empty
@@ -162,9 +170,9 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "root and sub accounts have grading periods" do
         it "receives copies of the 'nearest' sub-account's grading periods" do
-          root_group = group_helper.legacy_create_for_account(@root_account)
-          sub_group = group_helper.legacy_create_for_account(@sub_account)
-          sub_sub_group = group_helper.legacy_create_for_account(@sub_account_of_sub_account)
+          root_group = group_helper.create_for_account(@root_account)
+          sub_group = legacy_group_for_sub_account.call(@sub_account)
+          sub_sub_group = legacy_group_for_sub_account.call(@sub_account_of_sub_account)
           period_helper.create_presets_for_group(root_group, :current)
           period_helper.create_presets_for_group(sub_group, :current)
           period_helper.create_presets_for_group(sub_sub_group, :current)
@@ -175,8 +183,8 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
 
       context "sub accounts have grading periods, root account does not" do
         it "receives copies of the 'nearest' sub-account's grading periods" do
-          sub_group = group_helper.legacy_create_for_account(@sub_account)
-          sub_sub_group = group_helper.legacy_create_for_account(@sub_account_of_sub_account)
+          sub_group = legacy_group_for_sub_account.call(@sub_account)
+          sub_sub_group = legacy_group_for_sub_account.call(@sub_account_of_sub_account)
           period_helper.create_presets_for_group(sub_group, :current)
           period_helper.create_presets_for_group(sub_sub_group, :current)
           run_data_fixup
@@ -187,7 +195,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
       context "nearest sub-account does not have grading periods, next sub-account " \
       "does, and root account does not have grading periods" do
         before(:each) do
-          sub_group = group_helper.legacy_create_for_account(@sub_account)
+          sub_group = legacy_group_for_sub_account.call(@sub_account)
           period_helper.create_presets_for_group(sub_group, :current)
           run_data_fixup
         end

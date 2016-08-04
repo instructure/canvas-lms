@@ -352,23 +352,14 @@ describe "Wiki Pages" do
         get "/courses/#{@course.id}/pages/#{@vpage.url}/revisions"
       end
 
-      it "should let the revisions be focused" do
+      it "should focus the revision buttons" do
         driver.execute_script("$('.close-button').focus();")
         f('.close-button').send_keys(:tab)
-        all_revisions = ff('.revision')
+        all_revisions = ff('.revision-details')
         all_revisions.each do |revision|
           check_element_has_focus(revision)
           revision.send_keys(:tab)
         end
-      end
-
-      it "should focus on the 'restore this revision link' after selecting a revision" do
-        driver.execute_script("$('.revision:nth-child(2)').focus();")
-        element = fj('.revision:nth-child(2)')
-        element.send_keys(:enter)
-        wait_for_ajaximations
-        element.send_keys(:tab)
-        check_element_has_focus(f('.restore-link'))
       end
 
       it "should validate that revision restored is displayed", priority: "1", test_id: 126832 do

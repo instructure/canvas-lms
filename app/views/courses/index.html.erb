@@ -10,7 +10,6 @@
 <% js_bundle :course_list %>
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>
-<% unless @current_enrollments.empty? %>
   <div class="header-bar">
     <h2><%= t('headings.my_courses', %{All Courses}) %></h2>
   </div>
@@ -33,6 +32,9 @@
     </div>
   </div>
 
+<% if @current_enrollments.empty? %>
+  <%= t("You are not enrolled in any courses.") %>
+<% else %>
   <table id="my_courses_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered course-list-table"
     <% else %>class="table table-bordered course-list-table"<% end %> >
     <thead>

@@ -25,7 +25,7 @@ define([
     // ---------------
 
     componentDidMount(){
-      var dateInput = this.refs.dateInput.getDOMNode()
+      var dateInput = this.refs.dateInput
 
       $(dateInput).datetime_field().change( (e) => {
         var trimmedInput = $.trim(e.target.value)
@@ -40,7 +40,7 @@ define([
 
     // ensure jquery UI updates (as react doesn't know about it)
     componentDidUpdate(){
-      var dateInput = this.refs.dateInput.getDOMNode()
+      var dateInput = this.refs.dateInput
       $(dateInput).val(this.formattedDate())
     },
 

@@ -383,7 +383,8 @@ describe "Users API", type: :request do
         expect(response.headers['Link']).not_to match /last/
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
         url = $1
-        page = Rack::Utils.parse_nested_query(url)['page']
+        path, querystring = url.split("?")
+        page = Rack::Utils.parse_nested_query(querystring)['page']
         json = api_call(:get, url,
                            { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
         expect(json.size).to eq 1

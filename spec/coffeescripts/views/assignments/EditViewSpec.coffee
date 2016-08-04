@@ -299,3 +299,54 @@ define [
     view.cacheAssignmentSettings()
 
     equal null, userSettings.contextGet("new_assignment_settings")["invalid_attribute_example"]
+
+  module 'EditView: Conditional Release',
+    setup: ->
+      fakeENV.setup()
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
+      ENV.CONDITIONAL_RELEASE_ENV = { assignment: { id: 1 }, jwt: 'foo' }
+      $(document).on 'submit', -> false
+    teardown: ->
+      fakeENV.teardown()
+      $(document).off 'submit'
+    editView: ->
+      editView.apply(this, arguments)
+
+  test 'attaches conditional release editor', ->
+    view = @editView()
+    equal 1, view.$conditionalReleaseTarget.children().size()
+
+  test 'calls update when modified once', ->
+    view = @editView()
+    stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.onChange()
+    view.updateConditionalRelease()
+    ok stub.calledOnce
+
+  test 'does not call update when not modified', ->
+    view = @editView()
+    stub = @stub(view.conditionalReleaseEditor, 'updateAssignment')
+    view.updateConditionalRelease()
+    notOk stub.called
+
+  test 'validates conditional release', ->
+    view = @editView()
+    stub = @stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns 'foo'
+    errors = view.validateBeforeSave(view.getFormData(), {})
+    ok errors['conditional_release'] == 'foo'
+
+  test 'calls save in conditional release', (assert) ->
+    resolved = assert.async()
+
+    view = @editView()
+    superPromise = $.Deferred().resolve().promise()
+    crPromise = $.Deferred().resolve().promise()
+    mockSuper = sinon.mock(EditView.__super__)
+    mockSuper.expects('saveFormData').returns superPromise
+    stub = @stub(view.conditionalReleaseEditor, 'save').returns crPromise
+
+    finalPromise = view.saveFormData()
+    finalPromise.then ->
+      mockSuper.verify()
+      ok stub.calledOnce
+      resolved()

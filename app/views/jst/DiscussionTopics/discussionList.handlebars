@@ -1,12 +1,13 @@
 <div class="ig-header">
-  <h2 class="ig-header-title element_toggler"
-     aria-controls="{{listID}}"
-     aria-expanded="true"
-     tabindex="0">
+  <button
+    class="ig-header-title element_toggler"
+    aria-controls="{{listID}}"
+    aria-expanded="true"
+  >
     <i class="icon-mini-arrow-down"></i>
     {{title}}
-    <a href="#" role="button" class="screenreader-only" tabindex="-1">{{toggleMessage}}</a>
-  </h2>
+    <span class="screenreader-only">{{toggleMessage}}</span>
+  </button>
   {{#if titleHelp}}
     <span class="pull-right title-help">{{titleHelp}}</span>
   {{/if}}

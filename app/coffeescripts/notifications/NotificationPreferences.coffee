@@ -173,15 +173,39 @@ define [
         )
       ), @spinOpts
 
+    setupPreferenceIconsToolTip: (forClass, focusOutClass, at, my) =>
+      $notificationPrefs = $('#notification-preferences')
+
+      $notificationPrefs.find(forClass).tooltip(
+        open: (event, ui) ->
+          _.each($notificationPrefs.find(focusOutClass), (elem) ->
+            $(elem).focusout()
+          )
+        ,
+        position:
+          at: at
+          my: my
+          collision: 'none'
+        ,
+        tooltipClass: 'center bottom vertical'
+      )
+
     # Setup event bindings.
     setupEventBindings: =>
-
       $notificationPrefs = $('#notification-preferences')
       $notificationPrefs.find('.event-option-selection').buttonset()
+
+      # a11y requires tooltips shown when using arrows to navigate notification preferences
+      # arrows trigger .ui-botton tooltip while mouse hover triggers .frequency
+      # if focusing with hover and arrow is used, need to focus out of hover and vice versa,
+      # so only one tooltip is shown at a time (as opposed to one for mouse and one for arrows)
+      @setupPreferenceIconsToolTip('.ui-button', '.frequency', 'top-5', 'bottom')
+      @setupPreferenceIconsToolTip('.frequency', '.ui-button', 'top-22', 'center+10')
 
       $notificationPrefs.find('.frequency').on 'change', (e) =>
         freq = $(e.currentTarget)
         cell = freq.closest('td')
+        $(freq).focus()
         # Record the selected value in data attribute and update image class to reflect new state
         val = freq.attr('data-value')
         @saveNewCellValue(cell, val)

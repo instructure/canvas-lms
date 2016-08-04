@@ -203,6 +203,7 @@ define([
     },
 
     kickOffSubAcountCompilation() {
+      this.setState({isApplying: true})
       $.ajax({
         url: '/accounts/'+this.props.accountID+'/brand_configs/save_to_account',
         type: 'POST',
@@ -223,6 +224,7 @@ define([
         }
       })
       .fail(() => {
+        this.setState({isApplying: false})
         window.alert(I18n.t('An error occurred trying to apply this theme, please try again.'))
       })
     },
@@ -286,6 +288,8 @@ define([
         tooltipForWhyApplyIsDisabled = I18n.t('You need to "Preview Changes" before you can apply this to your account')
       } else if (this.props.brandConfig.md5 && !this.displayedMatchesSaved()) {
         tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
+      } else if (this.state.isApplying) {
+        tooltipForWhyApplyIsDisabled = I18n.t('Applying, please be patient')
       }
 
       return (

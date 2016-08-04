@@ -1182,9 +1182,9 @@ Reduce the width of your screen to see how the example components below both sca
 
 */
 
-
+$ic-Input-border: lighten($ic-color-dark, 65);
 @if $use_high_contrast { $ic-Input-border: $ic-color-dark; }
-@else { $ic-Input-border: lighten($ic-color-dark, 65); }
+
 $ic-Input-standard-height: 38px;
 
 @mixin ic-input-variant($border-color: $ic-Input-border, $color: $ic-brand-primary) {

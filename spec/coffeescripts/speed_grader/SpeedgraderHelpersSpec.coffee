@@ -82,3 +82,24 @@ define [
         { submission: { version: "two" } }
       ]
     equal @previewVersion(submission), "&version=1"
+
+  module "SpeedgraderHelpers#setRightBarDisabled",
+    setup: ->
+      @fixtureNode = document.getElementById("fixtures")
+      @testArea = document.createElement('div')
+      @testArea.id = "test_area"
+      @fixtureNode.appendChild(@testArea)
+      @startingHTML = '<input type="text" id="grading-box-extended"><textarea id="speedgrader_comment_textarea"></textarea><button id="add_attachment"></button><button id="media_comment_button"></button><button id="comment_submit_button"></button>'
+
+    teardown: ->
+      @fixtureNode.innerHTML = ""
+
+  test "it properly disables the elements we care about in the right bar", ->
+    @testArea.innerHTML = @startingHTML
+    SpeedgraderHelpers.setRightBarDisabled(true)
+    equal(@testArea.innerHTML, '<input type="text" id="grading-box-extended" class="ui-state-disabled" aria-disabled="true" readonly="readonly"><textarea id="speedgrader_comment_textarea" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></textarea><button id="add_attachment" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="media_comment_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button><button id="comment_submit_button" class="ui-state-disabled" aria-disabled="true" readonly="readonly"></button>')
+
+  test "it properly enables the elements we care about in the right bar", ->
+    @testArea.innerHTML = @startingHTML
+    SpeedgraderHelpers.setRightBarDisabled(false)
+    equal(@testArea.innerHTML, @startingHTML)

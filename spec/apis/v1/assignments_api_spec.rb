@@ -775,6 +775,20 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
       course_with_teacher(:active_all => true)
     end
 
+    it 'should respect post_to_sis default' do
+      a = @course.account
+      a.settings[:sis_default_grade_export] = {locked: false, value: true}
+      a.save!
+      group = @course.assignment_groups.create!({name: "first group"})
+      group_category = @course.group_categories.create!(name: "foo")
+      json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
+      expect(json['post_to_sis']).to eq true
+      a.settings[:sis_default_grade_export] = {locked: false, value: false}
+      a.save!
+      json = api_create_assignment_in_course(@course, create_assignment_json(group, group_category))
+      expect(json['post_to_sis']).to eq false
+    end
+
     it "returns unauthorized for users who do not have permission" do
       student_in_course(:active_all => true)
       @group = @course.assignment_groups.create!({:name => "some group"})
@@ -2109,7 +2123,7 @@ describe AssignmentsApiController, :include_lti_spec_helpers, type: :request do
           'html_url' =>
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
           'attachments' => [],
-          'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
+          'permissions' => {'delete' => true, 'attach' => true, 'update' => true, 'reply' => true},
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,

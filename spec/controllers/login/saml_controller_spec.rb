@@ -46,7 +46,8 @@ describe Login::SamlController do
            sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
-           issuer: "saml_entity"
+           issuer: "saml_entity",
+           saml_attributes: {},
           )
     )
 
@@ -88,7 +89,8 @@ describe Login::SamlController do
              sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
-             issuer: "such a lie"
+             issuer: "such a lie",
+             saml_attributes: {}
         )
     )
 
@@ -114,7 +116,8 @@ describe Login::SamlController do
            sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
-           issuer: "saml_entity"
+           issuer: "saml_entity",
+           saml_attributes: {}
           )
     )
 
@@ -152,6 +155,8 @@ describe Login::SamlController do
     account = account_with_saml
     ap = account.authentication_providers.first
     ap.update_attribute(:jit_provisioning, true)
+    ap.federated_attributes = { 'display_name' => 'eduPersonNickname' }
+    ap.save!
 
     Onelogin::Saml::Response.stubs(:new).returns(
       stub('response',
@@ -163,7 +168,8 @@ describe Login::SamlController do
            sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
-           issuer: "saml_entity"
+           issuer: "saml_entity",
+           saml_attributes: { 'eduPersonNickname' => 'Cody Cutrer' }
           ))
 
     # We dont want to log them out of everything.
@@ -176,6 +182,35 @@ describe Login::SamlController do
     expect(response).to redirect_to(dashboard_url(login_success: 1))
     p = account.pseudonyms.active.by_unique_id(unique_id).first!
     expect(p.authentication_provider).to eq ap
+    expect(p.user.short_name).to eq 'Cody Cutrer'
+  end
+
+  it "updates federated attributes" do
+    account = account_with_saml
+    user_with_pseudonym(active_all: 1, account: account)
+
+    ap = account.authentication_providers.first
+    ap.federated_attributes = { 'display_name' => 'eduPersonNickname' }
+    ap.save!
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+      stub('response',
+           is_valid?: true,
+           success_status?: true,
+           name_id: @pseudonym.unique_id,
+           name_identifier_format: nil,
+           name_qualifier: nil,
+           sp_name_qualifier: nil,
+           session_index: nil,
+           process: nil,
+           issuer: "saml_entity",
+           saml_attributes: { 'eduPersonNickname' => 'Cody Cutrer' })
+    )
+    LoadAccount.stubs(:default_domain_root_account).returns(account)
+
+    post :create, :SAMLResponse => "foo"
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    expect(@user.reload.short_name).to eq 'Cody Cutrer'
   end
 
   context "multiple authorization configs" do
@@ -200,6 +235,7 @@ describe Login::SamlController do
           sp_name_qualifier: nil,
           session_index: nil,
           process: nil,
+          saml_attributes: {}
       }
     end
 
@@ -248,7 +284,8 @@ describe Login::SamlController do
         name_qualifier: nil,
         sp_name_qualifier: nil,
         session_index: nil,
-        process: nil
+        process: nil,
+        saml_attributes: {},
       }
     end
 
@@ -458,7 +495,8 @@ SAML
              sp_name_qualifier: nil,
              session_index: nil,
              process: nil,
-             issuer: "saml_entity"
+             issuer: "saml_entity",
+             saml_attributes: {}
             )
       )
 
@@ -522,7 +560,8 @@ SAML
            sp_name_qualifier: nil,
            session_index: nil,
            process: nil,
-           issuer: "saml_entity"
+           issuer: "saml_entity",
+           saml_attributes: {}
           )
     )
 

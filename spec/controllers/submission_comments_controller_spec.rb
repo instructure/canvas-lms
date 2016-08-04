@@ -29,4 +29,23 @@ describe SubmissionCommentsController do
     end
 
   end
+
+  describe "PATCH 'update'" do
+    before(:once) do
+      course_with_teacher_logged_in(active_all: true)
+      submission_comment_model(author: @teacher, draft_comment: true)
+
+      @test_params = {
+        id: @submission_comment.id,
+        format: :json,
+        submission_comment: {
+          draft: false
+        }
+      }
+    end
+
+    it 'allows updating the status field' do
+      expect { patch 'update', @test_params }.to change { SubmissionComment.draft.count }.by(-1)
+    end
+  end
 end

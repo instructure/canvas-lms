@@ -28,7 +28,7 @@ define([
     },
 
     componentDidMount() {
-      React.findDOMNode(this.refs.titleInput).focus();
+      this.refs.titleInput.focus();
     },
 
     setSelectedEnrollmentTermIDs(termIDs) {
@@ -46,17 +46,8 @@ define([
       }
     },
 
-    anySelectedEnrollmentTerms() {
-      if(!_.isEmpty(this.state.selectedEnrollmentTermIDs)) {
-        return true;
-      } else {
-        $.flashError(I18n.t("At least one term must be attached"));
-        return false;
-      }
-    },
-
     isValid() {
-      return !this.props.readOnly && this.isTitlePresent() && this.anySelectedEnrollmentTerms();
+      return this.isTitlePresent()
     },
 
     submit(event) {

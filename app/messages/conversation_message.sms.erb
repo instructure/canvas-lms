@@ -1,7 +1,7 @@
 <% define_content :user_name do %>
   <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
 <% end %>
-<%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
+<%= t "%{user_name} just sent you a message in Canvas", :user_name => content(:user_name) %>
 
 <%= HtmlTextHelper.strip_and_truncate(asset.body, :max_length => 50) %>
 

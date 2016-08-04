@@ -113,7 +113,11 @@ class ExternalContentController < ApplicationController
       if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
         launch_url = item.url || json_data[:default_launch_url]
         url_gen_params = {url: launch_url}
-        url_gen_params[:display] = 'borderless' if item.placement_advice.presentation_document_target == 'iframe'
+
+        displays = {'iframe' => 'borderless', 'window' => 'borderless'}
+        url_gen_params[:display] =
+          displays[item.placement_advice.presentation_document_target]
+
         item.canvas_url = named_context_url(@context, :retrieve_context_external_tools_path, url_gen_params)
       end
       item

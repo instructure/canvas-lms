@@ -193,6 +193,24 @@ describe TabsController, type: :request do
       end
     end
 
+    it "includes collaboration tab if configured" do
+      course_with_teacher :active_all => true
+      @course.enable_feature! 'new_collaborations'
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                      { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                      { :include => ['external']})
+      expect(json.map { |el| el['id'] }).to include 'collaborations'
+    end
+
+    it "includes webconferences tab if configured" do
+      course_with_teacher :active_all => true
+      ApplicationController.any_instance.stubs(:feature_enabled?).with(:web_conferences).returns(true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                      { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                      { :include => ['external']})
+      expect(json.map { |el| el['id'] }).to include 'conferences'
+    end
+
     it 'should list navigation tabs for a group' do
       group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",

@@ -25,7 +25,7 @@ class ChangeEnrollmentsRoleIdNull < ActiveRecord::Migration
 
     # delete remaining duplicate enrollments
     Enrollment.find_ids_in_ranges(batch_size: 10000) do |start_id, end_id|
-      Enrollment.where(id: start_id..end_id, type: type, role_id: nil).delete_all
+      Enrollment.where(id: start_id..end_id, type: type, role_id: nil).each(&:destroy_permanently!)
     end
   end
 

@@ -45,6 +45,7 @@ describe BrandConfigRegenerator do
 
     regenerator = BrandConfigRegenerator.new(@parent_account, user, new_brand_config)
 
+    # 5 = 2 "inheriting" accounts + 3 "inheriting" shared configs
     brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(5)
     Delayed::Testing.drain
     expect(brandable_css_stub).to be_verified
@@ -109,4 +110,28 @@ describe BrandConfigRegenerator do
     expect(@grand_child_shared_config.brand_config).to eq(@grand_child_account.brand_config)
   end
 
+  it "handles site_admin correctly" do
+    setup_account_family_with_configs
+    Account.site_admin.enable_feature!(:use_new_styles)
+    site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
+    site_admin_config.save!
+
+    regenerator = BrandConfigRegenerator.new(Account.site_admin, user, new_brand_config)
+
+    # 6 = 3 "inheriting" accounts = 3 "inheriting" shared configs
+    brandable_css_stub = BrandableCSS.stubs(:compile_brand!).times(6)
+    Delayed::Testing.drain
+    expect(brandable_css_stub).to be_verified
+    expect(regenerator.progresses.count).to eq(6)
+
+    expect(Account.site_admin.brand_config).to eq(new_brand_config)
+
+    expect(@parent_account.reload.brand_config.parent).to eq(new_brand_config)
+    expect(@parent_shared_config.reload.brand_config.parent).to eq(new_brand_config)
+    expect(@parent_shared_config.brand_config).to eq(@parent_account.brand_config)
+
+    expect(@child_account.reload.brand_config.parent).to eq(@parent_account.brand_config)
+    expect(@child_shared_config.reload.brand_config.parent).to eq(@parent_account.brand_config)
+    expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)
+  end
 end

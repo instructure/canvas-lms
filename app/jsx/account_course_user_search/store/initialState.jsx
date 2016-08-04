@@ -1,4 +1,6 @@
-define([], function () {
+define([
+  './tabList'
+], function (tabList) {
 
   const initialState = {
     userList: {
@@ -10,8 +12,15 @@ define([], function () {
       timezones: window.ENV.TIMEZONES,
       permissions: window.ENV.PERMISSIONS,
       accountId: window.ENV.ACCOUNT_ID
+    },
+    tabList: {
+      basePath: '',
+      tabs: tabList,
+      selected: 0
     }
   };
 
+
   return initialState;
 });
+

@@ -57,7 +57,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'complete'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'incomplete'
     end
 
@@ -71,7 +71,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'A'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'C'
 
       clear_grade_and_validate
@@ -87,7 +87,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value '75'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value '50'
 
       clear_grade_and_validate
@@ -103,7 +103,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value '15'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value '10'
 
       clear_grade_and_validate
@@ -119,7 +119,7 @@ describe 'Speedgrader' do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       let_speedgrader_load
       expect(f('#grading-box-extended')).to have_value 'A'
-      f('a.next').click
+      f('#next-student-button').click
       expect(f('#grading-box-extended')).to have_value 'D'
 
       clear_grade_and_validate
@@ -212,6 +212,7 @@ describe 'Speedgrader' do
       end
 
       it 'in submissions page', priority: "1", test_id: 217612 do
+        driver.manage.window.maximize
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
         f('a.assess_submission_link').click
 
@@ -219,6 +220,7 @@ describe 'Speedgrader' do
         expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
 
         replace_content f('#criterion_crit1 input.criterion_points'), '5'
+        scroll_into_view('button.save_rubric_button')
         f('button.save_rubric_button').click
         wait_for_ajaximations
 

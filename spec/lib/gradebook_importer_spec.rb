@@ -460,7 +460,7 @@ describe GradebookImporter do
   end
 
   context "multiple grading periods" do
-    let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_course(course) }
+    let(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course) }
     let!(:old_period) do
       old_period_params = { title: "Course Period 2: old period",
                             start_date: 2.months.ago,

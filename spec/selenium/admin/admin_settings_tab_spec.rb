@@ -422,7 +422,7 @@ describe "admin settings tab" do
 
       get "/accounts/#{Account.default.id}/settings"
 
-      f(help_link_name_input).send_keys(link_name)
+      set_value f(help_link_name_input), link_name
       f(help_link_icon_option).click
 
       click_submit

@@ -1,3 +1,4 @@
+@if not $use_new_styles {
 // Shared between:
 // - bundles/login.scss
 // - bundles/login_confirm.scss
@@ -265,3 +266,4 @@ span.field-with-fancyplaceholder {
     }
   }
 }
+}//end @if not $use_new_styles

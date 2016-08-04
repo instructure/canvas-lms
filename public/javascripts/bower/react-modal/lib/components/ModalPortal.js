@@ -4,7 +4,6 @@ var focusManager = require('../helpers/focusManager');
 var scopeTab = require('../helpers/scopeTab');
 var Assign = require('lodash.assign');
 
-
 // so that our CSS is statically analyzable
 var CLASS_NAMES = {
   overlay: {
@@ -19,36 +18,6 @@ var CLASS_NAMES = {
   }
 };
 
-var defaultStyles = {
-  overlay : {
-    position        : 'fixed',
-    top             : 0,
-    left            : 0,
-    right           : 0,
-    bottom          : 0,
-    backgroundColor : 'rgba(255, 255, 255, 0.75)'
-  },
-  content : {
-    position                : 'absolute',
-    top                     : '40px',
-    left                    : '40px',
-    right                   : '40px',
-    bottom                  : '40px',
-    border                  : '1px solid #ccc',
-    background              : '#fff',
-    overflow                : 'auto',
-    WebkitOverflowScrolling : 'touch',
-    borderRadius            : '4px',
-    outline                 : 'none',
-    padding                 : '20px'
-
-  }
-};
-
-function stopPropagation(event) {
-  event.stopPropagation();
-}
-
 var ModalPortal = module.exports = React.createClass({
 
   displayName: 'ModalPortal',
@@ -56,10 +25,10 @@ var ModalPortal = module.exports = React.createClass({
   getDefaultProps: function() {
     return {
       style: {
-        overlay : {},
-        content : {}
+        overlay: {},
+        content: {}
       }
-    }
+    };
   },
 
   getInitialState: function() {
@@ -103,10 +72,14 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   open: function() {
-    focusManager.setupScopedFocus(this.getDOMNode());
+    focusManager.setupScopedFocus(this.node);
     focusManager.markForFocusLater();
     this.setState({isOpen: true}, function() {
       this.setState({afterOpen: true});
+
+      if (this.props.isOpen && this.props.onAfterOpen) {
+        this.props.onAfterOpen();
+      }
     }.bind(this));
   },
 
@@ -120,7 +93,7 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   focusContent: function() {
-    this.refs.content.getDOMNode().focus();
+    this.refs.content.focus();
   },
 
   closeWithTimeout: function() {
@@ -142,20 +115,32 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   handleKeyDown: function(event) {
-    if (event.keyCode == 9 /*tab*/) scopeTab(this.refs.content.getDOMNode(), event);
-    if (event.keyCode == 27 /*esc*/) this.requestClose();
+    if (event.keyCode == 9 /*tab*/) scopeTab(this.refs.content, event);
+    if (event.keyCode == 27 /*esc*/) {
+      event.preventDefault();
+      this.requestClose(event);
+    }
   },
 
-  handleOverlayClick: function() {
-    if (this.ownerHandlesClose())
-      this.requestClose();
-    else
-      this.focusContent();
+  handleOverlayClick: function(event) {
+    var node = event.target
+
+    while (node) {
+      if (node === this.refs.content) return
+      node = node.parentNode
+    }
+
+    if (this.props.shouldCloseOnOverlayClick) {
+      if (this.ownerHandlesClose())
+        this.requestClose(event);
+      else
+        this.focusContent();
+    }
   },
 
-  requestClose: function() {
+  requestClose: function(event) {
     if (this.ownerHandlesClose())
-      this.props.onRequestClose();
+      this.props.onRequestClose(event);
   },
 
   ownerHandlesClose: function() {
@@ -176,19 +161,21 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   render: function() {
+    var contentStyles = (this.props.className) ? {} : this.props.defaultStyles.content;
+    var overlayStyles = (this.props.overlayClassName) ? {} : this.props.defaultStyles.overlay;
+
     return this.shouldBeClosed() ? div() : (
       div({
         ref: "overlay",
         className: this.buildClassName('overlay', this.props.overlayClassName),
-        style: Assign({}, defaultStyles.overlay, this.props.style.overlay || {}),
+        style: Assign({}, overlayStyles, this.props.style.overlay || {}),
         onClick: this.handleOverlayClick
       },
         div({
           ref: "content",
-          style: Assign({}, defaultStyles.content, this.props.style.content || {}),
+          style: Assign({}, contentStyles, this.props.style.content || {}),
           className: this.buildClassName('content', this.props.className),
           tabIndex: "-1",
-          onClick: stopPropagation,
           onKeyDown: this.handleKeyDown
         },
           this.props.children

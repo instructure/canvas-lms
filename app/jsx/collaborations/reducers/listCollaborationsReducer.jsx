@@ -13,6 +13,7 @@ define([
     [ACTION_NAMES.LIST_COLLABORATIONS_START]: (state, action) => {
       return {
         ...state,
+        list: action.payload ? [] : state.list,
         listCollaborationsPending: true,
         listCollaborationsSuccessful: false,
         listCollaborationsError: null

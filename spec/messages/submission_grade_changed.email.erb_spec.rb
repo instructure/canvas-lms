@@ -25,19 +25,25 @@ describe 'submission_grade_changed.email' do
     @object = @submission
     generate_message(:submission_grade_changed, :email, @object)
   end
-  
-  it "should only include the score if opted in" do
+
+  it "should only include the score if opted in (and still enabled on root account)" do
     submission_model
     @assignment.update_attribute(:points_possible, 10)
     @submission.update_attribute(:score, 5)
     @object = @submission
     message = generate_message(:submission_grade_changed, :summary, @object)
     expect(message.body).not_to match(/score:/)
-    
+
     user = message.user
     user.preferences[:send_scores_in_emails] = true
     user.save!
     message = generate_message(:submission_grade_changed, :summary, @object, :user => user)
     expect(message.body).to match(/score:/)
+
+    Account.default.tap{|a| a.settings[:allow_sending_scores_in_emails] = false; a.save!}
+    @object.reload
+
+    message = generate_message(:submission_grade_changed, :summary, @object, :user => user)
+    expect(message.body).to_not match(/score:/)
   end
 end

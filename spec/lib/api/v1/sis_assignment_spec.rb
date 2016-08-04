@@ -83,11 +83,12 @@ describe Api::V1::SisAssignment do
     it "assignment groups have name and sis_source_id" do
       ag_name = 'chumba choo choo'
       sis_source_id = "my super unique goo-id"
-      assignment_group = AssignmentGroup.new(name: ag_name, sis_source_id: sis_source_id)
+      assignment_group = AssignmentGroup.new(name: ag_name, sis_source_id: sis_source_id, group_weight: 8.7)
       assignment_1.stubs(:assignment_group).returns(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
       expect(result[0]["assignment_group"]["sis_source_id"]).to eq(sis_source_id)
+      expect(result[0]["assignment_group"]["group_weight"]).to eq(8.7)
     end
 
     it "returns an empty hash for 0 assignments" do

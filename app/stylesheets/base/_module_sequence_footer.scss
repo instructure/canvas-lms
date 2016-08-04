@@ -1,5 +1,11 @@
-@if $use_new_styles { $bar-height: 64px; }
-@else { 
+$bar-height: 64px;
+$bar-background: null;
+$button-border-line: null;
+$top-bar-border: null;
+$top-bar-shadow: null;
+$text: null;
+$button-hover: null;
+@if not $use_new_styles {
   $bar-height: 55px;
   $bar-background: #eff2f5;
   $button-border-line: #d4d6d9;
@@ -22,7 +28,7 @@
   height: $bar-height+1;
   overflow: hidden;
 
-  @if $use_new_styles == false {
+  @if not $use_new_styles {
     a {
       line-height: $bar-height;
       font-weight: bold;

@@ -345,7 +345,6 @@ describe CollaborationsController do
 
   describe "PUT #update" do
     context "content_items" do
-
       let(:collaboration) do
         collab = @course.collaborations.create!(
           title: "a collab",
@@ -423,6 +422,21 @@ describe CollaborationsController do
         expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
       end
 
+      it "adds each group only once on multiple requests" do
+        user_session(@teacher)
+        group = group_model
+        group.add_user(@teacher, 'active')
+        content_items.first['ext_canvas_visibility'] = {
+          groups: [Lti::Asset.opaque_identifier_for(group)],
+          users: [Lti::Asset.opaque_identifier_for(@teacher)]
+        }
+        2.times {
+          put 'update', id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json
+        }
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+
+        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+      end
     end
   end
 

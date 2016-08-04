@@ -1,5 +1,5 @@
+@if not $use_new_styles {
 // Instructure's bootstrap mods:
-@import "base/environment";
 
 body {
   @include fontSize(13px);
@@ -363,3 +363,4 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     box-shadow: none;
   }
 }
+}//end @if not $use_new_styles

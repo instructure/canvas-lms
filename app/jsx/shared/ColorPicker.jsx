@@ -4,8 +4,9 @@ define([
   'react-modal',
   'i18n!calendar_color_picker',
   'jsx/shared/CourseNicknameEdit',
+  'classnames',
   'compiled/jquery.rails_flash_notifications'
-], function($, React, ReactModal, I18n, CourseNicknameEdit) {
+], function($, React, ReactModal, I18n, CourseNicknameEdit, classnames) {
 
   const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 
@@ -124,7 +125,7 @@ define([
     },
 
     setInputColor (event) {
-      var value = event.target.value;
+      var value = event.target.value || event.target.placeholder;
       event.preventDefault();
       this.setCurrentColor(value);
     },
@@ -164,7 +165,7 @@ define([
     onApply (color, event) {
       if (this.isValidHex(color)) {
         this.setState({ saveInProgress: true });
-        
+
         const doneSaving = () => {
           if (this.isMounted()) {
             this.setState({
@@ -172,17 +173,17 @@ define([
             });
           }
         };
-        
+
         const handleSuccess = () => {
           doneSaving();
           this.closeModal();
         };
-        
+
         const handleFailure = () => {
           doneSaving();
           $.flashError(I18n.t("Could not save '%{chosenColor}'", {chosenColor: this.state.currentColor}));
         };
-        
+
         // both API calls update the same User model and thus need to be performed serially
         $.when(this.setColorForCalendar(color)).then( () => {
           $.when(this.setCourseNickname()).then(
@@ -198,7 +199,7 @@ define([
     },
 
     onCancel() {
-      //reset to the cards current actual displaying color 
+      //reset to the cards current actual displaying color
       this.setCurrentColor(this.props.currentColor);
       this.closeModal();
     },
@@ -263,11 +264,11 @@ define([
 
     colorPreview () {
       var previewColor = this.isValidHex(this.state.currentColor) ? this.state.currentColor : "#FFFFFF";
-      
+
       if (previewColor.indexOf('#') < 0) {
         previewColor = '#' + previewColor;
       }
-      
+
       var inputColorStyle = {
         color: previewColor,
         borderColor: '#d6d6d6',
@@ -280,11 +281,11 @@ define([
              style = {inputColorStyle}
              role = "presentation"
              aria-hidden = "true"
-             tabIndex = "-1" 
+             tabIndex = "-1"
         >
         { !this.isValidHex(this.state.currentColor) ?
-          <i className="icon-warning" role="presentation"></i> 
-          : 
+          <i className="icon-warning" role="presentation"></i>
+          :
           null
         }
         </div>
@@ -292,9 +293,7 @@ define([
     },
 
     pickerBody () {
-
-      var cx = React.addons.classSet;
-      var inputClasses = cx({
+      const inputClasses = classnames({
         'ic-Input': true,
         'ColorPicker__CustomInput': true,
         'ic-Input--has-warning': !this.isValidHex(this.state.currentColor)
@@ -313,7 +312,7 @@ define([
           </div>
 
           <div className="ColorPicker__CustomInputContainer ic-Input-group">
-            
+
             {this.colorPreview()}
 
             <label className="screenreader-only" htmlFor={inputId}>

@@ -312,7 +312,11 @@ describe SearchController, type: :request do
         expect(links.map{ |l| l[:rel] }).to eq ['current', 'next', 'first']
 
         # get the next page
-        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json = follow_pagination_link('next', {
+          :controller => 'search',
+          :action => 'recipients',
+          :format => 'json'
+        })
         expect(json.size).to eql 1
         links = Api.parse_pagination_links(response.headers['Link'])
         links.each do |l|
@@ -338,7 +342,11 @@ describe SearchController, type: :request do
         expect(links.map{ |l| l[:rel] }).to eq ['current', 'next', 'first']
 
         # get the next page
-        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json = follow_pagination_link('next', {
+          :controller => 'search',
+          :action => 'recipients',
+          :format => 'json'
+        })
         expect(json.size).to eql 1
         links = Api.parse_pagination_links(response.headers['Link'])
         links.each do |l|
@@ -364,7 +372,11 @@ describe SearchController, type: :request do
         expect(links.map{ |l| l[:rel] }).to eq ['current', 'next', 'first']
 
         # get the next page
-        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json = follow_pagination_link('next', {
+          :controller => 'search',
+          :action => 'recipients',
+          :format => 'json'
+        })
         expect(json.size).to eql 1
         links = Api.parse_pagination_links(response.headers['Link'])
         links.each do |l|
@@ -396,7 +408,11 @@ describe SearchController, type: :request do
         expect(links.map{ |l| l[:rel] }).to eq ['current', 'next', 'first']
 
         # get the next page
-        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json = follow_pagination_link('next', {
+          :controller => 'search',
+          :action => 'recipients',
+          :format => 'json'
+        })
         expect(json.size).to eql 4
         expect(json.map{ |item| item['id'] }).to eq course_ids[4...6] + user_ids[0...2]
         links = Api.parse_pagination_links(response.headers['Link'])
@@ -407,7 +423,11 @@ describe SearchController, type: :request do
         expect(links.map{ |l| l[:rel] }).to eq ['current', 'next', 'first']
 
         # get the final page
-        json = follow_pagination_link('next', :controller => 'search', :action => 'recipients')
+        json = follow_pagination_link('next', {
+          :controller => 'search',
+          :action => 'recipients',
+          :format => 'json'
+        })
         expect(json.size).to eql 4
         expect(json.map{ |item| item['id'] }).to eq user_ids[2...6]
         links = Api.parse_pagination_links(response.headers['Link'])

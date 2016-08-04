@@ -130,7 +130,7 @@ define([
       if (onSubmit) {
         var loadingPromise = $.Deferred(),
             oldHandlers = {};
-        onSubmit(loadingPromise, formData);
+        onSubmit.call(this, loadingPromise, formData);
         $.each(['success', 'error'], function(i, successOrError){
           oldHandlers[successOrError] = options[successOrError];
           options[successOrError] = function() {

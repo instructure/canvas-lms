@@ -12,7 +12,7 @@ define([], function () {
       }
 
       if(isActiveCell && !gradeHasChanged && !this.isConcluded()) {
-        var gradeInput = this.refs.gradeInput.getDOMNode();
+        var gradeInput = this.refs.gradeInput;
         gradeInput.select();
       }
     },

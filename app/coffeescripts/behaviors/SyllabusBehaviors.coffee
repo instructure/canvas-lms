@@ -191,8 +191,8 @@ define [
     $course_syllabus_details = $('#course_syllabus_details')
 
     RichContentEditor.initSidebar({
-      show: -> $('#sidebar_content').hide(),
-      hide: -> $('#sidebar_content').show()
+      show: -> $('#sidebar_content, #course_show_secondary').hide(),
+      hide: -> $('#sidebar_content, #course_show_secondary').show()
     })
 
     $edit_course_syllabus_form.on 'edit', ->
@@ -200,6 +200,7 @@ define [
       $edit_syllabus_link.hide()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
+      $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
       $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
       RichContentEditor.loadNewEditor($course_syllabus_body, { focus: true, manageParent: true })
 

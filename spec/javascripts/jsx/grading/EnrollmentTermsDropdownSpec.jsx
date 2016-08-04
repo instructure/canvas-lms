@@ -1,8 +1,9 @@
 define([
   'react',
+  'react-dom',
   'underscore',
   'jsx/grading/EnrollmentTermsDropdown'
-], (React, _, Dropdown) => {
+], (React, ReactDOM, _, Dropdown) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -13,7 +14,7 @@ define([
         changeSelectedEnrollmentTerm: this.spy()
       };
       const element = React.createElement(Dropdown, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     terms() {
@@ -58,7 +59,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

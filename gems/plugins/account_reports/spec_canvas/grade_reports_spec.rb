@@ -21,11 +21,46 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Default Account Reports" do
   include ReportSpecHelper
 
-  before(:each) do
+  before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @default_term = @account.default_enrollment_term
+
+    @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
+    @term1.root_account = @account
+    @term1.sis_source_id = 'fall12'
+    @term1.save!
+    @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
+                                         :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
+                                         :sis_user_id => "user_sis_id_01")
+    @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
+                                         :name => 'Michael Bolton', :account => @account,
+                                         :sis_user_id => "user_sis_id_02")
+    @user3 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
+                                         :sortable_name => "Astley, Rick", :username => 'rick@roll.com',
+                                         :sis_user_id => "user_sis_id_03")
+    @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
+                                         :name => 'Jason Donovan', :account => @account,
+                                         :sis_user_id => "user_sis_id_04")
+    @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
+                                         :name => 'John Smith', :sis_user_id => "user_sis_id_05",
+                                         :account => @account)
+
+    @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
+    @course1.workflow_state = 'available'
+    @course1.enrollment_term_id = @term1.id
+    @course1.sis_source_id = "SIS_COURSE_ID_1"
+    @course1.save!
+    @course2 = course(:course_name => 'Math 101', :account => @account, :active_course => true)
+
+    @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
+    @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
+    @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
+    @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', :enrollment_state => :active)
+    @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
+    @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
+    @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
   end
 
   # The report should get all the grades for the term provided
@@ -33,54 +68,15 @@ describe "Default Account Reports" do
   # have a student in both courses
   # have sis id's and not sis ids
   describe "Grade Export report" do
-    before(:each) do
-      @term1 = EnrollmentTerm.create(:name => 'Fall', :start_at => 6.months.ago, :end_at => 1.year.from_now)
-      @term1.root_account = @account
-      @term1.sis_source_id = 'fall12'
-      @term1.save!
-      @user1 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-                                           :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-                                           :sis_user_id => "user_sis_id_01")
-      @user2 = user_with_managed_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
-                                           :name => 'Michael Bolton', :account => @account,
-                                           :sis_user_id => "user_sis_id_02")
-      @user3 = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "Rick Astley",
-                                           :sortable_name => "Astley, Rick", :username => 'rick@roll.com',
-                                           :sis_user_id => "user_sis_id_03")
-      @user4 = user_with_managed_pseudonym(:active_all => true, :username => 'jason@donovan.com',
-                                           :name => 'Jason Donovan', :account => @account,
-                                           :sis_user_id => "user_sis_id_04")
-      @user5 = user_with_managed_pseudonym(:active_all => true, :username => 'john@smith.com',
-                                           :name => 'John Smith', :sis_user_id => "user_sis_id_05",
-                                           :account => @account)
-
-      @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101', :account => @account)
-      @course1.workflow_state = 'available'
-      @course1.enrollment_term_id = @term1.id
-      @course1.sis_source_id = "SIS_COURSE_ID_1"
-      @course1.save!
-      @course2 = course(:course_name => 'Math 101', :account => @account, :active_course => true)
-      @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
-      @enrollment1.computed_final_score = 88
-      @enrollment1.save!
-      @enrollment2 = @course1.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :completed)
-      @enrollment2.computed_final_score = 90
-      @enrollment2.save!
-      @enrollment3 = @course2.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
-      @enrollment3.computed_final_score = 93
-      @enrollment3.save!
-      @enrollment4 = @course1.enroll_user(@user3, 'StudentEnrollment', :enrollment_state => :active)
-      @enrollment4.computed_final_score = 97
-      @enrollment4.save!
-      @enrollment5 = @course2.enroll_user(@user4, 'StudentEnrollment', :enrollment_state => :active)
-      @enrollment5.computed_final_score = 99
-      @enrollment5.save!
-      @enrollment6 = @course1.enroll_user(@user5, 'TeacherEnrollment', :enrollment_state => :active)
-      @enrollment7 = @course2.enroll_user(@user5, 'TaEnrollment', :enrollment_state => :active)
+    before(:once) do
+      @enrollment1.update_attribute :computed_final_score, 88
+      @enrollment2.update_attribute :computed_final_score, 90
+      @enrollment3.update_attribute :computed_final_score, 93
+      @enrollment4.update_attribute :computed_final_score, 97
+      @enrollment5.update_attribute :computed_final_score, 99
     end
 
     it "should run grade export for a term" do
-
       parameters = {}
       parameters["enrollment_term"] = @term1.id
       parsed = read_report('grade_export_csv', {order: 13, params: parameters})
@@ -280,5 +276,101 @@ describe "Default Account Reports" do
                            @default_term.id.to_s, nil, nil, "99.0", "active"]
     end
 
+  end
+
+  describe "MGP Grade Export" do
+    describe "#mgp_grade_export" do
+      it "makes csvs for all terms" do
+        reports = read_report("mgp_grade_export_csv")
+        expect(reports).to include "Default Term.csv"
+        expect(reports).to include "Fall.csv"
+      end
+
+      it "can return csv for a single term" do
+        reports = read_report("mgp_grade_export_csv",
+                              params: {enrollment_term_id: @term1.id})
+        expect(reports).to include "Fall.csv"
+        expect(reports).not_to include "Default Term.csv"
+      end
+    end
+
+    describe "#mgp_term_csv" do
+      before(:once) do
+        # set up grading periods
+        gpg = GradingPeriodGroup.new title: "Grading Periods"
+        gpg.root_account = @course2.root_account
+        gpg.enrollment_terms << @default_term
+        gpg.save!
+        past   = gpg.grading_periods.create! title: "Past", start_date: 1.week.ago, end_date: 1.day.ago
+        future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
+
+        # set up assignments
+        past_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.ago
+        future_assignment = @course2.assignments.create! points_possible: 100, due_at: 3.days.from_now
+
+        past_assignment.grade_student(@user2, grade: 25)
+        past_assignment.grade_student(@user4, grade: 75)
+        future_assignment.grade_student(@user2, grade: 75)
+        future_assignment.grade_student(@user4, grade: 25)
+      end
+
+      it "reports mgp grades" do
+        reports = read_report("mgp_grade_export_csv",
+                              params: {enrollment_term_id: @default_term.id},
+                              parse_header: true,
+                              order: ["student name"])
+        csv = reports["Default Term.csv"]
+        expect(csv.size).to eq 2
+        expect(
+          csv.all? { |student|
+            student["course"] == "Math 101"
+            student["grading period set"] == "Grading Periods"
+          }
+        ).to eq true
+
+        jason, mike = csv
+
+        expect(jason["student name"]).to eq "Jason Donovan"
+        expect(jason["Past current score"].to_f).to eq 75
+        expect(jason["Future current score"].to_f).to eq 25
+
+        expect(mike["student name"]).to eq "Michael Bolton"
+        expect(mike["Past final score"].to_f).to eq 25
+        expect(mike["Future final score"].to_f).to eq 75
+      end
+
+      it "works with students in multiple sections" do
+        section2 = @course2.course_sections.create! name: "section 2"
+        @course2.enroll_student(@user2, section: section2,
+          workflow_state: "active",
+          allow_multiple_enrollments: true).tap { |e| e.accept }
+
+        reports = read_report("mgp_grade_export_csv",
+                              params: {enrollment_term_id: @default_term.id},
+                              parse_header: true,
+                              order: ["student name", "section id"])
+        csv = reports["Default Term.csv"]
+
+        jason, mike1, mike2 = csv
+
+        expect(jason["student name"]).to eq "Jason Donovan"
+        expect(mike1["student name"]).to eq "Michael Bolton"
+        expect(mike2["student name"]).to eq "Michael Bolton"
+        expect(mike1["section"]).to eq "Math 101"
+        expect(mike2["section"]).to eq "section 2"
+        expect(mike1["Past final score"].to_f).to eq 25
+        expect(mike2["Past final score"].to_f).to eq 25
+      end
+
+      it "returns nothing for terms without grading periods" do
+        reports = read_report("mgp_grade_export_csv",
+                              params: {enrollment_term_id: @term1.id},
+                              header: true,
+                              order: "skip")
+        csv = reports["Fall.csv"]
+        expect(csv.size).to eq 1
+        expect(csv.first).to eq ["no grading periods configured for this term"]
+      end
+    end
   end
 end

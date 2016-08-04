@@ -1,4 +1,7 @@
 class AccountAuthorizationConfigsPresenter
+  include ActionView::Helpers::FormTagHelper
+  include ActionView::Helpers::FormOptionsHelper
+
   attr_reader :account
 
   def initialize(acc)
@@ -115,6 +118,23 @@ class AccountAuthorizationConfigsPresenter
 
   def parent_reg_selected
     account.parent_registration?
+  end
+
+  def available_federated_attributes(aac)
+    AccountAuthorizationConfig::CANVAS_ALLOWED_FEDERATED_ATTRIBUTES - aac.federated_attributes.keys
+  end
+
+  def federated_provider_attribute(aac, canvas_attribute = nil, selected = nil)
+    name = "authentication_provider[federated_attributes][#{canvas_attribute}][attribute]" if selected
+    if aac.class.recognized_federated_attributes.nil?
+      if selected
+        text_field_tag(name, selected, id: name)
+      else
+        text_field_tag(nil)
+      end
+    else
+      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: 'ic-Input', id: name)
+    end
   end
 
   private

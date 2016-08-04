@@ -1,11 +1,11 @@
 <div class="revision-content">
-  <div class="revision-details">
+  <button class="revision-details Button--link">
     {{#if edited_by}}
       {{#t 'revision_summary'}}<strong>{{updated_at}}</strong> by {{edited_by}}{{/t}}
     {{else}}
       <strong>{{updated_at}}</strong>
     {{/if}}
-  </div>
+  </button>
 
   {{#if IS.LATEST}}
     <div class="revision-actions">{{#t 'latest_revision'}}Latest Revision{{/t}}</div>

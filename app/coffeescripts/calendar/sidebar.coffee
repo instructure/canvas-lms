@@ -77,10 +77,29 @@ define [
 
       userSettings.set('checked_calendar_codes', @contexts)
 
+  setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA = ->
+    $calendarFeedModalContent = $('#calendar_feed_box')
+    $calendarFeedModalOpener = $('.dialog_opener[aria-controls="calendar_feed_box"]')
+    # We need to get the modal initialized early rather than wait for
+    # .dialog_opener to open it so we can attach the event to it the first
+    # time.  We extend so that we still get all the magic that .dialog_opener
+    # should give us.
+    $calendarFeedModalContent.dialog($.extend({
+      autoOpen: false,
+      modal: true
+    }, $calendarFeedModalOpener.data('dialogOpts')))
+
+    $calendarFeedModalContent.on('dialogclose', ->
+      forceScreenreaderToReparse($('#application')[0])
+    )
+
+
   return sidebar = (contexts, selectedContexts, dataSource) ->
     $holder   = $('#context-list-holder')
     $skipLink = $('.skip-to-calendar')
     $colorPickerBtn = $('.ContextList__MoreBtn')
+
+    setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA()
 
     $holder.html contextListTemplate(contexts: contexts)
 

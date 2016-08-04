@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CommunicationChannelsController do
   before :once do
@@ -633,6 +633,16 @@ describe CommunicationChannelsController do
         expect(@user.pseudonyms.length).to eq 1
         @cc.reload
         expect(@cc).to be_active
+      end
+
+      it "should reject pseudonym unique_id changes when creating a new user" do
+        @user.accept_terms
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
+
+        post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:unique_id => "haxxor@example.com", :password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
+
+        expect(@user.reload.pseudonyms.first.unique_id).to eq "jt@instructure.com"
       end
 
       it "should accept an invitation when merging with the current user" do

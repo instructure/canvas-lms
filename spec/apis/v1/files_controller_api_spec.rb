@@ -136,6 +136,18 @@ describe "Files API", type: :request do
       expect(@attachment.reload.file_state).to eq 'available'
     end
 
+    it "includes usage rights if overwriting a file that has them already" do
+      usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
+      @attachment.usage_rights = usage_rights
+      @attachment.save!
+      upload_data
+      json = call_create_success
+      expect(json['usage_rights']).to eq({"use_justification"=>"creative_commons",
+                                          "license"=>"cc_by_nd",
+                                          "legal_copyright"=>"(C) 2014 XYZ Corp",
+                                          "license_name"=>"CC Attribution No Derivatives"})
+    end
+
     it "should store long-ish non-ASCII filenames (local storage)" do
       local_storage!
       @attachment.update_attribute(:filename, "Качество образования-1.txt")

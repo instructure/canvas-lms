@@ -784,6 +784,8 @@ module ApplicationHelper
     includes = if use_new_styles?
       if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
         abc.css_and_js_overrides[:js_overrides]
+      else
+        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :js_overrides)
       end
     else
       get_global_includes.each_with_object([]) do |global_include, memo|
@@ -825,6 +827,8 @@ module ApplicationHelper
     includes = if use_new_styles?
       if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
         abc.css_and_js_overrides[:css_overrides]
+      else
+        Account.site_admin.brand_config.try(:css_and_js_overrides).try(:[], :css_overrides)
       end
     else
       get_global_includes.each_with_object([]) do |global_include, css_includes|
@@ -916,16 +920,16 @@ module ApplicationHelper
 
   def translated_due_date(assignment)
     if assignment.multiple_due_dates_apply_to?(@current_user)
-      t('#due_dates.multiple_due_dates', 'due: Multiple Due Dates')
+      t('Due: Multiple Due Dates')
     else
       assignment = assignment.overridden_for(@current_user)
 
       if assignment.due_at
-        t('#due_dates.due_at', 'due: %{assignment_due_date_time}', {
-          :assignment_due_date_time => datetime_string(force_zone(assignment.due_at))
-        })
+        t('Due: %{assignment_due_date_time}',
+          assignment_due_date_time: datetime_string(force_zone(assignment.due_at))
+        )
       else
-        t('#due_dates.no_due_date', 'due: No Due Date')
+        t('Due: No Due Date')
       end
     end
   end

@@ -39,7 +39,7 @@ describe 'Course Grading Periods' do
 
     it 'allows grading periods to be deleted', priority: "1", test_id: 202320 do
       grading_period_selector = '.grading-period'
-      group = group_helper.create_for_course(@course)
+      group = group_helper.legacy_create_for_course(@course)
       period_helper.create_with_weeks_for_group(group, 5, 3)
       period_helper.create_with_weeks_for_group(group, 3, 1)
       get "/courses/#{@course.id}/grading_standards"

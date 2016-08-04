@@ -12,8 +12,12 @@ define([
 
     onChange(event) {
       let trimmedText = event.target.value.trim();
-      this.props.changeSearchText(trimmedText);
+      this.search(trimmedText);
     },
+
+    search: _.debounce(function(trimmedText) {
+      this.props.changeSearchText(trimmedText);
+    }, 200),
 
     render() {
       return (

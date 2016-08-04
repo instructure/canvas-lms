@@ -520,8 +520,7 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         expect(@enrollment.state).to eql(:invited)
-        @enrollment.accept
-        expect(@enrollment.reload.state).to eql(:active)
+        @enrollment.accept if @enrollment.invited?
         expect(@enrollment.state_based_on_date).to eql(state_based_state)
 
         @course.start_at = 2.days.from_now
@@ -552,6 +551,7 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         expect(@enrollment.state).to eql(:invited)
+        expect(@enrollment.state_based_on_date).to eql(:invited)
         @enrollment.accept
         expect(@enrollment.reload.state).to eql(:active)
         expect(@enrollment.state_based_on_date).to eql(:active)
@@ -562,19 +562,17 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         expect(@enrollment.state).to eql(:invited)
-        @enrollment.accept
-        expect(@enrollment.reload.state).to eql(:active)
         expect(@enrollment.state_based_on_date).to eql(:completed)
+        expect(@enrollment.accept).to be_falsey
 
         @term.start_at = 2.days.from_now
         @term.end_at = 4.days.from_now
         @term.save!
-        @enrollment.workflow_state = 'invited'
-        @enrollment.save!
         @enrollment.reload
         expect(@enrollment.state).to eql(:invited)
         expect(@enrollment.state_based_on_date).to eql(:invited)
         expect(@enrollment.accept).to be_truthy
+        expect(@enrollment.reload.state_based_on_date).to eql(@enrollment.admin? ? :active : :accepted)
       end
 
       def enrollment_dates_override_test
@@ -598,8 +596,6 @@ describe Enrollment do
         @enrollment.workflow_state = 'invited'
         @enrollment.save!
         expect(@enrollment.state).to eql(:invited)
-        @enrollment.accept
-        expect(@enrollment.reload.state).to eql(:active)
         expect(@enrollment.state_based_on_date).to eql(:completed)
 
         @override.start_at = 2.days.from_now

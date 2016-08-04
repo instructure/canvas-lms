@@ -25,6 +25,7 @@ class CourseSection < ActiveRecord::Base
   belongs_to :course
   belongs_to :nonxlist_course, :class_name => 'Course'
   belongs_to :root_account, :class_name => 'Account'
+  belongs_to :enrollment_term
   has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :students, :through => :student_enrollments, :source => :user
@@ -47,6 +48,7 @@ class CourseSection < ActiveRecord::Base
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
   after_save :delete_enrollments_later_if_deleted
+  after_save :update_enrollment_states_if_necessary
 
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
@@ -270,5 +272,11 @@ class CourseSection < ActiveRecord::Base
 
   def common_to_users?(users)
     users.all?{ |user| self.student_enrollments.active.for_user(user).count > 0 }
+  end
+
+  def update_enrollment_states_if_necessary
+    if self.restrict_enrollments_to_section_dates_changed? || (self.restrict_enrollments_to_section_dates? && (changes.keys & %w{start_at end_at}).any?)
+      EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
+    end
   end
 end

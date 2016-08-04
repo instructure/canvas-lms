@@ -82,6 +82,23 @@ describe SubmissionComment do
       expect(@submission).to be_unsubmitted
       expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
     end
+
+    context 'draft comment' do
+      before(:each) do
+        @comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: true)
+      end
+
+      it 'does not dispatch notification on create' do
+        expect(@comment.messages_sent).to be_empty
+      end
+
+      it 'dispatches notification on update when the draft changes to false' do
+        @comment.draft = false
+        @comment.save
+
+        expect(@comment.messages_sent.keys).to eq(['Submission Comment'])
+      end
+    end
   end
 
   it "should allow valid attachments" do
@@ -302,6 +319,95 @@ This text has a http://www.google.com link in it...
         }.to change { submission.submission_comments.count }.from(3).to(1)
         expect(submission.submission_comments).to_not include [first_comment, second_comment]
         expect(submission.submission_comments).to include ungrouped_comment
+      end
+    end
+  end
+
+  describe 'scope: draft' do
+    before(:once) do
+      @standard_comment = SubmissionComment.create!(@valid_attributes)
+      @published_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: false }))
+      @draft_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true }))
+    end
+
+    it 'returns the draft comment' do
+      expect(SubmissionComment.draft.pluck(:id)).to include(@draft_comment.id)
+    end
+
+    it 'does not return the standard comment' do
+      expect(SubmissionComment.draft.pluck(:id)).not_to include(@standard_comment.id)
+    end
+
+    it 'does not return the published comment' do
+      expect(SubmissionComment.draft.pluck(:id)).not_to include(@published_comment.id)
+    end
+  end
+
+  describe 'scope: published' do
+    before(:once) do
+      @standard_comment = SubmissionComment.create!(@valid_attributes)
+      @published_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: false }))
+      @draft_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true }))
+
+      @standard_comment.update_attribute(:draft, nil)
+    end
+
+    it 'does not return the draft comment' do
+      expect(SubmissionComment.published.pluck(:id)).not_to include(@draft_comment.id)
+    end
+
+    it 'returns the standard comment' do
+      expect(SubmissionComment.published.pluck(:id)).to include(@standard_comment.id)
+    end
+
+    it 'returns the published comment' do
+      expect(SubmissionComment.published.pluck(:id)).to include(@published_comment.id)
+    end
+  end
+
+  describe 'authorization policy' do
+    context 'draft comment' do
+      before(:once) do
+        course_with_user('TeacherEnrollment', course: @course)
+        @second_teacher = @user
+
+        @submission_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true, author: @teacher }))
+      end
+
+      it 'can be updated by the teacher who created it' do
+        expect(@submission_comment.grants_any_right?(@teacher, {}, :update)).to be_truthy
+      end
+
+      it 'cannot be updated by a different teacher on the same course' do
+        expect(@submission_comment.grants_any_right?(@second_teacher, {}, :update)).to be_falsey
+      end
+
+      it 'cannot be read by a student if it would otherwise be readable by them' do
+        @submission_comment.teacher_only_comment = false
+
+        expect(@submission_comment.grants_any_right?(@student, {}, :read)).to be_falsey
+      end
+    end
+  end
+
+  describe '#update_submission' do
+    context 'draft comment' do
+      before(:once) do
+        SubmissionComment.create!(@valid_attributes)
+        @submission_comment = SubmissionComment.create!(@valid_attributes.merge({ draft: true, author: @teacher }))
+      end
+
+      it "is not reflected in the submission's submission_comments_count" do
+        expect(@submission_comment.submission.reload.submission_comments_count).to eq(1)
+      end
+
+      it "is reflected in the submission's submission_comments_count as soon as its draft field changes" do
+        @submission_comment.draft = false
+
+        expect { @submission_comment.save }.to(
+          change { @submission_comment.submission.reload.submission_comments_count }.
+            from(1).to(2)
+        )
       end
     end
   end

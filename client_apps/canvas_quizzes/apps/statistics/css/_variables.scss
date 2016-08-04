@@ -90,6 +90,4 @@ $activeOrHoverQuestionBoxBg: #f4f4f4;
 //
 //   - http://webaim.org/resources/contrastchecker/
 //   - http://www.dasplankton.de/ContrastA/
-@if $use_high_contrast {
-  @import "./variables_high_contrast";
-}
+@import "./variables_high_contrast";

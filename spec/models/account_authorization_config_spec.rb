@@ -148,4 +148,128 @@ describe AccountAuthorizationConfig do
       expect(aac3.reload.position).to eq(2)
     end
   end
+
+  describe "federated_attributes" do
+    context "validation" do
+      it "normalizes short form" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'integration_id' => 'internal_id'})
+        expect(aac).to be_valid
+        expect(aac.federated_attributes).to eq({ 'integration_id' => { 'attribute' => 'internal_id',
+                                                                       'provisioning_only' => false}})
+      end
+
+      it "defaults provisioning_only to false" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' }})
+        expect(aac).to be_valid
+        expect(aac.federated_attributes).to eq({ 'integration_id' => { 'attribute' => 'internal_id',
+                                                                       'provisioning_only' => false}})
+      end
+
+      it "doesn't allow invalid Canvas attributes" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'sis_id' => 'internal_id'})
+        expect(aac).not_to be_valid
+      end
+
+      it "allows valid provider attributes" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'integration_id' => 'internal_id'})
+        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        expect(aac).to be_valid
+      end
+
+      it "doesn't allow invalid provider attributes" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'integration_id' => 'garbage'})
+        AccountAuthorizationConfig::SAML.stubs(:recognized_federated_attributes).returns(['internal_id'])
+        expect(aac).not_to be_valid
+      end
+
+      it "rejects unknown keys for attriutes" do
+        aac = Account.default.authentication_providers.new(auth_type: 'saml',
+            federated_attributes: { 'integration_id' => { 'garbage' => 'internal_id' }})
+        expect(aac).not_to be_valid
+      end
+    end
+  end
+
+  describe "apply_federated_attributes" do
+    let(:aac) do
+      Account.default.authentication_providers.new(auth_type: 'saml',
+        federated_attributes: {
+          'display_name' => 'display_name',
+          'email' => 'email',
+          'given_name' => 'given_name',
+          'integration_id' => { 'attribute' => 'internal_id', 'provisioning_only' => true },
+          'locale' => 'locale',
+          'name' => 'name',
+          'sis_user_id' => { 'attribute' => 'sis_id', 'provisioning_only' => true },
+          'sortable_name' => 'sortable_name',
+          'surname' => 'surname',
+          'time_zone' => 'timezone'
+        })
+    end
+
+    before do
+      # ensure the federated_attributes hash is normalized
+      aac.valid?
+      user_with_pseudonym
+    end
+
+    it 'handles most attributes' do
+      aac.apply_federated_attributes(@pseudonym,
+        {
+          'display_name' => 'Mr. Cutler',
+          'email' => 'cody@school.edu',
+          'internal_id' => 'abc123',
+          'locale' => 'es',
+          'name' => 'Cody Cutrer',
+          'sis_id' => '28',
+          'sortable_name' => 'Cutrer, Cody',
+          'timezone' => 'America/New_York'
+        }, purpose: :provisioning)
+      @user.reload
+      expect(@user.short_name).to eq 'Mr. Cutler'
+      expect(@user.communication_channels.email.active.pluck(:path)).to be_include('cody@school.edu')
+      expect(@pseudonym.integration_id).to eq 'abc123'
+      expect(@user.locale).to eq 'es'
+      expect(@user.name).to eq 'Cody Cutrer'
+      expect(@pseudonym.sis_user_id).to eq '28'
+      expect(@user.sortable_name).to eq 'Cutrer, Cody'
+      expect(@user.time_zone.tzinfo.name).to eq 'America/New_York'
+    end
+
+    it 'handles separate names' do
+      aac.apply_federated_attributes(@pseudonym,
+        'given_name' => 'Cody',
+        'surname' => 'Cutrer')
+      @user.reload
+      expect(@user.short_name).to eq 'Cody Cutrer'
+      expect(@user.name).to eq 'Cody Cutrer'
+      expect(@user.sortable_name).to eq 'Cutrer, Cody'
+    end
+
+    it 'ignores attributes that are for provisioning only when not provisioning' do
+      aac.apply_federated_attributes(@pseudonym,
+         {
+           'email' => 'cody@school.edu',
+           'internal_id' => 'abc123',
+           'locale' => 'es',
+           'name' => 'Cody Cutrer',
+           'sis_id' => '28',
+           'sortable_name' => 'Cutrer, Cody',
+           'timezone' => 'America/New_York'
+         })
+      @user.reload
+      expect(@user.communication_channels.email.active.pluck(:path)).to be_include('cody@school.edu')
+      expect(@pseudonym.integration_id).not_to eq 'abc123'
+      expect(@user.locale).to eq 'es'
+      expect(@user.name).to eq 'Cody Cutrer'
+      expect(@pseudonym.sis_user_id).not_to eq '28'
+      expect(@user.sortable_name).to eq 'Cutrer, Cody'
+      expect(@user.time_zone.tzinfo.name).to eq 'America/New_York'
+    end
+  end
 end

@@ -3,3 +3,11 @@
 @import 'vendor/lightskin.scss';
 @import 'base/environment';
 @import 'our_custom_tiny_mce_stuff/tiny_like_ck_with_external_tools.scss';
+
+.ic-RichContentEditor textarea {
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}

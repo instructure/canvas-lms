@@ -546,7 +546,7 @@ define [
           start = now
         else
           start = fcUtil.clone(calendarDate)
-          start.date(start.date() - start.day())
+          start.date(start.date() - start.weekday())
 
       @setCurrentDate(start)
       @drawNowLine()

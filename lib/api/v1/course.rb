@@ -22,6 +22,7 @@ module Api::V1::Course
   include Api::V1::SectionEnrollments
   include Api::V1::PostGradesStatus
   include Api::V1::User
+  include Api::V1::Tab
 
   def course_settings_json(course)
     settings = {}
@@ -86,6 +87,7 @@ module Api::V1::Course
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
+      hash['tabs'] = tabs_available_json(course, user, session, ['external']) if includes.include?('tabs')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
 

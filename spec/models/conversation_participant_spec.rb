@@ -31,6 +31,21 @@ describe ConversationParticipant do
     expect(convo.messages.size).to eq 1
   end
 
+  it "should not decrement unread_conversations_count to a negative number" do
+    sender = user
+    recipient = user
+    convo = sender.initiate_conversation([recipient])
+    convo.add_message('test')
+
+    User.where(:id => recipient).update_all(:unread_conversations_count => 0) # force into the wrong state
+
+    part = recipient.conversations.first
+    part.update_one(:event => 'mark_as_read')
+
+    recipient.reload
+    expect(recipient.unread_conversations_count).to eq 0
+  end
+
   it "should correctly manage messages" do
     sender = user
     recipient = user

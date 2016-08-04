@@ -95,6 +95,10 @@ define [
       return @get('grading_type') || 'points' unless gradingType
       @set 'grading_type', gradingType
 
+    omitFromFinalGrade: (omitFromFinalGradeBoolean) =>
+      return @get 'omit_from_final_grade' unless arguments.length > 0
+      @set 'omit_from_final_grade', omitFromFinalGradeBoolean
+
     courseID: => @get('course_id')
 
     submissionTypes: (submissionTypes) =>
@@ -316,7 +320,8 @@ define [
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'hasDueDate', 'hasPointsPossible'
-        'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides'
+        'singleSectionDueDate', 'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
+        'omitFromFinalGrade'
       ]
 
       hash = id: @get 'id'

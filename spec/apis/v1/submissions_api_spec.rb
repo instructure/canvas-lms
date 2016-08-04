@@ -258,6 +258,34 @@ describe 'Submissions API', type: :request do
       expect(json["grade"]).to eq "5"
     end
 
+    context 'for a submission with a draft comment and a published comment' do
+      before(:once) do
+        @a1.update_submission(@student1, draft_comment: true, comment: 'Draft Answer: forty-one')
+        @a1.update_submission(@student1, comment: 'Answer: forty-two')
+      end
+
+      before(:each) do
+        @user = @student1
+
+        @json = api_call(:get,
+          "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+          { :controller => 'submissions_api', :action => 'show',
+            :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+            :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
+          { :include => %w(submission_comments) })
+      end
+
+      it 'returns only published comments' do
+        expect(@json['submission_comments'].size).to eq(1)
+
+        published_comments = @json['submission_comments'].select do |c|
+          c['comment'] == 'Answer: forty-two'
+        end
+
+        expect(published_comments[0]['comment']).to eq('Answer: forty-two')
+      end
+    end
+
     it "should not show rubric assessments to students on muted assignments" do
       @a1.mute!
       sub = @a1.grade_student(@student1, :grade => 5).first
@@ -618,6 +646,25 @@ describe 'Submissions API', type: :request do
 
     expect(json.first['submission_history'].count).to eq 2
     expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+  end
+
+  it "should return the correct submitted_at date for each quiz submission" do
+    course_with_student(course: @course, active_all: true)
+    quiz_with_graded_submission([multiple_answers_question_data], { user: @student })
+    Timecop.travel(15.minutes.ago) do
+      qs = @quiz.generate_submission(@student)
+      qs.mark_completed
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+    end
+    course_with_teacher_logged_in(:course => @course, :active_all => true)
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@quiz.assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => @quiz.assignment.id.to_s },
+          { :include => %w(submission_history) })
+    submission_dates = json.first['submission_history'].map { |hash| hash['submitted_at'] }
+    expect(submission_dates.first).not_to eq(submission_dates.last)
   end
 
   it "should allow students to retrieve their own submission" do
@@ -1645,7 +1692,7 @@ describe 'Submissions API', type: :request do
       @course.enroll_student(@student2).accept!
 
       @course.account.enable_feature!(:multiple_grading_periods)
-      gpg = Factories::GradingPeriodGroupHelper.new.create_for_course(@course)
+      gpg = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
       @gp1 = gpg.grading_periods.create!(
         title: 'first',
         weight: 50,
@@ -3356,6 +3403,7 @@ describe 'Submissions API', type: :request do
                 "scorer_id"=>@ta.id,
                 "provisional_grade_id"=>pg.id,
                 "grade_matches_current_submission"=>true,
+                "graded_anonymously"=>nil,
                 "final"=>false,
                 "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22:#{@student1.id},%22provisional_grade_id%22:#{pg.id}%7D"}]},
            {"id"=>@student2.id,

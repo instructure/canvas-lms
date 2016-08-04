@@ -190,6 +190,10 @@ class GroupsController < ApplicationController
   # @argument context_type [String, "Account"|"Course"]
   #  Only include groups that are in this type of context.
   #
+  # @argument include[] [String, "tabs"]
+  #   - "tabs": Include the list of tabs configured for each group.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \
   #          -H 'Authorization: Bearer <token>'
@@ -217,7 +221,7 @@ class GroupsController < ApplicationController
       format.json do
         @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.preload(:group_category)
+          scope.preload(:group_category, :context)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => (@groups.map { |g| group_json(g, @current_user, session,includes) })
@@ -231,6 +235,10 @@ class GroupsController < ApplicationController
   #
   # @argument only_own_groups [Boolean]
   #  Will only include groups that the user belongs to if this is set
+  #
+  # @argument include[] [String, "tabs"]
+  #   - "tabs": Include the list of tabs configured for each group.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/1/groups \
@@ -315,9 +323,11 @@ class GroupsController < ApplicationController
   #     curl https://<canvas>/api/v1/groups/<group_id> \
   #          -H 'Authorization: Bearer <token>'
   #
-  # @argument include[] [String, "permissions"]
+  # @argument include[] [String, "permissions", "tabs"]
   #   - "permissions": Include permissions the current user has
   #     for the group.
+  #   - "tabs": Include the list of tabs configured for each group.  See the
+  #     {api:TabsController#index List available tabs API} for more information.
   #
   # @returns Group
   def show

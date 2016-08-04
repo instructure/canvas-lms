@@ -8,8 +8,10 @@ define([
   'compiled/models/Folder',
   'jsx/files/FolderChild',
   'jsx/files/LoadingIndicator',
-  'jsx/files/FilePreview'
-  ], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview) {
+  'jsx/files/FilePreview',
+  'page',
+  'compiled/react_files/modules/FocusStore'
+], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview, Page, FocusStore) {
 
   SearchResults.displayErrors =  function (errors) {
     var error_message= null
@@ -36,6 +38,11 @@ define([
     );
   }
 
+  SearchResults.closeFilePreview = function (url) {
+    page(url);
+    FocusStore.setFocusToItem();
+  }
+
   SearchResults.renderFilePreview = function () {
     if (this.props.query.preview != null && this.state.collection.length) {
       return (
@@ -50,6 +57,7 @@ define([
           collection={this.state.collection}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           splat={this.props.splat}
+          closePreview={this.closeFilePreview}
         />
       )
     }
@@ -70,6 +78,7 @@ define([
             to='search'
             query= {this.props.query}
             params={this.props.params}
+            pathname={this.props.pathname}
             toggleAllSelected={this.props.toggleAllSelected}
             areAllItemsSelected={this.props.areAllItemsSelected}
             usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}

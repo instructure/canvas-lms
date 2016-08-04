@@ -81,11 +81,6 @@ describe Collaboration do
       expect(ae['title']).to eql('Biology 100 Collaboration')
     end
 
-    it "should be able to get the title from the data" do
-      @collaboration.title = nil
-      expect(@collaboration.title).to eql('Biology 100 Collaboration')
-    end
-
     it "should have Google Docs as a default service name" do
       expect(@collaboration.service_name).to eql('Google Docs')
     end
@@ -116,6 +111,14 @@ describe Collaboration do
       expect(@collaboration.collaborators.map(&:user_id).uniq.count).to eq 3
       expect(@collaboration.collaborators.map(&:group_id).uniq.count).to eq 1
       expect(@collaboration.collaborators.reload.map(&:user_id)).not_to include @users.last.id
+    end
+
+    it "does not add a group multiple times" do
+      @collaboration.update_members([@users[0]], @groups)
+      @collaboration.update_members([@users[0]], @groups)
+      @collaboration.reload
+
+      expect(@collaboration.collaborators.map(&:group_id).compact).to eq @groups.map(&:id)
     end
   end
 

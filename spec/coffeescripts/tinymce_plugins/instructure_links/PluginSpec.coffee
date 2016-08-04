@@ -5,6 +5,7 @@ define [
 ], ($, EditorLinks, LinkableEditor)->
 
   selection = null
+  alt = 'preview alt text'
 
   module "InstructureLinks Tinymce Plugin",
     setup: ->
@@ -46,6 +47,9 @@ define [
           <form id='instructure_link_prompt_form'>
             <input class='prompt' value='promptValue'/>
           </form>
+          <div class='inst-link-preview-alt'>
+            <input value='#{alt}'/>
+          </div>
         </div>
       ")
       $("#fixtures").append(@box)
@@ -85,7 +89,7 @@ define [
 
   test "it inserts the link properly", ->
     @mock(@editor).expects("createLink").once().
-      withArgs('promptValue', "classes")
+      withArgs('promptValue', "classes", sinon.match({'preview-alt': alt}))
     called = false
     @box.on('submit', (()-> called = true))
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))

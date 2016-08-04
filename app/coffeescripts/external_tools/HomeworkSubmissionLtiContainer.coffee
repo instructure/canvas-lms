@@ -8,11 +8,16 @@ define [
   'compiled/external_tools/ExternalToolCollection'
   'compiled/views/assignments/ExternalContentFileSubmissionView'
   'compiled/views/assignments/ExternalContentUrlSubmissionView'
+  'compiled/views/assignments/ExternalContentLtiLinkSubmissionView'
   'jquery.disableWhileLoading'
 ], ( Backbone, I18n, $, _, homeworkSubmissionTool, ExternalContentReturnView,
-     ExternalToolCollection, ExternalContentFileSubmissionView,  ExternalContentUrlSubmissionView) ->
+     ExternalToolCollection, ExternalContentFileSubmissionView,
+     ExternalContentUrlSubmissionView, ExternalContentLtiLinkSubmissionView) ->
 
   class HomeworkSubmissionLtiContainer
+    @homeworkSubmissionViewMap:
+      FileItem: ExternalContentFileSubmissionView
+      LtiLinkItem: ExternalContentLtiLinkSubmissionView
 
     constructor: (toolsFormSelector) ->
       @renderedViews = {}
@@ -83,14 +88,11 @@ define [
 
     createHomeworkSubmissionView: (tool, data) ->
       item = data.contentItems[0]
-      if item['@type'] == 'FileItem'
-        homeworkSubmissionView = new ExternalContentFileSubmissionView
-          externalTool: tool
-          model: new Backbone.Model(item)
-      else
-        homeworkSubmissionView = new ExternalContentUrlSubmissionView
-          externalTool: tool
-          model: new Backbone.Model(item)
+      viewClass = HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap[item['@type']] || ExternalContentUrlSubmissionView
+
+      homeworkSubmissionView = new viewClass
+        externalTool: tool
+        model: new Backbone.Model(item)
 
       homeworkSubmissionView.on 'relaunchTool', (tool, model) ->
         @remove()

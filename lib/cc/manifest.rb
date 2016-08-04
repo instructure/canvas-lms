@@ -18,10 +18,10 @@
 module CC
   class Manifest
     include CCHelper
-    
+
     attr_accessor :exporter, :weblinks, :basic_ltis
     attr_reader :options
-    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :user, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :to => :exporter
 
     def initialize(exporter, opts = {})
       @exporter = exporter
@@ -31,15 +31,15 @@ module CC
       @weblinks = []
       @options = opts
     end
-    
+
     def course
       @exporter.course
     end
-    
+
     def export_dir
       @exporter.export_dir
     end
-    
+
     def zip_file
       @exporter.zip_file
     end
@@ -55,12 +55,12 @@ module CC
       @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
       @document.instruct!
       @document.manifest({"identifier" => create_key(course, "common_cartridge_")}.merge(namespace_hash)) do |manifest_node|
-        
+
         manifest_node.metadata do |md|
           create_metadata(md)
         end
         set_progress(5)
-        
+
         begin
           Organization.create_organizations(self, manifest_node)
         rescue
@@ -74,7 +74,7 @@ module CC
           add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
         end
       end #manifest
-      
+
       # write any errors to the manifest file
       if @exporter.errors.length > 0
         @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", :export_id => @exporter.export_id)

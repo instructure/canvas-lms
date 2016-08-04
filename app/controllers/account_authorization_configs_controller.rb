@@ -119,6 +119,9 @@
 #         "jit_provisioning": {
 #           "description": "Just In Time provisioning. Valid for all providers except Canvas (which has the similar in concept self_registration setting).",
 #           "type": "boolean"
+#         },
+#         "federated_attributes": {
+#           "type": "FederatedAttributesConfig"
 #         }
 #       }
 #     }
@@ -160,6 +163,61 @@
 #           "example": "https://example.com/register_for_canvas",
 #           "type": "string"
 #        }
+#       }
+#     }
+#
+# @model FederatedAttributesConfig
+#     {
+#       "description": "A mapping of Canvas attribute names to attribute names that a provider may send, in order to update the value of these attributes when a user logs in. The values can be a FederatedAttributeConfig, or a raw string corresponding to the \"attribute\" property of a FederatedAttributeConfig. In responses, full FederatedAttributeConfig objects are returned if JIT provisioning is enabled, otherwise just the attribute names are returned.",
+#       "properties": {
+#         "display_name": {
+#           "description": "The full display name of the user"
+#         },
+#         "email": {
+#           "description": "The user's e-mail address"
+#         },
+#         "given_name": {
+#           "description": "The first, or given, name of the user"
+#         },
+#         "integration_id": {
+#           "description": "The secondary unique identifier for SIS purposes"
+#         },
+#         "locale": {
+#           "description": "The user's prefererred locale/language"
+#         },
+#         "name": {
+#           "description": "The full name of the user"
+#         },
+#         "sis_user_id": {
+#           "description": "The unique SIS identifier"
+#         },
+#         "sortable_name": {
+#           "description": "The full name of the user for sorting purposes"
+#         },
+#         "surname": {
+#           "description": "The surname, or last name, of the user"
+#         },
+#         "timezone": {
+#           "description": "The user's preferred time zone"
+#         }
+#       }
+#     }
+#
+# @model FederatedAttributeConfig
+#     {
+#       "description": "A single attribute name to be federated when a user logs in",
+#       "properties": {
+#         "attribute": {
+#           "description": "The name of the attribute as it will be sent from the authentication provider",
+#           "type": "string",
+#           "example": "mail"
+#         },
+#         "provisioning_only": {
+#           "description": "If the attribute should be applied only when provisioning a new user, rather than all logins",
+#           "type": "boolean",
+#           "default": false,
+#           "example": false
+#         }
 #       }
 #     }
 #
@@ -493,6 +551,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - requested_authn_context [Optional]
   #
   #   The SAML AuthnContext
+  #
+  # - federated_attributes [Optional]
+  #
+  #   See FederatedAttributesConfig. Any value is allowed for the provider attribute names.
   #
   # For Twitter, the additional recognized parameters are:
   #
@@ -913,7 +975,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   protected
   def filter_data(data)
     auth_type = data.delete(:auth_type)
-    data = data.permit(*AccountAuthorizationConfig.find_sti_class(auth_type).recognized_params)
+    klass = AccountAuthorizationConfig.find_sti_class(auth_type)
+    federated_attributes = data[:federated_attributes]
+    data = data.permit(klass.recognized_params)
+    data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type
     if data[:auth_type] == 'ldap'
       data[:auth_over_tls] = 'start_tls' unless data.has_key?(:auth_over_tls)

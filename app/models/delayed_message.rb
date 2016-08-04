@@ -35,6 +35,7 @@ class DelayedMessage < ActiveRecord::Base
     :communication_channel_id, :context, :workflow_state, :root_account_id
 
   validates_length_of :summary, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :link, maximum: maximum_text_length, allow_nil: true, allow_blank: true
   validates_presence_of :communication_channel_id, :workflow_state
 
   before_save :set_send_at
@@ -69,21 +70,21 @@ class DelayedMessage < ActiveRecord::Base
       where(:context_id => context, :context_type => context.class.base_class.to_s)
     end
   }
-  
+
   scope :by, lambda { |field| order(field) }
-  
+
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
   scope :to_summarize, -> {
     where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
   }
-  
+
   scope :next_to_summarize, -> {
     where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
-  
+
   include Workflow
-  
+
   workflow do
     state :pending do
       event :begin_send, :transitions_to => :sent do
@@ -91,19 +92,19 @@ class DelayedMessage < ActiveRecord::Base
       end
       event :cancel, :transitions_to => :cancelled
     end
-    
+
     state :cancelled
     state :sent
   end
-  
+
   def linked_name=(name)
   end
-  
+
   # This sets up a message and parses it internally.  Any template can
   # have these variables to build a message.  The most important one will
   # probably be delayed_messages, from which the right links and summaries
   # should be deliverable. After this is run on a list of delayed messages,
-  # the regular dispatch process will take place. 
+  # the regular dispatch process will take place.
   def self.summarize(delayed_message_ids)
     delayed_messages = DelayedMessage.where(id: delayed_message_ids.uniq)
     uniqs = {}

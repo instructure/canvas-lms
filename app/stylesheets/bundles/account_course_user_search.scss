@@ -8,14 +8,15 @@
 }
 
 .grid-row {
+  padding-right: 10px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+
   .icon-stats, .icon-message{
     margin-left: 10px;
     margin-right: 10px;
   }
-}
-
-.grid-row {
-  padding-right: 10px;
 }
 
 [role=columnheader] a{
@@ -36,14 +37,26 @@
   border-color: $ic-border-light;
 
   li[role=tab] {
-    padding: 10px 25px;
     font-size: 1.1em;
     color: $ic-link-color;
+    padding: 0;
+
+    a {
+        padding: 10px 25px;
+        display: block;
+        color: inherit;
+    }
 
     &[selected] {
       font-weight: bold;
-      color: $ic-color-dark;
       border-color: $ic-border-light;
+
+      a:link,
+      a:visited,
+      a:hover {
+        text-decoration: none;
+        color: $ic-color-dark;
+      }
     }
   }
 }
@@ -114,11 +127,6 @@
 
 .flex-grow-2 {
   flex-grow: 2;
-}
-
-.userUrl {
-  display: flex;
-  align-items: center;
 }
 
 .UserListRow__Avatar {

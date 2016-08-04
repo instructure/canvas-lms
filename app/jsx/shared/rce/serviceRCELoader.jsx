@@ -20,8 +20,7 @@ define([
 
     loadOnTarget(target, tinyMCEInitOptions, callback) {
       const textarea = this.getTargetTextarea(target)
-      const getTargetFn = tinyMCEInitOptions.getRenderingTarget || this.getRenderingTarget
-      const renderingTarget = getTargetFn(textarea)
+      const renderingTarget = this.getRenderingTarget(textarea, tinyMCEInitOptions.getRenderingTarget)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
       this.loadRCE(function(RCE) {
@@ -104,8 +103,17 @@ define([
     * @private
     * @return {Element} container element for rendering remote editor
     */
-    getRenderingTarget(textarea) {
-      return $(textarea).parent().get(0)
+    getRenderingTarget(textarea, getTargetFn = undefined) {
+      let renderingTarget
+
+      if (typeof getTargetFn === 'undefined') {
+        renderingTarget = $(textarea).parent().get(0)
+      } else {
+        renderingTarget = getTargetFn(textarea)
+      }
+      $(renderingTarget).addClass('ic-RichContentEditor')
+
+      return renderingTarget
     },
 
     /**
@@ -151,7 +159,8 @@ define([
         textareaId: textarea.id,
         textareaClassName: textarea.className,
         language: ENV.LOCALE,
-        mirroredAttrs: this._attrsToMirror(textarea)
+        mirroredAttrs: this._attrsToMirror(textarea),
+        onFocus: tinyMCEInitOptions.onFocus
       }
     },
 

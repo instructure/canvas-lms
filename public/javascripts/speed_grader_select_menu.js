@@ -101,6 +101,13 @@ define([
       });
       this.$el.change(onChange);
       this.accessibilityFixes(this.$el.parent());
+      this.replaceDropdownIcon(this.$el.parent());
+    };
+
+    this.replaceDropdownIcon = function(container){
+      var $span = $(container).find("span.ui-selectmenu-icon");
+      $span.removeClass("ui-icon");
+      $("<i class='icon-mini-arrow-down'></i>").appendTo($span);
     };
 
     this.jquerySelectMenu = function(){
@@ -135,8 +142,7 @@ define([
       return this.getIconHtml(htmlEscape(parts[2])) +
         '<span class="ui-selectmenu-item-header">' +
         htmlEscape(parts[0]) +
-        '</span><span class="ui-selectmenu-item-footer">' +
-        htmlEscape(parts[1]) + '</span>';
+        '</span>';
     };
   };
 

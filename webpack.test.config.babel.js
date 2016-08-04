@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 var webpack = require("webpack");
 var I18nPlugin = require("./frontend_build/i18nPlugin");
 var ClientAppsPlugin = require("./frontend_build/clientAppPlugin");
@@ -42,6 +43,14 @@ testWebpackConfig.module.loaders.push({
   loaders: ["qunitDependencyLoader"]
 });
 
+// Some plugins use a special spec_canvas path for their specs
+testWebpackConfig.module.loaders.push({
+  test: /\/spec_canvas\/coffeescripts\//,
+  loaders: [
+    'qunitDependencyLoader'
+  ]
+});
+
 testWebpackConfig.module.loaders.push({
   test: /\/spec\/javascripts\/jsx\//,
   loaders: ["qunitJsxDependencyLoader"]
@@ -51,6 +60,12 @@ testWebpackConfig.module.loaders.push({
   test: /\/ember\/.*\/tests\//,
   loaders: ["qunitDependencyLoader"]
 });
+
+testWebpackConfig.module.postLoaders = [{
+  test: /(jsx.*(\.js$|\.jsx$)|\.coffee$|public\/javascripts\/.*\.js$)/,
+  exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|compiled|jst|jsx|translations|vendor))/,
+  loader: 'istanbul-instrumenter'
+}]
 
 
 testWebpackConfig.module.noParse = [
