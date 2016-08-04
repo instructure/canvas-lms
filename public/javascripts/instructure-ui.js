@@ -1,3 +1,3 @@
-define(['vendor/instructure-ui'], function(InstUI) {
+define(['InstUI'], function(InstUI) {
   return InstUI;
 });
