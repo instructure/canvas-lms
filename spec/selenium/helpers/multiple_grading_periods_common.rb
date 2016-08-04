@@ -22,7 +22,7 @@ module MultipleGradingPeriods
       let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
       let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
-      let(:all_collapsed_set_titles_css) { '.GradingPeriodSet__title' }
+      let(:all_sets_css) { '.GradingPeriodSet__title'}
 
 
       # Period components
@@ -97,8 +97,12 @@ module MultipleGradingPeriods
       ff(all_collapsed_set_titles_css)
     end
 
+    def all_sets
+      ff(all_sets_css)
+    end
+
     def find_set(set_name)
-      all_collapsed_set_titles.each do |title|
+      all_sets.each do |title|
         if title.text == set_name then return title end
       end
       return nil
@@ -124,6 +128,11 @@ module MultipleGradingPeriods
       else
         alert.dismiss
       end
+    end
+
+    def search_grading_periods(search_term)
+      replace_content(search_box, search_term)
+      sleep 1 # InputFilter has a delay
     end
   end
 end

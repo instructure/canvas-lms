@@ -89,6 +89,13 @@ describe "multiple grading periods account page" do
         expect(find_set(group_name_1)).to be_displayed
         expect(find_set(group_name_2)).to be_displayed
       end
+
+      it "search grading periods", test_id: 2528642, priority: "1" do
+        visit_account_grading_standards(Account.default.id)
+        search_grading_periods("another")
+        expect(find_set(group_name_1)).to be nil
+        expect(find_set(group_name_2)).to be_displayed
+      end
     end
   end
 end
