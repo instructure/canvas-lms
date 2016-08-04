@@ -42,7 +42,7 @@ class GradebookExporter
 
     # grading_period_id == 0 means no grading period selected
     unless @options[:grading_period_id].try(:to_i) == 0
-      grading_period = GradingPeriod.context_find @course, @options[:grading_period_id]
+      grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
 
     calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,
