@@ -11,7 +11,7 @@
     "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
     "request": "2.73.0",
     "tough-cookie": "2.2.2",
-    "instructure-ui": "0.13.0"
+    "instructure-ui": "0.13.3"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
