@@ -139,38 +139,35 @@ describe WebConference do
       expect(conference.ended_at).to be < Time.zone.now
     end
 
-    it "should be restartable if end_at has not passed" do
-      conference.add_attendee(@user)
-      conference.stubs(:conference_status).returns(:active)
-      expect(conference).not_to be_finished
-      expect(conference).to be_restartable
-    end
-
-    it "should not be restartable if end_at has passed" do
-      conference.add_attendee(@user)
-      conference.start_at = 30.minutes.ago
-      conference.end_at = 20.minutes.ago
-      conference.save!
-      conference.stubs(:conference_status).returns(:active)
-      expect(conference).to be_finished
-      expect(conference).not_to be_restartable
-    end
-
-    it "should not be restartable if it's long running" do
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course)
-      conference.add_attendee(@user)
-      conference.start_at = 30.minutes.ago
-      conference.close
-      conference.stubs(:conference_status).returns(:active)
-      expect(conference).to be_finished
-      expect(conference).not_to be_restartable
-    end
-
     it "should not be active if it was manually ended" do
       conference.start_at = 1.hour.ago
       conference.end_at = nil
       conference.ended_at = 1.minute.ago
       expect(conference).not_to be_active
+    end
+
+    it "rejects ridiculously long conferences" do
+      conference.duration = 100000000000000
+      expect(conference).not_to be_valid
+    end
+
+    describe "restart" do
+      it "sets end_at to the new end date if a duration is known" do
+        conference.close
+        teh_future = 100.seconds.from_now
+        Timecop.freeze(teh_future) do
+          conference.restart
+          expect(conference.end_at).to eq teh_future + conference.duration.minutes
+        end
+      end
+
+      it "sets end_at to nil for a long-running manually-restarted conference" do
+        conference.duration = nil
+        conference.close
+        expect(conference.end_at).not_to be_nil
+        conference.restart
+        expect(conference.end_at).to be_nil
+      end
     end
   end
 
