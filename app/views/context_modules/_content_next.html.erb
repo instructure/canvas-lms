@@ -63,7 +63,7 @@ TEXT
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
     <% visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context) %>
-    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_8', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)] %>
+    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_9', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)] %>
     <% cache_key = cache_key_items.join('/') %>
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
     <% cache(cache_key) do %>
