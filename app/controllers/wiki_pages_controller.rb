@@ -101,7 +101,6 @@ class WikiPagesController < ApplicationController
       log_asset_access(@page, 'wiki', @wiki)
 
       js_data = {}
-      js_data[:wiki_page_menu_tools] = external_tools_display_hashes(:wiki_page_menu)
       if params[:module_item_id]
         js_data[:ModuleSequenceFooter_data] = item_sequence_base(Api.api_type_to_canvas_name('ModuleItem'), params[:module_item_id])
       end
@@ -150,13 +149,11 @@ class WikiPagesController < ApplicationController
       js_env js_data
 
       wiki_page_jsenv(@context)
-      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
       @padless = true
       if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
         add_crumb(@page.title)
         log_asset_access(@page, 'wiki', @wiki)
-        wiki_page_jsenv(@context)
-        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
       end
     end
