@@ -1298,6 +1298,7 @@ CanvasRails::Application.routes.draw do
       get 'conversations', action: :index, as: 'conversations'
       post 'conversations', action: :create
       get 'conversations/deleted', action: :deleted_index, as: 'deleted_conversations'
+      put 'conversations/restore', action: :restore_message
       post 'conversations/mark_all_as_read', action: :mark_all_as_read
       get 'conversations/batches', action: :batches, as: 'conversations_batches'
       get 'conversations/unread_count', action: :unread_count
