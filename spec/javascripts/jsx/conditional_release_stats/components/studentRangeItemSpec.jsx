@@ -10,9 +10,9 @@ define([
     studentIndex: 0,
     student: {
       user: { name: 'Foo Bar' },
-      progress: 0,
+      trend: 0,
     },
-    onSelect: () => {},
+    selectStudent: () => {},
   })
 
   const renderComponent = (props) => {
@@ -28,30 +28,39 @@ define([
     equal(renderedList.textContent, 'Foo Bar', 'renders student name')
   })
 
-  test('renders positive progress correctly', () => {
+  test('renders no trend correctly', () => {
     const props = defaultProps()
-    props.student.progress = 1
+    props.student.trend = null
     const component = renderComponent(props)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__progress-icon__positive')
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon')
+    equal(renderedList.length, 0, 'renders component')
+  })
+
+  test('renders positive trend correctly', () => {
+    const props = defaultProps()
+    props.student.trend = 1
+    const component = renderComponent(props)
+
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__positive')
     equal(renderedList.length, 1, 'renders component')
   })
 
-  test('renders neutral progress correctly', () => {
+  test('renders neutral trend correctly', () => {
     const props = defaultProps()
-    props.student.progress = 0
+    props.student.trend = 0
     const component = renderComponent(props)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__progress-icon__neutral')
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__neutral')
     equal(renderedList.length, 1, 'renders component')
   })
 
-  test('renders negative progress correctly', () => {
+  test('renders negative trend correctly', () => {
     const props = defaultProps()
-    props.student.progress = -1
+    props.student.trend = -1
     const component = renderComponent(props)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__progress-icon__negative')
+    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__negative')
     equal(renderedList.length, 1, 'renders component')
   })
 })

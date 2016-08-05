@@ -61,17 +61,44 @@ define([
   })
 
   test('selects student', () => {
-    const newState = reduce(actions.selectStudent(1))
-    equal(newState.selectedPath.student, 1, 'selects student')
+    const newState = reduce({ type: 'SELECT_STUDENT', payload: 1 })
+    equal(newState.selectedPath.student, 1, 'selects student index')
+  })
+
+  test('tests cache student', () => {
+    const newState = reduce(actions.addStudentToCache({ studentId: '1', data: {
+      trigger_assignment: {
+        assignment: { id: '1' },
+        submission: { grade: '100' },
+      },
+      follow_on_assignments: [
+        {
+          score: 100,
+          assignment: { id: '2' },
+        },
+      ],
+    }}))
+    deepEqual(newState.studentCache, { '1': {
+      triggerAssignment: {
+        assignment: { id: '1' },
+        submission: { grade: '100' },
+      },
+      followOnAssignments: [
+        {
+          score: 100,
+          assignment: { id: '2' },
+        },
+      ],
+    }}, 'caches correct student')
   })
 
   test('load start', () => {
-    const newState = reduce(actions.loadStart())
-    equal(newState.isLoading, true, 'starts load')
+    const newState = reduce(actions.loadInitialDataStart())
+    equal(newState.isInitialDataLoading, true, 'starts load')
   })
 
   test('load end', () => {
-    const newState = reduce(actions.loadEnd())
-    equal(newState.isLoading, false, 'ends load')
+    const newState = reduce(actions.loadInitialDataEnd())
+    equal(newState.isInitialDataLoading, false, 'ends load')
   })
 })

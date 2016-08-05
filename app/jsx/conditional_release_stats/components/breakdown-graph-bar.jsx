@@ -5,15 +5,13 @@ define([
   const { string, number, func } = React.PropTypes
 
   class BreakdownGraph extends React.Component {
-    static get propTypes () {
-      return {
-        rangeStudents: number.isRequired,
-        totalStudents: number.isRequired,
-        lowerBound: string.isRequired,
-        upperBound: string.isRequired,
-        rangeIndex: number.isRequired,
-        selectRange: func.isRequired,
-      }
+    static propTypes = {
+      rangeStudents: number.isRequired,
+      totalStudents: number.isRequired,
+      lowerBound: string.isRequired,
+      upperBound: string.isRequired,
+      rangeIndex: number.isRequired,
+      selectRange: func.isRequired,
     }
 
     constructor () {

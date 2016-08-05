@@ -60,6 +60,7 @@ define([
       range: 0,
       student: null,
     },
+    loadStudent: () => {},
     selectRange: () => {},
     selectStudent: () => {},
   })

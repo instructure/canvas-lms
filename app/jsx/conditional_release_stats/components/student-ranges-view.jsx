@@ -25,16 +25,14 @@ define([
   }
 
   return class StudentRangesView extends React.Component {
-    static get propTypes () {
-      return {
-        assignment: object.isRequired,
-        ranges: array.isRequired,
-        selectedPath: object.isRequired,
+    static propTypes = {
+      assignment: object.isRequired,
+      ranges: array.isRequired,
+      selectedPath: object.isRequired,
 
-        // actions
-        selectStudent: func.isRequired,
-        selectRange: func.isRequired,
-      }
+      // actions
+      selectStudent: func.isRequired,
+      selectRange: func.isRequired,
     }
 
     renderTabs () {

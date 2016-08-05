@@ -6,9 +6,25 @@ define([
 ], (_, { combineReducers }, helper, { actionTypes }) => {
   const { handleActions, identity, getPayload } = helper
 
-  const isLoading = handleActions({
-    [actionTypes.LOAD_START]: (state, action) => true,
-    [actionTypes.LOAD_END]: (state, action) => false,
+  const studentCache = handleActions({
+    [actionTypes.ADD_STUDENT_TO_CACHE]: (state, action) => {
+      const { studentId, data } = action.payload
+      state[studentId] = {
+        followOnAssignments: data.follow_on_assignments,
+        triggerAssignment: data.trigger_assignment,
+      }
+      return state
+    },
+  }, {})
+
+  const isInitialDataLoading = handleActions({
+    [actionTypes.LOAD_INITIAL_DATA_START]: (state, action) => true,
+    [actionTypes.LOAD_INITIAL_DATA_END]: (state, action) => false,
+  }, false)
+
+  const isStudentDetailsLoading = handleActions({
+    [actionTypes.LOAD_STUDENT_DETAILS_START]: (state, action) => true,
+    [actionTypes.LOAD_STUDENT_DETAILS_END]: (state, action) => false,
   }, false)
 
   const errors = handleActions({
@@ -18,6 +34,7 @@ define([
   }, [])
 
   const ranges = handleActions({
+    [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.ranges,
     [actionTypes.SET_SCORING_RANGES]: getPayload,
   }, [])
 
@@ -26,10 +43,12 @@ define([
   }, {})
 
   const rule = handleActions({
+    [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.rule,
     [actionTypes.SET_RULE]: getPayload,
-  }, {})
+  }, { course_id: '', trigger_assignment: '' })
 
   const enrolled = handleActions({
+    [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.enrolled,
     [actionTypes.SET_ENROLLED]: getPayload,
   }, 0)
 
@@ -52,12 +71,14 @@ define([
       state.student = null
       return state
     },
-  }, { range: 0 })
+  }, { range: 0, student: null })
 
   return combineReducers({
     apiUrl: identity(),
     jwt: identity(),
-    isLoading,
+    studentCache,
+    isInitialDataLoading,
+    isStudentDetailsLoading,
     errors,
     ranges,
     assignment,
