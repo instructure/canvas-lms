@@ -10,7 +10,8 @@
 
     "request": "these are to get things to install on node 0.12. remove them when we upgrade node. they are actually not direct-dependencies of our app",
     "request": "2.73.0",
-    "tough-cookie": "2.2.2"
+    "tough-cookie": "2.2.2",
+    "instructure-ui": "0.13.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -40,7 +41,6 @@
     "i18nliner-handlebars": "^0.1.1",
     "ieee754": "^1.1.6",
     "imports-loader": "^0.6.4",
-    "instructure-ui": "0.13.0",
     "is-array": "^1.0.1",
     "istanbul-instrumenter-loader": "0.2.0",
     "js-yaml": "^3.4.3",
