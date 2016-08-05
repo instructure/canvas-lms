@@ -143,7 +143,7 @@ module Lti
     end
 
     def enrollment_state
-      enrollments = @user ? @context.enrollments.where(user_id: @user.id) : []
+      enrollments = @user ? @context.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
       return '' if enrollments.size == 0
       enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end
