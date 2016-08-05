@@ -8,6 +8,7 @@ module MultipleGradingPeriods
       # Main page components
       let(:grading_periods_tab) { f("#grading-periods-tab") }
       let(:add_set_of_grading_periods_button) { f('button[aria-label="Add Set of Grading Periods"]') }
+      let(:term_dropdown) { f('select[aria-label="Enrollment Term"]')}
 
       # Set components
       let(:set_name_input) { f('#set-name')}
@@ -20,6 +21,8 @@ module MultipleGradingPeriods
       let(:edit_grading_period_set_button) { f('.edit_grading_period_set_button')}
       let(:edit_set_save_button) { f('button[aria-label="Save Grading Period Set"]') }
       let(:first_collapsed_set) { f('.GradingPeriodSet--collapsed') }
+      let(:all_collapsed_set_titles_css) { '.GradingPeriodSet--collapsed .GradingPeriodSet__title' }
+
 
       # Period components
       let(:period_title_input) { f('#title') }
@@ -90,6 +93,24 @@ module MultipleGradingPeriods
       period_edit_button.click
       replace_content(period_title_input, title)
       save_period_button.click
+    end
+
+    def select_term_filter(term)
+      term_dropdown.click
+      options = ff('select[aria-label="Enrollment Term"] option')
+      options.each do |option|
+        if option.text == term then option.click end
+      end
+    end
+
+    def all_collapsed_set_titles
+      ff(all_collapsed_set_titles_css)
+    end
+
+    def find_set(set_name)
+      all_collapsed_set_titles.each do |title|
+        if title.text == set_name then return title end
+      end
     end
   end
 end

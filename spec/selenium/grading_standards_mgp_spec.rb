@@ -48,6 +48,38 @@ describe "multiple grading periods account page" do
       edit_first_grading_period("Edited Title")
       expect(period_present?("Edited Title")).to be true
     end
+
+    context "page functionality" do
+      group_name_1 = "Group 1"
+      group_name_2 = "Group 2"
+      term_name_1 = "First Term"
+      term_name_2 = "Second Term"
+      period_name_1 = "A Grading Period"
+      period_name_2 = "Another Grading Period"
+
+      before(:each) do
+        group1 = group_helper.create_for_account_with_term(Account.default, term_name_1, group_name_1)
+        group2 = group_helper.create_for_account_with_term(Account.default, term_name_2, group_name_2)
+        period_helper.create_for_group(group1, title: period_name_1)
+        period_helper.create_for_group(group2, title: period_name_2)
+
+        visit_account_grading_standards(Account.default.id)
+      end
+
+      it "term dropdown filters grading period sets", test_id: 2528643, priority: "1" do
+        select_term_filter(term_name_1)
+        expect(find_set(group_name_1)).to be_displayed
+        expect(set_present?(group_name_2)).to be false
+
+        select_term_filter(term_name_2)
+        expect(find_set(group_name_2)).to be_displayed
+        expect(set_present?(group_name_1)).to be false
+
+        select_term_filter("All Terms")
+        expect(find_set(group_name_1)).to be_displayed
+        expect(find_set(group_name_2)).to be_displayed
+      end
+    end
   end
 end
 
