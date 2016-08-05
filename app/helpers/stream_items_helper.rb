@@ -28,10 +28,15 @@ module StreamItemsHelper
   end
 
   def categorize_stream_items(stream_items, user = @current_user)
-    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest)
     categorized_items = {}
     return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
+
+    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest)
     supported_categories.each { |category| categorized_items[category] = [] }
+
+    topic_types = %w{DiscussionTopic Announcement}
+    ActiveRecord::Associations::Preloader.new.preload(
+      stream_items.select{|i| topic_types.include?(i.asset_type)}.map{|item| item.data }, :context)
 
     stream_items.each do |item|
       category = item.data.class.name
@@ -60,7 +65,7 @@ module StreamItemsHelper
         next unless item.data.asset.assignment.published?
       end
 
-      if ["DiscussionTopic","Announcement"].include? category
+      if topic_types.include? category
         next if item.data.try(:visible_for?, user) == false
       end
 

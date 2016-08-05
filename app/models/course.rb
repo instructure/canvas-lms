@@ -83,7 +83,9 @@ class Course < ActiveRecord::Base
     if read_attribute(:time_zone)
       super
     else
-      root_account.default_time_zone
+      RequestCache.cache("account_time_zone", self.root_account_id) do
+        root_account.default_time_zone
+      end
     end
   end
 
