@@ -4174,7 +4174,8 @@ en-GB:
     other: "%{count} assignments with errors"
     zero: "No assignments with errors, click Continue"
   count_comments_cb137ab8: 
-    one: ""
+    one: "1 comment"
+    other: "%{count} comments"
   count_files_updated_4570a8a: 
     one: "1 file updated"
     other: "%{count} files updated"
