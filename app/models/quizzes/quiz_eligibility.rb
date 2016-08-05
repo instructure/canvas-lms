@@ -163,7 +163,7 @@ class Quizzes::QuizEligibility
   end
 
   def inactive_enrollment?
-    course.enrollments.where(user_id: user.id).all?(&:inactive?)
+    course.enrollments.where(user_id: user.id).preload(:enrollment_state).all?(&:inactive?)
   end
 
   def inactive_student_with_private_course?

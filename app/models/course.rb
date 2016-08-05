@@ -1196,7 +1196,7 @@ class Course < ActiveRecord::Base
     # Prior users
     given do |user|
       (available? || completed?) && user &&
-        prior_enrollments.for_user(user).any?{|e| !e.inactive?}
+        prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive?}
     end
     can :read, :read_outcomes
 
@@ -1217,7 +1217,7 @@ class Course < ActiveRecord::Base
 
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
+          (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| !e.inactive? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))} ||
             user.cached_not_ended_enrollments.any? do |e|
               e.course_id == self.id && e.completed? && e.has_permission_to?(permission) && (!applicable_roles || applicable_roles.include?(e.type))
             end
@@ -1240,7 +1240,7 @@ class Course < ActiveRecord::Base
     # Student of a concluded course
     given do |user|
       (self.available? || self.completed?) && user &&
-        (prior_enrollments.for_user(user).any?{|e| !e.inactive? && (e.student? || e.assigned_observer?) } ||
+        (prior_enrollments.for_user(user).preload(:enrollment_state).any?{|e| (e.student? || e.assigned_observer?) && !e.inactive?} ||
          user.cached_not_ended_enrollments.any? do |e|
           e.course_id == self.id && (e.student? || e.assigned_observer?) && e.state_based_on_date == :completed
          end
@@ -1287,7 +1287,8 @@ class Course < ActiveRecord::Base
     is_unpublished = self.created? || self.claimed?
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      self.enrollments.active_or_pending.for_user(user).reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
+      self.enrollments.active_or_pending.for_user(user).preload(:enrollment_state).
+        reject { |e| (is_unpublished && !(e.admin? || e.fake_student?)) || [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }

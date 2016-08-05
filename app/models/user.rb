@@ -613,7 +613,7 @@ class User < ActiveRecord::Base
   # Returns an array of groups which are currently visible for the user.
   def visible_groups
     @visible_groups ||= begin
-      enrollments = self.cached_current_enrollments(preload_courses: true)
+      enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
       visible_groups = self.current_groups.select do |group|
         group.context_type != 'Course' || enrollments.any? do |en|
           en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
@@ -1760,7 +1760,8 @@ class User < ActiveRecord::Base
 
       if opts[:preload_dates]
         Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
-      elsif opts[:preload_courses]
+      end
+      if opts[:preload_courses]
         ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
       end
       enrollments
@@ -1770,9 +1771,11 @@ class User < ActiveRecord::Base
   def cached_not_ended_enrollments
     RequestCache.cache("not_ended_enrollments", self) do
       self.shard.activate do
-        Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
+        enrollments = Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
           self.not_ended_enrollments.to_a
         end
+        Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
+        enrollments
       end
     end
   end
